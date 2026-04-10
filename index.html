@@ -3,1509 +3,492 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>N5 文法筆記 — 出口日語</title>
+<title>N5・N4 文法筆記 — 出口日語</title>
 <style>
-:root {
-  --bg: #faf8f5;
-  --bg-card: #ffffff;
-  --bg-sidebar: #1a1a2e;
-  --bg-sidebar-hover: #16213e;
-  --bg-sidebar-active: #0f3460;
-  --text: #2d2d2d;
-  --text-light: #666;
-  --text-sidebar: #c8c8d0;
-  --text-sidebar-active: #ffffff;
-  --accent: #e94560;
-  --accent2: #0f3460;
-  --border: #e8e4df;
-  --jp: #1a1a2e;
-  --zh: #555;
-  --tag-bg: #f0ebe5;
-  --tag-text: #8b7355;
-  --shadow: 0 1px 3px rgba(0,0,0,.06);
-  --shadow-hover: 0 4px 12px rgba(0,0,0,.1);
-  --radius: 10px;
-  --sidebar-w: 280px;
-  --header-h: 64px;
-}
-* { margin:0; padding:0; box-sizing:border-box; }
-html { scroll-behavior: smooth; scroll-padding-top: calc(var(--header-h) + 24px); }
-body {
-  font-family: "Hiragino Kaku Gothic ProN","Noto Sans TC","Noto Sans JP","PingFang TC",
-    -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  line-height: 1.7;
-  font-size: 15px;
-}
-
-/* Header */
-.header {
-  position: fixed; top:0; left:0; right:0; height: var(--header-h);
-  background: var(--bg-sidebar);
-  display: flex; align-items: center; padding: 0 24px;
-  z-index: 100; gap: 16px;
-}
-.header h1 {
-  color: #fff; font-size: 18px; font-weight: 600;
-  white-space: nowrap;
-}
-.header h1 span { color: var(--accent); }
-.header .search-box {
-  flex:1; max-width: 420px; position: relative;
-}
-.header .search-box input {
-  width:100%; padding: 8px 16px 8px 38px;
-  border: none; border-radius: 8px;
-  background: rgba(255,255,255,.1);
-  color: #fff; font-size: 14px;
-  outline: none; transition: background .2s;
-}
-.header .search-box input::placeholder { color: rgba(255,255,255,.4); }
-.header .search-box input:focus { background: rgba(255,255,255,.18); }
-.header .search-box svg {
-  position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
-  width:16px; height:16px; stroke: rgba(255,255,255,.4);
-}
-.header .stats {
-  color: rgba(255,255,255,.5); font-size: 13px;
-  margin-left: auto; white-space: nowrap;
-}
-.menu-btn {
-  display: none; background:none; border:none;
-  color:#fff; cursor:pointer; padding:4px;
-}
-.menu-btn svg { width:24px; height:24px; }
-
-/* Sidebar */
-.sidebar {
-  position: fixed; top: var(--header-h); left:0;
-  width: var(--sidebar-w); height: calc(100vh - var(--header-h));
-  background: var(--bg-sidebar);
-  overflow-y: auto; padding: 12px 0;
-  z-index: 90;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(255,255,255,.1) transparent;
-}
-.sidebar::-webkit-scrollbar { width:4px; }
-.sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,.1); border-radius:2px; }
-.sidebar .cat-title {
-  padding: 10px 20px 6px; font-size: 11px; text-transform: uppercase;
-  letter-spacing: 1.5px; color: var(--accent);
-  font-weight: 700; cursor: pointer;
-  display: flex; align-items: center; justify-content: space-between;
-  user-select: none;
-}
-.sidebar .cat-title::after {
-  content:''; display:inline-block; width:6px; height:6px;
-  border-right: 1.5px solid var(--accent); border-bottom: 1.5px solid var(--accent);
-  transform: rotate(45deg); transition: transform .2s;
-}
-.sidebar .cat-title.collapsed::after { transform: rotate(-45deg); }
-.sidebar .cat-items { overflow: hidden; transition: max-height .3s ease; }
-.sidebar .cat-items.collapsed { max-height: 0 !important; }
-.sidebar a {
-  display: block; padding: 6px 20px 6px 28px;
-  color: var(--text-sidebar); text-decoration: none;
-  font-size: 13px; transition: all .15s;
-  border-left: 3px solid transparent;
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-}
-.sidebar a:hover {
-  background: var(--bg-sidebar-hover);
-  color: #fff;
-}
-.sidebar a.active {
-  background: var(--bg-sidebar-active);
-  color: var(--text-sidebar-active);
-  border-left-color: var(--accent);
-}
-
-/* Main */
-.main {
-  margin-left: var(--sidebar-w);
-  padding: calc(var(--header-h) + 32px) 40px 80px;
-  max-width: 900px;
-}
-
-/* Intro */
-.intro {
-  background: linear-gradient(135deg, #0f3460 0%, #1a1a2e 100%);
-  color: #fff; border-radius: var(--radius); padding: 32px;
-  margin-bottom: 40px;
-}
-.intro h2 { font-size: 24px; margin-bottom: 8px; }
-.intro p { color: rgba(255,255,255,.7); font-size: 14px; line-height: 1.8; }
-.intro .tag-row { display:flex; gap:8px; margin-top:16px; flex-wrap:wrap; }
-.intro .tag {
-  background: rgba(255,255,255,.12); color: rgba(255,255,255,.8);
-  padding: 4px 12px; border-radius: 20px; font-size: 12px;
-}
-
-/* Category Section */
-.cat-section { margin-bottom: 48px; }
-.cat-section > h2 {
-  font-size: 20px; font-weight: 700; margin-bottom: 20px;
-  padding-bottom: 10px; border-bottom: 2px solid var(--accent);
-  display: flex; align-items: center; gap: 10px;
-}
-.cat-section > h2 .cat-icon {
-  width:28px; height:28px; border-radius:6px;
-  display:flex; align-items:center; justify-content:center;
-  font-size:14px; flex-shrink:0;
-  background: var(--accent); color:#fff;
-}
-
-/* Grammar Card */
-.grammar-card {
-  background: var(--bg-card);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  margin-bottom: 16px;
-  overflow: hidden;
-  transition: box-shadow .2s;
-  border: 1px solid var(--border);
-}
-.grammar-card:hover { box-shadow: var(--shadow-hover); }
-.grammar-card .card-header {
-  padding: 16px 20px;
-  cursor: pointer;
-  display: flex; align-items: center; gap: 12px;
-  user-select: none;
-}
-.grammar-card .card-header:hover { background: #faf8f5; }
-.grammar-card .card-num {
-  background: var(--accent2); color:#fff;
-  width:28px; height:28px; border-radius:50%;
-  display:flex; align-items:center; justify-content:center;
-  font-size:11px; font-weight:700; flex-shrink:0;
-}
-.grammar-card .card-title {
-  font-size: 16px; font-weight: 600; color: var(--jp);
-  flex:1;
-}
-.grammar-card .card-toggle {
-  width:20px; height:20px; transition: transform .2s;
-  stroke: #aaa; flex-shrink:0;
-}
-.grammar-card.open .card-toggle { transform: rotate(180deg); }
-.grammar-card .card-body {
-  max-height:0; overflow:hidden;
-  transition: max-height .35s ease;
-}
-.grammar-card.open .card-body { max-height: 2000px; }
-.grammar-card .card-content {
-  padding: 0 20px 20px;
-  border-top: 1px solid var(--border);
-}
-.grammar-card .explain {
-  margin: 16px 0;
-  color: var(--text);
-  font-size: 14px;
-  line-height: 1.9;
-}
-.grammar-card .pattern-box {
-  background: #f7f5f2; border-radius: 8px;
-  padding: 12px 16px; margin: 12px 0;
-  font-size: 15px; font-weight: 600;
-  color: var(--accent2);
-  border-left: 3px solid var(--accent);
-}
-.grammar-card .examples { margin-top: 16px; }
-.grammar-card .example {
-  padding: 10px 0;
-  border-bottom: 1px dashed var(--border);
-}
-.grammar-card .example:last-child { border-bottom:none; }
-.grammar-card .example .jp {
-  font-size: 15px; color: var(--jp); font-weight: 500;
-  line-height: 1.8;
-}
-.grammar-card .example .jp em {
-  font-style: normal; color: var(--accent);
-  font-weight: 700; text-decoration: underline;
-  text-decoration-color: rgba(233,69,96,.3);
-  text-underline-offset: 3px;
-}
-.grammar-card .example .zh {
-  font-size: 13px; color: var(--zh); margin-top: 2px;
-}
-.grammar-card .note {
-  margin-top: 14px; padding: 10px 14px;
-  background: #fff8e1; border-radius: 6px;
-  font-size: 13px; color: #8b6914;
-  border-left: 3px solid #f5c842;
-}
-.grammar-card .note::before { content:"💡 "; }
-
-/* Back to top */
-.back-top {
-  position: fixed; bottom:24px; right:24px;
-  width:44px; height:44px; border-radius:50%;
-  background: var(--accent2); color:#fff;
-  border:none; cursor:pointer; font-size:18px;
-  box-shadow: 0 2px 10px rgba(0,0,0,.2);
-  opacity:0; transition: opacity .3s;
-  z-index:80;
-  display:flex; align-items:center; justify-content:center;
-}
-.back-top.show { opacity:1; }
-
-/* No results */
-.no-results {
-  text-align:center; padding:60px 20px;
-  color: var(--text-light);
-}
-.no-results svg { width:64px; height:64px; stroke:#ccc; margin-bottom:16px; }
-
-/* Footer */
-.footer {
-  margin-left: var(--sidebar-w);
-  padding: 24px 40px;
-  text-align: center;
-  color: var(--text-light);
-  font-size: 12px;
-  border-top: 1px solid var(--border);
-}
-.footer a { color: var(--accent2); text-decoration:none; }
-
-/* Responsive */
-@media(max-width:860px) {
-  .sidebar { transform: translateX(-100%); transition: transform .3s; width:260px; }
-  .sidebar.open { transform: translateX(0); }
-  .main { margin-left:0; padding: calc(var(--header-h)+20px) 16px 60px; }
-  .footer { margin-left:0; padding:24px 16px; }
-  .menu-btn { display:block; }
-  .overlay {
-    display:none; position:fixed; inset:0;
-    background:rgba(0,0,0,.4); z-index:85;
-  }
-  .overlay.show { display:block; }
+:root{--bg:#faf8f5;--bg2:#fff;--sidebar:#1a1a2e;--sidebar-h:#16213e;--sidebar-a:#0f3460;--tx:#2d2d2d;--tx2:#666;--tx-s:#c8c8d0;--ac:#e94560;--ac2:#0f3460;--bd:#e8e4df;--sh:0 1px 3px rgba(0,0,0,.06);--sh2:0 4px 12px rgba(0,0,0,.1);--r:10px;--sw:270px;--hh:56px}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:calc(var(--hh)+24px)}
+body{font-family:"Hiragino Kaku Gothic ProN","Noto Sans TC","Noto Sans JP","PingFang TC",-apple-system,sans-serif;background:var(--bg);color:var(--tx);line-height:1.7;font-size:15px}
+.hd{position:fixed;top:0;left:0;right:0;height:var(--hh);background:var(--sidebar);display:flex;align-items:center;padding:0 16px;z-index:100;gap:10px}
+.hd h1{color:#fff;font-size:16px;font-weight:600;white-space:nowrap}
+.hd h1 span{color:var(--ac)}
+.tabs{display:flex;gap:4px;background:rgba(255,255,255,.08);border-radius:6px;padding:3px}
+.tabs button{background:none;border:none;color:rgba(255,255,255,.5);padding:4px 14px;border-radius:4px;cursor:pointer;font-size:13px;font-weight:600;transition:.2s}
+.tabs button.on{background:var(--ac);color:#fff}
+.tabs button:hover:not(.on){color:#fff}
+.fav-btn{background:none;border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.6);padding:4px 10px;border-radius:6px;cursor:pointer;font-size:12px;display:flex;align-items:center;gap:4px;transition:.2s;white-space:nowrap}
+.fav-btn:hover,.fav-btn.on{border-color:var(--ac);color:var(--ac)}
+.sb{position:relative;flex:1;max-width:340px}
+.sb input{width:100%;padding:7px 14px 7px 34px;border:none;border-radius:7px;background:rgba(255,255,255,.1);color:#fff;font-size:13px;outline:none;transition:.2s}
+.sb input::placeholder{color:rgba(255,255,255,.35)}
+.sb input:focus{background:rgba(255,255,255,.17)}
+.sb svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);width:14px;height:14px;stroke:rgba(255,255,255,.35)}
+.stats{color:rgba(255,255,255,.4);font-size:12px;white-space:nowrap}
+.auth-btn{background:none;border:1px solid rgba(255,255,255,.2);color:#fff;padding:5px 12px;border-radius:6px;cursor:pointer;font-size:12px;display:flex;align-items:center;gap:6px;transition:.2s;white-space:nowrap}
+.auth-btn:hover{border-color:var(--ac)}
+.auth-btn img{width:22px;height:22px;border-radius:50%}
+.menu-btn{display:none;background:none;border:none;color:#fff;cursor:pointer;padding:2px}
+.menu-btn svg{width:22px;height:22px}
+.sd{position:fixed;top:var(--hh);left:0;width:var(--sw);height:calc(100vh - var(--hh));background:var(--sidebar);overflow-y:auto;padding:10px 0;z-index:90;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.1) transparent}
+.sd::-webkit-scrollbar{width:3px}
+.sd::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:2px}
+.sd .ct{padding:9px 16px 5px;font-size:10px;letter-spacing:1.2px;color:var(--ac);font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:space-between;user-select:none;text-transform:uppercase}
+.sd .ct::after{content:'';display:inline-block;width:5px;height:5px;border-right:1.5px solid var(--ac);border-bottom:1.5px solid var(--ac);transform:rotate(45deg);transition:.2s}
+.sd .ct.c::after{transform:rotate(-45deg)}
+.sd .ci{overflow:hidden;transition:max-height .3s}
+.sd .ci.c{max-height:0!important}
+.sd a{display:block;padding:5px 16px 5px 24px;color:var(--tx-s);text-decoration:none;font-size:12px;transition:.15s;border-left:2px solid transparent;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sd a:hover{background:var(--sidebar-h);color:#fff}
+.sd a.on{background:var(--sidebar-a);color:#fff;border-left-color:var(--ac)}
+.mn{margin-left:var(--sw);padding:calc(var(--hh)+24px) 32px 60px;max-width:880px}
+.intro{background:linear-gradient(135deg,#0f3460,#1a1a2e);color:#fff;border-radius:var(--r);padding:28px;margin-bottom:32px}
+.intro h2{font-size:22px;margin-bottom:6px}
+.intro p{color:rgba(255,255,255,.65);font-size:13px;line-height:1.8}
+.intro .tg{display:flex;gap:6px;margin-top:12px;flex-wrap:wrap}
+.intro .tg span{background:rgba(255,255,255,.1);color:rgba(255,255,255,.75);padding:3px 10px;border-radius:16px;font-size:11px}
+.cs{margin-bottom:40px}
+.cs>h2{font-size:18px;font-weight:700;margin-bottom:16px;padding-bottom:8px;border-bottom:2px solid var(--ac);display:flex;align-items:center;gap:8px}
+.cs>h2 .ci2{width:26px;height:26px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;background:var(--ac);color:#fff}
+.gc{background:var(--bg2);border-radius:var(--r);box-shadow:var(--sh);margin-bottom:12px;overflow:hidden;transition:.2s;border:1px solid var(--bd)}
+.gc:hover{box-shadow:var(--sh2)}
+.gc .gh{padding:12px 16px;cursor:pointer;display:flex;align-items:center;gap:10px;user-select:none}
+.gc .gh:hover{background:#faf8f5}
+.gc .gn{background:var(--ac2);color:#fff;min-width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0}
+.gc .gt{font-size:15px;font-weight:600;color:var(--ac2);flex:1}
+.gc .star{width:20px;height:20px;cursor:pointer;fill:none;stroke:#ccc;stroke-width:2;transition:.2s;flex-shrink:0}
+.gc .star:hover{stroke:var(--ac)}
+.gc .star.on{fill:#ffd700;stroke:#ffc107}
+.gc .arr{width:18px;height:18px;transition:.2s;stroke:#aaa;flex-shrink:0}
+.gc.o .arr{transform:rotate(180deg)}
+.gc .gb{max-height:0;overflow:hidden;transition:max-height .35s}
+.gc.o .gb{max-height:3000px}
+.gc .gx{padding:0 16px 16px;border-top:1px solid var(--bd)}
+.gc .pt{background:#f7f5f2;border-radius:7px;padding:10px 14px;margin:12px 0;font-size:14px;font-weight:600;color:var(--ac2);border-left:3px solid var(--ac)}
+.gc .ep{margin:14px 0;color:var(--tx);font-size:13px;line-height:1.8}
+.gc .eg{margin-top:12px}
+.gc .ex{padding:8px 0;border-bottom:1px dashed var(--bd)}
+.gc .ex:last-child{border-bottom:none}
+.gc .ex .j{font-size:14px;color:var(--ac2);font-weight:500;line-height:1.7}
+.gc .ex .j em{font-style:normal;color:var(--ac);font-weight:700;text-decoration:underline;text-decoration-color:rgba(233,69,96,.3);text-underline-offset:2px}
+.gc .ex .z{font-size:12px;color:var(--tx2);margin-top:1px}
+.gc .nt{margin-top:12px;padding:8px 12px;background:#fff8e1;border-radius:5px;font-size:12px;color:#8b6914;border-left:3px solid #f5c842}
+.gc .nt::before{content:"💡 "}
+.bt{position:fixed;bottom:20px;right:20px;width:40px;height:40px;border-radius:50%;background:var(--ac2);color:#fff;border:none;cursor:pointer;font-size:16px;box-shadow:0 2px 8px rgba(0,0,0,.2);opacity:0;transition:.3s;z-index:80;display:flex;align-items:center;justify-content:center}
+.bt.s{opacity:1}
+.nr{text-align:center;padding:50px 20px;color:var(--tx2)}
+.ft{margin-left:var(--sw);padding:20px 32px;text-align:center;color:var(--tx2);font-size:11px;border-top:1px solid var(--bd)}
+.ft a{color:var(--ac2);text-decoration:none}
+/* Modal */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;align-items:center;justify-content:center}
+.modal-bg.show{display:flex}
+.modal{background:#fff;border-radius:12px;padding:28px;max-width:520px;width:90%;max-height:80vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.modal h3{font-size:18px;margin-bottom:12px}
+.modal p,.modal li{font-size:13px;line-height:1.8;color:var(--tx2)}
+.modal ol{padding-left:20px;margin:10px 0}
+.modal code{background:#f4f4f4;padding:2px 6px;border-radius:3px;font-size:12px}
+.modal .config-input{width:100%;height:120px;font-family:monospace;font-size:11px;border:1px solid var(--bd);border-radius:6px;padding:8px;margin:10px 0;resize:vertical}
+.modal .btn-row{display:flex;gap:8px;margin-top:16px}
+.modal button{padding:8px 20px;border-radius:6px;cursor:pointer;font-size:13px;border:none}
+.modal .btn-p{background:var(--ac);color:#fff}
+.modal .btn-s{background:#eee;color:#333}
+@media(max-width:860px){
+  .sd{transform:translateX(-100%);transition:.3s;width:250px}
+  .sd.open{transform:translateX(0)}
+  .mn{margin-left:0;padding:calc(var(--hh)+16px) 14px 50px}
+  .ft{margin-left:0;padding:20px 14px}
+  .menu-btn{display:block}
+  .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:85}
+  .overlay.show{display:block}
+  .sb{max-width:160px}
+  .stats{display:none}
 }
 </style>
 </head>
 <body>
 
-<!-- Header -->
-<header class="header">
-  <button class="menu-btn" onclick="toggleSidebar()" aria-label="選單">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-      <path d="M3 12h18M3 6h18M3 18h18"/>
-    </svg>
-  </button>
-  <h1>N5 <span>文法筆記</span></h1>
-  <div class="search-box">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-      <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
-    </svg>
-    <input type="text" id="search" placeholder="搜尋文法（如：助詞、て形、から...）" oninput="onSearch(this.value)">
+<header class="hd">
+  <button class="menu-btn" onclick="toggleSd()" aria-label="選單"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg></button>
+  <h1>出口<span>文法</span></h1>
+  <div class="tabs" id="tabs">
+    <button class="on" onclick="switchLevel('n5')">N5</button>
+    <button onclick="switchLevel('n4')">N4</button>
   </div>
-  <span class="stats" id="stats">119 個文法點</span>
+  <button class="fav-btn" id="favBtn" onclick="toggleFavFilter()">★ 收藏</button>
+  <div class="sb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg><input id="search" placeholder="搜尋文法..." oninput="onSearch(this.value)"></div>
+  <span class="stats" id="stats"></span>
+  <button class="auth-btn" id="authBtn" onclick="handleAuth()">登入</button>
 </header>
 
-<!-- Sidebar -->
-<nav class="sidebar" id="sidebar"></nav>
-<div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
-
-<!-- Main Content -->
-<main class="main" id="main"></main>
-
-<!-- Footer -->
-<footer class="footer">
-  筆記來源：<a href="https://www.youtube.com/@deguchi" target="_blank" rel="noopener">出口日語 YouTube</a>
-  ｜ 整理參考：<a href="https://jozu.tw/docs/deguchi-N5" target="_blank" rel="noopener">jozu.tw</a>
-  ｜ JLPT N5 文法 119 項完整收錄
+<nav class="sd" id="sd"></nav>
+<div class="overlay" id="overlay" onclick="toggleSd()"></div>
+<main class="mn" id="mn"></main>
+<footer class="ft">
+  <a href="https://www.youtube.com/@deguchi" target="_blank">出口日語 YouTube</a> ｜
+  <a href="https://jozu.tw/docs/deguchi-N5" target="_blank">jozu.tw</a> ｜
+  N5 119 項 ＋ N4 120 項 完整收錄
 </footer>
+<button class="bt" id="bt" onclick="scrollTo({top:0,behavior:'smooth'})">↑</button>
 
-<!-- Back to top -->
-<button class="back-top" id="backTop" onclick="scrollTo({top:0,behavior:'smooth'})">↑</button>
+<!-- Firebase Setup Modal -->
+<div class="modal-bg" id="setupModal">
+  <div class="modal">
+    <h3>🔧 設定 Google 登入</h3>
+    <p>需要建立 Firebase 專案才能使用 Google 登入與雲端收藏同步。</p>
+    <ol>
+      <li>到 <a href="https://console.firebase.google.com/" target="_blank">Firebase Console</a> 建立新專案</li>
+      <li>Authentication → 啟用 Google 登入</li>
+      <li>Firestore Database → 建立資料庫（測試模式）</li>
+      <li>專案設定 → 新增網頁應用 → 複製 config</li>
+      <li>在 Authentication → 設定 → 已授權網域 中加入 <code>miafrontend2026.github.io</code></li>
+    </ol>
+    <p>貼上 Firebase config JSON：</p>
+    <textarea class="config-input" id="configInput" placeholder='{"apiKey":"...","authDomain":"...","projectId":"...","storageBucket":"...","messagingSenderId":"...","appId":"..."}'></textarea>
+    <div class="btn-row">
+      <button class="btn-p" onclick="saveConfig()">儲存</button>
+      <button class="btn-s" onclick="closeModal()">稍後再說</button>
+    </div>
+  </div>
+</div>
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 
 <script>
-// ===== DATA =====
-const DATA = [
-// ── 基本句型 ──
-{id:"desu-noun",cat:"基本句型",t:"～です・～じゃありません（名詞）",
- p:"名詞 ＋ です／じゃありません",
- ex:"肯定用「です」，否定用「じゃありません」（較正式：ではありません）。普通體為「だ／じゃない」。",
- eg:[
-  {j:"佐藤さんは<em>会社員です</em>。",z:"佐藤是公司職員。"},
-  {j:"鈴木さんは学生<em>じゃありません</em>。社会人です。",z:"鈴木不是學生，是社會人士。"},
-  {j:"私は台湾人<em>です</em>。",z:"我是台灣人。"}
- ]},
-{id:"masu-masen",cat:"基本句型",t:"～ます・～ません",
- p:"動詞ます形 ＋ ます／ません",
- ex:"丁寧體（禮貌體）的現在肯定與否定。對長輩、陌生人使用。普通體為辞書形／ない形。",
- eg:[
-  {j:"明日、私は<em>働きます</em>。",z:"明天我會工作。"},
-  {j:"高橋部長はタバコを<em>吸いません</em>。",z:"高橋部長不抽菸。"},
-  {j:"夜8時から9時まで<em>勉強します</em>。",z:"晚上8點到9點讀書。"}
- ]},
-{id:"na-adj-present",cat:"基本句型",t:"～です・～じゃありません（な形容詞）",
- p:"な形容詞語幹 ＋ です／じゃありません",
- ex:"な形容詞的丁寧體現在式。肯定接「です」，否定接「じゃありません」。修飾名詞時加「な」。",
- eg:[
-  {j:"この部屋は<em>静かです</em>。",z:"這個房間很安靜。"},
-  {j:"あの人は<em>親切じゃありません</em>。",z:"那個人不親切。"},
-  {j:"日本語の勉強は<em>好きです</em>。",z:"喜歡學日文。"}
- ]},
-{id:"i-adj-present",cat:"基本句型",t:"～いです・～くないです",
- p:"い形容詞 ＋ です／い→くないです",
- ex:"い形容詞現在式。否定時去掉「い」加「くないです」（或「くありません」）。「いい」的否定是「よくないです」。",
- eg:[
-  {j:"今日は<em>暑いです</em>。",z:"今天很熱。"},
-  {j:"この映画は<em>面白くないです</em>。",z:"這部電影不有趣。"},
-  {j:"日本語は<em>難しいです</em>。",z:"日文很難。"}
- ]},
-{id:"deshita-noun",cat:"基本句型",t:"～でした・～じゃありませんでした（名詞）",
- p:"名詞 ＋ でした／じゃありませんでした",
- ex:"名詞過去式。「でした」是過去肯定，「じゃありませんでした」是過去否定。",
- eg:[
-  {j:"昨日は<em>休みでした</em>。",z:"昨天是休息日。"},
-  {j:"あの店は寿司屋<em>じゃありませんでした</em>。",z:"那家店以前不是壽司店。"},
-  {j:"先週の日曜日は<em>いい天気でした</em>。",z:"上週日是好天氣。"}
- ]},
-{id:"mashita",cat:"基本句型",t:"～ました・～ませんでした",
- p:"動詞ます形 ＋ ました／ませんでした",
- ex:"動詞的丁寧體過去式。「ました」是過去肯定，「ませんでした」是過去否定。",
- eg:[
-  {j:"昨日、映画を<em>見ました</em>。",z:"昨天看了電影。"},
-  {j:"朝ごはんを<em>食べませんでした</em>。",z:"沒吃早餐。"},
-  {j:"去年、日本へ<em>行きました</em>。",z:"去年去了日本。"}
- ]},
-{id:"na-adj-past",cat:"基本句型",t:"～でした・～じゃありませんでした（な形容詞）",
- p:"な形容詞語幹 ＋ でした／じゃありませんでした",
- ex:"な形容詞的過去式，用法與名詞過去式相同。",
- eg:[
-  {j:"昨日の試験は<em>簡単でした</em>。",z:"昨天的考試很簡單。"},
-  {j:"あの町は<em>にぎやかじゃありませんでした</em>。",z:"那個城鎮以前不熱鬧。"},
-  {j:"子供のとき、野菜が<em>嫌いでした</em>。",z:"小時候討厭蔬菜。"}
- ]},
-{id:"i-adj-past",cat:"基本句型",t:"～かったです・～くなかったです",
- p:"い形容詞：い→かったです／い→くなかったです",
- ex:"い形容詞過去式。去「い」加「かったです」（肯定）、「くなかったです」（否定）。「いい」→「よかったです」。",
- eg:[
-  {j:"昨日は<em>寒かったです</em>。",z:"昨天很冷。"},
-  {j:"テストは<em>難しくなかったです</em>。",z:"考試不難。"},
-  {j:"旅行は<em>よかったです</em>。",z:"旅行很好。"}
- ]},
-{id:"masenka",cat:"基本句型",t:"～ませんか",
- p:"動詞ます形 ＋ ませんか",
- ex:"委婉的邀請表現。「要不要一起…？」語氣比「ましょう」更禮貌。",
- eg:[
-  {j:"一緒に昼ごはんを<em>食べませんか</em>。",z:"要不要一起吃午餐？"},
-  {j:"週末、映画を<em>見ませんか</em>。",z:"週末要不要看電影？"},
-  {j:"ちょっと休み<em>ませんか</em>。",z:"要不要休息一下？"}
- ]},
-{id:"narimasu",cat:"基本句型",t:"～くなります・～になります",
- p:"い形→くなります／な形・名詞→になります",
- ex:"表示自然變化的結果。い形容詞去「い」加「くなります」，な形容詞／名詞加「になります」。",
- eg:[
-  {j:"春になると、<em>暖かくなります</em>。",z:"到了春天就會變暖。"},
-  {j:"日本語が<em>上手になりました</em>。",z:"日文變好了。"},
-  {j:"来年、大学生<em>になります</em>。",z:"明年要變成大學生了。"}
- ]},
-{id:"shimasu-change",cat:"基本句型",t:"～くします・～にします",
- p:"い形→くします／な形・名詞→にします",
- ex:"表示人為改變。い形容詞去「い」加「くします」，な形容詞／名詞加「にします」。",
- eg:[
-  {j:"音を<em>小さくします</em>。",z:"把聲音調小。"},
-  {j:"部屋を<em>きれいにします</em>。",z:"把房間弄乾淨。"},
-  {j:"コーヒーを<em>ホットにします</em>。",z:"咖啡要熱的。"}
- ]},
-{id:"mashou",cat:"基本句型",t:"～ましょう",
- p:"動詞ます形 ＋ ましょう",
- ex:"表示提議或邀約「一起做吧」。也可用於自言自語「我來做吧」。",
- eg:[
-  {j:"一緒に<em>行きましょう</em>。",z:"一起去吧。"},
-  {j:"タクシーで<em>行きましょう</em>。",z:"搭計程車去吧。"},
-  {j:"ちょっと<em>休みましょう</em>。",z:"休息一下吧。"}
- ]},
-{id:"teinei-futsuu",cat:"基本句型",t:"丁寧体與普通体",
- p:"丁寧体（です・ます）／普通体（だ・辞書形・ない形等）",
- ex:"丁寧體用於正式場合、對長輩陌生人。普通體用於朋友、家人。根據場合切換是日語的重要概念。",
- eg:[
-  {j:"（丁寧）明日は雨<em>です</em>。",z:"明天會下雨。"},
-  {j:"（普通）明日は雨<em>だ</em>。",z:"明天會下雨。"},
-  {j:"（丁寧）日本語を勉強してい<em>ます</em>。→（普通）勉強してい<em>る</em>。",z:"正在學日文。"}
- ]},
-{id:"teinei-hitei",cat:"基本句型",t:"丁寧体否定表現",
- p:"～ません ＝ ～ないです",
- ex:"丁寧體否定有兩種說法：「ません」較正式，「ないです」較口語。意思相同，可互換。",
- eg:[
-  {j:"行き<em>ません</em>。＝ 行か<em>ないです</em>。",z:"不去。"},
-  {j:"食べ<em>ません</em>。＝ 食べ<em>ないです</em>。",z:"不吃。"},
-  {j:"高く<em>ありません</em>。＝ 高く<em>ないです</em>。",z:"不貴。"}
- ]},
+// ========== CONFIG ==========
+let fbConfig = null;
+try { fbConfig = JSON.parse(localStorage.getItem('fb_config')); } catch(e){}
 
-// ── 助詞 ──
-{id:"wa-topic",cat:"助詞",t:"助詞「は」（主題）",
- p:"名詞 ＋ は",
- ex:"標示句子的主題，讀作「wa」。「は」標示的是「談論的對象」，不一定等於主語。",
- eg:[
-  {j:"<em>私は</em>大学生です。",z:"我是大學生。"},
-  {j:"<em>富士山は</em>日本でいちばん高い山です。",z:"富士山是日本最高的山。"},
-  {j:"<em>このお弁当は</em>妻が作りました。",z:"這個便當是妻子做的。"}
- ],n:"「は」和「が」的區別：「は」＝舊資訊（主題），「が」＝新資訊（焦點）。"},
-{id:"mo-particle",cat:"助詞",t:"助詞「も」",
- p:"名詞 ＋ も",
- ex:"表示「也」。取代「は」「が」「を」使用，表示與前述同類。",
- eg:[
-  {j:"私は学生です。田中さん<em>も</em>学生です。",z:"我是學生。田中也是學生。"},
-  {j:"コーヒー<em>も</em>紅茶<em>も</em>好きです。",z:"咖啡和紅茶都喜歡。"},
-  {j:"何<em>も</em>食べませんでした。",z:"什麼都沒吃。（疑問詞＋も＋否定）"}
- ]},
-{id:"no-possess",cat:"助詞",t:"助詞「の」（所有格）",
- p:"名詞A ＋ の ＋ 名詞B",
- ex:"表示所有、所屬、同位等關係。A 修飾 B，類似中文的「的」。",
- eg:[
-  {j:"<em>私の</em>本。",z:"我的書。"},
-  {j:"<em>日本語の</em>先生。",z:"日文老師。"},
-  {j:"<em>東京大学の</em>学生。",z:"東京大學的學生。"}
- ]},
-{id:"ka-question",cat:"助詞",t:"助詞「か」（疑問）",
- p:"文末 ＋ か",
- ex:"放在句尾表示疑問。丁寧體用「～ますか」「～ですか」。",
- eg:[
-  {j:"これは何です<em>か</em>。",z:"這是什麼？"},
-  {j:"田中さんは学生です<em>か</em>。",z:"田中是學生嗎？"},
-  {j:"明日、学校に行きます<em>か</em>。",z:"明天去學校嗎？"}
- ]},
-{id:"ni-time",cat:"助詞",t:"助詞「に」（時間點）",
- p:"時間名詞 ＋ に",
- ex:"標示動作發生的具體時間點。星期、日期、幾點需要加「に」，但「今日、昨日、毎日」等不加。",
- eg:[
-  {j:"<em>7時に</em>起きます。",z:"7點起床。"},
-  {j:"<em>月曜日に</em>会議があります。",z:"星期一有會議。"},
-  {j:"<em>3月25日に</em>日本へ行きます。",z:"3月25日去日本。"}
- ],n:"「今日、昨日、明日、毎日、毎週、先週、来月」等相對時間不加「に」。"},
-{id:"e-direction",cat:"助詞",t:"助詞「へ」（移動方向）",
- p:"場所 ＋ へ",
- ex:"表示移動的方向，讀作「e」。常與「行きます・来ます・帰ります」等移動動詞搭配。可與「に」互換。",
- eg:[
-  {j:"日本<em>へ</em>行きます。",z:"去日本。"},
-  {j:"家<em>へ</em>帰ります。",z:"回家。"},
-  {j:"どこ<em>へ</em>行きますか。",z:"要去哪裡？"}
- ]},
-{id:"de-transport",cat:"助詞",t:"助詞「で」（交通工具）",
- p:"交通工具 ＋ で",
- ex:"表示使用的交通手段。步行用「歩いて」不用「で」。",
- eg:[
-  {j:"バス<em>で</em>学校に行きます。",z:"搭公車去學校。"},
-  {j:"飛行機<em>で</em>東京へ行きます。",z:"搭飛機去東京。"},
-  {j:"自転車<em>で</em>来ました。",z:"騎腳踏車來的。"}
- ]},
-{id:"to-companion",cat:"助詞",t:"助詞「と」（動作夥伴）",
- p:"人 ＋ と（一緒に）",
- ex:"表示一起做某動作的對象。「と一緒に」更強調一起的感覺。",
- eg:[
-  {j:"友達<em>と</em>映画を見ます。",z:"和朋友看電影。"},
-  {j:"家族<em>と</em>旅行に行きました。",z:"和家人去旅行了。"},
-  {j:"誰<em>と</em>行きますか。",z:"和誰去？"}
- ]},
-{id:"o-object",cat:"助詞",t:"助詞「を」（受詞）",
- p:"名詞 ＋ を ＋ 他動詞",
- ex:"標示動作的對象（受詞），讀作「o」。接在他動詞前面。",
- eg:[
-  {j:"朝ごはん<em>を</em>食べます。",z:"吃早餐。"},
-  {j:"新聞<em>を</em>読みます。",z:"看報紙。"},
-  {j:"日本語<em>を</em>勉強しています。",z:"正在學日文。"}
- ]},
-{id:"de-place",cat:"助詞",t:"助詞「で」（動作地點）",
- p:"場所 ＋ で ＋ 動詞",
- ex:"表示動作進行的場所。注意：存在用「に」，動作用「で」。",
- eg:[
-  {j:"図書館<em>で</em>勉強します。",z:"在圖書館讀書。"},
-  {j:"レストラン<em>で</em>ご飯を食べます。",z:"在餐廳吃飯。"},
-  {j:"公園<em>で</em>遊びました。",z:"在公園玩了。"}
- ],n:"比較：「公園<b>に</b>います」（在公園＝存在）vs「公園<b>で</b>遊びます」（在公園玩＝動作）。"},
-{id:"kara-origin",cat:"助詞",t:"助詞「から」（起點）",
- p:"名詞 ＋ から",
- ex:"表示時間或空間的起點。常與「まで」搭配使用。",
- eg:[
-  {j:"9時<em>から</em>5時まで働きます。",z:"從9點工作到5點。"},
-  {j:"東京<em>から</em>大阪まで新幹線で3時間かかります。",z:"從東京到大阪搭新幹線要3小時。"},
-  {j:"来月<em>から</em>日本語を勉強します。",z:"從下個月開始學日文。"}
- ]},
-{id:"made-endpoint",cat:"助詞",t:"助詞「まで」（終點・限界）",
- p:"名詞 ＋ まで",
- ex:"表示時間或空間的終點、限界。「到～為止」。",
- eg:[
-  {j:"12時<em>まで</em>勉強します。",z:"讀書到12點。"},
-  {j:"駅<em>まで</em>歩きます。",z:"走路到車站。"},
-  {j:"明日<em>まで</em>に出してください。",z:"請在明天之前交出來。"}
- ]},
-{id:"to-listing",cat:"助詞",t:"助詞「と」（並列）",
- p:"名詞A ＋ と ＋ 名詞B",
- ex:"全部列舉。把所有項目用「と」連接，表示「A和B」。列舉的是全部，不是部分。",
- eg:[
-  {j:"机の上にペン<em>と</em>ノートがあります。",z:"桌上有筆和筆記本。"},
-  {j:"りんご<em>と</em>みかんを買いました。",z:"買了蘋果和橘子。"},
-  {j:"日本語<em>と</em>英語を勉強しています。",z:"正在學日文和英文。"}
- ]},
-{id:"ya-listing",cat:"助詞",t:"助詞「や」（部分列舉）",
- p:"名詞A ＋ や ＋ 名詞B（＋ など）",
- ex:"部分列舉。表示「A啊B啊（之類的）」，暗示還有其他未提到的東西。常搭配「など」。",
- eg:[
-  {j:"机の上にペン<em>や</em>ノート<em>など</em>があります。",z:"桌上有筆啊筆記本之類的。"},
-  {j:"休みの日は映画<em>や</em>買い物をします。",z:"休假日看電影啊購物之類的。"},
-  {j:"日本<em>や</em>韓国に行きたいです。",z:"想去日本啊韓國之類的。"}
- ]},
-{id:"de-means",cat:"助詞",t:"助詞「で」（手段・工具）",
- p:"工具／手段 ＋ で",
- ex:"表示使用的工具或手段。「用～」。",
- eg:[
-  {j:"はし<em>で</em>ご飯を食べます。",z:"用筷子吃飯。"},
-  {j:"日本語<em>で</em>手紙を書きます。",z:"用日文寫信。"},
-  {j:"スマホ<em>で</em>写真を撮りました。",z:"用手機拍了照片。"}
- ]},
-{id:"ni-recipient",cat:"助詞",t:"助詞「に」（動作對象）",
- p:"人 ＋ に ＋ 動詞",
- ex:"表示動作的對象（接受者）。常搭配「あげます、もらいます、教えます、会います」等。",
- eg:[
-  {j:"友達<em>に</em>プレゼントをあげます。",z:"送禮物給朋友。"},
-  {j:"先生<em>に</em>質問します。",z:"向老師提問。"},
-  {j:"駅で友達<em>に</em>会いました。",z:"在車站遇到了朋友。"}
- ]},
-{id:"kara-giver",cat:"助詞",t:"助詞「から」（授予方）",
- p:"人 ＋ から ＋ もらいます等",
- ex:"表示授予的來源。「從某人那裡得到」。",
- eg:[
-  {j:"母<em>から</em>手紙をもらいました。",z:"從媽媽那裡收到了信。"},
-  {j:"先生<em>から</em>日本語を習いました。",z:"跟老師學了日文。"},
-  {j:"友達<em>から</em>プレゼントをもらいました。",z:"從朋友那裡收到了禮物。"}
- ]},
-{id:"ni-contact",cat:"助詞",t:"助詞「に」（接觸點）",
- p:"名詞 ＋ に ＋ 動詞",
- ex:"表示接觸、附著的對象。搭配「乗ります、座ります、触ります」等。",
- eg:[
-  {j:"バス<em>に</em>乗ります。",z:"搭公車。"},
-  {j:"椅子<em>に</em>座ります。",z:"坐在椅子上。"},
-  {j:"壁<em>に</em>絵をかけます。",z:"在牆上掛畫。"}
- ]},
-{id:"de-unit",cat:"助詞",t:"助詞「で」（動作單位）",
- p:"數量／人數 ＋ で",
- ex:"表示進行動作的單位或範圍。「以～」。",
- eg:[
-  {j:"3人<em>で</em>行きます。",z:"3個人去。"},
-  {j:"全部<em>で</em>いくらですか。",z:"全部多少錢？"},
-  {j:"1000円<em>で</em>おつりをください。",z:"用1000日圓，請找零。"}
- ]},
-{id:"ga-ability",cat:"助詞",t:"助詞「が」（能力・好惡）",
- p:"名詞 ＋ が ＋ わかります／できます／好きです等",
- ex:"搭配能力、好惡、感情等表現時，對象用「が」標示。",
- eg:[
-  {j:"日本語<em>が</em>わかります。",z:"懂日文。"},
-  {j:"料理<em>が</em>できます。",z:"會做菜。"},
-  {j:"猫<em>が</em>好きです。",z:"喜歡貓。"}
- ]},
-{id:"ni-exist",cat:"助詞",t:"助詞「に」（存在位置）",
- p:"場所 ＋ に ＋ あります／います",
- ex:"表示人或物存在的位置。搭配「あります」（物）或「います」（有生命的）。",
- eg:[
-  {j:"机の上<em>に</em>本があります。",z:"桌上有書。"},
-  {j:"庭<em>に</em>猫がいます。",z:"庭院裡有貓。"},
-  {j:"東京<em>に</em>住んでいます。",z:"住在東京。"}
- ]},
-{id:"kara-reason",cat:"助詞",t:"助詞「から」（原因・理由）",
- p:"普通形／丁寧形 ＋ から",
- ex:"表示原因理由。「因為A，所以B」。口語中常放在句尾「～んですから」。",
- eg:[
-  {j:"仕事で使います<em>から</em>、日本語を勉強しています。",z:"因為工作上會用到，所以在學日文。"},
-  {j:"お金がありません<em>から</em>、何も買いません。",z:"因為沒有錢，什麼都不買。"},
-  {j:"寒いです<em>から</em>、窓を閉めてください。",z:"因為很冷，請關窗。"},
-  {j:"危ないです<em>から</em>、触らないでください。",z:"因為危險，請不要碰。"}
- ]},
-{id:"ni-entry",cat:"助詞",t:"助詞「に」（進入點・到達點）",
- p:"場所 ＋ に ＋ 入ります・着きます等",
- ex:"表示進入或到達的目的地。搭配「入ります、着きます、届きます」等動詞。",
- eg:[
-  {j:"部屋<em>に</em>入ります。",z:"進入房間。"},
-  {j:"駅<em>に</em>着きました。",z:"到車站了。"},
-  {j:"荷物が家<em>に</em>届きました。",z:"行李送到家了。"}
- ]},
-{id:"o-depart",cat:"助詞",t:"助詞「を」（離開點）",
- p:"場所 ＋ を ＋ 出ます・降ります等",
- ex:"表示離開某場所。搭配「出ます、降ります、卒業します」等動詞。",
- eg:[
-  {j:"朝7時に家<em>を</em>出ます。",z:"早上7點離開家。"},
-  {j:"東京駅<em>を</em>降ります。",z:"在東京站下車。"},
-  {j:"来年、大学<em>を</em>卒業します。",z:"明年大學畢業。"}
- ]},
-{id:"o-passage",cat:"助詞",t:"助詞「を」（經過點）",
- p:"場所 ＋ を ＋ 歩きます・渡ります等",
- ex:"表示經過、通過的場所。搭配「歩きます、走ります、渡ります、曲がります」等。",
- eg:[
-  {j:"公園<em>を</em>歩きます。",z:"走過公園。"},
-  {j:"橋<em>を</em>渡ります。",z:"過橋。"},
-  {j:"角<em>を</em>右に曲がります。",z:"在路口右轉。"}
- ]},
-{id:"dake",cat:"助詞",t:"限定助詞「だけ」",
- p:"名詞 ＋ だけ",
- ex:"表示「只有～」。限定範圍，語氣中性或滿足。",
- eg:[
-  {j:"コーヒー<em>だけ</em>飲みます。",z:"只喝咖啡。"},
-  {j:"日曜日<em>だけ</em>休みです。",z:"只有星期日休息。"},
-  {j:"少し<em>だけ</em>食べました。",z:"只吃了一點。"}
- ]},
-{id:"shika",cat:"助詞",t:"限定助詞「しか」",
- p:"名詞 ＋ しか ＋ 否定",
- ex:"表示「只有～」但帶有「不夠、遺憾」的語氣。後面必須接否定形。",
- eg:[
-  {j:"1000円<em>しか</em>ありません。",z:"只有1000日圓（不夠的感覺）。"},
-  {j:"日本語<em>しか</em>話せません。",z:"只會說日文。"},
-  {j:"水<em>しか</em>飲みません。",z:"只喝水。"}
- ],n:"「だけ」與「しか」的區別：「だけ」中性，「しか＋否定」帶有不滿足的語氣。"},
-{id:"ne-particle",cat:"助詞",t:"終助詞「ね」",
- p:"文末 ＋ ね",
- ex:"表示確認、同意或共感。「是吧、對吧」。",
- eg:[
-  {j:"いい天気です<em>ね</em>。",z:"天氣真好呢。"},
-  {j:"この料理はおいしいです<em>ね</em>。",z:"這道菜好吃呢。"},
-  {j:"明日は日曜日です<em>ね</em>。",z:"明天是星期日對吧。"}
- ]},
-{id:"yo-particle",cat:"助詞",t:"終助詞「よ」",
- p:"文末 ＋ よ",
- ex:"表示告知對方不知道的資訊或強調。「喔、呢」。",
- eg:[
-  {j:"このケーキ、おいしいです<em>よ</em>。",z:"這個蛋糕很好吃喔。"},
-  {j:"明日は休みです<em>よ</em>。",z:"明天放假喔。"},
-  {j:"もう遅いです<em>よ</em>。",z:"已經很晚了喔。"}
- ]},
-{id:"wa-emotion",cat:"助詞",t:"終助詞「わ」",
- p:"文末 ＋ わ",
- ex:"表示感嘆或柔和的斷定。傳統上女性用語，現代男女皆可使用（尤其關西方言）。",
- eg:[
-  {j:"すごい<em>わ</em>。",z:"好厲害啊。"},
-  {j:"もう帰る<em>わ</em>。",z:"我要回去了。"},
-  {j:"これ、高い<em>わ</em>。",z:"這個好貴啊。"}
- ]},
-{id:"ga-subject",cat:"助詞",t:"助詞「が」（主語）",
- p:"名詞 ＋ が",
- ex:"標示主語（動作的執行者）。用在新資訊、疑問詞的回答、從屬子句等場合。",
- eg:[
-  {j:"誰<em>が</em>来ましたか。",z:"誰來了？"},
-  {j:"田中さん<em>が</em>来ました。",z:"田中來了。"},
-  {j:"雨<em>が</em>降っています。",z:"正在下雨。"}
- ]},
-{id:"ga-adversative",cat:"助詞",t:"助詞「が」（逆接）",
- p:"文A ＋ が ＋ 文B",
- ex:"連接兩個句子，表示轉折。「雖然A，但是B」。",
- eg:[
-  {j:"日本語は難しい<em>です</em><em>が</em>、面白いです。",z:"日文雖然難，但是有趣。"},
-  {j:"この服は安い<em>です</em><em>が</em>、品質がいいです。",z:"這件衣服雖然便宜，但品質好。"},
-  {j:"行きたい<em>です</em><em>が</em>、時間がありません。",z:"雖然想去，但是沒有時間。"}
- ]},
-{id:"ga-preface",cat:"助詞",t:"助詞「が」（前言）",
- p:"文A ＋ が ＋ 文B",
- ex:"用於開場白，引出正題。不一定是轉折，只是鋪陳。「那個…」。",
- eg:[
-  {j:"すみません<em>が</em>、ちょっと教えてください。",z:"不好意思，可以教我一下嗎？"},
-  {j:"あのう、ちょっとお聞きしたいんです<em>が</em>…",z:"那個，我想請問一下…"},
-  {j:"実は来月から転勤になったんです<em>が</em>…",z:"其實下個月要調職…"}
- ]},
-{id:"kedo-particle",cat:"助詞",t:"助詞「けど」",
- p:"文A ＋ けど ＋ 文B",
- ex:"口語的逆接或前言助詞。比「が」更隨意。正式形為「けれども」。",
- eg:[
-  {j:"安い<em>けど</em>、おいしいです。",z:"雖然便宜，但很好吃。"},
-  {j:"明日は暇です<em>けど</em>、何かありますか。",z:"明天有空，有什麼事嗎？"},
-  {j:"ちょっと聞きたいんです<em>けど</em>…",z:"想問一下…"}
- ]},
-{id:"ni-purpose",cat:"助詞",t:"助詞「に」（目的）",
- p:"動詞ます形（去ます） ＋ に ＋ 行きます／来ます等",
- ex:"表示移動的目的。「去做某事」。ます形去掉「ます」後接「に」。",
- eg:[
-  {j:"映画を見<em>に</em>行きます。",z:"去看電影。"},
-  {j:"ご飯を食べ<em>に</em>来ました。",z:"來吃飯的。"},
-  {j:"日本へ勉強し<em>に</em>行きます。",z:"去日本唸書。"}
- ]},
-{id:"ni-frequency",cat:"助詞",t:"助詞「に」（頻率・比例）",
- p:"期間 ＋ に ＋ 回數",
- ex:"表示在某段時間內的頻率。「每～做幾次」。",
- eg:[
-  {j:"1週間<em>に</em>3回運動します。",z:"一週運動3次。"},
-  {j:"1か月<em>に</em>2回映画を見ます。",z:"一個月看2次電影。"},
-  {j:"1日<em>に</em>3回薬を飲みます。",z:"一天吃3次藥。"}
- ]},
-{id:"de-scope",cat:"助詞",t:"助詞「で」（範圍）",
- p:"範圍 ＋ で",
- ex:"表示限定的範圍中進行比較或判斷。",
- eg:[
-  {j:"クラス<em>で</em>いちばん背が高いです。",z:"在班上最高。"},
-  {j:"世界<em>で</em>いちばん有名な山は何ですか。",z:"世界上最有名的山是什麼？"},
-  {j:"日本<em>で</em>何がいちばん好きですか。",z:"在日本最喜歡什麼？"}
- ]},
-{id:"ga-no-interchange",cat:"助詞",t:"連体修飾節「が」與「の」的互換",
- p:"連体修飾節中：が ↔ の",
- ex:"在修飾名詞的子句中，「が」可以用「の」替換，語感更自然。",
- eg:[
-  {j:"私<em>が</em>作ったケーキ ＝ 私<em>の</em>作ったケーキ",z:"我做的蛋糕"},
-  {j:"花<em>が</em>きれいな公園 ＝ 花<em>の</em>きれいな公園",z:"花很漂亮的公園"},
-  {j:"音<em>が</em>大きい部屋 ＝ 音<em>の</em>大きい部屋",z:"聲音很大的房間"}
- ]},
-{id:"wa-contrast",cat:"助詞",t:"助詞「は」（區別・對比）",
- p:"名詞A ＋ は ～。名詞B ＋ は ～。",
- ex:"用「は」對比兩個事物。強調差異。",
- eg:[
-  {j:"肉<em>は</em>好きですが、魚<em>は</em>好きじゃありません。",z:"喜歡肉，但不喜歡魚。"},
-  {j:"漢字<em>は</em>読めますが、書くこと<em>は</em>できません。",z:"漢字看得懂，但不會寫。"},
-  {j:"ビール<em>は</em>飲みますが、ワイン<em>は</em>飲みません。",z:"啤酒會喝，但葡萄酒不喝。"}
- ]},
-{id:"ka-selection",cat:"助詞",t:"助詞「か」（選擇）",
- p:"名詞A ＋ か ＋ 名詞B",
- ex:"表示選擇「A或B」。",
- eg:[
-  {j:"コーヒー<em>か</em>紅茶、どちらがいいですか。",z:"咖啡或紅茶，哪個好？"},
-  {j:"バス<em>か</em>電車で行きます。",z:"搭公車或電車去。"},
-  {j:"土曜日<em>か</em>日曜日に会いましょう。",z:"星期六或日見面吧。"}
- ]},
-{id:"case-wa-mo",cat:"助詞",t:"格助詞＋は・も",
- p:"に＋は → には、で＋は → では、から＋も → からも",
- ex:"格助詞「に、で、から、まで」後面可以再接「は」或「も」，增加對比或追加語氣。但「を、が」會被「は、も」取代。",
- eg:[
-  {j:"東京<em>には</em>何度も行きました。",z:"東京去過好多次了。"},
-  {j:"この店<em>では</em>クレジットカードが使えます。",z:"這家店可以用信用卡。"},
-  {j:"日本<em>からも</em>中国<em>からも</em>来ました。",z:"從日本也從中國來了。"}
- ]},
-{id:"to-reciprocal",cat:"助詞",t:"助詞「と」（相互動作）",
- p:"人 ＋ と ＋ 相互動詞",
- ex:"表示相互動作的對象。搭配「結婚します、けんかします、話します」等。",
- eg:[
-  {j:"田中さん<em>と</em>結婚しました。",z:"和田中結婚了。"},
-  {j:"友達<em>と</em>けんかしました。",z:"和朋友吵架了。"},
-  {j:"先生<em>と</em>日本語で話します。",z:"和老師用日文說話。"}
- ]},
-{id:"o-awareness",cat:"助詞",t:"助詞「を」（意識・方向）",
- p:"場所・方向 ＋ を",
- ex:"表示移動中經過或朝向的方向，帶有意識性。",
- eg:[
-  {j:"空<em>を</em>飛びます。",z:"在天空飛。"},
-  {j:"海<em>を</em>泳ぎます。",z:"在海裡游泳。"},
-  {j:"道<em>を</em>歩きます。",z:"走在路上。"}
- ]},
-{id:"ni-aspect",cat:"助詞",t:"助詞「に」（方面）",
- p:"名詞 ＋ に ＋ 形容詞（便利です、必要です等）",
- ex:"表示在某方面的評價。「對～來說」。",
- eg:[
-  {j:"旅行<em>に</em>便利です。",z:"對旅行來說很方便。"},
-  {j:"健康<em>に</em>いいです。",z:"對健康好。"},
-  {j:"勉強<em>に</em>必要です。",z:"學習上有需要。"}
- ]},
-{id:"ni-change",cat:"助詞",t:"助詞「に」（變化結果）",
- p:"名詞 ＋ に ＋ なります／します",
- ex:"表示變化的結果。「變成～」。",
- eg:[
-  {j:"医者<em>に</em>なりたいです。",z:"想成為醫生。"},
-  {j:"信号が赤<em>に</em>なりました。",z:"信號燈變紅了。"},
-  {j:"ジュース<em>に</em>します。",z:"我選果汁。"}
- ]},
+let db = null, auth = null, currentUser = null;
+if (fbConfig) {
+  firebase.initializeApp(fbConfig);
+  auth = firebase.auth();
+  db = firebase.firestore();
+  auth.onAuthStateChanged(u => { currentUser = u; updateAuthUI(); loadFavorites(); });
+}
 
-// ── 動詞活用 ──
-{id:"masu-form",cat:"動詞活用",t:"動詞ます形",
- p:"五段動詞：う段→い段＋ます／一段動詞：去る＋ます",
- ex:"最基本的禮貌形。五段動詞將語尾的う段改成い段再加ます。一段動詞去る加ます。不規則：する→します、来る→来ます。",
- eg:[
-  {j:"書く → 書き<em>ます</em>",z:"寫（五段）"},
-  {j:"食べる → 食べ<em>ます</em>",z:"吃（一段）"},
-  {j:"する → し<em>ます</em>、来る → 来（き）<em>ます</em>",z:"做、來（不規則）"}
- ]},
-{id:"te-form",cat:"動詞活用",t:"て形",
- p:"五段動詞音便變化＋て／一段動詞：去る＋て",
- ex:"最重要的活用形之一，用於連接、請求、進行等。五段動詞有音便變化：く→いて、ぐ→いで、す→して、む・ぶ・ぬ→んで、う・つ・る→って。",
- eg:[
-  {j:"書く→書い<em>て</em>、泳ぐ→泳い<em>で</em>",z:"寫、游泳"},
-  {j:"話す→話し<em>て</em>、飲む→飲ん<em>で</em>",z:"說、喝"},
-  {j:"買う→買っ<em>て</em>、待つ→待っ<em>て</em>、帰る→帰っ<em>て</em>",z:"買、等、回去"},
-  {j:"食べる→食べ<em>て</em>、する→し<em>て</em>、来る→来（き）<em>て</em>",z:"吃、做、來"}
- ],n:"例外：行く→行って（不是行いて）。"},
-{id:"dict-form",cat:"動詞活用",t:"辞書形",
- p:"動詞的原形（字典形）",
- ex:"動詞在字典中的形式，也是普通體肯定形。五段動詞以う段結尾，一段動詞以る結尾。",
- eg:[
-  {j:"書きます → <em>書く</em>",z:"寫"},
-  {j:"食べます → <em>食べる</em>",z:"吃"},
-  {j:"します → <em>する</em>、来ます → <em>来る</em>",z:"做、來"}
- ]},
-{id:"nai-form",cat:"動詞活用",t:"ない形",
- p:"五段動詞：う段→あ段＋ない／一段動詞：去る＋ない",
- ex:"普通體的否定形。五段動詞將語尾う段改成あ段加ない（う→わない）。",
- eg:[
-  {j:"書く → 書か<em>ない</em>",z:"不寫"},
-  {j:"食べる → 食べ<em>ない</em>",z:"不吃"},
-  {j:"する → し<em>ない</em>、来る → 来（こ）<em>ない</em>",z:"不做、不來"},
-  {j:"買う → 買<em>わない</em>（不是買あない）",z:"不買"}
- ]},
-{id:"ta-form",cat:"動詞活用",t:"た形",
- p:"て形的「て→た」「で→だ」",
- ex:"過去式的普通體。變化方式與て形相同，只是把て換成た、で換成だ。",
- eg:[
-  {j:"書く→書い<em>た</em>、泳ぐ→泳い<em>だ</em>",z:"寫了、游了"},
-  {j:"食べる→食べ<em>た</em>",z:"吃了"},
-  {j:"する→し<em>た</em>、来る→来（き）<em>た</em>",z:"做了、來了"}
- ]},
-{id:"nakatta-form",cat:"動詞活用",t:"なかった形",
- p:"ない形：ない→なかった",
- ex:"過去否定的普通體。ない形的「ない」改成「なかった」。",
- eg:[
-  {j:"書かない→書か<em>なかった</em>",z:"沒寫"},
-  {j:"食べない→食べ<em>なかった</em>",z:"沒吃"},
-  {j:"しない→し<em>なかった</em>、来ない→来（こ）<em>なかった</em>",z:"沒做、沒來"}
- ]},
-{id:"verb-plain",cat:"動詞活用",t:"動詞的普通形",
- p:"肯定：辞書形 → 否定：ない形 → 過去肯定：た形 → 過去否定：なかった形",
- ex:"普通形四種變化的總整理。普通形用在朋友間的會話以及各種文法接續。",
- eg:[
-  {j:"行く / 行かない / 行った / 行か<em>なかった</em>",z:"去／不去／去了／沒去"},
-  {j:"見る / 見ない / 見た / 見<em>なかった</em>",z:"看／不看／看了／沒看"},
-  {j:"する / しない / した / し<em>なかった</em>",z:"做／不做／做了／沒做"}
- ]},
+// ========== AUTH ==========
+function handleAuth() {
+  if (!fbConfig) { document.getElementById('setupModal').classList.add('show'); return; }
+  if (currentUser) { auth.signOut(); currentUser = null; updateAuthUI(); return; }
+  auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()).catch(e => alert('登入失敗: ' + e.message));
+}
+function updateAuthUI() {
+  const btn = document.getElementById('authBtn');
+  if (currentUser) {
+    btn.innerHTML = `<img src="${currentUser.photoURL}" alt="">${currentUser.displayName.split(' ')[0]}`;
+    btn.title = '點擊登出';
+  } else {
+    btn.innerHTML = fbConfig ? '🔑 Google 登入' : '登入';
+  }
+}
+function saveConfig() {
+  try {
+    const c = JSON.parse(document.getElementById('configInput').value);
+    localStorage.setItem('fb_config', JSON.stringify(c));
+    location.reload();
+  } catch(e) { alert('JSON 格式錯誤，請檢查'); }
+}
+function closeModal() { document.getElementById('setupModal').classList.remove('show'); }
 
-// ── 形容詞・名詞 ──
-{id:"i-adj-plain",cat:"形容詞・名詞",t:"い形容詞的普通形",
- p:"高い／高くない／高かった／高くなかった",
- ex:"い形容詞的四種普通形變化。去掉です即為普通形。",
- eg:[
-  {j:"<em>高い</em> / 高く<em>ない</em> / 高<em>かった</em> / 高く<em>なかった</em>",z:"貴／不貴／貴了／不貴"},
-  {j:"<em>いい</em> / <em>よくない</em> / <em>よかった</em> / <em>よくなかった</em>",z:"好／不好／好了／不好（特殊變化）"}
- ]},
-{id:"na-adj-plain",cat:"形容詞・名詞",t:"な形容詞的普通形",
- p:"静かだ／静かじゃない／静かだった／静かじゃなかった",
- ex:"な形容詞去掉です系列，改用だ系列。",
- eg:[
-  {j:"元気<em>だ</em> / 元気<em>じゃない</em> / 元気<em>だった</em> / 元気<em>じゃなかった</em>",z:"有精神的"},
-  {j:"好き<em>だ</em> / 好き<em>じゃない</em> / 好き<em>だった</em> / 好き<em>じゃなかった</em>",z:"喜歡的"}
- ]},
-{id:"noun-plain",cat:"形容詞・名詞",t:"名詞的普通形",
- p:"学生だ／学生じゃない／学生だった／学生じゃなかった",
- ex:"名詞的普通形變化方式與な形容詞完全相同。",
- eg:[
-  {j:"雨<em>だ</em> / 雨<em>じゃない</em> / 雨<em>だった</em> / 雨<em>じゃなかった</em>",z:"是雨／不是雨／是雨了／不是雨"},
-  {j:"休み<em>だ</em> / 休み<em>じゃない</em>",z:"是休息日／不是休息日"}
- ]},
-{id:"adj-modify-noun",cat:"形容詞・名詞",t:"形容詞修飾名詞",
- p:"い形容詞＋名詞／な形容詞＋な＋名詞",
- ex:"形容詞放在名詞前面做修飾。い形容詞直接接名詞，な形容詞要加「な」。",
- eg:[
-  {j:"<em>大きい</em>犬。",z:"大狗。"},
-  {j:"<em>きれいな</em>花。",z:"漂亮的花。"},
-  {j:"<em>おいしい</em>料理。",z:"好吃的菜。"},
-  {j:"<em>有名な</em>人。",z:"有名的人。"}
- ]},
-{id:"adj-adverb",cat:"形容詞・名詞",t:"形容詞的副詞用法",
- p:"い形→く＋動詞／な形→に＋動詞",
- ex:"形容詞當副詞修飾動詞。い形容詞去い加く，な形容詞加に。",
- eg:[
-  {j:"<em>速く</em>走ります。",z:"快速地跑。"},
-  {j:"<em>きれいに</em>書きます。",z:"漂亮地寫。"},
-  {j:"<em>早く</em>起きます。",z:"早起。"},
-  {j:"<em>静かに</em>してください。",z:"請安靜。"}
- ]},
+// ========== FAVORITES ==========
+let favorites = { n5: [], n4: [] };
 
-// ── 存在表現 ──
-{id:"ni-ga-exist",cat:"存在表現",t:"～に～があります／います",
- p:"場所 ＋ に ＋ 物／人 ＋ が ＋ あります／います",
- ex:"表示「某處有某物／某人」。あります用於無生命的物品，います用於有生命的（人、動物）。焦點在「有什麼」。",
- eg:[
-  {j:"机の上<em>に</em>本<em>が</em>あります。",z:"桌上有書。"},
-  {j:"庭<em>に</em>猫<em>が</em>います。",z:"庭院裡有貓。"},
-  {j:"教室<em>に</em>学生<em>が</em>います。",z:"教室裡有學生。"}
- ]},
-{id:"wa-ni-exist",cat:"存在表現",t:"～は～にあります／います",
- p:"物／人 ＋ は ＋ 場所 ＋ に ＋ あります／います",
- ex:"表示「某物／某人在某處」。焦點在「在哪裡」。",
- eg:[
-  {j:"本<em>は</em>机の上<em>に</em>あります。",z:"書在桌上。"},
-  {j:"猫<em>は</em>庭<em>に</em>います。",z:"貓在庭院。"},
-  {j:"トイレ<em>は</em>1階<em>に</em>あります。",z:"廁所在1樓。"}
- ]},
-{id:"location-expr",cat:"存在表現",t:"位置表現",
- p:"上・下・前・後ろ・右・左・中・外・隣・間・近く・そば",
- ex:"表示位置的名詞。用「名詞の＋位置詞」的形式。",
- eg:[
-  {j:"机<em>の上に</em>本があります。",z:"桌子上面有書。"},
-  {j:"駅<em>の前に</em>コンビニがあります。",z:"車站前面有便利商店。"},
-  {j:"銀行<em>と</em>郵便局<em>の間に</em>花屋があります。",z:"銀行和郵局中間有花店。"}
- ]},
+function loadFavorites() {
+  // Load from localStorage first
+  try { favorites = JSON.parse(localStorage.getItem('deguchi_fav')) || { n5:[], n4:[] }; } catch(e){ favorites={n5:[],n4:[]}; }
+  // If logged in, merge from Firestore
+  if (currentUser && db) {
+    db.collection('users').doc(currentUser.uid).get().then(doc => {
+      if (doc.exists) {
+        const cloud = doc.data().favorites || {n5:[],n4:[]};
+        favorites.n5 = [...new Set([...favorites.n5, ...(cloud.n5||[])])];
+        favorites.n4 = [...new Set([...favorites.n4, ...(cloud.n4||[])])];
+        saveFavLocal();
+      }
+      render();
+    }).catch(() => render());
+  } else { render(); }
+}
+function saveFavLocal() { localStorage.setItem('deguchi_fav', JSON.stringify(favorites)); }
+function saveFavCloud() {
+  if (currentUser && db) {
+    db.collection('users').doc(currentUser.uid).set({ favorites }, { merge: true });
+  }
+}
+function toggleFav(id) {
+  const lv = currentLevel;
+  const idx = favorites[lv].indexOf(id);
+  if (idx > -1) favorites[lv].splice(idx, 1); else favorites[lv].push(id);
+  saveFavLocal(); saveFavCloud();
+  // Update star UI
+  const star = document.querySelector(`#${CSS.escape(id)} .star`);
+  if (star) star.classList.toggle('on', favorites[lv].includes(id));
+  updateFavCount();
+}
+function updateFavCount() {
+  const btn = document.getElementById('favBtn');
+  const c = favorites[currentLevel].length;
+  btn.textContent = c ? `★ 收藏 (${c})` : '★ 收藏';
+}
 
-// ── 授受動詞 ──
-{id:"agemasu",cat:"授受動詞",t:"授受動詞「あげます」",
- p:"A は B に ～を あげます",
- ex:"「給」。我給別人，或第三者給第三者。不用於別人給我。",
- eg:[
-  {j:"私は友達<em>に</em>プレゼントを<em>あげます</em>。",z:"我給朋友禮物。"},
-  {j:"田中さんは山田さん<em>に</em>花を<em>あげました</em>。",z:"田中給了山田花。"},
-  {j:"彼女<em>に</em>チョコレートを<em>あげました</em>。",z:"給了女朋友巧克力。"}
- ]},
-{id:"moraimasu",cat:"授受動詞",t:"授受動詞「もらいます」",
- p:"A は B に／から ～を もらいます",
- ex:"「收到、得到」。從某人那裡得到東西。授予方用「に」或「から」。",
- eg:[
-  {j:"私は母<em>に</em>時計を<em>もらいました</em>。",z:"我從媽媽那裡得到了手錶。"},
-  {j:"友達<em>から</em>手紙を<em>もらいました</em>。",z:"從朋友那裡收到了信。"},
-  {j:"誕生日にたくさんプレゼントを<em>もらいました</em>。",z:"生日收到了很多禮物。"}
- ]},
-{id:"kuremasu",cat:"授受動詞",t:"授受動詞「くれます」",
- p:"B は（A に）～を くれます",
- ex:"「給我」。別人給我（或我方的人）東西時使用。帶有感謝的語氣。",
- eg:[
-  {j:"友達が本を<em>くれました</em>。",z:"朋友給了我書。"},
-  {j:"母が弁当を作って<em>くれました</em>。",z:"媽媽幫我做了便當。"},
-  {j:"先生が日本語を教えて<em>くれました</em>。",z:"老師教了我日文。"}
- ]},
-{id:"yarimasu",cat:"授受動詞",t:"授受動詞「やります」",
- p:"A は B に ～を やります",
- ex:"「給」（對下位者）。對動物、植物或地位低於自己的對象使用。現代日語中也常用あげます取代。",
- eg:[
-  {j:"犬<em>に</em>えさを<em>やります</em>。",z:"餵狗飼料。"},
-  {j:"花<em>に</em>水を<em>やります</em>。",z:"給花澆水。"},
-  {j:"弟<em>に</em>おもちゃを<em>やりました</em>。",z:"給弟弟玩具。"}
- ]},
+// ========== STATE ==========
+let currentLevel = 'n5';
+let showFavOnly = false;
+let searchTerm = '';
 
-// ── て形的用法 ──
-{id:"te-de-cause",cat:"て形的用法",t:"「て形」與助詞「で」（原因）",
- p:"い形容詞て形（くて）／な形容詞で／名詞で",
- ex:"い形容詞去い加「くて」、な形容詞與名詞加「で」，表示原因。比「から」語氣更自然、更書面。",
- eg:[
-  {j:"頭が痛<em>くて</em>、学校を休みました。",z:"因為頭痛，請假了。"},
-  {j:"この町は静か<em>で</em>、いいです。",z:"這個城鎮很安靜，很好。"},
-  {j:"病気<em>で</em>、学校を休みました。",z:"因為生病，請假了。"}
- ]},
-{id:"te-listing",cat:"て形的用法",t:"「て形」（並列）",
- p:"動詞て形 ＋ 動詞て形 ＋ …",
- ex:"用て形連接多個動作或狀態，表示並列描述。形容詞也可用て形並列。",
- eg:[
-  {j:"この部屋は広<em>くて</em>、明る<em>くて</em>、きれいです。",z:"這個房間又寬又亮又漂亮。"},
-  {j:"彼は親切<em>で</em>、面白い人です。",z:"他是個親切又有趣的人。"},
-  {j:"朝、起き<em>て</em>、顔を洗い<em>て</em>、ご飯を食べます。",z:"早上起床、洗臉、吃飯。"}
- ]},
-{id:"te-method",cat:"て形的用法",t:"「て形」與「ないで」（方法・手段）",
- p:"動詞て形＋動詞 ／ 動詞ないで＋動詞",
- ex:"て形接續表示「用某方式做」。ないで表示「不做某事而做另一件事」。",
- eg:[
-  {j:"辞書を<em>使って</em>勉強します。",z:"用字典學習。"},
-  {j:"歩い<em>て</em>学校に行きます。",z:"走路去學校。"},
-  {j:"辞書を<em>使わないで</em>読みます。",z:"不用字典來閱讀。"}
- ]},
-{id:"te-sequence",cat:"て形的用法",t:"「て形」（動作順序）",
- p:"動詞て形 ＋ 動詞て形 ＋ 動詞",
- ex:"用て形連接表示動作的先後順序。「先做A，再做B，然後C」。",
- eg:[
-  {j:"朝起き<em>て</em>、顔を洗っ<em>て</em>、朝ごはんを食べます。",z:"早上起床，洗臉，吃早餐。"},
-  {j:"駅まで歩い<em>て</em>、電車に乗りました。",z:"走到車站，搭了電車。"},
-  {j:"家に帰っ<em>て</em>、シャワーを浴びました。",z:"回到家，洗了澡。"}
- ]},
-{id:"te-accompany",cat:"て形的用法",t:"「て形」（附帶狀況）",
- p:"動詞て形 ＋ 動詞",
- ex:"表示伴隨著某狀態進行另一個動作。「一邊…一邊…」或「帶著…做」。",
- eg:[
-  {j:"傘を持っ<em>て</em>出かけます。",z:"帶著傘出門。"},
-  {j:"眼鏡をかけ<em>て</em>本を読みます。",z:"戴著眼鏡看書。"},
-  {j:"コートを着<em>て</em>出かけました。",z:"穿著外套出門了。"}
- ]},
-{id:"te-imasu",cat:"て形的用法",t:"～ています",
- p:"動詞て形 ＋ います",
- ex:"表示①正在進行、②結果狀態、③習慣性動作。是最常用的文法之一。",
- eg:[
-  {j:"今、ご飯を食べ<em>ています</em>。",z:"現在正在吃飯。（進行）"},
-  {j:"結婚し<em>ています</em>。",z:"已經結婚了。（狀態）"},
-  {j:"毎日、日本語を勉強し<em>ています</em>。",z:"每天都在學日文。（習慣）"},
-  {j:"窓が開い<em>ています</em>。",z:"窗戶開著。（狀態）"}
- ]},
-{id:"tari-tari",cat:"て形的用法",t:"～たり～たりします",
- p:"動詞た形＋り ＋ 動詞た形＋り ＋ します",
- ex:"列舉幾個代表性動作，暗示還有其他。「做做A啊B啊之類的」。",
- eg:[
-  {j:"休みの日は映画を見<em>たり</em>、本を読ん<em>だり</em>します。",z:"休假日看看電影啊讀讀書之類的。"},
-  {j:"週末は掃除し<em>たり</em>、買い物し<em>たり</em>します。",z:"週末打掃啊購物之類的。"},
-  {j:"天気が良かっ<em>たり</em>悪かっ<em>たり</em>します。",z:"天氣時好時壞。"}
- ]},
+function switchLevel(lv) {
+  currentLevel = lv;
+  showFavOnly = false;
+  document.getElementById('favBtn').classList.remove('on');
+  document.getElementById('search').value = '';
+  searchTerm = '';
+  document.querySelectorAll('.tabs button').forEach((b,i) => b.classList.toggle('on', (i===0&&lv==='n5')||(i===1&&lv==='n4')));
+  render();
+}
+function toggleFavFilter() {
+  showFavOnly = !showFavOnly;
+  document.getElementById('favBtn').classList.toggle('on', showFavOnly);
+  render();
+}
+let st; function onSearch(v) { clearTimeout(st); st = setTimeout(() => { searchTerm = v.trim().toLowerCase(); render(); }, 200); }
 
-// ── 時間・順序 ──
-{id:"time-expressions",cat:"時間・順序",t:"時間表現",
- p:"今日・昨日・明日・先週・来月・毎日 等",
- ex:"常用的時間詞彙整理。相對時間（今日、昨日等）不加「に」，具體時間（3時、月曜日等）加「に」。",
- eg:[
-  {j:"<em>今日</em>は暑いです。",z:"今天很熱。"},
-  {j:"<em>先週</em>、映画を見ました。",z:"上週看了電影。"},
-  {j:"<em>来年</em>、日本へ行きます。",z:"明年要去日本。"}
- ]},
-{id:"te-kara",cat:"時間・順序",t:"～てから",
- p:"動詞て形 ＋ から",
- ex:"表示「做完A之後，再做B」。強調先後順序。",
- eg:[
-  {j:"ご飯を食べ<em>てから</em>、勉強します。",z:"吃完飯之後讀書。"},
-  {j:"シャワーを浴び<em>てから</em>、寝ます。",z:"洗完澡之後睡覺。"},
-  {j:"日本に来<em>てから</em>、日本語が上手になりました。",z:"來日本之後，日文變好了。"}
- ]},
-{id:"atode",cat:"時間・順序",t:"～あとで",
- p:"動詞た形 ＋ あとで ／ 名詞 ＋ の ＋ あとで",
- ex:"表示「A之後做B」。動詞用た形，名詞加の。",
- eg:[
-  {j:"仕事が終わっ<em>たあとで</em>、飲みに行きます。",z:"工作結束後去喝一杯。"},
-  {j:"授業<em>のあとで</em>、図書館に行きます。",z:"下課後去圖書館。"},
-  {j:"昼ごはん<em>のあとで</em>、散歩します。",z:"午餐後散步。"}
- ]},
-{id:"maeni",cat:"時間・順序",t:"～まえに",
- p:"動詞辞書形 ＋ まえに ／ 名詞 ＋ の ＋ まえに",
- ex:"表示「做A之前」。動詞用辞書形，名詞加の。",
- eg:[
-  {j:"寝る<em>まえに</em>、本を読みます。",z:"睡覺前看書。"},
-  {j:"食事<em>のまえに</em>、手を洗います。",z:"吃飯前洗手。"},
-  {j:"日本へ行く<em>まえに</em>、日本語を勉強しました。",z:"去日本之前學了日文。"}
- ]},
-{id:"toki",cat:"時間・順序",t:"～とき",
- p:"普通形 ＋ とき（な形容詞＋な＋とき、名詞＋の＋とき）",
- ex:"表示「～的時候」。前接普通形（な形容詞加な、名詞加の）。",
- eg:[
-  {j:"暇な<em>とき</em>、映画を見ます。",z:"有空的時候看電影。"},
-  {j:"わからない<em>とき</em>、先生に聞きます。",z:"不懂的時候問老師。"},
-  {j:"子供の<em>とき</em>、よく公園で遊びました。",z:"小時候常在公園玩。"},
-  {j:"日本に行った<em>とき</em>、お土産を買いました。",z:"去日本的時候買了伴手禮。"}
- ]},
-{id:"koro-goro",cat:"時間・順序",t:"～ころ・～ごろ",
- p:"時間 ＋ ごろ ／ 動詞普通形 ＋ ころ",
- ex:"表示大約的時間點。「ごろ」接具體時間，「ころ」接在句子後表示「大約那個時期」。",
- eg:[
-  {j:"7時<em>ごろ</em>起きます。",z:"大約7點起床。"},
-  {j:"12時<em>ごろ</em>昼ごはんを食べます。",z:"大約12點吃午餐。"},
-  {j:"大学生の<em>ころ</em>、よく旅行しました。",z:"大學生那個時期，常去旅行。"}
- ]},
-
-// ── 希望・請求 ──
-{id:"hoshii-tai",cat:"希望・請求",t:"～が欲しいです・～たいです",
- p:"名詞 ＋ が ＋ 欲しいです ／ 動詞ます形（去ます） ＋ たいです",
- ex:"「欲しい」表示想要某物，「～たい」表示想做某事。注意：只能用在第一人稱（自己的願望）。",
- eg:[
-  {j:"新しいパソコン<em>が欲しいです</em>。",z:"想要新電腦。"},
-  {j:"日本へ<em>行きたいです</em>。",z:"想去日本。"},
-  {j:"冷たいものが<em>飲みたいです</em>。",z:"想喝冰的東西。"}
- ],n:"問別人時：「何が欲しいですか」「何がしたいですか」。第三人稱用「～たがっています」。"},
-{id:"kudasai-noun",cat:"希望・請求",t:"～をください",
- p:"名詞 ＋ を ＋ ください",
- ex:"「請給我～」。購物、餐廳點餐時常用。",
- eg:[
-  {j:"水を<em>ください</em>。",z:"請給我水。"},
-  {j:"これを<em>ください</em>。",z:"請給我這個。"},
-  {j:"すみません、メニューを<em>ください</em>。",z:"不好意思，請給我菜單。"}
- ]},
-{id:"te-kudasai",cat:"希望・請求",t:"～てください・～ないでください",
- p:"動詞て形 ＋ ください ／ 動詞ないで ＋ ください",
- ex:"「請做～」「請不要做～」。禮貌的請求或指示。",
- eg:[
-  {j:"ここに名前を書い<em>てください</em>。",z:"請在這裡寫名字。"},
-  {j:"写真を撮ら<em>ないでください</em>。",z:"請不要拍照。"},
-  {j:"ちょっと待っ<em>てください</em>。",z:"請等一下。"}
- ]},
-{id:"naide-accompany",cat:"希望・請求",t:"「ないで」（附帶狀況）",
- p:"動詞ない形（去ない）＋ ないで ＋ 動詞",
- ex:"表示「不做A而做B」，即在不做某事的狀態下進行另一動作。",
- eg:[
-  {j:"朝ごはんを食べ<em>ないで</em>、学校に行きました。",z:"沒吃早餐就去學校了。"},
-  {j:"傘を持た<em>ないで</em>、出かけました。",z:"沒帶傘就出門了。"},
-  {j:"何も言わ<em>ないで</em>、帰りました。",z:"什麼都沒說就回去了。"}
- ]},
-{id:"nagara",cat:"希望・請求",t:"～ながら",
- p:"動詞ます形（去ます）＋ ながら ＋ 動詞",
- ex:"表示同時做兩件事。「一邊A一邊B」。主要動作在後面。",
- eg:[
-  {j:"音楽を聞き<em>ながら</em>、勉強します。",z:"一邊聽音樂一邊讀書。"},
-  {j:"コーヒーを飲み<em>ながら</em>、新聞を読みます。",z:"一邊喝咖啡一邊看報紙。"},
-  {j:"歩き<em>ながら</em>、スマホを見ないでください。",z:"請不要邊走邊看手機。"}
- ]},
-
-// ── 數量・指示 ──
-{id:"question-words",cat:"數量・指示",t:"疑問詞",
- p:"何・誰・どこ・いつ・どれ・どの・なぜ・いくら・いくつ",
- ex:"常用疑問詞整理。注意「なに」和「なん」的使用差異。",
- eg:[
-  {j:"これは<em>何</em>ですか。",z:"這是什麼？"},
-  {j:"<em>誰</em>が来ましたか。",z:"誰來了？"},
-  {j:"<em>いつ</em>日本へ行きますか。",z:"什麼時候去日本？"},
-  {j:"この本は<em>いくら</em>ですか。",z:"這本書多少錢？"}
- ]},
-{id:"demonstratives",cat:"數量・指示",t:"指示詞（こそあど言葉）",
- p:"これ・それ・あれ・どれ（事物）／ここ・そこ・あそこ・どこ（場所）",
- ex:"「こ」系列＝靠近說話者，「そ」系列＝靠近聽話者，「あ」系列＝離雙方都遠，「ど」系列＝疑問。",
- eg:[
-  {j:"<em>これ</em>は私のです。<em>それ</em>は田中さんのです。",z:"這是我的。那是田中的。"},
-  {j:"トイレは<em>あそこ</em>です。",z:"廁所在那邊。"},
-  {j:"<em>この</em>本はいくらですか。",z:"這本書多少錢？"},
-  {j:"駅は<em>どこ</em>ですか。",z:"車站在哪裡？"}
- ]},
-{id:"numbers",cat:"數量・指示",t:"數字的念法",
- p:"一～十、百、千、万",
- ex:"日文數字有音讀和訓讀。某些數字有特殊讀音：4（し・よん）、7（しち・なな）、9（く・きゅう）。",
- eg:[
-  {j:"いち、に、さん、<em>し／よん</em>、ご、ろく、<em>しち／なな</em>、はち、<em>く／きゅう</em>、じゅう",z:"1-10"},
-  {j:"ひゃく、<em>さんびゃく</em>、<em>ろっぴゃく</em>、<em>はっぴゃく</em>",z:"100, 300, 600, 800 有音變"},
-  {j:"せん、<em>さんぜん</em>、<em>はっせん</em>",z:"1000, 3000, 8000 有音變"}
- ]},
-{id:"counters",cat:"數量・指示",t:"數量詞",
- p:"～つ（一般）・～人（人）・～本（長物）・～枚（薄物）・～台（機器）・～冊（書）等",
- ex:"日文的量詞系統。不同物品用不同的量詞，且某些數字搭配量詞時有音變。",
- eg:[
-  {j:"りんごを<em>3つ</em>ください。",z:"請給我3個蘋果。"},
-  {j:"学生が<em>5人</em>います。",z:"有5個學生。"},
-  {j:"ペンを<em>2本</em>買いました。",z:"買了2枝筆。"},
-  {j:"紙を<em>10枚</em>もらいました。",z:"拿了10張紙。"}
- ]},
-{id:"kurai",cat:"數量・指示",t:"概數詞「くらい」",
- p:"數量 ＋ くらい（＝ぐらい）",
- ex:"表示大約的數量。「大概～左右」。くらい和ぐらい可互換。",
- eg:[
-  {j:"30分<em>くらい</em>かかります。",z:"大概要30分鐘左右。"},
-  {j:"100人<em>ぐらい</em>来ました。",z:"來了大約100人。"},
-  {j:"1時間<em>くらい</em>待ちました。",z:"等了大約1小時。"}
- ]},
-{id:"q-mo-neg",cat:"數量・指示",t:"疑問詞＋も＋否定",
- p:"何も・誰も・どこも＋否定動詞",
- ex:"疑問詞加「も」再接否定，表示全面否定。「什麼都不…」「誰都不…」。",
- eg:[
-  {j:"<em>何も</em>食べませんでした。",z:"什麼都沒吃。"},
-  {j:"<em>誰も</em>いません。",z:"沒有任何人。"},
-  {j:"<em>どこも</em>行きませんでした。",z:"哪裡都沒去。"}
- ]},
-{id:"q-ka",cat:"數量・指示",t:"疑問詞＋か",
- p:"何か・誰か・どこか・いつか",
- ex:"疑問詞加「か」表示不確定。「某個…」「某處…」。",
- eg:[
-  {j:"<em>何か</em>飲みますか。",z:"要喝點什麼嗎？"},
-  {j:"<em>誰か</em>来ましたよ。",z:"有人來了喔。"},
-  {j:"<em>どこか</em>へ行きたいです。",z:"想去某個地方。"},
-  {j:"<em>いつか</em>日本に行きたいです。",z:"總有一天想去日本。"}
- ]},
-
-// ── 修飾・接續 ──
-{id:"no-nominalizer",cat:"修飾・接續",t:"形式名詞「の」",
- p:"動詞普通形 ＋ の ＋ は／が／を",
- ex:"「の」可以將動詞句名詞化。「做某事（這件事）」。",
- eg:[
-  {j:"日本語を勉強する<em>の</em>は楽しいです。",z:"學日文（這件事）很快樂。"},
-  {j:"料理を作る<em>の</em>が好きです。",z:"喜歡做菜。"},
-  {j:"走る<em>の</em>は嫌いです。",z:"討厭跑步。"}
- ]},
-{id:"rentai-shushoku",cat:"修飾・接續",t:"連体修飾",
- p:"普通形 ＋ 名詞",
- ex:"用整個子句來修飾名詞。子句中用普通形。類似中文的「…的○○」。",
- eg:[
-  {j:"昨日<em>買った</em>本を読みます。",z:"看昨天買的書。"},
-  {j:"あそこに<em>いる</em>人は誰ですか。",z:"在那裡的人是誰？"},
-  {j:"私が<em>住んでいる</em>町は静かです。",z:"我住的城鎮很安靜。"}
- ]},
-{id:"rentaishi",cat:"修飾・接續",t:"連体詞",
- p:"この・その・あの・どの・大きな・小さな 等",
- ex:"專門修飾名詞的詞類，不能當述語用。「この、その、あの、どの」和「大きな、小さな」等。",
- eg:[
-  {j:"<em>この</em>本は面白いです。",z:"這本書很有趣。"},
-  {j:"<em>あの</em>人は誰ですか。",z:"那個人是誰？"},
-  {j:"<em>大きな</em>木がありました。",z:"有一棵大樹。"}
- ]},
-{id:"prefixes-suffixes",cat:"修飾・接續",t:"接頭辞・接尾辞",
- p:"お～・ご～（接頭辞）／～さん・～的・～中（接尾辞）",
- ex:"接頭辭加在詞前表示美化或尊敬。接尾辭加在詞後增加意義。",
- eg:[
-  {j:"<em>お</em>名前は何ですか。",z:"請問貴姓大名？（美化語）"},
-  {j:"<em>ご</em>家族は何人ですか。",z:"您家有幾個人？（尊敬語）"},
-  {j:"田中<em>さん</em>、鈴木<em>先生</em>",z:"田中先生/小姐、鈴木老師（稱呼接尾辭）"}
- ]},
-{id:"conjunctions",cat:"修飾・接續",t:"接續詞",
- p:"そして・それから・でも・しかし・だから・ところで 等",
- ex:"連接句子的詞。放在第二個句子的開頭。",
- eg:[
-  {j:"日本語を勉強しました。<em>そして</em>、日本へ行きました。",z:"學了日文。然後去了日本。"},
-  {j:"行きたいです。<em>でも</em>、お金がありません。",z:"想去。但是沒有錢。"},
-  {j:"雨でした。<em>だから</em>、出かけませんでした。",z:"下雨了。所以沒出門。"}
- ]},
-{id:"chuu-juu",cat:"修飾・接續",t:"接尾辞「～中」",
- p:"名詞 ＋ 中（ちゅう／じゅう）",
- ex:"「ちゅう」表示正在進行中，「じゅう」表示整個範圍。",
- eg:[
-  {j:"会議<em>中</em>（ちゅう）です。",z:"正在開會中。"},
-  {j:"一日<em>中</em>（じゅう）雨でした。",z:"一整天都在下雨。"},
-  {j:"世界<em>中</em>（じゅう）で有名です。",z:"全世界都很有名。"}
- ]},
-{id:"toiu",cat:"修飾・接續",t:"～という",
- p:"名詞A ＋ という ＋ 名詞B",
- ex:"「叫做A的B」。用於介紹名稱或引用。",
- eg:[
-  {j:"「鬼滅の刃」<em>という</em>アニメを知っていますか。",z:"你知道叫「鬼滅之刃」的動畫嗎？"},
-  {j:"田中<em>という</em>人から電話がありました。",z:"有一個叫田中的人打了電話來。"},
-  {j:"「ありがとう」は「thank you」<em>という</em>意味です。",z:"「ありがとう」是「thank you」的意思。"}
- ]},
-
-// ── 副詞 ──
-{id:"mou-mada",cat:"副詞",t:"副詞「もう」與「まだ」",
- p:"もう＋肯定（已經）／まだ＋否定（還沒）／まだ＋肯定（還在）",
- ex:"「もう」表示已經完成，「まだ」表示尚未或持續中。",
- eg:[
-  {j:"<em>もう</em>食べましたか。",z:"已經吃了嗎？"},
-  {j:"いいえ、<em>まだ</em>食べていません。",z:"不，還沒吃。"},
-  {j:"<em>まだ</em>雨が降っています。",z:"還在下雨。"},
-  {j:"<em>もう</em>11時ですよ。",z:"已經11點了喔。"}
- ]},
-{id:"adverbs-basic",cat:"副詞",t:"副詞的基本用法",
- p:"とても・たくさん・よく・あまり・全然・少し・ちょっと 等",
- ex:"副詞放在修飾的動詞或形容詞前面。「あまり」和「全然」後面接否定。",
- eg:[
-  {j:"この映画は<em>とても</em>面白いです。",z:"這部電影非常有趣。"},
-  {j:"昨日は<em>たくさん</em>食べました。",z:"昨天吃了很多。"},
-  {j:"日本語は<em>あまり</em>わかりません。",z:"日文不太懂。"},
-  {j:"英語は<em>全然</em>わかりません。",z:"英文完全不懂。"}
- ]},
-{id:"freq-degree-adverbs",cat:"副詞",t:"頻度・程度・量的副詞",
- p:"いつも・よく・ときどき・たまに・あまり・全然（頻度）",
- ex:"頻度高→低：いつも＞よく＞ときどき＞たまに＞あまり（＋否定）＞全然（＋否定）",
- eg:[
-  {j:"<em>いつも</em>7時に起きます。",z:"總是7點起床。"},
-  {j:"<em>ときどき</em>映画を見ます。",z:"偶爾看電影。"},
-  {j:"<em>たまに</em>外食します。",z:"偶爾外食。"},
-  {j:"お酒は<em>あまり</em>飲みません。",z:"不太喝酒。"}
- ]},
-
-// ── 其他表現 ──
-{id:"interjections",cat:"其他表現",t:"感応詞",
- p:"はい・いいえ・ええ・あのう・すみません・さあ 等",
- ex:"用於回應、引起注意或表示猶豫的詞。",
- eg:[
-  {j:"<em>はい</em>、そうです。",z:"是的，沒錯。"},
-  {j:"<em>あのう</em>、すみません。",z:"那個…不好意思。"},
-  {j:"<em>ええ</em>、いいですよ。",z:"嗯，好啊。"},
-  {j:"<em>さあ</em>、わかりません。",z:"嗯…不知道。"}
- ]},
-{id:"onomatopoeia",cat:"其他表現",t:"擬態語・擬声語（オノマトペ）",
- p:"ゆっくり・はっきり・どんどん・わくわく 等",
- ex:"擬聲語模擬聲音，擬態語模擬狀態。是日語的一大特色。",
- eg:[
-  {j:"<em>ゆっくり</em>話してください。",z:"請慢慢說。"},
-  {j:"<em>はっきり</em>言ってください。",z:"請說清楚。"},
-  {j:"雨が<em>ザーザー</em>降っています。",z:"雨嘩啦嘩啦地下著。"},
-  {j:"胸が<em>ドキドキ</em>します。",z:"心臟撲通撲通跳。"}
- ]},
-{id:"deshou",cat:"其他表現",t:"～でしょう",
- p:"普通形 ＋ でしょう",
- ex:"表示推測「大概是…吧」或向對方確認「…對吧？」。語調上升是確認，下降是推測。",
- eg:[
-  {j:"明日は雨<em>でしょう</em>。",z:"明天大概會下雨吧。"},
-  {j:"この料理はおいしい<em>でしょう</em>？",z:"這道菜好吃吧？"},
-  {j:"田中さんは来ない<em>でしょう</em>。",z:"田中大概不會來吧。"}
- ]},
-{id:"kara-desu",cat:"其他表現",t:"～からです",
- p:"普通形 ＋ からです",
- ex:"用來回答「どうしてですか」。「因為～」。放在句尾強調原因。",
- eg:[
-  {j:"どうして遅れましたか。——電車が遅れた<em>からです</em>。",z:"為什麼遲到了？——因為電車誤點了。"},
-  {j:"なぜ日本語を勉強していますか。——日本が好きだ<em>からです</em>。",z:"為什麼在學日文？——因為喜歡日本。"},
-  {j:"どうして行かないんですか。——忙しい<em>からです</em>。",z:"為什麼不去？——因為很忙。"}
- ]},
-{id:"intrans-trans",cat:"其他表現",t:"自動詞・他動詞",
- p:"自動詞（主語自行發生）／他動詞（有人施加動作）",
- ex:"自動詞不需要受詞（が），他動詞需要受詞（を）。很多動詞成對存在。",
- eg:[
-  {j:"ドアが<em>開きます</em>（自動）。/ ドアを<em>開けます</em>（他動）。",z:"門開了。/ 開門。"},
-  {j:"電気が<em>つきます</em>（自動）。/ 電気を<em>つけます</em>（他動）。",z:"燈亮了。/ 開燈。"},
-  {j:"窓が<em>閉まります</em>（自動）。/ 窓を<em>閉めます</em>（他動）。",z:"窗戶關了。/ 關窗戶。"}
- ]},
-{id:"te-imasu-arimasu",cat:"其他表現",t:"自動詞て形＋います・他動詞て形＋あります",
- p:"自動詞て形＋います（自然狀態）／他動詞て形＋あります（人為狀態）",
- ex:"自動詞ています表示自然形成的狀態，他動詞てあります表示某人刻意做成的狀態。",
- eg:[
-  {j:"窓が開い<em>ています</em>。（自然）",z:"窗戶開著。"},
-  {j:"窓が開け<em>てあります</em>。（有人開的）",z:"窗戶被（刻意）打開著。"},
-  {j:"壁に絵がかけ<em>てあります</em>。",z:"牆上掛著畫（有人掛的）。"}
- ]},
-{id:"plain-noun-mod",cat:"修飾・接續",t:"連体修飾",
- p:"普通形 ＋ 名詞",
- ex:"用普通形修飾後面的名詞，形成「做了～的○○」等表達。",
- eg:[
-  {j:"昨日<em>買った</em>本。",z:"昨天買的書。"},
-  {j:"日本語を<em>勉強している</em>学生。",z:"正在學日文的學生。"},
-  {j:"あそこに<em>いる</em>人。",z:"在那裡的人。"}
- ]},
-{id:"adnominal",cat:"修飾・接續",t:"連体詞",
- p:"この・その・あの・どの・大きな・小さな・いろんな 等",
- ex:"直接放在名詞前面修飾的特殊詞類，沒有活用變化。",
- eg:[
-  {j:"<em>この</em>映画は面白いです。",z:"這部電影很有趣。"},
-  {j:"<em>大きな</em>家に住みたいです。",z:"想住大房子。"},
-  {j:"<em>いろんな</em>国に行きました。",z:"去了各種國家。"}
- ]}
+// ========== N5 DATA ==========
+const N5 = [
+{id:"n5-1",cat:"基本句型",t:"～です・～じゃありません（名詞）",p:"名詞＋です／じゃありません",ex:"肯定「です」，否定「じゃありません」。普通體：だ／じゃない。",eg:[{j:"佐藤さんは<em>会社員です</em>。",z:"佐藤是公司職員。"},{j:"鈴木さんは学生<em>じゃありません</em>。",z:"鈴木不是學生。"}]},
+{id:"n5-2",cat:"基本句型",t:"～ます・～ません",p:"動詞ます形＋ます／ません",ex:"丁寧體現在式。對長輩、陌生人使用。",eg:[{j:"明日、私は<em>働きます</em>。",z:"明天我會工作。"},{j:"高橋部長はタバコを<em>吸いません</em>。",z:"高橋部長不抽菸。"}]},
+{id:"n5-3",cat:"基本句型",t:"～です・～じゃありません（な形容詞）",p:"な形容詞語幹＋です／じゃありません",ex:"な形容詞丁寧體。修飾名詞時加「な」。",eg:[{j:"この部屋は<em>静かです</em>。",z:"這個房間很安靜。"},{j:"あの人は<em>親切じゃありません</em>。",z:"那個人不親切。"}]},
+{id:"n5-4",cat:"基本句型",t:"～いです・～くないです",p:"い形容詞＋です／い→くないです",ex:"い形容詞現在式。「いい」否定→「よくないです」。",eg:[{j:"今日は<em>暑いです</em>。",z:"今天很熱。"},{j:"この映画は<em>面白くないです</em>。",z:"這部電影不有趣。"}]},
+{id:"n5-5",cat:"基本句型",t:"～でした（名詞過去）",p:"名詞＋でした／じゃありませんでした",ex:"名詞的過去式。",eg:[{j:"昨日は<em>休みでした</em>。",z:"昨天是休息日。"},{j:"あの店は寿司屋<em>じゃありませんでした</em>。",z:"那家店以前不是壽司店。"}]},
+{id:"n5-6",cat:"基本句型",t:"～ました・～ませんでした",p:"動詞ます形＋ました／ませんでした",ex:"動詞丁寧體過去式。",eg:[{j:"昨日、映画を<em>見ました</em>。",z:"昨天看了電影。"},{j:"朝ごはんを<em>食べませんでした</em>。",z:"沒吃早餐。"}]},
+{id:"n5-7",cat:"基本句型",t:"～でした（な形容詞過去）",p:"な形容詞語幹＋でした／じゃありませんでした",ex:"な形容詞過去式，同名詞。",eg:[{j:"試験は<em>簡単でした</em>。",z:"考試很簡單。"},{j:"あの町は<em>にぎやかじゃありませんでした</em>。",z:"那個城鎮以前不熱鬧。"}]},
+{id:"n5-8",cat:"基本句型",t:"～かったです（い形容詞過去）",p:"い形→かったです／くなかったです",ex:"去「い」加「かったです」。「いい」→「よかったです」。",eg:[{j:"昨日は<em>寒かったです</em>。",z:"昨天很冷。"},{j:"旅行は<em>よかったです</em>。",z:"旅行很好。"}]},
+{id:"n5-9",cat:"基本句型",t:"～ませんか",p:"動詞ます形＋ませんか",ex:"委婉的邀請。比「ましょう」更禮貌。",eg:[{j:"一緒に映画を<em>見ませんか</em>。",z:"要不要一起看電影？"},{j:"ちょっと<em>休みませんか</em>。",z:"要不要休息一下？"}]},
+{id:"n5-10",cat:"基本句型",t:"～くなります・～になります",p:"い形→くなります／な形・名詞→になります",ex:"表示自然變化的結果。",eg:[{j:"春になると、<em>暖かくなります</em>。",z:"到了春天就會變暖。"},{j:"日本語が<em>上手になりました</em>。",z:"日文變好了。"}]},
+{id:"n5-11",cat:"基本句型",t:"～くします・～にします",p:"い形→くします／な形・名詞→にします",ex:"表示人為改變。",eg:[{j:"音を<em>小さくします</em>。",z:"把聲音調小。"},{j:"部屋を<em>きれいにします</em>。",z:"把房間弄乾淨。"}]},
+{id:"n5-12",cat:"基本句型",t:"～ましょう",p:"動詞ます形＋ましょう",ex:"提議「一起做吧」。",eg:[{j:"一緒に<em>行きましょう</em>。",z:"一起去吧。"},{j:"ちょっと<em>休みましょう</em>。",z:"休息一下吧。"}]},
+{id:"n5-13",cat:"基本句型",t:"丁寧体與普通体",p:"丁寧体（です・ます）／普通体（だ・辞書形等）",ex:"丁寧體用於正式場合，普通體用於朋友家人。",eg:[{j:"明日は雨<em>です</em>。→ 明日は雨<em>だ</em>。",z:"明天會下雨。"},{j:"勉強してい<em>ます</em>。→ 勉強してい<em>る</em>。",z:"正在讀書。"}]},
+{id:"n5-14",cat:"基本句型",t:"丁寧体否定表現",p:"～ません ＝ ～ないです",ex:"兩種否定說法可互換。ません較正式，ないです較口語。",eg:[{j:"行き<em>ません</em> ＝ 行か<em>ないです</em>",z:"不去。"},{j:"高く<em>ありません</em> ＝ 高く<em>ないです</em>",z:"不貴。"}]},
+{id:"n5-15",cat:"助詞",t:"助詞「は」（主題）",p:"名詞＋は",ex:"標示句子主題，讀作「wa」。不一定等於主語。",eg:[{j:"<em>私は</em>大学生です。",z:"我是大學生。"},{j:"<em>このお弁当は</em>妻が作りました。",z:"這個便當是妻子做的。"}],n:"「は」＝舊資訊（主題），「が」＝新資訊（焦點）。"},
+{id:"n5-16",cat:"助詞",t:"助詞「も」",p:"名詞＋も",ex:"表示「也」。取代「は」「が」「を」。",eg:[{j:"田中さん<em>も</em>学生です。",z:"田中也是學生。"},{j:"コーヒー<em>も</em>紅茶<em>も</em>好きです。",z:"咖啡和紅茶都喜歡。"}]},
+{id:"n5-17",cat:"助詞",t:"助詞「の」（所有格）",p:"名詞A＋の＋名詞B",ex:"表示所有、所屬。類似「的」。",eg:[{j:"<em>私の</em>本。",z:"我的書。"},{j:"<em>日本語の</em>先生。",z:"日文老師。"}]},
+{id:"n5-18",cat:"助詞",t:"助詞「か」（疑問）",p:"文末＋か",ex:"句尾加「か」表示疑問。",eg:[{j:"これは何です<em>か</em>。",z:"這是什麼？"},{j:"田中さんは学生です<em>か</em>。",z:"田中是學生嗎？"}]},
+{id:"n5-19",cat:"助詞",t:"助詞「に」（時間點）",p:"時間名詞＋に",ex:"標示具體時間點。相對時間（今日等）不加。",eg:[{j:"<em>7時に</em>起きます。",z:"7點起床。"},{j:"<em>月曜日に</em>会議があります。",z:"星期一有會議。"}]},
+{id:"n5-20",cat:"助詞",t:"助詞「へ」（方向）",p:"場所＋へ",ex:"表示移動方向，讀「e」。可與「に」互換。",eg:[{j:"日本<em>へ</em>行きます。",z:"去日本。"},{j:"家<em>へ</em>帰ります。",z:"回家。"}]},
+{id:"n5-21",cat:"助詞",t:"助詞「で」（交通工具）",p:"交通工具＋で",ex:"表示交通手段。步行用「歩いて」。",eg:[{j:"バス<em>で</em>学校に行きます。",z:"搭公車去學校。"},{j:"自転車<em>で</em>来ました。",z:"騎腳踏車來的。"}]},
+{id:"n5-22",cat:"助詞",t:"助詞「と」（夥伴）",p:"人＋と（一緒に）",ex:"表示一起做某動作的對象。",eg:[{j:"友達<em>と</em>映画を見ます。",z:"和朋友看電影。"},{j:"誰<em>と</em>行きますか。",z:"和誰去？"}]},
+{id:"n5-23",cat:"助詞",t:"助詞「を」（受詞）",p:"名詞＋を＋他動詞",ex:"標示動作對象，讀「o」。",eg:[{j:"朝ごはん<em>を</em>食べます。",z:"吃早餐。"},{j:"日本語<em>を</em>勉強しています。",z:"正在學日文。"}]},
+{id:"n5-24",cat:"助詞",t:"助詞「で」（動作地點）",p:"場所＋で＋動詞",ex:"表示動作進行場所。存在用「に」，動作用「で」。",eg:[{j:"図書館<em>で</em>勉強します。",z:"在圖書館讀書。"},{j:"公園<em>で</em>遊びました。",z:"在公園玩了。"}]},
+{id:"n5-25",cat:"助詞",t:"助詞「から」（起點）",p:"名詞＋から",ex:"表示時間或空間起點。常搭配「まで」。",eg:[{j:"9時<em>から</em>5時まで働きます。",z:"從9點工作到5點。"},{j:"東京<em>から</em>大阪まで3時間。",z:"從東京到大阪3小時。"}]},
+{id:"n5-26",cat:"助詞",t:"助詞「まで」（終點）",p:"名詞＋まで",ex:"表示終點、限界。「到～為止」。",eg:[{j:"12時<em>まで</em>勉強します。",z:"讀書到12點。"},{j:"駅<em>まで</em>歩きます。",z:"走路到車站。"}]},
+{id:"n5-27",cat:"助詞",t:"助詞「と」（並列）",p:"名詞A＋と＋名詞B",ex:"全部列舉。「A和B」。",eg:[{j:"ペン<em>と</em>ノートがあります。",z:"有筆和筆記本。"},{j:"りんご<em>と</em>みかんを買いました。",z:"買了蘋果和橘子。"}]},
+{id:"n5-28",cat:"助詞",t:"助詞「や」（部分列舉）",p:"名詞A＋や＋名詞B（＋など）",ex:"部分列舉。暗示還有其他。",eg:[{j:"映画<em>や</em>買い物をします。",z:"看電影啊購物之類的。"},{j:"ペン<em>や</em>ノート<em>など</em>があります。",z:"有筆啊筆記本之類的。"}]},
+{id:"n5-29",cat:"助詞",t:"助詞「で」（手段・工具）",p:"工具＋で",ex:"表示使用的工具或手段。",eg:[{j:"はし<em>で</em>ご飯を食べます。",z:"用筷子吃飯。"},{j:"日本語<em>で</em>手紙を書きます。",z:"用日文寫信。"}]},
+{id:"n5-30",cat:"助詞",t:"助詞「に」（動作對象）",p:"人＋に＋動詞",ex:"表示動作接受者。",eg:[{j:"友達<em>に</em>プレゼントをあげます。",z:"送禮物給朋友。"},{j:"先生<em>に</em>質問します。",z:"向老師提問。"}]},
+{id:"n5-31",cat:"助詞",t:"助詞「から」（原因・理由）",p:"普通形／丁寧形＋から",ex:"表示原因理由。「因為A，所以B」。",eg:[{j:"寒いです<em>から</em>、窓を閉めてください。",z:"因為很冷，請關窗。"},{j:"お金がありません<em>から</em>、買いません。",z:"因為沒錢，不買。"}]},
+{id:"n5-32",cat:"助詞",t:"助詞「が」（能力・好惡）",p:"名詞＋が＋わかります／好きです等",ex:"搭配能力、好惡表現，對象用「が」。",eg:[{j:"日本語<em>が</em>わかります。",z:"懂日文。"},{j:"猫<em>が</em>好きです。",z:"喜歡貓。"}]},
+{id:"n5-33",cat:"助詞",t:"助詞「に」（存在位置）",p:"場所＋に＋あります／います",ex:"表示存在位置。",eg:[{j:"机の上<em>に</em>本があります。",z:"桌上有書。"},{j:"庭<em>に</em>猫がいます。",z:"庭院裡有貓。"}]},
+{id:"n5-34",cat:"助詞",t:"助詞「が」（主語）",p:"名詞＋が",ex:"標示主語。用在新資訊、疑問詞回答等。",eg:[{j:"誰<em>が</em>来ましたか。",z:"誰來了？"},{j:"雨<em>が</em>降っています。",z:"正在下雨。"}]},
+{id:"n5-35",cat:"助詞",t:"助詞「が」（逆接）",p:"文A＋が＋文B",ex:"轉折。「雖然A，但B」。",eg:[{j:"日本語は難しいです<em>が</em>、面白いです。",z:"日文雖然難但有趣。"},{j:"行きたいです<em>が</em>、時間がありません。",z:"想去但沒時間。"}]},
+{id:"n5-36",cat:"助詞",t:"助詞「けど」",p:"文A＋けど＋文B",ex:"口語的逆接或鋪陳。比「が」隨意。",eg:[{j:"安い<em>けど</em>、おいしいです。",z:"雖然便宜但好吃。"},{j:"聞きたいんです<em>けど</em>…",z:"想問一下…"}]},
+{id:"n5-37",cat:"助詞",t:"助詞「に」（目的）",p:"動詞ます形（去ます）＋に＋行きます等",ex:"表示移動目的。",eg:[{j:"映画を見<em>に</em>行きます。",z:"去看電影。"},{j:"ご飯を食べ<em>に</em>来ました。",z:"來吃飯的。"}]},
+{id:"n5-38",cat:"助詞",t:"限定助詞「だけ」「しか」",p:"だけ（中性限定）／しか＋否定（不足感）",ex:"「だけ」中性，「しか＋否定」帶遺憾語氣。",eg:[{j:"コーヒー<em>だけ</em>飲みます。",z:"只喝咖啡。"},{j:"1000円<em>しか</em>ありません。",z:"只有1000日圓（不夠）。"}]},
+{id:"n5-39",cat:"助詞",t:"終助詞「ね」「よ」",p:"文末＋ね（確認共感）／よ（告知強調）",ex:"「ね」求同意，「よ」告知新資訊。",eg:[{j:"いい天気です<em>ね</em>。",z:"天氣真好呢。"},{j:"このケーキ、おいしいです<em>よ</em>。",z:"這蛋糕很好吃喔。"}]},
+{id:"n5-40",cat:"助詞",t:"其他助詞整理",p:"を（離開/經過）・に（頻率/接觸/變化）・で（單位/範圍）・は（對比）・か（選擇）",ex:"各助詞的進階用法匯總。",eg:[{j:"大学<em>を</em>卒業します。",z:"大學畢業。（離開點）"},{j:"1週間<em>に</em>3回運動します。",z:"一週運動3次。（頻率）"},{j:"クラス<em>で</em>いちばん高い。",z:"班上最高。（範圍）"}]},
+{id:"n5-41",cat:"動詞活用",t:"動詞ます形",p:"五段：う段→い段＋ます／一段：去る＋ます",ex:"最基本的禮貌形。する→します，来る→来ます。",eg:[{j:"書く→書き<em>ます</em>",z:"寫（五段）"},{j:"食べる→食べ<em>ます</em>",z:"吃（一段）"}]},
+{id:"n5-42",cat:"動詞活用",t:"て形",p:"五段音便＋て／一段：去る＋て",ex:"最重要的活用。く→いて，ぐ→いで，す→して，む・ぶ・ぬ→んで，う・つ・る→って。例外：行く→行って。",eg:[{j:"書く→書い<em>て</em>、泳ぐ→泳い<em>で</em>",z:"寫、游泳"},{j:"飲む→飲ん<em>で</em>、買う→買っ<em>て</em>",z:"喝、買"}]},
+{id:"n5-43",cat:"動詞活用",t:"辞書形・ない形",p:"辞書形：原形（う段結尾）／ない形：あ段＋ない",ex:"辞書形＝普通體肯定。ない形＝普通體否定。う→わない。",eg:[{j:"書きます→<em>書く</em>／書か<em>ない</em>",z:"寫／不寫"},{j:"食べます→<em>食べる</em>／食べ<em>ない</em>",z:"吃／不吃"}]},
+{id:"n5-44",cat:"動詞活用",t:"た形・なかった形",p:"た形＝て→た（で→だ）／なかった形＝ない→なかった",ex:"過去式普通體。た形變化同て形。",eg:[{j:"書く→書い<em>た</em>、食べる→食べ<em>た</em>",z:"寫了、吃了"},{j:"書かない→書か<em>なかった</em>",z:"沒寫"}]},
+{id:"n5-45",cat:"動詞活用",t:"普通形總整理",p:"動詞・い形・な形・名詞 各四種變化",ex:"辞書形／ない形／た形／なかった形。な形容詞：だ／じゃない／だった／じゃなかった。",eg:[{j:"行く/行かない/行った/行か<em>なかった</em>",z:"動詞四變化"},{j:"元気<em>だ</em>/じゃない/<em>だった</em>/じゃなかった",z:"な形容詞四變化"}]},
+{id:"n5-46",cat:"形容詞・修飾",t:"形容詞修飾名詞",p:"い形＋名詞／な形＋な＋名詞",ex:"形容詞放名詞前做修飾。",eg:[{j:"<em>大きい</em>犬。",z:"大狗。"},{j:"<em>きれいな</em>花。",z:"漂亮的花。"}]},
+{id:"n5-47",cat:"形容詞・修飾",t:"形容詞的副詞用法",p:"い形→く＋動詞／な形→に＋動詞",ex:"形容詞當副詞修飾動詞。",eg:[{j:"<em>速く</em>走ります。",z:"快速地跑。"},{j:"<em>きれいに</em>書きます。",z:"漂亮地寫。"}]},
+{id:"n5-48",cat:"形容詞・修飾",t:"連体修飾",p:"普通形＋名詞",ex:"用子句修飾名詞。類似「…的○○」。",eg:[{j:"昨日<em>買った</em>本。",z:"昨天買的書。"},{j:"私が<em>住んでいる</em>町。",z:"我住的城鎮。"}]},
+{id:"n5-49",cat:"形容詞・修飾",t:"形式名詞「の」",p:"動詞普通形＋の＋は／が／を",ex:"「の」將動詞句名詞化。",eg:[{j:"日本語を勉強する<em>の</em>は楽しい。",z:"學日文很快樂。"},{j:"料理を作る<em>の</em>が好きです。",z:"喜歡做菜。"}]},
+{id:"n5-50",cat:"存在・授受",t:"存在表現",p:"場所に＋物が＋あります／います",ex:"あります（物）、います（有生命）。",eg:[{j:"机の上<em>に</em>本<em>が</em>あります。",z:"桌上有書。"},{j:"庭<em>に</em>猫<em>が</em>います。",z:"庭院有貓。"}]},
+{id:"n5-51",cat:"存在・授受",t:"授受動詞",p:"あげます（給人）／もらいます（得到）／くれます（給我）",ex:"三組授受動詞。やります＝對下給予。",eg:[{j:"友達にプレゼントを<em>あげます</em>。",z:"送禮物給朋友。"},{j:"友達が本を<em>くれました</em>。",z:"朋友給了我書。"}]},
+{id:"n5-52",cat:"て形用法",t:"～ています",p:"動詞て形＋います",ex:"①正在進行 ②結果狀態 ③習慣。",eg:[{j:"今、ご飯を食べ<em>ています</em>。",z:"正在吃飯。（進行）"},{j:"結婚し<em>ています</em>。",z:"已婚。（狀態）"}]},
+{id:"n5-53",cat:"て形用法",t:"て形的連接用法",p:"て形連接多個動作或狀態",ex:"並列描述、動作順序、原因、附帶狀況。",eg:[{j:"朝起き<em>て</em>、顔を洗い<em>て</em>、ご飯を食べます。",z:"起床→洗臉→吃飯。（順序）"},{j:"頭が痛<em>くて</em>、休みました。",z:"因為頭痛，請假了。（原因）"}]},
+{id:"n5-54",cat:"て形用法",t:"～てから・～あとで・～まえに",p:"てから（做完後）／た形あとで（之後）／辞書形まえに（之前）",ex:"表示動作先後關係的三個句型。",eg:[{j:"ご飯を食べ<em>てから</em>、勉強します。",z:"吃完飯後讀書。"},{j:"寝る<em>まえに</em>、本を読みます。",z:"睡前看書。"}]},
+{id:"n5-55",cat:"て形用法",t:"～てください・～ないでください",p:"て形＋ください／ないで＋ください",ex:"「請做～」「請不要做～」。",eg:[{j:"ここに名前を書い<em>てください</em>。",z:"請在這裡寫名字。"},{j:"写真を撮ら<em>ないでください</em>。",z:"請不要拍照。"}]},
+{id:"n5-56",cat:"て形用法",t:"～たり～たりします",p:"動詞た形＋り…＋します",ex:"列舉代表性動作。暗示還有其他。",eg:[{j:"映画を見<em>たり</em>、本を読ん<em>だり</em>します。",z:"看電影啊讀書之類的。"},{j:"天気が良かっ<em>たり</em>悪かっ<em>たり</em>します。",z:"天氣時好時壞。"}]},
+{id:"n5-57",cat:"表現・文型",t:"～が欲しいです・～たいです",p:"名詞＋が欲しい／ます形（去ます）＋たい",ex:"「欲しい」想要物品，「たい」想做動作。只用於第一人稱。",eg:[{j:"新しいパソコン<em>が欲しいです</em>。",z:"想要新電腦。"},{j:"日本へ<em>行きたいです</em>。",z:"想去日本。"}]},
+{id:"n5-58",cat:"表現・文型",t:"～ながら",p:"ます形（去ます）＋ながら＋動詞",ex:"同時做兩件事。主要動作在後面。",eg:[{j:"音楽を聞き<em>ながら</em>、勉強します。",z:"一邊聽音樂一邊讀書。"},{j:"歩き<em>ながら</em>スマホを見ないで。",z:"不要邊走邊看手機。"}]},
+{id:"n5-59",cat:"表現・文型",t:"～とき",p:"普通形＋とき",ex:"「～的時候」。な形加な，名詞加の。",eg:[{j:"暇な<em>とき</em>、映画を見ます。",z:"有空時看電影。"},{j:"日本に行った<em>とき</em>、お土産を買いました。",z:"去日本時買了伴手禮。"}]},
+{id:"n5-60",cat:"表現・文型",t:"～でしょう",p:"普通形＋でしょう",ex:"推測（語調↓）或確認（語調↑）。",eg:[{j:"明日は雨<em>でしょう</em>。",z:"明天大概下雨吧。"},{j:"この料理はおいしい<em>でしょう</em>？",z:"這道菜好吃吧？"}]},
+{id:"n5-61",cat:"表現・文型",t:"～からです",p:"普通形＋からです",ex:"回答「どうして」。強調原因。",eg:[{j:"——電車が遅れた<em>からです</em>。",z:"——因為電車誤點了。"},{j:"——日本が好きだ<em>からです</em>。",z:"——因為喜歡日本。"}]},
+{id:"n5-62",cat:"表現・文型",t:"自動詞・他動詞",p:"自動詞（が）：自然發生／他動詞（を）：人為動作",ex:"ドアが開く（自）／ドアを開ける（他）。",eg:[{j:"ドア<em>が</em>開きます。（自動）",z:"門開了。"},{j:"ドア<em>を</em>開けます。（他動）",z:"開門。"}]},
+{id:"n5-63",cat:"詞彙・其他",t:"疑問詞",p:"何・誰・どこ・いつ・どれ・いくら・どう",ex:"常用疑問詞。疑問詞＋も＋否定＝全面否定。疑問詞＋か＝不確定。",eg:[{j:"<em>何も</em>食べませんでした。",z:"什麼都沒吃。"},{j:"<em>どこか</em>へ行きたいです。",z:"想去某個地方。"}]},
+{id:"n5-64",cat:"詞彙・其他",t:"指示詞（こそあど）",p:"こ（近說話者）・そ（近聽話者）・あ（遠）・ど（疑問）",ex:"これ/それ/あれ/どれ、ここ/そこ/あそこ/どこ。",eg:[{j:"<em>これ</em>は何ですか。",z:"這是什麼？"},{j:"トイレは<em>あそこ</em>です。",z:"廁所在那邊。"}]},
+{id:"n5-65",cat:"詞彙・其他",t:"數量詞・時間表現",p:"～つ・～人・～本・～枚 等量詞",ex:"不同物品用不同量詞。くらい＝大約。",eg:[{j:"りんごを<em>3つ</em>ください。",z:"請給我3個蘋果。"},{j:"30分<em>くらい</em>かかります。",z:"大概30分鐘。"}]},
+{id:"n5-66",cat:"詞彙・其他",t:"副詞",p:"とても・たくさん・よく・あまり（＋否定）・全然（＋否定）",ex:"頻度高→低：いつも＞よく＞ときどき＞たまに＞あまり＞全然。",eg:[{j:"<em>とても</em>面白いです。",z:"非常有趣。"},{j:"お酒は<em>あまり</em>飲みません。",z:"不太喝酒。"}]},
+{id:"n5-67",cat:"詞彙・其他",t:"接續詞・感應詞・擬聲語",p:"そして・でも・だから（接續）／はい・あのう（感應）",ex:"接續詞連接句子。擬聲語（ゆっくり、はっきり等）是日語特色。",eg:[{j:"行きたい。<em>でも</em>、お金がない。",z:"想去。但是沒錢。"},{j:"<em>ゆっくり</em>話してください。",z:"請慢慢說。"}]},
+{id:"n5-68",cat:"詞彙・其他",t:"～という",p:"名詞A＋という＋名詞B",ex:"「叫做A的B」。介紹名稱或引用。",eg:[{j:"「鬼滅の刃」<em>という</em>アニメ。",z:"叫「鬼滅之刃」的動畫。"},{j:"田中<em>という</em>人から電話が。",z:"一個叫田中的人打電話來。"}]}
 ];
 
-// ===== CATEGORIES =====
-const CATEGORIES = [
-  {name:"基本句型", icon:"文"},
-  {name:"助詞", icon:"助"},
-  {name:"動詞活用", icon:"動"},
-  {name:"形容詞・名詞", icon:"形"},
-  {name:"存在表現", icon:"在"},
-  {name:"授受動詞", icon:"授"},
-  {name:"て形的用法", icon:"て"},
-  {name:"時間・順序", icon:"時"},
-  {name:"希望・請求", icon:"望"},
-  {name:"數量・指示", icon:"數"},
-  {name:"修飾・接續", icon:"接"},
-  {name:"副詞", icon:"副"},
-  {name:"其他表現", icon:"他"}
+// ========== N4 DATA ==========
+const N4 = [
+{id:"n4-1",cat:"表現・文型",t:"～までに（期限）",p:"時間＋までに",ex:"在某期限之前完成。「まで」＝持續到，「までに」＝期限前。",eg:[{j:"明日<em>までに</em>レポートを出してください。",z:"請在明天之前交報告。"},{j:"5時<em>までに</em>帰ります。",z:"5點之前回來。"}]},
+{id:"n4-2",cat:"表現・文型",t:"～つもりです（打算）",p:"辞書形／ない形＋つもりです",ex:"表示預定的意志或計畫。",eg:[{j:"来年、日本に行く<em>つもりです</em>。",z:"打算明年去日本。"},{j:"もうお酒は飲まない<em>つもりです</em>。",z:"打算不再喝酒了。"}]},
+{id:"n4-3",cat:"推量・様態",t:"～かもしれません",p:"普通形＋かもしれません",ex:"「也許、可能」。不確定的推測。",eg:[{j:"明日は雨が降る<em>かもしれません</em>。",z:"明天也許會下雨。"},{j:"彼は来ない<em>かもしれない</em>。",z:"他也許不會來。"}]},
+{id:"n4-4",cat:"比較",t:"～は...より（比較）",p:"AはBより＋形容詞",ex:"「A比B更…」。",eg:[{j:"東京は大阪<em>より</em>大きいです。",z:"東京比大阪大。"},{j:"電車はバス<em>より</em>速いです。",z:"電車比公車快。"}]},
+{id:"n4-5",cat:"表現・文型",t:"～やすい・～にくい",p:"ます形（去ます）＋やすい／にくい",ex:"「容易做～」「難以做～」。",eg:[{j:"この本は<em>読みやすい</em>です。",z:"這本書很好讀。"},{j:"この漢字は<em>覚えにくい</em>です。",z:"這個漢字很難記。"}]},
+{id:"n4-6",cat:"表現・文型",t:"～方（方法）",p:"ます形（去ます）＋方（かた）",ex:"「做～的方法」。",eg:[{j:"この漢字の<em>読み方</em>を教えてください。",z:"請告訴我這個漢字的讀法。"},{j:"箸の<em>使い方</em>がわかりません。",z:"不知道筷子的用法。"}]},
+{id:"n4-7",cat:"接続・原因",t:"助詞「ので」（原因）",p:"普通形＋ので（な形/名詞：な＋ので）",ex:"「因為～」。比「から」委婉客觀。",eg:[{j:"熱がある<em>ので</em>、休みます。",z:"因為發燒，要請假。"},{j:"日曜日な<em>ので</em>、銀行は休みです。",z:"因為是星期日，銀行休息。"}]},
+{id:"n4-8",cat:"接続・原因",t:"助詞「のに」（逆接）",p:"普通形＋のに（な形/名詞：な＋のに）",ex:"「明明～卻…」。帶不滿、意外語氣。",eg:[{j:"約束した<em>のに</em>、来ませんでした。",z:"明明約好了卻沒來。"},{j:"高い<em>のに</em>、おいしくないです。",z:"明明很貴卻不好吃。"}]},
+{id:"n4-9",cat:"表現・文型",t:"～ことができます",p:"辞書形＋ことができます",ex:"表示能力或可能性。＝可能形。",eg:[{j:"日本語を話す<em>ことができます</em>。",z:"能說日文。"},{j:"ここで写真を撮る<em>ことができます</em>。",z:"這裡可以拍照。"}]},
+{id:"n4-10",cat:"表現・文型",t:"～たことがあります（經驗）",p:"た形＋ことがあります",ex:"「曾經做過～」。表示過去的經驗。",eg:[{j:"日本に行っ<em>たことがあります</em>。",z:"去過日本。"},{j:"納豆を食べ<em>たことがありません</em>。",z:"沒吃過納豆。"}]},
+{id:"n4-11",cat:"表現・文型",t:"～ほうがいいです",p:"た形＋ほうがいい／ない形＋ほうがいい",ex:"「最好做～」「最好不要做～」。建議或勸告。",eg:[{j:"薬を飲ん<em>だほうがいいです</em>。",z:"最好吃藥。"},{j:"夜遅く食べない<em>ほうがいいです</em>。",z:"最好不要太晚吃東西。"}]},
+{id:"n4-12",cat:"表現・文型",t:"～すぎます（過度）",p:"ます形（去ます）＋すぎます／い形（去い）＋すぎ／な形＋すぎ",ex:"「太過～」。表示超過適當程度。",eg:[{j:"昨日、<em>食べすぎました</em>。",z:"昨天吃太多了。"},{j:"この部屋は<em>暑すぎます</em>。",z:"這個房間太熱了。"}]},
+{id:"n4-13",cat:"義務・許可",t:"～てもいいです（許可）",p:"て形＋もいいです",ex:"「可以做～」。表示許可。",eg:[{j:"ここで写真を撮っ<em>てもいいですか</em>。",z:"這裡可以拍照嗎？"},{j:"帰っ<em>てもいいですよ</em>。",z:"你可以回去了。"}]},
+{id:"n4-14",cat:"義務・許可",t:"～てはいけません（禁止）",p:"て形＋はいけません",ex:"「不可以做～」。表示禁止。",eg:[{j:"ここでタバコを吸っ<em>てはいけません</em>。",z:"這裡不可以抽菸。"},{j:"試験中に話し<em>てはいけません</em>。",z:"考試中不可以說話。"}]},
+{id:"n4-15",cat:"義務・許可",t:"～なくてもいいです（不必要）",p:"ない形（去ない）＋なくてもいいです",ex:"「不做也沒關係」。表示不必要。",eg:[{j:"明日は来<em>なくてもいいです</em>。",z:"明天不來也沒關係。"},{j:"急が<em>なくてもいいです</em>。",z:"不用急。"}]},
+{id:"n4-16",cat:"義務・許可",t:"～なければなりません（義務）",p:"ない形（去ない）＋なければなりません",ex:"「必須做～」。口語：なきゃ。",eg:[{j:"宿題をし<em>なければなりません</em>。",z:"必須做作業。"},{j:"薬を飲ま<em>なければなりません</em>。",z:"必須吃藥。"}]},
+{id:"n4-17",cat:"接続・原因",t:"～ために（目的）",p:"辞書形／名詞の＋ために",ex:"「為了做～」。表示意志性目的。",eg:[{j:"日本に留学する<em>ために</em>、お金を貯めています。",z:"為了去日本留學在存錢。"},{j:"健康の<em>ために</em>、毎日運動します。",z:"為了健康每天運動。"}]},
+{id:"n4-18",cat:"接続・原因",t:"～ために（原因）",p:"た形／名詞の＋ために",ex:"「因為～」。較客觀的原因表達。",eg:[{j:"台風の<em>ために</em>、電車が止まりました。",z:"因為颱風，電車停了。"},{j:"事故があった<em>ために</em>、遅れました。",z:"因為發生事故所以遲到了。"}]},
+{id:"n4-19",cat:"接続・原因",t:"～ように（目的）",p:"辞書形／ない形＋ように",ex:"「為了能夠～」。搭配非意志動詞或可能形。",eg:[{j:"忘れない<em>ように</em>メモします。",z:"為了不忘記而做筆記。"},{j:"日本語が話せる<em>ように</em>、勉強しています。",z:"為了能說日文在學習。"}]},
+{id:"n4-20",cat:"接続・原因",t:"～ようになります・～ようにします",p:"辞書形＋ようになる（變化）／ようにする（努力）",ex:"なる＝自然變化的結果。する＝有意識地努力。",eg:[{j:"日本語が話せる<em>ようになりました</em>。",z:"變得能說日文了。"},{j:"毎日運動する<em>ようにしています</em>。",z:"努力每天運動。"}]},
+{id:"n4-21",cat:"接続・原因",t:"助詞「し」（列舉理由）",p:"普通形＋し",ex:"列舉多個理由或性質。「又A又B」。",eg:[{j:"安い<em>し</em>、おいしい<em>し</em>、この店が好きです。",z:"又便宜又好吃，喜歡這家店。"},{j:"頭も痛い<em>し</em>、熱もある<em>し</em>、休みます。",z:"頭也痛，也發燒，要請假。"}]},
+{id:"n4-22",cat:"接続・原因",t:"～ても（逆接條件）",p:"て形＋も",ex:"「即使～也…」。",eg:[{j:"雨が降っ<em>ても</em>、行きます。",z:"即使下雨也要去。"},{j:"何回聞い<em>ても</em>、わかりません。",z:"問了幾次都不懂。"}]},
+{id:"n4-23",cat:"アスペクト",t:"～てみます（嘗試）",p:"て形＋みます",ex:"「試著做看看」。",eg:[{j:"この料理を食べ<em>てみます</em>。",z:"試吃看看這道菜。"},{j:"一度やっ<em>てみてください</em>。",z:"請試著做一次看看。"}]},
+{id:"n4-24",cat:"アスペクト",t:"～てしまいます（完結・遺憾）",p:"て形＋しまいます",ex:"①完全做完 ②不小心做了（遺憾）。口語：ちゃう。",eg:[{j:"宿題を全部やっ<em>てしまいました</em>。",z:"把作業全做完了。"},{j:"財布をなくし<em>てしまいました</em>。",z:"不小心弄丟了錢包。"}]},
+{id:"n4-25",cat:"アスペクト",t:"～ておきます（事前準備）",p:"て形＋おきます",ex:"「事先做好」或「維持原狀」。",eg:[{j:"会議の前に資料を準備し<em>ておきます</em>。",z:"會議前先準備好資料。"},{j:"窓は開け<em>ておいてください</em>。",z:"請讓窗戶開著。"}]},
+{id:"n4-26",cat:"アスペクト",t:"～てきます・～ていきます",p:"て形＋きます（來向）／て形＋いきます（去向）",ex:"表示動作方向、時間推移的變化。",eg:[{j:"人口が増え<em>てきました</em>。",z:"人口增加了（到現在）。"},{j:"これから寒くなっ<em>ていきます</em>。",z:"今後會越來越冷。"}]},
+{id:"n4-27",cat:"アスペクト",t:"～はじめます・～続けます・～終わります",p:"ます形（去ます）＋はじめる／続ける／終わる",ex:"表示動作的開始、持續、結束。",eg:[{j:"雨が降り<em>はじめました</em>。",z:"開始下雨了。"},{j:"3時間歩き<em>続けました</em>。",z:"走了3個小時。"}]},
+{id:"n4-28",cat:"アスペクト",t:"～ところです（動作階段）",p:"辞書形ところ（即將）／ているところ（正在）／たところ（剛完成）",ex:"表示動作進行的不同階段。",eg:[{j:"今から出かける<em>ところです</em>。",z:"正要出門。"},{j:"今、ご飯を食べている<em>ところです</em>。",z:"正在吃飯中。"},{j:"さっき帰ってきた<em>ところです</em>。",z:"剛回來。"}]},
+{id:"n4-29",cat:"アスペクト",t:"～たばかりです",p:"た形＋ばかりです",ex:"「剛做完～」。強調時間過不久。",eg:[{j:"日本に来<em>たばかりです</em>。",z:"剛來日本。"},{j:"さっき食べ<em>たばかりです</em>。",z:"剛吃過。"}]},
+{id:"n4-30",cat:"授受表現",t:"～てあげます・てもらいます・てくれます",p:"て形＋あげる（幫人做）／もらう（請人做）／くれる（人幫我做）",ex:"行為的授受。表示「做某事」的施予和接受。",eg:[{j:"友達に日本語を教え<em>てあげました</em>。",z:"教了朋友日文。"},{j:"友達に手伝っ<em>てもらいました</em>。",z:"請朋友幫忙了。"},{j:"母が弁当を作っ<em>てくれました</em>。",z:"媽媽幫我做了便當。"}]},
+{id:"n4-31",cat:"推量・様態",t:"～そうです（様態推量）",p:"ます形（去ます）＋そうです／い形（去い）＋そう／な形＋そう",ex:"「看起來好像要～」。根據外觀的推測。",eg:[{j:"雨が降り<em>そうです</em>。",z:"看起來快下雨了。"},{j:"このケーキはおいし<em>そうです</em>。",z:"這蛋糕看起來很好吃。"}],n:"例外：いい→よさそう、ない→なさそう。"},
+{id:"n4-32",cat:"推量・様態",t:"～そうです（伝聞）",p:"普通形＋そうです",ex:"「聽說～」。傳達從別處聽來的資訊。",eg:[{j:"明日は雨だ<em>そうです</em>。",z:"聽說明天會下雨。"},{j:"あの映画は面白い<em>そうです</em>。",z:"聽說那部電影很好看。"}]},
+{id:"n4-33",cat:"推量・様態",t:"～ようです・～みたいです",p:"普通形＋ようです（較正式）／みたいです（口語）",ex:"「好像是～」。根據觀察的推測。みたい較口語。",eg:[{j:"彼は忙しい<em>ようです</em>。",z:"他好像很忙。"},{j:"雨が降った<em>みたいです</em>。",z:"好像下過雨了。"}]},
+{id:"n4-34",cat:"推量・様態",t:"～らしいです",p:"普通形＋らしいです",ex:"①「聽說～」（傳聞推測） ②「很有～風格」（典型）。",eg:[{j:"田中さんは来月結婚する<em>らしいです</em>。",z:"聽說田中下個月要結婚。"},{j:"彼は男<em>らしい</em>人です。",z:"他是個很有男子氣概的人。"}]},
+{id:"n4-35",cat:"推量・様態",t:"～はずです",p:"普通形＋はずです",ex:"「應該是～」。基於根據的推斷。",eg:[{j:"彼はもう着いた<em>はずです</em>。",z:"他應該已經到了。"},{j:"そんな<em>はずがありません</em>。",z:"不應該是那樣。"}]},
+{id:"n4-36",cat:"推量・様態",t:"～でしょう・～だろう",p:"普通形＋でしょう（丁寧）／だろう（普通）",ex:"推測「大概」或確認「對吧」。だろう是普通體。",eg:[{j:"明日は晴れる<em>でしょう</em>。",z:"明天大概會放晴吧。"},{j:"大丈夫<em>だろう</em>。",z:"大概沒問題吧。"}]},
+{id:"n4-37",cat:"比較",t:"～より…ほうが",p:"BよりAのほうが＋形容詞",ex:"「比起B，A更…」。",eg:[{j:"バスより電車の<em>ほうが</em>速いです。",z:"比起公車，電車更快。"},{j:"肉より魚の<em>ほうが</em>好きです。",z:"比起肉，更喜歡魚。"}]},
+{id:"n4-38",cat:"比較",t:"～ほど…ない",p:"AはBほど＋形容詞否定",ex:"「A沒有B那麼…」。",eg:[{j:"大阪は東京<em>ほど</em>大きくないです。",z:"大阪沒有東京那麼大。"},{j:"今年は去年<em>ほど</em>暑くないです。",z:"今年沒去年那麼熱。"}]},
+{id:"n4-39",cat:"比較",t:"～でいちばん（最上級）",p:"範圍＋で＋いちばん＋形容詞",ex:"「在～中最…」。",eg:[{j:"日本<em>で</em>いちばん高い山は富士山です。",z:"日本最高的山是富士山。"},{j:"クラス<em>で</em>いちばん背が高い人は誰？",z:"班上最高的人是誰？"}]},
+{id:"n4-40",cat:"引用・思考",t:"～と言います",p:"普通形＋と言います",ex:"引用說話內容。直接引用或間接引用。",eg:[{j:"先生は「明日テストです」<em>と言いました</em>。",z:"老師說「明天考試」。"},{j:"田中さんは来ない<em>と言いました</em>。",z:"田中說不來。"}]},
+{id:"n4-41",cat:"引用・思考",t:"～と思います",p:"普通形＋と思います",ex:"「我覺得、我認為」。表示意見或推測。",eg:[{j:"明日は雨だ<em>と思います</em>。",z:"我覺得明天會下雨。"},{j:"この映画は面白い<em>と思います</em>。",z:"我覺得這部電影有趣。"}]},
+{id:"n4-42",cat:"引用・思考",t:"～うと思います（意志）",p:"意向形＋と思います",ex:"「我想要做～」。表示打算。",eg:[{j:"来年日本に行こう<em>と思います</em>。",z:"我想明年去日本。"},{j:"転職しよう<em>と思っています</em>。",z:"正在考慮換工作。"}]},
+{id:"n4-43",cat:"引用・思考",t:"～か（どうか）（間接疑問）",p:"普通形＋か（どうか）",ex:"間接問句。「是否～」「是不是～」。",eg:[{j:"明日雨が降る<em>かどうか</em>わかりません。",z:"不知道明天會不會下雨。"},{j:"何時に来る<em>か</em>教えてください。",z:"請告訴我幾點來。"}]},
+{id:"n4-44",cat:"引用・思考",t:"～がります（第三人稱慾望）",p:"い形（去い）＋がります",ex:"描述第三人稱的慾望或情感。",eg:[{j:"子供がおもちゃを<em>欲しがっています</em>。",z:"小孩想要玩具。"},{j:"彼は日本に<em>行きたがっています</em>。",z:"他想去日本。"}]},
+{id:"n4-45",cat:"表現・文型",t:"～んです・～のです",p:"普通形＋んです（な形/名詞：な＋んです）",ex:"強調説明、追問原因。口語常用。",eg:[{j:"どうした<em>んですか</em>。",z:"怎麼了？"},{j:"明日試験がある<em>んです</em>。",z:"（其實）明天有考試。"}]},
+{id:"n4-46",cat:"表現・文型",t:"～なさい（命令指示）",p:"ます形（去ます）＋なさい",ex:"較溫和的命令。父母對小孩、老師對學生。",eg:[{j:"早く<em>起きなさい</em>。",z:"快起床。"},{j:"静かに<em>しなさい</em>。",z:"安靜一點。"}]},
+{id:"n4-47",cat:"表現・文型",t:"～ことになります・～ことにします",p:"辞書形＋ことになる（被決定）／ことにする（自己決定）",ex:"なる＝外部決定。する＝主動決定。",eg:[{j:"来月から大阪に転勤する<em>ことになりました</em>。",z:"決定下個月調到大阪。（公司決定）"},{j:"毎日運動する<em>ことにしました</em>。",z:"決定每天運動。（自己決定）"}]},
+{id:"n4-48",cat:"表現・文型",t:"～まま（狀態保持）",p:"た形＋まま／ない形＋まま／名詞の＋まま",ex:"「保持～的狀態」。",eg:[{j:"靴を履いた<em>まま</em>家に入りました。",z:"穿著鞋就進了家門。"},{j:"電気をつけた<em>まま</em>寝ました。",z:"開著燈就睡了。"}]},
+{id:"n4-49",cat:"表現・文型",t:"～ばかり（偏重）",p:"動詞て形＋ばかりいる",ex:"「老是在做～」。帶有批評語氣。",eg:[{j:"ゲーム<em>ばかり</em>していないで、勉強しなさい。",z:"不要老是玩遊戲，去讀書。"},{j:"甘いもの<em>ばかり</em>食べています。",z:"老是吃甜的東西。"}]},
+{id:"n4-50",cat:"表現・文型",t:"～場合（條件假定）",p:"普通形＋場合（な形/名詞：の＋場合）",ex:"「在～的情況下」。比たら更正式。",eg:[{j:"雨の<em>場合</em>は中止します。",z:"下雨的話就取消。"},{j:"わからない<em>場合</em>は聞いてください。",z:"不懂的話請問。"}]},
+{id:"n4-51",cat:"動詞活用",t:"意向形",p:"五段：う段→おう段／一段：去る＋よう",ex:"「做～吧」。普通體的勸誘。する→しよう、来る→来よう。",eg:[{j:"映画を<em>見よう</em>。",z:"看電影吧。"},{j:"一緒に<em>行こう</em>。",z:"一起去吧。"}]},
+{id:"n4-52",cat:"動詞活用",t:"可能形",p:"五段：う段→え段＋る／一段：去る＋られる",ex:"「能夠做～」。が標示能力對象。口語：一段常省「ら」。",eg:[{j:"日本語が<em>話せます</em>。",z:"能說日文。"},{j:"刺身が<em>食べられます</em>。",z:"能吃生魚片。"}]},
+{id:"n4-53",cat:"動詞活用",t:"命令形・禁止形",p:"命令形：五段え段／禁止形：辞書形＋な",ex:"命令形＝直接命令。禁止形＝「不准～」。語氣很強。",eg:[{j:"<em>逃げろ</em>！",z:"快逃！"},{j:"ここに入る<em>な</em>！",z:"不准進來！"}]},
+{id:"n4-54",cat:"動詞活用",t:"条件形（ば形）",p:"五段：う段→え段＋ば／一段：去る＋れば",ex:"「如果～的話」。假定條件。",eg:[{j:"天気が良けれ<em>ば</em>、出かけます。",z:"如果天氣好就出門。"},{j:"安けれ<em>ば</em>買います。",z:"如果便宜就買。"}]},
+{id:"n4-55",cat:"條件表現",t:"～たら（條件）",p:"た形＋ら",ex:"「如果～了的話」。最通用的條件句。也可表示意外發現。",eg:[{j:"雨が降っ<em>たら</em>、行きません。",z:"如果下雨就不去。"},{j:"家に帰っ<em>たら</em>、猫がいました。",z:"回到家一看，有隻貓。"}]},
+{id:"n4-56",cat:"條件表現",t:"助詞「なら」（條件）",p:"普通形＋なら",ex:"「如果你說的是～的話」。接話題做建議。",eg:[{j:"日本に行く<em>なら</em>、京都がいいですよ。",z:"如果要去日本，京都不錯喔。"},{j:"安い<em>なら</em>、買います。",z:"便宜的話就買。"}]},
+{id:"n4-57",cat:"條件表現",t:"接続助詞「と」（恆常條件）",p:"辞書形＋と",ex:"「一做A就會B」。自然法則、習慣、機器操作。",eg:[{j:"春になる<em>と</em>、桜が咲きます。",z:"一到春天櫻花就開。"},{j:"このボタンを押す<em>と</em>、ドアが開きます。",z:"按這個按鈕門就會開。"}]},
+{id:"n4-58",cat:"條件表現",t:"～たら／ば／といいです（建議・願望）",p:"たら／ば／と＋いいです",ex:"建議「做～就好了」或願望「希望～」。",eg:[{j:"先生に聞い<em>たらいいですよ</em>。",z:"問老師就好了啊。"},{j:"明日、晴れる<em>といいですね</em>。",z:"希望明天放晴。"}]},
+{id:"n4-59",cat:"動詞活用",t:"受身形（被動）",p:"五段：あ段＋れる／一段：去る＋られる",ex:"「被做～」。直接被動、間接被動（迷惑被動）。",eg:[{j:"先生に<em>褒められました</em>。",z:"被老師稱讚了。"},{j:"電車で足を<em>踏まれました</em>。",z:"在電車上被踩了腳。"}]},
+{id:"n4-60",cat:"動詞活用",t:"使役形",p:"五段：あ段＋せる／一段：去る＋させる",ex:"「讓某人做～」。強制或允許。",eg:[{j:"母は子供に野菜を食べ<em>させます</em>。",z:"媽媽讓小孩吃蔬菜。"},{j:"先生は学生を立た<em>せました</em>。",z:"老師讓學生站起來。"}]},
+{id:"n4-61",cat:"動詞活用",t:"使役受身形",p:"五段：あ段＋される／一段：去る＋させられる",ex:"「被迫做～」。不情願地被要求。",eg:[{j:"毎日残業<em>させられます</em>。",z:"每天被迫加班。"},{j:"嫌いな野菜を食べ<em>させられました</em>。",z:"被迫吃了討厭的蔬菜。"}]},
+{id:"n4-62",cat:"敬語",t:"尊敬語",p:"お＋ます形＋になります／特別尊敬語",ex:"抬高對方行為。特別尊敬語：いらっしゃいます、おっしゃいます、ご覧になります等。",eg:[{j:"先生は何時に<em>お帰りになりますか</em>。",z:"老師幾點回去？"},{j:"社長は何と<em>おっしゃいましたか</em>。",z:"社長說了什麼？"}]},
+{id:"n4-63",cat:"敬語",t:"謙譲語",p:"お＋ます形＋します／特別謙譲語",ex:"降低自己行為。特別謙譲語：参ります、申します、拝見します等。",eg:[{j:"私が<em>お持ちします</em>。",z:"我來拿。"},{j:"明日<em>参ります</em>。",z:"明天我過去。"}]},
+{id:"n4-64",cat:"敬語",t:"～させていただきます",p:"使役形て＋いただきます",ex:"「請允許我做～」。非常禮貌的請求許可。",eg:[{j:"先に<em>帰らせていただきます</em>。",z:"請允許我先回去。"},{j:"確認<em>させていただきます</em>。",z:"讓我確認一下。"}]},
+{id:"n4-65",cat:"敬語",t:"敬語整理（お/ご・ございます）",p:"お＋和語／ご＋漢語（美化語）",ex:"お名前、ご住所等。ございます＝あります的敬語。",eg:[{j:"<em>お</em>名前は何ですか。",z:"請問貴姓？"},{j:"何か<em>ございます</em>か。",z:"有什麼事嗎？"}]},
+{id:"n4-66",cat:"口語・助詞",t:"縮約表現（口語）",p:"ている→てる、ておく→とく、てしまう→ちゃう",ex:"日常口語中的縮略形。",eg:[{j:"何し<em>てる</em>？",z:"在幹嘛？（＝している）"},{j:"忘れ<em>ちゃった</em>。",z:"忘記了。（＝てしまった）"}]},
+{id:"n4-67",cat:"口語・助詞",t:"助詞「でも」（全面肯定）",p:"疑問詞＋でも",ex:"「不管～都…」。全面肯定。",eg:[{j:"<em>誰でも</em>参加できます。",z:"任何人都能參加。"},{j:"<em>何でも</em>いいです。",z:"什麼都可以。"}]},
+{id:"n4-68",cat:"口語・助詞",t:"助詞「とか」（列舉）",p:"名詞＋とか＋名詞＋とか",ex:"口語的部分列舉。比「や」更隨意。",eg:[{j:"寿司<em>とか</em>ラーメン<em>とか</em>が好きです。",z:"喜歡壽司啊拉麵之類的。"},{j:"映画<em>とか</em>見ませんか。",z:"看個電影之類的如何？"}]},
+{id:"n4-69",cat:"表現・文型",t:"～ず・～ずに",p:"ない形（去ない）＋ず（に）",ex:"＝ないで。較書面。する→せず。",eg:[{j:"何も言わ<em>ずに</em>帰りました。",z:"什麼都沒說就回去了。"},{j:"朝ご飯を食べ<em>ず</em>出かけた。",z:"沒吃早餐就出門了。"}]},
+{id:"n4-70",cat:"表現・文型",t:"形式名詞「こと」",p:"普通形＋こと",ex:"將動詞句名詞化。和「の」類似但更書面。",eg:[{j:"私の趣味は映画を見る<em>こと</em>です。",z:"我的興趣是看電影。"},{j:"約束を守る<em>こと</em>は大切です。",z:"遵守約定很重要。"}]},
+{id:"n4-71",cat:"表現・文型",t:"～がします（感官知覺）",p:"名詞＋がします",ex:"表示感官知覺。聲音、味道、氣味等。",eg:[{j:"変な音<em>がします</em>。",z:"有奇怪的聲音。"},{j:"いいにおい<em>がします</em>。",z:"有好聞的味道。"}]},
+{id:"n4-72",cat:"表現・文型",t:"接尾語「～さ」",p:"い形（去い）＋さ／な形＋さ",ex:"把形容詞變成名詞。「～程度」。",eg:[{j:"この山の<em>高さ</em>は3776mです。",z:"這座山的高度是3776m。"},{j:"日本語の<em>難しさ</em>がわかりました。",z:"了解到了日文的難度。"}]},
+{id:"n4-73",cat:"表現・文型",t:"～ことがあります（可能性）",p:"辞書形＋ことがあります",ex:"「有時候會～」。偶發的可能性。",eg:[{j:"遅れる<em>ことがあります</em>。",z:"有時候會遲到。"},{j:"この道は渋滞する<em>ことがあります</em>。",z:"這條路有時候會塞車。"}]},
+{id:"n4-74",cat:"動詞活用",t:"尊敬形（れる・られる）",p:"五段：あ段＋れる／一段：去る＋られる",ex:"用被動形表示尊敬。形式同受身形。",eg:[{j:"先生はもう<em>帰られました</em>。",z:"老師已經回去了。（尊敬）"},{j:"部長は何を<em>食べられますか</em>。",z:"部長要吃什麼？（尊敬）"}]},
+{id:"n4-75",cat:"動詞活用",t:"動詞變化順序",p:"ます形→て形→可能形→受身形→使役形等",ex:"動詞的變化都從「辞書形」出發。理解分類（五段/一段/不規則）是關鍵。",eg:[{j:"書く：書きます/書いて/書ける/書かれる/書かせる",z:"寫：各種變化一覽"},{j:"食べる：食べます/食べて/食べられる/食べさせる",z:"吃：各種變化一覽"}]}
 ];
 
-// ===== RENDER =====
-function render(filter = '') {
-  const main = document.getElementById('main');
-  const sidebar = document.getElementById('sidebar');
-  const lf = filter.toLowerCase();
+// ========== CATEGORIES ==========
+const CATS_N5 = [
+  {name:"基本句型",icon:"文"},{name:"助詞",icon:"助"},{name:"動詞活用",icon:"動"},
+  {name:"形容詞・修飾",icon:"形"},{name:"存在・授受",icon:"在"},{name:"て形用法",icon:"て"},
+  {name:"表現・文型",icon:"型"},{name:"詞彙・其他",icon:"他"}
+];
+const CATS_N4 = [
+  {name:"表現・文型",icon:"型"},{name:"動詞活用",icon:"動"},{name:"條件表現",icon:"条"},
+  {name:"授受表現",icon:"授"},{name:"アスペクト",icon:"相"},{name:"推量・様態",icon:"推"},
+  {name:"比較",icon:"比"},{name:"義務・許可",icon:"規"},{name:"接続・原因",icon:"接"},
+  {name:"引用・思考",icon:"引"},{name:"敬語",icon:"敬"},{name:"口語・助詞",icon:"口"}
+];
 
-  // Filter data
-  const filtered = filter
-    ? DATA.filter(d => d.t.toLowerCase().includes(lf) || d.ex.toLowerCase().includes(lf) ||
-        (d.p && d.p.toLowerCase().includes(lf)) ||
-        d.eg.some(e => e.j.toLowerCase().includes(lf) || e.z.toLowerCase().includes(lf)))
-    : DATA;
+// ========== RENDER ==========
+function render() {
+  const data = currentLevel === 'n5' ? N5 : N4;
+  const cats = currentLevel === 'n5' ? CATS_N5 : CATS_N4;
+  const favList = favorites[currentLevel] || [];
+  const mn = document.getElementById('mn');
+  const sd = document.getElementById('sd');
+  const lf = searchTerm;
 
-  // Group by category
+  let filtered = data;
+  if (lf) filtered = filtered.filter(d => d.t.includes(lf)||d.ex.includes(lf)||(d.p&&d.p.includes(lf))||d.eg.some(e=>e.j.includes(lf)||e.z.includes(lf)));
+  if (showFavOnly) filtered = filtered.filter(d => favList.includes(d.id));
+
   const groups = {};
-  CATEGORIES.forEach(c => groups[c.name] = []);
-  filtered.forEach((d,i) => {
-    if (groups[d.cat]) groups[d.cat].push({...d, idx: DATA.indexOf(d)+1});
-  });
+  cats.forEach(c => groups[c.name] = []);
+  filtered.forEach(d => { if(groups[d.cat]) groups[d.cat].push(d); });
 
-  // Render main
-  let html = '';
-  if (!filter) {
-    html += `<div class="intro">
-      <h2>出口日語 N5 文法完整筆記</h2>
-      <p>根據出口仁老師的 YouTube N5 文法教學系列整理。涵蓋基本句型、助詞、動詞活用、形容詞、
-      存在表現、授受動詞、て形用法、時間順序、希望請求、數量指示、修飾接續、副詞等 13 大分類，
-      共 119 個文法點。</p>
-      <div class="tag-row">
-        <span class="tag">JLPT N5</span>
-        <span class="tag">119 文法點</span>
-        <span class="tag">出口日語</span>
-        <span class="tag">初級日文</span>
-      </div>
-    </div>`;
+  let h = '';
+  if (!lf && !showFavOnly) {
+    const lv = currentLevel.toUpperCase();
+    const cnt = data.length;
+    h += `<div class="intro"><h2>出口日語 ${lv} 文法完整筆記</h2><p>根據出口仁老師的 YouTube ${lv} 文法教學系列整理，共 ${cnt} 個文法點。</p><div class="tg"><span>JLPT ${lv}</span><span>${cnt} 文法點</span><span>出口日語</span></div></div>`;
   }
 
-  let visibleCount = 0;
-  CATEGORIES.forEach(cat => {
+  let vc = 0;
+  cats.forEach(cat => {
     const items = groups[cat.name];
-    if (!items || items.length === 0) return;
-    visibleCount += items.length;
-
-    html += `<section class="cat-section" id="cat-${cat.name}">
-      <h2><span class="cat-icon">${cat.icon}</span>${cat.name}
-        <span style="font-size:13px;color:#999;font-weight:400;margin-left:auto">${items.length} 項</span>
-      </h2>`;
-
-    items.forEach(d => {
-      html += `<div class="grammar-card" id="${d.id}">
-        <div class="card-header" onclick="toggleCard(this)">
-          <span class="card-num">${d.idx}</span>
-          <span class="card-title">${d.t}</span>
-          <svg class="card-toggle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <polyline points="6 9 12 15 18 9"/>
-          </svg>
-        </div>
-        <div class="card-body">
-          <div class="card-content">
-            <div class="pattern-box">${d.p}</div>
-            <div class="explain">${d.ex}</div>
-            <div class="examples">
-              ${d.eg.map(e => `<div class="example">
-                <div class="jp">${e.j}</div>
-                <div class="zh">${e.z}</div>
-              </div>`).join('')}
-            </div>
-            ${d.n ? `<div class="note">${d.n}</div>` : ''}
-          </div>
-        </div>
-      </div>`;
+    if (!items||!items.length) return;
+    vc += items.length;
+    h += `<section class="cs" id="cat-${cat.name}"><h2><span class="ci2">${cat.icon}</span>${cat.name}<span style="font-size:12px;color:#999;font-weight:400;margin-left:auto">${items.length} 項</span></h2>`;
+    items.forEach((d,i) => {
+      const isFav = favList.includes(d.id);
+      const idx = data.indexOf(d) + 1;
+      h += `<div class="gc" id="${d.id}"><div class="gh" onclick="toggleCard(this)"><span class="gn">${idx}</span><span class="gt">${d.t}</span><svg class="star ${isFav?'on':''}" onclick="event.stopPropagation();toggleFav('${d.id}')" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg class="arr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div><div class="gb"><div class="gx"><div class="pt">${d.p}</div><div class="ep">${d.ex}</div><div class="eg">${d.eg.map(e=>`<div class="ex"><div class="j">${e.j}</div><div class="z">${e.z}</div></div>`).join('')}</div>${d.n?`<div class="nt">${d.n}</div>`:''}</div></div></div>`;
     });
-
-    html += '</section>';
+    h += '</section>';
   });
 
-  if (visibleCount === 0) {
-    html += `<div class="no-results">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-        <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
-      </svg>
-      <p>找不到符合「${filter}」的文法項目</p>
-    </div>`;
-  }
+  if (!vc) h += `<div class="nr"><p>${showFavOnly?'還沒有收藏任何文法點':'找不到符合的文法項目'}</p></div>`;
+  mn.innerHTML = h;
+  document.getElementById('stats').textContent = `${vc} / ${data.length}`;
+  updateFavCount();
 
-  main.innerHTML = html;
-  document.getElementById('stats').textContent = `${visibleCount} / 119 個文法點`;
-
-  // Render sidebar
-  let sideHtml = '';
-  CATEGORIES.forEach(cat => {
+  // Sidebar
+  let sh = '';
+  cats.forEach(cat => {
     const items = groups[cat.name];
-    if (!items || items.length === 0) return;
-    sideHtml += `<div class="cat-title" onclick="toggleCat(this)">${cat.name}</div>`;
-    sideHtml += `<div class="cat-items" style="max-height:${items.length * 32}px">`;
-    items.forEach(d => {
-      sideHtml += `<a href="#${d.id}" onclick="closeSidebarMobile()">${d.t}</a>`;
-    });
-    sideHtml += '</div>';
+    if (!items||!items.length) return;
+    sh += `<div class="ct" onclick="toggleCat(this)">${cat.name}</div><div class="ci" style="max-height:${items.length*28}px">`;
+    items.forEach(d => { sh += `<a href="#${d.id}" onclick="closeSdMobile()">${d.t}</a>`; });
+    sh += '</div>';
   });
-  sidebar.innerHTML = sideHtml;
+  sd.innerHTML = sh;
 }
 
-// ===== INTERACTIONS =====
-function toggleCard(header) {
-  header.parentElement.classList.toggle('open');
-}
+function toggleCard(h){h.parentElement.classList.toggle('o')}
+function toggleCat(t){t.classList.toggle('c');t.nextElementSibling.classList.toggle('c')}
+function toggleSd(){document.getElementById('sd').classList.toggle('open');document.getElementById('overlay').classList.toggle('show')}
+function closeSdMobile(){if(innerWidth<=860){document.getElementById('sd').classList.remove('open');document.getElementById('overlay').classList.remove('show')}}
 
-function toggleCat(title) {
-  title.classList.toggle('collapsed');
-  const items = title.nextElementSibling;
-  items.classList.toggle('collapsed');
-}
-
-let searchTimer;
-function onSearch(val) {
-  clearTimeout(searchTimer);
-  searchTimer = setTimeout(() => render(val.trim()), 200);
-}
-
-function toggleSidebar() {
-  document.getElementById('sidebar').classList.toggle('open');
-  document.getElementById('overlay').classList.toggle('show');
-}
-
-function closeSidebarMobile() {
-  if (window.innerWidth <= 860) {
-    document.getElementById('sidebar').classList.remove('open');
-    document.getElementById('overlay').classList.remove('show');
-  }
-}
-
-// Back to top
-window.addEventListener('scroll', () => {
-  document.getElementById('backTop').classList.toggle('show', window.scrollY > 400);
-
-  // Active sidebar link
-  const cards = document.querySelectorAll('.grammar-card');
-  let current = '';
-  cards.forEach(card => {
-    if (card.getBoundingClientRect().top < 120) current = card.id;
-  });
-  document.querySelectorAll('.sidebar a').forEach(a => {
-    a.classList.toggle('active', a.getAttribute('href') === '#' + current);
-  });
+window.addEventListener('scroll',()=>{
+  document.getElementById('bt').classList.toggle('s',scrollY>300);
+  const cards=document.querySelectorAll('.gc');let cur='';
+  cards.forEach(c=>{if(c.getBoundingClientRect().top<100)cur=c.id});
+  document.querySelectorAll('.sd a').forEach(a=>a.classList.toggle('on',a.getAttribute('href')==='#'+cur));
 });
 
 // Init
-render();
-
-// Expand card if URL has hash
-if (location.hash) {
-  const el = document.querySelector(location.hash);
-  if (el && el.classList.contains('grammar-card')) {
-    el.classList.add('open');
-    setTimeout(() => el.scrollIntoView({behavior:'smooth'}), 100);
-  }
-}
+loadFavorites();
+updateAuthUI();
+if(location.hash){const el=document.querySelector(location.hash);if(el&&el.classList.contains('gc')){el.classList.add('o');setTimeout(()=>el.scrollIntoView({behavior:'smooth'}),100)}}
 </script>
 </body>
 </html>
