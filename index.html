@@ -290,26 +290,6 @@ body{font-family:"Noto Sans JP","Hiragino Kaku Gothic ProN","Noto Sans TC","Ping
   <div class="quiz-box" id="quizBox"></div>
 </div>
 
-<!-- Firebase Setup Modal -->
-<div class="modal-bg" id="setupModal">
-  <div class="modal">
-    <h3>🔧 設定 Google 登入</h3>
-    <p>需要建立 Firebase 專案才能使用 Google 登入與雲端收藏同步。</p>
-    <ol>
-      <li>到 <a href="https://console.firebase.google.com/" target="_blank">Firebase Console</a> 建立新專案</li>
-      <li>Authentication → 啟用 Google 登入</li>
-      <li>Firestore Database → 建立資料庫（測試模式）</li>
-      <li>專案設定 → 新增網頁應用 → 複製 config</li>
-      <li>在 Authentication → 設定 → 已授權網域 中加入 <code>miafrontend2026.github.io</code></li>
-    </ol>
-    <p>貼上 Firebase config JSON：</p>
-    <textarea class="config-input" id="configInput" placeholder='{"apiKey":"...","authDomain":"...","projectId":"...","storageBucket":"...","messagingSenderId":"...","appId":"..."}'></textarea>
-    <div class="btn-row">
-      <button class="btn-p" onclick="saveConfig()">儲存</button>
-      <button class="btn-s" onclick="closeModal()">稍後再說</button>
-    </div>
-  </div>
-</div>
 
 <!-- Vocab Data -->
 <script src="vocab-n5.js"></script>
@@ -329,8 +309,14 @@ body{font-family:"Noto Sans JP","Hiragino Kaku Gothic ProN","Noto Sans TC","Ping
 
 <script>
 // ========== CONFIG ==========
-let fbConfig = null;
-try { fbConfig = JSON.parse(localStorage.getItem('fb_config')); } catch(e){}
+const fbConfig = {
+  apiKey:"AIzaSyDnmg2XOuvwgE8m8xCF5sS4o0nQYoUplPI",
+  authDomain:"jpnote-1bdd6.firebaseapp.com",
+  projectId:"jpnote-1bdd6",
+  storageBucket:"jpnote-1bdd6.firebasestorage.app",
+  messagingSenderId:"666368174384",
+  appId:"1:666368174384:web:30a5f16d50c082b13dc0f5"
+};
 
 let db = null, auth = null, currentUser = null;
 if (fbConfig) {
@@ -342,7 +328,6 @@ if (fbConfig) {
 
 // ========== AUTH ==========
 function handleAuth() {
-  if (!fbConfig) { document.getElementById('setupModal').classList.add('show'); return; }
   if (currentUser) { auth.signOut(); currentUser = null; updateAuthUI(); return; }
   auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()).catch(e => alert('登入失敗: ' + e.message));
 }
@@ -352,17 +337,9 @@ function updateAuthUI() {
     btn.innerHTML = `<img src="${currentUser.photoURL}" alt="">${currentUser.displayName.split(' ')[0]}`;
     btn.title = '點擊登出';
   } else {
-    btn.innerHTML = fbConfig ? '🔑 Google 登入' : '登入';
+    btn.innerHTML = '🔑 Google 登入';
   }
 }
-function saveConfig() {
-  try {
-    const c = JSON.parse(document.getElementById('configInput').value);
-    localStorage.setItem('fb_config', JSON.stringify(c));
-    location.reload();
-  } catch(e) { alert('JSON 格式錯誤，請檢查'); }
-}
-function closeModal() { document.getElementById('setupModal').classList.remove('show'); }
 
 // ========== FAVORITES ==========
 const FAV_INIT = {n5:[],n4:[],n3:[],n2:[],vn5:[],vn4:[],vn3:[],vn2:[]};
