@@ -3,7 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>出口日語 N5～N2 備考筆記</title>
+<title>hayashi — JLPT N5～N2 備考筆記</title>
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon.svg">
+<link rel="manifest" href="manifest.json">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="hayashi">
+<meta name="theme-color" content="#1E293B">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=Noto+Serif+JP:wght@500;700&display=swap" rel="stylesheet">
@@ -268,7 +274,7 @@ body{font-family:"Noto Sans JP","Hiragino Kaku Gothic ProN","Noto Sans TC","Ping
 
 <header class="hd">
   <button class="menu-btn" onclick="toggleSd()" aria-label="選單"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg></button>
-  <h1>出口<span id="modeTitle">文法</span></h1>
+  <h1>hayashi<span id="modeTitle">文法</span></h1>
   <div class="mode-tog" id="modeTog">
     <button class="on" onclick="switchMode('grammar')">文法</button>
     <button onclick="switchMode('vocab')">單字</button>
@@ -292,8 +298,7 @@ body{font-family:"Noto Sans JP","Hiragino Kaku Gothic ProN","Noto Sans TC","Ping
 <div class="overlay" id="overlay" onclick="toggleSd()"></div>
 <main class="mn" id="mn"></main>
 <footer class="ft">
-  <a href="https://www.youtube.com/@deguchi" target="_blank">出口日語 YouTube</a> ｜
-  <a href="https://jozu.tw/docs/deguchi-N5" target="_blank">jozu.tw</a> ｜
+  <a href="https://github.com/miafrontend2026/deguchi-n5-notes" target="_blank">hayashi GitHub</a> ｜
   <span id="ftInfo">N5 119 項 ＋ N4 120 項 完整收錄</span>
 </footer>
 <button class="bt" id="bt" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
@@ -876,7 +881,7 @@ function render() {
   if (!lf && !showFavOnly) {
     const lv = currentLevel.toUpperCase();
     const cnt = data.length;
-    h += `<div class="intro"><h2>出口日語 ${lv} 文法完整筆記</h2><p>根據出口仁老師的 YouTube ${lv} 文法教學系列整理，共 ${cnt} 個文法點。</p><div class="tg"><span>JLPT ${lv}</span><span>${cnt} 文法點</span><span>出口日語</span></div></div>`;
+    h += `<div class="intro"><h2>JLPT ${lv} 文法筆記</h2><p>收錄 ${lv} 級別完整文法共 ${cnt} 個文法點，含接續規則、例句及中文解說。</p><div class="tg"><span>JLPT ${lv}</span><span>${cnt} 文法點</span><span>hayashi</span></div></div>`;
   }
 
   let vc = 0;
