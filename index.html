@@ -14,50 +14,51 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=Noto+Serif+JP:wght@500;700&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#f8f6f1;--bg2:#fff;--sidebar:#1a1a2e;--sidebar-h:#16213e;--sidebar-a:#0f3460;--tx:#1a1a2e;--tx2:#6b7280;--tx-s:#9ca3af;--ac:#e07a2f;--ac2:#3b82f6;--bd:#e8e4de;--sh:0 1px 3px rgba(0,0,0,.04);--sh2:0 6px 20px rgba(0,0,0,.08);--r:12px;--sw:260px;--hh:52px}
+:root{--bg:#f8f6f1;--bg2:#fff;--sidebar:#1a1a2e;--sidebar-h:#16213e;--sidebar-a:#0f3460;--tx:#1a1a2e;--tx2:#6b7280;--tx-s:#9ca3af;--ac:#e07a2f;--ac2:#3b82f6;--bd:#e8e4de;--sh:0 1px 3px rgba(0,0,0,.04);--sh2:0 6px 20px rgba(0,0,0,.08);--r:12px;--sw:260px;--hh:44px;--bar-h:36px;--btm-h:52px}
 *{margin:0;padding:0;box-sizing:border-box}
-html{scroll-behavior:smooth;scroll-padding-top:calc(var(--hh)+70px)}
+html{scroll-behavior:smooth}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
-body{font-family:"Noto Sans JP","Hiragino Kaku Gothic ProN","Noto Sans TC","PingFang TC",-apple-system,sans-serif;background:var(--bg);color:var(--tx);line-height:1.7;font-size:15px}
-/* ── Header: 2 rows ── */
-.hd{position:fixed;top:0;left:0;right:0;background:var(--sidebar);z-index:100;box-shadow:0 2px 12px rgba(0,0,0,.15)}
-.hd-top{display:flex;align-items:center;padding:0 16px;height:var(--hh);gap:10px}
-.hd-top h1{color:#fff;font-size:17px;font-family:"Noto Serif JP",serif;font-weight:700;white-space:nowrap;letter-spacing:.5px}
-.hd-top h1 span{color:var(--ac);font-size:13px;font-weight:500;margin-left:2px}
-.hd-top .sb{position:relative;flex:1;max-width:280px;margin-left:auto}
-.hd-top .sb input{width:100%;padding:6px 12px 6px 32px;border:none;border-radius:20px;background:rgba(255,255,255,.1);color:#fff;font-size:13px;outline:none;transition:.2s}
-.hd-top .sb input::placeholder{color:rgba(255,255,255,.3)}
+body{font-family:"Noto Sans JP","Hiragino Kaku Gothic ProN","Noto Sans TC","PingFang TC",-apple-system,sans-serif;background:var(--bg);color:var(--tx);line-height:1.7;font-size:15px;padding-bottom:var(--btm-h)}
+/* ── Top bar ── */
+.hd{position:fixed;top:0;left:0;right:0;background:var(--sidebar);z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.12)}
+.hd-top{display:flex;align-items:center;padding:0 12px;height:var(--hh);gap:8px}
+.hd-top h1{color:#fff;font-size:15px;font-family:"Noto Serif JP",serif;font-weight:700;white-space:nowrap}
+.hd-top h1 span{color:var(--ac);font-size:11px;font-weight:500;margin-left:2px}
+.hd-top .sb{position:relative;flex:1;max-width:260px;margin-left:auto}
+.hd-top .sb input{width:100%;padding:6px 12px 6px 30px;border:none;border-radius:18px;background:rgba(255,255,255,.1);color:#fff;font-size:12px;outline:none;transition:.2s}
+.hd-top .sb input::placeholder{color:rgba(255,255,255,.28)}
 .hd-top .sb input:focus{background:rgba(255,255,255,.18)}
-.hd-top .sb svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);width:13px;height:13px;stroke:rgba(255,255,255,.35)}
-.stats{color:rgba(255,255,255,.35);font-size:11px;white-space:nowrap}
-.auth-area{display:flex;align-items:center;gap:6px;margin-left:6px}
-.auth-btn{background:none;border:1px solid rgba(255,255,255,.2);color:#fff;padding:4px 12px;border-radius:20px;cursor:pointer;font-size:11px;display:flex;align-items:center;gap:5px;transition:.2s;white-space:nowrap}
-.auth-btn:hover{border-color:var(--ac);background:rgba(255,255,255,.06)}
-.auth-btn img{width:20px;height:20px;border-radius:50%}
-.logout-btn{background:none;border:1px solid rgba(255,99,71,.4);color:rgba(255,99,71,.8);padding:4px 10px;border-radius:20px;cursor:pointer;font-size:10px;transition:.2s;white-space:nowrap}
-.logout-btn:hover{background:rgba(255,99,71,.15);border-color:rgba(255,99,71,.7)}
+.hd-top .sb svg{position:absolute;left:9px;top:50%;transform:translateY(-50%);width:13px;height:13px;stroke:rgba(255,255,255,.3)}
+.stats{color:rgba(255,255,255,.3);font-size:10px;white-space:nowrap}
+.auth-area{display:flex;align-items:center;gap:5px}
+.auth-btn{background:none;border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.7);padding:3px 10px;border-radius:16px;cursor:pointer;font-size:10px;display:flex;align-items:center;gap:4px;transition:.2s;white-space:nowrap}
+.auth-btn:hover{border-color:var(--ac);color:#fff}
+.auth-btn img{width:18px;height:18px;border-radius:50%}
+.logout-btn{background:none;border:1px solid rgba(255,99,71,.3);color:rgba(255,99,71,.7);padding:3px 8px;border-radius:16px;cursor:pointer;font-size:10px;transition:.2s;white-space:nowrap}
+.logout-btn:hover{background:rgba(255,99,71,.12)}
 .menu-btn{display:none;background:none;border:none;color:#fff;cursor:pointer;padding:2px}
-.menu-btn svg{width:22px;height:22px}
-/* ── Toolbar row ── */
-.hd-bar{display:flex;align-items:center;padding:0 12px;height:34px;gap:5px;background:rgba(0,0,0,.15);overflow-x:auto;overflow-y:hidden;flex-wrap:nowrap;scrollbar-width:none;-webkit-overflow-scrolling:touch;-ms-overflow-style:none}
+.menu-btn svg{width:20px;height:20px}
+/* ── Tab bar (modes + levels) ── */
+.hd-bar{display:flex;align-items:center;padding:0 12px;height:var(--bar-h);gap:4px;background:rgba(0,0,0,.12);overflow-x:auto;overflow-y:hidden;flex-wrap:nowrap;scrollbar-width:none;-webkit-overflow-scrolling:touch}
 .hd-bar::-webkit-scrollbar{display:none}
 #tabsBar{display:contents}
-.mode-pill,.tab-pill,.tool-pill{border:none;border-radius:14px;cursor:pointer;font-size:11px;font-weight:600;padding:4px 11px;transition:.2s;white-space:nowrap;flex-shrink:0}
-.mode-pill{background:rgba(255,255,255,.08);color:rgba(255,255,255,.5)}
+.mode-pill,.tab-pill{border:none;border-radius:12px;cursor:pointer;font-size:12px;font-weight:600;padding:5px 12px;transition:.15s;white-space:nowrap;flex-shrink:0;-webkit-tap-highlight-color:transparent}
+.mode-pill{background:rgba(255,255,255,.07);color:rgba(255,255,255,.45)}
 .mode-pill.on{background:var(--ac);color:#fff}
-.mode-pill:hover:not(.on){color:#fff}
-.tab-pill{background:rgba(255,255,255,.06);color:rgba(255,255,255,.45)}
+.mode-pill:active:not(.on){background:rgba(255,255,255,.12)}
+.tab-pill{background:rgba(255,255,255,.05);color:rgba(255,255,255,.4)}
 .tab-pill.on{background:var(--ac2);color:#fff}
-.tab-pill:hover:not(.on){color:#fff}
-.tool-pill{display:none}
-.hd-sep{width:1px;height:18px;background:rgba(255,255,255,.1);flex-shrink:0}
-/* tabs/fav compat */
+.tab-pill:active:not(.on){background:rgba(255,255,255,.1)}
+.hd-sep{width:1px;height:16px;background:rgba(255,255,255,.08);flex-shrink:0;margin:0 2px}
+.fav-pill{border:none;border-radius:12px;cursor:pointer;font-size:12px;font-weight:600;padding:5px 10px;white-space:nowrap;flex-shrink:0;background:none;color:rgba(255,255,255,.4);-webkit-tap-highlight-color:transparent}
+.fav-pill.fav-on{color:var(--ac)}
 .tabs{display:contents}
 .fav-btn{display:none}
-/* ── Floating toolbar ── */
-.ftb{position:fixed;bottom:0;left:0;right:0;height:48px;background:var(--sidebar);display:flex;align-items:center;justify-content:space-around;padding:0 8px;z-index:95;box-shadow:0 -2px 10px rgba(0,0,0,.15);border-top:1px solid rgba(255,255,255,.06)}
-.ftb-btn{background:none;border:none;color:rgba(255,255,255,.5);font-size:11px;font-weight:500;cursor:pointer;padding:6px 10px;border-radius:8px;transition:.2s;text-decoration:none;white-space:nowrap;display:flex;flex-direction:column;align-items:center;gap:1px}
-.ftb-btn:hover,.ftb-btn:active{color:var(--ac);background:rgba(255,255,255,.06)}
+/* ── Bottom toolbar (5 items max per UX guideline) ── */
+.ftb{position:fixed;bottom:0;left:0;right:0;height:var(--btm-h);background:var(--sidebar);display:flex;align-items:stretch;justify-content:space-around;z-index:95;box-shadow:0 -1px 8px rgba(0,0,0,.12);padding-bottom:env(safe-area-inset-bottom)}
+.ftb-btn{background:none;border:none;color:rgba(255,255,255,.4);font-size:9px;font-weight:500;cursor:pointer;padding:4px 2px;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;transition:.15s;text-decoration:none;-webkit-tap-highlight-color:transparent;min-height:44px}
+.ftb-btn svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.5}
+.ftb-btn:active{color:var(--ac);background:rgba(255,255,255,.04)}
 .ftb-btn.fav-on{color:var(--ac)}
 .sd{position:fixed;top:calc(var(--hh) + 36px);left:0;width:var(--sw);height:calc(100vh - var(--hh) - 36px);background:var(--sidebar);overflow-y:auto;padding:10px 0;z-index:90;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.1) transparent}
 .sd::-webkit-scrollbar{width:3px}
@@ -70,7 +71,7 @@ body{font-family:"Noto Sans JP","Hiragino Kaku Gothic ProN","Noto Sans TC","Ping
 .sd a{display:block;padding:5px 16px 5px 24px;color:var(--tx-s);text-decoration:none;font-size:12px;transition:.15s;border-left:2px solid transparent;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .sd a:hover{background:var(--sidebar-h);color:#fff}
 .sd a.on{background:var(--sidebar-a);color:#fff;border-left-color:var(--ac)}
-.mn{margin-left:var(--sw);padding:calc(var(--hh)+52px) 32px 70px;max-width:880px}
+.mn{margin-left:var(--sw);padding:calc(var(--hh) + var(--bar-h) + 16px) 32px 70px;max-width:880px}
 .intro{background:linear-gradient(135deg,#1a1a2e 0%,#0f3460 50%,#1a1a2e 100%);color:#fff;border-radius:var(--r);padding:28px;margin-bottom:28px;position:relative;overflow:hidden}
 .intro::before{content:'';position:absolute;top:-30px;right:-30px;width:120px;height:120px;background:rgba(224,122,47,.15);border-radius:50%;filter:blur(40px)}
 .intro h2{font-family:"Noto Serif JP",serif;font-size:22px;margin-bottom:6px}
@@ -105,7 +106,7 @@ body{font-family:"Noto Sans JP","Hiragino Kaku Gothic ProN","Noto Sans TC","Ping
 .gc .ex .z{font-size:12px;color:var(--tx2);margin-top:1px}
 .gc .nt{margin-top:12px;padding:8px 12px;background:#FEF3C7;border-radius:5px;font-size:12px;color:#92400E;border-left:3px solid var(--ac);display:flex;align-items:flex-start;gap:6px}
 .gc .nt::before{content:"";display:inline-block;width:14px;height:14px;flex-shrink:0;margin-top:2px;background:currentColor;-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cpath d='M12 16v-4M12 8h.01'/%3E%3C/svg%3E") center/contain no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cpath d='M12 16v-4M12 8h.01'/%3E%3C/svg%3E") center/contain no-repeat}
-.bt{position:fixed;bottom:60px;right:20px;width:44px;height:44px;border-radius:50%;background:var(--ac);color:#fff;border:none;cursor:pointer;font-size:18px;box-shadow:0 2px 8px rgba(217,119,6,.3);opacity:0;pointer-events:none;transition:.3s ease-out;z-index:150;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent}
+.bt{position:fixed;bottom:68px;right:16px;width:44px;height:44px;border-radius:50%;background:var(--ac);color:#fff;border:none;cursor:pointer;font-size:18px;box-shadow:0 2px 8px rgba(217,119,6,.3);opacity:0;pointer-events:none;transition:.3s ease-out;z-index:150;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent}
 .bt:hover{transform:scale(1.05);box-shadow:0 4px 12px rgba(217,119,6,.4)}
 .bt:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
 .bt.s{opacity:1;pointer-events:auto}
@@ -155,23 +156,15 @@ body{font-family:"Noto Sans JP","Hiragino Kaku Gothic ProN","Noto Sans TC","Ping
 .daily-btn:hover{background:var(--ac2);color:#fff}
 .daily-btn.on{background:var(--ac2);color:#fff}
 @media(max-width:860px){
-  .hd-top{padding:0 10px;height:42px;gap:6px}
+  .hd-top{padding:0 10px}
   .hd-top h1{font-size:14px}
-  .hd-top h1 span{font-size:11px}
-  .hd-top .sb{max-width:none;flex:1}
-  .hd-top .sb input{font-size:12px;padding:5px 10px 5px 28px;border-radius:16px}
+  .hd-bar{padding:0 10px;gap:5px}
+  .mode-pill,.tab-pill{font-size:11px;padding:4px 10px}
+  .fav-pill{font-size:11px}
   .stats{display:none}
-  .auth-area{margin-left:0}
-  .auth-btn{font-size:10px;padding:3px 8px;gap:3px}
-  .auth-btn img{width:16px;height:16px}
-  .logout-btn{font-size:9px;padding:2px 6px}
-  .hd-bar{padding:0 8px;height:30px;gap:4px}
-  .mode-pill,.tab-pill{font-size:10px;padding:2px 8px}
-  .tool-pill{font-size:10px;padding:2px 7px}
-  .hd-sep{height:14px}
   .sd{transform:translateX(-100%);transition:.3s;width:250px}
   .sd.open{transform:translateX(0)}
-  .mn{margin-left:0;padding:84px 12px 70px}
+  .mn{margin-left:0;padding:calc(var(--hh) + var(--bar-h) + 12px) 12px 70px}
   .ft{margin-left:0;padding:16px 12px 64px;font-size:10px}
   .menu-btn{display:block}
   .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:85}
@@ -188,19 +181,15 @@ body{font-family:"Noto Sans JP","Hiragino Kaku Gothic ProN","Noto Sans TC","Ping
   .gc .gh{padding:10px 12px}
   .gc .gx{padding:0 12px 12px}
   .cf-hd{padding:10px 12px;font-size:13px}
-  .bt{bottom:16px;right:16px}
+  .bt{bottom:68px;right:14px}
   .daily-bar{padding:10px 12px;gap:8px}
   .daily-btn{padding:4px 10px;font-size:11px}
+  .ftb-btn{font-size:9px}
+  .ftb-btn svg{width:18px;height:18px}
 }
-@media(max-width:480px){
-  .hd-top{height:40px;gap:5px}
-  .hd-top h1{font-size:13px}
-  .hd-bar{gap:3px}
-  .mode-pill,.tab-pill{font-size:9px;padding:2px 7px}
-  .tool-pill{font-size:9px;padding:2px 6px}
-  .mn{padding:80px 10px 60px}
+@media(max-width:420px){
+  .mode-pill,.tab-pill{font-size:10px;padding:3px 8px}
   .vg{grid-template-columns:1fr}
-  .vi .vw{font-size:16px}
   .qmain{font-size:28px}
   .qopt{padding:10px;font-size:14px}
 }
@@ -310,17 +299,18 @@ body{font-family:"Noto Sans JP","Hiragino Kaku Gothic ProN","Noto Sans TC","Ping
     <button class="mode-pill" onclick="switchMode('confuse')">比較</button>
     <div class="hd-sep"></div>
     <div id="tabsBar" style="display:contents"></div>
+    <div class="hd-sep"></div>
+    <button class="fav-pill" id="favBtn" onclick="toggleFavFilter()">★</button>
   </div>
 </header>
-<!-- Floating toolbar -->
-<div class="ftb" id="ftb">
-  <button class="ftb-btn" id="favBtn" onclick="toggleFavFilter()">★</button>
-  <button class="ftb-btn" onclick="Quiz.start()">測驗</button>
-  <button class="ftb-btn" id="reviewBtn" onclick="SRS.start()">複習</button>
-  <button class="ftb-btn" onclick="GrammarDrill.start()">文法練</button>
-  <a class="ftb-btn" href="verbs.html">動詞</a>
-  <button class="ftb-btn" onclick="Stats.open()">統計</button>
-</div>
+<!-- Bottom nav: 5 items max (UX guideline) -->
+<nav class="ftb" id="ftb">
+  <button class="ftb-btn" onclick="Quiz.start()"><svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>測驗</button>
+  <button class="ftb-btn" id="reviewBtn" onclick="SRS.start()"><svg viewBox="0 0 24 24"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>複習</button>
+  <button class="ftb-btn" onclick="GrammarDrill.start()"><svg viewBox="0 0 24 24"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>文法</button>
+  <a class="ftb-btn" href="verbs.html"><svg viewBox="0 0 24 24"><path d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"/></svg>動詞</a>
+  <button class="ftb-btn" onclick="Stats.open()"><svg viewBox="0 0 24 24"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>統計</button>
+</nav>
 
 <nav class="sd" id="sd"></nav>
 <div class="overlay" id="overlay" onclick="toggleSd()"></div>
