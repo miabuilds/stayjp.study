@@ -174,6 +174,15 @@ body {
 .theme-btn:hover { color: var(--tx); background: var(--bg3); }
 .theme-btn svg { width: 18px; height: 18px; }
 
+/* Language toggle */
+.lang-btn {
+  background: var(--bg3); border: 1px solid var(--bd); cursor: pointer;
+  color: var(--tx2); padding: 2px 8px; font-size: 11px; font-weight: 600;
+  border-radius: 8px; font-family: inherit; white-space: nowrap;
+  transition: color .2s var(--ease), background .2s var(--ease), border-color .2s var(--ease);
+}
+.lang-btn:hover { color: var(--ac); border-color: var(--ac); }
+
 /* Menu button (mobile) */
 .menu-btn {
   display: none; background: none; border: none;
@@ -870,6 +879,7 @@ body {
     <div class="sb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg><input id="search" placeholder="搜尋文法・單字..." oninput="onSearch(this.value)"></div>
     <span class="stats" id="stats"></span>
     <a href="home.html" style="color:var(--tx3);font-size:11px;text-decoration:none;white-space:nowrap;padding:4px 8px;border-radius:8px;transition:color .2s,background .2s" onmouseover="this.style.color='var(--ac)';this.style.background='var(--bg3)'" onmouseout="this.style.color='var(--tx3)';this.style.background='none'">關於</a>
+    <button class="lang-btn" id="langBtn" onclick="cycleLang()">繁</button>
     <button class="theme-btn" id="themeBtn" onclick="toggleTheme()" aria-label="切換深色模式"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79z"/></svg></button>
     <div class="auth-area" id="authArea">
       <button class="auth-btn" id="authBtn" onclick="handleAuth()">登入</button>
@@ -937,6 +947,9 @@ body {
 <script src="grammar-n1.js"></script>
 <!-- Confusables -->
 <script src="confusables.js"></script>
+
+<!-- i18n -->
+<script src="i18n.js"></script>
 
 <!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
@@ -1118,10 +1131,20 @@ function updateFavCount() {
 }
 
 // ========== STATE ==========
-let currentMode = 'grammar'; // 'grammar' | 'vocab'
-let currentLevel = 'n5';
+const _savedMode = localStorage.getItem('lastMode');
+const _savedLevel = localStorage.getItem('lastLevel');
+let currentMode = (_savedMode === 'vocab' || _savedMode === 'confuse') ? _savedMode : 'grammar';
+let currentLevel = ['n5','n4','n3','n2','n1','all'].includes(_savedLevel) ? _savedLevel : 'n5';
 let showFavOnly = false;
 let searchTerm = '';
+
+// Restore saved mode/level UI on load
+(function initSavedState() {
+  document.querySelectorAll('.mode-pill').forEach((b,i) => b.classList.toggle('on',
+    (i===0&&currentMode==='grammar')||(i===1&&currentMode==='vocab')||(i===2&&currentMode==='confuse')));
+  document.getElementById('modeTitle').textContent = currentMode==='grammar'?'文法':currentMode==='vocab'?'單字':'比較';
+  updateTabs();
+})();
 
 function switchMode(mode) {
   currentMode = mode;
@@ -1133,19 +1156,23 @@ function switchMode(mode) {
   document.getElementById('modeTitle').textContent = mode==='grammar'?'文法':mode==='vocab'?'單字':'比較';
   updateTabs();
   currentLevel = mode==='confuse'?'all':'n5';
+  localStorage.setItem('lastMode', currentMode);
+  localStorage.setItem('lastLevel', currentLevel);
   doRender();
 }
 function updateTabs() {
   const bar = document.getElementById('tabsBar');
-  const allLevels = '<button class="tab-pill on" onclick="switchLevel(\'n5\')">N5</button><button class="tab-pill" onclick="switchLevel(\'n4\')">N4</button><button class="tab-pill" onclick="switchLevel(\'n3\')">N3</button><button class="tab-pill" onclick="switchLevel(\'n2\')">N2</button><button class="tab-pill" onclick="switchLevel(\'n1\')">N1</button>';
   if (currentMode === 'confuse') {
-    bar.innerHTML = '<button class="tab-pill on" onclick="switchLevel(\'all\')">全部</button><button class="tab-pill" onclick="switchLevel(\'n3\')">N3</button><button class="tab-pill" onclick="switchLevel(\'n2\')">N2</button>';
+    const cls = ['all','n3','n2'];
+    bar.innerHTML = cls.map(l => `<button class="tab-pill ${currentLevel===l?'on':''}" onclick="switchLevel('${l}')">${l==='all'?'全部':l.toUpperCase()}</button>`).join('');
   } else {
-    bar.innerHTML = allLevels;
+    const lvs = ['n5','n4','n3','n2','n1'];
+    bar.innerHTML = lvs.map(l => `<button class="tab-pill ${currentLevel===l?'on':''}" onclick="switchLevel('${l}')">${l.toUpperCase()}</button>`).join('');
   }
 }
 function switchLevel(lv) {
   currentLevel = lv;
+  localStorage.setItem('lastLevel', lv);
   showFavOnly = false;
   document.getElementById('favBtn').classList.remove('fav-on');
   document.getElementById('search').value = '';
