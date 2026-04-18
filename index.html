@@ -1544,7 +1544,8 @@ function renderVocab() {
     }
   }
 
-  const spkSvg = '<svg class="spk" onclick="event.stopPropagation();speak(this.closest(\'.vi\').querySelector(\'.vw\').textContent)" viewBox="0 0 24 24"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.54 8.46a5 5 0 010 7.07M19.07 4.93a10 10 0 010 14.14"/></svg>';
+  // 從 .vi 的 data-r（平假名讀音）發音，fallback 到 data-w（漢字）
+  const spkSvg = '<svg class="spk" onclick="event.stopPropagation();var vi=this.closest(\'.vi\');speak(vi.dataset.r||vi.dataset.w)" viewBox="0 0 24 24"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.54 8.46a5 5 0 010 7.07M19.07 4.93a10 10 0 010 14.14"/></svg>';
 
   // Use virtual list for full list (no search, no daily, no fav filter)
   const useVL = !lf && !showFavOnly && !dailyMode && typeof VirtualList !== 'undefined' && filtered.length > 200;
@@ -1578,7 +1579,7 @@ function renderVocab() {
         }
         const d = entry.d;
         const isFav = favList.includes(d.w);
-        return `<div class="vi" data-fid="${d.w}"><div class="vl"><div class="vw">${d.w}</div>${d.w!==d.r?`<div class="vr">${d.r}</div>`:''}<div class="vm">${d.m}</div></div>${spkSvg}<span class="vp">${entry.catName}</span><svg class="star ${isFav?'on':''}" onclick="toggleFav('${d.w.replace(/'/g,"\\'")}')" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>`;
+        return `<div class="vi" data-fid="${d.w}" data-w="${d.w}" data-r="${d.r||''}"><div class="vl"><div class="vw">${d.w}</div>${d.w!==d.r?`<div class="vr">${d.r}</div>`:''}<div class="vm">${d.m}</div></div>${spkSvg}<span class="vp">${entry.catName}</span><svg class="star ${isFav?'on':''}" onclick="toggleFav('${d.w.replace(/'/g,"\\'")}')" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>`;
       }
     });
 
@@ -1597,7 +1598,7 @@ function renderVocab() {
       h += '<div class="vg">';
       items.forEach(d => {
         const isFav = favList.includes(d.w);
-        h += `<div class="vi" data-fid="${d.w}"><div class="vl"><div class="vw">${d.w}</div>${d.w!==d.r?`<div class="vr">${d.r}</div>`:''}<div class="vm">${d.m}</div></div>${spkSvg}<span class="vp">${cat.name}</span><svg class="star ${isFav?'on':''}" onclick="toggleFav('${d.w.replace(/'/g,"\\'")}')" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>`;
+        h += `<div class="vi" data-fid="${d.w}" data-w="${d.w}" data-r="${d.r||''}"><div class="vl"><div class="vw">${d.w}</div>${d.w!==d.r?`<div class="vr">${d.r}</div>`:''}<div class="vm">${d.m}</div></div>${spkSvg}<span class="vp">${cat.name}</span><svg class="star ${isFav?'on':''}" onclick="toggleFav('${d.w.replace(/'/g,"\\'")}')" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>`;
       });
       h += '</div></section>';
     });
