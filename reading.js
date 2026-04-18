@@ -514,21 +514,21 @@ const Reading = (() => {
 
     box.innerHTML = `
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-        <h3 style="margin:0">讀解練習</h3>
+        <h3 style="margin:0">${t('rd_title')}</h3>
         <button class="qclose" style="width:auto;margin:0;padding:2px 10px" onclick="Reading.close()">✕</button>
       </div>
-      <p style="font-size:13px;color:var(--tx2);margin-bottom:12px">閱讀日文段落，回答理解問題</p>
-      <div class="qf"><label>級別</label><div class="qo" id="rdLevel">
+      <p style="font-size:13px;color:var(--tx2);margin-bottom:12px">${t('rd_subtitle')}</p>
+      <div class="qf"><label>${t('quiz_level')}</label><div class="qo" id="rdLevel">
         <button class="on" data-v="n5">N5</button><button data-v="n4">N4</button>
         <button data-v="n3">N3</button><button data-v="n2">N2</button>
         <button data-v="n1">N1</button>
       </div></div>
-      <div class="qf"><label>計時</label><div class="qo" id="rdTimer">
-        <button class="on" data-v="1">開啟</button><button data-v="0">關閉</button>
+      <div class="qf"><label>${t('rd_timer')}</label><div class="qo" id="rdTimer">
+        <button class="on" data-v="1">${t('rd_timer_on')}</button><button data-v="0">${t('rd_timer_off')}</button>
       </div></div>
       <div style="margin:10px 0;display:flex;flex-wrap:wrap;gap:4px">${levelStats}</div>
-      <button class="qstart" onclick="Reading.begin()">開始練習</button>
-      <button class="qclose" onclick="Reading.close()">取消</button>`;
+      <button class="qstart" onclick="Reading.begin()">${t('rd_start')}</button>
+      <button class="qclose" onclick="Reading.close()">${t('rd_cancel')}</button>`;
     box.querySelectorAll('.qo').forEach(g => {
       g.querySelectorAll('button').forEach(b => {
         b.onclick = () => { g.querySelectorAll('button').forEach(x => x.classList.remove('on')); b.classList.add('on'); };
@@ -541,7 +541,7 @@ const Reading = (() => {
     selectedLevel = document.querySelector('#rdLevel .on').dataset.v;
     timerEnabled = document.querySelector('#rdTimer .on').dataset.v === '1';
     const pool = passages.filter(p => p.level === selectedLevel);
-    if (!pool.length) { alert('此級別無讀解資料'); return; }
+    if (!pool.length) { alert(t('rd_no_data')); return; }
     currentPassage = pool[Math.floor(Math.random() * pool.length)];
     currentQ = 0;
     score = 0;
@@ -579,7 +579,7 @@ const Reading = (() => {
       <h4 style="margin-bottom:10px;color:var(--tx)">${p.title}</h4>
       <div id="rdPassage" style="background:var(--bg3);padding:16px;border-radius:8px;line-height:2;font-size:15px;margin-bottom:12px;border:1px solid var(--bd);color:var(--tx)">${passageHtml}</div>
       <div style="display:flex;gap:6px;margin-bottom:14px">
-        <button onclick="Reading.toggleFurigana()" style="font-size:11px;padding:4px 10px;border:1px solid var(--bd);border-radius:6px;background:var(--bg2);color:var(--tx2);cursor:pointer" id="rdFuriBtn">振假名：顯示</button>
+        <button onclick="Reading.toggleFurigana()" style="font-size:11px;padding:4px 10px;border:1px solid var(--bd);border-radius:6px;background:var(--bg2);color:var(--tx2);cursor:pointer" id="rdFuriBtn">${t('rd_furigana_show')}</button>
       </div>
       <div id="rdQuestions"></div>
       <div id="rdNav" style="margin-top:12px"></div>`;
@@ -621,9 +621,9 @@ const Reading = (() => {
 
     const navDiv = document.getElementById('rdNav');
     if (currentQ < currentPassage.questions.length - 1) {
-      navDiv.innerHTML = '<button class="qstart" onclick="Reading.nextQ()">下一題</button>';
+      navDiv.innerHTML = `<button class="qstart" onclick="Reading.nextQ()">${t('rd_next')}</button>`;
     } else {
-      navDiv.innerHTML = '<button class="qstart" onclick="Reading.showPassageResults()">查看結果</button>';
+      navDiv.innerHTML = `<button class="qstart" onclick="Reading.showPassageResults()">${t('rd_show_result')}</button>`;
     }
   }
 
@@ -649,16 +649,16 @@ const Reading = (() => {
     const cls = pct >= 80 ? 'good' : pct >= 50 ? 'ok' : 'bad';
     const box = document.getElementById('quizBox');
     box.innerHTML = `
-      <h3>讀解結果</h3>
+      <h3>${t('rd_title')}</h3>
       <div class="qscore ${cls}">${score} / ${total} (${pct}%)</div>
-      ${timerEnabled ? '<div style="text-align:center;font-size:13px;color:var(--tx2);margin-bottom:8px">用時：' + formatTime(timerSeconds) + '</div>' : ''}
-      <div style="font-size:13px;color:var(--tx2);margin-bottom:8px">文章：${p.title}（${p.level.toUpperCase()}）</div>
+      ${timerEnabled ? `<div style="text-align:center;font-size:13px;color:var(--tx2);margin-bottom:8px">${t('rd_time_used', { t: formatTime(timerSeconds) })}</div>` : ''}
+      <div style="font-size:13px;color:var(--tx2);margin-bottom:8px">${p.title}（${p.level.toUpperCase()}）</div>
       <div class="qresults">${answered.map(a =>
         '<div class="qr ' + (a.correct ? 'ok' : 'ng') + '"><span class="qrc">' + (a.correct ? '✓' : '✗') + '</span><span>' + a.q + '</span></div>'
       ).join('')}</div>
       <div class="qactions">
-        <button class="qstart" onclick="Reading.begin()">再來一篇</button>
-        <button class="qclose" onclick="Reading.close()">關閉</button>
+        <button class="qstart" onclick="Reading.begin()">${t('ls_retry')}</button>
+        <button class="qclose" onclick="Reading.close()">${t('ls_close')}</button>
       </div>`;
   }
 
@@ -671,7 +671,7 @@ const Reading = (() => {
       });
     }
     const btn = document.getElementById('rdFuriBtn');
-    if (btn) btn.textContent = '振假名：' + (furiganaVisible ? '顯示' : '隱藏');
+    if (btn) btn.textContent = furiganaVisible ? t('rd_furigana_show') : t('rd_furigana_hide');
   }
 
   function close() {

@@ -141,7 +141,7 @@ const MockExam = (() => {
     let histHTML = '';
     if (history.length) {
       const last3 = history.slice(-3).reverse();
-      histHTML = '<div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--bd)"><div style="font-size:12px;color:var(--tx2);font-weight:600;margin-bottom:6px">最近成績</div>';
+      histHTML = `<div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--bd)"><div style="font-size:12px;color:var(--tx2);font-weight:600;margin-bottom:6px">${t('me_recent')}</div>`;
       last3.forEach(h => {
         const pct = Math.round(h.totalScore / h.totalQuestions * 100);
         const cls = pct >= 60 ? 'good' : 'bad';
@@ -154,20 +154,20 @@ const MockExam = (() => {
     }
 
     box.innerHTML =
-      '<h3 style="margin-bottom:8px">JLPT 模擬考</h3>' +
-      '<div style="font-size:12px;color:var(--tx2);margin-bottom:12px">模擬真實 JLPT 考試，含文字語彙 + 文法讀解兩大部分</div>' +
-      '<div class="qf"><label>級別</label><div class="qo" id="meLevel">' +
+      `<h3 style="margin-bottom:8px">${t('me_title')}</h3>` +
+      `<div style="font-size:12px;color:var(--tx2);margin-bottom:12px">${t('me_subtitle')}</div>` +
+      `<div class="qf"><label>${t('quiz_level')}</label><div class="qo" id="meLevel">` +
         '<button data-v="n5">N5</button><button data-v="n4">N4</button>' +
         '<button class="on" data-v="n3">N3</button><button data-v="n2">N2</button><button data-v="n1">N1</button>' +
       '</div></div>' +
       '<div style="background:var(--bg3);border-radius:8px;padding:12px;margin:12px 0;font-size:12px;color:var(--tx2);line-height:1.6">' +
-        '<div style="font-weight:600;color:var(--tx);margin-bottom:4px">考試結構</div>' +
-        '<div>第一部分：文字・語彙 — 25 題 / 15 分鐘</div>' +
-        '<div>第二部分：文法・讀解 — 25 題 / 25 分鐘</div>' +
-        '<div style="margin-top:4px;color:var(--ac)">合格基準：總分 60% 以上</div>' +
+        `<div style="font-weight:600;color:var(--tx);margin-bottom:4px">${t('me_structure')}</div>` +
+        `<div>${t('me_part1')}</div>` +
+        `<div>${t('me_part2')}</div>` +
+        `<div style="margin-top:4px;color:var(--ac)">${t('me_pass_line')}</div>` +
       '</div>' +
-      '<button class="qstart" onclick="MockExam.beginExam()">開始模擬考</button>' +
-      '<button class="qclose" onclick="MockExam.close()">取消</button>' +
+      `<button class="qstart" onclick="MockExam.beginExam()">${t('me_start')}</button>` +
+      `<button class="qclose" onclick="MockExam.close()">${t('me_cancel')}</button>` +
       histHTML;
 
     box.querySelectorAll('.qo').forEach(g => {
@@ -185,7 +185,7 @@ const MockExam = (() => {
     const grammar = getGrammar(examLevel);
 
     if (!vocab.length || vocab.length < 10) {
-      alert('此級別單字資料不足，無法生成模擬考'); return;
+      alert(t('me_no_data')); return;
     }
 
     sections = [];
@@ -456,15 +456,15 @@ const MockExam = (() => {
 
     box.innerHTML =
       '<div style="text-align:center;padding:20px 0">' +
-        '<div style="font-size:12px;color:var(--tx2);margin-bottom:8px">JLPT ' + examLevel.toUpperCase() + ' 模擬考</div>' +
-        '<div style="font-size:32px;font-weight:700;margin:12px 0;color:var(--tx)">第 ' + sectionNum + ' 部分</div>' +
-        '<div style="font-size:20px;font-weight:600;color:var(--ac2);margin-bottom:8px">' + section.name + '</div>' +
-        '<div style="font-size:14px;color:var(--tx2);margin-bottom:16px">' + section.questions.length + ' 題 ／ ' + mins + ' 分鐘</div>' +
+        `<div style="font-size:12px;color:var(--tx2);margin-bottom:8px">JLPT ${examLevel.toUpperCase()} ${t('me_title')}</div>` +
+        `<div style="font-size:32px;font-weight:700;margin:12px 0;color:var(--tx)">${t('me_part_n', { n: sectionNum })}</div>` +
+        `<div style="font-size:20px;font-weight:600;color:var(--ac2);margin-bottom:8px">${section.name}</div>` +
+        `<div style="font-size:14px;color:var(--tx2);margin-bottom:16px">${t('me_part_info', { n: section.questions.length, m: mins })}</div>` +
         '<div style="background:var(--bg3);border-radius:8px;padding:12px;margin:16px 0;font-size:13px;color:var(--tx2);text-align:left;line-height:1.7">' +
           getQuestionTypeSummary(section) +
         '</div>' +
-        '<button class="qstart" onclick="MockExam.startTimer()">開始作答</button>' +
-        (currentSection > 0 ? '' : '<button class="qclose" onclick="MockExam.close()">放棄</button>') +
+        `<button class="qstart" onclick="MockExam.startTimer()">${t('me_begin')}</button>` +
+        (currentSection > 0 ? '' : `<button class="qclose" onclick="MockExam.close()">${t('me_abandon')}</button>`) +
       '</div>';
   }
 
@@ -688,31 +688,28 @@ const MockExam = (() => {
       '</div>';
     });
     html += '<div style="display:flex;justify-content:space-between;padding:10px 14px;font-size:14px;background:var(--bg3)">' +
-      '<span style="font-weight:600;color:var(--tx)">用時</span>' +
-      '<span style="color:var(--tx2)">' + timeStr + '</span>' +
+      `<span style="font-weight:600;color:var(--tx)">${t('me_time')}</span>` +
+      `<span style="color:var(--tx2)">${timeStr}</span>` +
     '</div>';
     html += '</div>';
 
-    // Pass/Fail
     html += '<div style="text-align:center;padding:12px;border-radius:8px;margin-bottom:14px;' +
       (finalPass
         ? 'background:var(--correct-bg);color:var(--correct-tx);border:1px solid var(--correct-bd)'
         : 'background:var(--wrong-bg);color:var(--wrong-tx);border:1px solid var(--wrong-bd)') +
       '">' +
-      '<div style="font-size:20px;font-weight:700">' + (finalPass ? '合格ライン達成！' : '不合格') + '</div>' +
-      '<div style="font-size:12px;margin-top:4px">合格基準：總分 60% 以上 + 各科 30% 以上</div>' +
+      `<div style="font-size:20px;font-weight:700">${finalPass ? t('me_passed') : t('me_failed')}</div>` +
+      `<div style="font-size:12px;margin-top:4px">${t('me_pass_criteria')}</div>` +
     '</div>';
 
-    // Weak areas
     if (weakAreas.length) {
       html += '<div style="background:var(--note-bg);color:var(--note-tx);padding:10px 14px;border-radius:8px;margin-bottom:14px;font-size:13px">' +
-        '<div style="font-weight:600;margin-bottom:4px">需加強的題型</div>' +
+        `<div style="font-weight:600;margin-bottom:4px">${t('me_weak_areas')}</div>` +
         weakAreas.map(w => '・' + w).join('<br>') +
       '</div>';
     }
 
-    // Type-level breakdown
-    html += '<div style="margin-bottom:14px"><div style="font-size:12px;color:var(--tx2);font-weight:600;margin-bottom:6px">各題型成績</div>';
+    html += `<div style="margin-bottom:14px"><div style="font-size:12px;color:var(--tx2);font-weight:600;margin-bottom:6px">${t('me_type_scores')}</div>`;
     sectionResults.forEach(sr => {
       Object.entries(sr.typeScores).forEach(([type, score]) => {
         const p = Math.round(score.correct / score.total * 100);
@@ -727,8 +724,8 @@ const MockExam = (() => {
 
     // Actions
     html += '<div class="qactions">' +
-      '<button class="qstart" onclick="MockExam.beginExam()">再考一次</button>' +
-      '<button class="qclose" onclick="MockExam.close()">返回</button>' +
+      `<button class="qstart" onclick="MockExam.beginExam()">${t('me_retry')}</button>` +
+      `<button class="qclose" onclick="MockExam.close()">${t('me_back')}</button>` +
     '</div>';
 
     box.innerHTML = html;

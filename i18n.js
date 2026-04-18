@@ -264,6 +264,7 @@ const I18n = (() => {
 
   // Page title
   page_title: '再留計劃 — 免費 JLPT N5~N1 備考工具｜單字・文法・模考・複習',
+  verbs_page_title: '再留計劃 — 動詞變化完全攻略',
 
   // Language
   lang_label: '繁',
@@ -489,6 +490,7 @@ const I18n = (() => {
   ft_grammar: 'N5～N1 共 {total} 个语法点',
   report_error: '🚩 回报此项错误',
   page_title: '再留计划 — 免费 JLPT N5~N1 备考工具｜单词・语法・模考・复习',
+  verbs_page_title: '再留计划 — 动词变化完全攻略',
   lang_label: '简',
 },
 
@@ -712,6 +714,7 @@ const I18n = (() => {
   ft_grammar: 'N5–N1: {total} grammar points',
   report_error: '🚩 Report this issue',
   page_title: 'StayJP Study — Free JLPT N5–N1 Prep｜Vocab・Grammar・Mock・Review',
+  verbs_page_title: 'StayJP Study — Japanese Verb Conjugation Guide',
   lang_label: 'EN',
 }
   };

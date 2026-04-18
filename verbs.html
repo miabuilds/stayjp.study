@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>再留計劃 — 動詞變化完全攻略</title>
+<title data-i18n="verbs_page_title">再留計劃 — 動詞變化完全攻略</title>
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-2WP4D34LE3"></script>
 <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','G-2WP4D34LE3');</script>
 <link rel="icon" href="stayjpplan.png" type="image/png">
@@ -403,7 +403,7 @@ td.hl { color: var(--em-color); font-weight: 600; }
 <header class="hd">
   <div class="hd-top">
     <a href="index.html" class="back-link"><svg style="width:12px;height:12px;vertical-align:-1px;margin-right:2px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>首頁</a>
-    <h1>日本再留計劃<span>動詞變化</span></h1>
+    <h1><span data-i18n="site_name">日本再留計劃</span><span data-i18n="verb_conjugation">動詞變化</span></h1>
     <nav class="nav-pills">
       <a href="#groups" class="on">分類</a>
       <a href="#conjugation">變化表</a>
@@ -1153,7 +1153,20 @@ td.hl { color: var(--em-color); font-weight: 600; }
   再留計劃 &mdash; <a href="index.html">回首頁</a> · <a href="contact.html">意見回饋</a>
 </footer>
 
+<script src="i18n.js"></script>
 <script>
+// ========== I18N (minimal — only page chrome, 教學內容維持繁中) ==========
+function applyI18n() {
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    el.textContent = t(el.dataset.i18n);
+  });
+  document.querySelectorAll('[data-i18n-aria]').forEach(el => {
+    el.setAttribute('aria-label', t(el.dataset.i18nAria));
+  });
+  document.documentElement.lang = I18n.getLang();
+  document.title = t('verbs_page_title');
+}
+
 // ========== THEME ==========
 function initTheme() {
   const saved = localStorage.getItem('theme');

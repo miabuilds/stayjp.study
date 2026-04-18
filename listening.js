@@ -269,7 +269,7 @@ const Listening = (() => {
   function saveScores(d) { localStorage.setItem(SCORE_KEY, JSON.stringify(d)); }
 
   function speakText(text, rate) {
-    if (!window.speechSynthesis) { alert('您的瀏覽器不支援語音合成'); return; }
+    if (!window.speechSynthesis) { alert(t('ls_no_tts')); return; }
     speechSynthesis.cancel();
     const u = new SpeechSynthesisUtterance(text);
     u.lang = 'ja-JP';
@@ -292,26 +292,26 @@ const Listening = (() => {
 
     box.innerHTML = `
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-        <h3 style="margin:0">聽力練習</h3>
+        <h3 style="margin:0">${t('ls_title')}</h3>
         <button class="qclose" style="width:auto;margin:0;padding:2px 10px" onclick="Listening.close()">✕</button>
       </div>
-      <p style="font-size:13px;color:var(--tx2);margin-bottom:6px">使用瀏覽器語音合成聆聽日語，回答理解問題</p>
-      <p style="font-size:11px;color:var(--tx3);margin-bottom:12px">提示：需要瀏覽器支援日語語音（macOS/iOS/Android 通常內建）</p>
-      <div class="qf"><label>級別</label><div class="qo" id="lsLevel">
+      <p style="font-size:13px;color:var(--tx2);margin-bottom:6px">${t('ls_subtitle')}</p>
+      <p style="font-size:11px;color:var(--tx3);margin-bottom:12px">${t('ls_hint')}</p>
+      <div class="qf"><label>${t('quiz_level')}</label><div class="qo" id="lsLevel">
         <button class="on" data-v="n5">N5</button><button data-v="n4">N4</button>
         <button data-v="n3">N3</button><button data-v="n2">N2</button>
         <button data-v="n1">N1</button>
       </div></div>
-      <div class="qf"><label>題數</label><div class="qo" id="lsCount">
-        <button data-v="3">3</button><button class="on" data-v="5">5</button><button data-v="all">全部</button>
+      <div class="qf"><label>${t('quiz_count')}</label><div class="qo" id="lsCount">
+        <button data-v="3">3</button><button class="on" data-v="5">5</button><button data-v="all">${t('ls_all')}</button>
       </div></div>
-      <div class="qf"><label>模式</label><div class="qo" id="lsMode">
-        <button class="on" data-v="test">測驗（限播2次）</button>
-        <button data-v="practice">練習（不限播放）</button>
+      <div class="qf"><label>${t('ls_mode')}</label><div class="qo" id="lsMode">
+        <button class="on" data-v="test">${t('ls_mode_test')}</button>
+        <button data-v="practice">${t('ls_mode_practice')}</button>
       </div></div>
       <div style="margin:10px 0;display:flex;flex-wrap:wrap;gap:4px">${levelStats}</div>
-      <button class="qstart" onclick="Listening.begin()">開始練習</button>
-      <button class="qclose" onclick="Listening.close()">取消</button>`;
+      <button class="qstart" onclick="Listening.begin()">${t('ls_start')}</button>
+      <button class="qclose" onclick="Listening.close()">${t('ls_cancel')}</button>`;
     box.querySelectorAll('.qo').forEach(g => {
       g.querySelectorAll('button').forEach(b => {
         b.onclick = () => { g.querySelectorAll('button').forEach(x => x.classList.remove('on')); b.classList.add('on'); };
@@ -329,7 +329,7 @@ const Listening = (() => {
     practiceMode = document.querySelector('#lsMode .on').dataset.v === 'practice';
 
     const pool = items.filter(i => i.level === selectedLevel);
-    if (!pool.length) { alert('此級別無聽力資料'); return; }
+    if (!pool.length) { alert(t('ls_no_data')); return; }
 
     const shuffled = [...pool].sort(() => Math.random() - 0.5);
     const count = countVal === 'all' ? shuffled.length : Math.min(parseInt(countVal), shuffled.length);
@@ -358,7 +358,7 @@ const Listening = (() => {
           <span style="font-size:11px;color:var(--tx3)">${idx + 1} / ${queue.length}</span>
         </span>
         <span style="display:flex;align-items:center;gap:6px">
-          <span style="font-size:12px;color:var(--tx2)">正確: ${score}</span>
+          <span style="font-size:12px;color:var(--tx2)">${t('quiz_score', { n: score })}</span>
           <button class="qclose" style="width:auto;margin:0;padding:2px 10px" onclick="Listening.close()">✕</button>
         </span>
       </div>
@@ -368,14 +368,14 @@ const Listening = (() => {
           <svg width="32" height="32" viewBox="0 0 24 24" fill="var(--ac2)" stroke="none"><polygon points="6,3 20,12 6,21"/></svg>
         </button>
         <div style="margin-top:8px;font-size:12px;color:var(--tx2)" id="lsReplayInfo">
-          ${practiceMode ? '練習模式：不限播放' : '剩餘播放次數：' + replaysLeft}
+          ${practiceMode ? t('ls_practice_info') : t('ls_plays_left', { n: replaysLeft })}
         </div>
       </div>
 
       ${practiceMode ? `
       <div style="display:flex;justify-content:center;gap:6px;margin-bottom:14px">
         <button onclick="Listening.setSpeed(0.7)" class="ls-speed-btn" style="font-size:11px;padding:4px 10px;border:1px solid var(--bd);border-radius:6px;background:${rateDisplay===0.7?'var(--ac2)':'var(--bg2)'};color:${rateDisplay===0.7?'#fff':'var(--tx2)'};cursor:pointer">0.7x</button>
-        <button onclick="Listening.setSpeed(null)" class="ls-speed-btn" style="font-size:11px;padding:4px 10px;border:1px solid var(--bd);border-radius:6px;background:${!speedOverride?'var(--ac2)':'var(--bg2)'};color:${!speedOverride?'#fff':'var(--tx2)'};cursor:pointer">原速</button>
+        <button onclick="Listening.setSpeed(null)" class="ls-speed-btn" style="font-size:11px;padding:4px 10px;border:1px solid var(--bd);border-radius:6px;background:${!speedOverride?'var(--ac2)':'var(--bg2)'};color:${!speedOverride?'#fff':'var(--tx2)'};cursor:pointer">${t('ls_speed_normal')}</button>
         <button onclick="Listening.setSpeed(1.2)" class="ls-speed-btn" style="font-size:11px;padding:4px 10px;border:1px solid var(--bd);border-radius:6px;background:${rateDisplay===1.2?'var(--ac2)':'var(--bg2)'};color:${rateDisplay===1.2?'#fff':'var(--tx2)'};cursor:pointer">1.2x</button>
       </div>` : ''}
 
@@ -384,7 +384,7 @@ const Listening = (() => {
         ${currentItem.options.map((o, i) => '<button class="qopt" onclick="Listening.answer(' + idx + ',' + i + ')">' + o + '</button>').join('')}
       </div>
       <div id="lsScript" style="display:none;margin-top:12px;padding:12px;background:var(--bg3);border-radius:8px;border:1px solid var(--bd)">
-        <div style="font-size:11px;color:var(--tx2);margin-bottom:4px;font-weight:600">原文：</div>
+        <div style="font-size:11px;color:var(--tx2);margin-bottom:4px;font-weight:600">${t('ls_script')}</div>
         <div style="font-size:14px;line-height:1.8;color:var(--tx)">${currentItem.script.replace(/\n/g, '<br>')}</div>
       </div>
       <div id="lsNav" style="margin-top:12px"></div>`;
@@ -400,7 +400,7 @@ const Listening = (() => {
     if (!practiceMode) {
       replaysLeft--;
       const info = document.getElementById('lsReplayInfo');
-      if (info) info.textContent = '剩餘播放次數：' + replaysLeft;
+      if (info) info.textContent = t('ls_plays_left', { n: replaysLeft });
     }
     const btn = document.getElementById('lsPlayBtn');
     if (btn) {
@@ -446,9 +446,9 @@ const Listening = (() => {
     // Show nav
     const navDiv = document.getElementById('lsNav');
     if (qIdx < queue.length - 1) {
-      navDiv.innerHTML = '<button class="qstart" onclick="Listening.renderItem(' + (qIdx + 1) + ')">下一題</button>';
+      navDiv.innerHTML = `<button class="qstart" onclick="Listening.renderItem(${qIdx + 1})">${t('rd_next')}</button>`;
     } else {
-      navDiv.innerHTML = '<button class="qstart" onclick="Listening.showResults()">查看結果</button>';
+      navDiv.innerHTML = `<button class="qstart" onclick="Listening.showResults()">${t('rd_show_result')}</button>`;
     }
 
     // Stop synthesis
@@ -468,15 +468,15 @@ const Listening = (() => {
     const cls = pct >= 80 ? 'good' : pct >= 50 ? 'ok' : 'bad';
     const box = document.getElementById('quizBox');
     box.innerHTML = `
-      <h3>聽力結果</h3>
+      <h3>${t('ls_result')}</h3>
       <div class="qscore ${cls}">${score} / ${total} (${pct}%)</div>
-      <div style="font-size:13px;color:var(--tx2);margin-bottom:8px">級別：${selectedLevel.toUpperCase()} | 模式：${practiceMode ? '練習' : '測驗'}</div>
+      <div style="font-size:13px;color:var(--tx2);margin-bottom:8px">${selectedLevel.toUpperCase()} | ${practiceMode ? t('ls_mode_practice') : t('ls_mode_test')}</div>
       <div class="qresults">${answered.map(a =>
         '<div class="qr ' + (a.correct ? 'ok' : 'ng') + '"><span class="qrc">' + (a.correct ? '✓' : '✗') + '</span><span>' + a.q + '</span><span style="font-size:11px;color:var(--tx3);margin-left:auto">' + a.type + '</span></div>'
       ).join('')}</div>
       <div class="qactions">
-        <button class="qstart" onclick="Listening.begin()">再來一組</button>
-        <button class="qclose" onclick="Listening.close()">關閉</button>
+        <button class="qstart" onclick="Listening.begin()">${t('ls_retry')}</button>
+        <button class="qclose" onclick="Listening.close()">${t('ls_close')}</button>
       </div>`;
   }
 
