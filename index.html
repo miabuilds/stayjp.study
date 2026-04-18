@@ -703,8 +703,14 @@ body {
   border-radius: 12px; background: var(--bg2);
   cursor: pointer; font-size: 15px;
   transition: all .2s var(--ease); text-align: center; color: var(--tx);
+  -webkit-tap-highlight-color: transparent;
 }
-.qopt:hover { border-color: var(--ac2); background: var(--bg3); }
+/* Hover 只在真的有指標裝置才觸發，避免 iOS Safari tap 後 :hover 卡住 */
+@media (hover: hover) and (pointer: fine) {
+  .qopt:hover { border-color: var(--ac2); background: var(--bg3); }
+}
+.qopt:focus { outline: none; }
+.qopt:focus-visible { outline: 2px solid var(--ac2); outline-offset: 2px; }
 .qopt.qcorrect { border-color: var(--correct-bd); background: var(--correct-bg); color: var(--correct-tx); }
 .qopt.qwrong { border-color: var(--wrong-bd); background: var(--wrong-bg); color: var(--wrong-tx); }
 .qscore { text-align: center; font-size: 32px; font-weight: 700; margin: 16px 0; padding: 20px; border-radius: 14px; }
@@ -1598,7 +1604,8 @@ function renderVocab() {
   sd.innerHTML = sh;
 
   // Update footer
-  document.getElementById('ftInfo').textContent = t('ft_vocab', { lv: currentLevel.toUpperCase(), n: data.length });
+  const vocabTotal = (typeof VOCAB_N5!=='undefined'?VOCAB_N5.length:0) + (typeof VOCAB_N4!=='undefined'?VOCAB_N4.length:0) + (typeof VOCAB_N3!=='undefined'?VOCAB_N3.length:0) + (typeof VOCAB_N2!=='undefined'?VOCAB_N2.length:0) + (typeof VOCAB_N1!=='undefined'?VOCAB_N1.length:0);
+  document.getElementById('ftInfo').textContent = t('ft_vocab', { lv: currentLevel.toUpperCase(), n: data.length, total: vocabTotal });
 }
 
 // ========== RENDER CONFUSABLES ==========

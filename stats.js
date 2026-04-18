@@ -214,7 +214,7 @@ const Stats = (() => {
   // ── 學習進度 ──
   function buildProgress() {
     const srs = getSRS();
-    const levels = ['n5', 'n4', 'n3', 'n2'];
+    const levels = ['n5', 'n4', 'n3', 'n2', 'n1'];
     let h = '<div class="st-section"><div class="st-title">學習進度</div>';
 
     levels.forEach(lv => {

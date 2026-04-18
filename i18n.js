@@ -255,7 +255,7 @@ const I18n = (() => {
   // Footer
   copyright: '© 2026 再留計劃 — All rights reserved.',
   disclaimer: '本站內容為原創整理，不隸屬於 JLPT 官方或任何教育機構。',
-  ft_vocab: '{lv} 單字 {n} 個收錄',
+  ft_vocab: '全站收錄 N5~N1 共 {total} 個單字（本頁 {lv} {n} 個）',
   ft_confuse: '易混淆詞比較 {n} 組收錄',
   ft_grammar: 'N5～N1 共 {total} 個文法點',
 
@@ -478,7 +478,7 @@ const I18n = (() => {
   ls_no_tts: '您的浏览器不支持语音合成',
   copyright: '© 2026 再留计划 — All rights reserved.',
   disclaimer: '本站内容为原创整理，不隶属于 JLPT 官方或任何教育机构。',
-  ft_vocab: '{lv} 单词 {n} 个收录',
+  ft_vocab: '全站收录 N5~N1 共 {total} 个单词（本页 {lv} {n} 个）',
   ft_confuse: '易混淆词对比 {n} 组收录',
   ft_grammar: 'N5～N1 共 {total} 个语法点',
   lang_label: '简',
@@ -699,7 +699,7 @@ const I18n = (() => {
   ls_no_tts: 'Your browser does not support speech synthesis',
   copyright: '© 2026 StayJP Study — All rights reserved.',
   disclaimer: 'Original content. Not affiliated with JLPT or any educational institution.',
-  ft_vocab: '{lv} Vocabulary: {n} words',
+  ft_vocab: 'Site total N5–N1: {total} words (this page: {lv} {n})',
   ft_confuse: 'Confusable Pairs: {n} groups',
   ft_grammar: 'N5–N1: {total} grammar points',
   lang_label: 'EN',

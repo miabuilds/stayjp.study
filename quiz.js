@@ -13,7 +13,7 @@ const Quiz = (() => {
       <h3 style="margin-bottom:8px">單字測驗</h3>
       <div class="qf"><label>級別</label><div class="qo" id="qLevel">
         <button class="on" data-v="n5">N5</button><button data-v="n4">N4</button>
-        <button data-v="n3">N3</button><button data-v="n2">N2</button>
+        <button data-v="n3">N3</button><button data-v="n2">N2</button><button data-v="n1">N1</button>
       </div></div>
       <div class="qf"><label>題型</label><div class="qo" id="qType">
         <button class="on" data-v="word2meaning">看日選中</button>
