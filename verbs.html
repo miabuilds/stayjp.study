@@ -1236,12 +1236,16 @@ async function cycleLang() {
   const cur = I18n.getLang();
   const idx = LANG_CYCLE.indexOf(cur);
   const next = LANG_CYCLE[(idx + 1) % LANG_CYCLE.length];
+  const btn = document.getElementById('langBtn');
+  if (next === 'zh-CN' && !_tw2cn) {
+    if (btn) { btn.disabled = true; btn.textContent = '…'; }
+    await ensureOpenCC();
+    if (btn) btn.disabled = false;
+  }
   I18n.setLang(next);
-  if (next === 'zh-CN') await ensureOpenCC();
   applyPageLang();
 }
 
-// 保留 applyI18n 名稱給其他 script 呼叫
 const applyI18n = applyPageLang;
 
 // 初始化
@@ -1249,6 +1253,13 @@ const applyI18n = applyPageLang;
   if (I18n.getLang() === 'zh-CN') { await ensureOpenCC(); applyPageLang(); }
   else applyPageLang();
 })();
+
+// 頁面 idle 時預載 OpenCC → 點「簡」可瞬間切換（避免 1~5 秒卡頓假象）
+if ('requestIdleCallback' in window) {
+  requestIdleCallback(() => ensureOpenCC(), { timeout: 5000 });
+} else {
+  setTimeout(() => ensureOpenCC(), 2000);
+}
 
 // ========== THEME ==========
 function initTheme() {

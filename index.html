@@ -1840,8 +1840,13 @@ async function cycleLang() {
   const cur = I18n.getLang();
   const idx = LANG_CYCLE.indexOf(cur);
   const next = LANG_CYCLE[(idx + 1) % LANG_CYCLE.length];
+  const btn = document.getElementById('langBtn');
+  if (next === 'zh-CN' && !_tw2cn) {
+    if (btn) { btn.disabled = true; btn.textContent = '…'; }
+    await ensureOpenCC();
+    if (btn) btn.disabled = false;
+  }
   I18n.setLang(next);
-  if (next === 'zh-CN') await ensureOpenCC();
   applyI18n();
   updateAuthUI();
   if (typeof doRender === 'function') doRender();
@@ -1850,6 +1855,13 @@ async function cycleLang() {
 // 若 localStorage 記錄使用者上次選簡中，頁面載入就先把 OpenCC 準備好再 render
 if (typeof I18n !== 'undefined' && I18n.getLang() === 'zh-CN') {
   ensureOpenCC().then(() => { if (typeof doRender === 'function') doRender(); });
+}
+
+// 頁面 idle 時預載 OpenCC → 點「簡」可瞬間切換
+if ('requestIdleCallback' in window) {
+  requestIdleCallback(() => ensureOpenCC(), { timeout: 8000 });
+} else {
+  setTimeout(() => ensureOpenCC(), 3000);
 }
 
 // ========== THEME ==========
