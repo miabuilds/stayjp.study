@@ -1805,6 +1805,7 @@ function applyI18n() {
     el.setAttribute('aria-label', t(el.dataset.i18nAria));
   });
   document.documentElement.lang = I18n.getLang();
+  document.title = t('page_title');
   const btn = document.getElementById('langBtn');
   if (btn) btn.textContent = LANG_LABEL[I18n.getLang()] || '繁';
 }

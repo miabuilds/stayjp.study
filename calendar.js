@@ -99,19 +99,23 @@ const Calendar = (() => {
     // Month labels
     const months = [];
     let lastMonth = -1;
+    const monthLabels = (typeof I18n !== 'undefined' && I18n.getMonths)
+      ? I18n.getMonths()
+      : ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
     for (let w = 0; w < weeks; w++) {
       const d = new Date(startDate);
       d.setDate(d.getDate() + w * 7);
       const m = d.getMonth();
       if (m !== lastMonth) {
-        const labels = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
-        months.push({ col: w, label: labels[m] });
+        months.push({ col: w, label: monthLabels[m] });
         lastMonth = m;
       }
     }
 
     // Day-of-week labels
-    const dayLabels = ['日','月','火','水','木','金','土'];
+    const dayLabels = (typeof I18n !== 'undefined' && I18n.getWeekdays)
+      ? I18n.getWeekdays()
+      : ['日','月','火','水','木','金','土'];
 
     // Build month label row
     let monthRow = '<div class="cal-row cal-months"><span class="cal-day-lbl"></span>';
@@ -142,8 +146,8 @@ const Calendar = (() => {
           const level = getLevel(log[key]);
           const dayData = log[key];
           const tip = dayData
-            ? `${key}：詞彙 ${dayData.vocab||0}・文法 ${dayData.grammar||0}・測驗 ${dayData.quiz||0}`
-            : `${key}：無活動`;
+            ? t('cal_tooltip', { date: key, v: dayData.vocab||0, g: dayData.grammar||0, q: dayData.quiz||0 })
+            : t('cal_tooltip_empty', { date: key });
           gridHTML += `<span class="cal-cell" data-level="${level}" title="${tip}"></span>`;
         }
       }
@@ -156,12 +160,12 @@ const Calendar = (() => {
         ${gridHTML}
       </div>
       <div class="cal-legend">
-        <span class="cal-legend-tx">少</span>
+        <span class="cal-legend-tx">${t('legend_less')}</span>
         <span class="cal-cell cal-legend-cell" data-level="0"></span>
         <span class="cal-cell cal-legend-cell" data-level="1"></span>
         <span class="cal-cell cal-legend-cell" data-level="2"></span>
         <span class="cal-cell cal-legend-cell" data-level="3"></span>
-        <span class="cal-legend-tx">多</span>
+        <span class="cal-legend-tx">${t('legend_more')}</span>
       </div>
     </div>`;
   }
@@ -174,7 +178,7 @@ const Calendar = (() => {
     const filled = Math.round(pct / 10);
     const bar = '█'.repeat(filled) + '░'.repeat(10 - filled);
     return `<div class="cal-progress">
-      <span>今日目標：</span>
+      <span>${t('today_goal')}</span>
       <span class="cal-prog-bar">${bar}</span>
       <span class="cal-prog-pct">${pct}%</span>
     </div>`;
@@ -184,19 +188,15 @@ const Calendar = (() => {
   function getPanelHTML() {
     const streaks = getStreaks();
     const summary = getTodaySummary();
-    const todayParts = [];
-    if (summary.vocab > 0) todayParts.push(`${summary.vocab} 詞彙`);
-    if (summary.grammar > 0) todayParts.push(`${summary.grammar} 文法`);
-    if (summary.quiz > 0) todayParts.push(`${summary.quiz} 測驗`);
-    const todayText = todayParts.length > 0 ? `已學 ${summary.total} 項` : '尚未開始';
+    const todayText = summary.total > 0 ? t('today_learned', { n: summary.total }) : t('today_not_started');
 
     return `<div class="cal-panel">
       <div class="cal-streak">
-        <span class="cal-streak-fire">🔥 連續 ${streaks.current} 天</span>
+        <span class="cal-streak-fire">${t('streak_fire', { n: streaks.current })}</span>
         <span class="cal-streak-sep">|</span>
-        <span>最長 ${streaks.longest} 天</span>
+        <span>${t('streak_longest', { n: streaks.longest })}</span>
         <span class="cal-streak-sep">|</span>
-        <span>今日：${todayText}</span>
+        <span>${t('today_prefix')}${todayText}</span>
       </div>
       ${buildHeatmap()}
       ${buildProgress()}

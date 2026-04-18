@@ -266,6 +266,10 @@ a:hover { text-decoration: underline; }
   </div>
 </footer>
 
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+
 <script>
 // ========== THEME ==========
 function initTheme() {
@@ -294,7 +298,18 @@ function updateThemeIcon() {
 }
 initTheme();
 
-// ========== FORM → GitHub Issue ==========
+// ========== FIREBASE ==========
+const fbConfig = {
+  apiKey: "AIzaSyDnmg2XOuvwgE8m8xCF5sS4o0nQYoUplPI",
+  authDomain: "jpnote-1bdd6.firebaseapp.com",
+  projectId: "jpnote-1bdd6",
+  storageBucket: "jpnote-1bdd6.firebasestorage.app",
+  messagingSenderId: "666368174384"
+};
+firebase.initializeApp(fbConfig);
+const db = firebase.firestore();
+
+// ========== FORM → Firestore ==========
 async function submitForm(e) {
   e.preventDefault();
   const btn = document.getElementById('submitBtn');
@@ -305,19 +320,21 @@ async function submitForm(e) {
   const msg = document.getElementById('fmsg').value;
   const email = document.getElementById('femail').value;
 
-  const labels = { bug: 'bug', feature: 'enhancement', content: 'content-error', other: '' };
-  const typeNames = { bug: 'Bug 回報', feature: '功能建議', content: '內容錯誤', other: '其他' };
-  const title = `[${typeNames[type]}] ${msg.slice(0, 60)}${msg.length > 60 ? '…' : ''}`;
-  const body = `**類型：** ${typeNames[type]}\n\n${msg}${email ? '\n\n**回覆 Email：** ' + email : ''}\n\n---\n_透過意見回饋頁面送出_`;
-
-  // Open GitHub new issue page with pre-filled content (no API token needed)
-  const params = new URLSearchParams({ title, body });
-  if (labels[type]) params.set('labels', labels[type]);
-  window.open('https://github.com/miafrontend2026/stayjp.study/issues/new?' + params.toString(), '_blank');
-
-  // Show success
-  document.getElementById('contactForm').style.display = 'none';
-  document.getElementById('successMsg').style.display = 'block';
+  try {
+    await db.collection('feedback').add({
+      type,
+      message: msg,
+      email: email || null,
+      ua: navigator.userAgent.slice(0, 200),
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    document.getElementById('contactForm').style.display = 'none';
+    document.getElementById('successMsg').style.display = 'block';
+  } catch (err) {
+    btn.disabled = false;
+    btn.textContent = '送出';
+    alert('送出失敗：' + (err.message || err));
+  }
 }
 </script>
 </body>

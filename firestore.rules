@@ -10,11 +10,34 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // 每個使用者只能讀寫自己的 doc
+    // 使用者私人資料（收藏 / 學習進度 / 複習資料）
     // 結構：users/{uid} → { favorites, quiz_history, srs_data, ... }
     match /users/{userId} {
       allow read, write: if request.auth != null
                         && request.auth.uid == userId;
+    }
+
+    // 意見回饋 — 從 contact.html 的表單寫入
+    // 任何人（包含未登入）可新增，但：
+    //   - 只能 create，不能讀取/更新/刪除（只有你從 Console 讀）
+    //   - 欄位限制防止亂塞資料
+    //   - 大小限制防 DoS
+    match /feedback/{docId} {
+      allow read, update, delete: if false;
+      allow create: if
+        // 必要欄位齊全
+        request.resource.data.keys().hasAll(['type', 'message', 'createdAt']) &&
+        // type 必須是預期值
+        request.resource.data.type in ['bug', 'feature', 'content', 'other'] &&
+        // 訊息非空且 ≤ 5000 字元
+        request.resource.data.message is string &&
+        request.resource.data.message.size() > 0 &&
+        request.resource.data.message.size() <= 5000 &&
+        // email 若存在必須是 string 或 null
+        (!('email' in request.resource.data) ||
+         request.resource.data.email == null ||
+         (request.resource.data.email is string &&
+          request.resource.data.email.size() <= 200));
     }
 
     // 預設拒絕：未明確允許的所有路徑皆擋

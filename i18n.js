@@ -262,6 +262,9 @@ const I18n = (() => {
   // Report error
   report_error: '🚩 回報此項錯誤',
 
+  // Page title
+  page_title: '再留計劃 — 免費 JLPT N5~N1 備考工具｜單字・文法・模考・複習',
+
   // Language
   lang_label: '繁',
 },
@@ -485,6 +488,7 @@ const I18n = (() => {
   ft_confuse: '易混淆词对比 {n} 组收录',
   ft_grammar: 'N5～N1 共 {total} 个语法点',
   report_error: '🚩 回报此项错误',
+  page_title: '再留计划 — 免费 JLPT N5~N1 备考工具｜单词・语法・模考・复习',
   lang_label: '简',
 },
 
@@ -707,6 +711,7 @@ const I18n = (() => {
   ft_confuse: 'Confusable Pairs: {n} groups',
   ft_grammar: 'N5–N1: {total} grammar points',
   report_error: '🚩 Report this issue',
+  page_title: 'StayJP Study — Free JLPT N5–N1 Prep｜Vocab・Grammar・Mock・Review',
   lang_label: 'EN',
 }
   };

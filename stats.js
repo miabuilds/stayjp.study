@@ -18,13 +18,12 @@ const Stats = (() => {
   }
 
   function buildHTML() {
-    let h = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0">學習統計</h3><button class="qclose" style="width:auto;margin:0;padding:2px 10px" onclick="Stats.close()">✕</button></div>';
-    // Tab navigation
+    let h = `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0">${t('stats_title')}</h3><button class="qclose" style="width:auto;margin:0;padding:2px 10px" onclick="Stats.close()">✕</button></div>`;
     h += '<div style="display:flex;gap:4px;margin-bottom:14px;overflow-x:auto;scrollbar-width:none">';
-    h += '<button class="qo-btn stat-tab on" onclick="Stats.switchTab(\'overview\')">總覽</button>';
-    h += '<button class="qo-btn stat-tab" onclick="Stats.switchTab(\'history\')">考試紀錄</button>';
-    h += '<button class="qo-btn stat-tab" onclick="Stats.switchTab(\'notebook\')">生詞本</button>';
-    h += '<button class="qo-btn stat-tab" onclick="Stats.switchTab(\'weak\')">弱點</button>';
+    h += `<button class="qo-btn stat-tab on" data-tab="overview" onclick="Stats.switchTab('overview')">${t('tab_overview')}</button>`;
+    h += `<button class="qo-btn stat-tab" data-tab="history" onclick="Stats.switchTab('history')">${t('tab_history')}</button>`;
+    h += `<button class="qo-btn stat-tab" data-tab="notebook" onclick="Stats.switchTab('notebook')">${t('tab_notebook')}</button>`;
+    h += `<button class="qo-btn stat-tab" data-tab="weak" onclick="Stats.switchTab('weak')">${t('tab_weak')}</button>`;
     h += '</div>';
     h += '<div id="statContent">';
     h += buildOverview();
@@ -34,9 +33,7 @@ const Stats = (() => {
 
   function switchTab(tab) {
     document.querySelectorAll('.stat-tab').forEach(b => {
-      b.classList.toggle('on', b.textContent.includes(
-        tab === 'overview' ? '總覽' : tab === 'history' ? '考試' : tab === 'notebook' ? '生詞' : '弱點'
-      ));
+      b.classList.toggle('on', b.dataset.tab === tab);
     });
     const c = document.getElementById('statContent');
     if (tab === 'overview') c.innerHTML = buildOverview();
@@ -52,15 +49,15 @@ const Stats = (() => {
   // ── 考試紀錄 ──
   function buildHistory() {
     const hist = getHistory();
-    if (!hist.length) return '<div class="st-section"><div class="st-title">考試紀錄</div><div class="st-empty">還沒有測驗紀錄</div></div>';
-    let h = '<div class="st-section"><div class="st-title">考試紀錄（最近 50 筆）</div>';
+    if (!hist.length) return `<div class="st-section"><div class="st-title">${t('tab_history')}</div><div class="st-empty">${t('history_empty')}</div></div>`;
+    let h = `<div class="st-section"><div class="st-title">${t('history_title')}</div>`;
     h += '<div style="max-height:400px;overflow-y:auto">';
     const recent = hist.slice(-50).reverse();
     recent.forEach((r, i) => {
       const pct = Math.round(r.score / r.total * 100);
       const color = pct >= 80 ? 'var(--correct,#16a34a)' : pct >= 60 ? 'var(--ok-tx,#ca8a04)' : 'var(--wrong,#dc2626)';
       const date = new Date(r.date).toLocaleDateString('zh-TW', {month:'numeric',day:'numeric',hour:'numeric',minute:'numeric'});
-      const typeMap = {word2meaning:'看日選中', meaning2word:'看中選日', reading:'選讀音'};
+      const typeMap = {word2meaning: t('type_ja_zh'), meaning2word: t('type_zh_ja'), reading: t('type_reading')};
       h += '<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--bd);font-size:13px">';
       h += '<span style="min-width:35px;font-weight:700;color:'+color+'">'+pct+'%</span>';
       h += '<span style="min-width:28px;font-size:11px;color:var(--ac2);font-weight:600">'+r.level.toUpperCase()+'</span>';
@@ -71,7 +68,7 @@ const Stats = (() => {
     });
     h += '</div></div>';
     // 錯題重考按鈕
-    h += '<button class="qstart" style="margin-top:12px" onclick="Stats.retryWrong()">錯題重考</button>';
+    h += `<button class="qstart" style="margin-top:12px" onclick="Stats.retryWrong()">${t('retry_wrong')}</button>`;
     return h;
   }
 
@@ -88,7 +85,7 @@ const Stats = (() => {
         if (vocab) wrong.push({ vocab, lv, wrongCount: val.reviews - val.correct });
       }
     });
-    if (!wrong.length) { alert('沒有錯題紀錄！先去測驗幾次吧。'); return; }
+    if (!wrong.length) { alert(t('no_wrong')); return; }
     wrong.sort((a, b) => b.wrongCount - a.wrongCount);
     const picked = wrong.slice(0, 20);
     const allVocab = [...getVocabData('n5'), ...getVocabData('n4'), ...getVocabData('n3'), ...getVocabData('n2'), ...getVocabData('n1')];
@@ -112,7 +109,7 @@ const Stats = (() => {
     if (nb.find(x => x.w === w && x.lv === lv)) return; // already exists
     nb.push({ w, r, m, lv, added: new Date().toISOString() });
     saveNotebook(nb);
-    alert(w + ' 已加入生詞本！');
+    alert(t('added_to_notebook', { w }));
   }
 
   function removeFromNotebook(w, lv) {
@@ -124,9 +121,9 @@ const Stats = (() => {
 
   function buildNotebook() {
     const nb = getNotebook();
-    let h = '<div class="st-section"><div class="st-title">生詞本 <span style="font-weight:400;font-size:12px;color:var(--tx2)">（' + nb.length + ' 個）</span></div>';
+    let h = `<div class="st-section"><div class="st-title">${t('notebook_title')} <span style="font-weight:400;font-size:12px;color:var(--tx2)">${t('notebook_count', { n: nb.length })}</span></div>`;
     if (!nb.length) {
-      h += '<div class="st-empty">還沒有收藏生詞。<br>在單字卡片上長按或在測驗中答錯的詞會自動加入。<br>也可以手動點擊單字旁的 📌 加入。</div>';
+      h += `<div class="st-empty">${t('notebook_empty').replace(/\n/g, '<br>')}</div>`;
     } else {
       h += '<div style="max-height:350px;overflow-y:auto">';
       nb.forEach(w => {
@@ -140,8 +137,8 @@ const Stats = (() => {
       });
       h += '</div>';
       h += '<div style="display:flex;gap:8px;margin-top:12px">';
-      h += '<button class="qstart" style="flex:1" onclick="Stats.quizNotebook()">生詞本測驗</button>';
-      h += '<button class="qclose" style="flex:1" onclick="Stats.reviewNotebook()">逐一複習</button>';
+      h += `<button class="qstart" style="flex:1" onclick="Stats.quizNotebook()">${t('notebook_quiz')}</button>`;
+      h += `<button class="qclose" style="flex:1" onclick="Stats.reviewNotebook()">${t('notebook_review')}</button>`;
       h += '</div>';
     }
     h += '</div>';
@@ -150,7 +147,7 @@ const Stats = (() => {
 
   function quizNotebook() {
     const nb = getNotebook();
-    if (nb.length < 4) { alert('生詞本至少需要 4 個詞才能測驗！'); return; }
+    if (nb.length < 4) { alert(t('notebook_min')); return; }
     const allVocab = [...getVocabData('n5'), ...getVocabData('n4'), ...getVocabData('n3'), ...getVocabData('n2'), ...getVocabData('n1')];
     const picked = [...nb].sort(() => Math.random() - 0.5).slice(0, 20);
     const qs = picked.map(item => {
@@ -165,18 +162,18 @@ const Stats = (() => {
 
   function reviewNotebook() {
     const nb = getNotebook();
-    if (!nb.length) { alert('生詞本是空的！'); return; }
+    if (!nb.length) { alert(t('notebook_empty_alert')); return; }
     let cur = 0;
     function renderCard() {
       const item = nb[cur];
       document.getElementById('quizBox').innerHTML = `
-        <div class="qhd"><span>生詞複習 ${cur+1} / ${nb.length}</span><button class="qclose" style="width:auto;margin:0;padding:2px 10px" onclick="Stats.close()">✕</button></div>
+        <div class="qhd"><span>${t('nb_progress', { cur: cur+1, total: nb.length })}</span><button class="qclose" style="width:auto;margin:0;padding:2px 10px" onclick="Stats.close()">✕</button></div>
         <div class="srs-card" onclick="this.querySelector('#nbBack').style.display='';this.querySelector('#nbFront').style.display='none'">
-          <div id="nbFront"><div class="qmain">${item.w}</div>${item.w!==item.r?'<div class="qsub">'+item.r+'</div>':''}<div class="srs-hint">點擊翻面</div></div>
+          <div id="nbFront"><div class="qmain">${item.w}</div>${item.w!==item.r?'<div class="qsub">'+item.r+'</div>':''}<div class="srs-hint">${t('flip_hint')}</div></div>
           <div id="nbBack" style="display:none"><div class="qmain">${item.w}</div>${item.w!==item.r?'<div class="qsub">'+item.r+'</div>':''}<div class="srs-meaning">${item.m}</div>
             <div class="srs-btns">
-              <button class="srs-btn srs-hard" onclick="event.stopPropagation();Stats._nbNext()">下一個</button>
-              <button class="srs-btn srs-ok" onclick="event.stopPropagation();Stats.removeFromNotebook('${item.w.replace(/'/g,"\\'")}','${item.lv}');Stats._nbNext()">記住了，移除</button>
+              <button class="srs-btn srs-hard" onclick="event.stopPropagation();Stats._nbNext()">${t('nb_next')}</button>
+              <button class="srs-btn srs-ok" onclick="event.stopPropagation();Stats.removeFromNotebook('${item.w.replace(/'/g,"\\'")}','${item.lv}');Stats._nbNext()">${t('nb_remove')}</button>
             </div>
           </div>
         </div>`;
@@ -188,7 +185,7 @@ const Stats = (() => {
   // ── 測驗成績走勢 ──
   function buildScoreChart() {
     const hist = getHistory();
-    if (!hist.length) return '<div class="st-section"><div class="st-title">測驗成績</div><div class="st-empty">還沒有測驗紀錄，去測驗看看吧！</div></div>';
+    if (!hist.length) return `<div class="st-section"><div class="st-title">${t('score_title')}</div><div class="st-empty">${t('score_empty')}</div></div>`;
 
     const last20 = hist.slice(-20);
     const pcts = last20.map(h => Math.round(h.score / h.total * 100));
@@ -207,15 +204,15 @@ const Stats = (() => {
     });
     bars += '</div>';
 
-    return '<div class="st-section"><div class="st-title">測驗成績</div>' + bars +
-      '<div class="st-row"><span>最近：' + recent + '%</span><span>平均：' + avg + '%</span><span>最高：' + max + '%</span><span>共 ' + hist.length + ' 次</span></div></div>';
+    return `<div class="st-section"><div class="st-title">${t('score_title')}</div>${bars}` +
+      `<div class="st-row"><span>${t('score_recent', { n: recent })}</span><span>${t('score_avg', { n: avg })}</span><span>${t('score_high', { n: max })}</span><span>${t('score_total', { n: hist.length })}</span></div></div>`;
   }
 
   // ── 學習進度 ──
   function buildProgress() {
     const srs = getSRS();
     const levels = ['n5', 'n4', 'n3', 'n2', 'n1'];
-    let h = '<div class="st-section"><div class="st-title">學習進度</div>';
+    let h = `<div class="st-section"><div class="st-title">${t('progress_title')}</div>`;
 
     levels.forEach(lv => {
       const total = getVocabData(lv).length;
@@ -233,9 +230,9 @@ const Stats = (() => {
         '<div class="st-prog-bar"><div class="st-prog-fill st-prog-mastered" style="width:' + masteredPct + '%"></div>' +
         '<div class="st-prog-fill st-prog-learning" style="width:' + (pct - masteredPct) + '%"></div></div>' +
         '<div class="st-prog-legend">' +
-        '<span class="st-dot st-dot-mastered"></span>已掌握 ' + mastered +
-        '<span class="st-dot st-dot-learning"></span>學習中 ' + learning +
-        '<span class="st-dot st-dot-new"></span>未學 ' + (total - learned) +
+        `<span class="st-dot st-dot-mastered"></span>${t('mastered', { n: mastered })}` +
+        `<span class="st-dot st-dot-learning"></span>${t('learning', { n: learning })}` +
+        `<span class="st-dot st-dot-new"></span>${t('unlearned', { n: total - learned })}` +
         '</div></div>';
     });
 
@@ -265,11 +262,11 @@ const Stats = (() => {
     const top20 = weak.slice(0, 20);
 
     if (!top20.length) {
-      return '<div class="st-section"><div class="st-title">弱點單字</div>' +
-        '<div class="st-empty">還沒有發現弱點單字。多做幾次測驗後這裡會顯示你最需要加強的詞！</div></div>';
+      return `<div class="st-section"><div class="st-title">${t('weak_title')}</div>` +
+        `<div class="st-empty">${t('weak_empty')}</div></div>`;
     }
 
-    let h = '<div class="st-section"><div class="st-title">弱點單字 <span style="font-weight:400;font-size:12px;color:#64748B">（正確率 &lt; 70%）</span></div>';
+    let h = `<div class="st-section"><div class="st-title">${t('weak_title')} <span style="font-weight:400;font-size:12px;color:#64748B">${t('weak_subtitle')}</span></div>`;
     h += '<div class="st-weak-list">';
     top20.forEach(w => {
       const rateColor = w.rate < 40 ? '#dc2626' : '#ca8a04';
@@ -283,7 +280,7 @@ const Stats = (() => {
     h += '</div>';
 
     if (weak.length > 0) {
-      h += '<button class="qstart" style="margin-top:12px" onclick="Stats.quizWeak()">弱點單字測驗（' + Math.min(weak.length, 20) + ' 題）</button>';
+      h += `<button class="qstart" style="margin-top:12px" onclick="Stats.quizWeak()">${t('weak_quiz', { n: Math.min(weak.length, 20) })}</button>`;
     }
     h += '</div>';
     return h;
@@ -305,7 +302,7 @@ const Stats = (() => {
         }
       }
     });
-    if (!weak.length) { alert('沒有弱點單字！'); return; }
+    if (!weak.length) { alert(t('weak_none')); return; }
 
     close();
     const count = Math.min(weak.length, 20);
@@ -326,7 +323,7 @@ const Stats = (() => {
     const s = Stats._wqState;
     const q = s.questions[s.cur];
     document.getElementById('quizBox').innerHTML = `
-      <div class="qhd"><span>弱點測驗 ${s.cur+1} / ${s.questions.length}</span><span>正確: ${s.score}</span><button class="qclose" style="width:auto;margin:0;padding:2px 10px" onclick="document.getElementById('quizBg').classList.remove('show')">✕</button></div>
+      <div class="qhd"><span>${t('weak_progress', { cur: s.cur+1, total: s.questions.length })}</span><span>${t('quiz_score', { n: s.score })}</span><button class="qclose" style="width:auto;margin:0;padding:2px 10px" onclick="document.getElementById('quizBg').classList.remove('show')">✕</button></div>
       <div class="qprompt"><div class="qmain">${q.word.w}</div>${q.word.w !== q.word.r ? '<div class="qsub">' + q.word.r + '</div>' : ''}</div>
       <div class="qopts">${q.options.map((o, i) => '<button class="qopt" onclick="Stats._answerWeak(' + i + ')">' + o.m + '</button>').join('')}</div>`;
   }
@@ -347,13 +344,13 @@ const Stats = (() => {
       if (s.cur >= s.questions.length) {
         const pct = Math.round(s.score / s.questions.length * 100);
         document.getElementById('quizBox').innerHTML = `
-          <h3>弱點測驗結果</h3>
+          <h3>${t('weak_result')}</h3>
           <div class="qscore ${pct>=80?'good':pct>=60?'ok':'bad'}">${s.score} / ${s.questions.length}（${pct}%）</div>
           <div class="qresults">${s.results.map(r => r.correct
             ? '<div class="qr ok"><span class="qrc">✓</span> '+r.word.w+' — '+r.word.m+'</div>'
-            : '<div class="qr ng"><span class="qrc">✗</span> '+r.word.w+' — 你選: '+r.options[r.chosenIdx].m+' → 正確: '+r.word.m+'</div>'
+            : `<div class="qr ng"><span class="qrc">✗</span> ${r.word.w} — ${t('quiz_you_chose', { chose: r.options[r.chosenIdx].m, correct: r.word.m })}</div>`
           ).join('')}</div>
-          <div class="qactions"><button class="qstart" onclick="Stats.quizWeak()">再來一次</button><button class="qclose" onclick="Stats.open()">回統計</button></div>`;
+          <div class="qactions"><button class="qstart" onclick="Stats.quizWeak()">${t('try_again')}</button><button class="qclose" onclick="Stats.open()">${t('back_to_stats')}</button></div>`;
       } else {
         _renderWQ();
       }
