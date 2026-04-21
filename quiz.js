@@ -107,10 +107,16 @@ const Quiz = (() => {
     box.innerHTML = `
       <h3>${t('quiz_result')}</h3>
       <div class="qscore ${pct>=80?'good':pct>=60?'ok':'bad'}">${score} / ${questions.length}（${pct}%）</div>
-      <div class="qresults">${results.map(r => r.correct
-        ? '<div class="qr ok"><span class="qrc">✓</span> '+r.word.w+' — '+(typeof cvt==='function'?cvt(r.word.m):r.word.m)+'</div>'
-        : `<div class="qr ng"><span class="qrc">✗</span> ${r.word.w} — ${t('quiz_you_chose', { chose: disp(r.options[r.chosenIdx]), correct: typeof cvt==='function'?cvt(r.word.m):r.word.m })}</div>`
-      ).join('')}</div>
+      <div class="qresults">${results.map(r => {
+        // 一律顯示完整三要素：漢字（讀音）— 中譯，讓使用者看到全貌
+        const m = typeof cvt==='function' ? cvt(r.word.m) : r.word.m;
+        const wFull = r.word.w + (r.word.w !== r.word.r ? '（'+r.word.r+'）' : '');
+        const summary = wFull + ' — ' + m;
+        if (r.correct) return '<div class="qr ok"><span class="qrc">✓</span> '+summary+'</div>';
+        // 錯題：依題型顯示正確答案（讀音題→讀音、中選日→漢字、看日選中→中譯）
+        const correctAnswer = disp(r.word);
+        return `<div class="qr ng"><span class="qrc">✗</span> ${summary}　${t('quiz_you_chose', { chose: disp(r.options[r.chosenIdx]), correct: correctAnswer })}</div>`;
+      }).join('')}</div>
       <div class="qactions"><button class="qstart" onclick="Quiz.begin()">${t('quiz_retry')}</button><button class="qclose" onclick="Quiz.close()">${t('quiz_back')}</button></div>`;
   }
 
