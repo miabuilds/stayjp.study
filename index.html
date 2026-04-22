@@ -308,17 +308,9 @@ body {
   padding: 12px 0; z-index: 90;
   border-right: 1px solid var(--bd);
 }
-/* 全站統一滾動條樣式（配合主題顏色） */
-* { scrollbar-width: thin; scrollbar-color: var(--bd) transparent; }
-::-webkit-scrollbar { width: 8px; height: 8px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb {
-  background: var(--bd); border-radius: 4px;
-  border: 2px solid transparent; background-clip: content-box;
-}
-::-webkit-scrollbar-thumb:hover { background: var(--tx3); background-clip: content-box; border: 2px solid transparent; }
-[data-theme="dark"] ::-webkit-scrollbar-thumb { background: #3A3A3C; background-clip: content-box; }
-[data-theme="dark"] ::-webkit-scrollbar-thumb:hover { background: #555; background-clip: content-box; }
+/* 全站隱藏滾動條（保留滾動功能） */
+* { scrollbar-width: none; -ms-overflow-style: none; }
+*::-webkit-scrollbar { width: 0; height: 0; display: none; }
 .sd .ct {
   padding: 10px 16px 6px; font-size: 10px; letter-spacing: 1.2px;
   color: var(--ac); font-weight: 700; cursor: pointer;
