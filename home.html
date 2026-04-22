@@ -414,6 +414,35 @@ a:hover { text-decoration: underline; }
   color: var(--ac); text-decoration: none; font-weight: 600;
 }
 .support-overseas a:hover { text-decoration: underline; }
+/* Contact 區（海外贊助 + 合作洽談） */
+.contact-block {
+  margin-top: 56px; padding: 28px 32px;
+  border-top: 1px solid var(--line);
+  max-width: 560px;
+}
+.contact-label {
+  font-family: var(--serif);
+  font-size: 11px; letter-spacing: .28em; color: var(--ac);
+  font-weight: 700; margin-bottom: 14px;
+}
+.contact-text {
+  font-size: 15px; line-height: 2; color: var(--tx);
+  font-family: var(--serif);
+}
+.contact-text strong { color: var(--ac); font-weight: 700; }
+.contact-mail {
+  display: inline-block; margin-top: 6px;
+  color: var(--tx); font-weight: 600; letter-spacing: .02em;
+  text-decoration: none; position: relative;
+  padding-bottom: 2px;
+}
+.contact-mail::after {
+  content: ''; position: absolute; left: 0; right: 0; bottom: 0;
+  height: 1px; background: var(--ac); transform: scaleX(1);
+  transform-origin: left; transition: transform .3s var(--ease);
+}
+.contact-mail:hover { text-decoration: none; color: var(--ac); }
+.contact-mail:hover::after { transform: scaleX(1.02); }
 @media(max-width:480px) {
   .support-qr { grid-template-columns: 1fr; gap: 14px; }
   .qr-card img, .qr-placeholder { width: 160px; height: 160px; }
@@ -570,15 +599,23 @@ a:hover { text-decoration: underline; }
     <h2 class="section-title reveal">謝謝支持我的<em>大阪生活</em>。</h2>
     <p class="support-msg reveal reveal-d1">若您在台灣，歡迎使用 <strong>街口</strong> 或 <strong>歐付寶</strong> 贊助。</p>
     <div class="support-qr">
-      <div class="qr-card">
+      <div class="qr-card reveal reveal-d2">
         <div class="qr-placeholder">QR 碼待上傳</div>
         <div class="qr-label">街口支付</div>
         <div class="qr-hint">手機街口 App 掃碼</div>
       </div>
-      <div class="qr-card">
+      <div class="qr-card reveal reveal-d3">
         <div class="qr-placeholder">QR 碼待上傳</div>
         <div class="qr-label">歐付寶</div>
         <div class="qr-hint">手機歐付寶 App 掃碼</div>
+      </div>
+    </div>
+
+    <div class="contact-block reveal reveal-d4">
+      <div class="contact-label">CONTACT · 聯絡</div>
+      <div class="contact-text">
+        海外使用者想贊助、或有 <strong>網頁開發需求合作</strong> 想洽談，歡迎來信：<br>
+        <a href="mailto:stayjpplan@gmail.com" class="contact-mail">stayjpplan@gmail.com</a>
       </div>
     </div>
   </div>
