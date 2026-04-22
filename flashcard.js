@@ -7,14 +7,14 @@ const FlashCard = (() => {
   const LEVELS = ['n5','n4','n3','n2','n1'];
   const COUNTDOWN_SEC = 20;
 
-  // 每個評分對應的複習間隔
-  const GRADE_INTERVAL = {
-    known: { days: 7,   ms: 7 * 86400 * 1000, label: '一週後' },
-    soso:  { days: 0,   ms: 60 * 60 * 1000,   label: '1 小時後' },
-    unknown: { days: 0, ms: 10 * 60 * 1000,   label: '10 分鐘後' }
-  };
+  // 評分規則由 SRS.GRADES 提供（單一來源），這裡只存「本輪內重現」的偏移
   const MAX_REAPPEAR = 2;         // 同一張卡本輪最多重現次數
   const REQUEUE_OFFSET = { soso: 5, unknown: 2 };
+  function gradeLabel(grade) {
+    return (typeof SRS !== 'undefined' && SRS.GRADES && SRS.GRADES[grade])
+      ? SRS.GRADES[grade].label
+      : '';
+  }
 
   let queue = [];
   let cur = 0;
@@ -130,14 +130,14 @@ const FlashCard = (() => {
     const goal = goalEl ? goalEl.value : getGoalLevel();
     const data = getData(lv);
     const srs = JSON.parse(localStorage.getItem('srs_data') || '{}');
-    const today = new Date().toISOString().split('T')[0];
 
     let html = '';
     // 本輪級別的進度（已學 = 至少一次記得）
     if (data && data.length) {
       const pf = lv + ':';
       const learned = countLearned(srs, lv);
-      const due = Object.keys(srs).filter(k => k.startsWith(pf) && srs[k].nextReview <= today).length;
+      const now = Date.now();
+      const due = Object.keys(srs).filter(k => k.startsWith(pf) && SRS.isDue(srs[k], now)).length;
       html += `<div><strong>${lv.toUpperCase()} 進度：</strong>${learned} / ${data.length}（已學 ${Math.round(learned/data.length*100)}%）${due>0?`　<span style="color:var(--ac)">・今日待複習 ${due}</span>`:''}</div>`;
     } else {
       html += `<div style="color:var(--tx2)">此級別無單字資料</div>`;
@@ -284,7 +284,6 @@ const FlashCard = (() => {
     if (!data || !data.length) { alert('此級別無單字資料'); return; }
     const srs = typeof SRS !== 'undefined' ? JSON.parse(localStorage.getItem('srs_data') || '{}') : {};
     const pf = level + ':';
-    const today = new Date().toISOString().split('T')[0];
     // 「已學」= 至少一次記得；只打過不熟/不會的不算，新詞模式仍會出現
     const learned = new Set(Object.keys(srs).filter(k => k.startsWith(pf) && (srs[k].correct || 0) > 0).map(k => k.slice(pf.length)));
     let pool;
@@ -292,10 +291,8 @@ const FlashCard = (() => {
       pool = data.filter(d => !learned.has(d.w));
       if (pool.length < count) pool = data; // 學完所有新詞就回到全部
     } else if (range === 'due') {
-      pool = data.filter(d => {
-        const e = srs[pf + d.w];
-        return e && e.nextReview <= today;
-      });
+      const now = Date.now();
+      pool = data.filter(d => SRS.isDue(srs[pf + d.w], now));
       if (!pool.length) pool = data.filter(d => !learned.has(d.w));
       if (!pool.length) pool = data;
     } else {
@@ -335,9 +332,9 @@ const FlashCard = (() => {
           ${item.w!==item.r?`<div class="fc-reading">${item.r}</div>`:''}
           <div class="fc-meaning">${typeof cvt==='function'?cvt(item.m):item.m}</div>
           <div class="fc-btns">
-            <button class="fc-btn fc-no" onclick="event.stopPropagation();FlashCard.answer('unknown')">✗ 不會<span class="fc-btn-hint">10 分後再見</span></button>
-            <button class="fc-btn fc-soso" onclick="event.stopPropagation();FlashCard.answer('soso')">◯ 不熟<span class="fc-btn-hint">1 小時後</span></button>
-            <button class="fc-btn fc-yes" onclick="event.stopPropagation();FlashCard.answer('known')">✓ 記得<span class="fc-btn-hint">一週後</span></button>
+            <button class="fc-btn fc-no" onclick="event.stopPropagation();FlashCard.answer('unknown')">✗ 不會<span class="fc-btn-hint">${gradeLabel('unknown')}</span></button>
+            <button class="fc-btn fc-soso" onclick="event.stopPropagation();FlashCard.answer('soso')">◯ 不熟<span class="fc-btn-hint">${gradeLabel('soso')}</span></button>
+            <button class="fc-btn fc-yes" onclick="event.stopPropagation();FlashCard.answer('known')">✓ 記得<span class="fc-btn-hint">${gradeLabel('known')}</span></button>
           </div>
           <div class="fc-hint">手機可左滑（不會）／右滑（記得）</div>
         </div>
@@ -378,42 +375,16 @@ const FlashCard = (() => {
     if (back) back.style.display = '';
   }
 
-  // 寫入 SRS，依 grade 設定下次複習間隔
-  function applyGrade(lv, word, grade) {
-    const KEY = 'srs_data';
-    let data = {};
-    try { data = JSON.parse(localStorage.getItem(KEY) || '{}'); } catch(e) {}
-    const k = lv + ':' + word;
-    const todayStr = new Date().toISOString().split('T')[0];
-    const e = data[k] || { interval: 0, ease: 2.5, nextReview: todayStr, reviews: 0, correct: 0 };
-    e.reviews = (e.reviews || 0) + 1;
-    e.lastReview = todayStr;
-    const now = Date.now();
-    const spec = GRADE_INTERVAL[grade];
-    if (grade === 'known') {
-      e.correct = (e.correct || 0) + 1;
-      e.interval = spec.days;
-      e.ease = Math.min(3, (e.ease || 2.5) + 0.1);
-    } else {
-      e.interval = 0;
-      e.ease = Math.max(1.3, (e.ease || 2.5) - (grade === 'unknown' ? 0.2 : 0.1));
-    }
-    const nextTs = now + spec.ms;
-    e.nextReviewTs = nextTs;
-    e.nextReview = new Date(nextTs).toISOString().split('T')[0];
-    data[k] = e;
-    localStorage.setItem(KEY, JSON.stringify(data));
-    if (typeof saveSRSCloud === 'function') saveSRSCloud();
-  }
-
   function answer(grade) {
     // 相容：舊呼叫 answer(true/false)
     if (grade === true) grade = 'known';
     else if (grade === false) grade = 'unknown';
-    if (!GRADE_INTERVAL[grade]) grade = 'unknown';
+    const valid = typeof SRS !== 'undefined' && SRS.GRADES && SRS.GRADES[grade];
+    if (!valid) grade = 'unknown';
     const item = queue[cur];
     score[grade]++;
-    applyGrade(level, item.w, grade);
+    // 單一寫入點：走 SRS 模組，不再繞過直寫 localStorage
+    if (typeof SRS !== 'undefined' && SRS.recordGrade) SRS.recordGrade(level, item.w, grade);
     if (typeof Calendar !== 'undefined') Calendar.logActivity('vocab');
 
     // 本輪內重現（不熟/不會）
@@ -485,9 +456,9 @@ const FlashCard = (() => {
 
     // 本輪評分明細 + 下次複習時間
     const breakdown = [];
-    if (score.known) breakdown.push(`<div><span style="color:var(--correct-bd);font-weight:600">✓ 記得 ${score.known} 個</span>　<span style="color:var(--tx2)">${GRADE_INTERVAL.known.label}再複習</span></div>`);
-    if (score.soso) breakdown.push(`<div><span style="color:var(--ac);font-weight:600">◯ 不熟 ${score.soso} 個</span>　<span style="color:var(--tx2)">${GRADE_INTERVAL.soso.label}再複習</span></div>`);
-    if (score.unknown) breakdown.push(`<div><span style="color:var(--wrong-bd);font-weight:600">✗ 不會 ${score.unknown} 個</span>　<span style="color:var(--tx2)">${GRADE_INTERVAL.unknown.label}再複習</span></div>`);
+    if (score.known) breakdown.push(`<div><span style="color:var(--correct-bd);font-weight:600">✓ 記得 ${score.known} 個</span>　<span style="color:var(--tx2)">${gradeLabel('known')}再複習</span></div>`);
+    if (score.soso) breakdown.push(`<div><span style="color:var(--ac);font-weight:600">◯ 不熟 ${score.soso} 個</span>　<span style="color:var(--tx2)">${gradeLabel('soso')}再複習</span></div>`);
+    if (score.unknown) breakdown.push(`<div><span style="color:var(--wrong-bd);font-weight:600">✗ 不會 ${score.unknown} 個</span>　<span style="color:var(--tx2)">${gradeLabel('unknown')}再複習</span></div>`);
 
     document.getElementById('quizBox').innerHTML = `
       <h3>本輪結束</h3>

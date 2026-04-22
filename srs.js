@@ -1,15 +1,31 @@
 // ========== SPACED REPETITION SYSTEM ==========
 const SRS = (() => {
   const KEY = 'srs_data';
+  // 全站唯一的評分 → 間隔對應表（FlashCard 按鈕文案也讀這裡）
+  const GRADES = {
+    known:   { ms: 7 * 86400 * 1000, label: '一週後'    },
+    soso:    { ms: 60 * 60 * 1000,   label: '1 小時後'  },
+    unknown: { ms: 10 * 60 * 1000,   label: '10 分鐘後' }
+  };
   function getData() { try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch(e) { return {}; } }
   function save(d) { localStorage.setItem(KEY, JSON.stringify(d)); }
   function today() { return new Date().toISOString().split('T')[0]; }
+  function dayOf(ts) { return new Date(ts).toISOString().split('T')[0]; }
   function k(lv, w) { return lv + ':' + w; }
+
+  // 統一的 due 判斷：優先用時間戳，沒有就 fallback 到日期字串（相容舊資料）
+  function isDue(e, now) {
+    if (!e) return false;
+    const n = now || Date.now();
+    if (typeof e.nextReviewTs === 'number') return e.nextReviewTs <= n;
+    return e.nextReview <= dayOf(n);
+  }
 
   function record(level, word, correct) {
     const d = getData();
     const key = k(level, word);
-    const e = d[key] || { interval: 0, ease: 2.5, nextReview: today(), reviews: 0, correct: 0 };
+    const now = Date.now();
+    const e = d[key] || { interval: 0, ease: 2.5, nextReview: today(), nextReviewTs: now, reviews: 0, correct: 0 };
     e.reviews++;
     if (correct) {
       e.correct++;
@@ -21,26 +37,55 @@ const SRS = (() => {
       e.interval = 1;
       e.ease = Math.max(1.3, e.ease - 0.2);
     }
-    const nd = new Date(); nd.setDate(nd.getDate() + e.interval);
-    e.nextReview = nd.toISOString().split('T')[0];
+    const nextTs = now + e.interval * 86400 * 1000;
+    e.nextReviewTs = nextTs;
+    e.nextReview = dayOf(nextTs);
     e.lastReview = today();
+    e.lastReviewTs = now;
+    d[key] = e;
+    save(d);
+    if (typeof saveSRSCloud === 'function') saveSRSCloud();
+  }
+
+  // FlashCard 的三評分統一走這裡（不會再繞過 SRS 直寫 localStorage）
+  function recordGrade(level, word, grade) {
+    const spec = GRADES[grade];
+    if (!spec) return;
+    const d = getData();
+    const key = k(level, word);
+    const now = Date.now();
+    const e = d[key] || { interval: 0, ease: 2.5, nextReview: today(), nextReviewTs: now, reviews: 0, correct: 0 };
+    e.reviews = (e.reviews || 0) + 1;
+    e.lastReview = today();
+    e.lastReviewTs = now;
+    if (grade === 'known') {
+      e.correct = (e.correct || 0) + 1;
+      e.interval = 7;
+      e.ease = Math.min(3, (e.ease || 2.5) + 0.1);
+    } else {
+      e.interval = 0;
+      e.ease = Math.max(1.3, (e.ease || 2.5) - (grade === 'unknown' ? 0.2 : 0.1));
+    }
+    const nextTs = now + spec.ms;
+    e.nextReviewTs = nextTs;
+    e.nextReview = dayOf(nextTs);
     d[key] = e;
     save(d);
     if (typeof saveSRSCloud === 'function') saveSRSCloud();
   }
 
   function getDue(level) {
-    const d = getData(), t = today(), out = [];
+    const d = getData(), now = Date.now(), out = [];
     Object.entries(d).forEach(([key, e]) => {
-      if (key.startsWith(level + ':') && e.nextReview <= t)
+      if (key.startsWith(level + ':') && isDue(e, now))
         out.push({ word: key.slice(level.length + 1), ...e });
     });
-    return out.sort((a, b) => a.nextReview.localeCompare(b.nextReview));
+    return out.sort((a, b) => (a.nextReviewTs || 0) - (b.nextReviewTs || 0));
   }
 
   function getDueCount() {
-    const d = getData(), t = today();
-    let c = 0; Object.values(d).forEach(e => { if (e.nextReview <= t) c++; });
+    const d = getData(), now = Date.now();
+    let c = 0; Object.values(d).forEach(e => { if (isDue(e, now)) c++; });
     return c;
   }
 
@@ -51,11 +96,11 @@ const SRS = (() => {
   }
 
   function getStats(level) {
-    const d = getData(), pf = level + ':', t = today();
+    const d = getData(), pf = level + ':', now = Date.now();
     const entries = Object.entries(d).filter(([x]) => x.startsWith(pf));
     return {
       total: entries.length,
-      due: entries.filter(([, v]) => v.nextReview <= t).length,
+      due: entries.filter(([, v]) => isDue(v, now)).length,
       mastered: entries.filter(([, v]) => v.interval >= 21).length,
       learning: entries.filter(([, v]) => v.interval > 0 && v.interval < 21).length
     };
@@ -141,5 +186,5 @@ const SRS = (() => {
     else span.textContent = c ? base + '(' + c + ')' : base;
   }
 
-  return { start, record, flip, rate, close, getDueCount, updateReviewCount, getStats };
+  return { start, record, recordGrade, flip, rate, close, getDueCount, updateReviewCount, getStats, isDue, GRADES };
 })();
