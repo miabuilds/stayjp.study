@@ -155,8 +155,7 @@ const FlashCard = (() => {
       <div style="display:flex;justify-content:center;margin-top:10px">
         <button onclick="event.stopPropagation();speak('${(item.r||item.w).replace(/'/g,"\\'")}')" style="background:var(--bg3);border:1px solid var(--bd);border-radius:20px;padding:6px 16px;cursor:pointer;color:var(--ac2);font-size:13px">🔊 播音</button>
       </div>`;
-    // auto play 發音
-    if (typeof speak === 'function') setTimeout(() => speak(item.r || item.w), 200);
+    // 不自動播音，使用者要聽點 🔊 按鈕
     // 倒數
     startTimer();
     // 綁手勢
