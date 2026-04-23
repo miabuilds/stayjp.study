@@ -1104,9 +1104,9 @@ select::-ms-expand { display: none; }
 <script src="i18n.js"></script>
 
 <!-- Firebase SDK -->
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/11.1.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/11.1.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore-compat.js"></script>
 
 <script>
 // ========== CONFIG ==========
@@ -1146,11 +1146,25 @@ function showInAppBanner() {
   document.body.appendChild(b);
 }
 
+function isMobile() {
+  return /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+}
 function handleAuth() {
   if (currentUser) { auth.signOut(); currentUser = null; updateAuthUI(); return; }
   if (isInAppBrowser()) { showInAppBanner(); return; }
   const provider = new firebase.auth.GoogleAuthProvider();
-  // Popup 優先（桌機最佳、手機 Safari 也多半能通）；被擋才 fallback redirect
+  provider.setCustomParameters({ prompt: 'select_account' });
+
+  if (isMobile()) {
+    // 手機強制 redirect（iOS Safari 對 popup 支援爛）
+    try {
+      auth.signInWithRedirect(provider).catch(e => alert('登入失敗 (redirect): ' + (e.code || '') + ' — ' + (e.message || '')));
+    } catch (e) {
+      alert('登入失敗 (sync): ' + e.message);
+    }
+    return;
+  }
+  // 桌機：popup → fallback redirect
   auth.signInWithPopup(provider).catch(e => {
     const code = (e && e.code) || '';
     if (code === 'auth/popup-blocked' || code === 'auth/popup-closed-by-user' ||
