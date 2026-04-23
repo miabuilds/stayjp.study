@@ -1429,6 +1429,15 @@ function nextDailyBatch() {
   doRender();
   window.scrollTo({top:0,behavior:'smooth'});
 }
+function prevDailyBatch() {
+  const lv = currentLevel;
+  const prog = getDailyProgress(lv);
+  prog.totalOffset = Math.max(prog.totalOffset - DAILY_NEW, 0);
+  prog.date = new Date().toISOString().split('T')[0];
+  saveDailyProgress(lv, prog);
+  doRender();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
 
 // ========== GRAMMAR DAILY MODE ==========
 function getGrammarDailyProgress(lv) {
@@ -1457,6 +1466,15 @@ function nextGrammarBatch() {
   const gd = getGrammarData(lv);
   const prog = getGrammarDailyProgress(lv);
   prog.totalOffset = Math.min(prog.totalOffset + GRAMMAR_DAILY_NEW, gd.data.length);
+  prog.date = new Date().toISOString().split('T')[0];
+  saveGrammarDailyProgress(lv, prog);
+  doRender();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function prevGrammarBatch() {
+  const lv = currentLevel;
+  const prog = getGrammarDailyProgress(lv);
+  prog.totalOffset = Math.max(prog.totalOffset - GRAMMAR_DAILY_NEW, 0);
   prog.date = new Date().toISOString().split('T')[0];
   saveGrammarDailyProgress(lv, prog);
   doRender();
@@ -1676,6 +1694,7 @@ function renderVocab() {
       <div class="dp"><div class="dp-lbl">${t('total_progress', { lv })}</div><div class="dp-bar"><div class="dp-fill" style="width:${Math.round(prog.totalOffset/cnt*100)}%"></div></div>
       <div class="dp-txt">${t('progress_txt', { n: prog.totalOffset, total: cnt })}</div></div>
       <button class="daily-btn ${dailyMode?'on':''}" onclick="toggleDailyMode()">${dailyMode?t('show_all'):t('daily_mode')}</button>
+      ${dailyMode&&prog.totalOffset>0?`<button class="daily-btn" onclick="prevDailyBatch()">${t('prev_batch')}</button>`:''}
       ${dailyMode&&prog.totalOffset<cnt?`<button class="daily-btn" onclick="nextDailyBatch()">${t('next_batch')}</button>`:''}
     </div>`;
     if (!dailyMode) {
@@ -1855,6 +1874,7 @@ function render() {
       <div class="dp"><div class="dp-lbl">${t('total_progress_grammar', { lv })}</div><div class="dp-bar"><div class="dp-fill" style="width:${Math.round(gProg.totalOffset/cnt*100)}%"></div></div>
       <div class="dp-txt">${t('progress_txt', { n: gProg.totalOffset, total: cnt })}</div></div>
       <button class="daily-btn ${grammarDailyMode?'on':''}" onclick="toggleGrammarDailyMode()">${grammarDailyMode?t('show_all'):t('daily_mode')}</button>
+      ${grammarDailyMode&&gProg.totalOffset>0?`<button class="daily-btn" onclick="prevGrammarBatch()">${t('prev_batch')}</button>`:''}
       ${grammarDailyMode&&gProg.totalOffset<cnt?`<button class="daily-btn" onclick="nextGrammarBatch()">${t('next_batch')}</button>`:''}
     </div>`;
     if (!grammarDailyMode) {
