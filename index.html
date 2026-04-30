@@ -1181,33 +1181,51 @@ function detectPlatform() {
   return 'desktop';
 }
 function showInAppHelp() {
-  // 移除舊的 banner（如果有）
   const old = document.getElementById('inAppBanner'); if (old) old.remove();
   const url = location.href;
   const platform = detectPlatform();
-  const title = '無法在此瀏覽器登入';
-  const msg = '此頁開在 LINE / Threads / IG 等 App 的內嵌瀏覽器中，Google 會封鎖登入。\n請改用系統瀏覽器（Safari / Chrome）開啟本站。';
+  const ua = navigator.userAgent || '';
+  const isLine = /Line\//i.test(ua);
+  const isThreads = /Barcelona/i.test(ua);
+  const isIG = /Instagram/i.test(ua);
+  const isFB = /FBAN|FBAV|FB_IAB/i.test(ua);
 
-  const iosBtn = `<a class="cc-btn primary" href="x-safari-https://${location.host}${location.pathname}${location.search}${location.hash}" style="text-decoration:none;display:flex;align-items:center;justify-content:center">用 Safari 開啟</a>`;
-  const androidBtn = `<a class="cc-btn primary" href="intent://${location.host}${location.pathname}${location.search}${location.hash}#Intent;scheme=https;package=com.android.chrome;end" style="text-decoration:none;display:flex;align-items:center;justify-content:center">用 Chrome 開啟</a>`;
-  const copyBtn = `<button class="cc-btn" data-act="copy">複製連結</button>`;
-  const closeBtn = `<button class="cc-btn" data-act="cancel">關閉</button>`;
-  const primaryBtn = platform === 'ios' ? iosBtn : platform === 'android' ? androidBtn : '';
-  const tip = platform === 'ios'
-    ? '若按鈕沒反應，請點右下角分享 / 右上角「⋯」→「在 Safari 開啟」。'
-    : platform === 'android'
-    ? '若按鈕沒反應，請點右上角「⋯」→「在瀏覽器中開啟」。'
-    : '請複製網址後到 Safari / Chrome 貼上開啟。';
+  let stepGuide = '';
+  if (isLine) {
+    stepGuide = platform === 'ios'
+      ? '1. 點右下角的 <strong>「⋯」</strong>圖示\n2. 選 <strong>「在預設瀏覽器中開啟」</strong>'
+      : '1. 點右上角的 <strong>「⋮」</strong>圖示\n2. 選 <strong>「在其他瀏覽器中開啟」</strong>';
+  } else if (isThreads || isIG) {
+    stepGuide = platform === 'ios'
+      ? '1. 點右上角的 <strong>「⋯」</strong>\n2. 選 <strong>「在外部瀏覽器中開啟」</strong>'
+      : '1. 點右上角的 <strong>「⋮」</strong>\n2. 選 <strong>「在 Chrome 中開啟」</strong>';
+  } else if (isFB) {
+    stepGuide = platform === 'ios'
+      ? '1. 點右下角的 <strong>「⋯」</strong>\n2. 選 <strong>「在 Safari 中開啟」</strong>'
+      : '1. 點右上角的 <strong>「⋮」</strong>\n2. 選 <strong>「在外部瀏覽器中開啟」</strong>';
+  } else {
+    stepGuide = '請點 App 內瀏覽器右上角或右下角的選單按鈕，選擇「在外部瀏覽器中開啟」';
+  }
+
+  const androidIntent = platform === 'android'
+    ? `<a class="cc-btn primary" href="intent://${location.host}${location.pathname}${location.search}${location.hash}#Intent;scheme=https;package=com.android.chrome;end" style="text-decoration:none;display:flex;align-items:center;justify-content:center">用 Chrome 開啟</a>`
+    : '';
 
   const mask = document.createElement('div');
   mask.className = 'cc-mask';
-  mask.innerHTML = `<div class="cc-box" role="dialog" aria-modal="true">
-    <div class="cc-title">${title}</div>
-    <div class="cc-msg">${msg}\n\n${tip}</div>
+  mask.innerHTML = `<div class="cc-box" role="dialog" aria-modal="true" style="width:min(380px,calc(100vw - 32px))">
+    <div class="cc-title">⚠️ 此瀏覽器無法登入 Google</div>
+    <div class="cc-msg">內嵌瀏覽器被 Google 封鎖第三方登入，請改用系統瀏覽器（Safari / Chrome）開啟本站。</div>
+    <div style="background:var(--bg3);border:1px solid var(--bd);border-radius:10px;padding:12px 14px;margin-bottom:14px;font-size:13px;line-height:1.9;color:var(--tx)">
+      <div style="font-weight:700;margin-bottom:6px;color:var(--ac2)">📱 開啟方式</div>
+      <div style="white-space:pre-line">${stepGuide}</div>
+    </div>
+    <div style="font-size:12px;color:var(--tx2);margin-bottom:10px">或直接複製網址，貼到 Safari / Chrome 開啟：</div>
+    <div style="background:var(--bg);border:1px solid var(--bd);border-radius:8px;padding:8px 10px;font-size:12px;color:var(--tx2);word-break:break-all;margin-bottom:12px;font-family:monospace">${url}</div>
     <div class="cc-btns" style="flex-direction:column;gap:8px">
-      ${primaryBtn}
-      ${copyBtn}
-      ${closeBtn}
+      <button class="cc-btn primary" data-act="copy">📋 複製網址</button>
+      ${androidIntent}
+      <button class="cc-btn" data-act="cancel">關閉</button>
     </div>
   </div>`;
   document.body.appendChild(mask);
@@ -1216,17 +1234,15 @@ function showInAppHelp() {
   mask.addEventListener('click', async e => {
     if (e.target === mask || e.target.dataset.act === 'cancel') close();
     else if (e.target.dataset.act === 'copy') {
-      try {
-        await navigator.clipboard.writeText(url);
-        e.target.textContent = '✓ 已複製，請到瀏覽器貼上';
-        e.target.classList.add('primary');
-      } catch(err) {
-        // fallback: 選取
+      let ok = false;
+      try { await navigator.clipboard.writeText(url); ok = true; } catch(err) {
         const ta = document.createElement('textarea');
-        ta.value = url; document.body.appendChild(ta); ta.select();
-        try { document.execCommand('copy'); e.target.textContent = '✓ 已複製'; } catch(_) { e.target.textContent = '複製失敗，請長按網址列'; }
+        ta.value = url; ta.style.position='fixed'; ta.style.opacity='0';
+        document.body.appendChild(ta); ta.select();
+        try { ok = document.execCommand('copy'); } catch(_) {}
         ta.remove();
       }
+      e.target.textContent = ok ? '✓ 已複製，請開啟 Safari/Chrome 貼上' : '複製失敗，請長按網址手動複製';
     }
   });
 }
