@@ -1,5 +1,5 @@
 {
-  "_comment": "Reading overrides applied to text BEFORE sending to VOICEVOX. Add entries when VOICEVOX mispronounces a word — value should be the correct kana.",
+  "_comment": "Reading overrides applied to text BEFORE sending to VOICEVOX. Add entries when VOICEVOX mispronounces a word — value should be the correct kana. Use value \"__SKIP__\" to skip pre-rendered audio for that text (falls back to browser TTS).",
   "洗濯物": "せんたくもの",
   "習って": "ならって",
   "飲みませんか": "のみませんか",
@@ -34,5 +34,6 @@
   "帰れな": "かえれな",
   "ひく": "ヒク",
   "はな": "ハナ",
-  "または": "マタハ"
+  "または": "マタハ",
+  "はがき": "__SKIP__"
 }

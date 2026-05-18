@@ -56,6 +56,8 @@ for (let i = 0; i < work.length; i++) {
   const mp3 = path.join(OUT_DIR, `${hash}.mp3`);
   if (!force && fs.existsSync(mp3)) { skipped++; continue; }
   const fed = applyOverrides(text, overrides);
+  // __SKIP__ marker: VOICEVOX 念不準的詞，跳過預生成讓前端 fallback 到瀏覽器 TTS
+  if (fed === '__SKIP__') { skipped++; continue; }
   try {
     const q = await audioQuery(fed);
     const wav = await synthesis(q);
