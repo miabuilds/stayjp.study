@@ -227,13 +227,20 @@ const MockExam = (() => {
       });
     });
 
-    // Type 2: 文脈規定 (7 questions)
-    const t2words = shuffle(allWords).slice(0, 7);
-    t2words.forEach(word => {
-      const templates = CONTEXT_TEMPLATES[level] || CONTEXT_TEMPLATES.n3;
-      const tmpl = templates[Math.floor(Math.random() * templates.length)];
-      const wrongs = shuffle(vocab.filter(w => w.w !== word.w && w.m !== word.m))
+    // Type 2: 文脈規定 (7 questions) — 強制套 template filter 配對詞類，干擾選項也限同詞類，
+    // 避免「天気が警官です」之類詞類錯配
+    const templates = CONTEXT_TEMPLATES[level] || CONTEXT_TEMPLATES.n3;
+    const t2candidates = shuffle(allWords);
+    let t2added = 0;
+    for (const word of t2candidates) {
+      if (t2added >= 7) break;
+      const eligibleTmpls = templates.filter(tm => tm.filter(word.c));
+      if (!eligibleTmpls.length) continue;  // 沒有 template 配這個詞類，跳過
+      const tmpl = eligibleTmpls[Math.floor(Math.random() * eligibleTmpls.length)];
+      // 干擾選項從同詞類抽，4 個選項都符合 template 的詞性要求
+      const wrongs = shuffle(vocab.filter(w => w.c === word.c && w.w !== word.w && w.m !== word.m))
         .slice(0, 3).map(w => w.w);
+      if (wrongs.length < 3) continue;  // 同詞類字數不夠湊干擾
       const opts = shuffle([word.w, ...wrongs]);
       questions.push({
         type: 2,
@@ -244,7 +251,8 @@ const MockExam = (() => {
         correctIdx: opts.indexOf(word.w),
         word: word,
       });
-    });
+      t2added++;
+    }
 
     // Type 3: 言い換え (6 questions)
     const t3words = shuffle(allWords).slice(0, 6);
