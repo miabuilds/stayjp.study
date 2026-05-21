@@ -1,0 +1,28 @@
+name: Sync learners from GA4
+
+on:
+  schedule:
+    # 每天 UTC 03:00 (台灣 11:00 AM) 跑一次
+    - cron: '0 3 * * *'
+  workflow_dispatch:
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install deps
+        run: |
+          mkdir -p /tmp/sync-learners && cd /tmp/sync-learners
+          npm init -y > /dev/null
+          npm install --silent @google-analytics/data@^4 firebase-admin@^12
+      - name: Run sync
+        env:
+          NODE_PATH: /tmp/sync-learners/node_modules
+          GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
+          GA4_PROPERTY_ID: ${{ secrets.GA4_PROPERTY_ID }}
+        run: node scripts/sync-learners-from-ga.mjs
