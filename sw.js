@@ -1,20 +1,14 @@
-const CACHE_NAME = 'stayjp-v126';
+const CACHE_NAME = 'stayjp-v127';
 const ASSETS = [
   './',
   './index.html',
   './home.html',
   './verbs.html',
   './contact.html',
-  './vocab-n5.js',
-  './vocab-n4.js',
-  './vocab-n3.js',
-  './vocab-n2.js',
-  './vocab-n1.js',
-  './grammar-n3.js',
-  './grammar-n2.js',
-  './grammar-n1.js',
+  // vocab-n*.js / grammar-n*.js / confusables.js 移除：資料已搬 Firestore content/master，
+  // 由 content-loader.js 取 + localStorage 快取
+  './content-loader.js',
   './grammar-kanji-readings.js',
-  './confusables.js',
   './quiz.js',
   './srs.js',
   './stats.js',

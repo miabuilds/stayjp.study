@@ -4,3 +4,5 @@ reading-issues.csv
 .firebase/
 firebase-debug.log
 firebase-debug.*.log
+
+*.bak
