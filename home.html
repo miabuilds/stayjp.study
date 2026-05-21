@@ -686,12 +686,12 @@ a:hover { text-decoration: underline; }
         <div class="stat-number">5</div>
         <div class="stat-label">Levels N5–N1</div>
       </div>
-      <div class="stat-item reveal reveal-d4">
-        <div class="stat-number" id="learnersCount">—</div>
+      <div class="stat-item reveal reveal-d4" id="learnersCard" style="display:none">
+        <div class="stat-number" id="learnersCount"></div>
         <div class="stat-label">Learners 累積學員</div>
       </div>
-      <div class="stat-item reveal reveal-d5">
-        <div class="stat-number" id="activeNowCount" style="color:var(--ac);">—</div>
+      <div class="stat-item reveal reveal-d5" id="activeNowCard" style="display:none">
+        <div class="stat-number" id="activeNowCount" style="color:var(--ac);"></div>
         <div class="stat-label">🟢 此刻在線</div>
       </div>
     </div>
@@ -763,15 +763,28 @@ a:hover { text-decoration: underline; }
   const ref = db.collection('stats').doc('global');
   const elLearners = document.getElementById('learnersCount');
   const elActive = document.getElementById('activeNowCount');
+  const cardLearners = document.getElementById('learnersCard');
+  const cardActive = document.getElementById('activeNowCard');
 
   // Firestore onSnapshot：cron 每 10 分鐘寫一次，前端自動更新顯示
+  // 防呆：沒數據或值非正整數就整張卡藏起來，不要顯示「—」或空白
   ref.onSnapshot(snap => {
     const d = snap.exists ? snap.data() : {};
-    if (elLearners) elLearners.textContent = (typeof d.learners === 'number' ? d.learners.toLocaleString() : '—') + (typeof d.learners === 'number' ? '+' : '');
-    if (elActive) elActive.textContent = typeof d.activeNow === 'number' ? d.activeNow.toLocaleString() : '—';
+    if (Number.isFinite(d.learners) && d.learners > 0) {
+      elLearners.textContent = d.learners.toLocaleString() + '+';
+      cardLearners.style.display = '';
+    } else {
+      cardLearners.style.display = 'none';
+    }
+    if (Number.isFinite(d.activeNow) && d.activeNow > 0) {
+      elActive.textContent = d.activeNow.toLocaleString();
+      cardActive.style.display = '';
+    } else {
+      cardActive.style.display = 'none';
+    }
   }, () => {
-    if (elLearners) elLearners.textContent = '—';
-    if (elActive) elActive.textContent = '—';
+    cardLearners.style.display = 'none';
+    cardActive.style.display = 'none';
   });
 })();
 </script>
