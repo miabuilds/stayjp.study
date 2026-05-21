@@ -690,6 +690,10 @@ a:hover { text-decoration: underline; }
         <div class="stat-number" id="learnersCount">—</div>
         <div class="stat-label">Learners 累積學員</div>
       </div>
+      <div class="stat-item reveal reveal-d5">
+        <div class="stat-number" id="activeNowCount" style="color:var(--ac);">—</div>
+        <div class="stat-label">🟢 此刻在線</div>
+      </div>
     </div>
   </div>
 </section>
@@ -757,23 +761,18 @@ a:hover { text-decoration: underline; }
   });
   const db = firebase.firestore();
   const ref = db.collection('stats').doc('global');
-  const el = document.getElementById('learnersCount');
+  const elLearners = document.getElementById('learnersCount');
+  const elActive = document.getElementById('activeNowCount');
 
-  // 客戶端 +1 移除：每訪客寫一次 → Firestore Spark 方案 20K 寫/日吃光配額。
-  // 改由 GitHub Actions cron 每天從 GA newUsers 覆寫 stats/global.learners。
-  async function bumpIfNew() { /* no-op */ }
-
-  async function render() {
-    try {
-      const snap = await ref.get();
-      const n = snap.exists && typeof snap.data().learners === 'number' ? snap.data().learners : 0;
-      if (el) el.textContent = n.toLocaleString() + '+';
-    } catch (e) {
-      if (el) el.textContent = '—';
-    }
-  }
-
-  bumpIfNew().then(render);
+  // Firestore onSnapshot：cron 每 10 分鐘寫一次，前端自動更新顯示
+  ref.onSnapshot(snap => {
+    const d = snap.exists ? snap.data() : {};
+    if (elLearners) elLearners.textContent = (typeof d.learners === 'number' ? d.learners.toLocaleString() : '—') + (typeof d.learners === 'number' ? '+' : '');
+    if (elActive) elActive.textContent = typeof d.activeNow === 'number' ? d.activeNow.toLocaleString() : '—';
+  }, () => {
+    if (elLearners) elLearners.textContent = '—';
+    if (elActive) elActive.textContent = '—';
+  });
 })();
 </script>
 

@@ -44,7 +44,7 @@ async function getAccessToken() {
   return j.access_token;
 }
 
-// 2) GA Data API runReport(newUsers, 全年)
+// 2a) GA Data API runReport(newUsers, 全年)
 async function getGaNewUsers(token) {
   const r = await fetch(`https://analyticsdata.googleapis.com/v1beta/properties/${propertyId}:runReport`, {
     method: 'POST',
@@ -55,6 +55,18 @@ async function getGaNewUsers(token) {
     }),
   });
   if (!r.ok) throw new Error(`GA runReport ${r.status}: ${await r.text()}`);
+  const j = await r.json();
+  return parseInt(j.rows?.[0]?.metricValues?.[0]?.value || '0', 10);
+}
+
+// 2b) GA Data API runRealtimeReport(activeUsers, 過去 30 分鐘)
+async function getGaActiveUsers(token) {
+  const r = await fetch(`https://analyticsdata.googleapis.com/v1beta/properties/${propertyId}:runRealtimeReport`, {
+    method: 'POST',
+    headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ metrics: [{ name: 'activeUsers' }] }),
+  });
+  if (!r.ok) throw new Error(`GA runRealtimeReport ${r.status}: ${await r.text()}`);
   const j = await r.json();
   return parseInt(j.rows?.[0]?.metricValues?.[0]?.value || '0', 10);
 }
@@ -91,18 +103,14 @@ async function getSaAccessToken() {
   return (await r.json()).access_token;
 }
 
-// 3) Firestore REST PATCH stats/global.learners — 用 SA access token
-async function writeFirestore(token, learners) {
-  const url = `https://firestore.googleapis.com/v1/projects/${projectId}/databases/(default)/documents/stats/global?updateMask.fieldPaths=learners&updateMask.fieldPaths=lastSyncedAt`;
+// 3) Firestore REST PATCH stats/global — 用 SA access token
+async function writeFirestore(token, fields) {
+  const params = Object.keys(fields).map(k => `updateMask.fieldPaths=${k}`).join('&');
+  const url = `https://firestore.googleapis.com/v1/projects/${projectId}/databases/(default)/documents/stats/global?${params}`;
   const r = await fetch(url, {
     method: 'PATCH',
     headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      fields: {
-        learners: { integerValue: String(learners) },
-        lastSyncedAt: { timestampValue: new Date().toISOString() },
-      },
-    }),
+    body: JSON.stringify({ fields }),
   });
   if (!r.ok) throw new Error(`Firestore PATCH ${r.status}: ${await r.text()}`);
   return r.json();
@@ -119,7 +127,14 @@ if (!Number.isFinite(newUsers) || newUsers <= 0) {
   process.exit(1);
 }
 
+const activeNow = await getGaActiveUsers(userToken);
+console.log(`GA activeUsers (last 30 min): ${activeNow}`);
+
 const saToken = await getSaAccessToken();
 console.log('Got SA access token (for Firestore)');
-await writeFirestore(saToken, newUsers);
-console.log(`Firestore stats/global.learners ← ${newUsers}`);
+await writeFirestore(saToken, {
+  learners: { integerValue: String(newUsers) },
+  activeNow: { integerValue: String(activeNow) },
+  lastSyncedAt: { timestampValue: new Date().toISOString() },
+});
+console.log(`Firestore stats/global ← learners=${newUsers}, activeNow=${activeNow}`);
