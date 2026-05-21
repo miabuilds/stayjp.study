@@ -1,9 +1,9 @@
 name: Sync learners from GA4
 
 on:
-  # 排程暫時關掉；等 secrets 設好再取消註解
-  # schedule:
-  #   - cron: '0 3 * * *'  # 每天 UTC 03:00 (台灣 11:00 AM)
+  schedule:
+    # UTC 10:00 = 台灣 18:00 = 太平洋時間早上（已過 Firestore 每日額度 reset 點）
+    - cron: '0 10 * * *'
   workflow_dispatch:
 
 jobs:
