@@ -16,7 +16,13 @@ import crypto from 'node:crypto';
 const need = ['OAUTH_CLIENT_ID', 'OAUTH_CLIENT_SECRET', 'OAUTH_REFRESH_TOKEN', 'GA4_PROPERTY_ID', 'GCP_SA_KEY'];
 for (const k of need) if (!process.env[k]) { console.error(`Missing ${k}`); process.exit(1); }
 
-const sa = JSON.parse(process.env.GCP_SA_KEY);
+let sa;
+try { sa = JSON.parse(process.env.GCP_SA_KEY); }
+catch (e) { console.error('GCP_SA_KEY 不是合法 JSON:', e.message); process.exit(1); }
+console.log('SA fields present:', Object.keys(sa).join(','));
+for (const k of ['project_id', 'client_email', 'private_key']) {
+  if (!sa[k]) { console.error(`GCP_SA_KEY 缺欄位 ${k}`); process.exit(1); }
+}
 const projectId = sa.project_id;
 const propertyId = process.env.GA4_PROPERTY_ID;
 const startDate = process.env.GA_START_DATE || '2025-01-01';
