@@ -9,16 +9,28 @@ const Stats = (() => {
 
   function open() {
     const box = document.getElementById('quizBox');
-    box.innerHTML = buildHTML();
+    box.innerHTML = buildHTML(true);
     document.getElementById('quizBg').classList.add('show');
+  }
+
+  // 內嵌頁面版（用於底部「我的」tab） — 直接灌進 #mn 主內容區、無 modal
+  function openProfile() {
+    const mn = document.getElementById('mn');
+    if (!mn) return;
+    document.querySelectorAll('.ftb-btn').forEach(b => b.classList.remove('on'));
+    const btns = document.querySelectorAll('.ftb-btn');
+    if (btns[3]) btns[3].classList.add('on'); // 「我的」 is index 3
+    mn.innerHTML = '<div style="padding:16px;max-width:880px;margin:0 auto">' + buildHTML(false) + '</div>';
+    document.getElementById('quizBg').classList.remove('show');
   }
 
   function close() {
     document.getElementById('quizBg').classList.remove('show');
   }
 
-  function buildHTML() {
-    let h = `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0">${t('stats_title')}</h3><button class="qclose" style="width:auto;margin:0;padding:2px 10px" onclick="Stats.close()">✕</button></div>`;
+  function buildHTML(showCloseBtn) {
+    const closeBtn = showCloseBtn ? `<button class="qclose" style="width:auto;margin:0;padding:2px 10px" onclick="Stats.close()">✕</button>` : '';
+    let h = `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0">${t('stats_title')}</h3>${closeBtn}</div>`;
     h += '<div style="display:flex;gap:4px;margin-bottom:14px;overflow-x:auto;scrollbar-width:none">';
     h += `<button class="qo-btn stat-tab on" data-tab="overview" onclick="Stats.switchTab('overview')">${t('tab_overview')}</button>`;
     h += `<button class="qo-btn stat-tab" data-tab="history" onclick="Stats.switchTab('history')">${t('tab_history')}</button>`;
@@ -592,5 +604,5 @@ const Stats = (() => {
     _renderFL();
   }
 
-  return { open, close, switchTab, quizWeak, retryWrong, _answerWeak, addToNotebook, removeFromNotebook, quizNotebook, reviewNotebook, addWrongQuestion, getWrongQuestions, removeWrongQuestion, quizWrongQuestions, _wqAnswer, _wqNext, _wqRemoveAndNext, quizFavListening, _flReplay, _flAnswer, _flNext };
+  return { open, openProfile, close, switchTab, quizWeak, retryWrong, _answerWeak, addToNotebook, removeFromNotebook, quizNotebook, reviewNotebook, addWrongQuestion, getWrongQuestions, removeWrongQuestion, quizWrongQuestions, _wqAnswer, _wqNext, _wqRemoveAndNext, quizFavListening, _flReplay, _flAnswer, _flNext };
 })();
