@@ -1,4 +1,4 @@
-const CACHE_NAME = 'stayjp-v131';
+const CACHE_NAME = 'stayjp-v132';
 const ASSETS = [
   './',
   './index.html',
@@ -9,6 +9,7 @@ const ASSETS = [
   // 由 content-loader.js 取 + localStorage 快取
   './content-loader.js',
   './grammar-kanji-readings.js',
+  './conjugate.js',
   './quiz.js',
   './srs.js',
   './stats.js',
