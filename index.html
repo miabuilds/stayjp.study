@@ -926,48 +926,90 @@ select::-ms-expand { display: none; }
 @keyframes fadeInSoft { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
 #main > * { animation: fadeInSoft .26s cubic-bezier(.2,.8,.2,1); }
 
-/* == 絲滑加強 polish pass(2026-05-26) ==
- * 套到全站,讓 modal / tab / toggle 都帶 spring 質感。
- * 尊重 prefers-reduced-motion(macOS / iOS 系統設定) — 全動畫立刻關。
+/* == 絲滑加強 polish pass v2(2026-05-26 dramatic 版本) ==
+ * v1 太保守用戶感覺沒差,這版放大幅度讓動畫明顯。
  */
 
-/* cc-mask 自訂彈窗:加長 + spring overshoot + 玻璃感 backdrop */
-.cc-mask { transition: opacity .24s var(--ease); backdrop-filter: blur(8px) saturate(140%); -webkit-backdrop-filter: blur(8px) saturate(140%); }
-.cc-box { transform: scale(.9) translateY(10px); opacity: 0; transition: transform .32s cubic-bezier(.34,1.56,.64,1), opacity .24s var(--ease); }
+/* cc-mask 彈窗:大幅 scale + 玻璃感 backdrop */
+.cc-mask { transition: opacity .3s var(--ease); backdrop-filter: blur(12px) saturate(150%); -webkit-backdrop-filter: blur(12px) saturate(150%); }
+.cc-box { transform: scale(.7) translateY(30px); opacity: 0; transition: transform .45s cubic-bezier(.34,1.56,.64,1), opacity .3s var(--ease); }
 .cc-mask.on .cc-box { transform: scale(1) translateY(0); opacity: 1; }
 
-/* drawer 玻璃感 backdrop */
-.drawer-bg { transition: opacity .24s var(--ease); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
-
-/* tab-pill / mode-pill on 狀態小放大 spring,點選時更有反饋 */
-.tab-pill, .mode-pill, .fav-pill {
-  transition: background .2s var(--ease), color .2s var(--ease),
-              transform .26s cubic-bezier(.34,1.56,.64,1),
-              border-color .2s var(--ease);
+/* quiz-bg 也升級成 spring 大幅進場(原本 .26s 太快) */
+@keyframes modalBoxInBig {
+  from { opacity: 0; transform: translateY(40px) scale(.85); }
+  to   { opacity: 1; transform: none; }
 }
-.tab-pill.on, .mode-pill.on { transform: scale(1.05); }
+.quiz-bg.show { animation: modalFadeIn .3s var(--ease) !important; backdrop-filter: blur(10px); }
+.quiz-bg.show .quiz-box { animation: modalBoxInBig .45s cubic-bezier(.34,1.56,.64,1) !important; }
 
-/* 星 / 收藏 / icon toggle:點下凹下 + on 狀態 pulse */
-.star, .gm-btn, .ex-spk {
-  transition: transform .22s cubic-bezier(.34,1.56,.64,1),
+/* verb modal 同樣升級 */
+#verbBg.show { backdrop-filter: blur(10px); transition: opacity .3s var(--ease); }
+
+/* drawer 玻璃感 backdrop + 抽屜上推更柔 */
+.drawer-bg { transition: opacity .3s var(--ease); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+.drawer { transition: transform .45s cubic-bezier(.34,1.56,.64,1) !important; }
+
+/* tab-pill / mode-pill on 狀態放大 + 點下凹回 */
+.tab-pill, .mode-pill, .fav-pill {
+  transition: background .25s var(--ease), color .25s var(--ease),
+              transform .3s cubic-bezier(.34,1.56,.64,1),
+              border-color .25s var(--ease);
+}
+.tab-pill.on, .mode-pill.on { transform: scale(1.08); }
+.tab-pill:active, .mode-pill:active { transform: scale(.94); }
+
+/* 星 / 收藏 / icon toggle */
+.star, .gm-btn, .ex-spk, .arr {
+  transition: transform .25s cubic-bezier(.34,1.56,.64,1),
               fill .2s var(--ease), stroke .2s var(--ease),
               background .2s var(--ease), border-color .2s var(--ease);
 }
-.star:active, .gm-btn:active, .ex-spk:active { transform: scale(.86); }
+.star:active, .gm-btn:active, .ex-spk:active { transform: scale(.82); }
 @keyframes starPulse {
   0% { transform: scale(1); }
-  40% { transform: scale(1.35); }
-  100% { transform: scale(1); }
+  35% { transform: scale(1.5) rotate(-15deg); }
+  70% { transform: scale(1.15) rotate(5deg); }
+  100% { transform: scale(1) rotate(0); }
 }
-.star.on { animation: starPulse .42s cubic-bezier(.34,1.56,.64,1); }
+.star.on { animation: starPulse .55s cubic-bezier(.34,1.56,.64,1); }
 
-/* Toast / WGToast:進場 spring */
-#wgToast { transition: opacity .24s var(--ease), transform .32s cubic-bezier(.34,1.56,.64,1) !important; }
+/* Toast spring 進場 */
+#wgToast { transition: opacity .25s var(--ease), transform .4s cubic-bezier(.34,1.56,.64,1) !important; }
 
-/* 卡片展開:用 cubic-bezier 讓「咻」一聲更順 */
-.gc .gb { transition: max-height .42s cubic-bezier(.4,0,.2,1); }
-.gc .arr { transition: transform .3s cubic-bezier(.34,1.56,.64,1); }
+/* 卡片展開:slower + 箭頭 180 旋轉 */
+.gc .gb { transition: max-height .5s cubic-bezier(.4,0,.2,1) !important; }
 .gc.o .arr { transform: rotate(180deg); }
+
+/* 卡片進場列表 listIn 放大移動距離 */
+@keyframes listIn {
+  from { opacity: 0; transform: translateY(20px) scale(.96); }
+  to   { opacity: 1; transform: none; }
+}
+.gc, .vi { animation: listIn .4s cubic-bezier(.2,.8,.2,1) both !important; }
+/* stagger:卡片依序進場(像 Apple) — 但限頭 10 張以免後面太慢 */
+.cs .gc:nth-child(2), .cs .vi:nth-child(2) { animation-delay: .03s; }
+.cs .gc:nth-child(3), .cs .vi:nth-child(3) { animation-delay: .06s; }
+.cs .gc:nth-child(4), .cs .vi:nth-child(4) { animation-delay: .09s; }
+.cs .gc:nth-child(5), .cs .vi:nth-child(5) { animation-delay: .12s; }
+.cs .gc:nth-child(6), .cs .vi:nth-child(6) { animation-delay: .15s; }
+.cs .gc:nth-child(7), .cs .vi:nth-child(7) { animation-delay: .18s; }
+.cs .gc:nth-child(8), .cs .vi:nth-child(8) { animation-delay: .21s; }
+.cs .gc:nth-child(9), .cs .vi:nth-child(9) { animation-delay: .24s; }
+.cs .gc:nth-child(10), .cs .vi:nth-child(10) { animation-delay: .27s; }
+
+/* 主內容 tab 切換淡入更明顯 */
+@keyframes fadeInSoftBig {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: none; }
+}
+#main > * { animation: fadeInSoftBig .4s cubic-bezier(.2,.8,.2,1) !important; }
+
+/* 卡片 hover 抬升加幅 */
+@media (hover: hover) and (pointer: fine) {
+  .gc:hover, .vi:hover { transform: translateY(-3px) !important; box-shadow: 0 8px 20px rgba(0,0,0,.08) !important; }
+  [data-theme="dark"] .gc:hover, [data-theme="dark"] .vi:hover { box-shadow: 0 8px 20px rgba(0,0,0,.4) !important; }
+}
 
 /* prefers-reduced-motion: 全動畫立刻關(尊重系統設定) */
 @media (prefers-reduced-motion: reduce) {
