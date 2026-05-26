@@ -194,10 +194,18 @@ textarea.note:focus{outline:none;border-color:var(--ac)}
   </div>
 
   <div id="wrapStats" class="stats">
-    <div class="stat-grid" id="statGrid"></div>
-    <div style="background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r);padding:18px;font-size:13px;color:var(--tx2)">
-      💡 訂閱 / 早鳥剩餘 / 月收入 等金流相關指標等綠界 callback 接好後上線。<br>
-      目前只顯示回饋處理統計 + 用戶總數。
+    <h2 style="font-size:14px;color:var(--tx2);margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px">👥 用戶 / 註冊</h2>
+    <div class="stat-grid" id="statUsers"></div>
+
+    <h2 style="font-size:14px;color:var(--tx2);margin-bottom:10px;margin-top:10px;text-transform:uppercase;letter-spacing:.5px">💰 訂閱 / 營業額</h2>
+    <div class="stat-grid" id="statBilling"></div>
+
+    <h2 style="font-size:14px;color:var(--tx2);margin-bottom:10px;margin-top:10px;text-transform:uppercase;letter-spacing:.5px">📥 回饋處理</h2>
+    <div class="stat-grid" id="statFeedback"></div>
+
+    <div style="background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r);padding:14px 18px;font-size:12px;color:var(--tx2);margin-top:18px">
+      💡 訂閱 / 營業額相關指標 等綠界 callback 接好後會自動有數字。架構已就緒 — Cloud Function 寫 transactions 集合,這頁讀。<br>
+      🔄 點 [📊 報表] tab 會重新查詢即時數字。
     </div>
   </div>
 </div>
@@ -445,37 +453,123 @@ async function saveNote() {
 }
 
 // ── stats ──
-function renderStats() {
+async function renderStats() {
+  // 立即把 feedback 統計畫出來(currentList 已在記憶體)
+  renderFeedbackStats();
+  // 用戶 / 訂閱 / 營業額 用 placeholder 先佔位,async 查回填
+  renderPlaceholders();
+  // async 查 Firestore
+  fetchUserStats().catch(err => showStatErr('statUsers', err));
+  fetchBillingStats().catch(err => showStatErr('statBilling', err));
+}
+
+function renderPlaceholders() {
+  const loading = `<div class="stat"><div class="lbl">…</div><div class="val">⏳</div><div class="sub">載入中</div></div>`;
+  document.getElementById('statUsers').innerHTML = loading.repeat(3);
+  document.getElementById('statBilling').innerHTML = loading.repeat(4);
+}
+
+function showStatErr(id, err) {
+  document.getElementById(id).innerHTML =
+    `<div class="stat" style="border-color:#EF4444"><div class="lbl">讀取失敗</div><div class="val" style="font-size:14px;color:#EF4444">${err.message}</div><div class="sub">確認 firestore.rules 已部署</div></div>`;
+}
+
+async function fetchUserStats() {
+  // 累積學員(從 stats/global.learners 讀,GitHub Actions cron 從 GA4 同步)
+  let learners = '-';
+  try {
+    const doc = await db.collection('stats').doc('global').get();
+    if (doc.exists && doc.data().learners) learners = doc.data().learners.toLocaleString();
+  } catch (e) { /* stats 公開可讀 */ }
+
+  // users/ 集合文件數(寫過資料的活躍用戶)
+  let userCount = '-';
+  try {
+    const snap = await db.collection('users').count().get();
+    userCount = snap.data().count.toLocaleString();
+  } catch (e) {
+    // Firestore SDK 太舊或權限問題,fallback 讀部分
+    try {
+      const snap = await db.collection('users').limit(1000).get();
+      userCount = snap.size >= 1000 ? '1000+' : snap.size.toLocaleString();
+    } catch (e2) { userCount = '無權限'; }
+  }
+
+  // 本週新註冊(查 users.createdAt 過去 7 天)— users doc 不一定有 createdAt,fallback
+  let thisWeekUsers = '-';
+  try {
+    const weekAgo = new Date(Date.now() - 7 * 86400000);
+    const snap = await db.collection('users').where('createdAt', '>=', weekAgo).count().get();
+    thisWeekUsers = snap.data().count.toLocaleString();
+  } catch (e) { thisWeekUsers = '欄位缺'; }
+
+  document.getElementById('statUsers').innerHTML = `
+    <div class="stat"><div class="lbl">累積學員 (GA4)</div><div class="val">${learners}</div><div class="sub">所有訪客累積</div></div>
+    <div class="stat"><div class="lbl">註冊用戶</div><div class="val">${userCount}</div><div class="sub">寫過資料的活躍用戶</div></div>
+    <div class="stat"><div class="lbl">本週新註冊</div><div class="val">${thisWeekUsers}</div><div class="sub">過去 7 天</div></div>
+  `;
+}
+
+async function fetchBillingStats() {
+  // 訂戶總數
+  let activeSubs = 0, earlyBirdUsed = 0;
+  try {
+    const snap = await db.collection('users').where('subscription.status', '==', 'active').count().get();
+    activeSubs = snap.data().count;
+  } catch (e) {
+    // 訂閱還沒上線 / 沒人訂 → 0
+  }
+  try {
+    const c = await db.collection('counters').doc('early_bird').get();
+    if (c.exists) earlyBirdUsed = c.data().count || 0;
+  } catch (e) {}
+
+  // 本月營業額
+  let monthRevenue = 0, monthRefund = 0;
+  try {
+    const monthStart = new Date();
+    monthStart.setDate(1);
+    monthStart.setHours(0, 0, 0, 0);
+    const txnSnap = await db.collection('transactions').where('occurred_at', '>=', monthStart).get();
+    txnSnap.forEach(d => {
+      const t = d.data();
+      if (t.status === 'success' && (t.type === 'subscribe' || t.type === 'renew')) monthRevenue += t.amount_twd || 0;
+      if (t.type === 'refund') monthRefund += Math.abs(t.amount_twd || 0);
+    });
+  } catch (e) { /* transactions 還沒有 */ }
+
+  document.getElementById('statBilling').innerHTML = `
+    <div class="stat"><div class="lbl">訂閱中</div><div class="val">${activeSubs}</div><div class="sub">status=active</div></div>
+    <div class="stat"><div class="lbl">早鳥已用 / 100</div><div class="val">${earlyBirdUsed}<small style="font-size:14px;color:var(--tx2)"> / 100</small></div><div class="sub">剩 ${100 - earlyBirdUsed} 名額</div></div>
+    <div class="stat"><div class="lbl">本月營業額</div><div class="val">NT$${monthRevenue.toLocaleString()}</div><div class="sub">訂閱 + 續訂</div></div>
+    <div class="stat"><div class="lbl">本月退費</div><div class="val">NT$${monthRefund.toLocaleString()}</div><div class="sub">${monthRevenue > 0 ? (monthRefund / monthRevenue * 100).toFixed(1) + '%' : '-'} 退費率</div></div>
+  `;
+}
+
+function renderFeedbackStats() {
   const counts = currentList.reduce((acc, f) => {
     const s = f.status || 'new';
     acc[s] = (acc[s] || 0) + 1;
     return acc;
   }, {});
-  // 平均解決時間
   const resolved = currentList.filter(f => f.status === 'resolved' && f.resolved_at && f.createdAt);
   const avgDays = resolved.length
     ? (resolved.reduce((sum, f) => sum + (f.resolved_at.toMillis() - f.createdAt.toMillis()), 0) / resolved.length / 86400000).toFixed(1)
     : '-';
-  // 本週新增
   const weekAgo = Date.now() - 7 * 86400000;
   const thisWeek = currentList.filter(f => f.createdAt?.toMillis() > weekAgo).length;
-  // 類別分布
   const byType = currentList.reduce((acc, f) => {
     acc[f.type || 'other'] = (acc[f.type || 'other'] || 0) + 1;
     return acc;
   }, {});
 
-  document.getElementById('statGrid').innerHTML = `
+  document.getElementById('statFeedback').innerHTML = `
     <div class="stat"><div class="lbl">未處理</div><div class="val">${counts.new || 0}</div><div class="sub">🔴 等你看</div></div>
-    <div class="stat"><div class="lbl">處理中</div><div class="val">${counts.in_progress || 0}</div><div class="sub">🟡 標記為 in_progress</div></div>
+    <div class="stat"><div class="lbl">處理中</div><div class="val">${counts.in_progress || 0}</div><div class="sub">🟡 in_progress</div></div>
     <div class="stat"><div class="lbl">已解決</div><div class="val">${counts.resolved || 0}</div><div class="sub">🟢 全時段</div></div>
     <div class="stat"><div class="lbl">本週新增</div><div class="val">${thisWeek}</div><div class="sub">過去 7 天</div></div>
-    <div class="stat"><div class="lbl">平均解決時間</div><div class="val">${avgDays}<small style="font-size:14px;color:var(--tx2)"> 天</small></div><div class="sub">已解決平均</div></div>
+    <div class="stat"><div class="lbl">平均解決</div><div class="val">${avgDays}<small style="font-size:14px;color:var(--tx2)"> 天</small></div><div class="sub">已解決平均</div></div>
     <div class="stat"><div class="lbl">總筆數</div><div class="val">${currentList.length}</div><div class="sub">含所有狀態</div></div>
-    <div class="stat"><div class="lbl">bug</div><div class="val">${byType.bug || 0}</div></div>
-    <div class="stat"><div class="lbl">內容</div><div class="val">${byType.content || 0}</div></div>
-    <div class="stat"><div class="lbl">建議</div><div class="val">${byType.feature || 0}</div></div>
-    <div class="stat"><div class="lbl">其他</div><div class="val">${byType.other || 0}</div></div>
   `;
 }
 

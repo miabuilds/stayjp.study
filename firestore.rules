@@ -10,11 +10,29 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // 使用者私人資料（收藏 / 學習進度 / 複習資料）
-    // 結構：users/{uid} → { favorites, quiz_history, srs_data, ... }
+    // 使用者私人資料（收藏 / 學習進度 / 複習資料 / 訂閱狀態）
+    // 結構：users/{uid} → { favorites, quiz_history, srs_data, subscription, ... }
+    // owner 可讀寫自己;admin email 可讀(report / debug 用,不能寫)
     match /users/{userId} {
-      allow read, write: if request.auth != null
-                        && request.auth.uid == userId;
+      allow read: if request.auth != null && (
+                    request.auth.uid == userId ||
+                    request.auth.token.email in ['stayjpplan@gmail.com', 'abc83327@gmail.com']
+                  );
+      allow write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // 訂閱交易帳本 — Cloud Function 寫,admin 讀
+    // 結構:transactions/{txnId} → { uid, type, amount_twd, ... }
+    match /transactions/{txnId} {
+      allow read: if request.auth != null &&
+                  request.auth.token.email in ['stayjpplan@gmail.com', 'abc83327@gmail.com'];
+      allow write: if false;  // 只有 Cloud Function (Admin SDK) 能寫
+    }
+
+    // 早鳥計數器
+    match /counters/{name} {
+      allow read: if true;  // 前端 paywall 要顯示「剩 X 名」
+      allow write: if false;  // 只 Cloud Function 寫
     }
 
     // 意見回饋 — contact.html 表單寫入,admin.html 後台讀寫
