@@ -393,29 +393,49 @@ function checkRefundEligibility(sub) {
   }
 }
 
+// Cloud Function endpoints
+const FN_CANCEL = 'https://cancelsubscription-lsd7okt5qa-de.a.run.app';
+const FN_REFUND = 'https://refund-lsd7okt5qa-de.a.run.app';
+
 async function cancelRenew() {
   if (!confirm('確定關閉自動續訂?到期日前都還能正常使用,到期後不再扣款。')) return;
+  const btn = document.getElementById('btnCancelRenew');
+  if (btn) { btn.disabled = true; btn.textContent = '處理中…'; }
   try {
-    await db.collection('users').doc(currentUser.uid).update({
-      'subscription.willRenew': false,
-      'subscription.status': 'cancelled',
+    const idToken = await currentUser.getIdToken();
+    const res = await fetch(FN_CANCEL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + idToken },
     });
-    alert('已關閉自動續訂。到期後不會再扣款。');
+    const data = await res.json();
+    if (!res.ok) { alert(data.reason || data.error || '操作失敗'); return; }
+    alert(data.message || '已關閉自動續訂。');
+    location.reload();
   } catch (err) {
     alert('操作失敗:' + err.message);
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = '關閉自動續訂'; }
   }
 }
 
 async function requestRefund() {
-  if (!confirm('確定要申請退費?\n\n按下確認後:\n• 訂閱立刻降級為免費版\n• 退款 3-5 工作天內回到信用卡\n• 已訂閱期間使用記錄會保留')) return;
+  if (!confirm('確定要申請退費?\n\n按下確認後:\n• 訂閱立刻降級為免費版\n• 退款 3-5 工作天內回到信用卡\n• 已訂閱期間使用記錄會保留\n• 退費滿 2 次後該帳號將永久無法訂閱')) return;
+  const btn = document.getElementById('btnRefund');
+  if (btn) { btn.disabled = true; btn.textContent = '處理中…'; }
   try {
-    // 目前未接 Cloud Function,先寫意願到 Firestore,Cloud Function 之後處理
-    await db.collection('users').doc(currentUser.uid).update({
-      'subscription.refund_requested_at': firebase.firestore.FieldValue.serverTimestamp(),
+    const idToken = await currentUser.getIdToken();
+    const res = await fetch(FN_REFUND, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + idToken },
     });
-    alert('退費申請已收到!\n\n系統會在 5 分鐘內自動處理。\n如果超過 1 小時未處理,請來信 stayjpplan@gmail.com。');
+    const data = await res.json();
+    if (!res.ok) { alert(data.reason || data.error || '退費失敗'); return; }
+    alert(data.message || '退費成功!');
+    location.reload();
   } catch (err) {
     alert('退費申請失敗:' + err.message);
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = '申請退費'; }
   }
 }
 
