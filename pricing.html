@@ -260,30 +260,30 @@ const _auth = firebase.auth();
   } catch (e) { console.warn('early bird counter load fail', e); }
 })();
 
+// 暫時白名單:金流還在 sandbox 測試,只有 owner 可以實際走訂閱流程
+// 一般用戶按下會看到「即將開放」提示,不會跳到 ECPay sandbox 結帳頁
+const SUBSCRIBE_TEST_WHITELIST = ['abc83327@gmail.com', 'stayjpplan@gmail.com'];
+
 async function startSubscribe(btn) {
   const card = btn.closest('.plan');
   const plan = card?.dataset.plan;
   if (!plan) { alert('找不到方案'); return false; }
 
-  const user = _auth.currentUser;
-  if (!user) {
-    if (confirm('請先登入 Google 帳號才能訂閱,是否前往登入?')) {
-      sessionStorage.setItem('subscribeAfterLogin', plan);
-      // 用 Google popup 登入
-      const provider = new firebase.auth.GoogleAuthProvider();
-      try {
-        await _auth.signInWithPopup(provider);
-      } catch (e) {
-        alert('登入失敗,請稍後再試。');
-        return false;
-      }
-    } else {
-      return false;
-    }
+  // 1. 已登入但不在白名單 → 顯示「即將開放」
+  const curUser = _auth.currentUser;
+  if (curUser && !SUBSCRIBE_TEST_WHITELIST.includes(curUser.email || '')) {
+    alert('訂閱功能即將開放,金流尚在測試中。\n\n免費版功能完全不受影響,可繼續使用所有內容。');
+    return false;
   }
 
-  const u = _auth.currentUser;
-  if (!u) return false;
+  // 2. 未登入 → 也顯示「即將開放」(避免無關用戶亂登入)
+  if (!curUser) {
+    alert('訂閱功能即將開放,金流尚在測試中。\n\n免費版功能完全不受影響,可繼續使用所有內容。');
+    return false;
+  }
+
+  // 3. 白名單用戶(owner)→ 走完整訂閱流程
+  const u = curUser;
 
   btn.textContent = '處理中…';
   btn.style.pointerEvents = 'none';
