@@ -21,6 +21,7 @@ export const createPayment = functions.onRequest(
   {
     cors: true,
     region: "asia-east1",
+    invoker: "public",
     maxInstances: 10,        // 防 DDoS 同時最多 10 個實例
     timeoutSeconds: 30,       // 30 秒沒回應就終止(綠界 API 通常 1-3 秒)
     memory: "256MiB",

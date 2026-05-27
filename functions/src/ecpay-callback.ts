@@ -25,6 +25,7 @@ import {
 export const ecpayCallback = functions.onRequest(
   {
     region: "asia-east1",
+    invoker: "public",
     maxInstances: 20,         // server-to-server,允許多一點
     timeoutSeconds: 60,        // 寫 Firestore + 早鳥 transaction 算進去
     memory: "256MiB",

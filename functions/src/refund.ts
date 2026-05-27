@@ -25,6 +25,7 @@ export const refund = functions.onRequest(
   {
     cors: true,
     region: "asia-east1",
+    invoker: "public",
     maxInstances: 5,           // 退費頻率低,5 個夠
     timeoutSeconds: 120,        // 要 call 綠界 API,給 2 分鐘餘裕
     memory: "256MiB",

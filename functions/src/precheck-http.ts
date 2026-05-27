@@ -14,6 +14,7 @@ export const precheck = functions.onRequest(
   {
     cors: true,
     region: "asia-east1",
+    invoker: "public",
     maxInstances: 10,
     timeoutSeconds: 15,
     memory: "256MiB",

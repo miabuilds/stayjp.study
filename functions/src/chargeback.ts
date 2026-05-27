@@ -15,6 +15,7 @@ if (admin.apps.length === 0) admin.initializeApp();
 export const chargeback = functions.onRequest(
   {
     region: "asia-east1",
+    invoker: "public",
     maxInstances: 5,           // chargeback 非常少見
     timeoutSeconds: 30,
     memory: "256MiB",

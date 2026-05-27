@@ -22,6 +22,7 @@ const REVENUECAT_AUTH_HEADER = process.env.REVENUECAT_WEBHOOK_SECRET || "";
 export const revenuecatWebhook = functions.onRequest(
   {
     region: "asia-east1",
+    invoker: "public",
     maxInstances: 20,          // App IAP webhook,給多一點 burst 空間
     timeoutSeconds: 60,
     memory: "256MiB",
