@@ -648,6 +648,11 @@ const MockExam = (() => {
     clearInterval(timerInterval);
     timerInterval = null;
 
+    // ToolQuota:標記該等級已完成 1 套(免費版 lifetime 限額用)
+    if (typeof window.ToolQuota !== 'undefined' && typeof currentLevel === 'string') {
+      try { window.ToolQuota.markMockCompleted(currentLevel); } catch (e) {}
+    }
+
     const totalTime = Date.now() - sectionStart; // approximate
     const sectionResults = sections.map((section, si) => {
       let correct = 0;
