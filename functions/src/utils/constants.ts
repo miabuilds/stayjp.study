@@ -33,7 +33,7 @@ export const PLANS: Record<PlanKey, {
     period_days: 365,
     ecpay_period_type: "Y",
     ecpay_frequency: 1,
-    display_name: "早期鳥年費",
+    display_name: "早鳥年費",
   },
   lifetime: {
     price_twd: 2990,

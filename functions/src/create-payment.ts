@@ -52,7 +52,7 @@ export const createPayment = functions.onRequest(
         res.status(403).json({
           error: "plan_not_allowed",
           reason: plan === "yearly_early_bird"
-            ? "早期鳥名額已滿或您不符合資格,請改選一般年費 / 月費。"
+            ? "早鳥名額已滿或您不符合資格,請改選一般年費 / 月費。"
             : "此方案目前不開放。",
           allowed_plans: check.allowed_plans,
         });

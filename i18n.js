@@ -80,7 +80,7 @@ const I18n = (() => {
   grammar_title: 'JLPT {lv} 文法筆記',
   grammar_desc: '收錄 {lv} 級別完整文法共 {n} 個文法點，含接續規則、例句及中文解說。',
   grammar_tag: '{n} 文法點',
-  brand_tag: '再留計劃',
+  brand_tag: '日本再留計劃',
 
   // Confuse intro
   confuse_title: '易混淆詞比較',
@@ -257,7 +257,7 @@ const I18n = (() => {
   ls_no_tts: '您的瀏覽器不支援語音合成',
 
   // Footer
-  copyright: '© 2026 再留計劃 — All rights reserved.',
+  copyright: '© 2026 日本再留計劃 — All rights reserved.',
   disclaimer: '本站為原創學習整理，建議搭配 JLPT 官方教材使用。若發現內容有誤，歡迎點卡片上「🚩 回報此項錯誤」告知。不隸屬於 JLPT 官方或任何教育機構。',
   ft_vocab: '全站收錄 N5~N1 共 {total} 個單字（本頁 {lv} {n} 個）',
   ft_confuse: '易混淆詞比較 {n} 組收錄',
@@ -271,8 +271,8 @@ const I18n = (() => {
   cat_count_grammar: '{n} 項',
 
   // Page title
-  page_title: '再留計劃 — 免費 JLPT N5~N1 備考工具｜單字・文法・模考・複習',
-  verbs_page_title: '再留計劃 — 動詞變化完全攻略',
+  page_title: '日本再留計劃 — 免費 JLPT N5~N1 備考工具｜單字・文法・模考・複習',
+  verbs_page_title: '日本再留計劃 — 動詞變化完全攻略',
 
   // Language
   lang_label: '繁',

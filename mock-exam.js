@@ -843,7 +843,7 @@ const MockExam = (() => {
     // Brand
     ctx.fillStyle = '#1C1C1E';
     ctx.font = 'bold 36px "Hiragino Mincho ProN", "Songti TC", serif';
-    ctx.fillText('再留計劃', 540, 940);
+    ctx.fillText('日本再留計劃', 540, 940);
 
     ctx.fillStyle = '#6A6A6A';
     ctx.font = '24px -apple-system, "Hiragino Sans", "PingFang TC", sans-serif';
@@ -862,8 +862,8 @@ const MockExam = (() => {
         try {
           await navigator.share({
             files: [file],
-            title: `我在再留計劃 ${level.toUpperCase()} 模擬考`,
-            text: `我在再留計劃 ${level.toUpperCase()} 模擬考拿了 ${score}/${total} ${passed ? '🎉 達標！' : '💪 繼續加油！'} stayjp.study`,
+            title: `我在日本再留計劃 ${level.toUpperCase()} 模擬考`,
+            text: `我在日本再留計劃 ${level.toUpperCase()} 模擬考拿了 ${score}/${total} ${passed ? '🎉 達標！' : '💪 繼續加油！'} stayjp.study`,
           });
           return;
         } catch (e) { /* user cancelled or share failed — fall through to download */ }
