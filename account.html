@@ -211,6 +211,7 @@ const fbConfig = {
   messagingSenderId: "666368174384"
 };
 firebase.initializeApp(fbConfig);
+  try { firebase.firestore().settings({ experimentalForceLongPolling: true }); } catch (e) {}
 const db = firebase.firestore();
 const auth = firebase.auth();
 
@@ -223,7 +224,7 @@ const PLAN_LABELS = {
 
 const STATUS_LABELS = {
   active: { text: '✓ 啟用中', cls: 'b-active' },
-  cancelled: { text: '已取消(用到期日)', cls: 'b-cancelled' },
+  cancelled: { text: '使用中・到期後不續扣', cls: 'b-cancelled' },
   refunded: { text: '已退費', cls: 'b-refunded' },
   expired: { text: '已過期', cls: 'b-expired' },
 };
