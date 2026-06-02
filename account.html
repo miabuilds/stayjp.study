@@ -324,8 +324,9 @@ function renderSubscription(sub) {
     sub.source === 'app' ? '📱 App (Apple / Google)' : sub.source;
   rowSource.style.display = 'flex';
 
-  // Actions
-  const isPremiumActive = sub.status === 'active' || sub.status === 'trialing';
+  // Actions — cancelled 但仍在期間內也算 Premium(可退費 / 仍能用)
+  const stillInPeriod = sub.expiresAt && sub.expiresAt > Date.now();
+  const isPremiumActive = (sub.status === 'active' || sub.status === 'trialing' || sub.status === 'cancelled') && stillInPeriod;
   if (isPremiumActive) {
     freeActions.style.display = 'none';
     premiumActions.style.display = 'block';
