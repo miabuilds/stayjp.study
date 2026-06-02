@@ -65,10 +65,12 @@ export const cancelSubscription = functions.onRequest(
         // 停止定期定額:CreditCardPeriodAction Action=CancelRevoke
         // 用 MerchantTradeNo(原訂單號,不是 TradeNo)
         const cfg = ecpayConfig();
+        // ECPay CreditCardPeriodAction:Action 只接受 "Cancel" / "ReAuth" / "Re-Pay" / "Refund"
+        // 「終止訂閱」用 "Cancel"
         const params: Record<string, string | number> = {
           MerchantID: cfg.merchantId,
           MerchantTradeNo: sub.ecpay_order,
-          Action: "CancelRevoke",
+          Action: "Cancel",
           TimeStamp: Math.floor(Date.now() / 1000),
         };
         params.CheckMacValue = checkMacValue(params);
