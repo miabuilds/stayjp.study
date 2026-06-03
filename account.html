@@ -451,11 +451,17 @@ function loadTransactions() {
     .limit(20)
     .onSnapshot(snap => {
       const list = document.getElementById('txnList');
-      if (snap.empty) {
+      // 過濾:只顯示用戶有感覺的交易(status=success/refunded)
+      // 隱藏 pending(createPayment 占位)/ failed(cancel/refund 失敗的內部 retry)
+      const visible = snap.docs.filter(d => {
+        const t = d.data();
+        return t.status === 'success' || t.status === 'refunded';
+      });
+      if (visible.length === 0) {
         list.innerHTML = '<p style="color:var(--tx3);font-size:13px;text-align:center;padding:14px">尚無交易紀錄</p>';
         return;
       }
-      list.innerHTML = snap.docs.map(d => {
+      list.innerHTML = visible.map(d => {
         const t = d.data();
         const date = t.occurred_at?.toDate ? t.occurred_at.toDate().toLocaleDateString('zh-TW') : '—';
         const typeLabel = ({
