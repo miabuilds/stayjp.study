@@ -1,17 +1,18 @@
 // ========================================================================
-// tool-quota.js — Freemium 工具額度限制(按「實際使用」計數版本)
+// tool-quota.js — Freemium 簡化版(2026-06-03)
 //
-// 設計改版 (2026-05-29):
-//   - 改成按 ACTION 計數(每答 1 張卡 / 念 1 句 / 答 1 題 = +1),不是 session
-//   - 額度收緊讓用戶嚐到甜頭就被擋 → 引導付費
-//   - 關掉重開不會 reset(localStorage 跟日期綁定,午夜 reset)
+// 規則:
+//   - 所有內容(單字 / 文法 / 例句 / 動詞變化表 / 語音)→ 完全免費,不限
+//   - 所有 Premium 練習工具共用「每日試用 3 次」一個 bucket:
+//     SRS / 快速背單字 / 跟讀 / 動詞變化練習 / Quiz / 讀解 / 聽力 / 今日故事
+//   - 模考:每等級 1 套 lifetime(獨立計數)
+//   - Premium = unlimited
 //
 // 設計原則:
 //   1. **不影響線上使用者** — 只對白名單 owner email 啟動 gating
-//   2. 訂閱中 = unlimited
-//   3. 免費版 SRS/快速背單字 共享 3 卡/天,跟讀 3 句/天,動詞 3 題/天,模考 1 套/等級 lifetime
+//      (其他 user 完全沒感覺,所有 tool 維持原本無限制行為)
 //
-// 等正式金流 ready + 想開放給所有 user 時,把 isOwner() 邏輯改成
+// 等正式金流 ready + 想開放給所有 user 時,把白名單檢查改成
 // 「登入 user 且 not premium」即可。
 // ========================================================================
 
@@ -21,17 +22,9 @@
     'stayjpplan@gmail.com',
   ]);
 
-  // 額度設定
-  const LIMITS = {
-    vocab:        3,   // SRS + 快速背單字 共用(每張答完算 1)
-    shadow:       3,   // 跟讀(每句念完算 1)
-    conjugate:    3,   // 動詞變化練習(每題答完算 1)
-    quiz:         3,   // 文法 / 單字測驗(每次 start 算 1 session)
-    reading:      1,   // 讀解練習(每天 1 篇)
-    listening:    1,   // 聽力練習 + 收藏聽力測驗(共用,每天 1 題)
-    daily_story:  1,   // 今日故事(每天 1 次預覽)
-    audio_play:  10,   // 單字 / 例句語音點擊(每次喇叭 +1)
-  };
+  // 統一每日試用次數
+  const DAILY_LIMIT = 3;
+  const KEY = 'daily';
 
   function dateKey() {
     const d = new Date();
@@ -52,7 +45,7 @@
 
   function isPremium() {
     if (!cachedSub) return false;
-    if (cachedSub.status !== 'active' && cachedSub.status !== 'trialing') return false;
+    if (cachedSub.status !== 'active' && cachedSub.status !== 'trialing' && cachedSub.status !== 'cancelled') return false;
     return (cachedSub.expiresAt || 0) > Date.now();
   }
 
@@ -64,50 +57,29 @@
     return true;
   }
 
-  function canUse(tool) {
+  function canUse(scope) {
     if (!shouldGate()) return true;
-    if (tool.startsWith('mock_exam_')) {
-      return localStorage.getItem('mock_completed_' + tool.replace('mock_exam_', '')) !== '1';
+    if (scope && scope.startsWith('mock_exam_')) {
+      return localStorage.getItem('mock_completed_' + scope.replace('mock_exam_', '')) !== '1';
     }
-    const limit = LIMITS[tool];
-    if (!limit) return true; // 未知工具不擋
-    return (loadCount()[tool] || 0) < limit;
+    return (loadCount()[KEY] || 0) < DAILY_LIMIT;
   }
 
-  function consume(tool) {
+  function consume(scope) {
     if (!shouldGate()) return;
-    if (tool.startsWith('mock_exam_')) return; // 模考另外標記
-    const counts = loadCount();
-    counts[tool] = (counts[tool] || 0) + 1;
-    saveCount(counts);
+    if (scope && scope.startsWith('mock_exam_')) return; // 模考另記
+    const c = loadCount();
+    c[KEY] = (c[KEY] || 0) + 1;
+    saveCount(c);
     refreshBadge();
   }
 
-  function used(tool) {
-    if (tool.startsWith('mock_exam_')) {
-      return localStorage.getItem('mock_completed_' + tool.replace('mock_exam_', '')) === '1' ? 1 : 0;
-    }
-    return loadCount()[tool] || 0;
-  }
-
-  function showPaywall(tool) {
-    const labels = {
-      vocab: '單字背誦(SRS / 快速背單字)',
-      shadow: '跟讀練習',
-      conjugate: '動詞變化練習',
-      quiz: '測驗',
-      reading: '讀解練習',
-      listening: '聽力練習',
-      daily_story: '今日故事',
-      audio_play: '單字語音',
-    };
-    const label = tool.startsWith('mock_exam_')
-      ? `${tool.replace('mock_exam_', '').toUpperCase()} 模擬考`
-      : (labels[tool] || tool);
-    const msg = tool.startsWith('mock_exam_')
-      ? '免費版每等級只能試 1 套模考,你已經完成過了。\n升級 Premium 可無限做模考 + 詳解 + 錯題回顧。'
-      : `免費版每天 ${LIMITS[tool]} 次,你用完了。\n升級 Premium 無限次使用,還能跨裝置同步。`;
-    if (confirm(`🚫 ${label} 免費額度用完\n\n${msg}\n\n要看訂閱方案嗎?`)) {
+  function showPaywall(scope) {
+    const isMock = scope && scope.startsWith('mock_exam_');
+    const msg = isMock
+      ? `免費版每等級可試 1 套模考,你已完成過 ${scope.replace('mock_exam_','').toUpperCase()}。\n升級 Premium 可無限做模考 + 詳解 + 錯題回顧。`
+      : `免費版每天可試用 Premium 工具 ${DAILY_LIMIT} 次,你用完了。\n升級 Premium 無限次使用,還能跨裝置同步。`;
+    if (confirm(`免費額度用完\n\n${msg}\n\n要看訂閱方案嗎?`)) {
       window.location.href = 'pricing.html';
     }
   }
@@ -123,32 +95,20 @@
       badge = document.createElement('div');
       badge.id = 'quotaBadge';
       badge.style.cssText = 'position:fixed;bottom:14px;left:14px;background:rgba(0,0,0,.78);color:#fff;padding:8px 12px;border-radius:10px;font-size:11px;font-family:-apple-system,sans-serif;line-height:1.5;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,.2);cursor:pointer;max-width:200px';
-      badge.title = '免費版 quota 顯示(只 owner 看得到)。點擊看訂閱狀態。';
+      badge.title = '免費版 quota(只 owner 看得到)。點擊看訂閱狀態。';
       badge.onclick = () => window.location.href = 'account.html';
       document.body.appendChild(badge);
     }
     const c = loadCount();
-    const tag = isPremium() ? '✅ Premium' : '🆓 免費版';
-    function row(label, key) {
-      const used = c[key] || 0;
-      const limit = LIMITS[key];
-      const color = used >= limit ? '#EF4444' : (used >= limit - 1 ? '#F59E0B' : '#fff');
-      return `<div style="color:${color}">${label}: ${used}/${limit}</div>`;
-    }
+    const used = c[KEY] || 0;
+    const color = used >= DAILY_LIMIT ? '#EF4444' : (used >= DAILY_LIMIT - 1 ? '#F59E0B' : '#fff');
     badge.innerHTML = `
-      <div style="font-weight:700;margin-bottom:4px">${tag} · 今日額度</div>
-      ${row('單字', 'vocab')}
-      ${row('跟讀', 'shadow')}
-      ${row('動詞', 'conjugate')}
-      ${row('測驗', 'quiz')}
-      ${row('讀解', 'reading')}
-      ${row('聽力', 'listening')}
-      ${row('故事', 'daily_story')}
-      ${row('語音', 'audio_play')}
+      <div style="font-weight:700;margin-bottom:2px">免費版</div>
+      <div style="color:${color}">今日試用 ${used}/${DAILY_LIMIT}</div>
     `;
   }
 
-  // ── Firestore 訂閱監聽 ──
+  // ── Firestore subscription watcher ──
   function watchSubscription() {
     if (typeof firebase === 'undefined' || !firebase.auth) return;
     firebase.auth().onAuthStateChanged(user => {
@@ -164,107 +124,84 @@
     });
   }
 
-  // ── 包 wrapper ──
-  // 用 function 內容判斷是否已包過,而非 key map(避免 method+toolName 重複時誤判)
+  // ── 包 wrapper(用 toString sentinel dedupe)──
   function isAlreadyWrapped(fn) {
     return typeof fn === 'function' && fn.toString().includes('__TQ_WRAPPED__');
   }
 
-  function wrapStart(obj, method, toolName) {
+  function wrapStart(obj, method) {
     if (!obj || typeof obj[method] !== 'function') return;
     if (isAlreadyWrapped(obj[method])) return;
     const orig = obj[method];
     obj[method] = function(...args) {
       /* __TQ_WRAPPED__ */
-      if (!canUse(toolName)) { showPaywall(toolName); return; }
+      if (!canUse()) { showPaywall(); return; }
       return orig.apply(this, args);
     };
   }
 
-  function wrapAction(obj, method, toolName) {
+  function wrapAction(obj, method) {
     if (!obj || typeof obj[method] !== 'function') return;
     if (isAlreadyWrapped(obj[method])) return;
     const orig = obj[method];
     obj[method] = function(...args) {
       /* __TQ_WRAPPED__ */
-      if (!canUse(toolName)) { showPaywall(toolName); return; }
-      consume(toolName);
+      if (!canUse()) { showPaywall(); return; }
+      consume();
       return orig.apply(this, args);
     };
   }
 
-  // 模組由 index.html 顯式掛到 window(top-level const 不會自動掛 globalThis)
-  function getGlobal(name) {
-    return window[name];
-  }
+  function getGlobal(name) { return window[name]; }
 
   function applyGating() {
-    // ── SRS / 快速背單字 共用 vocab bucket ──
+    // ── 主動練習工具(action-based,每次操作 +1)──
     const SRS_ = getGlobal('SRS');
-    if (SRS_) {
-      wrapStart(SRS_, 'start', 'vocab');
-      wrapAction(SRS_, 'rate', 'vocab');
-      wrapAction(SRS_, 'recordGrade', 'vocab');
-    }
+    if (SRS_) { wrapStart(SRS_, 'start'); wrapAction(SRS_, 'rate'); wrapAction(SRS_, 'recordGrade'); }
+
     const FlashCard_ = getGlobal('FlashCard');
-    if (FlashCard_) {
-      wrapStart(FlashCard_, 'start', 'vocab');
-      wrapStart(FlashCard_, 'beginToday', 'vocab');
-      wrapAction(FlashCard_, 'answer', 'vocab');
-    }
+    if (FlashCard_) { wrapStart(FlashCard_, 'start'); wrapStart(FlashCard_, 'beginToday'); wrapAction(FlashCard_, 'answer'); }
 
-    // ── 跟讀 ──
     const Shadow_ = getGlobal('Shadow');
-    if (Shadow_) {
-      wrapStart(Shadow_, 'start', 'shadow');
-      wrapStart(Shadow_, 'startCurrent', 'shadow');
-      wrapStart(Shadow_, 'startFavs', 'shadow');
-      // playOnce 由 index.html 內注入呼叫 consumeShadowOrBlock
-    }
+    if (Shadow_) { wrapStart(Shadow_, 'start'); wrapStart(Shadow_, 'startCurrent'); wrapStart(Shadow_, 'startFavs'); }
 
-    // ── 動詞變化練習 ──
     const GrammarDrill_ = getGlobal('GrammarDrill');
-    if (GrammarDrill_) {
-      wrapStart(GrammarDrill_, 'start', 'conjugate');
-      wrapAction(GrammarDrill_, 'rate', 'conjugate');
-      wrapAction(GrammarDrill_, 'answerQuiz', 'conjugate');
-    }
+    if (GrammarDrill_) { wrapStart(GrammarDrill_, 'start'); wrapAction(GrammarDrill_, 'rate'); wrapAction(GrammarDrill_, 'answerQuiz'); }
 
-    // ── 測驗 Quiz ──
+    // ── session-based(start 才算 1)──
     const Quiz_ = getGlobal('Quiz');
-    if (Quiz_) wrapStart(Quiz_, 'start', 'quiz');
+    if (Quiz_) wrapStart(Quiz_, 'start');
 
-    // ── 讀解練習 ──
     const Reading_ = getGlobal('Reading');
-    if (Reading_) wrapStart(Reading_, 'start', 'reading');
+    if (Reading_) wrapStart(Reading_, 'start');
 
-    // ── 聽力 + 收藏聽力測驗 ──
     const Listening_ = getGlobal('Listening');
-    if (Listening_) wrapStart(Listening_, 'start', 'listening');
+    if (Listening_) wrapStart(Listening_, 'start');
     const Stats_ = getGlobal('Stats');
-    if (Stats_ && typeof Stats_.quizFavListening === 'function') {
-      wrapStart(Stats_, 'quizFavListening', 'listening');
-    }
+    if (Stats_ && typeof Stats_.quizFavListening === 'function') wrapStart(Stats_, 'quizFavListening');
 
-    // ── 今日故事 ──
     const DailyStory_ = getGlobal('DailyStory');
-    if (DailyStory_) wrapStart(DailyStory_, 'open', 'daily_story');
-
-    // ── 單字 / 例句語音 ──
-    // `function speak(...)` 是 function declaration,既在 global scope 也在 window 上。
-    // HTML inline onclick="speak(...)" 透過 window 解析 → 覆蓋 window.speak 就會生效。
-    // 模組內部呼叫 speak() 走 global binding(沒被覆寫)→ 不計數,正合我意:工具內的音不額外算。
-    if (typeof window.speak === 'function' && !isAlreadyWrapped(window.speak)) {
-      const origSpeak = window.speak;
-      window.speak = function() {
+    if (DailyStory_) wrapStart(DailyStory_, 'open');
+    // start session 同時計 +1(因為 daily story 開了就讀完了沒 per-action)
+    if (DailyStory_ && !isAlreadyWrapped(DailyStory_.open)) {
+      // wrapStart 內已只 check 沒 consume。改成 action-based:
+      // 改不易,簡單做法:讓 open 開了就算 +1
+    }
+    // 簡單處理:讓 DailyStory.open 也算 action(因為一次 open 就是 1 篇故事)
+    if (DailyStory_ && DailyStory_.open && !DailyStory_._tqConsumeWrapped) {
+      const origOpen = DailyStory_.open;
+      DailyStory_.open = function(...args) {
         /* __TQ_WRAPPED__ */
-        if (!canUse('audio_play')) { showPaywall('audio_play'); return; }
-        consume('audio_play');
-        return origSpeak.apply(this, arguments);
+        if (!canUse()) { showPaywall(); return; }
+        consume();
+        return origOpen.apply(this, args);
       };
+      DailyStory_._tqConsumeWrapped = true;
     }
 
-    // ── 模考 ──
+    // 語音 speak — 不擋(歸入內容瀏覽)
+
+    // ── 模考:獨立 lifetime 計數 ──
     const MockExam_ = getGlobal('MockExam');
     if (MockExam_ && MockExam_.startSection && !isAlreadyWrapped(MockExam_.startSection)) {
       const orig = MockExam_.startSection;
@@ -277,23 +214,23 @@
     }
   }
 
+  // For mock exam completion (called from mock-exam.js)
   function markMockCompleted(level) {
     if (!shouldGate()) return;
     localStorage.setItem('mock_completed_' + level.toLowerCase(), '1');
     refreshBadge();
   }
 
-  // ── Shadow 跟讀 per-sentence 計數(由 index.html 內的 playOnce 主動呼)──
+  // 跟讀 per-sentence 計數(由 index.html 內 playOnce 呼)
   function consumeShadowOrBlock() {
-    // 給 Shadow.playOnce 在每句開始播之前呼;若回 false 表示已超額,Shadow 應停止
-    if (!canUse('shadow')) { showPaywall('shadow'); return false; }
-    consume('shadow');
+    if (!canUse()) { showPaywall(); return false; }
+    consume();
     return true;
   }
 
   window.ToolQuota = {
-    canUse, consume, used, showPaywall,
-    shouldGate, isPremium,
+    canUse, consume, used: () => loadCount()[KEY] || 0,
+    showPaywall, shouldGate, isPremium,
     markMockCompleted,
     consumeShadowOrBlock,
     refreshBadge,
