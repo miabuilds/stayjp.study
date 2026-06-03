@@ -195,7 +195,7 @@ export const refund = functions.onRequest(
         refunded_amount: refundAmount,
         new_status: "refunded",
         will_blacklist: bl.permanently_blocked,
-        message: `已退費 NT$${refundAmount},5 個工作天內入帳。${bl.permanently_blocked ? "因第 2 次退費,此帳號已限制再次訂閱。" : ""}`,
+        message: `已退費 NT$${refundAmount},約 7-14 個工作天由綠界 / 發卡銀行退至原信用卡。${bl.permanently_blocked ? "因第 2 次退費,此帳號已限制再次訂閱。" : ""}`,
       });
     } catch (err) {
       console.error("refund error:", err);

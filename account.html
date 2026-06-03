@@ -421,7 +421,7 @@ async function cancelRenew() {
 }
 
 async function requestRefund() {
-  if (!confirm('確定要申請退費?\n\n按下確認後:\n• 訂閱立刻降級為免費版\n• 退款 3-5 工作天內回到信用卡\n• 已訂閱期間使用記錄會保留\n• 退費滿 2 次後該帳號將永久無法訂閱')) return;
+  if (!confirm('確定要申請退費?\n\n按下確認後:\n• 訂閱立刻降級為免費版\n• 退款 7-14 個工作天由綠界 / 發卡銀行退回原信用卡\n• 已訂閱期間使用記錄會保留\n• 退費滿 2 次後該帳號將永久無法訂閱')) return;
   const btn = document.getElementById('btnRefund');
   if (btn) { btn.disabled = true; btn.textContent = '處理中…'; }
   try {
