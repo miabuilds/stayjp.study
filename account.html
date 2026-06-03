@@ -72,134 +72,134 @@ a:hover{text-decoration:underline}
 <body>
 
 <header class="hd">
-  <h1><a href="home.html" style="color:inherit;text-decoration:none">日本再留計劃</a></h1>
-  <nav class="nav">
-    <a href="index.html">學習</a>
-    <a href="pricing.html">方案</a>
-    <a href="contact.html">聯絡</a>
-  </nav>
+ <h1><a href="home.html" style="color:inherit;text-decoration:none">日本再留計劃</a></h1>
+ <nav class="nav">
+ <a href="index.html">學習</a>
+ <a href="pricing.html">方案</a>
+ <a href="contact.html">聯絡</a>
+ </nav>
 </header>
 
 <main class="main">
 
-  <div id="gateView" class="gate" style="display:none">
-    <h2>🔒 我的帳號</h2>
-    <p>登入 Google 帳號才能管理訂閱。免費版用戶也可以登入,讓進度雲端同步、跨裝置使用。</p>
-    <button id="loginBtn" class="btn primary">用 Google 登入</button>
-  </div>
+ <div id="gateView" class="gate" style="display:none">
+ <h2> 我的帳號</h2>
+ <p>登入 Google 帳號才能管理訂閱。免費版用戶也可以登入,讓進度雲端同步、跨裝置使用。</p>
+ <button id="loginBtn" class="btn primary">用 Google 登入</button>
+ </div>
 
-  <div id="appView" style="display:none">
+ <div id="appView" style="display:none">
 
-    <!-- 帳號 -->
-    <div class="card">
-      <h2>👤 我的帳號</h2>
-      <div class="status-row">
-        <span class="lbl">Email</span>
-        <span class="val" id="userEmail">—</span>
-      </div>
-      <div class="status-row">
-        <span class="lbl">UID</span>
-        <span class="val" id="userUid" style="font-family:monospace;font-size:11px">—</span>
-      </div>
-      <div class="actions">
-        <button class="btn" onclick="logout()">登出</button>
-      </div>
-    </div>
+ <!-- 帳號 -->
+ <div class="card">
+ <h2> 我的帳號</h2>
+ <div class="status-row">
+ <span class="lbl">Email</span>
+ <span class="val" id="userEmail">—</span>
+ </div>
+ <div class="status-row">
+ <span class="lbl">UID</span>
+ <span class="val" id="userUid" style="font-family:monospace;font-size:11px">—</span>
+ </div>
+ <div class="actions">
+ <button class="btn" onclick="logout()">登出</button>
+ </div>
+ </div>
 
-    <!-- 訂閱狀態 -->
-    <div class="card">
-      <h2>💎 訂閱狀態</h2>
-      <div class="status-row">
-        <span class="lbl">目前方案</span>
-        <span class="val" id="planLabel">免費版 <span class="badge b-free">FREE</span></span>
-      </div>
-      <div class="status-row" id="rowStatus" style="display:none">
-        <span class="lbl">狀態</span>
-        <span class="val" id="statusBadge">—</span>
-      </div>
-      <div class="status-row" id="rowExpiry" style="display:none">
-        <span class="lbl">到期日</span>
-        <span class="val" id="expiryDate">—</span>
-      </div>
-      <div class="status-row" id="rowRenew" style="display:none">
-        <span class="lbl">自動續訂</span>
-        <span class="val" id="willRenew">—</span>
-      </div>
-      <div class="status-row" id="rowSource" style="display:none">
-        <span class="lbl">購買來源</span>
-        <span class="val" id="sourceLabel">—</span>
-      </div>
+ <!-- 訂閱狀態 -->
+ <div class="card">
+ <h2> 訂閱狀態</h2>
+ <div class="status-row">
+ <span class="lbl">目前方案</span>
+ <span class="val" id="planLabel">免費版 <span class="badge b-free">FREE</span></span>
+ </div>
+ <div class="status-row" id="rowStatus" style="display:none">
+ <span class="lbl">狀態</span>
+ <span class="val" id="statusBadge">—</span>
+ </div>
+ <div class="status-row" id="rowExpiry" style="display:none">
+ <span class="lbl">到期日</span>
+ <span class="val" id="expiryDate">—</span>
+ </div>
+ <div class="status-row" id="rowRenew" style="display:none">
+ <span class="lbl">自動續訂</span>
+ <span class="val" id="willRenew">—</span>
+ </div>
+ <div class="status-row" id="rowSource" style="display:none">
+ <span class="lbl">購買來源</span>
+ <span class="val" id="sourceLabel">—</span>
+ </div>
 
-      <div id="freeActions" style="display:none">
-        <p style="font-size:13px;color:var(--tx2);margin-top:14px;line-height:1.7">
-          免費版能用所有內容瀏覽 + 工具每天 3 次(SRS / 跟讀 / 動詞變化練習)+ 模考每等級 1 套。
-          升級 Premium 解鎖無限次。
-        </p>
-        <div class="actions">
-          <a href="pricing.html" class="btn primary">查看方案 →</a>
-        </div>
-      </div>
+ <div id="freeActions" style="display:none">
+ <p style="font-size:13px;color:var(--tx2);margin-top:14px;line-height:1.7">
+ 免費版能用所有內容瀏覽 + 工具每天 3 次(SRS / 跟讀 / 動詞變化練習)+ 模考每等級 1 套。
+ 升級 Premium 解鎖無限次。
+ </p>
+ <div class="actions">
+ <a href="pricing.html" class="btn primary">查看方案 →</a>
+ </div>
+ </div>
 
-      <div id="premiumActions" style="display:none">
-        <p style="font-size:13px;color:var(--tx2);margin-top:14px">
-          感謝你的支持!以下是訂閱管理選項。
-        </p>
-        <div class="actions">
-          <button class="btn" id="btnCancelRenew" onclick="cancelRenew()">關閉自動續訂</button>
-          <a class="btn primary" id="btnResubscribe" href="pricing.html" style="display:none">重新訂閱(恢復自動續扣)</a>
-          <button class="btn danger" id="btnRefund" onclick="requestRefund()">申請退費</button>
-        </div>
-        <div id="resubscribeInfo" class="info-box" style="margin-top:14px;display:none">
-          ⓘ 已關閉自動續訂。到期日前仍可正常使用,到期後降為免費版。
-          想恢復續扣必須重新訂閱(綠界規則:已取消的定期定額無法回復)。
-        </div>
-        <div id="refundInfo" class="info-box" style="margin-top:14px;display:none"></div>
-      </div>
+ <div id="premiumActions" style="display:none">
+ <p style="font-size:13px;color:var(--tx2);margin-top:14px">
+ 感謝你的支持!以下是訂閱管理選項。
+ </p>
+ <div class="actions">
+ <button class="btn" id="btnCancelRenew" onclick="cancelRenew()">關閉自動續訂</button>
+ <a class="btn primary" id="btnResubscribe" href="pricing.html" style="display:none">重新訂閱(恢復自動續扣)</a>
+ <button class="btn danger" id="btnRefund" onclick="requestRefund()">申請退費</button>
+ </div>
+ <div id="resubscribeInfo" class="info-box" style="margin-top:14px;display:none">
+ 已關閉自動續訂。到期日前仍可正常使用,到期後降為免費版。
+ 想恢復續扣必須重新訂閱(綠界規則:已取消的定期定額無法回復)。
+ </div>
+ <div id="refundInfo" class="info-box" style="margin-top:14px;display:none"></div>
+ </div>
 
-      <!-- App 訂戶的特殊提示 -->
-      <div id="appPlatformNote" class="warn-box" style="display:none;margin-top:14px">
-        ⚠️ 你的訂閱是透過 <strong id="appPlatform">App</strong> 購買。取消請至:
-        <ul style="margin:8px 0 0 18px">
-          <li id="iosNote" style="display:none">iOS:設定 → Apple ID → 訂閱項目 → StayJP → 取消</li>
-          <li id="androidNote" style="display:none">Android:Google Play → 帳戶 → 訂閱 → StayJP → 取消</li>
-        </ul>
-        <p style="margin-top:6px;font-size:12px">退費也須透過原 App 商店申請。</p>
-      </div>
-    </div>
+ <!-- App 訂戶的特殊提示 -->
+ <div id="appPlatformNote" class="warn-box" style="display:none;margin-top:14px">
+ 你的訂閱是透過 <strong id="appPlatform">App</strong> 購買。取消請至:
+ <ul style="margin:8px 0 0 18px">
+ <li id="iosNote" style="display:none">iOS:設定 → Apple ID → 訂閱項目 → StayJP → 取消</li>
+ <li id="androidNote" style="display:none">Android:Google Play → 帳戶 → 訂閱 → StayJP → 取消</li>
+ </ul>
+ <p style="margin-top:6px;font-size:12px">退費也須透過原 App 商店申請。</p>
+ </div>
+ </div>
 
-    <!-- 交易紀錄 -->
-    <div class="card" id="txnCard" style="display:none">
-      <h2>📜 交易紀錄</h2>
-      <div class="txn-list" id="txnList">載入中…</div>
-    </div>
+ <!-- 交易紀錄 -->
+ <div class="card" id="txnCard" style="display:none">
+ <h2> 交易紀錄</h2>
+ <div class="txn-list" id="txnList">載入中…</div>
+ </div>
 
-    <!-- 早鳥剩餘名額 -->
-    <div class="card">
-      <h2>🐦 早鳥優惠</h2>
-      <div class="status-row">
-        <span class="lbl">剩餘名額</span>
-        <span class="val" id="earlyBirdCount">— / 100</span>
-      </div>
-      <p style="font-size:13px;color:var(--tx2);margin-top:14px">
-        前 100 訂戶限定:NT$990 / 年,<strong>終身鎖價 forever</strong>。
-        滿額後新訂戶就是 NT$1,490 / 年。
-      </p>
-      <div class="actions">
-        <a href="pricing.html" class="btn primary">查看方案</a>
-      </div>
-    </div>
+ <!-- 早鳥剩餘名額 -->
+ <div class="card">
+ <h2> 早鳥優惠</h2>
+ <div class="status-row">
+ <span class="lbl">剩餘名額</span>
+ <span class="val" id="earlyBirdCount">— / 100</span>
+ </div>
+ <p style="font-size:13px;color:var(--tx2);margin-top:14px">
+ 前 100 訂戶限定:NT$990 / 年,<strong>終身鎖價 forever</strong>。
+ 滿額後新訂戶就是 NT$1,490 / 年。
+ </p>
+ <div class="actions">
+ <a href="pricing.html" class="btn primary">查看方案</a>
+ </div>
+ </div>
 
-  </div>
+ </div>
 </main>
 
 <footer class="ft">
-  日本再留計劃 (Stay JP) &mdash;
-  <a href="home.html">回首頁</a> ·
-  <a href="pricing.html">方案</a> ·
-  <a href="contact.html">聯絡客服</a> ·
-  <a href="terms.html">服務條款</a> ·
-  <a href="privacy.html">隱私權</a> ·
-  <a href="refund.html">退費政策</a>
+ 日本再留計劃 (Stay JP) &mdash;
+ <a href="home.html">回首頁</a> ·
+ <a href="pricing.html">方案</a> ·
+ <a href="contact.html">聯絡客服</a> ·
+ <a href="terms.html">服務條款</a> ·
+ <a href="privacy.html">隱私權</a> ·
+ <a href="refund.html">退費政策</a>
 </footer>
 
 <!-- Firebase SDK -->
@@ -209,29 +209,29 @@ a:hover{text-decoration:underline}
 
 <script>
 const fbConfig = {
-  apiKey: "AIzaSyDnmg2XOuvwgE8m8xCF5sS4o0nQYoUplPI",
-  authDomain: "jpnote-1bdd6.firebaseapp.com",
-  projectId: "jpnote-1bdd6",
-  storageBucket: "jpnote-1bdd6.firebasestorage.app",
-  messagingSenderId: "666368174384"
+ apiKey: "AIzaSyDnmg2XOuvwgE8m8xCF5sS4o0nQYoUplPI",
+ authDomain: "jpnote-1bdd6.firebaseapp.com",
+ projectId: "jpnote-1bdd6",
+ storageBucket: "jpnote-1bdd6.firebasestorage.app",
+ messagingSenderId: "666368174384"
 };
 firebase.initializeApp(fbConfig);
-  try { firebase.firestore().settings({ experimentalForceLongPolling: true }); } catch (e) {}
+ try { firebase.firestore().settings({ experimentalForceLongPolling: true }); } catch (e) {}
 const db = firebase.firestore();
 const auth = firebase.auth();
 
 const PLAN_LABELS = {
-  monthly: '月費訂閱',
-  yearly: '年費訂閱',
-  yearly_early_bird: '🐦 早鳥年費',
-  lifetime: '🏆 終身方案',
+ monthly: '月費訂閱',
+ yearly: '年費訂閱',
+ yearly_early_bird: ' 早鳥年費',
+ lifetime: ' 終身方案',
 };
 
 const STATUS_LABELS = {
-  active: { text: '✓ 啟用中', cls: 'b-active' },
-  cancelled: { text: '使用中・到期後不續扣', cls: 'b-cancelled' },
-  refunded: { text: '已退費', cls: 'b-refunded' },
-  expired: { text: '已過期', cls: 'b-expired' },
+ active: { text: ' 啟用中', cls: 'b-active' },
+ cancelled: { text: '使用中・到期後不續扣', cls: 'b-cancelled' },
+ refunded: { text: '已退費', cls: 'b-refunded' },
+ expired: { text: '已過期', cls: 'b-expired' },
 };
 
 let currentUser = null;
@@ -240,178 +240,178 @@ let txnUnsub = null;
 
 // ── auth ──
 auth.onAuthStateChanged(user => {
-  const gate = document.getElementById('gateView');
-  const app = document.getElementById('appView');
-  if (!user) {
-    gate.style.display = 'flex';
-    app.style.display = 'none';
-    if (txnUnsub) txnUnsub();
-    return;
-  }
-  currentUser = user;
-  gate.style.display = 'none';
-  app.style.display = 'block';
-  document.getElementById('userEmail').textContent = user.email || '—';
-  document.getElementById('userUid').textContent = user.uid;
-  loadSubscription();
-  loadEarlyBird();
+ const gate = document.getElementById('gateView');
+ const app = document.getElementById('appView');
+ if (!user) {
+ gate.style.display = 'flex';
+ app.style.display = 'none';
+ if (txnUnsub) txnUnsub();
+ return;
+ }
+ currentUser = user;
+ gate.style.display = 'none';
+ app.style.display = 'block';
+ document.getElementById('userEmail').textContent = user.email || '—';
+ document.getElementById('userUid').textContent = user.uid;
+ loadSubscription();
+ loadEarlyBird();
 });
 
 document.getElementById('loginBtn').onclick = () => {
-  const provider = new firebase.auth.GoogleAuthProvider();
-  provider.setCustomParameters({ prompt: 'select_account' });
-  auth.signInWithPopup(provider).catch(err => alert('登入失敗:' + err.message));
+ const provider = new firebase.auth.GoogleAuthProvider();
+ provider.setCustomParameters({ prompt: 'select_account' });
+ auth.signInWithPopup(provider).catch(err => alert('登入失敗:' + err.message));
 };
 
 function logout() { auth.signOut().then(() => location.reload()); }
 
 // ── subscription ──
 function loadSubscription() {
-  db.collection('users').doc(currentUser.uid).onSnapshot(doc => {
-    const sub = doc.data()?.subscription || null;
-    currentSub = sub;
-    renderSubscription(sub);
-    if (sub) loadTransactions(); else document.getElementById('txnCard').style.display = 'none';
-  }, err => {
-    console.warn('subscription load failed', err);
-  });
+ db.collection('users').doc(currentUser.uid).onSnapshot(doc => {
+ const sub = doc.data()?.subscription || null;
+ currentSub = sub;
+ renderSubscription(sub);
+ if (sub) loadTransactions(); else document.getElementById('txnCard').style.display = 'none';
+ }, err => {
+ console.warn('subscription load failed', err);
+ });
 }
 
 function renderSubscription(sub) {
-  const planLabel = document.getElementById('planLabel');
-  const rowStatus = document.getElementById('rowStatus');
-  const rowExpiry = document.getElementById('rowExpiry');
-  const rowRenew = document.getElementById('rowRenew');
-  const rowSource = document.getElementById('rowSource');
-  const freeActions = document.getElementById('freeActions');
-  const premiumActions = document.getElementById('premiumActions');
-  const appNote = document.getElementById('appPlatformNote');
+ const planLabel = document.getElementById('planLabel');
+ const rowStatus = document.getElementById('rowStatus');
+ const rowExpiry = document.getElementById('rowExpiry');
+ const rowRenew = document.getElementById('rowRenew');
+ const rowSource = document.getElementById('rowSource');
+ const freeActions = document.getElementById('freeActions');
+ const premiumActions = document.getElementById('premiumActions');
+ const appNote = document.getElementById('appPlatformNote');
 
-  if (!sub) {
-    planLabel.innerHTML = '免費版 <span class="badge b-free">FREE</span>';
-    rowStatus.style.display = 'none';
-    rowExpiry.style.display = 'none';
-    rowRenew.style.display = 'none';
-    rowSource.style.display = 'none';
-    freeActions.style.display = 'block';
-    premiumActions.style.display = 'none';
-    appNote.style.display = 'none';
-    return;
-  }
+ if (!sub) {
+ planLabel.innerHTML = '免費版 <span class="badge b-free">FREE</span>';
+ rowStatus.style.display = 'none';
+ rowExpiry.style.display = 'none';
+ rowRenew.style.display = 'none';
+ rowSource.style.display = 'none';
+ freeActions.style.display = 'block';
+ premiumActions.style.display = 'none';
+ appNote.style.display = 'none';
+ return;
+ }
 
-  // Plan label
-  const pl = PLAN_LABELS[sub.plan] || sub.plan;
-  const earlyBird = sub.is_early_bird ? '<span class="badge b-early-bird">早鳥鎖價</span>' : '';
-  planLabel.innerHTML = `${pl} ${earlyBird}`;
+ // Plan label
+ const pl = PLAN_LABELS[sub.plan] || sub.plan;
+ const earlyBird = sub.is_early_bird ? '<span class="badge b-early-bird">早鳥鎖價</span>' : '';
+ planLabel.innerHTML = `${pl} ${earlyBird}`;
 
-  // Status
-  const st = STATUS_LABELS[sub.status] || { text: sub.status, cls: 'b-free' };
-  document.getElementById('statusBadge').innerHTML = `<span class="badge ${st.cls}">${st.text}</span>`;
-  rowStatus.style.display = 'flex';
+ // Status
+ const st = STATUS_LABELS[sub.status] || { text: sub.status, cls: 'b-free' };
+ document.getElementById('statusBadge').innerHTML = `<span class="badge ${st.cls}">${st.text}</span>`;
+ rowStatus.style.display = 'flex';
 
-  // Expiry
-  if (sub.plan === 'lifetime') {
-    document.getElementById('expiryDate').textContent = '永久(終身方案)';
-  } else if (sub.expiresAt) {
-    const d = new Date(sub.expiresAt);
-    document.getElementById('expiryDate').textContent = d.toLocaleDateString('zh-TW', { year: 'numeric', month: '2-digit', day: '2-digit' });
-  }
-  rowExpiry.style.display = 'flex';
+ // Expiry
+ if (sub.plan === 'lifetime') {
+ document.getElementById('expiryDate').textContent = '永久(終身方案)';
+ } else if (sub.expiresAt) {
+ const d = new Date(sub.expiresAt);
+ document.getElementById('expiryDate').textContent = d.toLocaleDateString('zh-TW', { year: 'numeric', month: '2-digit', day: '2-digit' });
+ }
+ rowExpiry.style.display = 'flex';
 
-  // Will renew
-  if (sub.plan !== 'lifetime') {
-    document.getElementById('willRenew').innerHTML = sub.willRenew ? '✓ 開啟' : '✗ 關閉(到期不續扣)';
-    rowRenew.style.display = 'flex';
-  }
+ // Will renew
+ if (sub.plan !== 'lifetime') {
+ document.getElementById('willRenew').innerHTML = sub.willRenew ? ' 開啟' : ' 關閉(到期不續扣)';
+ rowRenew.style.display = 'flex';
+ }
 
-  // Source
-  document.getElementById('sourceLabel').textContent =
-    sub.source === 'web' ? '🌐 網頁 (綠界)' :
-    sub.source === 'app' ? '📱 App (Apple / Google)' : sub.source;
-  rowSource.style.display = 'flex';
+ // Source
+ document.getElementById('sourceLabel').textContent =
+ sub.source === 'web' ? ' 網頁 (綠界)' :
+ sub.source === 'app' ? ' App (Apple / Google)' : sub.source;
+ rowSource.style.display = 'flex';
 
-  // Actions — cancelled 但仍在期間內也算 Premium(可退費 / 仍能用)
-  const stillInPeriod = sub.expiresAt && sub.expiresAt > Date.now();
-  const isPremiumActive = (sub.status === 'active' || sub.status === 'trialing' || sub.status === 'cancelled') && stillInPeriod;
-  if (isPremiumActive) {
-    freeActions.style.display = 'none';
-    premiumActions.style.display = 'block';
+ // Actions — cancelled 但仍在期間內也算 Premium(可退費 / 仍能用)
+ const stillInPeriod = sub.expiresAt && sub.expiresAt > Date.now();
+ const isPremiumActive = (sub.status === 'active' || sub.status === 'trialing' || sub.status === 'cancelled') && stillInPeriod;
+ if (isPremiumActive) {
+ freeActions.style.display = 'none';
+ premiumActions.style.display = 'block';
 
-    // App 訂戶不能在這取消
-    if (sub.source === 'app') {
-      appNote.style.display = 'block';
-      document.getElementById('btnCancelRenew').style.display = 'none';
-      document.getElementById('btnRefund').style.display = 'none';
-      // App store 判斷
-      if (sub.apple_txn) {
-        document.getElementById('appPlatform').textContent = 'iOS App Store';
-        document.getElementById('iosNote').style.display = 'list-item';
-      } else if (sub.google_txn) {
-        document.getElementById('appPlatform').textContent = 'Google Play';
-        document.getElementById('androidNote').style.display = 'list-item';
-      }
-    } else {
-      appNote.style.display = 'none';
-      const btnCancel = document.getElementById('btnCancelRenew');
-      const btnResub  = document.getElementById('btnResubscribe');
-      const resubInfo = document.getElementById('resubscribeInfo');
-      btnCancel.style.display = '';
-      btnResub.style.display = 'none';
-      resubInfo.style.display = 'none';
-      document.getElementById('btnRefund').style.display = '';
-      // willRenew=true → 顯示「關閉自動續訂」可按
-      // willRenew=false → 藏「關閉」、顯示「重新訂閱」+ info 解釋
-      if (!sub.willRenew && sub.plan !== 'lifetime') {
-        btnCancel.style.display = 'none';
-        btnResub.style.display = '';
-        resubInfo.style.display = 'block';
-      } else {
-        btnCancel.disabled = sub.plan === 'lifetime';
-      }
-      // 終身無自動續訂概念
-      if (sub.plan === 'lifetime') {
-        btnCancel.style.display = 'none';
-        btnResub.style.display = 'none';
-        resubInfo.style.display = 'none';
-      }
+ // App 訂戶不能在這取消
+ if (sub.source === 'app') {
+ appNote.style.display = 'block';
+ document.getElementById('btnCancelRenew').style.display = 'none';
+ document.getElementById('btnRefund').style.display = 'none';
+ // App store 判斷
+ if (sub.apple_txn) {
+ document.getElementById('appPlatform').textContent = 'iOS App Store';
+ document.getElementById('iosNote').style.display = 'list-item';
+ } else if (sub.google_txn) {
+ document.getElementById('appPlatform').textContent = 'Google Play';
+ document.getElementById('androidNote').style.display = 'list-item';
+ }
+ } else {
+ appNote.style.display = 'none';
+ const btnCancel = document.getElementById('btnCancelRenew');
+ const btnResub = document.getElementById('btnResubscribe');
+ const resubInfo = document.getElementById('resubscribeInfo');
+ btnCancel.style.display = '';
+ btnResub.style.display = 'none';
+ resubInfo.style.display = 'none';
+ document.getElementById('btnRefund').style.display = '';
+ // willRenew=true 顯示「關閉自動續訂」可按
+ // willRenew=false 藏「關閉」、顯示「重新訂閱」+ info 解釋
+ if (!sub.willRenew && sub.plan !== 'lifetime') {
+ btnCancel.style.display = 'none';
+ btnResub.style.display = '';
+ resubInfo.style.display = 'block';
+ } else {
+ btnCancel.disabled = sub.plan === 'lifetime';
+ }
+ // 終身無自動續訂概念
+ if (sub.plan === 'lifetime') {
+ btnCancel.style.display = 'none';
+ btnResub.style.display = 'none';
+ resubInfo.style.display = 'none';
+ }
 
-      // 退費規則檢查
-      checkRefundEligibility(sub);
-    }
-  } else {
-    freeActions.style.display = 'block';
-    premiumActions.style.display = 'none';
-    appNote.style.display = 'none';
-  }
+ // 退費規則檢查
+ checkRefundEligibility(sub);
+ }
+ } else {
+ freeActions.style.display = 'block';
+ premiumActions.style.display = 'none';
+ appNote.style.display = 'none';
+ }
 }
 
 function checkRefundEligibility(sub) {
-  const refundInfo = document.getElementById('refundInfo');
-  const btnRefund = document.getElementById('btnRefund');
-  if (!sub.startedAt) { refundInfo.style.display = 'none'; return; }
+ const refundInfo = document.getElementById('refundInfo');
+ const btnRefund = document.getElementById('btnRefund');
+ if (!sub.startedAt) { refundInfo.style.display = 'none'; return; }
 
-  const daysSinceStart = (Date.now() - sub.startedAt) / 86400000;
+ const daysSinceStart = (Date.now() - sub.startedAt) / 86400000;
 
-  if (sub.plan === 'lifetime') {
-    if (daysSinceStart <= 7) {
-      refundInfo.textContent = `終身方案首購 7 天內可全額退費。剩 ${Math.ceil(7 - daysSinceStart)} 天可申請。`;
-      refundInfo.style.display = 'block';
-      btnRefund.disabled = false;
-    } else {
-      refundInfo.textContent = '終身方案超過 7 天視為已使用,不能退費。';
-      refundInfo.style.display = 'block';
-      btnRefund.disabled = true;
-    }
-  } else if (daysSinceStart <= 7) {
-    refundInfo.textContent = `首次訂閱 7 天內 100% 全額退費,剩 ${Math.ceil(7 - daysSinceStart)} 天可申請。`;
-    refundInfo.style.display = 'block';
-    btnRefund.disabled = false;
-  } else {
-    const remainDays = sub.expiresAt ? Math.max(0, (sub.expiresAt - Date.now()) / 86400000) : 0;
-    refundInfo.textContent = `超過 7 天可按剩餘天數比例退費。剩餘 ${Math.ceil(remainDays)} 天可退。`;
-    refundInfo.style.display = 'block';
-    btnRefund.disabled = remainDays <= 0;
-  }
+ if (sub.plan === 'lifetime') {
+ if (daysSinceStart <= 7) {
+ refundInfo.textContent = `終身方案首購 7 天內可全額退費。剩 ${Math.ceil(7 - daysSinceStart)} 天可申請。`;
+ refundInfo.style.display = 'block';
+ btnRefund.disabled = false;
+ } else {
+ refundInfo.textContent = '終身方案超過 7 天視為已使用,不能退費。';
+ refundInfo.style.display = 'block';
+ btnRefund.disabled = true;
+ }
+ } else if (daysSinceStart <= 7) {
+ refundInfo.textContent = `首次訂閱 7 天內 100% 全額退費,剩 ${Math.ceil(7 - daysSinceStart)} 天可申請。`;
+ refundInfo.style.display = 'block';
+ btnRefund.disabled = false;
+ } else {
+ const remainDays = sub.expiresAt ? Math.max(0, (sub.expiresAt - Date.now()) / 86400000) : 0;
+ refundInfo.textContent = `超過 7 天可按剩餘天數比例退費。剩餘 ${Math.ceil(remainDays)} 天可退。`;
+ refundInfo.style.display = 'block';
+ btnRefund.disabled = remainDays <= 0;
+ }
 }
 
 // Cloud Function endpoints
@@ -419,118 +419,118 @@ const FN_CANCEL = 'https://cancelsubscription-lsd7okt5qa-de.a.run.app';
 const FN_REFUND = 'https://refund-lsd7okt5qa-de.a.run.app';
 
 async function cancelRenew() {
-  if (!confirm('確定關閉自動續訂?到期日前都還能正常使用,到期後不再扣款。')) return;
-  const btn = document.getElementById('btnCancelRenew');
-  if (btn) { btn.disabled = true; btn.textContent = '處理中…'; }
-  try {
-    const idToken = await currentUser.getIdToken();
-    const res = await fetch(FN_CANCEL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + idToken },
-    });
-    const data = await res.json();
-    if (!res.ok) { alert(data.reason || data.error || '操作失敗'); return; }
-    alert(data.message || '已關閉自動續訂。');
-    location.reload();
-  } catch (err) {
-    alert('操作失敗:' + err.message);
-  } finally {
-    if (btn) { btn.disabled = false; btn.textContent = '關閉自動續訂'; }
-  }
+ if (!confirm('確定關閉自動續訂?到期日前都還能正常使用,到期後不再扣款。')) return;
+ const btn = document.getElementById('btnCancelRenew');
+ if (btn) { btn.disabled = true; btn.textContent = '處理中…'; }
+ try {
+ const idToken = await currentUser.getIdToken();
+ const res = await fetch(FN_CANCEL, {
+ method: 'POST',
+ headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + idToken },
+ });
+ const data = await res.json();
+ if (!res.ok) { alert(data.reason || data.error || '操作失敗'); return; }
+ alert(data.message || '已關閉自動續訂。');
+ location.reload();
+ } catch (err) {
+ alert('操作失敗:' + err.message);
+ } finally {
+ if (btn) { btn.disabled = false; btn.textContent = '關閉自動續訂'; }
+ }
 }
 
 async function requestRefund() {
-  if (!confirm('確定要申請退費?\n\n按下確認後:\n• 訂閱立刻降級為免費版\n• 退款 7-14 個工作天由綠界 / 發卡銀行退回原信用卡\n• 已訂閱期間使用記錄會保留\n• 退費滿 2 次後該帳號將永久無法訂閱')) return;
-  const btn = document.getElementById('btnRefund');
-  if (btn) { btn.disabled = true; btn.textContent = '處理中…'; }
-  try {
-    const idToken = await currentUser.getIdToken();
-    const res = await fetch(FN_REFUND, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + idToken },
-    });
-    const data = await res.json();
-    if (!res.ok) { alert(data.reason || data.error || '退費失敗'); return; }
-    alert(data.message || '退費成功!');
-    location.reload();
-  } catch (err) {
-    alert('退費申請失敗:' + err.message);
-  } finally {
-    if (btn) { btn.disabled = false; btn.textContent = '申請退費'; }
-  }
+ if (!confirm('確定要申請退費?\n\n按下確認後:\n• 訂閱立刻降級為免費版\n• 退款 7-14 個工作天由綠界 / 發卡銀行退回原信用卡\n• 已訂閱期間使用記錄會保留\n• 退費滿 2 次後該帳號將永久無法訂閱')) return;
+ const btn = document.getElementById('btnRefund');
+ if (btn) { btn.disabled = true; btn.textContent = '處理中…'; }
+ try {
+ const idToken = await currentUser.getIdToken();
+ const res = await fetch(FN_REFUND, {
+ method: 'POST',
+ headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + idToken },
+ });
+ const data = await res.json();
+ if (!res.ok) { alert(data.reason || data.error || '退費失敗'); return; }
+ alert(data.message || '退費成功!');
+ location.reload();
+ } catch (err) {
+ alert('退費申請失敗:' + err.message);
+ } finally {
+ if (btn) { btn.disabled = false; btn.textContent = '申請退費'; }
+ }
 }
 
 // ── transactions ──
 function loadTransactions() {
-  document.getElementById('txnCard').style.display = 'block';
-  if (txnUnsub) txnUnsub();
-  txnUnsub = db.collection('transactions')
-    .where('uid', '==', currentUser.uid)
-    .orderBy('occurred_at', 'desc')
-    .limit(20)
-    .onSnapshot(snap => {
-      const list = document.getElementById('txnList');
-      // 過濾:只顯示用戶有感覺的交易(status=success/refunded)
-      // 隱藏 pending(createPayment 占位)/ failed(cancel/refund 失敗的內部 retry)
-      const visible = snap.docs.filter(d => {
-        const t = d.data();
-        return t.status === 'success' || t.status === 'refunded';
-      });
-      if (visible.length === 0) {
-        list.innerHTML = '<p style="color:var(--tx3);font-size:13px;text-align:center;padding:14px">尚無交易紀錄</p>';
-        return;
-      }
-      list.innerHTML = visible.map(d => {
-        const t = d.data();
-        const date = t.occurred_at?.toDate ? t.occurred_at.toDate().toLocaleDateString('zh-TW') : '—';
-        const typeLabel = ({
-          subscribe: '✓ 訂閱成功',
-          renew: '🔁 續訂成功',
-          refund: '↩️ 退費',
-          fail: '⚠️ 扣款失敗',
-          cancel: '🛑 關閉自動續訂',
-          chargeback: '⚠️ 信用卡爭議',
-          gift: '🎁 贈送 Premium',
-        })[t.type] || t.type;
-        // plan key → 人話
-        const planLabel = PLAN_LABELS[t.plan] || (t.plan && t.plan !== 'n/a' ? t.plan : '');
-        // 金額顯示(用戶角度):
-        //   訂閱 / 續訂  → -NT$XXX (錢出去,紅字)
-        //   退費          → +NT$XXX (錢回來,綠字)
-        //   取消 / 失敗 / chargeback → 不顯示金額(沒實際錢動)
-        const showAmount = ['subscribe','renew','refund'].includes(t.type);
-        const amt = Math.abs(t.amount_twd || 0);
-        const userPaid = t.type === 'subscribe' || t.type === 'renew';
-        const amtClass = userPaid ? 'negative' : 'positive';
-        const amtPrefix = userPaid ? '-' : '+';
-        const amtCell = showAmount && amt !== 0
-          ? `<div class="amt ${amtClass}">${amtPrefix}NT$${amt.toLocaleString()}</div>`
-          : `<div class="amt" style="color:var(--tx3);font-weight:400;font-size:12px">—</div>`;
-        const titleLine = planLabel ? `${typeLabel} · ${planLabel}` : typeLabel;
-        return `<div class="txn">
-          <div>
-            <div class="type">${titleLine}</div>
-            <div class="date">${date}</div>
-          </div>
-          ${amtCell}
-        </div>`;
-      }).join('');
-    }, err => {
-      // permission denied or empty
-      document.getElementById('txnList').innerHTML = '<p style="color:var(--tx3);font-size:13px;text-align:center;padding:14px">尚無交易紀錄</p>';
-    });
+ document.getElementById('txnCard').style.display = 'block';
+ if (txnUnsub) txnUnsub();
+ txnUnsub = db.collection('transactions')
+ .where('uid', '==', currentUser.uid)
+ .orderBy('occurred_at', 'desc')
+ .limit(20)
+ .onSnapshot(snap => {
+ const list = document.getElementById('txnList');
+ // 過濾:只顯示用戶有感覺的交易(status=success/refunded)
+ // 隱藏 pending(createPayment 占位)/ failed(cancel/refund 失敗的內部 retry)
+ const visible = snap.docs.filter(d => {
+ const t = d.data();
+ return t.status === 'success' || t.status === 'refunded';
+ });
+ if (visible.length === 0) {
+ list.innerHTML = '<p style="color:var(--tx3);font-size:13px;text-align:center;padding:14px">尚無交易紀錄</p>';
+ return;
+ }
+ list.innerHTML = visible.map(d => {
+ const t = d.data();
+ const date = t.occurred_at?.toDate ? t.occurred_at.toDate().toLocaleDateString('zh-TW') : '—';
+ const typeLabel = ({
+ subscribe: ' 訂閱成功',
+ renew: ' 續訂成功',
+ refund: ' 退費',
+ fail: ' 扣款失敗',
+ cancel: ' 關閉自動續訂',
+ chargeback: ' 信用卡爭議',
+ gift: ' 贈送 Premium',
+ })[t.type] || t.type;
+ // plan key 人話
+ const planLabel = PLAN_LABELS[t.plan] || (t.plan && t.plan !== 'n/a' ? t.plan : '');
+ // 金額顯示(用戶角度):
+ // 訂閱 / 續訂 -NT$XXX (錢出去,紅字)
+ // 退費 +NT$XXX (錢回來,綠字)
+ // 取消 / 失敗 / chargeback 不顯示金額(沒實際錢動)
+ const showAmount = ['subscribe','renew','refund'].includes(t.type);
+ const amt = Math.abs(t.amount_twd || 0);
+ const userPaid = t.type === 'subscribe' || t.type === 'renew';
+ const amtClass = userPaid ? 'negative' : 'positive';
+ const amtPrefix = userPaid ? '-' : '+';
+ const amtCell = showAmount && amt !== 0
+ ? `<div class="amt ${amtClass}">${amtPrefix}NT$${amt.toLocaleString()}</div>`
+ : `<div class="amt" style="color:var(--tx3);font-weight:400;font-size:12px">—</div>`;
+ const titleLine = planLabel ? `${typeLabel} · ${planLabel}` : typeLabel;
+ return `<div class="txn">
+ <div>
+ <div class="type">${titleLine}</div>
+ <div class="date">${date}</div>
+ </div>
+ ${amtCell}
+ </div>`;
+ }).join('');
+ }, err => {
+ // permission denied or empty
+ document.getElementById('txnList').innerHTML = '<p style="color:var(--tx3);font-size:13px;text-align:center;padding:14px">尚無交易紀錄</p>';
+ });
 }
 
 // ── early bird counter (public read) ──
 async function loadEarlyBird() {
-  try {
-    const doc = await db.collection('counters').doc('early_bird').get();
-    const used = doc.exists ? (doc.data().count || 0) : 0;
-    const limit = doc.exists ? (doc.data().limit || 100) : 100;
-    document.getElementById('earlyBirdCount').textContent = `${limit - used} / ${limit}`;
-  } catch (e) {
-    document.getElementById('earlyBirdCount').textContent = '100 / 100';
-  }
+ try {
+ const doc = await db.collection('counters').doc('early_bird').get();
+ const used = doc.exists ? (doc.data().count || 0) : 0;
+ const limit = doc.exists ? (doc.data().limit || 100) : 100;
+ document.getElementById('earlyBirdCount').textContent = `${limit - used} / ${limit}`;
+ } catch (e) {
+ document.getElementById('earlyBirdCount').textContent = '100 / 100';
+ }
 }
 </script>
 
