@@ -1,11 +1,16 @@
-// Scheduled function:每天跑一次,處理失敗扣款 retry + 過期降級
+// Scheduled function:每天跑一次,處理過期降級
 //
-// retry 排程:Day 1 / 3 / 7 / 14(根據 failed_retries 計數推算)
-// Day 15 → status = expired,降為免費版
+// 注意:我們不主動 retry 扣款。ECPay 定期定額系統內部會自動重試。
+// 我們做的只是:
+//   - 收到 ecpay-callback failed 通知 → 增 failed_retries 計數 + 記 last_retry_at
+//   - 這個 cron 每天檢查:超過 FAILED_PAYMENT_GRACE_DAYS 還沒成功 → 降級為 expired
+//
+// FAILED_PAYMENT_GRACE_DAYS 是粗略 grace,還沒對照 ECPay 文件確認他們實際重試
+// 的次數 / 間隔。等正式上線後觀察 callback 模式再調。
 
 import * as functions from "firebase-functions/v2/scheduler";
 import * as admin from "firebase-admin";
-import { RETRY_SCHEDULE_DAYS } from "./utils/constants";
+import { FAILED_PAYMENT_GRACE_DAYS } from "./utils/constants";
 import { db, patchSubscription, writeTransaction, nowMs } from "./utils/firestore";
 
 if (admin.apps.length === 0) admin.initializeApp();
@@ -37,8 +42,8 @@ export const dailyRetryCron = functions.onSchedule(
       const failedCount = sub.failed_retries as number;
       const daysSinceLastFail = Math.floor((nowMs() - sub.last_retry_at) / (24 * 60 * 60 * 1000));
 
-      // 超過 14 天還沒成功 → 過期
-      if (failedCount >= RETRY_SCHEDULE_DAYS.length || daysSinceLastFail > 15) {
+      // 超過 grace period 還沒成功 → 過期
+      if (daysSinceLastFail > FAILED_PAYMENT_GRACE_DAYS) {
         await patchSubscription(uid, {
           status: "expired",
           willRenew: false,

@@ -51,8 +51,11 @@ export const REFUND_POLICY = {
   no_early_bird_after_refunds: 1,  // 退費 1 次後不享早鳥
 };
 
-// 失敗扣款 retry 排程(天數)
-export const RETRY_SCHEDULE_DAYS = [1, 3, 7, 14];
+// 失敗扣款 grace period:超過 N 天還在 failed → 訂閱降級為 expired
+// 注意:實際 retry 行為由 ECPay 定期定額系統內部處理(我們沒主動 retry)。
+// 14 天只是粗略 grace,還沒對照 ECPay 官方文件確認他們重試次數 / 間隔。
+// TODO:查綠界文件確認定期定額扣款失敗重試流程,調整這個值。
+export const FAILED_PAYMENT_GRACE_DAYS = 14;
 
 // 環境設定 — 從 functions config 讀
 export function ecpayConfig() {
