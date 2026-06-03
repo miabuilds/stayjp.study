@@ -234,7 +234,7 @@ const fbConfig = {
   messagingSenderId: "666368174384"
 };
 if (!firebase.apps.length) firebase.initializeApp(fbConfig);
-  try { firebase.firestore().settings({ experimentalForceLongPolling: true }); } catch (e) {}
+  try { firebase.firestore().settings({ experimentalAutoDetectLongPolling: true, useFetchStreams: false }); } catch (e) {}
 const _db = firebase.firestore();
 const _auth = firebase.auth();
 

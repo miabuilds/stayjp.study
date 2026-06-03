@@ -1361,6 +1361,9 @@ const fbConfig = {
 let db = null, auth = null, currentUser = null;
 if (fbConfig) {
   firebase.initializeApp(fbConfig);
+  // Safari ITP 會擋 Firestore 預設的 fetch streams + WebChannel,改長輪詢 + 禁 fetch streams
+  // 必須在 firebase.firestore() 第一次取用之前設,否則無效
+  try { firebase.firestore().settings({ experimentalAutoDetectLongPolling: true, useFetchStreams: false }); } catch (e) {}
   auth = firebase.auth();
   db = firebase.firestore();
   auth.onAuthStateChanged(u => { currentUser = u; updateAuthUI(); loadFavorites(); loadCloudData(); if (typeof Streak !== 'undefined') { Streak.syncDown(); Streak.render(); } });
