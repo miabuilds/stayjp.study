@@ -469,13 +469,17 @@ function loadTransactions() {
         })[t.type] || t.type;
         // plan key → 人話
         const planLabel = PLAN_LABELS[t.plan] || (t.plan && t.plan !== 'n/a' ? t.plan : '');
-        // 金額顯示:cancel / fail / chargeback 不顯示金額(零元無意義)
+        // 金額顯示(用戶角度):
+        //   訂閱 / 續訂  → -NT$XXX (錢出去,紅字)
+        //   退費          → +NT$XXX (錢回來,綠字)
+        //   取消 / 失敗 / chargeback → 不顯示金額(沒實際錢動)
         const showAmount = ['subscribe','renew','refund'].includes(t.type);
-        const amt = t.amount_twd || 0;
-        const amtClass = t.type === 'refund' ? 'negative' : 'positive';
-        const amtPrefix = t.type === 'refund' ? '-' : '+';
+        const amt = Math.abs(t.amount_twd || 0);
+        const userPaid = t.type === 'subscribe' || t.type === 'renew';
+        const amtClass = userPaid ? 'negative' : 'positive';
+        const amtPrefix = userPaid ? '-' : '+';
         const amtCell = showAmount && amt !== 0
-          ? `<div class="amt ${amtClass}">${amtPrefix}NT$${Math.abs(amt).toLocaleString()}</div>`
+          ? `<div class="amt ${amtClass}">${amtPrefix}NT$${amt.toLocaleString()}</div>`
           : `<div class="amt" style="color:var(--tx3);font-weight:400;font-size:12px">—</div>`;
         const titleLine = planLabel ? `${typeLabel} · ${planLabel}` : typeLabel;
         return `<div class="txn">
