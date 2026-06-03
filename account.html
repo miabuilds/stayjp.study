@@ -146,7 +146,12 @@ a:hover{text-decoration:underline}
         </p>
         <div class="actions">
           <button class="btn" id="btnCancelRenew" onclick="cancelRenew()">關閉自動續訂</button>
+          <a class="btn primary" id="btnResubscribe" href="pricing.html" style="display:none">重新訂閱(恢復自動續扣)</a>
           <button class="btn danger" id="btnRefund" onclick="requestRefund()">申請退費</button>
+        </div>
+        <div id="resubscribeInfo" class="info-box" style="margin-top:14px;display:none">
+          ⓘ 已關閉自動續訂。到期日前仍可正常使用,到期後降為免費版。
+          想恢復續扣必須重新訂閱(綠界規則:已取消的定期定額無法回復)。
         </div>
         <div id="refundInfo" class="info-box" style="margin-top:14px;display:none"></div>
       </div>
@@ -347,13 +352,27 @@ function renderSubscription(sub) {
       }
     } else {
       appNote.style.display = 'none';
-      document.getElementById('btnCancelRenew').style.display = '';
+      const btnCancel = document.getElementById('btnCancelRenew');
+      const btnResub  = document.getElementById('btnResubscribe');
+      const resubInfo = document.getElementById('resubscribeInfo');
+      btnCancel.style.display = '';
+      btnResub.style.display = 'none';
+      resubInfo.style.display = 'none';
       document.getElementById('btnRefund').style.display = '';
-      // 已關閉自動續訂 → disable 按鈕
-      document.getElementById('btnCancelRenew').disabled = !sub.willRenew || sub.plan === 'lifetime';
+      // willRenew=true → 顯示「關閉自動續訂」可按
+      // willRenew=false → 藏「關閉」、顯示「重新訂閱」+ info 解釋
+      if (!sub.willRenew && sub.plan !== 'lifetime') {
+        btnCancel.style.display = 'none';
+        btnResub.style.display = '';
+        resubInfo.style.display = 'block';
+      } else {
+        btnCancel.disabled = sub.plan === 'lifetime';
+      }
       // 終身無自動續訂概念
       if (sub.plan === 'lifetime') {
-        document.getElementById('btnCancelRenew').style.display = 'none';
+        btnCancel.style.display = 'none';
+        btnResub.style.display = 'none';
+        resubInfo.style.display = 'none';
       }
 
       // 退費規則檢查
