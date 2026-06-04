@@ -1,4 +1,4 @@
-const CACHE_NAME = 'stayjp-v151';
+const CACHE_NAME = 'stayjp-v152';
 const ASSETS = [
   './',
   './index.html',
@@ -44,13 +44,30 @@ self.addEventListener('message', e => {
   if (e.data && e.data.type === 'SKIP_WAITING') self.skipWaiting();
 });
 
+// 本地開發（localhost / 127.0.0.1）完全不攔截，交給瀏覽器直連，
+// 避免舊 SW 劫持 emulator + cleanUrls 的 301 導致 Safari 白屏
+const IS_LOCAL = self.location.hostname === 'localhost' || self.location.hostname === '127.0.0.1';
+
 // Fetch: cache-first, fallback to network
 self.addEventListener('fetch', e => {
+  if (IS_LOCAL) return;                       // dev：放行，不走 SW
+  if (e.request.method !== 'GET') return;      // 非 GET（付款 POST 等）不攔
+
   e.respondWith(
     caches.match(e.request).then(cached => {
-      return cached || fetch(e.request).then(response => {
+      if (cached) return cached;
+      return fetch(e.request).then(response => {
+        // Safari 禁止 SW 回傳「帶 redirected 標記」的導航響應（cleanUrls 301 會觸發），
+        // 重建一份乾淨響應再回傳，否則 Safari 報 "Response served by service worker has redirections"
+        if (response.redirected) {
+          return response.blob().then(body => new Response(body, {
+            status: response.status,
+            statusText: response.statusText,
+            headers: response.headers
+          }));
+        }
         // Cache successful GET responses for future use
-        if (e.request.method === 'GET' && response.status === 200) {
+        if (response.status === 200) {
           const clone = response.clone();
           caches.open(CACHE_NAME).then(cache => cache.put(e.request, clone));
         }
