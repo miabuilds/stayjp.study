@@ -160,7 +160,7 @@ body {
 .stats { color: var(--tx3); font-size: 10px; white-space: nowrap; }
 
 /* Auth */
-.auth-area { display: flex; align-items: center; gap: 5px; }
+.auth-area { display: flex; align-items: center; gap: 5px; position: relative; }
 .auth-btn {
   background: none; border: 1px solid var(--bd);
   color: var(--tx2); padding: 4px 12px;
@@ -170,13 +170,26 @@ body {
 }
 .auth-btn:hover { border-color: var(--ac); color: var(--ac); }
 .auth-btn img { width: 18px; height: 18px; border-radius: 50%; }
-.logout-btn {
-  background: none; border: 1px solid rgba(220,38,38,.25);
-  color: rgba(220,38,38,.6); padding: 4px 10px;
-  border-radius: 20px; cursor: pointer; font-size: 11px;
-  transition: background .2s var(--ease); white-space: nowrap;
+.user-menu {
+  position: absolute; top: calc(100% + 6px); right: 0;
+  background: var(--bg2); border: 1px solid var(--bd); border-radius: 10px;
+  min-width: 180px; padding: 4px; z-index: 200;
+  box-shadow: 0 8px 24px rgba(0,0,0,.12);
+  display: none;
 }
-.logout-btn:hover { background: rgba(220,38,38,.06); }
+.user-menu.show { display: block; }
+.user-menu .um-head {
+  padding: 10px 12px; border-bottom: 1px solid var(--bd);
+  font-size: 11px; color: var(--tx3); word-break: break-all;
+}
+.user-menu .um-item {
+  display: block; width: 100%; text-align: left;
+  background: none; border: 0; padding: 8px 12px;
+  font-size: 13px; color: var(--tx); cursor: pointer; border-radius: 6px;
+}
+.user-menu .um-item:hover { background: var(--bg3); }
+.user-menu .um-item.danger { color: #DC2626; }
+.user-menu .um-item.danger:hover { background: rgba(220,38,38,.06); }
 
 /* Theme toggle */
 .theme-btn {
@@ -1461,13 +1474,31 @@ function updateAuthUI() {
   if (!area) return;
   if (currentUser) {
     const name = (currentUser.displayName || currentUser.email || 'User').split(' ')[0];
+    const email = currentUser.email || '';
     const photo = currentUser.photoURL || '';
     const img = photo ? `<img src="${photo}" alt="" onerror="this.style.display='none'">` : '';
-    area.innerHTML = `<span class="auth-btn" style="cursor:default">${img}${name}</span><button class="logout-btn" onclick="handleAuth()">${t('logout')}</button>`;
+    area.innerHTML = `
+      <button class="auth-btn" id="userMenuBtn" onclick="toggleUserMenu(event)">${img}${name} ▾</button>
+      <div class="user-menu" id="userMenu">
+        <div class="um-head">${email}</div>
+        <a class="um-item" href="account.html">我的帳號</a>
+        <a class="um-item" href="pricing.html">訂閱方案</a>
+        <button class="um-item danger" onclick="handleAuth()">登出</button>
+      </div>`;
   } else {
     area.innerHTML = `<button class="auth-btn" id="authBtn" onclick="handleAuth()">${t('login')}</button>`;
   }
 }
+function toggleUserMenu(e) {
+  e?.stopPropagation();
+  document.getElementById('userMenu')?.classList.toggle('show');
+}
+document.addEventListener('click', e => {
+  const menu = document.getElementById('userMenu');
+  if (!menu || !menu.classList.contains('show')) return;
+  if (e.target.closest('#userMenuBtn') || e.target.closest('#userMenu')) return;
+  menu.classList.remove('show');
+});
 
 // ========== FAVORITES ==========
 const FAV_INIT = {n5:[],n4:[],n3:[],n2:[],n1:[],vn5:[],vn4:[],vn3:[],vn2:[],vn1:[]};
