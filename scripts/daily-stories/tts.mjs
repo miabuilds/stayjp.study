@@ -62,7 +62,8 @@ for (const f of files) {
   if (filterLevel && !f.startsWith(filterLevel + '_')) continue;
   const data = JSON.parse(fs.readFileSync(path.join(STORIES_DIR, f), 'utf8'));
   if (!data.pass) { console.log(`⏭  ${f} not pass,跳過`); continue; }
-  for (const s of data.story?.sentences || []) sentences.add(s.j);
+  // s.r = 讀音覆蓋（修正 VOICEVOX/瀏覽器多音字誤讀，如 方→かた）；沒有就用 s.j
+  for (const s of data.story?.sentences || []) sentences.add(s.r || s.j);
 }
 
 console.log(`📝 收集 ${sentences.size} 句 from ${files.length} 篇故事`);

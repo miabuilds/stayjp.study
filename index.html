@@ -2369,7 +2369,7 @@ const DailyStory = (() => {
     const sent = story.sentences[i];
     const el = document.querySelector(`.ds-sent[data-i="${i}"]`);
     if (el) el.classList.add('playing');
-    playSentence(sent.j, () => { if (el) el.classList.remove('playing'); });
+    playSentence(sent.r || sent.j, () => { if (el) el.classList.remove('playing'); });
   }
 
   async function playAll() {
@@ -2392,7 +2392,7 @@ const DailyStory = (() => {
       const sent = story.sentences[i];
       const el = document.querySelector(`.ds-sent[data-i="${i}"]`);
       if (el) el.classList.add('playing');
-      await new Promise(resolve => playSentence(sent.j, resolve));
+      await new Promise(resolve => playSentence(sent.r || sent.j, resolve));
       if (el) el.classList.remove('playing');
       // 句間停頓
       await new Promise(r => setTimeout(r, 350));
