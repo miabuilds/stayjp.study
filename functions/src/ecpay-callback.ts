@@ -15,7 +15,7 @@
 //   6. 回應綠界 "1|OK"(成功)或 "0|Error"
 
 import * as functions from "firebase-functions/v2/https";
-import { PLANS, PlanKey } from "./utils/constants";
+import { PLANS, PlanKey, ECPAY_SECRETS } from "./utils/constants";
 import { verifyCheckMacValue } from "./utils/ecpay";
 import {
   writeTransaction, getSubscription, writeSubscription, patchSubscription,
@@ -24,6 +24,7 @@ import {
 
 export const ecpayCallback = functions.onRequest(
   {
+    secrets: ECPAY_SECRETS,
     region: "asia-east1",
     invoker: "public",
     maxInstances: 20,         // server-to-server,允許多一點

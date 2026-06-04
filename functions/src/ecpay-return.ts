@@ -8,10 +8,11 @@
 //      這裡不寫 Firestore,不做任何業務邏輯。
 
 import * as functions from "firebase-functions/v2/https";
-import { ecpayConfig } from "./utils/constants";
+import { ecpayConfig, ECPAY_SECRETS } from "./utils/constants";
 
 export const ecpayReturn = functions.onRequest(
   {
+    secrets: ECPAY_SECRETS,
     region: "asia-east1",
     invoker: "public",
     maxInstances: 10,

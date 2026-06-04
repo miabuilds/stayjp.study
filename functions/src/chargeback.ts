@@ -9,11 +9,13 @@ import { verifyCheckMacValue } from "./utils/ecpay";
 import {
   writeTransaction, getSubscription, patchSubscription, recordChargeback,
 } from "./utils/firestore";
+import { ECPAY_SECRETS } from "./utils/constants";
 
 if (admin.apps.length === 0) admin.initializeApp();
 
 export const chargeback = functions.onRequest(
   {
+    secrets: ECPAY_SECRETS,
     region: "asia-east1",
     invoker: "public",
     maxInstances: 5,           // chargeback 非常少見

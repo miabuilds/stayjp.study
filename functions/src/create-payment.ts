@@ -9,7 +9,7 @@
 
 import * as functions from "firebase-functions/v2/https";
 import * as admin from "firebase-admin";
-import { PLANS, PlanKey, ecpayConfig, ecpayEndpoint } from "./utils/constants";
+import { PLANS, PlanKey, ecpayConfig, ecpayEndpoint, ECPAY_SECRETS } from "./utils/constants";
 import { checkMacValue, ecpayDateTimeTW, generateMerchantTradeNo } from "./utils/ecpay";
 import {
   precheckSubscribe, writeTransaction, emailHash,
@@ -19,6 +19,7 @@ if (admin.apps.length === 0) admin.initializeApp();
 
 export const createPayment = functions.onRequest(
   {
+    secrets: ECPAY_SECRETS,
     cors: true,
     region: "asia-east1",
     invoker: "public",

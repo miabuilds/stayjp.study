@@ -1,6 +1,23 @@
 // Stay-jp-notes 訂閱方案配置
 // 改價要同時改:pricing.html / home.html / stayjp-app/src/lib/subscription.ts
 
+import { defineSecret } from "firebase-functions/params";
+
+// ECPay 機密設定。金流相關 function 都要在 options 加 `secrets: ECPAY_SECRETS`,
+// 否則 `firebase functions:secrets:set` 設的值不會注入 process.env,會 fallback 到沙盒。
+// 設定方式（值由 owner 設,不進 git）：
+//   firebase functions:secrets:set ECPAY_MERCHANT_ID   # 正式商店代號
+//   firebase functions:secrets:set ECPAY_HASH_KEY      # 正式 HashKey
+//   firebase functions:secrets:set ECPAY_HASH_IV       # 正式 HashIV
+//   firebase functions:secrets:set ECPAY_PRODUCTION    # 輸入 true
+//   firebase deploy --only functions
+export const ECPAY_SECRETS = [
+  defineSecret("ECPAY_MERCHANT_ID"),
+  defineSecret("ECPAY_HASH_KEY"),
+  defineSecret("ECPAY_HASH_IV"),
+  defineSecret("ECPAY_PRODUCTION"),
+];
+
 export const EARLY_BIRD_LIMIT = 100;
 
 export type PlanKey = "monthly" | "yearly" | "yearly_early_bird" | "lifetime";

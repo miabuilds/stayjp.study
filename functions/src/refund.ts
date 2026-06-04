@@ -16,7 +16,7 @@
 import * as functions from "firebase-functions/v2/https";
 import * as admin from "firebase-admin";
 import axios from "axios";
-import { PLANS, REFUND_POLICY, ecpayConfig, ecpayRefundEndpoint } from "./utils/constants";
+import { PLANS, REFUND_POLICY, ecpayConfig, ecpayRefundEndpoint, ECPAY_SECRETS } from "./utils/constants";
 import { checkMacValue } from "./utils/ecpay";
 import {
   getSubscription, patchSubscription, writeTransaction,
@@ -27,6 +27,7 @@ if (admin.apps.length === 0) admin.initializeApp();
 
 export const refund = functions.onRequest(
   {
+    secrets: ECPAY_SECRETS,
     cors: true,
     region: "asia-east1",
     invoker: "public",

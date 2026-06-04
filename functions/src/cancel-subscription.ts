@@ -8,7 +8,7 @@
 import * as functions from "firebase-functions/v2/https";
 import * as admin from "firebase-admin";
 import axios from "axios";
-import { ecpayConfig, ecpayPeriodActionEndpoint } from "./utils/constants";
+import { ecpayConfig, ecpayPeriodActionEndpoint, ECPAY_SECRETS } from "./utils/constants";
 import { checkMacValue } from "./utils/ecpay";
 import { getSubscription, patchSubscription, writeTransaction } from "./utils/firestore";
 
@@ -16,6 +16,7 @@ if (admin.apps.length === 0) admin.initializeApp();
 
 export const cancelSubscription = functions.onRequest(
   {
+    secrets: ECPAY_SECRETS,
     cors: true,
     region: "asia-east1",
     invoker: "public",
