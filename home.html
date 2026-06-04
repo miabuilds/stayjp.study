@@ -424,47 +424,6 @@ a:hover { text-decoration: underline; }
   font-size: 16px; color: var(--tx2); line-height: 1.9;
 }
 .support-msg strong { color: var(--ac); font-weight: 700; }
-.support-qr {
-  display: grid; grid-template-columns: 1fr 1fr;
-  gap: 24px; max-width: 640px;
-}
-.qr-card {
-  background: var(--bg2); border: 1px solid var(--line);
-  border-radius: var(--r); padding: 16px 16px 20px;
-  text-align: center; transition: border-color .25s var(--ease);
-  cursor: zoom-in;
-}
-.qr-card:hover { border-color: var(--ac); }
-.qr-card img {
-  display: block; width: 100%; max-width: 280px;
-  height: auto; margin: 0 auto 14px;
-  border-radius: 8px;
-}
-.qr-placeholder {
-  display: flex; align-items: center; justify-content: center;
-  width: 100%; max-width: 280px; aspect-ratio: 1 / 1.5;
-  margin: 0 auto 14px; border-radius: 8px;
-  color: var(--tx3); font-size: 12px;
-  border: 2px dashed var(--line); background: var(--bg3);
-}
-.qr-label {
-  font-family: var(--serif); letter-spacing: .05em;
-  font-size: 16px; font-weight: 700; color: var(--tx);
-}
-/* Lightbox */
-.qr-lightbox {
-  display: none; position: fixed; inset: 0;
-  background: rgba(0,0,0,.85); z-index: 1000;
-  align-items: center; justify-content: center;
-  padding: 24px; cursor: zoom-out;
-  animation: qrFadeIn .25s var(--ease);
-}
-.qr-lightbox.show { display: flex; }
-.qr-lightbox img { max-width: 90vw; max-height: 90vh; border-radius: 12px; }
-@keyframes qrFadeIn { from { opacity: 0; } to { opacity: 1; } }
-.qr-hint {
-  font-size: 12px; color: var(--tx3); margin-top: 4px;
-}
 .support-overseas {
   text-align: center; margin-top: 28px;
   font-size: 13px; color: var(--tx3);
@@ -502,10 +461,6 @@ a:hover { text-decoration: underline; }
 }
 .contact-mail:hover { text-decoration: none; color: var(--ac); }
 .contact-mail:hover::after { transform: scaleX(1.02); }
-@media(max-width:480px) {
-  .support-qr { grid-template-columns: 1fr; gap: 14px; max-width: 360px; }
-  .qr-card img { max-width: 320px; }
-}
 
 .ft-links { display: flex; gap: 16px; justify-content: center; margin-top: 12px; }
 
@@ -549,6 +504,19 @@ a:hover { text-decoration: underline; }
 }
 .cl-body { font-size: 15px; line-height: 1.7; color: var(--tx); }
 @media(max-width:600px) { .cl-item { flex-direction: column; gap: 6px; } }
+/* 口碑 / 學員回饋 */
+.voices { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 8px; }
+.voice-card { background: var(--bg2); border: 1px solid var(--line); border-radius: 16px; padding: 22px; display: flex; flex-direction: column; gap: 16px; }
+.voice-quote { font-size: 15px; line-height: 1.85; color: var(--tx); }
+.voice-meta { display: flex; align-items: center; gap: 10px; margin-top: auto; }
+.voice-av { width: 36px; height: 36px; border-radius: 50%; background: var(--bg3); display: flex; align-items: center; justify-content: center; font-size: 17px; flex-shrink: 0; }
+.voice-handle { font-size: 12px; color: var(--tx2); line-height: 1.4; }
+.voice-handle strong { display: block; color: var(--tx); font-size: 13px; font-weight: 600; }
+/* 信任條 */
+.trust-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px 26px; margin-top: 26px; font-size: 14px; color: var(--tx2); }
+.trust-row span { display: inline-flex; align-items: center; gap: 6px; }
+.trust-row b { color: var(--ac); font-weight: 700; }
+@media(max-width:800px) { .voices { grid-template-columns: 1fr; } }
 </style>
 </head>
 <body>
@@ -644,18 +612,52 @@ a:hover { text-decoration: underline; }
   </div>
 </section>
 
+<!-- About / 關於作者 -->
+<section class="section">
+  <div class="section-inner" style="max-width:780px">
+    <div class="eyebrow reveal">ABOUT · 關於</div>
+    <h2 class="section-title reveal">為了留在日本，<em>邊學邊做</em>。</h2>
+    <p class="reveal" style="font-size:17px;line-height:2;color:var(--tx2)">
+      「日本再留計劃」這個名字，其實是我自己的處境——技術・人文知識・國際業務（技人國）簽證的門檻越收越緊，往後可能得考到 JLPT N2。我希望能<strong style="color:var(--tx)">再一次拿到在留卡、繼續留在日本</strong>，於是邊準備考試，邊把自己需要的工具一個個做出來。
+    </p>
+    <p class="reveal reveal-d1" style="font-size:17px;line-height:2;color:var(--tx2)">
+      原本只是寫給自己讀，順手也分享給同事用；越做越完整，乾脆放上網給大家一起學。結果上線<strong style="color:var(--tx)">一個多月，使用人數就快突破 4 萬、註冊會員突破 2 千</strong>。
+    </p>
+    <p class="reveal reveal-d2" style="font-size:17px;line-height:2;color:var(--tx2)">
+      不是補習班、也不是大公司，就是一個同樣在考 JLPT 的人，把真正想要的工具做出來、免費開放——所以每個功能，都是真的有人在用、在回饋裡一點一點長出來的。
+    </p>
+  </div>
+</section>
+
+<!-- Voices 學員回饋（脆網友真實回饋，填入前請先 DM 取得同意，或將帳號打碼） -->
+<section class="section">
+  <div class="section-inner">
+    <div class="eyebrow reveal">VOICES · 學員回饋</div>
+    <h2 class="section-title reveal">用過的人，這麼說。</h2>
+    <div class="voices">
+      <div class="voice-card reveal"><div class="voice-quote">「如果有付費項目，我非常願意支付！」</div><div class="voice-meta"><div class="voice-av">💬</div><div class="voice-handle"><strong>@ra****</strong>Threads 網友</div></div></div>
+      <div class="voice-card reveal reveal-d1"><div class="voice-quote">「太強了！版面乾淨、操作簡單直覺，會讓人想一直學習下去！」</div><div class="voice-meta"><div class="voice-av">💬</div><div class="voice-handle"><strong>@ju****</strong>Threads 網友</div></div></div>
+      <div class="voice-card reveal reveal-d2"><div class="voice-quote">「非常好用，謝謝你這麼用心開發！」</div><div class="voice-meta"><div class="voice-av">💬</div><div class="voice-handle"><strong>@ji****</strong>Threads 網友</div></div></div>
+      <div class="voice-card reveal"><div class="voice-quote">「很容易上手，花幾分鐘學習也沒壓力！」</div><div class="voice-meta"><div class="voice-av">💬</div><div class="voice-handle"><strong>@se****</strong>Threads 網友</div></div></div>
+      <div class="voice-card reveal reveal-d1"><div class="voice-quote">「同樣身為工程師，覺得很實用！」</div><div class="voice-meta"><div class="voice-av">💬</div><div class="voice-handle"><strong>@h.****</strong>Threads・工程師</div></div></div>
+      <div class="voice-card reveal reveal-d2"><div class="voice-quote">「對學習很有幫助，謝謝你 🙏」</div><div class="voice-meta"><div class="voice-av">💬</div><div class="voice-handle"><strong>@mo****</strong>Threads 網友</div></div></div>
+    </div>
+    <p style="font-size:12px;color:var(--tx3);text-align:center;margin-top:16px">※ 取自 Threads（脆）真實留言，原意未改；帳號已部分隱去以保護隱私。</p>
+  </div>
+</section>
+
 <!-- Pricing teaser -->
 <section class="section pricing-teaser">
   <div class="section-inner">
     <div class="eyebrow reveal">PRICING · 方案</div>
-    <h2 class="section-title reveal">內容永久免費，<em>工具想練到爽再升級</em>。</h2>
+    <h2 class="section-title reveal">內容免費，<em>工具想練到爽再升級</em>。</h2>
     <div class="pt-mascot reveal" aria-hidden="true"><img src="images/mascot/tanuki-cheer.png" alt=""></div>
     <div class="pt-grid">
       <div class="pt-card pt-featured reveal">
-        <div class="pt-badge pt-badge-best">🐦 限前 100 名 · 最划算</div>
+        <div class="pt-badge pt-badge-best">🐦 限量 100 名 · 最划算</div>
         <div class="pt-name">早鳥年費</div>
         <div class="pt-price"><span>NT$</span>990<small>/ 年</small></div>
-        <div class="pt-desc">終身鎖價 forever · 等於月 NT$82</div>
+        <div class="pt-desc">NT$990/年・自動續扣（月均 NT$82）· 比標準年費省 NT$500</div>
       </div>
       <div class="pt-card reveal reveal-d1">
         <div class="pt-badge">省 17%</div>
@@ -667,8 +669,14 @@ a:hover { text-decoration: underline; }
         <div class="pt-badge" style="background:#F59E0B;color:#fff">🏆 一次解決</div>
         <div class="pt-name">終身方案</div>
         <div class="pt-price"><span>NT$</span>2,990</div>
-        <div class="pt-desc">一次付清 · 永久使用 · 不再扣款</div>
+        <div class="pt-desc">一次付清 · 買斷功能 · 不再扣款</div>
       </div>
+    </div>
+    <div class="trust-row reveal">
+      <span><b>✓</b> 7 天無條件全額退費</span>
+      <span><b>✓</b> 隨時可取消</span>
+      <span><b>✓</b> 繁中介面・N5–N1 全等級</span>
+      <span><b>✓</b> 單字・文法・模考・跟讀一站式</span>
     </div>
     <div style="text-align:center;margin-top:32px">
       <a href="pricing.html" class="hero-cta" style="background:var(--tx);color:var(--bg)">查看完整方案
@@ -734,24 +742,7 @@ a:hover { text-decoration: underline; }
 <!-- Support -->
 <section class="section" id="support">
   <div class="section-inner">
-    <div class="eyebrow reveal">SUPPORT · 支持</div>
-    <div class="support-qr" style="margin-top:32px">
-      <div class="qr-card reveal reveal-d2" onclick="openQr('streetpay.jpg')">
-        <img src="streetpay.jpg" alt="街口支付 QR Code" loading="lazy">
-        <div class="qr-label">街口支付</div>
-        <div class="qr-hint">點圖放大 · 街口 App 掃碼</div>
-      </div>
-      <div class="qr-card reveal reveal-d3" onclick="openQr('allpay.jpg')">
-        <img src="allpay.jpg" alt="歐付寶 QR Code" loading="lazy">
-        <div class="qr-label">歐付寶</div>
-        <div class="qr-hint">點圖放大 · 歐付寶 App 掃碼</div>
-      </div>
-    </div>
-    <div class="qr-lightbox" id="qrLightbox" onclick="this.classList.remove('show')">
-      <img id="qrLightboxImg" alt="QR Code 放大">
-    </div>
-
-    <div class="contact-block reveal reveal-d4">
+    <div class="contact-block reveal reveal-d2">
       <div class="contact-label">CONTACT · 聯絡</div>
       <div class="contact-text">
         海外使用者想贊助、或有 <strong>網頁開發需求合作</strong> 想洽談，歡迎來信：<br>
@@ -940,14 +931,6 @@ function updateThemeIcon() {
     : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79z"/></svg>';
 }
 initTheme();
-
-// ========== QR LIGHTBOX ==========
-function openQr(src) {
-  const box = document.getElementById('qrLightbox');
-  const img = document.getElementById('qrLightboxImg');
-  img.src = src;
-  box.classList.add('show');
-}
 
 // ========== SCROLL REVEAL ==========
 (() => {

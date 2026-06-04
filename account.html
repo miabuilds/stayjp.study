@@ -132,7 +132,7 @@ a:hover{text-decoration:underline}
 
  <div id="freeActions" style="display:none">
  <p style="font-size:13px;color:var(--tx2);margin-top:14px;line-height:1.7">
- 免費版能用所有內容瀏覽 + 工具每天 3 次(SRS / 跟讀 / 動詞變化練習)+ 模考每等級 1 套。
+ 免費版能用所有內容瀏覽 + 每個練習工具每天免費 1 次(SRS / 跟讀 / 動詞變化練習等)+ 模考每等級 1 套。
  升級 Premium 解鎖無限次。
  </p>
  <div class="actions">
@@ -181,7 +181,7 @@ a:hover{text-decoration:underline}
  <span class="val" id="earlyBirdCount">— / 100</span>
  </div>
  <p style="font-size:13px;color:var(--tx2);margin-top:14px">
- 前 100 訂戶限定:NT$990 / 年,<strong>終身鎖價 forever</strong>。
+ 前 100 訂戶限定:NT$990 / 年,自動續扣,<strong>續訂維持此價(標準年費 NT$1,490)</strong>。
  滿額後新訂戶就是 NT$1,490 / 年。
  </p>
  <div class="actions">
@@ -311,7 +311,7 @@ function renderSubscription(sub) {
 
  // Expiry
  if (sub.plan === 'lifetime') {
- document.getElementById('expiryDate').textContent = '永久(終身方案)';
+ document.getElementById('expiryDate').textContent = '無到期日(終身方案 · 買斷)';
  } else if (sub.expiresAt) {
  const d = new Date(sub.expiresAt);
  document.getElementById('expiryDate').textContent = d.toLocaleDateString('zh-TW', { year: 'numeric', month: '2-digit', day: '2-digit' });
@@ -440,7 +440,7 @@ async function cancelRenew() {
 }
 
 async function requestRefund() {
- if (!confirm('確定要申請退費?\n\n按下確認後:\n• 訂閱立刻降級為免費版\n• 退款 7-14 個工作天由綠界 / 發卡銀行退回原信用卡\n• 已訂閱期間使用記錄會保留\n• 退費滿 2 次後該帳號將永久無法訂閱')) return;
+ if (!confirm('確定要申請退費?\n\n按下確認後:\n• 訂閱立刻降級為免費版\n• 退款 7-14 個工作天由綠界 / 發卡銀行退回原信用卡\n• 已訂閱期間使用記錄會保留\n• 七天內為無條件全額退;逾七天按未使用比例退\n（本站僅對明顯惡意濫用退費之帳號,保留拒絕未來新訂閱之權利）')) return;
  const btn = document.getElementById('btnRefund');
  if (btn) { btn.disabled = true; btn.textContent = '處理中…'; }
  try {

@@ -201,6 +201,41 @@ a:hover { text-decoration: underline; }
   .hd h1 { font-size: 15px; }
   .hd-links a { font-size: 12px; padding: 4px 10px; }
 }
+/* ===== 支持 / 贊助 QR（自 home.html 搬入）===== */
+.support-qr {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 24px; max-width: 640px; margin-top: 24px;
+}
+.qr-card {
+  background: var(--bg2); border: 1px solid var(--bd);
+  border-radius: var(--r); padding: 16px 16px 20px;
+  text-align: center; transition: border-color .25s var(--ease);
+  cursor: zoom-in;
+}
+.qr-card:hover { border-color: var(--ac); }
+.qr-card img {
+  display: block; width: 100%; max-width: 280px;
+  height: auto; margin: 0 auto 14px; border-radius: 8px;
+}
+.qr-label {
+  letter-spacing: .05em; font-size: 16px; font-weight: 700; color: var(--tx);
+}
+.qr-hint { font-size: 12px; color: var(--tx3); margin-top: 4px; }
+/* Lightbox */
+.qr-lightbox {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,.85); z-index: 1000;
+  align-items: center; justify-content: center;
+  padding: 24px; cursor: zoom-out;
+  animation: qrFadeIn .25s var(--ease);
+}
+.qr-lightbox.show { display: flex; }
+.qr-lightbox img { max-width: 90vw; max-height: 90vh; border-radius: 12px; }
+@keyframes qrFadeIn { from { opacity: 0; } to { opacity: 1; } }
+@media(max-width:600px) {
+  .support-qr { grid-template-columns: 1fr; gap: 14px; max-width: 360px; }
+  .qr-card img { max-width: 320px; }
+}
 </style>
 </head>
 <body>
@@ -286,6 +321,27 @@ a:hover { text-decoration: underline; }
       ※ 主要聯絡管道為 Email，回覆速度最快。若您身在境外或希望語音溝通，請於上述時段撥打客服電話。
     </div>
   </div>
+
+  <!-- Support / 贊助 QR（自 home.html 搬入） -->
+  <section id="support" style="margin-top:40px">
+    <h2>支持本站</h2>
+    <p class="subtitle">覺得好用、想請我喝杯咖啡的話，可以掃碼贊助。完全自由，沒有也完全沒關係 🙏</p>
+    <div class="support-qr">
+      <div class="qr-card" onclick="openQr('streetpay.jpg')">
+        <img src="streetpay.jpg" alt="街口支付 QR Code" loading="lazy">
+        <div class="qr-label">街口支付</div>
+        <div class="qr-hint">點圖放大 · 街口 App 掃碼</div>
+      </div>
+      <div class="qr-card" onclick="openQr('allpay.jpg')">
+        <img src="allpay.jpg" alt="歐付寶 QR Code" loading="lazy">
+        <div class="qr-label">歐付寶</div>
+        <div class="qr-hint">點圖放大 · 歐付寶 App 掃碼</div>
+      </div>
+    </div>
+    <div class="qr-lightbox" id="qrLightbox" onclick="this.classList.remove('show')">
+      <img id="qrLightboxImg" alt="QR Code 放大">
+    </div>
+  </section>
 </main>
 
 <footer class="ft">
@@ -498,5 +554,14 @@ async function submitForm(e) {
 </script>
 <!-- Cloudflare Web Analytics --><script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon="{&quot;token&quot;: &quot;0a94a20c2737440a86f55c4241011f68&quot;}"></script><!-- End Cloudflare Web Analytics -->
 <script src="counter.js"></script>
+<script>
+// 贊助 QR 放大（自 home.html 搬入）
+function openQr(src) {
+  const box = document.getElementById('qrLightbox');
+  const img = document.getElementById('qrLightboxImg');
+  img.src = src;
+  box.classList.add('show');
+}
+</script>
 </body>
 </html>

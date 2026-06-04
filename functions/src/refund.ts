@@ -59,10 +59,14 @@ export const refund = functions.onRequest(
         return;
       }
 
-      if (sub.status !== "active" && sub.status !== "cancelled") {
+      // 只擋「已結算」狀態(status="refunded" 同時涵蓋已退款與已爭議扣回 chargeback,
+      // 見 chargeback.ts),避免重複退費。其餘狀態(含 expired/逾期停權)只要仍有
+      // 「已付費未使用天數」就應允許比例退,不得逕予沒收(消保法第12條 顯失公平)。
+      // 實際可退金額由下方比例計算把關,daysRemaining<=0 時以 no_refundable_amount 擋下。
+      if (sub.status === "refunded") {
         res.status(400).json({
-          error: "not_active",
-          reason: `訂閱狀態為「${sub.status}」,無可退費。`,
+          error: "already_settled",
+          reason: "訂閱已退款/已爭議扣回,無可重複退費。",
         });
         return;
       }

@@ -1322,7 +1322,7 @@ select::-ms-expand { display: none; }
 <div class="overlay" id="overlay" onclick="toggleSd()"></div>
 <main class="mn" id="mn"></main>
 <footer class="ft">
-  <div style="margin-bottom:10px"><a href="home.html#support" style="font-size:12px;color:var(--ac);text-decoration:none">💝 支持 / 贊助</a></div>
+  <div style="margin-bottom:10px"><a href="contact.html#support" style="font-size:12px;color:var(--ac);text-decoration:none">💝 支持 / 贊助</a></div>
   <div data-i18n="copyright">&copy; 2026 再留計劃 — All rights reserved.</div>
   <div style="margin-top:4px" data-i18n="disclaimer">本站內容為原創整理，不隸屬於 JLPT 官方或任何教育機構。</div>
   <div style="margin-top:4px;font-size:12px;opacity:.7">語音：VOICEVOX:四国めたん</div>
@@ -2036,7 +2036,7 @@ const Shadow = (() => {
   let _sharedAudio = null;
   function playOnce(text, onEnd) {
     if (paused) return;
-    // ToolQuota:每句念 1 次算 1 次跟讀(免費版每天 3 句,超過會擋並停止播放)
+    // ToolQuota:跟讀 session 在 Shadow.start* 開啟時計 1 次(免費版每工具每天 1 次);同 session 內逐句免費
     if (typeof window.ToolQuota !== 'undefined' && window.ToolQuota.shouldGate && window.ToolQuota.shouldGate()) {
       if (!window.ToolQuota.consumeShadowOrBlock()) {
         paused = true;
