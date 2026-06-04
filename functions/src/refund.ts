@@ -119,32 +119,45 @@ export const refund = functions.onRequest(
         return;
       }
 
-      // 呼叫綠界退費 API(DoAction Action=R)
+      // 呼叫綠界退費 API(信用卡 CreditDetail/DoAction)
+      //
+      // ⚠️ 信用卡退款動作依「結算狀態」不同,用錯會回 error_amount_R:
+      //   已關帳(撥款後,約隔日起) → R 退刷(可部分退)
+      //   已請款未關帳(當天/撥款前) → E 取消請款(僅全額)
+      //   已授權未請款(預授權)      → N 放棄授權(僅全額)
+      // 不另打查詢 API,改採「依序嘗試、取第一個 RtnCode=1」:
+      //   全額退(7 天內)→ R → E → N(任一結算狀態都能退到錢)
+      //   部分退(逾 7 天,必已關帳)→ 只用 R(E/N 僅全額,不可用於部分退)
       const cfg = ecpayConfig();
-      const refundParams: Record<string, string | number> = {
-        MerchantID: cfg.merchantId,
-        MerchantTradeNo: sub.ecpay_order,
-        TradeNo: tradeNo,                  // ← 必須是 ECPay TradeNo 不是 MerchantTradeNo
-        Action: "R",                       // R = Refund
-        TotalAmount: refundAmount,
-      };
-      refundParams.CheckMacValue = checkMacValue(refundParams);
+      const isFullRefund = refundAmount === planInfo.price_twd;
+      const actions = isFullRefund ? ["R", "E", "N"] : ["R"];
 
       let ecpayMsg = "";
       let refundOk = false;
-      try {
-        const ecpayRes = await axios.post(
-          ecpayRefundEndpoint(),
-          new URLSearchParams(refundParams as Record<string, string>).toString(),
-          { headers: { "Content-Type": "application/x-www-form-urlencoded" }, timeout: 30000 },
-        );
-        ecpayMsg = String(ecpayRes.data);
-        console.log("ECPay refund response:", ecpayMsg);
-        // 綠界 DoAction 回應格式:RtnCode=1 為成功
-        refundOk = /RtnCode=1\b/.test(ecpayMsg);
-      } catch (e) {
-        ecpayMsg = String(e);
-        console.error("ECPay refund call failed:", e);
+      let usedAction = "";
+      for (const action of actions) {
+        const refundParams: Record<string, string | number> = {
+          MerchantID: cfg.merchantId,
+          MerchantTradeNo: sub.ecpay_order,
+          TradeNo: tradeNo,                // ← 必須是 ECPay TradeNo 不是 MerchantTradeNo
+          Action: action,
+          TotalAmount: refundAmount,
+        };
+        refundParams.CheckMacValue = checkMacValue(refundParams);
+        try {
+          const ecpayRes = await axios.post(
+            ecpayRefundEndpoint(),
+            new URLSearchParams(refundParams as Record<string, string>).toString(),
+            { headers: { "Content-Type": "application/x-www-form-urlencoded" }, timeout: 30000 },
+          );
+          ecpayMsg = String(ecpayRes.data);
+          console.log(`ECPay refund response (Action=${action}):`, ecpayMsg);
+          // 綠界 DoAction 回應格式:RtnCode=1 為成功
+          if (/RtnCode=1\b/.test(ecpayMsg)) { refundOk = true; usedAction = action; break; }
+        } catch (e) {
+          ecpayMsg = String(e);
+          console.error(`ECPay refund call failed (Action=${action}):`, e);
+        }
       }
 
       if (!refundOk) {
@@ -184,7 +197,7 @@ export const refund = functions.onRequest(
         external_id: tradeNo,
         status: "refunded",
         email_hash: emailHash(email),
-        note: refundReason,
+        note: `${refundReason}(ECPay Action=${usedAction})`,
       });
 
       // 早鳥首次訂閱 + 7 天內全退 → 釋放名額(讓下一個 user 可以買早鳥)
