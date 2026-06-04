@@ -50,7 +50,8 @@ const GrammarDrill = (() => {
         <button data-v="n3">N3</button><button data-v="n2">N2</button><button data-v="n1">N1</button>
       </div></div>
       <div class="qf"><label>${t('gd_range')}</label><div class="qo" id="gdRange">
-        <button data-v="due" class="on">${t('gd_range_due')}</button>
+        <button data-v="today" class="on">📚 ${t('gd_range_today')}</button>
+        <button data-v="due">${t('gd_range_due')}</button>
         <button data-v="new">${t('gd_range_new')}</button>
         <button data-v="all">${t('gd_range_all')}</button>
       </div></div>
@@ -77,14 +78,18 @@ const GrammarDrill = (() => {
     const srs = getSRS();
     const todayStr = today();
 
-    if (range === 'due') {
-      queue = data.filter(d => { const e = srs[d.id]; return e && e.nextReview <= todayStr; });
-      if (!queue.length) {
-        // Add some new ones if no due
-        const learned = new Set(Object.keys(srs));
-        const nw = data.filter(d => !learned.has(d.id)).slice(0, 10);
-        queue = nw;
+    if (range === 'today') {
+      // 「今日學習」= 文法每日批次（offset ~ offset+GRAMMAR_DAILY_NEW），對齊單字測驗的同名範圍
+      if (typeof getGrammarDailyProgress !== 'function' || typeof GRAMMAR_DAILY_NEW === 'undefined') {
+        alert(t('gd_today_empty')); return;
       }
+      const prog = getGrammarDailyProgress(lvl);
+      queue = data.slice(prog.totalOffset, prog.totalOffset + GRAMMAR_DAILY_NEW);
+      if (!queue.length) { alert(t('gd_today_empty')); return; }
+    } else if (range === 'due') {
+      // 只出真正到期的複習項；沒有就明確告知（不再偷塞新項，避免和「新的」混淆）
+      queue = data.filter(d => { const e = srs[d.id]; return e && e.nextReview <= todayStr; });
+      if (!queue.length) { alert(t('gd_due_empty')); return; }
     } else if (range === 'new') {
       const learned = new Set(Object.keys(srs));
       queue = data.filter(d => !learned.has(d.id)).slice(0, 15);

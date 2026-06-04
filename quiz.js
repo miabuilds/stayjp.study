@@ -21,6 +21,7 @@ const Quiz = (() => {
         <button class="on" data-v="word2meaning">${t('type_ja_zh')}</button>
         <button data-v="meaning2word">${t('type_zh_ja')}</button>
         <button data-v="reading">${t('type_reading')}</button>
+        <button data-v="typing">${t('type_typing')}</button>
       </div></div>
       <div class="qf"><label>範圍</label><div class="qo" id="qRange">
         <button class="on" data-v="all">全部</button>
@@ -70,6 +71,29 @@ const Quiz = (() => {
     renderQ();
   }
 
+  // ===== 讀音題「語音易混淆」干擾項生成（促音/長音/濁音 最小對立）=====
+  const DAKU = {'か':'が','が':'か','き':'ぎ','ぎ':'き','く':'ぐ','ぐ':'く','け':'げ','げ':'け','こ':'ご','ご':'こ','さ':'ざ','ざ':'さ','し':'じ','じ':'し','す':'ず','ず':'す','せ':'ぜ','ぜ':'せ','そ':'ぞ','ぞ':'そ','た':'だ','だ':'た','ち':'ぢ','ぢ':'ち','つ':'づ','づ':'つ','て':'で','で':'て','と':'ど','ど':'と','は':'ば','ば':'ぱ','ぱ':'は','ひ':'び','び':'ぴ','ぴ':'ひ','ふ':'ぶ','ぶ':'ぷ','ぷ':'ふ','へ':'べ','べ':'ぺ','ぺ':'へ','ほ':'ぼ','ぼ':'ぽ','ぽ':'ほ'};
+  const SOKU_BEFORE = 'かきくけこさしすせそたちつてとぱぴぷぺぽ';
+  const OU_ROW = 'おこそとのほもよろごぞどぼぽうくすつぬふむゆるぐずづぶぷ';
+  function lengthenShorten(s, set) {
+    if (/[うい]$/.test(s) && s.length > 2) set.add(s.slice(0, -1));      // 去長音
+    if (OU_ROW.includes(s[s.length - 1])) set.add(s + 'う');             // 加長音（限 o/u 段）
+  }
+  function genPhoneticConfusables(r) {
+    const base = new Set(); const chars = [...r];
+    chars.forEach((c, i) => { if (DAKU[c]) { const v = [...chars]; v[i] = DAKU[c]; base.add(v.join('')); } }); // 濁/半濁
+    lengthenShorten(r, base);                                            // 長音 增減
+    if (r.includes('っ')) base.add(r.replace('っ', ''));                  // 去促音
+    else for (let i = 1; i < chars.length; i++) {                        // 加促音（避免接 ん/っ 後）
+      if (SOKU_BEFORE.includes(chars[i]) && chars[i-1] !== 'ん' && chars[i-1] !== 'っ') {
+        base.add(chars.slice(0, i).join('') + 'っ' + chars.slice(i).join('')); break;
+      }
+    }
+    [...base].forEach(v => lengthenShorten(v, base));                    // 組合：濁音變體再做長音 → 補滿網格
+    base.delete(r);
+    return [...base].filter(s => s.length >= 2 && !/っっ|っ$|^っ|うう/.test(s));
+  }
+
   function generate(source, distractorPool, count) {
     // 兼容舊呼叫：如果只傳 1~2 個參數，補成同個 pool
     if (count === undefined) { count = distractorPool; distractorPool = source; }
@@ -78,12 +102,24 @@ const Quiz = (() => {
     const shuffled = [...filtered].sort(() => Math.random() - 0.5);
     const picked = shuffled.slice(0, Math.min(count, shuffled.length));
     return picked.map(word => {
-      const pool = distractorPool.filter(d => {
-        if (quizType === 'word2meaning') return d.m !== word.m;
-        if (quizType === 'meaning2word') return d.w !== word.w;
-        return d.r !== word.r;
-      }).sort(() => Math.random() - 0.5).slice(0, 3);
-      const options = [word, ...pool].sort(() => Math.random() - 0.5);
+      let distractors;
+      if (quizType === 'reading') {
+        // 干擾項 = 語音易混淆最小對立；不足 3 個再用題庫真詞補
+        distractors = genPhoneticConfusables(word.r).sort(() => Math.random() - 0.5)
+          .slice(0, 3).map(s => ({ w: '', r: s, m: '' }));
+        if (distractors.length < 3) {
+          const seen = new Set([word.r, ...distractors.map(o => o.r)]);
+          const extra = distractorPool.filter(d => !seen.has(d.r))
+            .sort(() => Math.random() - 0.5).slice(0, 3 - distractors.length);
+          distractors = distractors.concat(extra);
+        }
+      } else {
+        distractors = distractorPool.filter(d => {
+          if (quizType === 'word2meaning') return d.m !== word.m;
+          return d.w !== word.w; // meaning2word
+        }).sort(() => Math.random() - 0.5).slice(0, 3);
+      }
+      const options = [word, ...distractors].sort(() => Math.random() - 0.5);
       return { word, options, correctIdx: options.indexOf(word) };
     });
   }
@@ -94,7 +130,53 @@ const Quiz = (() => {
     return item.r;
   }
 
+  // 濁音/半濁音 → 清音基底（用於「差在哪」判斷）
+  const DAKU_BASE = {'が':'か','ぎ':'き','ぐ':'く','げ':'け','ご':'こ','ざ':'さ','じ':'し','ず':'す','ぜ':'せ','ぞ':'そ','だ':'た','ぢ':'ち','づ':'つ','で':'て','ど':'と','ば':'は','び':'ひ','ぶ':'ふ','べ':'へ','ぼ':'ほ','ぱ':'は','ぴ':'ひ','ぷ':'ふ','ぺ':'へ','ぽ':'ほ'};
+  function typingDiffHint(a, b) {
+    const stripDaku = s => [...s].map(c => DAKU_BASE[c] || c).join('');
+    if (stripDaku(a) === stripDaku(b)) return t('ty_diff_daku');               // 只差濁/半濁
+    if (a.replace(/っ/g, '') === b.replace(/っ/g, '')) return t('ty_diff_soku'); // 只差促音
+    if (a.replace(/[ーう]/g, '') === b.replace(/[ーう]/g, '')) return t('ty_diff_long'); // 只差長音
+    return t('ty_diff_other');
+  }
+  function renderTyping() {
+    const q = questions[current];
+    const main = typeof cvt === 'function' ? cvt(q.word.m) : q.word.m;
+    const box = document.getElementById('quizBox');
+    box.innerHTML = `
+      <div class="qhd"><span>${current+1} / ${questions.length}</span><span>${t('quiz_score', { n: score })}</span><button class="qclose" style="width:auto;margin:0;padding:2px 10px" onclick="Quiz.close()">✕</button></div>
+      <div class="qprompt"><div class="qmain">${main}</div><div class="qsub">${t('ty_sub')}</div></div>
+      <div class="qf"><input id="tyInput" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="${t('ty_placeholder')}" style="width:100%;box-sizing:border-box;padding:12px 14px;font-size:20px;text-align:center;border:1px solid var(--bd);border-radius:10px;background:var(--bg2);color:var(--tx)"></div>
+      <div id="tyFeedback" style="min-height:24px;text-align:center;font-size:14px;margin:8px 0"></div>
+      <button class="qstart" onclick="Quiz.submitTyping()">${t('ty_submit')}</button>`;
+    const inp = document.getElementById('tyInput');
+    if (inp) { inp.focus(); inp.onkeydown = e => { if (e.key === 'Enter' && !e.isComposing) Quiz.submitTyping(); }; }
+  }
+  function submitTyping() {
+    const q = questions[current];
+    const inp = document.getElementById('tyInput');
+    if (!inp || inp.disabled) return;
+    const typed = inp.value.trim().replace(/\s+/g, '');
+    if (!typed) return;
+    const ok = typed === q.word.r || typed === q.word.w;
+    if (ok) score++;
+    results.push({ word: q.word, correct: ok, typed, typing: true });
+    if (typeof SRS !== 'undefined' && SRS.record) SRS.record(quizLevel, q.word.w, ok);
+    if (!ok && typeof Stats !== 'undefined' && Stats.addToNotebook) Stats.addToNotebook(q.word.w, q.word.r, q.word.m, quizLevel);
+    inp.disabled = true;
+    const fb = document.getElementById('tyFeedback');
+    if (ok) {
+      inp.style.borderColor = 'var(--ac)';
+      if (fb) fb.innerHTML = `<span style="color:var(--ac)">✓ ${q.word.r}</span>`;
+    } else {
+      inp.style.borderColor = '#EF4444';
+      if (fb) fb.innerHTML = `<span style="color:#EF4444">✗ ${t('ty_correct_is')}：<b>${q.word.r}</b></span>　<span style="color:var(--tx2)">${typingDiffHint(typed, q.word.r)}</span>`;
+    }
+    setTimeout(() => { current++; current >= questions.length ? showResults() : renderQ(); }, ok ? 700 : 1700);
+  }
+
   function renderQ() {
+    if (quizType === 'typing') { renderTyping(); return; }
     const q = questions[current];
     const box = document.getElementById('quizBox');
     let main, sub;
@@ -143,6 +225,10 @@ const Quiz = (() => {
         const wFull = r.word.w + (r.word.w !== r.word.r ? '（'+r.word.r+'）' : '');
         const summary = wFull + ' — ' + m;
         if (r.correct) return '<div class="qr ok"><span class="qrc">✓</span> '+summary+'</div>';
+        // 打字題錯：顯示你打的 + 正解
+        if (r.typing) {
+          return `<div class="qr ng"><span class="qrc">✗</span> ${summary}　${t('ty_you_typed')}：${r.typed || '—'} → ${t('ty_correct_is')}：${r.word.r}</div>`;
+        }
         // 錯題：依題型顯示正確答案（讀音題→讀音、中選日→漢字、看日選中→中譯）
         const correctAnswer = disp(r.word);
         return `<div class="qr ng"><span class="qrc">✗</span> ${summary}　${t('quiz_you_chose', { chose: disp(r.options[r.chosenIdx]), correct: correctAnswer })}</div>`;
@@ -159,5 +245,5 @@ const Quiz = (() => {
     renderQ();
   }
 
-  return { start, begin, answer, close, toggleKanji, retrySame };
+  return { start, begin, answer, close, toggleKanji, retrySame, submitTyping };
 })();
