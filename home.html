@@ -531,6 +531,23 @@ a:hover { text-decoration: underline; }
   .marquee span { font-size: 18px; }
   .hero-cta { padding: 14px 28px; font-size: 14px; }
 }
+/* Changelog 近期更新 */
+.changelog { border-top: 1px solid var(--line); }
+.cl-item {
+  display: flex; gap: 20px; padding: 22px 4px;
+  border-bottom: 1px solid var(--line); align-items: baseline;
+}
+.cl-date {
+  font-family: var(--serif); font-size: 13px; color: var(--ac);
+  letter-spacing: .12em; white-space: nowrap; flex-shrink: 0; min-width: 70px;
+}
+.cl-tag {
+  display: inline-block; font-size: 11px; font-weight: 700; color: var(--ac);
+  border: 1px solid var(--ac); border-radius: 6px; padding: 1px 7px;
+  margin-right: 8px; letter-spacing: .05em;
+}
+.cl-body { font-size: 15px; line-height: 1.7; color: var(--tx); }
+@media(max-width:600px) { .cl-item { flex-direction: column; gap: 6px; } }
 </style>
 </head>
 <body>
@@ -608,6 +625,20 @@ a:hover { text-decoration: underline; }
         <div class="feature-desc">艾賓浩斯記憶曲線，記得 / 不熟 / 不會三段評分，排程到對的時間點出現。</div>
       </div>
 
+    </div>
+  </div>
+</section>
+
+<!-- Changelog 近期更新 -->
+<section class="section">
+  <div class="section-inner">
+    <div class="eyebrow reveal">CHANGELOG · 近期更新</div>
+    <h2 class="section-title reveal">一直在<em>偷偷變強</em>。</h2>
+    <div class="changelog reveal reveal-d1">
+      <div class="cl-item"><span class="cl-date">2026.06</span><div class="cl-body"><span class="cl-tag">新功能</span>單字測驗新增「✍️ 打字輸入」題型，再加上讀音題的「易混淆」挑戰（促音・長音・濁音差一個，更有挑戰性）。</div></div>
+      <div class="cl-item"><span class="cl-date">2026.06</span><div class="cl-body"><span class="cl-tag">新功能</span>文法練習新增「今日學習」範圍，對齊單字測驗，只練今天學過的文法。</div></div>
+      <div class="cl-item"><span class="cl-date">2026.06</span><div class="cl-body"><span class="cl-tag">改進</span>動詞變化互動練習選擇題改版：干擾項換成同一動詞的其他變化形，真正考辨認能力，不再看漢字就猜中。</div></div>
+      <div class="cl-item"><span class="cl-date">2026.06</span><div class="cl-body"><span class="cl-tag">改進</span>今日故事跟讀讀音校正，多音字（方・被る 等）不再念錯。</div></div>
     </div>
   </div>
 </section>
