@@ -258,7 +258,9 @@ export async function precheckSubscribe(uid: string, email: string): Promise<Pre
   const { count, limit } = await getEarlyBirdCount();
   const earlyBirdOpen = count < limit;
 
-  const allowed: PlanKey[] = ["monthly", "yearly"];
+  // lifetime(買斷)= 一次性付款,只受「無 active 訂閱 + 非黑名單」限制(上面已擋),
+  // 不受早鳥名額 / 退費資格影響 → 一律放行
+  const allowed: PlanKey[] = ["monthly", "yearly", "lifetime"];
   if (earlyBirdOpen && !noEarlyBird) allowed.unshift("yearly_early_bird");
 
   return { ok: true, allowed_plans: allowed };
