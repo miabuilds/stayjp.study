@@ -1,4 +1,4 @@
-const CACHE_NAME = 'stayjp-v152';
+const CACHE_NAME = 'stayjp-v153';
 const ASSETS = [
   './',
   './index.html',
@@ -8,6 +8,8 @@ const ASSETS = [
   // vocab-n*.js / grammar-n*.js / confusables.js 移除：資料已搬 Firestore content/master，
   // 由 content-loader.js 取 + localStorage 快取
   './content-loader.js',
+  './i18n.js',
+  './tool-quota.js',
   './grammar-kanji-readings.js',
   './conjugate.js',
   './quiz.js',
@@ -23,11 +25,11 @@ const ASSETS = [
   './stayjpplan.png',
   './stayjpplan-192.png',
   './manifest.json',
+  './pricing.html',
   './terms.html',
   './privacy.html',
   './refund.html',
-  './account.html',
-  './quota.js'
+  './account.html'
 ];
 
 // Install: cache all assets
