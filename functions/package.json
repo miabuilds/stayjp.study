@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "StayJP Cloud Functions — 綠界 ECPay 金流 + RevenueCat webhook + 失敗 retry + chargeback",
   "engines": {
-    "node": "20"
+    "node": "22"
   },
   "main": "lib/index.js",
   "scripts": {
@@ -21,7 +21,7 @@
     "firebase-functions": "^6.1.0"
   },
   "devDependencies": {
-    "@types/node": "^20.14.0",
+    "@types/node": "^22.0.0",
     "typescript": "^5.5.0"
   },
   "private": true
