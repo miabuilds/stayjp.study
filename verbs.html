@@ -298,10 +298,19 @@ td.hl { color: var(--em-color); font-weight: 600; }
 [data-theme="dark"] .quiz-panel { box-shadow: none; }
 .quiz-controls { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
 .quiz-controls select, .quiz-controls button {
-  padding: 6px 14px; border-radius: 10px; font-size: 13px;
+  padding: 7px 14px; border-radius: 10px; font-size: 13px;
   cursor: pointer; border: 1px solid var(--bd);
   background: var(--bg2); color: var(--tx); transition: all .2s var(--ease);
 }
+/* 去掉 native select 的 3D 斜角外觀，改用扁平自繪箭頭，與深色扁平主題一致 */
+.quiz-controls select {
+  -webkit-appearance: none; -moz-appearance: none; appearance: none;
+  padding-right: 32px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 12px center;
+}
+.quiz-controls select:hover { border-color: var(--ac2); }
+.quiz-controls select:focus { outline: none; border-color: var(--ac2); }
 .quiz-controls button {
   background: var(--ac2); color: #fff; border-color: var(--ac2); font-weight: 600;
 }
@@ -1180,8 +1189,8 @@ td.hl { color: var(--em-color); font-weight: 600; }
       <p style="color:var(--tx2);font-size:13px;margin-bottom:12px">看句子裡的助詞（が／を）和語意，選出對應的自動詞或他動詞形式。答錯會顯示提示，連續答對 5 題自動換下一輪。</p>
       <div id="ptqWrap"></div>
       <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
-        <button class="spk" style="padding:6px 14px;width:auto;font-size:13px" onclick="PTQuiz.next()">下一題 →</button>
-        <button class="spk" style="padding:6px 14px;width:auto;font-size:13px" onclick="PTQuiz.reset()">重置分數</button>
+        <button style="padding:8px 18px;font-size:13px;font-weight:600;background:var(--ac);color:#fff;border:none;border-radius:10px;cursor:pointer" onclick="PTQuiz.next()">下一題 →</button>
+        <button style="padding:8px 18px;font-size:13px;background:var(--bg2);color:var(--tx);border:1px solid var(--bd);border-radius:10px;cursor:pointer" onclick="PTQuiz.reset()">重置分數</button>
         <span id="ptqScore" style="margin-left:auto;font-size:13px;color:var(--tx2);align-self:center"></span>
       </div>
     </div></div>
@@ -1652,19 +1661,31 @@ function escHtml(s) {
   return s.replace(/'/g, "\\'").replace(/"/g, '&quot;');
 }
 
+function shuffleInPlace(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
 function generateOptions(verb, formKey, correct) {
-  const allAnswers = VERBS.map(v => v[formKey]).filter(a => a !== correct);
-  for (let i = allAnswers.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [allAnswers[i], allAnswers[j]] = [allAnswers[j], allAnswers[i]];
+  // 干擾項用「同一動詞的其他變化形」（泳ぐ→泳がない/泳ぎます/泳いで…），漢字相同，
+  // 逼使用者真的辨認「哪個才是該變化形」，而非看漢字配對。
+  // （原本取其他動詞的同一形，漢字不同，看漢字就能猜中，失去考點）
+  let wrong = shuffleInPlace(
+    [...new Set(
+      FORM_KEYS.filter(k => k !== formKey).map(k => verb[k]).filter(a => a && a !== correct)
+    )]
+  ).slice(0, 3);
+  // 該動詞可用變化形不足 3 個（重複/缺漏）→ 用其他動詞的同一形補滿
+  if (wrong.length < 3) {
+    const others = shuffleInPlace(
+      VERBS.map(v => v[formKey]).filter(a => a && a !== correct && !wrong.includes(a))
+    );
+    wrong = wrong.concat(others.slice(0, 3 - wrong.length));
   }
-  const wrong = allAnswers.slice(0, 3);
-  const opts = [correct, ...wrong];
-  for (let i = opts.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [opts[i], opts[j]] = [opts[j], opts[i]];
-  }
-  return opts;
+  return shuffleInPlace([correct, ...wrong]);
 }
 
 function checkTypedAnswer(correct) {
