@@ -379,6 +379,13 @@ function renderSubscription(sub) {
  checkRefundEligibility(sub);
  }
  } else {
+ // 已失效(退費 / 過期):不再顯示為有效方案,避免「目前方案 + 未來到期日」誤導。
+ // 功能上 isPremium() 已排除這些狀態(全額退費=權限即止),UI 同步顯示為免費版。
+ planLabel.innerHTML = '免費版 <span class="badge b-free">FREE</span>';
+ rowExpiry.style.display = 'none';
+ rowRenew.style.display = 'none';
+ rowSource.style.display = 'none';
+ // rowStatus 保留,顯示「已退費 / 已過期」當作說明
  freeActions.style.display = 'block';
  premiumActions.style.display = 'none';
  appNote.style.display = 'none';
