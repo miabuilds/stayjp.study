@@ -421,7 +421,13 @@ function sendEmail(tmpl, f) {
  const issue = (f.message || '').slice(0, 120).replace(/\n/g, ' ');
  const subject = tmpl.subject;
  const body = tmpl.body.replace(/\{DATE\}/g, date).replace(/\{ISSUE\}/g, issue);
- const url = `mailto:${encodeURIComponent(f.email)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+ // 用 Gmail 撰寫視窗、以 stayjpplan@gmail.com 為寄件帳號(需在瀏覽器登入該帳號)
+ // authuser=email 指定帳號;view=cm 撰寫模式;su=主旨;body=內文
+ const SENDER = 'stayjpplan@gmail.com';
+ const url = `https://mail.google.com/mail/?authuser=${encodeURIComponent(SENDER)}`
+   + `&view=cm&fs=1&to=${encodeURIComponent(f.email)}`
+   + `&su=${encodeURIComponent(subject)}`
+   + `&body=${encodeURIComponent(body)}`;
  window.open(url, '_blank');
 
  // mark email sent
