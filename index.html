@@ -1311,6 +1311,7 @@ select::-ms-expand { display: none; }
   <hr style="border:none;border-top:1px solid var(--bd);margin:4px 0">
   <div style="font-size:10px;color:var(--tx3);padding:4px 12px 2px;text-transform:uppercase;letter-spacing:.5px">跟讀</div>
   <button class="more-item" onclick="closeMore();Shadow.startFavs()">⭐ 跟讀我的收藏</button>
+  <button class="more-item" onclick="closeMore();Shadow.startGrammarFavs()">📖 跟讀收藏文法</button>
   <button class="more-item" onclick="closeMore();Stats.quizFavListening()">🎧 收藏聽力測驗</button>
   <hr style="border:none;border-top:1px solid var(--bd);margin:4px 0">
   <div style="font-size:10px;color:var(--tx3);padding:4px 12px 2px;text-transform:uppercase;letter-spacing:.5px">學習工具</div>
@@ -2207,13 +2208,35 @@ const Shadow = (() => {
     start(items);
   }
 
+  // 只跟讀「收藏的文法」例句(文法卡 ★ → favorites[lv]),純文法、專注練不熟的
+  function startGrammarFavs() {
+    const items = [];
+    ['n5','n4','n3','n2','n1'].forEach(lv => {
+      const favIds = favorites[lv] || [];
+      if (!favIds.length) return;
+      const byId = {};
+      (getGrammarData(lv).data || []).forEach(g => { byId[g.id] = g; });
+      favIds.forEach(id => {
+        const g = byId[id];
+        if (!g || !Array.isArray(g.eg)) return;
+        g.eg.forEach(e => {
+          const j = (e.j || '').replace(/<[^>]+>/g, '').trim();  // 去掉 <em> 等標籤
+          if (j) items.push({ j, z: e.z || g.t || '' });
+        });
+      });
+    });
+    if (!items.length) { alert('還沒收藏文法。在文法卡右上點 ★ 收藏,再回來這裡只跟讀你收藏的文法。'); return; }
+    items.sort(() => Math.random() - 0.5);
+    start(items);
+  }
+
   function favCount() {
     let c = Object.keys(loadFavs()).length;
     try { c += (JSON.parse(localStorage.getItem('word_notebook')) || []).length; } catch(e) {}
     return c;
   }
 
-  return { startCurrent, startFavs, start, favCount };
+  return { startCurrent, startFavs, startGrammarFavs, start, favCount };
 })();
 
 // ========== DAILY STORY (今日故事) ==========
