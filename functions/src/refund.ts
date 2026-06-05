@@ -132,7 +132,8 @@ export const refund = functions.onRequest(
       const isFullRefund = refundAmount === planInfo.price_twd;
       const actions = isFullRefund ? ["R", "E", "N"] : ["R"];
 
-      let ecpayMsg = "";
+      let ecpayMsg = "";       // 失敗時回報用
+      let rMsg = "";           // R(退刷)的回應 — 已關帳交易的真正失敗原因通常在此(如「可退刷額度不足」)
       let refundOk = false;
       let usedAction = "";
       for (const action of actions) {
@@ -144,21 +145,25 @@ export const refund = functions.onRequest(
           TotalAmount: refundAmount,
         };
         refundParams.CheckMacValue = checkMacValue(refundParams);
+        let msg = "";
         try {
           const ecpayRes = await axios.post(
             ecpayRefundEndpoint(),
             new URLSearchParams(refundParams as Record<string, string>).toString(),
             { headers: { "Content-Type": "application/x-www-form-urlencoded" }, timeout: 30000 },
           );
-          ecpayMsg = String(ecpayRes.data);
-          console.log(`ECPay refund response (Action=${action}):`, ecpayMsg);
+          msg = String(ecpayRes.data);
+          console.log(`ECPay refund response (Action=${action}):`, msg);
           // 綠界 DoAction 回應格式:RtnCode=1 為成功
-          if (/RtnCode=1\b/.test(ecpayMsg)) { refundOk = true; usedAction = action; break; }
+          if (/RtnCode=1\b/.test(msg)) { refundOk = true; usedAction = action; ecpayMsg = msg; break; }
         } catch (e) {
-          ecpayMsg = String(e);
+          msg = String(e);
           console.error(`ECPay refund call failed (Action=${action}):`, e);
         }
+        if (action === "R") rMsg = msg;
       }
+      // 失敗時優先回報 R 的原因:E/N 對已關帳交易必回 error_closed,會蓋掉真正原因(如餘額不足)
+      if (!refundOk) ecpayMsg = rMsg || ecpayMsg;
 
       if (!refundOk) {
         // 綠界退費失敗 → 不要更新 Firestore,避免錢沒退用戶降級
