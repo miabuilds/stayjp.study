@@ -21,6 +21,7 @@
     'stayjpplan@gmail.com',
   ]);
 
+  const LAUNCHED = false;         // ⚠️ 開閘總開關:false=過渡期(不 gate 真實用戶);true=正式開閘(gating 全員非 premium)
   const PER_TOOL_LIMIT = 1;       // 每個工具每天免費次數
   const GLOBAL_DAILY_LIMIT = 3;   // 每天全站最多免費試用幾個練習工具(收緊「每工具 1 次」的總量)
   const TOOL_NAMES = {
@@ -53,7 +54,8 @@
     if (!authReady) return false;     // 等 auth 狀態確定再決定,避免閃一下
     if (isPremium()) return false;     // 付費用戶(登入 + 有效訂閱)→ 不擋
     if (cachedUserEmail && QUOTA_WHITELIST.has(cachedUserEmail.toLowerCase())) return false;  // owner / 免費白名單帳號 → 永遠免擋
-    return true;                       // 其餘所有人(含未登入訪客)→ 每工具每天 1 次
+    if (!LAUNCHED) return false;       // 未開閘:過渡期不 gate 任何真實用戶(開閘時把 LAUNCHED 改 true)
+    return true;                       // 開閘後:其餘所有人(含未登入訪客)→ 每工具每天 1 次
     // ↑ 開閘版(2026-06):匿名也擋,只有 premium 免擋。
     //   過渡期舊邏輯(僅 owner 白名單)如需回退:
     //   if (!cachedUserEmail) return false;
