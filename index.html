@@ -1465,10 +1465,18 @@ function showInAppHelp() {
   });
 }
 
+let _signingIn = false;
 function handleAuth() {
   if (currentUser) { auth.signOut(); currentUser = null; updateAuthUI(); return; }
   if (isInAppBrowser()) { showInAppHelp(); return; }
-  auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()).catch(e => alert('登入失敗: ' + e.message));
+  if (_signingIn) return;   // 防連點:前一個登入彈窗還沒結束就別再開(auth/cancelled-popup-request)
+  _signingIn = true;
+  auth.signInWithPopup(new firebase.auth.GoogleAuthProvider())
+    .catch(e => {
+      // 連點被取消 / 用戶自己關彈窗 = 良性,不要彈「登入失敗」嚇人
+      if (e.code !== 'auth/cancelled-popup-request' && e.code !== 'auth/popup-closed-by-user') alert('登入失敗: ' + e.message);
+    })
+    .finally(() => { _signingIn = false; });
 }
 function updateAuthUI() {
   const area = document.getElementById('authArea');
