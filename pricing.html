@@ -71,6 +71,13 @@ a:hover{text-decoration:underline}
 .plan-features li.disabled::before{content:"—";color:var(--tx3)}
 .plan-cta{display:block;text-align:center;padding:12px;background:var(--bg3);color:var(--tx);border-radius:10px;font-weight:600;font-size:14px;border:1px solid var(--bd)}
 .plan.featured .plan-cta{background:var(--ac);color:#fff;border-color:var(--ac)}
+/* 已訂閱狀態 */
+.plan-cta.is-current{background:var(--bg3);color:var(--tx2);border-color:var(--bd);cursor:default;opacity:.85}
+.plan.featured .plan-cta.is-current{background:var(--bg3);color:var(--tx2);border-color:var(--bd)}
+.plan-cta.is-manage{background:transparent;color:var(--tx2);border-color:var(--bd)}
+.cur-badge{display:inline-block;background:var(--ac);color:#fff;font-size:11px;font-weight:700;padding:2px 9px;border-radius:999px;margin-left:6px;vertical-align:middle}
+.sub-banner{background:var(--bg2);border:1px solid var(--ac);border-radius:14px;padding:16px 18px;margin-bottom:24px;text-align:center;font-size:14px;line-height:1.7}
+.sub-banner a{font-weight:700;color:var(--ac)}
 
 /* Addon table */
 .addons{background:var(--bg2);border:1px solid var(--bd);border-radius:14px;overflow:hidden;margin:24px 0}
@@ -111,6 +118,9 @@ a:hover{text-decoration:underline}
     <strong>🎁 免費版能做什麼？</strong>　完整瀏覽所有等級文法 / 單字 / 例句、收藏，每個 Premium 練習工具（跟讀 / SRS 記憶卡 / 動詞變化練習等）每天免費試 1 次、模擬考（每等級 1 套）。<a href="index.html" style="font-weight:700">立即開始 →</a><br>
     <span style="font-size:13px;color:var(--tx2)">先用免費版體驗，喜歡再升級。不會藏內容、不會跳廣告打你臉。</span>
   </div>
+
+  <!-- 已訂閱會員提示(JS 偵測到 active 訂閱才顯示)-->
+  <div class="sub-banner" id="subBanner" style="display:none"></div>
 
   <!-- === 四付費方案 === -->
   <div class="plans">
@@ -205,13 +215,6 @@ a:hover{text-decoration:underline}
     <li>系統異常導致無法使用，全額退費</li>
   </ul>
 
-  <div class="box warn" style="margin-top:48px">
-    <strong>⚠️ 試營運說明</strong><br>
-    本服務目前處於試營運階段，金流整合審核中，付費方案尚未正式開放。
-    所有<strong>內容與免費版工具現已可使用</strong>：<a href="index.html">開始學習 →</a><br>
-    <span style="font-size:13px">金流開通後會發 email 通知早期用戶搶 NT$990 早鳥名額。</span>
-  </div>
-
   <h3 style="margin-top:48px">常見疑問</h3>
   <div style="margin-top:8px">
     <details style="border-bottom:1px solid var(--bd);padding:14px 0"><summary style="cursor:pointer;font-weight:600">免費版就能用，為什麼要付費？</summary><p style="margin:10px 0 0;color:var(--tx2);font-size:14px;line-height:1.8">所有「內容」（單字、文法、例句、語音）一律免費。付費解鎖的是<strong>無限次的練習工具</strong>（SRS 記憶卡、跟讀、模考、聽力讀解…）——免費版每天有試用次數，認真衝刺、想無限練習時再升級就好。</p></details>
@@ -257,7 +260,8 @@ const _auth = firebase.auth();
   try {
     const snap = await _db.doc('counters/early_bird').get();
     const data = snap.data() || {};
-    const left = (data.limit || 100) - (data.count || 0);
+    const lim = data.limit || 100;
+    const left = Math.max(0, Math.min(lim, lim - (data.count || 0)));   // 防 count 異常導致顯示爆掉
     const card = document.querySelector('.plan.best');
     if (!card) return;
     const name = card.querySelector('.plan-name');
@@ -275,9 +279,46 @@ const _auth = firebase.auth();
   } catch (e) { console.warn('early bird counter load fail', e); }
 })();
 
-// 暫時白名單:金流還在 sandbox 測試,只有 owner 可以實際走訂閱流程
-// 一般用戶按下會看到「即將開放」提示,不會跳到 ECPay sandbox 結帳頁
-const SUBSCRIBE_TEST_WHITELIST = ['abc83327@gmail.com', 'stayjpplan@gmail.com'];
+// === 已訂閱會員:pricing 反映訂閱狀態,避免重複下單 ===
+function applySubscriptionState(sub) {
+  const active = sub
+    && (sub.status === 'active' || sub.status === 'trialing' || sub.status === 'cancelled')
+    && sub.expiresAt && sub.expiresAt > Date.now();
+  if (!active) return;
+  const PLAN_TXT = { monthly: '月費', yearly: '年費', yearly_early_bird: '早鳥年費', lifetime: '終身方案' };
+  const banner = document.getElementById('subBanner');
+  if (banner) {
+    banner.innerHTML = `你已是 <strong>${PLAN_TXT[sub.plan] || sub.plan}</strong> 訂閱會員，無需重複訂購。`
+      + `<br><a href="account.html">前往帳號管理（續訂 / 取消 / 退費）→</a>`;
+    banner.style.display = 'block';
+  }
+  document.querySelectorAll('.plan').forEach(card => {
+    const cta = card.querySelector('.plan-cta');
+    if (!cta) return;
+    if (card.dataset.plan === sub.plan) {
+      const name = card.querySelector('.plan-name');
+      if (name && !name.querySelector('.cur-badge')) {
+        name.insertAdjacentHTML('beforeend', '<span class="cur-badge">目前方案</span>');
+      }
+      cta.textContent = '✓ 目前方案';
+      cta.classList.add('is-current');
+      cta.onclick = () => false;
+      cta.removeAttribute('href');
+    } else {
+      cta.textContent = '管理訂閱 →';
+      cta.classList.add('is-manage');
+      cta.onclick = null;
+      cta.setAttribute('href', 'account.html');
+    }
+  });
+}
+_auth.onAuthStateChanged(async user => {
+  if (!user) return;
+  try {
+    const snap = await _db.doc('users/' + user.uid).get();
+    applySubscriptionState(snap.data()?.subscription || null);
+  } catch (e) { console.warn('sub state load fail', e); }
+});
 
 // Cloud Function endpoints(stayjp.study 走 GitHub Pages,不能用 /api/* rewrite)
 const FN_CREATE_PAYMENT = 'https://createpayment-lsd7okt5qa-de.a.run.app';
@@ -385,20 +426,28 @@ async function startSubscribe(btn) {
   const plan = card?.dataset.plan;
   if (!plan) { alert('找不到方案'); return false; }
 
-  // 1. 已登入但不在白名單 → 顯示「即將開放」
-  const curUser = _auth.currentUser;
-  if (curUser && !SUBSCRIBE_TEST_WHITELIST.includes(curUser.email || '')) {
-    alert('訂閱功能即將開放,金流尚在測試中。\n\n免費版功能完全不受影響,可繼續使用所有內容。');
-    return false;
-  }
-
-  // 2. 未登入 → 也顯示「即將開放」(避免無關用戶亂登入)
+  // 1. 先等 Firebase 還原登入狀態(currentUser 在頁面剛載入時可能還是 null,
+  //    同步讀會誤判成「未登入」而誤彈登入框)
+  let curUser = _auth.currentUser;
   if (!curUser) {
-    alert('訂閱功能即將開放,金流尚在測試中。\n\n免費版功能完全不受影響,可繼續使用所有內容。');
-    return false;
+    curUser = await new Promise(resolve => {
+      const unsub = _auth.onAuthStateChanged(u => { unsub(); resolve(u); });
+    });
   }
 
-  // 3. 白名單用戶(owner)→ 走完整訂閱流程
+  // 2. 真的沒登入 → 先登入(付款需身分),登入後 onAuthStateChanged 會自動 resume 這個方案
+  if (!curUser) {
+    sessionStorage.setItem('subscribeAfterLogin', plan);
+    try {
+      await _auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
+    } catch (e) {
+      console.warn('login cancelled', e);
+      sessionStorage.removeItem('subscribeAfterLogin');
+    }
+    return false;   // resume handler 會在登入成功後重新觸發本流程
+  }
+
+  // 3. 已登入 → 走完整訂閱流程
   const u = curUser;
 
   // 下單前:明示續扣條款 + 強制勾選同意 + 已滿18歲(消保法)
@@ -459,5 +508,6 @@ _auth.onAuthStateChanged(user => {
   }
 });
 </script>
+<script defer src="auth-header.js"></script>
 </body>
 </html>

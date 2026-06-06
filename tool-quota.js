@@ -21,7 +21,7 @@
     'stayjpplan@gmail.com',
   ]);
 
-  const LAUNCHED = false;         // ⚠️ 開閘總開關:false=過渡期(不 gate 真實用戶);true=正式開閘(gating 全員非 premium)
+  const LAUNCHED = true;          // ⚠️ 開閘總開關:false=過渡期(不 gate 真實用戶);true=正式開閘(gating 全員非 premium)
   const PER_TOOL_LIMIT = 1;       // 每個工具每天免費次數
   const GLOBAL_DAILY_LIMIT = 3;   // 每天全站最多免費試用幾個練習工具(收緊「每工具 1 次」的總量)
   const TOOL_NAMES = {

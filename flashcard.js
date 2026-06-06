@@ -9,6 +9,7 @@ const FlashCard = (() => {
 
   // 評分規則由 SRS.GRADES 提供（單一來源），這裡只存「本輪內重現」的偏移
   const MAX_REAPPEAR = 2;         // 同一張卡本輪最多重現次數
+  const FREE_FC_LIMIT = 5;        // 免費版每次快速背單字只試前 5 張(到了就停 + 彈 paywall)
   const REQUEUE_OFFSET = { soso: 5, unknown: 2 };
   function gradeLabel(grade) {
     return (typeof SRS !== 'undefined' && SRS.GRADES && SRS.GRADES[grade])
@@ -307,6 +308,13 @@ const FlashCard = (() => {
 
   function renderCard() {
     if (cur >= queue.length) return showResults();
+    // 免費版每次只試前 FREE_FC_LIMIT 張,到了就停並彈 paywall;premium(不被 gate)不限
+    if (cur >= FREE_FC_LIMIT && window.ToolQuota && ToolQuota.shouldGate && ToolQuota.shouldGate()) {
+      clearInterval(timerId);
+      close();
+      if (ToolQuota.showPaywall) ToolQuota.showPaywall('flashcard');
+      return;
+    }
     flipped = false;
     timeLeft = COUNTDOWN_SEC;
     const item = queue[cur];

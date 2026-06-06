@@ -87,7 +87,7 @@ export const ecpayCallback = functions.onRequest(
 
         // 早鳥首次訂閱 → 占名額
         let isEarlyBird = false;
-        if (plan === "yearly_early_bird" && isFirstPayment) {
+        if (plan === "yearly_early_bird" && isFirstPayment && !existingSub?.is_early_bird) {
           const reserved = await tryReserveEarlyBird();
           if (!reserved) {
             // 已滿,改一般年費價格 — 不應發生因為 precheck 已擋,但防禦性處理
@@ -95,7 +95,7 @@ export const ecpayCallback = functions.onRequest(
           }
           isEarlyBird = reserved;
         } else if (plan === "yearly_early_bird") {
-          // 續扣早鳥(原本就有 is_early_bird flag)
+          // 續扣 / 取消後重訂的早鳥:原本就有 is_early_bird flag,不重複占名額
           isEarlyBird = existingSub?.is_early_bird === true;
         }
 
@@ -103,9 +103,9 @@ export const ecpayCallback = functions.onRequest(
         // expiresAt 加 5 年上限,防 sandbox / bug 累積失控
         const MAX_EXPIRES_MS = nowMs() + 5 * 365 * 24 * 60 * 60 * 1000;
         const newExpiresAt = plusDays(nowMs(), planInfo.period_days);
-        const proposedExpiresAt = existingSub?.status === "active"
-          ? plusDays(existingSub.expiresAt, planInfo.period_days)   // 續扣:加一期
-          : newExpiresAt;
+        const proposedExpiresAt = (existingSub && existingSub.expiresAt > nowMs())
+          ? plusDays(existingSub.expiresAt, planInfo.period_days)   // 續扣 / 取消後未到期重訂:從現有到期日往後加,不吃掉已付費剩餘天數
+          : newExpiresAt;                                            // 全新訂閱 / 已過期:從現在起算
         const capExpiresAt = Math.min(proposedExpiresAt, MAX_EXPIRES_MS);
 
         const newSub: SubscriptionDoc = {
