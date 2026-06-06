@@ -482,6 +482,7 @@ async function saveNote() {
 // ── 訂閱者 ──
 const FN_LIST_SUBS = 'https://asia-east1-jpnote-1bdd6.cloudfunctions.net/adminListSubscribers';
 const FN_UNBLOCK   = 'https://asia-east1-jpnote-1bdd6.cloudfunctions.net/adminUnblockUser';
+const FN_USER_STATS = 'https://asia-east1-jpnote-1bdd6.cloudfunctions.net/adminUserStats';
 const SUB_PLAN_TXT = { monthly:'月費', yearly:'年費', yearly_early_bird:'早鳥年費', lifetime:'終身' };
 const SUB_STATUS_TXT = { active:'使用中', cancelled:'已取消', refunded:'已退費', expired:'已過期', trialing:'試用' };
 
@@ -567,31 +568,22 @@ async function fetchUserStats() {
  if (doc.exists && doc.data().learners) learners = doc.data().learners.toLocaleString();
  } catch (e) { /* stats 公開可讀 */ }
 
- // users/ 集合文件數(寫過資料的活躍用戶)
- let userCount = '-';
+ // 註冊用戶 + 本週新註冊:走 adminUserStats(Admin SDK,繞過 client count() 的不穩 + 無 1000 上限)
+ let userCount = '—', thisWeekUsers = '—';
  try {
- const snap = await db.collection('users').count().get();
- userCount = snap.data().count.toLocaleString();
- } catch (e) {
- // Firestore SDK 太舊或權限問題,fallback 讀部分
- try {
- const snap = await db.collection('users').limit(1000).get();
- userCount = snap.size >= 1000 ? '1000+' : snap.size.toLocaleString();
- } catch (e2) { userCount = '無權限'; }
- }
-
- // 本週新註冊(查 users.createdAt 過去 7 天)— users doc 不一定有 createdAt,fallback
- let thisWeekUsers = '-';
- try {
- const weekAgo = new Date(Date.now() - 7 * 86400000);
- const snap = await db.collection('users').where('createdAt', '>=', weekAgo).count().get();
- thisWeekUsers = snap.data().count.toLocaleString();
- } catch (e) { thisWeekUsers = '欄位缺'; }
+ const t = await auth.currentUser.getIdToken();
+ const r = await fetch(FN_USER_STATS, { method:'POST', headers:{ Authorization:'Bearer '+t } });
+ const d = await r.json();
+ if (r.ok) {
+ userCount = (d.userCount ?? 0).toLocaleString();
+ thisWeekUsers = (d.newThisWeek ?? 0).toLocaleString();
+ } else { userCount = thisWeekUsers = '讀取失敗'; }
+ } catch (e) { userCount = thisWeekUsers = '錯誤'; }
 
  document.getElementById('statUsers').innerHTML = `
  <div class="stat"><div class="lbl">累積學員 (GA4)</div><div class="val">${learners}</div><div class="sub">所有訪客累積</div></div>
  <div class="stat"><div class="lbl">註冊用戶</div><div class="val">${userCount}</div><div class="sub">寫過資料的活躍用戶</div></div>
- <div class="stat"><div class="lbl">本週新註冊</div><div class="val">${thisWeekUsers}</div><div class="sub">過去 7 天</div></div>
+ <div class="stat"><div class="lbl">本週新註冊</div><div class="val">${thisWeekUsers}</div><div class="sub">過去 7 天(Google 登入)</div></div>
  `;
 }
 

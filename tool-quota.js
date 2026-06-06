@@ -21,7 +21,8 @@
     'stayjpplan@gmail.com',
   ]);
 
-  const PER_TOOL_LIMIT = 1;   // 每個工具每天免費次數
+  const PER_TOOL_LIMIT = 1;       // 每個工具每天免費次數
+  const GLOBAL_DAILY_LIMIT = 3;   // 每天全站最多免費試用幾個練習工具(收緊「每工具 1 次」的總量)
   const TOOL_NAMES = {
     srs: 'SRS 記憶卡', flashcard: '快速背單字', shadow: '跟讀', grammar: '文法練習',
     quiz: '單字測驗', reading: '讀解', listening: '聽力', story: '今日故事',
@@ -49,11 +50,14 @@
     return (cachedSub.expiresAt || 0) > Date.now();
   }
   function shouldGate() {
-    if (!authReady) return false;
-    if (!cachedUserEmail) return false;
-    if (!QUOTA_WHITELIST.has(cachedUserEmail)) return false;   // 金流上線時改為:登入且 !isPremium()
-    if (isPremium()) return false;
-    return true;
+    if (!authReady) return false;     // 等 auth 狀態確定再決定,避免閃一下
+    if (isPremium()) return false;     // 付費用戶(登入 + 有效訂閱)→ 不擋
+    if (cachedUserEmail && QUOTA_WHITELIST.has(cachedUserEmail.toLowerCase())) return false;  // owner / 免費白名單帳號 → 永遠免擋
+    return true;                       // 其餘所有人(含未登入訪客)→ 每工具每天 1 次
+    // ↑ 開閘版(2026-06):匿名也擋,只有 premium 免擋。
+    //   過渡期舊邏輯(僅 owner 白名單)如需回退:
+    //   if (!cachedUserEmail) return false;
+    //   if (!QUOTA_WHITELIST.has(cachedUserEmail)) return false;
   }
 
   // re-entrancy guard：避免「一次開啟卻觸發多個被包方法」(如 startCurrent 內部再呼 start) 重複扣次。
@@ -67,7 +71,12 @@
       return localStorage.getItem('mock_completed_' + tool.replace('mock_exam_', '')) !== '1';
     }
     if (!tool) tool = 'misc';
-    return (loadCount()[tool] || 0) < PER_TOOL_LIMIT;
+    const c = loadCount();
+    if ((c[tool] || 0) >= PER_TOOL_LIMIT) return false;              // 同工具今天已試過
+    // 全站每日上限:已試滿 GLOBAL_DAILY_LIMIT 個不同工具,就不再開放新工具
+    const totalToday = Object.values(c).reduce((a, b) => a + b, 0);
+    if (totalToday >= GLOBAL_DAILY_LIMIT) return false;
+    return true;
   }
   function consume(tool) {
     if (!shouldGate()) return;
@@ -111,9 +120,13 @@
     ensurePaywallStyles();
     const isMock = tool && tool.startsWith('mock_exam_');
     const name = TOOL_NAMES[tool] || '這個工具';
+    // 區分:此工具已試過 vs 今天免費試用工具數已達全站上限(挡到沒試過的新工具)
+    const usedThis = !isMock && tool && (loadCount()[tool] || 0) >= PER_TOOL_LIMIT;
     const msg = isMock
       ? `免費版每等級可試 1 套模考，你已完成過 <strong>${tool.replace('mock_exam_','').toUpperCase()}</strong>。`
-      : `免費版每個工具每天可免費試 1 次，<strong>「${name}」今天已經試過了</strong>。`;
+      : usedThis
+        ? `免費版每個工具每天可免費試 1 次，<strong>「${name}」今天已經試過了</strong>。`
+        : `免費版每天可免費試用 <strong>${GLOBAL_DAILY_LIMIT} 個練習工具</strong>，今天的次數已用完。`;
     const wrap = document.createElement('div');
     wrap.className = 'pw-backdrop';
     wrap.id = 'pwBackdrop';
@@ -147,8 +160,8 @@
       badge = document.createElement('div');
       badge.id = 'quotaBadge';
       badge.style.cssText = 'position:fixed;bottom:14px;left:14px;background:rgba(0,0,0,.78);color:#fff;padding:8px 12px;border-radius:10px;font-size:11px;font-family:-apple-system,sans-serif;line-height:1.5;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,.2);cursor:pointer;max-width:220px';
-      badge.title = '免費版 quota(只 owner 看得到)。點擊看訂閱狀態。';
-      badge.onclick = () => window.location.href = 'account.html';
+      badge.title = '免費版每日額度。點擊查看訂閱方案。';
+      badge.onclick = () => window.location.href = 'pricing.html';
       document.body.appendChild(badge);
     }
     const c = loadCount();
@@ -166,7 +179,7 @@
       authReady = true;
       if (!user) { cachedUserEmail = null; cachedSub = null; refreshBadge(); return; }
       cachedUserEmail = user.email || null;
-      if (!QUOTA_WHITELIST.has(cachedUserEmail || '')) { refreshBadge(); return; }
+      // 開閘版:所有登入用戶都監聽訂閱(才偵測得到 premium → 免擋)
       firebase.firestore().doc('users/' + user.uid).onSnapshot(snap => {
         cachedSub = snap.data()?.subscription || null;
         refreshBadge();
