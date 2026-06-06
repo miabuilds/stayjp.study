@@ -782,6 +782,7 @@ a:hover { text-decoration: underline; }
   if (typeof firebase === 'undefined') return;
   if (!firebase.apps.length) firebase.initializeApp({
     apiKey: 'AIzaSyDnmg2XOuvwgE8m8xCF5sS4o0nQYoUplPI',
+    authDomain: 'jpnote-1bdd6.firebaseapp.com',   // 登入彈窗需要(auth-header 共用此 app)
     projectId: 'jpnote-1bdd6',
   });
   const db = firebase.firestore();
