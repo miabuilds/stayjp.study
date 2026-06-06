@@ -1823,6 +1823,16 @@ function speak(text) {
 }
 if (window.speechSynthesis) speechSynthesis.getVoices();
 
+// 關分頁 / 切走 / 關瀏覽器 → 停掉殘留語音
+// (speechSynthesis 是瀏覽器層級佇列,頁面卸載後仍會繼續講;mp3 Audio 隨頁面卸載自然停)
+function stopAllSpeech() {
+  try { if (window.speechSynthesis) speechSynthesis.cancel(); } catch (e) {}
+  try { if (typeof __ttsAudio !== 'undefined' && __ttsAudio) __ttsAudio.pause(); } catch (e) {}
+}
+window.addEventListener('pagehide', stopAllSpeech);
+window.addEventListener('beforeunload', stopAllSpeech);
+document.addEventListener('visibilitychange', () => { if (document.hidden) stopAllSpeech(); });
+
 
 // ========== SHADOWING (跟讀模式) ==========
 // Auto-cycle through the currently visible Japanese texts: show -> play -> pause for repetition
@@ -2078,8 +2088,16 @@ const Shadow = (() => {
     }
   }
 
+  const FREE_SHADOW_LIMIT = 5;   // 免費版每次跟讀只試前 5 句(跟讀一次連播很長,想更緊改小、更鬆改大)
   function step() {
     if (paused || idx >= queue.length) return;
+    // 免費版跟讀只試前 FREE_SHADOW_LIMIT 句,之後關閉並彈 paywall;premium(不被 gate)不限
+    if (idx >= FREE_SHADOW_LIMIT && window.ToolQuota && ToolQuota.shouldGate && ToolQuota.shouldGate()) {
+      clearTimer();
+      exit(true);
+      if (ToolQuota.showPaywall) ToolQuota.showPaywall('shadow');
+      return;
+    }
     const item = queue[idx];
     if (!item) return;
     if (stage === 0) {
@@ -2355,12 +2373,14 @@ const DailyStory = (() => {
 
   function stopAudio() {
     _playing = false;
+    _playToken++;   // 作廢任何進行中的播放鏈 / play() fallback
     if (window.speechSynthesis) speechSynthesis.cancel();
-    if (_audio) { try { _audio.pause(); _audio.src = ''; } catch (e) {} _audio = null; }
+    if (_audio) { try { _audio.onended = null; _audio.onerror = null; _audio.pause(); _audio.src = ''; } catch (e) {} _audio = null; }
     document.querySelectorAll('.ds-sent.playing').forEach(el => el.classList.remove('playing'));
   }
 
   function playSentence(text, onEnd) {
+    const myToken = _playToken;
     const hash = window.__TTS && window.__TTS[text];
     if (hash) {
       if (!_audio) _audio = new Audio();
@@ -2368,7 +2388,8 @@ const DailyStory = (() => {
       _audio.onerror = onEnd;
       _audio.src = 'audio/tts/' + hash + '.mp3';
       _audio.playbackRate = 0.95;
-      _audio.play().catch(() => speakBrowser(text, onEnd));
+      // play() 被 stopAudio 中斷會 reject;若已停止(token 變了)就別 fallback 到瀏覽器語音(否則關掉後還繼續講)
+      _audio.play().catch(() => { if (myToken === _playToken) speakBrowser(text, onEnd); else onEnd && onEnd(); });
     } else {
       speakBrowser(text, onEnd);
     }
