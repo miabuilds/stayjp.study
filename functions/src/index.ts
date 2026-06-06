@@ -19,3 +19,5 @@ export { chargeback } from "./chargeback";
 export { revenuecatWebhook } from "./revenuecat-webhook";
 export { dailyRetryCron } from "./daily-retry-cron";
 export { adminResetBilling } from "./admin-reset-billing";
+export { adminListSubscribers } from "./admin-list-subscribers";
+export { adminUnblockUser } from "./admin-unblock-user";
