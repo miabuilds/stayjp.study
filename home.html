@@ -482,13 +482,26 @@ a:hover { text-decoration: underline; }
   .section { padding: 72px 24px; }
   .section-title { margin-bottom: 40px; }
 }
+@media (max-width: 600px) {
+  /* 手機 header 太擠:收起次要文字導覽(學習工具/動詞變化/意見回饋),保留 logo / 繁 / 主題 / 登入 */
+  .hd-links a { display: none; }
+  .hd-inner { padding: 0 16px; gap: 8px; }
+  .hd h1 { font-size: 14px; }
+}
 @media (max-width: 480px) {
-  .hd-links a { font-size: 12px; }
   .marquee span { font-size: 18px; }
   .hero-cta { padding: 14px 28px; font-size: 14px; }
 }
 /* Changelog 近期更新 */
 .changelog { border-top: 1px solid var(--line); }
+.cl-item.cl-more { display: none; }
+.changelog.show-all .cl-item.cl-more { display: flex; }
+.cl-toggle {
+  display: block; margin: 18px auto 0; background: none; border: 1px solid var(--line);
+  color: var(--tx2); font-size: 13px; padding: 8px 20px; border-radius: 999px;
+  cursor: pointer; transition: color .2s, border-color .2s; font-family: inherit;
+}
+.cl-toggle:hover { color: var(--ac); border-color: var(--ac); }
 .cl-item {
   display: flex; gap: 20px; padding: 22px 4px;
   border-bottom: 1px solid var(--line); align-items: baseline;
@@ -609,8 +622,9 @@ a:hover { text-decoration: underline; }
       <div class="cl-item"><span class="cl-date">2026.06</span><div class="cl-body"><span class="cl-tag">修正</span>今日故事／語音：關閉視窗、切換分頁或關閉瀏覽器後，聲音會立刻停止（之前會繼續念、甚至變成瀏覽器語音）。</div></div>
       <div class="cl-item"><span class="cl-date">2026.06</span><div class="cl-body"><span class="cl-tag">新功能</span>單字測驗新增「✍️ 打字輸入」題型，再加上讀音題的「易混淆」挑戰（促音・長音・濁音差一個，更有挑戰性）。</div></div>
       <div class="cl-item"><span class="cl-date">2026.06</span><div class="cl-body"><span class="cl-tag">新功能</span>文法練習新增「今日學習」範圍，對齊單字測驗，只練今天學過的文法。</div></div>
-      <div class="cl-item"><span class="cl-date">2026.06</span><div class="cl-body"><span class="cl-tag">改進</span>動詞變化互動練習選擇題改版：干擾項換成同一動詞的其他變化形，真正考辨認能力，不再看漢字就猜中。</div></div>
-      <div class="cl-item"><span class="cl-date">2026.06</span><div class="cl-body"><span class="cl-tag">改進</span>今日故事跟讀讀音校正，多音字（方・被る 等）不再念錯。</div></div>
+      <div class="cl-item cl-more"><span class="cl-date">2026.06</span><div class="cl-body"><span class="cl-tag">改進</span>動詞變化互動練習選擇題改版：干擾項換成同一動詞的其他變化形，真正考辨認能力，不再看漢字就猜中。</div></div>
+      <div class="cl-item cl-more"><span class="cl-date">2026.06</span><div class="cl-body"><span class="cl-tag">改進</span>今日故事跟讀讀音校正，多音字（方・被る 等）不再念錯。</div></div>
+      <button class="cl-toggle" onclick="const c=this.closest('.changelog');const o=c.classList.toggle('show-all');this.textContent=o?'收合 ▲':'查看更多 ▾'">查看更多 ▾</button>
     </div>
   </div>
 </section>
