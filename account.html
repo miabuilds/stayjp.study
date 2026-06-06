@@ -539,7 +539,8 @@ async function loadEarlyBird() {
  const doc = await db.collection('counters').doc('early_bird').get();
  const used = doc.exists ? (doc.data().count || 0) : 0;
  const limit = doc.exists ? (doc.data().limit || 100) : 100;
- document.getElementById('earlyBirdCount').textContent = `${limit - used} / ${limit}`;
+ const left = Math.max(0, Math.min(limit, limit - used));   // 防 count 異常(負數/超量)導致顯示爆掉
+ document.getElementById('earlyBirdCount').textContent = `${left} / ${limit}`;
  } catch (e) {
  document.getElementById('earlyBirdCount').textContent = '100 / 100';
  }

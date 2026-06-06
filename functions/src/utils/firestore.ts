@@ -137,9 +137,15 @@ export async function tryReserveEarlyBird(): Promise<boolean> {
 }
 
 export async function releaseEarlyBird(): Promise<void> {
-  await db.doc("counters/early_bird").update({
-    count: FieldValue.increment(-1),
-    updated_at: FieldValue.serverTimestamp(),
+  // 用 transaction + 下限 0,避免釋放比占用多時 count 變負數(會讓「剩餘名額」顯示爆 100)
+  const ref = db.doc("counters/early_bird");
+  await db.runTransaction(async tx => {
+    const snap = await tx.get(ref);
+    const cur = (snap.data()?.count as number) || 0;
+    tx.set(ref, {
+      count: Math.max(0, cur - 1),
+      updated_at: FieldValue.serverTimestamp(),
+    }, { merge: true });
   });
 }
 
