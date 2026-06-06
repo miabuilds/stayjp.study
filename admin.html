@@ -615,11 +615,14 @@ async function fetchBillingStats() {
  });
  } catch (e) { /* transactions 還沒有 */ }
 
+ const ebUsed = Math.max(0, earlyBirdUsed);                       // 防 count 異常(負數)
+ const ebLeft = Math.max(0, Math.min(100, 100 - earlyBirdUsed));
+ const netRevenue = monthRevenue - monthRefund;                   // 淨額 = 收款 − 退費
  document.getElementById('statBilling').innerHTML = `
  <div class="stat"><div class="lbl">訂閱中</div><div class="val">${activeSubs}</div><div class="sub">status=active</div></div>
- <div class="stat"><div class="lbl">早鳥已用 / 100</div><div class="val">${earlyBirdUsed}<small style="font-size:14px;color:var(--tx2)"> / 100</small></div><div class="sub">剩 ${100 - earlyBirdUsed} 名額</div></div>
- <div class="stat"><div class="lbl">本月營業額</div><div class="val">NT$${monthRevenue.toLocaleString()}</div><div class="sub">訂閱 + 續訂</div></div>
- <div class="stat"><div class="lbl">本月退費</div><div class="val">NT$${monthRefund.toLocaleString()}</div><div class="sub">${monthRevenue > 0 ? (monthRefund / monthRevenue * 100).toFixed(1) + '%' : '-'} 退費率</div></div>
+ <div class="stat"><div class="lbl">早鳥已用 / 100</div><div class="val">${ebUsed}<small style="font-size:14px;color:var(--tx2)"> / 100</small></div><div class="sub">剩 ${ebLeft} 名額</div></div>
+ <div class="stat"><div class="lbl">本月營業額(淨)</div><div class="val">NT$${netRevenue.toLocaleString()}</div><div class="sub">訂閱+續訂 − 退費</div></div>
+ <div class="stat"><div class="lbl">本月退費</div><div class="val">NT$${monthRefund.toLocaleString()}</div><div class="sub">收款 NT$${monthRevenue.toLocaleString()} · ${monthRevenue > 0 ? (monthRefund / monthRevenue * 100).toFixed(1) + '%' : '-'} 退費率</div></div>
  `;
 }
 
