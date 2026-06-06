@@ -447,7 +447,7 @@ async function cancelRenew() {
 }
 
 async function requestRefund() {
- if (!confirm('確定要申請退費?\n\n按下確認後:\n• 訂閱立刻降級為免費版\n• 退款 7-14 個工作天由綠界 / 發卡銀行退回原信用卡\n• 已訂閱期間使用記錄會保留\n• 七天內為無條件全額退;逾七天按未使用比例退\n（本站僅對明顯惡意濫用退費之帳號,保留拒絕未來新訂閱之權利）')) return;
+ if (!confirm('確定要申請退費?\n\n按下確認後:\n• 訂閱立刻降級為免費版\n• 退款由綠界經發卡銀行退回原卡,入帳時間依你的信用卡結帳週期而定（若已過結帳日,可能顯示在下一期帳單）\n• 已訂閱期間使用記錄會保留\n• 七天內為無條件全額退;逾七天按未使用比例退\n（本站僅對明顯惡意濫用退費之帳號,保留拒絕未來新訂閱之權利）')) return;
  const btn = document.getElementById('btnRefund');
  if (btn) { btn.disabled = true; btn.textContent = '處理中…'; }
  try {
