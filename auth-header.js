@@ -80,7 +80,8 @@
   }
 
   function isInApp() {
-    return /FBAN|FBAV|Instagram|Line\/|; wv\)/i.test(navigator.userAgent || '');
+    // 與 index 的 isInAppBrowser 對齊:Line/FB/IG/Threads/WeChat/Twitter/TikTok/Kakao/Naver…
+    return /FBAN|FBAV|FB_IAB|Instagram|Line\/|MicroMessenger|Twitter|TikTok|KAKAOTALK|NAVER|Barcelona|BytedanceWebview/i.test(navigator.userAgent || '');
   }
 
   var auth, area;
@@ -116,7 +117,7 @@
 
   function login() {
     if (isInApp()) {
-      alert('請用 Safari / Chrome 開啟本站登入（App 內建瀏覽器無法登入 Google）。');
+      alert('你正在 App 內建瀏覽器(Line／IG／Threads／FB／微信 等)開啟本站,Google 登入會被擋。\n\n請改用 Safari 或 Chrome:\n點右上／右下的「⋯」或「⋮」→ 選「在預設瀏覽器開啟」,再登入即可。');
       return;
     }
     auth.signInWithPopup(new firebase.auth.GoogleAuthProvider())
