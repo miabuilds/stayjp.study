@@ -1473,8 +1473,12 @@ function handleAuth() {
   _signingIn = true;
   auth.signInWithPopup(new firebase.auth.GoogleAuthProvider())
     .catch(e => {
-      // 連點被取消 / 用戶自己關彈窗 = 良性,不要彈「登入失敗」嚇人
-      if (e.code !== 'auth/cancelled-popup-request' && e.code !== 'auth/popup-closed-by-user') alert('登入失敗: ' + e.message);
+      const code = e && e.code;
+      // 連點被取消 / 用戶自己關彈窗 = 良性,不彈
+      if (code === 'auth/cancelled-popup-request' || code === 'auth/popup-closed-by-user') return;
+      // 網路不穩 → 友善提示,不丟英文
+      if (code === 'auth/network-request-failed') { alert('網路不穩,登入連線失敗,請稍後再試一次。'); return; }
+      alert('登入失敗: ' + (e && e.message || e));
     })
     .finally(() => { _signingIn = false; });
 }

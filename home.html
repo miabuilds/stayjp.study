@@ -803,6 +803,7 @@ a:hover { text-decoration: underline; }
     projectId: 'jpnote-1bdd6',
   });
   const db = firebase.firestore();
+  try { db.settings({ experimentalAutoDetectLongPolling: true, useFetchStreams: false }); } catch (e) {}  // Safari/App 內建瀏覽器連線穩定(對齊其他頁)
   const ref = db.collection('stats').doc('global');
   const elLearners = document.getElementById('learnersCount');
   const elActive = document.getElementById('activeNowCount');

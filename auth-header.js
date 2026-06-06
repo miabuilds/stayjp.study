@@ -125,8 +125,10 @@
     _ahxSigningIn = true;
     auth.signInWithPopup(new firebase.auth.GoogleAuthProvider())
       .catch(function (e) {
-        // 連點被取消 / 用戶關彈窗 = 良性,不彈「登入失敗」
-        if (e && e.code !== 'auth/cancelled-popup-request' && e.code !== 'auth/popup-closed-by-user') alert('登入失敗: ' + (e.message || e));
+        var code = e && e.code;
+        if (code === 'auth/cancelled-popup-request' || code === 'auth/popup-closed-by-user') return;  // 良性
+        if (code === 'auth/network-request-failed') { alert('網路不穩,登入連線失敗,請稍後再試一次。'); return; }
+        alert('登入失敗: ' + (e && e.message || e));
       })
       .finally(function () { _ahxSigningIn = false; });
   }

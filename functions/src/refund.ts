@@ -99,8 +99,9 @@ export const refund = functions.onRequest(
         refundAmount = planInfo.price_twd;
         refundReason = "首次訂閱 7 天內全額退";
       } else {
-        // 一般訂閱 7 天後 按剩餘比例退
-        refundAmount = Math.floor(planInfo.price_twd * daysRemaining / planInfo.period_days);
+        // 一般訂閱 7 天後 按剩餘比例退;上限為單期價(續扣多期者 daysRemaining 可能 > period_days,
+        // 退到「最近一筆 charge」超過該筆金額會被綠界退刷打回 → cap 在單期價)
+        refundAmount = Math.min(planInfo.price_twd, Math.floor(planInfo.price_twd * daysRemaining / planInfo.period_days));
         refundReason = `按剩餘 ${daysRemaining} 天比例退`;
         if (refundAmount <= 0) {
           res.status(400).json({ error: "no_refundable_amount", reason: "已用完訂閱期,無可退費。" });
@@ -206,8 +207,10 @@ export const refund = functions.onRequest(
       });
 
       // 早鳥首次訂閱 + 7 天內全退 → 釋放名額(讓下一個 user 可以買早鳥)
+      // 釋放後清 is_early_bird flag,確保每個名額最多釋放一次(避免後續 chargeback 重複釋放)
       if (sub.is_early_bird && daysSinceStart <= REFUND_POLICY.full_refund_days) {
         await releaseEarlyBird().catch(e => console.warn("releaseEarlyBird fail:", e));
+        await patchSubscription(uid, { is_early_bird: false }).catch(() => {});
       }
 
       // 記黑名單(refund_count++,2 次 → permanently_blocked)

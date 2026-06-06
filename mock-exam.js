@@ -185,12 +185,20 @@ const MockExam = (() => {
     // 從起始面板讀 level；從結果頁呼叫時面板不存在，沿用上次
     const lvEl = document.querySelector('#meLevel .on');
     if (lvEl) examLevel = lvEl.dataset.v;
+    // 免費版每等級限 1 套模考(gating);premium / 白名單 / 免費名單免擋(canUse 內含 shouldGate)
+    if (window.ToolQuota && window.ToolQuota.canUse && !window.ToolQuota.canUse('mock_exam_' + examLevel)) {
+      window.ToolQuota.showPaywall('mock_exam_' + examLevel);
+      return;
+    }
     const vocab = getVocab(examLevel);
     const grammar = getGrammar(examLevel);
 
     if (!vocab.length || vocab.length < 10) {
       alert(t('me_no_data')); return;
     }
+
+    // 確定開考 → 立刻計入該等級(開了就算用掉 1 套,避免「開了不做完→無限重開」繞過)
+    if (window.ToolQuota && window.ToolQuota.markMockCompleted) window.ToolQuota.markMockCompleted(examLevel);
 
     sections = [];
     currentSection = 0;
@@ -213,10 +221,15 @@ const MockExam = (() => {
     const allWords = shuffle(vocab);
 
     // Type 1: 漢字讀音 (7 questions)
-    const t1words = shuffle(kanjiWords).slice(0, 7);
+    const t1words = shuffle(kanjiWords).slice(0, 11);   // 文脈規定(Type 2)移除後,讀音題補到 11
     t1words.forEach(word => {
-      const wrongs = shuffle(kanjiWords.filter(w => w.r !== word.r))
-        .slice(0, 3).map(w => w.r);
+      // 干擾項優先用「語音易混淆」(促音/長音/濁音 最小對立),才不會用刪去法就猜到;不足 3 個再用別詞讀音補
+      let wrongs = (typeof Quiz !== 'undefined' && Quiz.genPhoneticConfusables)
+        ? shuffle(Quiz.genPhoneticConfusables(word.r)).slice(0, 3) : [];
+      if (wrongs.length < 3) {
+        const seen = new Set([word.r, ...wrongs]);
+        wrongs = wrongs.concat(shuffle(kanjiWords.filter(w => !seen.has(w.r))).map(w => w.r).slice(0, 3 - wrongs.length));
+      }
       const opts = shuffle([word.r, ...wrongs]);
       questions.push({
         type: 1,
@@ -229,35 +242,12 @@ const MockExam = (() => {
       });
     });
 
-    // Type 2: 文脈規定 (7 questions) — 強制套 template filter 配對詞類，干擾選項也限同詞類，
-    // 避免「天気が警官です」之類詞類錯配
-    const templates = CONTEXT_TEMPLATES[level] || CONTEXT_TEMPLATES.n3;
-    const t2candidates = shuffle(allWords);
-    let t2added = 0;
-    for (const word of t2candidates) {
-      if (t2added >= 7) break;
-      const eligibleTmpls = templates.filter(tm => tm.filter(word.c));
-      if (!eligibleTmpls.length) continue;  // 沒有 template 配這個詞類，跳過
-      const tmpl = eligibleTmpls[Math.floor(Math.random() * eligibleTmpls.length)];
-      // 干擾選項從同詞類抽，4 個選項都符合 template 的詞性要求
-      const wrongs = shuffle(vocab.filter(w => w.c === word.c && w.w !== word.w && w.m !== word.m))
-        .slice(0, 3).map(w => w.w);
-      if (wrongs.length < 3) continue;  // 同詞類字數不夠湊干擾
-      const opts = shuffle([word.w, ...wrongs]);
-      questions.push({
-        type: 2,
-        typeName: '文脈規定',
-        prompt: '選出最適合填入＿＿的詞語',
-        display: '<div style="font-size:16px;line-height:1.8">' + tmpl.s + '</div><div style="font-size:13px;color:var(--tx2);margin-top:4px">正確答案的意思：' + word.m + '</div>',
-        options: opts,
-        correctIdx: opts.indexOf(word.w),
-        word: word,
-      });
-      t2added++;
-    }
+    // Type 2 文脈規定 已移除:vocab 只有 {詞/讀音/意思/詞類}、無例句,通用模板套隨機詞會產出
+    // 「天気が古いです(天氣是舊的)」這種語義不通的題(模板只配詞類、無法決定唯一正解)。
+    // 與本檔 Type 4 註解同理(模板題不可靠)→ 該 7 題改分配到資料驅動的 Type 1(讀音)+ Type 3(言い換え)。
 
     // Type 3: 言い換え (6 questions)
-    const t3words = shuffle(allWords).slice(0, 6);
+    const t3words = shuffle(allWords).slice(0, 9);   // 文脈規定移除後,言い換え補到 9
     t3words.forEach(word => {
       const wrongs = shuffle(vocab.filter(w => w.m !== word.m))
         .slice(0, 3).map(w => w.m);
@@ -334,28 +324,26 @@ const MockExam = (() => {
       });
     }
 
-    // Type 6: 文の組み立て (8 questions)
+    // Type 6: 文の組み立て (最多 8 題)
+    // 只用能切出 ≥3 片段、且湊得出 4 個「互不相同」排列的句子;湊不出就跳過,絕不重複填同一個錯排
+    // (修:原本短句只切 2 段 → 排列只有 2 種 → 用重複的錯排湊滿 4 選項 → 3 個選項一模一樣)
     if (grammar.length >= 4) {
-      const t6items = shuffle(grammar.filter(g => g.eg && g.eg.length > 0)).slice(0, 8);
-      t6items.forEach(item => {
+      const t6cands = shuffle(grammar.filter(g => g.eg && g.eg.length > 0));
+      let t6count = 0;
+      for (const item of t6cands) {
+        if (t6count >= 8) break;
         const ex = item.eg[Math.floor(Math.random() * item.eg.length)];
-        const sentence = ex.j.replace(/<em>/g, '').replace(/<\/em>/g, '');
-        // Split into fragments
+        const sentence = ex.j.replace(/<\/?em>/g, '');
         const fragments = splitSentence(sentence);
-        if (fragments.length < 2) return;
-
+        if (fragments.length < 3) continue;
         const correctOrder = fragments.join('');
-        const shuffledFrags = shuffle(fragments);
-        // Generate 3 wrong arrangements
-        const arrangements = [fragments.join('')];
-        for (let i = 0; i < 10 && arrangements.length < 4; i++) {
+        const arrangements = [correctOrder];
+        for (let i = 0; i < 30 && arrangements.length < 4; i++) {
           const attempt = shuffle(fragments).join('');
           if (!arrangements.includes(attempt)) arrangements.push(attempt);
         }
-        // If not enough wrong arrangements, fill with modified versions
-        while (arrangements.length < 4) {
-          arrangements.push(shuffle(fragments).join(''));
-        }
+        if (arrangements.length < 4) continue;   // 湊不出 4 個不同(罕見)→ 跳過
+        const shuffledFrags = shuffle(fragments);
         const opts = shuffle(arrangements);
         questions.push({
           type: 6,
@@ -368,7 +356,8 @@ const MockExam = (() => {
           correctIdx: opts.indexOf(correctOrder),
           grammar: item,
         });
-      });
+        t6count++;
+      }
     }
 
     // Type 7: 短文讀解 (7 questions)
@@ -428,27 +417,15 @@ const MockExam = (() => {
   }
 
   function splitSentence(s) {
-    // Split a Japanese sentence into 3-4 roughly equal parts
+    // 切成 3~4 段「等長」片段(重排題用)。等長切保證得到 n 段、且彼此不同(不會出現重複選項)。
+    // 太短就回單一片段 → Type 6 會跳過(排列題沒意義)。
     const len = s.length;
-    if (len < 6) return [s];
-    const partSize = Math.ceil(len / 4);
+    if (len < 9) return [s];
+    const n = len >= 18 ? 4 : 3;
+    const size = Math.ceil(len / n);
     const parts = [];
-    // Try splitting at natural points (particles, etc.)
-    const breakPoints = ['、', 'は', 'が', 'を', 'に', 'で', 'と', 'も', 'の'];
-    let start = 0;
-    let partCount = 0;
-    const targetParts = Math.min(4, Math.max(2, Math.floor(len / 4)));
-
-    for (let i = partSize; i < len && partCount < targetParts - 1; i++) {
-      if (breakPoints.includes(s[i]) || i - start >= partSize + 2) {
-        parts.push(s.substring(start, i + 1));
-        start = i + 1;
-        partCount++;
-        i = start + partSize - 1;
-      }
-    }
-    if (start < len) parts.push(s.substring(start));
-    return parts.length >= 2 ? parts : [s.substring(0, Math.floor(len / 2)), s.substring(Math.floor(len / 2))];
+    for (let i = 0; i < len; i += size) parts.push(s.substring(i, i + size));
+    return parts;
   }
 
   // ── Section control ──
@@ -649,8 +626,8 @@ const MockExam = (() => {
     timerInterval = null;
 
     // ToolQuota:標記該等級已完成 1 套(免費版 lifetime 限額用)
-    if (typeof window.ToolQuota !== 'undefined' && typeof currentLevel === 'string') {
-      try { window.ToolQuota.markMockCompleted(currentLevel); } catch (e) {}
+    if (typeof window.ToolQuota !== 'undefined' && typeof examLevel === 'string') {
+      try { window.ToolQuota.markMockCompleted(examLevel); } catch (e) {}
     }
 
     const totalTime = Date.now() - sectionStart; // approximate

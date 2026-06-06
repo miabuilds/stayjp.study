@@ -7,7 +7,7 @@ import * as functions from "firebase-functions/v2/https";
 import * as admin from "firebase-admin";
 import { verifyCheckMacValue } from "./utils/ecpay";
 import {
-  writeTransaction, getSubscription, patchSubscription, recordChargeback,
+  writeTransaction, getSubscription, patchSubscription, recordChargeback, releaseEarlyBird,
 } from "./utils/firestore";
 import { ECPAY_SECRETS } from "./utils/constants";
 
@@ -70,6 +70,11 @@ export const chargeback = functions.onRequest(
           status: "refunded",
           willRenew: false,
         });
+        // 早鳥被爭議扣回 → 釋放名額(用 is_early_bird flag 一次性,避免與 refund 重複釋放)
+        if (sub.is_early_bird) {
+          await releaseEarlyBird().catch(() => { /* counter 不存在就略過 */ });
+          await patchSubscription(uid, { is_early_bird: false });
+        }
       }
 
       res.status(200).send("1|OK");

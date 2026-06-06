@@ -215,7 +215,7 @@ const fbConfig = {
  storageBucket: "jpnote-1bdd6.firebasestorage.app",
  messagingSenderId: "666368174384"
 };
-firebase.initializeApp(fbConfig);
+if (!firebase.apps.length) firebase.initializeApp(fbConfig);
  try { firebase.firestore().settings({ experimentalAutoDetectLongPolling: true, useFetchStreams: false }); } catch (e) {}
 const db = firebase.firestore();
 const auth = firebase.auth();

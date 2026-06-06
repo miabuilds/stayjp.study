@@ -221,7 +221,7 @@
     const FlashCard_ = getGlobal('FlashCard');
     if (FlashCard_) { gateStart(FlashCard_, 'start', 'flashcard'); gateStart(FlashCard_, 'beginToday', 'flashcard'); }
     const Shadow_ = getGlobal('Shadow');
-    if (Shadow_) { gateStart(Shadow_, 'start', 'shadow'); gateStart(Shadow_, 'startCurrent', 'shadow'); gateStart(Shadow_, 'startFavs', 'shadow'); }
+    if (Shadow_) { gateStart(Shadow_, 'start', 'shadow'); gateStart(Shadow_, 'startCurrent', 'shadow'); gateStart(Shadow_, 'startFavs', 'shadow'); gateStart(Shadow_, 'startGrammarFavs', 'shadow'); }
     const GrammarDrill_ = getGlobal('GrammarDrill'); if (GrammarDrill_) gateStart(GrammarDrill_, 'start', 'grammar');
     const Quiz_ = getGlobal('Quiz');         if (Quiz_) gateStart(Quiz_, 'start', 'quiz');
     const Reading_ = getGlobal('Reading');   if (Reading_) gateStart(Reading_, 'start', 'reading');
@@ -230,17 +230,8 @@
     if (Stats_ && typeof Stats_.quizFavListening === 'function') gateStart(Stats_, 'quizFavListening', 'listening');
     const DailyStory_ = getGlobal('DailyStory'); if (DailyStory_) gateStart(DailyStory_, 'open', 'story');
 
-    // ── 模考:獨立 lifetime 計數（每等級 1 套）──
-    const MockExam_ = getGlobal('MockExam');
-    if (MockExam_ && MockExam_.startSection && !isAlreadyWrapped(MockExam_.startSection)) {
-      const orig = MockExam_.startSection;
-      MockExam_.startSection = function(...args) {
-        /* __TQ_WRAPPED__ */
-        const lv = (MockExam_.currentLevel || args[0] || 'n5').toLowerCase();
-        if (!canUse('mock_exam_' + lv)) { showPaywall('mock_exam_' + lv); return; }
-        return orig.apply(this, args);
-      };
-    }
+    // ── 模考 gating 已移進 mock-exam.js 的 beginExam ──
+    // (外部 wrapper 抓不到 startSection [未 export] 也拿不到 examLevel,故在內部 gate)
   }
 
   function markMockCompleted(level) {

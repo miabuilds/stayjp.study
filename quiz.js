@@ -245,5 +245,5 @@ const Quiz = (() => {
     renderQ();
   }
 
-  return { start, begin, answer, close, toggleKanji, retrySame, submitTyping };
+  return { start, begin, answer, close, toggleKanji, retrySame, submitTyping, genPhoneticConfusables };
 })();
