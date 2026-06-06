@@ -37,6 +37,14 @@ service cloud.firestore {
       allow write: if false;  // 只 Cloud Function 寫
     }
 
+    // 免費白名單(管理員後台授予)— 文件存在 = 該 uid 免費
+    // 用戶只能讀自己的(tool-quota 判斷是否免擋);只有 Cloud Function (Admin SDK) 能寫,
+    // 防止用戶自己寫 free_users/{自己uid} 自封免費。
+    match /free_users/{uid} {
+      allow read: if request.auth != null && request.auth.uid == uid;
+      allow write: if false;
+    }
+
     // 黑名單(退費 / chargeback 紀錄)— 用 emailHash 當 doc id
     // 只有 Cloud Function 能讀寫;前端不該知道誰在黑名單
     match /blacklist/{emailHash} {

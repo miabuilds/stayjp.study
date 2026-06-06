@@ -91,12 +91,15 @@
       var name = (user.displayName || user.email || 'User').split(' ')[0];
       var photo = user.photoURL || '';
       var img = photo ? '<img src="' + photo + '" alt="" onerror="this.style.display=\'none\'">' : '';
+      var ADMIN = ['stayjpplan@gmail.com', 'abc83327@gmail.com'];
+      var adminLink = ADMIN.indexOf((user.email || '').toLowerCase()) > -1 ? '<a class="ahx-item" href="admin.html">🛠 管理後台</a>' : '';
       area.innerHTML =
         '<button class="ahx-btn" id="ahxMenuBtn" type="button">' + img + name + ' ▾</button>' +
         '<div class="ahx-menu" id="ahxMenu">' +
           '<div class="ahx-head">' + (user.email || '') + '</div>' +
           '<a class="ahx-item" href="account.html">我的帳號</a>' +
           '<a class="ahx-item" href="pricing.html">訂閱方案</a>' +
+          adminLink +
           '<button class="ahx-item danger" id="ahxLogout" type="button">登出</button>' +
         '</div>';
       area.querySelector('#ahxMenuBtn').onclick = function (e) {

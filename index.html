@@ -1478,12 +1478,15 @@ function updateAuthUI() {
     const email = currentUser.email || '';
     const photo = currentUser.photoURL || '';
     const img = photo ? `<img src="${photo}" alt="" onerror="this.style.display='none'">` : '';
+    const ADMIN_EMAILS = ['stayjpplan@gmail.com', 'abc83327@gmail.com'];
+    const adminLink = ADMIN_EMAILS.includes(email.toLowerCase()) ? `<a class="um-item" href="admin.html">🛠 管理後台</a>` : '';
     area.innerHTML = `
       <button class="auth-btn" id="userMenuBtn" onclick="toggleUserMenu(event)">${img}${name} ▾</button>
       <div class="user-menu" id="userMenu">
         <div class="um-head">${email}</div>
         <a class="um-item" href="account.html">我的帳號</a>
         <a class="um-item" href="pricing.html">訂閱方案</a>
+        ${adminLink}
         <button class="um-item danger" onclick="handleAuth()">登出</button>
       </div>`;
   } else {

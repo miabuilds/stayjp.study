@@ -22,3 +22,4 @@ export { adminResetBilling } from "./admin-reset-billing";
 export { adminListSubscribers } from "./admin-list-subscribers";
 export { adminUnblockUser } from "./admin-unblock-user";
 export { adminUserStats } from "./admin-user-stats";
+export { adminFreeAccess } from "./admin-free-access";
