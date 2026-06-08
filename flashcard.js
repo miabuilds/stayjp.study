@@ -1,5 +1,36 @@
 // ========== FLASHCARD MODE (類 26秒 快速背單字) ==========
 // 倒數自動翻面 + 手勢左右滑 + 自動播音 + 記錄 SRS
+
+// 易混淆單字自動提示：跨級別建一次「讀音→漢字集合」索引（記憶體快取），
+// 卡片渲染時若同讀音存在不同漢字，就提示注意區別（如 撮る／取る 同讀 とる）。
+// FlashCard 與 SRS 兩處共用，掛在 window 上、執行期呼叫，不受 script 載入順序影響。
+(function () {
+  let _readingIdx = null;
+  function buildReadingIdx() {
+    if (_readingIdx) return _readingIdx;
+    _readingIdx = {};
+    if (typeof getVocabData !== 'function') return _readingIdx;
+    ['n5', 'n4', 'n3', 'n2', 'n1'].forEach(lv => {
+      let data; try { data = getVocabData(lv); } catch (e) { data = null; }
+      (data || []).forEach(v => {
+        if (!v || !v.r || !v.w) return;
+        (_readingIdx[v.r] = _readingIdx[v.r] || new Set()).add(v.w);
+      });
+    });
+    return _readingIdx;
+  }
+  window.sameReadingHint = function (item) {
+    if (!item || !item.r) return '';
+    const set = buildReadingIdx()[item.r];
+    if (!set || set.size < 2) return '';
+    // 排除自己與「純假名同形」(w===r)，只留下會混淆的不同漢字
+    const others = [...set].filter(w => w !== item.w && w !== item.r);
+    if (!others.length) return '';
+    const list = others.slice(0, 3).map(w => '「' + w + '（' + item.r + '）」').join('、');
+    return '⚠️ 注意：與' + list + '讀音相同，注意漢字區別';
+  };
+})();
+
 const FlashCard = (() => {
   const EXAM_KEY = 'exam_date';
   const BASE_KEY = 'base_level';    // 目前程度（這級以下視為已懂）'none'|'n5'|'n4'|'n3'|'n2'
@@ -318,6 +349,7 @@ const FlashCard = (() => {
     flipped = false;
     timeLeft = COUNTDOWN_SEC;
     const item = queue[cur];
+    const cfHint = window.sameReadingHint ? window.sameReadingHint(item) : '';
     const box = document.getElementById('quizBox');
     box.innerHTML = `
       <div class="qhd">
@@ -339,6 +371,7 @@ const FlashCard = (() => {
           <div class="fc-word" style="font-size:28px">${item.w}</div>
           ${item.w!==item.r?`<div class="fc-reading">${item.r}</div>`:''}
           <div class="fc-meaning">${typeof cvt==='function'?cvt(item.m):item.m}</div>
+          ${cfHint?`<div class="confuse-hint">${cfHint}</div>`:''}
           ${Array.isArray(item.e)&&item.e.length?`<div class="fc-ex">${item.e.map(ex=>`<div class="fc-ex-row"><div class="fc-ex-j">${ex.j}<svg class="fc-ex-spk" onclick="event.stopPropagation();speak('${(ex.j||'').replace(/'/g,"\\'")}')" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.54 8.46a5 5 0 010 7.07"/></svg></div><div class="fc-ex-z">${typeof cvt==='function'?cvt(ex.z):ex.z}</div></div>`).join('')}</div>`:''}
           <div class="fc-btns">
             <button class="fc-btn fc-no" onclick="event.stopPropagation();FlashCard.answer('unknown')">✗ 不會<span class="fc-btn-hint">${gradeLabel('unknown')}</span></button>

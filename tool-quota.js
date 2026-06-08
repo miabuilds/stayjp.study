@@ -243,8 +243,16 @@
   // 跟讀逐句：跟讀 session 已在 Shadow.start* 開啟時計過 1 次「shadow」,逐句不再額外擋。
   function consumeShadowOrBlock() { return true; }
 
+  // 該工具今天免費額度是否已用完（且確實在 gating 範圍內）
+  function usedUp(tool) { return shouldGate() && !canUse(tool); }
+  // 學習頁按鈕旁的升級小 badge：橘色細邊框小字，點擊跳訂閱頁。額度沒用完時回空字串。
+  function upgradeBadge(tool) {
+    if (!usedUp(tool)) return '';
+    return `<a href="pricing.html" class="quota-upsell" title="升級 Premium 無限使用">今日已用完 · 升級無限使用 ↗</a>`;
+  }
+
   window.ToolQuota = {
-    canUse, consume,
+    canUse, consume, usedUp, upgradeBadge,
     used: () => { const c = loadCount(); return Object.keys(TOOL_NAMES).filter(t => (c[t] || 0) >= PER_TOOL_LIMIT).length; },
     showPaywall, shouldGate, isPremium,
     markMockCompleted,

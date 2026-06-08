@@ -95,6 +95,32 @@ a:hover{text-decoration:underline}
 
 .ft{padding:40px 20px;text-align:center;color:var(--tx3);font-size:12px;border-top:1px solid var(--bd);background:var(--bg);line-height:1.9}
 .ft a{color:var(--ac2)}
+
+/* 免費 vs 付費 功能對照表 */
+.cmp-wrap{background:var(--bg2);border:1px solid var(--bd);border-radius:14px;overflow:hidden;margin:0 0 32px}
+.cmp{width:100%;border-collapse:collapse;font-size:13px}
+.cmp th,.cmp td{padding:11px 14px;border-bottom:1px solid var(--bd);text-align:center}
+.cmp th{background:var(--bg3);font-weight:700;font-size:12px;color:var(--tx2)}
+.cmp thead th:last-child{color:var(--ac)}
+.cmp td:first-child,.cmp th:first-child{text-align:left;color:var(--tx);font-weight:600}
+.cmp tr:last-child td{border-bottom:none}
+.cmp .paid{color:var(--ac);font-weight:700}
+.cmp .free-lim{color:var(--tx2)}
+.cmp .no{color:var(--tx3)}
+
+/* 社會認同引言卡 */
+.quote-card{background:var(--bg3);border-radius:16px;padding:18px 22px;margin:0 0 28px;display:flex;align-items:center;gap:14px}
+.quote-card .qc-ico{font-size:26px;flex-shrink:0}
+.quote-card .qc-text{font-size:15px;color:var(--tx);line-height:1.7}
+.quote-card .qc-who{font-size:12px;color:var(--tx2);margin-top:3px}
+
+/* 持續更新標記 */
+.update-line{font-size:13px;color:var(--tx2);text-align:center;margin:-36px 0 40px}
+
+/* 月費「入門首選」視覺區分（虛線邊框 + badge + 副標） */
+.plan.entry{border:1.5px dashed var(--ac2);position:relative}
+.plan.entry::before{content:"入門首選";position:absolute;top:-12px;right:16px;background:var(--ac2);color:#fff;font-size:11px;font-weight:700;padding:4px 12px;border-radius:999px}
+.plan-subtitle{font-size:13px;font-weight:600;color:var(--ac2);background:rgba(74,127,212,.1);border-radius:8px;padding:7px 10px;margin-bottom:16px;text-align:center}
 </style>
 </head>
 <body>
@@ -112,6 +138,8 @@ a:hover{text-decoration:underline}
 <main class="main">
   <h2>方案與價目表</h2>
   <p class="lead">所有內容免費瀏覽 — N5～N1 文法 / 單字 / 例句通通看到飽。<br>付費解鎖的是「無限次練習工具」，認真備考再升級就好。</p>
+  <!-- 數字 = home.html changelog 中 2026 年的更新條目數，發版時同步調整 -->
+  <p class="update-line">🔄 持續開發中 · 2026 年已更新 7 次</p>
 
   <!-- === 免費方案 callout === -->
   <div class="box tip" style="margin-bottom:32px;text-align:center">
@@ -119,8 +147,36 @@ a:hover{text-decoration:underline}
     <span style="font-size:13px;color:var(--tx2)">先用免費版體驗，喜歡再升級。不會藏內容、不會跳廣告打你臉。</span>
   </div>
 
+  <!-- === 免費版 vs 付費版 功能對照 === -->
+  <div class="cmp-wrap">
+    <table class="cmp">
+      <thead>
+        <tr><th>功能</th><th>免費版</th><th>付費版</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>瀏覽單字／文法</td><td class="free-lim">✅ 無限</td><td class="paid">✅ 無限</td></tr>
+        <tr><td>SRS 間隔複習</td><td class="free-lim">每天 1 次</td><td class="paid">✅ 無限</td></tr>
+        <tr><td>跟讀練習</td><td class="free-lim">每天 1 次</td><td class="paid">✅ 無限</td></tr>
+        <tr><td>模擬考</td><td class="free-lim">每等級 1 套</td><td class="paid">✅ 無限</td></tr>
+        <tr><td>今日故事</td><td class="free-lim">每天 1 次</td><td class="paid">✅ 無限</td></tr>
+        <tr><td>文法練習</td><td class="free-lim">每天 1 次</td><td class="paid">✅ 無限</td></tr>
+        <tr><td>聽力練習</td><td class="free-lim">每天 1 次</td><td class="paid">✅ 無限</td></tr>
+        <tr><td>跨裝置雲端同步</td><td class="no">❌</td><td class="paid">✅</td></tr>
+      </tbody>
+    </table>
+  </div>
+
   <!-- 已訂閱會員提示(JS 偵測到 active 訂閱才顯示)-->
   <div class="sub-banner" id="subBanner" style="display:none"></div>
+
+  <!-- === 社會認同：值得付費的真實回饋 === -->
+  <div class="quote-card">
+    <div class="qc-ico">💬</div>
+    <div>
+      <div class="qc-text">「如果有付費項目，我<b>非常願意支付</b>！」</div>
+      <div class="qc-who">@ra**** · Threads 網友</div>
+    </div>
+  </div>
 
   <!-- === 四付費方案 === -->
   <div class="plans">
@@ -153,11 +209,12 @@ a:hover{text-decoration:underline}
       <a class="plan-cta" href="javascript:void(0)" onclick="return startSubscribe(this)">訂閱</a>
     </div>
 
-    <div class="plan" data-plan="monthly">
+    <div class="plan entry" data-plan="monthly">
       <div class="plan-name">月費訂閱</div>
       <div class="plan-tag">先試一個月再說</div>
       <div class="plan-price"><span class="currency">NT$</span>149<span class="unit">/ 月</span></div>
       <div class="plan-cycle">自動續扣 · 隨時可取消</div>
+      <div class="plan-subtitle">👋 不確定值不值得？先試一個月</div>
       <ul class="plan-features">
         <li>適合短期衝刺（考前 1-2 個月）</li>
         <li>隨時可改成年費鎖長期優惠</li>
@@ -176,7 +233,7 @@ a:hover{text-decoration:underline}
         <li>不再扣款、不會被漲價</li>
         <li>適合準備跨多年級 N5 → N1 的長期學習者</li>
         <li>跨裝置雲端同步</li>
-        <li><strong>限定範圍：JLPT N5-N1 全部內容 + 現有工具</strong></li>
+        <li><span style="color:var(--tx2);font-size:12px;font-weight:400">涵蓋 N5–N1 全等級內容與目前所有工具</span></li>
       </ul>
       <a class="plan-cta" href="javascript:void(0)" onclick="return startSubscribe(this)">訂閱</a>
     </div>

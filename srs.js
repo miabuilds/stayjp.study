@@ -106,6 +106,27 @@ const SRS = (() => {
     };
   }
 
+  // 複習進度視覺化：已掌握比例環圈圖 + 三項數字圖例（已學 / 待複習 / 已掌握）
+  function statsDonut(st) {
+    const total = st.total || 0;
+    if (!total) return `<div class="srs-stats">${t('srs_stats', { learned: st.total, due: st.due, mastered: st.mastered })}</div>`;
+    const C = 125.66, masteredLen = (st.mastered / total) * C;
+    const pct = Math.round(st.mastered / total * 100);
+    return `<div class="srs-stats-wrap">
+      <svg class="srs-donut" width="56" height="56" viewBox="0 0 56 56" aria-hidden="true">
+        <circle class="dn-bg" cx="28" cy="28" r="20" fill="none" stroke-width="8"/>
+        <circle cx="28" cy="28" r="20" fill="none" stroke-width="8" stroke="#16a34a" stroke-linecap="round"
+          stroke-dasharray="${masteredLen.toFixed(2)} ${C}" transform="rotate(-90 28 28)"/>
+        <text x="28" y="32" text-anchor="middle" font-size="13" font-weight="700" fill="var(--tx)">${pct}%</text>
+      </svg>
+      <div class="srs-legend">
+        <div><i style="background:var(--tx3)"></i>${t('srs_stat_learned', { n: st.total })}</div>
+        <div><i style="background:var(--ac)"></i>${t('srs_stat_due', { n: st.due })}</div>
+        <div><i style="background:#16a34a"></i>${t('srs_stat_mastered', { n: st.mastered })}</div>
+      </div>
+    </div>`;
+  }
+
   let queue = [], cur = 0, lvl = 'n5';
 
   // 跨級別抓所有 due 單字，依 nextReviewTs 排序
@@ -141,6 +162,7 @@ const SRS = (() => {
     const item = queue[cur];
     const itemLv = item.level || lvl;
     const st = getStats(itemLv);
+    const cfHint = window.sameReadingHint ? window.sameReadingHint(item) : '';
     document.getElementById('quizBox').innerHTML = `
       <div class="qhd"><span>${t('review')} ${cur+1} / ${queue.length}</span><span>${itemLv.toUpperCase()}・${item.isNew?t('srs_new'):t('srs_review')}</span><button class="qclose" style="width:auto;margin:0;padding:2px 10px" onclick="SRS.close()">✕</button></div>
       <div class="srs-card" id="srsCard" onclick="SRS.flip()">
@@ -154,13 +176,14 @@ const SRS = (() => {
           <div class="qmain">${item.w}</div>
           ${item.w!==item.r?'<div class="qsub">'+item.r+'</div>':''}
           ${item.m && item.m!==item.w ? '<div class="srs-meaning">'+(typeof cvt==='function'?cvt(item.m):item.m)+'</div>' : ''}
+          ${cfHint?'<div class="confuse-hint">'+cfHint+'</div>':''}
           <div class="srs-btns">
             <button class="srs-btn srs-hard" onclick="event.stopPropagation();SRS.rate(false)">${t('srs_hard')}</button>
             <button class="srs-btn srs-ok" onclick="event.stopPropagation();SRS.rate(true)">${t('srs_ok')}</button>
           </div>
         </div>
       </div>
-      <div class="srs-stats">${t('srs_stats', { learned: st.total, due: st.due, mastered: st.mastered })}</div>`;
+      ${statsDonut(st)}`;
   }
 
   function flip() {

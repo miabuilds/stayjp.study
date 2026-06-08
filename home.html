@@ -78,6 +78,7 @@
 html{scroll-behavior:smooth}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
 
+html, body { overflow-x: hidden; }  /* 安全網：任何來源的水平溢出都不讓 body 被撐開（避免手機橫向捲軸→文字擠成超窄欄→大空白） */
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans JP", "PingFang TC", system-ui, sans-serif;
   background: var(--bg); color: var(--tx);
@@ -379,6 +380,7 @@ a:hover { text-decoration: underline; }
 .stat-item {
   padding: 44px 20px; text-align: left;
   border-right: 1px solid var(--line);
+  min-width: 0;  /* grid item 預設 min-width:auto 會被寬數字撐開 → 視窗溢出；設 0 讓欄位能縮 */
 }
 .stat-item:last-child { border-right: none; }
 .stat-number {
@@ -400,6 +402,11 @@ a:hover { text-decoration: underline; }
   .stats-grid { grid-template-columns: 1fr 1fr; }
   .stat-item:nth-child(2) { border-right: none; }
   .stat-item:nth-child(1), .stat-item:nth-child(2) { border-bottom: 1px solid var(--line); }
+}
+/* 極窄機（≤360px）：縮 padding 與數字級距，2 欄不再被撐到溢出 */
+@media (max-width: 360px) {
+  .stat-item { padding: 28px 12px; }
+  .stat-number { font-size: 34px; }
 }
 
 /* == Footer == */
@@ -954,7 +961,9 @@ initTheme();
 // ========== SCROLL REVEAL ==========
 (() => {
   const els = document.querySelectorAll('.reveal');
-  if (!('IntersectionObserver' in window)) {
+  // 行動裝置直接顯示、跳過進場動畫：手機上 section 常比 viewport 高很多，
+  // threshold 永遠達不到 → 元素卡在 opacity:0 → 出現大片空白。innerWidth<768 直接顯示最穩。
+  if (!('IntersectionObserver' in window) || window.innerWidth < 768) {
     els.forEach(e => e.classList.add('in'));
     return;
   }
@@ -962,7 +971,7 @@ initTheme();
     entries.forEach(e => {
       if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
     });
-  }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+  }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
   els.forEach(el => io.observe(el));
 })();
 </script>
