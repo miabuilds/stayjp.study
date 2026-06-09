@@ -144,6 +144,8 @@ textarea.note:focus{outline:none;border-color:var(--ac)}
  <button id="tabStats"> 報表</button>
  <button id="tabSubs"> 訂閱者</button>
  <button id="tabLedger"> 帳本</button>
+ <button id="tabSetSub"> 訂閱管理</button>
+ <button id="tabErrLog"> 報錯</button>
  </div>
  <div class="me" id="meInfo"></div>
  <button class="btn" onclick="logout()" style="font-size:11px;padding:4px 10px">登出</button>
@@ -265,6 +267,52 @@ textarea.note:focus{outline:none;border-color:var(--ac)}
  <div id="ledgerTotals" class="stat-grid" style="margin-bottom:16px"></div>
  <div id="ledgerList" style="font-size:12px;color:var(--tx2);overflow-x:auto">點「重新整理」載入。</div>
  </div>
+
+ <!-- 訂閱管理 -->
+ <div id="wrapSetSub" class="stats">
+ <h2 style="font-size:14px;color:var(--tx2);text-transform:uppercase;letter-spacing:.5px;margin:0 0 14px">手動訂閱管理</h2>
+ <div style="max-width:420px;display:flex;flex-direction:column;gap:12px">
+ <label style="font-size:13px;color:var(--tx2)">用戶 Email
+ <input id="ssEmail" type="email" placeholder="user@example.com" style="width:100%;min-height:44px;padding:8px 10px;margin-top:4px;border:1px solid var(--bd);border-radius:8px;background:var(--bg2);color:var(--tx);font-size:15px">
+ </label>
+ <label style="font-size:13px;color:var(--tx2)">方案(補開用)
+ <select id="ssPlan" style="width:100%;min-height:44px;padding:8px 10px;margin-top:4px;border:1px solid var(--bd);border-radius:8px;background:var(--bg2);color:var(--tx);font-size:15px">
+ <option value="monthly">月費</option>
+ <option value="yearly">年費</option>
+ <option value="yearly_early_bird">早鳥年費</option>
+ <option value="lifetime">終身</option>
+ </select>
+ </label>
+ <label style="font-size:13px;color:var(--tx2)">到期日(補開用)
+ <input id="ssExpiry" type="date" style="width:100%;min-height:44px;padding:8px 10px;margin-top:4px;border:1px solid var(--bd);border-radius:8px;background:var(--bg2);color:var(--tx);font-size:15px">
+ </label>
+ <label style="font-size:13px;color:var(--tx2)">延長天數(延長用)
+ <input id="ssDays" type="number" min="1" placeholder="例如 30" style="width:100%;min-height:44px;padding:8px 10px;margin-top:4px;border:1px solid var(--bd);border-radius:8px;background:var(--bg2);color:var(--tx);font-size:15px">
+ </label>
+ <div style="display:flex;gap:8px;flex-wrap:wrap">
+ <button class="btn" onclick="setSub('set')" style="flex:1;min-height:44px;min-width:90px">補開/設定</button>
+ <button class="btn" onclick="setSub('extend')" style="flex:1;min-height:44px;min-width:90px">延長</button>
+ <button class="btn danger" onclick="setSub('cancel')" style="flex:1;min-height:44px;min-width:90px">取消訂閱</button>
+ </div>
+ <div id="ssMsg" style="font-size:13px"></div>
+ <div id="ssResult" style="font-size:13px;color:var(--tx2)"></div>
+ </div>
+ </div>
+
+ <!-- 報錯 log -->
+ <div id="wrapErrLog" class="stats">
+ <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:14px">
+ <h2 style="font-size:14px;color:var(--tx2);text-transform:uppercase;letter-spacing:.5px;margin:0">程式報錯(Cloud Logging)</h2>
+ <select id="elHours" style="min-height:36px;padding:4px 8px;border:1px solid var(--bd);border-radius:8px;background:var(--bg2);color:var(--tx);font-size:13px">
+ <option value="24">近 24 小時</option>
+ <option value="48" selected>近 48 小時</option>
+ <option value="168">近 7 天</option>
+ </select>
+ <button class="btn" onclick="renderErrLog()" style="font-size:11px;padding:4px 10px">↻ 重新整理</button>
+ <span id="elCount" style="font-size:12px;color:var(--tx2)"></span>
+ </div>
+ <div id="elList" style="font-size:12px;color:var(--tx2)">點「重新整理」載入。</div>
+ </div>
 </div>
 
 <!-- Firebase SDK -->
@@ -348,18 +396,25 @@ document.getElementById('tabFeedback').onclick = () => switchTab('feedback');
 document.getElementById('tabStats').onclick = () => switchTab('stats');
 document.getElementById('tabSubs').onclick = () => switchTab('subs');
 document.getElementById('tabLedger').onclick = () => switchTab('ledger');
+document.getElementById('tabSetSub').onclick = () => switchTab('setsub');
+document.getElementById('tabErrLog').onclick = () => switchTab('errlog');
 function switchTab(tab) {
  document.getElementById('tabFeedback').classList.toggle('on', tab === 'feedback');
  document.getElementById('tabStats').classList.toggle('on', tab === 'stats');
  document.getElementById('tabSubs').classList.toggle('on', tab === 'subs');
  document.getElementById('tabLedger').classList.toggle('on', tab === 'ledger');
+ document.getElementById('tabSetSub').classList.toggle('on', tab === 'setsub');
+ document.getElementById('tabErrLog').classList.toggle('on', tab === 'errlog');
  document.getElementById('wrapFeedback').style.display = tab === 'feedback' ? 'flex' : 'none';
  document.getElementById('wrapStats').classList.toggle('on', tab === 'stats');
  document.getElementById('wrapSubs').classList.toggle('on', tab === 'subs');
  document.getElementById('wrapLedger').classList.toggle('on', tab === 'ledger');
+ document.getElementById('wrapSetSub').classList.toggle('on', tab === 'setsub');
+ document.getElementById('wrapErrLog').classList.toggle('on', tab === 'errlog');
  if (tab === 'stats') renderStats();
  if (tab === 'subs') renderSubs();
  if (tab === 'ledger') renderLedger();
+ if (tab === 'errlog') renderErrLog();
 }
 
 // ── feedback subscription ──
@@ -530,6 +585,71 @@ const FN_UNBLOCK   = 'https://asia-east1-jpnote-1bdd6.cloudfunctions.net/adminUn
 const FN_USER_STATS = 'https://asia-east1-jpnote-1bdd6.cloudfunctions.net/adminUserStats';
 const FN_CLEANUP_PENDING = 'https://asia-east1-jpnote-1bdd6.cloudfunctions.net/adminCleanupPending';
 const FN_RECOMPUTE_EB = 'https://asia-east1-jpnote-1bdd6.cloudfunctions.net/adminRecomputeEarlyBird';
+const FN_SET_SUB = 'https://asia-east1-jpnote-1bdd6.cloudfunctions.net/adminSetSubscription';
+const FN_ERR_LOG = 'https://asia-east1-jpnote-1bdd6.cloudfunctions.net/adminErrorLog';
+
+// ── 訂閱管理 ──
+async function setSub(action) {
+ const msg = document.getElementById('ssMsg');
+ const result = document.getElementById('ssResult');
+ const email = (document.getElementById('ssEmail').value || '').trim();
+ if (!email) { msg.textContent = '請輸入 email'; msg.style.color = '#EF4444'; return; }
+ const body = { action, email };
+ if (action === 'set') {
+   body.plan = document.getElementById('ssPlan').value;
+   const dv = document.getElementById('ssExpiry').value;
+   if (!dv) { msg.textContent = '補開請選到期日'; msg.style.color = '#EF4444'; return; }
+   body.expiresAt = dv;
+   if (!confirm(`補開 ${email} 的「${document.getElementById('ssPlan').selectedOptions[0].text}」訂閱,到期 ${dv}?`)) return;
+ } else if (action === 'extend') {
+   body.days = Number(document.getElementById('ssDays').value || 0);
+   if (!body.days || body.days <= 0) { msg.textContent = '請輸入延長天數'; msg.style.color = '#EF4444'; return; }
+   if (!confirm(`把 ${email} 的到期日往後延 ${body.days} 天?`)) return;
+ } else if (action === 'cancel') {
+   if (!confirm(`取消 ${email} 的訂閱(關閉續扣)?`)) return;
+ }
+ msg.textContent = '處理中…'; msg.style.color = 'var(--tx2)'; result.textContent = '';
+ try {
+   const t = await auth.currentUser.getIdToken();
+   const r = await fetch(FN_SET_SUB, { method:'POST', headers:{ 'Content-Type':'application/json', Authorization:'Bearer '+t }, body: JSON.stringify(body) });
+   const d = await r.json();
+   if (!r.ok) { msg.textContent = '失敗:' + (d.reason || d.error || r.status); msg.style.color = '#EF4444'; return; }
+   msg.textContent = `✓ 完成(${action})`; msg.style.color = '#16A34A';
+   const s = d.subscription;
+   result.innerHTML = s
+     ? `最新狀態:<b>${SUB_PLAN_TXT[s.plan]||s.plan}</b> · ${SUB_STATUS_TXT[s.status]||s.status} · 到期 ${s.expiresAt ? new Date(Number(s.expiresAt)).toLocaleDateString('zh-TW') : '—'} · 續扣 ${s.willRenew?'是':'否'}`
+     : '(目前無訂閱)';
+ } catch (e) { msg.textContent = '錯誤:' + e.message; msg.style.color = '#EF4444'; }
+}
+
+// ── 報錯 log ──
+async function renderErrLog() {
+ const box = document.getElementById('elList');
+ const cnt = document.getElementById('elCount');
+ const hours = Number(document.getElementById('elHours').value || 48);
+ box.textContent = '載入中…'; cnt.textContent = '';
+ try {
+   const t = await auth.currentUser.getIdToken();
+   const r = await fetch(FN_ERR_LOG, { method:'POST', headers:{ 'Content-Type':'application/json', Authorization:'Bearer '+t }, body: JSON.stringify({ hours }) });
+   const d = await r.json();
+   if (!r.ok) {
+     box.innerHTML = `<div style="color:#EF4444">讀取失敗:${d.message || d.error || r.status}<br><br>若為權限錯誤,請到 GCP Console → IAM,給函數的 service account 加上「Logs Viewer / roles/logging.viewer」。</div>`;
+     return;
+   }
+   cnt.textContent = `共 ${d.count} 筆`;
+   const items = d.items || [];
+   if (!items.length) { box.innerHTML = '<span style="color:#16A34A">這段期間沒有 ERROR 🎉</span>'; return; }
+   box.innerHTML = items.map(it => `
+     <div style="border-bottom:1px solid var(--bd);padding:8px 0">
+       <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+         <span style="color:#EF4444;font-weight:600">${it.severity}</span>
+         <span style="color:var(--tx)">${it.service||'?'}</span>
+         <span style="color:var(--tx3);font-size:11px">${it.timestamp ? new Date(it.timestamp).toLocaleString('zh-TW') : ''}</span>
+       </div>
+       <pre style="white-space:pre-wrap;word-break:break-word;margin:4px 0 0;font-size:11px;color:var(--tx2)">${(it.message||'').replace(/</g,'&lt;')}</pre>
+     </div>`).join('');
+ } catch (e) { box.innerHTML = `<div style="color:#EF4444">錯誤:${e.message}</div>`; }
+}
 
 // 校正早鳥計數器 = 重算成「實際持有早鳥的訂閱數」,修正 pricing 顯示的剩餘名額。
 async function recomputeEarlyBird() {
