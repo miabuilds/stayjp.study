@@ -28,5 +28,17 @@
       ]
     }
   ],
-  "fieldOverrides": []
+  "fieldOverrides": [
+    { "collectionGroup": "users", "fieldPath": "srs_data", "indexes": [] },
+    { "collectionGroup": "users", "fieldPath": "grammar_srs", "indexes": [] },
+    { "collectionGroup": "users", "fieldPath": "grammar_weak", "indexes": [] },
+    { "collectionGroup": "users", "fieldPath": "word_notebook", "indexes": [] },
+    { "collectionGroup": "users", "fieldPath": "quiz_history", "indexes": [] },
+    { "collectionGroup": "users", "fieldPath": "mock_exam_history", "indexes": [] },
+    { "collectionGroup": "users", "fieldPath": "study_log", "indexes": [] },
+    { "collectionGroup": "users", "fieldPath": "daily_progress", "indexes": [] },
+    { "collectionGroup": "users", "fieldPath": "reading_done", "indexes": [] },
+    { "collectionGroup": "users", "fieldPath": "listening_done", "indexes": [] },
+    { "collectionGroup": "users", "fieldPath": "listening_scores", "indexes": [] }
+  ]
 }
