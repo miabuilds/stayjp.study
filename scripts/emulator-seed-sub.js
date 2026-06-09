@@ -1,7 +1,7 @@
 // emulator 種子:造一個「肥 user doc(2700 項 SRS)+ 舊式 subscription」的測試用戶,供 Gate 1 驗證。
 // 用法:FIRESTORE_EMULATOR_HOST=localhost:8080 NODE_PATH=functions/node_modules node scripts/emulator-seed-sub.js
 const admin = require("firebase-admin");
-if (admin.apps.length === 0) admin.initializeApp({ projectId: "jpnote-1bdd6" });
+if (admin.apps.length === 0) admin.initializeApp({ projectId: process.env.GCLOUD_PROJECT || "jpnote-1bdd6" });
 const db = admin.firestore();
 
 (async () => {

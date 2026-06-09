@@ -1,7 +1,7 @@
 // 對帳:列出「有舊 users.subscription 但沒有新 subscriptions/{uid} doc」者。期望 0。
 // 用法同 migrate-subscriptions.js(NODE_PATH=functions/node_modules + 憑證 / emulator)。
 const admin = require("firebase-admin");
-if (admin.apps.length === 0) admin.initializeApp({ projectId: "jpnote-1bdd6" });
+if (admin.apps.length === 0) admin.initializeApp({ projectId: process.env.GCLOUD_PROJECT || "jpnote-1bdd6" });
 const db = admin.firestore();
 
 (async () => {

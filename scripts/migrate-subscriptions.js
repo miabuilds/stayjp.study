@@ -25,7 +25,7 @@ module.exports = { migrate };
 // 直接執行時才連真實 / emulator Firestore
 if (require.main === module) {
   const admin = require("firebase-admin");
-  if (admin.apps.length === 0) admin.initializeApp({ projectId: "jpnote-1bdd6" });
+  if (admin.apps.length === 0) admin.initializeApp({ projectId: process.env.GCLOUD_PROJECT || "jpnote-1bdd6" });
   const COMMIT = process.argv.includes("--commit");
   migrate(admin.firestore(), { commit: COMMIT })
     .then((r) => {
