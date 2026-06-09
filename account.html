@@ -266,12 +266,21 @@ document.getElementById('loginBtn').onclick = () => {
 function logout() { auth.signOut().then(() => location.reload()); }
 
 // ── subscription ──
+// 訂閱已搬到 subscriptions/{uid};遷移過渡期讀不到才退回舊 users/{uid}.subscription
 function loadSubscription() {
- db.collection('users').doc(currentUser.uid).onSnapshot(doc => {
- const sub = doc.data()?.subscription || null;
+ const apply = sub => {
  currentSub = sub;
  renderSubscription(sub);
  if (sub) loadTransactions(); else document.getElementById('txnCard').style.display = 'none';
+ };
+ let gotNew = false;
+ db.collection('subscriptions').doc(currentUser.uid).onSnapshot(doc => {
+ if (doc.exists) { gotNew = true; apply(doc.data() || null); }
+ else if (!gotNew) {
+ db.collection('users').doc(currentUser.uid).get()
+ .then(d => { if (!gotNew) apply(d.data()?.subscription || null); })
+ .catch(() => {});
+ }
  }, err => {
  console.warn('subscription load failed', err);
  });

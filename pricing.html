@@ -372,8 +372,12 @@ function applySubscriptionState(sub) {
 _auth.onAuthStateChanged(async user => {
   if (!user) return;
   try {
-    const snap = await _db.doc('users/' + user.uid).get();
-    applySubscriptionState(snap.data()?.subscription || null);
+    // 訂閱已搬到 subscriptions/{uid};遷移過渡期讀不到才退回舊 users/{uid}.subscription
+    let sub = null;
+    const ns = await _db.doc('subscriptions/' + user.uid).get();
+    if (ns.exists) sub = ns.data();
+    else { const os = await _db.doc('users/' + user.uid).get(); sub = os.data()?.subscription || null; }
+    applySubscriptionState(sub);
   } catch (e) { console.warn('sub state load fail', e); }
 });
 

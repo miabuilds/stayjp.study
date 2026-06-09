@@ -188,10 +188,21 @@
         .then(d => { cachedFreeAccess = d.exists; refreshBadge(); })
         .catch(() => {});
       // 開閘版:所有登入用戶都監聽訂閱(才偵測得到 premium → 免擋)
-      firebase.firestore().doc('users/' + user.uid).onSnapshot(snap => {
-        cachedSub = snap.data()?.subscription || null;
-        refreshBadge();
-        applyGating();
+      // 訂閱已搬到 subscriptions/{uid};遷移過渡期讀不到才退回舊 users/{uid}.subscription
+      const _fs = firebase.firestore();
+      let _gotNewSub = false;
+      _fs.doc('subscriptions/' + user.uid).onSnapshot(snap => {
+        if (snap.exists) {
+          _gotNewSub = true;
+          cachedSub = snap.data() || null;
+          refreshBadge(); applyGating();
+        } else if (!_gotNewSub) {
+          _fs.doc('users/' + user.uid).get().then(d => {
+            if (_gotNewSub) return;   // 新 doc 期間已生成就不採用舊的
+            cachedSub = d.data()?.subscription || null;
+            refreshBadge(); applyGating();
+          }).catch(() => {});
+        }
       }, err => console.warn('[ToolQuota] sub watch error:', err));
     });
   }
