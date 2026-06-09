@@ -1,0 +1,25 @@
+name: Monitor user doc sizes
+
+# 每週掃 users/{uid} 文件大小,逼近 Firestore 1 MiB 上限就告警(臨界 → 紅 + 寄信)。
+# 在「訂閱獨立 + 進度壓縮」上線前,當早期預警,別被 doc 撐爆突襲。
+
+on:
+  schedule:
+    - cron: '0 1 * * 1'   # 每週一 01:00 UTC
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install firebase-admin
+        run: npm install --no-save firebase-admin
+      - name: Scan doc sizes
+        env:
+          GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
+        run: node scripts/check-doc-sizes.mjs
