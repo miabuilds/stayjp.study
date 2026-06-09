@@ -35,7 +35,7 @@ export const adminRecomputeEarlyBird = functions.onRequest(
       if (!OWNER_EMAILS.has(decoded.email || "")) { res.status(403).json({ error: "not_owner" }); return; }
 
       // 真實持有早鳥名額的訂閱數
-      const snap = await db.collection("users").where("subscription.is_early_bird", "==", true).get();
+      const snap = await db.collection("subscriptions").where("is_early_bird", "==", true).get();
       const realCount = snap.size;
 
       const ref = db.doc("counters/early_bird");

@@ -53,24 +53,29 @@ export interface SubscriptionDoc {
   last_retry_at?: number;
 }
 
+// 訂閱存獨立 collection subscriptions/{uid}(不受進度 doc 索引/體積影響;規則 write:false 防自封 premium)。
+// 遷移過渡期:getSubscription 先讀新位置,讀不到才退回舊的 users/{uid}.subscription。
+const SUBS = "subscriptions";
+
 export async function getSubscription(uid: string): Promise<SubscriptionDoc | null> {
-  const snap = await db.doc(`users/${uid}`).get();
-  return (snap.data()?.subscription as SubscriptionDoc) || null;
+  const newSnap = await db.collection(SUBS).doc(uid).get();
+  if (newSnap.exists) return (newSnap.data() as SubscriptionDoc) || null;
+  // 雙讀後備(尚未回填的舊用戶)
+  const legacy = await db.doc(`users/${uid}`).get();
+  return (legacy.data()?.subscription as SubscriptionDoc) || null;
 }
 
 export async function writeSubscription(uid: string, sub: SubscriptionDoc): Promise<void> {
-  await db.doc(`users/${uid}`).set({ subscription: sub }, { merge: true });
+  // 一律寫新位置(獨立小 doc)
+  await db.collection(SUBS).doc(uid).set(sub, { merge: true });
 }
 
 export async function patchSubscription(
   uid: string,
   patch: Partial<SubscriptionDoc>,
 ): Promise<void> {
-  const updates: Record<string, unknown> = {};
-  for (const [k, v] of Object.entries(patch)) {
-    updates[`subscription.${k}`] = v;
-  }
-  await db.doc(`users/${uid}`).update(updates);
+  // 新位置欄位是頂層,set(merge) 等效於原 dotted-path update
+  await db.collection(SUBS).doc(uid).set(patch, { merge: true });
 }
 
 /**

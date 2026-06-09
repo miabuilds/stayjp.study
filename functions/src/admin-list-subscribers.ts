@@ -28,12 +28,12 @@ export const adminListSubscribers = functions.onRequest(
       const decoded = await admin.auth().verifyIdToken(idToken);
       if (!OWNER_EMAILS.has(decoded.email || "")) { res.status(403).json({ error: "not_owner" }); return; }
 
-      const snap = await db.collection("users")
-        .where("subscription.status", "in", ["active", "trialing", "cancelled", "refunded", "expired"])
+      const snap = await db.collection("subscriptions")
+        .where("status", "in", ["active", "trialing", "cancelled", "refunded", "expired"])
         .limit(500).get();
 
       const subscribers = await Promise.all(snap.docs.map(async (doc) => {
-        const s = (doc.data().subscription || {}) as Record<string, unknown>;
+        const s = (doc.data() || {}) as Record<string, unknown>;
         let email = "";
         try { email = (await admin.auth().getUser(doc.id)).email || ""; } catch { /* user 可能已刪 */ }
         return {

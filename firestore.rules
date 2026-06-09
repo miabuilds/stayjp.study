@@ -31,6 +31,18 @@ service cloud.firestore {
       allow write: if false;  // 只有 Cloud Function (Admin SDK) 能寫
     }
 
+    // 訂閱狀態 — 從 users/{uid}.subscription 獨立出來
+    // 結構:subscriptions/{uid} → { source, plan, status, expiresAt, willRenew, ... }
+    // owner + admin 可讀;write:false → 只有 Cloud Function (Admin SDK) 能寫,
+    // 堵死「owner 可寫 users → 自封 subscription.status=active 白嫖 premium」漏洞。
+    match /subscriptions/{uid} {
+      allow read: if request.auth != null && (
+                    request.auth.uid == uid ||
+                    request.auth.token.email in ['stayjpplan@gmail.com', 'abc83327@gmail.com']
+                  );
+      allow write: if false;
+    }
+
     // 早鳥計數器
     match /counters/{name} {
       allow read: if true;  // 前端 paywall 要顯示「剩 X 名」

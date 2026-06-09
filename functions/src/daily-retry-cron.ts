@@ -28,14 +28,14 @@ export const dailyRetryCron = functions.onSchedule(
     console.log("Daily retry cron started");
 
     // 1. 找所有 failed_retries > 0 的訂閱
-    const snap = await db.collection("users")
-      .where("subscription.failed_retries", ">", 0)
+    const snap = await db.collection("subscriptions")
+      .where("failed_retries", ">", 0)
       .get();
 
     console.log(`Found ${snap.size} users with failed retries`);
 
     for (const doc of snap.docs) {
-      const sub = doc.data().subscription;
+      const sub = doc.data();
       if (!sub || !sub.last_retry_at) continue;
 
       const uid = doc.id;
