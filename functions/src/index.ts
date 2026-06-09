@@ -25,3 +25,5 @@ export { adminUserStats } from "./admin-user-stats";
 export { adminFreeAccess } from "./admin-free-access";
 export { adminCleanupPending } from "./admin-cleanup-pending";
 export { adminRecomputeEarlyBird } from "./admin-recompute-earlybird";
+export { adminSetSubscription } from "./admin-set-subscription";
+export { adminErrorLog } from "./admin-error-log";
