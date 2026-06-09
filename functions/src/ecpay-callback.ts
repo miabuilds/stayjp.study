@@ -19,7 +19,8 @@ import { PLANS, PlanKey, ECPAY_SECRETS } from "./utils/constants";
 import { verifyCheckMacValue } from "./utils/ecpay";
 import {
   writeTransaction, getSubscription, writeSubscription, patchSubscription,
-  tryReserveEarlyBird, nowMs, plusDays, SubscriptionDoc, db,
+  tryReserveEarlyBird, releaseEarlyBird, writePaymentFailure,
+  nowMs, plusDays, SubscriptionDoc, db,
 } from "./utils/firestore";
 
 export const ecpayCallback = functions.onRequest(
@@ -87,6 +88,7 @@ export const ecpayCallback = functions.onRequest(
 
         // 早鳥首次訂閱 → 占名額
         let isEarlyBird = false;
+        let reservedThisCall = false;   // 本次呼叫是否真的占了名額(失敗時要釋放,避免重試灌爆計數器)
         if (plan === "yearly_early_bird" && isFirstPayment && !existingSub?.is_early_bird) {
           const reserved = await tryReserveEarlyBird();
           if (!reserved) {
@@ -94,6 +96,7 @@ export const ecpayCallback = functions.onRequest(
             console.warn("Early bird full but ECPay charged, falling back to yearly", { uid });
           }
           isEarlyBird = reserved;
+          reservedThisCall = reserved;
         } else if (plan === "yearly_early_bird") {
           // 續扣 / 取消後重訂的早鳥:原本就有 is_early_bird flag,不重複占名額
           isEarlyBird = existingSub?.is_early_bird === true;
@@ -121,7 +124,30 @@ export const ecpayCallback = functions.onRequest(
           is_early_bird: isEarlyBird || existingSub?.is_early_bird === true,
           failed_retries: 0,   // 成功歸零
         };
-        await writeSubscription(uid, newSub);
+        try {
+          await writeSubscription(uid, newSub);
+        } catch (subErr) {
+          // 🚨 訂閱寫入失敗 — 最常見主因:users/{uid} 索引條目超限(INDEX_ENTRIES_COUNT_LIMIT_EXCEEDED)
+          //    或 doc 體積逼近 1MiB。錢已收,但開通沒成功。防呆策略:
+          //  1. 不寫 success transaction → 保留 idempotency,讓綠界重試(或修好後)能自癒
+          //  2. 釋放本次占用的早鳥名額 → 重試會重占,避免重試多次把計數器灌爆
+          //  3. 寫進獨立小 collection payment_failures(「絕不」寫 users doc)+ 大聲 log 告警
+          //  4. 回 500 → 綠界重試;暫時性問題會自癒,永久性(體積超限)則靠 payment_failures 人工對帳
+          console.error("🚨 SUBSCRIPTION WRITE FAILED — payment received but NOT provisioned", {
+            uid, plan, tradeNo, merchantTradeNo, amount, err: String(subErr),
+          });
+          if (reservedThisCall) await releaseEarlyBird().catch(() => { /* best effort */ });
+          await writePaymentFailure({
+            uid, plan,
+            merchant_trade_no: merchantTradeNo,
+            trade_no: tradeNo,
+            amount_twd: amount,
+            reason: "subscription_write_failed",
+            error: String(subErr),
+          }).catch(e => console.error("payment_failure 告警也寫失敗:", e));
+          res.status(500).send("0|Subscription Write Failed");
+          return;
+        }
 
         // 寫 transaction(Firestore 不接受 undefined,有值才放)
         const txn: Parameters<typeof writeTransaction>[0] = {
@@ -154,11 +180,12 @@ export const ecpayCallback = functions.onRequest(
         });
 
         // retry 計數 +1(daily-retry-cron 會根據這個值決定何時 retry)
+        // best-effort:user doc 若超限會寫失敗,但 fail transaction 已寫進帳本,不該因此拋錯
         if (existingSub) {
           await patchSubscription(uid, {
             failed_retries: (existingSub.failed_retries || 0) + 1,
             last_retry_at: nowMs(),
-          });
+          }).catch(e => console.error("patchSubscription(failed_retries) 失敗(user doc 可能超限):", e));
         }
 
         console.warn("✗ ECPay payment failed", { uid, plan, rtnCode, rtnMsg });

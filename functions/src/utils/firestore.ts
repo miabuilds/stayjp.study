@@ -119,6 +119,29 @@ export async function writeTransaction(txn: Omit<TransactionDoc, "occurred_at">)
   return ref.id;
 }
 
+// ───── 金流告警:訂閱開通失敗的人工對帳佇列 ─────────────────────────────
+// 收到錢但 writeSubscription 失敗時(最常見:users/{uid} 索引條目/體積超限)寫這裡。
+// 刻意寫進獨立小 collection,「絕不」寫 users/{uid} — 那個 doc 可能正是失敗主因。
+export interface PaymentFailureDoc {
+  uid: string;
+  plan: string;
+  merchant_trade_no?: string;
+  trade_no?: string;
+  amount_twd: number;
+  reason: string;            // e.g. "subscription_write_failed"
+  error: string;             // 原始錯誤訊息(含 INDEX_ENTRIES_COUNT_LIMIT_EXCEEDED 等)
+}
+
+export async function writePaymentFailure(rec: PaymentFailureDoc): Promise<void> {
+  // doc id = trade_no:同筆付款的綠界重試會 upsert 同一 doc,不會灌爆 collection
+  const id = rec.trade_no || rec.merchant_trade_no || db.collection("payment_failures").doc().id;
+  await db.collection("payment_failures").doc(id).set({
+    ...rec,
+    resolved: false,
+    occurred_at: FieldValue.serverTimestamp(),
+  }, { merge: true });
+}
+
 // ───── 早鳥計數器(atomic transaction)─────────────────────────────────
 
 export async function tryReserveEarlyBird(): Promise<boolean> {
