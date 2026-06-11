@@ -274,6 +274,25 @@ export async function precheckSubscribe(uid: string, email: string): Promise<Pre
     };
   }
 
+  // 1.5 防連點重複扣款:近 10 分鐘已有「處理中(pending)」的訂閱結帳 → 擋。
+  //      (race:第一筆還沒收到 ECPay callback 開通前,使用者又送一次 → 兩筆都成立 → 重複扣款)
+  try {
+    const cutoff = admin.firestore.Timestamp.fromMillis(nowMs() - 10 * 60 * 1000);
+    const recent = await db.collection("transactions")
+      .where("uid", "==", uid)
+      .where("occurred_at", ">=", cutoff)
+      .get();
+    const hasPendingSubscribe = recent.docs.some((d) => {
+      const t = d.data();
+      return t.type === "subscribe" && t.status === "pending";
+    });
+    if (hasPendingSubscribe) {
+      return { ok: false, reason: "你有一筆付款正在處理中,請稍候幾分鐘再試,避免重複扣款。" };
+    }
+  } catch (e) {
+    console.warn("[precheck] pending check failed", e);   // 查詢失敗不擋正常流程
+  }
+
   // 2. 黑名單?
   const bl = await getBlacklist(email);
   if (bl?.permanently_blocked) {
