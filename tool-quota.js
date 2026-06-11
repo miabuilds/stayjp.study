@@ -246,14 +246,17 @@
 
   // 該工具今天免費額度是否已用完（且確實在 gating 範圍內）
   function usedUp(tool) { return shouldGate() && !canUse(tool); }
-  // 學習頁按鈕旁的升級小 badge：橘色細邊框小字，點擊跳訂閱頁。額度沒用完時回空字串。
-  function upgradeBadge(tool) {
-    if (!usedUp(tool)) return '';
-    return `<a href="pricing.html" class="quota-upsell" title="升級 Premium 無限使用">今日已用完 · 升級無限使用 ↗</a>`;
+  // 整排工具按鈕「下方一行」的低調升級提示：gating 中 + 今天有任一工具已用完才出現,否則回空字串。
+  function upsellLine() {
+    if (!shouldGate()) return '';
+    const c = loadCount();
+    const anyUsed = Object.keys(TOOL_NAMES).some(t => (c[t] || 0) >= PER_TOOL_LIMIT);
+    if (!anyUsed) return '';
+    return `<a href="pricing.html" class="quota-upsell-line">🔒 今日免費額度用完了 · 升級無限使用 ↗</a>`;
   }
 
   window.ToolQuota = {
-    canUse, consume, usedUp, upgradeBadge,
+    canUse, consume, usedUp, upsellLine,
     used: () => { const c = loadCount(); return Object.keys(TOOL_NAMES).filter(t => (c[t] || 0) >= PER_TOOL_LIMIT).length; },
     showPaywall, shouldGate, isPremium,
     markMockCompleted,

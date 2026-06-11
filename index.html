@@ -739,14 +739,11 @@ select::-ms-expand { display: none; }
 /* 危險操作隔離：重置進度推到行末、降低存在感，避免與「上一批/下一批」誤觸 */
 .daily-reset { margin-left: auto; opacity: .45; border-color: var(--bd); color: var(--tx3); }
 .daily-reset:hover { opacity: 1; background: var(--wrong-bd, #dc2626); border-color: var(--wrong-bd, #dc2626); color: #fff; }
-/* 付費轉換：某工具當日免費額度用完時，按鈕旁的升級提示小 badge */
-/* 每個工具按鈕+它的 badge 包成一個直欄,badge 待在自己按鈕正下方,不會在 flex 列裡跟別的按鈕交錯 */
-.daily-bar .tool-cell { display: inline-flex; flex-direction: column; align-items: flex-start; gap: 4px; vertical-align: top; }
-.quota-upsell { display: inline-flex; align-items: center; align-self: flex-start; white-space: nowrap;
-  font-size: 11px; font-weight: 600; color: #C2410C; background: rgba(245,158,11,.1);
-  border: 1px solid #F59E0B; border-radius: 8px; padding: 3px 8px; text-decoration: none; line-height: 1.2; }
-.quota-upsell:hover { background: #F59E0B; color: #fff; }
-[data-theme="dark"] .quota-upsell { color: #FBBF24; }
+/* 付費轉換：免費額度用完時,整排工具按鈕「下方一行」的低調升級提示(不再每顆一個橘框) */
+.quota-upsell-line { flex-basis: 100%; display: block; margin-top: 2px; text-align: center;
+  font-size: 12px; font-weight: 500; color: var(--tx2); text-decoration: none;
+  padding: 7px 10px; border-radius: 10px; background: rgba(245,158,11,.08); border: 1px solid rgba(245,158,11,.35); }
+.quota-upsell-line:hover { background: rgba(245,158,11,.16); color: var(--ac); }
 
 /* == Responsive: Mobile (max-width: 768px) == */
 @media (max-width: 768px) {
@@ -2946,9 +2943,10 @@ function renderVocab() {
       <div class="dp"><div class="dp-lbl">${t('total_progress', { lv })}</div><div class="dp-bar"><div class="dp-fill" style="width:${Math.round(prog.totalOffset/cnt*100)}%"></div></div>
       <div class="dp-txt">${t('progress_txt', { n: prog.totalOffset, total: cnt, unit: t('unit_vocab') })}</div></div>
       <button class="daily-btn ${dailyMode?'on':''}" onclick="toggleDailyMode()">${dailyMode?t('show_all'):t('daily_mode')}</button>
-      <span class="tool-cell"><button class="shadow-trigger" onclick="Shadow.startCurrent()">🎧 跟讀本頁</button>${window.ToolQuota&&ToolQuota.upgradeBadge?ToolQuota.upgradeBadge('shadow'):''}</span>
-      ${dailyMode?`<span class="tool-cell"><button class="daily-btn" onclick="FlashCard.beginToday()">⚡ 快速背本批</button>${window.ToolQuota&&ToolQuota.upgradeBadge?ToolQuota.upgradeBadge('flashcard'):''}</span>`:''}
-      ${dailyMode?`<span class="tool-cell"><button class="daily-btn" onclick="DailyStory.open()" style="background:linear-gradient(135deg,#D4654A,#E8734A);color:#fff;border-color:#D4654A">📖 今日故事</button>${window.ToolQuota&&ToolQuota.upgradeBadge?ToolQuota.upgradeBadge('story'):''}</span>`:''}
+      <button class="shadow-trigger" onclick="Shadow.startCurrent()">🎧 跟讀本頁</button>
+      ${dailyMode?`<button class="daily-btn" onclick="FlashCard.beginToday()">⚡ 快速背本批</button>`:''}
+      ${dailyMode?`<button class="daily-btn" onclick="DailyStory.open()" style="background:linear-gradient(135deg,#D4654A,#E8734A);color:#fff;border-color:#D4654A">📖 今日故事</button>`:''}
+      ${window.ToolQuota&&ToolQuota.upsellLine?ToolQuota.upsellLine():''}
       ${dailyMode?`<div class="daily-batch-row">
         ${prog.totalOffset>0?`<button class="daily-btn" onclick="prevDailyBatch()">${t('prev_batch')}</button>`:''}
         ${prog.totalOffset<cnt?`<button class="daily-btn" onclick="nextDailyBatch()">${t('next_batch')}</button>`:''}
@@ -3135,8 +3133,9 @@ function render() {
       <div class="dp"><div class="dp-lbl">${t('total_progress_grammar', { lv })}</div><div class="dp-bar"><div class="dp-fill" style="width:${Math.round(gProg.totalOffset/cnt*100)}%"></div></div>
       <div class="dp-txt">${t('progress_txt', { n: gProg.totalOffset, total: cnt, unit: t('unit_grammar') })}</div></div>
       <button class="daily-btn ${grammarDailyMode?'on':''}" onclick="toggleGrammarDailyMode()">${grammarDailyMode?t('show_all'):t('daily_mode')}</button>
-      <span class="tool-cell"><button class="shadow-trigger" onclick="Shadow.startCurrent()">🎧 跟讀本頁</button>${window.ToolQuota&&ToolQuota.upgradeBadge?ToolQuota.upgradeBadge('shadow'):''}</span>
+      <button class="shadow-trigger" onclick="Shadow.startCurrent()">🎧 跟讀本頁</button>
       ${currentLevel === 'n5' ? `<button class="shadow-trigger" style="background:var(--ac2);color:#fff" onclick="jumpToParticles()">📃 跳到助詞</button>` : ''}
+      ${window.ToolQuota&&ToolQuota.upsellLine?ToolQuota.upsellLine():''}
       ${grammarDailyMode?`<div class="daily-batch-row">
         ${gProg.totalOffset>0?`<button class="daily-btn" onclick="prevGrammarBatch()">${t('prev_batch')}</button>`:''}
         ${gProg.totalOffset<cnt?`<button class="daily-btn" onclick="nextGrammarBatch()">${t('next_batch')}</button>`:''}
