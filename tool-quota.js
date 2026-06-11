@@ -163,7 +163,8 @@
     if (!badge) {
       badge = document.createElement('div');
       badge.id = 'quotaBadge';
-      badge.style.cssText = 'position:fixed;bottom:14px;left:14px;background:rgba(0,0,0,.78);color:#fff;padding:8px 12px;border-radius:10px;font-size:11px;font-family:-apple-system,sans-serif;line-height:1.5;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,.2);cursor:pointer;max-width:220px';
+      // bottom 要避開底部導覽列(.ftb,高度 var(--btm))+ 瀏海安全區,否則手機上會蓋住「學習」tab
+      badge.style.cssText = 'position:fixed;bottom:calc(var(--btm, 56px) + env(safe-area-inset-bottom) + 12px);left:14px;background:rgba(0,0,0,.78);color:#fff;padding:8px 12px;border-radius:10px;font-size:11px;font-family:-apple-system,sans-serif;line-height:1.5;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,.2);cursor:pointer;max-width:220px';
       badge.title = '免費版每日額度。點擊查看訂閱方案。';
       badge.onclick = () => window.location.href = 'pricing.html';
       document.body.appendChild(badge);
