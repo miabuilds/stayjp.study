@@ -740,7 +740,9 @@ select::-ms-expand { display: none; }
 .daily-reset { margin-left: auto; opacity: .45; border-color: var(--bd); color: var(--tx3); }
 .daily-reset:hover { opacity: 1; background: var(--wrong-bd, #dc2626); border-color: var(--wrong-bd, #dc2626); color: #fff; }
 /* 付費轉換：某工具當日免費額度用完時，按鈕旁的升級提示小 badge */
-.quota-upsell { display: inline-flex; align-items: center; align-self: center; white-space: nowrap;
+/* 每個工具按鈕+它的 badge 包成一個直欄,badge 待在自己按鈕正下方,不會在 flex 列裡跟別的按鈕交錯 */
+.daily-bar .tool-cell { display: inline-flex; flex-direction: column; align-items: flex-start; gap: 4px; vertical-align: top; }
+.quota-upsell { display: inline-flex; align-items: center; align-self: flex-start; white-space: nowrap;
   font-size: 11px; font-weight: 600; color: #C2410C; background: rgba(245,158,11,.1);
   border: 1px solid #F59E0B; border-radius: 8px; padding: 3px 8px; text-decoration: none; line-height: 1.2; }
 .quota-upsell:hover { background: #F59E0B; color: #fff; }
@@ -2944,9 +2946,9 @@ function renderVocab() {
       <div class="dp"><div class="dp-lbl">${t('total_progress', { lv })}</div><div class="dp-bar"><div class="dp-fill" style="width:${Math.round(prog.totalOffset/cnt*100)}%"></div></div>
       <div class="dp-txt">${t('progress_txt', { n: prog.totalOffset, total: cnt, unit: t('unit_vocab') })}</div></div>
       <button class="daily-btn ${dailyMode?'on':''}" onclick="toggleDailyMode()">${dailyMode?t('show_all'):t('daily_mode')}</button>
-      <button class="shadow-trigger" onclick="Shadow.startCurrent()">🎧 跟讀本頁</button>${window.ToolQuota&&ToolQuota.upgradeBadge?ToolQuota.upgradeBadge('shadow'):''}
-      ${dailyMode?`<button class="daily-btn" onclick="FlashCard.beginToday()">⚡ 快速背本批</button>${window.ToolQuota&&ToolQuota.upgradeBadge?ToolQuota.upgradeBadge('flashcard'):''}`:''}
-      ${dailyMode?`<button class="daily-btn" onclick="DailyStory.open()" style="background:linear-gradient(135deg,#D4654A,#E8734A);color:#fff;border-color:#D4654A">📖 今日故事</button>${window.ToolQuota&&ToolQuota.upgradeBadge?ToolQuota.upgradeBadge('story'):''}`:''}
+      <span class="tool-cell"><button class="shadow-trigger" onclick="Shadow.startCurrent()">🎧 跟讀本頁</button>${window.ToolQuota&&ToolQuota.upgradeBadge?ToolQuota.upgradeBadge('shadow'):''}</span>
+      ${dailyMode?`<span class="tool-cell"><button class="daily-btn" onclick="FlashCard.beginToday()">⚡ 快速背本批</button>${window.ToolQuota&&ToolQuota.upgradeBadge?ToolQuota.upgradeBadge('flashcard'):''}</span>`:''}
+      ${dailyMode?`<span class="tool-cell"><button class="daily-btn" onclick="DailyStory.open()" style="background:linear-gradient(135deg,#D4654A,#E8734A);color:#fff;border-color:#D4654A">📖 今日故事</button>${window.ToolQuota&&ToolQuota.upgradeBadge?ToolQuota.upgradeBadge('story'):''}</span>`:''}
       ${dailyMode?`<div class="daily-batch-row">
         ${prog.totalOffset>0?`<button class="daily-btn" onclick="prevDailyBatch()">${t('prev_batch')}</button>`:''}
         ${prog.totalOffset<cnt?`<button class="daily-btn" onclick="nextDailyBatch()">${t('next_batch')}</button>`:''}
@@ -3133,7 +3135,7 @@ function render() {
       <div class="dp"><div class="dp-lbl">${t('total_progress_grammar', { lv })}</div><div class="dp-bar"><div class="dp-fill" style="width:${Math.round(gProg.totalOffset/cnt*100)}%"></div></div>
       <div class="dp-txt">${t('progress_txt', { n: gProg.totalOffset, total: cnt, unit: t('unit_grammar') })}</div></div>
       <button class="daily-btn ${grammarDailyMode?'on':''}" onclick="toggleGrammarDailyMode()">${grammarDailyMode?t('show_all'):t('daily_mode')}</button>
-      <button class="shadow-trigger" onclick="Shadow.startCurrent()">🎧 跟讀本頁</button>${window.ToolQuota&&ToolQuota.upgradeBadge?ToolQuota.upgradeBadge('shadow'):''}
+      <span class="tool-cell"><button class="shadow-trigger" onclick="Shadow.startCurrent()">🎧 跟讀本頁</button>${window.ToolQuota&&ToolQuota.upgradeBadge?ToolQuota.upgradeBadge('shadow'):''}</span>
       ${currentLevel === 'n5' ? `<button class="shadow-trigger" style="background:var(--ac2);color:#fff" onclick="jumpToParticles()">📃 跳到助詞</button>` : ''}
       ${grammarDailyMode?`<div class="daily-batch-row">
         ${gProg.totalOffset>0?`<button class="daily-btn" onclick="prevGrammarBatch()">${t('prev_batch')}</button>`:''}
