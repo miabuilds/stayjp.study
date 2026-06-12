@@ -3331,6 +3331,24 @@ function toggleTheme() {
   localStorage.setItem('theme', next);
   updateThemeIcon();
 }
+// 原生 App 主題橋(index.html 沒載 auth-header.js,故內嵌):切色 → 回報 data-theme + --bg 色碼,
+// 原生照著漆安全區(瀏海/底部)。一般瀏覽器無 STAYJP_NATIVE → 跳過。
+(function () {
+  function reportTheme() {
+    try {
+      if (!(window.STAYJP_NATIVE && window.STAYJP_NATIVE.isNativeApp)) return;
+      if (!(window.ReactNativeWebView && window.ReactNativeWebView.postMessage)) return;
+      var theme = document.documentElement.getAttribute('data-theme') || 'light';
+      var bg = getComputedStyle(document.documentElement).getPropertyValue('--bg').trim();
+      window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'THEME', payload: { theme: theme, bg: bg } }));
+    } catch (_) {}
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', reportTheme);
+  else reportTheme();
+  try {
+    new MutationObserver(reportTheme).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+  } catch (_) {}
+})();
 function updateThemeIcon() {
   const btn = document.getElementById('themeBtn');
   if (!btn) return;

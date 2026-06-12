@@ -154,3 +154,23 @@
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
   else init();
 })();
+
+/* 原生 App 主題橋:網頁切深/淺色時,把目前 data-theme + 實際 --bg 色碼回報給原生,
+   讓 App 的安全區(瀏海 / 底部)照著漆,跟網頁內容無縫接色。一般瀏覽器無 STAYJP_NATIVE → 跳過。
+   (此檔每頁都載;index.html 沒載,另在該頁內嵌同一段。) */
+(function () {
+  function reportTheme() {
+    try {
+      if (!(window.STAYJP_NATIVE && window.STAYJP_NATIVE.isNativeApp)) return;
+      if (!(window.ReactNativeWebView && window.ReactNativeWebView.postMessage)) return;
+      var theme = document.documentElement.getAttribute('data-theme') || 'light';
+      var bg = getComputedStyle(document.documentElement).getPropertyValue('--bg').trim();
+      window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'THEME', payload: { theme: theme, bg: bg } }));
+    } catch (_) {}
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', reportTheme);
+  else reportTheme();
+  try {
+    new MutationObserver(reportTheme).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+  } catch (_) {}
+})();
