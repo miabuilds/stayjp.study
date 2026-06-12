@@ -88,8 +88,23 @@ export const adminSetSubscription = functions.onRequest(
           payment_method: "manual", external_id: `admin-extend-${nowMs()}`,
           status: "success", note: `manual extend ${days}d by ${decoded.email}`,
         });
+      } else if (action === "refund") {
+        // 手動退費記帳 — 用在「虛擬ATM / 轉帳」這種綠界無法自動退刷、owner 已手動把錢轉回去的情況。
+        // 只補記一筆 type:'refund' 帳(讓報表淨營收正確下修),刻意「不做」以下事:
+        //   - 不碰 subscription 狀態(重複扣款只退多付那筆,她的有效訂閱權限照常)
+        //   - 不進黑名單 / 不累計 refund_count(她是重複匯款的受害方,不該被封)
+        //   - 不釋放早鳥名額(她仍是早鳥)
+        const amount = Number(req.body?.amount || 0);
+        if (!amount || amount <= 0) { res.status(400).json({ error: "invalid_amount", reason: "退費金額需為正數(NT$)" }); return; }
+        const note = String(req.body?.note || "").slice(0, 200);
+        await writeTransaction({
+          uid, type: "refund", source: "web", plan: "n/a", amount_twd: -Math.abs(amount),
+          payment_method: "manual", external_id: `admin-refund-${nowMs()}`,
+          status: "refunded",
+          note: `manual ATM/transfer refund NT$${amount} by ${decoded.email}${note ? " — " + note : ""}`,
+        });
       } else {
-        res.status(400).json({ error: "invalid_action", reason: "action 需為 set / cancel / extend" });
+        res.status(400).json({ error: "invalid_action", reason: "action 需為 set / cancel / extend / refund" });
         return;
       }
 

@@ -294,6 +294,12 @@ textarea.note:focus{outline:none;border-color:var(--ac)}
  <button class="btn" onclick="setSub('extend')" style="flex:1;min-height:44px;min-width:90px">延長</button>
  <button class="btn danger" onclick="setSub('cancel')" style="flex:1;min-height:44px;min-width:90px">取消訂閱</button>
  </div>
+ <hr style="border:none;border-top:1px solid var(--bd);margin:14px 0 10px">
+ <label style="font-size:13px;color:var(--tx2)">手動退費記帳(虛擬ATM / 轉帳,已自己轉回 → 補記一筆)
+ <input id="ssRefundAmt" type="number" min="1" placeholder="退回金額 NT$,例如 199" style="width:100%;min-height:44px;padding:8px 10px;margin-top:4px;border:1px solid var(--bd);border-radius:8px;background:var(--bg2);color:var(--tx);font-size:15px">
+ </label>
+ <div style="font-size:12px;color:var(--tx3);margin:2px 0 6px">只記帳(報表淨營收下修),不碰她的訂閱權限、不列黑名單、不釋放早鳥。重複扣款用這個。</div>
+ <button class="btn danger" onclick="setSub('refund')" style="width:100%;min-height:44px">記一筆退費</button>
  <div id="ssMsg" style="font-size:13px"></div>
  <div id="ssResult" style="font-size:13px;color:var(--tx2)"></div>
  </div>
@@ -607,6 +613,10 @@ async function setSub(action) {
    if (!confirm(`把 ${email} 的到期日往後延 ${body.days} 天?`)) return;
  } else if (action === 'cancel') {
    if (!confirm(`取消 ${email} 的訂閱(關閉續扣)?`)) return;
+ } else if (action === 'refund') {
+   body.amount = Number(document.getElementById('ssRefundAmt').value || 0);
+   if (!body.amount || body.amount <= 0) { msg.textContent = '請輸入退回金額(NT$)'; msg.style.color = '#EF4444'; return; }
+   if (!confirm(`幫 ${email} 補記一筆退費 NT$${body.amount}?\n(只記帳、報表淨營收下修;不碰權限、不列黑名單)\n⚠ 錢要你自己先在銀行轉回去,這裡只是記帳。`)) return;
  }
  msg.textContent = '處理中…'; msg.style.color = 'var(--tx2)'; result.textContent = '';
  try {
