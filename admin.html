@@ -280,7 +280,7 @@ textarea.note:focus{outline:none;border-color:var(--ac)}
  <option value="monthly">月費</option>
  <option value="yearly">年費</option>
  <option value="yearly_early_bird">早鳥年費</option>
- <option value="lifetime">終身</option>
+ <option value="lifetime">買斷</option>
  </select>
  </label>
  <label style="font-size:13px;color:var(--tx2)">到期日(補開用)
@@ -761,7 +761,7 @@ async function freeAccess(action, emailArg) {
       : '<span style="color:var(--tx3)">目前沒有免費白名單帳號</span>';
   } catch (e) { msg.textContent = '錯誤:' + e.message; msg.style.color = '#EF4444'; }
 }
-const SUB_PLAN_TXT = { monthly:'月費', yearly:'年費', yearly_early_bird:'早鳥年費', lifetime:'終身' };
+const SUB_PLAN_TXT = { monthly:'月費', yearly:'年費', yearly_early_bird:'早鳥年費', lifetime:'買斷' };
 // cancelled 真正含義是「關閉自動續扣、但到期前仍可用」,不是「已終止」。標籤講清楚避免誤判(看「到期」欄判斷是否還在期內)。
 const SUB_STATUS_TXT = { active:'使用中', cancelled:'取消續扣（仍可用）', refunded:'已退費', expired:'已過期', trialing:'試用' };
 // 交易帳本(transactions)用的標籤 — 與 account.html 對齊
@@ -794,7 +794,7 @@ async function renderSubs() {
             <td style="padding:8px 6px;color:var(--tx)">${s.email || s.uid.slice(0,8)}${s.is_early_bird?' <span style="color:#D946EF">★早鳥</span>':''}</td>
             <td style="padding:8px 6px">${SUB_PLAN_TXT[s.plan]||s.plan}</td>
             <td style="padding:8px 6px">${SUB_STATUS_TXT[s.status]||s.status}</td>
-            <td style="padding:8px 6px">${s.plan==='lifetime'?'終身':fmtDate(s.expiresAt)}</td>
+            <td style="padding:8px 6px">${s.plan==='lifetime'?'買斷':fmtDate(s.expiresAt)}</td>
             <td style="padding:8px 6px">${s.willRenew?'開':'關'}</td>
             <td style="padding:8px 6px">${s.source==='web'?'網頁':s.source==='app'?'App':(s.source||'—')}</td>
             <td style="padding:8px 6px;white-space:nowrap"><button class="btn" style="font-size:11px;padding:3px 8px" onclick="showTxns('${s.uid}','${(s.email||'').replace(/'/g,"\\'")}')">明細</button>${s.email?` <button class="btn" style="font-size:11px;padding:3px 8px" onclick="document.getElementById('unblockEmail').value='${s.email}';document.getElementById('unblockEmail').scrollIntoView()">填入解鎖</button>`:''}</td>

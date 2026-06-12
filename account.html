@@ -224,7 +224,7 @@ const PLAN_LABELS = {
  monthly: '月費訂閱',
  yearly: '年費訂閱',
  yearly_early_bird: ' 早鳥年費',
- lifetime: ' 終身方案',
+ lifetime: ' 買斷方案',
 };
 
 const STATUS_LABELS = {
@@ -313,7 +313,7 @@ function renderSubscription(sub) {
 
  // Expiry
  if (sub.plan === 'lifetime') {
- document.getElementById('expiryDate').textContent = '無到期日(終身方案 · 買斷)';
+ document.getElementById('expiryDate').textContent = '無到期日(買斷方案)';
  } else if (sub.expiresAt) {
  const d = new Date(sub.expiresAt);
  document.getElementById('expiryDate').textContent = d.toLocaleDateString('zh-TW', { year: 'numeric', month: '2-digit', day: '2-digit' });
@@ -370,7 +370,7 @@ function renderSubscription(sub) {
  } else {
  btnCancel.disabled = sub.plan === 'lifetime';
  }
- // 終身無自動續訂概念
+ // 買斷無自動續訂概念
  if (sub.plan === 'lifetime') {
  btnCancel.style.display = 'none';
  btnResub.style.display = 'none';
@@ -403,11 +403,11 @@ function checkRefundEligibility(sub) {
 
  if (sub.plan === 'lifetime') {
  if (daysSinceStart <= 7) {
- refundInfo.textContent = `終身方案首購 7 天內可全額退費。剩 ${Math.ceil(7 - daysSinceStart)} 天可申請。`;
+ refundInfo.textContent = `買斷方案首購 7 天內可全額退費。剩 ${Math.ceil(7 - daysSinceStart)} 天可申請。`;
  refundInfo.style.display = 'block';
  btnRefund.disabled = false;
  } else {
- refundInfo.textContent = '終身方案超過 7 天視為已使用,不能退費。';
+ refundInfo.textContent = '買斷方案超過 7 天視為已使用,不能退費。';
  refundInfo.style.display = 'block';
  btnRefund.disabled = true;
  }

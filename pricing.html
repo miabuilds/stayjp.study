@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="canonical" href="https://stayjp.study/pricing.html">
 <title>價目表 — 日本再留計劃</title>
-<meta name="description" content="日本再留計劃方案與價目表。內容免費瀏覽，付費解鎖無限次練習工具。早鳥 NT$990/年（限量 100 名，比標準年費省 500）、年費 NT$1,490、月費 NT$149、終身 NT$2,990。">
+<meta name="description" content="日本再留計劃方案與價目表。內容免費瀏覽，付費解鎖無限次練習工具。早鳥 NT$990/年（限量 100 名，比標準年費省 500）、年費 NT$1,490、月費 NT$149、買斷 NT$2,990。">
 <meta property="og:title" content="價目表 — 日本再留計劃">
 <meta property="og:description" content="內容免費瀏覽，工具想練到爽再升級。早鳥 NT$990/年（限量 100 名）。">
 <meta property="og:type" content="website">
@@ -224,7 +224,7 @@ a:hover{text-decoration:underline}
     </div>
 
     <div class="plan lifetime" data-plan="lifetime">
-      <div class="plan-name">終身方案</div>
+      <div class="plan-name">買斷方案</div>
       <div class="plan-tag">一次付清 · 永不續扣 · 買斷現有功能*</div>
       <div class="plan-price"><span class="currency">NT$</span>2,990</div>
       <div class="plan-cycle">等於 2 年年費，之後免費用</div>
@@ -244,7 +244,7 @@ a:hover{text-decoration:underline}
     <strong style="color:var(--tx)">不做 7 天試用</strong> — 免費版本身就是試用，不用綁信用卡，不會忘記取消。
   </p>
 
-  <p style="font-size:13px;color:var(--tx2);margin-bottom:32px">所有價格為新台幣 (TWD)，含營業稅。境外用戶結帳時依當下匯率以信用卡發卡幣別扣款。<br>* 終身方案之「買斷」指本服務存續期間；本站為個人工作室經營，無法保證無限期營運，服務若終止之補償方式詳見<a href="terms.html">服務條款</a>第 8 條。</p>
+  <p style="font-size:13px;color:var(--tx2);margin-bottom:32px">所有價格為新台幣 (TWD)，含營業稅。境外用戶結帳時依當下匯率以信用卡發卡幣別扣款。<br>* 買斷方案為一次付清、買斷本服務存續期間既有功能之使用權；本站為個人工作室經營，無法保證無限期營運，服務若終止之補償方式詳見<a href="terms.html">服務條款</a>第 8 條。</p>
 
   <!-- === 訂閱規則 === -->
   <h3>訂閱規則</h3>
@@ -342,7 +342,7 @@ function applySubscriptionState(sub) {
     && (sub.status === 'active' || sub.status === 'trialing' || sub.status === 'cancelled')
     && sub.expiresAt && sub.expiresAt > Date.now();
   if (!active) return;
-  const PLAN_TXT = { monthly: '月費', yearly: '年費', yearly_early_bird: '早鳥年費', lifetime: '終身方案' };
+  const PLAN_TXT = { monthly: '月費', yearly: '年費', yearly_early_bird: '早鳥年費', lifetime: '買斷方案' };
   const banner = document.getElementById('subBanner');
   if (banner) {
     banner.innerHTML = `你已是 <strong>${PLAN_TXT[sub.plan] || sub.plan}</strong> 訂閱會員，無需重複訂購。`
@@ -387,7 +387,7 @@ const PLAN_TERMS = {
   monthly:           { name: '月費訂閱', price: 'NT$149',   cycle: '每月', recurring: true },
   yearly:            { name: '年費訂閱', price: 'NT$1,490', cycle: '每年', recurring: true },
   yearly_early_bird: { name: '早鳥年費', price: 'NT$990', cycle: '每年', recurring: true },
-  lifetime:          { name: '終身方案', price: 'NT$2,990', cycle: '一次付清', recurring: false },
+  lifetime:          { name: '買斷方案', price: 'NT$2,990', cycle: '一次付清', recurring: false },
 };
 
 // 下單前確認框:強制勾選「同意續扣條款」+「已滿18歲」才可付款
