@@ -45,6 +45,7 @@
   let cachedUserEmail = null;
   let cachedFreeAccess = false;   // free_users/{uid} 存在 = 管理員授予免費(在 admin 後台加白名單)
   let authReady = false;
+  let subLoaded = false;   // 登入用戶的訂閱 doc 是否已載入(避免載入空窗誤判免費 → 訂閱者跳額度 badge)
 
   function isPremium() {
     if (!cachedSub) return false;
@@ -53,6 +54,7 @@
   }
   function shouldGate() {
     if (!authReady) return false;     // 等 auth 狀態確定再決定,避免閃一下
+    if (cachedUserEmail && !subLoaded) return false;  // 登入用戶:訂閱狀態還沒載完前先不擋(訂閱者 doc 載入慢時不會誤跳額度 badge)
     if (isPremium()) return false;     // 付費用戶(登入 + 有效訂閱)→ 不擋
     if (cachedUserEmail && QUOTA_WHITELIST.has(cachedUserEmail.toLowerCase())) return false;  // owner / 免費白名單帳號 → 永遠免擋
     if (cachedFreeAccess) return false;  // 管理員後台授予免費(free_users/{uid})→ 免擋
@@ -182,8 +184,11 @@
     if (typeof firebase === 'undefined' || !firebase.auth) return;
     firebase.auth().onAuthStateChanged(user => {
       authReady = true;
-      if (!user) { cachedUserEmail = null; cachedSub = null; cachedFreeAccess = false; refreshBadge(); return; }
+      if (!user) { cachedUserEmail = null; cachedSub = null; cachedFreeAccess = false; subLoaded = true; refreshBadge(); return; }
       cachedUserEmail = user.email || null;
+      subLoaded = false;   // 換 user → 重新等這個 user 的訂閱載入
+      // 兜底:萬一訂閱 onSnapshot 一直沒回(極端),8 秒後恢復 gating,避免免費登入用戶逃逸
+      setTimeout(() => { if (!subLoaded) { subLoaded = true; refreshBadge(); } }, 8000);
       // 管理員後台授予的免費白名單(free_users/{uid} 存在 = 免費)
       firebase.firestore().doc('free_users/' + user.uid).get()
         .then(d => { cachedFreeAccess = d.exists; refreshBadge(); })
@@ -191,9 +196,10 @@
       // 開閘版:所有登入用戶都監聽訂閱(才偵測得到 premium → 免擋)
       firebase.firestore().doc('users/' + user.uid).onSnapshot(snap => {
         cachedSub = snap.data()?.subscription || null;
+        subLoaded = true;
         refreshBadge();
         applyGating();
-      }, err => console.warn('[ToolQuota] sub watch error:', err));
+      }, err => { console.warn('[ToolQuota] sub watch error:', err); subLoaded = true; refreshBadge(); });
     });
   }
 
