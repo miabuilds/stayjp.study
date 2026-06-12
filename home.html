@@ -125,6 +125,16 @@ a:hover { text-decoration: underline; }
 .hd-links a:hover { color: var(--tx); text-decoration: none; }
 .hd-links a:hover::after { transform: scaleX(1); transform-origin: left; }
 
+/* 手機漢堡選單 — 桌面隱藏,≤600px 才出現(取代被收起的文字導覽) */
+.hd-burger { display: none; background: none; border: 0; cursor: pointer; color: var(--tx2); padding: 6px; border-radius: 10px; align-items: center; justify-content: center; flex-shrink: 0; }
+.hd-burger:hover { color: var(--ac); }
+.hd-burger svg { width: 22px; height: 22px; }
+.hd-burger-wrap { position: relative; display: inline-flex; }
+.hd-menu { position: absolute; top: calc(100% + 8px); right: 0; min-width: 180px; background: var(--bg2); border: 1px solid var(--line); border-radius: 12px; padding: 6px; box-shadow: 0 8px 28px rgba(0,0,0,.22); z-index: 300; display: none; }
+.hd-menu.show { display: block; }
+.hd-menu a { display: block; padding: 10px 14px; font-size: 14px; color: var(--tx); text-decoration: none; border-radius: 8px; white-space: nowrap; }
+.hd-menu a:hover { background: var(--bg3); text-decoration: none; }
+
 /* Theme toggle */
 .theme-btn {
   background: none; border: none; cursor: pointer;
@@ -490,8 +500,11 @@ a:hover { text-decoration: underline; }
   .section-title { margin-bottom: 40px; }
 }
 @media (max-width: 600px) {
-  /* 手機 header 太擠:收起次要文字導覽(學習工具/動詞變化/意見回饋),保留 logo / 繁 / 主題 / 登入 */
-  .hd-links a { display: none; }
+  /* 手機 header 太擠:把文字導覽(學習工具/動詞變化/意見回饋)收進 ☰ 漢堡選單,
+     保留 logo / 繁 / 主題 / 登入。用 > a 只藏直接子層,才不會連帶藏掉
+     auth-header 帳號選單與漢堡選單裡的 <a>(那些是巢狀的)。 */
+  .hd-links > a { display: none; }
+  .hd-burger { display: inline-flex; }
   .hd-inner { padding: 0 16px; gap: 8px; }
   .hd h1 { font-size: 14px; }
 }
@@ -548,6 +561,15 @@ a:hover { text-decoration: underline; }
       <a href="index.html">學習工具</a>
       <a href="verbs.html">動詞變化</a>
       <a href="contact.html">意見回饋</a>
+      <div class="hd-burger-wrap">
+        <button class="hd-burger" id="hdBurger" type="button" aria-label="選單" aria-expanded="false" onclick="toggleHdMenu(event)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+        <div class="hd-menu" id="hdMenu">
+          <a href="index.html">學習工具</a>
+          <a href="verbs.html">動詞變化</a>
+          <a href="contact.html">意見回饋</a>
+          <a href="pricing.html">訂閱方案</a>
+        </div>
+      </div>
       <button class="lang-btn" id="langBtn" onclick="cycleLang()">繁</button>
       <button class="theme-btn" id="themeBtn" onclick="toggleTheme()" aria-label="切換深色模式"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79z"/></svg></button>
     </div>
@@ -948,6 +970,29 @@ function toggleTheme() {
   localStorage.setItem('theme', next);
   updateThemeIcon();
 }
+// 手機漢堡選單 — 點 ☰ 開關;點外面 / 按 Esc 關
+function toggleHdMenu(e) {
+  if (e) e.stopPropagation();
+  const m = document.getElementById('hdMenu');
+  const b = document.getElementById('hdBurger');
+  if (!m) return;
+  const open = m.classList.toggle('show');
+  if (b) b.setAttribute('aria-expanded', open ? 'true' : 'false');
+}
+document.addEventListener('click', function (e) {
+  const m = document.getElementById('hdMenu');
+  if (m && m.classList.contains('show') && !e.target.closest('.hd-burger-wrap')) {
+    m.classList.remove('show');
+    const b = document.getElementById('hdBurger');
+    if (b) b.setAttribute('aria-expanded', 'false');
+  }
+});
+document.addEventListener('keydown', function (e) {
+  if (e.key === 'Escape') {
+    const m = document.getElementById('hdMenu');
+    if (m) m.classList.remove('show');
+  }
+});
 function updateThemeIcon() {
   const btn = document.getElementById('themeBtn');
   if (!btn) return;
