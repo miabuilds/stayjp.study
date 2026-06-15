@@ -148,7 +148,21 @@
         m.classList.remove('show');
       }
     });
-    auth.onAuthStateChanged(render);
+    auth.onAuthStateChanged(function (user) {
+      render(user);
+      // 在原生 App 的 WebView 內 → 把 Firebase uid 遞給 app,綁定 RevenueCat appUserID,
+      // 讓 app 內購買(IAP)的 webhook 能寫進正確的 users/{uid}.subscription。
+      // 一般瀏覽器沒有 window.STAYJP_NATIVE → 整段跳過,對網頁用戶零影響。
+      try {
+        if (window.STAYJP_NATIVE && window.STAYJP_NATIVE.isNativeApp &&
+            window.ReactNativeWebView && window.ReactNativeWebView.postMessage) {
+          window.ReactNativeWebView.postMessage(JSON.stringify(
+            user && user.uid ? { type: 'RC_LOGIN', payload: { uid: user.uid } }
+                             : { type: 'RC_LOGOUT' }
+          ));
+        }
+      } catch (e) { /* 橋接失敗靜默,不影響網頁 */ }
+    });
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
