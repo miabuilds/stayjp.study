@@ -46,6 +46,7 @@ export const adminListSubscribers = functions.onRequest(
           startedAt: s.startedAt || null,
           is_early_bird: s.is_early_bird === true,
           willRenew: s.willRenew === true,
+          ecpay_order: s.ecpay_order || null,   // 有=綠界定期定額;無=手動/PayPal(報表用來區分付款方式)
         };
       }));
 

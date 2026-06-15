@@ -796,7 +796,7 @@ async function renderSubs() {
             <td style="padding:8px 6px">${SUB_STATUS_TXT[s.status]||s.status}</td>
             <td style="padding:8px 6px">${s.plan==='lifetime'?'買斷':fmtDate(s.expiresAt)}</td>
             <td style="padding:8px 6px">${s.willRenew?'開':'關'}</td>
-            <td style="padding:8px 6px">${s.source==='web'?'網頁':s.source==='app'?'App':(s.source||'—')}</td>
+            <td style="padding:8px 6px">${s.source==='app'?'App(IAP)':(s.ecpay_order?'綠界':'手動/PayPal')}</td>
             <td style="padding:8px 6px;white-space:nowrap"><button class="btn" style="font-size:11px;padding:3px 8px" onclick="showTxns('${s.uid}','${(s.email||'').replace(/'/g,"\\'")}')">明細</button>${s.email?` <button class="btn" style="font-size:11px;padding:3px 8px" onclick="document.getElementById('unblockEmail').value='${s.email}';document.getElementById('unblockEmail').scrollIntoView()">填入解鎖</button>`:''}</td>
           </tr>`).join('')}</tbody>
       </table>`;

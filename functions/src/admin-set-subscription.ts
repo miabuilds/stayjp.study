@@ -58,7 +58,8 @@ export const adminSetSubscription = functions.onRequest(
           plan,
           status: "active",
           expiresAt,
-          willRenew: plan !== "lifetime",
+          // 手動補開(PayPal / 贈送)= 沒有定期定額約定 → 不會自動續訂。一律 false,報表才不會誤顯示「會續扣」。
+          willRenew: false,
           startedAt: existing?.startedAt || nowMs(),
           is_early_bird: plan === "yearly_early_bird" || existing?.is_early_bird === true,
           failed_retries: 0,
