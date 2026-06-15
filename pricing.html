@@ -252,8 +252,8 @@ a:hover{text-decoration:underline}
        一般瀏覽器顯示;App(WebView, Apple IAP)內由下方 script 自動隱藏,
        避免外部付款連結違反 App Store 規範(3.1.1)。 -->
   <div id="overseasPay" class="box" style="max-width:560px;margin:0 auto 32px">
-    <h3 style="margin:0 0 6px;font-size:16px;color:var(--tx)">🌍 海外用戶付款(Overseas)</h3>
-    <p style="margin:0 0 12px">台灣以外的信用卡透過 <strong>PayPal</strong> 收款、由我們手動開通(台灣卡請直接用上方綠界訂閱)。三步驟:</p>
+    <h3 style="margin:0 0 6px;font-size:16px;color:var(--tx)">💳 PayPal 付款</h3>
+    <p style="margin:0 0 12px">海外信用卡、或本站刷卡維護期間,訂閱透過 <strong>PayPal</strong> 付款 + 人工開通。三步驟:</p>
     <ol style="margin:0 0 16px;padding-left:20px;line-height:1.8">
       <li><strong>先用 Google 登入本站一次</strong>(右上角登入)— 開通需對到你的帳號。</li>
       <li>點下方按鈕用 PayPal 付款。</li>
@@ -264,7 +264,7 @@ a:hover{text-decoration:underline}
       <a class="pp-btn" href="https://www.paypal.com/ncp/payment/DKX7844UYTZU4" target="_blank" rel="noopener" onclick="return ppPay(event,'yearly_early_bird',this.href)">早鳥年費 NT$990 · PayPal</a>
       <a class="pp-btn alt" href="https://www.paypal.com/ncp/payment/4JXGHA86C47BJ" target="_blank" rel="noopener" onclick="return ppPay(event,'lifetime',this.href)">買斷 NT$2,990 · PayPal</a>
     </div>
-    <p style="margin:12px 0 0;font-size:12px;color:var(--tx3)">付款幣別依 PayPal 當下匯率換算;跨境手續費由 PayPal 收取。海外手動開通目前開放<strong>早鳥年費 / 買斷</strong>;月費請用上方綠界訂閱。</p>
+    <p style="margin:12px 0 0;font-size:12px;color:var(--tx3)">付款幣別依 PayPal 當下匯率換算;跨境手續費由 PayPal 收取。目前開放<strong>早鳥年費 / 買斷</strong>;月費・標準年費暫不開放。</p>
   </div>
   <script>
     // App(WebView)走 Apple IAP,隱藏外部付款連結,避免違反 App Store 審核規範。
@@ -504,7 +504,7 @@ function showConsentDialog(plan) {
 }
 
 // 🔧 綠界刷卡維護期間 → 訂閱暫時改走 PayPal 人工開通。修好把這行改回 false 即可還原綠界。
-const ECPAY_DOWN = false;
+const ECPAY_DOWN = true;
 // 維護期間有 PayPal 連結、可付款的方案(其餘方案的訂閱鈕停用)
 const PP_PLANS = ['yearly_early_bird', 'lifetime'];
 // 維護期:頂部加提示橫幅 + 停用沒有 PayPal 連結的方案訂閱鈕
