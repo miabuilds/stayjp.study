@@ -966,7 +966,7 @@ async function fetchUserStats() {
 async function fetchBillingStats() {
  // 訂閱狀態數一律從 adminListSubscribers(Admin SDK)算 — 與「訂閱者」分頁同一來源,保證兩頁一致。
  // (前端 client SDK 的 users.count() 聚合查詢會靜默丟錯 → 全變 0,故不再用。)
- let activeSubs = 0, cancelledSubs = 0, refundedSubs = 0, expiredSubs = 0, earlyBirdHeld = 0, subsTotal = 0;
+ let activeSubs = 0, activeRenew = 0, activeManual = 0, cancelledSubs = 0, refundedSubs = 0, expiredSubs = 0, earlyBirdHeld = 0, subsTotal = 0;
  try {
  const t = await auth.currentUser.getIdToken();
  const r = await fetch(FN_LIST_SUBS, { method: 'POST', headers: { Authorization: 'Bearer ' + t } });
@@ -974,7 +974,7 @@ async function fetchBillingStats() {
  const subs = d.subscribers || [];
  subsTotal = subs.length;
  subs.forEach(s => {
- if (s.status === 'active') activeSubs++;
+ if (s.status === 'active') { activeSubs++; if (s.willRenew) activeRenew++; else activeManual++; }
  else if (s.status === 'cancelled') cancelledSubs++;
  else if (s.status === 'refunded') refundedSubs++;
  else if (s.status === 'expired') expiredSubs++;
@@ -1010,7 +1010,7 @@ async function fetchBillingStats() {
  const allNet = allRevenue - allRefund;
  document.getElementById('statBilling').innerHTML = `
  <div class="stat"><div class="lbl">累計售出</div><div class="val">${soldUids.size}<small style="font-size:13px;color:var(--tx2)"> 人</small>${reSold ? ` <small style="font-size:12px;color:var(--tx2)">+${reSold} 重訂</small>` : ''}</div><div class="sub">不重複買家(含手動/PayPal;不含續訂 renew、不受之後取消退費影響)</div></div>
- <div class="stat"><div class="lbl">訂閱中(自動續訂)</div><div class="val">${activeSubs}</div><div class="sub">目前 status=active · 共 ${subsTotal} 筆訂閱紀錄</div></div>
+ <div class="stat"><div class="lbl">自動續訂中</div><div class="val">${activeRenew}</div><div class="sub">會自動續扣的綠界訂閱${activeManual ? ` · 另 ${activeManual} 筆手動/PayPal 有效(不續訂)` : ''} · 有效共 ${activeSubs}</div></div>
  <div class="stat"><div class="lbl">取消續扣・已退費</div><div class="val" style="font-size:20px">${cancelledSubs} <small style="font-size:13px;color:var(--tx2)">取消</small> / ${refundedSubs} <small style="font-size:13px;color:var(--tx2)">退費</small></div><div class="sub">取消=期內仍可用 · 過期 ${expiredSubs}</div></div>
  <div class="stat"><div class="lbl">早鳥目前持有 / 100</div><div class="val">${earlyBirdHeld}<small style="font-size:14px;color:var(--tx2)"> / 100</small></div><div class="sub">剩 ${ebLeft} 名額${ebDrift ? ` · <span style="color:#EF4444">⚠ 計數器=${earlyBirdCounter}(pricing 顯示的剩餘用這個)</span> <button class="btn" style="font-size:10px;padding:2px 7px" onclick="recomputeEarlyBird()">校正→${earlyBirdHeld}</button>` : ''}</div></div>
  <div class="stat"><div class="lbl">累計營業額(淨)</div><div class="val">NT$${allNet.toLocaleString()}</div><div class="sub">收款 ${allRevenue.toLocaleString()} − 退費 ${allRefund.toLocaleString()}</div></div>
