@@ -103,6 +103,8 @@ a:hover{text-decoration:underline}
  </div>
  <div class="actions">
  <button class="btn" onclick="logout()">登出</button>
+ <!-- 刪除帳號:只在原生 App 內顯示(Apple 5.1.1(v) 要求);網頁用戶看不到。由 initDeleteAccount() 解鎖 -->
+ <button class="btn" id="deleteAccountBtn" onclick="deleteAccount()" style="display:none;color:#EF4444;border-color:rgba(239,68,68,.4)">刪除帳號</button>
  </div>
  </div>
 
@@ -426,6 +428,37 @@ function checkRefundEligibility(sub) {
 // Cloud Function endpoints
 const FN_CANCEL = 'https://cancelsubscription-lsd7okt5qa-de.a.run.app';
 const FN_REFUND = 'https://refund-lsd7okt5qa-de.a.run.app';
+const FN_DELETE_ACCOUNT = 'https://deleteaccount-lsd7okt5qa-de.a.run.app';
+
+// 只在原生 App 的 WebView 內顯示「刪除帳號」(Apple 要求);網頁不顯示。
+function initDeleteAccount() {
+  try {
+    if (window.STAYJP_NATIVE && window.STAYJP_NATIVE.isNativeApp) {
+      const b = document.getElementById('deleteAccountBtn');
+      if (b) b.style.display = '';
+    }
+  } catch (e) {}
+}
+initDeleteAccount();
+
+async function deleteAccount() {
+  if (!currentUser) { alert('請先登入'); return; }
+  if (!confirm('確定要永久刪除帳號?\n\n• 你的學習進度、收藏、訂閱狀態將被清除,無法復原。\n• 若你有訂閱,刪除帳號「不會」自動停止扣款 — 請先到 Apple 設定 → 訂閱 取消,再刪帳號。\n\n仍要刪除?')) return;
+  try {
+    const idToken = await currentUser.getIdToken();
+    const res = await fetch(FN_DELETE_ACCOUNT, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + idToken },
+    });
+    const d = await res.json().catch(() => ({}));
+    if (!res.ok) { alert('刪除失敗:' + (d.message || d.error || res.status) + '\n請稍後再試或聯絡客服。'); return; }
+    alert('帳號已刪除。感謝你使用過 StayJP 🙏');
+    try { await auth.signOut(); } catch (e) {}
+    location.reload();
+  } catch (e) {
+    alert('刪除失敗:' + e.message);
+  }
+}
 
 async function cancelRenew() {
  if (!confirm('確定關閉自動續訂?到期日前都還能正常使用,到期後不再扣款。')) return;

@@ -27,3 +27,4 @@ export { adminCleanupPending } from "./admin-cleanup-pending";
 export { adminRecomputeEarlyBird } from "./admin-recompute-earlybird";
 export { adminSetSubscription } from "./admin-set-subscription";
 export { adminErrorLog } from "./admin-error-log";
+export { deleteAccount } from "./delete-account";
