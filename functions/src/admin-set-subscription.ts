@@ -51,6 +51,11 @@ export const adminSetSubscription = functions.onRequest(
         const raw = req.body?.expiresAt;
         const expiresAt = typeof raw === "number" ? raw : (raw ? new Date(String(raw)).getTime() : 0);
         if (!expiresAt || isNaN(expiresAt)) { res.status(400).json({ error: "invalid_expiresAt", reason: "需傳到期日(yyyy-mm-dd 或 ms)" }); return; }
+        // 實付金額:有給用給的(PayPal 實收),沒給用方案定價。> 0 視為「售出」(計入營收/累計售出);
+        // = 0 視為「贈送」(不計營收)。
+        const amount = req.body?.amount != null && req.body?.amount !== ""
+          ? Math.max(0, Math.round(Number(req.body.amount)))
+          : PLANS[plan].price_twd;
 
         const existing = await getSubscription(uid);
         const sub: SubscriptionDoc = {
@@ -66,9 +71,9 @@ export const adminSetSubscription = functions.onRequest(
         };
         await writeSubscription(uid, sub);
         await writeTransaction({
-          uid, type: "gift", source: "web", plan, amount_twd: 0,
+          uid, type: amount > 0 ? "subscribe" : "gift", source: "web", plan, amount_twd: amount,
           payment_method: "manual", external_id: `admin-set-${nowMs()}`,
-          status: "success", note: `manual admin set by ${decoded.email}`,
+          status: "success", note: `manual admin set by ${decoded.email} (NT$${amount})`,
         });
       } else if (action === "cancel") {
         await patchSubscription(uid, { status: "cancelled", willRenew: false });

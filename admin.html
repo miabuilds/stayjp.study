@@ -286,6 +286,9 @@ textarea.note:focus{outline:none;border-color:var(--ac)}
  <label style="font-size:13px;color:var(--tx2)">到期日(補開用)
  <input id="ssExpiry" type="date" style="width:100%;min-height:44px;padding:8px 10px;margin-top:4px;border:1px solid var(--bd);border-radius:8px;background:var(--bg2);color:var(--tx);font-size:15px">
  </label>
+ <label style="font-size:13px;color:var(--tx2)">實付金額(補開用,NT$;留空=用方案定價,填 0=免費贈送不計營收)
+ <input id="ssAmount" type="number" min="0" placeholder="例如 990(PayPal 實收)" style="width:100%;min-height:44px;padding:8px 10px;margin-top:4px;border:1px solid var(--bd);border-radius:8px;background:var(--bg2);color:var(--tx);font-size:15px">
+ </label>
  <label style="font-size:13px;color:var(--tx2)">延長天數(延長用)
  <input id="ssDays" type="number" min="1" placeholder="例如 30" style="width:100%;min-height:44px;padding:8px 10px;margin-top:4px;border:1px solid var(--bd);border-radius:8px;background:var(--bg2);color:var(--tx);font-size:15px">
  </label>
@@ -606,7 +609,9 @@ async function setSub(action) {
    const dv = document.getElementById('ssExpiry').value;
    if (!dv) { msg.textContent = '補開請選到期日'; msg.style.color = '#EF4444'; return; }
    body.expiresAt = dv;
-   if (!confirm(`補開 ${email} 的「${document.getElementById('ssPlan').selectedOptions[0].text}」訂閱,到期 ${dv}?`)) return;
+   const amtv = document.getElementById('ssAmount').value;
+   if (amtv !== '') body.amount = Number(amtv);   // 留空 → 後端用方案定價
+   if (!confirm(`補開 ${email} 的「${document.getElementById('ssPlan').selectedOptions[0].text}」訂閱,到期 ${dv}${amtv !== '' ? `,實付 NT$${amtv}` : '(用方案定價)'}?`)) return;
  } else if (action === 'extend') {
    body.days = Number(document.getElementById('ssDays').value || 0);
    if (!body.days || body.days <= 0) { msg.textContent = '請輸入延長天數'; msg.style.color = '#EF4444'; return; }
@@ -951,14 +956,18 @@ async function fetchBillingStats() {
  const ebDrift = earlyBirdHeld !== earlyBirdCounter;
 
  // 累計售出 + 營業額：一律從 transactions 帳本算(不受之後取消/退費影響 → 反映「真的賣出幾筆」)
- let everSold = 0, allRevenue = 0, allRefund = 0, monthRevenue = 0, monthRefund = 0;
+ // everSold=不重複買家數;reSold=同人再訂(重訂)筆數,分開呈現。
+ let allRevenue = 0, allRefund = 0, monthRevenue = 0, monthRefund = 0;
+ const soldUids = new Set(); let reSold = 0;
  try {
  const monthStart = new Date(); monthStart.setDate(1); monthStart.setHours(0, 0, 0, 0);
  const snap = await db.collection('transactions').orderBy('occurred_at', 'desc').limit(5000).get();
  snap.forEach(d => {
  const t = d.data();
  const inMonth = t.occurred_at && t.occurred_at.toDate && t.occurred_at.toDate() >= monthStart;
- if (t.status === 'success' && t.type === 'subscribe') everSold++;                    // 新訂閱筆數(不含續訂)
+ if (t.status === 'success' && t.type === 'subscribe') {                               // 新訂閱(不含續訂 renew)
+   if (t.uid && soldUids.has(t.uid)) reSold++; else if (t.uid) soldUids.add(t.uid);   // 同人再訂算重訂、不灌買家數
+ }
  if (t.status === 'success' && (t.type === 'subscribe' || t.type === 'renew')) { allRevenue += t.amount_twd || 0; if (inMonth) monthRevenue += t.amount_twd || 0; }
  if (t.type === 'refund') { allRefund += Math.abs(t.amount_twd || 0); if (inMonth) monthRefund += Math.abs(t.amount_twd || 0); }
  });
@@ -968,7 +977,7 @@ async function fetchBillingStats() {
  const monthNet = monthRevenue - monthRefund;
  const allNet = allRevenue - allRefund;
  document.getElementById('statBilling').innerHTML = `
- <div class="stat"><div class="lbl">累計售出</div><div class="val">${everSold}</div><div class="sub">帳本中成功的新訂閱筆數(含同人重訂;不受之後取消/退費影響)</div></div>
+ <div class="stat"><div class="lbl">累計售出</div><div class="val">${soldUids.size}<small style="font-size:13px;color:var(--tx2)"> 人</small>${reSold ? ` <small style="font-size:12px;color:var(--tx2)">+${reSold} 重訂</small>` : ''}</div><div class="sub">不重複買家(含手動/PayPal;不含續訂 renew、不受之後取消退費影響)</div></div>
  <div class="stat"><div class="lbl">訂閱中(自動續訂)</div><div class="val">${activeSubs}</div><div class="sub">目前 status=active · 共 ${subsTotal} 筆訂閱紀錄</div></div>
  <div class="stat"><div class="lbl">取消續扣・已退費</div><div class="val" style="font-size:20px">${cancelledSubs} <small style="font-size:13px;color:var(--tx2)">取消</small> / ${refundedSubs} <small style="font-size:13px;color:var(--tx2)">退費</small></div><div class="sub">取消=期內仍可用 · 過期 ${expiredSubs}</div></div>
  <div class="stat"><div class="lbl">早鳥目前持有 / 100</div><div class="val">${earlyBirdHeld}<small style="font-size:14px;color:var(--tx2)"> / 100</small></div><div class="sub">剩 ${ebLeft} 名額${ebDrift ? ` · <span style="color:#EF4444">⚠ 計數器=${earlyBirdCounter}(pricing 顯示的剩餘用這個)</span> <button class="btn" style="font-size:10px;padding:2px 7px" onclick="recomputeEarlyBird()">校正→${earlyBirdHeld}</button>` : ''}</div></div>
