@@ -306,6 +306,13 @@ textarea.note:focus{outline:none;border-color:var(--ac)}
  <div id="ssMsg" style="font-size:13px"></div>
  <div id="ssResult" style="font-size:13px;color:var(--tx2)"></div>
  </div>
+ <div style="margin-top:28px">
+ <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+ <h3 style="font-size:14px;color:var(--tx2);margin:0">PayPal 待開通(用戶點了 PayPal 鈕)</h3>
+ <button class="btn" onclick="loadPaypalPending()" style="font-size:11px;padding:3px 9px">↻</button>
+ </div>
+ <div id="ppPendingList" style="font-size:13px;color:var(--tx2)">載入中…</div>
+ </div>
  </div>
 
  <!-- 報錯 log -->
@@ -424,7 +431,32 @@ function switchTab(tab) {
  if (tab === 'subs') renderSubs();
  if (tab === 'ledger') renderLedger();
  if (tab === 'errlog') renderErrLog();
+ if (tab === 'setsub') loadPaypalPending();
 }
+
+// PayPal 待開通清單(用戶在 pricing 點 PayPal 鈕時記錄的 paypal_pending)
+async function loadPaypalPending() {
+ const box = document.getElementById('ppPendingList');
+ if (!box) return;
+ box.textContent = '載入中…';
+ try {
+   const snap = await db.collection('paypal_pending').orderBy('created_at', 'desc').limit(50).get();
+   if (snap.empty) { box.innerHTML = '<span style="color:var(--tx3)">目前沒有待開通的 PayPal 記錄</span>'; return; }
+   const esc = s => (s || '').replace(/'/g, "\\'");
+   box.innerHTML = snap.docs.map(d => {
+     const x = d.data();
+     const t = x.created_at && x.created_at.toDate ? x.created_at.toDate().toLocaleString('zh-TW') : '';
+     const plan = SUB_PLAN_TXT[x.plan] || x.plan || '—';
+     return `<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;border-bottom:1px solid var(--bd);padding:6px 0">
+       <span style="color:var(--tx)">${x.email || x.uid}</span>
+       <span>· ${plan}</span>
+       <span style="color:var(--tx3);font-size:12px">· ${t}</span>
+       <button class="btn" style="font-size:11px;padding:3px 8px;margin-left:auto" onclick="document.getElementById('ssEmail').value='${esc(x.email)}';document.getElementById('ssPlan').value='${esc(x.plan)}';document.getElementById('ssEmail').scrollIntoView({block:'center'})">填入補開↑</button>
+     </div>`;
+   }).join('');
+ } catch (e) { box.innerHTML = '<span style="color:#EF4444">讀取失敗:' + e.message + '</span>'; }
+}
+
 
 // ── feedback subscription ──
 function subscribeFeedback() {

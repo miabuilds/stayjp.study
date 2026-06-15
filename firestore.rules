@@ -45,6 +45,15 @@ service cloud.firestore {
       allow write: if false;
     }
 
+    // PayPal 手動付款意向 — 登入用戶點 PayPal 鈕時記錄自己的 {uid,email,plan},
+    // owner 對帳/開通用。建立限本人、只有 owner 能讀;不可改/刪。
+    match /paypal_pending/{id} {
+      allow create: if request.auth != null && request.resource.data.uid == request.auth.uid;
+      allow read: if request.auth != null &&
+                     request.auth.token.email in ['stayjpplan@gmail.com', 'abc83327@gmail.com'];
+      allow update, delete: if false;
+    }
+
     // 黑名單(退費 / chargeback 紀錄)— 用 emailHash 當 doc id
     // 只有 Cloud Function 能讀寫;前端不該知道誰在黑名單
     match /blacklist/{emailHash} {
