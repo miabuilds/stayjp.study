@@ -248,27 +248,33 @@ a:hover{text-decoration:underline}
 
   <p style="font-size:13px;color:var(--tx2);margin-bottom:32px">所有價格為新台幣 (TWD)，含營業稅。境外用戶結帳時依當下匯率以信用卡發卡幣別扣款。<br>* 買斷方案為一次付清、買斷本服務存續期間既有功能之使用權；本站為個人工作室經營，無法保證無限期營運，服務若終止之補償方式詳見<a href="terms.html">服務條款</a>第 8 條。</p>
 
-  <!-- === 海外用戶(PayPal 手動開通)===
-       一般瀏覽器顯示;App(WebView, Apple IAP)內由下方 script 自動隱藏,
-       避免外部付款連結違反 App Store 規範(3.1.1)。 -->
+  <!-- === 海外用戶(PayPal 自動開通)===
+       一般瀏覽器顯示;App(WebView, Apple IAP)內由下方 script 自動隱藏(App Store 3.1.1)。
+       付款走 PayPal Orders API:server 建單(custom_id 綁 uid)→ 捕捉成功當下自動開通。 -->
   <div id="overseasPay" class="box" style="max-width:560px;margin:0 auto 32px">
     <h3 style="margin:0 0 6px;font-size:16px;color:var(--tx)">🌍 海外用戶付款(Overseas)</h3>
-    <p style="margin:0 0 12px">台灣以外的信用卡透過 <strong>PayPal</strong> 收款、由我們手動開通(台灣卡請直接用上方綠界訂閱)。三步驟:</p>
-    <ol style="margin:0 0 16px;padding-left:20px;line-height:1.8">
-      <li><strong>先用 Google 登入本站一次</strong>(右上角登入)— 開通需對到你的帳號。</li>
-      <li>點下方按鈕用 PayPal 付款。</li>
-      <li>付款後把<strong>「你登入的 email」+ 付款截圖</strong>透過<a href="contact.html">意見回饋</a>傳給我們,<strong>24 小時內</strong>幫你開通。</li>
-    </ol>
-    <p id="ppEmailHint" style="display:none;margin:0 0 14px;padding:10px 12px;background:var(--bg3);border-radius:8px;font-size:13px"></p>
-    <div class="pp-btns">
-      <a class="pp-btn" href="https://www.paypal.com/ncp/payment/DKX7844UYTZU4" target="_blank" rel="noopener" onclick="return ppPay(event,'yearly_early_bird',this.href)">早鳥年費 NT$990 · PayPal</a>
-      <a class="pp-btn alt" href="https://www.paypal.com/ncp/payment/4JXGHA86C47BJ" target="_blank" rel="noopener" onclick="return ppPay(event,'lifetime',this.href)">買斷 NT$2,990 · PayPal</a>
+    <p style="margin:0 0 12px">台灣以外的信用卡透過 <strong>PayPal</strong> 付款,<strong>付完自動開通</strong>、不用等人工(台灣卡請用上方綠界訂閱)。請先用右上角 <strong>Google 登入</strong>,付款才對得到你的帳號。</p>
+    <p id="ppLoginHint" style="display:none;margin:0 0 14px;padding:10px 12px;background:var(--bg3);border-radius:8px;font-size:13px">⚠️ 請先用右上角 <strong>Google 登入</strong>,再用下方 PayPal 付款。</p>
+    <div style="max-width:340px;margin:0 auto">
+      <div style="font-size:14px;font-weight:600;margin:0 0 6px;color:var(--tx)">早鳥年費 · US$32</div>
+      <div id="ppBtnEarly"></div>
+      <div style="font-size:14px;font-weight:600;margin:18px 0 6px;color:var(--tx)">買斷 · US$96</div>
+      <div id="ppBtnLifetime"></div>
     </div>
-    <p style="margin:12px 0 0;font-size:12px;color:var(--tx3)">付款幣別依 PayPal 當下匯率換算;跨境手續費由 PayPal 收取。海外手動開通目前開放<strong>早鳥年費 / 買斷</strong>;月費請用上方綠界訂閱。</p>
+    <p style="margin:14px 0 0;font-size:12px;color:var(--tx3)">以 USD 收款(PayPal 不支援 TWD),約等值 NT$990 / NT$2,990;跨境手續費由 PayPal 收取。海外開放<strong>早鳥年費 / 買斷</strong>;月費請用上方綠界訂閱。</p>
   </div>
   <script>
     // App(WebView)走 Apple IAP,隱藏外部付款連結,避免違反 App Store 審核規範。
     (function(){ try { if (window.STAYJP_NATIVE && window.STAYJP_NATIVE.isNativeApp) { var b = document.getElementById('overseasPay'); if (b) b.style.display = 'none'; } } catch(_) {} })();
+    // 載入 PayPal SDK(僅非 App;App 走 IAP 不需要)。載好 → 由主 script 的 __renderPaypalButtons 畫按鈕。
+    (function(){
+      if (window.STAYJP_NATIVE && window.STAYJP_NATIVE.isNativeApp) return;
+      var s = document.createElement('script');
+      // ⚠️ 上線改成 live client-id(與 functions 的 PAYPAL_PRODUCTION 一起切)
+      s.src = 'https://www.paypal.com/sdk/js?client-id=AeWHhYkZLsmyZzCrVRuxvbBfpeNEqGGDeEQe1uAoAvLA6DFPD_w3yF2-UUzZmcv_mfLWVTzaSzv25Dwt&currency=USD&intent=capture';
+      s.onload = function(){ try { window.__renderPaypalButtons && window.__renderPaypalButtons(); } catch(e){ console.warn('pp render', e); } };
+      document.head.appendChild(s);
+    })();
   </script>
 
   <!-- === 訂閱規則 === -->
@@ -553,29 +559,63 @@ function goPayPal(plan, email) {
   }
 }
 
-// PayPal(海外/手動)按鈕:點擊先確保登入 → 記錄 {uid,email,plan} 到 paypal_pending,
-// 這樣 user 不用另外把 email 傳給我們;付款後我們對 paypal_pending + PayPal 通知主動開通。
-async function ppPay(ev, plan, url) {
-  if (ev) ev.preventDefault();
-  let u = _auth.currentUser;
-  if (!u) {
-    try { const r = await _auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()); u = r.user; }
-    catch (e) { alert('請先用 Google 登入,我們才能把付款對到你的帳號。'); return false; }
-  }
-  try {
-    await _db.collection('paypal_pending').add({
-      uid: u.uid, email: u.email || '', plan,
-      created_at: firebase.firestore.FieldValue.serverTimestamp(),
-    });
-  } catch (e) { /* 記錄失敗不擋付款 */ }
-  const hint = document.getElementById('ppEmailHint');
-  if (hint) {
-    hint.style.display = 'block';
-    hint.innerHTML = '✓ 已記錄你的帳號 <strong>' + (u.email || '') + '</strong>。付款完成後我們會<strong>主動幫你開通</strong>,不用再另外傳 email(保留付款截圖以備查即可)。';
-  }
-  window.open(url, '_blank', 'noopener');
-  return false;
+// PayPal SDK 按鈕(海外自動開通):createOrder → server 建單(custom_id 綁 uid);
+// onApprove → server 捕捉 + 同步開通。付款對帳零誤差,付完即開通。
+const PP_CREATE_URL  = 'https://asia-east1-jpnote-1bdd6.cloudfunctions.net/paypalCreateOrder';
+const PP_CAPTURE_URL = 'https://asia-east1-jpnote-1bdd6.cloudfunctions.net/paypalCaptureOrder';
+let _ppRendered = false;
+
+function ppNeedLogin() {
+  const h = document.getElementById('ppLoginHint');
+  if (h) { h.style.display = 'block'; h.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
 }
+
+function ppButton(containerId, plan) {
+  const el = document.getElementById(containerId);
+  if (!window.paypal || !el) return;
+  window.paypal.Buttons({
+    style: { layout: 'vertical', height: 42 },
+    createOrder: async function () {
+      const u = _auth.currentUser;
+      if (!u) { ppNeedLogin(); throw new Error('not_logged_in'); }
+      const idt = await u.getIdToken();
+      const r = await fetch(PP_CREATE_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + idt },
+        body: JSON.stringify({ plan }),
+      });
+      const d = await r.json();
+      if (!d.id) throw new Error('create_failed');
+      return d.id;
+    },
+    onApprove: async function (data) {
+      const u = _auth.currentUser;
+      const idt = await u.getIdToken();
+      const r = await fetch(PP_CAPTURE_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + idt },
+        body: JSON.stringify({ orderID: data.orderID }),
+      });
+      const d = await r.json();
+      if (d && d.ok) {
+        alert('✓ 付款成功,已開通!即將前往帳號頁。');
+        location.href = 'account.html';
+      } else {
+        alert('已收到付款,但開通遇到問題。別擔心,我們已記錄,會盡快幫你開通;如數分鐘後仍未生效請來信客服。');
+      }
+    },
+    onError: function (err) { console.error('paypal error', err); },
+  }).render('#' + containerId);
+}
+
+window.__renderPaypalButtons = function () {
+  if (_ppRendered || !window.paypal) return;
+  _ppRendered = true;
+  ppButton('ppBtnEarly', 'yearly_early_bird');
+  ppButton('ppBtnLifetime', 'lifetime');
+};
+// SDK 若比此 script 早載好 → 直接畫;否則由 SDK script 的 onload 觸發。
+if (window.paypal) window.__renderPaypalButtons();
 
 let _subInFlight = false;   // 防連點重複送出(避免重複扣款)
 async function startSubscribe(btn) {
