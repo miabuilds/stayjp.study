@@ -587,27 +587,39 @@ function goPayPal(plan, email) {
   }
 }
 
-// PayPal 手動開通按鈕(現行預設):記錄 {uid,email,plan} 到 paypal_pending,開啟收款連結。
-async function ppPay(ev, plan, url) {
-  if (ev) ev.preventDefault();
-  let u = _auth.currentUser;
+// 第三方 App 內建瀏覽器(Line/IG/FB/微信…)會擋 Google 登入 → 偵測 + 提示改用外部瀏覽器。
+// (我們自己的 App 是 WKWebView,不會 match 這些 UA,且訂閱已走 OPEN_PAYWALL,不受影響。)
+function ppIsInApp() {
+  return /FBAN|FBAV|FB_IAB|Instagram|Line\/|MicroMessenger|Twitter|TikTok|KAKAOTALK|NAVER|Barcelona|BytedanceWebview/i.test(navigator.userAgent || '');
+}
+function ppInAppAlert() {
+  alert('你正在 App 內建瀏覽器(Line／IG／Threads／FB／微信 等)開啟本站,Google 登入會被擋,無法完成訂閱。\n\n請改用 Safari 或 Chrome:點右上／右下的「⋯」或「⋮」→「在預設瀏覽器開啟」,再登入訂閱。');
+}
+
+// PayPal 手動開通按鈕(現行預設):背景記錄 {uid,email,plan},讓 <a target=_blank href> 自然開啟收款連結。
+// 注意:不可 await 後再 window.open —— await 一卡,瀏覽器會把 window.open 當非點擊觸發而擋彈窗(只記錄、沒跳轉)。
+// 改成:已登入 → 背景 fire-and-forget 記錄 + return true(讓連結自然開);沒登入 → 擋下提示先登入。
+function ppPay(ev, plan, url) {
+  const u = _auth.currentUser;
   if (!u) {
-    try { const r = await _auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()); u = r.user; }
-    catch (e) { alert('請先用 Google 登入,我們才能把付款對到你的帳號。'); return false; }
+    if (ev) ev.preventDefault();
+    if (ppIsInApp()) { ppInAppAlert(); return false; }   // 第三方 App 瀏覽器擋登入 → 提示用外部瀏覽器
+    _auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()).catch(function () {});
+    alert('請先用 Google 登入,再點一次付款按鈕,我們才能把付款對到你的帳號。');
+    return false;
   }
   try {
-    await _db.collection('paypal_pending').add({
+    _db.collection('paypal_pending').add({
       uid: u.uid, email: u.email || '', plan,
       created_at: firebase.firestore.FieldValue.serverTimestamp(),
-    });
+    }).catch(function () {});
   } catch (e) { /* 記錄失敗不擋付款 */ }
   const hint = document.getElementById('ppEmailHint');
   if (hint) {
     hint.style.display = 'block';
-    hint.innerHTML = '✓ 已記錄你的帳號 <strong>' + (u.email || '') + '</strong>。付款完成後我們會<strong>主動幫你開通</strong>,不用再另外傳 email(保留付款截圖以備查即可)。';
+    hint.innerHTML = '✓ 已記錄你的帳號 <strong>' + (u.email || '') + '</strong>。付款完成後我們會<strong>主動幫你開通</strong>(保留付款截圖以備查即可)。';
   }
-  window.open(url, '_blank', 'noopener');
-  return false;
+  return true;   // 讓 <a target="_blank" href> 自然開啟 PayPal 連結(不 preventDefault / 不 window.open → 不被擋)
 }
 
 // PayPal SDK 按鈕(?pptest=1 的自動開通):createOrder → server 建單(custom_id 綁 uid);
@@ -722,6 +734,8 @@ async function startSubscribe(btn) {
 
   // 2. 真的沒登入 → 先登入,登入後 onAuthStateChanged 會自動 resume 這個方案
   if (!curUser) {
+    // 第三方 App 內建瀏覽器擋 Google 登入 → 直接提示改用外部瀏覽器,不要硬登入(會失敗)
+    if (ppIsInApp()) { ppInAppAlert(); unlock(); return false; }
     sessionStorage.setItem('subscribeAfterLogin', plan);
     try {
       await _auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
