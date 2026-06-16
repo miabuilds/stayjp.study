@@ -487,6 +487,18 @@ async function startSubscribe(btn) {
   const plan = card?.dataset.plan;
   if (!plan) { alert('找不到方案'); return false; }
 
+  // ── 原生 App 內(iOS/Android）：Apple/Google 規定 app 內的數位訂閱不可走外部金流（綠界），
+  //    必須用原生 IAP。偵測到在 App 的 WebView 裡 → 改通知原生端開 paywall，不走綠界。
+  //    一般瀏覽器沒有 window.STAYJP_NATIVE → 此分支直接跳過，綠界流程完全不變。
+  if (window.STAYJP_NATIVE && window.STAYJP_NATIVE.isNativeApp) {
+    try {
+      if (window.ReactNativeWebView && window.ReactNativeWebView.postMessage) {
+        window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'OPEN_PAYWALL', plan }));
+      }
+    } catch (e) { /* 橋接失敗就靜默,不影響網頁 */ }
+    return false;
+  }
+
   // 1. 先等 Firebase 還原登入狀態(currentUser 在頁面剛載入時可能還是 null,
   //    同步讀會誤判成「未登入」而誤彈登入框)
   let curUser = _auth.currentUser;
