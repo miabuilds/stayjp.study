@@ -273,9 +273,14 @@ a:hover{text-decoration:underline}
 
     <!-- 預設:PayPal 自動開通,付完即生效 -->
     <div id="ppAuto">
-      <p style="margin:0 0 12px">台灣以外的信用卡透過 <strong>PayPal</strong> 付款,<strong>付完自動開通</strong>。請先用右上角 <strong>Google 登入</strong>,付款才對得到你的帳號。</p>
-      <p id="ppLoginHint" style="display:none;margin:0 0 14px;padding:10px 12px;background:var(--bg3);border-radius:8px;font-size:13px">⚠️ 請先用右上角 <strong>Google 登入</strong>,再用下方 PayPal 付款。</p>
-      <div style="max-width:340px;margin:0 auto">
+      <p style="margin:0 0 12px">台灣以外的信用卡透過 <strong>PayPal</strong> 付款,<strong>付完自動開通</strong>。需先用 Google 登入,付款才對得到你的帳號。</p>
+      <!-- 沒登入:先彈 Google 登入(不顯示 PayPal 鈕,避免點了閃掉)-->
+      <div id="ppLoginGate" style="max-width:340px;margin:0 auto;text-align:center">
+        <p style="margin:0 0 10px;font-size:13px;color:var(--tx2)">先用 Google 登入,才能把付款對到你的帳號:</p>
+        <button onclick="ppLogin()" style="width:100%;padding:12px;border-radius:12px;border:1px solid var(--bd);background:var(--bg2);color:var(--tx);font-size:15px;font-weight:600;cursor:pointer">使用 Google 登入</button>
+      </div>
+      <!-- 登入後才出現 PayPal 按鈕 -->
+      <div id="ppBtnsWrap" style="display:none;max-width:340px;margin:0 auto">
         <div style="font-size:14px;font-weight:600;margin:0 0 6px;color:var(--tx)">早鳥年費 · US$32</div>
         <div id="ppBtnEarly"></div>
         <div style="font-size:14px;font-weight:600;margin:18px 0 6px;color:var(--tx)">買斷 · US$96</div>
@@ -292,7 +297,7 @@ a:hover{text-decoration:underline}
       if (window.STAYJP_NATIVE && window.STAYJP_NATIVE.isNativeApp) return;
       var s = document.createElement('script');
       s.src = 'https://www.paypal.com/sdk/js?client-id=Aeuts8UKvc-wbXSHPrGCuWXOh9_ZnvYugi-ElkAls1eOxEWjjv-Td0N74w0xIQdXLtkW39SIKYewCtFB&currency=USD&intent=capture';
-      s.onload = function(){ try { window.__renderPaypalButtons && window.__renderPaypalButtons(); } catch(e){ console.warn('pp render', e); } };
+      s.onload = function(){ try { (window.ppSyncAuth || window.__renderPaypalButtons)(); } catch(e){ console.warn('pp render', e); } };
       document.head.appendChild(s);
     })();
   </script>
@@ -608,9 +613,27 @@ const PP_CREATE_URL  = 'https://asia-east1-jpnote-1bdd6.cloudfunctions.net/paypa
 const PP_CAPTURE_URL = 'https://asia-east1-jpnote-1bdd6.cloudfunctions.net/paypalCaptureOrder';
 let _ppRendered = false;
 
-function ppNeedLogin() {
-  const h = document.getElementById('ppLoginHint');
-  if (h) { h.style.display = 'block'; h.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+// 海外區的 Google 登入(沒登入時 ppAuto 顯示這顆,點了直接彈 Google)
+function ppLogin() {
+  _auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()).catch(function (e) {
+    var c = e && e.code;
+    if (c === 'auth/popup-closed-by-user' || c === 'auth/cancelled-popup-request') return;
+    alert('登入失敗:' + ((e && e.message) || e));
+  });
+}
+// 依登入狀態切換:沒登入顯示登入鈕、登入後才顯示 PayPal 按鈕(避免未登入點 PayPal 閃掉)
+function ppSyncAuth() {
+  const gate = document.getElementById('ppLoginGate');
+  const wrap = document.getElementById('ppBtnsWrap');
+  if (!gate || !wrap) return;
+  if (_auth.currentUser) {
+    gate.style.display = 'none';
+    wrap.style.display = '';
+    if (window.paypal) window.__renderPaypalButtons();
+  } else {
+    gate.style.display = '';
+    wrap.style.display = 'none';
+  }
 }
 
 function ppButton(containerId, plan) {
@@ -620,7 +643,7 @@ function ppButton(containerId, plan) {
     style: { layout: 'vertical', height: 42 },
     createOrder: async function () {
       const u = _auth.currentUser;
-      if (!u) { ppNeedLogin(); throw new Error('not_logged_in'); }
+      if (!u) { ppSyncAuth(); throw new Error('not_logged_in'); }
       const idt = await u.getIdToken();
       const r = await fetch(PP_CREATE_URL, {
         method: 'POST',
@@ -657,8 +680,9 @@ window.__renderPaypalButtons = function () {
   ppButton('ppBtnEarly', 'yearly_early_bird');
   ppButton('ppBtnLifetime', 'lifetime');
 };
-// SDK 若比此 script 早載好 → 直接畫;否則由 SDK script 的 onload 觸發。
-if (window.paypal) window.__renderPaypalButtons();
+// 登入狀態變化 → 切換登入鈕 / PayPal 按鈕(登入後才畫 PayPal)
+_auth.onAuthStateChanged(ppSyncAuth);
+if (window.paypal) ppSyncAuth();
 
 let _subInFlight = false;   // 防連點重複送出(避免重複扣款)
 async function startSubscribe(btn) {
