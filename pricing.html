@@ -583,6 +583,19 @@ async function startSubscribe(btn) {
   const plan = card?.dataset.plan;
   if (!plan) { alert('找不到方案'); return false; }
 
+  // ── 原生 App 內(iOS/Android）：Apple/Google 規定 app 內的數位訂閱不可走外部金流（綠界），
+  //    必須用原生 IAP。偵測到在 App 的 WebView 裡 → 改通知原生端開 paywall，不走綠界。
+  //    一般瀏覽器沒有 window.STAYJP_NATIVE → 此分支直接跳過,綠界流程完全不變。
+  //    擺在防連點鎖之前:App 內直接 return,不必鎖按鈕。
+  if (window.STAYJP_NATIVE && window.STAYJP_NATIVE.isNativeApp) {
+    try {
+      if (window.ReactNativeWebView && window.ReactNativeWebView.postMessage) {
+        window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'OPEN_PAYWALL', plan }));
+      }
+    } catch (e) { /* 橋接失敗就靜默,不影響網頁 */ }
+    return false;
+  }
+
   if (_subInFlight) return false;   // 已有一筆訂閱在處理中 → 擋連點
   _subInFlight = true;
   const unlock = () => { _subInFlight = false; document.querySelectorAll('.plan-cta').forEach(b => { b.style.pointerEvents = ''; b.style.opacity = ''; }); };
