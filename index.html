@@ -1523,9 +1523,9 @@ function showInAppHelp() {
 let _signingIn = false;
 function handleAuth() {
   if (currentUser) { auth.signOut(); currentUser = null; updateAuthUI(); return; }
-  // 原生 App(WebView)內:Google OAuth 會被擋 → 改發 GOOGLE_LOGIN 給原生,由原生 SDK 登入後注回。
+  // 原生 App(WebView)內:Google OAuth 會被擋 → 發 OPEN_LOGIN,由原生彈登入選單(Google/Apple)。
   if (window.STAYJP_NATIVE && window.STAYJP_NATIVE.isNativeApp) {
-    try { if (window.ReactNativeWebView && window.ReactNativeWebView.postMessage) window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'GOOGLE_LOGIN' })); } catch (e) {}
+    try { if (window.ReactNativeWebView && window.ReactNativeWebView.postMessage) window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'OPEN_LOGIN' })); } catch (e) {}
     return;
   }
   if (isInAppBrowser()) { showInAppHelp(); return; }

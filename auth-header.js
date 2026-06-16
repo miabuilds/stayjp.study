@@ -126,19 +126,18 @@
   }
 
   // 原生 App(WebView)內:Google/Apple OAuth 在嵌入式 WebView 會被擋(Google 回 disallowed_useragent)。
-  // firebase.auth() 是單例 → patch 一次,所有共用此實例的頁面(含 pricing/account/contact…)登入都改走原生橋接:
-  // postMessage 給原生 → 原生用 SDK 登入 → mintCustomToken → 注入 signInWithCustomToken,完成同帳號登入。
+  // firebase.auth() 是單例 → patch 一次,所有共用此實例的頁面(含 pricing/account/contact…)登入都改走原生:
+  // postMessage OPEN_LOGIN → 原生彈登入選單 → 原生 SDK 登入 → mintCustomToken → 注入 signInWithCustomToken。
   // 回「使用者取消」良性 reject:各頁 catch 本就把這個碼當取消靜默處理,不會跳錯誤框。
   function patchNativeLogin() {
     if (!auth || auth.__stayjpNativePatched) return;
     if (!(window.STAYJP_NATIVE && window.STAYJP_NATIVE.isNativeApp)) return;
     auth.__stayjpNativePatched = true;
-    auth.signInWithPopup = function (provider) {
-      var pid = (provider && provider.providerId) || '';
-      var type = /apple/i.test(pid) ? 'APPLE_LOGIN' : 'GOOGLE_LOGIN';
+    auth.signInWithPopup = function () {
+      // 發 OPEN_LOGIN → 原生彈登入選單(Google / Apple 由用戶選),不在網頁端預設提供者。
       try {
         if (window.ReactNativeWebView && window.ReactNativeWebView.postMessage) {
-          window.ReactNativeWebView.postMessage(JSON.stringify({ type: type }));
+          window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'OPEN_LOGIN' }));
         }
       } catch (e) { /* 橋接失敗就靜默 */ }
       return Promise.reject({ code: 'auth/popup-closed-by-user', message: 'stayjp-native-login-bridge' });
