@@ -47,6 +47,7 @@ export interface SubscriptionDoc {
   ecpay_order?: string;
   apple_txn?: string;
   google_txn?: string;
+  paypal_capture?: string;   // PayPal 一次性付款的 capture id;有值 = 來源為 PayPal、退費要用它
   is_early_bird?: boolean;
   refund_requested_at?: admin.firestore.Timestamp;
   failed_retries?: number;

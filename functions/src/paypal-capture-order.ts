@@ -71,6 +71,7 @@ export const paypalCaptureOrder = functions.onRequest(
         expiresAt: plusDays(nowMs(), planInfo.period_days),
         willRenew: false,            // PayPal 一次性付款,不自動續扣
         startedAt: nowMs(),
+        paypal_capture: cap.captureId,   // 標記來源=PayPal + 退費用
         is_early_bird: isEarlyBird,
         failed_retries: 0,
       };

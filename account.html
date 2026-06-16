@@ -330,8 +330,9 @@ function renderSubscription(sub) {
 
  // Source
  document.getElementById('sourceLabel').textContent =
- sub.source === 'web' ? ' 網頁 (綠界)' :
- sub.source === 'app' ? ' App (Apple / Google)' : sub.source;
+ sub.source === 'app' ? ' App (Apple / Google)' :
+ sub.paypal_capture ? ' 網頁 (PayPal)' :
+ sub.source === 'web' ? ' 網頁 (綠界)' : sub.source;
  rowSource.style.display = 'flex';
 
  // Actions — cancelled 但仍在期間內也算 Premium(可退費 / 仍能用)
@@ -363,9 +364,13 @@ function renderSubscription(sub) {
  btnResub.style.display = 'none';
  resubInfo.style.display = 'none';
  document.getElementById('btnRefund').style.display = '';
- // willRenew=true 顯示「關閉自動續訂」可按
- // willRenew=false 藏「關閉」、顯示「重新訂閱」+ info 解釋
- if (!sub.willRenew && sub.plan !== 'lifetime') {
+ // PayPal 一次性付款:沒有自動續扣 → 不顯示「關閉/恢復續訂」,只留退費
+ // 綠界 willRenew=true → 顯示「關閉自動續訂」;willRenew=false → 藏「關閉」、顯示「重新訂閱」+ info
+ if (sub.paypal_capture) {
+ btnCancel.style.display = 'none';
+ btnResub.style.display = 'none';
+ resubInfo.style.display = 'none';
+ } else if (!sub.willRenew && sub.plan !== 'lifetime') {
  btnCancel.style.display = 'none';
  btnResub.style.display = '';
  resubInfo.style.display = 'block';
@@ -428,6 +433,7 @@ function checkRefundEligibility(sub) {
 // Cloud Function endpoints
 const FN_CANCEL = 'https://cancelsubscription-lsd7okt5qa-de.a.run.app';
 const FN_REFUND = 'https://refund-lsd7okt5qa-de.a.run.app';
+const FN_PAYPAL_REFUND = 'https://asia-east1-jpnote-1bdd6.cloudfunctions.net/paypalRefund';
 const FN_DELETE_ACCOUNT = 'https://deleteaccount-lsd7okt5qa-de.a.run.app';
 
 // 只在原生 App 的 WebView 內顯示「刪除帳號」(Apple 要求);網頁不顯示。
@@ -482,15 +488,19 @@ async function cancelRenew() {
 }
 
 async function requestRefund() {
+ const isPaypal = !!(_sub && _sub.paypal_capture);
  const ebWarn = (_sub && _sub.is_early_bird)
    ? '\n• ⚠️ 早鳥為限量一次性優惠:退費後無法再以早鳥價訂閱,日後重新訂閱僅能用一般價(年費 NT$1,490)。'
    : '';
- if (!confirm('確定要申請退費?\n\n按下確認後:\n• 訂閱立刻降級為免費版\n• 退款由綠界經發卡銀行退回原卡,入帳時間依你的信用卡結帳週期而定（若已過結帳日,可能顯示在下一期帳單）\n• 已訂閱期間使用記錄會保留\n• 七天內為無條件全額退;逾七天按未使用比例退' + ebWarn + '\n（本站僅對明顯惡意濫用退費之帳號,保留拒絕未來新訂閱之權利）')) return;
+ const refundDesc = isPaypal
+   ? '• 款項由 PayPal 退回你的付款方式,入帳時間依 PayPal / 發卡行而定\n• 僅限首購 7 天內;逾期請來信客服'
+   : '• 退款由綠界經發卡銀行退回原卡,入帳時間依你的信用卡結帳週期而定（若已過結帳日,可能顯示在下一期帳單）\n• 七天內為無條件全額退;逾七天按未使用比例退';
+ if (!confirm('確定要申請退費?\n\n按下確認後:\n• 訂閱立刻降級為免費版\n' + refundDesc + '\n• 已訂閱期間使用記錄會保留' + ebWarn + '\n（本站僅對明顯惡意濫用退費之帳號,保留拒絕未來新訂閱之權利）')) return;
  const btn = document.getElementById('btnRefund');
  if (btn) { btn.disabled = true; btn.textContent = '處理中…'; }
  try {
  const idToken = await currentUser.getIdToken();
- const res = await fetch(FN_REFUND, {
+ const res = await fetch(isPaypal ? FN_PAYPAL_REFUND : FN_REFUND, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + idToken },
  });

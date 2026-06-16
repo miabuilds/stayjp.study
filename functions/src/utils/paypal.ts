@@ -74,3 +74,18 @@ export async function capturePaypalOrder(orderId: string): Promise<CaptureResult
     payerEmail: String((d.payer as { email_address?: string })?.email_address || ""),
   };
 }
+
+// 全額退款(退指定 capture)。空 body = 全額退。回 refund id。
+export async function refundPaypalCapture(captureId: string): Promise<string> {
+  const token = await accessToken();
+  const r = await fetch(`${paypalApiBase()}/v2/payments/captures/${captureId}/refund`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+    body: "{}",
+  });
+  const d = (await r.json()) as { id?: string; status?: string };
+  if (!r.ok || (d.status && d.status !== "COMPLETED")) {
+    throw new Error(`paypal refund ${r.status}: ${JSON.stringify(d)}`);
+  }
+  return String(d.id || "");
+}
