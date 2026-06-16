@@ -255,8 +255,8 @@ a:hover{text-decoration:underline}
   <div id="overseasPay" class="box" style="max-width:560px;margin:0 auto 32px">
     <h3 style="margin:0 0 6px;font-size:16px;color:var(--tx)">🌍 海外用戶付款(Overseas)</h3>
 
-    <!-- 預設:手動開通(現行,真實用戶看這個)-->
-    <div id="ppManual">
+    <!-- 緊急後備:手動開通(平時隱藏;PayPal 自動流程出問題時可改回顯示)-->
+    <div id="ppManual" style="display:none">
       <p style="margin:0 0 12px">台灣以外的信用卡透過 <strong>PayPal</strong> 收款、由我們手動開通(台灣卡請直接用上方綠界訂閱)。三步驟:</p>
       <ol style="margin:0 0 16px;padding-left:20px;line-height:1.8">
         <li><strong>先用 Google 登入本站一次</strong>(右上角登入)— 開通需對到你的帳號。</li>
@@ -271,8 +271,8 @@ a:hover{text-decoration:underline}
       <p style="margin:12px 0 0;font-size:12px;color:var(--tx3)">付款幣別依 PayPal 當下匯率換算;跨境手續費由 PayPal 收取。海外手動開通目前開放<strong>早鳥年費 / 買斷</strong>;月費請用上方綠界訂閱。</p>
     </div>
 
-    <!-- 測試(?pptest=1):自動開通,付完即生效 -->
-    <div id="ppAuto" style="display:none">
+    <!-- 預設:PayPal 自動開通,付完即生效 -->
+    <div id="ppAuto">
       <p style="margin:0 0 12px">台灣以外的信用卡透過 <strong>PayPal</strong> 付款,<strong>付完自動開通</strong>。請先用右上角 <strong>Google 登入</strong>,付款才對得到你的帳號。</p>
       <p id="ppLoginHint" style="display:none;margin:0 0 14px;padding:10px 12px;background:var(--bg3);border-radius:8px;font-size:13px">⚠️ 請先用右上角 <strong>Google 登入</strong>,再用下方 PayPal 付款。</p>
       <div style="max-width:340px;margin:0 auto">
@@ -287,15 +287,11 @@ a:hover{text-decoration:underline}
   <script>
     // App(WebView)走 Apple IAP,隱藏外部付款連結,避免違反 App Store 審核規範。
     (function(){ try { if (window.STAYJP_NATIVE && window.STAYJP_NATIVE.isNativeApp) { var b = document.getElementById('overseasPay'); if (b) b.style.display = 'none'; } } catch(_) {} })();
-    // ?pptest=1:切到自動開通(sandbox)做測試,真實用戶看不到。
+    // 海外自動付款(正式):非 App 載入 PayPal SDK(live client-id)→ 畫按鈕。
     (function(){
       if (window.STAYJP_NATIVE && window.STAYJP_NATIVE.isNativeApp) return;
-      if (location.search.indexOf('pptest') === -1) return;   // 預設不啟用,線上用戶零影響
-      var m = document.getElementById('ppManual'); if (m) m.style.display = 'none';
-      var a = document.getElementById('ppAuto');   if (a) a.style.display = '';
       var s = document.createElement('script');
-      // ⚠️ 上線改成 live client-id(與 functions 的 PAYPAL_PRODUCTION 一起切),並移除 pptest 閘門
-      s.src = 'https://www.paypal.com/sdk/js?client-id=AeWHhYkZLsmyZzCrVRuxvbBfpeNEqGGDeEQe1uAoAvLA6DFPD_w3yF2-UUzZmcv_mfLWVTzaSzv25Dwt&currency=USD&intent=capture';
+      s.src = 'https://www.paypal.com/sdk/js?client-id=Aeuts8UKvc-wbXSHPrGCuWXOh9_ZnvYugi-ElkAls1eOxEWjjv-Td0N74w0xIQdXLtkW39SIKYewCtFB&currency=USD&intent=capture';
       s.onload = function(){ try { window.__renderPaypalButtons && window.__renderPaypalButtons(); } catch(e){ console.warn('pp render', e); } };
       document.head.appendChild(s);
     })();

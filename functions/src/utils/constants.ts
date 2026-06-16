@@ -66,19 +66,22 @@ export const PLANS: Record<PlanKey, {
 //       上線再:firebase functions:secrets:set PAYPAL_PRODUCTION (輸入 true) + 換 live client id
 export const PAYPAL_SECRETS = [
   defineSecret("PAYPAL_CLIENT_SECRET"),
+  defineSecret("PAYPAL_PRODUCTION"),   // 設 "true" 走正式;未設/非 true → sandbox
 ];
-// 上線切正式:firebase functions:secrets:set PAYPAL_PRODUCTION (true) 後,把它加進上面陣列再 deploy。
-// 目前未設 → process.env.PAYPAL_PRODUCTION 為空 → 走 sandbox。
 
-// Client ID 是公開值(前端 SDK 也會用),預設 sandbox;可用 env PAYPAL_CLIENT_ID 覆寫。
+// Client ID 是公開值(前端 SDK 也會用);依 PAYPAL_PRODUCTION 選 live / sandbox,可用 env 覆寫。
 const PAYPAL_SANDBOX_CLIENT_ID =
   "AeWHhYkZLsmyZzCrVRuxvbBfpeNEqGGDeEQe1uAoAvLA6DFPD_w3yF2-UUzZmcv_mfLWVTzaSzv25Dwt";
+const PAYPAL_LIVE_CLIENT_ID =
+  "Aeuts8UKvc-wbXSHPrGCuWXOh9_ZnvYugi-ElkAls1eOxEWjjv-Td0N74w0xIQdXLtkW39SIKYewCtFB";
 
 export function paypalConfig() {
+  const isProduction = process.env.PAYPAL_PRODUCTION === "true";
   return {
-    clientId: process.env.PAYPAL_CLIENT_ID || PAYPAL_SANDBOX_CLIENT_ID,
+    clientId: process.env.PAYPAL_CLIENT_ID
+      || (isProduction ? PAYPAL_LIVE_CLIENT_ID : PAYPAL_SANDBOX_CLIENT_ID),
     secret: process.env.PAYPAL_CLIENT_SECRET || "",
-    isProduction: process.env.PAYPAL_PRODUCTION === "true",
+    isProduction,
     currency: "USD",
   };
 }
