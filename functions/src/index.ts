@@ -28,3 +28,4 @@ export { adminRecomputeEarlyBird } from "./admin-recompute-earlybird";
 export { adminSetSubscription } from "./admin-set-subscription";
 export { adminErrorLog } from "./admin-error-log";
 export { deleteAccount } from "./delete-account";
+export { mintCustomToken } from "./mint-custom-token";
