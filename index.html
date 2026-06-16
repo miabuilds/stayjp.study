@@ -1427,7 +1427,7 @@ const fbConfig = {
   appId:"1:666368174384:web:30a5f16d50c082b13dc0f5"
 };
 
-let db = null, auth = null, currentUser = null;
+let db = null, auth = null, currentUser = null, _authResolved = false;
 if (fbConfig) {
   firebase.initializeApp(fbConfig);
   // Safari ITP 會擋 Firestore 預設的 fetch streams + WebChannel,改長輪詢 + 禁 fetch streams
@@ -1435,7 +1435,17 @@ if (fbConfig) {
   try { firebase.firestore().settings({ experimentalAutoDetectLongPolling: true, useFetchStreams: false }); } catch (e) {}
   auth = firebase.auth();
   db = firebase.firestore();
-  auth.onAuthStateChanged(u => { currentUser = u; updateAuthUI(); loadFavorites(); loadCloudData(); if (typeof Streak !== 'undefined') { Streak.syncDown(); Streak.render(); } });
+  auth.onAuthStateChanged(u => { currentUser = u; _authResolved = true; try { localStorage.setItem('stayjp_logged_in', u ? '1' : '0'); } catch (e) {} updateAuthUI(); loadFavorites(); loadCloudData(); if (typeof Streak !== 'undefined') { Streak.syncDown(); Streak.render(); } });
+  // 登入狀態還原前(currentUser 暫時為 null):若上次是登入的,先把右上角鈕顯示為佔位「···」並停用,
+  // 避免「明明已登入卻顯示『登入』」被誤點。onAuthStateChanged 一回來 updateAuthUI 就覆寫成正確狀態。
+  try {
+    if (localStorage.getItem('stayjp_logged_in') === '1') {
+      var _ab = document.getElementById('authBtn');
+      if (_ab) { _ab.textContent = '···'; _ab.style.opacity = '.55'; _ab.style.pointerEvents = 'none'; }
+    }
+  } catch (e) {}
+  // 保險:萬一 auth 卡住沒回呼,4 秒後也讓登入鈕可用(避免永遠停用)
+  setTimeout(function () { _authResolved = true; }, 4000);
   // 累計學員計數的 +1 移除：每位訪客寫 1 次 → Firestore Spark 方案 20K 寫/日上限會吃光配額
   // 改由 GitHub Actions cron 每天從 GA newUsers 覆寫 stats/global.learners
 }
@@ -1522,6 +1532,8 @@ function showInAppHelp() {
 
 let _signingIn = false;
 function handleAuth() {
+  // 登入狀態還沒還原完 → 忽略點擊,避免「其實已登入」卻被當未登入而觸發重複登入報錯
+  if (!_authResolved) return;
   if (currentUser) { auth.signOut(); currentUser = null; updateAuthUI(); return; }
   // 原生 App(WebView)內:Google OAuth 會被擋 → 發 OPEN_LOGIN,由原生彈登入選單(Google/Apple)。
   if (window.STAYJP_NATIVE && window.STAYJP_NATIVE.isNativeApp) {
