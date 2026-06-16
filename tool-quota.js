@@ -221,16 +221,48 @@
       try { return orig.apply(this, args); } finally { _gateDepth--; }
     };
   }
+  // 「開介面免費、真正開始才扣一次/session」的延後計費包法。
+  //   startMethod:點(底部 tab 等)進來的方法 → 只「武裝」,不擋不扣 → 誤點不掉額度
+  //   beginMethod:真正開始的動作(Quiz 按「開始測驗」=begin;SRS 第一次評分=rate)
+  //               → 該 session 第一次才檢查額度 + 扣 1 次;之後同 session 續用(下一輪/下一張)免費
+  // 解決:底部 bar「測驗/複習」一點就扣 → 消費者容易誤點掉額度。
+  const _armed = {};   // _armed[tool]=true 表示此 session 尚未扣
+  function gateDeferred(obj, startMethod, beginMethod, tool) {
+    if (!obj) return;
+    if (typeof obj[startMethod] === 'function' && !isAlreadyWrapped(obj[startMethod])) {
+      const origStart = obj[startMethod];
+      obj[startMethod] = function(...args) {
+        /* __TQ_WRAPPED__ */
+        _armed[tool] = true;            // 只武裝:開介面/顯示第一張卡 → 免費,不擋不扣
+        return origStart.apply(this, args);
+      };
+    }
+    if (typeof obj[beginMethod] === 'function' && !isAlreadyWrapped(obj[beginMethod])) {
+      const origBegin = obj[beginMethod];
+      obj[beginMethod] = function(...args) {
+        /* __TQ_WRAPPED__ */
+        if (_armed[tool]) {             // 此 session 第一次真正開始
+          if (!canUse(tool)) { showPaywall(tool); return; }
+          consume(tool);
+          _armed[tool] = false;         // 同 session 後續(下一輪/下一張)不再扣
+        }
+        return origBegin.apply(this, args);
+      };
+    }
+  }
+
   function getGlobal(name) { return window[name]; }
 
   function applyGating() {
-    const SRS_ = getGlobal('SRS');           if (SRS_) gateStart(SRS_, 'start', 'srs');
+    // 複習:點 tab(SRS.start)只顯示第一張卡正面=免費;翻卡後第一次「記得/不會」評分(rate)才扣
+    const SRS_ = getGlobal('SRS');           if (SRS_) gateDeferred(SRS_, 'start', 'rate', 'srs');
     const FlashCard_ = getGlobal('FlashCard');
     if (FlashCard_) { gateStart(FlashCard_, 'start', 'flashcard'); gateStart(FlashCard_, 'beginToday', 'flashcard'); }
     const Shadow_ = getGlobal('Shadow');
     if (Shadow_) { gateStart(Shadow_, 'start', 'shadow'); gateStart(Shadow_, 'startCurrent', 'shadow'); gateStart(Shadow_, 'startFavs', 'shadow'); gateStart(Shadow_, 'startGrammarFavs', 'shadow'); }
     const GrammarDrill_ = getGlobal('GrammarDrill'); if (GrammarDrill_) gateStart(GrammarDrill_, 'start', 'grammar');
-    const Quiz_ = getGlobal('Quiz');         if (Quiz_) gateStart(Quiz_, 'start', 'quiz');
+    // 測驗:點 tab(Quiz.start)只開設定/介紹頁=免費;按「開始測驗」(begin)才扣
+    const Quiz_ = getGlobal('Quiz');         if (Quiz_) gateDeferred(Quiz_, 'start', 'begin', 'quiz');
     const Reading_ = getGlobal('Reading');   if (Reading_) gateStart(Reading_, 'start', 'reading');
     const Listening_ = getGlobal('Listening'); if (Listening_) gateStart(Listening_, 'start', 'listening');
     const Stats_ = getGlobal('Stats');
