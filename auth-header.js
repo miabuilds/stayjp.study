@@ -125,6 +125,26 @@
     }
   }
 
+  // 原生 App(WebView)內:Google/Apple OAuth 在嵌入式 WebView 會被擋(Google 回 disallowed_useragent)。
+  // firebase.auth() 是單例 → patch 一次,所有共用此實例的頁面(含 pricing/account/contact…)登入都改走原生橋接:
+  // postMessage 給原生 → 原生用 SDK 登入 → mintCustomToken → 注入 signInWithCustomToken,完成同帳號登入。
+  // 回「使用者取消」良性 reject:各頁 catch 本就把這個碼當取消靜默處理,不會跳錯誤框。
+  function patchNativeLogin() {
+    if (!auth || auth.__stayjpNativePatched) return;
+    if (!(window.STAYJP_NATIVE && window.STAYJP_NATIVE.isNativeApp)) return;
+    auth.__stayjpNativePatched = true;
+    auth.signInWithPopup = function (provider) {
+      var pid = (provider && provider.providerId) || '';
+      var type = /apple/i.test(pid) ? 'APPLE_LOGIN' : 'GOOGLE_LOGIN';
+      try {
+        if (window.ReactNativeWebView && window.ReactNativeWebView.postMessage) {
+          window.ReactNativeWebView.postMessage(JSON.stringify({ type: type }));
+        }
+      } catch (e) { /* 橋接失敗就靜默 */ }
+      return Promise.reject({ code: 'auth/popup-closed-by-user', message: 'stayjp-native-login-bridge' });
+    };
+  }
+
   function login() {
     if (isInApp()) {
       alert('你正在 App 內建瀏覽器(Line／IG／Threads／FB／微信 等)開啟本站,Google 登入會被擋。\n\n請改用 Safari 或 Chrome:\n點右上／右下的「⋯」或「⋮」→ 選「在預設瀏覽器開啟」,再登入即可。');
@@ -146,6 +166,7 @@
     injectCSS();
     try { auth = await ensureFirebase(); }
     catch (e) { console.warn('[auth-header] firebase load fail', e); return; }
+    patchNativeLogin();
     area = document.createElement('div');
     area.className = 'ahx-area';
     area.id = 'ahxArea';

@@ -1523,6 +1523,11 @@ function showInAppHelp() {
 let _signingIn = false;
 function handleAuth() {
   if (currentUser) { auth.signOut(); currentUser = null; updateAuthUI(); return; }
+  // 原生 App(WebView)內:Google OAuth 會被擋 → 改發 GOOGLE_LOGIN 給原生,由原生 SDK 登入後注回。
+  if (window.STAYJP_NATIVE && window.STAYJP_NATIVE.isNativeApp) {
+    try { if (window.ReactNativeWebView && window.ReactNativeWebView.postMessage) window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'GOOGLE_LOGIN' })); } catch (e) {}
+    return;
+  }
   if (isInAppBrowser()) { showInAppHelp(); return; }
   if (_signingIn) return;   // 防連點:前一個登入彈窗還沒結束就別再開(auth/cancelled-popup-request)
   _signingIn = true;
