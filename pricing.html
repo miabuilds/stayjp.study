@@ -595,6 +595,17 @@ function ppIsInApp() {
 function ppInAppAlert() {
   alert('你正在 App 內建瀏覽器(Line／IG／Threads／FB／微信 等)開啟本站,Google 登入會被擋,無法完成訂閱。\n\n請改用 Safari 或 Chrome:點右上／右下的「⋯」或「⋮」→「在預設瀏覽器開啟」,再登入訂閱。');
 }
+// 進站就掛常駐警告橫幅(不依賴 alert / 點擊 → 任何 App 內建瀏覽器都看得到)
+function ppShowInAppBanner() {
+  if (!ppIsInApp() || document.getElementById('inAppBanner')) return;
+  var b = document.createElement('div');
+  b.id = 'inAppBanner';
+  b.style.cssText = 'position:sticky;top:0;z-index:99999;background:#F59E0B;color:#1a1a1a;padding:11px 14px;font-size:13px;line-height:1.6;text-align:center;font-weight:600';
+  b.innerHTML = '⚠️ 你在 App 內建瀏覽器,<u>無法登入/訂閱</u>。請點右上/右下「⋯」或「⋮」→「在預設瀏覽器開啟」,改用 Safari / Chrome。';
+  document.body.insertBefore(b, document.body.firstChild);
+}
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', ppShowInAppBanner);
+else ppShowInAppBanner();
 
 // PayPal 手動開通按鈕(現行預設):背景記錄 {uid,email,plan},讓 <a target=_blank href> 自然開啟收款連結。
 // 注意:不可 await 後再 window.open —— await 一卡,瀏覽器會把 window.open 當非點擊觸發而擋彈窗(只記錄、沒跳轉)。
