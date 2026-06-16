@@ -260,6 +260,7 @@ textarea.note:focus{outline:none;border-color:var(--ac)}
  <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:14px">
  <h2 style="font-size:14px;color:var(--tx2);text-transform:uppercase;letter-spacing:.5px;margin:0">全交易帳本</h2>
  <button class="btn" onclick="renderLedger()" style="font-size:11px;padding:4px 10px">↻ 重新整理</button>
+ <button class="btn" onclick="exportLedgerCSV()" style="font-size:11px;padding:4px 10px">⤓ 匯出 CSV</button>
  <span id="ledgerCount" style="font-size:12px;color:var(--tx2)"></span>
  <button class="btn danger" onclick="cleanupPending()" style="font-size:11px;padding:4px 10px;margin-left:auto" title="刪掉超過 1 小時的「處理中」棄單(未扣款,不影響營收)">🧹 清掉處理中棄單</button>
  <span id="cleanupMsg" style="font-size:12px"></span>
@@ -726,6 +727,23 @@ async function cleanupPending() {
   } catch (e) { msg.textContent = '錯誤:' + e.message; msg.style.color = '#EF4444'; }
 }
 
+// 帳本匯出用:renderLedger 載入時收集,exportLedgerCSV 下載。
+let _ledgerExport = [];
+function exportLedgerCSV() {
+  if (!_ledgerExport.length) { alert('先按「重新整理」載入帳本再匯出'); return; }
+  const head = ['時間', 'Email/UID', '類型', '方案', '金額(NT$)', '付款方式', '狀態', '交易ID'];
+  const q = v => '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"';
+  const lines = [head.map(q).join(',')];
+  _ledgerExport.forEach(r => lines.push([r.time, r.who, r.type, r.plan, r.amount, r.pay, r.status, r.ext].map(q).join(',')));
+  // BOM 讓 Excel 正確顯示中文
+  const blob = new Blob(['﻿' + lines.join('\r\n')], { type: 'text/csv;charset=utf-8;' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'stayjp-transactions-' + new Date().toISOString().slice(0, 10) + '.csv';
+  document.body.appendChild(a); a.click(); a.remove();
+  URL.revokeObjectURL(a.href);
+}
+
 // 全交易帳本：一次列出所有交易 + 總額,用來跟綠界逐筆對帳、找出測試假帳。
 async function renderLedger() {
   const box = document.getElementById('ledgerList');
@@ -746,9 +764,21 @@ async function renderLedger() {
     let rev = 0, refund = 0, pending = 0;
     const fmt = ts => ts && ts.toDate ? ts.toDate().toLocaleString('zh-TW', { hour12: false }) : '—';
     const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+    const PAY_TXT = { ecpay: '綠界', manual: '手動/PayPal', apple_iap: 'Apple', google_billing: 'Google' };
+    _ledgerExport = [];
     const rows = snap.docs.map(dd => {
       const x = dd.data();
       const amt = x.amount_twd || 0;
+      _ledgerExport.push({
+        time: fmt(x.occurred_at),
+        who: uidEmail[x.uid] || x.uid || '',
+        type: TXN_TYPE_TXT[x.type] || x.type || '',
+        plan: SUB_PLAN_TXT[x.plan] || (x.plan && x.plan !== 'n/a' ? x.plan : ''),
+        amount: amt,
+        pay: PAY_TXT[x.payment_method] || x.payment_method || '',
+        status: TXN_STATUS_TXT[x.status] || x.status || '',
+        ext: x.external_id || '',
+      });
       if (x.status === 'success' && (x.type === 'subscribe' || x.type === 'renew')) rev += amt;
       if (x.type === 'refund') refund += Math.abs(amt);
       if (x.status === 'pending') pending++;
