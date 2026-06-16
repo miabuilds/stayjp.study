@@ -29,3 +29,5 @@ export { adminSetSubscription } from "./admin-set-subscription";
 export { adminErrorLog } from "./admin-error-log";
 export { deleteAccount } from "./delete-account";
 export { mintCustomToken } from "./mint-custom-token";
+export { paypalCreateOrder } from "./paypal-create-order";
+export { paypalCaptureOrder } from "./paypal-capture-order";

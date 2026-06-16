@@ -61,6 +61,41 @@ export const PLANS: Record<PlanKey, {
   },
 };
 
+// ───── PayPal(網頁海外用戶,一次性付款:早鳥年費 / 買斷)─────────────────
+// 設定:firebase functions:secrets:set PAYPAL_CLIENT_SECRET
+//       上線再:firebase functions:secrets:set PAYPAL_PRODUCTION (輸入 true) + 換 live client id
+export const PAYPAL_SECRETS = [
+  defineSecret("PAYPAL_CLIENT_SECRET"),
+];
+// 上線切正式:firebase functions:secrets:set PAYPAL_PRODUCTION (true) 後,把它加進上面陣列再 deploy。
+// 目前未設 → process.env.PAYPAL_PRODUCTION 為空 → 走 sandbox。
+
+// Client ID 是公開值(前端 SDK 也會用),預設 sandbox;可用 env PAYPAL_CLIENT_ID 覆寫。
+const PAYPAL_SANDBOX_CLIENT_ID =
+  "AeWHhYkZLsmyZzCrVRuxvbBfpeNEqGGDeEQe1uAoAvLA6DFPD_w3yF2-UUzZmcv_mfLWVTzaSzv25Dwt";
+
+export function paypalConfig() {
+  return {
+    clientId: process.env.PAYPAL_CLIENT_ID || PAYPAL_SANDBOX_CLIENT_ID,
+    secret: process.env.PAYPAL_CLIENT_SECRET || "",
+    isProduction: process.env.PAYPAL_PRODUCTION === "true",
+    currency: "USD",
+  };
+}
+
+export function paypalApiBase() {
+  return paypalConfig().isProduction
+    ? "https://api-m.paypal.com"
+    : "https://api-m.sandbox.paypal.com";
+}
+
+// PayPal 只開放「海外一次性方案」:早鳥年費 / 買斷(月費 / 標準年費走綠界定期定額)。
+// 金額用 USD(PayPal 不直接收 TWD);對帳 ledger 仍記 TWD 標價(PLANS.price_twd)。
+export const PAYPAL_PRICES_USD: Partial<Record<PlanKey, number>> = {
+  yearly_early_bird: 32,
+  lifetime: 96,
+};
+
 // 退費規則(全自動)
 export const REFUND_POLICY = {
   full_refund_days: 7,             // 首次訂閱 7 天內全退

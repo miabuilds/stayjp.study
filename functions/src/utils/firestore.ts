@@ -102,7 +102,7 @@ export interface TransactionDoc {
   plan: PlanKey | "n/a";
   amount_twd: number;          // 正數 = 收入,負數 = 退費
   occurred_at: admin.firestore.Timestamp;
-  payment_method: "ecpay" | "apple_iap" | "google_billing" | "manual";
+  payment_method: "ecpay" | "apple_iap" | "google_billing" | "manual" | "paypal";
   external_id: string;
   status: "success" | "pending" | "failed" | "refunded";
   invoice_no?: string;
