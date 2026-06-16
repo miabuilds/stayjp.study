@@ -248,29 +248,53 @@ a:hover{text-decoration:underline}
 
   <p style="font-size:13px;color:var(--tx2);margin-bottom:32px">所有價格為新台幣 (TWD)，含營業稅。境外用戶結帳時依當下匯率以信用卡發卡幣別扣款。<br>* 買斷方案為一次付清、買斷本服務存續期間既有功能之使用權；本站為個人工作室經營，無法保證無限期營運，服務若終止之補償方式詳見<a href="terms.html">服務條款</a>第 8 條。</p>
 
-  <!-- === 海外用戶(PayPal 自動開通)===
+  <!-- === 海外用戶(PayPal)===
        一般瀏覽器顯示;App(WebView, Apple IAP)內由下方 script 自動隱藏(App Store 3.1.1)。
-       付款走 PayPal Orders API:server 建單(custom_id 綁 uid)→ 捕捉成功當下自動開通。 -->
+       預設 = 現行手動流程(線上用戶零影響)。?pptest=1 = sandbox 自動開通(測試用)。
+       測通 + 建好 live PayPal app 後,把 ppAuto 設為預設、移除 ppManual。 -->
   <div id="overseasPay" class="box" style="max-width:560px;margin:0 auto 32px">
     <h3 style="margin:0 0 6px;font-size:16px;color:var(--tx)">🌍 海外用戶付款(Overseas)</h3>
-    <p style="margin:0 0 12px">台灣以外的信用卡透過 <strong>PayPal</strong> 付款,<strong>付完自動開通</strong>、不用等人工(台灣卡請用上方綠界訂閱)。請先用右上角 <strong>Google 登入</strong>,付款才對得到你的帳號。</p>
-    <p id="ppLoginHint" style="display:none;margin:0 0 14px;padding:10px 12px;background:var(--bg3);border-radius:8px;font-size:13px">⚠️ 請先用右上角 <strong>Google 登入</strong>,再用下方 PayPal 付款。</p>
-    <div style="max-width:340px;margin:0 auto">
-      <div style="font-size:14px;font-weight:600;margin:0 0 6px;color:var(--tx)">早鳥年費 · US$32</div>
-      <div id="ppBtnEarly"></div>
-      <div style="font-size:14px;font-weight:600;margin:18px 0 6px;color:var(--tx)">買斷 · US$96</div>
-      <div id="ppBtnLifetime"></div>
+
+    <!-- 預設:手動開通(現行,真實用戶看這個)-->
+    <div id="ppManual">
+      <p style="margin:0 0 12px">台灣以外的信用卡透過 <strong>PayPal</strong> 收款、由我們手動開通(台灣卡請直接用上方綠界訂閱)。三步驟:</p>
+      <ol style="margin:0 0 16px;padding-left:20px;line-height:1.8">
+        <li><strong>先用 Google 登入本站一次</strong>(右上角登入)— 開通需對到你的帳號。</li>
+        <li>點下方按鈕用 PayPal 付款。</li>
+        <li>付款後把<strong>「你登入的 email」+ 付款截圖</strong>透過<a href="contact.html">意見回饋</a>傳給我們,<strong>24 小時內</strong>幫你開通。</li>
+      </ol>
+      <p id="ppEmailHint" style="display:none;margin:0 0 14px;padding:10px 12px;background:var(--bg3);border-radius:8px;font-size:13px"></p>
+      <div class="pp-btns">
+        <a class="pp-btn" href="https://www.paypal.com/ncp/payment/DKX7844UYTZU4" target="_blank" rel="noopener" onclick="return ppPay(event,'yearly_early_bird',this.href)">早鳥年費 NT$990 · PayPal</a>
+        <a class="pp-btn alt" href="https://www.paypal.com/ncp/payment/4JXGHA86C47BJ" target="_blank" rel="noopener" onclick="return ppPay(event,'lifetime',this.href)">買斷 NT$2,990 · PayPal</a>
+      </div>
+      <p style="margin:12px 0 0;font-size:12px;color:var(--tx3)">付款幣別依 PayPal 當下匯率換算;跨境手續費由 PayPal 收取。海外手動開通目前開放<strong>早鳥年費 / 買斷</strong>;月費請用上方綠界訂閱。</p>
     </div>
-    <p style="margin:14px 0 0;font-size:12px;color:var(--tx3)">以 USD 收款(PayPal 不支援 TWD),約等值 NT$990 / NT$2,990;跨境手續費由 PayPal 收取。海外開放<strong>早鳥年費 / 買斷</strong>;月費請用上方綠界訂閱。</p>
+
+    <!-- 測試(?pptest=1):自動開通,付完即生效 -->
+    <div id="ppAuto" style="display:none">
+      <p style="margin:0 0 12px">台灣以外的信用卡透過 <strong>PayPal</strong> 付款,<strong>付完自動開通</strong>。請先用右上角 <strong>Google 登入</strong>,付款才對得到你的帳號。</p>
+      <p id="ppLoginHint" style="display:none;margin:0 0 14px;padding:10px 12px;background:var(--bg3);border-radius:8px;font-size:13px">⚠️ 請先用右上角 <strong>Google 登入</strong>,再用下方 PayPal 付款。</p>
+      <div style="max-width:340px;margin:0 auto">
+        <div style="font-size:14px;font-weight:600;margin:0 0 6px;color:var(--tx)">早鳥年費 · US$32</div>
+        <div id="ppBtnEarly"></div>
+        <div style="font-size:14px;font-weight:600;margin:18px 0 6px;color:var(--tx)">買斷 · US$96</div>
+        <div id="ppBtnLifetime"></div>
+      </div>
+      <p style="margin:14px 0 0;font-size:12px;color:var(--tx3)">以 USD 收款(PayPal 不支援 TWD),約等值 NT$990 / NT$2,990;跨境手續費由 PayPal 收取。</p>
+    </div>
   </div>
   <script>
     // App(WebView)走 Apple IAP,隱藏外部付款連結,避免違反 App Store 審核規範。
     (function(){ try { if (window.STAYJP_NATIVE && window.STAYJP_NATIVE.isNativeApp) { var b = document.getElementById('overseasPay'); if (b) b.style.display = 'none'; } } catch(_) {} })();
-    // 載入 PayPal SDK(僅非 App;App 走 IAP 不需要)。載好 → 由主 script 的 __renderPaypalButtons 畫按鈕。
+    // ?pptest=1:切到自動開通(sandbox)做測試,真實用戶看不到。
     (function(){
       if (window.STAYJP_NATIVE && window.STAYJP_NATIVE.isNativeApp) return;
+      if (location.search.indexOf('pptest') === -1) return;   // 預設不啟用,線上用戶零影響
+      var m = document.getElementById('ppManual'); if (m) m.style.display = 'none';
+      var a = document.getElementById('ppAuto');   if (a) a.style.display = '';
       var s = document.createElement('script');
-      // ⚠️ 上線改成 live client-id(與 functions 的 PAYPAL_PRODUCTION 一起切)
+      // ⚠️ 上線改成 live client-id(與 functions 的 PAYPAL_PRODUCTION 一起切),並移除 pptest 閘門
       s.src = 'https://www.paypal.com/sdk/js?client-id=AeWHhYkZLsmyZzCrVRuxvbBfpeNEqGGDeEQe1uAoAvLA6DFPD_w3yF2-UUzZmcv_mfLWVTzaSzv25Dwt&currency=USD&intent=capture';
       s.onload = function(){ try { window.__renderPaypalButtons && window.__renderPaypalButtons(); } catch(e){ console.warn('pp render', e); } };
       document.head.appendChild(s);
@@ -559,7 +583,30 @@ function goPayPal(plan, email) {
   }
 }
 
-// PayPal SDK 按鈕(海外自動開通):createOrder → server 建單(custom_id 綁 uid);
+// PayPal 手動開通按鈕(現行預設):記錄 {uid,email,plan} 到 paypal_pending,開啟收款連結。
+async function ppPay(ev, plan, url) {
+  if (ev) ev.preventDefault();
+  let u = _auth.currentUser;
+  if (!u) {
+    try { const r = await _auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()); u = r.user; }
+    catch (e) { alert('請先用 Google 登入,我們才能把付款對到你的帳號。'); return false; }
+  }
+  try {
+    await _db.collection('paypal_pending').add({
+      uid: u.uid, email: u.email || '', plan,
+      created_at: firebase.firestore.FieldValue.serverTimestamp(),
+    });
+  } catch (e) { /* 記錄失敗不擋付款 */ }
+  const hint = document.getElementById('ppEmailHint');
+  if (hint) {
+    hint.style.display = 'block';
+    hint.innerHTML = '✓ 已記錄你的帳號 <strong>' + (u.email || '') + '</strong>。付款完成後我們會<strong>主動幫你開通</strong>,不用再另外傳 email(保留付款截圖以備查即可)。';
+  }
+  window.open(url, '_blank', 'noopener');
+  return false;
+}
+
+// PayPal SDK 按鈕(?pptest=1 的自動開通):createOrder → server 建單(custom_id 綁 uid);
 // onApprove → server 捕捉 + 同步開通。付款對帳零誤差,付完即開通。
 const PP_CREATE_URL  = 'https://asia-east1-jpnote-1bdd6.cloudfunctions.net/paypalCreateOrder';
 const PP_CAPTURE_URL = 'https://asia-east1-jpnote-1bdd6.cloudfunctions.net/paypalCaptureOrder';
