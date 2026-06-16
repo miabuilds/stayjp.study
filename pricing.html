@@ -632,7 +632,7 @@ function ppButton(containerId, plan) {
         body: JSON.stringify({ plan }),
       });
       const d = await r.json();
-      if (!d.id) throw new Error('create_failed');
+      if (!d.id) { if (d.reason) alert(d.reason); throw new Error(d.error || 'create_failed'); }
       return d.id;
     },
     onApprove: async function (data) {

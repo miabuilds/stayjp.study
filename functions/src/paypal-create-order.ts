@@ -5,6 +5,7 @@ import * as functions from "firebase-functions/v2/https";
 import * as admin from "firebase-admin";
 import { PAYPAL_SECRETS, PAYPAL_PRICES_USD, PlanKey } from "./utils/constants";
 import { createPaypalOrder } from "./utils/paypal";
+import { getSubscription, nowMs } from "./utils/firestore";
 
 if (admin.apps.length === 0) admin.initializeApp();
 
@@ -32,6 +33,17 @@ export const paypalCreateOrder = functions.onRequest(
       if (!amountUsd) {
         // 只接受 PayPal 開放的方案(早鳥年費 / 買斷);月費/標準年費請走綠界
         res.status(400).json({ error: "plan_not_supported_on_paypal", plan });
+        return;
+      }
+
+      // 守衛:已是有效付費會員 → 擋下,避免重複扣款(要換方案請先退費/到期或洽客服)
+      const existing = await getSubscription(uid);
+      if (existing && existing.status !== "refunded" && existing.status !== "expired"
+          && (existing.expiresAt || 0) > nowMs()) {
+        res.status(409).json({
+          error: "already_subscribed",
+          reason: "你目前已是付費會員,無需重複購買。若要更換方案,請先到帳號頁退費,或來信客服協助。",
+        });
         return;
       }
 
