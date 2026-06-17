@@ -299,7 +299,8 @@ a:hover{text-decoration:underline}
       var m = document.getElementById('ppManual'); if (m) m.style.display = 'none';
       var a = document.getElementById('ppAuto');   if (a) a.style.display = '';
       var s = document.createElement('script');
-      s.src = 'https://www.paypal.com/sdk/js?client-id=Aeuts8UKvc-wbXSHPrGCuWXOh9_ZnvYugi-ElkAls1eOxEWjjv-Td0N74w0xIQdXLtkW39SIKYewCtFB&currency=USD&intent=capture';
+      // sandbox client-id(?pptest 測試用;真實用戶走 ppManual,不載此 SDK)。正式啟用時換回 live。
+      s.src = 'https://www.paypal.com/sdk/js?client-id=AeWHhYkZLsmyZzCrVRuxvbBfpeNEqGGDeEQe1uAoAvLA6DFPD_w3yF2-UUzZmcv_mfLWVTzaSzv25Dwt&currency=USD&intent=capture';
       s.onload = function(){ try { (window.ppSyncAuth || window.__renderPaypalButtons)(); } catch(e){ console.warn('pp render', e); } };
       document.head.appendChild(s);
     })();
