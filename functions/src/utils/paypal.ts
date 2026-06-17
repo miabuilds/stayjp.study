@@ -89,3 +89,14 @@ export async function refundPaypalCapture(captureId: string): Promise<string> {
   }
   return String(d.id || "");
 }
+
+// 健檢:拿到 OAuth token = 金鑰有效 + PayPal API 活著。回模式(sandbox/live)。
+export async function paypalHealthCheck(): Promise<{ ok: boolean; mode: string }> {
+  const mode = paypalConfig().isProduction ? "live" : "sandbox";
+  try {
+    await accessToken();
+    return { ok: true, mode };
+  } catch {
+    return { ok: false, mode };
+  }
+}

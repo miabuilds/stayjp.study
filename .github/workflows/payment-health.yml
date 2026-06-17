@@ -1,0 +1,32 @@
+name: Payment health (daily)
+
+# 每天自動驗金流可用,異常就讓這個 job 失敗 → GitHub 自動寄信給 repo 擁有者。
+# 涵蓋過去事故類型:頁面壞 / 訂閱鈕 JS 壞 / function 掛 / 綠界設定錯 / 收了錢沒開通。
+on:
+  schedule:
+    - cron: "0 0 * * *"   # 每天 00:00 UTC = 台灣 08:00
+  workflow_dispatch: {}    # 也可手動觸發
+
+jobs:
+  health:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 金流頁載得到 + 訂閱鈕 JS 還在
+        run: |
+          html=$(curl -fsS --max-time 20 https://stayjp.study/pricing.html) || {
+            echo "::error::pricing.html 載入失敗(頁面掛了)"; exit 1; }
+          echo "$html" | grep -q "function startSubscribe" || {
+            echo "::error::pricing.html 找不到 startSubscribe → 訂閱鈕可能壞了"; exit 1; }
+          echo "pricing.html OK"
+
+      - name: paymentHealth(綠界 / PayPal / Firestore / 對帳)
+        run: |
+          resp=$(curl -sS --max-time 25 -w $'\n%{http_code}' https://asia-east1-jpnote-1bdd6.cloudfunctions.net/paymentHealth)
+          code=$(printf '%s' "$resp" | tail -n1)
+          body=$(printf '%s' "$resp" | sed '$d')
+          echo "$body"
+          if [ "$code" != "200" ]; then
+            echo "::error::paymentHealth 不正常 (HTTP $code) — 綠界/PayPal/對帳有問題,詳見上方 body"
+            exit 1
+          fi
+          echo "paymentHealth OK"
