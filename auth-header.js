@@ -111,17 +111,8 @@
       };
       area.querySelector('#ahxLogout').onclick = function () { auth.signOut(); };
     } else {
-      // 在原生 App 內額外顯示「Apple 登入」(Apple 4.8 要求)→ postMessage 給原生跑 Sign in with Apple。
-      var inApp = window.STAYJP_NATIVE && window.STAYJP_NATIVE.isNativeApp && window.ReactNativeWebView;
-      area.innerHTML = '<button class="ahx-btn" id="ahxLogin" type="button">登入</button>'
-        + (inApp ? '<button class="ahx-btn" id="ahxApple" type="button" style="margin-left:6px"> 登入</button>' : '');
+      area.innerHTML = '<button class="ahx-btn" id="ahxLogin" type="button">登入</button>';
       area.querySelector('#ahxLogin').onclick = login;
-      if (inApp) {
-        var ab = area.querySelector('#ahxApple');
-        if (ab) ab.onclick = function () {
-          try { window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'APPLE_LOGIN' })); } catch (e) {}
-        };
-      }
     }
   }
 
