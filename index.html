@@ -1532,14 +1532,16 @@ function showInAppHelp() {
 
 let _signingIn = false;
 function handleAuth() {
-  // 登入狀態還沒還原完 → 忽略點擊,避免「其實已登入」卻被當未登入而觸發重複登入報錯
-  if (!_authResolved) return;
-  if (currentUser) { auth.signOut(); currentUser = null; updateAuthUI(); return; }
-  // 原生 App(WebView)內:Google OAuth 會被擋 → 發 OPEN_LOGIN,由原生彈登入選單(Google/Apple)。
+  // 原生 App(WebView)內:登入一律發 OPEN_LOGIN 開原生選單(Apple/Google)。
+  // ⚠️ 必須擺在 _authResolved guard「之前」—— App 的 WebView 裡 Firebase 登入狀態常沒及時還原,
+  //    _authResolved=false 會把這段擋掉 → 登入鈕點了完全沒反應(訂閱無此 guard 所以正常)。
   if (window.STAYJP_NATIVE && window.STAYJP_NATIVE.isNativeApp) {
     try { if (window.ReactNativeWebView && window.ReactNativeWebView.postMessage) window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'OPEN_LOGIN' })); } catch (e) {}
     return;
   }
+  // 以下為一般網頁路徑:登入狀態還沒還原完 → 忽略點擊,避免誤判未登入而重複登入
+  if (!_authResolved) return;
+  if (currentUser) { auth.signOut(); currentUser = null; updateAuthUI(); return; }
   if (isInAppBrowser()) { showInAppHelp(); return; }
   if (_signingIn) return;   // 防連點:前一個登入彈窗還沒結束就別再開(auth/cancelled-popup-request)
   _signingIn = true;
