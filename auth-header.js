@@ -39,6 +39,7 @@
         'transition:border-color .2s,color .2s}' +
       '.ahx-btn:hover{border-color:var(--ac,#888);color:var(--ac,#000)}' +
       '.ahx-btn img{width:18px;height:18px;border-radius:50%}' +
+      '.ahx-btn .ahx-name{display:inline-block;max-width:96px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;vertical-align:bottom}' +
       '.ahx-menu{position:absolute;top:calc(100% + 6px);right:0;background:var(--bg2,#fff);' +
         'border:1px solid var(--bd,#ddd);border-radius:10px;min-width:180px;padding:4px;z-index:300;' +
         'box-shadow:0 8px 24px rgba(0,0,0,.18);display:none}' +
@@ -90,13 +91,15 @@
   function render(user) {
     if (!area) return;
     if (user) {
-      var name = (user.displayName || user.email || 'User').split(' ')[0];
+      var _em = user.email || '';
+      // Apple privaterelay 用戶沒 displayName → 取信箱 @ 前半截,避免長信箱撐爆 header
+      var name = user.displayName ? user.displayName.split(' ')[0] : (_em ? _em.split('@')[0] : 'User');
       var photo = user.photoURL || '';
       var img = photo ? '<img src="' + photo + '" alt="" onerror="this.style.display=\'none\'">' : '';
       var ADMIN = ['stayjpplan@gmail.com', 'abc83327@gmail.com'];
       var adminLink = ADMIN.indexOf((user.email || '').toLowerCase()) > -1 ? '<a class="ahx-item" href="admin.html">🛠 管理後台</a>' : '';
       area.innerHTML =
-        '<button class="ahx-btn" id="ahxMenuBtn" type="button">' + img + name + ' ▾</button>' +
+        '<button class="ahx-btn" id="ahxMenuBtn" type="button">' + img + '<span class="ahx-name">' + name + '</span> ▾</button>' +
         '<div class="ahx-menu" id="ahxMenu">' +
           '<div class="ahx-head">' + (user.email || '') + '</div>' +
           '<a class="ahx-item" href="account.html">我的帳號</a>' +

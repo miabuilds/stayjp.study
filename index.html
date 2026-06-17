@@ -171,6 +171,7 @@ body {
 }
 .auth-btn:hover { border-color: var(--ac); color: var(--ac); }
 .auth-btn img { width: 18px; height: 18px; border-radius: 50%; }
+.auth-btn .um-name { display: inline-block; max-width: 96px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; vertical-align: bottom; }
 .user-menu {
   position: absolute; top: calc(100% + 6px); right: 0;
   background: var(--bg2); border: 1px solid var(--bd); border-radius: 10px;
@@ -1560,14 +1561,15 @@ function updateAuthUI() {
   const area = document.getElementById('authArea');
   if (!area) return;
   if (currentUser) {
-    const name = (currentUser.displayName || currentUser.email || 'User').split(' ')[0];
     const email = currentUser.email || '';
+    // Apple privaterelay 用戶沒有 displayName → 退而取信箱 @ 前半截,避免整串長信箱撐爆 header
+    const name = currentUser.displayName ? currentUser.displayName.split(' ')[0] : (email ? email.split('@')[0] : 'User');
     const photo = currentUser.photoURL || '';
     const img = photo ? `<img src="${photo}" alt="" onerror="this.style.display='none'">` : '';
     const ADMIN_EMAILS = ['stayjpplan@gmail.com', 'abc83327@gmail.com'];
     const adminLink = ADMIN_EMAILS.includes(email.toLowerCase()) ? `<a class="um-item" href="admin.html">🛠 管理後台</a>` : '';
     area.innerHTML = `
-      <button class="auth-btn" id="userMenuBtn" onclick="toggleUserMenu(event)">${img}${name} ▾</button>
+      <button class="auth-btn" id="userMenuBtn" onclick="toggleUserMenu(event)">${img}<span class="um-name">${name}</span> ▾</button>
       <div class="user-menu" id="userMenu">
         <div class="um-head">${email}</div>
         <a class="um-item" href="account.html">我的帳號</a>
