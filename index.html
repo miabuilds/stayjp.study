@@ -1532,7 +1532,6 @@ function showInAppHelp() {
 
 let _signingIn = false;
 function handleAuth() {
-  try { if (window.ReactNativeWebView) alert('DBG handleAuth | native=' + !!(window.STAYJP_NATIVE && window.STAYJP_NATIVE.isNativeApp) + ' RN=' + !!(window.ReactNativeWebView && window.ReactNativeWebView.postMessage)); } catch (e) {}
   // 原生 App(WebView)內:登入一律發 OPEN_LOGIN 開原生選單(Apple/Google)。
   // ⚠️ 必須擺在 _authResolved guard「之前」—— App 的 WebView 裡 Firebase 登入狀態常沒及時還原,
   //    _authResolved=false 會把這段擋掉 → 登入鈕點了完全沒反應(訂閱無此 guard 所以正常)。

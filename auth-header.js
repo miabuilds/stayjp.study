@@ -136,7 +136,6 @@
   }
 
   function login() {
-    try { if (window.ReactNativeWebView) alert('DBG login | inApp3rd=' + isInApp() + ' native=' + !!(window.STAYJP_NATIVE && window.STAYJP_NATIVE.isNativeApp) + ' patched=' + !!(auth && auth.__stayjpNativePatched)); } catch (e) {}
     if (isInApp()) {
       alert('你正在 App 內建瀏覽器(Line／IG／Threads／FB／微信 等)開啟本站,Google 登入會被擋。\n\n請改用 Safari 或 Chrome:\n點右上／右下的「⋯」或「⋮」→ 選「在預設瀏覽器開啟」,再登入即可。');
       return;
