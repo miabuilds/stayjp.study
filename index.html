@@ -3053,6 +3053,13 @@ function renderVocab() {
     });
 
     if (!vc) h += `<div class="nr"><p>${showFavOnly?t('no_fav_vocab'):t('no_result_vocab')}</p></div>`;
+    // 底部換批列(使用者回饋:背完一批不用上滑找按鈕)。只在每日模式 + 有結果時顯示。
+    if (dailyMode && !lf && !showFavOnly && vc) {
+      h += `<div class="daily-batch-row" style="margin-top:20px;justify-content:center">
+        ${prog.totalOffset>0?`<button class="daily-btn" onclick="prevDailyBatch()">${t('prev_batch')}</button>`:''}
+        ${prog.totalOffset<data.length?`<button class="daily-btn" onclick="nextDailyBatch()">${t('next_batch')}</button>`:''}
+      </div>`;
+    }
     mn.innerHTML = h;
     document.getElementById('stats').textContent = `${vc} / ${data.length}`;
     updateFavCount();
@@ -3199,6 +3206,13 @@ function render() {
   });
 
   if (!vc) h += `<div class="nr"><p>${showFavOnly?t('no_fav_grammar'):t('no_result_grammar')}</p></div>`;
+  // 底部換批列(使用者回饋:背完一批不用上滑找按鈕)。只在每日模式 + 有結果時顯示。
+  if (grammarDailyMode && !lf && !showFavOnly && vc) {
+    h += `<div class="daily-batch-row" style="margin-top:20px;justify-content:center">
+      ${gProg.totalOffset>0?`<button class="daily-btn" onclick="prevGrammarBatch()">${t('prev_batch')}</button>`:''}
+      ${gProg.totalOffset<data.length?`<button class="daily-btn" onclick="nextGrammarBatch()">${t('next_batch')}</button>`:''}
+    </div>`;
+  }
   // Affiliate block on N3+ grammar pages — most relevant audience for italki conversion.
   if (vc && /^n[123]$/.test(currentLevel)) h += renderAffiliateBlock('grammar_' + currentLevel);
   mn.innerHTML = h;
