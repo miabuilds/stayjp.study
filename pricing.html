@@ -304,7 +304,12 @@ a:hover{text-decoration:underline}
           '<button id="iapGo" style="width:100%;padding:14px;background:var(--ac);color:#fff;border:0;border-radius:10px;font-weight:600;font-size:15px;cursor:pointer">查看方案 / 訂閱</button>' +
           '</div>';
         document.getElementById('iapGo').onclick = function(){
-          try { if (window.ReactNativeWebView && window.ReactNativeWebView.postMessage) window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'OPEN_PAYWALL' })); } catch(_) {}
+          try {
+            if (!(window.ReactNativeWebView && window.ReactNativeWebView.postMessage)) return;
+            var u = (window.firebase && firebase.auth && firebase.auth().currentUser) || null;
+            // 未登入 → 直接彈原生登入選單(登入後再點才進 paywall),不跳死路頁
+            window.ReactNativeWebView.postMessage(JSON.stringify({ type: u ? 'OPEN_PAYWALL' : 'OPEN_LOGIN' }));
+          } catch(_) {}
         };
       } catch(_) {}
     })();
@@ -729,7 +734,9 @@ async function startSubscribe(btn) {
   if (window.STAYJP_NATIVE && window.STAYJP_NATIVE.isNativeApp) {
     try {
       if (window.ReactNativeWebView && window.ReactNativeWebView.postMessage) {
-        window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'OPEN_PAYWALL', plan }));
+        // 未登入 → 先彈原生登入選單(登入後再點才進 paywall),不讓買到匿名帳號
+        var u = (window.firebase && firebase.auth && firebase.auth().currentUser) || null;
+        window.ReactNativeWebView.postMessage(JSON.stringify(u ? { type: 'OPEN_PAYWALL', plan } : { type: 'OPEN_LOGIN' }));
       }
     } catch (e) { /* 橋接失敗就靜默,不影響網頁 */ }
     return false;
