@@ -263,6 +263,7 @@ textarea.note:focus{outline:none;border-color:var(--ac)}
  <button class="btn" onclick="exportLedgerCSV()" style="font-size:11px;padding:4px 10px">⤓ 匯出 CSV</button>
  <span id="ledgerCount" style="font-size:12px;color:var(--tx2)"></span>
  <button class="btn danger" onclick="cleanupPending()" style="font-size:11px;padding:4px 10px;margin-left:auto" title="刪掉超過 1 小時的「處理中」棄單(未扣款,不影響營收)">🧹 清掉處理中棄單</button>
+ <button class="btn danger" onclick="purgeTest()" style="font-size:11px;padding:4px 10px" title="清除 2 個寫死的測試帳號(knv2dycg8z / yujoulinforwork)的交易+訂閱,並校正早鳥名額。不影響真客人。">🧪 清除測試帳號資料</button>
  <span id="cleanupMsg" style="font-size:12px"></span>
  </div>
  <div id="ledgerTotals" class="stat-grid" style="margin-bottom:16px"></div>
@@ -629,6 +630,7 @@ const FN_CLEANUP_PENDING = 'https://asia-east1-jpnote-1bdd6.cloudfunctions.net/a
 const FN_RECOMPUTE_EB = 'https://asia-east1-jpnote-1bdd6.cloudfunctions.net/adminRecomputeEarlyBird';
 const FN_SET_SUB = 'https://asia-east1-jpnote-1bdd6.cloudfunctions.net/adminSetSubscription';
 const FN_ERR_LOG = 'https://asia-east1-jpnote-1bdd6.cloudfunctions.net/adminErrorLog';
+const FN_PURGE_TEST = 'https://asia-east1-jpnote-1bdd6.cloudfunctions.net/adminPurgeTest';
 
 // ── 訂閱管理 ──
 async function setSub(action) {
@@ -724,6 +726,21 @@ async function cleanupPending() {
     if (!r.ok) { msg.textContent = '失敗:' + (d.error || r.status); msg.style.color = '#EF4444'; return; }
     msg.textContent = `✓ 已刪 ${d.deleted} 筆(保留近 1 小時內 ${d.kept_recent} 筆)`; msg.style.color = '#16A34A';
     renderLedger();
+  } catch (e) { msg.textContent = '錯誤:' + e.message; msg.style.color = '#EF4444'; }
+}
+
+// 清除「寫死的測試帳號」資料(交易+訂閱+pending)並校正早鳥。後端寫死 allowlist,不可能誤刪真客人。
+async function purgeTest() {
+  const msg = document.getElementById('cleanupMsg');
+  if (!confirm('清除 2 個測試帳號(knv2dycg8z / yujoulinforwork)的交易+訂閱,並校正早鳥名額?\n(只清這 2 個寫死帳號,不影響真客人;不可復原)')) return;
+  msg.textContent = '清理中…'; msg.style.color = 'var(--tx2)';
+  try {
+    const t = await auth.currentUser.getIdToken();
+    const r = await fetch(FN_PURGE_TEST, { method: 'POST', headers: { Authorization: 'Bearer ' + t } });
+    const d = await r.json();
+    if (!r.ok) { msg.textContent = '失敗:' + (d.error || r.status); msg.style.color = '#EF4444'; return; }
+    msg.textContent = `✓ 清了 ${d.deletedTxns} 筆交易、早鳥校正為 ${d.earlyBird}`; msg.style.color = '#16A34A';
+    renderLedger(); renderStats();
   } catch (e) { msg.textContent = '錯誤:' + e.message; msg.style.color = '#EF4444'; }
 }
 

@@ -33,3 +33,5 @@ export { paypalCreateOrder } from "./paypal-create-order";
 export { paypalCaptureOrder } from "./paypal-capture-order";
 export { paypalRefund } from "./paypal-refund";
 export { paymentHealth } from "./payment-health";
+
+export { adminPurgeTest } from "./admin-purge-test";
