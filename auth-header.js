@@ -112,7 +112,11 @@
         var m = area.querySelector('#ahxMenu');
         if (m) m.classList.toggle('show');
       };
-      area.querySelector('#ahxLogout').onclick = function () { auth.signOut(); };
+      area.querySelector('#ahxLogout').onclick = function () {
+        try { auth.signOut(); } catch (e) {}
+        // App 內:通知原生也登出(原生 Firebase + RevenueCat),否則狀態卡住要重開 app
+        try { if (window.STAYJP_NATIVE && window.STAYJP_NATIVE.isNativeApp && window.ReactNativeWebView && window.ReactNativeWebView.postMessage) window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'NATIVE_LOGOUT' })); } catch (e) {}
+      };
     } else {
       area.innerHTML = '<button class="ahx-btn" id="ahxLogin" type="button">登入</button>';
       area.querySelector('#ahxLogin').onclick = login;
