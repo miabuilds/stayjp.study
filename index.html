@@ -2417,9 +2417,7 @@ const DailyStory = (() => {
     const id = getStoryId();
     let story = await fetchStory(id);
     if (!story) {
-      const prog = getDailyProgress(currentLevel);
-      const batchIdx = Math.floor(prog.totalOffset / DAILY_NEW);
-      alert(`這個批次的故事還沒生成(${currentLevel.toUpperCase()} batch ${batchIdx + 1})\n\n目前已有 N5 batch 1-4。之後會補齊全部等級。`);
+      alert('這個單元目前沒有對應的故事,換個單元或用「⚡ 快速背本批」複習吧 🙂');
       return;
     }
     showModal(story);

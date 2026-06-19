@@ -442,6 +442,15 @@ function initDeleteAccount() {
     if (window.STAYJP_NATIVE && window.STAYJP_NATIVE.isNativeApp) {
       const b = document.getElementById('deleteAccountBtn');
       if (b) b.style.display = '';
+      // App 內:所有「查看方案/升級」連結改開原生 IAP paywall,不導到網頁金流頁(App Store 3.1.1)
+      document.querySelectorAll('a[href$="pricing.html"]').forEach(function(a){
+        a.removeAttribute('href');
+        a.style.cursor = 'pointer';
+        a.addEventListener('click', function(e){
+          e.preventDefault();
+          try { if (window.ReactNativeWebView && window.ReactNativeWebView.postMessage) window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'OPEN_PAYWALL' })); } catch (_) {}
+        });
+      });
     }
   } catch (e) {}
 }
