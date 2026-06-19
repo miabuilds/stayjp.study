@@ -18,7 +18,12 @@ service cloud.firestore {
                     request.auth.uid == userId ||
                     request.auth.token.email in ['stayjpplan@gmail.com', 'abc83327@gmail.com']
                   );
-      allow write: if request.auth != null && request.auth.uid == userId;
+      // 本人可寫自己的 doc(srs_data/收藏/streak…),但「subscription 欄位禁止 client 寫」
+      // —— 訂閱只准 Cloud Function (Admin SDK 繞過規則) 寫,防止有人改 console 自己白嫖 premium。
+      allow create: if request.auth != null && request.auth.uid == userId
+                    && !('subscription' in request.resource.data);
+      allow update: if request.auth != null && request.auth.uid == userId
+                    && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['subscription']);
     }
 
     // 訂閱交易帳本 — Cloud Function 寫,admin + 用戶自己讀

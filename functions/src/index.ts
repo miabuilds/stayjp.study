@@ -35,3 +35,5 @@ export { paypalRefund } from "./paypal-refund";
 export { paymentHealth } from "./payment-health";
 
 export { adminPurgeTest } from "./admin-purge-test";
+
+export { rcSyncSubscription } from "./rc-sync-subscription";
