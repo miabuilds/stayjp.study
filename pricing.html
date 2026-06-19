@@ -308,7 +308,7 @@ a:hover{text-decoration:underline}
             if (!(window.ReactNativeWebView && window.ReactNativeWebView.postMessage)) return;
             var u = (window.firebase && firebase.auth && firebase.auth().currentUser) || null;
             // 未登入 → 直接彈原生登入選單(登入後再點才進 paywall),不跳死路頁
-            window.ReactNativeWebView.postMessage(JSON.stringify({ type: u ? 'OPEN_PAYWALL' : 'OPEN_LOGIN' }));
+            window.ReactNativeWebView.postMessage(JSON.stringify(u ? { type: 'OPEN_PAYWALL' } : { type: 'OPEN_LOGIN', intent: 'subscribe' }));
           } catch(_) {}
         };
       } catch(_) {}
@@ -736,7 +736,7 @@ async function startSubscribe(btn) {
       if (window.ReactNativeWebView && window.ReactNativeWebView.postMessage) {
         // 未登入 → 先彈原生登入選單(登入後再點才進 paywall),不讓買到匿名帳號
         var u = (window.firebase && firebase.auth && firebase.auth().currentUser) || null;
-        window.ReactNativeWebView.postMessage(JSON.stringify(u ? { type: 'OPEN_PAYWALL', plan } : { type: 'OPEN_LOGIN' }));
+        window.ReactNativeWebView.postMessage(JSON.stringify(u ? { type: 'OPEN_PAYWALL', plan } : { type: 'OPEN_LOGIN', intent: 'subscribe' }));
       }
     } catch (e) { /* 橋接失敗就靜默,不影響網頁 */ }
     return false;
