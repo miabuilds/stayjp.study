@@ -1436,8 +1436,7 @@ if (fbConfig) {
   try { firebase.firestore().settings({ experimentalAutoDetectLongPolling: true, useFetchStreams: false }); } catch (e) {}
   auth = firebase.auth();
   db = firebase.firestore();
-  auth.onAuthStateChanged(u => { currentUser = u; _authResolved = true; try { localStorage.setItem('stayjp_logged_in', u ? '1' : '0'); } catch (e) {} updateAuthUI(); loadFavorites(); loadCloudData(); if (typeof Streak !== 'undefined') { Streak.syncDown(); Streak.render(); }
-    try { if (u && window.STAYJP_NATIVE && window.STAYJP_NATIVE.isNativeApp) { Promise.all([ db.collection('users').doc(u.uid).get(), db.collection('subscriptions').doc(u.uid).get() ]).then(function(r){ var a = r[0].exists && r[0].data() && r[0].data().subscription; var b = r[1].exists ? r[1].data() : null; var fmt = function(s){ return s ? (s.plan + '/' + s.status) : 'none'; }; alert('DBG uid=' + u.uid + '\nusers=' + fmt(a) + '\nsubscriptions=' + fmt(b)); }).catch(function(e){ alert('DBG uid=' + u.uid + '\nread err=' + e); }); } } catch (e) {} });
+  auth.onAuthStateChanged(u => { currentUser = u; _authResolved = true; try { localStorage.setItem('stayjp_logged_in', u ? '1' : '0'); } catch (e) {} updateAuthUI(); loadFavorites(); loadCloudData(); if (typeof Streak !== 'undefined') { Streak.syncDown(); Streak.render(); } });
   // 登入狀態還原前(currentUser 暫時為 null):若上次是登入的,先把右上角鈕顯示為佔位「···」並停用,
   // 避免「明明已登入卻顯示『登入』」被誤點。onAuthStateChanged 一回來 updateAuthUI 就覆寫成正確狀態。
   try {
