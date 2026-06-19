@@ -292,7 +292,7 @@ a:hover{text-decoration:underline}
   <script>
     // App(WebView)走 Apple IAP:整頁換成單一「App 內購買」入口,
     // 徹底清掉綠界/PayPal/信用卡等外部金流字眼與連結(App Store 3.1.1 反導流)。
-    (function(){
+    function stayjpScrubPricing(){
       try {
         if (!(window.STAYJP_NATIVE && window.STAYJP_NATIVE.isNativeApp)) return;
         var main = document.querySelector('main.main');
@@ -312,7 +312,9 @@ a:hover{text-decoration:underline}
           } catch(_) {}
         };
       } catch(_) {}
-    })();
+    }
+    // 一定要等整頁解析完才清,否則「訂閱規則」等後段內容會在 innerHTML 替換後才被解析、又接回 main(綠界字眼重現)。
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', stayjpScrubPricing); else stayjpScrubPricing();
     // 海外付款暫改回手動(ppManual 預設顯示);自動 PayPal 先收起來,改天加 ?pptest=1 再測。
     (function(){
       if (window.STAYJP_NATIVE && window.STAYJP_NATIVE.isNativeApp) return;
