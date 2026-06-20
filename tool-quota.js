@@ -103,6 +103,8 @@
     c[tool] = (c[tool] || 0) + 1;
     saveCount(c);
     refreshBadge();
+    // 用完當下即時重繪學習列表 → 該工具按鈕立刻變 🔒,不用 reload
+    try { if (typeof window.doRender === 'function') window.doRender(); } catch (e) {}
   }
 
   function ensurePaywallStyles() {

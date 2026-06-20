@@ -1853,6 +1853,7 @@ function toggleFavFilter() {
   doRender();
 }
 let st; function onSearch(v) { clearTimeout(st); st = setTimeout(() => { searchTerm = v.trim().toLowerCase(); doRender(); }, 200); }
+window.doRender = doRender;   // 給 tool-quota:用完額度後即時重繪,🔒 立刻顯示(免 reload)
 function doRender() {
   if (currentMode==='vocab') renderVocab();
   else if (currentMode==='confuse') renderConfuse();
