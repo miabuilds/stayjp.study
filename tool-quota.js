@@ -54,7 +54,7 @@
   }
   function trialDaysLeft() {
     if (cachedTrialStart == null) return 0;
-    return Math.max(0, Math.ceil((cachedTrialStart + TRIAL_DAYS * 86400000 - Date.now()) / 86400000));
+    return Math.min(TRIAL_DAYS, Math.max(0, Math.ceil((cachedTrialStart + TRIAL_DAYS * 86400000 - Date.now()) / 86400000)));
   }
 
   function isPremium() {
