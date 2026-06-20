@@ -171,7 +171,7 @@
   // ── UI badge（只 owner 看得到）──
   function refreshBadge() {
     let badge = document.getElementById('quotaBadge');
-    const trial = inTrial();
+    const trial = inTrial() && !isPremium();   // 付費用戶不顯示試用 badge(即使曾在試用期訂閱)
     if (!trial && !shouldGate()) { if (badge) badge.remove(); return; }
     if (!badge) {
       badge = document.createElement('div');
