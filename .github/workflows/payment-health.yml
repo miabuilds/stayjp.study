@@ -44,3 +44,18 @@ jobs:
             exit 1
           fi
           echo "paymentHealth OK"
+
+  # 實載健檢:無頭瀏覽器真的開 pricing 頁,確認 startSubscribe 是 function + 無頁面錯誤。
+  # 抓「語法檢查」抓不到的執行期壞掉。每日/手動跑(push 時 Pages 還沒部署完,不在 push 跑避免誤報)。
+  smoke:
+    if: github.event_name != 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: 裝 Playwright
+        run: npm i -D playwright && npx playwright install --with-deps chromium
+      - name: pricing 實載(startSubscribe 是 function + 無錯誤)
+        run: node scripts/smoke-pricing.mjs
