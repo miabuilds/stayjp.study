@@ -10,8 +10,8 @@ const browser = await chromium.launch();
 try {
   const page = await browser.newPage();
   page.on('pageerror', (e) => errors.push(String(e)));
-  await page.goto(URL, { waitUntil: 'networkidle', timeout: 30000 });
-  await page.waitForTimeout(1500);
+  await page.goto(URL, { waitUntil: 'domcontentloaded', timeout: 45000 });
+  await page.waitForTimeout(3000);   // 等內嵌 script 跑完定義 startSubscribe(不能用 networkidle:Firebase 持續連線永不 idle → 誤報逾時)
   const startType = await page.evaluate(() => typeof window.startSubscribe);
   let bad = false;
   if (startType !== 'function') {
