@@ -58,16 +58,17 @@ export const revenuecatWebhook = functions.onRequest(
 
       const planInfo = PLANS[plan];
       const existingSub = await getSubscription(uid);
+      const eventId = event.id as string | undefined;   // RC 事件唯一 id → 給 writeTransaction 做冪等(重送不重複入帳)
 
       switch (type) {
         case "INITIAL_PURCHASE":
-        case "RENEWAL": {
-          let isEarlyBird = false;
+        case "RENEWAL":
+        case "PRODUCT_CHANGE": {   // 月↔年 升降級:用新 product 重寫 plan/到期日(原本沒處理 → 升降級不生效)
+          // 只有「首次購買早鳥 product」才佔名額;is_early_bird 以「買的就是早鳥 product」為準(sticky:不被續訂/競態打回原價)
           if (plan === "yearly_early_bird" && type === "INITIAL_PURCHASE") {
-            isEarlyBird = await tryReserveEarlyBird();
-          } else if (plan === "yearly_early_bird") {
-            isEarlyBird = existingSub?.is_early_bird === true;
+            await tryReserveEarlyBird();
           }
+          const isEarlyBird = plan === "yearly_early_bird" || existingSub?.is_early_bird === true;
           const newSub: SubscriptionDoc = {
             source: "app",
             plan,
@@ -76,7 +77,7 @@ export const revenuecatWebhook = functions.onRequest(
             willRenew: true,
             startedAt: existingSub?.startedAt || nowMs(),
             apple_txn: event.transaction_id,
-            is_early_bird: isEarlyBird || existingSub?.is_early_bird === true,
+            is_early_bird: isEarlyBird,
             failed_retries: 0,
           };
           await writeSubscription(uid, newSub);
@@ -91,7 +92,7 @@ export const revenuecatWebhook = functions.onRequest(
             external_id: event.transaction_id || event.original_transaction_id,
             status: "success",
             note: `RevenueCat ${type}`,
-          });
+          }, eventId);
           break;
         }
 
@@ -109,7 +110,7 @@ export const revenuecatWebhook = functions.onRequest(
             external_id: event.transaction_id || "",
             status: "success",
             note: "User cancelled (will run until expiresAt)",
-          });
+          }, eventId);
           break;
         }
 
@@ -125,7 +126,7 @@ export const revenuecatWebhook = functions.onRequest(
             external_id: event.transaction_id || "",
             status: "failed",
             note: "Subscription expired",
-          });
+          }, eventId);
           break;
         }
 
@@ -144,7 +145,7 @@ export const revenuecatWebhook = functions.onRequest(
             external_id: event.transaction_id || "",
             status: "failed",
             note: "Billing issue (card expired / insufficient funds)",
-          });
+          }, eventId);
           break;
         }
 
@@ -164,7 +165,7 @@ export const revenuecatWebhook = functions.onRequest(
             external_id: event.transaction_id || event.original_transaction_id || "",
             status: "refunded",
             note: `RevenueCat ${type} — access revoked`,
-          });
+          }, eventId);
           break;
         }
 

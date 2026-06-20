@@ -111,8 +111,13 @@ export interface TransactionDoc {
   email_hash?: string;         // 防薅羊毛追蹤
 }
 
-export async function writeTransaction(txn: Omit<TransactionDoc, "occurred_at">): Promise<string> {
-  const ref = db.collection("transactions").doc();
+export async function writeTransaction(
+  txn: Omit<TransactionDoc, "occurred_at">,
+  dedupeId?: string,   // 給定 → 用它當 doc id(冪等:webhook 重送會覆寫同一筆,不會重複入帳)
+): Promise<string> {
+  const ref = dedupeId
+    ? db.collection("transactions").doc(dedupeId)
+    : db.collection("transactions").doc();
   await ref.set({
     ...txn,
     occurred_at: FieldValue.serverTimestamp(),
