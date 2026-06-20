@@ -199,20 +199,25 @@
     `;
   }
 
+  // 重繪學習列表(讓工具按鈕的 🔒/置灰跟著 gating 狀態更新)。只在 index 有 doRender 時生效。
+  function rerenderTools() {
+    try { if (typeof window.doRender === 'function') window.doRender(); } catch (e) {}
+  }
+
   // ── Firestore subscription watcher ──
   function watchSubscription() {
     if (typeof firebase === 'undefined' || !firebase.auth) return;
     firebase.auth().onAuthStateChanged(user => {
       authReady = true;
       cachedTrialStart = null; trialWriteDone = false;   // 換帳號/登出 → 重置試用狀態,重新依該 user 的 doc 評估
-      if (!user) { cachedUserEmail = null; cachedSub = null; cachedFreeAccess = false; subLoaded = true; refreshBadge(); return; }
+      if (!user) { cachedUserEmail = null; cachedSub = null; cachedFreeAccess = false; subLoaded = true; refreshBadge(); rerenderTools(); return; }
       cachedUserEmail = user.email || null;
       subLoaded = false;   // 換 user → 重新等這個 user 的訂閱載入
       // 兜底:萬一訂閱 onSnapshot 一直沒回(極端),8 秒後恢復 gating,避免免費登入用戶逃逸
-      setTimeout(() => { if (!subLoaded) { subLoaded = true; refreshBadge(); } }, 8000);
+      setTimeout(() => { if (!subLoaded) { subLoaded = true; refreshBadge(); rerenderTools(); } }, 8000);
       // 管理員後台授予的免費白名單(free_users/{uid} 存在 = 免費)
       firebase.firestore().doc('free_users/' + user.uid).get()
-        .then(d => { cachedFreeAccess = d.exists; refreshBadge(); })
+        .then(d => { cachedFreeAccess = d.exists; refreshBadge(); rerenderTools(); })
         .catch(() => {});
       // 開閘版:所有登入用戶都監聽訂閱(才偵測得到 premium → 免擋)
       firebase.firestore().doc('users/' + user.uid).onSnapshot(snap => {
@@ -235,7 +240,8 @@
         subLoaded = true;
         refreshBadge();
         applyGating();
-      }, err => { console.warn('[ToolQuota] sub watch error:', err); subLoaded = true; refreshBadge(); });
+        rerenderTools();   // 訂閱狀態載完 → 重繪,工具按鈕的 🔒 才會在進頁面當下就正確(免換頁觸發)
+      }, err => { console.warn('[ToolQuota] sub watch error:', err); subLoaded = true; refreshBadge(); rerenderTools(); });
     });
   }
 
