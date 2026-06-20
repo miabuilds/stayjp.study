@@ -79,6 +79,24 @@ export const adminPurgeTest = functions.onRequest(
         } catch { /* 無此 collection */ }
       }
 
+      // 3.5 清掉所有 RevenueCat 匿名 id($RCAnonymousID:*)的孤兒交易/訂閱。
+      //     成因:未登入就購買 → 綁到匿名身分。真用戶一律有 Firebase uid(登入閘門保證),
+      //     所以匿名 id 的資料 100% 是測試/孤兒,清掉不會誤刪真客人。
+      const anonUids = new Set<string>();
+      const anonSnap = await db.collection("transactions")
+        .where("uid", ">=", "$RCAnonymousID:")
+        .where("uid", "<", "$RCAnonymousID;")   // ';'=':'+1 → 抓所有 "$RCAnonymousID:*" 前綴
+        .get();
+      for (let i = 0; i < anonSnap.docs.length; i += 450) {
+        const b = db.batch();
+        anonSnap.docs.slice(i, i + 450).forEach((d) => { b.delete(d.ref); anonUids.add(d.data().uid as string); });
+        await b.commit();
+      }
+      for (const au of anonUids) {
+        await db.doc(`users/${au}`).delete().catch(() => { /* 匿名 doc 純孤兒,直接刪 */ });
+      }
+      log.push(`✓ 匿名 id:刪 ${anonSnap.size} 筆交易、${anonUids.size} 個孤兒 doc`);
+
       // 4. 校正早鳥名額 = 實際持有早鳥的訂閱數(測試早鳥已刪,這裡會是真實值)
       const ebSnap = await db.collection("users").where("subscription.is_early_bird", "==", true).get();
       await db.doc("counters/early_bird").set({ count: ebSnap.size }, { merge: true });
