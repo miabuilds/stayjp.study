@@ -323,6 +323,8 @@
 
   window.ToolQuota = {
     canUse, consume, usedUp, upsellLine,
+    // 這個工具今天的免費額度是否用完(被擋時才 true;trial/premium/未開閘 → false)。給按鈕顯示 🔒 用。
+    isLocked: (tool) => shouldGate() && !canUse(tool),
     used: () => { const c = loadCount(); return Object.keys(TOOL_NAMES).filter(t => (c[t] || 0) >= PER_TOOL_LIMIT).length; },
     showPaywall, shouldGate, isPremium,
     markMockCompleted,
