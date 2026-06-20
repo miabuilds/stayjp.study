@@ -781,7 +781,7 @@ async function renderLedger() {
     let rev = 0, refund = 0, pending = 0;
     const fmt = ts => ts && ts.toDate ? ts.toDate().toLocaleString('zh-TW', { hour12: false }) : '—';
     const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
-    const PAY_TXT = { ecpay: '綠界', manual: '手動/PayPal', apple_iap: 'Apple', google_billing: 'Google' };
+    const PAY_TXT = { ecpay: '綠界', manual: '手動', apple_iap: 'Apple / iOS', google_billing: 'Google Play', paypal: 'PayPal' };
     _ledgerExport = [];
     const rows = snap.docs.map(dd => {
       const x = dd.data();
@@ -808,6 +808,7 @@ async function renderLedger() {
         <td style="padding:6px 6px;white-space:nowrap">${TXN_TYPE_TXT[x.type] || x.type}</td>
         <td style="padding:6px 6px;white-space:nowrap">${SUB_PLAN_TXT[x.plan] || (x.plan && x.plan !== 'n/a' ? x.plan : '—')}</td>
         <td style="padding:6px 6px;text-align:right;white-space:nowrap">${amtCell}</td>
+        <td style="padding:6px 6px;white-space:nowrap">${PAY_TXT[x.payment_method] || x.payment_method || '—'}</td>
         <td style="padding:6px 6px">${TXN_STATUS_TXT[x.status] || x.status}</td>
         <td style="padding:6px 6px;color:var(--tx3);font-size:11px;word-break:break-all">${esc(x.external_id || '—')}</td>
       </tr>`;
@@ -820,7 +821,7 @@ async function renderLedger() {
     box.innerHTML = `<table style="width:100%;border-collapse:collapse;min-width:680px">
       <thead><tr style="text-align:left;color:var(--tx2);border-bottom:1px solid var(--bd)">
         <th style="padding:6px 6px">時間</th><th style="padding:6px 6px">帳號</th><th style="padding:6px 6px">類型</th>
-        <th style="padding:6px 6px">方案</th><th style="padding:6px 6px;text-align:right">金額</th><th style="padding:6px 6px">狀態</th><th style="padding:6px 6px">綠界單號</th>
+        <th style="padding:6px 6px">方案</th><th style="padding:6px 6px;text-align:right">金額</th><th style="padding:6px 6px">來源</th><th style="padding:6px 6px">狀態</th><th style="padding:6px 6px">單號</th>
       </tr></thead><tbody>${rows}</tbody></table>`;
   } catch (e) { box.textContent = '讀取失敗:' + e.message; }
 }
@@ -913,6 +914,8 @@ async function showTxns(uid, email) {
     if (snap.empty) { body.textContent = '此帳號沒有任何交易紀錄(可能是手動／App 端訂閱,或資料尚未寫入)。'; return; }
     const fmt = ts => ts && ts.toDate ? ts.toDate().toLocaleString('zh-TW', { hour12:false }) : '—';
     const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+    const SRC_TXT = { ecpay: '綠界', apple_iap: 'Apple / iOS', google_billing: 'Google Play', paypal: 'PayPal', manual: '手動' };
+    const srcOf = x => SRC_TXT[x.payment_method] || x.payment_method || '其他';
     // 卡片式：避免寬表格被超長綠界單號/備註撐爆版（桌機、手機都安全）
     let pendingN = 0;
     body.innerHTML = `${snap.docs.map(d => { const x = d.data();
@@ -931,8 +934,8 @@ async function showTxns(uid, email) {
             <span class="t-type">${TXN_TYPE_TXT[x.type] || x.type}${plan ? ' · ' + plan : ''}</span>
             <span class="t-amt">${amtHTML}</span>
           </div>
-          <div class="t-meta"><span>${fmt(x.occurred_at)}</span><span>狀態:${TXN_STATUS_TXT[x.status] || x.status}</span></div>
-          ${x.external_id ? `<div class="t-id">綠界單號:${esc(x.external_id)}</div>` : ''}
+          <div class="t-meta"><span>${fmt(x.occurred_at)}</span><span>來源:${srcOf(x)}</span><span>狀態:${TXN_STATUS_TXT[x.status] || x.status}</span></div>
+          ${x.external_id ? `<div class="t-id">${srcOf(x)}單號:${esc(x.external_id)}</div>` : ''}
           ${x.note ? `<div class="t-note">${esc(x.note)}</div>` : ''}
         </div>`; }).join('')}
       <div style="font-size:11px;color:var(--tx3);margin-top:4px">共 ${snap.size} 筆${pendingN ? `,其中 ${pendingN} 筆「處理中」是發起結帳但 ECPay 扣款 callback 未回來(未實際扣款,不計入營業額)` : ''}。退費走 App 退費鈕才會留「退費」紀錄;綠界後台手動退這裡不會有退費列。</div>`;
