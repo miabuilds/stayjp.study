@@ -2973,7 +2973,7 @@ function renderVocab() {
       <button class="daily-btn ${dailyMode?'on':''}" onclick="toggleDailyMode()">${dailyMode?t('show_all'):t('daily_mode')}</button>
       <button class="shadow-trigger" onclick="Shadow.startCurrent()" ${window.ToolQuota&&ToolQuota.isLocked&&ToolQuota.isLocked('shadow')?'style="opacity:.55"':''}>${window.ToolQuota&&ToolQuota.isLocked&&ToolQuota.isLocked('shadow')?'🔒':'🎧'} 跟讀本頁</button>
       ${dailyMode?`<button class="daily-btn" onclick="FlashCard.beginToday()" ${window.ToolQuota&&ToolQuota.isLocked&&ToolQuota.isLocked('flashcard')?'style="opacity:.55"':''}>${window.ToolQuota&&ToolQuota.isLocked&&ToolQuota.isLocked('flashcard')?'🔒':'⚡'} 快速背本批</button>`:''}
-      ${dailyMode?`<button class="daily-btn" onclick="DailyStory.open()" style="background:linear-gradient(135deg,#D4654A,#E8734A);color:#fff;border-color:#D4654A">📖 今日故事</button>`:''}
+      ${dailyMode?`<button class="daily-btn" onclick="DailyStory.open()" style="background:linear-gradient(135deg,#D4654A,#E8734A);color:#fff;border-color:#D4654A${window.ToolQuota&&ToolQuota.isLocked&&ToolQuota.isLocked('story')?';opacity:.55':''}">${window.ToolQuota&&ToolQuota.isLocked&&ToolQuota.isLocked('story')?'🔒':'📖'} 今日故事</button>`:''}
       ${window.ToolQuota&&ToolQuota.upsellLine?ToolQuota.upsellLine():''}
       ${dailyMode?`<div class="daily-batch-row">
         ${prog.totalOffset>0?`<button class="daily-btn" onclick="prevDailyBatch()">${t('prev_batch')}</button>`:''}
