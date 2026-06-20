@@ -737,8 +737,8 @@ async function startSubscribe(btn) {
     try {
       if (window.ReactNativeWebView && window.ReactNativeWebView.postMessage) {
         // 未登入 → 先彈原生登入選單(登入後再點才進 paywall),不讓買到匿名帳號
-        var u = (window.firebase && firebase.auth && firebase.auth().currentUser) || null;
-        window.ReactNativeWebView.postMessage(JSON.stringify(u ? { type: 'OPEN_PAYWALL', plan } : { type: 'OPEN_LOGIN', intent: 'subscribe' }));
+        var _su = (window.firebase && firebase.auth && firebase.auth().currentUser) || null;
+        window.ReactNativeWebView.postMessage(JSON.stringify(_su ? { type: 'OPEN_PAYWALL', plan } : { type: 'OPEN_LOGIN', intent: 'subscribe' }));
       }
     } catch (e) { /* 橋接失敗就靜默,不影響網頁 */ }
     return false;
