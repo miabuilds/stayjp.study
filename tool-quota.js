@@ -46,6 +46,15 @@
   let cachedFreeAccess = false;   // free_users/{uid} 存在 = 管理員授予免費(在 admin 後台加白名單)
   let authReady = false;
   let subLoaded = false;   // 登入用戶的訂閱 doc 是否已載入(避免載入空窗誤判免費 → 訂閱者跳額度 badge)
+  let cachedTrialStart = null;   // 免費試用起始(ms);登入用戶享 TRIAL_DAYS 天全功能無限
+  const TRIAL_DAYS = 3;
+  function inTrial() {
+    return cachedTrialStart != null && Date.now() < cachedTrialStart + TRIAL_DAYS * 86400000;
+  }
+  function trialDaysLeft() {
+    if (cachedTrialStart == null) return 0;
+    return Math.max(0, Math.ceil((cachedTrialStart + TRIAL_DAYS * 86400000 - Date.now()) / 86400000));
+  }
 
   function isPremium() {
     if (!cachedSub) return false;
@@ -56,6 +65,7 @@
     if (!authReady) return false;     // 等 auth 狀態確定再決定,避免閃一下
     if (cachedUserEmail && !subLoaded) return false;  // 登入用戶:訂閱狀態還沒載完前先不擋(訂閱者 doc 載入慢時不會誤跳額度 badge)
     if (isPremium()) return false;     // 付費用戶(登入 + 有效訂閱)→ 不擋
+    if (inTrial()) return false;       // 登入用戶 3 天全功能免費試用 → 不擋
     if (cachedUserEmail && QUOTA_WHITELIST.has(cachedUserEmail.toLowerCase())) return false;  // owner / 免費白名單帳號 → 永遠免擋
     if (cachedFreeAccess) return false;  // 管理員後台授予免費(free_users/{uid})→ 免擋
     if (!LAUNCHED) return false;       // 未開閘:過渡期不 gate 任何真實用戶(開閘時把 LAUNCHED 改 true)
@@ -161,7 +171,8 @@
   // ── UI badge（只 owner 看得到）──
   function refreshBadge() {
     let badge = document.getElementById('quotaBadge');
-    if (!shouldGate()) { if (badge) badge.remove(); return; }
+    const trial = inTrial();
+    if (!trial && !shouldGate()) { if (badge) badge.remove(); return; }
     if (!badge) {
       badge = document.createElement('div');
       badge.id = 'quotaBadge';
@@ -170,6 +181,12 @@
       badge.title = '免費版每日額度。點擊查看訂閱方案。';
       badge.onclick = () => window.location.href = 'pricing.html';
       document.body.appendChild(badge);
+    }
+    if (trial) {
+      badge.title = '免費試用中,全功能無限。點擊查看訂閱方案。';
+      badge.innerHTML = '<div style="font-weight:700;margin-bottom:2px">✨ 免費試用中・剩 ' + trialDaysLeft() + ' 天</div>'
+        + '<div style="color:#FCD34D">全工具無限使用,試用後升級鎖價 →</div>';
+      return;
     }
     const c = loadCount();
     const usedTools = Object.keys(TOOL_NAMES).filter(t => (c[t] || 0) >= PER_TOOL_LIMIT);
@@ -195,7 +212,18 @@
         .catch(() => {});
       // 開閘版:所有登入用戶都監聽訂閱(才偵測得到 premium → 免擋)
       firebase.firestore().doc('users/' + user.uid).onSnapshot(snap => {
-        cachedSub = snap.data()?.subscription || null;
+        const data = snap.data() || {};
+        cachedSub = data.subscription || null;
+        // 免費試用:讀 trial_started_at(server 時戳);沒有 + 非付費 → 第一次登入即開啟 3 天試用(只設一次)
+        const ts = data.trial_started_at;
+        if (ts && typeof ts.toMillis === 'function') cachedTrialStart = ts.toMillis();
+        else if (ts && ts.seconds) cachedTrialStart = ts.seconds * 1000;
+        else if (!ts && !isPremium()) {
+          cachedTrialStart = Date.now();   // 樂觀:本機先當作現在開始(server 回來後以 server 時戳為準)
+          firebase.firestore().doc('users/' + user.uid)
+            .set({ trial_started_at: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true })
+            .catch(() => {});
+        }
         subLoaded = true;
         refreshBadge();
         applyGating();
