@@ -303,14 +303,27 @@ a:hover{text-decoration:underline}
           '<p style="color:var(--tx2);margin:0 0 22px;line-height:1.7">解鎖無限次 SRS／跟讀／動詞變化練習 + 完整模擬考 + 跨裝置同步。</p>' +
           '<button id="iapGo" style="width:100%;padding:14px;background:var(--ac);color:#fff;border:0;border-radius:10px;font-weight:600;font-size:15px;cursor:pointer">查看方案 / 訂閱</button>' +
           '</div>';
-        document.getElementById('iapGo').onclick = function(){
+        function iapOpen(){
           try {
             if (!(window.ReactNativeWebView && window.ReactNativeWebView.postMessage)) return;
             var u = (window.firebase && firebase.auth && firebase.auth().currentUser) || null;
-            // 未登入 → 直接彈原生登入選單(登入後再點才進 paywall),不跳死路頁
+            // 登入了 → 直接開 paywall;沒登入 → 彈原生登入選單(intent:subscribe;web.tsx 登入後會自動接著開 paywall)。
             window.ReactNativeWebView.postMessage(JSON.stringify(u ? { type: 'OPEN_PAYWALL' } : { type: 'OPEN_LOGIN', intent: 'subscribe' }));
           } catch(_) {}
-        };
+        }
+        document.getElementById('iapGo').onclick = iapOpen;
+        // 不要停在「升級 Premium → 查看方案」這層中間頁(脫褲子放屁):
+        // 等 Firebase 還原登入狀態後自動開一次(直達 paywall / 登入)。按鈕留著當「再開一次」fallback。
+        try {
+          if (window.firebase && firebase.auth) {
+            var _fired = false;
+            var _off = firebase.auth().onAuthStateChanged(function(){
+              if (_fired) return; _fired = true;
+              try { if (_off) _off(); } catch(_) {}
+              iapOpen();
+            });
+          } else { iapOpen(); }
+        } catch(_) { iapOpen(); }
       } catch(_) {}
     }
     // 一定要等整頁解析完才清,否則「訂閱規則」等後段內容會在 innerHTML 替換後才被解析、又接回 main(綠界字眼重現)。
