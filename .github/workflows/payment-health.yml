@@ -3,6 +3,17 @@ name: Payment health (daily)
 # 每天自動驗金流可用,異常就讓這個 job 失敗 → GitHub 自動寄信給 repo 擁有者。
 # 涵蓋過去事故類型:頁面壞 / 訂閱鈕 JS 壞 / function 掛 / 綠界設定錯 / 收了錢沒開通。
 on:
+  push:
+    branches: [main]
+    paths:
+      - 'pricing.html'
+      - 'index.html'
+      - 'account.html'
+      - 'home.html'
+      - 'tool-quota.js'
+      - 'auth-header.js'
+      - 'scripts/check-inline-js.js'
+      - '.github/workflows/payment-health.yml'
   schedule:
     - cron: "0 0 * * *"   # 每天 00:00 UTC = 台灣 08:00
   workflow_dispatch: {}    # 也可手動觸發
@@ -11,6 +22,9 @@ jobs:
   health:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
+      - name: 內嵌 JS 語法檢查(防 var 撞名等語法錯弄死整段金流 JS — 字串式檢查抓不到)
+        run: node scripts/check-inline-js.js
       - name: 金流頁載得到 + 訂閱鈕 JS 還在
         run: |
           html=$(curl -fsS --max-time 20 https://stayjp.study/pricing.html) || {
