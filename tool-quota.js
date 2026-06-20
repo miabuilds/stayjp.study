@@ -47,6 +47,7 @@
   let authReady = false;
   let subLoaded = false;   // 登入用戶的訂閱 doc 是否已載入(避免載入空窗誤判免費 → 訂閱者跳額度 badge)
   let cachedTrialStart = null;   // 免費試用起始(ms);登入用戶享 TRIAL_DAYS 天全功能無限
+  let trialWriteDone = false;    // 防呆:trial_started_at 一個 session 只寫一次(避免 serverTimestamp pending 期間重複寫)
   const TRIAL_DAYS = 3;
   function inTrial() {
     return cachedTrialStart != null && Date.now() < cachedTrialStart + TRIAL_DAYS * 86400000;
@@ -201,6 +202,7 @@
     if (typeof firebase === 'undefined' || !firebase.auth) return;
     firebase.auth().onAuthStateChanged(user => {
       authReady = true;
+      cachedTrialStart = null; trialWriteDone = false;   // 換帳號/登出 → 重置試用狀態,重新依該 user 的 doc 評估
       if (!user) { cachedUserEmail = null; cachedSub = null; cachedFreeAccess = false; subLoaded = true; refreshBadge(); return; }
       cachedUserEmail = user.email || null;
       subLoaded = false;   // 換 user → 重新等這個 user 的訂閱載入
@@ -219,10 +221,14 @@
         if (ts && typeof ts.toMillis === 'function') cachedTrialStart = ts.toMillis();
         else if (ts && ts.seconds) cachedTrialStart = ts.seconds * 1000;
         else if (!ts && !isPremium()) {
-          cachedTrialStart = Date.now();   // 樂觀:本機先當作現在開始(server 回來後以 server 時戳為準)
-          firebase.firestore().doc('users/' + user.uid)
-            .set({ trial_started_at: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true })
-            .catch(() => {});
+          cachedTrialStart = cachedTrialStart || Date.now();   // 樂觀:本機先當現在開始(只設一次,server 回來以 server 時戳為準)
+          // 只在「尚未寫過 + 沒有 pending 寫入」時寫,避免 serverTimestamp pending 期間重複觸發
+          if (!trialWriteDone && !(snap.metadata && snap.metadata.hasPendingWrites)) {
+            trialWriteDone = true;
+            firebase.firestore().doc('users/' + user.uid)
+              .set({ trial_started_at: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true })
+              .catch(() => {});
+          }
         }
         subLoaded = true;
         refreshBadge();
@@ -331,6 +337,9 @@
     consumeShadowOrBlock,
     refreshBadge,
     _resetToday: () => { localStorage.removeItem('tool_usage_' + dateKey()); refreshBadge(); },
+    // 測試用:模擬試用已結束(本機,重整即恢復)→ 可立刻測「免費版額度 + 🔒 鎖定」流程,不用等 3 天
+    _endTrial: () => { cachedTrialStart = Date.now() - (TRIAL_DAYS + 1) * 86400000; refreshBadge(); },
+    _trialInfo: () => ({ start: cachedTrialStart, inTrial: inTrial(), daysLeft: trialDaysLeft(), premium: isPremium() }),
     _resetMock: () => {
       ['n5','n4','n3','n2','n1'].forEach(lv => localStorage.removeItem('mock_completed_' + lv));
       refreshBadge();
