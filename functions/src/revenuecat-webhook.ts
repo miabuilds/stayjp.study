@@ -148,6 +148,26 @@ export const revenuecatWebhook = functions.onRequest(
           break;
         }
 
+        // Apple/Google 退款或退單(信用卡爭議)。RevenueCat 送 REFUND;
+        // 沒處理的話 doc 會停在 status:active、expiresAt 未來 → 退款後仍能無限用(漏財紅線)。
+        // 立即收回:status→refunded、willRenew→false、expiresAt→now(isPremium 立刻判定失效)。
+        case "REFUND":
+        case "CHARGEBACK": {
+          await patchSubscription(uid, { status: "refunded", willRenew: false, expiresAt: nowMs() });
+          await writeTransaction({
+            uid,
+            type: "refund",
+            source: "app",
+            plan,
+            amount_twd: 0,
+            payment_method: event.store === "PLAY_STORE" ? "google_billing" : "apple_iap",
+            external_id: event.transaction_id || event.original_transaction_id || "",
+            status: "refunded",
+            note: `RevenueCat ${type} — access revoked`,
+          });
+          break;
+        }
+
         default:
           console.log("Unhandled RevenueCat event type:", type);
       }
