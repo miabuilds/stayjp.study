@@ -135,7 +135,8 @@
       // 發 OPEN_LOGIN → 原生彈登入選單(Google / Apple 由用戶選),不在網頁端預設提供者。
       try {
         if (window.ReactNativeWebView && window.ReactNativeWebView.postMessage) {
-          window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'OPEN_LOGIN' }));
+          var _lng = (window.localStorage && localStorage.getItem('ui_lang')) || 'zh-TW';
+          window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'OPEN_LOGIN', lang: _lng }));
         }
       } catch (e) { /* 橋接失敗就靜默 */ }
       return Promise.reject({ code: 'auth/popup-closed-by-user', message: 'stayjp-native-login-bridge' });

@@ -307,8 +307,10 @@ a:hover{text-decoration:underline}
           try {
             if (!(window.ReactNativeWebView && window.ReactNativeWebView.postMessage)) return;
             var u = (window.firebase && firebase.auth && firebase.auth().currentUser) || null;
+            var _lng = (window.localStorage && localStorage.getItem('ui_lang')) || 'zh-TW';
             // 登入了 → 直接開 paywall;沒登入 → 彈原生登入選單(intent:subscribe;web.tsx 登入後會自動接著開 paywall)。
-            window.ReactNativeWebView.postMessage(JSON.stringify(u ? { type: 'OPEN_PAYWALL' } : { type: 'OPEN_LOGIN', intent: 'subscribe' }));
+            // 帶 lang → 原生 paywall 跟著繁/簡(否則原生永遠繁中)。
+            window.ReactNativeWebView.postMessage(JSON.stringify(u ? { type: 'OPEN_PAYWALL', lang: _lng } : { type: 'OPEN_LOGIN', intent: 'subscribe', lang: _lng }));
           } catch(_) {}
         }
         document.getElementById('iapGo').onclick = iapOpen;
@@ -751,7 +753,8 @@ async function startSubscribe(btn) {
       if (window.ReactNativeWebView && window.ReactNativeWebView.postMessage) {
         // 未登入 → 先彈原生登入選單(登入後再點才進 paywall),不讓買到匿名帳號
         var _su = (window.firebase && firebase.auth && firebase.auth().currentUser) || null;
-        window.ReactNativeWebView.postMessage(JSON.stringify(_su ? { type: 'OPEN_PAYWALL', plan } : { type: 'OPEN_LOGIN', intent: 'subscribe' }));
+        var _slng = (window.localStorage && localStorage.getItem('ui_lang')) || 'zh-TW';
+        window.ReactNativeWebView.postMessage(JSON.stringify(_su ? { type: 'OPEN_PAYWALL', plan, lang: _slng } : { type: 'OPEN_LOGIN', intent: 'subscribe', lang: _slng }));
       }
     } catch (e) { /* 橋接失敗就靜默,不影響網頁 */ }
     return false;
