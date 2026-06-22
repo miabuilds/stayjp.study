@@ -143,6 +143,29 @@
     };
   }
 
+  // App 內:全站攔截「查看方案/訂閱」連結(連到 pricing)→ 直接開原生 paywall,
+  // 不載入網頁金流頁。否則導去 pricing.html 會閃一下「升級 Premium / 查看方案」中間頁(scrub)再彈 paywall(脫褲子放屁)。
+  // capture 階段攔 + stopPropagation:蓋過各頁自己的 pricing 連結處理(如 account.html),避免重複開。
+  function patchPricingLinks() {
+    if (!(window.STAYJP_NATIVE && window.STAYJP_NATIVE.isNativeApp)) return;
+    document.addEventListener('click', function (e) {
+      var a = e.target && e.target.closest ? e.target.closest('a[href]') : null;
+      if (!a) return;
+      var href = a.getAttribute('href') || '';
+      if (!/(^|\/)pricing(\.html)?(\?|#|$)/.test(href)) return;   // 只攔 pricing 連結
+      e.preventDefault();
+      e.stopPropagation();
+      try {
+        if (!(window.ReactNativeWebView && window.ReactNativeWebView.postMessage)) return;
+        var u = (window.firebase && firebase.auth && firebase.auth().currentUser) || null;
+        var lng = (window.localStorage && localStorage.getItem('ui_lang')) || 'zh-TW';
+        window.ReactNativeWebView.postMessage(JSON.stringify(u
+          ? { type: 'OPEN_PAYWALL', lang: lng }
+          : { type: 'OPEN_LOGIN', intent: 'subscribe', lang: lng }));
+      } catch (_) {}
+    }, true);
+  }
+
   function login() {
     if (isInApp()) {
       alert('你正在 App 內建瀏覽器(Line／IG／Threads／FB／微信 等)開啟本站,Google 登入會被擋。\n\n請改用 Safari 或 Chrome:\n點右上／右下的「⋯」或「⋮」→ 選「在預設瀏覽器開啟」,再登入即可。');
@@ -165,6 +188,7 @@
     try { auth = await ensureFirebase(); }
     catch (e) { console.warn('[auth-header] firebase load fail', e); return; }
     patchNativeLogin();
+    patchPricingLinks();
     area = document.createElement('div');
     area.className = 'ahx-area';
     area.id = 'ahxArea';
