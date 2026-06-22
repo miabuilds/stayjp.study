@@ -228,13 +228,16 @@
         if (ts && typeof ts.toMillis === 'function') cachedTrialStart = ts.toMillis();
         else if (ts && ts.seconds) cachedTrialStart = ts.seconds * 1000;
         else if (!ts && !isPremium()) {
-          cachedTrialStart = cachedTrialStart || Date.now();   // 樂觀:本機先當現在開始(只設一次,server 回來以 server 時戳為準)
-          // 只在「尚未寫過 + 沒有 pending 寫入」時寫,避免 serverTimestamp pending 期間重複觸發
+          // 改由後端 startTrial 決定資格:同一個 email(gmail 去點/去+別名)用過試用就不再發 →
+          // 刪帳號重辦同信箱無效。後端寫 trial_started_at,這個 onSnapshot 會再回來帶起試用。
+          // 不再本機樂觀開試用(避免「用過的人」短暫看到試用、也防鑽)。
           if (!trialWriteDone && !(snap.metadata && snap.metadata.hasPendingWrites)) {
             trialWriteDone = true;
-            firebase.firestore().doc('users/' + user.uid)
-              .set({ trial_started_at: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true })
-              .catch(() => {});
+            user.getIdToken().then(function (tok) {
+              return fetch('https://asia-east1-jpnote-1bdd6.cloudfunctions.net/startTrial', {
+                method: 'POST', headers: { Authorization: 'Bearer ' + tok }
+              });
+            }).catch(function () {});
           }
         }
         subLoaded = true;

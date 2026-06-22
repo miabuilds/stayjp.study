@@ -18,12 +18,18 @@ service cloud.firestore {
                     request.auth.uid == userId ||
                     request.auth.token.email in ['stayjpplan@gmail.com', 'abc83327@gmail.com']
                   );
-      // 本人可寫自己的 doc(srs_data/收藏/streak…),但「subscription 欄位禁止 client 寫」
-      // —— 訂閱只准 Cloud Function (Admin SDK 繞過規則) 寫,防止有人改 console 自己白嫖 premium。
+      // 本人可寫自己的 doc(srs_data/收藏/streak…),但「subscription」與「trial_started_at」禁止 client 寫
+      // —— 訂閱與試用起始只准 Cloud Function (Admin SDK 繞過規則) 寫,防止有人改 console 自己白嫖 / 重發試用。
       allow create: if request.auth != null && request.auth.uid == userId
-                    && !('subscription' in request.resource.data);
+                    && !('subscription' in request.resource.data)
+                    && !('trial_started_at' in request.resource.data);
       allow update: if request.auth != null && request.auth.uid == userId
-                    && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['subscription']);
+                    && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['subscription', 'trial_started_at']);
+    }
+
+    // 用過試用的 email 記錄(startTrial 後端寫)— client 完全碰不到,防鑽試用。
+    match /trial_used/{key} {
+      allow read, write: if false;
     }
 
     // 訂閱交易帳本 — Cloud Function 寫,admin + 用戶自己讀
