@@ -68,12 +68,21 @@ export const revenuecatWebhook = functions.onRequest(
           if (plan === "yearly_early_bird" && type === "INITIAL_PURCHASE") {
             await tryReserveEarlyBird();
           }
-          const isEarlyBird = plan === "yearly_early_bird" || existingSub?.is_early_bird === true;
+          // 防呆:access 只增不減。理論上 Apple 同訂閱群組只允許一個有效訂閱,但若群組設錯 /
+          // sandbox 殘留 / 事件亂序,導致一個用戶多個訂閱事件競爭時,不讓「較短的續訂」蓋掉
+          // 「較晚到期的有效訂閱」。仍照常記帳本(稽核),但當前訂閱保留較長有效期 + 該方案身分,
+          // 避免到期日/方案在事件間跳動、誤縮短權益。
+          const newExpiry = plusDays(nowMs(), planInfo.period_days);
+          const keepExisting = !!existingSub && existingSub.status !== "expired"
+            && (existingSub.expiresAt || 0) > newExpiry;
+          const finalPlan = keepExisting ? existingSub!.plan : plan;
+          const finalExpiry = keepExisting ? existingSub!.expiresAt : newExpiry;
+          const isEarlyBird = finalPlan === "yearly_early_bird" || existingSub?.is_early_bird === true;
           const newSub: SubscriptionDoc = {
             source: "app",
-            plan,
+            plan: finalPlan,
             status: "active",
-            expiresAt: plusDays(nowMs(), planInfo.period_days),
+            expiresAt: finalExpiry,
             willRenew: true,
             startedAt: existingSub?.startedAt || nowMs(),
             apple_txn: event.transaction_id,
