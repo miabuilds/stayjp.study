@@ -52,6 +52,12 @@ export const adminPurgeTest = functions.onRequest(
         catch { log.push(`ℹ ${em} 查無 Auth 帳號(可能已刪),用寫死 uid`); }
       }
 
+      // 可選:owner 從帳本「清此帳號」按鈕指定單一 uid 清除。
+      // uid 是從畫面點選的那一列帶來的(非自由輸入 → 不會 typo 誤刪),且這支已 owner-only。
+      // 用途:清測試殘留 / 已刪帳號的孤兒交易(email 已查不到 uid 的情況,如 ANeqpJUCaC)。
+      const bodyUid = (req.body && typeof req.body.uid === "string") ? req.body.uid.trim() : "";
+      if (bodyUid) { uids.add(bodyUid); log.push(`ℹ 指定清除 uid: ${bodyUid}`); }
+
       let totalTxn = 0;
       for (const uid of uids) {
         // 1. subscription 欄位

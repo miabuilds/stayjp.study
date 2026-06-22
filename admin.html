@@ -744,6 +744,25 @@ async function purgeTest() {
   } catch (e) { msg.textContent = '錯誤:' + e.message; msg.style.color = '#EF4444'; }
 }
 
+// 帳本單列「清此帳號」:清掉這個 uid 的訂閱+全部交易(owner 操作)。
+// uid 從點選的列帶來(非自由輸入),用於清測試殘留 / 已刪帳號的孤兒交易(email 查不到 uid 的情況)。
+async function purgeUid(uid) {
+  if (!uid) return;
+  if (!confirm('清除此帳號的「訂閱 + 全部交易」?\n\nuid: ' + uid + '\n\n⚠️ 請確認這是測試/孤兒帳號,不是真客人。不可復原。')) return;
+  try {
+    const t = await auth.currentUser.getIdToken();
+    const r = await fetch(FN_PURGE_TEST, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + t },
+      body: JSON.stringify({ uid }),
+    });
+    const d = await r.json();
+    if (!r.ok) { alert('清除失敗:' + (d.error || r.status)); return; }
+    alert('✓ 已清除 ' + uid + '\n交易 ' + (d.deletedTxns || 0) + ' 筆,早鳥校正為 ' + d.earlyBird);
+    renderLedger(); renderStats();
+  } catch (e) { alert('清除失敗:' + e.message); }
+}
+
 // 帳本匯出用:renderLedger 載入時收集,exportLedgerCSV 下載。
 let _ledgerExport = [];
 function exportLedgerCSV() {
@@ -811,6 +830,7 @@ async function renderLedger() {
         <td style="padding:6px 6px;white-space:nowrap">${PAY_TXT[x.payment_method] || x.payment_method || '—'}</td>
         <td style="padding:6px 6px">${TXN_STATUS_TXT[x.status] || x.status}</td>
         <td style="padding:6px 6px;color:var(--tx3);font-size:11px;word-break:break-all">${esc(x.external_id || '—')}</td>
+        <td style="padding:6px 6px;white-space:nowrap"><button onclick="purgeUid('${esc(x.uid)}')" style="font-size:10px;padding:2px 7px;border:1px solid var(--bd);border-radius:6px;background:transparent;color:#EF4444;cursor:pointer" title="清除此 uid 的訂閱+全部交易(owner 操作,確認是測試/孤兒帳號)">清此帳號</button></td>
       </tr>`;
     }).join('');
     totalsEl.innerHTML = `
@@ -821,7 +841,7 @@ async function renderLedger() {
     box.innerHTML = `<table style="width:100%;border-collapse:collapse;min-width:680px">
       <thead><tr style="text-align:left;color:var(--tx2);border-bottom:1px solid var(--bd)">
         <th style="padding:6px 6px">時間</th><th style="padding:6px 6px">帳號</th><th style="padding:6px 6px">類型</th>
-        <th style="padding:6px 6px">方案</th><th style="padding:6px 6px;text-align:right">金額</th><th style="padding:6px 6px">來源</th><th style="padding:6px 6px">狀態</th><th style="padding:6px 6px">單號</th>
+        <th style="padding:6px 6px">方案</th><th style="padding:6px 6px;text-align:right">金額</th><th style="padding:6px 6px">來源</th><th style="padding:6px 6px">狀態</th><th style="padding:6px 6px">單號</th><th style="padding:6px 6px"></th>
       </tr></thead><tbody>${rows}</tbody></table>`;
   } catch (e) { box.textContent = '讀取失敗:' + e.message; }
 }
