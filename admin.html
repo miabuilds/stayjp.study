@@ -732,7 +732,7 @@ async function cleanupPending() {
 // 清除「寫死的測試帳號」資料(交易+訂閱+pending)並校正早鳥。後端寫死 allowlist,不可能誤刪真客人。
 async function purgeTest() {
   const msg = document.getElementById('cleanupMsg');
-  if (!confirm('清除 2 個測試帳號(knv2dycg8z / yujoulinforwork)的交易+訂閱,並校正早鳥名額?\n(只清這 2 個寫死帳號,不影響真客人;不可復原)')) return;
+  if (!confirm('隱藏 2 個測試帳號(knv2dycg8z / yujoulinforwork)的交易+訂閱,並校正早鳥名額?\n(假刪除:資料保留可復原,只動這 2 個寫死帳號,不影響真客人)')) return;
   msg.textContent = '清理中…'; msg.style.color = 'var(--tx2)';
   try {
     const t = await auth.currentUser.getIdToken();
@@ -748,7 +748,7 @@ async function purgeTest() {
 // uid 從點選的列帶來(非自由輸入),用於清測試殘留 / 已刪帳號的孤兒交易(email 查不到 uid 的情況)。
 async function purgeUid(uid) {
   if (!uid) return;
-  if (!confirm('清除此帳號的「訂閱 + 全部交易」?\n\nuid: ' + uid + '\n\n⚠️ 請確認這是測試/孤兒帳號,不是真客人。不可復原。')) return;
+  if (!confirm('隱藏此帳號的「訂閱 + 全部交易」?(假刪除,資料保留可復原)\n\nuid: ' + uid + '\n\n訂閱會設為 voided(撤銷 premium)、交易標記隱藏 → 從帳本消失但不真刪。')) return;
   try {
     const t = await auth.currentUser.getIdToken();
     const r = await fetch(FN_PURGE_TEST, {
@@ -758,7 +758,7 @@ async function purgeUid(uid) {
     });
     const d = await r.json();
     if (!r.ok) { alert('清除失敗:' + (d.error || r.status)); return; }
-    alert('✓ 已清除 ' + uid + '\n交易 ' + (d.deletedTxns || 0) + ' 筆,早鳥校正為 ' + d.earlyBird);
+    alert('✓ 已隱藏(假刪)' + uid + '\n交易 ' + (d.deletedTxns || 0) + ' 筆,早鳥校正為 ' + d.earlyBird + '\n(資料保留,需要可復原)');
     renderLedger(); renderStats();
   } catch (e) { alert('清除失敗:' + e.message); }
 }
@@ -796,13 +796,14 @@ async function renderLedger() {
   } catch (e) {}
   try {
     const snap = await db.collection('transactions').orderBy('occurred_at', 'desc').limit(2000).get();
-    cnt.textContent = `共 ${snap.size} 筆`;
+    const visibleDocs = snap.docs.filter(dd => !dd.data().hidden);   // 假刪除(hidden)的不顯示、不計入
+    cnt.textContent = `共 ${visibleDocs.length} 筆`;
     let rev = 0, refund = 0, pending = 0;
     const fmt = ts => ts && ts.toDate ? ts.toDate().toLocaleString('zh-TW', { hour12: false }) : '—';
     const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
     const PAY_TXT = { ecpay: '綠界', manual: '手動', apple_iap: 'Apple / iOS', google_billing: 'Google Play', paypal: 'PayPal' };
     _ledgerExport = [];
-    const rows = snap.docs.map(dd => {
+    const rows = visibleDocs.map(dd => {
       const x = dd.data();
       const amt = x.amount_twd || 0;
       _ledgerExport.push({
@@ -830,7 +831,7 @@ async function renderLedger() {
         <td style="padding:6px 6px;white-space:nowrap">${PAY_TXT[x.payment_method] || x.payment_method || '—'}</td>
         <td style="padding:6px 6px">${TXN_STATUS_TXT[x.status] || x.status}</td>
         <td style="padding:6px 6px;color:var(--tx3);font-size:11px;word-break:break-all">${esc(x.external_id || '—')}</td>
-        <td style="padding:6px 6px;white-space:nowrap"><button onclick="purgeUid('${esc(x.uid)}')" style="font-size:10px;padding:2px 7px;border:1px solid var(--bd);border-radius:6px;background:transparent;color:#EF4444;cursor:pointer" title="清除此 uid 的訂閱+全部交易(owner 操作,確認是測試/孤兒帳號)">清此帳號</button></td>
+        <td style="padding:6px 6px;white-space:nowrap"><button onclick="purgeUid('${esc(x.uid)}')" style="font-size:10px;padding:2px 7px;border:1px solid var(--bd);border-radius:6px;background:transparent;color:#EF4444;cursor:pointer" title="假刪除此 uid 的訂閱+全部交易(隱藏、可復原;owner 操作)">隱藏此帳號</button></td>
       </tr>`;
     }).join('');
     totalsEl.innerHTML = `
