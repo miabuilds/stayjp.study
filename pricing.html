@@ -297,12 +297,10 @@ a:hover{text-decoration:underline}
         if (!(window.STAYJP_NATIVE && window.STAYJP_NATIVE.isNativeApp)) return;
         var main = document.querySelector('main.main');
         if (!main) return;
+        // App 內不渲染「升級 Premium」卡(避免被導到本頁時閃那張中間頁);只放中性 placeholder,
+        // 馬上自動開原生 paywall。placeholder 可點當 fallback(萬一 auto-open 沒觸發)。
         main.innerHTML =
-          '<div class="box" style="max-width:480px;margin:40px auto;text-align:center">' +
-          '<h2 style="margin:0 0 12px">升級 Premium</h2>' +
-          '<p style="color:var(--tx2);margin:0 0 22px;line-height:1.7">解鎖無限次 SRS／跟讀／動詞變化練習 + 完整模擬考 + 跨裝置同步。</p>' +
-          '<button id="iapGo" style="width:100%;padding:14px;background:var(--ac);color:#fff;border:0;border-radius:10px;font-weight:600;font-size:15px;cursor:pointer">查看方案 / 訂閱</button>' +
-          '</div>';
+          '<div id="iapGo" style="max-width:480px;margin:80px auto;text-align:center;color:var(--tx2);cursor:pointer">載入方案中…</div>';
         function iapOpen(){
           try {
             if (!(window.ReactNativeWebView && window.ReactNativeWebView.postMessage)) return;
