@@ -189,9 +189,16 @@ const Quiz = (() => {
     if (ok) {
       setTimeout(advance, 700);   // 答對 → 自動跳下一題(順、不用多按)
     } else {
-      // 答錯 → 不自動跳,讓使用者慢慢看正解;把「送出」換成「下一題 →」,聚焦讓 Enter 也能前進
+      // 答錯 → 不自動跳,讓使用者看清正解(含假名讀音)後再前進。
+      // 防呆:剛剛「送出」用的那次 Enter(尤其長按 auto-repeat)會順勢按下這顆剛聚焦的按鈕,
+      // 害正解一閃即過(harry 回饋:enter 出現錯誤時間過短)。先把 onclick 設 null,延遲後才綁定
+      // 前進 + 聚焦,讓那次按鍵先結束;之後再按 Enter / 點按鈕才會前進 → 與滑鼠操作一致。
       const btn = document.querySelector('#quizBox .qstart');
-      if (btn) { btn.textContent = '下一題 →'; btn.onclick = advance; btn.focus(); }
+      if (btn) {
+        btn.textContent = '下一題 →';
+        btn.onclick = null;
+        setTimeout(() => { btn.onclick = advance; btn.focus(); }, 450);
+      }
     }
   }
 

@@ -429,13 +429,14 @@ const FlashCard = (() => {
     if (typeof SRS !== 'undefined' && SRS.recordGrade) SRS.recordGrade(level, item.w, grade);
     if (typeof Calendar !== 'undefined') Calendar.logActivity('vocab');
 
-    // 本輪內重現（不熟/不會）
+    // 本輪內重現（不熟/不會）→ 排到「本輪佇列尾端」,等這批跑完再回來。
+    // 間隔效應:隔幾張就重現會造成「流暢性錯覺」(靠短期記憶回聲答對,非真記住);
+    // 放到尾端(約隔整批)逼使用者從較長期記憶提取,記得更牢,也少了「怎麼又是它」的煩躁。
+    // (harry 回饋;REQUEUE_OFFSET 改不再使用,保留定義不影響。)
     if (grade !== 'known') {
       const tries = reappearCount[item.w] || 0;
       if (tries < MAX_REAPPEAR) {
-        const offset = REQUEUE_OFFSET[grade] || 3;
-        const insertAt = Math.min(queue.length, cur + 1 + offset);
-        queue.splice(insertAt, 0, item);
+        queue.push(item);   // 放到佇列尾端
         reappearCount[item.w] = tries + 1;
       }
     }
