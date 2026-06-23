@@ -186,9 +186,21 @@
       document.body.appendChild(badge);
     }
     if (trial) {
+      const daysLeft = trialDaysLeft();
       badge.title = '免費試用中,全功能無限。點擊查看訂閱方案。';
-      badge.innerHTML = '<div style="font-weight:700;margin-bottom:2px">✨ 免費試用中・剩 ' + trialDaysLeft() + ' 天</div>'
-        + '<div style="color:#FCD34D">全工具無限使用,試用後升級鎖價 →</div>';
+      // 最後一天 → 換成緊迫感文案吸引升級(badge 本來就可點 → pricing /(App 內)開 paywall)
+      badge.innerHTML = daysLeft <= 1
+        ? '<div style="font-weight:700;margin-bottom:2px;color:#FCA5A5">⏰ 試用最後 ' + daysLeft + ' 天</div>'
+          + '<div style="color:#FCD34D">升級 Premium 鎖優惠價,繼續無限使用 →</div>'
+        : '<div style="font-weight:700;margin-bottom:2px">✨ 免費試用中・剩 ' + daysLeft + ' 天</div>'
+          + '<div style="color:#FCD34D">全工具無限使用,試用後升級鎖價 →</div>';
+      return;
+    }
+    // 試用已結束(這個帳號曾開過試用、現已過期、非付費)→ 轉換提示,取代一般免費版 badge
+    if (cachedTrialStart != null && !isPremium()) {
+      badge.title = '3 天試用已結束。點擊升級,解鎖無限練習。';
+      badge.innerHTML = '<div style="font-weight:700;margin-bottom:2px">✨ 3 天試用已結束</div>'
+        + '<div style="color:#FCD34D">升級 Premium 解鎖無限練習 →</div>';
       return;
     }
     const c = loadCount();
