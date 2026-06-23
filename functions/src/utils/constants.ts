@@ -32,7 +32,7 @@ export const PLANS: Record<PlanKey, {
   display_name: string;
 }> = {
   monthly: {
-    price_twd: 149,
+    price_twd: 150,
     period_days: 30,
     ecpay_period_type: "M",
     ecpay_frequency: 1,
