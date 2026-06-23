@@ -185,7 +185,14 @@ const Quiz = (() => {
       inp.style.borderColor = '#EF4444';
       if (fb) fb.innerHTML = `<span style="color:#EF4444">✗ ${t('ty_correct_is')}：<b>${q.word.r}</b></span>　<span style="color:var(--tx2)">${typingDiffHint(typed, q.word.r)}</span>`;
     }
-    setTimeout(() => { current++; current >= questions.length ? showResults() : renderQ(); }, ok ? 700 : 1700);
+    const advance = () => { current++; current >= questions.length ? showResults() : renderQ(); };
+    if (ok) {
+      setTimeout(advance, 700);   // 答對 → 自動跳下一題(順、不用多按)
+    } else {
+      // 答錯 → 不自動跳,讓使用者慢慢看正解;把「送出」換成「下一題 →」,聚焦讓 Enter 也能前進
+      const btn = document.querySelector('#quizBox .qstart');
+      if (btn) { btn.textContent = '下一題 →'; btn.onclick = advance; btn.focus(); }
+    }
   }
 
   function renderQ() {
