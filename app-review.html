@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>StayJP App 全面 Review</title>
+<style>
+  :root{--bg:#0f1729;--card:#172339;--tx:#e8eef7;--tx2:#9fb0c8;--ac:#e0563f;--line:#26344f;
+    --crit:#ff5a5a;--high:#ff9f43;--med:#ffd24a;--low:#6fd3a0;--done:#5ad17a;}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.65 -apple-system,"PingFang TC","Microsoft JhengHei",system-ui,sans-serif;padding:24px 16px 64px}
+  .wrap{max-width:860px;margin:0 auto}
+  h1{font-size:26px;margin:0 0 4px;letter-spacing:-.4px}
+  .sub{color:var(--tx2);margin:0 0 24px;font-size:14px}
+  .summary{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 20px;margin-bottom:28px}
+  .summary h2{margin:0 0 10px;font-size:16px}
+  .counts{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+  .pill{padding:4px 12px;border-radius:999px;font-size:13px;font-weight:700}
+  .pill.c{background:rgba(255,90,90,.16);color:var(--crit)}
+  .pill.h{background:rgba(255,159,67,.16);color:var(--high)}
+  .pill.m{background:rgba(255,210,74,.14);color:var(--med)}
+  .pill.l{background:rgba(111,211,160,.14);color:var(--low)}
+  .top5{margin:0;padding-left:20px}.top5 li{margin-bottom:6px}
+  h2.sec{font-size:19px;margin:32px 0 12px;padding-left:11px;border-left:4px solid var(--ac)}
+  .f{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:12px}
+  .f .hd{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:7px}
+  .sev{font-size:11px;font-weight:800;padding:2px 9px;border-radius:6px;text-transform:uppercase;letter-spacing:.3px}
+  .sev.crit{background:var(--crit);color:#3a0000}.sev.high{background:var(--high);color:#3a1c00}
+  .sev.med{background:var(--med);color:#3a3000}.sev.low{background:var(--low);color:#003020}
+  .loc{font-family:ui-monospace,Menlo,monospace;font-size:12px;color:var(--tx2);word-break:break-all}
+  .st{margin-left:auto;font-size:11px;font-weight:700;padding:2px 9px;border-radius:6px;white-space:nowrap}
+  .st.fix{background:rgba(90,209,122,.16);color:var(--done)}
+  .st.dec{background:rgba(159,176,200,.16);color:var(--tx2)}
+  .f .ti{font-weight:700;margin-bottom:4px}
+  .f .fx{color:var(--tx2);font-size:14px}.f .fx b{color:var(--tx)}
+  .note{background:rgba(224,86,63,.08);border:1px solid rgba(224,86,63,.3);border-radius:10px;padding:12px 16px;margin:18px 0;font-size:14px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>StayJP App — 全面 Review</h1>
+<p class="sub">2026-06-20 · 4 個並行 agent 分區深掃(金流 / 登入 / 網頁閘門·試用 / UX)· 共 39 項,去重後彙整</p>
+<div class="note" style="background:rgba(90,209,122,.1);border-color:rgba(90,209,122,.35)"><b>✅ 已修 16 項並上線</b>(app OTA + hosting + functions 部署):退款收回 Premium、登入卡死/雙重登入/登出清乾淨、購買防孤兒+未解鎖不誤報成功、paywall loading 骨架、按鈕變灰、openURL 防呆、載入逾時重試。下方標 <span class="st dec" style="display:inline">待決定</span> 的 13 項需要你拍板(多半是取捨或要排期)。</div>
+
+<div class="summary">
+  <h2>總覽</h2>
+  <div class="counts">
+    <span class="pill c">Critical 4</span>
+    <span class="pill h">High 9</span>
+    <span class="pill m">Medium 8</span>
+    <span class="pill l">Low 4</span>
+  </div>
+  <b style="font-size:14px">最該先修的 5 件(付了錢沒功能 / 退款還能用 / 登入卡死):</b>
+  <ol class="top5">
+    <li><b>退款後仍是 Premium</b> — webhook 沒有 REFUND 事件處理,Apple 退款後帳號照樣無限用(漏財紅線)</li>
+    <li><b>登入轉圈卡死 + 登出要重開 App</b> — 20s 計時器沒清 + 登出沒清 WebView 端 Firebase</li>
+    <li><b>購買「成功」但其實沒解鎖</b> — purchase 回 ok 卻沒檢查 entitled,跳「升級成功」但還是免費</li>
+    <li><b>買到匿名帳號(孤兒交易)</b> — 購買前沒確認 RevenueCat appUserID == Firebase uid</li>
+    <li><b>方案升降 / 買斷 沒寫入</b> — webhook 漏 PRODUCT_CHANGE / NON_RENEWING / lifetime 映射</li>
+  </ol>
+</div>
+
+<div class="note">
+  <b>重要前提 — 分支分歧:</b> 線上跑的是 <code>origin/main</code>(有 3 天試用、subLoaded 守衛);本地 <code>feat/subscription-decouple</code> 把試用拔了、守衛也拔了,且<b>尚未部署</b>。部分 finding 是針對「feat 分支若直接上線會壞」——標 [feat] 的別急著合併。
+</div>
+
+<h2 class="sec">💳 金流 / 訂閱</h2>
+
+<div class="f"><div class="hd"><span class="sev crit">Critical</span><span class="loc">revenuecat-webhook.ts</span><span class="st fix">✅ 已上線</span></div>
+<div class="ti">退款 / 退單後仍保有 Premium</div>
+<div class="fx">webhook 只處理 INITIAL/RENEWAL/CANCEL/EXPIRE/BILLING,<b>沒有 REFUND</b> → 退款後 doc 仍 status:active、expiresAt 未來 → 無限用。<b>修:</b>加 REFUND case,status→refunded 且 expiresAt→now(立即收回)。</div></div>
+
+<div class="f"><div class="hd"><span class="sev crit">Critical</span><span class="loc">revenuecat-webhook.ts:164</span><span class="st dec">待決定</span></div>
+<div class="ti">買斷(lifetime)+ 方案升降 不寫入</div>
+<div class="fx">webhook 產品映射漏 lifetime;且沒處理 NON_RENEWING_PURCHASE(買斷)/ PRODUCT_CHANGE(月↔年)/ TRANSFER(換 Apple ID)→ 全落到 default 不寫。<b>修:</b>PRODUCT_CHANGE(月↔年升降級)<b>已修上線</b>;lifetime 映射待買斷商品上架再補。<b>但</b>買斷目前商店沒上架、paywall 也只在有商品時顯示 → 可跟金流一起排,不擋上線。</div></div>
+
+<div class="f"><div class="hd"><span class="sev high">High</span><span class="loc">revenuecat.ts:115 / Paywall.tsx:127</span><span class="st fix">✅ 已上線</span></div>
+<div class="ti">購買「成功」但 entitlement 沒生效 → 假的升級成功</div>
+<div class="fx">purchase() 回 {ok:true}, Paywall 只看 r.ok 不看 r.entitled → ask-to-buy/家長核准/deferred 時跳「升級成功」但實際免費。<b>修:</b>ok&&!entitled → 顯示「購買處理中,稍後生效」。</div></div>
+
+<div class="f"><div class="hd"><span class="sev high">High</span><span class="loc">revenuecat.ts:43 / _layout.tsx:96</span><span class="st fix">✅ 已上線</span></div>
+<div class="ti">買到匿名帳號(孤兒交易)</div>
+<div class="fx">購買前只檢查 Firebase 登入,沒確認 RevenueCat 已 logIn(uid)。RC 還是匿名 id 時購買 → webhook app_user_id 是 $RCAnonymousID → 寫到垃圾 doc,付了錢沒功能。<b>修:</b>購買前斷言 getAppUserID()==uid,不符先 re-login。</div></div>
+
+<div class="f"><div class="hd"><span class="sev high">High</span><span class="loc">webhook:69 / rcSync</span><span class="st fix">✅ 已上線</span></div>
+<div class="ti">早鳥鎖價被 RENEWAL 打回原價 + 雙寫競態</div>
+<div class="fx">webhook 與 rcSync 都全量覆寫同一 doc 無 last-writer 守衛;RENEWAL 時若 existingSub 競態缺失,is_early_bird 會被重算成 false。<b>修:</b>is_early_bird 視為 sticky(true 不可降)、到期日一律以 RC expires_date 為準。</div></div>
+
+<div class="f"><div class="hd"><span class="sev med">Medium</span><span class="loc">webhook:85</span><span class="st fix">✅ 已上線</span></div>
+<div class="ti">webhook 重送 → 帳本重複入帳</div>
+<div class="fx">RC 失敗會重送,writeTransaction 用隨機 doc id → 重複列、早鳥計數膨脹。<b>修:</b>用 event.id / transaction_id 當 doc id 做冪等。</div></div>
+
+<h2 class="sec">🔐 登入 / 登出 / Session</h2>
+
+<div class="f"><div class="hd"><span class="sev crit">Critical</span><span class="loc">web.tsx:176</span><span class="st fix">✅ 已上線</span></div>
+<div class="ti">登入轉圈卡死 / 殘留計時器亂關</div>
+<div class="fx">20s「安全閥」setTimeout 沒存 handle、沒清 → 成功登入後它仍在 t=20s 觸發;若此時開了第二次登入,spinner 被它扯掉 → 以為失敗又點一次(雙重登入);元件卸載還會 setState 洩漏。<b>修:</b>handle 存 ref,所有結束點 + 卸載都 clearTimeout。</div></div>
+
+<div class="f"><div class="hd"><span class="sev high">High</span><span class="loc">web.tsx:248</span><span class="st fix">✅ 已上線</span></div>
+<div class="ti">登出只登出原生、WebView 還是登入態 → 要重開 App</div>
+<div class="fx">NATIVE_LOGOUT 只 signOut 原生 Firebase,沒清 WebView 內那套 → 頁面仍顯示登入 / 無法重登(就是你遇到的「登出壞掉、要重啟」)。<b>修:</b>登出時也注入 firebase.auth().signOut() 進 WebView,兩邊一起清。</div></div>
+
+<div class="f"><div class="hd"><span class="sev high">High</span><span class="loc">_layout.tsx:96</span><span class="st fix">✅ 已上線</span></div>
+<div class="ti">每次 auth=null 都 rcLogOut → 孤兒交易風險</div>
+<div class="fx">onAuthStateChanged 冷啟/換 token 會先吐 null,每個 null 都 rcLogOut() → RC 退回匿名。此窗口內購買 → 寫錯帳號。<b>修:</b>只在「明確登出」rcLogOut,記住 last appUserID 跳過重複 logIn。</div></div>
+
+<div class="f"><div class="hd"><span class="sev high">High</span><span class="loc">subscription.ts:88 / web.tsx:213</span><span class="st fix">✅ 已上線</span></div>
+<div class="ti">訂閱監聽綁到 auth.currentUser 競態 → 會員顯示免費</div>
+<div class="fx">subscribeToSubscription 同步讀 auth.currentUser,但 effect 依賴的是另一套 user.uid;原生 auth 慢一步 → cb(null) 卡住,有訂閱卻顯示免費。<b>修:</b>把 uid 顯式傳入,不要讀 currentUser。</div></div>
+
+<div class="f"><div class="hd"><span class="sev med">Medium</span><span class="loc">web.tsx:238</span><span class="st fix">✅ 已上線</span></div>
+<div class="ti">pendingPaywall 取消/失敗沒重設 → 之後亂跳 paywall</div>
+<div class="fx">點訂閱設 pendingPaywall=true,取消登入或失敗沒重設 → 下次無關登入成功竟自動彈 paywall。<b>修:</b>取消/BRIDGE_ERR/catch 都重設 false。</div></div>
+
+<div class="f"><div class="hd"><span class="sev med">Medium</span><span class="loc">web.tsx:202</span><span class="st fix">✅ 已上線</span></div>
+<div class="ti">沒擋雙重登入</div>
+<div class="fx">原生登入選單沒有 in-flight 鎖(網頁端有),連點 / Google 完又點 Apple → 兩條 bridge 並跑、綁錯 uid。<b>修:</b>加 inFlight ref,進行中忽略後續。</div></div>
+
+<div class="f"><div class="hd"><span class="sev med">Medium</span><span class="loc">auth-header.js:134</span><span class="st dec">待決定</span></div>
+<div class="ti">bridge 失敗被當成「使用者取消」靜默</div>
+<div class="fx">native patch 的 signInWithPopup 永遠 reject popup-closed-by-user;postMessage 真失敗時也吞掉 → 點登入沒反應、沒錯誤。<b>修:</b>橋接失敗用不同 code + 真錯誤訊息。</div></div>
+
+<h2 class="sec">🌐 網頁閘門 / 試用 / 額度</h2>
+
+<div class="f"><div class="hd"><span class="sev high">High</span><span class="loc">tool-quota.js (feat 分支)</span><span class="st dec">待決定 [feat]</span></div>
+<div class="ti">feat 分支會把「付費會員」擋在門外</div>
+<div class="fx">feat 分支移除了 subLoaded 守衛 + 8s failsafe → auth ready 但 sub 還沒載入這段,登入的付費用戶被 gate、看到 paywall。<b>修:</b>合併前還原守衛。<b>這是 feat 分支沒上線才沒爆,別直接合。</b></div></div>
+
+<div class="f"><div class="hd"><span class="sev high">High</span><span class="loc">tool-quota.js:50(origin/main 線上)</span><span class="st dec">待決定</span></div>
+<div class="ti">試用天數閃動(剩 4 天→3 天)+ 看裝置時鐘</div>
+<div class="fx">Math.ceil + 樂觀本地 start 先渲染、serverTimestamp 回來再重算 → 閃動;Date.now() 是裝置時鐘,可被改。<b>修(若保留試用):</b>只用 server timestamp、Math.floor + 「不到 1 天」標籤。</div></div>
+
+<div class="f"><div class="hd"><span class="sev med">Medium</span><span class="loc">tool-quota.js:32</span><span class="st dec">設計取捨</span></div>
+<div class="ti">每日額度純前端、可繞過</div>
+<div class="fx">localStorage 依裝置日期計數,改日期 / 無痕 / 清快取即重置。<b>取捨:</b>當作轉換用的軟性 gate 可接受;要真擋得 server 端按 uid 計。先標記,不必現在改。</div></div>
+
+<div class="f"><div class="hd"><span class="sev low">Low</span><span class="loc">tool-quota.js:182</span><span class="st dec">設計取捨</span></div>
+<div class="ti">ToolQuota / Firebase 載入失敗 → 全站不設限(fail-open)</div>
+<div class="fx">擋廣告外掛擋掉腳本 = 全部免費。fail-open 對付費用戶體驗較友善,但等於漏洞。<b>建議:</b>有意識保留 + 加監控,別默默放生。</div></div>
+
+<h2 class="sec">🎨 UX / UI / 防呆</h2>
+
+<div class="f"><div class="hd"><span class="sev high">High</span><span class="loc">web.tsx:151</span><span class="st fix">✅ 已上線</span></div>
+<div class="ti">8s 後硬關載入層 → 網慢時白畫面無出路</div>
+<div class="fx">不管載好沒,8s 後 setWebLoaded(true) → 慢網丟到空白 WebView,沒錯誤沒重試。<b>修:</b>逾時且未載好 → 顯示重試畫面(沿用 renderError),別露出空白。</div></div>
+
+<div class="f"><div class="hd"><span class="sev high">High</span><span class="loc">Paywall.tsx:66</span><span class="st fix">✅ 已上線</span></div>
+<div class="ti">paywall 沒有 loading 狀態 → 會員先被閃購買頁</div>
+<div class="fx">gate 初始 loading 卻沒對應畫面,檢查訂閱期間整個購買 UI 照顯示;且兩個 promise 失敗時 catch 設成 ok → 有訂閱卻在爛網顯示成未訂閱。<b>修:</b>加 loading 骨架;錯誤時偏向安全處理。</div></div>
+
+<div class="f"><div class="hd"><span class="sev high">High</span><span class="loc">Paywall.tsx:160</span><span class="st fix">✅ 已上線</span></div>
+<div class="ti">「請先登入」是死路(沒有登入鈕)</div>
+<div class="fx">文案叫人登入,按鈕「返回登入」只是 onBack 退回 WebView,沒實際觸發登入。<b>修:</b>need_login 直接觸發原生登入選單。</div></div>
+
+<div class="f"><div class="hd"><span class="sev med">Medium</span><span class="loc">web.tsx:266</span><span class="st dec">待決定</span></div>
+<div class="ti">cacheEnabled=false → 每次冷啟全站重抓(慢/脆主因)</div>
+<div class="fx">每次開 App 重抓整個 stayjp.study → 任何延遲/抖動 = 長轉圈→8s 逾時→空白。很可能是「這幾天問題好多」的根。<b>修:</b>開回快取 + 用 cache-control/版號控制新鮮度,別整個關掉。要改我再評估風險。</div></div>
+
+<div class="f"><div class="hd"><span class="sev med">Medium</span><span class="loc">Paywall.tsx:248,271</span><span class="st fix">✅ 已上線</span></div>
+<div class="ti">購買鈕沒 disabled 視覺 + 抓不到方案是死路</div>
+<div class="fx">購買中按鈕仍不變灰(只有恢復鈕變灰);getOfferings 失敗 → 點購買跳「方案載入中」無重試。<b>修:</b>Button 傳 disabled/loading;方案空時顯示骨架 + 重試。</div></div>
+
+<div class="f"><div class="hd"><span class="sev med">Medium</span><span class="loc">Paywall.tsx:309 / settings.tsx:19</span><span class="st fix">✅ 已上線</span></div>
+<div class="ti">外部連結 / 通知權限被拒 無回饋</div>
+<div class="fx">服務條款/隱私 openURL 無 try/catch(離線靜默失敗,Apple 審核會測);通知被拒時時間選擇器默默跳回 off 像 bug。<b>修:</b>openURL 包錯誤;權限被拒給提示 + 導去設定。</div></div>
+
+<div class="f"><div class="hd"><span class="sev low">Low</span><span class="loc">_layout.tsx:102 / app/(tabs)/*</span><span class="st dec">建議清理</span></div>
+<div class="ti">原生分頁(今日/單字/文法…)是到不了的死碼</div>
+<div class="fx">_layout 每次啟動都 router.replace("/web") → 整個原生學習 UI + onboarding + flashcard-session 用戶根本進不去。<b>建議:</b>刪掉減少混淆與包體積(不影響功能)。</div></div>
+
+</div>
+</body>
+</html>

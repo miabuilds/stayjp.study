@@ -1,7 +1,28 @@
 // ========== i18n — 繁中(預設) / 简中 / English ==========
 const I18n = (() => {
   const LANG_KEY = 'ui_lang';
-  let lang = localStorage.getItem(LANG_KEY) || 'zh-TW';
+
+  // 首次造訪(localStorage 尚無 ui_lang)→ 依系統語言決定:簡體→zh-CN、繁體/其他→zh-TW。
+  // 偵測後「寫回 localStorage」,這樣 App 端 bridge 讀 ui_lang 也會拿到同一值(繁簡一致)。
+  function detectLang() {
+    try {
+      const list = (navigator.languages && navigator.languages.length)
+        ? navigator.languages : [navigator.language || ''];
+      for (const raw of list) {
+        const l = String(raw).toLowerCase();
+        if (l.indexOf('zh') !== 0) continue;                     // 非中文 → 看下一個,全非中文則默認繁
+        if (/hans|^zh-cn|^zh-sg|^zh-my/.test(l)) return 'zh-CN';  // 簡體系
+        return 'zh-TW';                                           // 其他中文(繁/TW/HK/MO)→ 繁
+      }
+    } catch (_) { /* 偵測失敗 → 默認繁 */ }
+    return 'zh-TW';
+  }
+
+  let lang = localStorage.getItem(LANG_KEY);
+  if (!lang) {
+    lang = detectLang();
+    try { localStorage.setItem(LANG_KEY, lang); } catch (_) {}
+  }
 
   // ── Translation dictionaries ──
   const dict = {

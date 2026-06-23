@@ -23,6 +23,7 @@ export const revenuecatWebhook = functions.onRequest(
   {
     region: "asia-east1",
     invoker: "public",
+    secrets: ["REVENUECAT_WEBHOOK_SECRET"],   // 宣告後 process.env 才拿得到,啟用 webhook 驗證
     maxInstances: 20,          // App IAP webhook,給多一點 burst 空間
     timeoutSeconds: 60,
     memory: "256MiB",
