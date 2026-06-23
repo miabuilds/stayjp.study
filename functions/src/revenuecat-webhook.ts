@@ -18,11 +18,13 @@ import {
 if (admin.apps.length === 0) admin.initializeApp();
 
 const REVENUECAT_AUTH_HEADER = process.env.REVENUECAT_WEBHOOK_SECRET || "";
+const ENTITLEMENT_ID = "StayJP Plan Premium";   // 跟 rc-sync-subscription.ts 一致
 
 export const revenuecatWebhook = functions.onRequest(
   {
     region: "asia-east1",
     invoker: "public",
+    secrets: ["REVENUECAT_SECRET_KEY"],   // TRANSFER 事件不帶 product → 要查 RC REST 還原訂閱
     maxInstances: 20,          // App IAP webhook,給多一點 burst 空間
     timeoutSeconds: 60,
     memory: "256MiB",
@@ -45,6 +47,41 @@ export const revenuecatWebhook = functions.onRequest(
       const type = event.type as string;
 
       console.log("RevenueCat event:", { type, uid, productId });
+
+      // TRANSFER:Apple 沙盒/換機/換帳號時,同一 Apple ID 的購買會在 app_user_id 之間轉移。
+      // 這種事件「沒有 app_user_id / product_id」,uid 在 transferred_to / transferred_from。
+      // 原本走到下面 `!uid` → 400 → RC 不斷重試卻永遠失敗 → 權益轉到新 uid 卻沒人寫 →
+      // 「付了錢訂閱卻是空的」。改:對 transferred_to 查 RC REST 還原訂閱;transferred_from 失權則收回。
+      if (type === "TRANSFER") {
+        const toList: string[] = Array.isArray(event.transferred_to) ? event.transferred_to : [];
+        const fromList: string[] = Array.isArray(event.transferred_from) ? event.transferred_from : [];
+        console.log("RevenueCat TRANSFER:", { to: toList, from: fromList });
+        let wrote = 0;
+        let hadError = false;
+        for (const to of toList) {
+          if (!to || String(to).startsWith("$RCAnonymousID")) continue;   // 匿名 id 不是真 user
+          const r = await fetchAndWriteFromRc(to);
+          if (r === "written") wrote++;
+          else if (r === "error") hadError = true;
+        }
+        for (const fr of fromList) {
+          if (!fr || String(fr).startsWith("$RCAnonymousID")) continue;
+          const ent = await fetchRcEntitlement(fr);
+          if (ent.ok && !ent.active) {
+            // 確認 from 端在 RC 已無有效權益 → 收回(Apple 同群組只允許一個有效訂閱)
+            const ex = await getSubscription(fr);
+            if (ex && ex.status === "active") {
+              await patchSubscription(fr, { status: "expired", willRenew: false, expiresAt: nowMs() });
+            }
+          } else if (!ent.ok) {
+            hadError = true;
+          }
+        }
+        // 全部查詢都失敗且沒寫成任何一筆 → 回非 2xx 讓 RC 稍後重試(別吞掉)
+        if (hadError && wrote === 0) { res.status(503).send("rc fetch error, retry later"); return; }
+        res.status(200).send(`ok (transfer wrote=${wrote})`);
+        return;
+      }
 
       if (!uid) { res.status(400).send("missing app_user_id"); return; }
 
@@ -213,6 +250,56 @@ function mapProductIdToPlan(productId: string): PlanKey | null {
     "stayjp_yearly": "yearly",
     "com.stayjp.app.yearly_early_bird": "yearly_early_bird",
     "stayjp_yearly_early_bird": "yearly_early_bird",
+    "com.stayjp.app.lifetime": "lifetime",   // 原本漏了 → app 買斷版會寫不進(unknown product)
+    "stayjp_lifetime": "lifetime",
   };
   return map[productId] ?? null;
+}
+
+// ── TRANSFER 用:跟 RevenueCat REST 對帳(獨立驗證,跟 rc-sync-subscription.ts 同一套邏輯)──
+interface RcEnt { ok: boolean; active: boolean; productId?: string; expiresDate?: string | null; unsubscribed?: boolean; }
+
+async function fetchRcEntitlement(uid: string): Promise<RcEnt> {
+  const secret = process.env.REVENUECAT_SECRET_KEY || "";
+  if (!secret || !uid) return { ok: false, active: false };
+  try {
+    const r = await fetch(`https://api.revenuecat.com/v1/subscribers/${encodeURIComponent(uid)}`, {
+      headers: { Authorization: `Bearer ${secret}` },
+    });
+    if (!r.ok) return { ok: false, active: false };
+    const data = await r.json() as { subscriber?: { entitlements?: Record<string, {
+      expires_date?: string | null; product_identifier?: string; unsubscribe_detected_at?: string | null;
+    }> } };
+    const ent = data?.subscriber?.entitlements?.[ENTITLEMENT_ID];
+    const active = !!ent && (!ent.expires_date || new Date(ent.expires_date).getTime() > Date.now());
+    return {
+      ok: true, active,
+      productId: ent?.product_identifier,
+      expiresDate: ent?.expires_date,
+      unsubscribed: !!ent?.unsubscribe_detected_at,
+    };
+  } catch {
+    return { ok: false, active: false };
+  }
+}
+
+async function fetchAndWriteFromRc(uid: string): Promise<"written" | "no-entitlement" | "error"> {
+  const ent = await fetchRcEntitlement(uid);
+  if (!ent.ok) return "error";
+  if (!ent.active) return "no-entitlement";
+  const plan = mapProductIdToPlan(ent.productId || "") || "monthly";
+  const expiresAt = ent.expiresDate ? new Date(ent.expiresDate).getTime() : nowMs() + 365 * 100 * 864e5;
+  const existing = await getSubscription(uid);
+  const sub: SubscriptionDoc = {
+    source: "app",
+    plan,
+    status: "active",
+    expiresAt,
+    willRenew: !ent.unsubscribed,
+    startedAt: existing?.startedAt || nowMs(),
+    is_early_bird: existing?.is_early_bird === true,
+    failed_retries: 0,
+  };
+  await writeSubscription(uid, sub);
+  return "written";
 }
