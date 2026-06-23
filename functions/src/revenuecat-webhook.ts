@@ -105,6 +105,7 @@ export const revenuecatWebhook = functions.onRequest(
       switch (type) {
         case "INITIAL_PURCHASE":
         case "RENEWAL":
+        case "NON_RENEWING_PURCHASE":   // 買斷(lifetime)是非續訂商品 → RC 發此事件,不是 INITIAL_PURCHASE。原本沒接 → 買斷付了 2990 卻寫不進訂閱
         case "PRODUCT_CHANGE": {   // 月↔年 升降級:用新 product 重寫 plan/到期日(原本沒處理 → 升降級不生效)
           // 只有「首次購買早鳥 product」才佔名額;is_early_bird 以「買的就是早鳥 product」為準(sticky:不被續訂/競態打回原價)
           if (plan === "yearly_early_bird" && type === "INITIAL_PURCHASE") {
@@ -127,7 +128,7 @@ export const revenuecatWebhook = functions.onRequest(
             plan: finalPlan,
             status: "active",
             expiresAt: finalExpiry,
-            willRenew: true,
+            willRenew: finalPlan !== "lifetime",   // 買斷不續訂
             startedAt: existingSub?.startedAt || nowMs(),
             apple_txn: event.transaction_id,
             is_early_bird: isEarlyBird,
@@ -137,7 +138,7 @@ export const revenuecatWebhook = functions.onRequest(
 
           await writeTransaction({
             uid,
-            type: type === "INITIAL_PURCHASE" ? "subscribe" : "renew",
+            type: (type === "INITIAL_PURCHASE" || type === "NON_RENEWING_PURCHASE") ? "subscribe" : "renew",
             source: "app",
             plan,
             amount_twd: planInfo.price_twd,
