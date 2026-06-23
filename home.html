@@ -383,16 +383,18 @@ a:hover { text-decoration: underline; }
 /* == Stats · 大字排版無框 == */
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(3, 1fr);   /* 6 項數字 → 2 排×3,不再有單格落單到第二排破版 */
   gap: 0;
   border-top: 1px solid var(--line);
 }
 .stat-item {
   padding: 44px 20px; text-align: left;
-  border-right: 1px solid var(--line);
+  border-left: 1px solid var(--line);    /* 改用左線:尾格(learners/在線)未載入隱藏時,不會留下懸空的右分隔線 */
+  border-bottom: 1px solid var(--line);
   min-width: 0;  /* grid item 預設 min-width:auto 會被寬數字撐開 → 視窗溢出；設 0 讓欄位能縮 */
 }
-.stat-item:last-child { border-right: none; }
+.stat-item:nth-child(3n+1) { border-left: none; }   /* 每排第一格不要左線 */
+.stat-item:nth-child(n+4)  { border-bottom: none; } /* 底排(第 4–6 格)不要下線 */
 .stat-number {
   font-family: var(--serif);
   font-size: clamp(40px, 5vw, 64px);
@@ -410,8 +412,9 @@ a:hover { text-decoration: underline; }
 }
 @media (max-width: 680px) {
   .stats-grid { grid-template-columns: 1fr 1fr; }
-  .stat-item:nth-child(2) { border-right: none; }
-  .stat-item:nth-child(1), .stat-item:nth-child(2) { border-bottom: 1px solid var(--line); }
+  /* 2 欄重設(用 :nth-child(n) 提高權重蓋過桌面 3n+1 / n+4 規則):左欄無左線、每格都有下線 */
+  .stat-item:nth-child(n) { border-left: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+  .stat-item:nth-child(odd) { border-left: none; }
 }
 /* 極窄機（≤360px）：縮 padding 與數字級距，2 欄不再被撐到溢出 */
 @media (max-width: 360px) {
