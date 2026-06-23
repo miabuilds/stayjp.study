@@ -163,7 +163,15 @@ const Quiz = (() => {
     if (!inp || inp.disabled) return;
     const typed = inp.value.trim().replace(/\s+/g, '');
     if (!typed) return;
-    const ok = typed === q.word.r || typed === q.word.w;
+    // 打了「正確的漢字」但不是假名讀音 → 這題考的是讀音,不算作答、不扣分,提示後讓他重打假名。
+    if (typed === q.word.w && typed !== q.word.r) {
+      const fbh = document.getElementById('tyFeedback');
+      if (fbh) fbh.innerHTML = `<span style="color:var(--tx2)">✍️ 要輸入「假名讀音」哦:<b style="color:var(--tx)">${q.word.r}</b></span>`;
+      inp.value = '';
+      inp.focus();
+      return;
+    }
+    const ok = typed === q.word.r;   // 只認假名讀音
     if (ok) score++;
     results.push({ word: q.word, correct: ok, typed, typing: true });
     if (typeof SRS !== 'undefined' && SRS.record) SRS.record(quizLevel, q.word.w, ok);
