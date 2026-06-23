@@ -142,10 +142,15 @@ const Quiz = (() => {
   function renderTyping() {
     const q = questions[current];
     const main = typeof cvt === 'function' ? cvt(q.word.m) : q.word.m;
+    // 詞性(資料內建、已校對的 c 欄位)→ 映射成清楚標籤,讓做題時知道要輸入名詞/動詞/形容詞
+    const POS_LABEL = { '名': '名詞', '動': '動詞', 'い形': 'い形容詞', 'な形': 'な形容詞', '副': '副詞', '他': '其他' };
+    const posBadge = q.word.c
+      ? `<div style="margin-top:8px"><span style="display:inline-block;padding:2px 11px;border-radius:999px;background:var(--bg3);color:var(--tx2);font-size:12px;font-weight:600">${POS_LABEL[q.word.c] || q.word.c}</span></div>`
+      : '';
     const box = document.getElementById('quizBox');
     box.innerHTML = `
       <div class="qhd"><span>${current+1} / ${questions.length}</span><span>${t('quiz_score', { n: score })}</span><button class="qclose" style="width:auto;margin:0;padding:2px 10px" onclick="Quiz.close()">✕</button></div>
-      <div class="qprompt"><div class="qmain">${main}</div><div class="qsub">${t('ty_sub')}</div></div>
+      <div class="qprompt"><div class="qmain">${main}</div>${posBadge}<div class="qsub">${t('ty_sub')}</div></div>
       <div class="qf"><input id="tyInput" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="${t('ty_placeholder')}" style="width:100%;box-sizing:border-box;padding:12px 14px;font-size:20px;text-align:center;border:1px solid var(--bd);border-radius:10px;background:var(--bg2);color:var(--tx)"></div>
       <div id="tyFeedback" style="min-height:24px;text-align:center;font-size:14px;margin:8px 0"></div>
       <button class="qstart" onclick="Quiz.submitTyping()">${t('ty_submit')}</button>`;
