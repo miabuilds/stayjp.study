@@ -2943,6 +2943,18 @@ function getVocabData(lv) {
 }
 
 // ========== RENDER VOCAB ==========
+// 側邊欄點分類 → 跳到該分類。虛擬列表(展開全部 >200 筆)時區塊不在 DOM,改叫 VirtualList 捲動;
+// 否則(每日/搜尋/收藏等非虛擬)用 #vcat anchor 捲動。回傳 false 擋掉預設 anchor 跳轉。
+function vocabJump(catKey) {
+  closeSdMobile();
+  if (typeof VirtualList !== 'undefined' && VirtualList.isActive() && window._vlCatIndex && window._vlCatIndex[catKey] != null) {
+    VirtualList.scrollToIndex(window._vlCatIndex[catKey]);
+  } else {
+    const el = document.getElementById('vcat-' + catKey);
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+  return false;
+}
 function renderVocab() {
   const data = getVocabData(currentLevel);
   const favSet = getVocabFavSet(currentLevel);
@@ -3006,10 +3018,13 @@ function renderVocab() {
     VirtualList.destroy();
 
     // Build flat item array with category headers
+    // 同時記錄「分類 → header 在扁平陣列的索引」,讓側邊欄能叫 VirtualList 捲到該分類。
     const vlItems = [];
+    window._vlCatIndex = {};
     VOCAB_CATS.forEach(cat => {
       const items = groups[cat.key];
       if (!items || !items.length) return;
+      window._vlCatIndex[cat.key] = vlItems.length;
       vlItems.push({ type: 'header', cat, count: items.length });
       items.forEach(d => vlItems.push({ type: 'item', d, catName: cat.name }));
     });
@@ -3040,6 +3055,7 @@ function renderVocab() {
   } else {
     // Destroy virtual list if switching away from full mode
     if (typeof VirtualList !== 'undefined' && VirtualList.isActive()) VirtualList.destroy();
+    window._vlCatIndex = null;   // 非虛擬列表 → 側邊欄改走 #vcat anchor(區塊都在 DOM)
 
     let vc = 0;
     VOCAB_CATS.forEach(cat => {
@@ -3075,8 +3091,8 @@ function renderVocab() {
     const items = groups[cat.key];
     if (!items||!items.length) return;
     sh += `<div class="ct" onclick="toggleCat(this)">${cvt(cat.name)} (${items.length})</div><div class="ci" style="max-height:${Math.min(items.length*28,400)}px">`;
-    items.slice(0,50).forEach(d => { sh += `<a href="#vcat-${cat.key}" onclick="closeSdMobile()">${d.w} ${d.m}</a>`; });
-    if(items.length>50) sh+=`<a href="#vcat-${cat.key}" style="color:var(--ac)" onclick="closeSdMobile()">${t('sidebar_more', { n: items.length-50 })}</a>`;
+    items.slice(0,50).forEach(d => { sh += `<a href="#vcat-${cat.key}" onclick="return vocabJump('${cat.key}')">${d.w} ${d.m}</a>`; });
+    if(items.length>50) sh+=`<a href="#vcat-${cat.key}" style="color:var(--ac)" onclick="return vocabJump('${cat.key}')">${t('sidebar_more', { n: items.length-50 })}</a>`;
     sh += '</div>';
   });
   sd.innerHTML = sh;

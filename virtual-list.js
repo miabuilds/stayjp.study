@@ -112,5 +112,20 @@ const VirtualList = (() => {
     return container !== null;
   }
 
-  return { init, destroy, isActive };
+  // 捲到第 i 個項目(虛擬列表用,讓側邊欄分類能跳轉)。扣掉固定頁首高度避免被遮。
+  function scrollToIndex(i) {
+    if (!container || !items.length) return;
+    i = Math.max(0, Math.min(items.length - 1, i));
+    const cs = getComputedStyle(document.documentElement);
+    const off = (parseInt(cs.getPropertyValue('--hh')) || 0) + (parseInt(cs.getPropertyValue('--bar-h')) || 0) + 16;
+    const sp = scrollParent === window ? (window.scrollY || window.pageYOffset || 0) : scrollParent.scrollTop;
+    const containerDocTop = container.getBoundingClientRect().top + sp;
+    const target = Math.max(0, containerDocTop + i * itemHeight - off);
+    if (scrollParent === window) window.scrollTo({ top: target, behavior: 'smooth' });
+    else if (scrollParent.scrollTo) scrollParent.scrollTo({ top: target, behavior: 'smooth' });
+    else scrollParent.scrollTop = target;
+    onScroll();
+  }
+
+  return { init, destroy, isActive, scrollToIndex };
 })();
