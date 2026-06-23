@@ -67,11 +67,12 @@ export async function patchSubscription(
   uid: string,
   patch: Partial<SubscriptionDoc>,
 ): Promise<void> {
-  const updates: Record<string, unknown> = {};
-  for (const [k, v] of Object.entries(patch)) {
-    updates[`subscription.${k}`] = v;
-  }
-  await db.doc(`users/${uid}`).update(updates);
+  // 用 set(merge) 而非 update():update() 在 doc 不存在時會丟 NOT_FOUND → 整個 webhook 500、
+  // RevenueCat 無限重送,且 REFUND/EXPIRATION 永遠撤銷不了權益(漏財紅線)。set merge 會深層合併
+  // subscription 既有欄位、doc 不存在則建立,語義等同但不會炸。
+  const subPatch: Record<string, unknown> = {};
+  for (const [k, v] of Object.entries(patch)) subPatch[k] = v;
+  await db.doc(`users/${uid}`).set({ subscription: subPatch }, { merge: true });
 }
 
 /**

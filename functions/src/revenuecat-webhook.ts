@@ -73,7 +73,9 @@ export const revenuecatWebhook = functions.onRequest(
           // 「較晚到期的有效訂閱」。仍照常記帳本(稽核),但當前訂閱保留較長有效期 + 該方案身分,
           // 避免到期日/方案在事件間跳動、誤縮短權益。
           const newExpiry = plusDays(nowMs(), planInfo.period_days);
-          const keepExisting = !!existingSub && existingSub.status !== "expired"
+          // 只有「目前仍 active」的訂閱才值得保留;refunded / voided(假刪)/ cancelled / expired
+          // 一律不保留 → 避免一筆遲到的續訂把「已退款/已撤銷」帳號重新復活成 premium。
+          const keepExisting = !!existingSub && existingSub.status === "active"
             && (existingSub.expiresAt || 0) > newExpiry;
           const finalPlan = keepExisting ? existingSub!.plan : plan;
           const finalExpiry = keepExisting ? existingSub!.expiresAt : newExpiry;
