@@ -59,6 +59,11 @@ export const revenuecatWebhook = functions.onRequest(
       const planInfo = PLANS[plan];
       const existingSub = await getSubscription(uid);
       const eventId = event.id as string | undefined;   // RC 事件唯一 id → 給 writeTransaction 做冪等(重送不重複入帳)
+      // 實際結帳幣別 + 實付金額(外國人買 iOS 才有意義;amount_twd 只是台幣牌價,非實收)。
+      // 注意 Firestore 不收 undefined → 有值才放進物件。
+      const rcMoney: { currency?: string; amount_paid?: number } = {};
+      if (typeof event.currency === "string" && event.currency) rcMoney.currency = event.currency;
+      if (typeof event.price_in_purchased_currency === "number") rcMoney.amount_paid = event.price_in_purchased_currency;
 
       switch (type) {
         case "INITIAL_PURCHASE":
@@ -99,6 +104,7 @@ export const revenuecatWebhook = functions.onRequest(
             source: "app",
             plan,
             amount_twd: planInfo.price_twd,
+            ...rcMoney,   // 實際幣別 + 實付金額(外國人/非台幣)
             payment_method: event.store === "PLAY_STORE" ? "google_billing" : "apple_iap",
             external_id: event.transaction_id || event.original_transaction_id,
             status: "success",
@@ -166,12 +172,17 @@ export const revenuecatWebhook = functions.onRequest(
         case "REFUND":
         case "CHARGEBACK": {
           await patchSubscription(uid, { status: "refunded", willRenew: false, expiresAt: nowMs() });
+          // 退款金額存成負數(實際幣別),方便對帳:外國人退的是當地幣別,不是台幣
+          const refundMoney: { currency?: string; amount_paid?: number } = {};
+          if (rcMoney.currency) refundMoney.currency = rcMoney.currency;
+          if (rcMoney.amount_paid != null) refundMoney.amount_paid = -Math.abs(rcMoney.amount_paid);
           await writeTransaction({
             uid,
             type: "refund",
             source: "app",
             plan,
             amount_twd: 0,
+            ...refundMoney,
             payment_method: event.store === "PLAY_STORE" ? "google_billing" : "apple_iap",
             external_id: event.transaction_id || event.original_transaction_id || "",
             status: "refunded",

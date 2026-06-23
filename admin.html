@@ -820,7 +820,10 @@ async function renderLedger() {
       if (x.type === 'refund') refund += Math.abs(amt);
       if (x.status === 'pending') pending++;
       const incomplete = x.status === 'pending' || x.status === 'failed';
+      // 外幣交易(Apple/Google 非台幣)→ 顯示實際幣別與實付金額,而非台幣牌價(amount_twd)
+      const foreign = x.currency && x.currency !== 'TWD' && typeof x.amount_paid === 'number';
       const amtCell = incomplete ? `<span style="color:var(--tx3)">${Math.abs(amt).toLocaleString()} 未扣</span>`
+        : foreign ? `<span style="color:${x.amount_paid >= 0 ? '#16A34A' : '#EF4444'};font-weight:600">${x.amount_paid >= 0 ? '+' : '-'}${esc(x.currency)} ${Math.abs(x.amount_paid).toLocaleString()}</span>`
         : amt !== 0 ? `<span style="color:${amt > 0 ? '#16A34A' : '#EF4444'};font-weight:600">${amt > 0 ? '+' : '-'}${Math.abs(amt).toLocaleString()}</span>` : '—';
       return `<tr style="border-bottom:1px solid var(--bd)${incomplete ? ';opacity:.5' : ''}">
         <td style="padding:6px 6px;white-space:nowrap">${fmt(x.occurred_at)}</td>

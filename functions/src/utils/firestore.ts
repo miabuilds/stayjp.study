@@ -102,7 +102,9 @@ export interface TransactionDoc {
   type: TxnType;
   source: Source;
   plan: PlanKey | "n/a";
-  amount_twd: number;          // 正數 = 收入,負數 = 退費
+  amount_twd: number;          // 正數 = 收入,負數 = 退費(綠界=實收 TWD;Apple/Google=台幣牌價,僅供參考)
+  currency?: string;           // 實際結帳幣別(Apple/Google IAP,如 TWD/USD/JPY);綠界一律 TWD
+  amount_paid?: number;        // 該幣別的實付金額(外國人買 iOS 時,真金額在這,不是 amount_twd)
   occurred_at: admin.firestore.Timestamp;
   payment_method: "ecpay" | "apple_iap" | "google_billing" | "manual" | "paypal";
   external_id: string;
