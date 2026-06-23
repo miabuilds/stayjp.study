@@ -51,6 +51,7 @@ const Stats = (() => {
       b.classList.toggle('on', b.dataset.tab === tab);
     });
     const c = document.getElementById('statContent');
+    if (!c) return;
     if (tab === 'stats') c.innerHTML = buildStatsCombined();
     else if (tab === 'collection') c.innerHTML = buildCollectionCombined();
     else if (tab === 'settings') c.innerHTML = buildSettings();
@@ -139,7 +140,7 @@ const Stats = (() => {
     let nb = getNotebook();
     nb = nb.filter(x => !(x.w === w && x.lv === lv));
     saveNotebook(nb);
-    switchTab('notebook');
+    switchTab('collection');
   }
 
   function buildNotebook() {
@@ -464,7 +465,7 @@ const Stats = (() => {
   function removeWrongQuestion(mode, id) {
     const arr = getWrongQuestions().filter(x => !(x.mode === mode && x.id === id));
     saveWrongQuestions(arr);
-    switchTab('wrongq');
+    switchTab('collection');
   }
 
   function buildWrongQuestions() {
@@ -565,7 +566,7 @@ const Stats = (() => {
         <div style="text-align:center;padding:24px 0"><div style="font-size:48px;font-weight:700;color:${col}">${pct}%</div><div style="color:var(--tx2);margin-top:4px">${_wq.correct} / ${_wq.arr.length}</div></div>
         <div style="display:flex;gap:8px">
           <button class="qstart" style="flex:1" onclick="Stats.quizWrongQuestions()">🔁 再考一次</button>
-          <button class="qclose" style="flex:1" onclick="Stats.open();Stats.switchTab('wrongq')">回錯題回顧</button>
+          <button class="qclose" style="flex:1" onclick="Stats.open();Stats.switchTab('collection')">回錯題回顧</button>
         </div>`;
       return;
     }
