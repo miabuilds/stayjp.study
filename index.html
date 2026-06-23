@@ -389,6 +389,10 @@ select::-ms-expand { display: none; }
   max-width: 720px;
 }
 
+/* 在「我的」頁:隱藏左側單字/文法清單(那清單在此無作用,點了沒反應),內容區補滿 */
+body.profile-view .sd { display: none; }
+body.profile-view .mn { margin-left: 0; }
+
 /* == Intro banner == */
 .intro {
   background: linear-gradient(135deg, var(--bg3) 0%, var(--bg2) 100%);
@@ -1855,6 +1859,7 @@ function toggleFavFilter() {
 let st; function onSearch(v) { clearTimeout(st); st = setTimeout(() => { searchTerm = v.trim().toLowerCase(); doRender(); }, 200); }
 window.doRender = doRender;   // 給 tool-quota:用完額度後即時重繪,🔒 立刻顯示(免 reload)
 function doRender() {
+  document.body.classList.remove('profile-view');   // 回到學習列表 → 還原側邊欄(離開「我的」)
   if (currentMode==='vocab') renderVocab();
   else if (currentMode==='confuse') renderConfuse();
   else render();

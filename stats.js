@@ -17,6 +17,7 @@ const Stats = (() => {
   function openProfile() {
     const mn = document.getElementById('mn');
     if (!mn) return;
+    document.body.classList.add('profile-view');   // 隱藏左側單字/文法清單(在「我的」無作用)
     document.querySelectorAll('.ftb-btn').forEach(b => b.classList.remove('on'));
     const btns = document.querySelectorAll('.ftb-btn');
     if (btns[3]) btns[3].classList.add('on'); // 「我的」 is index 3
