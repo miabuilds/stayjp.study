@@ -175,9 +175,9 @@
   function goToPlans() {
     try {
       if (window.STAYJP_NATIVE && window.STAYJP_NATIVE.isNativeApp && window.ReactNativeWebView && window.ReactNativeWebView.postMessage) {
-        const u = (window.firebase && firebase.auth && firebase.auth().currentUser) || null;
         const lng = (window.localStorage && localStorage.getItem('ui_lang')) || 'zh-TW';
-        window.ReactNativeWebView.postMessage(JSON.stringify(u ? { type: 'OPEN_PAYWALL', lang: lng } : { type: 'OPEN_LOGIN', intent: 'subscribe', lang: lng }));
+        // 看方案不用登入 → 一律開 paywall;訂閱才要求登入(paywall 內處理)
+        window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'OPEN_PAYWALL', lang: lng }));
         return;
       }
     } catch (_) {}

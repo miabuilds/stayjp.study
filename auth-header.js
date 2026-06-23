@@ -166,11 +166,9 @@
       e.stopPropagation();
       try {
         if (!(window.ReactNativeWebView && window.ReactNativeWebView.postMessage)) return;
-        var u = (window.firebase && firebase.auth && firebase.auth().currentUser) || null;
         var lng = (window.localStorage && localStorage.getItem('ui_lang')) || 'zh-TW';
-        window.ReactNativeWebView.postMessage(JSON.stringify(u
-          ? { type: 'OPEN_PAYWALL', lang: lng }
-          : { type: 'OPEN_LOGIN', intent: 'subscribe', lang: lng }));
+        // 看方案不用登入 → 一律開 paywall;真的要訂閱(按 CTA)時 paywall 內才要求登入
+        window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'OPEN_PAYWALL', lang: lng }));
       } catch (_) {}
     }, true);
   }
