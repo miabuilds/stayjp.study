@@ -186,6 +186,7 @@ const Stats = (() => {
   function reviewNotebook() {
     const nb = getNotebook();
     if (!nb.length) { alert(t('notebook_empty_alert')); return; }
+    document.getElementById('quizBg').classList.add('show');   // 我的頁 inline → 須開 overlay 才看得到逐一複習卡
     let cur = 0;
     function renderCard() {
       const item = nb[cur];
@@ -379,6 +380,8 @@ const Stats = (() => {
   }
 
   function _renderWQ() {
+    // 我的頁是 inline 渲染(會隱藏 quizBg),這裡務必把測驗 overlay 打開,否則寫進 quizBox 卻看不到 = 沒反應
+    document.getElementById('quizBg').classList.add('show');
     const s = Stats._wqState;
     const q = s.questions[s.cur];
     document.getElementById('quizBox').innerHTML = `
