@@ -88,9 +88,17 @@
   var auth, area;
   var _ahxSigningIn = false;
 
+  // 載入中的中性佔位(上次有登入才用)→ 避免閃「登入」。非互動。
+  function renderPlaceholder() {
+    if (!area) return;
+    area.innerHTML = '<span class="ahx-btn" aria-hidden="true" style="opacity:.5;pointer-events:none">'
+      + '<span style="width:18px;height:18px;border-radius:50%;background:var(--bg3,#d1d5db);display:inline-block"></span></span>';
+  }
+
   function render(user) {
     if (!area) return;
     if (user) {
+      try { localStorage.setItem('ahx_li', '1'); } catch (e) {}   // 記住已登入 → 下次載入先顯示佔位不閃「登入」
       var _em = user.email || '';
       // Apple privaterelay 用戶沒 displayName → 取信箱 @ 前半截,避免長信箱撐爆 header
       var name = user.displayName ? user.displayName.split(' ')[0] : (_em ? _em.split('@')[0] : 'User');
@@ -118,6 +126,7 @@
         try { if (window.STAYJP_NATIVE && window.STAYJP_NATIVE.isNativeApp && window.ReactNativeWebView && window.ReactNativeWebView.postMessage) window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'NATIVE_LOGOUT' })); } catch (e) {}
       };
     } else {
+      try { localStorage.removeItem('ahx_li'); } catch (e) {}   // 確定登出 → 清快取,下次直接顯示「登入」
       area.innerHTML = '<button class="ahx-btn" id="ahxLogin" type="button">登入</button>';
       area.querySelector('#ahxLogin').onclick = login;
     }
@@ -185,14 +194,17 @@
 
   async function init() {
     injectCSS();
-    try { auth = await ensureFirebase(); }
-    catch (e) { console.warn('[auth-header] firebase load fail', e); return; }
-    patchNativeLogin();
-    patchPricingLinks();
+    // 先建 area + 依「上次登入狀態」渲染:Firebase 載入那 1~2 秒,對上次有登入的人顯示中性 placeholder,
+    // 不要先閃「登入」再變名字(登出者快取不為 1 → 維持空白,等狀態確定才出現「登入」,也不會閃)。
     area = document.createElement('div');
     area.className = 'ahx-area';
     area.id = 'ahxArea';
     findAnchor().appendChild(area);
+    try { if (localStorage.getItem('ahx_li') === '1') renderPlaceholder(); } catch (e) {}
+    try { auth = await ensureFirebase(); }
+    catch (e) { console.warn('[auth-header] firebase load fail', e); return; }
+    patchNativeLogin();
+    patchPricingLinks();
     document.addEventListener('click', function (e) {
       var m = document.getElementById('ahxMenu');
       if (m && m.classList.contains('show') &&
