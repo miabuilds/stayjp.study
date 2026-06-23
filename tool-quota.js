@@ -165,10 +165,23 @@
       setTimeout(() => wrap.remove(), 320);
     };
     function onEsc(e) { if (e.key === 'Escape') close(); }
-    wrap.querySelector('#pwOk').onclick = () => { window.location.href = 'pricing.html'; };
+    wrap.querySelector('#pwOk').onclick = () => { goToPlans(); };
     wrap.querySelector('#pwCancel').onclick = close;
     wrap.onclick = (e) => { if (e.target === wrap) close(); };
     document.addEventListener('keydown', onEsc);
+  }
+
+  // 前往方案:App 內直接開原生 paywall(不載入 pricing 頁 → 不會閃一下網頁價格頁);網頁則導到 pricing。
+  function goToPlans() {
+    try {
+      if (window.STAYJP_NATIVE && window.STAYJP_NATIVE.isNativeApp && window.ReactNativeWebView && window.ReactNativeWebView.postMessage) {
+        const u = (window.firebase && firebase.auth && firebase.auth().currentUser) || null;
+        const lng = (window.localStorage && localStorage.getItem('ui_lang')) || 'zh-TW';
+        window.ReactNativeWebView.postMessage(JSON.stringify(u ? { type: 'OPEN_PAYWALL', lang: lng } : { type: 'OPEN_LOGIN', intent: 'subscribe', lang: lng }));
+        return;
+      }
+    } catch (_) {}
+    window.location.href = 'pricing.html';
   }
 
   // ── UI badge（只 owner 看得到）──
@@ -182,7 +195,7 @@
       // bottom 要避開底部導覽列(.ftb,高度 var(--btm))+ 瀏海安全區,否則手機上會蓋住「學習」tab
       badge.style.cssText = 'position:fixed;bottom:calc(var(--btm, 56px) + env(safe-area-inset-bottom) + 12px);left:14px;background:rgba(0,0,0,.78);color:#fff;padding:8px 12px;border-radius:10px;font-size:11px;font-family:-apple-system,sans-serif;line-height:1.5;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,.2);cursor:pointer;max-width:220px';
       badge.title = '免費版每日額度。點擊查看訂閱方案。';
-      badge.onclick = () => window.location.href = 'pricing.html';
+      badge.onclick = () => goToPlans();
       document.body.appendChild(badge);
     }
     if (trial) {
