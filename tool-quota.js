@@ -187,7 +187,9 @@
   // ── UI badge（只 owner 看得到）──
   function refreshBadge() {
     let badge = document.getElementById('quotaBadge');
-    const trial = inTrial() && !isPremium();   // 付費用戶不顯示試用 badge(即使曾在試用期訂閱)
+    // App 沒有 3 天試用(走 Apple 7 天)→ App 一律不顯示「試用中 / 試用已結束」,只顯示免費版額度。網頁照常。
+    const isNative = !!(window.STAYJP_NATIVE && window.STAYJP_NATIVE.isNativeApp);
+    const trial = inTrial() && !isPremium() && !isNative;   // 付費用戶不顯示試用 badge(即使曾在試用期訂閱)
     if (!trial && !shouldGate()) { if (badge) badge.remove(); return; }
     if (!badge) {
       badge = document.createElement('div');
@@ -210,7 +212,7 @@
       return;
     }
     // 試用已結束(這個帳號曾開過試用、現已過期、非付費)→ 轉換提示,取代一般免費版 badge
-    if (cachedTrialStart != null && !isPremium()) {
+    if (cachedTrialStart != null && !isPremium() && !isNative) {
       badge.title = '3 天試用已結束。點擊升級,解鎖無限練習。';
       badge.innerHTML = '<div style="font-weight:700;margin-bottom:2px">✨ 3 天試用已結束</div>'
         + '<div style="color:#FCD34D">升級 Premium 解鎖無限練習 →</div>';
