@@ -230,7 +230,8 @@ const PLAN_LABELS = {
 };
 
 const STATUS_LABELS = {
- active: { text: ' 啟用中', cls: 'b-active' },
+ trialing: { text: '🎁 免費試用中', cls: 'b-active' },
+ active: { text: '✓ Premium 會員', cls: 'b-active' },
  cancelled: { text: '使用中・到期後不續扣', cls: 'b-cancelled' },
  refunded: { text: '已退費', cls: 'b-refunded' },
  expired: { text: '已過期', cls: 'b-expired' },
@@ -303,22 +304,43 @@ function renderSubscription(sub) {
  return;
  }
 
+ // 是否「現在真的有有效權益」:active/trialing/cancelled 且尚未到期。
+ // 其餘(voided 假刪 / expired 過期 / refunded 退費 / cancelled 已過期)→ 一律當免費版乾淨顯示,
+ // 不把 voided / trialing 這種內部英文狀態直接秀給使用者(這是「看不出有沒有訂閱」的根因)。
+ const now = Date.now();
+ const inPeriod = !!(sub.expiresAt && sub.expiresAt > now);
+ const isPrem = (sub.status === 'active' || sub.status === 'trialing' || sub.status === 'cancelled') && inPeriod;
+ if (!isPrem) {
+ planLabel.innerHTML = '免費版 <span class="badge b-free">FREE</span>';
+ rowStatus.style.display = 'none';
+ rowExpiry.style.display = 'none';
+ rowRenew.style.display = 'none';
+ rowSource.style.display = 'none';
+ freeActions.style.display = 'block';
+ premiumActions.style.display = 'none';
+ appNote.style.display = 'none';
+ return;
+ }
+
  // Plan label
  const pl = PLAN_LABELS[sub.plan] || sub.plan;
  const earlyBird = sub.is_early_bird ? '<span class="badge b-early-bird">早鳥鎖價</span>' : '';
  planLabel.innerHTML = `${pl} ${earlyBird}`;
 
- // Status
- const st = STATUS_LABELS[sub.status] || { text: sub.status, cls: 'b-free' };
+ // Status(只會是有權益的狀態;fallback 也給正面字樣,不再漏英文)
+ const st = STATUS_LABELS[sub.status] || { text: 'Premium 會員', cls: 'b-active' };
  document.getElementById('statusBadge').innerHTML = `<span class="badge ${st.cls}">${st.text}</span>`;
  rowStatus.style.display = 'flex';
 
- // Expiry
+ // Expiry(試用中額外標「試用至 … 剩 N 天」,讓人清楚現在是試用)
  if (sub.plan === 'lifetime') {
  document.getElementById('expiryDate').textContent = '無到期日(買斷方案)';
  } else if (sub.expiresAt) {
  const d = new Date(sub.expiresAt);
- document.getElementById('expiryDate').textContent = d.toLocaleDateString('zh-TW', { year: 'numeric', month: '2-digit', day: '2-digit' });
+ const dateStr = d.toLocaleDateString('zh-TW', { year: 'numeric', month: '2-digit', day: '2-digit' });
+ const daysLeft = Math.max(0, Math.ceil((sub.expiresAt - now) / 86400000));
+ document.getElementById('expiryDate').textContent =
+ sub.status === 'trialing' ? `試用至 ${dateStr}(剩 ${daysLeft} 天)` : dateStr;
  }
  rowExpiry.style.display = 'flex';
 
