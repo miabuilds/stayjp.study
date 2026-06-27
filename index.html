@@ -1709,9 +1709,11 @@ function loadCloudData() {
       });
       if (patched) {
         localStorage.setItem('study_log', JSON.stringify(sl));
-        if (typeof saveAllCloud === 'function') saveAllCloud();
       }
     }
+    // 合併後一律把 union 推回雲端:讓「登出時學的 / 只存在本機的學習日」也同步上去,
+    // 其他裝置下次登入就拿得到 → 修「火焰跨裝置連續、但月曆塗滿散落各機」(只有 backfill 時才推會漏掉)。
+    if (typeof saveAllCloud === 'function') saveAllCloud();
     if (typeof SRS !== 'undefined') SRS.updateReviewCount();
     if (typeof Calendar !== 'undefined') Calendar.renderPanel();
     doRender();
