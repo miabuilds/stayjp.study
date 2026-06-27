@@ -263,7 +263,13 @@ auth.onAuthStateChanged(user => {
 document.getElementById('loginBtn').onclick = () => {
  const provider = new firebase.auth.GoogleAuthProvider();
  provider.setCustomParameters({ prompt: 'select_account' });
- auth.signInWithPopup(provider).catch(err => alert('登入失敗:' + err.message));
+ auth.signInWithPopup(provider).catch(err => {
+   const code = err && err.code;
+   // 良性:連點取消 / 關彈窗 / App 內原生登入橋接(會發 OPEN_LOGIN 彈原生登入框,不該跳錯誤)
+   if (code === 'auth/cancelled-popup-request' || code === 'auth/popup-closed-by-user') return;
+   if (code === 'auth/network-request-failed') { alert('網路不穩,登入連線失敗,請稍後再試一次。'); return; }
+   alert('登入失敗:' + (err && err.message || err));
+ });
 };
 
 function logout() { auth.signOut().then(() => location.reload()); }

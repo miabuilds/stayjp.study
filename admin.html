@@ -403,6 +403,8 @@ document.getElementById('loginBtn').onclick = () => {
  const provider = new firebase.auth.GoogleAuthProvider();
  provider.setCustomParameters({ prompt: 'select_account' });
  auth.signInWithPopup(provider).catch(err => {
+ const code = err && err.code;
+ if (code === 'auth/cancelled-popup-request' || code === 'auth/popup-closed-by-user') return;  // 良性(含 App 原生登入橋接)
  document.getElementById('errMsg').textContent = '登入失敗:' + err.message;
  });
 };
