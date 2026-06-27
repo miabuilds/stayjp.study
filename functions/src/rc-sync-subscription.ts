@@ -57,21 +57,27 @@ export const rcSyncSubscription = functions.onRequest(
         headers: { Authorization: `Bearer ${secret}` },
       });
       if (!r.ok) { res.status(502).json({ error: "rc_fetch_failed", status: r.status }); return; }
-      const data = await r.json() as { subscriber?: { entitlements?: Record<string, {
-        expires_date?: string | null; product_identifier?: string; unsubscribe_detected_at?: string | null;
-      }> } };
+      const data = await r.json() as { subscriber?: {
+        entitlements?: Record<string, {
+          expires_date?: string | null; product_identifier?: string; unsubscribe_detected_at?: string | null;
+        }>;
+        subscriptions?: Record<string, { period_type?: string }>;   // period_type: "trial"|"intro"|"normal"
+      } };
 
       const ent = data?.subscriber?.entitlements?.[ENTITLEMENT_ID];
       const active = !!ent && (!ent.expires_date || new Date(ent.expires_date).getTime() > Date.now());
       if (!active || !ent) { res.json({ ok: true, premium: false }); return; }
 
-      const plan = mapProductIdToPlan(ent.product_identifier || "") || "monthly";
+      const prodId = ent.product_identifier || "";
+      const plan = mapProductIdToPlan(prodId) || "monthly";
       const expiresAt = ent.expires_date ? new Date(ent.expires_date).getTime() : nowMs() + 365 * 100 * 864e5;
+      // 試用期 → status: trialing(帳號頁顯示「試用中・剩 N 天」,而非「Premium 會員」)
+      const periodType = data?.subscriber?.subscriptions?.[prodId]?.period_type;
       const existing = await getSubscription(uid);
       const sub: SubscriptionDoc = {
         source: "app",
         plan,
-        status: "active",
+        status: periodType === "trial" ? "trialing" : "active",
         expiresAt,
         willRenew: !ent.unsubscribe_detected_at,
         startedAt: existing?.startedAt || nowMs(),

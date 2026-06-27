@@ -128,7 +128,8 @@ export const revenuecatWebhook = functions.onRequest(
           const newSub: SubscriptionDoc = {
             source: "app",
             plan: finalPlan,
-            status: "active",
+            // 試用期(免費 7 天)→ trialing,帳號頁顯示「試用中・剩 N 天」;試用轉付費的 RENEWAL period_type=NORMAL → active
+            status: event.period_type === "TRIAL" ? "trialing" : "active",
             expiresAt: finalExpiry,
             willRenew: finalPlan !== "lifetime",   // 買斷不續訂
             startedAt: existingSub?.startedAt || nowMs(),

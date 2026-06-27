@@ -22,7 +22,7 @@ export const EARLY_BIRD_LIMIT = 100;
 
 export type PlanKey = "monthly" | "yearly" | "yearly_early_bird" | "lifetime";
 export type Source = "web" | "app";
-export type SubStatus = "active" | "cancelled" | "expired" | "refunded";
+export type SubStatus = "trialing" | "active" | "cancelled" | "expired" | "refunded" | "voided";
 
 export const PLANS: Record<PlanKey, {
   price_twd: number;
