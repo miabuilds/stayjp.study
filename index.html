@@ -1313,6 +1313,41 @@ body.profile-view .mn { margin-left: 0; max-width: none; }   /* 滿版 → 內�
   .cal-panel { margin: 0 0 12px; padding: 12px; }
   .cal-streak { font-size: 13px; }
 }
+
+/* ===== 新手引導(只對零紀錄新用戶,一次性)===== */
+.onb-mask { position: fixed; inset: 0; z-index: 6000; background: rgba(0,0,0,.45);
+  display: flex; align-items: center; justify-content: center; padding: 20px;
+  opacity: 0; transition: opacity .25s ease; -webkit-tap-highlight-color: transparent; }
+.onb-mask.show { opacity: 1; }
+.onb-card { background: var(--bg); border: 1px solid var(--bd); border-radius: 18px;
+  width: 100%; max-width: 380px; max-height: 88vh; overflow-y: auto; padding: 26px 22px;
+  box-shadow: 0 14px 44px rgba(0,0,0,.28); box-sizing: border-box;
+  transform: translateY(18px) scale(.97); transition: transform .3s cubic-bezier(.2,.85,.25,1); }
+.onb-mask.show .onb-card { transform: translateY(0) scale(1); }
+.onb-title { font-size: 22px; font-weight: 800; color: var(--tx); text-align: center; line-height: 1.3; }
+.onb-sub { font-size: 14px; color: var(--tx2); text-align: center; margin-top: 8px; line-height: 1.6; }
+.onb-q { font-size: 14px; font-weight: 700; color: var(--tx); margin: 22px 0 12px; text-align: center; }
+.onb-lv-grid { display: flex; flex-direction: column; gap: 9px; }
+.onb-lv { display: flex; align-items: center; gap: 10px; padding: 13px 16px; border: 1.5px solid var(--bd);
+  border-radius: 12px; background: var(--bg2); color: var(--tx); font-size: 16px; font-weight: 800;
+  cursor: pointer; text-align: left; transition: border-color .15s, background .15s, transform .12s; }
+.onb-lv:hover { border-color: var(--ac); background: var(--bg3); }
+.onb-lv:active { transform: scale(.97); }
+.onb-lv-hint { font-size: 12px; font-weight: 500; color: var(--tx2); }
+.onb-tips { display: flex; flex-direction: column; gap: 16px; margin: 22px 0; }
+.onb-tip { display: flex; gap: 12px; align-items: flex-start; }
+.onb-tip-ic { font-size: 20px; flex-shrink: 0; line-height: 1.4; }
+.onb-tip-tx { font-size: 14px; color: var(--tx); line-height: 1.55; }
+.onb-tip-tx b { color: var(--ac); font-weight: 700; }
+.onb-start { width: 100%; padding: 14px; border: none; border-radius: 999px; background: var(--ac);
+  color: #fff; font-size: 16px; font-weight: 800; cursor: pointer; transition: transform .12s, opacity .15s; }
+.onb-start:active { transform: scale(.97); opacity: .9; }
+.onb-skip { display: block; margin: 16px auto 0; background: none; border: none; color: var(--tx2);
+  font-size: 13px; cursor: pointer; text-decoration: underline; }
+@media (max-width: 600px) {
+  .onb-card { padding: 22px 18px; border-radius: 16px; }
+  .onb-title { font-size: 20px; }
+}
 </style>
 </head>
 <body>
@@ -1716,6 +1751,11 @@ function loadCloudData() {
     if (typeof saveAllCloud === 'function') saveAllCloud();
     if (typeof SRS !== 'undefined') SRS.updateReviewCount();
     if (typeof Calendar !== 'undefined') Calendar.renderPanel();
+    // 回訪用戶在這台第一次登入、雲端資料剛載入 → 標記引導完成並關掉(避免對老用戶閃出新手引導)
+    if (typeof _onbHasData === 'function' && _onbHasData()) {
+      localStorage.setItem('onboarding_done_v1', '1');
+      if (typeof _onbRemove === 'function') _onbRemove();
+    }
     doRender();
   }).catch(() => {});
 }
@@ -2675,6 +2715,67 @@ const Streak = (() => {
 
   return { markToday, render, showInfo, syncDown, maybePromptAt7 };
 })();
+
+// ===== 新手引導:只對「完全沒有學習紀錄」的新使用者出現一次 =====
+function _onbHasData() {
+  const ks = ['study_log','word_notebook','quiz_history','srs_data','sairyuu_fav'];
+  for (const k of ks) {
+    try {
+      const v = JSON.parse(localStorage.getItem(k) || 'null');
+      if (Array.isArray(v) ? v.length : (v && typeof v === 'object' && Object.keys(v).length)) return true;
+    } catch (e) {}
+  }
+  return false;
+}
+function _onbRemove() {
+  const m = document.getElementById('onbMask');
+  if (m) { m.classList.remove('show'); setTimeout(() => m.remove(), 300); }
+}
+function onbFinish() { localStorage.setItem('onboarding_done_v1', '1'); _onbRemove(); }
+function onbPick(lv) {
+  try { if (currentMode !== 'grammar') switchMode('grammar'); } catch (e) {}
+  try { switchLevel(lv); } catch (e) {}
+  const card = document.querySelector('#onbMask .onb-card');
+  if (!card) { onbFinish(); return; }
+  card.innerHTML =
+    '<div class="onb-title">' + cvt('準備好了!') + '</div>' +
+    '<div class="onb-sub">' + cvt('已幫你切到 ' + lv.toUpperCase() + ',先認識一下畫面:') + '</div>' +
+    '<div class="onb-tips">' +
+      '<div class="onb-tip"><span class="onb-tip-ic">📚</span><span class="onb-tip-tx">' + cvt('上方切換 <b>單字 / 文法</b>,內容全部免費看。') + '</span></div>' +
+      '<div class="onb-tip"><span class="onb-tip-ic">✍️</span><span class="onb-tip-tx">' + cvt('下方 <b>測驗・複習・我的</b>:做題、背單字卡、看進度。') + '</span></div>' +
+      '<div class="onb-tip"><span class="onb-tip-ic">🔥</span><span class="onb-tip-tx">' + cvt('每天回來學一點,右上 <b>火焰</b> 記錄你的連續天數。') + '</span></div>' +
+    '</div>' +
+    '<button class="onb-start" onclick="onbFinish()">' + cvt('開始學習') + '</button>';
+}
+function showOnboarding() {
+  if (document.getElementById('onbMask')) return;
+  const m = document.createElement('div');
+  m.id = 'onbMask';
+  m.className = 'onb-mask';
+  m.innerHTML =
+    '<div class="onb-card" role="dialog" aria-modal="true">' +
+      '<div class="onb-title">' + cvt('歡迎來到 StayJP 🎉') + '</div>' +
+      '<div class="onb-sub">' + cvt('免費學 JLPT N5–N1:單字・文法・模考・間隔複習') + '</div>' +
+      '<div class="onb-q">' + cvt('先選你的程度(之後隨時可改)') + '</div>' +
+      '<div class="onb-lv-grid">' +
+        '<button class="onb-lv" onclick="onbPick(\'n5\')">N5 <span class="onb-lv-hint">' + cvt('零基礎・入門') + '</span></button>' +
+        '<button class="onb-lv" onclick="onbPick(\'n4\')">N4 <span class="onb-lv-hint">' + cvt('初級') + '</span></button>' +
+        '<button class="onb-lv" onclick="onbPick(\'n3\')">N3 <span class="onb-lv-hint">' + cvt('中級') + '</span></button>' +
+        '<button class="onb-lv" onclick="onbPick(\'n2\')">N2 <span class="onb-lv-hint">' + cvt('中高級') + '</span></button>' +
+        '<button class="onb-lv" onclick="onbPick(\'n1\')">N1 <span class="onb-lv-hint">' + cvt('高級') + '</span></button>' +
+      '</div>' +
+      '<button class="onb-skip" onclick="onbFinish()">' + cvt('先逛逛,跳過') + '</button>' +
+    '</div>';
+  document.body.appendChild(m);
+  requestAnimationFrame(() => m.classList.add('show'));
+}
+function maybeShowOnboarding() {
+  if (localStorage.getItem('onboarding_done_v1')) return;
+  if (_onbHasData()) { localStorage.setItem('onboarding_done_v1', '1'); return; } // 既有用戶:標記、永不顯示
+  showOnboarding();
+}
+// 延遲:讓已登入回訪用戶先把雲端資料載入(loadCloudData 會在有資料時標記/關掉),避免對老用戶閃出引導
+setTimeout(maybeShowOnboarding, 1200);
 
 // Bootstrap: bump streak on every page load, render the badge, possibly prompt for login.
 markStreakOnLoad();
