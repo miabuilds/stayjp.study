@@ -101,6 +101,8 @@ export const revenuecatWebhook = functions.onRequest(
       const rcMoney: { currency?: string; amount_paid?: number } = {};
       if (typeof event.currency === "string" && event.currency) rcMoney.currency = event.currency;
       if (typeof event.price_in_purchased_currency === "number") rcMoney.amount_paid = event.price_in_purchased_currency;
+      // 沙盒(測試)vs 正式(真實付款)→ 寫進 subscription/交易,後台才分得出測試帳號與真實金流
+      const isSandbox = event.environment === "SANDBOX";
 
       switch (type) {
         case "INITIAL_PURCHASE":
@@ -132,6 +134,7 @@ export const revenuecatWebhook = functions.onRequest(
             startedAt: existingSub?.startedAt || nowMs(),
             apple_txn: event.transaction_id,
             is_early_bird: isEarlyBird,
+            is_sandbox: isSandbox,
             failed_retries: 0,
           };
           await writeSubscription(uid, newSub);
@@ -143,6 +146,7 @@ export const revenuecatWebhook = functions.onRequest(
             plan,
             amount_twd: planInfo.price_twd,
             ...rcMoney,   // 實際幣別 + 實付金額(外國人/非台幣)
+            is_sandbox: isSandbox,
             payment_method: event.store === "PLAY_STORE" ? "google_billing" : "apple_iap",
             external_id: event.transaction_id || event.original_transaction_id,
             status: "success",
@@ -221,6 +225,7 @@ export const revenuecatWebhook = functions.onRequest(
             plan,
             amount_twd: 0,
             ...refundMoney,
+            is_sandbox: isSandbox,
             payment_method: event.store === "PLAY_STORE" ? "google_billing" : "apple_iap",
             external_id: event.transaction_id || event.original_transaction_id || "",
             status: "refunded",

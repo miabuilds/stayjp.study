@@ -49,6 +49,7 @@ export interface SubscriptionDoc {
   google_txn?: string;
   paypal_capture?: string;   // PayPal 一次性付款的 capture id;有值 = 來源為 PayPal、退費要用它
   is_early_bird?: boolean;
+  is_sandbox?: boolean;        // Apple/Google 沙盒測試購買(非真實付款)→ 後台用來區分測試/真實
   refund_requested_at?: admin.firestore.Timestamp;
   failed_retries?: number;
   last_retry_at?: number;
@@ -105,6 +106,7 @@ export interface TransactionDoc {
   amount_twd: number;          // 正數 = 收入,負數 = 退費(綠界=實收 TWD;Apple/Google=台幣牌價,僅供參考)
   currency?: string;           // 實際結帳幣別(Apple/Google IAP,如 TWD/USD/JPY);綠界一律 TWD
   amount_paid?: number;        // 該幣別的實付金額(外國人買 iOS 時,真金額在這,不是 amount_twd)
+  is_sandbox?: boolean;        // Apple/Google 沙盒測試交易(非真實金流)→ 後台對帳要排除
   occurred_at: admin.firestore.Timestamp;
   payment_method: "ecpay" | "apple_iap" | "google_billing" | "manual" | "paypal";
   external_id: string;
