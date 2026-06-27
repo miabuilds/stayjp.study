@@ -1744,7 +1744,7 @@ function saveSRSCloud() {
   db.collection('users').doc(currentUser.uid).set({ srs_data: d }, { merge: true });
 }
 // ── Sync ALL data ──
-const SYNC_KEYS = ['study_log','word_notebook','grammar_srs','daily_progress','mock_exam_history','exam_date','base_level','goal_level','reading_done','listening_scores','listening_done','shadow_favs','wrong_questions'];
+const SYNC_KEYS = ['study_log','word_notebook','grammar_srs','daily_progress','mock_exam_history','exam_date','base_level','goal_level','reading_done','reading_scores','listening_scores','listening_done','shadow_favs','wrong_questions'];
 function saveAllCloud() {
   if (!currentUser || !db) return;
   const payload = {};
