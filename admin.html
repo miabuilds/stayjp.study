@@ -1087,6 +1087,7 @@ async function fetchBillingStats() {
  const snap = await db.collection('transactions').orderBy('occurred_at', 'desc').limit(5000).get();
  snap.forEach(d => {
  const t = d.data();
+ if (t.hidden || t.is_sandbox) return;   // 跳過假刪/沙盒測試交易 → 與帳本一致,不灌爆營業額(Apple 沙盒會狂續訂)
  const inMonth = t.occurred_at && t.occurred_at.toDate && t.occurred_at.toDate() >= monthStart;
  if (t.status === 'success' && t.type === 'subscribe') {                               // 新訂閱(不含續訂 renew)
    if (t.uid && soldUids.has(t.uid)) reSold++; else if (t.uid) soldUids.add(t.uid);   // 同人再訂算重訂、不灌買家數
