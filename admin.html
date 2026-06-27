@@ -815,9 +815,11 @@ async function renderLedger() {
         pay: PAY_TXT[x.payment_method] || x.payment_method || '',
         status: TXN_STATUS_TXT[x.status] || x.status || '',
         ext: x.external_id || '',
+        test: x.is_sandbox ? 'sandbox(測試)' : '',
       });
-      if (x.status === 'success' && (x.type === 'subscribe' || x.type === 'renew')) rev += amt;
-      if (x.type === 'refund') refund += Math.abs(amt);
+      // 沙盒測試購買不計入營收/退費(否則對帳數字虛高)
+      if (!x.is_sandbox && x.status === 'success' && (x.type === 'subscribe' || x.type === 'renew')) rev += amt;
+      if (!x.is_sandbox && x.type === 'refund') refund += Math.abs(amt);
       if (x.status === 'pending') pending++;
       const incomplete = x.status === 'pending' || x.status === 'failed';
       // 外幣交易(Apple/Google 非台幣)→ 顯示實際幣別與實付金額,而非台幣牌價(amount_twd)
@@ -825,8 +827,8 @@ async function renderLedger() {
       const amtCell = incomplete ? `<span style="color:var(--tx3)">${Math.abs(amt).toLocaleString()} 未扣</span>`
         : foreign ? `<span style="color:${x.amount_paid >= 0 ? '#16A34A' : '#EF4444'};font-weight:600">${x.amount_paid >= 0 ? '+' : '-'}${esc(x.currency)} ${Math.abs(x.amount_paid).toLocaleString()}</span>`
         : amt !== 0 ? `<span style="color:${amt > 0 ? '#16A34A' : '#EF4444'};font-weight:600">${amt > 0 ? '+' : '-'}${Math.abs(amt).toLocaleString()}</span>` : '—';
-      return `<tr style="border-bottom:1px solid var(--bd)${incomplete ? ';opacity:.5' : ''}">
-        <td style="padding:6px 6px;white-space:nowrap">${fmt(x.occurred_at)}</td>
+      return `<tr style="border-bottom:1px solid var(--bd)${(incomplete || x.is_sandbox) ? ';opacity:.5' : ''}">
+        <td style="padding:6px 6px;white-space:nowrap">${x.is_sandbox?'<span style="color:#F59E0B">🧪</span> ':''}${fmt(x.occurred_at)}</td>
         <td style="padding:6px 6px">${esc(uidEmail[x.uid] || x.uid.slice(0, 10))}</td>
         <td style="padding:6px 6px;white-space:nowrap">${TXN_TYPE_TXT[x.type] || x.type}</td>
         <td style="padding:6px 6px;white-space:nowrap">${SUB_PLAN_TXT[x.plan] || (x.plan && x.plan !== 'n/a' ? x.plan : '—')}</td>
@@ -877,21 +879,37 @@ const SUB_STATUS_TXT = { active:'使用中', cancelled:'取消續扣（仍可用
 const TXN_TYPE_TXT = { subscribe:'訂閱', renew:'續訂', refund:'退費', cancel:'關閉續扣', fail:'扣款失敗', chargeback:'信用卡爭議', gift:'贈送' };
 const TXN_STATUS_TXT = { success:'成功', pending:'處理中', failed:'失敗', refunded:'已退費' };
 
+let _allSubs = [];
+let _subsFilter = 'real';   // real(真實) | test(沙盒測試) | all(全部);預設只看真實 → 後台乾淨
+function setSubsFilter(f) { _subsFilter = f; renderSubsTable(); }
 async function renderSubs() {
   freeAccess('list');   // 同時載入免費白名單清單
   const box = document.getElementById('subsList');
-  const cnt = document.getElementById('subsCount');
   box.textContent = '載入中…';
   try {
     const t = await auth.currentUser.getIdToken();
     const res = await fetch(FN_LIST_SUBS, { method:'POST', headers:{ Authorization:'Bearer '+t } });
     const data = await res.json();
     if (!res.ok) { box.textContent = '讀取失敗:' + (data.error || res.status); return; }
-    const list = data.subscribers || [];
-    cnt.textContent = `共 ${data.count} 筆`;
-    if (!list.length) { box.textContent = '目前沒有訂閱者。'; return; }
-    const fmtDate = ms => ms ? new Date(Number(ms)).toLocaleDateString('zh-TW') : '—';
-    box.innerHTML = `
+    _allSubs = data.subscribers || [];
+    renderSubsTable();
+  } catch (e) { box.textContent = '錯誤:' + e.message; }
+}
+function renderSubsTable() {
+  const box = document.getElementById('subsList');
+  const cnt = document.getElementById('subsCount');
+  const realN = _allSubs.filter(s => !s.is_sandbox).length;
+  const testN = _allSubs.filter(s => s.is_sandbox).length;
+  cnt.textContent = `真實 ${realN} · 測試 ${testN}`;
+  const list = _subsFilter === 'all' ? _allSubs
+    : _subsFilter === 'test' ? _allSubs.filter(s => s.is_sandbox)
+    : _allSubs.filter(s => !s.is_sandbox);
+  const fmtDate = ms => ms ? new Date(Number(ms)).toLocaleDateString('zh-TW') : '—';
+  const fbtn = (f, label) => `<button class="btn" style="font-size:11px;padding:4px 10px;${_subsFilter===f?'background:var(--ac);color:#fff;border-color:var(--ac)':''}" onclick="setSubsFilter('${f}')">${label}</button>`;
+  const filterBar = `<div style="display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap">${fbtn('real','真實 '+realN)}${fbtn('test','🧪 測試 '+testN)}${fbtn('all','全部 '+_allSubs.length)}<span style="font-size:11px;color:var(--tx3);align-self:center;margin-left:4px">(沙盒測試購買=非真實金流;舊測試資料無此旗標,需手動辨識)</span></div>`;
+  const srcTxt = s => s.source==='app' ? 'App(IAP)' : (s.ecpay_order?'綠界':'手動/PayPal');
+  if (!list.length) { box.innerHTML = filterBar + '<div style="color:var(--tx3);padding:12px">沒有符合的訂閱者。</div>'; return; }
+  box.innerHTML = filterBar + `
       <table style="width:100%;border-collapse:collapse;font-size:12px">
         <thead><tr style="text-align:left;color:var(--tx2);border-bottom:1px solid var(--bd)">
           <th style="padding:8px 6px">Email</th><th style="padding:8px 6px">方案</th>
@@ -899,17 +917,16 @@ async function renderSubs() {
           <th style="padding:8px 6px">續扣</th><th style="padding:8px 6px">來源</th><th style="padding:8px 6px"></th>
         </tr></thead>
         <tbody>${list.map(s => `
-          <tr style="border-bottom:1px solid var(--bd)">
-            <td style="padding:8px 6px;color:var(--tx)">${s.email || s.uid.slice(0,8)}${s.is_early_bird?' <span style="color:#D946EF">★早鳥</span>':''}</td>
+          <tr style="border-bottom:1px solid var(--bd)${s.is_sandbox?';opacity:.55':''}">
+            <td style="padding:8px 6px;color:var(--tx)">${s.is_sandbox?'<span style="color:#F59E0B">🧪測試</span> ':''}${s.email || s.uid.slice(0,8)}${s.is_early_bird?' <span style="color:#D946EF">★早鳥</span>':''}</td>
             <td style="padding:8px 6px">${SUB_PLAN_TXT[s.plan]||s.plan}</td>
             <td style="padding:8px 6px">${SUB_STATUS_TXT[s.status]||s.status}</td>
             <td style="padding:8px 6px">${s.plan==='lifetime'?'買斷':fmtDate(s.expiresAt)}</td>
             <td style="padding:8px 6px">${s.willRenew?'開':'關'}</td>
-            <td style="padding:8px 6px">${s.source==='app'?'App(IAP)':(s.ecpay_order?'綠界':'手動/PayPal')}</td>
+            <td style="padding:8px 6px">${srcTxt(s)}</td>
             <td style="padding:8px 6px;white-space:nowrap"><button class="btn" style="font-size:11px;padding:3px 8px" onclick="showTxns('${s.uid}','${(s.email||'').replace(/'/g,"\\'")}')">明細</button>${s.email?` <button class="btn" style="font-size:11px;padding:3px 8px" onclick="document.getElementById('unblockEmail').value='${s.email}';document.getElementById('unblockEmail').scrollIntoView()">填入解鎖</button>`:''}</td>
           </tr>`).join('')}</tbody>
       </table>`;
-  } catch (e) { box.textContent = '錯誤:' + e.message; }
 }
 
 // ── 訂購明細：點某訂閱者 → 拉該 uid 的完整交易帳本(transactions) ──
