@@ -252,7 +252,9 @@
         const ts = data.trial_started_at;
         if (ts && typeof ts.toMillis === 'function') cachedTrialStart = ts.toMillis();
         else if (ts && ts.seconds) cachedTrialStart = ts.seconds * 1000;
-        else if (!ts && !isPremium()) {
+        // App 不自動發 3 天免綁卡試用 → App 的試用走 Apple 原生「7 天免費試用」(按訂閱才開始),
+        // 避免兩套試用打架 + 吃掉轉換(已免費 3 天誰還按訂閱)。網頁維持自動 3 天(網頁沒有 Apple 試用)。
+        else if (!ts && !isPremium() && !(window.STAYJP_NATIVE && window.STAYJP_NATIVE.isNativeApp)) {
           // 改由後端 startTrial 決定資格:同一個 email(gmail 去點/去+別名)用過試用就不再發 →
           // 刪帳號重辦同信箱無效。後端寫 trial_started_at,這個 onSnapshot 會再回來帶起試用。
           // 不再本機樂觀開試用(避免「用過的人」短暫看到試用、也防鑽)。
