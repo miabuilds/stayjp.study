@@ -518,8 +518,12 @@ function syncRefCode(data) {
     }
   } catch (e) {}
 }
-// 進站預填:?ref= 已由 auth-header 存進 localStorage,填回輸入框讓使用者看到已帶入
-try { const _r = localStorage.getItem('stayjp_ref'); if (_r) { const _i = document.getElementById('refInput'); if (_i && !_i.value) _i.value = _r; } } catch (e) {}
+// 進站預填:直接從網址解析 ?ref=(不依賴 auth-header 載入時機),順便寫進 localStorage 供登入後歸因
+try {
+  const _m = (location.search || '').match(/[?&]ref=([A-Za-z0-9_-]{1,32})/);
+  const _r = (_m ? _m[1].toUpperCase() : '') || localStorage.getItem('stayjp_ref');
+  if (_r) { try { localStorage.setItem('stayjp_ref', _r); } catch (e) {} const _i = document.getElementById('refInput'); if (_i && !_i.value) _i.value = _r; }
+} catch (e) {}
 
 // Cloud Function endpoints(stayjp.study 走 GitHub Pages,不能用 /api/* rewrite)
 const FN_CREATE_PAYMENT = 'https://createpayment-lsd7okt5qa-de.a.run.app';
