@@ -117,7 +117,12 @@ export const revenuecatWebhook = functions.onRequest(
           // sandbox 殘留 / 事件亂序,導致一個用戶多個訂閱事件競爭時,不讓「較短的續訂」蓋掉
           // 「較晚到期的有效訂閱」。仍照常記帳本(稽核),但當前訂閱保留較長有效期 + 該方案身分,
           // 避免到期日/方案在事件間跳動、誤縮短權益。
-          const newExpiry = plusDays(nowMs(), planInfo.period_days);
+          // 到期日以 RevenueCat/Apple 給的真實 expiration_at_ms 為準:
+          //   試用 → 試用結束日(7 天後),帳號頁才顯示「剩 7 天」而非整個方案週期;
+          //   續訂 → 實際週期末(沙盒加速也正確);取消後也才會在正確日期斷權益,不多送。
+          // 缺值(買斷 NON_RENEWING 無到期等)才退回「now + 方案週期天數」。rcSync 一直是讀真實到期,這裡對齊。
+          const rcExpiryMs = typeof event.expiration_at_ms === "number" && event.expiration_at_ms > 0 ? event.expiration_at_ms : null;
+          const newExpiry = rcExpiryMs || plusDays(nowMs(), planInfo.period_days);
           // 只有「目前仍 active」的訂閱才值得保留;refunded / voided(假刪)/ cancelled / expired
           // 一律不保留 → 避免一筆遲到的續訂把「已退款/已撤銷」帳號重新復活成 premium。
           const keepExisting = !!existingSub && existingSub.status === "active"
