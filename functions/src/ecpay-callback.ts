@@ -18,7 +18,7 @@ import * as functions from "firebase-functions/v2/https";
 import { PLANS, PlanKey, ECPAY_SECRETS } from "./utils/constants";
 import { verifyCheckMacValue } from "./utils/ecpay";
 import {
-  writeTransaction, getSubscription, writeSubscription, patchSubscription,
+  writeTransaction, getSubscription, writeSubscription, patchSubscription, getRefCode,
   tryReserveEarlyBird, releaseEarlyBird, writePaymentFailure,
   nowMs, plusDays, SubscriptionDoc, db,
 } from "./utils/firestore";
@@ -124,6 +124,17 @@ export const ecpayCallback = functions.onRequest(
           is_early_bird: isEarlyBird || existingSub?.is_early_bird === true,
           failed_retries: 0,   // 成功歸零
         };
+        // 推薦碼好康:確認真實付款(綠界 active)+ 有 ref_code + 沒發過 → 到期日 +7 天(一次性,延續旗標不重發)
+        // 與 Apple webhook 同一套邏輯,讓 web 訂閱也享同樣好康(數位邊際成本≈0)。
+        if (existingSub?.ref_bonus_at) {
+          newSub.ref_bonus_at = existingSub.ref_bonus_at;
+        } else if (plan !== "lifetime") {
+          const refCode = await getRefCode(uid);
+          if (refCode) {
+            newSub.expiresAt = newSub.expiresAt + 7 * 864e5;
+            newSub.ref_bonus_at = nowMs();
+          }
+        }
         try {
           await writeSubscription(uid, newSub);
         } catch (subErr) {
