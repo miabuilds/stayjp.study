@@ -917,14 +917,20 @@ function renderSubsTable() {
   const srcTxt = s => s.source==='app' ? 'App(IAP)' : (s.ecpay_order?'綠界':'手動/PayPal');
   // 狀態 + 來源彙總 / 漏斗(以目前篩選範圍計):試用中 →(轉化)→ 已付費;Apple vs 網頁
   const sc = {}; let srcApp = 0, srcWeb = 0, srcOther = 0, trialApp = 0, paidApp = 0;
+  const refTally = {};   // KOL 推薦碼 → { total: 歸因人數, paid: 其中已付費(active)數 }
   list.forEach(s => {
     sc[s.status] = (sc[s.status] || 0) + 1;
     if (s.source === 'app') { srcApp++; if (s.status === 'trialing') trialApp++; else if (s.status === 'active') paidApp++; }
     else if (s.source === 'web') srcWeb++; else srcOther++;
+    if (s.ref_code) { const r = (refTally[s.ref_code] = refTally[s.ref_code] || { total: 0, paid: 0 }); r.total++; if (s.status === 'active') r.paid++; }
   });
   const n = k => sc[k] || 0;
   const convBase = n('trialing') + n('active');
   const convRate = convBase ? Math.round(n('active') / convBase * 100) : 0;   // 快照付費佔比(非世代轉化,僅參考)
+  const refKeys = Object.keys(refTally).sort((a, b) => refTally[b].total - refTally[a].total);
+  const refLine = refKeys.length ? `<div style="font-size:12px;margin-bottom:10px;padding:8px 11px;background:var(--bg);border:1px solid var(--bd);border-radius:8px">
+    <span style="color:var(--tx2)">🎟 推薦碼(KOL):</span> ${refKeys.map(k => `<span style="margin-right:14px"><b>${k}</b> 帶來 <b>${refTally[k].total}</b> 人(付費 <b style="color:#16A34A">${refTally[k].paid}</b>)</span>`).join('')}
+  </div>` : '';
   const summary = `<div style="display:flex;gap:12px;flex-wrap:wrap;font-size:12px;margin-bottom:10px;padding:8px 11px;background:var(--bg);border:1px solid var(--bd);border-radius:8px">
     <span>🎁 試用中 <b style="color:#D946EF">${n('trialing')}</b></span>
     <span style="color:var(--tx3)">→</span>
@@ -950,15 +956,15 @@ function renderSubsTable() {
       <span style="color:var(--tx2)">第 ${_subsPage + 1} / ${totalPages} 頁(共 ${list.length} 筆)</span>
       <button class="btn" style="font-size:11px;padding:3px 10px" ${_subsPage >= totalPages - 1 ? 'disabled' : ''} onclick="setSubsPage(${_subsPage + 1})">下一頁 →</button>
     </div>` : '';
-  if (!list.length) { box.innerHTML = filterBar + summary + '<div style="color:var(--tx3);padding:12px">沒有符合的訂閱者。</div>'; return; }
-  box.innerHTML = filterBar + summary + `
+  if (!list.length) { box.innerHTML = filterBar + summary + refLine + '<div style="color:var(--tx3);padding:12px">沒有符合的訂閱者。</div>'; return; }
+  box.innerHTML = filterBar + summary + refLine + `
       <table style="width:100%;border-collapse:collapse;font-size:12px">
         <thead><tr style="text-align:left;color:var(--tx2);border-bottom:1px solid var(--bd)">
           ${th('email','Email')}${th('plan','方案')}${th('status','狀態')}${th('expiresAt','到期')}<th style="padding:8px 6px">續扣</th>${th('source','來源')}<th style="padding:8px 6px"></th>
         </tr></thead>
         <tbody>${pageList.map(s => `
           <tr style="border-bottom:1px solid var(--bd)${s.is_sandbox?';opacity:.55':''}">
-            <td style="padding:8px 6px;color:var(--tx)">${s.is_sandbox?'<span style="color:#F59E0B">🧪測試</span> ':''}${s.email || s.uid.slice(0,8)}${s.is_early_bird?' <span style="color:#D946EF">★早鳥</span>':''}</td>
+            <td style="padding:8px 6px;color:var(--tx)">${s.is_sandbox?'<span style="color:#F59E0B">🧪測試</span> ':''}${s.email || s.uid.slice(0,8)}${s.is_early_bird?' <span style="color:#D946EF">★早鳥</span>':''}${s.ref_code?` <span style="color:#0EA5E9">🎟${s.ref_code}</span>`:''}</td>
             <td style="padding:8px 6px">${SUB_PLAN_TXT[s.plan]||s.plan}</td>
             <td style="padding:8px 6px">${SUB_STATUS_TXT[s.status]||s.status}</td>
             <td style="padding:8px 6px">${s.plan==='lifetime'?'買斷':fmtDate(s.expiresAt)}</td>

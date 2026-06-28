@@ -1476,7 +1476,19 @@ if (fbConfig) {
   try { firebase.firestore().settings({ experimentalAutoDetectLongPolling: true, useFetchStreams: false }); } catch (e) {}
   auth = firebase.auth();
   db = firebase.firestore();
-  auth.onAuthStateChanged(u => { currentUser = u; _authResolved = true; _writeAuthCache(u); try { localStorage.setItem('stayjp_logged_in', u ? '1' : '0'); } catch (e) {} updateAuthUI(); loadFavorites(); loadCloudData(); if (typeof Streak !== 'undefined') { Streak.syncDown(); Streak.render(); } });
+  auth.onAuthStateChanged(u => { currentUser = u; _authResolved = true; _writeAuthCache(u); if (u) storeRefCode(); try { localStorage.setItem('stayjp_logged_in', u ? '1' : '0'); } catch (e) {} updateAuthUI(); loadFavorites(); loadCloudData(); if (typeof Streak !== 'undefined') { Streak.syncDown(); Streak.render(); } });
+  // 推薦碼歸因:登入後首次把 localStorage 的 ?ref= 碼寫進 users/{uid}.ref_code(已有就不覆蓋 → 首次點擊歸因)
+  function storeRefCode() {
+    try {
+      var ref = localStorage.getItem('stayjp_ref');
+      if (!ref || !currentUser || !db) return;
+      var docRef = db.collection('users').doc(currentUser.uid);
+      docRef.get().then(function (d) {
+        if (d.exists && d.data() && d.data().ref_code) return;   // 首次歸因,不覆蓋既有
+        docRef.set({ ref_code: ref, ref_at: Date.now() }, { merge: true });
+      }).catch(function () {});
+    } catch (e) {}
+  }
   // 換頁(整頁重載)還原前先用 localStorage 快取樂觀渲染成已登入(見 _authUser);這裡只需在
   // 還原完先畫一次(讀快取),onAuthStateChanged 回來會再對帳覆寫。
   updateAuthUI();

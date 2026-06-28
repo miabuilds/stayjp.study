@@ -27,6 +27,13 @@
   };
   var SDK = 'https://www.gstatic.com/firebasejs/10.12.0/';
 
+  // 推薦碼歸因(KOL):?ref=CODE 連結 → 存 localStorage(首次不覆蓋);登入時由有 firestore 的頁面
+  // (index.html)首次寫進 users/{uid}.ref_code。每頁都載入本檔 → App/網頁通用。
+  try {
+    var _refm = (location.search || '').match(/[?&]ref=([A-Za-z0-9_-]{1,32})/);
+    if (_refm && !localStorage.getItem('stayjp_ref')) localStorage.setItem('stayjp_ref', _refm[1].toUpperCase());
+  } catch (e) {}
+
   function injectCSS() {
     if (document.getElementById('ahxStyles')) return;
     var s = document.createElement('style');
