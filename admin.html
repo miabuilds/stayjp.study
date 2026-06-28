@@ -883,7 +883,12 @@ const TXN_STATUS_TXT = { success:'成功', pending:'處理中', failed:'失敗',
 
 let _allSubs = [];
 let _subsFilter = 'real';   // real(真實) | test(沙盒測試) | all(全部);預設只看真實 → 後台乾淨
-function setSubsFilter(f) { _subsFilter = f; renderSubsTable(); }
+let _subsSort = { key: 'expiresAt', dir: -1 };   // 預設到期日新→舊
+let _subsPage = 0;
+const SUBS_PER_PAGE = 50;                         // 人數變多時分頁,避免一次塞爆
+function setSubsFilter(f) { _subsFilter = f; _subsPage = 0; renderSubsTable(); }
+function setSubsSort(k) { if (_subsSort.key === k) _subsSort.dir *= -1; else _subsSort = { key: k, dir: 1 }; _subsPage = 0; renderSubsTable(); }
+function setSubsPage(p) { _subsPage = p; renderSubsTable(); }
 async function renderSubs() {
   freeAccess('list');   // 同時載入免費白名單清單
   const box = document.getElementById('subsList');
@@ -903,38 +908,55 @@ function renderSubsTable() {
   const realN = _allSubs.filter(s => !s.is_sandbox).length;
   const testN = _allSubs.filter(s => s.is_sandbox).length;
   cnt.textContent = `真實 ${realN} · 測試 ${testN}`;
-  const list = _subsFilter === 'all' ? _allSubs
+  let list = _subsFilter === 'all' ? _allSubs.slice()
     : _subsFilter === 'test' ? _allSubs.filter(s => s.is_sandbox)
     : _allSubs.filter(s => !s.is_sandbox);
   const fmtDate = ms => ms ? new Date(Number(ms)).toLocaleDateString('zh-TW') : '—';
   const fbtn = (f, label) => `<button class="btn" style="font-size:11px;padding:4px 10px;${_subsFilter===f?'background:var(--ac);color:#fff;border-color:var(--ac)':''}" onclick="setSubsFilter('${f}')">${label}</button>`;
   const filterBar = `<div style="display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap">${fbtn('real','真實 '+realN)}${fbtn('test','🧪 測試 '+testN)}${fbtn('all','全部 '+_allSubs.length)}<span style="font-size:11px;color:var(--tx3);align-self:center;margin-left:4px">(沙盒測試購買=非真實金流;舊測試資料無此旗標,需手動辨識)</span></div>`;
   const srcTxt = s => s.source==='app' ? 'App(IAP)' : (s.ecpay_order?'綠界':'手動/PayPal');
-  // 狀態 + 來源彙總(以目前篩選範圍計):一眼看清「試用中 vs 已付費轉正」、「Apple vs 網頁」
-  const sc = {}; let srcApp = 0, srcWeb = 0, srcOther = 0;
+  // 狀態 + 來源彙總 / 漏斗(以目前篩選範圍計):試用中 →(轉化)→ 已付費;Apple vs 網頁
+  const sc = {}; let srcApp = 0, srcWeb = 0, srcOther = 0, trialApp = 0, paidApp = 0;
   list.forEach(s => {
     sc[s.status] = (sc[s.status] || 0) + 1;
-    if (s.source === 'app') srcApp++; else if (s.source === 'web') srcWeb++; else srcOther++;
+    if (s.source === 'app') { srcApp++; if (s.status === 'trialing') trialApp++; else if (s.status === 'active') paidApp++; }
+    else if (s.source === 'web') srcWeb++; else srcOther++;
   });
   const n = k => sc[k] || 0;
+  const convBase = n('trialing') + n('active');
+  const convRate = convBase ? Math.round(n('active') / convBase * 100) : 0;   // 快照付費佔比(非世代轉化,僅參考)
   const summary = `<div style="display:flex;gap:12px;flex-wrap:wrap;font-size:12px;margin-bottom:10px;padding:8px 11px;background:var(--bg);border:1px solid var(--bd);border-radius:8px">
     <span>🎁 試用中 <b style="color:#D946EF">${n('trialing')}</b></span>
+    <span style="color:var(--tx3)">→</span>
     <span>✓ 已付費 <b style="color:#16A34A">${n('active')}</b></span>
-    <span>取消續扣 <b>${n('cancelled')}</b></span>
+    <span>付費佔比 <b>${convRate}%</b></span>
+    <span style="border-left:1px solid var(--bd);padding-left:12px">取消續扣 <b>${n('cancelled')}</b></span>
     <span>退費 <b>${n('refunded')}</b></span>
     <span>過期 <b>${n('expired')}</b></span>
-    <span style="border-left:1px solid var(--bd);padding-left:12px">🍎 Apple <b>${srcApp}</b></span>
+    <span style="border-left:1px solid var(--bd);padding-left:12px">🍎 Apple <b>${srcApp}</b> <small style="color:var(--tx3)">(試用 ${trialApp}・付費 ${paidApp})</small></span>
     <span>🌐 網頁 <b>${srcWeb}</b>${srcOther?` ・ 其他 <b>${srcOther}</b>`:''}</span>
   </div>`;
+  // 排序(點欄位標題)+ 分頁(人數變多不塞爆)
+  const sval = (s, k) => k === 'email' ? (s.email || '') : k === 'status' ? (s.status || '') : k === 'source' ? (s.source || '') : k === 'plan' ? (s.plan || '') : Number(s.expiresAt || 0);
+  list.sort((a, b) => { const av = sval(a, _subsSort.key), bv = sval(b, _subsSort.key); return av < bv ? -_subsSort.dir : av > bv ? _subsSort.dir : 0; });
+  const totalPages = Math.max(1, Math.ceil(list.length / SUBS_PER_PAGE));
+  if (_subsPage >= totalPages) _subsPage = totalPages - 1;
+  if (_subsPage < 0) _subsPage = 0;
+  const pageList = list.slice(_subsPage * SUBS_PER_PAGE, (_subsPage + 1) * SUBS_PER_PAGE);
+  const arrow = k => _subsSort.key === k ? (_subsSort.dir > 0 ? ' ▲' : ' ▼') : '';
+  const th = (k, label) => `<th style="padding:8px 6px;cursor:pointer;user-select:none" onclick="setSubsSort('${k}')">${label}${arrow(k)}</th>`;
+  const pager = totalPages > 1 ? `<div style="display:flex;gap:8px;align-items:center;justify-content:flex-end;margin-top:10px;font-size:12px">
+      <button class="btn" style="font-size:11px;padding:3px 10px" ${_subsPage <= 0 ? 'disabled' : ''} onclick="setSubsPage(${_subsPage - 1})">← 上一頁</button>
+      <span style="color:var(--tx2)">第 ${_subsPage + 1} / ${totalPages} 頁(共 ${list.length} 筆)</span>
+      <button class="btn" style="font-size:11px;padding:3px 10px" ${_subsPage >= totalPages - 1 ? 'disabled' : ''} onclick="setSubsPage(${_subsPage + 1})">下一頁 →</button>
+    </div>` : '';
   if (!list.length) { box.innerHTML = filterBar + summary + '<div style="color:var(--tx3);padding:12px">沒有符合的訂閱者。</div>'; return; }
   box.innerHTML = filterBar + summary + `
       <table style="width:100%;border-collapse:collapse;font-size:12px">
         <thead><tr style="text-align:left;color:var(--tx2);border-bottom:1px solid var(--bd)">
-          <th style="padding:8px 6px">Email</th><th style="padding:8px 6px">方案</th>
-          <th style="padding:8px 6px">狀態</th><th style="padding:8px 6px">到期</th>
-          <th style="padding:8px 6px">續扣</th><th style="padding:8px 6px">來源</th><th style="padding:8px 6px"></th>
+          ${th('email','Email')}${th('plan','方案')}${th('status','狀態')}${th('expiresAt','到期')}<th style="padding:8px 6px">續扣</th>${th('source','來源')}<th style="padding:8px 6px"></th>
         </tr></thead>
-        <tbody>${list.map(s => `
+        <tbody>${pageList.map(s => `
           <tr style="border-bottom:1px solid var(--bd)${s.is_sandbox?';opacity:.55':''}">
             <td style="padding:8px 6px;color:var(--tx)">${s.is_sandbox?'<span style="color:#F59E0B">🧪測試</span> ':''}${s.email || s.uid.slice(0,8)}${s.is_early_bird?' <span style="color:#D946EF">★早鳥</span>':''}</td>
             <td style="padding:8px 6px">${SUB_PLAN_TXT[s.plan]||s.plan}</td>
@@ -944,7 +966,7 @@ function renderSubsTable() {
             <td style="padding:8px 6px">${srcTxt(s)}</td>
             <td style="padding:8px 6px;white-space:nowrap"><button class="btn" style="font-size:11px;padding:3px 8px" onclick="showTxns('${s.uid}','${(s.email||'').replace(/'/g,"\\'")}')">明細</button>${s.email?` <button class="btn" style="font-size:11px;padding:3px 8px" onclick="document.getElementById('unblockEmail').value='${s.email}';document.getElementById('unblockEmail').scrollIntoView()">填入解鎖</button>`:''}</td>
           </tr>`).join('')}</tbody>
-      </table>`;
+      </table>` + pager;
 }
 
 // ── 訂購明細：點某訂閱者 → 拉該 uid 的完整交易帳本(transactions) ──
