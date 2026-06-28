@@ -87,6 +87,11 @@
 
   var auth, area;
   var _ahxSigningIn = false;
+  var _ahxResolved = false;
+  // 跨頁(整頁重載)樂觀登入快取 —— 與 index.html 共用同一組 localStorage 鍵,
+  // 任一頁(account/pricing…)登入後寫入,換頁先樂觀渲染成已登入,消除原生 App 換頁「未登入」閃爍。
+  function _ahxReadCache() { try { return JSON.parse(localStorage.getItem('stayjp_auth_cache') || 'null'); } catch (e) { return null; } }
+  function _ahxWriteCache(u) { try { u ? localStorage.setItem('stayjp_auth_cache', JSON.stringify({ uid: u.uid, displayName: u.displayName, email: u.email, photoURL: u.photoURL })) : localStorage.removeItem('stayjp_auth_cache'); } catch (e) {} }
 
   // 載入中的中性佔位(上次有登入才用)→ 避免閃「登入」。非互動。
   function renderPlaceholder() {
@@ -121,12 +126,12 @@
         if (m) m.classList.toggle('show');
       };
       area.querySelector('#ahxLogout').onclick = function () {
-        try { auth.signOut(); } catch (e) {}
+        try { auth.signOut(); _ahxWriteCache(null); localStorage.setItem('stayjp_logged_in', '0'); } catch (e) {}
         // App 內:通知原生也登出(原生 Firebase + RevenueCat),否則狀態卡住要重開 app
         try { if (window.STAYJP_NATIVE && window.STAYJP_NATIVE.isNativeApp && window.ReactNativeWebView && window.ReactNativeWebView.postMessage) window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'NATIVE_LOGOUT' })); } catch (e) {}
       };
     } else {
-      try { localStorage.removeItem('ahx_li'); } catch (e) {}   // 確定登出 → 清快取,下次直接顯示「登入」
+      try { localStorage.removeItem('ahx_li'); _ahxWriteCache(null); localStorage.setItem('stayjp_logged_in', '0'); } catch (e) {}   // 確定登出 → 清快取,下次直接顯示「登入」
       area.innerHTML = '<button class="ahx-btn" id="ahxLogin" type="button">登入</button>';
       area.querySelector('#ahxLogin').onclick = login;
     }
@@ -198,7 +203,7 @@
     area.className = 'ahx-area';
     area.id = 'ahxArea';
     findAnchor().appendChild(area);
-    try { if (localStorage.getItem('ahx_li') === '1') renderPlaceholder(); } catch (e) {}
+    try { var _c = _ahxReadCache(); if (_c) render(_c); else if (localStorage.getItem('ahx_li') === '1') renderPlaceholder(); } catch (e) {}
     try { auth = await ensureFirebase(); }
     catch (e) { console.warn('[auth-header] firebase load fail', e); return; }
     patchNativeLogin();
@@ -210,7 +215,12 @@
         m.classList.remove('show');
       }
     });
+    // 還原失敗保險:4 秒沒回呼 → 標記已解析並重繪真實狀態(回退「登入」鈕),不卡在樂觀快取
+    setTimeout(function () { if (!_ahxResolved) { _ahxResolved = true; render(auth && auth.currentUser ? auth.currentUser : null); } }, 4000);
     auth.onAuthStateChanged(function (user) {
+      _ahxResolved = true;
+      _ahxWriteCache(user);
+      try { localStorage.setItem('stayjp_logged_in', user ? '1' : '0'); } catch (e) {}
       render(user);
       // 在原生 App 的 WebView 內 → 把 Firebase uid 遞給 app,綁定 RevenueCat appUserID,
       // 讓 app 內購買(IAP)的 webhook 能寫進正確的 users/{uid}.subscription。

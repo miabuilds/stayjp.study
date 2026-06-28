@@ -1476,17 +1476,12 @@ if (fbConfig) {
   try { firebase.firestore().settings({ experimentalAutoDetectLongPolling: true, useFetchStreams: false }); } catch (e) {}
   auth = firebase.auth();
   db = firebase.firestore();
-  auth.onAuthStateChanged(u => { currentUser = u; _authResolved = true; try { localStorage.setItem('stayjp_logged_in', u ? '1' : '0'); } catch (e) {} updateAuthUI(); loadFavorites(); loadCloudData(); if (typeof Streak !== 'undefined') { Streak.syncDown(); Streak.render(); } });
-  // 登入狀態還原前(currentUser 暫時為 null):若上次是登入的,先把右上角鈕顯示為佔位「···」並停用,
-  // 避免「明明已登入卻顯示『登入』」被誤點。onAuthStateChanged 一回來 updateAuthUI 就覆寫成正確狀態。
-  try {
-    if (localStorage.getItem('stayjp_logged_in') === '1') {
-      var _ab = document.getElementById('authBtn');
-      if (_ab) { _ab.textContent = '···'; _ab.style.opacity = '.55'; _ab.style.pointerEvents = 'none'; }
-    }
-  } catch (e) {}
-  // 保險:萬一 auth 卡住沒回呼,4 秒後也讓登入鈕可用(避免永遠停用)
-  setTimeout(function () { _authResolved = true; }, 4000);
+  auth.onAuthStateChanged(u => { currentUser = u; _authResolved = true; _writeAuthCache(u); try { localStorage.setItem('stayjp_logged_in', u ? '1' : '0'); } catch (e) {} updateAuthUI(); loadFavorites(); loadCloudData(); if (typeof Streak !== 'undefined') { Streak.syncDown(); Streak.render(); } });
+  // 換頁(整頁重載)還原前先用 localStorage 快取樂觀渲染成已登入(見 _authUser);這裡只需在
+  // 還原完先畫一次(讀快取),onAuthStateChanged 回來會再對帳覆寫。
+  updateAuthUI();
+  // 保險:萬一 auth 卡住沒回呼,4 秒後標記已解析「並重繪」→ 退回可用的「登入」鈕,絕不卡在佔位/快取
+  setTimeout(function () { if (!_authResolved) { _authResolved = true; updateAuthUI(); } }, 4000);
   // 累計學員計數的 +1 移除：每位訪客寫 1 次 → Firestore Spark 方案 20K 寫/日上限會吃光配額
   // 改由 GitHub Actions cron 每天從 GA newUsers 覆寫 stats/global.learners
 }
@@ -1577,10 +1572,10 @@ function handleAuth() {
   // ⚠️ 必須擺在 _authResolved guard「之前」—— App 的 WebView 裡 Firebase 登入狀態常沒及時還原,
   //    _authResolved=false 會把這段擋掉 → 登入鈕點了完全沒反應(訂閱無此 guard 所以正常)。
   if (window.STAYJP_NATIVE && window.STAYJP_NATIVE.isNativeApp) {
-    if (currentUser) {
-      // 已登入 → 這次點擊是「登出」:網頁登出 + 通知原生也登出(原生 Firebase + RevenueCat),否則狀態卡住要重開 app
+    if (_authUser()) {
+      // 已登入(含樂觀快取)→ 這次點擊是「登出」:網頁登出 + 通知原生也登出(原生 Firebase + RevenueCat),否則狀態卡住要重開 app
       try { auth.signOut(); } catch (e) {}
-      currentUser = null; updateAuthUI();
+      currentUser = null; _writeAuthCache(null); updateAuthUI();
       try { if (window.ReactNativeWebView && window.ReactNativeWebView.postMessage) window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'NATIVE_LOGOUT' })); } catch (e) {}
       return;
     }
@@ -1589,7 +1584,7 @@ function handleAuth() {
   }
   // 以下為一般網頁路徑:登入狀態還沒還原完 → 忽略點擊,避免誤判未登入而重複登入
   if (!_authResolved) return;
-  if (currentUser) { auth.signOut(); currentUser = null; updateAuthUI(); return; }
+  if (currentUser) { auth.signOut(); currentUser = null; _writeAuthCache(null); updateAuthUI(); return; }
   if (isInAppBrowser()) { showInAppHelp(); return; }
   if (_signingIn) return;   // 防連點:前一個登入彈窗還沒結束就別再開(auth/cancelled-popup-request)
   _signingIn = true;
@@ -1604,14 +1599,21 @@ function handleAuth() {
     })
     .finally(() => { _signingIn = false; });
 }
+// 原生 App 換頁(整頁重載)時 firebase 還原登入有空窗 → 用 localStorage 快取使用者身分,
+// 換頁先樂觀渲染成已登入(消除「未登入」閃爍 + 不被誤點登入);onAuthStateChanged 回來再對帳。
+// 還原失敗(4 秒 timeout)→ _authResolved=true → _authUser() 回退 currentUser(null)→ 顯示可用的「登入」鈕,永不卡死。
+function _readAuthCache() { try { return JSON.parse(localStorage.getItem('stayjp_auth_cache') || 'null'); } catch (e) { return null; } }
+function _writeAuthCache(u) { try { u ? localStorage.setItem('stayjp_auth_cache', JSON.stringify({ uid: u.uid, displayName: u.displayName, email: u.email, photoURL: u.photoURL })) : localStorage.removeItem('stayjp_auth_cache'); } catch (e) {} }
+function _authUser() { return currentUser || (!_authResolved ? _readAuthCache() : null); }
 function updateAuthUI() {
   const area = document.getElementById('authArea');
   if (!area) return;
-  if (currentUser) {
-    const email = currentUser.email || '';
+  const cu = _authUser();
+  if (cu) {
+    const email = cu.email || '';
     // Apple privaterelay 用戶沒有 displayName → 退而取信箱 @ 前半截,避免整串長信箱撐爆 header
-    const name = currentUser.displayName ? currentUser.displayName.split(' ')[0] : (email ? email.split('@')[0] : 'User');
-    const photo = currentUser.photoURL || '';
+    const name = cu.displayName ? cu.displayName.split(' ')[0] : (email ? email.split('@')[0] : 'User');
+    const photo = cu.photoURL || '';
     const img = photo ? `<img src="${photo}" alt="" onerror="this.style.display='none'">` : '';
     const ADMIN_EMAILS = ['stayjpplan@gmail.com', 'abc83327@gmail.com'];
     const adminLink = ADMIN_EMAILS.includes(email.toLowerCase()) ? `<a class="um-item" href="admin.html">🛠 管理後台</a>` : '';
