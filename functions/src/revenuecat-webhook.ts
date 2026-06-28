@@ -150,13 +150,15 @@ export const revenuecatWebhook = functions.onRequest(
             type: (type === "INITIAL_PURCHASE" || type === "NON_RENEWING_PURCHASE") ? "subscribe" : "renew",
             source: "app",
             plan,
-            amount_twd: planInfo.price_twd,
-            ...rcMoney,   // 實際幣別 + 實付金額(外國人/非台幣)
+            // 免費試用(period_type=TRIAL)沒實際扣款 → amount_twd 記 0,不灌營收;
+            // 試用轉正的 RENEWAL(period_type=NORMAL)才是第一筆真實收款 → 記牌價。
+            amount_twd: event.period_type === "TRIAL" ? 0 : planInfo.price_twd,
+            ...rcMoney,   // 實際幣別 + 實付金額(外國人/非台幣);試用時 amount_paid 本就 0
             is_sandbox: isSandbox,
             payment_method: event.store === "PLAY_STORE" ? "google_billing" : "apple_iap",
             external_id: event.transaction_id || event.original_transaction_id,
             status: "success",
-            note: `RevenueCat ${type}`,
+            note: event.period_type === "TRIAL" ? `RevenueCat ${type} (免費試用,未扣款)` : `RevenueCat ${type}`,
           }, eventId);
           break;
         }
