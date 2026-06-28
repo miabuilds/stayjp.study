@@ -253,6 +253,17 @@ textarea.note:focus{outline:none;border-color:var(--ac)}
  <span id="freeMsg" style="font-size:12px;margin-left:8px"></span>
  <div id="freeList" style="margin-top:10px;font-size:12px;color:var(--tx2)"></div>
  </div>
+ <div style="background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r);padding:12px 16px;margin-bottom:14px;font-size:13px">
+ <strong>🎟 推薦碼管理(KOL)</strong>
+ <div style="display:flex;gap:6px;flex-wrap:wrap;margin:8px 0">
+ <input id="refCodeNew" placeholder="碼(如 HARRY)" style="padding:6px 10px;border:1px solid var(--bd);border-radius:8px;background:var(--bg);color:var(--tx);font-size:13px;text-transform:uppercase;width:140px">
+ <input id="refKolNew" placeholder="KOL 名稱／備註" style="padding:6px 10px;border:1px solid var(--bd);border-radius:8px;background:var(--bg);color:var(--tx);font-size:13px;flex:1;min-width:140px">
+ <button class="btn" onclick="createRefCode()" style="font-size:12px;padding:5px 12px">建立</button>
+ <button class="btn" onclick="loadRefCodes()" style="font-size:11px;padding:5px 10px">↻</button>
+ </div>
+ <div id="refCodeMsg" style="font-size:12px;margin-bottom:6px"></div>
+ <div id="refCodeList" style="font-size:12px;color:var(--tx2)">—</div>
+ </div>
  <div id="subsList" style="font-size:13px;color:var(--tx2)">載入中…</div>
  </div>
 
@@ -889,7 +900,50 @@ const SUBS_PER_PAGE = 50;                         // 人數變多時分頁,避�
 function setSubsFilter(f) { _subsFilter = f; _subsPage = 0; renderSubsTable(); }
 function setSubsSort(k) { if (_subsSort.key === k) _subsSort.dir *= -1; else _subsSort = { key: k, dir: 1 }; _subsPage = 0; renderSubsTable(); }
 function setSubsPage(p) { _subsPage = p; renderSubsTable(); }
+// ── 🎟 推薦碼管理 ──
+const KOL_PAGE = 'https://stayjp.study/kol.html';   // KOL 自助查詢頁
+async function loadRefCodes() {
+  const box = document.getElementById('refCodeList');
+  if (!box) return;
+  try {
+    const snap = await db.collection('ref_codes').orderBy('created_at', 'desc').get();
+    if (snap.empty) { box.textContent = '尚無推薦碼。建立後把「推薦連結」給網頁受眾、把「碼」給 App 受眾(請對方到帳號頁輸入)。'; return; }
+    box.innerHTML = snap.docs.map(d => { const c = d.data(); const code = d.id;
+      const refLink = 'https://stayjp.study/?ref=' + code;
+      const kolLink = KOL_PAGE + '?code=' + code + '&t=' + (c.token || '');
+      return `<div style="padding:8px 0;border-bottom:1px solid var(--bd)${c.active === false ? ';opacity:.5' : ''}">
+        <b>${code}</b> · ${c.kol || ''} ${c.active === false ? '<span style="color:#EF4444">(停用)</span>' : ''}
+        <div style="margin-top:4px;display:flex;gap:6px;flex-wrap:wrap">
+          <button class="btn" style="font-size:11px;padding:3px 8px" onclick="copyTxt('${refLink}')">複製推薦連結</button>
+          <button class="btn" style="font-size:11px;padding:3px 8px" onclick="copyTxt('${kolLink}')">複製 KOL 查詢頁連結</button>
+          <button class="btn" style="font-size:11px;padding:3px 8px" onclick="toggleRefCode('${code}',${c.active === false})">${c.active === false ? '啟用' : '停用'}</button>
+        </div>
+      </div>`; }).join('');
+  } catch (e) { box.textContent = '讀取失敗:' + e.message; }
+}
+function createRefCode() {
+  const code = (document.getElementById('refCodeNew').value || '').trim().toUpperCase().replace(/[^A-Z0-9_-]/g, '').slice(0, 32);
+  const kol = (document.getElementById('refKolNew').value || '').trim().slice(0, 60);
+  const msg = document.getElementById('refCodeMsg');
+  if (!code) { msg.style.color = '#EF4444'; msg.textContent = '請輸入碼。'; return; }
+  const ref = db.collection('ref_codes').doc(code);
+  ref.get().then(d => {
+    if (d.exists) { msg.style.color = '#EF4444'; msg.textContent = '碼已存在:' + code; return; }
+    const token = (crypto.randomUUID ? crypto.randomUUID().replace(/-/g, '') : (Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2))).slice(0, 20);
+    ref.set({ kol, token, active: true, created_at: Date.now() }).then(() => {
+      msg.style.color = '#16A34A'; msg.textContent = '✓ 已建立 ' + code;
+      document.getElementById('refCodeNew').value = ''; document.getElementById('refKolNew').value = '';
+      loadRefCodes();
+    }).catch(e => { msg.style.color = '#EF4444'; msg.textContent = '建立失敗:' + e.message; });
+  });
+}
+function toggleRefCode(code, activate) {
+  db.collection('ref_codes').doc(code).set({ active: !!activate }, { merge: true }).then(loadRefCodes);
+}
+function copyTxt(t) { (navigator.clipboard ? navigator.clipboard.writeText(t) : Promise.reject()).then(() => { const m = document.getElementById('refCodeMsg'); m.style.color = '#16A34A'; m.textContent = '已複製:' + t; }).catch(() => { const m = document.getElementById('refCodeMsg'); m.style.color = 'var(--tx2)'; m.textContent = t; }); }
+
 async function renderSubs() {
+  loadRefCodes();
   freeAccess('list');   // 同時載入免費白名單清單
   const box = document.getElementById('subsList');
   box.textContent = '載入中…';

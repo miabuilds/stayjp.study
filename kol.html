@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>推薦成效 — 日本再留計劃</title>
+<style>
+  :root { --bg:#FAF9F6;--bg2:#FFFFFF;--tx:#2C2C2C;--tx2:#7A7A7A;--tx3:#ACACAC;--ac:#D4654A;--bd:#E8E5E0; }
+  @media (prefers-color-scheme: dark) { :root { --bg:#1C1C1E;--bg2:#2C2C2E;--tx:#E5E5E5;--tx2:#8E8E93;--tx3:#636366;--ac:#E8734A;--bd:#3A3A3C; } }
+  *{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,"PingFang TC","Noto Sans TC",sans-serif}
+  body{background:var(--bg);color:var(--tx);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+  .card{background:var(--bg2);border:1px solid var(--bd);border-radius:18px;max-width:420px;width:100%;padding:28px 24px;box-shadow:0 20px 50px -20px rgba(0,0,0,.25)}
+  .brand{font-size:13px;color:var(--ac);font-weight:700;letter-spacing:.5px;margin-bottom:4px}
+  h1{font-size:20px;margin-bottom:2px}
+  .kol{font-size:14px;color:var(--tx2);margin-bottom:20px}
+  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:18px}
+  .stat{background:var(--bg);border:1px solid var(--bd);border-radius:12px;padding:14px 8px;text-align:center}
+  .stat .v{font-size:26px;font-weight:800;letter-spacing:-.5px}
+  .stat .l{font-size:12px;color:var(--tx2);margin-top:3px}
+  .paid .v{color:#16A34A}
+  .trial .v{color:#D946EF}
+  .note{font-size:12px;color:var(--tx3);line-height:1.7}
+  .err{color:#EF4444;font-size:14px;text-align:center;padding:20px 0}
+  .loading{color:var(--tx2);text-align:center;padding:30px 0}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="brand">StayJP · 推薦成效</div>
+  <h1 id="title">載入中…</h1>
+  <div class="kol" id="kol"></div>
+  <div id="body"><div class="loading">查詢中…</div></div>
+</div>
+<script>
+  const FN = 'https://asia-east1-jpnote-1bdd6.cloudfunctions.net/kolStats';
+  const q = new URLSearchParams(location.search);
+  const code = (q.get('code') || '').toUpperCase();
+  const t = q.get('t') || '';
+  const title = document.getElementById('title');
+  const kolEl = document.getElementById('kol');
+  const body = document.getElementById('body');
+  if (!code || !t) {
+    title.textContent = '連結不完整';
+    body.innerHTML = '<div class="err">這個查詢連結缺少參數,請使用主辦方提供的完整連結。</div>';
+  } else {
+    fetch(FN + '?code=' + encodeURIComponent(code) + '&t=' + encodeURIComponent(t))
+      .then(r => r.json().then(d => ({ ok: r.ok, d })))
+      .then(({ ok, d }) => {
+        if (!ok || !d.ok) {
+          title.textContent = '查詢失敗';
+          body.innerHTML = '<div class="err">連結無效或已停用,請向主辦方確認。</div>';
+          return;
+        }
+        title.textContent = '推薦碼 ' + d.code;
+        kolEl.textContent = d.kol ? (d.kol + ' 的成效') : '';
+        body.innerHTML =
+          '<div class="stats">' +
+            '<div class="stat"><div class="v">' + d.total + '</div><div class="l">帶來人數</div></div>' +
+            '<div class="stat paid"><div class="v">' + d.paid + '</div><div class="l">已付費</div></div>' +
+            '<div class="stat trial"><div class="v">' + d.trialing + '</div><div class="l">試用中</div></div>' +
+          '</div>' +
+          '<div class="note">「帶來人數」= 透過你的推薦碼註冊的人;「已付費」= 其中目前付費訂閱中(結算依據);「試用中」= 免費試用尚未轉付費。數字即時更新。</div>';
+      })
+      .catch(() => {
+        title.textContent = '連線失敗';
+        body.innerHTML = '<div class="err">網路連線失敗,請稍後重新整理。</div>';
+      });
+  }
+</script>
+</body>
+</html>
