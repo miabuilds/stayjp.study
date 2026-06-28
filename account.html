@@ -242,23 +242,33 @@ let currentSub = null;
 let txnUnsub = null;
 
 // ── auth ──
-auth.onAuthStateChanged(user => {
- const gate = document.getElementById('gateView');
- const app = document.getElementById('appView');
- if (!user) {
- gate.style.display = 'flex';
- app.style.display = 'none';
+// 換頁樂觀登入:與 index.html / auth-header.js 共用 localStorage 'stayjp_auth_cache',
+// App 換到帳號頁時 firebase 還原前先用快取顯示 appView(email/uid),不留白也不閃登入 gate。
+let _acctResolved = false;
+function _acctReadCache() { try { return JSON.parse(localStorage.getItem('stayjp_auth_cache') || 'null'); } catch (e) { return null; } }
+function _acctShowApp(u) {
+ document.getElementById('gateView').style.display = 'none';
+ document.getElementById('appView').style.display = 'block';
+ document.getElementById('userEmail').textContent = u.email || '—';
+ document.getElementById('userUid').textContent = u.uid || '';
+}
+function _acctShowGate() {
+ document.getElementById('gateView').style.display = 'flex';
+ document.getElementById('appView').style.display = 'none';
  if (txnUnsub) txnUnsub();
- return;
- }
+}
+auth.onAuthStateChanged(user => {
+ _acctResolved = true;
+ if (!user) { _acctShowGate(); return; }
  currentUser = user;
- gate.style.display = 'none';
- app.style.display = 'block';
- document.getElementById('userEmail').textContent = user.email || '—';
- document.getElementById('userUid').textContent = user.uid;
+ _acctShowApp(user);
  loadSubscription();
  loadEarlyBird();
 });
+// 還原前:有快取先樂觀顯示 appView(訂閱卡等 onAuthStateChanged 回來才載入);
+// 4s 沒回呼且仍未登入 → 回退顯示 gate,讓使用者可重新登入,不卡在空白/假已登入。
+try { const _c = _acctReadCache(); if (_c) _acctShowApp(_c); } catch (e) {}
+setTimeout(function () { if (!_acctResolved && !currentUser) _acctShowGate(); }, 4000);
 
 document.getElementById('loginBtn').onclick = () => {
  const provider = new firebase.auth.GoogleAuthProvider();
