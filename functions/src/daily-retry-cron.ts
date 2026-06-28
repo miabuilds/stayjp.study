@@ -51,6 +51,7 @@ export const dailyRetryCron = functions.onSchedule(
         await patchSubscription(uid, {
           status: "expired",
           willRenew: false,
+          failed_retries: 0,   // 清零 → 隔天 cron 不再撈到同一人重複降級+重寫假失敗交易(本來會每天洗一筆)
         });
         await writeTransaction({
           uid,
