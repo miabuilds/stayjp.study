@@ -71,6 +71,13 @@ service cloud.firestore {
                      request.auth.token.email in ['stayjpplan@gmail.com', 'abc83327@gmail.com'];
     }
 
+    // 系統告警(每日訂閱稽核結果)— Cloud Function (Admin SDK) 寫,admin 後台讀
+    match /system_alerts/{doc} {
+      allow read: if request.auth != null &&
+                     request.auth.token.email in ['stayjpplan@gmail.com', 'abc83327@gmail.com'];
+      allow write: if false;
+    }
+
     // 黑名單(退費 / chargeback 紀錄)— 用 emailHash 當 doc id
     // 只有 Cloud Function 能讀寫;前端不該知道誰在黑名單
     match /blacklist/{emailHash} {
