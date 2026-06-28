@@ -11,7 +11,7 @@ import * as functions from "firebase-functions/v2/https";
 import * as admin from "firebase-admin";
 import { PLANS, PlanKey } from "./utils/constants";
 import {
-  writeSubscription, writeTransaction, getSubscription,
+  writeSubscription, writeTransaction, getSubscription, getRefCode,
   patchSubscription, nowMs, plusDays, tryReserveEarlyBird, SubscriptionDoc,
 } from "./utils/firestore";
 
@@ -143,6 +143,17 @@ export const revenuecatWebhook = functions.onRequest(
             is_sandbox: isSandbox,
             failed_retries: 0,
           };
+          // 推薦碼好康(階段2):確認「真實付費」轉化才送 7 天(數位邊際成本≈0;一次性、不疊加、不重複)。
+          // 條件:active(真付款,非 TRIAL)+ 非沙盒 + 該帳號有 ref_code + 之前沒發過。
+          if (existingSub?.ref_bonus_at) {
+            newSub.ref_bonus_at = existingSub.ref_bonus_at;   // 延續旗標 → 續訂不重發、不一直 +7
+          } else if (newSub.status === "active" && !isSandbox) {
+            const refCode = await getRefCode(uid);
+            if (refCode) {
+              newSub.expiresAt = newSub.expiresAt + 7 * 864e5;   // 到期日 +7 天(我們的權益;Apple 計費週期不變)
+              newSub.ref_bonus_at = nowMs();
+            }
+          }
           await writeSubscription(uid, newSub);
 
           await writeTransaction({

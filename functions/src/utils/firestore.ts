@@ -53,11 +53,18 @@ export interface SubscriptionDoc {
   refund_requested_at?: admin.firestore.Timestamp;
   failed_retries?: number;
   last_retry_at?: number;
+  ref_bonus_at?: number;       // KOL 推薦碼好康:確認真實付款後發過 7 天的時戳(一次性,防重複/疊加)
 }
 
 export async function getSubscription(uid: string): Promise<SubscriptionDoc | null> {
   const snap = await db.doc(`users/${uid}`).get();
   return (snap.data()?.subscription as SubscriptionDoc) || null;
+}
+
+// 讀使用者根層的 KOL 推薦碼(歸因用;與 subscription 同一份 users/{uid} 文件)
+export async function getRefCode(uid: string): Promise<string> {
+  const snap = await db.doc(`users/${uid}`).get();
+  return (snap.data()?.ref_code as string) || "";
 }
 
 export async function writeSubscription(uid: string, sub: SubscriptionDoc): Promise<void> {
