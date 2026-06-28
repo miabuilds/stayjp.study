@@ -876,7 +876,7 @@ async function freeAccess(action, emailArg) {
 }
 const SUB_PLAN_TXT = { monthly:'月費', yearly:'年費', yearly_early_bird:'早鳥年費', lifetime:'買斷' };
 // cancelled 真正含義是「關閉自動續扣、但到期前仍可用」,不是「已終止」。標籤講清楚避免誤判(看「到期」欄判斷是否還在期內)。
-const SUB_STATUS_TXT = { active:'使用中', cancelled:'取消續扣（仍可用）', refunded:'已退費', expired:'已過期', trialing:'試用' };
+const SUB_STATUS_TXT = { active:'✓ 已付費', cancelled:'取消續扣（仍可用）', refunded:'已退費', expired:'已過期', trialing:'🎁 試用中' };
 // 交易帳本(transactions)用的標籤 — 與 account.html 對齊
 const TXN_TYPE_TXT = { subscribe:'訂閱', renew:'續訂', refund:'退費', cancel:'關閉續扣', fail:'扣款失敗', chargeback:'信用卡爭議', gift:'贈送' };
 const TXN_STATUS_TXT = { success:'成功', pending:'處理中', failed:'失敗', refunded:'已退費' };
@@ -910,8 +910,24 @@ function renderSubsTable() {
   const fbtn = (f, label) => `<button class="btn" style="font-size:11px;padding:4px 10px;${_subsFilter===f?'background:var(--ac);color:#fff;border-color:var(--ac)':''}" onclick="setSubsFilter('${f}')">${label}</button>`;
   const filterBar = `<div style="display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap">${fbtn('real','真實 '+realN)}${fbtn('test','🧪 測試 '+testN)}${fbtn('all','全部 '+_allSubs.length)}<span style="font-size:11px;color:var(--tx3);align-self:center;margin-left:4px">(沙盒測試購買=非真實金流;舊測試資料無此旗標,需手動辨識)</span></div>`;
   const srcTxt = s => s.source==='app' ? 'App(IAP)' : (s.ecpay_order?'綠界':'手動/PayPal');
-  if (!list.length) { box.innerHTML = filterBar + '<div style="color:var(--tx3);padding:12px">沒有符合的訂閱者。</div>'; return; }
-  box.innerHTML = filterBar + `
+  // 狀態 + 來源彙總(以目前篩選範圍計):一眼看清「試用中 vs 已付費轉正」、「Apple vs 網頁」
+  const sc = {}; let srcApp = 0, srcWeb = 0, srcOther = 0;
+  list.forEach(s => {
+    sc[s.status] = (sc[s.status] || 0) + 1;
+    if (s.source === 'app') srcApp++; else if (s.source === 'web') srcWeb++; else srcOther++;
+  });
+  const n = k => sc[k] || 0;
+  const summary = `<div style="display:flex;gap:12px;flex-wrap:wrap;font-size:12px;margin-bottom:10px;padding:8px 11px;background:var(--bg);border:1px solid var(--bd);border-radius:8px">
+    <span>🎁 試用中 <b style="color:#D946EF">${n('trialing')}</b></span>
+    <span>✓ 已付費 <b style="color:#16A34A">${n('active')}</b></span>
+    <span>取消續扣 <b>${n('cancelled')}</b></span>
+    <span>退費 <b>${n('refunded')}</b></span>
+    <span>過期 <b>${n('expired')}</b></span>
+    <span style="border-left:1px solid var(--bd);padding-left:12px">🍎 Apple <b>${srcApp}</b></span>
+    <span>🌐 網頁 <b>${srcWeb}</b>${srcOther?` ・ 其他 <b>${srcOther}</b>`:''}</span>
+  </div>`;
+  if (!list.length) { box.innerHTML = filterBar + summary + '<div style="color:var(--tx3);padding:12px">沒有符合的訂閱者。</div>'; return; }
+  box.innerHTML = filterBar + summary + `
       <table style="width:100%;border-collapse:collapse;font-size:12px">
         <thead><tr style="text-align:left;color:var(--tx2);border-bottom:1px solid var(--bd)">
           <th style="padding:8px 6px">Email</th><th style="padding:8px 6px">方案</th>
