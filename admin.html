@@ -258,7 +258,8 @@ textarea.note:focus{outline:none;border-color:var(--ac)}
  <strong>🎟 推薦碼管理(KOL)</strong>
  <div style="display:flex;gap:6px;flex-wrap:wrap;margin:8px 0">
  <input id="refCodeNew" placeholder="碼(如 HARRY)" style="padding:6px 10px;border:1px solid var(--bd);border-radius:8px;background:var(--bg);color:var(--tx);font-size:13px;text-transform:uppercase;width:140px">
- <input id="refKolNew" placeholder="KOL 名稱／備註" style="padding:6px 10px;border:1px solid var(--bd);border-radius:8px;background:var(--bg);color:var(--tx);font-size:13px;flex:1;min-width:140px">
+ <input id="refKolNew" placeholder="KOL 名稱／備註" style="padding:6px 10px;border:1px solid var(--bd);border-radius:8px;background:var(--bg);color:var(--tx);font-size:13px;flex:1;min-width:120px">
+ <input id="refCommNew" type="number" min="0" max="100" value="20" title="抽成 %(套用在利潤上)" style="padding:6px 10px;border:1px solid var(--bd);border-radius:8px;background:var(--bg);color:var(--tx);font-size:13px;width:90px" placeholder="抽成%">
  <button class="btn" onclick="createRefCode()" style="font-size:12px;padding:5px 12px">建立</button>
  <button class="btn" onclick="loadRefCodes()" style="font-size:11px;padding:5px 10px">↻</button>
  </div>
@@ -903,6 +904,22 @@ function setSubsSort(k) { if (_subsSort.key === k) _subsSort.dir *= -1; else _su
 function setSubsPage(p) { _subsPage = p; renderSubsTable(); }
 // ── 🎟 推薦碼管理 ──
 const KOL_PAGE = 'https://stayjp.study/kol.html';   // KOL 自助查詢頁
+// 抽成試算:售價 − 平台手續費(Apple SBP 15% / 綠界 2.75%)= 利潤;利潤 × 抽成% = 抽成。
+// 只計目前 active 的被推薦人(首筆估算),依各人 plan 價 + source 平台費分別算。
+const REF_PLAN_PRICE = { monthly: 150, yearly: 1490, yearly_early_bird: 990, lifetime: 2990 };
+const REF_FEE = { app: 0.15, web: 0.0275 };   // Apple SBP / 綠界
+function refCommissionFor(code, pct) {
+  if (!pct || !Array.isArray(_allSubs)) return { paid: 0, amount: 0 };
+  let paid = 0, amount = 0;
+  _allSubs.forEach(s => {
+    if (s.ref_code !== code || s.status !== 'active' || s.is_sandbox) return;
+    paid++;
+    const price = REF_PLAN_PRICE[s.plan] || 0;
+    const fee = s.source === 'app' ? REF_FEE.app : REF_FEE.web;
+    amount += price * (1 - fee) * (pct / 100);
+  });
+  return { paid, amount: Math.round(amount) };
+}
 async function loadRefCodes() {
   const box = document.getElementById('refCodeList');
   if (!box) return;
@@ -912,8 +929,11 @@ async function loadRefCodes() {
     box.innerHTML = snap.docs.map(d => { const c = d.data(); const code = d.id;
       const refLink = 'https://stayjp.study/?ref=' + code;
       const kolLink = KOL_PAGE + '?code=' + code + '&t=' + (c.token || '');
+      const pct = c.commission_pct != null ? c.commission_pct : 20;
+      const comm = refCommissionFor(code, pct);
       return `<div style="padding:8px 0;border-bottom:1px solid var(--bd)${c.active === false ? ';opacity:.5' : ''}">
         <b>${code}</b> · ${c.kol || ''} ${c.active === false ? '<span style="color:#EF4444">(停用)</span>' : ''}
+        <span style="color:var(--tx2);margin-left:6px">抽成 ${pct}% · 付費 ${comm.paid} 人 · 預估抽成 <b style="color:#16A34A">NT$${comm.amount.toLocaleString()}</b><span style="color:var(--tx3)">(利潤計,首筆)</span></span>
         <div style="margin-top:4px;display:flex;gap:6px;flex-wrap:wrap">
           <button class="btn" style="font-size:11px;padding:3px 8px" onclick="copyTxt('${refLink}')">複製推薦連結</button>
           <button class="btn" style="font-size:11px;padding:3px 8px" onclick="copyTxt('${kolLink}')">複製 KOL 查詢頁連結</button>
@@ -926,12 +946,13 @@ function createRefCode() {
   const code = (document.getElementById('refCodeNew').value || '').trim().toUpperCase().replace(/[^A-Z0-9_-]/g, '').slice(0, 32);
   const kol = (document.getElementById('refKolNew').value || '').trim().slice(0, 60);
   const msg = document.getElementById('refCodeMsg');
+  const comm = Math.max(0, Math.min(100, parseInt(document.getElementById('refCommNew').value, 10) || 20));
   if (!code) { msg.style.color = '#EF4444'; msg.textContent = '請輸入碼。'; return; }
   const ref = db.collection('ref_codes').doc(code);
   ref.get().then(d => {
     if (d.exists) { msg.style.color = '#EF4444'; msg.textContent = '碼已存在:' + code; return; }
     const token = (crypto.randomUUID ? crypto.randomUUID().replace(/-/g, '') : (Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2))).slice(0, 20);
-    ref.set({ kol, token, active: true, created_at: Date.now() }).then(() => {
+    ref.set({ kol, token, active: true, commission_pct: comm, created_at: Date.now() }).then(() => {
       msg.style.color = '#16A34A'; msg.textContent = '✓ 已建立 ' + code;
       document.getElementById('refCodeNew').value = ''; document.getElementById('refKolNew').value = '';
       loadRefCodes();
@@ -964,7 +985,6 @@ async function loadSubAudit() {
 
 async function renderSubs() {
   loadSubAudit();
-  loadRefCodes();
   freeAccess('list');   // 同時載入免費白名單清單
   const box = document.getElementById('subsList');
   box.textContent = '載入中…';
@@ -975,6 +995,7 @@ async function renderSubs() {
     if (!res.ok) { box.textContent = '讀取失敗:' + (data.error || res.status); return; }
     _allSubs = data.subscribers || [];
     renderSubsTable();
+    loadRefCodes();   // 放在 _allSubs 載入後 → 才能算每碼預估抽成
   } catch (e) { box.textContent = '錯誤:' + e.message; }
 }
 function renderSubsTable() {

@@ -300,13 +300,21 @@ function applyRefCode() {
  if (!raw) { msg.style.color = 'var(--tx3)'; msg.textContent = '請輸入推薦碼。'; return; }
  if (!currentUser || !db) { msg.style.color = 'var(--tx3)'; msg.textContent = '請先登入。'; return; }
  const docRef = db.collection('users').doc(currentUser.uid);
+ const VALIDATE_URL = 'https://asia-east1-jpnote-1bdd6.cloudfunctions.net/validateRefCode';
+ const store = (label) => docRef.set({ ref_code: raw, ref_at: Date.now() }, { merge: true }).then(() => {
+   try { localStorage.setItem('stayjp_ref', raw); } catch (e) {}
+   msg.style.color = '#16A34A'; msg.textContent = label;
+ }).catch(() => { msg.style.color = '#EF4444'; msg.textContent = '套用失敗,請稍後再試。'; });
  docRef.get().then(d => {
    const cur = d.exists && d.data() ? d.data().ref_code : '';
    if (cur) { msg.style.color = 'var(--tx3)'; msg.textContent = '已套用推薦碼:' + cur + '(每人限一次,不可更改)'; return; }
-   docRef.set({ ref_code: raw, ref_at: Date.now() }, { merge: true }).then(() => {
-     try { localStorage.setItem('stayjp_ref', raw); } catch (e) {}
-     msg.style.color = '#16A34A'; msg.textContent = '✓ 已套用 ' + raw + ',付費訂閱成功後自動多送 7 天!';
-   }).catch(() => { msg.style.color = '#EF4444'; msg.textContent = '套用失敗,請稍後再試。'; });
+   msg.style.color = 'var(--tx3)'; msg.textContent = '驗證中…';
+   // 先驗證碼存不存在(查無就擋下,不亂存);驗證服務出錯/斷線 → fail-open 先存
+   fetch(VALIDATE_URL + '?code=' + encodeURIComponent(raw)).then(r => r.json()).then(v => {
+     if (v && v.valid) store('✓ 已套用 ' + raw + (v.kol ? '(' + v.kol + ')' : '') + ',付費訂閱成功後自動多送 7 天!');
+     else if (v && v.error) store('已套用 ' + raw + '(暫時無法即時驗證)');
+     else { msg.style.color = '#EF4444'; msg.textContent = '查無此推薦碼,請確認後再輸入。'; }
+   }).catch(() => store('已套用 ' + raw + '(暫時無法驗證)'));
  }).catch(() => { msg.style.color = '#EF4444'; msg.textContent = '讀取失敗,請稍後再試。'; });
 }
 

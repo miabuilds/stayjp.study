@@ -489,17 +489,25 @@ function applyRefCode() {
   const raw = (document.getElementById('refInput').value || '').trim().toUpperCase().replace(/[^A-Z0-9_-]/g, '').slice(0, 32);
   const msg = document.getElementById('refMsg');
   if (!raw) { msg.style.color = 'var(--tx3)'; msg.textContent = '請輸入推薦碼。'; return; }
-  try { localStorage.setItem('stayjp_ref', raw); } catch (e) {}
+  const VALIDATE_URL = 'https://asia-east1-jpnote-1bdd6.cloudfunctions.net/validateRefCode';
   const u = _auth.currentUser;
-  if (!u) { msg.style.color = '#16A34A'; msg.textContent = '✓ 已記住 ' + raw + ',登入並付費後自動多送 7 天!'; return; }
-  const ref = _db.doc('users/' + u.uid);
-  ref.get().then(d => {
-    const cur = d.exists && d.data() ? d.data().ref_code : '';
-    if (cur) { msg.style.color = 'var(--tx3)'; document.getElementById('refInput').value = cur; document.getElementById('refInput').disabled = true; msg.textContent = '已套用推薦碼:' + cur + '(每人限一次,不可更改)'; return; }
-    ref.set({ ref_code: raw, ref_at: Date.now() }, { merge: true }).then(() => {
-      msg.style.color = '#16A34A'; msg.textContent = '✓ 已套用 ' + raw + ',付費訂閱成功後自動多送 7 天!';
-    }).catch(() => { msg.style.color = '#EF4444'; msg.textContent = '套用失敗,請稍後再試。'; });
-  }).catch(() => { msg.style.color = '#EF4444'; msg.textContent = '讀取失敗,請稍後再試。'; });
+  msg.style.color = 'var(--tx3)'; msg.textContent = '驗證中…';
+  // 先驗證碼存不存在;查無就擋下、不亂存。驗證斷線 → fail-open(先記住)。
+  const writeFor = (label) => {
+    try { localStorage.setItem('stayjp_ref', raw); } catch (e) {}
+    if (!u) { msg.style.color = '#16A34A'; msg.textContent = label.replace('已套用', '已記住').replace('付費訂閱成功後', '登入並付費後'); return; }
+    const ref = _db.doc('users/' + u.uid);
+    ref.get().then(d => {
+      const cur = d.exists && d.data() ? d.data().ref_code : '';
+      if (cur) { msg.style.color = 'var(--tx3)'; document.getElementById('refInput').value = cur; document.getElementById('refInput').disabled = true; msg.textContent = '已套用推薦碼:' + cur + '(每人限一次,不可更改)'; return; }
+      ref.set({ ref_code: raw, ref_at: Date.now() }, { merge: true }).then(() => { msg.style.color = '#16A34A'; msg.textContent = label; }).catch(() => { msg.style.color = '#EF4444'; msg.textContent = '套用失敗,請稍後再試。'; });
+    }).catch(() => { msg.style.color = '#EF4444'; msg.textContent = '讀取失敗,請稍後再試。'; });
+  };
+  fetch(VALIDATE_URL + '?code=' + encodeURIComponent(raw)).then(r => r.json()).then(v => {
+    if (v && v.valid) writeFor('✓ 已套用 ' + raw + (v.kol ? '(' + v.kol + ')' : '') + ',付費訂閱成功後自動多送 7 天!');
+    else if (v && v.error) writeFor('已套用 ' + raw + '(暫時無法即時驗證)');
+    else { msg.style.color = '#EF4444'; msg.textContent = '查無此推薦碼,請確認後再輸入。'; }
+  }).catch(() => writeFor('已套用 ' + raw + '(暫時無法驗證)'));
 }
 // 登入後同步:已有碼→鎖定顯示;沒碼但進站帶了 ?ref=→首次寫進 users/{uid}(確保付款前已在文件上,後端才發得到 +7)
 function syncRefCode(data) {
