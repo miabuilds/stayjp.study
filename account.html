@@ -161,7 +161,7 @@ a:hover{text-decoration:underline}
  </div>
  <div id="resubscribeInfo" class="info-box" style="margin-top:14px;display:none">
  已關閉自動續訂。到期日前仍可正常使用,到期後降為免費版。
- 想恢復續扣必須重新訂閱(綠界規則:已取消的定期定額無法回復)。
+ 想恢復續扣必須重新訂閱(已取消的定期扣款無法回復)。
  </div>
  <div id="refundInfo" class="info-box" style="margin-top:14px;display:none"></div>
  </div>
@@ -410,8 +410,8 @@ function renderSubscription(sub) {
  // Source
  document.getElementById('sourceLabel').textContent =
  sub.source === 'app' ? ' App (Apple / Google)' :
- sub.paypal_capture ? ' 網頁 (PayPal)' :
- sub.source === 'web' ? ' 網頁 (綠界)' : sub.source;
+ sub.paypal_capture ? ' 網頁' :
+ sub.source === 'web' ? ' 網頁' : sub.source;
  rowSource.style.display = 'flex';
 
  // Actions — cancelled 但仍在期間內也算 Premium(可退費 / 仍能用)
@@ -586,8 +586,8 @@ async function requestRefund() {
    ? '\n• ⚠️ 早鳥為限量一次性優惠:退費後無法再以早鳥價訂閱,日後重新訂閱僅能用一般價(年費 NT$1,490)。'
    : '';
  const refundDesc = isPaypal
-   ? '• 款項由 PayPal 退回你的付款方式,入帳時間依 PayPal / 發卡行而定\n• 僅限首購 7 天內;逾期請來信客服'
-   : '• 退款由綠界經發卡銀行退回原卡,入帳時間依你的信用卡結帳週期而定（若已過結帳日,可能顯示在下一期帳單）\n• 七天內為無條件全額退;逾七天按未使用比例退';
+   ? '• 款項退回你的原付款方式,入帳時間依金流服務商 / 發卡行而定\n• 僅限首購 7 天內;逾期請來信客服'
+   : '• 退款經發卡銀行退回原卡,入帳時間依你的信用卡結帳週期而定（若已過結帳日,可能顯示在下一期帳單）\n• 七天內為無條件全額退;逾七天按未使用比例退';
  if (!confirm('確定要申請退費?\n\n按下確認後:\n• 訂閱立刻降級為免費版\n' + refundDesc + '\n• 已訂閱期間使用記錄會保留' + ebWarn + '\n（本站僅對明顯惡意濫用退費之帳號,保留拒絕未來新訂閱之權利）')) return;
  const btn = document.getElementById('btnRefund');
  if (btn) { btn.disabled = true; btn.textContent = '處理中…'; }
