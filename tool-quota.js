@@ -63,6 +63,10 @@
     return (cachedSub.expiresAt || 0) > Date.now();
   }
   function shouldGate() {
+    // App(WebView)內:原生已購買(RevenueCat 裝置級 entitlement 或帳號訂閱)→ 直接放行。
+    // Apple 5.1.1:App 內可未登入購買,premium 由原生注入 STAYJP_NATIVE.isPremium(即時更新)。
+    // 純網頁沒有 window.STAYJP_NATIVE → 此判斷跳過,網頁行為完全不變。
+    if (window.STAYJP_NATIVE && window.STAYJP_NATIVE.isNativeApp && window.STAYJP_NATIVE.isPremium) return false;
     if (!authReady) return false;     // 等 auth 狀態確定再決定,避免閃一下
     if (cachedUserEmail && !subLoaded) return false;  // 登入用戶:訂閱狀態還沒載完前先不擋(訂閱者 doc 載入慢時不會誤跳額度 badge)
     if (isPremium()) return false;     // 付費用戶(登入 + 有效訂閱)→ 不擋
