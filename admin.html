@@ -813,7 +813,7 @@ async function renderLedger() {
     const snap = await db.collection('transactions').orderBy('occurred_at', 'desc').limit(2000).get();
     const visibleDocs = snap.docs.filter(dd => !dd.data().hidden);   // 假刪除(hidden)的不顯示、不計入
     cnt.textContent = `共 ${visibleDocs.length} 筆`;
-    let rev = 0, refund = 0, pending = 0;
+    let rev = 0, refund = 0, pending = 0, revWeb = 0, revApp = 0;
     const fmt = ts => ts && ts.toDate ? ts.toDate().toLocaleString('zh-TW', { hour12: false }) : '—';
     const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
     const PAY_TXT = { ecpay: '綠界', manual: '手動', apple_iap: 'Apple / iOS', google_billing: 'Google Play', paypal: 'PayPal' };
@@ -833,7 +833,7 @@ async function renderLedger() {
         test: x.is_sandbox ? 'sandbox(測試)' : '',
       });
       // 沙盒測試購買不計入營收/退費(否則對帳數字虛高)
-      if (!x.is_sandbox && x.status === 'success' && (x.type === 'subscribe' || x.type === 'renew')) rev += amt;
+      if (!x.is_sandbox && x.status === 'success' && (x.type === 'subscribe' || x.type === 'renew')) { rev += amt; if (x.source === 'app') revApp += amt; else revWeb += amt; }
       if (!x.is_sandbox && x.type === 'refund') refund += Math.abs(amt);
       if (x.status === 'pending') pending++;
       const incomplete = x.status === 'pending' || x.status === 'failed';
@@ -854,10 +854,18 @@ async function renderLedger() {
         <td style="padding:6px 6px;white-space:nowrap"><button onclick="purgeUid('${esc(x.uid)}')" style="font-size:10px;padding:2px 7px;border:1px solid var(--bd);border-radius:6px;background:transparent;color:#EF4444;cursor:pointer" title="假刪除此 uid 的訂閱+全部交易(隱藏、可復原;owner 操作)">隱藏此帳號</button></td>
       </tr>`;
     }).join('');
+    // 平台成本估算:綠界手續費 2.75%、Apple 抽成 15%(已加入 Small Business Program;未加入為 30%)。
+    // 以台幣牌價估;Apple 實際依商店幣別/在地價,數字為概估對帳用。
+    const FEE_WEB = 0.0275, APPLE_CUT = 0.15;
+    const feeWeb = Math.round(revWeb * FEE_WEB);
+    const feeApple = Math.round(revApp * APPLE_CUT);
+    const netInHand = revWeb - feeWeb + revApp - feeApple - refund;
     totalsEl.innerHTML = `
-      <div class="stat"><div class="lbl">收款(success 訂閱+續訂)</div><div class="val">NT$${rev.toLocaleString()}</div></div>
-      <div class="stat"><div class="lbl">退費</div><div class="val">NT$${refund.toLocaleString()}</div></div>
-      <div class="stat"><div class="lbl">淨營收</div><div class="val">NT$${(rev - refund).toLocaleString()}</div><div class="sub">應 = 綠界實收淨額</div></div>
+      <div class="stat"><div class="lbl">收款(success 訂閱+續訂)</div><div class="val">NT$${rev.toLocaleString()}</div><div class="sub">綠界 ${revWeb.toLocaleString()} + Apple ${revApp.toLocaleString()}</div></div>
+      <div class="stat"><div class="lbl">綠界手續費(2.75%)</div><div class="val" style="color:#EF4444">−NT$${feeWeb.toLocaleString()}</div></div>
+      <div class="stat"><div class="lbl">Apple 抽成(15% SBP)</div><div class="val" style="color:#EF4444">−NT$${feeApple.toLocaleString()}</div><div class="sub">未加入 SBP 則為 30%</div></div>
+      <div class="stat"><div class="lbl">退費</div><div class="val" style="color:#EF4444">−NT$${refund.toLocaleString()}</div></div>
+      <div class="stat"><div class="lbl">實際到手(淨)</div><div class="val" style="color:#16A34A">NT$${netInHand.toLocaleString()}</div><div class="sub">收款 − 平台費 − 退費</div></div>
       <div class="stat"><div class="lbl">處理中(未扣款)</div><div class="val">${pending}</div><div class="sub">棄單噪音,可清</div></div>`;
     box.innerHTML = `<table style="width:100%;border-collapse:collapse;min-width:680px">
       <thead><tr style="text-align:left;color:var(--tx2);border-bottom:1px solid var(--bd)">
