@@ -154,7 +154,11 @@ export const revenuecatWebhook = functions.onRequest(
               newSub.ref_bonus_at = nowMs();
             }
           }
-          await writeSubscription(uid, newSub);
+          // 匿名購買(未登入)→ 不寫 users/{$RCAnonymousID} 訂閱 doc(否則污染訂閱者清單、變假使用者)。
+          // 權益靠 RC 裝置級 entitlement 解鎖;登入後由 TRANSFER 歸戶把訂閱寫進真帳號。
+          // 交易仍照記(見下)→ 營收準確,匿名購買也算得到。
+          const isAnonUid = typeof uid === "string" && uid.startsWith("$RCAnonymousID");
+          if (!isAnonUid) await writeSubscription(uid, newSub);
 
           await writeTransaction({
             uid,
@@ -326,5 +330,18 @@ async function fetchAndWriteFromRc(uid: string): Promise<"written" | "no-entitle
     failed_retries: 0,
   };
   await writeSubscription(uid, sub);
+  // 帳號頁交易明細:補一筆「App 訂閱(登入歸戶)」。amount_twd=0 → 不重複計營收
+  //（真實付款/試用已在購買當下記過,可能在匿名 id 名下)。冪等 id 防 TRANSFER 重送重複寫。
+  await writeTransaction({
+    uid,
+    type: "subscribe",
+    source: "app",
+    plan,
+    amount_twd: 0,
+    payment_method: "apple_iap",
+    external_id: "",
+    status: "success",
+    note: "透過 App Store 訂閱(登入歸戶)",
+  }, `transfer_${uid}`);
   return "written";
 }

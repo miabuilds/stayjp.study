@@ -32,7 +32,8 @@ export const adminListSubscribers = functions.onRequest(
         .where("subscription.status", "in", ["active", "trialing", "cancelled", "refunded", "expired"])
         .limit(500).get();
 
-      const subscribers = await Promise.all(snap.docs.map(async (doc) => {
+      const subscribers = (await Promise.all(snap.docs.map(async (doc) => {
+        if (doc.id.startsWith("$RCAnonymousID")) return null;   // 匿名購買遺留的假 user doc → 不列入訂閱者
         const d = doc.data();
         const s = (d.subscription || {}) as Record<string, unknown>;
         let email = "";
@@ -51,7 +52,7 @@ export const adminListSubscribers = functions.onRequest(
           ecpay_order: s.ecpay_order || null,   // 有=綠界定期定額;無=手動/PayPal(報表用來區分付款方式)
           ref_code: d.ref_code || "",           // KOL 推薦碼歸因(首次點擊寫入 users/{uid}.ref_code)
         };
-      }));
+      }))).filter((x): x is NonNullable<typeof x> => x !== null);
 
       // 依到期日新到舊排序
       subscribers.sort((a, b) => (Number(b.expiresAt) || 0) - (Number(a.expiresAt) || 0));
