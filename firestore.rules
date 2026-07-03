@@ -32,6 +32,16 @@ service cloud.firestore {
       allow read, write: if false;
     }
 
+    // 進度資料(srs_data 等大 blob,各 key gzip bytes)— 從 users/{uid} 搬出,避免撞 1MiB。
+    // 本人可讀寫自己;admin 可讀(debug)。無金流欄位,owner 可寫無自封 premium 風險。
+    match /user_progress/{uid} {
+      allow read: if request.auth != null && (
+                    request.auth.uid == uid ||
+                    request.auth.token.email in ['stayjpplan@gmail.com', 'abc83327@gmail.com']
+                  );
+      allow write: if request.auth != null && request.auth.uid == uid;
+    }
+
     // 訂閱交易帳本 — Cloud Function 寫,admin + 用戶自己讀
     // 結構:transactions/{txnId} → { uid, type, amount_twd, ... }
     match /transactions/{txnId} {

@@ -1442,6 +1442,7 @@ body.profile-view .mn { margin-left: 0; max-width: none; }   /* 滿版 → 內�
      content-loader.js 載入時若 localStorage 有快取就同步 set window globals；沒有就靠
      ContentLoader.ready() Promise 在 init 時等 Firestore fetch。 -->
 <script src="content-loader.js"></script>
+<script src="progress-codec.js"></script>
 <script src="grammar-kanji-readings.js"></script>
 <script src="conjugate.js"></script>
 
@@ -1681,9 +1682,23 @@ function saveFavCloud() {
 // ========== CLOUD SYNC: Quiz History & SRS ==========
 function loadCloudData() {
   if (!currentUser || !db) return;
-  db.collection('users').doc(currentUser.uid).get().then(doc => {
-    if (!doc.exists) return;
-    const d = doc.data();
+  // 雙讀:進度大 key 優先讀 user_progress/{uid}(壓縮),缺則退回 users/{uid} 舊欄位。
+  // 未遷移用戶無 user_progress doc → 全走 legacy,行為零改變。
+  Promise.all([
+    db.collection('users').doc(currentUser.uid).get(),
+    db.collection('user_progress').doc(currentUser.uid).get().catch(() => null),
+  ]).then(async ([doc, pdoc]) => {
+    if (!doc.exists && !(pdoc && pdoc.exists)) return;
+    const d = doc.exists ? doc.data() : {};
+    if (pdoc && pdoc.exists && window.ProgressCodec) {
+      const pd = pdoc.data() || {};
+      for (const k of ProgressCodec.PROGRESS_BIG_KEYS) {
+        const v = pd[k];
+        if (v == null) continue;
+        try { d[k] = await ProgressCodec.gunzipJSON(v.toUint8Array ? v.toUint8Array() : v); }
+        catch (e) { /* 壞資料 → 保留 legacy d[k] */ }
+      }
+    }
     // Merge quiz history
     if (d.quiz_history) {
       const local = JSON.parse(localStorage.getItem('quiz_history') || '[]');
@@ -1786,15 +1801,30 @@ function mergeSRS(local, cloud) {
   });
   return merged;
 }
+// 雙寫的新路:進度大 key 各自壓縮寫 user_progress/{uid}(舊路仍照寫 users/{uid} → 回滾無損、未遷移用戶照讀舊欄位)。
+function saveProgressKeys(map) {
+  if (!currentUser || !db || !window.ProgressCodec || !ProgressCodec.SUPPORTED) return;
+  const uid = currentUser.uid;
+  (async () => {
+    const out = {};
+    for (const k in map) {
+      if (map[k] == null) continue;
+      try { out[k] = firebase.firestore.Blob.fromUint8Array(await ProgressCodec.gzipBytes(map[k])); } catch (e) {}
+    }
+    if (Object.keys(out).length) db.collection('user_progress').doc(uid).set(out, { merge: true }).catch(() => {});
+  })();
+}
 function saveQuizCloud() {
   if (!currentUser || !db) return;
   const h = JSON.parse(localStorage.getItem('quiz_history') || '[]');
   db.collection('users').doc(currentUser.uid).set({ quiz_history: h }, { merge: true });
+  saveProgressKeys({ quiz_history: h });
 }
 function saveSRSCloud() {
   if (!currentUser || !db) return;
   const d = JSON.parse(localStorage.getItem('srs_data') || '{}');
   db.collection('users').doc(currentUser.uid).set({ srs_data: d }, { merge: true });
+  saveProgressKeys({ srs_data: d });
 }
 // ── Sync ALL data ──
 const SYNC_KEYS = ['study_log','word_notebook','grammar_srs','daily_progress','mock_exam_history','exam_date','base_level','goal_level','reading_done','reading_scores','listening_scores','listening_done','shadow_favs','wrong_questions'];
@@ -1805,6 +1835,12 @@ function saveAllCloud() {
     try { const v = localStorage.getItem(k); if (v) payload[k] = JSON.parse(v); } catch(e) {}
   });
   if (Object.keys(payload).length) db.collection('users').doc(currentUser.uid).set(payload, { merge: true });
+  // 大 key 另壓縮雙寫 user_progress(小純量 exam_date/base_level/goal_level/daily_progress 續留 users)
+  if (window.ProgressCodec) {
+    const big = {};
+    ProgressCodec.PROGRESS_BIG_KEYS.forEach(k => { if (payload[k] != null) big[k] = payload[k]; });
+    saveProgressKeys(big);
+  }
 }
 function favKey() { return currentMode==='vocab' ? 'v'+currentLevel : currentLevel; }
 // 單字收藏統一從 word_notebook 取資料；文法/比較仍用 favorites[lv]
