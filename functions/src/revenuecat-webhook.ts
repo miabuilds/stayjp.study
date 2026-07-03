@@ -24,7 +24,7 @@ export const revenuecatWebhook = functions.onRequest(
   {
     region: "asia-east1",
     invoker: "public",
-    secrets: ["REVENUECAT_SECRET_KEY"],   // TRANSFER 事件不帶 product → 要查 RC REST 還原訂閱
+    secrets: ["REVENUECAT_SECRET_KEY", "REVENUECAT_WEBHOOK_SECRET"],   // SECRET_KEY:TRANSFER 查 RC REST 還原訂閱;WEBHOOK_SECRET:驗 Authorization 擋偽造
     maxInstances: 20,          // App IAP webhook,給多一點 burst 空間
     timeoutSeconds: 60,
     memory: "256MiB",
