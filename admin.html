@@ -792,6 +792,8 @@ async function purgeUid(uid) {
 
 // 帳本匯出用:renderLedger 載入時收集,exportLedgerCSV 下載。
 let _ledgerExport = [];
+let _ledgerHideSandbox = true;   // 帳本預設隱藏沙盒(測試)交易;不改營收(本來就排除)、不改 CSV(仍含測試欄),只影響列表顯示
+function toggleLedgerSandbox() { _ledgerHideSandbox = !_ledgerHideSandbox; renderLedger(); }
 function exportLedgerCSV() {
   if (!_ledgerExport.length) { alert('先按「重新整理」載入帳本再匯出'); return; }
   const head = ['時間', 'Email/UID', '類型', '方案', '金額(NT$)', '付款方式', '狀態', '交易ID'];
@@ -824,7 +826,10 @@ async function renderLedger() {
   try {
     const snap = await db.collection('transactions').orderBy('occurred_at', 'desc').limit(2000).get();
     const visibleDocs = snap.docs.filter(dd => !dd.data().hidden);   // 假刪除(hidden)的不顯示、不計入
-    cnt.textContent = `共 ${visibleDocs.length} 筆`;
+    const sandboxN = visibleDocs.filter(dd => dd.data().is_sandbox).length;   // 沙盒(測試)筆數
+    const realN = visibleDocs.length - sandboxN;
+    cnt.innerHTML = `共 ${_ledgerHideSandbox ? realN : visibleDocs.length} 筆`
+      + (sandboxN ? ` <span style="color:var(--tx3)">·</span> <a href="javascript:void(0)" onclick="toggleLedgerSandbox()" style="color:#0EA5E9;text-decoration:none">${_ledgerHideSandbox ? `已隱藏 ${sandboxN} 筆沙盒（點此顯示）` : `顯示含沙盒（點此隱藏）`}</a>` : '');
     let rev = 0, refund = 0, pending = 0, revWeb = 0, revApp = 0;
     const fmt = ts => ts && ts.toDate ? ts.toDate().toLocaleString('zh-TW', { hour12: false }) : '—';
     const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -854,6 +859,7 @@ async function renderLedger() {
       const amtCell = incomplete ? `<span style="color:var(--tx3)">${Math.abs(amt).toLocaleString()} 未扣</span>`
         : foreign ? `<span style="color:${x.amount_paid >= 0 ? '#16A34A' : '#EF4444'};font-weight:600">${x.amount_paid >= 0 ? '+' : '-'}${esc(x.currency)} ${Math.abs(x.amount_paid).toLocaleString()}</span>`
         : amt !== 0 ? `<span style="color:${amt > 0 ? '#16A34A' : '#EF4444'};font-weight:600">${amt > 0 ? '+' : '-'}${Math.abs(amt).toLocaleString()}</span>` : '—';
+      if (_ledgerHideSandbox && x.is_sandbox) return '';   // 預設隱藏沙盒列(營收/CSV 上方已算完,僅不渲染此列)
       return `<tr style="border-bottom:1px solid var(--bd)${(incomplete || x.is_sandbox) ? ';opacity:.5' : ''}">
         <td style="padding:6px 6px;white-space:nowrap">${x.is_sandbox?'<span style="color:#F59E0B">🧪</span> ':''}${fmt(x.occurred_at)}</td>
         <td style="padding:6px 6px">${esc(uidEmail[x.uid] || x.uid.slice(0, 10))}</td>
