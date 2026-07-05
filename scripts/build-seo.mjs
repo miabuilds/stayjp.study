@@ -49,7 +49,7 @@ for (const lv of LEVELS) {
     const enUrl = `${ORIGIN}/en/g/${lv}/${slug}/`;
     const alts = [{ lang:'zh-Hant', href:zhUrl }, { lang:'en', href:enUrl }];
     const related = (byCat[entry.cat] || []).filter(x => x.id !== entry.id).slice(0, 6)
-      .map(x => ({ t:x.t, href:`/g/${lv}/${slugs.get(x.id)}/` }));
+      .map(x => ({ id:x.id, t:x.t, href:`/g/${lv}/${slugs.get(x.id)}/` }));
     write(`g/${lv}/${slug}`, renderGrammarPage({
       entry, level: lv, lang:'zh-Hant', canonical: zhUrl, alternates: alts, related, appUrl: `${ORIGIN}/#${lv}` }));
     urls.push({ loc: zhUrl, priority: '0.7' });
@@ -57,7 +57,7 @@ for (const lv of LEVELS) {
     const enEntry = en[entry.id];
     if (enEntry) {
       const enPaired = { ...enEntry, eg: enExamples(entry, enEntry) };
-      const relEn = related.map(r => ({ t:r.t, href:`/en${r.href}` }));
+      const relEn = related.map(r => ({ t: en[r.id]?.t || r.t, href:`/en${r.href}` }));
       write(`en/g/${lv}/${slug}`, renderGrammarPage({
         entry: enPaired, level: lv, lang:'en', canonical: enUrl,
         alternates:[{lang:'zh-Hant',href:zhUrl},{lang:'en',href:enUrl}], related: relEn, appUrl: `${ORIGIN}/en/#${lv}` }));
