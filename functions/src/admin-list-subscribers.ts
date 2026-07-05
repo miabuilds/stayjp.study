@@ -28,12 +28,14 @@ export const adminListSubscribers = functions.onRequest(
       const decoded = await admin.auth().verifyIdToken(idToken);
       if (!OWNER_EMAILS.has(decoded.email || "")) { res.status(403).json({ error: "not_owner" }); return; }
 
-      const snap = await db.collection("subscriptions")
-        .where("status", "in", ["active", "trialing", "cancelled", "refunded", "expired"])
+      const snap = await db.collection("users")
+        .where("subscription.status", "in", ["active", "trialing", "cancelled", "refunded", "expired"])
         .limit(500).get();
 
-      const subscribers = await Promise.all(snap.docs.map(async (doc) => {
-        const s = (doc.data() || {}) as Record<string, unknown>;
+      const subscribers = (await Promise.all(snap.docs.map(async (doc) => {
+        if (doc.id.startsWith("$RCAnonymousID")) return null;   // 匿名購買遺留的假 user doc → 不列入訂閱者
+        const d = doc.data();
+        const s = (d.subscription || {}) as Record<string, unknown>;
         let email = "";
         try { email = (await admin.auth().getUser(doc.id)).email || ""; } catch { /* user 可能已刪 */ }
         return {
@@ -45,9 +47,12 @@ export const adminListSubscribers = functions.onRequest(
           expiresAt: s.expiresAt || null,
           startedAt: s.startedAt || null,
           is_early_bird: s.is_early_bird === true,
+          is_sandbox: s.is_sandbox === true,    // 沙盒測試購買(非真實付款)→ 後台區分測試/真實
           willRenew: s.willRenew === true,
+          ecpay_order: s.ecpay_order || null,   // 有=綠界定期定額;無=手動/PayPal(報表用來區分付款方式)
+          ref_code: d.ref_code || "",           // KOL 推薦碼歸因(首次點擊寫入 users/{uid}.ref_code)
         };
-      }));
+      }))).filter((x): x is NonNullable<typeof x> => x !== null);
 
       // 依到期日新到舊排序
       subscribers.sort((a, b) => (Number(b.expiresAt) || 0) - (Number(a.expiresAt) || 0));

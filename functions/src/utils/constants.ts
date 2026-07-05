@@ -22,7 +22,7 @@ export const EARLY_BIRD_LIMIT = 100;
 
 export type PlanKey = "monthly" | "yearly" | "yearly_early_bird" | "lifetime";
 export type Source = "web" | "app";
-export type SubStatus = "active" | "cancelled" | "expired" | "refunded";
+export type SubStatus = "trialing" | "active" | "cancelled" | "expired" | "refunded" | "voided";
 
 export const PLANS: Record<PlanKey, {
   price_twd: number;
@@ -32,7 +32,7 @@ export const PLANS: Record<PlanKey, {
   display_name: string;
 }> = {
   monthly: {
-    price_twd: 149,
+    price_twd: 150,
     period_days: 30,
     ecpay_period_type: "M",
     ecpay_frequency: 1,
@@ -59,6 +59,44 @@ export const PLANS: Record<PlanKey, {
     ecpay_frequency: 1,
     display_name: "終身方案",
   },
+};
+
+// ───── PayPal(網頁海外用戶,一次性付款:早鳥年費 / 買斷)─────────────────
+// 設定:firebase functions:secrets:set PAYPAL_CLIENT_SECRET
+//       上線再:firebase functions:secrets:set PAYPAL_PRODUCTION (輸入 true) + 換 live client id
+export const PAYPAL_SECRETS = [
+  defineSecret("PAYPAL_CLIENT_SECRET"),
+  defineSecret("PAYPAL_PRODUCTION"),   // 設 "true" 走正式;未設/非 true → sandbox
+];
+
+// Client ID 是公開值(前端 SDK 也會用);依 PAYPAL_PRODUCTION 選 live / sandbox,可用 env 覆寫。
+const PAYPAL_SANDBOX_CLIENT_ID =
+  "AeWHhYkZLsmyZzCrVRuxvbBfpeNEqGGDeEQe1uAoAvLA6DFPD_w3yF2-UUzZmcv_mfLWVTzaSzv25Dwt";
+const PAYPAL_LIVE_CLIENT_ID =
+  "Aeuts8UKvc-wbXSHPrGCuWXOh9_ZnvYugi-ElkAls1eOxEWjjv-Td0N74w0xIQdXLtkW39SIKYewCtFB";
+
+export function paypalConfig() {
+  const isProduction = process.env.PAYPAL_PRODUCTION === "true";
+  return {
+    clientId: process.env.PAYPAL_CLIENT_ID
+      || (isProduction ? PAYPAL_LIVE_CLIENT_ID : PAYPAL_SANDBOX_CLIENT_ID),
+    secret: process.env.PAYPAL_CLIENT_SECRET || "",
+    isProduction,
+    currency: "USD",
+  };
+}
+
+export function paypalApiBase() {
+  return paypalConfig().isProduction
+    ? "https://api-m.paypal.com"
+    : "https://api-m.sandbox.paypal.com";
+}
+
+// PayPal 只開放「海外一次性方案」:早鳥年費 / 買斷(月費 / 標準年費走綠界定期定額)。
+// 金額用 USD(PayPal 不直接收 TWD);對帳 ledger 仍記 TWD 標價(PLANS.price_twd)。
+export const PAYPAL_PRICES_USD: Partial<Record<PlanKey, number>> = {
+  yearly_early_bird: 32,
+  lifetime: 96,
 };
 
 // 退費規則(全自動)

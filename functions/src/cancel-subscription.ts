@@ -94,24 +94,36 @@ export const cancelSubscription = functions.onRequest(
       }
 
       if (isRecurring && !ecpayOk) {
-        // 綠界 cancel API 失敗 → 不要更新 Firestore,避免兩邊狀態不一致
-        await writeTransaction({
-          uid,
-          type: "cancel",
-          source: "web",
-          plan: sub.plan,
-          amount_twd: 0,
-          payment_method: "ecpay",
-          external_id: sub.ecpay_order || "",
-          status: "failed",
-          note: `ECPay PeriodAction CancelRevoke failed: ${ecpayMsg}`,
-        });
-        res.status(500).json({
-          error: "ecpay_cancel_failed",
-          reason: "綠界端取消失敗,請稍後再試或聯絡客服。",
-          ecpay_response: ecpayMsg,
-        });
-        return;
+        // 綠界「不存在的訂單」(RtnCode=90100150):定期定額約定在首次授權後需數分鐘才會登錄到
+        // PeriodAction 系統。分三種情況處理,別一律卡死用戶:
+        const orderNotFound = /RtnCode=90100150\b/.test(ecpayMsg) || ecpayMsg.includes("不存在的訂單");
+        const recentlySubscribed = (Date.now() - (sub.startedAt || 0)) < 15 * 60 * 1000;
+
+        if (orderNotFound && recentlySubscribed) {
+          // (a) 訂閱剛成立 → 約定還在建立,請稍後再試。不改 DB(避免誤判),用戶可重試。
+          res.status(409).json({
+            error: "too_soon",
+            reason: "訂閱剛成立,綠界扣款約定建立中,請約 10 分鐘後再回來按一次取消。",
+          });
+          return;
+        }
+        if (!orderNotFound) {
+          // (c) 其他綠界錯誤(網路 / 其他 RtnCode）→ 維持嚴格:不更新 DB,避免兩邊不一致。
+          await writeTransaction({
+            uid, type: "cancel", source: "web", plan: sub.plan, amount_twd: 0,
+            payment_method: "ecpay", external_id: sub.ecpay_order || "",
+            status: "failed", note: `ECPay PeriodAction Cancel failed: ${ecpayMsg}`,
+          });
+          res.status(500).json({
+            error: "ecpay_cancel_failed",
+            reason: "綠界端取消失敗,請稍後再試或聯絡客服。",
+            ecpay_response: ecpayMsg,
+          });
+          return;
+        }
+        // (b) orderNotFound 但訂閱已成立 >15 分鐘 → 綠界查無此定期約定 = 沒有會扣款的訂單,
+        //     放行本地取消(不會再被扣)。落 note 標註,往下走正常的 cancelled 更新。
+        ecpayMsg = `綠界查無定期訂單,視為已無扣款約定(${ecpayMsg})`;
       }
 
       // 更新 Firestore — willRenew=false,status="cancelled"

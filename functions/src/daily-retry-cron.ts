@@ -28,25 +28,30 @@ export const dailyRetryCron = functions.onSchedule(
     console.log("Daily retry cron started");
 
     // 1. 找所有 failed_retries > 0 的訂閱
-    const snap = await db.collection("subscriptions")
-      .where("failed_retries", ">", 0)
+    const snap = await db.collection("users")
+      .where("subscription.failed_retries", ">", 0)
       .get();
 
     console.log(`Found ${snap.size} users with failed retries`);
 
     for (const doc of snap.docs) {
-      const sub = doc.data();
+      const sub = doc.data().subscription;
       if (!sub || !sub.last_retry_at) continue;
 
       const uid = doc.id;
       const failedCount = sub.failed_retries as number;
       const daysSinceLastFail = Math.floor((nowMs() - sub.last_retry_at) / (24 * 60 * 60 * 1000));
 
-      // 超過 grace period 還沒成功 → 過期
-      if (daysSinceLastFail > FAILED_PAYMENT_GRACE_DAYS) {
+      // 超過 grace period 還沒成功 → 過期。
+      // ⚠️ 必須同時確認「當前已付費期間真的結束(expiresAt 已過)」才能降級。
+      // 否則使用者這期是付過錢的(expiresAt 在未來),失敗的是「下一期續扣」,
+      // 提早降 expired 會發生「付費到 7/9、卻 6/28 就顯示已過期」的誤殺。
+      const paidPeriodEnded = (sub.expiresAt || 0) <= nowMs();
+      if (daysSinceLastFail > FAILED_PAYMENT_GRACE_DAYS && paidPeriodEnded) {
         await patchSubscription(uid, {
           status: "expired",
           willRenew: false,
+          failed_retries: 0,   // 清零 → 隔天 cron 不再撈到同一人重複降級+重寫假失敗交易(本來會每天洗一筆)
         });
         await writeTransaction({
           uid,

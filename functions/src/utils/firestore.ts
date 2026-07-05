@@ -47,35 +47,40 @@ export interface SubscriptionDoc {
   ecpay_order?: string;
   apple_txn?: string;
   google_txn?: string;
+  paypal_capture?: string;   // PayPal 一次性付款的 capture id;有值 = 來源為 PayPal、退費要用它
   is_early_bird?: boolean;
+  is_sandbox?: boolean;        // Apple/Google 沙盒測試購買(非真實付款)→ 後台用來區分測試/真實
   refund_requested_at?: admin.firestore.Timestamp;
   failed_retries?: number;
   last_retry_at?: number;
+  ref_bonus_at?: number;       // KOL 推薦碼好康:確認真實付款後發過 7 天的時戳(一次性,防重複/疊加)
 }
 
-// 訂閱存獨立 collection subscriptions/{uid}(不受進度 doc 索引/體積影響;規則 write:false 防自封 premium)。
-// 遷移過渡期:getSubscription 先讀新位置,讀不到才退回舊的 users/{uid}.subscription。
-const SUBS = "subscriptions";
-
 export async function getSubscription(uid: string): Promise<SubscriptionDoc | null> {
-  const newSnap = await db.collection(SUBS).doc(uid).get();
-  if (newSnap.exists) return (newSnap.data() as SubscriptionDoc) || null;
-  // 雙讀後備(尚未回填的舊用戶)
-  const legacy = await db.doc(`users/${uid}`).get();
-  return (legacy.data()?.subscription as SubscriptionDoc) || null;
+  const snap = await db.doc(`users/${uid}`).get();
+  return (snap.data()?.subscription as SubscriptionDoc) || null;
+}
+
+// 讀使用者根層的 KOL 推薦碼(歸因用;與 subscription 同一份 users/{uid} 文件)
+export async function getRefCode(uid: string): Promise<string> {
+  const snap = await db.doc(`users/${uid}`).get();
+  return (snap.data()?.ref_code as string) || "";
 }
 
 export async function writeSubscription(uid: string, sub: SubscriptionDoc): Promise<void> {
-  // 一律寫新位置(獨立小 doc)
-  await db.collection(SUBS).doc(uid).set(sub, { merge: true });
+  await db.doc(`users/${uid}`).set({ subscription: sub }, { merge: true });
 }
 
 export async function patchSubscription(
   uid: string,
   patch: Partial<SubscriptionDoc>,
 ): Promise<void> {
-  // 新位置欄位是頂層,set(merge) 等效於原 dotted-path update
-  await db.collection(SUBS).doc(uid).set(patch, { merge: true });
+  // 用 set(merge) 而非 update():update() 在 doc 不存在時會丟 NOT_FOUND → 整個 webhook 500、
+  // RevenueCat 無限重送,且 REFUND/EXPIRATION 永遠撤銷不了權益(漏財紅線)。set merge 會深層合併
+  // subscription 既有欄位、doc 不存在則建立,語義等同但不會炸。
+  const subPatch: Record<string, unknown> = {};
+  for (const [k, v] of Object.entries(patch)) subPatch[k] = v;
+  await db.doc(`users/${uid}`).set({ subscription: subPatch }, { merge: true });
 }
 
 /**
@@ -98,17 +103,19 @@ export async function getLatestSuccessTradeNo(uid: string): Promise<string | nul
 
 export type TxnType =
   | "subscribe" | "renew" | "cancel" | "refund"
-  | "fail" | "chargeback" | "gift"
-  | "trial_start";   // 免費試用開通(amount_twd=0,不計營收;轉正時才發 renew 記真實金額)
+  | "fail" | "chargeback" | "gift";
 
 export interface TransactionDoc {
   uid: string;
   type: TxnType;
   source: Source;
   plan: PlanKey | "n/a";
-  amount_twd: number;          // 正數 = 收入,負數 = 退費
+  amount_twd: number;          // 正數 = 收入,負數 = 退費(綠界=實收 TWD;Apple/Google=台幣牌價,僅供參考)
+  currency?: string;           // 實際結帳幣別(Apple/Google IAP,如 TWD/USD/JPY);綠界一律 TWD
+  amount_paid?: number;        // 該幣別的實付金額(外國人買 iOS 時,真金額在這,不是 amount_twd)
+  is_sandbox?: boolean;        // Apple/Google 沙盒測試交易(非真實金流)→ 後台對帳要排除
   occurred_at: admin.firestore.Timestamp;
-  payment_method: "ecpay" | "apple_iap" | "google_billing" | "manual";
+  payment_method: "ecpay" | "apple_iap" | "google_billing" | "manual" | "paypal";
   external_id: string;
   status: "success" | "pending" | "failed" | "refunded";
   invoice_no?: string;
@@ -116,8 +123,13 @@ export interface TransactionDoc {
   email_hash?: string;         // 防薅羊毛追蹤
 }
 
-export async function writeTransaction(txn: Omit<TransactionDoc, "occurred_at">): Promise<string> {
-  const ref = db.collection("transactions").doc();
+export async function writeTransaction(
+  txn: Omit<TransactionDoc, "occurred_at">,
+  dedupeId?: string,   // 給定 → 用它當 doc id(冪等:webhook 重送會覆寫同一筆,不會重複入帳)
+): Promise<string> {
+  const ref = dedupeId
+    ? db.collection("transactions").doc(dedupeId)
+    : db.collection("transactions").doc();
   await ref.set({
     ...txn,
     occurred_at: FieldValue.serverTimestamp(),
@@ -278,6 +290,25 @@ export async function precheckSubscribe(uid: string, email: string): Promise<Pre
       ok: false,
       reason: `您在${sub.source === "app" ? " App" : "網頁"}已有訂閱(到期日:${new Date(sub.expiresAt).toLocaleDateString("zh-TW")}),不需重複訂閱。`,
     };
+  }
+
+  // 1.5 防連點重複扣款:近 10 分鐘已有「處理中(pending)」的訂閱結帳 → 擋。
+  //      (race:第一筆還沒收到 ECPay callback 開通前,使用者又送一次 → 兩筆都成立 → 重複扣款)
+  try {
+    const cutoff = admin.firestore.Timestamp.fromMillis(nowMs() - 10 * 60 * 1000);
+    const recent = await db.collection("transactions")
+      .where("uid", "==", uid)
+      .where("occurred_at", ">=", cutoff)
+      .get();
+    const hasPendingSubscribe = recent.docs.some((d) => {
+      const t = d.data();
+      return t.type === "subscribe" && t.status === "pending";
+    });
+    if (hasPendingSubscribe) {
+      return { ok: false, reason: "你有一筆付款正在處理中,請稍候幾分鐘再試,避免重複扣款。" };
+    }
+  } catch (e) {
+    console.warn("[precheck] pending check failed", e);   // 查詢失敗不擋正常流程
   }
 
   // 2. 黑名單?
