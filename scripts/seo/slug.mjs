@@ -1,11 +1,20 @@
 import { kanaToRomaji } from './romaji.mjs';
 
-const DECORATION = /[～〜・（）()｛｝【】「」、。･\s　]/g;
+const DECORATION = /[～〜・｛｝【】「」『』、。･\s　]/g;
+const PAREN = /[（(][^）)]*[）)]/g;      // （名詞）(主題) 等注解
+const QUOTED = /[「『]([^」』]+)[」』]/g; // 「は」『まで』等引号内的文法本体
+
+// 标题→用于生成 slug 的核心文字:优先取引号内(真正的助词/词),否则剥掉注解后取剩余。
+function coreText(title) {
+  const quoted = [...title.matchAll(QUOTED)].map(m => m[1]);
+  if (quoted.length) return quoted.join('');
+  return title.replace(PAREN, '');
+}
 
 // 贪婪最长匹配把标题里的汉字词换成假名读音,再整体转罗马音。
 function toKana(title, readings) {
   const keys = Object.keys(readings).sort((a, b) => b.length - a.length); // 长优先
-  const s = title.replace(DECORATION, '');
+  const s = coreText(title).replace(DECORATION, '');
   let i = 0, out = '';
   outer: while (i < s.length) {
     for (const k of keys) {

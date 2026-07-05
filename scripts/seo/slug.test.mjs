@@ -6,7 +6,17 @@ const R = { '対':'たい' };
 
 test('strips decoration, kana → slug', () => {
   assert.equal(titleToSlug('～てしまう', {}), 'teshimau');
-  assert.equal(titleToSlug('～です・～じゃありません（名詞）', {}), null); // 名詞 无读音→残留汉字→null
+});
+test('strips （...）annotation so kana core survives', () => {
+  // 剥掉（名詞）注解后剩纯假名→可转
+  assert.equal(titleToSlug('～です・～じゃありません（名詞）', {}), 'desujaarimasen');
+});
+test('prefers 「...」quoted core (the actual particle)', () => {
+  assert.equal(titleToSlug('助詞「は」（主題）', {}), 'ha');
+  assert.equal(titleToSlug('助詞「まで」（終點）', {}), 'made');
+});
+test('all-kanji title with no readings → null', () => {
+  assert.equal(titleToSlug('丁寧体與普通体', {}), null);
 });
 test('kanji resolved via readings map', () => {
   assert.equal(titleToSlug('～に対して', R), 'nitaishite');
