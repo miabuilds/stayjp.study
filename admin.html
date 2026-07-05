@@ -964,6 +964,7 @@ async function loadRefCodes() {
           <button class="btn" style="font-size:11px;padding:3px 8px" onclick="copyTxt('${refLink}')">複製推薦連結</button>
           <button class="btn" style="font-size:11px;padding:3px 8px" onclick="copyTxt('${kolLink}')">複製 KOL 查詢頁連結</button>
           <button class="btn" style="font-size:11px;padding:3px 8px" onclick="toggleRefCode('${code}',${c.active === false})">${c.active === false ? '啟用' : '停用'}</button>
+          <button class="btn danger" style="font-size:11px;padding:3px 8px" onclick="deleteRefCode('${code}',${comm.paid})">刪除</button>
         </div>
       </div>`; }).join('');
   } catch (e) { box.textContent = '讀取失敗:' + e.message; }
@@ -987,6 +988,11 @@ function createRefCode() {
 }
 function toggleRefCode(code, activate) {
   db.collection('ref_codes').doc(code).set({ active: !!activate }, { merge: true }).then(loadRefCodes);
+}
+function deleteRefCode(code, paid) {
+  const warn = paid > 0 ? `\n\n⚠ 此碼已有 ${paid} 位付費歸因者,刪除後 KOL 統計頁與即時歸因會失效(歷史交易/抽成仍可從帳本查)。` : '';
+  if (!confirm('刪除推薦碼 ' + code + '?此動作不可復原。' + warn)) return;
+  db.collection('ref_codes').doc(code).delete().then(loadRefCodes).catch(e => { const m = document.getElementById('refCodeMsg'); m.style.color = '#EF4444'; m.textContent = '刪除失敗:' + e.message; });
 }
 function copyTxt(t) { (navigator.clipboard ? navigator.clipboard.writeText(t) : Promise.reject()).then(() => { const m = document.getElementById('refCodeMsg'); m.style.color = '#16A34A'; m.textContent = '已複製:' + t; }).catch(() => { const m = document.getElementById('refCodeMsg'); m.style.color = 'var(--tx2)'; m.textContent = t; }); }
 
