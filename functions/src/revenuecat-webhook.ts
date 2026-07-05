@@ -63,6 +63,12 @@ export const revenuecatWebhook = functions.onRequest(
       switch (type) {
         case "INITIAL_PURCHASE":
         case "RENEWAL": {
+          // 免費試用期:period_type === "TRIAL"。用戶當下付 0 元,不能記為營收。
+          // 只有 INITIAL_PURCHASE 可能是 TRIAL(試用開通);RENEWAL 一律是真實扣款(含試用轉正,帶 is_trial_conversion)。
+          const isTrial = event.period_type === "TRIAL";
+          // 到期日以 RevenueCat 給的實際 expiration 為準(試用 7 天 vs 正式 30/365 天不同),拿不到才退回 plusDays。
+          const expiresAt = Number(event.expiration_at_ms) || plusDays(nowMs(), planInfo.period_days);
+
           let isEarlyBird = false;
           if (plan === "yearly_early_bird" && type === "INITIAL_PURCHASE") {
             isEarlyBird = await tryReserveEarlyBird();
@@ -72,8 +78,8 @@ export const revenuecatWebhook = functions.onRequest(
           const newSub: SubscriptionDoc = {
             source: "app",
             plan,
-            status: "active",
-            expiresAt: plusDays(nowMs(), planInfo.period_days),
+            status: "active",          // 試用期一樣給 premium(狀態正確,是真的能用)
+            expiresAt,
             willRenew: true,
             startedAt: existingSub?.startedAt || nowMs(),
             apple_txn: event.transaction_id,
@@ -82,16 +88,21 @@ export const revenuecatWebhook = functions.onRequest(
           };
           await writeSubscription(uid, newSub);
 
+          const txnType = type === "INITIAL_PURCHASE"
+            ? (isTrial ? "trial_start" : "subscribe")
+            : "renew";
           await writeTransaction({
             uid,
-            type: type === "INITIAL_PURCHASE" ? "subscribe" : "renew",
+            type: txnType,
             source: "app",
             plan,
-            amount_twd: planInfo.price_twd,
+            amount_twd: isTrial ? 0 : planInfo.price_twd,   // 試用 = 0,轉正/續訂才記真實金額
             payment_method: event.store === "PLAY_STORE" ? "google_billing" : "apple_iap",
             external_id: event.transaction_id || event.original_transaction_id,
             status: "success",
-            note: `RevenueCat ${type}`,
+            note: isTrial
+              ? `RevenueCat ${type} (free trial, no charge)`
+              : (event.is_trial_conversion ? `RevenueCat ${type} (trial→paid)` : `RevenueCat ${type}`),
           });
           break;
         }

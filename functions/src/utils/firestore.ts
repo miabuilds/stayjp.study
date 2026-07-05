@@ -98,7 +98,8 @@ export async function getLatestSuccessTradeNo(uid: string): Promise<string | nul
 
 export type TxnType =
   | "subscribe" | "renew" | "cancel" | "refund"
-  | "fail" | "chargeback" | "gift";
+  | "fail" | "chargeback" | "gift"
+  | "trial_start";   // 免費試用開通(amount_twd=0,不計營收;轉正時才發 renew 記真實金額)
 
 export interface TransactionDoc {
   uid: string;
