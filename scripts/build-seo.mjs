@@ -2,13 +2,14 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { loadData, LEVELS } from './seo/data.mjs';
 import { resolveSlugs } from './seo/slug.mjs';
-import { renderGrammarPage, renderHub } from './seo/templates.mjs';
+import { renderGrammarPage, renderHub, renderVocabPage } from './seo/templates.mjs';
 import { buildSitemap } from './seo/sitemap.mjs';
+import { posSlug } from './seo/pos.mjs';
 
 const ROOT = path.resolve(import.meta.dirname, '..');
 const DRY = process.argv.includes('--dry') || process.env.DRY_RUN;
 const ORIGIN = 'https://stayjp.study';
-const stats = { pages: 0, fallback: 0, collisions: 0 };
+const stats = { pages: 0, fallback: 0, collisions: 0, unmappedPos: 0 };
 
 function write(rel, html) {
   stats.pages++;
@@ -27,7 +28,7 @@ function enExamples(zhEntry, enEntry) {
   return eeg; // 数量不齐 → 退回英文字符串
 }
 
-const { grammar, readings } = loadData();
+const { grammar, vocab, readings } = loadData();
 const urls = [];
 const STATIC = [['/','1.0'],['/home.html','0.9'],['/pricing.html','0.8'],['/verbs.html','0.7'],
   ['/contact.html','0.3'],['/terms.html','0.2'],['/privacy.html','0.2'],['/refund.html','0.2']];
@@ -75,5 +76,41 @@ for (const lv of LEVELS) {
   }
 }
 
+// ---- 单字聚合表(按级×词性) ----
+for (const lv of LEVELS) {
+  const zh = vocab[lv].zh, en = vocab[lv].en;
+  const groups = {}; // slug → { pos, zh:[{w,r,m}], en:[{w,r,m}] }
+  zh.forEach((w, i) => {
+    const p = posSlug(w.c);
+    if (!p) { stats.unmappedPos++; return; }
+    (groups[p.slug] ||= { pos: p, zh: [], en: [] });
+    groups[p.slug].zh.push({ w: w.w, r: w.r, m: w.m });
+    const e = en[i];
+    if (e) groups[p.slug].en.push({ w: e.w, r: w.r, m: e.m }); // EN 无读音→借 ZH 同序读音
+  });
+  const hubZh = [], hubEn = [];
+  for (const [slug, g] of Object.entries(groups)) {
+    const zhUrl = `${ORIGIN}/v/${lv}/${slug}/`, enUrl = `${ORIGIN}/en/v/${lv}/${slug}/`;
+    const alts = [{ lang:'zh-Hant', href:zhUrl }, { lang:'en', href:enUrl }];
+    write(`v/${lv}/${slug}`, renderVocabPage({
+      level:lv, lang:'zh-Hant', posZh:g.pos.zh, posEn:g.pos.en, words:g.zh, canonical:zhUrl, alternates:alts, appUrl:`${ORIGIN}/#${lv}` }));
+    urls.push({ loc: zhUrl, priority:'0.6' });
+    hubZh.push({ t:`${g.pos.zh}（${g.zh.length}）`, href:`/v/${lv}/${slug}/` });
+    if (g.en.length) {
+      write(`en/v/${lv}/${slug}`, renderVocabPage({
+        level:lv, lang:'en', posZh:g.pos.zh, posEn:g.pos.en, words:g.en, canonical:enUrl,
+        alternates:[{lang:'zh-Hant',href:zhUrl},{lang:'en',href:enUrl}], appUrl:`${ORIGIN}/en/#${lv}` }));
+      urls.push({ loc: enUrl, priority:'0.5' });
+      hubEn.push({ t:`${g.pos.en} (${g.en.length})`, href:`/en/v/${lv}/${slug}/` });
+    }
+  }
+  write(`v/${lv}`, renderHub({ level:lv, lang:'zh-Hant', items:hubZh, canonical:`${ORIGIN}/v/${lv}/`, kind:'vocab' }));
+  urls.push({ loc:`${ORIGIN}/v/${lv}/`, priority:'0.6' });
+  if (hubEn.length) {
+    write(`en/v/${lv}`, renderHub({ level:lv, lang:'en', items:hubEn, canonical:`${ORIGIN}/en/v/${lv}/`, kind:'vocab' }));
+    urls.push({ loc:`${ORIGIN}/en/v/${lv}/`, priority:'0.5' });
+  }
+}
+
 if (!DRY) fs.writeFileSync(path.join(ROOT, 'sitemap.xml'), buildSitemap(urls));
-console.log(`[build-seo] pages=${stats.pages} fallback(id-slug)=${stats.fallback} collisions=${stats.collisions} sitemap-urls=${urls.length}${DRY ? ' (DRY)' : ''}`);
+console.log(`[build-seo] pages=${stats.pages} fallback(id-slug)=${stats.fallback} collisions=${stats.collisions} unmappedPos=${stats.unmappedPos} sitemap-urls=${urls.length}${DRY ? ' (DRY)' : ''}`);
