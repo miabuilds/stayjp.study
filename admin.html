@@ -93,6 +93,35 @@ textarea.note:focus{outline:none;border-color:var(--ac)}
 .stat .val{font-size:28px;font-weight:800;color:var(--tx);letter-spacing:-.5px}
 .stat .sub{font-size:11px;color:var(--tx3);margin-top:4px}
 
+/* 營收儀表板 */
+.rev-section{margin-bottom:26px}
+.rev-section>h2{font-size:14px;color:var(--tx2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.rev-card{background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r);padding:18px}
+.rev-toggle{display:inline-flex;border:1px solid var(--bd);border-radius:7px;overflow:hidden}
+.rev-toggle button{padding:3px 11px;background:var(--bg);border:none;color:var(--tx2);font-size:12px;font-weight:600;cursor:pointer}
+.rev-toggle button.on{background:var(--ac);color:#fff}
+.rev-chart svg{width:100%;height:auto;display:block;overflow:visible}
+.rev-bar{transition:opacity .12s}
+.rev-bar:hover{opacity:.7;cursor:pointer}
+.rev-hbar-row{display:grid;grid-template-columns:112px 1fr auto;gap:10px;align-items:center;margin-bottom:9px;font-size:12px}
+.rev-hbar-track{background:var(--bg3);border-radius:6px;height:22px;position:relative;overflow:hidden}
+.rev-hbar-fill{height:100%;border-radius:6px;min-width:2px}
+.rev-hbar-lbl{color:var(--tx2);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rev-hbar-val{color:var(--tx);font-weight:700;white-space:nowrap;font-variant-numeric:tabular-nums}
+.rev-heat-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.rev-heat{display:grid;grid-template-columns:34px repeat(24,minmax(20px,1fr));gap:2px;min-width:600px}
+.rev-heat .hh{font-size:9px;color:var(--tx3);text-align:center;align-self:center}
+.rev-heat .hd{font-size:10px;color:var(--tx2);font-weight:600;align-self:center}
+.rev-heat .cell{aspect-ratio:1;border-radius:3px;background:var(--bg3)}
+.rev-legend{display:flex;gap:14px;flex-wrap:wrap;font-size:11px;color:var(--tx2);margin-top:12px;align-items:center}
+.rev-legend span{display:inline-flex;align-items:center;gap:5px}
+.rev-legend i{width:11px;height:11px;border-radius:3px;display:inline-block;flex:none}
+.rev-set{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px}
+.rev-set label{display:block;font-size:11px;color:var(--tx2);font-weight:600;margin-bottom:4px}
+.rev-set input[type=number]{width:100%;padding:6px 9px;border:1px solid var(--bd);border-radius:7px;background:var(--bg);color:var(--tx);font-size:13px}
+.rev-set .chk{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--tx);font-weight:600;margin-top:22px}
+#revTip{position:fixed;z-index:200;background:var(--tx);color:var(--bg);font-size:11px;padding:5px 8px;border-radius:6px;pointer-events:none;opacity:0;transition:opacity .08s;white-space:nowrap;font-weight:600;box-shadow:0 2px 8px rgba(0,0,0,.2)}
+
 /* Login gate */
 .gate{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;gap:14px}
 .gate h1{font-size:24px;color:var(--ac);font-weight:800}
@@ -142,6 +171,7 @@ textarea.note:focus{outline:none;border-color:var(--ac)}
  <div class="tabs">
  <button id="tabFeedback" class="on"> 回饋</button>
  <button id="tabStats"> 報表</button>
+ <button id="tabRevenue"> 營收</button>
  <button id="tabSubs"> 訂閱者</button>
  <button id="tabLedger"> 帳本</button>
  <button id="tabSetSub"> 訂閱管理</button>
@@ -231,6 +261,64 @@ textarea.note:focus{outline:none;border-color:var(--ac)}
  <div style="background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r);padding:14px 18px;font-size:12px;color:var(--tx2);margin-top:18px">
  訂閱 / 營業額相關指標 等綠界 callback 接好後會自動有數字。架構已就緒 — Cloud Function 寫 transactions 集合,這頁讀。<br>
  點 [ 報表] tab 會重新查詢即時數字。
+ </div>
+ </div>
+
+ <div id="wrapRevenue" class="stats">
+ <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:16px">
+ <h2 style="font-size:14px;color:var(--tx2);text-transform:uppercase;letter-spacing:.5px;margin:0">營收儀表板</h2>
+ <button class="btn" onclick="renderRevenue()" style="font-size:11px;padding:4px 10px">↻ 重新整理</button>
+ <span id="revMeta" style="font-size:12px;color:var(--tx3)"></span>
+ </div>
+
+ <div class="stat-grid" id="revStats" style="margin-bottom:24px"></div>
+
+ <div class="rev-section">
+ <h2>每日收入
+ <span class="rev-toggle" id="revRangeToggle"><button data-v="30" class="on">30 天</button><button data-v="90">90 天</button></span>
+ <span class="rev-toggle" id="revNetToggle"><button data-v="net" class="on">淨收入</button><button data-v="gross">毛收入</button></span>
+ </h2>
+ <div class="rev-card rev-chart" id="revDaily">載入中…</div>
+ </div>
+
+ <div class="rev-section">
+ <h2>每月營收(近 12 月)</h2>
+ <div class="rev-card rev-chart" id="revMonthly">載入中…</div>
+ </div>
+
+ <div class="rev-section">
+ <h2>收入來源</h2>
+ <div class="rev-card">
+ <div style="font-size:11px;color:var(--tx2);font-weight:700;margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px">依平台(毛收入)</div>
+ <div id="revBySource"></div>
+ <div style="font-size:11px;color:var(--tx2);font-weight:700;margin:18px 0 10px;text-transform:uppercase;letter-spacing:.5px;border-top:1px solid var(--bd);padding-top:16px">依方案(毛收入)</div>
+ <div id="revByPlan"></div>
+ </div>
+ </div>
+
+ <div class="rev-section">
+ <h2>成交時段(星期 × 小時)</h2>
+ <div class="rev-card">
+ <div class="rev-heat-wrap"><div class="rev-heat" id="revHeat"></div></div>
+ <div class="rev-legend"><span>少</span><i style="background:rgba(57,135,229,.15)"></i><i style="background:rgba(57,135,229,.45)"></i><i style="background:rgba(57,135,229,.72)"></i><i style="background:rgba(57,135,229,1)"></i><span>多</span><span style="margin-left:auto;color:var(--tx3)">格子=成功成交筆數 · 你本地時間</span></div>
+ </div>
+ </div>
+
+ <div class="rev-section">
+ <h2>抽成 / 跑道設定</h2>
+ <div class="rev-card">
+ <div class="rev-set">
+ <div><label>Apple 抽成 %</label><input type="number" id="setApple" step="0.1" min="0" max="100"></div>
+ <div><label>Google 抽成 %</label><input type="number" id="setGoogle" step="0.1" min="0" max="100"></div>
+ <div><label>綠界費率 %(國內卡)</label><input type="number" id="setEcpayPct" step="0.01" min="0" max="100"></div>
+ <div><label>綠界每筆固定費 NT$</label><input type="number" id="setEcpayFix" step="1" min="0"></div>
+ <div><label>每月生活開銷 NT$</label><input type="number" id="setCost" step="100" min="0"></div>
+ <div><label>目前存款 NT$</label><input type="number" id="setSavings" step="1000" min="0"></div>
+ <label class="chk"><input type="checkbox" id="setSBP">Apple SBP(抽成砍到 15%)</label>
+ </div>
+ <div style="margin-top:14px"><button class="btn primary" onclick="saveRevSettings()" style="font-size:12px;padding:6px 14px">儲存並重算</button> <span id="revSetMsg" style="font-size:12px;color:var(--tx2);margin-left:8px"></span></div>
+ <div style="font-size:11px;color:var(--tx3);margin-top:10px;line-height:1.6">淨收入 = 毛收入 − 平台抽成 − 退費。存款/開銷只存在你這台瀏覽器(localStorage),不上傳。跑道 = 存款 ÷(每月開銷 − 近 30 天淨收入);淨收入蓋過開銷時顯示「自給自足」。</div>
+ </div>
  </div>
  </div>
 
@@ -411,6 +499,7 @@ function logout() { auth.signOut(); location.reload(); }
 // ── tabs ──
 document.getElementById('tabFeedback').onclick = () => switchTab('feedback');
 document.getElementById('tabStats').onclick = () => switchTab('stats');
+document.getElementById('tabRevenue').onclick = () => switchTab('revenue');
 document.getElementById('tabSubs').onclick = () => switchTab('subs');
 document.getElementById('tabLedger').onclick = () => switchTab('ledger');
 document.getElementById('tabSetSub').onclick = () => switchTab('setsub');
@@ -418,17 +507,20 @@ document.getElementById('tabErrLog').onclick = () => switchTab('errlog');
 function switchTab(tab) {
  document.getElementById('tabFeedback').classList.toggle('on', tab === 'feedback');
  document.getElementById('tabStats').classList.toggle('on', tab === 'stats');
+ document.getElementById('tabRevenue').classList.toggle('on', tab === 'revenue');
  document.getElementById('tabSubs').classList.toggle('on', tab === 'subs');
  document.getElementById('tabLedger').classList.toggle('on', tab === 'ledger');
  document.getElementById('tabSetSub').classList.toggle('on', tab === 'setsub');
  document.getElementById('tabErrLog').classList.toggle('on', tab === 'errlog');
  document.getElementById('wrapFeedback').style.display = tab === 'feedback' ? 'flex' : 'none';
  document.getElementById('wrapStats').classList.toggle('on', tab === 'stats');
+ document.getElementById('wrapRevenue').classList.toggle('on', tab === 'revenue');
  document.getElementById('wrapSubs').classList.toggle('on', tab === 'subs');
  document.getElementById('wrapLedger').classList.toggle('on', tab === 'ledger');
  document.getElementById('wrapSetSub').classList.toggle('on', tab === 'setsub');
  document.getElementById('wrapErrLog').classList.toggle('on', tab === 'errlog');
  if (tab === 'stats') renderStats();
+ if (tab === 'revenue') renderRevenue();
  if (tab === 'subs') renderSubs();
  if (tab === 'ledger') renderLedger();
  if (tab === 'errlog') renderErrLog();
@@ -1074,6 +1166,212 @@ function renderFeedbackStats() {
  <div class="stat"><div class="lbl">總筆數</div><div class="val">${currentList.length}</div><div class="sub">含所有狀態</div></div>
  `;
 }
+
+// ══════════════ 營收儀表板 ══════════════
+const REV_DEFAULTS = { apple: 30, google: 15, ecpayPct: 2.75, ecpayFix: 1, sbp: false, cost: 0, savings: 0 };
+const SRC_LABEL = { apple_iap: 'App(Apple)', google_billing: 'App(Google)', ecpay: '網頁(綠界)', manual: '手動' };
+const CAT_LIGHT = ['#2a78d6', '#1baf7a', '#eda100', '#008300'];
+const CAT_DARK  = ['#3987e5', '#199e70', '#c98500', '#008300'];
+let revState = { range: 30, mode: 'net' };
+let REV_TX = null;   // 快取:成功收入交易 [{ts,amount,net,pm,plan}](切 30/90、淨/毛 免重查)
+
+function isDark() { return document.documentElement.getAttribute('data-theme') === 'dark'; }
+function catColors() { return isDark() ? CAT_DARK : CAT_LIGHT; }
+function fmtNT(v) { return 'NT$' + Math.round(v).toLocaleString(); }
+function planLabel(p) { const M = (typeof SUB_PLAN_TXT !== 'undefined') ? SUB_PLAN_TXT : {}; return M[p] || (p && p !== 'n/a' ? p : '其他'); }
+
+function revSettings() {
+ try { return { ...REV_DEFAULTS, ...JSON.parse(localStorage.getItem('revSettings') || '{}') }; }
+ catch (e) { return { ...REV_DEFAULTS }; }
+}
+function loadRevSettingsToInputs() {
+ const s = revSettings();
+ [['setApple', s.apple], ['setGoogle', s.google], ['setEcpayPct', s.ecpayPct], ['setEcpayFix', s.ecpayFix], ['setCost', s.cost], ['setSavings', s.savings]]
+   .forEach(([id, v]) => { const el = document.getElementById(id); if (el) el.value = v; });
+ document.getElementById('setSBP').checked = !!s.sbp;
+ document.getElementById('setApple').disabled = !!s.sbp;
+}
+function saveRevSettings() {
+ const num = id => Number(document.getElementById(id).value) || 0;
+ const s = { apple: num('setApple'), google: num('setGoogle'), ecpayPct: num('setEcpayPct'), ecpayFix: num('setEcpayFix'), cost: num('setCost'), savings: num('setSavings'), sbp: document.getElementById('setSBP').checked };
+ localStorage.setItem('revSettings', JSON.stringify(s));
+ document.getElementById('revSetMsg').textContent = '已儲存 ✓';
+ setTimeout(() => { document.getElementById('revSetMsg').textContent = ''; }, 2000);
+ renderRevenue();
+}
+document.getElementById('setSBP').addEventListener('change', e => { document.getElementById('setApple').disabled = e.target.checked; });
+
+// 單筆抽成:Apple/Google 按百分比、綠界按 %+固定處理費;手動 0
+function feeFor(t, s) {
+ const amt = t.amount_twd || 0;
+ if (amt <= 0) return 0;
+ if (t.payment_method === 'apple_iap') return amt * (s.sbp ? 15 : s.apple) / 100;
+ if (t.payment_method === 'google_billing') return amt * s.google / 100;
+ if (t.payment_method === 'ecpay') return amt * s.ecpayPct / 100 + s.ecpayFix;
+ return 0;
+}
+
+async function renderRevenue() {
+ loadRevSettingsToInputs();
+ const s = revSettings();
+ const box = document.getElementById('revDaily');
+ box.textContent = '載入中…';
+ let snap;
+ try { snap = await db.collection('transactions').orderBy('occurred_at', 'desc').limit(5000).get(); }
+ catch (e) { box.textContent = '讀取失敗:' + e.message; return; }
+
+ const now = new Date();
+ const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+ const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+ const cut30 = new Date(now.getTime() - 30 * 86400000);
+ const income = [];
+ let monthGross = 0, monthFee = 0, monthRefund = 0, allGross = 0, allFee = 0, allRefund = 0, todayNet = 0, net30 = 0, monthTrials = 0;
+ const bySource = {}, byPlan = {};
+
+ snap.forEach(doc => {
+  const t = doc.data();
+  const dt = (t.occurred_at && t.occurred_at.toDate) ? t.occurred_at.toDate() : null;
+  if (!dt) return;
+  if (t.status === 'success' && (t.type === 'subscribe' || t.type === 'renew') && (t.amount_twd || 0) > 0) {
+   const amt = t.amount_twd || 0, fee = feeFor(t, s), net = amt - fee;
+   income.push({ ts: dt, amount: amt, net, pm: t.payment_method, plan: t.plan });
+   allGross += amt; allFee += fee;
+   if (dt >= monthStart) { monthGross += amt; monthFee += fee; }
+   if (dt >= cut30) net30 += net;
+   if (dt >= todayStart) todayNet += net;
+   const sl = SRC_LABEL[t.payment_method] || t.payment_method || '其他';
+   bySource[sl] = (bySource[sl] || 0) + amt;
+   const pl = planLabel(t.plan);
+   byPlan[pl] = (byPlan[pl] || 0) + amt;
+  } else if (t.type === 'refund' || t.type === 'chargeback') {
+   const r = Math.abs(t.amount_twd || 0);
+   allRefund += r; if (dt >= monthStart) monthRefund += r;
+  } else if (t.type === 'trial_start') {
+   if (dt >= monthStart) monthTrials++;
+  }
+ });
+ REV_TX = income;
+ const monthNet = monthGross - monthFee - monthRefund;
+ const allNet = allGross - allFee - allRefund;
+
+ // 跑道估算
+ let runway = '—', runwaySub = '填每月開銷+存款才算', runwayAlert = false;
+ if (s.cost > 0 && net30 >= s.cost) { runway = '自給自足'; runwaySub = `近30天淨 ${fmtNT(net30)} ≥ 開銷 ${fmtNT(s.cost)}`; }
+ else if (s.savings > 0 || s.cost > 0) {
+  const burn = s.cost - net30;
+  if (burn <= 0) { runway = '自給自足'; runwaySub = `淨收入已蓋過開銷`; }
+  else { const m = s.savings / burn; runway = m.toFixed(1) + ' 個月'; runwaySub = `存款 ${fmtNT(s.savings)} ÷ 月缺口 ${fmtNT(burn)}`; runwayAlert = m < 2; }
+ }
+
+ document.getElementById('revStats').innerHTML = `
+  <div class="stat"><div class="lbl">今日淨收入</div><div class="val">${fmtNT(todayNet)}</div><div class="sub">扣抽成後 · 到現在為止</div></div>
+  <div class="stat"><div class="lbl">本月淨收入</div><div class="val">${fmtNT(monthNet)}</div><div class="sub">毛 ${fmtNT(monthGross)} − 抽成 ${fmtNT(monthFee)} − 退費 ${fmtNT(monthRefund)}</div></div>
+  <div class="stat"><div class="lbl">近 30 天淨收入</div><div class="val">${fmtNT(net30)}</div><div class="sub">跑道計算用的月淨收入</div></div>
+  <div class="stat"><div class="lbl">跑道估算</div><div class="val"${runwayAlert ? ' style="color:#EF4444"' : ''}>${runway}${runwayAlert ? ' ⚠' : ''}</div><div class="sub">${runwaySub}</div></div>
+  <div class="stat"><div class="lbl">本月新試用</div><div class="val">${monthTrials}</div><div class="sub">trial_start · 還沒付錢,未計營收</div></div>
+  <div class="stat"><div class="lbl">累計淨收入</div><div class="val">${fmtNT(allNet)}</div><div class="sub">毛 ${fmtNT(allGross)} − 抽成 ${fmtNT(allFee)} − 退費 ${fmtNT(allRefund)}</div></div>
+ `;
+
+ renderDaily();
+ renderMonthly(income);
+ hbars('revBySource', sortObj(bySource));
+ hbars('revByPlan', sortObj(byPlan));
+ renderHeatmap(income);
+ document.getElementById('revMeta').textContent = `帳本 ${snap.size} 筆 · 更新 ${now.toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit' })}`;
+}
+
+function sortObj(o) { return Object.entries(o).map(([label, value]) => ({ label, value })).sort((a, b) => b.value - a.value); }
+function localKey(d) { return d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate(); }
+
+function renderDaily() {
+ if (!REV_TX) return;
+ const days = revState.range, mode = revState.mode;
+ const now = new Date(), end = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+ const keys = [], map = {};
+ for (let i = days - 1; i >= 0; i--) { const d = new Date(end.getTime() - i * 86400000); const k = localKey(d); map[k] = { d, v: 0 }; keys.push(k); }
+ const cut = end.getTime() - (days - 1) * 86400000;
+ REV_TX.forEach(t => { if (t.ts.getTime() >= cut) { const k = localKey(t.ts); if (map[k]) map[k].v += (mode === 'net' ? t.net : t.amount); } });
+ const data = keys.map(k => { const b = map[k]; return { value: b.v, tip: `${b.d.getMonth() + 1}/${b.d.getDate()} · ${mode === 'net' ? '淨' : '毛'} ${fmtNT(b.v)}`, xlabel: `${b.d.getMonth() + 1}/${b.d.getDate()}` }; });
+ document.getElementById('revDaily').innerHTML = svgBars(data, catColors()[0], days === 30 ? 5 : 15);
+}
+
+function renderMonthly(income) {
+ const now = new Date(), data = [];
+ for (let i = 11; i >= 0; i--) { const d = new Date(now.getFullYear(), now.getMonth() - i, 1); data.push({ y: d.getFullYear(), m: d.getMonth(), val: 0 }); }
+ income.forEach(t => { const i = data.findIndex(x => x.y === t.ts.getFullYear() && x.m === t.ts.getMonth()); if (i >= 0) data[i].val += t.net; });
+ const bars = data.map(x => ({ value: x.val, tip: `${x.y}/${x.m + 1} · 淨 ${fmtNT(x.val)}`, xlabel: `${String(x.y).slice(2)}/${x.m + 1}` }));
+ document.getElementById('revMonthly').innerHTML = svgBars(bars, catColors()[0], 1);
+}
+
+// 純 SVG 長條圖:細長條、圓角頂、基線、最高值直接標數字、每筆可 hover
+function svgBars(data, color, everyLabel) {
+ if (!data.length || data.every(d => d.value <= 0)) return '<div style="color:var(--tx3);font-size:13px;padding:20px 0;text-align:center">此區間尚無收入資料</div>';
+ const W = 720, H = 200, padL = 6, padR = 6, padT = 24, padB = 24;
+ const n = data.length, max = Math.max(1, ...data.map(d => d.value));
+ const plotW = W - padL - padR, plotH = H - padT - padB, slot = plotW / n;
+ const bw = Math.max(2, Math.min(26, slot * 0.68)), base = padT + plotH;
+ let bars = '', labels = '';
+ data.forEach((d, i) => {
+  const x = padL + slot * i + (slot - bw) / 2;
+  const h = d.value <= 0 ? 0 : Math.max(1, d.value / max * plotH), y = base - h;
+  bars += `<rect class="rev-bar" x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${bw.toFixed(1)}" height="${h.toFixed(1)}" rx="${Math.min(4, bw / 2).toFixed(1)}" fill="${color}" data-tip="${d.tip}"></rect>`;
+  if (everyLabel && (i % everyLabel === 0 || i === n - 1)) labels += `<text x="${(x + bw / 2).toFixed(1)}" y="${H - 8}" text-anchor="middle" font-size="9" fill="var(--tx3)">${d.xlabel}</text>`;
+ });
+ const mi = data.reduce((a, d, i) => d.value > data[a].value ? i : a, 0), md = data[mi];
+ const mx = padL + slot * mi + slot / 2, mh = md.value / max * plotH, my = base - mh;
+ const maxLbl = md.value > 0 ? `<text x="${mx.toFixed(1)}" y="${(my - 6).toFixed(1)}" text-anchor="middle" font-size="10" font-weight="700" fill="var(--tx)">${fmtNT(md.value)}</text>` : '';
+ return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="收入長條圖"><line x1="${padL}" y1="${base}" x2="${W - padR}" y2="${base}" stroke="var(--bd)" stroke-width="1"/>${bars}${labels}${maxLbl}</svg>`;
+}
+
+function hbars(id, rows) {
+ const el = document.getElementById(id);
+ if (!rows.length) { el.innerHTML = '<div style="color:var(--tx3);font-size:12px">尚無資料</div>'; return; }
+ const colors = catColors(), total = rows.reduce((a, r) => a + r.value, 0) || 1, max = Math.max(1, ...rows.map(r => r.value));
+ el.innerHTML = rows.map((r, i) => `
+  <div class="rev-hbar-row">
+   <div class="rev-hbar-lbl">${r.label}</div>
+   <div class="rev-hbar-track"><div class="rev-hbar-fill" style="width:${(r.value / max * 100).toFixed(1)}%;background:${colors[i % colors.length]}"></div></div>
+   <div class="rev-hbar-val">${fmtNT(r.value)} <span style="color:var(--tx3);font-weight:600">${(r.value / total * 100).toFixed(0)}%</span></div>
+  </div>`).join('') +
+  `<div class="rev-legend">${rows.map((r, i) => `<span><i style="background:${colors[i % colors.length]}"></i>${r.label}</span>`).join('')}</div>`;
+}
+
+function renderHeatmap(income) {
+ const WD = ['一', '二', '三', '四', '五', '六', '日'];
+ const counts = Array.from({ length: 7 }, () => new Array(24).fill(0));
+ income.forEach(t => { counts[(t.ts.getDay() + 6) % 7][t.ts.getHours()]++; });
+ let max = 0; counts.forEach(r => r.forEach(c => { if (c > max) max = c; }));
+ let html = '<div class="hh"></div>';
+ for (let h = 0; h < 24; h++) html += `<div class="hh">${h % 3 === 0 ? h : ''}</div>`;
+ for (let d = 0; d < 7; d++) {
+  html += `<div class="hd">${WD[d]}</div>`;
+  for (let h = 0; h < 24; h++) {
+   const c = counts[d][h], a = (max && c) ? (0.15 + 0.85 * (c / max)) : 0;
+   const bg = c ? `rgba(57,135,229,${a.toFixed(2)})` : '';
+   html += `<div class="cell"${bg ? ` style="background:${bg}"` : ''} data-tip="週${WD[d]} ${h}:00 · ${c} 筆"></div>`;
+  }
+ }
+ document.getElementById('revHeat').innerHTML = html;
+}
+
+// 分頁切換(range / 淨毛)— 用快取重繪,不重查
+document.querySelectorAll('#revRangeToggle button').forEach(b => b.onclick = () => {
+ document.querySelectorAll('#revRangeToggle button').forEach(x => x.classList.remove('on')); b.classList.add('on');
+ revState.range = Number(b.dataset.v); renderDaily();
+});
+document.querySelectorAll('#revNetToggle button').forEach(b => b.onclick = () => {
+ document.querySelectorAll('#revNetToggle button').forEach(x => x.classList.remove('on')); b.classList.add('on');
+ revState.mode = b.dataset.v; renderDaily();
+});
+
+// hover tooltip(長條 + 熱力格共用)
+(function () {
+ const tip = document.getElementById('revTip'), wrap = document.getElementById('wrapRevenue');
+ if (!tip || !wrap) return;
+ wrap.addEventListener('mouseover', e => { const el = e.target.closest('[data-tip]'); if (!el) return; tip.textContent = el.getAttribute('data-tip'); tip.style.opacity = '1'; });
+ wrap.addEventListener('mousemove', e => { if (tip.style.opacity === '1') { tip.style.left = (e.clientX + 12) + 'px'; tip.style.top = (e.clientY - 30) + 'px'; } });
+ wrap.addEventListener('mouseout', e => { if (e.target.closest('[data-tip]')) tip.style.opacity = '0'; });
+})();
 
 function escapeHtml(s) {
  return String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
