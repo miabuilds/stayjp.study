@@ -2467,15 +2467,16 @@ const DailyStory = (() => {
   const STORIES = {
     'n5_0': {
       title: 'N5 Day 1 · 我的家族',
+      title_en: 'N5 Day 1 · My Family',
       vocab: ['私','僕','あなた','彼','彼女','皆さん','人','方','子供','男','女','男の子','女の子','大人','友達','名前','家族','お父さん','お母さん','お兄さん'],
       sentences: [
-        { j: '私の名前は田中です。', z: '我叫田中。' },
-        { j: '家族は四人です。お父さん、お母さん、お兄さん、僕です。', z: '家裡有四個人:爸爸、媽媽、哥哥、我。' },
-        { j: '僕は男の子で、学校に友達がたくさんいます。', z: '我是男孩子,學校裡有很多朋友。' },
-        { j: 'クラスの男の子も女の子も、皆さん優しい人ばかりです。', z: '班上的男生女生,大家都是很善良的人。' },
-        { j: '隣の家に彼と彼女が住んでいます。', z: '隔壁住著他和她。' },
-        { j: '彼は大人の男の人、彼女は女の人で、子供もいます。', z: '他是大人男生,她是女生,還有一個小孩。' },
-        { j: 'あなたの家族には、優しい方がいますか?', z: '你家裡也有善良的人嗎?' },
+        { j: '私の名前は田中です。', z: '我叫田中。', e: 'My name is Tanaka.' },
+        { j: '家族は四人です。お父さん、お母さん、お兄さん、僕です。', z: '家裡有四個人:爸爸、媽媽、哥哥、我。', e: 'There are four people in my family: Dad, Mom, my older brother, and me.' },
+        { j: '僕は男の子で、学校に友達がたくさんいます。', z: '我是男孩子,學校裡有很多朋友。', e: "I'm a boy, and I have lots of friends at school." },
+        { j: 'クラスの男の子も女の子も、皆さん優しい人ばかりです。', z: '班上的男生女生,大家都是很善良的人。', e: 'The boys and girls in my class are all kind people.' },
+        { j: '隣の家に彼と彼女が住んでいます。', z: '隔壁住著他和她。', e: 'A guy and a girl live next door.' },
+        { j: '彼は大人の男の人、彼女は女の人で、子供もいます。', z: '他是大人男生,她是女生,還有一個小孩。', e: "He's a grown man and she's a woman, and they have a child." },
+        { j: 'あなたの家族には、優しい方がいますか?', z: '你家裡也有善良的人嗎?', e: 'Are there any kind people in your family too?' },
       ],
     },
   };
@@ -2535,7 +2536,7 @@ const DailyStory = (() => {
     mask.innerHTML = `
       <div class="cc-box" style="width:min(560px,calc(100vw - 32px));max-height:85vh;overflow-y:auto">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
-          <div class="cc-title" style="font-size:16px;margin:0">📖 ${story.title}</div>
+          <div class="cc-title" style="font-size:16px;margin:0">📖 ${enOr(story.title, story.title_en || story.title)}</div>
           <button onclick="DailyStory.close()" style="background:none;border:none;color:var(--tx2);font-size:18px;cursor:pointer;padding:4px 8px">✕</button>
         </div>
         <div style="font-size:11px;color:var(--tx3);margin-bottom:14px">本批 20 個單字串成短文,粗體 = 今日學習目標。</div>
@@ -2543,7 +2544,7 @@ const DailyStory = (() => {
           ${story.sentences.map((s, i) => `
             <div class="ds-sent" data-i="${i}">
               <div class="ds-j" onclick="DailyStory.playOne(${i})">${highlightVocab(s.j, story.vocab)}</div>
-              <div class="ds-z" style="display:none">${s.z}</div>
+              <div class="ds-z" style="display:none">${enOr(s.z, s.e || s.z)}</div>
             </div>
           `).join('')}
         </div>
