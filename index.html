@@ -1348,6 +1348,8 @@ body.profile-view .mn { margin-left: 0; max-width: none; }   /* 滿版 → 內�
   .onb-card { padding: 22px 18px; border-radius: 16px; }
   .onb-title { font-size: 20px; }
 }
+/* 英文模式:隱藏單字元中文分類圖示徽章(助/型/形/在/他…),分類名已英文 */
+html[lang="en"] .ci2 { display: none; }
 </style>
 </head>
 <body>
@@ -1381,7 +1383,7 @@ body.profile-view .mn { margin-left: 0; max-width: none; }   /* 滿版 → 內�
   <button class="ftb-btn on" onclick="switchBottomTab(this);deferRender()"><svg viewBox="0 0 24 24"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg><span data-i18n="learn">學習</span></button>
   <button class="ftb-btn" onclick="Quiz.start()"><svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg><span data-i18n="quiz">測驗</span></button>
   <button class="ftb-btn" id="reviewBtn" onclick="SRS.start()"><svg viewBox="0 0 24 24"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg><span data-i18n="review">複習</span></button>
-  <button class="ftb-btn" onclick="Stats.openProfile()"><svg viewBox="0 0 24 24"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg><span>我的</span></button>
+  <button class="ftb-btn" onclick="Stats.openProfile()"><svg viewBox="0 0 24 24"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg><span data-i18n="tab_mine">我的</span></button>
   <button class="ftb-btn" onclick="openMoreMenu()"><svg viewBox="0 0 24 24"><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg><span data-i18n="more">更多</span></button>
 </nav>
 
@@ -1451,6 +1453,9 @@ body.profile-view .mn { margin-left: 0; max-width: none; }   /* 滿版 → 內�
 
 <!-- i18n -->
 <script src="i18n.js"></script>
+<!-- 執行期 UI 中文→英文翻譯層(僅 lang=en 生效;學習內容由 content overlay 處理) -->
+<script src="ui-map.js"></script>
+<script src="translate-layer.js"></script>
 
 <!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
@@ -2788,7 +2793,7 @@ function onbPick(lv) {
   if (!card) { onbFinish(); return; }
   card.innerHTML =
     '<div class="onb-title">' + cvt('準備好了!') + '</div>' +
-    '<div class="onb-sub">' + cvt('已幫你切到 ' + lv.toUpperCase() + ',先認識一下畫面:') + '</div>' +
+    '<div class="onb-sub">' + enOr('已幫你切到 ' + lv.toUpperCase() + ',先認識一下畫面:', 'Switched you to ' + lv.toUpperCase() + '. A quick tour of the screen:') + '</div>' +
     '<div class="onb-tips">' +
       '<div class="onb-tip"><span class="onb-tip-ic">📚</span><span class="onb-tip-tx">' + cvt('上方切換 <b>單字 / 文法</b>,內容全部免費看。') + '</span></div>' +
       '<div class="onb-tip"><span class="onb-tip-ic">✍️</span><span class="onb-tip-tx">' + cvt('下方 <b>測驗・複習・我的</b>:做題、背單字卡、看進度。') + '</span></div>' +
@@ -2803,17 +2808,17 @@ function showOnboarding() {
   m.className = 'onb-mask';
   m.innerHTML =
     '<div class="onb-card" role="dialog" aria-modal="true">' +
-      '<div class="onb-title">' + cvt('歡迎來到 StayJP 🎉') + '</div>' +
-      '<div class="onb-sub">' + cvt('免費學 JLPT N5–N1:單字・文法・模考・間隔複習') + '</div>' +
-      '<div class="onb-q">' + cvt('先選你的程度(之後隨時可改)') + '</div>' +
+      '<div class="onb-title">' + enOr('歡迎來到 StayJP 🎉','Welcome to StayJP 🎉') + '</div>' +
+      '<div class="onb-sub">' + enOr('免費學 JLPT N5–N1:單字・文法・模考・間隔複習','Learn JLPT N5–N1 for free: vocabulary · grammar · mock exams · spaced review') + '</div>' +
+      '<div class="onb-q">' + enOr('先選你的程度(之後隨時可改)','Pick your level (you can change it anytime)') + '</div>' +
       '<div class="onb-lv-grid">' +
-        '<button class="onb-lv" onclick="onbPick(\'n5\')">N5 <span class="onb-lv-hint">' + cvt('零基礎・入門') + '</span></button>' +
-        '<button class="onb-lv" onclick="onbPick(\'n4\')">N4 <span class="onb-lv-hint">' + cvt('初級') + '</span></button>' +
-        '<button class="onb-lv" onclick="onbPick(\'n3\')">N3 <span class="onb-lv-hint">' + cvt('中級') + '</span></button>' +
-        '<button class="onb-lv" onclick="onbPick(\'n2\')">N2 <span class="onb-lv-hint">' + cvt('中高級') + '</span></button>' +
-        '<button class="onb-lv" onclick="onbPick(\'n1\')">N1 <span class="onb-lv-hint">' + cvt('高級') + '</span></button>' +
+        '<button class="onb-lv" onclick="onbPick(\'n5\')">N5 <span class="onb-lv-hint">' + enOr('零基礎・入門','Complete beginner') + '</span></button>' +
+        '<button class="onb-lv" onclick="onbPick(\'n4\')">N4 <span class="onb-lv-hint">' + enOr('初級','Elementary') + '</span></button>' +
+        '<button class="onb-lv" onclick="onbPick(\'n3\')">N3 <span class="onb-lv-hint">' + enOr('中級','Intermediate') + '</span></button>' +
+        '<button class="onb-lv" onclick="onbPick(\'n2\')">N2 <span class="onb-lv-hint">' + enOr('中高級','Upper-intermediate') + '</span></button>' +
+        '<button class="onb-lv" onclick="onbPick(\'n1\')">N1 <span class="onb-lv-hint">' + enOr('高級','Advanced') + '</span></button>' +
       '</div>' +
-      '<button class="onb-skip" onclick="onbFinish()">' + cvt('先逛逛,跳過') + '</button>' +
+      '<button class="onb-skip" onclick="onbFinish()">' + enOr('先逛逛,跳過','Skip · just browse') + '</button>' +
     '</div>';
   document.body.appendChild(m);
   requestAnimationFrame(() => m.classList.add('show'));
@@ -3141,7 +3146,7 @@ function renderVocab() {
       <div class="dp"><div class="dp-lbl">${t('total_progress', { lv })}</div><div class="dp-bar"><div class="dp-fill" style="width:${Math.round(prog.totalOffset/cnt*100)}%"></div></div>
       <div class="dp-txt">${t('progress_txt', { n: prog.totalOffset, total: cnt, unit: t('unit_vocab') })}</div></div>
       <button class="daily-btn ${dailyMode?'on':''}" onclick="toggleDailyMode()">${dailyMode?t('show_all'):t('daily_mode')}</button>
-      <button class="shadow-trigger" onclick="Shadow.startCurrent()" ${window.ToolQuota&&ToolQuota.isLocked&&ToolQuota.isLocked('shadow')?'style="opacity:.55"':''}>${window.ToolQuota&&ToolQuota.isLocked&&ToolQuota.isLocked('shadow')?'🔒':'🎧'} 跟讀本頁</button>
+      <button class="shadow-trigger" onclick="Shadow.startCurrent()" ${window.ToolQuota&&ToolQuota.isLocked&&ToolQuota.isLocked('shadow')?'style="opacity:.55"':''}>${window.ToolQuota&&ToolQuota.isLocked&&ToolQuota.isLocked('shadow')?'🔒':'🎧'} ${enOr('跟讀本頁','Shadow this page')}</button>
       ${dailyMode?`<button class="daily-btn" onclick="FlashCard.beginToday()" ${window.ToolQuota&&ToolQuota.isLocked&&ToolQuota.isLocked('flashcard')?'style="opacity:.55"':''}>${window.ToolQuota&&ToolQuota.isLocked&&ToolQuota.isLocked('flashcard')?'🔒':'⚡'} 快速背本批</button>`:''}
       ${dailyMode?`<button class="daily-btn" onclick="DailyStory.open()" style="background:linear-gradient(135deg,#D4654A,#E8734A);color:#fff;border-color:#D4654A${window.ToolQuota&&ToolQuota.isLocked&&ToolQuota.isLocked('story')?';opacity:.55':''}">${window.ToolQuota&&ToolQuota.isLocked&&ToolQuota.isLocked('story')?'🔒':'📖'} 今日故事</button>`:''}
       ${window.ToolQuota&&ToolQuota.upsellLine?ToolQuota.upsellLine():''}
@@ -3194,12 +3199,12 @@ function renderVocab() {
       buffer: 15,
       renderItem: (entry) => {
         if (entry.type === 'header') {
-          return `<section class="cs"><h2><span class="ci2">${entry.cat.icon}</span>${cvt(entry.cat.name)}<span style="font-size:12px;color:#999;font-weight:400;margin-left:auto">${t('cat_count_vocab', { n: entry.count })}</span></h2></section>`;
+          return `<section class="cs"><h2><span class="ci2">${entry.cat.icon}</span>${catLabel(entry.cat.name)}<span style="font-size:12px;color:#999;font-weight:400;margin-left:auto">${t('cat_count_vocab', { n: entry.count })}</span></h2></section>`;
         }
         const d = entry.d;
         const isFav = favList.includes(d.w);
         const verbBtn = d.c === '動' ? `<button class="verb-btn" onclick="event.stopPropagation();openVerbModal('${d.w.replace(/'/g,"\\'")}','${(d.r||'').replace(/'/g,"\\'")}')" title="變化表">変</button>` : '';
-        return `<div class="vi" data-fid="${d.w}" data-w="${d.w}" data-r="${d.r||''}"><div class="vl"><div class="vw">${d.w}</div>${d.w!==d.r?`<div class="vr">${d.r}</div>`:''}<div class="vm">${cvt(d.m)}</div></div>${spkSvg}${verbBtn}<span class="vp">${cvt(entry.catName)}</span><svg class="star ${isFav?'on':''}" onclick="toggleFav('${d.w.replace(/'/g,"\\'")}')" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>`;
+        return `<div class="vi" data-fid="${d.w}" data-w="${d.w}" data-r="${d.r||''}"><div class="vl"><div class="vw">${d.w}</div>${d.w!==d.r?`<div class="vr">${d.r}</div>`:''}<div class="vm">${cvt(d.m)}</div></div>${spkSvg}${verbBtn}<span class="vp">${catLabel(entry.catName)}</span><svg class="star ${isFav?'on':''}" onclick="toggleFav('${d.w.replace(/'/g,"\\'")}')" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>`;
       }
     });
 
@@ -3215,12 +3220,12 @@ function renderVocab() {
       const items = groups[cat.key];
       if (!items||!items.length) return;
       vc += items.length;
-      h += `<section class="cs" id="vcat-${cat.key}"><h2><span class="ci2">${cat.icon}</span>${cvt(cat.name)}<span style="font-size:12px;color:#999;font-weight:400;margin-left:auto">${t('cat_count_vocab', { n: items.length })}</span></h2>`;
+      h += `<section class="cs" id="vcat-${cat.key}"><h2><span class="ci2">${cat.icon}</span>${catLabel(cat.name)}<span style="font-size:12px;color:#999;font-weight:400;margin-left:auto">${t('cat_count_vocab', { n: items.length })}</span></h2>`;
       h += '<div class="vg">';
       items.forEach(d => {
         const isFav = favList.includes(d.w);
         const verbBtn = d.c === '動' ? `<button class="verb-btn" onclick="event.stopPropagation();openVerbModal('${d.w.replace(/'/g,"\\'")}','${(d.r||'').replace(/'/g,"\\'")}')" title="變化表">変</button>` : '';
-        h += `<div class="vi" data-fid="${d.w}" data-w="${d.w}" data-r="${d.r||''}"><div class="vl"><div class="vw">${d.w}</div>${d.w!==d.r?`<div class="vr">${d.r}</div>`:''}<div class="vm">${cvt(d.m)}</div></div>${spkSvg}${verbBtn}<span class="vp">${cvt(cat.name)}</span><svg class="star ${isFav?'on':''}" onclick="toggleFav('${d.w.replace(/'/g,"\\'")}')" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>`;
+        h += `<div class="vi" data-fid="${d.w}" data-w="${d.w}" data-r="${d.r||''}"><div class="vl"><div class="vw">${d.w}</div>${d.w!==d.r?`<div class="vr">${d.r}</div>`:''}<div class="vm">${cvt(d.m)}</div></div>${spkSvg}${verbBtn}<span class="vp">${catLabel(cat.name)}</span><svg class="star ${isFav?'on':''}" onclick="toggleFav('${d.w.replace(/'/g,"\\'")}')" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>`;
       });
       h += '</div></section>';
     });
@@ -3243,7 +3248,7 @@ function renderVocab() {
   VOCAB_CATS.forEach(cat => {
     const items = groups[cat.key];
     if (!items||!items.length) return;
-    sh += `<div class="ct" onclick="toggleCat(this)">${cvt(cat.name)} (${items.length})</div><div class="ci" style="max-height:${Math.min(items.length*28,400)}px">`;
+    sh += `<div class="ct" onclick="toggleCat(this)">${catLabel(cat.name)} (${items.length})</div><div class="ci" style="max-height:${Math.min(items.length*28,400)}px">`;
     items.slice(0,50).forEach(d => { sh += `<a href="#vcat-${cat.key}" onclick="return vocabJump('${cat.key}')">${d.w} ${d.m}</a>`; });
     if(items.length>50) sh+=`<a href="#vcat-${cat.key}" style="color:var(--ac)" onclick="return vocabJump('${cat.key}')">${t('sidebar_more', { n: items.length-50 })}</a>`;
     sh += '</div>';
@@ -3342,8 +3347,8 @@ function render() {
       <div class="dp"><div class="dp-lbl">${t('total_progress_grammar', { lv })}</div><div class="dp-bar"><div class="dp-fill" style="width:${Math.round(gProg.totalOffset/cnt*100)}%"></div></div>
       <div class="dp-txt">${t('progress_txt', { n: gProg.totalOffset, total: cnt, unit: t('unit_grammar') })}</div></div>
       <button class="daily-btn ${grammarDailyMode?'on':''}" onclick="toggleGrammarDailyMode()">${grammarDailyMode?t('show_all'):t('daily_mode')}</button>
-      <button class="shadow-trigger" onclick="Shadow.startCurrent()" ${window.ToolQuota&&ToolQuota.isLocked&&ToolQuota.isLocked('shadow')?'style="opacity:.55"':''}>${window.ToolQuota&&ToolQuota.isLocked&&ToolQuota.isLocked('shadow')?'🔒':'🎧'} 跟讀本頁</button>
-      ${currentLevel === 'n5' ? `<button class="shadow-trigger" style="background:var(--ac2);color:#fff" onclick="jumpToParticles()">📃 跳到助詞</button>` : ''}
+      <button class="shadow-trigger" onclick="Shadow.startCurrent()" ${window.ToolQuota&&ToolQuota.isLocked&&ToolQuota.isLocked('shadow')?'style="opacity:.55"':''}>${window.ToolQuota&&ToolQuota.isLocked&&ToolQuota.isLocked('shadow')?'🔒':'🎧'} ${enOr('跟讀本頁','Shadow this page')}</button>
+      ${currentLevel === 'n5' ? `<button class="shadow-trigger" style="background:var(--ac2);color:#fff" onclick="jumpToParticles()">📃 ${enOr('跳到助詞','Jump to particles')}</button>` : ''}
       ${window.ToolQuota&&ToolQuota.upsellLine?ToolQuota.upsellLine():''}
       ${grammarDailyMode?`<div class="daily-batch-row">
         ${gProg.totalOffset>0?`<button class="daily-btn" onclick="prevGrammarBatch()">${t('prev_batch')}</button>`:''}
@@ -3365,12 +3370,12 @@ function render() {
     const items = groups[cat.name];
     if (!items||!items.length) return;
     vc += items.length;
-    h += `<section class="cs" id="cat-${cat.name}"><h2><span class="ci2">${cat.icon}</span>${cvt(cat.name)}<span style="font-size:12px;color:#999;font-weight:400;margin-left:auto">${t('cat_count_grammar', { n: items.length })}</span></h2>`;
+    h += `<section class="cs" id="cat-${cat.name}"><h2><span class="ci2">${cat.icon}</span>${catLabel(cat.name)}<span style="font-size:12px;color:#999;font-weight:400;margin-left:auto">${t('cat_count_grammar', { n: items.length })}</span></h2>`;
     items.forEach((d,i) => {
       const isFav = favList.includes(d.id);
       const idx = data.indexOf(d) + 1;
       const reportUrl = `mailto:stayjpplan@gmail.com?subject=${encodeURIComponent('[文法錯誤] ' + d.id + ' ' + d.t)}&body=${encodeURIComponent('文法 ID：' + d.id + '\n文法名：' + d.t + '\n\n錯誤描述：\n（請說明哪裡有錯，例如：接續格式、例句語感、中譯…）\n')}`;
-      h += `<div class="gc" id="${d.id}"><div class="gh" onclick="toggleCard(this,event)"><span class="gn">${idx}</span><span class="gt">${d.t}</span>${(currentLevel==='n5'&&d.n)?'<span class="gbadge-adv">進階</span>':''}<svg class="star ${isFav?'on':''}" onclick="event.stopPropagation();toggleFav('${d.id}')" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg class="arr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div><div class="gb"><div class="gx"><div class="pt">${d.p}</div><div class="ep">${cvt(d.ex)}</div><div class="eg">${d.eg.map(e=>{
+      h += `<div class="gc" id="${d.id}"><div class="gh" onclick="toggleCard(this,event)"><span class="gn">${idx}</span><span class="gt">${d.t}</span>${(currentLevel==='n5'&&d.n)?'<span class="gbadge-adv">'+enOr('進階','Advanced')+'</span>':''}<svg class="star ${isFav?'on':''}" onclick="event.stopPropagation();toggleFav('${d.id}')" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg class="arr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div><div class="gb"><div class="gx"><div class="pt">${d.p}</div><div class="ep">${cvt(d.ex)}</div><div class="eg">${d.eg.map(e=>{
         const pureJ = e.j.replace(/<[^>]+>/g,'').replace(/'/g,"\\'");
         return `<div class="ex"><div class="j">${e.j}<svg class="ex-spk" onclick="event.stopPropagation();speak('${pureJ}')" viewBox="0 0 24 24"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.54 8.46a5 5 0 010 7.07M19.07 4.93a10 10 0 010 14.14"/></svg></div><div class="z">${cvt(e.z)}</div></div>`;
       }).join('')}</div>${d.n?(currentLevel==='n5'?`<div class="nt-collapse"><button type="button" class="nt-toggle" onclick="event.stopPropagation();toggleNote(this)">展開說明 ▾</button><div class="nt nt-hidden">${cvt(d.n)}</div></div>`:`<div class="nt">${cvt(d.n)}</div>`):''}<a class="gc-report" href="${reportUrl}" target="_blank" rel="noopener">${t('report_error')}</a></div></div></div>`;
@@ -3399,7 +3404,7 @@ function render() {
   cats.forEach(cat => {
     const items = groups[cat.name];
     if (!items||!items.length) return;
-    sh += `<div class="ct" onclick="toggleCat(this)">${cvt(cat.name)}</div><div class="ci" style="max-height:${items.length*28}px">`;
+    sh += `<div class="ct" onclick="toggleCat(this)">${catLabel(cat.name)}</div><div class="ci" style="max-height:${items.length*28}px">`;
     items.forEach(d => { sh += `<a href="#${d.id}" onclick="closeSdMobile()">${d.t}</a>`; });
     sh += '</div>';
   });
@@ -3429,8 +3434,13 @@ function fixHeaderHeight() {
 }
 window.addEventListener('resize', fixHeaderHeight);
 
-// Service Worker — force update check on every load + 偵測新版自動 reload
+// [本地複查暫時停用 SW —— 部署前把 (false && …) 改回 ('serviceWorker' in navigator)]
 if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.getRegistrations().then(rs => rs.forEach(r => r.unregister())).catch(() => {});
+  if (window.caches) caches.keys().then(ks => ks.forEach(k => caches.delete(k))).catch(() => {});
+}
+// Service Worker — force update check on every load + 偵測新版自動 reload
+if (false && 'serviceWorker' in navigator) {
   let __reloadedForSW = false;
   // 新 SW activate（取得控制權）就 reload，使用者拿到的就是新 code
   navigator.serviceWorker.addEventListener('controllerchange', () => {
@@ -3456,8 +3466,8 @@ if ('serviceWorker' in navigator) {
 }
 
 // ========== I18N ==========
-const LANG_CYCLE = ['zh-TW', 'zh-CN'];
-const LANG_LABEL = { 'zh-TW': '繁', 'zh-CN': '简' };
+const LANG_CYCLE = ['zh-TW', 'zh-CN', 'en'];
+const LANG_LABEL = { 'zh-TW': '繁', 'zh-CN': '简', 'en': 'EN' };
 
 // OpenCC 繁→簡 runtime 轉換（保留單一資料來源）
 let _tw2cn = null;
@@ -3483,6 +3493,69 @@ function cvt(text) {
   return _tw2cn(text);
 }
 
+// 分類名英譯(cat 是分組鍵不疊,標題/標籤在 render 時用這個譯;lang!=en 走 cvt)
+const CAT_EN = {
+  '助詞':'Particles','動詞活用':'Verb Conjugation','基本句型':'Basic Sentence Patterns','て形用法':'Te-form Usage','形容詞・修飾':'Adjectives & Modifiers','存在・授受':'Existence & Giving/Receiving','表現・文型':'Expressions & Patterns','詞彙・其他':'Vocabulary & Others','條件表現':'Conditional Expressions','接続・原因':'Conjunctions & Cause','授受表現':'Giving & Receiving','推量・様態':'Conjecture & Appearance','アスペクト':'Aspect','敬語':'Honorifics','義務・許可':'Obligation & Permission','比較':'Comparison','引用・思考':'Quotation & Thought','口語・助詞':'Colloquial & Particles','時間':'Time','条件・仮定':'Conditionals','範囲・限定':'Scope & Limitation','比較・程度':'Comparison & Degree','様態・傾向':'Appearance & Tendency','主張・強調':'Assertion & Emphasis','その他':'Others','時間・変化':'Time & Change','原因・理由':'Cause & Reason','逆接・対比':'Contrast & Concession','程度・強調':'Degree & Emphasis','話題・評価':'Topic & Evaluation','文末表現':'Sentence-ending Expressions','限定・強調':'Limitation & Emphasis','逆接・譲歩':'Concession','程度・比較':'Degree & Comparison','文末・書き言葉':'Sentence-ending & Written',
+  '名詞':'Nouns','動詞':'Verbs','い形容詞':'I-adjectives','な形容詞':'Na-adjectives','副詞':'Adverbs'
+};
+function catLabel(name) { return (I18n.getLang() === 'en') ? (CAT_EN[name] || name) : cvt(name); }
+// 硬編 UI 字串:lang=en 給英文,否則沿用 cvt(繁/簡不變)。
+function enOr(zh, en) { return (I18n.getLang() === 'en') ? en : cvt(zh); }
+
+// ── English content overlay ──
+// lang=en 時把英文疊進 window.N5..N1 / VOCAB_N5..N1(存原中文供切回),渲染碼照舊讀欄位,無需改。
+let _enLoading = null;
+function loadContentEn() {
+  if (window.STAYJP_EN) return Promise.resolve();
+  if (_enLoading) return _enLoading;
+  _enLoading = new Promise((resolve) => {
+    const s = document.createElement('script');
+    s.src = 'content-en.js';
+    s.onload = () => resolve();
+    s.onerror = () => resolve();   // 失敗則靜默退回中文
+    document.head.appendChild(s);
+  });
+  return _enLoading;
+}
+function overlayEnglishContent(on) {
+  const EN = window.STAYJP_EN || {};
+  // 文法:by id
+  [['N5','N5_EN'],['N4','N4_EN'],['N3','N3_EN'],['N2','N2_EN'],['N1','N1_EN']].forEach(([b, e]) => {
+    const arr = window[b]; const map = EN[e]; if (!Array.isArray(arr)) return;
+    arr.forEach(it => {
+      // 注意:不疊 cat(它是分組鍵,見 CATS_*),分類標題另用 catLabel() 譯。只疊顯示欄位 ex/eg/n。
+      if (on) {
+        if (!it.__zh) it.__zh = { t: it.t, p: it.p, ex: it.ex, n: it.n, eg: (it.eg || []).map(x => x.z) };
+        const en = map && map[it.id];
+        if (en) {
+          if (en.t != null) it.t = en.t;   // 標題:日文保留、中文標註英譯
+          if (en.p != null) it.p = en.p;   // 結構
+          if (en.ex != null) it.ex = en.ex;
+          if (en.n != null) it.n = en.n;
+          (it.eg || []).forEach((x, k) => { if (en.eg && en.eg[k] != null) x.z = en.eg[k]; });
+        }
+      } else if (it.__zh) {
+        it.t = it.__zh.t; it.p = it.__zh.p; it.ex = it.__zh.ex; it.n = it.__zh.n;
+        (it.eg || []).forEach((x, k) => { if (it.__zh.eg[k] != null) x.z = it.__zh.eg[k]; });
+      }
+    });
+  });
+  // 單字:by index(僅在數量一致時才疊,防錯位)
+  [['VOCAB_N5','VOCAB_N5_EN'],['VOCAB_N4','VOCAB_N4_EN'],['VOCAB_N3','VOCAB_N3_EN'],['VOCAB_N2','VOCAB_N2_EN'],['VOCAB_N1','VOCAB_N1_EN']].forEach(([b, e]) => {
+    const arr = window[b]; const em = EN[e]; if (!Array.isArray(arr) || !Array.isArray(em) || arr.length !== em.length) return;
+    arr.forEach((it, i) => {
+      // 不疊 c(詞性,是 VOCAB_CATS 分組鍵),只疊詞義 m;詞性標籤由 catLabel() 譯。
+      if (on) { if (!it.__zh) it.__zh = { m: it.m }; if (em[i]) { it.m = em[i].m; } }
+      else if (it.__zh) { it.m = it.__zh.m; }
+    });
+  });
+}
+async function applyContentLang() {
+  const on = I18n.getLang() === 'en';
+  if (on) await loadContentEn();
+  overlayEnglishContent(on);
+}
+
 function applyI18n() {
   // 移除 EN 支援：若 localStorage 存的是 'en'，強制切回繁中
   if (!LANG_CYCLE.includes(I18n.getLang())) I18n.setLang('zh-TW');
@@ -3505,6 +3578,8 @@ async function cycleLang() {
   const cur = I18n.getLang();
   const idx = LANG_CYCLE.indexOf(cur);
   const next = LANG_CYCLE[(idx + 1) % LANG_CYCLE.length];
+  // 涉及 en 的切換:translate-layer 已就地改寫 DOM(不可逆),直接 reload 讓整頁以新語言重繪最乾淨。
+  if (next === 'en' || cur === 'en') { I18n.setLang(next); location.reload(); return; }
   const btn = document.getElementById('langBtn');
   if (next === 'zh-CN' && !_tw2cn) {
     if (btn) { btn.disabled = true; btn.textContent = '…'; }
@@ -3606,7 +3681,9 @@ setTimeout(fixHeaderHeight, 50);
 if(location.hash){const el=document.querySelector(location.hash);if(el&&el.classList.contains('gc')){el.classList.add('o');setTimeout(()=>el.scrollIntoView({behavior:'smooth'}),100)}}
 
 // 等內容資料就位（重訪通常立刻 resolve，首訪等 Firestore fetch）→ 餵 Listening/Reading items + 跑需要 vocab data 的遷移 + 重 render
-(typeof ContentLoader !== 'undefined' ? ContentLoader.ready() : Promise.resolve()).then(() => {
+(typeof ContentLoader !== 'undefined' ? ContentLoader.ready() : Promise.resolve()).then(async () => {
+  // lang=en:內容就位後先疊英文,再重繪讓文法/單字卡呈現英文(例句/解說)
+  if (I18n.getLang() === 'en') { try { await applyContentLang(); if (typeof doRender === 'function') doRender(); } catch (_) {} }
   if (typeof Listening !== 'undefined' && Listening.setItems) Listening.setItems(window.LISTENING_ITEMS || []);
   if (typeof Reading !== 'undefined' && Reading.setPassages) Reading.setPassages(window.READING_PASSAGES || []);
 
