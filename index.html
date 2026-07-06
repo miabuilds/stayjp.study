@@ -2792,14 +2792,14 @@ function onbPick(lv) {
   const card = document.querySelector('#onbMask .onb-card');
   if (!card) { onbFinish(); return; }
   card.innerHTML =
-    '<div class="onb-title">' + cvt('準備好了!') + '</div>' +
+    '<div class="onb-title">' + enOr(cvt('準備好了!'), "You're all set!") + '</div>' +
     '<div class="onb-sub">' + enOr('已幫你切到 ' + lv.toUpperCase() + ',先認識一下畫面:', 'Switched you to ' + lv.toUpperCase() + '. A quick tour of the screen:') + '</div>' +
     '<div class="onb-tips">' +
-      '<div class="onb-tip"><span class="onb-tip-ic">📚</span><span class="onb-tip-tx">' + cvt('上方切換 <b>單字 / 文法</b>,內容全部免費看。') + '</span></div>' +
-      '<div class="onb-tip"><span class="onb-tip-ic">✍️</span><span class="onb-tip-tx">' + cvt('下方 <b>測驗・複習・我的</b>:做題、背單字卡、看進度。') + '</span></div>' +
-      '<div class="onb-tip"><span class="onb-tip-ic">🔥</span><span class="onb-tip-tx">' + cvt('每天回來學一點,右上 <b>火焰</b> 記錄你的連續天數。') + '</span></div>' +
+      '<div class="onb-tip"><span class="onb-tip-ic">📚</span><span class="onb-tip-tx">' + enOr(cvt('上方切換 <b>單字 / 文法</b>,內容全部免費看。'), 'Switch between <b>Vocabulary / Grammar</b> up top — all content is free to browse.') + '</span></div>' +
+      '<div class="onb-tip"><span class="onb-tip-ic">✍️</span><span class="onb-tip-tx">' + enOr(cvt('下方 <b>測驗・複習・我的</b>:做題、背單字卡、看進度。'), 'Down below, <b>Quiz · Review · Me</b>: take quizzes, drill flashcards, track your progress.') + '</span></div>' +
+      '<div class="onb-tip"><span class="onb-tip-ic">🔥</span><span class="onb-tip-tx">' + enOr(cvt('每天回來學一點,右上 <b>火焰</b> 記錄你的連續天數。'), 'Come back a little each day — the <b>streak flame</b> up top tracks your consecutive days.') + '</span></div>' +
     '</div>' +
-    '<button class="onb-start" onclick="onbFinish()">' + cvt('開始學習') + '</button>';
+    '<button class="onb-start" onclick="onbFinish()">' + enOr(cvt('開始學習'), 'Start learning') + '</button>';
 }
 function showOnboarding() {
   if (document.getElementById('onbMask')) return;
