@@ -57,6 +57,18 @@
   function translateAll() { if (active()) walk(document.body); }
   window.UITranslate = { translateAll, walk, active, trStr };
 
+  // 攔截原生對話框(alert/confirm/prompt):英文模式下先過字典翻譯再顯示。
+  // 這些是瀏覽器原生 UI、非 DOM 文字節點,walk/MutationObserver 抓不到,只能在呼叫點攔。
+  ['alert', 'confirm', 'prompt'].forEach(function (fn) {
+    var orig = window[fn];
+    if (typeof orig !== 'function') return;
+    window[fn] = function (msg) {
+      var args = [].slice.call(arguments);
+      try { if (active() && msg != null) args[0] = trStr(String(msg)); } catch (_) {}
+      return orig.apply(window, args);
+    };
+  });
+
   function start() {
     if (!document.body) return void setTimeout(start, 40);
     translateAll();
