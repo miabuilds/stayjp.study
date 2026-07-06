@@ -3685,6 +3685,19 @@ if(location.hash){const el=document.querySelector(location.hash);if(el&&el.class
 (typeof ContentLoader !== 'undefined' ? ContentLoader.ready() : Promise.resolve()).then(async () => {
   // lang=en:內容就位後先疊英文,再重繪讓文法/單字卡呈現英文(例句/解說)
   if (I18n.getLang() === 'en') { try { await applyContentLang(); if (typeof doRender === 'function') doRender(); } catch (_) {} }
+  // lang=en:把 reading/listening 題目(q/options/解說)就地換成英文(日文文章/音檔腳本不動);由 reading-listening-en.js 提供
+  if (I18n.getLang() === 'en' && window.RL_EN) {
+    try {
+      (window.READING_PASSAGES || []).forEach(function (p) {
+        var e = window.RL_EN.reading[p.id];
+        if (e && p.questions) p.questions.forEach(function (q, i) { if (e[i]) { q.q = e[i].q_en; q.options = e[i].options_en; if (e[i].explanation_en) q.explanation = e[i].explanation_en; } });
+      });
+      (window.LISTENING_ITEMS || []).forEach(function (x) {
+        var e = window.RL_EN.listening[x.id];
+        if (e) { x.q = e.q_en; x.options = e.options_en; }
+      });
+    } catch (_) {}
+  }
   if (typeof Listening !== 'undefined' && Listening.setItems) Listening.setItems(window.LISTENING_ITEMS || []);
   if (typeof Reading !== 'undefined' && Reading.setPassages) Reading.setPassages(window.READING_PASSAGES || []);
 
@@ -3750,6 +3763,7 @@ function toggleNote(btn) {
 <script src="stats.js"></script>
 <script src="grammar-drill.js"></script>
 <script src="mock-exam.js"></script>
+<script src="reading-listening-en.js"></script>
 <script src="reading.js"></script>
 <script src="listening.js"></script>
 <script src="flashcard.js"></script>
