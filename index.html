@@ -537,8 +537,10 @@ body.profile-view .mn { margin-left: 0; max-width: none; }   /* 滿版 → 內�
 }
 .gc .ep { margin: 14px 0; color: var(--tx); font-size: 14px; line-height: 1.8; }
 .gc .eg { margin-top: 12px; }
-.gc .ex { padding: 8px 0; border-bottom: 1px dashed var(--bd); }
-.gc .ex:last-child { border-bottom: none; }
+.gc .ex { padding: 10px 12px; border: 1px solid var(--bd); border-radius: 10px; margin-bottom: 8px; cursor: pointer; transition: background .15s var(--ease), border-color .15s var(--ease); }
+.gc .ex:hover { background: var(--bg3); border-color: var(--ac2); }
+.gc .ex:active { background: var(--bg3); }
+.gc .ex:last-child { margin-bottom: 0; }
 .gc .ex .j { font-size: 14px; color: var(--ac2); font-weight: 500; line-height: 1.7; }
 .ex-spk {
   width: 16px; height: 16px; cursor: pointer;
@@ -685,6 +687,7 @@ body.profile-view .mn { margin-left: 0; max-width: none; }   /* 滿版 → 內�
   border-radius: var(--r); padding: 14px;
   display: flex; align-items: flex-start; gap: 10px;
   transition: border-color .2s var(--ease); position: relative;
+  cursor: pointer;
 }
 [data-theme="dark"] .vi:hover { box-shadow: none; }
 .vi:hover { border-color: var(--ac2); }
@@ -3114,6 +3117,15 @@ function vocabJump(catKey) {
   }
   return false;
 }
+// 單字卡:點卡身(非 ★/喇叭/変 鈕)即唸單字,免特地點喇叭。委派在 document,存活虛擬列表重繪。
+document.addEventListener('click', function (e) {
+  if (!e.target.closest) return;
+  var vi = e.target.closest('.vi');
+  if (!vi) return;
+  if (e.target.closest('.star, .spk, .verb-btn')) return;   // 這些各有動作
+  var r = vi.dataset.r || vi.dataset.w;
+  if (r && typeof speak === 'function') speak(r);
+});
 function renderVocab() {
   const data = getVocabData(currentLevel);
   const favSet = getVocabFavSet(currentLevel);
@@ -3378,7 +3390,7 @@ function render() {
       const reportUrl = `mailto:stayjpplan@gmail.com?subject=${encodeURIComponent('[文法錯誤] ' + d.id + ' ' + d.t)}&body=${encodeURIComponent('文法 ID：' + d.id + '\n文法名：' + d.t + '\n\n錯誤描述：\n（請說明哪裡有錯，例如：接續格式、例句語感、中譯…）\n')}`;
       h += `<div class="gc" id="${d.id}"><div class="gh" onclick="toggleCard(this,event)"><span class="gn">${idx}</span><span class="gt">${d.t}</span>${(currentLevel==='n5'&&d.n)?'<span class="gbadge-adv">'+enOr('進階','Advanced')+'</span>':''}<svg class="star ${isFav?'on':''}" onclick="event.stopPropagation();toggleFav('${d.id}')" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg class="arr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div><div class="gb"><div class="gx"><div class="pt">${d.p}</div><div class="ep">${cvt(d.ex)}</div><div class="eg">${d.eg.map(e=>{
         const pureJ = e.j.replace(/<[^>]+>/g,'').replace(/'/g,"\\'");
-        return `<div class="ex"><div class="j">${e.j}<svg class="ex-spk" onclick="event.stopPropagation();speak('${pureJ}')" viewBox="0 0 24 24"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.54 8.46a5 5 0 010 7.07M19.07 4.93a10 10 0 010 14.14"/></svg></div><div class="z">${cvt(e.z)}</div></div>`;
+        return `<div class="ex" onclick="speak('${pureJ}')" title="${enOr('點方框唸例句','Tap box to hear')}"><div class="j">${e.j}<svg class="ex-spk" onclick="event.stopPropagation();speak('${pureJ}')" viewBox="0 0 24 24"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.54 8.46a5 5 0 010 7.07M19.07 4.93a10 10 0 010 14.14"/></svg></div><div class="z">${cvt(e.z)}</div></div>`;
       }).join('')}</div>${d.n?(currentLevel==='n5'?`<div class="nt-collapse"><button type="button" class="nt-toggle" onclick="event.stopPropagation();toggleNote(this)">展開說明 ▾</button><div class="nt nt-hidden">${cvt(d.n)}</div></div>`:`<div class="nt">${cvt(d.n)}</div>`):''}<a class="gc-report" href="${reportUrl}" target="_blank" rel="noopener">${t('report_error')}</a></div></div></div>`;
     });
     h += '</section>';
