@@ -344,8 +344,8 @@ a:hover { text-decoration: underline; }
 <script src="i18n.js"></script>
 <script>
 // ========== I18N (繁/簡切換 via OpenCC runtime 轉換) ==========
-const LANG_CYCLE = ['zh-TW', 'zh-CN'];
-const LANG_LABEL = { 'zh-TW': '繁', 'zh-CN': '简' };
+const LANG_CYCLE = ['zh-TW', 'zh-CN', 'en'];
+const LANG_LABEL = { 'zh-TW': '繁', 'zh-CN': '简', 'en': 'EN' };
 if (typeof I18n !== 'undefined' && !LANG_CYCLE.includes(I18n.getLang())) I18n.setLang('zh-TW');
 
 let _tw2cn = null;
@@ -416,6 +416,7 @@ async function cycleLang() {
   const cur = I18n.getLang();
   const idx = LANG_CYCLE.indexOf(cur);
   const next = LANG_CYCLE[(idx + 1) % LANG_CYCLE.length];
+  if (next === 'en' || cur === 'en') { I18n.setLang(next); location.reload(); return; }
   const btn = document.getElementById('langBtn');
   if (next === 'zh-CN' && !_tw2cn) {
     if (btn) { btn.disabled = true; btn.textContent = '…'; }
@@ -548,5 +549,7 @@ function openQr(src) {
 }
 </script>
 <script defer src="auth-header.js"></script>
+<script src="ui-map.js"></script>
+<script src="translate-layer.js"></script>
 </body>
 </html>
