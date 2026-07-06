@@ -15,7 +15,19 @@ const Reading = (() => {
 
   // ── passage bank ──
   let passages = window.READING_PASSAGES || [];
-  function setPassages(arr) { passages = arr || []; }
+  // lang=en:題目/選項/解說就地換英文(reading-listening-en.js 提供;日文文章不動)。放在資料必經漏斗,免受載入時機影響。
+  function _rlEn() { try { return localStorage.getItem('ui_lang') === 'en'; } catch (e) { return false; } }
+  var _TYPE_EN = { '日常会話': 'Everyday conversation', 'お知らせ': 'Announcement', 'メール': 'Email', '説明文': 'Explanatory text', '新聞記事風': 'News-style article', 'エッセイ': 'Essay', '短い会話': 'Short conversation', '説明を聞く': 'Listen to an explanation', '単語聞き取り': 'Word listening' };
+  function setPassages(arr) {
+    passages = arr || [];
+    if (_rlEn() && window.RL_EN && window.RL_EN.reading) {
+      passages.forEach(function (p) {
+        if (_TYPE_EN[p.type]) p.type = _TYPE_EN[p.type];
+        var e = window.RL_EN.reading[p.id];
+        if (e && p.questions) p.questions.forEach(function (q, i) { if (e[i]) { q.q = e[i].q_en; q.options = e[i].options_en; if (e[i].explanation_en) q.explanation = e[i].explanation_en; } });
+      });
+    }
+  }
 
   // ── helpers ──
   function getScores() { try { return JSON.parse(localStorage.getItem(SCORE_KEY)) || {}; } catch(e) { return {}; } }
@@ -142,6 +154,12 @@ const Reading = (() => {
 
   function renderPassage() {
     const p = currentPassage;
+    // 渲染時保底 overlay 當前篇(免受資料載入時機影響;冪等)
+    if (p && _rlEn() && window.RL_EN && window.RL_EN.reading) {
+      if (_TYPE_EN[p.type]) p.type = _TYPE_EN[p.type];
+      var _e = window.RL_EN.reading[p.id];
+      if (_e && p.questions) p.questions.forEach(function (q, i) { if (_e[i]) { q.q = _e[i].q_en; q.options = _e[i].options_en; if (_e[i].explanation_en) q.explanation = _e[i].explanation_en; } });
+    }
     const box = document.getElementById('quizBox');
 
     if (timerEnabled) {

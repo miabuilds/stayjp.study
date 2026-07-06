@@ -14,7 +14,15 @@ const Listening = (() => {
 
   // ── item bank ──
   let items = window.LISTENING_ITEMS || [];
-  function setItems(arr) { items = arr || []; }
+  // lang=en:題目/選項就地換英文(reading-listening-en.js;日文音檔腳本不動)
+  function _rlEn() { try { return localStorage.getItem('ui_lang') === 'en'; } catch (e) { return false; } }
+  var _TYPE_EN = { '日常会話': 'Everyday conversation', 'お知らせ': 'Announcement', 'メール': 'Email', '説明文': 'Explanatory text', '新聞記事風': 'News-style article', 'エッセイ': 'Essay', '短い会話': 'Short conversation', '説明を聞く': 'Listen to an explanation', '単語聞き取り': 'Word listening' };
+  function setItems(arr) {
+    items = arr || [];
+    if (_rlEn() && window.RL_EN && window.RL_EN.listening) {
+      items.forEach(function (x) { if (_TYPE_EN[x.type]) x.type = _TYPE_EN[x.type]; var e = window.RL_EN.listening[x.id]; if (e) { x.q = e.q_en; x.options = e.options_en; } });
+    }
+  }
 
   // ── helpers ──
   function getScores() { try { return JSON.parse(localStorage.getItem(SCORE_KEY)) || {}; } catch(e) { return {}; } }
@@ -180,6 +188,12 @@ const Listening = (() => {
   function renderItem(idx) {
     if (idx >= queue.length) { showResults(); return; }
     currentItem = queue[idx];
+    // 渲染時保底 overlay 當前題(免受資料載入時機影響;冪等)
+    if (currentItem && _rlEn() && window.RL_EN && window.RL_EN.listening) {
+      if (_TYPE_EN[currentItem.type]) currentItem.type = _TYPE_EN[currentItem.type];
+      var _e = window.RL_EN.listening[currentItem.id];
+      if (_e) { currentItem.q = _e.q_en; currentItem.options = _e.options_en; }
+    }
     replaysLeft = practiceMode ? 999 : 2;
 
     const box = document.getElementById('quizBox');
