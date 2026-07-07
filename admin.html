@@ -850,8 +850,10 @@ async function renderLedger() {
         test: x.is_sandbox ? 'sandbox(測試)' : '',
       });
       // 沙盒測試購買不計入營收/退費(否則對帳數字虛高)
-      if (!x.is_sandbox && x.status === 'success' && (x.type === 'subscribe' || x.type === 'renew')) { rev += amt; if (x.source === 'app') revApp += amt; else revWeb += amt; }
-      if (!x.is_sandbox && x.type === 'refund') refund += Math.abs(amt);
+      // 站方自己的帳號(ADMIN_EMAILS)測試購買也不計營收
+      const isOwnerAcct = ADMIN_EMAILS.includes((uidEmail[x.uid] || '').toLowerCase());
+      if (!x.is_sandbox && !isOwnerAcct && x.status === 'success' && (x.type === 'subscribe' || x.type === 'renew')) { rev += amt; if (x.source === 'app') revApp += amt; else revWeb += amt; }
+      if (!x.is_sandbox && !isOwnerAcct && x.type === 'refund') refund += Math.abs(amt);
       if (x.status === 'pending') pending++;
       const incomplete = x.status === 'pending' || x.status === 'failed';
       // 外幣交易(Apple/Google 非台幣)→ 顯示實際幣別與實付金額,而非台幣牌價(amount_twd)
