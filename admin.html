@@ -289,6 +289,7 @@ textarea.note:focus{outline:none;border-color:var(--ac)}
  <span id="ledgerCount" style="font-size:12px;color:var(--tx2)"></span>
  <button class="btn danger" onclick="cleanupPending()" style="font-size:11px;padding:4px 10px;margin-left:auto" title="刪掉超過 1 小時的「處理中」棄單(未扣款,不影響營收)">🧹 清掉處理中棄單</button>
  <button class="btn danger" onclick="purgeTest()" style="font-size:11px;padding:4px 10px" title="清除 2 個寫死的測試帳號(knv2dycg8z / yujoulinforwork)的交易+訂閱,並校正早鳥名額。不影響真客人。">🧪 清除測試帳號資料</button>
+ <button class="btn" onclick="backfillPaytype()" style="font-size:11px;padding:4px 10px" title="一次性:回填 8 個 ATM 用戶(pay_type=atm、關續訂)+ 4 個 PayPal 手開(pay_type=paypal)的付款分類。冪等可重跑,跑完可請工程師移除。">🔧 回填付款分類(一次性)</button>
  <span id="cleanupMsg" style="font-size:12px"></span>
  </div>
  <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:14px;font-size:12px;color:var(--tx2)">
@@ -670,6 +671,22 @@ const FN_RECOMPUTE_EB = 'https://asia-east1-jpnote-1bdd6.cloudfunctions.net/admi
 const FN_SET_SUB = 'https://asia-east1-jpnote-1bdd6.cloudfunctions.net/adminSetSubscription';
 const FN_ERR_LOG = 'https://asia-east1-jpnote-1bdd6.cloudfunctions.net/adminErrorLog';
 const FN_PURGE_TEST = 'https://asia-east1-jpnote-1bdd6.cloudfunctions.net/adminPurgeTest';
+const FN_BACKFILL_PAYTYPE = 'https://asia-east1-jpnote-1bdd6.cloudfunctions.net/adminBackfillPaytype';
+async function backfillPaytype() {
+  if (!confirm('一次性回填付款分類?\n• 8 個 ATM 用戶 → pay_type=atm、關自動續訂\n• 4 個 PayPal 手開 → pay_type=paypal\n冪等、可重跑,不影響金額。')) return;
+  const msg = document.getElementById('cleanupMsg');
+  msg.style.color = 'var(--tx2)'; msg.textContent = '回填中…';
+  try {
+    const t = await auth.currentUser.getIdToken();
+    const r = await fetch(FN_BACKFILL_PAYTYPE, { method: 'POST', headers: { Authorization: 'Bearer ' + t } });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.message || d.error || r.status);
+    msg.style.color = '#16A34A';
+    msg.textContent = '✅ 回填完成:' + Object.keys(d.result || {}).length + ' 人';
+    console.log('回填結果', d.result);
+    renderLedger();
+  } catch (e) { msg.style.color = '#EF4444'; msg.textContent = '回填失敗:' + e.message; }
+}
 
 // ── 訂閱管理 ──
 async function setSub(action) {
