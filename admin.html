@@ -291,6 +291,18 @@ textarea.note:focus{outline:none;border-color:var(--ac)}
  <button class="btn danger" onclick="purgeTest()" style="font-size:11px;padding:4px 10px" title="清除 2 個寫死的測試帳號(knv2dycg8z / yujoulinforwork)的交易+訂閱,並校正早鳥名額。不影響真客人。">🧪 清除測試帳號資料</button>
  <span id="cleanupMsg" style="font-size:12px"></span>
  </div>
+ <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:14px;font-size:12px;color:var(--tx2)">
+ <span>區間</span>
+ <input type="date" id="ledgerFrom" style="padding:5px 8px;border:1px solid var(--bd);border-radius:8px;background:var(--bg);color:var(--tx);font-size:12px">
+ <span>~</span>
+ <input type="date" id="ledgerTo" style="padding:5px 8px;border:1px solid var(--bd);border-radius:8px;background:var(--bg);color:var(--tx);font-size:12px">
+ <button class="btn" onclick="renderLedger()" style="font-size:11px;padding:5px 12px">查詢</button>
+ <button class="btn" onclick="ledgerRange('month')" style="font-size:11px;padding:5px 10px">當月</button>
+ <button class="btn" onclick="ledgerRange('lastmonth')" style="font-size:11px;padding:5px 10px">上月</button>
+ <button class="btn" onclick="ledgerRange('all')" style="font-size:11px;padding:5px 10px">全部</button>
+ <span id="ledgerRangeLabel" style="color:var(--tx3)"></span>
+ </div>
+ <div id="ledgerBySource" class="stat-grid" style="margin-bottom:12px"></div>
  <div id="ledgerTotals" class="stat-grid" style="margin-bottom:16px"></div>
  <div id="ledgerList" style="font-size:12px;color:var(--tx2);overflow-x:auto">點「重新整理」載入。</div>
  </div>
@@ -794,6 +806,26 @@ async function purgeUid(uid) {
 let _ledgerExport = [];
 let _ledgerHideSandbox = true;   // 帳本預設隱藏沙盒(測試)交易;不改營收(本來就排除)、不改 CSV(仍含測試欄),只影響列表顯示
 function toggleLedgerSandbox() { _ledgerHideSandbox = !_ledgerHideSandbox; renderLedger(); }
+// 區間快捷:設定日期輸入框後重算
+function ledgerRange(kind) {
+  const iso = d => d.toISOString().slice(0, 10);
+  const fromEl = document.getElementById('ledgerFrom'), toEl = document.getElementById('ledgerTo');
+  const now = new Date();
+  if (kind === 'all') { fromEl.value = ''; toEl.value = ''; }
+  else if (kind === 'month') { fromEl.value = iso(new Date(now.getFullYear(), now.getMonth(), 1)); toEl.value = iso(now); }
+  else if (kind === 'lastmonth') { fromEl.value = iso(new Date(now.getFullYear(), now.getMonth() - 1, 1)); toEl.value = iso(new Date(now.getFullYear(), now.getMonth(), 0)); }
+  renderLedger();
+}
+// 交易 → 金流渠道(pay_type 有值才細分信用卡/ATM;manual 標 paypal 才算 PayPal 收入)
+function txnChannel(x) {
+  const pm = x.payment_method;
+  if (pm === 'apple_iap') return 'Apple';
+  if (pm === 'google_billing') return 'Google';
+  if (pm === 'paypal') return 'PayPal';
+  if (pm === 'manual') return x.pay_type === 'paypal' ? 'PayPal' : '手動贈送';
+  if (pm === 'ecpay') return x.pay_type === 'atm' ? '綠界ATM' : x.pay_type === 'cvs' ? '綠界超商' : '綠界信用卡';
+  return pm || '其他';
+}
 function exportLedgerCSV() {
   if (!_ledgerExport.length) { alert('先按「重新整理」載入帳本再匯出'); return; }
   const head = ['時間', 'Email/UID', '類型', '方案', '金額(NT$)', '付款方式', '狀態', '交易ID'];
@@ -825,12 +857,19 @@ async function renderLedger() {
   } catch (e) {}
   try {
     const snap = await db.collection('transactions').orderBy('occurred_at', 'desc').limit(2000).get();
-    const visibleDocs = snap.docs.filter(dd => !dd.data().hidden);   // 假刪除(hidden)的不顯示、不計入
+    // 區間過濾:讀日期輸入框(空=不限)
+    const fromEl = document.getElementById('ledgerFrom'), toEl = document.getElementById('ledgerTo');
+    const fromMs = fromEl.value ? new Date(fromEl.value + 'T00:00:00').getTime() : 0;
+    const toMs = toEl.value ? new Date(toEl.value + 'T23:59:59').getTime() : Infinity;
+    document.getElementById('ledgerRangeLabel').textContent = (fromEl.value || toEl.value) ? `${fromEl.value || '最早'} ~ ${toEl.value || '今'}` : '全部期間';
+    const inRange = dd => { const o = dd.data().occurred_at; const ms = o && o.toDate ? o.toDate().getTime() : 0; return ms >= fromMs && ms <= toMs; };
+    const visibleDocs = snap.docs.filter(dd => !dd.data().hidden && inRange(dd));   // 假刪除+區間外的不計
     const sandboxN = visibleDocs.filter(dd => dd.data().is_sandbox).length;   // 沙盒(測試)筆數
     const realN = visibleDocs.length - sandboxN;
     cnt.innerHTML = `共 ${_ledgerHideSandbox ? realN : visibleDocs.length} 筆`
       + (sandboxN ? ` <span style="color:var(--tx3)">·</span> <a href="javascript:void(0)" onclick="toggleLedgerSandbox()" style="color:#0EA5E9;text-decoration:none">${_ledgerHideSandbox ? `已隱藏 ${sandboxN} 筆沙盒（點此顯示）` : `顯示含沙盒（點此隱藏）`}</a>` : '');
     let rev = 0, refund = 0, pending = 0, revWeb = 0, revApp = 0;
+    const bySrc = {};   // 各金流渠道 → 收款加總
     const fmt = ts => ts && ts.toDate ? ts.toDate().toLocaleString('zh-TW', { hour12: false }) : '—';
     const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
     const PAY_TXT = { ecpay: '綠界', manual: '手動', apple_iap: 'Apple / iOS', google_billing: 'Google Play', paypal: 'PayPal' };
@@ -852,7 +891,7 @@ async function renderLedger() {
       // 沙盒測試購買不計入營收/退費(否則對帳數字虛高)
       // 站方自己的帳號(ADMIN_EMAILS)測試購買也不計營收
       const isOwnerAcct = ADMIN_EMAILS.includes((uidEmail[x.uid] || '').toLowerCase());
-      if (!x.is_sandbox && !isOwnerAcct && x.status === 'success' && (x.type === 'subscribe' || x.type === 'renew')) { rev += amt; if (x.source === 'app') revApp += amt; else revWeb += amt; }
+      if (!x.is_sandbox && !isOwnerAcct && x.status === 'success' && (x.type === 'subscribe' || x.type === 'renew')) { rev += amt; if (x.source === 'app') revApp += amt; else revWeb += amt; const ch = txnChannel(x); bySrc[ch] = (bySrc[ch] || 0) + amt; }
       if (!x.is_sandbox && !isOwnerAcct && x.type === 'refund') refund += Math.abs(amt);
       if (x.status === 'pending') pending++;
       const incomplete = x.status === 'pending' || x.status === 'failed';
@@ -880,6 +919,12 @@ async function renderLedger() {
     const feeWeb = Math.round(revWeb * FEE_WEB);
     const feeApple = Math.round(revApp * APPLE_CUT);
     const netInHand = revWeb - feeWeb + revApp - feeApple - refund;
+    // 各金流來源分別加總(依金額大→小)
+    const srcEl = document.getElementById('ledgerBySource');
+    const srcEntries = Object.entries(bySrc).sort((a, b) => b[1] - a[1]);
+    srcEl.innerHTML = srcEntries.length
+      ? srcEntries.map(([k, v]) => `<div class="stat"><div class="lbl">${k}</div><div class="val">NT$${v.toLocaleString()}</div></div>`).join('')
+      : '<div class="stat"><div class="lbl">此區間無收款</div><div class="val">—</div></div>';
     totalsEl.innerHTML = `
       <div class="stat"><div class="lbl">收款(success 訂閱+續訂)</div><div class="val">NT$${rev.toLocaleString()}</div><div class="sub">綠界 ${revWeb.toLocaleString()} + Apple ${revApp.toLocaleString()}</div></div>
       <div class="stat"><div class="lbl">綠界手續費(2.75%)</div><div class="val" style="color:#EF4444">−NT$${feeWeb.toLocaleString()}</div></div>
