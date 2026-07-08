@@ -50,6 +50,7 @@ export interface SubscriptionDoc {
   paypal_capture?: string;   // PayPal 一次性付款的 capture id;有值 = 來源為 PayPal、退費要用它
   is_early_bird?: boolean;
   is_sandbox?: boolean;        // Apple/Google 沙盒測試購買(非真實付款)→ 後台用來區分測試/真實
+  pay_type?: "credit" | "atm" | "cvs" | "paypal";   // 綠界付款細分:信用卡(可續扣)/ATM/超商(一次性,不續扣)
   refund_requested_at?: admin.firestore.Timestamp;
   failed_retries?: number;
   last_retry_at?: number;
@@ -81,6 +82,41 @@ export async function patchSubscription(
   const subPatch: Record<string, unknown> = {};
   for (const [k, v] of Object.entries(patch)) subPatch[k] = v;
   await db.doc(`users/${uid}`).set({ subscription: subPatch }, { merge: true });
+}
+
+/**
+ * 用戶推薦好友 · 雙向獎勵的「獎推薦人」那半:朋友真實付費後,給碼主(推薦人)+7 天 premium。
+ * 從兩支付款 callback 呼叫(朋友首次真付費點);best-effort、包在 try 外層不影響主流程。
+ * 安全設計:
+ *   - 沙盒 / 匿名 uid → 不發
+ *   - 朋友沒歸因碼 / 該碼非 user 型(KOL 走抽成) → 不發
+ *   - 防自我推薦(owner === friend) → 不發
+ *   - 冪等:朋友 referrer_paid_at 設過就不再發(續訂不重複獎)
+ */
+export async function rewardReferrerOnPayment(friendUid: string, isSandbox: boolean): Promise<void> {
+  if (isSandbox) return;
+  if (typeof friendUid !== "string" || friendUid.startsWith("$RCAnonymousID")) return;
+  const fSnap = await db.doc(`users/${friendUid}`).get();
+  const fd = fSnap.data() || {};
+  const code = fd.ref_code as string | undefined;
+  if (!code || fd.referrer_paid_at) return;
+  const cSnap = await db.doc(`ref_codes/${code}`).get();
+  const c = cSnap.data();
+  if (!c || c.type !== "user") return;                 // 只有用戶個人碼獎碼主;KOL 碼不走這
+  const ownerUid = c.owner_uid as string | undefined;
+  if (!ownerUid || ownerUid === friendUid) return;      // 防自我推薦
+  // 獎推薦人 +7 天(延長或發放 premium);isPremium 認 expiresAt,plan 只是載體
+  const ownerSub = await getSubscription(ownerUid);
+  const base = Math.max(nowMs(), ownerSub?.expiresAt || 0);
+  const patch: Partial<SubscriptionDoc> = { status: "active", expiresAt: base + 7 * 864e5, willRenew: ownerSub?.willRenew ?? false };
+  if (!ownerSub) { patch.plan = "monthly"; patch.source = "web"; patch.startedAt = nowMs(); }
+  await patchSubscription(ownerUid, patch);
+  await writeTransaction({
+    uid: ownerUid, type: "gift", source: "web", plan: ownerSub?.plan || "monthly",
+    amount_twd: 0, payment_method: "manual", external_id: `referral-${friendUid}-${nowMs()}`,
+    status: "success", note: `推薦好友(${friendUid})付費 → 獎勵推薦人 +7 天`,
+  });
+  await db.doc(`users/${friendUid}`).set({ referrer_paid_at: nowMs() }, { merge: true });
 }
 
 /**
@@ -116,6 +152,7 @@ export interface TransactionDoc {
   is_sandbox?: boolean;        // Apple/Google 沙盒測試交易(非真實金流)→ 後台對帳要排除
   occurred_at: admin.firestore.Timestamp;
   payment_method: "ecpay" | "apple_iap" | "google_billing" | "manual" | "paypal";
+  pay_type?: "credit" | "atm" | "cvs" | "paypal";   // 綠界細分:信用卡/ATM/超商(儀表板分源、續扣判斷用)
   external_id: string;
   status: "success" | "pending" | "failed" | "refunded";
   invoice_no?: string;

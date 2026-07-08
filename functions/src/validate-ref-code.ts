@@ -26,7 +26,16 @@ export const validateRefCode = functions.onRequest(
       const d = await db.doc(`ref_codes/${code}`).get();
       const c = d.data();
       const valid = d.exists && !!c && c.active !== false;
-      res.json({ valid, kol: valid ? (c!.kol || "") : "" });
+      // 若帶了登入 token,檢查是不是「填自己的碼」(user 型個人碼)→ 回 self 讓前端擋掉,文案友善
+      let self = false;
+      const idToken = (req.headers.authorization || "").replace(/^Bearer\s+/i, "");
+      if (valid && idToken && c!.type === "user" && c!.owner_uid) {
+        try {
+          const uid = (await admin.auth().verifyIdToken(idToken)).uid;
+          self = uid === c!.owner_uid;
+        } catch { /* token 壞掉不擋,當作非本人 */ }
+      }
+      res.json({ valid, kol: valid ? (c!.kol || "") : "", type: valid ? (c!.type || "kol") : "", self });
     } catch (err) {
       console.error("validateRefCode error:", err);
       // 出錯回 error 旗標 → 前端 fail-open(不擋使用者,但標示暫無法驗證)
