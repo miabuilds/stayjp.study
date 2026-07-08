@@ -1199,7 +1199,10 @@ body.profile-view .mn { margin-left: 0; max-width: none; }   /* 滿版 → 內�
   margin: 8px 0;
 }
 .cf-eg { margin-top: 10px; }
-.cf-eg .ex { padding: 4px 0; font-size: 14px; }
+.cf-eg .ex { padding: 8px 10px; font-size: 14px; border: 1px solid var(--bd); border-radius: 10px; margin-bottom: 8px; cursor: pointer; transition: background .15s var(--ease), border-color .15s var(--ease); }
+.cf-eg .ex:hover { background: var(--bg3); border-color: var(--ac2); }
+.cf-eg .ex:active { background: var(--bg3); }
+.cf-eg .ex:last-child { margin-bottom: 0; }
 .cf-eg .j { color: var(--ac2); }
 .cf-eg .j em { color: var(--em-color); font-style: normal; font-weight: 700; }
 .cf-eg .z { font-size: 12px; color: var(--tx2); }
@@ -3301,7 +3304,7 @@ function renderConfuse() {
       h += '<div class="cf-eg">';
       cf.eg.forEach(e => {
         const pureJ = e.j.replace(/<[^>]+>/g,'').replace(/'/g,"\\'");
-        h += '<div class="ex"><div class="j">'+e.j+'<svg class="ex-spk" onclick="event.stopPropagation();speak(\''+pureJ+'\')" viewBox="0 0 24 24"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.54 8.46a5 5 0 010 7.07M19.07 4.93a10 10 0 010 14.14"/></svg></div><div class="z">'+cvt(e.z)+'</div></div>';
+        h += '<div class="ex" onclick="event.stopPropagation();speak(\''+pureJ+'\')" title="'+enOr('點方框唸例句','Tap box to hear')+'"><div class="j">'+e.j+'<svg class="ex-spk" onclick="event.stopPropagation();speak(\''+pureJ+'\')" viewBox="0 0 24 24"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.54 8.46a5 5 0 010 7.07M19.07 4.93a10 10 0 010 14.14"/></svg></div><div class="z">'+cvt(e.z)+'</div></div>';
       });
       h += '</div>';
     }
