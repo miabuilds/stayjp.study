@@ -19,6 +19,7 @@ import { PLANS, PlanKey, ECPAY_SECRETS } from "./utils/constants";
 import { verifyCheckMacValue } from "./utils/ecpay";
 import {
   writeTransaction, getSubscription, writeSubscription, patchSubscription, getRefCode,
+  rewardReferrerOnPayment,
   tryReserveEarlyBird, releaseEarlyBird, writePaymentFailure,
   nowMs, plusDays, SubscriptionDoc, db,
 } from "./utils/firestore";
@@ -61,6 +62,25 @@ export const ecpayCallback = functions.onRequest(
       const rtnCode         = String(body.RtnCode || "0");
       const rtnMsg          = body.RtnMsg || "";
       const isSuccess       = rtnCode === "1";
+
+      // 付款方式細分(綠界 PaymentType):信用卡 / ATM / 超商。
+      // 只有信用卡(定期定額)會自動續扣;ATM、超商是一次性,willRenew 必須為 false。
+      const paymentType = String(body.PaymentType || "");
+      const payType = /^Credit/i.test(paymentType) ? "credit"
+        : /ATM/i.test(paymentType) ? "atm"
+        : /CVS|BARCODE/i.test(paymentType) ? "cvs"
+        : "credit";   // 空值多為定期定額續扣回呼(信用卡)→ 預設 credit
+
+      // ── 模擬付款防護(ECPay 官方要求)──
+      // 綠界後台「模擬付款通知」會用「正式金鑰」簽發 RtnCode=1 的 callback,但未實際扣款、
+      // 也不會進交易明細。SimulatePaid=1 = 模擬 → 一律不開通 Premium、不寫成功交易,
+      // 僅回 1|OK 讓綠界別重試。(缺此判斷曾導致模擬付款開出「幽靈 Premium」。)
+      const isSimulated = String(body.SimulatePaid || "0") === "1";
+      if (isSimulated) {
+        console.warn("[ecpay] SimulatePaid=1 模擬付款,不開通 Premium", { uid, plan, merchantTradeNo, tradeNo });
+        res.status(200).send("1|OK");
+        return;
+      }
 
       // ── Idempotency check ──
       // ECPay 在 sandbox / 定期定額 偶會重發 callback;同個 TradeNo 已成功寫過就 skip
@@ -118,7 +138,8 @@ export const ecpayCallback = functions.onRequest(
           expiresAt: plan === "lifetime"
             ? plusDays(nowMs(), planInfo.period_days)   // lifetime 直接 now + 100 年
             : capExpiresAt,
-          willRenew: plan !== "lifetime",
+          willRenew: plan !== "lifetime" && payType === "credit",   // 只有信用卡定期定額會續扣;ATM/超商=一次性
+          pay_type: payType,
           startedAt: existingSub?.startedAt || nowMs(),
           ecpay_order: merchantTradeNo,
           is_early_bird: isEarlyBird || existingSub?.is_early_bird === true,
@@ -168,12 +189,18 @@ export const ecpayCallback = functions.onRequest(
           plan,
           amount_twd: amount,
           payment_method: "ecpay",
+          pay_type: payType,
           external_id: tradeNo || merchantTradeNo,
           status: "success",
           note: rtnMsg,
         };
         if (body.InvoiceNo) txn.invoice_no = body.InvoiceNo;
         await writeTransaction(txn);
+
+        // 用戶推薦好友雙向獎勵 · 獎推薦人那半:朋友(uid)真付費 → 給碼主 +7 天。
+        // best-effort、冪等(referrer_paid_at)、非 user 型碼/自我推薦自動略過;絕不影響主開通流程。
+        // 走到這一定是真付款(SimulatePaid=1 早已 return),故 isSandbox=false。
+        await rewardReferrerOnPayment(uid, false).catch(e => console.error("rewardReferrer(ecpay) 略過:", e));
 
         console.log("✓ ECPay payment success", { uid, plan, amount, isFirstPayment });
       } else {

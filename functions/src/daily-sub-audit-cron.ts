@@ -1,12 +1,15 @@
-// Scheduled function:每日訂閱健康稽核(唯讀)。
+// Scheduled function:每日訂閱健康稽核。
 // 揪出「付了錢卻被影響」或「該過期沒過期」的不一致,寫進 system_alerts/sub_audit 供後台看,
 // 有異常時 console.error(可在 Cloud Logging 設告警 / 之後接 email)。
 //
-// ⚠️ 純唯讀使用者資料,只寫自己的 system_alerts doc,絕不改任何 users/{uid}。
+// 自動修:over_granted(到期卻仍 active/trialing/cancelled、非 lifetime)→ 把 status 翻成 expired
+//   + willRenew=false(標籤對齊事實;premium 本來就靠 expiresAt 擋,翻標籤不影響權益)。
+//   其餘類型(wrongly_expired / no_expiry)只告警不自動改(需人工判斷)。
+// 每筆 issue 解析 email 方便一眼看懂。
 
 import * as functions from "firebase-functions/v2/scheduler";
 import * as admin from "firebase-admin";
-import { db, nowMs } from "./utils/firestore";
+import { db, nowMs, patchSubscription } from "./utils/firestore";
 
 if (admin.apps.length === 0) admin.initializeApp();
 
@@ -51,16 +54,29 @@ export const dailySubAuditCron = functions.onSchedule(
       }
     });
 
+    // 解析 email + 自動修 over_granted(到期卻仍開通 → 翻 expired)
+    let autoFixed = 0;
+    for (const iss of issues) {
+      try { iss.email = (await admin.auth().getUser(iss.uid as string)).email || ""; } catch { iss.email = "(查無帳號)"; }
+      if (iss.type === "over_granted") {
+        try {
+          await patchSubscription(iss.uid as string, { status: "expired", willRenew: false });
+          iss.auto_fixed = true; autoFixed++;
+        } catch (e) { iss.auto_fixed = false; iss.fix_error = String(e); }
+      }
+    }
+
     const summary = {
       checked_at: now,
       total: real,
       issue_count: issues.length,
+      auto_fixed: autoFixed,
       issues: issues.slice(0, 100),   // 後台顯示用,上限 100
     };
     await db.doc("system_alerts/sub_audit").set(summary);
 
     if (issues.length) {
-      console.error(`[sub-audit] ⚠️ ${issues.length} 筆訂閱異常(共 ${real} 筆)`, JSON.stringify(issues.slice(0, 50)));
+      console.error(`[sub-audit] ⚠️ ${issues.length} 筆訂閱異常(共 ${real} 筆,已自動修 ${autoFixed} 筆過期)`, JSON.stringify(issues.slice(0, 50)));
     } else {
       console.log(`[sub-audit] ✅ OK,${real} 筆訂閱全部一致`);
     }

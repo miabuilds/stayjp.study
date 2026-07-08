@@ -72,7 +72,10 @@ export const adminSetSubscription = functions.onRequest(
         await writeSubscription(uid, sub);
         await writeTransaction({
           uid, type: amount > 0 ? "subscribe" : "gift", source: "web", plan, amount_twd: amount,
-          payment_method: "manual", external_id: `admin-set-${nowMs()}`,
+          payment_method: "manual",
+          // 有金額 = PayPal/實收(儀表板歸「PayPal」);0 = 贈送(歸「手動贈送」)
+          ...(amount > 0 ? { pay_type: "paypal" as const } : {}),
+          external_id: `admin-set-${nowMs()}`,
           status: "success", note: `manual admin set by ${decoded.email} (NT$${amount})`,
         });
       } else if (action === "cancel") {
@@ -81,6 +84,15 @@ export const adminSetSubscription = functions.onRequest(
           uid, type: "cancel", source: "web", plan: "n/a", amount_twd: 0,
           payment_method: "manual", external_id: `admin-cancel-${nowMs()}`,
           status: "success", note: `manual admin cancel by ${decoded.email}`,
+        });
+      } else if (action === "revoke") {
+        // 立即停用(退費後收回權限):把到期日設為現在 → isPremium(看 expiresAt)立刻變 false。
+        // 與「取消訂閱」差別:cancel 只停續扣、用到到期;revoke 是馬上收回。
+        await patchSubscription(uid, { status: "cancelled", willRenew: false, expiresAt: nowMs() });
+        await writeTransaction({
+          uid, type: "cancel", source: "web", plan: "n/a", amount_twd: 0,
+          payment_method: "manual", external_id: `admin-revoke-${nowMs()}`,
+          status: "success", note: `manual admin revoke (立即收回) by ${decoded.email}`,
         });
       } else if (action === "extend") {
         const days = Number(req.body?.days || 0);
