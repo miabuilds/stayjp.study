@@ -335,7 +335,8 @@ textarea.note:focus{outline:none;border-color:var(--ac)}
  <div style="display:flex;gap:8px;flex-wrap:wrap">
  <button class="btn" onclick="setSub('set')" style="flex:1;min-height:44px;min-width:90px">補開/設定</button>
  <button class="btn" onclick="setSub('extend')" style="flex:1;min-height:44px;min-width:90px">延長</button>
- <button class="btn danger" onclick="setSub('cancel')" style="flex:1;min-height:44px;min-width:90px">取消訂閱</button>
+ <button class="btn danger" onclick="setSub('cancel')" style="flex:1;min-height:44px;min-width:90px" title="關閉續扣,對方仍可用到到期日">取消訂閱</button>
+ <button class="btn danger" onclick="setSub('revoke')" style="flex:1;min-height:44px;min-width:90px" title="退費後用:到期日設為現在,立刻收回 Premium 降回免費">立即停用(收回)</button>
  </div>
  <hr style="border:none;border-top:1px solid var(--bd);margin:14px 0 10px">
  <label style="font-size:13px;color:var(--tx2)">手動退費記帳(虛擬ATM / 轉帳,已自己轉回 → 補記一筆)
@@ -746,7 +747,9 @@ async function setSub(action) {
    if (!body.days || body.days <= 0) { msg.textContent = '請輸入延長天數'; msg.style.color = '#EF4444'; return; }
    if (!confirm(`把 ${email} 的到期日往後延 ${body.days} 天?`)) return;
  } else if (action === 'cancel') {
-   if (!confirm(`取消 ${email} 的訂閱(關閉續扣)?`)) return;
+   if (!confirm(`取消 ${email} 的訂閱(關閉續扣,仍可用到到期日)?`)) return;
+ } else if (action === 'revoke') {
+   if (!confirm(`立即停用 ${email} 的訂閱、馬上收回 Premium?\n(到期日設為現在 → 對方立刻降回免費版;用於退費後收回。不列黑名單)`)) return;
  } else if (action === 'refund') {
    body.amount = Number(document.getElementById('ssRefundAmt').value || 0);
    if (!body.amount || body.amount <= 0) { msg.textContent = '請輸入退回金額(NT$)'; msg.style.color = '#EF4444'; return; }
