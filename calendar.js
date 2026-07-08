@@ -190,14 +190,18 @@ const Calendar = (() => {
     const summary = getTodaySummary();
     const todayText = summary.total > 0 ? t('today_learned', { n: summary.total }) : t('today_not_started');
 
-    return `<div class="cal-panel">
-      <div class="cal-streak">
-        <span class="cal-streak-fire">${t('streak_fire', { n: streaks.current })}</span>
+    // 全新用戶(從未學過)→ 顯示鼓勵文案,不用一排「0 天／0 天」勸退第一印象
+    const isBrandNew = streaks.current === 0 && streaks.longest === 0 && summary.total === 0;
+    const streakInner = isBrandNew
+      ? `<span class="cal-streak-fire">${t('streak_empty')}</span>`
+      : `<span class="cal-streak-fire">${t('streak_fire', { n: streaks.current })}</span>
         <span class="cal-streak-sep">|</span>
         <span>${t('streak_longest', { n: streaks.longest })}</span>
         <span class="cal-streak-sep">|</span>
-        <span>${t('today_prefix')}${todayText}</span>
-      </div>
+        <span>${t('today_prefix')}${todayText}</span>`;
+
+    return `<div class="cal-panel">
+      <div class="cal-streak">${streakInner}</div>
       ${buildHeatmap()}
       ${buildProgress()}
     </div>`;
