@@ -199,6 +199,24 @@ a:hover{text-decoration:underline}
  </div>
  </div>
 
+ <!-- 邀請好友(雙向獎勵)-->
+ <div class="card" id="inviteCard" style="display:none">
+ <h2>🎁 邀請好友,雙方各得 7 天</h2>
+ <p style="font-size:13px;color:var(--tx2);margin-top:6px;line-height:1.7">
+ 把你的專屬連結分享給朋友。朋友用連結註冊並<strong>首次付費訂閱成功</strong>後,你和他<strong>各獲得 7 天 Premium</strong>(自動加到到期日,無上限次數)。
+ </p>
+ <div style="margin-top:14px;padding:12px;background:var(--bg3);border-radius:10px">
+ <div style="font-size:12px;color:var(--tx3);margin-bottom:6px">你的專屬推薦碼</div>
+ <div id="inviteCode" style="font-size:22px;font-weight:800;letter-spacing:2px;font-family:ui-monospace,monospace;color:var(--tx)">— — — — — —</div>
+ <div style="display:flex;gap:8px;margin-top:12px">
+ <input id="inviteLink" readonly style="flex:1;padding:8px 10px;border:1px solid var(--bd);border-radius:8px;background:var(--bg);color:var(--tx2);font-size:13px">
+ <button class="btn primary" onclick="copyInviteLink()" id="inviteCopyBtn" style="white-space:nowrap">複製連結</button>
+ </div>
+ <button class="btn" onclick="shareInvite()" id="inviteShareBtn" style="width:100%;margin-top:8px;display:none">分享給朋友</button>
+ <div id="inviteMsg" style="font-size:12px;margin-top:8px;color:var(--tx3)"></div>
+ </div>
+ </div>
+
  </div>
 </main>
 
@@ -272,6 +290,7 @@ auth.onAuthStateChanged(user => {
  _acctShowApp(user);
  loadSubscription();
  loadEarlyBird();
+ loadInviteCard();
 });
 // 還原前:有快取先樂觀顯示 appView(訂閱卡等 onAuthStateChanged 回來才載入);
 // 4s 沒回呼且仍未登入 → 回退顯示 gate,讓使用者可重新登入,不卡在空白/假已登入。
@@ -309,13 +328,62 @@ function applyRefCode() {
    const cur = d.exists && d.data() ? d.data().ref_code : '';
    if (cur) { msg.style.color = 'var(--tx3)'; msg.textContent = '已套用推薦碼:' + cur + '(每人限一次,不可更改)'; return; }
    msg.style.color = 'var(--tx3)'; msg.textContent = '驗證中…';
-   // 先驗證碼存不存在(查無就擋下,不亂存);驗證服務出錯/斷線 → fail-open 先存
-   fetch(VALIDATE_URL + '?code=' + encodeURIComponent(raw)).then(r => r.json()).then(v => {
+   // 先驗證碼存不存在(查無就擋下,不亂存);驗證服務出錯/斷線 → fail-open 先存。
+   // 帶 idToken → 後端可判斷「填自己的碼」(self)並擋下,不讓人自我推薦刷 7 天。
+   currentUser.getIdToken().then(idToken => fetch(VALIDATE_URL + '?code=' + encodeURIComponent(raw), {
+     headers: { 'Authorization': 'Bearer ' + idToken },
+   })).then(r => r.json()).then(v => {
+     if (v && v.self) { msg.style.color = '#EF4444'; msg.textContent = '這是你自己的推薦碼,請把它分享給朋友 🙂'; return; }
      if (v && v.valid) store('✓ 已套用 ' + raw + (v.kol ? '(' + v.kol + ')' : '') + ',付費訂閱成功後自動多送 7 天!');
      else if (v && v.error) store('已套用 ' + raw + '(暫時無法即時驗證)');
      else { msg.style.color = '#EF4444'; msg.textContent = '查無此推薦碼,請確認後再輸入。'; }
    }).catch(() => store('已套用 ' + raw + '(暫時無法驗證)'));
  }).catch(() => { msg.style.color = '#EF4444'; msg.textContent = '讀取失敗,請稍後再試。'; });
+}
+
+// ── 邀請好友:取自己的專屬碼(後端 Admin SDK 建/回,冪等)+ 組分享連結 ──
+let _inviteCode = '';
+async function loadInviteCard() {
+ if (!currentUser) return;
+ const card = document.getElementById('inviteCard');
+ try {
+   const idToken = await currentUser.getIdToken();
+   const r = await fetch('https://asia-east1-jpnote-1bdd6.cloudfunctions.net/getMyRefCode', {
+     method: 'POST', headers: { 'Authorization': 'Bearer ' + idToken },
+   });
+   const j = await r.json();
+   if (!j || !j.code) return;   // 拿不到碼就不顯示卡,不留半殘 UI
+   _inviteCode = j.code;
+   const link = 'https://stayjp.study/?ref=' + _inviteCode;
+   document.getElementById('inviteCode').textContent = _inviteCode;
+   document.getElementById('inviteLink').value = link;
+   if (navigator.share) document.getElementById('inviteShareBtn').style.display = 'block';
+   card.style.display = 'block';
+ } catch (e) { /* 靜默:邀請卡是加分功能,失敗不影響帳號頁 */ }
+}
+function copyInviteLink() {
+ const link = document.getElementById('inviteLink').value;
+ const msg = document.getElementById('inviteMsg');
+ const done = () => { msg.style.color = '#16A34A'; msg.textContent = '✓ 連結已複製,貼給朋友吧!'; };
+ if (navigator.clipboard && navigator.clipboard.writeText) {
+   navigator.clipboard.writeText(link).then(done).catch(() => { fallbackCopy(link); done(); });
+ } else { fallbackCopy(link); done(); }
+}
+function fallbackCopy(text) {
+ const el = document.getElementById('inviteLink');
+ el.removeAttribute('readonly'); el.select(); el.setSelectionRange(0, 99999);
+ try { document.execCommand('copy'); } catch (e) {}
+ el.setAttribute('readonly', ''); el.blur();
+}
+function shareInvite() {
+ const link = 'https://stayjp.study/?ref=' + _inviteCode;
+ if (navigator.share) {
+   navigator.share({
+     title: '日本再留計劃 · 免費 JLPT 學習工具',
+     text: '用我的連結註冊 StayJP,訂閱後我們各多送 7 天 Premium!',
+     url: link,
+   }).catch(() => {});
+ }
 }
 
 // ── subscription ──
