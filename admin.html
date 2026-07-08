@@ -939,7 +939,7 @@ async function renderLedger() {
       _ledgerExport.push({
         time: fmt(x.occurred_at),
         who: uidEmail[x.uid] || x.uid || '',
-        type: TXN_TYPE_TXT[x.type] || x.type || '',
+        type: txnTypeLabel(x),
         plan: SUB_PLAN_TXT[x.plan] || (x.plan && x.plan !== 'n/a' ? x.plan : ''),
         amount: amt,
         pay: PAY_TXT[x.payment_method] || x.payment_method || '',
@@ -963,7 +963,7 @@ async function renderLedger() {
       return `<tr style="border-bottom:1px solid var(--bd)${(incomplete || x.is_sandbox) ? ';opacity:.5' : ''}">
         <td style="padding:6px 6px;white-space:nowrap">${x.is_sandbox?'<span style="color:#F59E0B">🧪</span> ':''}${fmt(x.occurred_at)}</td>
         <td style="padding:6px 6px">${esc(uidEmail[x.uid] || x.uid.slice(0, 10))}</td>
-        <td style="padding:6px 6px;white-space:nowrap">${TXN_TYPE_TXT[x.type] || x.type}</td>
+        <td style="padding:6px 6px;white-space:nowrap">${txnTypeLabel(x)}</td>
         <td style="padding:6px 6px;white-space:nowrap">${SUB_PLAN_TXT[x.plan] || (x.plan && x.plan !== 'n/a' ? x.plan : '—')}</td>
         <td style="padding:6px 6px;text-align:right;white-space:nowrap">${amtCell}</td>
         <td style="padding:6px 6px;white-space:nowrap">${PAY_TXT[x.payment_method] || x.payment_method || '—'}</td>
@@ -1023,7 +1023,13 @@ const SUB_PLAN_TXT = { monthly:'月費', yearly:'年費', yearly_early_bird:'早
 // cancelled 真正含義是「關閉自動續扣、但到期前仍可用」,不是「已終止」。標籤講清楚避免誤判(看「到期」欄判斷是否還在期內)。
 const SUB_STATUS_TXT = { active:'✓ 已付費', cancelled:'取消續扣（仍可用）', refunded:'已退費', expired:'已過期', trialing:'🎁 試用中' };
 // 交易帳本(transactions)用的標籤 — 與 account.html 對齊
-const TXN_TYPE_TXT = { subscribe:'訂閱', renew:'續訂', refund:'退費', cancel:'關閉續扣', fail:'扣款失敗', chargeback:'信用卡爭議', gift:'贈送' };
+const TXN_TYPE_TXT = { subscribe:'訂閱', renew:'續訂', refund:'退費', cancel:'關閉續扣', fail:'扣款失敗', chargeback:'信用卡爭議', gift:'贈送', expire:'訂閱到期' };
+// 歷史相容:2026-07 前 EXPIRATION 事件被誤記成 type:'fail' note:'Subscription expired'。
+// 那不是扣款失敗(扣款失敗已由 BILLING_ISSUE 記一筆),顯示層改標「訂閱到期」,不動資料(非破壞)。
+function txnTypeLabel(x) {
+  if (x && x.type === 'fail' && typeof x.note === 'string' && x.note.indexOf('Subscription expired') === 0) return '訂閱到期';
+  return TXN_TYPE_TXT[x.type] || x.type || '';
+}
 const TXN_STATUS_TXT = { success:'成功', pending:'處理中', failed:'失敗', refunded:'已退費' };
 
 let _allSubs = [];
@@ -1252,7 +1258,7 @@ async function showTxns(uid, email) {
         const plan = SUB_PLAN_TXT[x.plan] || (x.plan && x.plan !== 'n/a' ? x.plan : '');
         return `<div class="txn-modal-card"${incomplete ? ' style="opacity:.6"' : ''}>
           <div class="t-top">
-            <span class="t-type">${TXN_TYPE_TXT[x.type] || x.type}${plan ? ' · ' + plan : ''}</span>
+            <span class="t-type">${txnTypeLabel(x)}${plan ? ' · ' + plan : ''}</span>
             <span class="t-amt">${amtHTML}</span>
           </div>
           <div class="t-meta"><span>${fmt(x.occurred_at)}</span><span>來源:${srcOf(x)}</span><span>狀態:${TXN_STATUS_TXT[x.status] || x.status}</span></div>
