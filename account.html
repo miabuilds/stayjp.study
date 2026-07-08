@@ -580,7 +580,38 @@ async function cancelRenew() {
  }
 }
 
+// ATM／超商付款 → 人工退款(不能信用卡退刷):說明 + 手續費由用戶負擔 + 填原因(留存分析)
+async function requestRefundAtm() {
+ const en = (function(){ try { return localStorage.getItem('ui_lang') === 'en'; } catch(e){ return false; } })();
+ const intro = en
+   ? 'You paid by ATM / convenience store, so it can\'t be auto-refunded to a card — our team will transfer it back manually.\n\nA NT$15 bank-transfer fee is deducted from your refund (you cover it). We\'ll email you within 3 business days to confirm your bank account.\n\nContinue?'
+   : '你是 ATM／超商付款,無法自動退刷到信用卡——將由客服人工匯回。\n\n轉帳手續費 NT$15 由您負擔(從退款金額扣除)。我們會在 3 個工作天內以 email 與你聯繫、確認你的匯款帳戶。\n\n要繼續嗎?';
+ if (!confirm(intro)) return;
+ const reason = prompt(en ? 'Please tell us why you\'re requesting a refund (required — we keep it to improve):' : '請填寫退款原因(必填,我們會據此改善):', '');
+ if (reason == null) return;
+ if (!reason.trim()) { alert(en ? 'A reason is required.' : '請填寫退款原因。'); return; }
+ const btn = document.getElementById('btnRefund');
+ if (btn) { btn.disabled = true; btn.textContent = en ? 'Submitting…' : '處理中…'; }
+ try {
+  const idToken = await currentUser.getIdToken();
+  const res = await fetch(FN_REFUND, {
+   method: 'POST',
+   headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + idToken },
+   body: JSON.stringify({ reason: reason.trim() }),
+  });
+  const data = await res.json();
+  if (!res.ok) { alert(data.reason || data.error || (en ? 'Request failed' : '申請失敗')); return; }
+  alert(data.message || (en ? 'Refund request received; support will contact you.' : '已收到你的退款申請,客服會與你聯繫。'));
+ } catch (err) {
+  alert((en ? 'Refund request failed: ' : '退款申請失敗:') + err.message);
+ } finally {
+  if (btn) { btn.disabled = false; btn.textContent = en ? 'Request a refund' : '申請退費'; }
+ }
+}
+
 async function requestRefund() {
+ // ATM／超商付款走人工退款(信用卡退刷會回「訂單不存在」)
+ if (_sub && (_sub.pay_type === 'atm' || _sub.pay_type === 'cvs')) return requestRefundAtm();
  const isPaypal = !!(_sub && _sub.paypal_capture);
  const _en = (function(){ try { return localStorage.getItem('ui_lang') === 'en'; } catch(e){ return false; } })();
  const ebWarn = (_sub && _sub.is_early_bird)
