@@ -130,6 +130,12 @@ service cloud.firestore {
       allow write: if false;
     }
 
+    // ATM 人工退款申請 — Cloud Function(Admin SDK)寫入;admin 後台讀 + 標記已處理。
+    match /refund_requests/{id} {
+      allow read, write: if request.auth != null &&
+                    request.auth.token.email in ['stayjpplan@gmail.com', 'abc83327@gmail.com'];
+    }
+
     // 預設拒絕：未明確允許的所有路徑皆擋
     match /{document=**} {
       allow read, write: if false;

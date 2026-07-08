@@ -157,6 +157,7 @@ textarea.note:focus{outline:none;border-color:var(--ac)}
  <button id="tabSubs"> 訂閱者</button>
  <button id="tabLedger"> 帳本</button>
  <button id="tabSetSub"> 訂閱管理</button>
+ <button id="tabRefunds"> 退款申請</button>
  <button id="tabErrLog"> 報錯</button>
  </div>
  <div class="me" id="meInfo"></div>
@@ -369,6 +370,18 @@ textarea.note:focus{outline:none;border-color:var(--ac)}
  </div>
  <div id="elList" style="font-size:12px;color:var(--tx2)">點「重新整理」載入。</div>
  </div>
+
+ <!-- ATM 退款申請 -->
+ <div id="wrapRefunds" class="stats">
+ <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:14px">
+ <h2 style="font-size:14px;color:var(--tx2);text-transform:uppercase;letter-spacing:.5px;margin:0">ATM 退款申請</h2>
+ <button class="btn" onclick="renderRefunds()" style="font-size:11px;padding:4px 10px">↻ 重新整理</button>
+ <label style="font-size:12px;color:var(--tx2)"><input type="checkbox" id="rfShowDone" onchange="renderRefunds()"> 含已處理</label>
+ <span id="rfCount" style="font-size:12px;color:var(--tx2)"></span>
+ </div>
+ <div style="font-size:12px;color:var(--tx3);margin-bottom:10px">ATM／超商付款無法自動退刷,用戶申請後列在這。你手動匯回「實退金額」給對方(手續費已扣),再到「訂閱管理」取消他的訂閱,然後按「標記已處理」。</div>
+ <div id="rfList" style="font-size:12px;color:var(--tx2)">點「重新整理」載入。</div>
+ </div>
 </div>
 
 <!-- Firebase SDK -->
@@ -455,8 +468,11 @@ document.getElementById('tabStats').onclick = () => switchTab('stats');
 document.getElementById('tabSubs').onclick = () => switchTab('subs');
 document.getElementById('tabLedger').onclick = () => switchTab('ledger');
 document.getElementById('tabSetSub').onclick = () => switchTab('setsub');
+document.getElementById('tabRefunds').onclick = () => switchTab('refunds');
 document.getElementById('tabErrLog').onclick = () => switchTab('errlog');
 function switchTab(tab) {
+ document.getElementById('tabRefunds').classList.toggle('on', tab === 'refunds');
+ document.getElementById('wrapRefunds').classList.toggle('on', tab === 'refunds');
  document.getElementById('tabFeedback').classList.toggle('on', tab === 'feedback');
  document.getElementById('tabStats').classList.toggle('on', tab === 'stats');
  document.getElementById('tabSubs').classList.toggle('on', tab === 'subs');
@@ -474,6 +490,45 @@ function switchTab(tab) {
  if (tab === 'ledger') renderLedger();
  if (tab === 'errlog') renderErrLog();
  if (tab === 'setsub') loadPaypalPending();
+ if (tab === 'refunds') renderRefunds();
+}
+
+// ATM 退款申請清單(refund_requests):用戶申請、你手動匯款後標記已處理
+async function renderRefunds() {
+ const box = document.getElementById('rfList');
+ const cnt = document.getElementById('rfCount');
+ const showDone = document.getElementById('rfShowDone').checked;
+ box.textContent = '載入中…';
+ try {
+  const snap = await db.collection('refund_requests').orderBy('created_at', 'desc').limit(200).get();
+  const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const pend = snap.docs.filter(d => (d.data().status || 'pending') === 'pending').length;
+  cnt.innerHTML = `待處理 ${pend} 筆` + (snap.size > pend ? ` · 共 ${snap.size}` : '');
+  const docs = snap.docs.filter(d => showDone || (d.data().status || 'pending') === 'pending');
+  if (!docs.length) { box.innerHTML = '<span style="color:var(--tx3)">目前沒有待處理的退款申請 🎉</span>'; return; }
+  box.innerHTML = docs.map(d => {
+   const x = d.data();
+   const t = x.created_at && x.created_at.toDate ? x.created_at.toDate().toLocaleString('zh-TW') : '';
+   const done = (x.status || 'pending') === 'done';
+   return `<div style="border-bottom:1px solid var(--bd);padding:10px 0${done ? ';opacity:.5' : ''}">
+     <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+       <strong style="color:var(--tx)">${esc(x.email || x.uid)}</strong>
+       <span>· ${SUB_PLAN_TXT[x.plan] || x.plan || ''} · ${esc((x.pay_type || '').toUpperCase())}</span>
+       <span style="color:#16A34A;font-weight:600">實退 NT$${x.net_refund}</span>
+       <span style="color:var(--tx3);font-size:11px">(退 ${x.refund_amount} − 手續費 ${x.transfer_fee}) · ${t}</span>
+       ${done ? '<span style="color:var(--tx3);margin-left:auto">✓ 已處理</span>' : `<button class="btn" style="font-size:11px;padding:3px 9px;margin-left:auto" onclick="markRefundDone('${d.id}')">標記已處理</button>`}
+     </div>
+     <div style="margin-top:4px;color:var(--tx2)">原因:${esc(x.reason || '—')}</div>
+   </div>`;
+  }).join('');
+ } catch (e) { box.innerHTML = '<span style="color:#EF4444">讀取失敗:' + e.message + '</span>'; }
+}
+async function markRefundDone(id) {
+ if (!confirm('確認已把「實退金額」匯回給對方、標記為已處理?\n(記得也去「訂閱管理」取消/降級他的訂閱)')) return;
+ try {
+  await db.collection('refund_requests').doc(id).set({ status: 'done', done_at: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true });
+  renderRefunds();
+ } catch (e) { alert('標記失敗:' + e.message); }
 }
 
 // PayPal 待開通清單(用戶在 pricing 點 PayPal 鈕時記錄的 paypal_pending)
