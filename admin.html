@@ -866,7 +866,8 @@ let _ledgerHideSandbox = true;   // 帳本預設隱藏沙盒(測試)交易;不�
 function toggleLedgerSandbox() { _ledgerHideSandbox = !_ledgerHideSandbox; renderLedger(); }
 // 區間快捷:設定日期輸入框後重算
 function ledgerRange(kind) {
-  const iso = d => d.toISOString().slice(0, 10);
+  // 用「當地日期」格式化,別用 toISOString()(會轉 UTC → 台灣月初變成前一天)
+  const iso = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
   const fromEl = document.getElementById('ledgerFrom'), toEl = document.getElementById('ledgerTo');
   const now = new Date();
   if (kind === 'all') { fromEl.value = ''; toEl.value = ''; }
