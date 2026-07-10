@@ -136,6 +136,13 @@ service cloud.firestore {
                     request.auth.token.email in ['stayjpplan@gmail.com', 'abc83327@gmail.com'];
     }
 
+    // KOL 分潤紀錄 — Cloud Function(Admin SDK)寫,admin 後台唯讀對帳/結算
+    match /commissions/{id} {
+      allow read: if request.auth != null &&
+                    request.auth.token.email in ['stayjpplan@gmail.com', 'abc83327@gmail.com'];
+      allow write: if false;
+    }
+
     // 預設拒絕：未明確允許的所有路徑皆擋
     match /{document=**} {
       allow read, write: if false;

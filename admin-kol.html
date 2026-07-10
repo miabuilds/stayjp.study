@@ -55,8 +55,8 @@
       <div id="payoutBanner"></div>
       <div id="payoutTable">載入中…</div>
       <div class="muted" style="margin-top:10px">
-        目前金額為<b>估算</b>:依「目前付費中(active)被推薦人數 × 各人方案首筆利潤 × 抽成%」。
-        精準的「待確認 / 已鎖定可領 / 已付款」與退款扣回、匯款門檻(NT$1,000)、每月結算,待分潤引擎上線後接入此頁。
+        金額為<b>精算真實紀錄</b>(commissions):被推薦人首筆真付款產生「待確認」→ 過 30 天鎖定期無退費轉「可領」→ 結算匯款後轉「已付款」;退款/退單自動扣回。
+        建議滿 <b>NT$1,000</b>(🔔)每月結算匯款。標記已付款的一鍵結算功能為下一步(P3);目前先依此表手動匯款對帳。
       </div>
     </div>
 
@@ -167,18 +167,25 @@ async function loadRefCodes() {
 async function loadPayout() {
   const box = document.getElementById('payoutTable'), banner = document.getElementById('payoutBanner');
   try {
-    const snap = await db.collection('ref_codes').get();
-    const rows = [];
-    let grand = 0;
-    snap.forEach(d => { const c=d.data(); if ((c.type||'') === 'user') return;   // 只算 KOL 分潤碼
-      const pct=c.commission_pct!=null?c.commission_pct:20; const comm=refCommissionFor(d.id,pct);
-      if (comm.paid>0) { rows.push({ code:d.id, kol:c.kol||'', pct, ...comm }); grand += comm.amount; } });
-    rows.sort((a,b)=>b.amount-a.amount);
-    if (!rows.length) { box.innerHTML = '<div class="muted">目前沒有帶來付費的推薦碼。</div>'; banner.innerHTML=''; return; }
-    banner.className='banner info'; banner.innerHTML = `目前累計預估分潤 <b>NT$${grand.toLocaleString()}</b>(${rows.length} 位 KOL 有付費歸因)。正式制度上線後,滿 NT$1,000 每月 10 號結算並在此提醒你匯款。`;
-    box.innerHTML = `<table><thead><tr><th>KOL</th><th>碼</th><th class="num">帶來</th><th class="num">付費</th><th class="num">抽成%</th><th class="num">預估分潤</th></tr></thead><tbody>`
-      + rows.map(r=>`<tr><td>${r.kol||'—'}</td><td><code>${r.code}</code></td><td class="num">${r.total}</td><td class="num">${r.paid}</td><td class="num">${r.pct}%</td><td class="num"><b style="color:#16A34A">NT$${r.amount.toLocaleString()}</b></td></tr>`).join('')
-      + `<tr><td colspan="5" style="text-align:right;font-weight:700">合計</td><td class="num"><b>NT$${grand.toLocaleString()}</b></td></tr></tbody></table>`;
+    // 讀真實分潤紀錄(commissions)+ ref_codes 名稱對照
+    const [csnap, rsnap] = await Promise.all([ db.collection('commissions').get(), db.collection('ref_codes').get() ]);
+    const nameByCode = {}; rsnap.forEach(d => { nameByCode[d.id] = d.data().kol || ''; });
+    const g = {};   // code → { pending, locked, paid }
+    csnap.forEach(d => { const c = d.data(); const code = c.code || '?'; const st = c.state || 'pending'; const a = Number(c.amount_twd) || 0;
+      const r = g[code] = g[code] || { pending:0, locked:0, paid:0 }; if (r[st] != null) r[st] += a; });
+    const codes = Object.keys(g);
+    if (!codes.length) { box.innerHTML = '<div class="muted">尚無分潤紀錄(等第一位被推薦人真付費即出現;付款後 30 天鎖定期過才可領)。</div>'; banner.innerHTML=''; return; }
+    let tP=0, tL=0, tPaid=0;
+    const rows = codes.map(code => { const r=g[code]; tP+=r.pending; tL+=r.locked; tPaid+=r.paid; return { code, kol:nameByCode[code]||'', ...r }; })
+      .sort((a,b) => b.locked - a.locked);
+    const due = rows.filter(r => r.locked >= 1000);
+    banner.className = 'banner info';
+    banner.innerHTML = tL > 0
+      ? `🔔 本期<b>可結算(已鎖定)NT$${tL.toLocaleString()}</b>,其中滿 NT$1,000 該匯款:<b>${due.length}</b> 位。待確認(鎖定期內)NT$${tP.toLocaleString()}、累計已付款 NT$${tPaid.toLocaleString()}。`
+      : `待確認(鎖定期內)NT$${tP.toLocaleString()};尚無已鎖定可領金額。累計已付款 NT$${tPaid.toLocaleString()}。`;
+    box.innerHTML = `<table><thead><tr><th>KOL</th><th>碼</th><th class="num">待確認</th><th class="num">可領(鎖定)</th><th class="num">已付款</th></tr></thead><tbody>`
+      + rows.map(r => `<tr><td>${r.kol||'—'}</td><td><code>${r.code}</code></td><td class="num" style="color:var(--tx2)">NT$${r.pending.toLocaleString()}</td><td class="num"><b style="color:${r.locked>=1000?'#16A34A':'var(--tx2)'}">NT$${r.locked.toLocaleString()}</b>${r.locked>=1000?' 🔔':''}</td><td class="num" style="color:var(--tx3)">NT$${r.paid.toLocaleString()}</td></tr>`).join('')
+      + `<tr><td colspan="2" style="text-align:right;font-weight:700">合計</td><td class="num">NT$${tP.toLocaleString()}</td><td class="num"><b>NT$${tL.toLocaleString()}</b></td><td class="num">NT$${tPaid.toLocaleString()}</td></tr></tbody></table>`;
   } catch(e){ box.textContent='讀取失敗:'+e.message; }
 }
 
