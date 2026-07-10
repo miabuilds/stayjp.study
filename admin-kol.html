@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>KOL 分潤後台 — 日本再留計劃</title>
+<style>
+  :root { --bg:#F6F4EF;--bg2:#FFFFFF;--tx:#2C2C2C;--tx2:#7A7A7A;--tx3:#ACACAC;--ac:#D4654A;--bd:#E8E5E0;--r:12px; }
+  @media (prefers-color-scheme: dark){ :root{ --bg:#1C1C1E;--bg2:#2C2C2E;--tx:#E5E5E5;--tx2:#8E8E93;--tx3:#636366;--ac:#E8734A;--bd:#3A3A3C; } }
+  *{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,"PingFang TC","Noto Sans TC",sans-serif}
+  body{background:var(--bg);color:var(--tx);min-height:100vh;font-size:14px}
+  .hd{position:sticky;top:0;background:var(--bg);border-bottom:1px solid var(--bd);padding:12px 20px;display:flex;align-items:center;gap:14px;z-index:10}
+  .hd b{font-size:16px}.hd .sp{flex:1}
+  .hd a{color:var(--ac);text-decoration:none;font-size:13px}
+  .wrap{max-width:900px;margin:0 auto;padding:20px}
+  .card{background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r);padding:18px;margin-bottom:18px}
+  h2{font-size:15px;margin-bottom:12px}
+  .btn{background:var(--bg);border:1px solid var(--bd);border-radius:8px;padding:7px 12px;color:var(--tx);cursor:pointer;font-size:13px}
+  .btn:hover{border-color:var(--ac)}
+  .btn.pri{background:var(--ac);color:#fff;border-color:var(--ac)}
+  .btn.danger{color:#EF4444}
+  input{padding:7px 10px;border:1px solid var(--bd);border-radius:8px;background:var(--bg);color:var(--tx);font-size:13px}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th,td{text-align:left;padding:8px 6px;border-bottom:1px solid var(--bd)}
+  th{color:var(--tx2);font-weight:600;font-size:12px}
+  .num{text-align:right;font-variant-numeric:tabular-nums}
+  .gate{min-height:100vh;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:14px}
+  .muted{color:var(--tx3);font-size:12px}
+  .banner{padding:10px 12px;border-radius:8px;font-size:13px;margin-bottom:14px}
+  .banner.info{background:rgba(212,101,74,.1);border:1px solid var(--ac);color:var(--ac)}
+  .pill{display:inline-block;padding:2px 8px;border-radius:999px;font-size:11px;background:var(--bg);border:1px solid var(--bd)}
+</style>
+</head>
+<body>
+<div id="gate" class="gate" style="display:none">
+  <b>KOL 分潤後台</b>
+  <button id="loginBtn" class="btn pri">用 Google 登入(限 admin)</button>
+  <div id="errMsg" style="color:#EF4444;font-size:13px"></div>
+</div>
+
+<div id="app" style="display:none">
+  <div class="hd">
+    <b>🎟 KOL 分潤後台</b>
+    <span class="pill" id="meInfo"></span>
+    <span class="sp"></span>
+    <a href="admin.html">← 主後台</a>
+    <a href="#" onclick="logout();return false">登出</a>
+  </div>
+  <div class="wrap">
+
+    <!-- 分潤 / 付款總覽 -->
+    <div class="card">
+      <h2>💰 分潤總覽 · 本期待付款</h2>
+      <div id="payoutBanner"></div>
+      <div id="payoutTable">載入中…</div>
+      <div class="muted" style="margin-top:10px">
+        目前金額為<b>估算</b>:依「目前付費中(active)被推薦人數 × 各人方案首筆利潤 × 抽成%」。
+        精準的「待確認 / 已鎖定可領 / 已付款」與退款扣回、匯款門檻(NT$1,000)、每月結算,待分潤引擎上線後接入此頁。
+      </div>
+    </div>
+
+    <!-- 推薦碼管理 -->
+    <div class="card">
+      <h2>推薦碼管理</h2>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
+        <input id="refCodeNew" placeholder="碼(英數,如 ABC123)" style="flex:1;min-width:120px">
+        <input id="refKolNew" placeholder="KOL 名稱／備註" style="flex:1;min-width:120px">
+        <input id="refCommNew" type="number" min="0" max="100" value="20" title="抽成%(套用在利潤上)" style="width:90px" placeholder="抽成%">
+        <button class="btn pri" onclick="createRefCode()">建立</button>
+      </div>
+      <div id="refCodeMsg" class="muted" style="margin-bottom:8px"></div>
+      <div id="refCodeList">載入中…</div>
+      <div class="muted" style="margin-top:8px">「推薦連結」給網頁受眾;「碼」給 App 受眾(請對方到帳號頁輸入)。「KOL 查詢頁連結」給 KOL 自己看成效。</div>
+    </div>
+
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script>
+const ADMIN_EMAILS = ['stayjpplan@gmail.com', 'abc83327@gmail.com'];
+const fbConfig = { apiKey:"AIzaSyDnmg2XOuvwgE8m8xCF5sS4o0nQYoUplPI", authDomain:"jpnote-1bdd6.firebaseapp.com", projectId:"jpnote-1bdd6", storageBucket:"jpnote-1bdd6.firebasestorage.app", messagingSenderId:"666368174384" };
+if (!firebase.apps.length) firebase.initializeApp(fbConfig);
+try { firebase.firestore().settings({ experimentalAutoDetectLongPolling:true, useFetchStreams:false }); } catch(e){}
+const db = firebase.firestore();
+const auth = firebase.auth();
+const FN_LIST_SUBS = 'https://asia-east1-jpnote-1bdd6.cloudfunctions.net/adminListSubscribers';
+const KOL_PAGE = 'https://stayjp.study/kol.html';
+
+auth.onAuthStateChanged(user => {
+  const gate = document.getElementById('gate'), app = document.getElementById('app');
+  if (!user || !ADMIN_EMAILS.includes((user.email||'').toLowerCase())) {
+    gate.style.display = 'flex'; app.style.display = 'none';
+    if (user && !ADMIN_EMAILS.includes((user.email||'').toLowerCase())) { document.getElementById('errMsg').textContent = user.email+' 不是 admin'; auth.signOut(); }
+    return;
+  }
+  gate.style.display = 'none'; app.style.display = 'block';
+  document.getElementById('meInfo').textContent = user.email;
+  loadAll();
+});
+document.getElementById('loginBtn').onclick = () => {
+  const p = new firebase.auth.GoogleAuthProvider(); p.setCustomParameters({ prompt:'select_account' });
+  auth.signInWithPopup(p).catch(err => { if (err.code==='auth/popup-closed-by-user'||err.code==='auth/cancelled-popup-request') return; document.getElementById('errMsg').textContent='登入失敗:'+err.message; });
+};
+function logout(){ auth.signOut(); location.reload(); }
+
+// ── 抽成試算(與主後台一致)──
+const REF_PLAN_PRICE = { monthly:150, yearly:1490, yearly_early_bird:990, lifetime:2990 };
+const REF_FEE = { app:0.15, web:0.0275 };
+let _allSubs = [];
+function refCommissionFor(code, pct) {
+  if (!pct || !Array.isArray(_allSubs)) return { paid:0, amount:0, total:0 };
+  let paid=0, amount=0, total=0;
+  _allSubs.forEach(s => {
+    if (s.ref_code !== code || s.is_sandbox) return;
+    total++;
+    if (s.status !== 'active') return;
+    paid++;
+    const price = REF_PLAN_PRICE[s.plan] || 0;
+    const fee = s.source === 'app' ? REF_FEE.app : REF_FEE.web;
+    amount += price * (1 - fee) * (pct/100);
+  });
+  return { paid, amount: Math.round(amount), total };
+}
+
+async function loadAll() {
+  // 先抓訂閱者(算歸因/抽成),再畫兩塊
+  try {
+    const t = await auth.currentUser.getIdToken();
+    const res = await fetch(FN_LIST_SUBS, { method:'POST', headers:{ Authorization:'Bearer '+t } });
+    const data = await res.json();
+    _allSubs = (res.ok && data.subscribers) ? data.subscribers : [];
+  } catch(e) { _allSubs = []; }
+  loadRefCodes();
+  loadPayout();
+}
+
+async function loadRefCodes() {
+  const box = document.getElementById('refCodeList');
+  try {
+    const snap = await db.collection('ref_codes').orderBy('created_at','desc').get();
+    if (snap.empty) { box.textContent = '尚無推薦碼。'; return; }
+    box.innerHTML = snap.docs.map(d => { const c=d.data(), code=d.id;
+      const refLink = 'https://stayjp.study/?ref='+code;
+      const kolLink = KOL_PAGE+'?code='+code+'&t='+(c.token||'');
+      const pct = c.commission_pct != null ? c.commission_pct : 20;
+      const comm = refCommissionFor(code, pct);
+      return `<div style="padding:8px 0;border-bottom:1px solid var(--bd)${c.active===false?';opacity:.5':''}">
+        <b>${code}</b> · ${c.kol||''} ${c.active===false?'<span style="color:#EF4444">(停用)</span>':''}
+        <span style="color:var(--tx2);margin-left:6px">抽成 ${pct}% · 帶來 ${comm.total} 人 · 付費 ${comm.paid} 人 · 預估分潤 <b style="color:#16A34A">NT$${comm.amount.toLocaleString()}</b></span>
+        <div style="margin-top:4px;display:flex;gap:6px;flex-wrap:wrap">
+          <button class="btn" style="font-size:11px;padding:3px 8px" onclick="copyTxt('${refLink}')">複製推薦連結</button>
+          <button class="btn" style="font-size:11px;padding:3px 8px" onclick="copyTxt('${kolLink}')">複製 KOL 查詢頁連結</button>
+          <button class="btn" style="font-size:11px;padding:3px 8px" onclick="setRate('${code}',${pct})">改抽成%</button>
+          <button class="btn" style="font-size:11px;padding:3px 8px" onclick="toggleRefCode('${code}',${c.active===false})">${c.active===false?'啟用':'停用'}</button>
+          <button class="btn danger" style="font-size:11px;padding:3px 8px" onclick="deleteRefCode('${code}',${comm.paid})">刪除</button>
+        </div>
+      </div>`; }).join('');
+  } catch(e) { box.textContent = '讀取失敗:'+e.message; }
+}
+
+async function loadPayout() {
+  const box = document.getElementById('payoutTable'), banner = document.getElementById('payoutBanner');
+  try {
+    const snap = await db.collection('ref_codes').get();
+    const rows = [];
+    let grand = 0;
+    snap.forEach(d => { const c=d.data(); const pct=c.commission_pct!=null?c.commission_pct:20; const comm=refCommissionFor(d.id,pct);
+      if (comm.paid>0) { rows.push({ code:d.id, kol:c.kol||'', pct, ...comm }); grand += comm.amount; } });
+    rows.sort((a,b)=>b.amount-a.amount);
+    if (!rows.length) { box.innerHTML = '<div class="muted">目前沒有帶來付費的推薦碼。</div>'; banner.innerHTML=''; return; }
+    banner.className='banner info'; banner.innerHTML = `目前累計預估分潤 <b>NT$${grand.toLocaleString()}</b>(${rows.length} 位 KOL 有付費歸因)。正式制度上線後,滿 NT$1,000 每月 10 號結算並在此提醒你匯款。`;
+    box.innerHTML = `<table><thead><tr><th>KOL</th><th>碼</th><th class="num">帶來</th><th class="num">付費</th><th class="num">抽成%</th><th class="num">預估分潤</th></tr></thead><tbody>`
+      + rows.map(r=>`<tr><td>${r.kol||'—'}</td><td><code>${r.code}</code></td><td class="num">${r.total}</td><td class="num">${r.paid}</td><td class="num">${r.pct}%</td><td class="num"><b style="color:#16A34A">NT$${r.amount.toLocaleString()}</b></td></tr>`).join('')
+      + `<tr><td colspan="5" style="text-align:right;font-weight:700">合計</td><td class="num"><b>NT$${grand.toLocaleString()}</b></td></tr></tbody></table>`;
+  } catch(e){ box.textContent='讀取失敗:'+e.message; }
+}
+
+function createRefCode() {
+  const code = (document.getElementById('refCodeNew').value||'').trim().toUpperCase().replace(/[^A-Z0-9_-]/g,'').slice(0,32);
+  const kol = (document.getElementById('refKolNew').value||'').trim().slice(0,60);
+  const msg = document.getElementById('refCodeMsg');
+  const comm = Math.max(0,Math.min(100,parseInt(document.getElementById('refCommNew').value,10)||20));
+  if (!code) { msg.style.color='#EF4444'; msg.textContent='請輸入碼。'; return; }
+  const ref = db.collection('ref_codes').doc(code);
+  ref.get().then(d => {
+    if (d.exists) { msg.style.color='#EF4444'; msg.textContent='碼已存在:'+code; return; }
+    const token = (crypto.randomUUID?crypto.randomUUID().replace(/-/g,''):(Math.random().toString(36).slice(2)+Math.random().toString(36).slice(2))).slice(0,20);
+    ref.set({ kol, token, active:true, commission_pct:comm, type:'kol', created_at:Date.now() }).then(()=>{
+      msg.style.color='#16A34A'; msg.textContent='✓ 已建立 '+code;
+      document.getElementById('refCodeNew').value=''; document.getElementById('refKolNew').value='';
+      loadRefCodes(); loadPayout();
+    }).catch(e=>{ msg.style.color='#EF4444'; msg.textContent='建立失敗:'+e.message; });
+  });
+}
+function setRate(code, cur) {
+  const v = prompt('設定 '+code+' 的抽成%(0-100):', cur);
+  if (v===null) return;
+  const pct = Math.max(0,Math.min(100,parseInt(v,10)));
+  if (isNaN(pct)) return;
+  db.collection('ref_codes').doc(code).set({ commission_pct:pct },{merge:true}).then(()=>{ loadRefCodes(); loadPayout(); });
+}
+function toggleRefCode(code, activate){ db.collection('ref_codes').doc(code).set({ active:!!activate },{merge:true}).then(()=>{loadRefCodes();loadPayout();}); }
+function deleteRefCode(code, paid){
+  const warn = paid>0?`\n\n⚠ 此碼已有 ${paid} 位付費歸因者,刪除後 KOL 統計頁與即時歸因會失效(歷史交易/抽成仍可從帳本查)。`:'';
+  if (!confirm('刪除推薦碼 '+code+'?此動作不可復原。'+warn)) return;
+  db.collection('ref_codes').doc(code).delete().then(()=>{loadRefCodes();loadPayout();}).catch(e=>{ const m=document.getElementById('refCodeMsg'); m.style.color='#EF4444'; m.textContent='刪除失敗:'+e.message; });
+}
+function copyTxt(t){ (navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(()=>{ const m=document.getElementById('refCodeMsg'); m.style.color='#16A34A'; m.textContent='已複製:'+t; }).catch(()=>{ const m=document.getElementById('refCodeMsg'); m.style.color='var(--tx2)'; m.textContent=t; }); }
+</script>
+</body>
+</html>
