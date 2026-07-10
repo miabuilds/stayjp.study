@@ -16,14 +16,76 @@
 import * as functions from "firebase-functions/v2/https";
 import * as admin from "firebase-admin";
 import axios from "axios";
-import { PLANS, REFUND_POLICY, ecpayConfig, ecpayRefundEndpoint, ECPAY_SECRETS } from "./utils/constants";
+import { PLANS, REFUND_POLICY, ecpayConfig, ecpayRefundEndpoint, ecpayPeriodQueryEndpoint, ecpayPeriodActionEndpoint, ECPAY_SECRETS } from "./utils/constants";
 import { checkMacValue } from "./utils/ecpay";
 import {
   getSubscription, patchSubscription, writeTransaction,
   recordRefund, releaseEarlyBird, getLatestSuccessTradeNo, nowMs, emailHash,
+  voidKolCommission,
 } from "./utils/firestore";
 
 if (admin.apps.length === 0) admin.initializeApp();
+
+// ATM/超商人工退款時,匯回的轉帳手續費(由用戶負擔,從退款額扣)。
+// 依你實際匯款成本調整:線上/eATM 跨行約 NT$15。
+const ATM_REFUND_FEE = 15;
+
+// 定期定額退款前,查該訂單拿到「要退那一期」真正的 TradeNo。
+// 單筆 DoAction 用 callback 首次存的 external_id 對定期定額會回「訂單不存在」,
+// 必須改用 QueryCreditCardPeriodInfo 回傳 ExecLog 內該期的 TradeNo。
+// 查不到(如 lifetime 一次性單、或查詢失敗)→ 回 null,呼叫端 fallback 回帳本存的號碼。
+async function queryPeriodTradeNo(
+  merchantTradeNo: string,
+  cfg: ReturnType<typeof ecpayConfig>,
+): Promise<{ tradeNo: string | null; raw: unknown }> {
+  const params: Record<string, string | number> = {
+    MerchantID: cfg.merchantId,
+    MerchantTradeNo: merchantTradeNo,
+    TimeStamp: Math.floor(Date.now() / 1000),
+  };
+  params.CheckMacValue = checkMacValue(params);
+  const r = await axios.post(
+    ecpayPeriodQueryEndpoint(),
+    new URLSearchParams(params as Record<string, string>).toString(),
+    { headers: { "Content-Type": "application/x-www-form-urlencoded" }, timeout: 30000 },
+  );
+  const data = r.data as {
+    RtnCode?: number; TradeNo?: string;
+    ExecLog?: Array<{ RtnCode?: number; TradeNo?: string; amount?: number; process_date?: string }>;
+  };
+  // 挑「最近一筆成功扣款」的 TradeNo(7 天全退通常只有首期;比例退時退最近一期)
+  const execLog = Array.isArray(data?.ExecLog) ? data.ExecLog : [];
+  const successLogs = execLog.filter(e => Number(e?.RtnCode) === 1 && e?.TradeNo);
+  const picked = successLogs.length ? successLogs[successLogs.length - 1].TradeNo : data?.TradeNo;
+  return { tradeNo: picked ? String(picked) : null, raw: data };
+}
+
+// 退費成功後,停掉定期定額後續授權(CreditCardPeriodAction Action=Cancel,用 MerchantTradeNo)。
+// 不做的話綠界會照約定繼續每期扣款 → 退了錢下期又被扣。
+// 失敗不擋退費(錢已退),但回報讓呼叫端 log,可到綠界後台手動停用。
+async function stopPeriodOrder(
+  merchantTradeNo: string,
+  cfg: ReturnType<typeof ecpayConfig>,
+): Promise<{ ok: boolean; msg: string }> {
+  const params: Record<string, string | number> = {
+    MerchantID: cfg.merchantId,
+    MerchantTradeNo: merchantTradeNo,
+    Action: "Cancel",
+    TimeStamp: Math.floor(Date.now() / 1000),
+  };
+  params.CheckMacValue = checkMacValue(params);
+  try {
+    const r = await axios.post(
+      ecpayPeriodActionEndpoint(),
+      new URLSearchParams(params as Record<string, string>).toString(),
+      { headers: { "Content-Type": "application/x-www-form-urlencoded" }, timeout: 15000 },
+    );
+    const msg = String(r.data);
+    return { ok: /RtnCode=1\b/.test(msg), msg };
+  } catch (e) {
+    return { ok: false, msg: String(e) };
+  }
+}
 
 export const refund = functions.onRequest(
   {
@@ -109,14 +171,62 @@ export const refund = functions.onRequest(
         }
       }
 
-      // 拿最近一筆 success transaction 的 TradeNo(綠界產的交易編號)
-      const tradeNo = await getLatestSuccessTradeNo(uid);
-      if (!tradeNo) {
-        res.status(500).json({ error: "missing_trade_no", reason: "找不到對應的扣款交易,請聯絡客服。" });
-        return;
-      }
       if (!sub.ecpay_order) {
         res.status(500).json({ error: "missing_ecpay_order" });
+        return;
+      }
+
+      // ── ATM / 超商付款:無法信用卡退刷 → 走人工退款 ──
+      // 綠界 ATM/超商是一次性匯款,沒有可退刷的信用卡授權,DoAction 會回「訂單不存在」。
+      // 改成:記一筆退款申請(含原因),由客服人工匯回;轉帳手續費由用戶負擔(從退款額扣)。
+      if (sub.pay_type === "atm" || sub.pay_type === "cvs") {
+        const reason = String(req.body?.reason || "").trim();
+        if (!reason) { res.status(400).json({ error: "reason_required", reason: "請填寫退款原因後再送出。" }); return; }
+        const fee = ATM_REFUND_FEE;
+        const net = Math.max(0, refundAmount - fee);
+        await admin.firestore().collection("refund_requests").add({
+          uid, email, plan: sub.plan, pay_type: sub.pay_type, ecpay_order: sub.ecpay_order,
+          refund_amount: refundAmount, transfer_fee: fee, net_refund: net,
+          reason, refund_policy: refundReason, status: "pending",
+          created_at: admin.firestore.FieldValue.serverTimestamp(),
+        });
+        await writeTransaction({
+          uid, type: "refund", source: "web", plan: sub.plan, amount_twd: 0,
+          payment_method: "ecpay", pay_type: sub.pay_type, external_id: sub.ecpay_order,
+          status: "pending", email_hash: emailHash(email),
+          note: `ATM人工退款申請:退${refundAmount}−手續費${fee}=實退${net};原因:${reason}`,
+        });
+        await patchSubscription(uid, { refund_requested_at: admin.firestore.Timestamp.now() });
+        res.json({
+          ok: true,
+          manual: true,
+          refund_amount: refundAmount,
+          transfer_fee: fee,
+          net_refund: net,
+          message: `你是 ATM 付款,無法自動退刷,將由客服人工匯回。\n\n退款 NT$${refundAmount} − 轉帳手續費 NT$${fee} = 實退 NT$${net}(手續費由您負擔)。\n\n客服會在 3 個工作天內以 email 與你聯繫、確認你的匯款帳戶後轉回。`,
+        });
+        return;
+      }
+
+      // 決定退款要帶的 TradeNo。
+      // 定期定額(訂閱)→ 先查綠界該訂單,取該期真正的 TradeNo(ExecLog);
+      // 查不到(lifetime 一次性單 / 查詢失敗)→ fallback 回帳本存的 external_id。
+      // 這是修「綠界訂閱退費一直回『訂單不存在』」的核心:舊碼直接拿 callback 首存號碼,
+      // 對定期定額不是可退刷的單筆交易號 → 綠界查無此單。
+      const cfg = ecpayConfig();
+      let tradeNo = await getLatestSuccessTradeNo(uid);
+      try {
+        const q = await queryPeriodTradeNo(sub.ecpay_order, cfg);
+        console.log(`ECPay period query (order=${sub.ecpay_order}):`, JSON.stringify(q.raw));
+        if (q.tradeNo) {
+          console.log(`refund: using period TradeNo ${q.tradeNo} (fallback was ${tradeNo})`);
+          tradeNo = q.tradeNo;
+        }
+      } catch (e) {
+        console.error("ECPay period query failed, fallback to stored TradeNo:", e);
+      }
+      if (!tradeNo) {
+        res.status(500).json({ error: "missing_trade_no", reason: "找不到對應的扣款交易,請聯絡客服。" });
         return;
       }
 
@@ -129,7 +239,6 @@ export const refund = functions.onRequest(
       // 不另打查詢 API,改採「依序嘗試、取第一個 RtnCode=1」:
       //   全額退(7 天內)→ R → E → N(任一結算狀態都能退到錢)
       //   部分退(逾 7 天,必已關帳)→ 只用 R(E/N 僅全額,不可用於部分退)
-      const cfg = ecpayConfig();
       const isFullRefund = refundAmount === planInfo.price_twd;
       const actions = isFullRefund ? ["R", "E", "N"] : ["R"];
 
@@ -187,7 +296,17 @@ export const refund = functions.onRequest(
         return;
       }
 
-      // 退費成功 → 更新狀態 + 寫帳本 + 釋放早鳥
+      // 退費成功 → 停掉定期定額後續授權(否則綠界照約定下期又扣款)。
+      // 非 lifetime 才有定期定額;停扣失敗只 log 不擋(錢已退),可到綠界後台手動停用該筆。
+      if (sub.plan !== "lifetime") {
+        const stop = await stopPeriodOrder(sub.ecpay_order, cfg);
+        console.log(`refund: stop period (order=${sub.ecpay_order}) ok=${stop.ok} msg=${stop.msg}`);
+        if (!stop.ok) {
+          console.warn(`refund: 定期定額停扣失敗,需到綠界後台手動停用 ${sub.ecpay_order}: ${stop.msg}`);
+        }
+      }
+
+      // 更新狀態 + 寫帳本 + 釋放早鳥
       await patchSubscription(uid, {
         status: "refunded",
         willRenew: false,
@@ -205,6 +324,9 @@ export const refund = functions.onRequest(
         email_hash: emailHash(email),
         note: `${refundReason}(ECPay Action=${usedAction})`,
       });
+
+      // KOL 分潤 clawback:退款成功 → 該買家分潤作廢
+      await voidKolCommission(uid, "ecpay_refund").catch(e => console.error("voidKolCommission(refund) 略過:", e));
 
       // 早鳥首次訂閱 + 7 天內全退 → 釋放名額(讓下一個 user 可以買早鳥)
       // 釋放後清 is_early_bird flag,確保每個名額最多釋放一次(避免後續 chargeback 重複釋放)

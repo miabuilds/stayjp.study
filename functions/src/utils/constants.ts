@@ -150,3 +150,14 @@ export function ecpayPeriodActionEndpoint() {
     ? "https://payment.ecpay.com.tw/Cashier/CreditCardPeriodAction"
     : "https://payment-stage.ecpay.com.tw/Cashier/CreditCardPeriodAction";
 }
+
+// 定期定額 訂單查詢 — QueryCreditCardPeriodInfo (用 MerchantTradeNo)
+// 回傳 JSON,ExecLog[] 內每期扣款有各自的 TradeNo/gwsr。
+// 退定期定額某一期必須用「該期 ExecLog 的 TradeNo」,不能用 callback 首次存的號碼,
+// 否則單筆 DoAction 會回「訂單不存在」。
+export function ecpayPeriodQueryEndpoint() {
+  const cfg = ecpayConfig();
+  return cfg.isProduction
+    ? "https://payment.ecpay.com.tw/Cashier/QueryCreditCardPeriodInfo"
+    : "https://payment-stage.ecpay.com.tw/Cashier/QueryCreditCardPeriodInfo";
+}

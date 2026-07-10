@@ -50,6 +50,7 @@ export interface SubscriptionDoc {
   paypal_capture?: string;   // PayPal 一次性付款的 capture id;有值 = 來源為 PayPal、退費要用它
   is_early_bird?: boolean;
   is_sandbox?: boolean;        // Apple/Google 沙盒測試購買(非真實付款)→ 後台用來區分測試/真實
+  pay_type?: "credit" | "atm" | "cvs" | "paypal";   // 綠界付款細分:信用卡(可續扣)/ATM/超商(一次性,不續扣)
   refund_requested_at?: admin.firestore.Timestamp;
   failed_retries?: number;
   last_retry_at?: number;
@@ -81,6 +82,122 @@ export async function patchSubscription(
   const subPatch: Record<string, unknown> = {};
   for (const [k, v] of Object.entries(patch)) subPatch[k] = v;
   await db.doc(`users/${uid}`).set({ subscription: subPatch }, { merge: true });
+}
+
+/**
+ * 用戶推薦好友 · 雙向獎勵的「獎推薦人」那半:朋友真實付費後,給碼主(推薦人)+7 天 premium。
+ * 從兩支付款 callback 呼叫(朋友首次真付費點);best-effort、包在 try 外層不影響主流程。
+ * 安全設計:
+ *   - 沙盒 / 匿名 uid → 不發
+ *   - 朋友沒歸因碼 / 該碼非 user 型(KOL 走抽成) → 不發
+ *   - 防自我推薦(owner === friend) → 不發
+ *   - 冪等:朋友 referrer_paid_at 設過就不再發(續訂不重複獎)
+ */
+export async function rewardReferrerOnPayment(friendUid: string, isSandbox: boolean): Promise<void> {
+  if (isSandbox) return;
+  if (typeof friendUid !== "string" || friendUid.startsWith("$RCAnonymousID")) return;
+  const fSnap = await db.doc(`users/${friendUid}`).get();
+  const fd = fSnap.data() || {};
+  const code = fd.ref_code as string | undefined;
+  if (!code || fd.referrer_paid_at) return;
+  const cSnap = await db.doc(`ref_codes/${code}`).get();
+  const c = cSnap.data();
+  if (!c || c.type !== "user") return;                 // 只有用戶個人碼獎碼主;KOL 碼不走這
+  const ownerUid = c.owner_uid as string | undefined;
+  if (!ownerUid || ownerUid === friendUid) return;      // 防自我推薦
+  // 獎推薦人 +7 天(延長或發放 premium);isPremium 認 expiresAt,plan 只是載體
+  const ownerSub = await getSubscription(ownerUid);
+  const base = Math.max(nowMs(), ownerSub?.expiresAt || 0);
+  const patch: Partial<SubscriptionDoc> = { status: "active", expiresAt: base + 7 * 864e5, willRenew: ownerSub?.willRenew ?? false };
+  if (!ownerSub) { patch.plan = "monthly"; patch.source = "web"; patch.startedAt = nowMs(); }
+  await patchSubscription(ownerUid, patch);
+  await writeTransaction({
+    uid: ownerUid, type: "gift", source: "web", plan: ownerSub?.plan || "monthly",
+    amount_twd: 0, payment_method: "manual", external_id: `referral-${friendUid}-${nowMs()}`,
+    status: "success", note: `推薦好友(${friendUid})付費 → 獎勵推薦人 +7 天`,
+  });
+  await db.doc(`users/${friendUid}`).set({ referrer_paid_at: nowMs() }, { merge: true });
+}
+
+// ───── KOL 分潤引擎 ──────────────────────────────────────────────────────
+// commissions/{code_buyerUid}:被推薦人「首筆真實付款」產生一筆分潤紀錄。
+// 狀態:pending(付款,鎖定期內)→ locked(過 30 天無退費,可領)→ paid(已結算匯款);
+//       void = 退費/退單作廢(clawback)。精算金額給後台結算與付款用。
+const COMMISSION_LOCK_DAYS = 30;
+const KOL_FEE = { web: 0.0275, app: 0.15 };   // 綠界 / Apple·Google SBP
+
+export interface CommissionDoc {
+  code: string;
+  owner_uid: string;
+  buyer_uid: string;
+  plan: string;
+  gross_twd: number;
+  fee_twd: number;
+  profit_twd: number;
+  rate?: number;              // 抽成 %(或用 fixed)
+  fixed?: number;             // 議價固定額(設了優先於 rate)
+  amount_twd: number;         // 該筆分潤
+  paid_at: number;            // 被推薦人付款時間
+  lock_at: number;            // 鎖定時間(paid_at + 30d)
+  state: "pending" | "locked" | "void" | "paid";
+  source: string;
+  txn_id: string;
+  created_at: number;
+  void_reason?: string;
+  voided_at?: number;
+  payout_id?: string;
+}
+
+/**
+ * 被推薦人首筆真付款 → 若歸因到 KOL 碼(type:'kol' + 有 owner_uid),產一筆 pending 分潤。
+ * best-effort、冪等(code_buyer);沙盒/試用(gross=0)/續訂/匿名/自我推薦/停權碼 全擋。
+ */
+export async function recordKolCommission(
+  buyerUid: string,
+  opts: { plan: string; gross_twd: number; source: "web" | "app"; txnId: string; isSandbox: boolean; isFirstPayment: boolean },
+): Promise<void> {
+  const { plan, gross_twd, source, txnId, isSandbox, isFirstPayment } = opts;
+  if (isSandbox || !isFirstPayment || !(gross_twd > 0)) return;              // 只算首筆真實付款
+  if (typeof buyerUid !== "string" || buyerUid.startsWith("$RCAnonymousID")) return;
+  const bd = (await db.doc(`users/${buyerUid}`).get()).data() || {};
+  const code = bd.ref_code as string | undefined;
+  if (!code) return;
+  const c = (await db.doc(`ref_codes/${code}`).get()).data();
+  if (!c || c.type === "user") return;                                       // 只有 KOL 碼抽成;個人碼走 +7
+  const ownerUid = c.owner_uid as string | undefined;
+  if (!ownerUid || ownerUid === buyerUid) return;                            // 需可歸屬 + 防自我推薦
+  if (c.status === "suspended") return;                                      // 停權不產生新分潤
+  const ref = db.doc(`commissions/${code}_${buyerUid}`);                     // 冪等:一碼一買家一筆
+  if ((await ref.get()).exists) return;
+  const fee = source === "app" ? KOL_FEE.app : KOL_FEE.web;
+  const profit = Math.round(gross_twd * (1 - fee));
+  const fixed = typeof c.commission_fixed === "number" ? c.commission_fixed : null;
+  const rate = typeof c.commission_pct === "number" ? c.commission_pct : 20;
+  const amount = fixed != null ? Math.max(0, Math.round(fixed)) : Math.max(0, Math.round(profit * rate / 100));
+  const now = nowMs();
+  await ref.set({
+    code, owner_uid: ownerUid, buyer_uid: buyerUid, plan,
+    gross_twd, fee_twd: gross_twd - profit, profit_twd: profit,
+    ...(fixed != null ? { fixed } : { rate }),
+    amount_twd: amount,
+    paid_at: now, lock_at: now + COMMISSION_LOCK_DAYS * 864e5,
+    state: "pending", source, txn_id: txnId, created_at: now,
+  } as CommissionDoc);
+}
+
+/**
+ * 退費 / 退單 → 把該買家的分潤作廢(clawback)。pending/locked/paid 都翻 void;
+ * 已 paid(已匯款給 KOL)的翻 void 後,後台結算會從該 KOL 後續應付扣回。
+ */
+export async function voidKolCommission(buyerUid: string, reason: string): Promise<void> {
+  if (typeof buyerUid !== "string" || !buyerUid) return;
+  const snap = await db.collection("commissions").where("buyer_uid", "==", buyerUid).get();
+  for (const d of snap.docs) {
+    const s = d.data().state;
+    if (s === "pending" || s === "locked" || s === "paid") {
+      await d.ref.set({ state: "void", void_reason: reason || "refund", voided_at: nowMs() }, { merge: true });
+    }
+  }
 }
 
 /**
@@ -116,6 +233,7 @@ export interface TransactionDoc {
   is_sandbox?: boolean;        // Apple/Google 沙盒測試交易(非真實金流)→ 後台對帳要排除
   occurred_at: admin.firestore.Timestamp;
   payment_method: "ecpay" | "apple_iap" | "google_billing" | "manual" | "paypal";
+  pay_type?: "credit" | "atm" | "cvs" | "paypal";   // 綠界細分:信用卡/ATM/超商(儀表板分源、續扣判斷用)
   external_id: string;
   status: "success" | "pending" | "failed" | "refunded";
   invoice_no?: string;

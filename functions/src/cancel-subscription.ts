@@ -63,10 +63,12 @@ export const cancelSubscription = functions.onRequest(
       let ecpayMsg = "";
 
       if (isRecurring && sub.ecpay_order) {
-        // 停止定期定額:CreditCardPeriodAction Action=CancelRevoke
+        // 停止定期定額:CreditCardPeriodAction Action=Cancel
         // 用 MerchantTradeNo(原訂單號,不是 TradeNo)
         const cfg = ecpayConfig();
-        // ECPay CreditCardPeriodAction:Action 只接受 "Cancel" / "ReAuth" / "Re-Pay" / "Refund"
+        // ECPay CreditCardPeriodAction 只支援兩個 Action:
+        //   "Cancel" = 停用後續授權(終止訂閱)、"ReAuth" = 前期授權失敗時重新授權。
+        //   ★ 沒有退款 Action。退定期定額某一期的錢要走 refund.ts(查該期 TradeNo → DoAction 退刷)。
         // 「終止訂閱」用 "Cancel"
         const params: Record<string, string | number> = {
           MerchantID: cfg.merchantId,
