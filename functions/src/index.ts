@@ -25,6 +25,7 @@ export { adminUserStats } from "./admin-user-stats";
 export { kolStats } from "./kol-stats";
 export { validateRefCode } from "./validate-ref-code";
 export { getMyRefCode } from "./get-my-ref-code";
+export { partnerJoin } from "./partner-join";
 export { dailySubAuditCron } from "./daily-sub-audit-cron";
 export { adminFreeAccess } from "./admin-free-access";
 export { adminCleanupPending } from "./admin-cleanup-pending";
