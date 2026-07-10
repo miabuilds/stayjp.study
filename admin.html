@@ -1065,8 +1065,9 @@ async function loadRefCodes() {
   if (!box) return;
   try {
     const snap = await db.collection('ref_codes').orderBy('created_at', 'desc').get();
-    if (snap.empty) { box.textContent = '尚無推薦碼。建立後把「推薦連結」給網頁受眾、把「碼」給 App 受眾(請對方到帳號頁輸入)。'; return; }
-    box.innerHTML = snap.docs.map(d => { const c = d.data(); const code = d.id;
+    const kolDocs = snap.docs.filter(d => (d.data().type || '') !== 'user');   // 排除 type:user 個人碼(非 KOL、無 token)
+    if (!kolDocs.length) { box.textContent = '尚無 KOL 推薦碼。'; return; }
+    box.innerHTML = kolDocs.map(d => { const c = d.data(); const code = d.id;
       const refLink = 'https://stayjp.study/?ref=' + code;
       const kolLink = KOL_PAGE + '?code=' + code + '&t=' + (c.token || '');
       const pct = c.commission_pct != null ? c.commission_pct : 20;
@@ -1076,7 +1077,7 @@ async function loadRefCodes() {
         <span style="color:var(--tx2);margin-left:6px">抽成 ${pct}% · 付費 ${comm.paid} 人 · 預估抽成 <b style="color:#16A34A">NT$${comm.amount.toLocaleString()}</b><span style="color:var(--tx3)">(利潤計,首筆)</span></span>
         <div style="margin-top:4px;display:flex;gap:6px;flex-wrap:wrap">
           <button class="btn" style="font-size:11px;padding:3px 8px" onclick="copyTxt('${refLink}')">複製推薦連結</button>
-          <button class="btn" style="font-size:11px;padding:3px 8px" onclick="copyTxt('${kolLink}')">複製 KOL 查詢頁連結</button>
+          ${c.token ? `<button class="btn" style="font-size:11px;padding:3px 8px" onclick="copyTxt('${kolLink}')">複製 KOL 查詢頁連結</button>` : ''}
           <button class="btn" style="font-size:11px;padding:3px 8px" onclick="toggleRefCode('${code}',${c.active === false})">${c.active === false ? '啟用' : '停用'}</button>
           <button class="btn danger" style="font-size:11px;padding:3px 8px" onclick="deleteRefCode('${code}',${comm.paid})">刪除</button>
         </div>

@@ -142,8 +142,10 @@ async function loadRefCodes() {
   const box = document.getElementById('refCodeList');
   try {
     const snap = await db.collection('ref_codes').orderBy('created_at','desc').get();
-    if (snap.empty) { box.textContent = '尚無推薦碼。'; return; }
-    box.innerHTML = snap.docs.map(d => { const c=d.data(), code=d.id;
+    // 只列 KOL 分潤碼:排除 type:'user' 個人推薦碼(那是用戶帳號頁自己生的 +7 碼,不是 KOL、也無 token)
+    const docs = snap.docs.filter(d => (d.data().type || '') !== 'user');
+    if (!docs.length) { box.textContent = '尚無 KOL 推薦碼。到 partner.html 自助加入,或用上方表單建立。'; return; }
+    box.innerHTML = docs.map(d => { const c=d.data(), code=d.id;
       const refLink = 'https://stayjp.study/?ref='+code;
       const kolLink = KOL_PAGE+'?code='+code+'&t='+(c.token||'');
       const pct = c.commission_pct != null ? c.commission_pct : 20;
@@ -153,7 +155,7 @@ async function loadRefCodes() {
         <span style="color:var(--tx2);margin-left:6px">抽成 ${pct}% · 帶來 ${comm.total} 人 · 付費 ${comm.paid} 人 · 預估分潤 <b style="color:#16A34A">NT$${comm.amount.toLocaleString()}</b></span>
         <div style="margin-top:4px;display:flex;gap:6px;flex-wrap:wrap">
           <button class="btn" style="font-size:11px;padding:3px 8px" onclick="copyTxt('${refLink}')">複製推薦連結</button>
-          <button class="btn" style="font-size:11px;padding:3px 8px" onclick="copyTxt('${kolLink}')">複製 KOL 查詢頁連結</button>
+          ${c.token ? `<button class="btn" style="font-size:11px;padding:3px 8px" onclick="copyTxt('${kolLink}')">複製 KOL 查詢頁連結</button>` : '<span style="font-size:11px;color:var(--tx3)">(無 token,不提供查詢頁)</span>'}
           <button class="btn" style="font-size:11px;padding:3px 8px" onclick="setRate('${code}',${pct})">改抽成%</button>
           <button class="btn" style="font-size:11px;padding:3px 8px" onclick="toggleRefCode('${code}',${c.active===false})">${c.active===false?'啟用':'停用'}</button>
           <button class="btn danger" style="font-size:11px;padding:3px 8px" onclick="deleteRefCode('${code}',${comm.paid})">刪除</button>
@@ -168,7 +170,8 @@ async function loadPayout() {
     const snap = await db.collection('ref_codes').get();
     const rows = [];
     let grand = 0;
-    snap.forEach(d => { const c=d.data(); const pct=c.commission_pct!=null?c.commission_pct:20; const comm=refCommissionFor(d.id,pct);
+    snap.forEach(d => { const c=d.data(); if ((c.type||'') === 'user') return;   // 只算 KOL 分潤碼
+      const pct=c.commission_pct!=null?c.commission_pct:20; const comm=refCommissionFor(d.id,pct);
       if (comm.paid>0) { rows.push({ code:d.id, kol:c.kol||'', pct, ...comm }); grand += comm.amount; } });
     rows.sort((a,b)=>b.amount-a.amount);
     if (!rows.length) { box.innerHTML = '<div class="muted">目前沒有帶來付費的推薦碼。</div>'; banner.innerHTML=''; return; }
