@@ -9,7 +9,7 @@ import * as admin from "firebase-admin";
 import { PLANS, PlanKey } from "./utils/constants";
 import {
   getSubscription, writeSubscription, patchSubscription, writeTransaction,
-  nowMs, SubscriptionDoc,
+  nowMs, SubscriptionDoc, voidKolCommission,
 } from "./utils/firestore";
 
 if (admin.apps.length === 0) admin.initializeApp();
@@ -94,6 +94,8 @@ export const adminSetSubscription = functions.onRequest(
           payment_method: "manual", external_id: `admin-revoke-${nowMs()}`,
           status: "success", note: `manual admin revoke (立即收回) by ${decoded.email}`,
         });
+        // 立即停用=退費後收回 → 這筆付款沒留住,KOL 分潤 clawback
+        await voidKolCommission(uid, "admin_revoke").catch(e => console.error("voidKolCommission(revoke) 略過:", e));
       } else if (action === "extend") {
         const days = Number(req.body?.days || 0);
         if (!days || days <= 0) { res.status(400).json({ error: "invalid_days" }); return; }
