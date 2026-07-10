@@ -186,6 +186,7 @@ a:hover{text-decoration:underline}
     <div style="display:flex;gap:8px">
       <input id="refInput" placeholder="推薦碼" autocapitalize="characters" style="flex:1;padding:9px 11px;border:1px solid var(--bd);border-radius:9px;background:var(--bg);color:var(--tx);font-size:14px;text-transform:uppercase">
       <button type="button" onclick="applyRefCode()" style="white-space:nowrap;padding:9px 18px;border-radius:9px;border:none;background:var(--ac);color:#fff;font-weight:600;cursor:pointer">套用</button>
+      <button type="button" id="refClear" onclick="clearRefCode()" style="display:none;white-space:nowrap;padding:9px 14px;border-radius:9px;border:1px solid var(--bd);background:var(--bg);color:var(--tx2);cursor:pointer">清除</button>
     </div>
     <div id="refMsg" style="font-size:12px;margin-top:6px;color:var(--tx3)"></div>
   </div>
@@ -507,9 +508,10 @@ function applyRefCode() {
     if (!u) { msg.style.color = '#16A34A'; msg.textContent = label.replace('已套用', '已記住').replace('付費訂閱成功後', '登入並付費後'); return; }
     const ref = _db.doc('users/' + u.uid);
     ref.get().then(d => {
-      const cur = d.exists && d.data() ? d.data().ref_code : '';
-      if (cur) { msg.style.color = 'var(--tx3)'; document.getElementById('refInput').value = cur; document.getElementById('refInput').disabled = true; msg.textContent = '已套用推薦碼:' + cur + '(每人限一次,不可更改)'; return; }
-      ref.set({ ref_code: raw, ref_at: Date.now() }, { merge: true }).then(() => { msg.style.color = '#16A34A'; msg.textContent = label; }).catch(() => { msg.style.color = '#EF4444'; msg.textContent = '套用失敗,請稍後再試。'; });
+      const dd = d.exists && d.data() ? d.data() : {};
+      // 只有「已發放 7 天好康」才鎖定;發放前可更改(修打錯/測試碼)
+      if (dd.ref_code && dd.ref_bonus_at) { msg.style.color = 'var(--tx3)'; document.getElementById('refInput').value = dd.ref_code; document.getElementById('refInput').disabled = true; msg.textContent = '已套用推薦碼:' + dd.ref_code + '(好康已發放,不可更改)'; return; }
+      ref.set({ ref_code: raw, ref_at: Date.now() }, { merge: true }).then(() => { msg.style.color = '#16A34A'; msg.textContent = label; const clr = document.getElementById('refClear'); if (clr) clr.style.display = 'inline-block'; }).catch(() => { msg.style.color = '#EF4444'; msg.textContent = '套用失敗,請稍後再試。'; });
     }).catch(() => { msg.style.color = '#EF4444'; msg.textContent = '讀取失敗,請稍後再試。'; });
   };
   fetch(VALIDATE_URL + '?code=' + encodeURIComponent(raw)).then(r => r.json()).then(v => {
@@ -518,13 +520,29 @@ function applyRefCode() {
     else { msg.style.color = '#EF4444'; msg.textContent = '查無此推薦碼,請確認後再輸入。'; }
   }).catch(() => writeFor('已套用 ' + raw + '(暫時無法驗證)'));
 }
+// 清除推薦碼:發放 7 天好康前可清(修打錯/測試碼);已發放則鎖定
+function clearRefCode() {
+  const msg = document.getElementById('refMsg');
+  const done = () => { const inp = document.getElementById('refInput'), clr = document.getElementById('refClear'); if (inp) { inp.value = ''; inp.disabled = false; } if (clr) clr.style.display = 'none'; if (msg) { msg.style.color = '#16A34A'; msg.textContent = '✓ 已清除,可重新輸入推薦碼。'; } };
+  try { localStorage.removeItem('stayjp_ref'); } catch (e) {}
+  const u = _auth.currentUser;
+  if (!u) { done(); return; }
+  const ref = _db.doc('users/' + u.uid);
+  ref.get().then(d => {
+    const dd = d.data() || {};
+    if (dd.ref_bonus_at) { if (msg) { msg.style.color = 'var(--tx3)'; msg.textContent = '7 天好康已發放,無法清除。'; } return; }
+    ref.update({ ref_code: firebase.firestore.FieldValue.delete(), ref_at: firebase.firestore.FieldValue.delete() }).then(done).catch(() => { if (msg) { msg.style.color = '#EF4444'; msg.textContent = '清除失敗,請稍後再試。'; } });
+  });
+}
 // 登入後同步:已有碼→鎖定顯示;沒碼但進站帶了 ?ref=→首次寫進 users/{uid}(確保付款前已在文件上,後端才發得到 +7)
 function syncRefCode(data) {
   try {
     const inp = document.getElementById('refInput'), m = document.getElementById('refMsg');
     if (data.ref_code) {
-      if (inp) { inp.value = data.ref_code; inp.disabled = true; }
-      if (m) { m.style.color = 'var(--tx3)'; m.textContent = '已套用推薦碼:' + data.ref_code + (data.ref_bonus_at ? '(7 天好康已發放 ✓)' : '(付費後自動多送 7 天)'); }
+      const rewarded = !!data.ref_bonus_at;   // 已發放 → 鎖定;否則可改/可清
+      if (inp) { inp.value = data.ref_code; inp.disabled = rewarded; }
+      const clr = document.getElementById('refClear'); if (clr) clr.style.display = rewarded ? 'none' : 'inline-block';
+      if (m) { m.style.color = 'var(--tx3)'; m.textContent = rewarded ? ('已套用推薦碼:' + data.ref_code + '(7 天好康已發放 ✓,不可更改)') : ('目前推薦碼:' + data.ref_code + '(付費後多送 7 天;發放前可更改或清除)'); }
       return;
     }
     const pending = localStorage.getItem('stayjp_ref');
