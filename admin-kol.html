@@ -88,6 +88,7 @@ try { firebase.firestore().settings({ experimentalAutoDetectLongPolling:true, us
 const db = firebase.firestore();
 const auth = firebase.auth();
 const FN_LIST_SUBS = 'https://asia-east1-jpnote-1bdd6.cloudfunctions.net/adminListSubscribers';
+const FN_SETTLE = 'https://asia-east1-jpnote-1bdd6.cloudfunctions.net/adminSettleKolPayout';
 const KOL_PAGE = 'https://stayjp.study/kol.html';
 
 auth.onAuthStateChanged(user => {
@@ -169,7 +170,8 @@ async function loadPayout() {
   try {
     // 讀真實分潤紀錄(commissions)+ ref_codes 名稱對照
     const [csnap, rsnap] = await Promise.all([ db.collection('commissions').get(), db.collection('ref_codes').get() ]);
-    const nameByCode = {}; rsnap.forEach(d => { nameByCode[d.id] = d.data().kol || ''; });
+    const nameByCode = {}, payByCode = {}; rsnap.forEach(d => { const c = d.data(); nameByCode[d.id] = c.kol || ''; payByCode[d.id] = c.payout || null; });
+    const payStr = p => !p ? '<span style="color:var(--tx3)">未填收款</span>' : ((p.method === 'paypal' ? 'PayPal ' : '銀行 ') + (p.account || '(未填帳號)'));
     const g = {};   // code → { pending, locked, paid }
     csnap.forEach(d => { const c = d.data(); const code = c.code || '?'; const st = c.state || 'pending'; const a = Number(c.amount_twd) || 0;
       const r = g[code] = g[code] || { pending:0, locked:0, paid:0 }; if (r[st] != null) r[st] += a; });
@@ -183,12 +185,24 @@ async function loadPayout() {
     banner.innerHTML = tL > 0
       ? `🔔 本期<b>可結算(已鎖定)NT$${tL.toLocaleString()}</b>,其中滿 NT$1,000 該匯款:<b>${due.length}</b> 位。待確認(鎖定期內)NT$${tP.toLocaleString()}、累計已付款 NT$${tPaid.toLocaleString()}。`
       : `待確認(鎖定期內)NT$${tP.toLocaleString()};尚無已鎖定可領金額。累計已付款 NT$${tPaid.toLocaleString()}。`;
-    box.innerHTML = `<table><thead><tr><th>KOL</th><th>碼</th><th class="num">待確認</th><th class="num">可領(鎖定)</th><th class="num">已付款</th></tr></thead><tbody>`
-      + rows.map(r => `<tr><td>${r.kol||'—'}</td><td><code>${r.code}</code></td><td class="num" style="color:var(--tx2)">NT$${r.pending.toLocaleString()}</td><td class="num"><b style="color:${r.locked>=1000?'#16A34A':'var(--tx2)'}">NT$${r.locked.toLocaleString()}</b>${r.locked>=1000?' 🔔':''}</td><td class="num" style="color:var(--tx3)">NT$${r.paid.toLocaleString()}</td></tr>`).join('')
-      + `<tr><td colspan="2" style="text-align:right;font-weight:700">合計</td><td class="num">NT$${tP.toLocaleString()}</td><td class="num"><b>NT$${tL.toLocaleString()}</b></td><td class="num">NT$${tPaid.toLocaleString()}</td></tr></tbody></table>`;
+    box.innerHTML = `<table><thead><tr><th>KOL</th><th>碼</th><th class="num">待確認</th><th class="num">可領(鎖定)</th><th class="num">已付款</th><th>收款 / 結算</th></tr></thead><tbody>`
+      + rows.map(r => `<tr><td>${r.kol||'—'}</td><td><code>${r.code}</code></td><td class="num" style="color:var(--tx2)">NT$${r.pending.toLocaleString()}</td><td class="num"><b style="color:${r.locked>=1000?'#16A34A':'var(--tx2)'}">NT$${r.locked.toLocaleString()}</b>${r.locked>=1000?' 🔔':''}</td><td class="num" style="color:var(--tx3)">NT$${r.paid.toLocaleString()}</td><td style="font-size:12px">${payStr(payByCode[r.code])}${r.locked>0?` <button class="btn" style="font-size:11px;padding:3px 8px;margin-left:6px" onclick="settleKol('${r.code}',${r.locked})">標記已付款</button>`:''}</td></tr>`).join('')
+      + `<tr><td colspan="2" style="text-align:right;font-weight:700">合計</td><td class="num">NT$${tP.toLocaleString()}</td><td class="num"><b>NT$${tL.toLocaleString()}</b></td><td class="num">NT$${tPaid.toLocaleString()}</td><td></td></tr></tbody></table>`;
   } catch(e){ box.textContent='讀取失敗:'+e.message; }
 }
 
+async function settleKol(code, locked) {
+  if (!confirm('確認你已把 ' + code + ' 的可領分潤 NT$' + Number(locked).toLocaleString() + ' 匯款給對方了嗎?\n\n按確定 = 標記已付款(建立結算紀錄、把這些分潤轉「已付款」、並自動扣抵任何退款負債)。實際匯款請先自行完成。')) return;
+  try {
+    const t = await auth.currentUser.getIdToken();
+    const r = await fetch(FN_SETTLE, { method: 'POST', headers: { 'Authorization': 'Bearer ' + t, 'Content-Type': 'application/json' }, body: JSON.stringify({ code }) });
+    const d = await r.json();
+    if (!r.ok || !d.ok) { alert('結算失敗:' + (d.error || r.status)); return; }
+    if (d.nothing) alert('此碼目前沒有可結算的分潤。');
+    else alert('✓ 已結算 ' + code + ':' + d.count + ' 筆,淨額 NT$' + Number(d.net_twd || 0).toLocaleString() + (d.clawback_twd ? '(已扣退款負債 NT$' + Number(d.clawback_twd).toLocaleString() + ')' : ''));
+    loadPayout();
+  } catch (e) { alert('結算失敗:' + e.message); }
+}
 function createRefCode() {
   const code = (document.getElementById('refCodeNew').value||'').trim().toUpperCase().replace(/[^A-Z0-9_-]/g,'').slice(0,32);
   const kol = (document.getElementById('refKolNew').value||'').trim().slice(0,60);
