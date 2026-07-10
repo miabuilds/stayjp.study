@@ -528,6 +528,12 @@ function syncRefCode(data) {
       return;
     }
     const pending = localStorage.getItem('stayjp_ref');
+    // 預防投機:不能歸因到自己的碼(個人碼 my_ref_code / KOL 碼 kol_code)→ 自我推薦刷分潤/刷 7 天擋掉
+    if (pending && (pending === data.my_ref_code || pending === data.kol_code)) {
+      try { localStorage.removeItem('stayjp_ref'); } catch (e) {}
+      if (m) { m.style.color = 'var(--tx3)'; m.textContent = '這是你自己的推薦碼,請分享給別人 🙂'; }
+      return;
+    }
     if (pending && _auth.currentUser) {
       _db.doc('users/' + _auth.currentUser.uid).set({ ref_code: pending, ref_at: Date.now() }, { merge: true }).catch(() => {});
       if (inp && !inp.value) inp.value = pending;

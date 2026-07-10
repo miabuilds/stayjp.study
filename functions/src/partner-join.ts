@@ -29,8 +29,20 @@ export const partnerJoin = functions.onRequest(
     try {
       const idToken = (req.headers.authorization || "").replace(/^Bearer\s+/i, "");
       if (!idToken) { res.status(401).json({ error: "missing_auth" }); return; }
-      const decoded = await admin.auth().verifyIdToken(idToken);
+      // 驗證失敗是「授權問題」→ 回 401,不要當成 500 內部錯誤(防呆:壞/過期 token 有明確語意)
+      let decoded: admin.auth.DecodedIdToken;
+      try {
+        decoded = await admin.auth().verifyIdToken(idToken);
+      } catch {
+        res.status(401).json({ error: "invalid_auth" });
+        return;
+      }
       const uid = decoded.uid;
+      // 防呆:匿名 / 非正常帳號不得申請(避免拋棄式帳號批量刷碼)
+      if (!uid || typeof uid !== "string" || uid.startsWith("$RCAnonymousID") || decoded.firebase?.sign_in_provider === "anonymous") {
+        res.status(403).json({ error: "login_required", reason: "請用 Google/Apple 帳號登入後再加入。" });
+        return;
+      }
 
       const body = req.body || {};
       const agree = body.agree === true || body.agree === "true";
@@ -38,9 +50,10 @@ export const partnerJoin = functions.onRequest(
       const userRef = db.doc(`users/${uid}`);
       const u = (await userRef.get()).data() || {};
 
-      // 已有 KOL 碼 → 回既有(冪等)
+      // 已有 KOL 碼 → 回既有(冪等)。被停權者不還碼、明確擋(預防投機:停權後不能繼續拿新歸因)
       if (u.kol_code) {
         const ex = (await db.doc(`ref_codes/${u.kol_code}`).get()).data() || {};
+        if (ex.status === "suspended") { res.status(403).json({ error: "suspended", reason: "你的合作資格已被暫停,請聯絡我們。" }); return; }
         res.json({ code: u.kol_code, token: ex.token || "", commission_pct: ex.commission_pct ?? DEFAULT_COMMISSION_PCT });
         return;
       }
