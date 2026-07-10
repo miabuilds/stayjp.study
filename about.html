@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>關於 StayJP — 免費 JLPT N5–N1 學習工具｜日本再留計劃</title>
+<meta name="description" content="StayJP(日本再留計劃)是免費的 JLPT N5–N1 學習網站:7,710 單字卡附例句、382 文法點、線上模擬考、SRS 間隔複習。網頁與 iOS App 皆可用。">
+<style>
+  :root{ --bg:#F6F4EF;--bg2:#FFFFFF;--tx:#2C2C2C;--tx2:#6B6B6B;--tx3:#9A9A9A;--ac:#C6553B;--ac2:#D4654A;--bd:#E7E3DC;--good:#2E7D57;--serif:"Noto Serif TC","Songti TC",serif; }
+  @media (prefers-color-scheme:dark){ :root{ --bg:#161615;--bg2:#211F1D;--tx:#EDEBE7;--tx2:#A7A29B;--tx3:#6E6A64;--ac:#E8734A;--ac2:#E8734A;--bd:#332F2B;--good:#7FC7A0; }}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--tx);font-family:-apple-system,"PingFang TC","Noto Sans TC",sans-serif;line-height:1.75;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:760px;margin:0 auto;padding:0 22px}
+  header{display:flex;align-items:center;gap:12px;padding:16px 0}
+  header .logo{font-family:var(--serif);font-weight:700;font-size:18px}
+  header .sp{flex:1}
+  header a,.langbtn{color:var(--tx2);text-decoration:none;font-size:14px;background:none;border:0;cursor:pointer;font-family:inherit}
+  .langbtn{border:1px solid var(--bd);border-radius:999px;padding:5px 12px;color:var(--tx)}
+  .hero{padding:40px 0 20px}
+  .eyebrow{color:var(--ac);font-weight:700;font-size:13px;letter-spacing:.12em;text-transform:uppercase}
+  h1{font-family:var(--serif);font-size:clamp(28px,5.5vw,42px);line-height:1.2;margin:12px 0 14px;text-wrap:balance}
+  .lead{color:var(--tx2);font-size:17px;max-width:600px}
+  section{padding:26px 0;border-top:1px solid var(--bd)}
+  h2{font-family:var(--serif);font-size:23px;margin-bottom:14px}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media(max-width:560px){.grid{grid-template-columns:1fr}}
+  .feat{background:var(--bg2);border:1px solid var(--bd);border-radius:14px;padding:18px}
+  .feat .ic{font-size:22px}
+  .feat h3{font-size:16px;margin:8px 0 4px}
+  .feat p{font-size:14px;color:var(--tx2)}
+  ul.who{list-style:none;display:grid;gap:8px}
+  ul.who li{padding-left:24px;position:relative;color:var(--tx)}
+  ul.who li::before{content:"›";position:absolute;left:4px;color:var(--ac);font-weight:800}
+  .cols{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media(max-width:560px){.cols{grid-template-columns:1fr}}
+  .plan{border:1px solid var(--bd);border-radius:14px;padding:18px;background:var(--bg2)}
+  .plan.free{border-color:var(--good)}
+  .plan h3{font-size:16px;margin-bottom:8px}
+  .plan .price{font-size:13px;color:var(--tx3);margin-bottom:8px}
+  .plan p{font-size:14px;color:var(--tx2)}
+  .cta{display:flex;gap:12px;flex-wrap:wrap;margin-top:8px}
+  .btn{display:inline-flex;align-items:center;gap:8px;background:var(--ac);color:#fff;border-radius:100px;padding:13px 26px;font-size:15px;font-weight:600;text-decoration:none}
+  .btn.sec{background:transparent;color:var(--ac);border:1.5px solid var(--ac)}
+  .btn:hover{background:var(--ac2)}
+  footer{padding:34px 0;text-align:center;color:var(--tx3);font-size:13px;border-top:1px solid var(--bd);margin-top:20px}
+  footer a{color:var(--tx2)}
+  [data-t]{display:none}
+  body[data-lang="zh"] [data-t="zh"]{display:revert}
+  body[data-lang="en"] [data-t="en"]{display:revert}
+  .stat-row{display:flex;gap:22px;flex-wrap:wrap;margin-top:18px}
+  .stat b{font-family:var(--serif);font-size:26px;color:var(--ac);display:block}
+  .stat span{font-size:13px;color:var(--tx2)}
+</style>
+</head>
+<body data-lang="zh">
+<div class="wrap">
+  <header>
+    <span class="logo" data-t="zh">日本再留計劃</span><span class="logo" data-t="en">StayJP</span>
+    <span class="sp"></span>
+    <a href="home.html" data-t="zh">首頁</a><a href="home.html" data-t="en">Home</a>
+    <button class="langbtn" onclick="toggleLang()"><span data-t="zh">EN</span><span data-t="en">中文</span></button>
+  </header>
+
+  <div class="hero">
+    <div class="eyebrow">About</div>
+    <h1><span data-t="zh">用得起、學得完的<br>JLPT N5–N1 學習工具</span><span data-t="en">A free, complete<br>JLPT N5–N1 study tool</span></h1>
+    <p class="lead"><span data-t="zh">StayJP(日本再留計劃)是一個免費的日文學習網站與 App。從五十音之後到 N1,單字、文法、模考、複習一站搞定——大部分功能免費就能用。</span><span data-t="en">StayJP is a free Japanese-learning website and app. From beyond kana all the way to N1 — vocabulary, grammar, mock exams, and spaced review in one place. Most of it is free to use.</span></p>
+    <div class="stat-row">
+      <div class="stat"><b>7,710</b><span data-t="zh">單字(附例句)</span><span data-t="en">words (with examples)</span></div>
+      <div class="stat"><b>382</b><span data-t="zh">文法點</span><span data-t="en">grammar points</span></div>
+      <div class="stat"><b>N5–N1</b><span data-t="zh">全等級</span><span data-t="en">all levels</span></div>
+    </div>
+  </div>
+
+  <section>
+    <h2><span data-t="zh">你可以做什麼</span><span data-t="en">What you can do</span></h2>
+    <div class="grid">
+      <div class="feat"><div class="ic">🗂️</div><h3><span data-t="zh">單字卡 + 例句</span><span data-t="en">Vocab cards + examples</span></h3><p><span data-t="zh">7,710 個單字,每個都有日文例句與中／英翻譯,點卡片就能聽發音。</span><span data-t="en">7,710 words, each with a Japanese example sentence and translation. Tap a card to hear it.</span></p></div>
+      <div class="feat"><div class="ic">📐</div><h3><span data-t="zh">文法 + 例句</span><span data-t="en">Grammar + examples</span></h3><p><span data-t="zh">382 個文法點,接續、語感、例句都講清楚,點例句方框就唸出來。</span><span data-t="en">382 grammar points with clear usage notes and example sentences you can tap to hear.</span></p></div>
+      <div class="feat"><div class="ic">📝</div><h3><span data-t="zh">線上模擬考</span><span data-t="en">Mock exams</span></h3><p><span data-t="zh">各等級模擬考,考完看成績、還能分享成績卡。</span><span data-t="en">Level-based mock exams with scores and a shareable result card.</span></p></div>
+      <div class="feat"><div class="ic">🔁</div><h3><span data-t="zh">SRS 間隔複習</span><span data-t="en">Spaced repetition</span></h3><p><span data-t="zh">系統依你的記憶曲線安排複習,不熟的多見幾次。</span><span data-t="en">Reviews are scheduled to your memory curve — you see weak items more often.</span></p></div>
+      <div class="feat"><div class="ic">🔀</div><h3><span data-t="zh">易混淆詞比較</span><span data-t="en">Confusable words</span></h3><p><span data-t="zh">把容易搞混的近義詞擺一起比較,附例句。</span><span data-t="en">Easily-confused words compared side by side, with examples.</span></p></div>
+      <div class="feat"><div class="ic">🎧</div><h3><span data-t="zh">跟讀發音</span><span data-t="en">Shadowing</span></h3><p><span data-t="zh">跟著唸例句練發音與語調。</span><span data-t="en">Read along with example sentences to practice pronunciation.</span></p></div>
+    </div>
+  </section>
+
+  <section>
+    <h2><span data-t="zh">適合誰</span><span data-t="en">Who it's for</span></h2>
+    <ul class="who">
+      <li><span data-t="zh">準備 JLPT 日檢的考生(N5 到 N1)</span><span data-t="en">Anyone preparing for the JLPT (N5 to N1)</span></li>
+      <li><span data-t="zh">想去日本留學、工作、長住的人</span><span data-t="en">People planning to study, work, or live in Japan</span></li>
+      <li><span data-t="zh">喜歡動漫、日劇、旅遊,想看懂原文的人</span><span data-t="en">Fans of anime, drama, or travel who want to understand the original</span></li>
+      <li><span data-t="zh">自學者——不用報班,零碎時間就能背</span><span data-t="en">Self-learners — no class needed, study in spare moments</span></li>
+    </ul>
+  </section>
+
+  <section>
+    <h2><span data-t="zh">免費 vs. Premium</span><span data-t="en">Free vs. Premium</span></h2>
+    <div class="cols">
+      <div class="plan free"><h3><span data-t="zh">免費</span><span data-t="en">Free</span></h3><div class="price" data-t="zh">無需信用卡</div><div class="price" data-t="en">No card required</div><p><span data-t="zh">瀏覽全部單字/文法內容,每個練習工具每天免費使用,模考每等級一套。</span><span data-t="en">Browse all vocabulary & grammar, use each practice tool free every day, and one mock exam per level.</span></p></div>
+      <div class="plan"><h3>Premium</h3><div class="price" data-t="zh">解鎖無限次</div><div class="price" data-t="en">Unlimited access</div><p><span data-t="zh">所有練習工具無限次、模考無限、進階功能全開。支持我們繼續免費開放給更多人。</span><span data-t="en">Unlimited practice, unlimited mock exams, and all advanced features — while keeping the core free for everyone.</span></p></div>
+    </div>
+  </section>
+
+  <section>
+    <h2><span data-t="zh">怎麼開始</span><span data-t="en">How to start</span></h2>
+    <p style="color:var(--tx2);margin-bottom:14px"><span data-t="zh">網頁打開就能用,或下載 iOS App 隨身背。用 Google 帳號登入即可同步進度,還送免費試用。</span><span data-t="en">Use it right in your browser, or get the iOS app to study anywhere. Sign in with Google to sync your progress — a free trial is included.</span></p>
+    <div class="cta">
+      <a class="btn" href="index.html"><span data-t="zh">在網頁上使用 →</span><span data-t="en">Use on the web →</span></a>
+      <a class="btn sec" href="https://apps.apple.com/app/id6778227353"><span data-t="zh">下載 iOS App</span><span data-t="en">Download iOS App</span></a>
+    </div>
+  </section>
+
+  <footer>
+    日本再留計劃 (StayJP) ·
+    <a href="home.html" data-t="zh">首頁</a><a href="home.html" data-t="en">Home</a> ·
+    <a href="pricing.html" data-t="zh">方案</a><a href="pricing.html" data-t="en">Pricing</a> ·
+    <a href="partner.html" data-t="zh">合作分潤</a><a href="partner.html" data-t="en">Partner</a> ·
+    <a href="contact.html" data-t="zh">聯絡</a><a href="contact.html" data-t="en">Contact</a>
+  </footer>
+</div>
+<script>
+  function setLang(l){ document.body.setAttribute('data-lang', l); document.documentElement.lang = l==='en'?'en':'zh-Hant'; try{ localStorage.setItem('stayjp_about_lang', l); }catch(e){} }
+  function toggleLang(){ setLang(document.body.getAttribute('data-lang')==='zh'?'en':'zh'); }
+  (function(){
+    var saved; try{ saved = localStorage.getItem('stayjp_about_lang'); }catch(e){}
+    if(saved){ setLang(saved); }
+    else { setLang((navigator.language||'').toLowerCase().indexOf('zh')===0 ? 'zh' : 'en'); }
+  })();
+</script>
+</body>
+</html>
