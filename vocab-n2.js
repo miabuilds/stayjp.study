@@ -1881,7 +1881,7 @@ const VOCAB_N2 = [
 {w:"共有する",r:"きょうゆうする",m:"共有",c:"動",t:"他",ex:{j:"チーム全員が同じ目標を共有することで、作業の効率は格段に上がった。",z:"透過全體隊員共有同一個目標,作業效率顯著提升了。",e:"By having the entire team share the same goal, work efficiency improved dramatically."}},
 {w:"占有する",r:"せんゆうする",m:"佔有",c:"動",t:"他",ex:{j:"一部の大企業が市場の大半を占有している状況が長年続いている。",z:"少數大企業佔有市場大半的狀況已持續多年。",e:"A situation in which a few large corporations occupy most of the market has continued for many years."}},
 {w:"独占する",r:"どくせんする",m:"獨佔",c:"動",t:"他",ex:{j:"その会社は独自の技術によって、業界のシェアをほぼ独占している。",z:"那家公司憑藉獨家技術,幾乎獨佔了業界的市佔率。",e:"Through its proprietary technology, that company almost monopolizes the industry's market share."}},
-{w:"支障する",r:"ししょうする",m:"妨礙",c:"動",t:"自",ex:{j:"睡眠不足が続くと、日常の業務に支障をきたすことも少なくない。",z:"若持續睡眠不足,也不乏妨礙到日常業務的情況。",e:"When lack of sleep persists, it not infrequently causes hindrance to daily work.",rv:1}},
+{w:"支障",r:"ししょう",m:"妨礙;障礙",c:"名",ex:{j:"睡眠不足が続くと、日常の業務に支障をきたすことも少なくない。",z:"若持續睡眠不足,也不乏妨礙到日常業務的情況。",e:"When lack of sleep persists, it not infrequently causes hindrance to daily work."}},
 {w:"妨害する",r:"ぼうがいする",m:"妨害",c:"動",t:"他",ex:{j:"反対派が議事の進行を妨害したため、審議は一時中断された。",z:"由於反對派妨害了議事的進行,審議一度中斷。",e:"Because the opposition obstructed the proceedings, the deliberation was temporarily suspended."}},
 {w:"阻止する",r:"そしする",m:"阻止",c:"動",t:"他",ex:{j:"警察は非合法な集会を未然に阻止するべく、周辺を厳重に警戒した。",z:"警方為了防患未然地阻止非法集會,嚴密戒備周邊。",e:"The police kept strict watch on the surroundings in order to prevent the illegal gathering before it could occur."}},
 {w:"遮断する",r:"しゃだんする",m:"遮斷",c:"動",t:"他",ex:{j:"事故発生に伴い、当該区間への電力の供給が一時的に遮断された。",z:"隨著事故發生,對該區段的電力供應一度被遮斷。",e:"Following the accident, the power supply to the section in question was temporarily cut off."}},

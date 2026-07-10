@@ -1918,7 +1918,7 @@ const VOCAB_N3 = [
 {w:"呆気ない",r:"あっけない",m:"不過癮的",c:"い形",ex:{j:"あんなに練習したのに、試合は呆気なく負けてしまった。",z:"明明練習了那麼久,比賽卻草草地就輸掉了。",e:"After all that practice, we lost the match in an anticlimactic instant."}},
 {w:"手堅い",r:"てがたい",m:"穩妥的",c:"い形",ex:{j:"彼は冒険をせず、いつも手堅い方法で仕事を進める。",z:"他不冒險,總是用穩妥的方法推進工作。",e:"He doesn't take risks and always advances his work in a steady, dependable way."}},
 {w:"手厚い",r:"てあつい",m:"優厚的",c:"い形",ex:{j:"この会社は社員への手厚い福利厚生で知られている。",z:"這家公司以對員工優厚的福利待遇而聞名。",e:"This company is known for its generous employee benefits."}},
-{w:"手軽い",r:"てがるい",m:"簡便的",c:"い形",ex:{j:"電子レンジがあれば、忙しい朝でも手軽く食事の準備ができる。",z:"只要有微波爐,就算是忙碌的早晨也能輕鬆簡便地準備餐點。",e:"With a microwave, you can prepare a meal quickly and easily even on a busy morning.",rv:1}},
+{w:"手軽",r:"てがる",m:"簡便的",c:"な形",ex:{j:"電子レンジがあれば、忙しい朝でも手軽に食事の準備ができる。",z:"只要有微波爐,就算是忙碌的早晨也能輕鬆簡便地準備餐點。",e:"With a microwave, you can prepare a meal quickly and easily even on a busy morning."}},
 {w:"手荒い",r:"てあらい",m:"粗暴的",c:"い形",ex:{j:"荷物を手荒く扱われて、中身が壊れてしまった。",z:"行李被粗暴地對待,裡面的東西壞掉了。",e:"The luggage was handled roughly, and the contents ended up broken."}},
 {w:"根深い",r:"ねぶかい",m:"根深蒂固的",c:"い形",ex:{j:"この地域の差別問題は、根深くて簡単には解決できない。",z:"這個地區的歧視問題根深蒂固,無法輕易解決。",e:"The discrimination problem in this region is deep-rooted and can't be solved easily."}},
 {w:"奥深い",r:"おくぶかい",m:"深奧的",c:"い形",ex:{j:"茶道は学べば学ぶほど奥深いものだと感じさせられる。",z:"茶道越學越讓人感受到它的深奧。",e:"The more you study the tea ceremony, the more you're made to feel how profound it is."}},

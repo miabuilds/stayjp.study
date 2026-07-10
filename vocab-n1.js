@@ -1783,7 +1783,7 @@ const VOCAB_N1 = [
 {w:"自問自答",r:"じもんじとう",m:"自問自答",c:"他",ex:{j:"本当にこの道でよかったのかと、彼は夜な夜な自問自答を繰り返していた。",z:"這條路真的走對了嗎,他夜夜反覆地自問自答。",e:"Was this really the right path? Night after night he kept asking and answering the question to himself."}},
 {w:"美辞麗句",r:"びじれいく",m:"華麗辭藻",c:"他",ex:{j:"美辞麗句を並べ立てた演説ほど、中身が空っぽなものはない。",z:"越是堆砌華麗辭藻的演說,內容往往越空洞。",e:"No speech is emptier in substance than one packed with flowery rhetoric."}},
 {w:"率先垂範",r:"そっせんすいはん",m:"以身作則",c:"他",ex:{j:"リーダーたる者、部下に命じる前に自ら率先垂範すべきだ。",z:"身為領導者,在命令部屬之前應當自己以身作則。",e:"A true leader should set an example first before ordering subordinates around."}},
-{w:"先見之明",r:"せんけんのめい",m:"先見之明",c:"他",ex:{j:"十年前にこの技術に投資した彼には、まさに先見の明があったと言える。",z:"十年前就投資這項技術的他,可說是真有先見之明。",e:"Having invested in this technology ten years ago, he truly had foresight.",rv:1}},
+{w:"先見の明",r:"せんけんのめい",m:"先見之明",c:"名",ex:{j:"十年前にこの技術に投資した彼には、まさに先見の明があったと言える。",z:"十年前就投資這項技術的他,可說是真有先見之明。",e:"Having invested in this technology ten years ago, he truly had foresight."}},
 {w:"無我夢中",r:"むがむちゅう",m:"忘我境界",c:"他",ex:{j:"締め切りに追われ、気づけば無我夢中で朝までキーボードを叩いていた。",z:"被截稿期追著跑,回過神來已忘我地敲鍵盤到天亮。",e:"Chased by the deadline, before I knew it I was pounding the keyboard until dawn, utterly absorbed."}},
 {w:"威風堂々",r:"いふうどうどう",m:"威風堂堂",c:"他",ex:{j:"優勝旗を掲げて入場する選手たちの姿は、実に威風堂々としていた。",z:"高舉冠軍旗進場的選手們,姿態當真威風堂堂。",e:"The athletes marching in holding the championship banner looked truly majestic and dignified."}},
 {w:"厚顔無恥",r:"こうがんむち",m:"厚顏無恥",c:"他",ex:{j:"あれだけ迷惑をかけておいて礼の一つも言わないとは、厚顔無恥にもほどがある。",z:"添了那麼多麻煩卻連一句道謝都沒有,厚顏無恥也該有個限度。",e:"Causing so much trouble and not even offering a word of thanks — there's a limit to such shamelessness."}},
