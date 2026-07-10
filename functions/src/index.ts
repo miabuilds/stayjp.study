@@ -27,6 +27,7 @@ export { validateRefCode } from "./validate-ref-code";
 export { getMyRefCode } from "./get-my-ref-code";
 export { partnerJoin } from "./partner-join";
 export { commissionLockCron } from "./commission-lock-cron";
+export { adminSettleKolPayout } from "./admin-settle-kol-payout";
 export { dailySubAuditCron } from "./daily-sub-audit-cron";
 export { adminFreeAccess } from "./admin-free-access";
 export { adminCleanupPending } from "./admin-cleanup-pending";
