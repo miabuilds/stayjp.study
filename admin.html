@@ -1120,9 +1120,19 @@ async function loadSubAudit() {
     if (!a.issue_count) {
       box.innerHTML = `<div style="padding:8px 11px;background:rgba(22,163,74,.1);border:1px solid #16A34A;border-radius:8px;color:#16A34A">✅ 每日訂閱稽核:${a.total} 筆全部一致,無異常。<span style="color:var(--tx3);font-weight:400">(${when})</span></div>`;
     } else {
-      const TYPE = { wrongly_expired: '🔴 付費卻被誤標過期', over_granted: '🟡 已過期卻仍開通', no_expiry: '⚪ 無到期日' };
-      const rows = (a.issues || []).map(i => `<div style="padding:3px 0">${TYPE[i.type] || i.type} · <code>${i.uid}</code> · ${i.status || ''} · ${i.source || ''}</div>`).join('');
-      box.innerHTML = `<div style="padding:8px 11px;background:rgba(239,68,68,.1);border:1px solid #EF4444;border-radius:8px;color:#EF4444"><b>⚠️ 每日訂閱稽核:${a.issue_count} 筆異常</b> <span style="color:var(--tx3);font-weight:400">(${when})</span>${rows}</div>`;
+      const TYPE = { wrongly_expired: '🔴 付費卻被誤標過期', over_granted: '🟡 過期標籤滯後', no_expiry: '⚪ 無到期日' };
+      const issues = a.issues || [];
+      // over_granted 自動修 = 只是標籤翻正,不影響權益、無漏財 → 良性;其餘需人工看。
+      const benign = issues.filter(i => i.auto_fixed);
+      const needAction = issues.filter(i => !i.auto_fixed);
+      const row = i => `<div style="padding:3px 0">${TYPE[i.type] || i.type} · <code>${i.uid}</code> · ${i.status || ''} · ${i.source || ''}${i.auto_fixed ? ' <span style="color:#16A34A">✓ 已自動修正</span>' : ''}</div>`;
+      if (!needAction.length) {
+        // 全部良性(已自動修過期標籤)→ 綠色安心,不用處理
+        box.innerHTML = `<div style="padding:8px 11px;background:rgba(22,163,74,.1);border:1px solid #16A34A;border-radius:8px;color:#16A34A"><b>✅ 每日訂閱稽核:已自動修正 ${benign.length} 筆過期標籤</b>(僅 status 標籤滯後,權益早已依到期日停用、<b>無漏財</b>,無需處理)<span style="color:var(--tx3);font-weight:400"> (${when})</span><div style="margin-top:4px;color:var(--tx2);font-size:12px">${benign.map(row).join('')}</div></div>`;
+      } else {
+        // 有需人工處理的(🔴 誤標過期 / ⚪ 無到期日)→ 紅色,良性的收在下面
+        box.innerHTML = `<div style="padding:8px 11px;background:rgba(239,68,68,.1);border:1px solid #EF4444;border-radius:8px;color:#EF4444"><b>⚠️ 每日訂閱稽核:${needAction.length} 筆需處理</b> <span style="color:var(--tx3);font-weight:400">(${when})</span>${needAction.map(row).join('')}${benign.length ? `<div style="margin-top:6px;color:var(--tx2);font-size:12px">另有 ${benign.length} 筆過期標籤已自動修正(無需處理):${benign.map(row).join('')}</div>` : ''}</div>`;
+      }
     }
   } catch (e) { box.innerHTML = '<span style="color:var(--tx3)">稽核讀取失敗:' + e.message + '</span>'; }
 }
