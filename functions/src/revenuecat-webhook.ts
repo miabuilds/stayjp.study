@@ -12,7 +12,7 @@ import * as admin from "firebase-admin";
 import { PLANS, PlanKey } from "./utils/constants";
 import {
   writeSubscription, writeTransaction, getSubscription, getRefCode,
-  rewardReferrerOnPayment,
+  rewardReferrerOnPayment, recordKolCommission, voidKolCommission,
   patchSubscription, nowMs, plusDays, tryReserveEarlyBird, SubscriptionDoc,
 } from "./utils/firestore";
 
@@ -181,6 +181,15 @@ export const revenuecatWebhook = functions.onRequest(
           // 試用(未扣款)當作沙盒略過,等轉正的 RENEWAL 才發;沙盒/匿名/非 user 型碼由 helper 自擋。冪等。
           await rewardReferrerOnPayment(uid, isSandbox || event.period_type === "TRIAL")
             .catch(e => console.error("rewardReferrer(rc) 略過:", e));
+          // KOL 分潤:首筆真付款轉化 → 產 pending 分潤(試用 gross=0 自動略過;續訂非首筆略過)
+          await recordKolCommission(uid, {
+            plan,
+            gross_twd: event.period_type === "TRIAL" ? 0 : planInfo.price_twd,
+            source: "app",
+            txnId: event.transaction_id || event.original_transaction_id || "",
+            isSandbox,
+            isFirstPayment: type === "INITIAL_PURCHASE" || type === "NON_RENEWING_PURCHASE",
+          }).catch(e => console.error("recordKolCommission(rc) 略過:", e));
           break;
         }
 
@@ -253,6 +262,8 @@ export const revenuecatWebhook = functions.onRequest(
             status: "refunded",
             note: `RevenueCat ${type} — access revoked`,
           }, eventId);
+          // KOL 分潤 clawback:退款/退單 → 該買家的分潤作廢(已付則後續扣回)
+          await voidKolCommission(uid, `rc_${type.toLowerCase()}`).catch(e => console.error("voidKolCommission(rc) 略過:", e));
           break;
         }
 

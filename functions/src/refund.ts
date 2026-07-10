@@ -21,6 +21,7 @@ import { checkMacValue } from "./utils/ecpay";
 import {
   getSubscription, patchSubscription, writeTransaction,
   recordRefund, releaseEarlyBird, getLatestSuccessTradeNo, nowMs, emailHash,
+  voidKolCommission,
 } from "./utils/firestore";
 
 if (admin.apps.length === 0) admin.initializeApp();
@@ -323,6 +324,9 @@ export const refund = functions.onRequest(
         email_hash: emailHash(email),
         note: `${refundReason}(ECPay Action=${usedAction})`,
       });
+
+      // KOL 分潤 clawback:退款成功 → 該買家分潤作廢
+      await voidKolCommission(uid, "ecpay_refund").catch(e => console.error("voidKolCommission(refund) 略過:", e));
 
       // 早鳥首次訂閱 + 7 天內全退 → 釋放名額(讓下一個 user 可以買早鳥)
       // 釋放後清 is_early_bird flag,確保每個名額最多釋放一次(避免後續 chargeback 重複釋放)

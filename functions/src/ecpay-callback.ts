@@ -19,7 +19,7 @@ import { PLANS, PlanKey, ECPAY_SECRETS } from "./utils/constants";
 import { verifyCheckMacValue } from "./utils/ecpay";
 import {
   writeTransaction, getSubscription, writeSubscription, patchSubscription, getRefCode,
-  rewardReferrerOnPayment,
+  rewardReferrerOnPayment, recordKolCommission,
   tryReserveEarlyBird, releaseEarlyBird, writePaymentFailure,
   nowMs, plusDays, SubscriptionDoc, db,
 } from "./utils/firestore";
@@ -201,6 +201,9 @@ export const ecpayCallback = functions.onRequest(
         // best-effort、冪等(referrer_paid_at)、非 user 型碼/自我推薦自動略過;絕不影響主開通流程。
         // 走到這一定是真付款(SimulatePaid=1 早已 return),故 isSandbox=false。
         await rewardReferrerOnPayment(uid, false).catch(e => console.error("rewardReferrer(ecpay) 略過:", e));
+        // KOL 分潤:首筆真付款 → 產 pending 分潤(best-effort、冪等、非 KOL 碼/自我推薦自動略過)
+        await recordKolCommission(uid, { plan, gross_twd: amount, source: "web", txnId: tradeNo || merchantTradeNo, isSandbox: false, isFirstPayment })
+          .catch(e => console.error("recordKolCommission(ecpay) 略過:", e));
 
         console.log("✓ ECPay payment success", { uid, plan, amount, isFirstPayment });
       } else {

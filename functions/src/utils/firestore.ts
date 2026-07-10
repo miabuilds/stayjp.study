@@ -119,6 +119,87 @@ export async function rewardReferrerOnPayment(friendUid: string, isSandbox: bool
   await db.doc(`users/${friendUid}`).set({ referrer_paid_at: nowMs() }, { merge: true });
 }
 
+// ───── KOL 分潤引擎 ──────────────────────────────────────────────────────
+// commissions/{code_buyerUid}:被推薦人「首筆真實付款」產生一筆分潤紀錄。
+// 狀態:pending(付款,鎖定期內)→ locked(過 30 天無退費,可領)→ paid(已結算匯款);
+//       void = 退費/退單作廢(clawback)。精算金額給後台結算與付款用。
+const COMMISSION_LOCK_DAYS = 30;
+const KOL_FEE = { web: 0.0275, app: 0.15 };   // 綠界 / Apple·Google SBP
+
+export interface CommissionDoc {
+  code: string;
+  owner_uid: string;
+  buyer_uid: string;
+  plan: string;
+  gross_twd: number;
+  fee_twd: number;
+  profit_twd: number;
+  rate?: number;              // 抽成 %(或用 fixed)
+  fixed?: number;             // 議價固定額(設了優先於 rate)
+  amount_twd: number;         // 該筆分潤
+  paid_at: number;            // 被推薦人付款時間
+  lock_at: number;            // 鎖定時間(paid_at + 30d)
+  state: "pending" | "locked" | "void" | "paid";
+  source: string;
+  txn_id: string;
+  created_at: number;
+  void_reason?: string;
+  voided_at?: number;
+  payout_id?: string;
+}
+
+/**
+ * 被推薦人首筆真付款 → 若歸因到 KOL 碼(type:'kol' + 有 owner_uid),產一筆 pending 分潤。
+ * best-effort、冪等(code_buyer);沙盒/試用(gross=0)/續訂/匿名/自我推薦/停權碼 全擋。
+ */
+export async function recordKolCommission(
+  buyerUid: string,
+  opts: { plan: string; gross_twd: number; source: "web" | "app"; txnId: string; isSandbox: boolean; isFirstPayment: boolean },
+): Promise<void> {
+  const { plan, gross_twd, source, txnId, isSandbox, isFirstPayment } = opts;
+  if (isSandbox || !isFirstPayment || !(gross_twd > 0)) return;              // 只算首筆真實付款
+  if (typeof buyerUid !== "string" || buyerUid.startsWith("$RCAnonymousID")) return;
+  const bd = (await db.doc(`users/${buyerUid}`).get()).data() || {};
+  const code = bd.ref_code as string | undefined;
+  if (!code) return;
+  const c = (await db.doc(`ref_codes/${code}`).get()).data();
+  if (!c || c.type === "user") return;                                       // 只有 KOL 碼抽成;個人碼走 +7
+  const ownerUid = c.owner_uid as string | undefined;
+  if (!ownerUid || ownerUid === buyerUid) return;                            // 需可歸屬 + 防自我推薦
+  if (c.status === "suspended") return;                                      // 停權不產生新分潤
+  const ref = db.doc(`commissions/${code}_${buyerUid}`);                     // 冪等:一碼一買家一筆
+  if ((await ref.get()).exists) return;
+  const fee = source === "app" ? KOL_FEE.app : KOL_FEE.web;
+  const profit = Math.round(gross_twd * (1 - fee));
+  const fixed = typeof c.commission_fixed === "number" ? c.commission_fixed : null;
+  const rate = typeof c.commission_pct === "number" ? c.commission_pct : 20;
+  const amount = fixed != null ? Math.max(0, Math.round(fixed)) : Math.max(0, Math.round(profit * rate / 100));
+  const now = nowMs();
+  await ref.set({
+    code, owner_uid: ownerUid, buyer_uid: buyerUid, plan,
+    gross_twd, fee_twd: gross_twd - profit, profit_twd: profit,
+    ...(fixed != null ? { fixed } : { rate }),
+    amount_twd: amount,
+    paid_at: now, lock_at: now + COMMISSION_LOCK_DAYS * 864e5,
+    state: "pending", source, txn_id: txnId, created_at: now,
+  } as CommissionDoc);
+}
+
+/**
+ * 退費 / 退單 → 把該買家的分潤作廢(clawback)。pending/locked/paid 都翻 void;
+ * 已 paid(已匯款給 KOL)的翻 void 後,後台結算會從該 KOL 後續應付扣回。
+ */
+export async function voidKolCommission(buyerUid: string, reason: string): Promise<void> {
+  if (typeof buyerUid !== "string" || !buyerUid) return;
+  const snap = await db.collection("commissions").where("buyer_uid", "==", buyerUid).get();
+  for (const d of snap.docs) {
+    const s = d.data().state;
+    if (s === "pending" || s === "locked" || s === "paid") {
+      await d.ref.set({ state: "void", void_reason: reason || "refund", voided_at: nowMs() }, { merge: true });
+    }
+  }
+}
+
 /**
  * 取最近一筆成功 charge transaction(subscribe / renew),回傳 ECPay TradeNo。
  * 退費 / cancel 用這個,不能用 subscription.ecpay_order(那是 MerchantTradeNo)。
