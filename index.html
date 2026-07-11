@@ -699,6 +699,10 @@ body.profile-view .mn { margin-left: 0; max-width: none; }   /* 滿版 → 內�
 .vi .vex { margin-top: 8px; padding-top: 8px; border-top: 1px dashed var(--bd); }
 .vi .vex .exj { display: block; font-size: 14px; line-height: 1.7; color: var(--tx); }
 .vi .vex .exz { display: block; font-size: 12px; line-height: 1.5; color: var(--tx2); margin-top: 2px; }
+.vi .vex { cursor: pointer; }
+.vi .vex:hover { border-color: var(--ac2); }
+.vex-spk { width: 15px; height: 15px; vertical-align: -2px; margin-left: 6px; fill: none; stroke: var(--ac2); stroke-width: 2; opacity: .75; }
+.vi .vex:hover .vex-spk { opacity: 1; }
 .vi .vp {
   font-size: 9px; padding: 2px 7px; border-radius: 10px;
   background: var(--ac); color: #fff;
@@ -3129,7 +3133,7 @@ document.addEventListener('click', function (e) {
   if (!e.target.closest) return;
   var vi = e.target.closest('.vi');
   if (!vi) return;
-  if (e.target.closest('.star, .spk, .verb-btn')) return;   // 這些各有動作
+  if (e.target.closest('.star, .spk, .verb-btn, .vex')) return;   // 這些各有動作
   var r = vi.dataset.r || vi.dataset.w;
   if (r && typeof speak === 'function') speak(r);
 });
@@ -3224,7 +3228,7 @@ function renderVocab() {
         const d = entry.d;
         const isFav = favList.includes(d.w);
         const verbBtn = d.c === '動' ? `<button class="verb-btn" onclick="event.stopPropagation();openVerbModal('${d.w.replace(/'/g,"\\'")}','${(d.r||'').replace(/'/g,"\\'")}')" title="變化表">変</button>` : '';
-        return `<div class="vi" data-fid="${d.w}" data-w="${d.w}" data-r="${d.r||''}"><div class="vl"><div class="vw">${d.w}</div>${d.w!==d.r?`<div class="vr">${d.r}</div>`:''}<div class="vm">${cvt(d.m)}</div>${d.ex?`<div class="vex" data-nolang><span class="exj">${d.ex.j}</span><span class="exz">${enOr(d.ex.z,d.ex.e||'')}</span></div>`:''}</div>${spkSvg}${verbBtn}<span class="vp">${catLabel(entry.catName)}</span><svg class="star ${isFav?'on':''}" onclick="toggleFav('${d.w.replace(/'/g,"\\'")}')" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>`;
+        return `<div class="vi" data-fid="${d.w}" data-w="${d.w}" data-r="${d.r||''}"><div class="vl"><div class="vw">${d.w}</div>${d.w!==d.r?`<div class="vr">${d.r}</div>`:''}<div class="vm">${cvt(d.m)}</div>${d.ex?`<div class="vex" data-nolang data-j="${(''+d.ex.j).replace(/"/g,'&quot;')}" onclick="event.stopPropagation();speak(this.dataset.j)" title="${enOr('點例句聽發音','Tap to hear')}"><span class="exj">${d.ex.j}<svg class="vex-spk" viewBox="0 0 24 24"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.54 8.46a5 5 0 010 7.07M19.07 4.93a10 10 0 010 14.14"/></svg></span><span class="exz">${enOr(d.ex.z,d.ex.e||'')}</span></div>`:''}</div>${spkSvg}${verbBtn}<span class="vp">${catLabel(entry.catName)}</span><svg class="star ${isFav?'on':''}" onclick="toggleFav('${d.w.replace(/'/g,"\\'")}')" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>`;
       }
     });
 
@@ -3245,7 +3249,7 @@ function renderVocab() {
       items.forEach(d => {
         const isFav = favList.includes(d.w);
         const verbBtn = d.c === '動' ? `<button class="verb-btn" onclick="event.stopPropagation();openVerbModal('${d.w.replace(/'/g,"\\'")}','${(d.r||'').replace(/'/g,"\\'")}')" title="變化表">変</button>` : '';
-        h += `<div class="vi" data-fid="${d.w}" data-w="${d.w}" data-r="${d.r||''}"><div class="vl"><div class="vw">${d.w}</div>${d.w!==d.r?`<div class="vr">${d.r}</div>`:''}<div class="vm">${cvt(d.m)}</div>${d.ex?`<div class="vex" data-nolang><span class="exj">${d.ex.j}</span><span class="exz">${enOr(d.ex.z,d.ex.e||'')}</span></div>`:''}</div>${spkSvg}${verbBtn}<span class="vp">${catLabel(cat.name)}</span><svg class="star ${isFav?'on':''}" onclick="toggleFav('${d.w.replace(/'/g,"\\'")}')" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>`;
+        h += `<div class="vi" data-fid="${d.w}" data-w="${d.w}" data-r="${d.r||''}"><div class="vl"><div class="vw">${d.w}</div>${d.w!==d.r?`<div class="vr">${d.r}</div>`:''}<div class="vm">${cvt(d.m)}</div>${d.ex?`<div class="vex" data-nolang data-j="${(''+d.ex.j).replace(/"/g,'&quot;')}" onclick="event.stopPropagation();speak(this.dataset.j)" title="${enOr('點例句聽發音','Tap to hear')}"><span class="exj">${d.ex.j}<svg class="vex-spk" viewBox="0 0 24 24"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.54 8.46a5 5 0 010 7.07M19.07 4.93a10 10 0 010 14.14"/></svg></span><span class="exz">${enOr(d.ex.z,d.ex.e||'')}</span></div>`:''}</div>${spkSvg}${verbBtn}<span class="vp">${catLabel(cat.name)}</span><svg class="star ${isFav?'on':''}" onclick="toggleFav('${d.w.replace(/'/g,"\\'")}')" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>`;
       });
       h += '</div></section>';
     });
