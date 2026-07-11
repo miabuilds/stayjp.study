@@ -139,8 +139,14 @@
       };
     } else {
       try { localStorage.removeItem('ahx_li'); _ahxWriteCache(null); localStorage.setItem('stayjp_logged_in', '0'); } catch (e) {}   // 確定登出 → 清快取,下次直接顯示「登入」
-      area.innerHTML = '<button class="ahx-btn" id="ahxLogin" type="button">登入</button>';
-      area.querySelector('#ahxLogin').onclick = login;
+      area.innerHTML = '<button class="ahx-btn" id="ahxLogin" type="button">登入</button>' +
+        '<div class="ahx-menu" id="ahxLoginMenu">' +
+          '<button class="ahx-item" id="ahxLoginG" type="button">用 Google 登入</button>' +
+          '<button class="ahx-item" id="ahxLoginA" type="button">用 Apple 登入</button>' +
+        '</div>';
+      area.querySelector('#ahxLogin').onclick = onLoginClick;
+      area.querySelector('#ahxLoginG').onclick = function (e) { e.stopPropagation(); closeLoginMenu(); loginWith('google'); };
+      area.querySelector('#ahxLoginA').onclick = function (e) { e.stopPropagation(); closeLoginMenu(); loginWith('apple'); };
     }
   }
 
@@ -185,18 +191,37 @@
     }, true);
   }
 
-  function login() {
+  function closeLoginMenu() { var m = document.getElementById('ahxLoginMenu'); if (m) m.classList.remove('show'); }
+
+  // 點「登入」:App 內建瀏覽器→提示;原生 App→走原生橋接;一般網頁→彈 Google/Apple 選單
+  function onLoginClick(e) {
+    if (e) e.stopPropagation();
     if (isInApp()) {
-      alert('你正在 App 內建瀏覽器(Line／IG／Threads／FB／微信 等)開啟本站,Google 登入會被擋。\n\n請改用 Safari 或 Chrome:\n點右上／右下的「⋯」或「⋮」→ 選「在預設瀏覽器開啟」,再登入即可。');
+      alert('你正在 App 內建瀏覽器(Line／IG／Threads／FB／微信 等)開啟本站,登入會被擋。\n\n請改用 Safari 或 Chrome:\n點右上／右下的「⋯」或「⋮」→ 選「在預設瀏覽器開啟」,再登入即可。');
       return;
     }
-    if (_ahxSigningIn) return;   // 防連點:前一個登入彈窗還沒結束就別再開(auth/cancelled-popup-request)
+    // 原生 App:signInWithPopup 已被 patch 成發 OPEN_LOGIN 原生選單(Google/Apple 原生選)→ 直接觸發,不顯示網頁選單
+    if (window.STAYJP_NATIVE && window.STAYJP_NATIVE.isNativeApp) { loginWith('google'); return; }
+    var m = document.getElementById('ahxLoginMenu');
+    if (m) m.classList.toggle('show');
+  }
+
+  function loginWith(providerName) {
+    if (_ahxSigningIn) return;   // 防連點
     _ahxSigningIn = true;
-    auth.signInWithPopup(new firebase.auth.GoogleAuthProvider())
+    var provider;
+    if (providerName === 'apple') {
+      provider = new firebase.auth.OAuthProvider('apple.com');
+      provider.addScope('email'); provider.addScope('name');
+    } else {
+      provider = new firebase.auth.GoogleAuthProvider();
+    }
+    auth.signInWithPopup(provider)
       .catch(function (e) {
         var code = e && e.code;
         if (code === 'auth/cancelled-popup-request' || code === 'auth/popup-closed-by-user') return;  // 良性
         if (code === 'auth/network-request-failed') { alert('網路不穩,登入連線失敗,請稍後再試一次。'); return; }
+        if (code === 'auth/operation-not-allowed') { alert('Apple 登入還在設定中,請先用 Google 登入。'); return; }
         alert('登入失敗: ' + (e && e.message || e));
       })
       .finally(function () { _ahxSigningIn = false; });
@@ -220,6 +245,11 @@
       if (m && m.classList.contains('show') &&
           !e.target.closest('#ahxMenuBtn') && !e.target.closest('#ahxMenu')) {
         m.classList.remove('show');
+      }
+      var lm = document.getElementById('ahxLoginMenu');
+      if (lm && lm.classList.contains('show') &&
+          !e.target.closest('#ahxLogin') && !e.target.closest('#ahxLoginMenu')) {
+        lm.classList.remove('show');
       }
     });
     // 還原失敗保險:4 秒沒回呼 → 標記已解析並重繪真實狀態(回退「登入」鈕),不卡在樂觀快取
