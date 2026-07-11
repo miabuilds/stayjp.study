@@ -302,6 +302,7 @@ const FlashCard = (() => {
     const goalSel = document.getElementById('fcGoal');
     goalSel.addEventListener('change', () => { setGoalLevel(goalSel.value); renderStartInfo(); });
     renderStartInfo();
+    if (typeof cvtStaticUI === 'function') cvtStaticUI(document.getElementById('quizBox'));   // 簡中:轉設定框寫死的繁體字(如「範圍」,無日文,安全)
     document.getElementById('quizBg').classList.add('show');
   }
 

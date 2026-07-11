@@ -62,6 +62,7 @@ const GrammarDrill = (() => {
         b.onclick = () => { g.querySelectorAll('button').forEach(x => x.classList.remove('on')); b.classList.add('on'); };
       });
     });
+    if (typeof cvtStaticUI === 'function') cvtStaticUI(box);   // 簡中:轉設定框寫死的繁體字(無日文,安全)
     document.getElementById('quizBg').classList.add('show');
   }
 
