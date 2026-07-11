@@ -1,7 +1,8 @@
 {
   "emulators": {
     "hosting": { "port": 5002 },
-    "firestore": { "port": 8099 }
+    "firestore": { "port": 8099 },
+    "auth": { "port": 9099 }
   },
   "firestore": {
     "rules": "firestore.rules",
