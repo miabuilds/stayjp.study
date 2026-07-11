@@ -1617,15 +1617,34 @@ function handleAuth() {
   if (!_authResolved) return;
   if (currentUser) { auth.signOut(); currentUser = null; _writeAuthCache(null); updateAuthUI(); return; }
   if (isInAppBrowser()) { showInAppHelp(); return; }
+  // web 未登入 → 開 Google/Apple 選單(iOS 用 Apple 付費者要用 Apple 登入才對得到同一 uid)
+  toggleLoginMenu();
+}
+function toggleLoginMenu(e) {
+  e?.stopPropagation();
+  document.getElementById('loginMenu')?.classList.toggle('show');
+}
+// 實際登入:google | apple。Apple 付費者(iOS)必須用 Apple 登入才對得到同一 Firebase uid → 網頁才看得到訂閱。
+function loginWith(provider) {
+  document.getElementById('loginMenu')?.classList.remove('show');
   if (_signingIn) return;   // 防連點:前一個登入彈窗還沒結束就別再開(auth/cancelled-popup-request)
   _signingIn = true;
-  auth.signInWithPopup(new firebase.auth.GoogleAuthProvider())
+  let p;
+  if (provider === 'apple') {
+    p = new firebase.auth.OAuthProvider('apple.com');
+    p.addScope('email'); p.addScope('name');
+  } else {
+    p = new firebase.auth.GoogleAuthProvider();
+  }
+  auth.signInWithPopup(p)
     .catch(e => {
       const code = e && e.code;
       // 連點被取消 / 用戶自己關彈窗 = 良性,不彈
       if (code === 'auth/cancelled-popup-request' || code === 'auth/popup-closed-by-user') return;
       // 網路不穩 → 友善提示,不丟英文
       if (code === 'auth/network-request-failed') { alert('網路不穩,登入連線失敗,請稍後再試一次。'); return; }
+      // Apple 尚未在 Firebase 開通 → 友善提示,別丟英文
+      if (code === 'auth/operation-not-allowed') { alert('此登入方式暫時無法使用,請改用另一種方式登入。'); return; }
       alert('登入失敗: ' + (e && e.message || e));
     })
     .finally(() => { _signingIn = false; });
@@ -1658,7 +1677,12 @@ function updateAuthUI() {
         <button class="um-item danger" onclick="handleAuth()">登出</button>
       </div>`;
   } else {
-    area.innerHTML = `<button class="auth-btn" id="authBtn" onclick="handleAuth()">${t('login')}</button>`;
+    area.innerHTML = `
+      <button class="auth-btn" id="authBtn" onclick="handleAuth()">${t('login')}</button>
+      <div class="user-menu" id="loginMenu">
+        <button class="um-item" onclick="loginWith('google')">使用 Google 登入</button>
+        <button class="um-item" onclick="loginWith('apple')">使用 Apple 登入</button>
+      </div>`;
   }
 }
 function toggleUserMenu(e) {
@@ -1667,9 +1691,13 @@ function toggleUserMenu(e) {
 }
 document.addEventListener('click', e => {
   const menu = document.getElementById('userMenu');
-  if (!menu || !menu.classList.contains('show')) return;
-  if (e.target.closest('#userMenuBtn') || e.target.closest('#userMenu')) return;
-  menu.classList.remove('show');
+  if (menu && menu.classList.contains('show') && !e.target.closest('#userMenuBtn') && !e.target.closest('#userMenu')) {
+    menu.classList.remove('show');
+  }
+  const lmenu = document.getElementById('loginMenu');
+  if (lmenu && lmenu.classList.contains('show') && !e.target.closest('#authBtn') && !e.target.closest('#loginMenu')) {
+    lmenu.classList.remove('show');
+  }
 });
 
 // ========== FAVORITES ==========
