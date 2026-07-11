@@ -85,7 +85,9 @@ a:hover{text-decoration:underline}
  <div id="gateView" class="gate" style="display:none">
  <h2> 我的帳號</h2>
  <p>登入帳號才能管理訂閱。免費版用戶也可以登入,讓進度雲端同步、跨裝置使用。</p>
- <button id="loginBtn" class="btn primary">登入</button>
+ <button id="loginBtn" class="btn primary">用 Google 登入</button>
+ <button id="loginApple" class="btn" style="background:#000;color:#fff;border:1px solid #000;margin-top:8px">  用 Apple 登入</button>
+ <p style="font-size:12px;color:var(--tx3);margin-top:8px">在 App 用 Apple 付費的,用同一個 Apple ID 登入,網頁也是 Premium。</p>
  </div>
 
  <div id="appView" style="display:none">
@@ -307,6 +309,19 @@ document.getElementById('loginBtn').onclick = () => {
    if (code === 'auth/cancelled-popup-request' || code === 'auth/popup-closed-by-user') return;
    if (code === 'auth/network-request-failed') { alert('網路不穩,登入連線失敗,請稍後再試一次。'); return; }
    alert('登入失敗:' + (err && err.message || err));
+ });
+};
+
+// Apple 登入(web):讓 iOS 用 Apple 付費者用同一 Apple ID 登入 → 同一 Firebase uid → 讀到同一份訂閱 → 網頁也 Premium
+document.getElementById('loginApple').onclick = () => {
+ const provider = new firebase.auth.OAuthProvider('apple.com');
+ provider.addScope('email'); provider.addScope('name');
+ auth.signInWithPopup(provider).catch(err => {
+   const code = err && err.code;
+   if (code === 'auth/cancelled-popup-request' || code === 'auth/popup-closed-by-user') return;
+   if (code === 'auth/operation-not-allowed') { alert('Apple 登入還在設定中,請先用 Google 登入。'); return; }
+   if (code === 'auth/network-request-failed') { alert('網路不穩,登入連線失敗,請稍後再試一次。'); return; }
+   alert('Apple 登入失敗:' + (err && err.message || err));
  });
 };
 
