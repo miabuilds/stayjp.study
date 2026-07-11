@@ -109,6 +109,7 @@ const fbConfig={ apiKey:"AIzaSyDnmg2XOuvwgE8m8xCF5sS4o0nQYoUplPI", authDomain:"j
 if(!firebase.apps.length) firebase.initializeApp(fbConfig);
 const auth=firebase.auth();
 const FN_JOIN='https://asia-east1-jpnote-1bdd6.cloudfunctions.net/partnerJoin';
+const FN_PAYOUT='https://asia-east1-jpnote-1bdd6.cloudfunctions.net/partnerUpdatePayout';
 const SITE='https://stayjp.study';
 const area=document.getElementById('joinArea');
 const esc=s=>String(s||'').replace(/[<>&"]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));
@@ -164,8 +165,57 @@ function showLink(d){
       <a class="btn sec" href="${esc(stats)}" target="_blank" style="padding:11px 20px;font-size:14px">📊 看我的推薦成效</a>
       ${navigator.share?'<button class="btn sec" style="padding:11px 20px;font-size:14px" onclick="shareLink()">分享</button>':''}
     </div>
-    <div id="joinMsg" class="muted" style="margin-top:10px">你的推薦碼:<b>${esc(d.code)}</b>(App 受眾可到帳號頁輸入此碼歸因)。收款資料可隨時更新,結算前補齊即可。</div>`;
+    <div id="joinMsg" class="muted" style="margin-top:10px">你的推薦碼:<b>${esc(d.code)}</b>(App 受眾可到帳號頁輸入此碼歸因)。</div>
+    <div style="margin-top:18px;padding-top:16px;border-top:1px solid var(--bd)">
+      <div style="font-weight:700;margin-bottom:4px">💰 收款資料</div>
+      <p class="muted" style="margin:0 0 10px">累積分潤滿 NT$1,000 於每月結算,款項匯到這裡。結算前補齊即可、可隨時修改。</p>
+      <div id="payStatus" style="margin-bottom:10px"></div>
+      <select id="uPayM"><option value="">選擇收款方式</option><option value="bank">台灣銀行轉帳</option><option value="paypal">PayPal</option></select>
+      <div id="bankRow" style="display:none">
+        <input id="uPayBank" placeholder="銀行 / 分行(例:國泰世華 台北分行)">
+        <input id="uPayName" placeholder="戶名(需與帳戶一致,對帳用)">
+      </div>
+      <input id="uPayA" placeholder="收款帳號 / PayPal Email">
+      <div style="margin-top:12px"><button class="btn sec" id="savePayBtn">儲存收款資料</button></div>
+      <div id="payMsg" class="muted" style="margin-top:8px"></div>
+    </div>`;
   window.__link=link;
+  setupPayout(d.payout);
+}
+
+function setupPayout(p){
+  const m=document.getElementById('uPayM'), bankRow=document.getElementById('bankRow'),
+        bank=document.getElementById('uPayBank'), name=document.getElementById('uPayName'),
+        acc=document.getElementById('uPayA'), status=document.getElementById('payStatus'),
+        btn=document.getElementById('savePayBtn'), msg=document.getElementById('payMsg');
+  const toggle=()=>{ bankRow.style.display = m.value==='bank' ? 'block' : 'none'; };
+  const showStatus=pp=>{
+    if(pp && pp.method && pp.account){
+      status.className='ok'; status.style.fontSize='14px';
+      status.innerHTML='✓ 目前收款方式:<b>'+(pp.method==='paypal'?'PayPal':'銀行轉帳')+'</b> · '+esc(pp.account);
+    }else{
+      status.className='err'; status.style.fontSize='14px';
+      status.innerHTML='⚠ 尚未填收款資料 — 結算前請務必補齊,否則無法匯款給你。';
+    }
+  };
+  // 預填既有資料
+  if(p){ m.value=p.method||''; acc.value=p.account||''; if(bank)bank.value=p.bank||''; if(name)name.value=p.name||''; }
+  toggle(); showStatus(p);
+  m.onchange=toggle;
+  btn.onclick=async()=>{
+    if(!m.value){ msg.className='err'; msg.textContent='請先選收款方式。'; return; }
+    if(!acc.value.trim()){ msg.className='err'; msg.textContent='請填收款帳號 / PayPal Email。'; return; }
+    btn.disabled=true; msg.className='muted'; msg.textContent='儲存中…';
+    try{
+      const t=await auth.currentUser.getIdToken();
+      const body={ payout_method:m.value, payout_account:acc.value, payout_bank:(bank?bank.value:''), payout_name:(name?name.value:'') };
+      const r=await fetch(FN_PAYOUT,{method:'POST',headers:{'Authorization':'Bearer '+t,'Content-Type':'application/json'},body:JSON.stringify(body)});
+      const d=await r.json();
+      if(d.ok){ msg.className='muted ok'; msg.textContent='✓ 收款資料已儲存。'; showStatus(d.payout); }
+      else { msg.className='err'; msg.textContent='儲存失敗:'+esc(d.reason||d.error||'unknown'); }
+    }catch(e){ msg.className='err'; msg.textContent='儲存失敗,請稍後再試。'; }
+    finally{ btn.disabled=false; }
+  };
 }
 function copyLink(){ const el=document.getElementById('myLink'); (navigator.clipboard?navigator.clipboard.writeText(el.value):Promise.reject()).then(()=>{ const m=document.getElementById('joinMsg'); m.className='muted ok'; m.textContent='✓ 已複製,貼給你的觀眾吧!'; }).catch(()=>{ el.removeAttribute('readonly'); el.select(); try{document.execCommand('copy');}catch(e){} }); }
 function shareLink(){ if(navigator.share) navigator.share({ title:'日本再留計劃 · 免費 JLPT 學習工具', text:'用我的連結註冊 StayJP,還多送你 7 天 Premium!', url:window.__link }).catch(()=>{}); }
