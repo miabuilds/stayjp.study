@@ -36,7 +36,8 @@
   .row{display:flex;margin:9px 0;gap:8px;align-items:flex-end}
   .row.me{flex-direction:row-reverse}
   .who{font-size:20px;flex-shrink:0;width:30px;text-align:center;line-height:1.9}
-  .bubble{max-width:80%;padding:10px 14px;border-radius:18px;cursor:pointer;position:relative;transition:transform .12s ease}
+  .bubble{max-width:80%;padding:10px 14px;border-radius:18px;position:relative;transition:transform .12s ease}
+  .bubble[data-j]{cursor:pointer}
   .bubble:active{transform:scale(.97)}
   .row.you .bubble{background:var(--you);border-bottom-left-radius:6px}
   .row.me .bubble{background:var(--me);border-bottom-right-radius:6px}
@@ -78,6 +79,7 @@
   </footer>
 </div>
 
+<script src="audio/tts/manifest.js"></script>
 <script>
 const SCENES = [
   { ic:'🏪', bg:'var(--blue)', zh:'便利商店', en:'Convenience store', lines:[
@@ -144,8 +146,8 @@ function render(){
       ${s.lines.map(l => `
         <div class="row ${l.side}">
           <div class="who">${l.w}</div>
-          <div class="bubble" data-j="${esc(l.jp)}" onclick="speakLine(this)" title="點我發音 / tap to hear">
-            <div class="jp">${esc(l.jp)}${SPK}</div>
+          <div class="bubble"${(window.__TTS&&window.__TTS[l.jp])?` data-j="${esc(l.jp)}" onclick="speakLine(this)" title="點我發音 / tap to hear"`:''}>
+            <div class="jp">${esc(l.jp)}${(window.__TTS&&window.__TTS[l.jp])?SPK:''}</div>
             <div class="rm">${esc(l.rm)}</div>
             <div class="tr"><span data-t="zh">${esc(l.zh)}</span><span data-t="en">${esc(l.en)}</span></div>
           </div>
@@ -173,9 +175,9 @@ function browserSpeak(t){
 function setLang(l){ document.body.setAttribute('data-lang', l); document.documentElement.lang = l==='en'?'en':'zh-Hant'; try{localStorage.setItem('stayjp_about_lang',l);}catch(e){} }
 function toggleLang(){ setLang(document.body.getAttribute('data-lang')==='zh'?'en':'zh'); }
 render();
+(function(){ try{ var anyA=SCENES.some(function(sc){return sc.lines.some(function(l){return window.__TTS&&window.__TTS[l.jp];});}); var h=document.querySelector(".hint"); if(h&&!anyA) h.style.display="none"; }catch(e){} })();
 (function(){ var s; try{s=localStorage.getItem('stayjp_about_lang');}catch(e){} setLang(s || ((navigator.language||'').toLowerCase().indexOf('zh')===0?'zh':'en')); })();
 if(window.speechSynthesis) speechSynthesis.getVoices();
 </script>
-<script src="audio/tts/manifest.js"></script>
 </body>
 </html>
