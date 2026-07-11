@@ -72,12 +72,10 @@ for (const lv of ['n5', 'n4', 'n3', 'n2', 'n1']) {
     const text = (item.r || item.w || '').trim();
     if (!text) continue;
     add(text, `vocab-${lv}`);
-    // Example sentences (item.e[].j) — frontend FlashCard / vocab cards 點例句喇叭時讀 j 原文
-    if (Array.isArray(item.e)) {
-      for (const ex of item.e) {
-        const j = stripHtml((ex && ex.j) || '');
-        if (j) add(j, `vocab-${lv}#${item.w || text}`);
-      }
+    // Example sentence (item.ex.j = {j,z,e}) — 點例句喇叭讀 j 原文
+    if (item.ex && item.ex.j) {
+      const j = stripHtml(item.ex.j);
+      if (j) add(j, `vocab-${lv}#${item.w || text}`);
     }
   }
 }
