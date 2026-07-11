@@ -126,11 +126,11 @@ a:hover { text-decoration: underline; }
 .hd-links a:hover::after { transform: scaleX(1); transform-origin: left; }
 
 /* 手機漢堡選單 — 桌面隱藏,≤600px 才出現(取代被收起的文字導覽) */
-.hd-burger { display: none; background: none; border: 0; cursor: pointer; color: var(--tx2); padding: 6px; border-radius: 10px; align-items: center; justify-content: center; flex-shrink: 0; }
+.hd-burger { display: inline-flex; background: none; border: 0; cursor: pointer; color: var(--tx2); padding: 6px; border-radius: 10px; align-items: center; justify-content: center; flex-shrink: 0; }
 .hd-burger:hover { color: var(--ac); }
 .hd-burger svg { width: 22px; height: 22px; }
-.hd-burger-wrap { position: relative; display: inline-flex; }
-.hd-menu { position: absolute; top: calc(100% + 8px); right: 0; min-width: 180px; background: var(--bg2); border: 1px solid var(--line); border-radius: 12px; padding: 6px; box-shadow: 0 8px 28px rgba(0,0,0,.22); z-index: 300; display: none; }
+.hd-burger-wrap { position: relative; display: none; }
+.hd-menu { position: absolute; top: calc(100% + 8px); left: 0; min-width: 180px; background: var(--bg2); border: 1px solid var(--line); border-radius: 12px; padding: 6px; box-shadow: 0 8px 28px rgba(0,0,0,.22); z-index: 300; display: none; }
 .hd-menu.show { display: block; }
 .hd-menu a { display: block; padding: 10px 14px; font-size: 14px; color: var(--tx); text-decoration: none; border-radius: 8px; white-space: nowrap; }
 .hd-menu a:hover { background: var(--bg3); text-decoration: none; }
@@ -519,7 +519,7 @@ a:hover { text-decoration: underline; }
      保留 logo / 繁 / 主題 / 登入。用 > a 只藏直接子層,才不會連帶藏掉
      auth-header 帳號選單與漢堡選單裡的 <a>(那些是巢狀的)。 */
   .hd-links > a { display: none; }
-  .hd-burger { display: inline-flex; }
+  .hd-burger-wrap { display: inline-flex; }
   .hd-inner { padding: 0 16px; gap: 8px; }
   .hd h1 { font-size: 14px; }
 }
@@ -576,6 +576,20 @@ a:hover { text-decoration: underline; }
 
 <header class="hd">
   <div class="hd-inner">
+    <div class="hd-burger-wrap">
+      <button class="hd-burger" id="hdBurger" type="button" aria-label="選單" aria-expanded="false" onclick="toggleHdMenu(event)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+      <div class="hd-menu" id="hdMenu">
+        <a href="index.html">學習工具</a>
+        <a href="about.html">關於網站</a>
+        <a href="howto.html">使用教學</a>
+        <a href="jlpt.html">JLPT 指南</a>
+        <a href="phrases.html">生活會話</a>
+        <a href="verbs.html">動詞變化</a>
+        <a href="contact.html">意見回饋</a>
+        <a href="pricing.html">訂閱方案</a>
+        <a href="partner.html">合作分潤・推薦賺錢</a>
+      </div>
+    </div>
     <h1>日本再留計劃</h1>
     <div class="hd-links">
       <a href="index.html">學習工具</a>
@@ -583,21 +597,6 @@ a:hover { text-decoration: underline; }
       <a href="verbs.html">動詞變化</a>
       <a href="partner.html">合作分潤</a>
       <a href="contact.html">意見回饋</a>
-      <div class="hd-burger-wrap">
-        <button class="hd-burger" id="hdBurger" type="button" aria-label="選單" aria-expanded="false" onclick="toggleHdMenu(event)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
-        <div class="hd-menu" id="hdMenu">
-          <a href="index.html">學習工具</a>
-          <a href="about.html">關於網站</a>
-      <a href="phrases.html">生活會話</a>
-          <a href="howto.html">使用教學</a>
-          <a href="jlpt.html">JLPT 指南</a>
-          <a href="phrases.html">生活會話</a>
-          <a href="verbs.html">動詞變化</a>
-          <a href="contact.html">意見回饋</a>
-          <a href="pricing.html">訂閱方案</a>
-          <a href="partner.html">合作分潤・推薦賺錢</a>
-        </div>
-      </div>
       <button class="lang-btn" id="langBtn" onclick="cycleLang()">繁</button>
       <button class="theme-btn" id="themeBtn" onclick="toggleTheme()" aria-label="切換深色模式"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79z"/></svg></button>
     </div>
