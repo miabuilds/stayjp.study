@@ -202,9 +202,9 @@
     }
     // 原生 App:signInWithPopup 已被 patch 成發 OPEN_LOGIN 原生選單(Google/Apple 原生選)→ 直接觸發,不顯示網頁選單
     if (window.STAYJP_NATIVE && window.STAYJP_NATIVE.isNativeApp) { loginWith('google'); return; }
-    // Apple 網頁登入設定好前:先直接 Google(不彈 Google/Apple 選單)。設定好把下面改回開選單即可。
-    loginWith('google'); return;
-    // var m = document.getElementById('ahxLoginMenu'); if (m) m.classList.toggle('show');
+    // 一般網頁:彈 Google/Apple 選單
+    var m = document.getElementById('ahxLoginMenu');
+    if (m) m.classList.toggle('show');
   }
 
   function loginWith(providerName) {
