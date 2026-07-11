@@ -37,6 +37,7 @@ const Quiz = (() => {
         b.onclick = () => { g.querySelectorAll('button').forEach(x => x.classList.remove('on')); b.classList.add('on'); };
       });
     });
+    if (typeof cvtStaticUI === 'function') cvtStaticUI(box);   // 簡中:把寫死的 範圍/全部/今日學習 轉簡(設定框無日文,安全)
     document.getElementById('quizBg').classList.add('show');
   }
 

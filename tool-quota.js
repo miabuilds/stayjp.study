@@ -213,6 +213,7 @@
           + '<div style="color:#FCD34D">升級 Premium 鎖優惠價,繼續無限使用 →</div>'
         : '<div style="font-weight:700;margin-bottom:2px">✨ 免費試用中・剩 ' + daysLeft + ' 天</div>'
           + '<div style="color:#FCD34D">全工具無限使用,試用後升級鎖價 →</div>';
+      if (typeof cvtStaticUI === 'function') cvtStaticUI(badge);
       return;
     }
     // 試用已結束(這個帳號曾開過試用、現已過期、非付費)→ 轉換提示,取代一般免費版 badge
@@ -220,6 +221,7 @@
       badge.title = '3 天試用已結束。點擊升級,解鎖無限練習。';
       badge.innerHTML = '<div style="font-weight:700;margin-bottom:2px">✨ 3 天試用已結束</div>'
         + '<div style="color:#FCD34D">升級 Premium 解鎖無限練習 →</div>';
+      if (typeof cvtStaticUI === 'function') cvtStaticUI(badge);
       return;
     }
     const c = loadCount();
@@ -228,6 +230,7 @@
       <div style="font-weight:700;margin-bottom:2px">免費版・每工具每天 1 次</div>
       <div style="color:${usedTools.length ? '#F59E0B' : '#fff'}">今日已用：${usedTools.length} 個工具</div>
     `;
+    if (typeof cvtStaticUI === 'function') cvtStaticUI(badge);   // 簡中:徽章寫死繁體轉簡(純中文,安全)
   }
 
   // 重繪學習列表(讓工具按鈕的 🔒/置灰跟著 gating 狀態更新)。只在 index 有 doRender 時生效。

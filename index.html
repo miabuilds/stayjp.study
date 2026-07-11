@@ -3528,13 +3528,35 @@ function ensureOpenCC() {
     if (_tw2cn) return resolve(_tw2cn);
     if (window.OpenCC) {
       _tw2cn = window.OpenCC.Converter({ from: 'tw', to: 'cn' });
+      if (I18n.setConverter) I18n.setConverter(_tw2cn);   // 讓 t() 在 zh-CN 缺 key 時也轉簡,不露繁體
       return resolve(_tw2cn);
     }
     const s = document.createElement('script');
     s.src = 'https://cdn.jsdelivr.net/npm/opencc-js@1.0.5/dist/umd/full.js';
-    s.onload = () => { _tw2cn = window.OpenCC.Converter({ from: 'tw', to: 'cn' }); resolve(_tw2cn); };
+    s.onload = () => {
+      _tw2cn = window.OpenCC.Converter({ from: 'tw', to: 'cn' });
+      if (I18n.setConverter) I18n.setConverter(_tw2cn);
+      resolve(_tw2cn);
+    };
     s.onerror = () => resolve(null);
     document.head.appendChild(s);
+  });
+}
+// 純中文 UI 容器(選單/設定彈窗,無日文詞頭)在 zh-CN 時把寫死的繁體字轉簡。
+// 含假名的文字節點跳過(那是日文),避免動到日文內容;不做全域 walk(會誤傷「動詞」這類日文漢字詞頭)。
+function cvtStaticUI(root) {
+  if (I18n.getLang() !== 'zh-CN') return;
+  const el = typeof root === 'string' ? document.getElementById(root) : root;
+  if (!el) return;
+  if (!_tw2cn) { ensureOpenCC().then(() => cvtStaticUI(el)); return; }   // OpenCC 還沒載好 → 載完再轉(自癒,免時序競態)
+  const kana = /[ぁ-ゖァ-ヺー]/;
+  const w = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+  const list = []; let n;
+  while ((n = w.nextNode())) list.push(n);
+  list.forEach(node => {
+    if (kana.test(node.nodeValue)) return;
+    const c = _tw2cn(node.nodeValue);
+    if (c !== node.nodeValue) node.nodeValue = c;
   });
 }
 
@@ -3645,8 +3667,9 @@ async function cycleLang() {
 }
 
 // 若 localStorage 記錄使用者上次選簡中，頁面載入就先把 OpenCC 準備好再 render
+// OpenCC 載入後要「重跑 applyI18n」:初次 applyI18n 時 converter 還沒好,缺 zh-CN key 的字會露繁體,重跑才轉簡。
 if (typeof I18n !== 'undefined' && I18n.getLang() === 'zh-CN') {
-  ensureOpenCC().then(() => { if (typeof doRender === 'function') doRender(); });
+  ensureOpenCC().then(() => { applyI18n(); if (typeof doRender === 'function') doRender(); });
 }
 
 // 頁面 idle 時預載 OpenCC → 點「簡」可瞬間切換
@@ -3785,6 +3808,7 @@ setTimeout(()=>{ if(typeof SRS!=='undefined') SRS.updateReviewCount(); }, 100);
 function openMoreMenu() {
   var m = document.getElementById('moreMenu');
   if (m.classList.contains('open')) { closeMore(); return; }
+  cvtStaticUI('moreMenu');   // 簡中模式:把選單裡寫死(無 data-i18n)的繁體字轉簡,避免繁簡混雜
   document.getElementById('moreBackdrop').classList.add('show');
   m.classList.add('open');
 }
