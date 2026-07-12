@@ -1376,6 +1376,7 @@ html[lang="en"] .ci2 { display: none; }
     <span class="stats" id="stats"></span>
     <button class="lang-btn" id="langBtn" onclick="cycleLang()">繁</button>
     <button class="theme-btn" id="themeBtn" onclick="toggleTheme()" data-i18n-aria="theme_toggle" aria-label="切換深色模式"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79z"/></svg></button>
+    <button class="theme-btn" onclick="showQuickGuide()" data-i18n-aria="quick_guide" aria-label="使用說明" title="使用說明"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9.5"/><path d="M9.2 9.3a2.9 2.9 0 0 1 5.6 1c0 1.9-2.8 2.5-2.8 2.5"/><path d="M12 16.8h.01"/></svg></button>
     <button class="streak-btn" id="streakBtn" onclick="Streak.showInfo()" title="連續學習天數" style="display:none">
       <span class="streak-flame">🔥</span><span class="streak-num" id="streakNum">0</span>
     </button>
@@ -2833,6 +2834,16 @@ function _onbRemove() {
   if (m) { m.classList.remove('show'); setTimeout(() => m.remove(), 300); }
 }
 function onbFinish() { localStorage.setItem('onboarding_done_v1', '1'); _onbRemove(); }
+// 快速上手提示(引導第二步 + 「?」重看 共用)。豐富到 5 條,直接回答「這畫面在幹嘛」。
+function quickTipsHTML() {
+  return '<div class="onb-tips">' +
+    '<div class="onb-tip"><span class="onb-tip-ic">📚</span><span class="onb-tip-tx">' + enOr(cvt('上方切換 <b>單字 / 文法</b>,選 N5–N1 級別,內容全部免費看。'), 'Switch <b>Vocabulary / Grammar</b> and pick N5–N1 up top — all free to browse.') + '</span></div>' +
+    '<div class="onb-tip"><span class="onb-tip-ic">🔊</span><span class="onb-tip-tx">' + enOr(cvt('<b>點卡片上半</b>唸單字、<b>點例句</b>唸例句,真人發音。'), 'Tap the <b>top of a card</b> to hear the word, tap the <b>example</b> to hear the sentence — real voice.') + '</span></div>' +
+    '<div class="onb-tip"><span class="onb-tip-ic">✍️</span><span class="onb-tip-tx">' + enOr(cvt('下方 <b>測驗・複習・我的</b>:做題、間隔複習、看進度。'), 'Bottom bar <b>Quiz · Review · Me</b>: quizzes, spaced review, your progress.') + '</span></div>' +
+    '<div class="onb-tip"><span class="onb-tip-ic">🛠</span><span class="onb-tip-tx">' + enOr(cvt('右下 <b>更多</b> 有模擬考、文法/敬語練習、動詞變化等工具。'), 'Bottom-right <b>More</b> has mock exams, grammar/keigo practice, verb conjugation and more.') + '</span></div>' +
+    '<div class="onb-tip"><span class="onb-tip-ic">🔥</span><span class="onb-tip-tx">' + enOr(cvt('每天回來學一點,右上 <b>火焰</b> 記錄連續天數。'), 'Come back daily — the <b>streak flame</b> up top counts your consecutive days.') + '</span></div>' +
+  '</div>';
+}
 function onbPick(lv) {
   try { if (currentMode !== 'grammar') switchMode('grammar'); } catch (e) {}
   try { switchLevel(lv); } catch (e) {}
@@ -2841,12 +2852,22 @@ function onbPick(lv) {
   card.innerHTML =
     '<div class="onb-title">' + enOr(cvt('準備好了!'), "You're all set!") + '</div>' +
     '<div class="onb-sub">' + enOr('已幫你切到 ' + lv.toUpperCase() + ',先認識一下畫面:', 'Switched you to ' + lv.toUpperCase() + '. A quick tour of the screen:') + '</div>' +
-    '<div class="onb-tips">' +
-      '<div class="onb-tip"><span class="onb-tip-ic">📚</span><span class="onb-tip-tx">' + enOr(cvt('上方切換 <b>單字 / 文法</b>,內容全部免費看。'), 'Switch between <b>Vocabulary / Grammar</b> up top — all content is free to browse.') + '</span></div>' +
-      '<div class="onb-tip"><span class="onb-tip-ic">✍️</span><span class="onb-tip-tx">' + enOr(cvt('下方 <b>測驗・複習・我的</b>:做題、背單字卡、看進度。'), 'Down below, <b>Quiz · Review · Me</b>: take quizzes, drill flashcards, track your progress.') + '</span></div>' +
-      '<div class="onb-tip"><span class="onb-tip-ic">🔥</span><span class="onb-tip-tx">' + enOr(cvt('每天回來學一點,右上 <b>火焰</b> 記錄你的連續天數。'), 'Come back a little each day — the <b>streak flame</b> up top tracks your consecutive days.') + '</span></div>' +
-    '</div>' +
+    quickTipsHTML() +
     '<button class="onb-start" onclick="onbFinish()">' + enOr(cvt('開始學習'), 'Start learning') + '</button>';
+}
+// 隨時重看的快速上手(由 header 的「?」觸發;不寫 onboarding_done、可重複開)
+function showQuickGuide() {
+  if (document.getElementById('onbMask')) return;
+  const m = document.createElement('div');
+  m.id = 'onbMask'; m.className = 'onb-mask';
+  m.innerHTML = '<div class="onb-card" role="dialog" aria-modal="true">' +
+    '<div class="onb-title">' + enOr(cvt('快速上手'), 'Quick Start') + '</div>' +
+    '<div class="onb-sub">' + enOr(cvt('這個畫面怎麼用:'), 'How to use this screen:') + '</div>' +
+    quickTipsHTML() +
+    '<button class="onb-start" onclick="_onbRemove()">' + enOr(cvt('知道了'), 'Got it') + '</button>' +
+  '</div>';
+  document.body.appendChild(m);
+  requestAnimationFrame(() => m.classList.add('show'));
 }
 function showOnboarding() {
   if (document.getElementById('onbMask')) return;
