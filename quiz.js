@@ -100,7 +100,7 @@ const Quiz = (() => {
     if (count === undefined) { count = distractorPool; distractorPool = source; }
     // 選讀音題型：排除純假名詞（w === r），否則題目和正解同形沒意義
     const filtered = quizType === 'reading' ? source.filter(d => d.w !== d.r) : source;
-    const shuffled = [...filtered].sort(() => Math.random() - 0.5);
+    const shuffled = (typeof shuf === 'function' ? shuf(filtered) : [...filtered]);
     const picked = shuffled.slice(0, Math.min(count, shuffled.length));
     return picked.map(word => {
       let distractors;
@@ -120,7 +120,7 @@ const Quiz = (() => {
           return d.w !== word.w; // meaning2word
         }).sort(() => Math.random() - 0.5).slice(0, 3);
       }
-      const options = [word, ...distractors].sort(() => Math.random() - 0.5);
+      const options = (typeof shuf === 'function' ? shuf([word, ...distractors]) : [word, ...distractors]);
       return { word, options, correctIdx: options.indexOf(word) };
     });
   }
