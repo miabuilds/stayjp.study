@@ -18,8 +18,17 @@ const Calendar = (() => {
     else if (type === 'quiz') log[d].quiz++;
     saveLog(log);
     if (typeof saveAllCloud === 'function') saveAllCloud();
-    // 留存:學完一次後(App)邀請開每日提醒。延遲避免打斷當下操作;maybePromptReminder 自帶「只一次/只App/不蓋測驗」守衛。
-    if (typeof maybePromptReminder === 'function') setTimeout(maybePromptReminder, 1500);
+    // 留存:學完一次後(App)邀請開每日提醒。
+    // ⚠️ logActivity 常在「測驗結果頁」觸發,此時 .quiz-bg 還開著 → maybePromptReminder 會被「不蓋測驗」守衛擋掉。
+    //    所以用重試:每 1.5s 試一次,直到測驗框關閉(回到列表)才彈;成功後設 flag、interval 自停。最多 ~30s。
+    if (typeof maybePromptReminder === 'function') {
+      var _rtry = 0;
+      var _riv = setInterval(function () {
+        _rtry++;
+        if (localStorage.getItem('reminder_prompted_v1') || _rtry > 20) { clearInterval(_riv); return; }
+        maybePromptReminder();
+      }, 1500);
+    }
   }
 
   // Calculate streaks
