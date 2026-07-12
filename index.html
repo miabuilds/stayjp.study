@@ -1999,6 +1999,9 @@ function toggleFavFilter() {
 let st; function onSearch(v) { clearTimeout(st); st = setTimeout(() => { searchTerm = v.trim().toLowerCase(); doRender(); }, 200); }
 window.doRender = doRender;   // 給 tool-quota:用完額度後即時重繪,🔒 立刻顯示(免 reload)
 function doRender() {
+  // 語言就緒前先不渲染內容:en/zh-CN 要先把英文疊層 / OpenCC 準備好,否則會先閃繁體再跳 → 外國/簡中使用者體驗差。
+  // zh-TW 一開始就 ready;en/zh-CN 由 applyContentLang / ensureOpenCC 完成後設 true(有 3s fallback 防卡死)。
+  if (!window._langReady) return;
   document.body.classList.remove('profile-view');   // 回到學習列表 → 還原側邊欄(離開「我的」)
   if (currentMode==='vocab') renderVocab();
   else if (currentMode==='confuse') renderConfuse();
@@ -3686,7 +3689,7 @@ async function cycleLang() {
 // 若 localStorage 記錄使用者上次選簡中，頁面載入就先把 OpenCC 準備好再 render
 // OpenCC 載入後要「重跑 applyI18n」:初次 applyI18n 時 converter 還沒好,缺 zh-CN key 的字會露繁體,重跑才轉簡。
 if (typeof I18n !== 'undefined' && I18n.getLang() === 'zh-CN') {
-  ensureOpenCC().then(() => { applyI18n(); if (typeof doRender === 'function') doRender(); });
+  ensureOpenCC().then(() => { applyI18n(); window._langReady = true; if (typeof doRender === 'function') doRender(); });
 }
 
 // 頁面 idle 時預載 OpenCC → 點「簡」可瞬間切換
@@ -3741,6 +3744,10 @@ function updateThemeIcon() {
 }
 initTheme();
 applyI18n();
+// 語言就緒旗標:zh-TW 立即可渲染;en/zh-CN 等英文疊層 / OpenCC 就緒(見下方 ready 區塊)。
+// fallback:萬一準備失敗,3 秒後強制放行,內容一定會出來(不會空白卡死)。
+window._langReady = (typeof I18n === 'undefined') || (I18n.getLang() !== 'en' && I18n.getLang() !== 'zh-CN');
+setTimeout(function () { if (!window._langReady) { window._langReady = true; if (typeof doRender === 'function') doRender(); } }, 3000);
 
 // 一次性清理：舊版 cloud merge bug 造成 word_notebook 同 (w, lv) 累積重複
 // 修 key: JSON.stringify(entry) → (w, lv)，並同步回 cloud
@@ -3775,7 +3782,7 @@ if(location.hash){const el=document.querySelector(location.hash);if(el&&el.class
 // 等內容資料就位（重訪通常立刻 resolve，首訪等 Firestore fetch）→ 餵 Listening/Reading items + 跑需要 vocab data 的遷移 + 重 render
 (typeof ContentLoader !== 'undefined' ? ContentLoader.ready() : Promise.resolve()).then(async () => {
   // lang=en:內容就位後先疊英文,再重繪讓文法/單字卡呈現英文(例句/解說)
-  if (I18n.getLang() === 'en') { try { await applyContentLang(); if (typeof doRender === 'function') doRender(); } catch (_) {} }
+  if (I18n.getLang() === 'en') { try { await applyContentLang(); } catch (_) {} window._langReady = true; if (typeof doRender === 'function') doRender(); }
   // lang=en:把 reading/listening 題目(q/options/解說)就地換成英文(日文文章/音檔腳本不動);由 reading-listening-en.js 提供
   if (I18n.getLang() === 'en' && window.RL_EN) {
     try {
