@@ -685,14 +685,14 @@ body.profile-view .mn { margin-left: 0; max-width: none; }   /* 滿版 → 內�
 .vi {
   background: var(--bg2); border: 1px solid var(--bd);
   border-radius: var(--r); padding: 14px;
-  display: flex; align-items: flex-start; gap: 10px;
   transition: border-color .2s var(--ease); position: relative;
   cursor: pointer;
 }
 [data-theme="dark"] .vi:hover { box-shadow: none; }
 .vi:hover { border-color: var(--ac2); }
-.vi .vl { flex: 1; min-width: 0; }
-.vi .vw { font-size: 20px; font-weight: 700; line-height: 1.3; color: var(--tx); font-family: "Hiragino Mincho ProN", "Noto Serif JP", serif; }
+/* 控制項(喇叭/変/詞性/★)絕對定位右上 → 詞義、例句、虛線都滿版 */
+.vi .vx-ctrl { position: absolute; top: 12px; right: 12px; display: flex; align-items: center; gap: 8px; z-index: 1; }
+.vi .vw { font-size: 20px; font-weight: 700; line-height: 1.3; color: var(--tx); font-family: "Hiragino Mincho ProN", "Noto Serif JP", serif; padding-right: 150px; }
 .vi .vr { font-size: 12px; color: var(--ac2); margin-top: 2px; }
 .vi .vm { font-size: 14px; color: var(--tx2); margin-top: 4px; }
 /* 例句:接在中文意思下方,日文句 + 對應語言翻譯。整塊 data-nolang,語言由渲染時決定 */
@@ -3220,6 +3220,20 @@ function renderVocab() {
   // 從 .vi 的 data-r（平假名讀音）發音，fallback 到 data-w（漢字）
   const spkSvg = '<svg class="spk" onclick="event.stopPropagation();var vi=this.closest(\'.vi\');speak(vi.dataset.r||vi.dataset.w)" viewBox="0 0 24 24"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.54 8.46a5 5 0 010 7.07M19.07 4.93a10 10 0 010 14.14"/></svg>';
 
+  // 單一單字卡 HTML(兩處渲染共用,免分歧)。控制項(喇叭/変/詞性/★)絕對定位右上,
+  // 讓詞義+例句+虛線滿版;虛線上半=點卡身唸單字,虛線下半=點例句唸例句(見 document click 委派)。
+  // 例句一律可點(音檔已全生成,speak() 有 mp3 用 mp3、沒有退瀏覽器 TTS)。
+  const esc1 = s => (''+s).replace(/'/g, "\\'");
+  function vocabCardHTML(d, catName, isFav) {
+    const verbBtn = d.c === '動' ? `<button class="verb-btn" onclick="event.stopPropagation();openVerbModal('${esc1(d.w)}','${esc1(d.r||'')}')" title="變化表">変</button>` : '';
+    const ex = d.ex ? `<div class="vex" data-nolang data-j="${(''+d.ex.j).replace(/"/g,'&quot;')}" onclick="event.stopPropagation();speak(this.dataset.j)" title="${enOr('點例句聽發音','Tap to hear')}"><span class="exj">${d.ex.j}<svg class="vex-spk" viewBox="0 0 24 24"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.54 8.46a5 5 0 010 7.07M19.07 4.93a10 10 0 010 14.14"/></svg></span><span class="exz">${enOr(d.ex.z,d.ex.e||'')}</span></div>` : '';
+    return `<div class="vi" data-fid="${d.w}" data-w="${d.w}" data-r="${d.r||''}">`
+      + `<div class="vx-ctrl">${spkSvg}${verbBtn}<span class="vp">${catLabel(catName)}</span><svg class="star ${isFav?'on':''}" onclick="event.stopPropagation();toggleFav('${esc1(d.w)}')" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>`
+      + `<div class="vw">${d.w}</div>${d.w!==d.r?`<div class="vr">${d.r}</div>`:''}<div class="vm">${cvt(d.m)}</div>`
+      + ex
+      + `</div>`;
+  }
+
   // Use virtual list for full list (no search, no daily, no fav filter)
   const useVL = !lf && !showFavOnly && !dailyMode && typeof VirtualList !== 'undefined' && filtered.length > 200;
 
@@ -3255,8 +3269,7 @@ function renderVocab() {
         }
         const d = entry.d;
         const isFav = favList.includes(d.w);
-        const verbBtn = d.c === '動' ? `<button class="verb-btn" onclick="event.stopPropagation();openVerbModal('${d.w.replace(/'/g,"\\'")}','${(d.r||'').replace(/'/g,"\\'")}')" title="變化表">変</button>` : '';
-        return `<div class="vi" data-fid="${d.w}" data-w="${d.w}" data-r="${d.r||''}"><div class="vl"><div class="vw">${d.w}</div>${d.w!==d.r?`<div class="vr">${d.r}</div>`:''}<div class="vm">${cvt(d.m)}</div>${d.ex?`<div class="vex" data-nolang${(window.__TTS&&window.__TTS[d.ex.j])?` data-j="${(''+d.ex.j).replace(/"/g,'&quot;')}" onclick="event.stopPropagation();speak(this.dataset.j)" title="${enOr('點例句聽發音','Tap to hear')}"`:''}><span class="exj">${d.ex.j}${(window.__TTS&&window.__TTS[d.ex.j])?`<svg class="vex-spk" viewBox="0 0 24 24"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.54 8.46a5 5 0 010 7.07M19.07 4.93a10 10 0 010 14.14"/></svg>`:''}</span><span class="exz">${enOr(d.ex.z,d.ex.e||'')}</span></div>`:''}</div>${spkSvg}${verbBtn}<span class="vp">${catLabel(entry.catName)}</span><svg class="star ${isFav?'on':''}" onclick="toggleFav('${d.w.replace(/'/g,"\\'")}')" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>`;
+        return vocabCardHTML(d, entry.catName, isFav);
       }
     });
 
@@ -3276,8 +3289,7 @@ function renderVocab() {
       h += '<div class="vg">';
       items.forEach(d => {
         const isFav = favList.includes(d.w);
-        const verbBtn = d.c === '動' ? `<button class="verb-btn" onclick="event.stopPropagation();openVerbModal('${d.w.replace(/'/g,"\\'")}','${(d.r||'').replace(/'/g,"\\'")}')" title="變化表">変</button>` : '';
-        h += `<div class="vi" data-fid="${d.w}" data-w="${d.w}" data-r="${d.r||''}"><div class="vl"><div class="vw">${d.w}</div>${d.w!==d.r?`<div class="vr">${d.r}</div>`:''}<div class="vm">${cvt(d.m)}</div>${d.ex?`<div class="vex" data-nolang${(window.__TTS&&window.__TTS[d.ex.j])?` data-j="${(''+d.ex.j).replace(/"/g,'&quot;')}" onclick="event.stopPropagation();speak(this.dataset.j)" title="${enOr('點例句聽發音','Tap to hear')}"`:''}><span class="exj">${d.ex.j}${(window.__TTS&&window.__TTS[d.ex.j])?`<svg class="vex-spk" viewBox="0 0 24 24"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.54 8.46a5 5 0 010 7.07M19.07 4.93a10 10 0 010 14.14"/></svg>`:''}</span><span class="exz">${enOr(d.ex.z,d.ex.e||'')}</span></div>`:''}</div>${spkSvg}${verbBtn}<span class="vp">${catLabel(cat.name)}</span><svg class="star ${isFav?'on':''}" onclick="toggleFav('${d.w.replace(/'/g,"\\'")}')" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>`;
+        h += vocabCardHTML(d, cat.name, isFav);
       });
       h += '</div></section>';
     });
