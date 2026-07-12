@@ -2902,12 +2902,21 @@ function maybePromptReminder() {
   m.id = 'onbMask'; m.className = 'onb-mask';
   m.innerHTML = '<div class="onb-card" role="dialog" aria-modal="true">' +
     '<div class="onb-title">' + enOr(cvt('開個每日提醒?'), 'Turn on a daily reminder?') + '</div>' +
-    '<div class="onb-sub">' + enOr(cvt('每天固定時間輕輕提醒你來學一下——養成習慣最有效,不怕忘記、streak 不斷。'), 'A gentle nudge at the same time each day — the best way to build the habit and keep your streak alive.') + '</div>' +
-    '<button class="onb-start" onclick="enableDailyReminder(\'20:00\')">' + enOr(cvt('好,晚上 8 點提醒我'), 'Yes, remind me at 8 PM') + '</button>' +
+    '<div class="onb-sub">' + enOr(cvt('選個你方便的時間,每天輕輕提醒你來學一下——養成習慣最有效,streak 不斷。'), 'Pick a time that suits you — a gentle daily nudge is the best way to build the habit and keep your streak alive.') + '</div>' +
+    '<div style="display:flex;align-items:center;justify-content:center;gap:10px;margin:16px 0">' +
+      '<span style="font-size:14px;color:var(--tx2)">' + enOr(cvt('提醒時間'), 'Time') + '</span>' +
+      '<input type="time" id="rmTime" value="20:00" style="font-size:19px;padding:8px 12px;border:1px solid var(--bd);border-radius:10px;background:var(--bg2);color:var(--tx)">' +
+    '</div>' +
+    '<button class="onb-start" onclick="enableDailyReminderFromInput()">' + enOr(cvt('開啟提醒'), 'Turn on reminder') + '</button>' +
     '<button class="onb-skip" onclick="_onbRemove()">' + enOr(cvt('先不用'), 'Not now') + '</button>' +
   '</div>';
   document.body.appendChild(m);
   requestAnimationFrame(() => m.classList.add('show'));
+}
+function enableDailyReminderFromInput() {
+  var inp = document.getElementById('rmTime');
+  var time = (inp && inp.value) ? inp.value : '20:00';
+  enableDailyReminder(time);
 }
 function enableDailyReminder(time) {
   _onbRemove();
