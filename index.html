@@ -2919,6 +2919,31 @@ function enableDailyReminder(time) {
   } catch (e) {}
   localStorage.setItem('reminder_time_pref', time || '20:00');
 }
+// 重試直到不在測驗/引導畫面才彈(測驗結果頁還開著時 maybePromptReminder 會自我跳過)。成功設 flag、自停。
+function startReminderPrompt() {
+  var tries = 0;
+  var iv = setInterval(function () {
+    tries++;
+    if (localStorage.getItem('reminder_prompted_v1') || tries > 20) { clearInterval(iv); return; }
+    maybePromptReminder();
+  }, 1500);
+}
+function _hasStudyActivity() {
+  try {
+    var q = localStorage.getItem('quiz_history'); if (q && q !== '[]') return true;
+    var sl = localStorage.getItem('study_log'); if (sl && sl !== '{}') return true;
+    var sr = localStorage.getItem('srs_data'); if (sr && sr !== '{}') return true;
+    var nb = localStorage.getItem('word_notebook'); if (nb && nb !== '[]') return true;
+  } catch (e) {}
+  return false;
+}
+// 開 app:App + 未提醒過 + 曾經學過 → 等引導/語言就緒後主動邀請(不必非得剛做完測驗才觸發)
+setTimeout(function () {
+  if (window.STAYJP_NATIVE && window.STAYJP_NATIVE.isNativeApp
+    && !localStorage.getItem('reminder_prompted_v1') && _hasStudyActivity()) {
+    startReminderPrompt();
+  }
+}, 4000);
 function maybeShowOnboarding() {
   if (localStorage.getItem('onboarding_done_v1')) return;
   if (_onbHasData()) { localStorage.setItem('onboarding_done_v1', '1'); return; } // 既有用戶:標記、永不顯示
