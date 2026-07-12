@@ -95,7 +95,7 @@ const GrammarDrill = (() => {
       const learned = new Set(Object.keys(srs));
       queue = data.filter(d => !learned.has(d.id)).slice(0, 15);
     } else {
-      queue = [...data].sort(() => Math.random() - 0.5).slice(0, 20);
+      queue = (typeof shuf === 'function' ? shuf(data) : [...data]).slice(0, 20);
     }
 
     if (!queue.length) { alert(t('gd_no_match')); return; }
@@ -187,7 +187,7 @@ const GrammarDrill = (() => {
       });
     });
     const wrong = distractPool.sort(() => Math.random() - 0.5).slice(0, 3);
-    const options = [answer, ...wrong].sort(() => Math.random() - 0.5);
+    const options = (typeof shuf === 'function' ? shuf([answer, ...wrong]) : [answer, ...wrong]);
     const correctIdx = options.indexOf(answer);
     const blanked = eg.j.replace(/<em>(.*?)<\/em>/, '＿＿＿＿');
     const pureJ = blanked.replace(/<[^>]+>/g, '').replace(/'/g, "\\'");

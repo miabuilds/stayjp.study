@@ -3555,6 +3555,10 @@ function ensureOpenCC() {
     document.head.appendChild(s);
   });
 }
+// Fisher-Yates 洗牌(全域)。⚠️ 別用 arr.sort(()=>Math.random()-0.5):對小陣列(如 4 選項)有嚴重偏差,
+// 會讓原本 index 0 的元素(選擇題常把正解放第一個)大機率留在左上 → 答案老是左上。測驗選項/抽題一律用這個。
+window.shuf = function (a) { a = a.slice(); for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var t = a[i]; a[i] = a[j]; a[j] = t; } return a; };
+
 // 純中文 UI 容器(選單/設定彈窗,無日文詞頭)在 zh-CN 時把寫死的繁體字轉簡。
 // 含假名的文字節點跳過(那是日文),避免動到日文內容;不做全域 walk(會誤傷「動詞」這類日文漢字詞頭)。
 function cvtStaticUI(root) {

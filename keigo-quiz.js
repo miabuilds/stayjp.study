@@ -25,7 +25,7 @@ const KeigoQuiz = (() => {
 
   let questions = [], current = 0, score = 0, results = [];
   let mode = "plain2keigo", kind = "both";
-  const shuffle = a => [...a].sort(() => Math.random() - 0.5);
+  const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
   const eo = (zh, en) => (typeof enOr === "function" ? enOr(zh, en) : zh);
   const typeZhEn = ty => ty === "sonkei" ? ["尊敬語", "Respectful"] : ["謙譲語", "Humble"];
 

@@ -90,10 +90,11 @@ const MockExam = (() => {
     const correctSentence = makeUsageSentence(word, true);
     const wrongSentences = wrongs.map(wr => makeUsageSentence(wr, false, w));
 
-    const all = [
+    const allOpts = [
       { text: correctSentence, correct: true },
       ...wrongSentences.map(s => ({ text: s, correct: false }))
-    ].sort(() => Math.random() - 0.5);
+    ];
+    const all = (typeof shuf === 'function' ? shuf(allOpts) : allOpts);
 
     return { sentences: all, correctIdx: all.findIndex(a => a.correct) };
   }
