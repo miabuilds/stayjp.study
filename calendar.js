@@ -18,6 +18,8 @@ const Calendar = (() => {
     else if (type === 'quiz') log[d].quiz++;
     saveLog(log);
     if (typeof saveAllCloud === 'function') saveAllCloud();
+    // 留存:學完一次後(App)邀請開每日提醒。延遲避免打斷當下操作;maybePromptReminder 自帶「只一次/只App/不蓋測驗」守衛。
+    if (typeof maybePromptReminder === 'function') setTimeout(maybePromptReminder, 1500);
   }
 
   // Calculate streaks

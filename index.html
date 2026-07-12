@@ -2891,6 +2891,34 @@ function showOnboarding() {
   document.body.appendChild(m);
   requestAnimationFrame(() => m.classList.add('show'));
 }
+// 留存最大槓桿:第一次學完後,主動邀請開「每日提醒」。一次性。
+// ⚠️ 只在 App 顯示 —— 原生能可靠排本地通知把人拉回來;純網頁瀏覽器關閉分頁後無法可靠排程(要 push 後端,另議)。
+function maybePromptReminder() {
+  if (localStorage.getItem('reminder_prompted_v1')) return;
+  if (!(window.STAYJP_NATIVE && window.STAYJP_NATIVE.isNativeApp)) return;   // App 專用
+  if (document.querySelector('.quiz-bg.show') || document.getElementById('onbMask')) return;   // 別蓋在測驗/引導上,下次活動再試
+  localStorage.setItem('reminder_prompted_v1', '1');
+  const m = document.createElement('div');
+  m.id = 'onbMask'; m.className = 'onb-mask';
+  m.innerHTML = '<div class="onb-card" role="dialog" aria-modal="true">' +
+    '<div class="onb-title">' + enOr(cvt('開個每日提醒?'), 'Turn on a daily reminder?') + '</div>' +
+    '<div class="onb-sub">' + enOr(cvt('每天固定時間輕輕提醒你來學一下——養成習慣最有效,不怕忘記、streak 不斷。'), 'A gentle nudge at the same time each day — the best way to build the habit and keep your streak alive.') + '</div>' +
+    '<button class="onb-start" onclick="enableDailyReminder(\'20:00\')">' + enOr(cvt('好,晚上 8 點提醒我'), 'Yes, remind me at 8 PM') + '</button>' +
+    '<button class="onb-skip" onclick="_onbRemove()">' + enOr(cvt('先不用'), 'Not now') + '</button>' +
+  '</div>';
+  document.body.appendChild(m);
+  requestAnimationFrame(() => m.classList.add('show'));
+}
+function enableDailyReminder(time) {
+  _onbRemove();
+  try {
+    if (window.STAYJP_NATIVE && window.STAYJP_NATIVE.isNativeApp && window.ReactNativeWebView) {
+      // 交給原生:web.tsx 的 SET_REMINDER 會先要通知權限、再排每日本地通知
+      window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'SET_REMINDER', payload: { time: time || '20:00' } }));
+    }
+  } catch (e) {}
+  localStorage.setItem('reminder_time_pref', time || '20:00');
+}
 function maybeShowOnboarding() {
   if (localStorage.getItem('onboarding_done_v1')) return;
   if (_onbHasData()) { localStorage.setItem('onboarding_done_v1', '1'); return; } // 既有用戶:標記、永不顯示
