@@ -2092,5 +2092,26 @@ const VOCAB_N3 = [
 {w:"大雑把に",r:"おおざっぱに",m:"粗略地",c:"他",ex:{j:"細かい数字はいいので、大雑把に予算を教えてください。",z:"詳細數字不用,請粗略地告訴我預算就好。",e:"You don't need exact figures; just give me a rough estimate of the budget."}},
 {w:"至急",r:"しきゅう",m:"火速",c:"他",ex:{j:"至急ご連絡いただきたい件がございますので、折り返しお電話ください。",z:"有一件需要火速聯絡的事,請您回撥電話。",e:"There's a matter I need to reach you about urgently, so please call me back."}},
 {w:"早急に",r:"さっきゅうに",m:"趕緊",c:"他",ex:{j:"この問題については、早急に対策を立てる必要があります。",z:"關於這個問題,必須趕緊制定對策。",e:"We need to come up with countermeasures for this problem as soon as possible."}},
-{w:"徹底的に",r:"てっていてきに",m:"徹底地",c:"他",ex:{j:"原因が分かるまで、徹底的に調べさせていただきます。",z:"在查明原因之前,請容我徹底地調查。",e:"I will investigate thoroughly until the cause is found."}}
+{w:"徹底的に",r:"てっていてきに",m:"徹底地",c:"他",ex:{j:"原因が分かるまで、徹底的に調べさせていただきます。",z:"在查明原因之前,請容我徹底地調查。",e:"I will investigate thoroughly until the cause is found."}},
+// ── 擬態語・疊字詞(擴充)──
+{w:"きらきら",r:"きらきら",m:"閃閃發光",c:"副",ex:{j:"夜空に星がきらきら輝いている。",z:"夜空中星星閃閃發光。",e:"The stars are twinkling in the night sky."}},
+{w:"ぴかぴか",r:"ぴかぴか",m:"亮晶晶",c:"副",ex:{j:"靴をぴかぴかに磨いた。",z:"把鞋子擦得亮晶晶。",e:"I polished my shoes until they shone."}},
+{w:"こつこつ",r:"こつこつ",m:"勤懇踏實地",c:"副",ex:{j:"毎日こつこつ努力を続けた。",z:"每天踏實地持續努力。",e:"I kept working at it steadily every day."}},
+{w:"ぶつぶつ",r:"ぶつぶつ",m:"嘟囔;抱怨",c:"副",ex:{j:"彼は不満をぶつぶつ言っている。",z:"他嘟嘟囔囔地發牢騷。",e:"He's muttering complaints under his breath."}},
+{w:"からから",r:"からから",m:"乾透;口渴",c:"副",ex:{j:"のどがからからに渇いた。",z:"喉嚨渴得要命。",e:"My throat is completely parched."}},
+{w:"くたくた",r:"くたくた",m:"精疲力竭",c:"副",ex:{j:"一日中歩いてくたくたになった。",z:"走了一整天,累得精疲力竭。",e:"I walked all day and I'm worn out."}},
+{w:"びっくり",r:"びっくり",m:"嚇一跳",c:"副",ex:{j:"突然の大きな音にびっくりした。",z:"被突然的巨響嚇了一跳。",e:"I was startled by the sudden loud noise."}},
+{w:"うきうき",r:"うきうき",m:"雀躍;興高采烈",c:"副",ex:{j:"明日の旅行を思うとうきうきする。",z:"一想到明天的旅行就雀躍不已。",e:"I feel giddy thinking about tomorrow's trip."}},
+{w:"すやすや",r:"すやすや",m:"香甜地睡",c:"副",ex:{j:"赤ちゃんがすやすや眠っている。",z:"嬰兒睡得香甜。",e:"The baby is sleeping peacefully."}},
+{w:"ちょくちょく",r:"ちょくちょく",m:"時常;三不五時",c:"副",ex:{j:"最近、彼とちょくちょく会う。",z:"最近三不五時和他見面。",e:"Lately I run into him quite often."}},
+{w:"わいわい",r:"わいわい",m:"熱鬧喧嘩",c:"副",ex:{j:"友達とわいわい騒いで楽しかった。",z:"和朋友吵吵鬧鬧地玩得很開心。",e:"We had a lively, noisy time with friends."}},
+{w:"きっぱり",r:"きっぱり",m:"斷然;乾脆",c:"副",ex:{j:"彼の誘いをきっぱり断った。",z:"斷然拒絕了他的邀約。",e:"I turned down his invitation flatly."}},
+{w:"ぶかぶか",r:"ぶかぶか",m:"(衣物)寬鬆晃蕩",c:"副",ex:{j:"このズボンは大きくてぶかぶかだ。",z:"這條褲子太大,鬆垮垮的。",e:"These pants are too big and baggy."}},
+{w:"がやがや",r:"がやがや",m:"吵嚷(人聲鼎沸)",c:"副",ex:{j:"教室ががやがやとうるさい。",z:"教室裡人聲鼎沸很吵。",e:"The classroom is noisy with chatter."}},
+{w:"うとうと",r:"うとうと",m:"打瞌睡",c:"副",ex:{j:"電車の中でうとうとしてしまった。",z:"在電車上不小心打起了瞌睡。",e:"I dozed off on the train."}},
+{w:"ずきずき",r:"ずきずき",m:"抽痛",c:"副",ex:{j:"頭がずきずき痛む。",z:"頭一陣陣抽痛。",e:"My head is throbbing."}},
+{w:"ぷんぷん",r:"ぷんぷん",m:"怒氣沖沖;(氣味)撲鼻",c:"副",ex:{j:"彼女は朝から怒ってぷんぷんしている。",z:"她從早上就氣呼呼的。",e:"She's been in a huff since this morning."}},
+{w:"ねばねば",r:"ねばねば",m:"黏糊糊",c:"副",ex:{j:"納豆はねばねばしている。",z:"納豆黏糊糊的。",e:"Natto is sticky and stringy."}},
+{w:"もぐもぐ",r:"もぐもぐ",m:"(閉嘴)咀嚼",c:"副",ex:{j:"子供が何かをもぐもぐ食べている。",z:"小孩正在嘴巴閉著嚼東西。",e:"The child is munching on something."}},
+{w:"ごくごく",r:"ごくごく",m:"咕嘟咕嘟(喝)",c:"副",ex:{j:"冷たい水をごくごく飲んだ。",z:"咕嘟咕嘟地喝下冰水。",e:"I gulped down the cold water."}}
 ];
