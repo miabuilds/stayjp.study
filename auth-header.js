@@ -94,28 +94,24 @@
   function injectLangSwitcher() {
     try {
       if (typeof I18n === 'undefined' || !I18n.getLang || !I18n.setLang) return;
-      if (document.getElementById('langBtn') || typeof window.cycleLang === 'function') return; // 頁面已有
-      if (document.getElementById('ahxLangBtn')) return;                                          // 防重複
-      var CYCLE = ['zh-TW', 'zh-CN', 'en'];
-      var LABEL = { 'zh-TW': '繁', 'zh-CN': '简', 'en': 'EN' };
-      var btn = document.createElement('button');
-      btn.type = 'button';
-      btn.id = 'ahxLangBtn';
-      btn.className = 'ahx-btn';
-      btn.style.padding = '5px 11px';
-      btn.setAttribute('aria-label', '切換語言 / Language');
-      btn.title = '切換語言 / Language';
-      btn.textContent = LABEL[I18n.getLang()] || '繁';
-      btn.onclick = function () {
-        var cur = I18n.getLang();
-        var next = CYCLE[(CYCLE.indexOf(cur) + 1) % CYCLE.length];
-        I18n.setLang(next);
-        // 重載讓 dict 字串與 translate-layer(en)重新套用。en/zh-TW 全頁生效；
-        // zh-CN 的動態字串會切簡，少數頁面內嵌的繁體長文若無 OpenCC 則維持繁體(不影響閱讀)。
-        location.reload();
-      };
-      if (area && area.parentNode) area.parentNode.insertBefore(btn, area);
-      else findAnchor().appendChild(btn);
+      if (document.getElementById('langBtn') || document.getElementById('langSel') || typeof window.cycleLang === 'function') return; // 頁面已有
+      if (document.getElementById('ahxLangSel')) return;                                          // 防重複
+      var cur = I18n.getLang();
+      var sel = document.createElement('select');
+      sel.id = 'ahxLangSel';
+      sel.className = 'ahx-btn';
+      sel.style.padding = '5px 22px 5px 10px';
+      sel.setAttribute('aria-label', '切換語言 / Language');
+      [['zh-TW', '繁體'], ['zh-CN', '简体'], ['en', 'EN']].forEach(function (o) {
+        var op = document.createElement('option');
+        op.value = o[0]; op.textContent = o[1];
+        if (o[0] === cur) op.selected = true;
+        sel.appendChild(op);
+      });
+      // 選了就 reload：讓 dict 字串與 translate-layer(en) 重新套用（en/zh-TW 全頁生效）。
+      sel.onchange = function () { I18n.setLang(sel.value); location.reload(); };
+      if (area && area.parentNode) area.parentNode.insertBefore(sel, area);
+      else findAnchor().appendChild(sel);
     } catch (e) { /* no-op */ }
   }
 
