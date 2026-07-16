@@ -87,6 +87,38 @@
         || document.body;
   }
 
+  // 全站共用語言切換鍵。使用者回饋：只有 home 頁能改語言，其他頁沒有。
+  // 這些內容頁(account/pricing/privacy/refund/terms…)本來就載了 i18n.js + translate-layer.js，
+  // 只是少了切換鍵。本檔每頁都載 → 統一補上一顆，繁/簡/EN 循環。
+  // 有自己語言鍵的頁(home/verbs/contact 內嵌 #langBtn + cycleLang)自動跳過，不重覆。
+  function injectLangSwitcher() {
+    try {
+      if (typeof I18n === 'undefined' || !I18n.getLang || !I18n.setLang) return;
+      if (document.getElementById('langBtn') || typeof window.cycleLang === 'function') return; // 頁面已有
+      if (document.getElementById('ahxLangBtn')) return;                                          // 防重複
+      var CYCLE = ['zh-TW', 'zh-CN', 'en'];
+      var LABEL = { 'zh-TW': '繁', 'zh-CN': '简', 'en': 'EN' };
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.id = 'ahxLangBtn';
+      btn.className = 'ahx-btn';
+      btn.style.padding = '5px 11px';
+      btn.setAttribute('aria-label', '切換語言 / Language');
+      btn.title = '切換語言 / Language';
+      btn.textContent = LABEL[I18n.getLang()] || '繁';
+      btn.onclick = function () {
+        var cur = I18n.getLang();
+        var next = CYCLE[(CYCLE.indexOf(cur) + 1) % CYCLE.length];
+        I18n.setLang(next);
+        // 重載讓 dict 字串與 translate-layer(en)重新套用。en/zh-TW 全頁生效；
+        // zh-CN 的動態字串會切簡，少數頁面內嵌的繁體長文若無 OpenCC 則維持繁體(不影響閱讀)。
+        location.reload();
+      };
+      if (area && area.parentNode) area.parentNode.insertBefore(btn, area);
+      else findAnchor().appendChild(btn);
+    } catch (e) { /* no-op */ }
+  }
+
   function isInApp() {
     // 與 index 的 isInAppBrowser 對齊:Line/FB/IG/Threads/WeChat/Twitter/TikTok/Kakao/Naver…
     return /FBAN|FBAV|FB_IAB|Instagram|Line\/|MicroMessenger|Twitter|TikTok|KAKAOTALK|NAVER|Barcelona|BytedanceWebview/i.test(navigator.userAgent || '');
@@ -236,6 +268,7 @@
     area.className = 'ahx-area';
     area.id = 'ahxArea';
     findAnchor().appendChild(area);
+    injectLangSwitcher();
     try { var _c = _ahxReadCache(); if (_c) render(_c); else if (localStorage.getItem('ahx_li') === '1') renderPlaceholder(); } catch (e) {}
     try { auth = await ensureFirebase(); }
     catch (e) { console.warn('[auth-header] firebase load fail', e); return; }
