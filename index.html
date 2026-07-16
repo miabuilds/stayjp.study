@@ -1435,6 +1435,7 @@ html[lang="en"] .ci2 { display: none; }
   <button class="more-item" onclick="closeMore();switchMode('confuse')">🔀 易混淆詞比較</button>
   <a class="more-item" href="verbs.html">📐 動詞變化規則</a>
   <a class="more-item" href="contact.html" data-i18n="feedback">💬 意見回饋</a>
+  <button class="more-item" id="moreLangBtn" onclick="closeMore();cycleLang()">🌐 語言 / Language：繁</button>
 </div>
 
 <nav class="sd" id="sd"></nav>
@@ -3762,6 +3763,9 @@ function applyI18n() {
   document.title = t('page_title');
   const btn = document.getElementById('langBtn');
   if (btn) btn.textContent = LANG_LABEL[I18n.getLang()] || '繁';
+  // 手機版 header 藏了語言鍵（省空間、確保登入可見）→ 在「更多」選單提供切換，並顯示目前語言
+  const mlb = document.getElementById('moreLangBtn');
+  if (mlb) mlb.textContent = '🌐 語言 / Language：' + (LANG_LABEL[I18n.getLang()] || '繁');
 }
 
 async function cycleLang() {

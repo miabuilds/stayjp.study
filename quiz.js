@@ -207,15 +207,28 @@ const Quiz = (() => {
   // 「我不會」按鈕：常駐在題目上，就算等一下用猜的猜對了，也能主動把這個字收進單字本。
   // （使用者回饋：很常「我不會但還是猜中」，答對就不會自動進單字本，需要手動標記。）
   function dunnoBtnHtml() {
-    return `<div style="text-align:center;margin:2px 0 10px"><button type="button" id="qDunno" onclick="Quiz.markUnknown()" style="font-size:12px;padding:6px 14px;border:1px solid var(--bd);border-radius:20px;background:var(--bg2);color:var(--tx2);cursor:pointer">🔖 這題我不會，加入單字本</button></div>`;
+    return `<div style="text-align:center;margin:2px 0 10px"><button type="button" id="qDunno" onclick="Quiz.markUnknown()" style="font-size:12px;padding:6px 14px;border:1px solid var(--bd);border-radius:20px;background:var(--bg2);color:var(--tx2);cursor:pointer">🔖 我不會，看答案</button></div>`;
   }
+  // 「我不會」= 直接當作不會：不逼使用者猜 → 加入單字本 + SRS 記為錯 + 顯示正解 + 自動跳下一題。
   function markUnknown() {
     const q = questions[current];
     if (!q || !q.word) return;
     if (typeof Stats !== 'undefined' && Stats.addToNotebook) Stats.addToNotebook(q.word.w, q.word.r, q.word.m, quizLevel, true);
-    const b = document.getElementById('qDunno');
-    if (b) { b.textContent = '✓ 已加入單字本'; b.disabled = true; b.style.opacity = '.7'; b.style.cursor = 'default'; }
+    if (typeof SRS !== 'undefined' && SRS.record) SRS.record(quizLevel, q.word.w, false);   // 不會 → SRS 記錯，會再排複習
+    results.push({ word: q.word, correct: false, dunno: true, options: q.options, correctIdx: q.correctIdx, typing: quizType === 'typing' });
     if (typeof showToast === 'function') showToast('🔖 已加入單字本：' + q.word.w);
+    const b = document.getElementById('qDunno');
+    if (b) { b.disabled = true; b.style.opacity = '.6'; b.style.cursor = 'default'; }
+    // 顯示正解
+    if (quizType === 'typing') {
+      const inp = document.getElementById('tyInput'); if (inp) inp.disabled = true;
+      const fb = document.getElementById('tyFeedback');
+      if (fb) fb.innerHTML = `<span style="color:var(--ac)">${t('ty_correct_is')}：<b>${q.word.r}</b></span>`;
+    } else {
+      document.querySelectorAll('.qopt').forEach((el, i) => { el.disabled = true; if (i === q.correctIdx) el.classList.add('qcorrect'); });
+    }
+    // 給時間看正解，再自動跳下一題（不用再按）
+    setTimeout(() => { current++; current >= questions.length ? showResults() : renderQ(); }, 1200);
   }
 
   function renderQ() {
@@ -269,6 +282,11 @@ const Quiz = (() => {
         const wFull = r.word.w + (r.word.w !== r.word.r ? '（'+r.word.r+'）' : '');
         const summary = wFull + ' — ' + m;
         if (r.correct) return '<div class="qr ok"><span class="qrc">✓</span> '+summary+'</div>';
+        // 「我不會」：只顯示正解，不顯示「你選了什麼」
+        if (r.dunno) {
+          const ca = r.typing ? r.word.r : disp(r.word);
+          return `<div class="qr ng"><span class="qrc">🔖</span> ${summary}　${t('ty_correct_is')}：${ca}</div>`;
+        }
         // 打字題錯：顯示你打的 + 正解
         if (r.typing) {
           return `<div class="qr ng"><span class="qrc">✗</span> ${summary}　${t('ty_you_typed')}：${r.typed || '—'} → ${t('ty_correct_is')}：${r.word.r}</div>`;

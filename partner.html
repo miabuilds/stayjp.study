@@ -20,9 +20,10 @@
   .hero p{color:var(--tx2);font-size:16px;max-width:520px;margin:0 auto}
   .card{background:var(--bg2);border:1px solid var(--bd);border-radius:16px;padding:24px;margin:18px 0}
   h2{font-family:var(--serif);font-size:21px;margin-bottom:14px}
-  .rate{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:8px 0}
-  .rate .b{background:var(--bg);border:1px solid var(--bd);border-radius:12px;padding:16px 10px;text-align:center}
-  .rate .b .v{font-size:24px;font-weight:800;color:var(--good);font-variant-numeric:tabular-nums}
+  /* auto-fit + minmax(0,..) 讓格子在窄螢幕能縮、必要時換行，不會撐爆版面(手機破版修正) */
+  .rate{display:grid;grid-template-columns:repeat(auto-fit,minmax(92px,1fr));gap:10px;margin:8px 0}
+  .rate .b{background:var(--bg);border:1px solid var(--bd);border-radius:12px;padding:14px 8px;text-align:center;min-width:0}
+  .rate .b .v{font-size:clamp(17px,4.6vw,24px);font-weight:800;color:var(--good);font-variant-numeric:tabular-nums;white-space:nowrap}
   .rate .b .l{font-size:12px;color:var(--tx2);margin-top:3px}
   ul.feat{list-style:none;display:grid;gap:10px}
   ul.feat li{padding-left:26px;position:relative;color:var(--tx)}

@@ -308,6 +308,7 @@ textarea.note:focus{outline:none;border-color:var(--ac)}
  <div id="ledgerBySource" class="stat-grid" style="margin-bottom:12px"></div>
  <div id="ledgerTotals" class="stat-grid" style="margin-bottom:16px"></div>
  <div id="ledgerChart" style="margin-bottom:18px"></div>
+ <div id="ledgerChartDaily" style="margin-bottom:18px"></div>
  <div id="ledgerList" style="font-size:12px;color:var(--tx2);overflow-x:auto">點「重新整理」載入。</div>
  </div>
 
@@ -933,6 +934,9 @@ async function renderLedger() {
     let rev = 0, refund = 0, pending = 0, revWeb = 0, revApp = 0;
     const bySrc = {};   // 各金流渠道 → 收款加總
     const byMonth = {}; // 'YYYY-MM' → { web, app } 每月營業額(給趨勢圖)
+    const byDay = {};   // 當月 day(1..31) → { web, app } 每日營業額
+    const _now = new Date();
+    const curYM = _now.getFullYear() + '-' + String(_now.getMonth() + 1).padStart(2, '0');
     const fmt = ts => ts && ts.toDate ? ts.toDate().toLocaleString('zh-TW', { hour12: false }) : '—';
     const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
     const PAY_TXT = { ecpay: '綠界', manual: '手動', apple_iap: 'Apple / iOS', google_billing: 'Google Play', paypal: 'PayPal' };
@@ -954,7 +958,7 @@ async function renderLedger() {
       // 沙盒測試購買不計入營收/退費(否則對帳數字虛高)
       // 站方自己的帳號(ADMIN_EMAILS)測試購買也不計營收
       const isOwnerAcct = ADMIN_EMAILS.includes((uidEmail[x.uid] || '').toLowerCase());
-      if (!x.is_sandbox && !isOwnerAcct && x.status === 'success' && (x.type === 'subscribe' || x.type === 'renew')) { rev += amt; if (x.source === 'app') revApp += amt; else revWeb += amt; const ch = txnChannel(x); bySrc[ch] = (bySrc[ch] || 0) + amt; const _o = x.occurred_at, _d = _o && _o.toDate ? _o.toDate() : null; if (_d) { const mk = _d.getFullYear() + '-' + String(_d.getMonth() + 1).padStart(2, '0'); const mm = byMonth[mk] || (byMonth[mk] = { web: 0, app: 0 }); if (x.source === 'app') mm.app += amt; else mm.web += amt; } }
+      if (!x.is_sandbox && !isOwnerAcct && x.status === 'success' && (x.type === 'subscribe' || x.type === 'renew')) { rev += amt; if (x.source === 'app') revApp += amt; else revWeb += amt; const ch = txnChannel(x); bySrc[ch] = (bySrc[ch] || 0) + amt; const _o = x.occurred_at, _d = _o && _o.toDate ? _o.toDate() : null; if (_d) { const mk = _d.getFullYear() + '-' + String(_d.getMonth() + 1).padStart(2, '0'); const mm = byMonth[mk] || (byMonth[mk] = { web: 0, app: 0 }); if (x.source === 'app') mm.app += amt; else mm.web += amt; if (mk === curYM) { const dk = _d.getDate(); const dd = byDay[dk] || (byDay[dk] = { web: 0, app: 0 }); if (x.source === 'app') dd.app += amt; else dd.web += amt; } } }
       if (!x.is_sandbox && !isOwnerAcct && x.type === 'refund') refund += Math.abs(amt);
       if (x.status === 'pending') pending++;
       const incomplete = x.status === 'pending' || x.status === 'failed';
@@ -996,6 +1000,7 @@ async function renderLedger() {
       <div class="stat"><div class="lbl">實際到手(淨)</div><div class="val" style="color:#16A34A">NT$${netInHand.toLocaleString()}</div><div class="sub">收款 − 平台費 − 退費</div></div>
       <div class="stat"><div class="lbl">處理中(未扣款)</div><div class="val">${pending}</div><div class="sub">棄單噪音,可清</div></div>`;
     renderRevenueChart(byMonth);
+    renderDailyChart(byDay);
     box.innerHTML = `<table style="width:100%;border-collapse:collapse;min-width:680px">
       <thead><tr style="text-align:left;color:var(--tx2);border-bottom:1px solid var(--bd)">
         <th style="padding:6px 6px">時間</th><th style="padding:6px 6px">帳號</th><th style="padding:6px 6px">類型</th>
@@ -1052,6 +1057,53 @@ function renderRevenueChart(byMonth) {
   el.innerHTML = `<h3 style="font-size:13px;color:var(--tx2);margin:0 0 8px;font-weight:700">📈 每月營業額</h3>`
     + legend
     + `<div style="overflow-x:auto"><svg viewBox="0 0 ${W} ${H}" width="100%" style="max-width:${W}px;min-width:${Math.min(W, 320)}px;display:block" role="img" aria-label="每月營業額長條圖">${grid}${bars}</svg></div>`;
+}
+
+// 當月每日營業額（純 inline SVG）。綠界+Apple 疊圖；今天用強調色標示。
+function renderDailyChart(byDay) {
+  const el = document.getElementById('ledgerChartDaily');
+  if (!el) return;
+  const now = new Date();
+  const yr = now.getFullYear(), mo = now.getMonth();           // mo: 0-based
+  const days = new Date(yr, mo + 1, 0).getDate();              // 當月天數
+  const todayD = now.getDate();
+  const data = []; let monthTotal = 0;
+  for (let d = 1; d <= days; d++) {
+    const rec = byDay[d] || { web: 0, app: 0 };
+    const total = Math.round(rec.web + rec.app);
+    monthTotal += total;
+    data.push({ d, web: Math.round(rec.web), app: Math.round(rec.app), total });
+  }
+  const maxV = Math.max(1, ...data.map(x => x.total));
+  const W = Math.max(360, days * 17), H = 200;
+  const padL = 8, padR = 8, padT = 22, padB = 24;
+  const plotW = W - padL - padR, plotH = H - padT - padB;
+  const step = plotW / days, bw = Math.min(12, step * 0.7);
+  const money = n => 'NT$' + n.toLocaleString();
+  let grid = '';
+  [0, 0.5, 1].forEach(f => {
+    const yy = padT + plotH - f * plotH, val = Math.round(maxV * f);
+    grid += `<line x1="${padL}" y1="${yy.toFixed(1)}" x2="${W - padR}" y2="${yy.toFixed(1)}" stroke="var(--bd)" stroke-width="1" ${f ? 'stroke-dasharray="3 3"' : ''}/>`;
+    grid += `<text x="${padL}" y="${(yy - 3).toFixed(1)}" font-size="9" fill="var(--tx3)">${money(val)}</text>`;
+  });
+  let bars = '';
+  data.forEach((x, i) => {
+    const cx = padL + step * i + step / 2, bx = cx - bw / 2;
+    const hWeb = (x.web / maxV) * plotH, hApp = (x.app / maxV) * plotH;
+    const yWeb = padT + plotH - hWeb, yApp = yWeb - hApp;
+    if (x.web > 0) bars += `<rect x="${bx.toFixed(1)}" y="${yWeb.toFixed(1)}" width="${bw.toFixed(1)}" height="${hWeb.toFixed(1)}" rx="1.5" fill="#16A34A"><title>${x.d}日 綠界 ${money(x.web)}</title></rect>`;
+    if (x.app > 0) bars += `<rect x="${bx.toFixed(1)}" y="${yApp.toFixed(1)}" width="${bw.toFixed(1)}" height="${hApp.toFixed(1)}" rx="1.5" fill="#0EA5E9"><title>${x.d}日 Apple ${money(x.app)}</title></rect>`;
+    if (x.d === 1 || x.d % 5 === 0 || x.d === todayD) {
+      bars += `<text x="${cx.toFixed(1)}" y="${(H - padB + 13).toFixed(1)}" font-size="8.5" fill="${x.d === todayD ? 'var(--ac)' : 'var(--tx2)'}" text-anchor="middle">${x.d}</text>`;
+    }
+  });
+  const legend = `<div style="display:flex;gap:14px;align-items:center;font-size:11px;color:var(--tx2);margin-bottom:6px">
+    <span style="display:inline-flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:2px;background:#16A34A;display:inline-block"></span>綠界</span>
+    <span style="display:inline-flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:2px;background:#0EA5E9;display:inline-block"></span>Apple</span>
+    <span style="color:var(--tx3);margin-left:auto">${yr}年${mo + 1}月・當月合計 ${money(monthTotal)}</span></div>`;
+  el.innerHTML = `<h3 style="font-size:13px;color:var(--tx2);margin:0 0 8px;font-weight:700">📅 當月每日營業額</h3>`
+    + legend
+    + `<div style="overflow-x:auto"><svg viewBox="0 0 ${W} ${H}" width="100%" style="max-width:${W}px;min-width:${Math.min(W, 340)}px;display:block" role="img" aria-label="當月每日營業額長條圖">${grid}${bars}</svg></div>`;
 }
 
 const FN_FREE_ACCESS = 'https://asia-east1-jpnote-1bdd6.cloudfunctions.net/adminFreeAccess';
