@@ -128,12 +128,13 @@ const Stats = (() => {
   }
   function saveNotebook(nb) { localStorage.setItem('word_notebook', JSON.stringify(nb)); if (typeof saveAllCloud === 'function') saveAllCloud(); }
 
-  function addToNotebook(w, r, m, lv) {
+  function addToNotebook(w, r, m, lv, silent) {
     const nb = getNotebook();
-    if (nb.find(x => x.w === w && x.lv === lv)) return; // already exists
+    if (nb.find(x => x.w === w && x.lv === lv)) return false; // already exists
     nb.push({ w, r, m, lv, added: new Date().toISOString() });
     saveNotebook(nb);
-    alert(t('added_to_notebook', { w }));
+    if (!silent) alert(t('added_to_notebook', { w }));   // silent=true → 由呼叫端自行用 toast 提示
+    return true;
   }
 
   function removeFromNotebook(w, lv) {

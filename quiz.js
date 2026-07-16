@@ -152,6 +152,7 @@ const Quiz = (() => {
     box.innerHTML = `
       <div class="qhd"><span>${current+1} / ${questions.length}</span><span>${t('quiz_score', { n: score })}</span><button class="qclose" style="width:auto;margin:0;padding:2px 10px" onclick="Quiz.close()">✕</button></div>
       <div class="qprompt"><div class="qmain">${main}</div>${posBadge}<div class="qsub">${t('ty_sub')}</div></div>
+      ${dunnoBtnHtml()}
       <div class="qf"><input id="tyInput" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="${t('ty_placeholder')}" style="width:100%;box-sizing:border-box;padding:12px 14px;font-size:20px;text-align:center;border:1px solid var(--bd);border-radius:10px;background:var(--bg2);color:var(--tx)"></div>
       <div id="tyFeedback" style="min-height:24px;text-align:center;font-size:14px;margin:8px 0"></div>
       <button class="qstart" onclick="Quiz.submitTyping()">${t('ty_submit')}</button>`;
@@ -203,6 +204,20 @@ const Quiz = (() => {
     }
   }
 
+  // 「我不會」按鈕：常駐在題目上，就算等一下用猜的猜對了，也能主動把這個字收進單字本。
+  // （使用者回饋：很常「我不會但還是猜中」，答對就不會自動進單字本，需要手動標記。）
+  function dunnoBtnHtml() {
+    return `<div style="text-align:center;margin:2px 0 10px"><button type="button" id="qDunno" onclick="Quiz.markUnknown()" style="font-size:12px;padding:6px 14px;border:1px solid var(--bd);border-radius:20px;background:var(--bg2);color:var(--tx2);cursor:pointer">🔖 這題我不會，加入單字本</button></div>`;
+  }
+  function markUnknown() {
+    const q = questions[current];
+    if (!q || !q.word) return;
+    if (typeof Stats !== 'undefined' && Stats.addToNotebook) Stats.addToNotebook(q.word.w, q.word.r, q.word.m, quizLevel, true);
+    const b = document.getElementById('qDunno');
+    if (b) { b.textContent = '✓ 已加入單字本'; b.disabled = true; b.style.opacity = '.7'; b.style.cursor = 'default'; }
+    if (typeof showToast === 'function') showToast('🔖 已加入單字本：' + q.word.w);
+  }
+
   function renderQ() {
     if (quizType === 'typing') { renderTyping(); return; }
     const q = questions[current];
@@ -220,6 +235,7 @@ const Quiz = (() => {
     box.innerHTML = `
       <div class="qhd"><span>${current+1} / ${questions.length}</span><span>${t('quiz_score', { n: score })}</span><button class="qclose" style="width:auto;margin:0;padding:2px 10px" onclick="Quiz.close()">✕</button></div>
       <div class="qprompt"><div class="qmain">${main}</div>${sub?'<div class="qsub">'+sub+'</div>':''}${kanjiToggle}</div>
+      ${dunnoBtnHtml()}
       <div class="qopts">${q.options.map((o,i) => '<button class="qopt" onclick="Quiz.answer('+i+')">'+disp(o)+'</button>').join('')}</div>`;
   }
 
@@ -273,5 +289,5 @@ const Quiz = (() => {
     renderQ();
   }
 
-  return { start, begin, answer, close, toggleKanji, retrySame, submitTyping, genPhoneticConfusables };
+  return { start, begin, answer, close, toggleKanji, retrySame, submitTyping, genPhoneticConfusables, markUnknown };
 })();

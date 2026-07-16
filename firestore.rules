@@ -18,13 +18,44 @@ service cloud.firestore {
                     request.auth.uid == userId ||
                     request.auth.token.email in ['stayjpplan@gmail.com', 'abc83327@gmail.com']
                   );
-      // 本人可寫自己的 doc(srs_data/收藏/streak…),但「subscription」與「trial_started_at」禁止 client 寫
+
+      // 推薦碼歸因防竄改:ref_code 只能設成「存在、啟用、未停權、且不是自己的」碼。
+      // rules 的 get()/exists() 會繞過 ref_codes 的讀取規則(admin-only),可直接驗證。
+      // (同一路徑的 get() 在單次評估內快取,只算一次讀取。)防有人改 console 亂塞碼/停權碼刷分潤。
+      function refCodeValidOnSet(code) {
+        // 用 .get(key, default) 安全取值：正常啟用的碼沒有 status 欄位(只有停權才寫)，
+        // 直接存取不存在的欄位在規則裡會丟錯 → 一律用預設值。
+        return code is string
+          && exists(/databases/$(database)/documents/ref_codes/$(code))
+          && get(/databases/$(database)/documents/ref_codes/$(code)).data.get('active', true) != false
+          && get(/databases/$(database)/documents/ref_codes/$(code)).data.get('status', '') != 'suspended'
+          && get(/databases/$(database)/documents/ref_codes/$(code)).data.get('owner_uid', '') != userId;
+      }
+      // 只有在真的改動 ref_code/ref_at/ref_bonus_at 時才做額外檢查:
+      //   - ref_bonus_at(首購獎勵鎖旗標)只准 Cloud Function 寫,client 不得設/改
+      //   - 改 ref_code 前提:尚未鎖定(未發首購獎);清除 ref_code(登出/更換前)一律允許
+      //   - 設 ref_code:必須通過 refCodeValidOnSet
+      function refCodeUpdateOk() {
+        let d = request.resource.data;
+        let changed = d.diff(resource.data).affectedKeys();
+        return !changed.hasAny(['ref_code', 'ref_at', 'ref_bonus_at'])
+          || ( !changed.hasAny(['ref_bonus_at'])
+               && !('ref_bonus_at' in resource.data)
+               && ( !('ref_code' in d) || d.ref_code == null || refCodeValidOnSet(d.ref_code) ) );
+      }
+
+      // 本人可寫自己的 doc(srs_data/收藏/streak…),但「subscription」「trial_started_at」禁止 client 寫
       // —— 訂閱與試用起始只准 Cloud Function (Admin SDK 繞過規則) 寫,防止有人改 console 自己白嫖 / 重發試用。
       allow create: if request.auth != null && request.auth.uid == userId
                     && !('subscription' in request.resource.data)
-                    && !('trial_started_at' in request.resource.data);
+                    && !('trial_started_at' in request.resource.data)
+                    && !('ref_bonus_at' in request.resource.data)
+                    && ( !('ref_code' in request.resource.data)
+                         || request.resource.data.ref_code == null
+                         || refCodeValidOnSet(request.resource.data.ref_code) );
       allow update: if request.auth != null && request.auth.uid == userId
-                    && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['subscription', 'trial_started_at']);
+                    && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['subscription', 'trial_started_at'])
+                    && refCodeUpdateOk();
     }
 
     // 用過試用的 email 記錄(startTrial 後端寫)— client 完全碰不到,防鑽試用。

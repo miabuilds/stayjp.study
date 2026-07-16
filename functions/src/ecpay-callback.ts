@@ -58,7 +58,11 @@ export const ecpayCallback = functions.onRequest(
 
       const merchantTradeNo = body.MerchantTradeNo;
       const tradeNo         = body.TradeNo;
-      const amount          = Number(body.TradeAmt || PLANS[plan].price_twd);
+      // 實收金額：一次性結帳回呼帶 TradeAmt；定期定額「續扣」回呼不帶 TradeAmt，
+      // 而是用 Amount / PeriodAmount 帶當期實扣金額。早期綠界月費 149 的定期定額用戶，
+      // 每期仍實扣 149（授權金額鎖定），若只讀 TradeAmt 會 fallback 到現行牌價 150，
+      // 導致交易明細與分潤金額誤記成 150。優先取綠界實際回報金額，牌價僅作最後保底。
+      const amount          = Number(body.TradeAmt || body.Amount || body.PeriodAmount || PLANS[plan].price_twd);
       const rtnCode         = String(body.RtnCode || "0");
       const rtnMsg          = body.RtnMsg || "";
       const isSuccess       = rtnCode === "1";

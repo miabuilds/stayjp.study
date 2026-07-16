@@ -21,3 +21,7 @@ gcp-sa-*.json
 .env
 .env.local
 .env.*.local
+
+# Firestore emulator debug log
+firestore-debug.log
+firebase-debug.log

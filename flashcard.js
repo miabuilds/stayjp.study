@@ -373,7 +373,7 @@ const FlashCard = (() => {
           ${item.w!==item.r?`<div class="fc-reading">${item.r}</div>`:''}
           <div class="fc-meaning">${typeof cvt==='function'?cvt(item.m):item.m}</div>
           ${cfHint?`<div class="confuse-hint">${cfHint}</div>`:''}
-          ${Array.isArray(item.e)&&item.e.length?`<div class="fc-ex">${item.e.map(ex=>`<div class="fc-ex-row"><div class="fc-ex-j">${ex.j}<svg class="fc-ex-spk" onclick="event.stopPropagation();speak('${(ex.j||'').replace(/'/g,"\\'")}')" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.54 8.46a5 5 0 010 7.07"/></svg></div><div class="fc-ex-z">${typeof cvt==='function'?cvt(ex.z):ex.z}</div></div>`).join('')}</div>`:''}
+          ${Array.isArray(item.e)&&item.e.length?`<div class="fc-ex">${item.e.map(ex=>`<div class="fc-ex-row"><div class="fc-ex-j">${window.furiganaHTML?window.furiganaHTML(ex.j):ex.j}<svg class="fc-ex-spk" onclick="event.stopPropagation();speak('${(ex.j||'').replace(/'/g,"\\'")}')" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.54 8.46a5 5 0 010 7.07"/></svg></div><div class="fc-ex-z">${typeof cvt==='function'?cvt(ex.z):ex.z}</div></div>`).join('')}</div>`:''}
           <div class="fc-btns">
             <button class="fc-btn fc-no" onclick="event.stopPropagation();FlashCard.answer('unknown')">✗ 不會<span class="fc-btn-hint">${gradeLabel('unknown')}</span></button>
             <button class="fc-btn fc-soso" onclick="event.stopPropagation();FlashCard.answer('soso')">◯ 不熟<span class="fc-btn-hint">${gradeLabel('soso')}</span></button>
@@ -429,6 +429,13 @@ const FlashCard = (() => {
     // 單一寫入點：走 SRS 模組，不再繞過直寫 localStorage
     if (typeof SRS !== 'undefined' && SRS.recordGrade) SRS.recordGrade(level, item.w, grade);
     if (typeof Calendar !== 'undefined') Calendar.logActivity('vocab');
+
+    // 「不會」→ 自動收進單字本（含左滑）。去重、靜默(不彈 alert 打斷)，用 toast 提示。
+    // 使用者回饋：不會的字要能進單字本，不然常常猜中就漏掉了。
+    if (grade === 'unknown' && typeof Stats !== 'undefined' && Stats.addToNotebook) {
+      const added = Stats.addToNotebook(item.w, item.r, item.m, level, true);
+      if (added && typeof showToast === 'function') showToast('🔖 已加入單字本：' + item.w);
+    }
 
     // 本輪內重現（不熟/不會）→ 排到「本輪佇列尾端」,等這批跑完再回來。
     // 間隔效應:隔幾張就重現會造成「流暢性錯覺」(靠短期記憶回聲答對,非真記住);
