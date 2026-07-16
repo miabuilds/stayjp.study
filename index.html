@@ -210,6 +210,7 @@ body {
   border-radius: 8px; font-family: inherit; white-space: nowrap;
   transition: color .2s var(--ease), background .2s var(--ease), border-color .2s var(--ease);
 }
+select.lang-btn { padding: 2px 22px 2px 8px; height: auto; }
 .lang-btn:hover { color: var(--ac); border-color: var(--ac); }
 
 /* Menu button (mobile) */
@@ -1379,7 +1380,7 @@ html[lang="en"] .ci2 { display: none; }
     <h1><a href="home.html" data-i18n="site_name" style="color:inherit;text-decoration:none">日本再留計劃</a></h1><span id="modeTitle" style="display:none">文法</span>
     <div class="sb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg><input id="search" data-i18n-ph="search_ph" placeholder="搜尋文法・單字..." oninput="onSearch(this.value)"></div>
     <span class="stats" id="stats"></span>
-    <button class="lang-btn" id="langBtn" onclick="cycleLang()">繁</button>
+    <select class="lang-btn" id="langSel" aria-label="語言 / Language" onchange="setLangSel(this.value)"><option value="zh-TW">繁體</option><option value="zh-CN">简体</option><option value="en">EN</option></select>
     <button class="theme-btn" id="themeBtn" onclick="toggleTheme()" data-i18n-aria="theme_toggle" aria-label="切換深色模式"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79z"/></svg></button>
     <button class="theme-btn" onclick="showQuickGuide()" data-i18n-aria="quick_guide" aria-label="使用說明" title="使用說明"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9.5"/><path d="M9.2 9.3a2.9 2.9 0 0 1 5.6 1c0 1.9-2.8 2.5-2.8 2.5"/><path d="M12 16.8h.01"/></svg></button>
     <button class="streak-btn" id="streakBtn" onclick="Streak.showInfo()" title="連續學習天數" style="display:none">
@@ -1435,7 +1436,11 @@ html[lang="en"] .ci2 { display: none; }
   <button class="more-item" onclick="closeMore();switchMode('confuse')">🔀 易混淆詞比較</button>
   <a class="more-item" href="verbs.html">📐 動詞變化規則</a>
   <a class="more-item" href="contact.html" data-i18n="feedback">💬 意見回饋</a>
-  <button class="more-item" id="moreLangBtn" onclick="closeMore();cycleLang()">🌐 語言 / Language：繁</button>
+  <label class="more-item" style="display:flex;align-items:center;gap:8px;justify-content:space-between;cursor:pointer">🌐 語言 / Language
+    <select id="moreLangSel" onchange="setLangSel(this.value)" style="font-size:13px;padding:4px 24px 4px 8px;border-radius:8px" onclick="event.stopPropagation()">
+      <option value="zh-TW">繁體中文</option><option value="zh-CN">简体中文</option><option value="en">English</option>
+    </select>
+  </label>
 </div>
 
 <nav class="sd" id="sd"></nav>
@@ -3761,11 +3766,24 @@ function applyI18n() {
   });
   document.documentElement.lang = I18n.getLang();
   document.title = t('page_title');
-  const btn = document.getElementById('langBtn');
-  if (btn) btn.textContent = LANG_LABEL[I18n.getLang()] || '繁';
-  // 手機版 header 藏了語言鍵（省空間、確保登入可見）→ 在「更多」選單提供切換，並顯示目前語言
-  const mlb = document.getElementById('moreLangBtn');
-  if (mlb) mlb.textContent = '🌐 語言 / Language：' + (LANG_LABEL[I18n.getLang()] || '繁');
+  // 語言用 select 直接選（繁/简/EN）；同步 header 與「更多」選單兩個下拉的目前值
+  const _cl = I18n.getLang();
+  const ls = document.getElementById('langSel'); if (ls) ls.value = _cl;
+  const mls = document.getElementById('moreLangSel'); if (mls) mls.value = _cl;
+}
+
+// 用 select 直接指定語言（取代循環按鈕）。en 涉及 translate-layer 就地改寫 → reload 最乾淨；
+// zh-TW↔zh-CN 就地套用（zh-CN 需先備好 OpenCC）。
+async function setLangSel(next) {
+  if (!next) return;
+  const cur = I18n.getLang();
+  if (next === cur) return;
+  if (next === 'en' || cur === 'en') { I18n.setLang(next); location.reload(); return; }
+  if (next === 'zh-CN' && typeof ensureOpenCC === 'function' && !_tw2cn) { await ensureOpenCC(); }
+  I18n.setLang(next);
+  applyI18n();
+  if (typeof updateAuthUI === 'function') updateAuthUI();
+  if (typeof doRender === 'function') doRender();
 }
 
 async function cycleLang() {
