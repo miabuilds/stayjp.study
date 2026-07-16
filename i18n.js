@@ -21,11 +21,23 @@ const I18n = (() => {
     return 'zh-TW';
   }
 
-  let lang = localStorage.getItem(LANG_KEY);
-  if (!lang) {
-    lang = detectLang();
-    try { localStorage.setItem(LANG_KEY, lang); } catch (_) {}
+  // 跨啟動持久化備援：iOS WKWebView 的 localStorage 有時會在 App 重啟後被清掉，
+  // ui_lang 一消失就回退到 detectLang()（英文系統 → 又變英文，回饋「設了中文重開還是英文」）。
+  // 用 cookie 做備援：cookie 在 WebView 保存較穩，localStorage 被清時仍能還原語言選擇。
+  function readCookieLang() {
+    try { const m = document.cookie.match(/(?:^|;\s*)ui_lang=([^;]+)/); return m ? decodeURIComponent(m[1]) : null; }
+    catch (_) { return null; }
   }
+  function writeCookieLang(l) {
+    try { document.cookie = 'ui_lang=' + encodeURIComponent(l) + ';path=/;max-age=' + (60 * 60 * 24 * 365 * 2) + ';SameSite=Lax'; }
+    catch (_) {}
+  }
+
+  let lang = localStorage.getItem(LANG_KEY);
+  if (!lang) lang = readCookieLang();   // localStorage 被清 → 先試 cookie 還原
+  if (!lang) lang = detectLang();       // 都沒有 → 首次造訪，偵測系統語言
+  try { localStorage.setItem(LANG_KEY, lang); } catch (_) {}
+  writeCookieLang(lang);                // 一律鏡射到 cookie，之後被清也救得回
 
   // ── Translation dictionaries ──
   const dict = {
@@ -601,7 +613,8 @@ const I18n = (() => {
   function setLang(l) {
     if (!dict[l]) return;
     lang = l;
-    localStorage.setItem(LANG_KEY, l);
+    try { localStorage.setItem(LANG_KEY, l); } catch (_) {}
+    writeCookieLang(l);   // 同步寫 cookie，跨啟動保存（修 iOS 重開變英文）
   }
 
   function getMonths() { return dict[lang].months || dict['zh-TW'].months; }
