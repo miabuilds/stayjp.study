@@ -45,3 +45,4 @@ export { adminPurgeTest } from "./admin-purge-test";
 
 export { rcSyncSubscription } from "./rc-sync-subscription";
 export { startTrial } from "./start-trial";
+export { trialEmailCron } from "./trial-email-cron";
