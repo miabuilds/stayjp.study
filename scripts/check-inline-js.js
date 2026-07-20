@@ -26,9 +26,20 @@ function checkSnippet(label, code) {
 for (const file of HTML_FILES) {
   if (!fs.existsSync(file)) continue;
   const html = fs.readFileSync(file, 'utf8');
-  const re = /<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/g;
+  const re = /<script(?![^>]*\bsrc=)([^>]*)>([\s\S]*?)<\/script>/g;
   let m, i = 0;
-  while ((m = re.exec(html))) { checkSnippet(file + '#' + i, m[1]); i++; }
+  while ((m = re.exec(html))) {
+    // 只檢查會被當 JS 執行的 script;ld+json 等資料型 script 內容是 JSON,node --check 會誤報
+    const type = (m[1].match(/\btype\s*=\s*["']?([^"'\s>]+)/) || [])[1] || '';
+    const isJs = !type || /javascript|^module$|^text\/js$/i.test(type);
+    if (isJs) checkSnippet(file + '#' + i, m[2]);
+    // JSON 型的仍驗證是合法 JSON,避免結構化資料壞掉沒人發現
+    else if (/json/i.test(type)) {
+      try { JSON.parse(m[2]); }
+      catch (e) { console.error('::error::' + file + '#' + i + ' JSON 壞掉(' + type + '):' + e.message); bad = true; }
+    }
+    i++;
+  }
 }
 for (const f of JS_FILES) {
   if (!fs.existsSync(f)) continue;
