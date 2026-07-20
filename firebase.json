@@ -29,7 +29,8 @@
       "scripts/**",
       "reading-issues.csv",
       "firestore.rules",
-      "README.md"
+      "README.md",
+      "EMAILS.md"
     ],
     "cleanUrls": true,
     "trailingSlash": false,

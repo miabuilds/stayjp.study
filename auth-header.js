@@ -45,6 +45,11 @@
         'align-items:center;gap:5px;line-height:1;white-space:nowrap;font-family:inherit;' +
         'transition:border-color .2s,color .2s}' +
       '.ahx-btn:hover{border-color:var(--ac,#888);color:var(--ac,#000)}' +
+      // select 要關掉原生外觀自己畫箭頭:iOS/WebKit 對「原生外觀+自訂背景圓角」的 select 會渲染成疊影亂紋
+      'select.ahx-btn{appearance:none;-webkit-appearance:none;-moz-appearance:none;' +
+        'background-color:var(--bg3,#eee);' +
+        "background-image:url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path d='M1 1l4 4 4-4' fill='none' stroke='%23999' stroke-width='1.5' stroke-linecap='round'/></svg>\");" +
+        'background-repeat:no-repeat;background-position:right 8px center;background-size:10px 6px}' +
       '.ahx-btn img{width:18px;height:18px;border-radius:50%}' +
       '.ahx-btn .ahx-name{display:inline-block;max-width:96px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;vertical-align:bottom}' +
       '.ahx-menu{position:absolute;top:calc(100% + 6px);right:0;background:var(--bg2,#fff);' +

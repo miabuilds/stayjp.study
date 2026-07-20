@@ -25,3 +25,6 @@ gcp-sa-*.json
 # Firestore emulator debug log
 firestore-debug.log
 firebase-debug.log
+
+# 內部行銷文件,不上線
+EMAILS.md
