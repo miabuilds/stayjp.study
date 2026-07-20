@@ -26,6 +26,36 @@
 <meta name="twitter:title" content="日本再留計劃 — 免費 JLPT N5~N1 備考工具">
 <meta name="twitter:description" content="7710+ 單字、382 文法點、模擬考、SRS 間隔複習、聽力讀解練習。不用下載，打開就能用。">
 <meta name="twitter:image" content="https://stayjp.study/staybanner.jpg">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "日本再留計劃 StayJP Study",
+  "url": "https://stayjp.study/",
+  "applicationCategory": "EducationalApplication",
+  "operatingSystem": "Web, iOS",
+  "inLanguage": "zh-Hant",
+  "description": "免費 JLPT N5~N1 線上備考工具。7710+ 單字、382 文法點、模擬考、SRS 間隔複習、聽力讀解練習。",
+  "offers": [
+    { "@type": "Offer", "name": "免費版", "price": "0", "priceCurrency": "TWD" },
+    { "@type": "Offer", "name": "早鳥年費", "price": "990", "priceCurrency": "TWD" },
+    { "@type": "Offer", "name": "年費訂閱", "price": "1490", "priceCurrency": "TWD" },
+    { "@type": "Offer", "name": "買斷方案", "price": "2990", "priceCurrency": "TWD" }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    { "@type": "Question", "name": "免費版和付費版差在哪?", "acceptedAnswer": { "@type": "Answer", "text": "單字、文法等內容免費瀏覽,練習工具每天有免費額度;付費解鎖無限次練習(SRS 記憶卡、跟讀、模考、聽力)與跨裝置雲端同步。" } },
+    { "@type": "Question", "name": "需要註冊或信用卡嗎?", "acceptedAnswer": { "@type": "Answer", "text": "不用,打開瀏覽器就能用大部分功能。用 Google 帳號登入即送 3 天全功能免費試用,不需要信用卡。" } },
+    { "@type": "Question", "name": "付費後悔了怎麼辦?", "acceptedAnswer": { "@type": "Answer", "text": "首次訂閱 7 天內無條件全額退費,訂閱也隨時可以取消。" } },
+    { "@type": "Question", "name": "手機和電腦的進度會同步嗎?", "acceptedAnswer": { "@type": "Answer", "text": "付費版支援跨裝置雲端同步,手機、電腦、iOS App 換著學,月曆與學習紀錄自動補齊;免費版進度存在本地裝置。" } }
+  ]
+}
+</script>
 <style>
 /* ======================================================
    日本再留計劃 — Landing Page
@@ -225,6 +255,27 @@ a:hover { text-decoration: underline; }
   font-size: 12px; color: var(--tx-s);
   letter-spacing: .15em; text-transform: uppercase;
 }
+
+/* JLPT 倒數 pill — 考試有死線,把急迫感放在 CTA 正上方 */
+.hero-count {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--ac-soft); color: var(--ac);
+  font-size: 13px; font-weight: 700; letter-spacing: .04em;
+  padding: 6px 14px; border-radius: 999px; margin-bottom: 24px;
+}
+
+/* == FAQ == */
+.faq { max-width: 780px; }
+.faq details { border-bottom: 1px solid var(--line); }
+.faq summary {
+  cursor: pointer; font-size: 16px; font-weight: 600; color: var(--tx);
+  padding: 18px 4px; list-style: none;
+  display: flex; justify-content: space-between; align-items: center; gap: 12px;
+}
+.faq summary::-webkit-details-marker { display: none; }
+.faq summary::after { content: '+'; color: var(--ac); font-size: 22px; font-weight: 400; flex-shrink: 0; }
+.faq details[open] summary::after { content: '−'; }
+.faq .faq-a { font-size: 15px; color: var(--tx2); line-height: 1.9; padding: 0 4px 20px; }
 
 /* 吉祥物：右側站姿，桌機顯示在 hero 文字旁 */
 .hero { display: flex; align-items: center; gap: 60px; }
@@ -583,6 +634,7 @@ a:hover { text-decoration: underline; }
         <a href="about.html">關於網站</a>
         <a href="howto.html">使用教學</a>
         <a href="jlpt.html">JLPT 指南</a>
+        <a href="grammar/index.html">文法索引</a>
         <a href="phrases.html">生活會話</a>
         <a href="verbs.html">動詞變化</a>
         <a href="contact.html">意見回饋</a>
@@ -610,8 +662,9 @@ a:hover { text-decoration: underline; }
     <h2 class="hero-kana reveal reveal-d1">日々是学習。</h2>
     <h1 class="hero-title reveal reveal-d2">N5 到 N1，<br><em>陪你考過每一關。</em></h1>
     <p class="hero-desc reveal reveal-d3"><strong>7,710 個單字・382 個文法・模擬考・SRS 間隔複習。</strong><br>免費就能用大部分功能，全面備考再升級。</p>
+    <div class="hero-count reveal reveal-d3" id="jlptCountWrap" style="display:none">⏳ <span id="jlptCountText"></span></div>
     <div class="hero-cta-row reveal reveal-d4">
-      <a href="index.html" class="hero-cta">在網頁上使用
+      <a href="index.html" class="hero-cta">免費開始學習
         <svg style="width:16px;height:16px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
       </a>
       <a href="https://apps.apple.com/app/id6778227353" class="hero-cta app">
@@ -619,7 +672,7 @@ a:hover { text-decoration: underline; }
         下載 iOS App
       </a>
     </div>
-    <p class="hero-trust reveal reveal-d4" style="margin-top:16px;font-size:14px;color:var(--tx2)"><span>免費・無需信用卡・5 萬+ 學習者一起備考</span>　<a href="pricing.html" style="color:var(--ac);text-decoration:underline">看付費方案</a></p>
+    <p class="hero-trust reveal reveal-d4" style="margin-top:16px;font-size:14px;color:var(--tx2)"><span>免費・無需信用卡・登入送 3 天全功能試用・5 萬+ 學習者一起備考</span>　<a href="pricing.html" style="color:var(--ac);text-decoration:underline">看付費方案</a></p>
   </div>
   <div class="hero-mascot reveal reveal-d2">
     <img src="images/mascot/tanuki-stand.png" alt="日本再留計劃吉祥物 — 學者狸太郎" loading="eager">
@@ -705,7 +758,7 @@ a:hover { text-decoration: underline; }
       「日本再留計劃」這個名字，其實是我自己的處境——技術・人文知識・國際業務（技人國）簽證的門檻越收越緊，往後可能得考到 JLPT N2。我希望能<strong style="color:var(--tx)">再一次拿到在留卡、繼續留在日本</strong>，於是邊準備考試，邊把自己需要的工具一個個做出來。
     </p>
     <p class="reveal reveal-d1" style="font-size:17px;line-height:2;color:var(--tx2)">
-      原本只是寫給自己讀，順手也分享給同事用；越做越完整，乾脆放上網給大家一起學。結果上線<strong style="color:var(--tx)">一個多月，使用人數就快突破 4 萬、註冊會員突破 2 千</strong>。
+      原本只是寫給自己讀，順手也分享給同事用；越做越完整，乾脆放上網給大家一起學。結果上線<strong style="color:var(--tx)">一個多月，使用人數就快突破 4 萬</strong>；現在已有 <strong style="color:var(--tx)">5 萬多位學習者、2 千多名註冊會員</strong>一起備考。
     </p>
     <p class="reveal reveal-d2" style="font-size:17px;line-height:2;color:var(--tx2)">
       不是補習班、也不是大公司，就是一個同樣在考 JLPT 的人，把真正想要的工具做出來、免費開放——所以每個功能，都是真的有人在用、在回饋裡一點一點長出來的。
@@ -738,7 +791,7 @@ a:hover { text-decoration: underline; }
     <div class="pt-mascot reveal" aria-hidden="true"><img src="images/mascot/tanuki-cheer.png" alt=""></div>
     <div class="pt-grid">
       <div class="pt-card pt-featured reveal">
-        <div class="pt-badge pt-badge-best">🐦 限量 100 名 · 最划算</div>
+        <div class="pt-badge pt-badge-best" id="ebBadge">🐦 限量 100 名 · 最划算</div>
         <div class="pt-name">早鳥年費</div>
         <div class="pt-price"><span>NT$</span>990<small>/ 年</small></div>
         <div class="pt-desc">NT$990/年・自動續扣（月均 NT$82）· 比標準年費省 NT$500</div>
@@ -757,11 +810,13 @@ a:hover { text-decoration: underline; }
       </div>
     </div>
     <div class="trust-row reveal">
+      <span><b>✓</b> 登入即送 3 天全功能試用</span>
       <span><b>✓</b> 7 天無條件全額退費</span>
       <span><b>✓</b> 隨時可取消</span>
       <span><b>✓</b> 繁中介面・N5–N1 全等級</span>
       <span><b>✓</b> 單字・文法・模考・跟讀一站式</span>
     </div>
+    <p class="reveal" style="text-align:center;margin-top:18px;font-size:14px;color:var(--tx2)">考前一兩個月衝刺？另有<strong style="color:var(--tx)">月費 NT$150</strong>，隨時可取消。</p>
     <div style="text-align:center;margin-top:32px">
       <a href="pricing.html" class="hero-cta" style="background:var(--tx);color:var(--bg)">查看完整方案
         <svg style="width:16px;height:16px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
@@ -823,6 +878,32 @@ a:hover { text-decoration: underline; }
   </div>
 </section>
 
+<!-- FAQ -->
+<section class="section" id="faq">
+  <div class="section-inner">
+    <div class="eyebrow reveal">FAQ · 常見問題</div>
+    <h2 class="section-title reveal">付費前，<em>你可能想知道</em>。</h2>
+    <div class="faq reveal reveal-d1">
+      <details>
+        <summary>免費版和付費版差在哪？</summary>
+        <div class="faq-a">單字、文法等內容免費瀏覽，練習工具每天有免費額度；付費解鎖無限次練習（SRS 記憶卡、跟讀、模考、聽力）與跨裝置雲端同步。</div>
+      </details>
+      <details>
+        <summary>需要註冊或信用卡嗎？</summary>
+        <div class="faq-a">不用，打開瀏覽器就能用大部分功能。用 Google 帳號登入即送 <strong>3 天全功能免費試用</strong>，不需要信用卡。</div>
+      </details>
+      <details>
+        <summary>付費後悔了怎麼辦？</summary>
+        <div class="faq-a">首次訂閱 <strong>7 天內無條件全額退費</strong>，訂閱也隨時可以取消。詳見<a href="refund.html">退費政策</a>。</div>
+      </details>
+      <details>
+        <summary>手機和電腦的進度會同步嗎？</summary>
+        <div class="faq-a">付費版支援跨裝置雲端同步，手機、電腦、iOS App 換著學，月曆與學習紀錄自動補齊；免費版進度存在本地裝置。</div>
+      </details>
+    </div>
+  </div>
+</section>
+
 <!-- Support -->
 <section class="section" id="support">
   <div class="section-inner">
@@ -845,6 +926,7 @@ a:hover { text-decoration: underline; }
     </div>
     <div>
       <a href="index.html">學習工具</a>
+      <a href="grammar/index.html">文法索引</a>
       <a href="verbs.html">動詞變化</a>
       <a href="about.html">關於網站</a>
       <a href="contact.html">意見回饋</a>
@@ -899,6 +981,17 @@ a:hover { text-decoration: underline; }
     cardLearners.style.display = 'none';
     cardActive.style.display = 'none';
   });
+
+  // 早鳥剩餘名額 — 與 pricing.html 讀同一個 counters/early_bird;讀不到就維持原文案
+  db.doc('counters/early_bird').get().then(snap => {
+    const d = snap.data() || {};
+    const lim = d.limit || 100;
+    const left = Math.max(0, Math.min(lim, lim - (d.count || 0)));
+    const badge = document.getElementById('ebBadge');
+    if (!badge) return;
+    if (left <= 0) badge.textContent = '早鳥名額已滿';
+    else if (left < lim) badge.textContent = `🐦 早鳥限量 ${lim} 名・只剩 ${left} 名`;
+  }).catch(() => {});
 })();
 </script>
 
@@ -1043,6 +1136,22 @@ function updateThemeIcon() {
     : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79z"/></svg>';
 }
 initTheme();
+
+// ========== JLPT 倒數 ==========
+// JLPT 固定每年 7 月、12 月的第一個星期日舉行;自動算下一場,不用手動改日期
+(() => {
+  const el = document.getElementById('jlptCountText');
+  const wrap = document.getElementById('jlptCountWrap');
+  if (!el || !wrap) return;
+  const firstSunday = (y, m) => { const d = new Date(y, m, 1); d.setDate(1 + (7 - d.getDay()) % 7); return d; };
+  const now = new Date(); const y = now.getFullYear();
+  const next = [firstSunday(y, 6), firstSunday(y, 11), firstSunday(y + 1, 6)].find(d => d > now);
+  if (!next) return;
+  const days = Math.ceil((next - now) / 86400000);
+  if (days > 200) return;  // 剛考完那陣子不催,倒數 200 天內才顯示
+  el.textContent = `距離 ${next.getMonth() + 1}/${next.getDate()} JLPT 還有 ${days} 天，今天開始還來得及`;
+  wrap.style.display = '';
+})();
 
 // ========== SCROLL REVEAL ==========
 (() => {

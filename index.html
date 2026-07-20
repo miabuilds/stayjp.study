@@ -210,7 +210,14 @@ body {
   border-radius: 8px; font-family: inherit; white-space: nowrap;
   transition: color .2s var(--ease), background .2s var(--ease), border-color .2s var(--ease);
 }
-select.lang-btn { padding: 2px 22px 2px 8px; height: auto; }
+/* select 要關掉原生外觀自己畫箭頭:iOS/WebKit 對「保留原生外觀 + 自訂背景圓角」的 select 會渲染成疊影亂紋 */
+select.lang-btn {
+  padding: 2px 22px 2px 8px; height: auto;
+  appearance: none; -webkit-appearance: none; -moz-appearance: none;
+  background-color: var(--bg3);
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path d='M1 1l4 4 4-4' fill='none' stroke='%23999' stroke-width='1.5' stroke-linecap='round'/></svg>");
+  background-repeat: no-repeat; background-position: right 7px center; background-size: 10px 6px;
+}
 .lang-btn:hover { color: var(--ac); border-color: var(--ac); }
 
 /* Menu button (mobile) */
