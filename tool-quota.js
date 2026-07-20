@@ -132,10 +132,41 @@
         transition:transform .12s ease,opacity .15s,background .15s}
       .pw-btn:active{transform:scale(.97)}
       .pw-ok{background:var(--ac);color:#fff;box-shadow:0 8px 20px -6px var(--ac);margin-bottom:8px}
+      .pw-alt{background:transparent;color:var(--ac);border:1px solid var(--ac);margin-bottom:8px}
+      .pw-alt:hover{background:var(--ac);color:#fff}
       .pw-cancel{background:transparent;color:var(--tx2)}
       .pw-cancel:hover{color:var(--tx)}
+      .pw-meta{font-size:12.5px;line-height:2;color:var(--tx2);margin:0 0 16px;text-align:center}
+      .pw-meta b{color:var(--ac);font-weight:700}
     `;
     document.head.appendChild(st);
+  }
+
+  // ── 彈窗動態賣點:JLPT 倒數 + 早鳥剩餘名額 ──
+  // JLPT 固定 7 月/12 月第一個週日;>200 天(剛考完)不顯示,避免空催
+  function jlptCountdown() {
+    const firstSunday = (y, m) => { const d = new Date(y, m, 1); d.setDate(1 + (7 - d.getDay()) % 7); return d; };
+    const now = new Date(), y = now.getFullYear();
+    const next = [firstSunday(y, 6), firstSunday(y, 11), firstSunday(y + 1, 6)].find(d => d > now);
+    if (!next) return null;
+    const days = Math.ceil((next - now) / 86400000);
+    if (days > 200) return null;
+    return { days, label: (next.getMonth() + 1) + '/' + next.getDate() };
+  }
+  // 早鳥剩餘名額:同 pricing 的 counters/early_bird,localStorage 快取 10 分鐘(開彈窗不用每次打 Firestore)
+  function fetchEarlyBirdLeft() {
+    try {
+      const cached = JSON.parse(localStorage.getItem('eb_left_cache') || 'null');
+      if (cached && Date.now() - cached.ts < 600000) return Promise.resolve(cached.left);
+    } catch (e) {}
+    if (typeof firebase === 'undefined' || !firebase.firestore) return Promise.resolve(null);
+    return firebase.firestore().doc('counters/early_bird').get().then(snap => {
+      const d = snap.data() || {};
+      const lim = d.limit || 100;
+      const left = Math.max(0, Math.min(lim, lim - (d.count || 0)));
+      try { localStorage.setItem('eb_left_cache', JSON.stringify({ left, ts: Date.now() })); } catch (e) {}
+      return left;
+    }).catch(() => null);
   }
 
   function showPaywall(tool) {
@@ -150,15 +181,43 @@
       : usedThis
         ? `免費版每個工具每天可免費試 1 次，<strong>「${name}」今天已經試過了</strong>。`
         : `免費版每天可免費試用 <strong>${GLOBAL_DAILY_LIMIT} 個練習工具</strong>，今天的次數已用完。`;
+    // 分流:額度用完的當下是轉換率最高的時刻,依狀態給不同的下一步
+    //   App 內      → 維持原生 paywall(不提台幣價,Apple 定價/審核不同)
+    //   網頁+未登入  → 主推「登入送 3 天全功能試用」(還沒體驗過完整價值,先給試用比直接要錢轉換高)
+    //   網頁+已登入  → 主推方案,帶 JLPT 倒數 + 早鳥剩餘名額 + 退費安心線
+    const isNative = !!(window.STAYJP_NATIVE && window.STAYJP_NATIVE.isNativeApp);
+    const canOfferTrial = !isNative && !cachedUserEmail && typeof window.loginWith === 'function';
+    const cd = jlptCountdown();
+
+    let body, primary, secondary;
+    if (isNative) {
+      body = `${msg}<br>升級 <b>Premium</b>，即可<strong>無限次</strong>使用所有練習工具。`;
+      primary = { label: '查看訂閱方案 →', act: 'plans' };
+    } else if (canOfferTrial) {
+      body = `${msg}<br>用 Google 登入即送 <strong>3 天全功能試用</strong>——SRS、模考、跟讀全部無限，<b>不用信用卡</b>。`;
+      primary = { label: '🎁 Google 登入，免費試 3 天', act: 'login' };
+      secondary = { label: '直接看訂閱方案 →', act: 'plans' };
+    } else {
+      body = `${msg}<br>升級 <b>Premium</b>，所有練習工具<strong>無限次</strong>使用。`;
+      primary = { label: '解鎖無限練習 →', act: 'plans' };
+    }
+
+    const metaLines = [];
+    if (!isNative && cd) metaLines.push(`⏳ 距離 ${cd.label} JLPT 還有 <b>${cd.days} 天</b>`);
+    if (!isNative) metaLines.push(`<span id="pwEbLine" style="display:none">🐦 早鳥年費 NT$990・只剩 <b id="pwEbLeft"></b> 名</span>`);
+    if (!isNative && !canOfferTrial) metaLines.push('✓ 7 天內無條件全額退費，隨時可取消');
+
     const wrap = document.createElement('div');
     wrap.className = 'pw-backdrop';
     wrap.id = 'pwBackdrop';
     wrap.innerHTML = `
       <div class="pw-card" role="dialog" aria-modal="true">
-        <div class="pw-ico">⭐</div>
-        <h3 class="pw-title">免費額度用完了</h3>
-        <p class="pw-msg">${msg}<br>升級 <b>Premium</b>，即可<strong>無限次</strong>使用所有練習工具。</p>
-        <button class="pw-btn pw-ok" id="pwOk">查看訂閱方案 →</button>
+        <div class="pw-ico">${canOfferTrial ? '🎁' : '⭐'}</div>
+        <h3 class="pw-title">今天的免費額度用完了</h3>
+        <p class="pw-msg">${body}</p>
+        ${metaLines.length ? `<p class="pw-meta">${metaLines.join('<br>')}</p>` : ''}
+        <button class="pw-btn pw-ok" id="pwOk">${primary.label}</button>
+        ${secondary ? `<button class="pw-btn pw-alt" id="pwAlt">${secondary.label}</button>` : ''}
         <button class="pw-btn pw-cancel" id="pwCancel">稍後再說</button>
       </div>`;
     document.body.appendChild(wrap);
@@ -169,10 +228,27 @@
       setTimeout(() => wrap.remove(), 320);
     };
     function onEsc(e) { if (e.key === 'Escape') close(); }
-    wrap.querySelector('#pwOk').onclick = () => { goToPlans(); };
+    const run = (act) => {
+      if (act === 'login') { close(); try { window.loginWith('google'); } catch (e) { goToPlans(); } return; }
+      goToPlans();
+    };
+    wrap.querySelector('#pwOk').onclick = () => run(primary.act);
+    const altBtn = wrap.querySelector('#pwAlt');
+    if (altBtn) altBtn.onclick = () => run(secondary.act);
     wrap.querySelector('#pwCancel').onclick = close;
     wrap.onclick = (e) => { if (e.target === wrap) close(); };
     document.addEventListener('keydown', onEsc);
+    if (typeof cvtStaticUI === 'function') cvtStaticUI(wrap);   // 簡中轉換(對齊 badge 做法)
+
+    // 早鳥名額 async 帶入;彈窗已關或賣完(0)就不顯示
+    if (!isNative) {
+      fetchEarlyBirdLeft().then(left => {
+        if (!left || left <= 0) return;
+        const line = document.getElementById('pwEbLine');
+        const n = document.getElementById('pwEbLeft');
+        if (line && n) { n.textContent = left; line.style.display = ''; }
+      });
+    }
   }
 
   // 前往方案:App 內直接開原生 paywall(不載入 pricing 頁 → 不會閃一下網頁價格頁);網頁則導到 pricing。

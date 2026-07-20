@@ -191,6 +191,22 @@ a:hover{text-decoration:underline}
     <div id="refMsg" style="font-size:12px;margin-top:6px;color:var(--tx3)"></div>
   </div>
 
+  <!-- === JLPT 倒數(自動算下一場,>200 天不顯示)=== -->
+  <div id="jlptCd" style="display:none;max-width:440px;margin:18px auto 0;text-align:center;background:rgba(184,54,42,.08);color:var(--ac);border-radius:999px;padding:8px 18px;font-size:14px;font-weight:700"></div>
+  <script>
+  (function () {
+    var fs = function (y, m) { var d = new Date(y, m, 1); d.setDate(1 + (7 - d.getDay()) % 7); return d; };
+    var now = new Date(), y = now.getFullYear();
+    var next = [fs(y, 6), fs(y, 11), fs(y + 1, 6)].filter(function (d) { return d > now; })[0];
+    if (!next) return;
+    var days = Math.ceil((next - now) / 86400000);
+    if (days > 200) return;
+    var el = document.getElementById('jlptCd');
+    el.textContent = '⏳ 距離 ' + (next.getMonth() + 1) + '/' + next.getDate() + ' JLPT 還有 ' + days + ' 天，訂閱期剛好蓋住整個備考週期';
+    el.style.display = 'block';
+  })();
+  </script>
+
   <!-- === 四付費方案 === -->
   <div class="plans">
 
