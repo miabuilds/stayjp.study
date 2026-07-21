@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>衝刺計畫內容上傳（admin）</title>
+<meta name="robots" content="noindex,nofollow">
+<style>
+body{font-family:-apple-system,"PingFang TC",system-ui,sans-serif;max-width:640px;margin:40px auto;padding:0 20px;line-height:1.7;color:#1c1c1e}
+h1{font-size:20px}.box{border:1px solid #E5DECF;border-radius:12px;padding:20px;margin:16px 0;background:#FAF8F3}
+button{background:#B8362A;color:#fff;border:0;border-radius:8px;padding:10px 20px;font-size:14px;font-weight:600;cursor:pointer}
+button:disabled{opacity:.5}
+input[type=file]{margin:10px 0}
+#log{font-family:ui-monospace,monospace;font-size:12px;white-space:pre-wrap;background:#1c1c1e;color:#8f8;padding:14px;border-radius:8px;max-height:340px;overflow:auto;margin-top:16px}
+.err{color:#B8362A}
+</style>
+</head>
+<body>
+<h1>衝刺計畫內容上傳</h1>
+<p>限管理員。選擇本機的 <code>sprint-content.json</code>（由 <code>node scripts/build-sprint-plans.mjs</code> 產生），一鍵灌進 Firestore。內容不進版控、不外流。</p>
+
+<div class="box" id="gate">
+  <p>請先用管理員帳號登入。</p>
+  <button id="loginBtn">用 Google 登入</button>
+  <div class="err" id="gateMsg"></div>
+</div>
+
+<div class="box" id="app" style="display:none">
+  <div>登入身分:<b id="who"></b></div>
+  <p>選擇 <code>sprint-content.json</code>:</p>
+  <input type="file" id="file" accept="application/json">
+  <br><button id="upBtn" disabled>上傳到 Firestore</button>
+  <div id="log"></div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script>
+var ADMIN=['stayjpplan@gmail.com','abc83327@gmail.com'];
+if(!firebase.apps.length)firebase.initializeApp({apiKey:'AIzaSyDnmg2XOuvwgE8m8xCF5sS4o0nQYoUplPI',authDomain:'jpnote-1bdd6.firebaseapp.com',projectId:'jpnote-1bdd6'});
+try{firebase.firestore().settings({experimentalAutoDetectLongPolling:true,useFetchStreams:false})}catch(e){}
+var db=firebase.firestore(),auth=firebase.auth();
+var log=function(m,e){var el=document.getElementById('log');el.innerHTML+=(e?'<span class=err>'+m+'</span>':m)+'\n';el.scrollTop=el.scrollHeight};
+var DATA=null;
+
+document.getElementById('loginBtn').onclick=function(){auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()).catch(function(e){document.getElementById('gateMsg').textContent='登入失敗:'+(e.code||e.message)})};
+document.getElementById('file').onchange=function(ev){
+  var f=ev.target.files[0];if(!f)return;
+  var r=new FileReader();
+  r.onload=function(){try{DATA=JSON.parse(r.result);document.getElementById('upBtn').disabled=false;log('已載入:'+Object.keys(DATA).join(', '))}catch(e){log('JSON 解析失敗:'+e.message,true)}};
+  r.readAsText(f);
+};
+
+document.getElementById('upBtn').onclick=async function(){
+  if(!DATA)return;
+  this.disabled=true;
+  var levels=Object.keys(DATA);
+  for(var li=0;li<levels.length;li++){
+    var lv=levels[li],d=DATA[lv];
+    try{
+      // meta 一份(免費,含考試情報/策略/易混淆),各週各一份
+      await db.doc('sprint_content/'+lv+'_meta').set({
+        free:true, level:d.level, pass:d.pass, combined:d.combined, times:d.times,
+        sections:d.sections, strategy:d.strategy, counts:d.counts, perDay:d.perDay,
+        heavyVocab:d.heavyVocab, confusables:d.confusables, weekCount:d.weeks.length
+      });
+      log('✓ '+lv+'_meta');
+      for(var wi=0;wi<d.weeks.length;wi++){
+        var wk=d.weeks[wi];
+        await db.doc('sprint_content/'+lv+'_w'+wk.n).set({
+          free:wk.free, level:d.level, n:wk.n, cats:wk.cats, grammar:wk.grammar, vocab:wk.vocab
+        });
+        log('  ✓ '+lv+'_w'+wk.n+(wk.free?' (免費)':''));
+      }
+    }catch(e){log('✗ '+lv+': '+(e.code||e.message),true)}
+  }
+  log('=== 完成 ===');
+  this.disabled=false;
+};
+
+auth.onAuthStateChanged(function(u){
+  if(!u){document.getElementById('gate').style.display='block';document.getElementById('app').style.display='none';return}
+  if(ADMIN.indexOf((u.email||'').toLowerCase())<0){document.getElementById('gateMsg').textContent='此帳號非管理員';return}
+  document.getElementById('gate').style.display='none';
+  document.getElementById('app').style.display='block';
+  document.getElementById('who').textContent=u.email;
+});
+</script>
+</body>
+</html>

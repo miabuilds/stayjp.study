@@ -72,6 +72,27 @@ service cloud.firestore {
       allow delete: if false;
     }
 
+    // 衝刺計畫內容 — 每級 meta 一份、每週一份(docId 如 n4_meta / n4_w1)。
+    // 由 admin 從 sprint-upload.html 灌入;讀取按權限:免費週(free==true)人人可讀,
+    // 其餘週需「訂閱中」或「有衝刺計畫存取權」。避免付費內容外流。
+    function sprintEntitled() {
+      return request.auth != null && (
+        (exists(/databases/$(database)/documents/users/$(request.auth.uid))
+          && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('subscription', {}).get('status', '') in ['active','trialing','cancelled','lifetime'])
+        || exists(/databases/$(database)/documents/sprint_access/$(request.auth.uid))
+      );
+    }
+    match /sprint_content/{docId} {
+      allow read: if resource.data.get('free', false) == true || sprintEntitled();
+      allow write: if request.auth != null &&
+        request.auth.token.email in ['stayjpplan@gmail.com', 'abc83327@gmail.com'];
+    }
+    // 衝刺計畫購買者(未來單獨售出時,Cloud Function 寫;現階段訂閱者即解鎖)
+    match /sprint_access/{uid} {
+      allow read: if request.auth != null && request.auth.uid == uid;
+      allow write: if false;
+    }
+
     // 進度資料(srs_data 等大 blob,各 key gzip bytes)— 從 users/{uid} 搬出,避免撞 1MiB。
     // 本人可讀寫自己;admin 可讀(debug)。無金流欄位,owner 可寫無自封 premium 風險。
     match /user_progress/{uid} {

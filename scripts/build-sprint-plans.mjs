@@ -259,7 +259,48 @@ ${!E.combined ? '- [ ] (W9 起)模考三科有沒有哪科接近 19 分最低標
   return md;
 }
 
+// 結構化資料(給 Firestore 上傳用;閱讀頁 sprint-plan.html 依權限渲染)
+function buildData(lv) {
+  const LV = lv.toUpperCase();
+  const grammarRaw = loadGrammar(lv);
+  const vocab = loadVocab(lv);
+  const cfs = loadConfusables(lv);
+  const catOrder = [];
+  grammarRaw.forEach(g => { if (!catOrder.includes(g.cat)) catOrder.push(g.cat); });
+  const grammar = catOrder.flatMap(c => grammarRaw.filter(g => g.cat === c));
+  const gWeeks = chunk(grammar, FOUND_WEEKS);
+  const vWeeks = chunk(vocab.map((w, i) => ({ ...w, n: i + 1 })), FOUND_WEEKS);
+  const perDay = Math.ceil(vocab.length / FOUND_WEEKS / 6);
+  const E = EXAM[lv];
+
+  const weeks = gWeeks.map((gs, w) => {
+    const vs = vWeeks[w];
+    const step = Math.ceil(vs.length / 6);
+    return {
+      n: w + 1,
+      free: w === 0,   // W1 免費試讀
+      cats: [...new Set(gs.map(g => g.cat))],
+      grammar: gs.map(g => ({ t: g.t, p: g.p, ex: strip(g.ex), eg: g.eg && g.eg[0] ? { j: strip(g.eg[0].j), z: g.eg[0].z } : null })),
+      vocab: { from: vs[0].n, to: vs[vs.length - 1].n, fw: vs[0].w, fr: vs[0].r, lw: vs[vs.length - 1].w, lr: vs[vs.length - 1].r, perDay: step,
+        samples: vs.filter((_, i) => i % step === 0).slice(0, 6).map(s => ({ w: s.w, r: s.r, m: s.m })) },
+    };
+  });
+
+  return {
+    level: LV, pass: E.pass, combined: E.combined, times: E.times,
+    sections: E.sections, strategy: STRATEGY[lv],
+    counts: { vocab: vocab.length, grammar: grammar.length, confusables: cfs.length },
+    perDay, heavyVocab: vocab.length > 1500,
+    confusables: cfs.map(c => ({ words: c.words.map(w => w.w), tip: strip(c.tip).split('。')[0] })),
+    weeks,
+  };
+}
+
+const all = {};
 for (const lv of LEVELS) {
   writeFileSync(join(ROOT, `SPRINT-${lv.toUpperCase()}.md`), build(lv));
+  all[lv] = buildData(lv);
   console.log(`✓ SPRINT-${lv.toUpperCase()}.md`);
 }
+writeFileSync(join(ROOT, 'sprint-content.json'), JSON.stringify(all));
+console.log('✓ sprint-content.json（結構化,供上傳 Firestore;已 gitignore）');

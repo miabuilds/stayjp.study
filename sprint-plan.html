@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>90 天衝刺計畫｜日本再留計劃</title>
+<meta name="description" content="JLPT N5–N1 90 天衝刺計畫:逐週文法精讀＋單字進度＋模考節奏,照表操課考過 12 月 JLPT。W1 免費試讀。">
+<link rel="canonical" href="https://stayjp.study/sprint-plan.html">
+<link rel="icon" href="stayjpplan.png" type="image/png">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-2WP4D34LE3"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','G-2WP4D34LE3');</script>
+<script>(function(){var t=localStorage.getItem('theme');if(t)document.documentElement.setAttribute('data-theme',t);else if(matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches)document.documentElement.setAttribute('data-theme','dark')})();</script>
+<style>
+:root{--bg:#FAF8F3;--bg2:#FFF;--bg3:#F2EEE5;--tx:#1C1C1E;--tx2:#6A6A6A;--tx3:#A9A9A9;--ac:#B8362A;--ac-soft:rgba(184,54,42,.08);--ac2:#2F5D7A;--bd:#E5DECF;--line:#DDD5C0;--serif:"Hiragino Mincho ProN","Noto Serif JP","Songti TC",serif}
+[data-theme="dark"]{--bg:#121113;--bg2:#1B1A1C;--bg3:#1F1E20;--tx:#EDE8DE;--tx2:#8F8A7E;--tx3:#5D5A53;--ac:#E4715F;--ac-soft:rgba(228,113,95,.1);--ac2:#7FA5C2;--bd:#2C2A27;--line:#2C2A27}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Noto Sans JP","PingFang TC",system-ui,sans-serif;background:var(--bg);color:var(--tx);line-height:1.75;font-size:15px;-webkit-font-smoothing:antialiased}
+a{color:var(--ac2);text-decoration:none}a:hover{text-decoration:underline}
+.hd{position:sticky;top:0;background:var(--bg);border-bottom:1px solid var(--line);z-index:20}
+.hd-in{max-width:820px;margin:0 auto;display:flex;align-items:center;gap:14px;padding:12px 20px}
+.hd-in h2{font-family:var(--serif);font-size:15px;font-weight:700}.hd-in h2 a{color:var(--tx)}
+.hd-in nav{margin-left:auto;display:flex;gap:12px;font-size:13px}.hd-in nav a{color:var(--tx2);white-space:nowrap}
+main{max-width:820px;margin:0 auto;padding:32px 20px 90px}
+.eyebrow{font-size:11px;letter-spacing:.28em;color:var(--ac);font-weight:700;text-transform:uppercase;margin-bottom:12px}
+h1{font-family:var(--serif);font-size:clamp(26px,5vw,38px);line-height:1.25;margin-bottom:10px}
+.lead{color:var(--tx2);margin-bottom:20px}
+.lvtabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:24px}
+.lvtab{padding:7px 16px;border:1px solid var(--bd);border-radius:999px;cursor:pointer;font-size:14px;font-weight:600;background:var(--bg2);color:var(--tx2)}
+.lvtab.on{background:var(--ac);color:#fff;border-color:var(--ac)}
+.card{background:var(--bg2);border:1px solid var(--line);border-radius:14px;padding:20px 22px;margin-bottom:16px}
+h2.sec{font-family:var(--serif);font-size:19px;margin:28px 0 12px;display:flex;align-items:center;gap:10px}
+h2.sec::before{content:'';width:18px;height:2px;background:var(--ac)}
+table{border-collapse:collapse;width:100%;font-size:13px;margin:6px 0}
+th{background:var(--bg3);text-align:left;padding:7px 10px;font-size:12px;color:var(--tx2)}
+td{border-top:1px solid var(--line);padding:7px 10px}
+.wk{border:1px solid var(--line);border-radius:14px;margin-bottom:14px;overflow:hidden}
+.wk-h{padding:14px 18px;background:var(--bg3);cursor:pointer;display:flex;align-items:center;gap:10px;font-weight:700}
+.wk-h .n{font-family:var(--serif);color:var(--ac)}
+.wk-h .lock{margin-left:auto;font-size:12px;color:var(--tx3);font-weight:400}
+.wk-h .free{margin-left:auto;font-size:11px;background:var(--ac);color:#fff;padding:2px 10px;border-radius:999px}
+.wk-body{padding:16px 18px;display:none}.wk.open .wk-body{display:block}
+.gp{margin:12px 0 2px;font-weight:700}.gp .t{color:var(--ac)}
+.gsub{margin-left:14px;font-size:13.5px;color:var(--tx2)}
+.gsub.eg{color:var(--tx3);font-style:normal}
+.gsub .ja{color:var(--tx);font-family:var(--serif)}
+.vocab{margin-top:14px;padding-top:12px;border-top:1px dashed var(--line);font-size:13.5px;color:var(--tx2)}
+.locked .wk-body{display:none}
+.paywall{border:2px dashed var(--ac);border-radius:14px;padding:24px;text-align:center;background:var(--ac-soft);margin-bottom:16px}
+.paywall p{color:var(--tx2);margin-bottom:14px}
+.btn{display:inline-block;background:var(--ac);color:#fff;font-weight:700;padding:12px 28px;border-radius:999px;font-size:15px}
+.btn:hover{text-decoration:none;opacity:.92}
+.strat li{margin:4px 0}
+.loading{color:var(--tx3);text-align:center;padding:40px}
+.ft{border-top:1px solid var(--line);padding:26px 20px;font-size:12px;color:var(--tx3);text-align:center}
+.ft a{color:var(--tx2);margin:0 8px}
+</style>
+</head>
+<body>
+<header class="hd"><div class="hd-in">
+  <h2><a href="home.html">日本再留計劃</a></h2>
+  <nav><a href="index.html">練習工具</a><a href="pricing.html">方案</a><a href="#" id="loginLink">登入</a></nav>
+</div></header>
+<main>
+  <div class="eyebrow">SPRINT · 90 天衝刺</div>
+  <h1>90 天衝刺計畫</h1>
+  <p class="lead">逐週文法精讀＋單字進度＋模考節奏,照表操課考過 12 月 JLPT。<b>W1 免費試讀</b>,其餘週訂閱後解鎖。</p>
+  <div class="lvtabs" id="lvtabs"></div>
+  <div id="content"><div class="loading">載入中…</div></div>
+</main>
+<footer class="ft">
+  © 2026 日本再留計劃 / StayJP Study
+  <div><a href="home.html">首頁</a><a href="index.html">學習工具</a><a href="pricing.html">方案</a><a href="sprint.html">關於衝刺計畫</a></div>
+</footer>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script>
+if(!firebase.apps.length)firebase.initializeApp({apiKey:'AIzaSyDnmg2XOuvwgE8m8xCF5sS4o0nQYoUplPI',authDomain:'jpnote-1bdd6.firebaseapp.com',projectId:'jpnote-1bdd6'});
+try{firebase.firestore().settings({experimentalAutoDetectLongPolling:true,useFetchStreams:false})}catch(e){}
+var db=firebase.firestore(),auth=firebase.auth();
+var LEVELS=['n5','n4','n3','n2','n1'];
+var curLv=(location.hash.replace('#','')||'n4').toLowerCase();
+if(LEVELS.indexOf(curLv)<0)curLv='n4';
+var entitled=false, user=null;
+
+document.getElementById('loginLink').onclick=function(e){e.preventDefault();if(user){auth.signOut()}else{auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()).catch(function(){})}};
+
+function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+
+function renderTabs(){
+  document.getElementById('lvtabs').innerHTML=LEVELS.map(function(lv){
+    return '<span class="lvtab'+(lv===curLv?' on':'')+'" data-lv="'+lv+'">'+lv.toUpperCase()+'</span>';
+  }).join('');
+  [].forEach.call(document.querySelectorAll('.lvtab'),function(t){t.onclick=function(){curLv=t.dataset.lv;location.hash=curLv;renderTabs();load()}});
+}
+
+function metaHtml(m){
+  var rows=m.sections.map(function(s){return '<tr><td>'+esc(s[0])+'</td><td>'+s[1]+'</td><td>'+s[2]+'</td></tr>'}).join('');
+  var cfs=(m.confusables||[]).slice(0,12).map(function(c){return '<li><b>'+esc(c.words.join('／'))+'</b> — '+esc(c.tip)+'。</li>'}).join('');
+  return '<div class="card">'
+    +'<h2 class="sec">考試結構與合格線</h2>'
+    +'<p><b>總分 180,合格線 '+m.pass+' 分。</b>'+(m.combined?'兩個得點區分各有最低標。':'三個得點區分,每科最低 19/60——任一科沒過,總分再高也不合格,不能偏科。')+'</p>'
+    +'<table><thead><tr><th>得點區分</th><th>滿分</th><th>最低標</th></tr></thead><tbody>'+rows+'</tbody></table>'
+    +'<p style="font-size:13px;color:var(--tx3);margin-top:8px">考試時間(近年,以官方公告為準):'+esc(m.times)+'</p>'
+    +'<h2 class="sec">各科拿分策略</h2><ul class="strat">'+m.strategy.map(function(s){return '<li>'+mdBold(esc(s))+'</li>'}).join('')+'</ul>'
+    +(cfs?'<h2 class="sec">最愛考的易混淆('+m.counts.confusables+' 組)</h2><ul class="strat">'+cfs+'</ul>':'')
+    +'</div>';
+}
+function mdBold(s){return s.replace(/\*\*(.+?)\*\*/g,'<b>$1</b>')}
+
+function weekHtml(wk,unlocked){
+  var head='<div class="wk-h" data-n="'+wk.n+'"><span class="n">W'+wk.n+'</span> '+esc(wk.cats.join('・'))
+    +(wk.free?'<span class="free">免費試讀</span>':(unlocked?'<span class="lock">▾</span>':'<span class="lock">🔒 訂閱解鎖</span>'))+'</div>';
+  if(!wk.free && !unlocked) return '<div class="wk locked">'+head+'</div>';
+  var g=wk.grammar.map(function(x,i){
+    return '<div class="gp"><span class="t">'+(i+1)+'. '+esc(x.t)+'</span></div>'
+      +'<div class="gsub">接續:'+esc(x.p)+'</div>'
+      +'<div class="gsub">意味:'+esc(x.ex)+'</div>'
+      +(x.eg?'<div class="gsub eg">例:<span class="ja">'+esc(x.eg.j)+'</span>（'+esc(x.eg.z)+'）</div>':'');
+  }).join('');
+  var v=wk.vocab;
+  var samp=(v.samples||[]).map(function(s){return esc(s.w)+'('+esc(s.r)+')='+esc(s.m)}).join('、');
+  var vocab='<div class="vocab"><b>本週單字</b>:第 '+v.from+'–'+v.to+' 字（'+esc(v.fw)+' → '+esc(v.lw)+'），約 '+v.perDay+'/天。<br>抽樣重點:'+samp+'。</div>';
+  return '<div class="wk"><div class="wk-h" data-n="'+wk.n+'"><span class="n">W'+wk.n+'</span> '+esc(wk.cats.join('・'))
+    +(wk.free?'<span class="free">免費試讀</span>':'<span class="lock">▾</span>')+'</div><div class="wk-body">'+g+vocab+'</div></div>';
+}
+
+async function load(){
+  var box=document.getElementById('content');
+  box.innerHTML='<div class="loading">載入中…</div>';
+  try{
+    var meta=await db.doc('sprint_content/'+curLv+'_meta').get();
+    if(!meta.exists){box.innerHTML='<div class="card">此級內容尚未上架。</div>';return}
+    var m=meta.data();
+    var html=metaHtml(m);
+    // 逐週讀取(鎖住的週前端不抓內容,只有解鎖才抓)
+    html+='<h2 class="sec">打底期 8 週 — 文法精讀 × 單字</h2>';
+    if(!entitled){
+      html+='<div class="paywall"><p>W1 免費試讀。解鎖 W2–W'+m.weekCount+' 完整逐週計畫 + 實戰/衝刺期規劃,訂閱即可。</p><a class="btn" href="pricing.html">看訂閱方案 →</a></div>';
+    }
+    var wrap=document.createElement('div');wrap.innerHTML=html;box.innerHTML='';box.appendChild(wrap);
+    for(var n=1;n<=m.weekCount;n++){
+      var unlocked=entitled||n===1;
+      var holder=document.createElement('div');
+      if(unlocked){
+        try{var d=await db.doc('sprint_content/'+curLv+'_w'+n).get();if(d.exists){holder.innerHTML=weekHtml(d.data(),true)}}
+        catch(e){holder.innerHTML='';}
+      }else{
+        holder.innerHTML='<div class="wk locked"><div class="wk-h"><span class="n">W'+n+'</span> <span class="lock">🔒 訂閱解鎖</span></div></div>';
+      }
+      box.appendChild(holder.firstChild);
+    }
+    [].forEach.call(box.querySelectorAll('.wk:not(.locked) .wk-h'),function(h){h.onclick=function(){h.parentNode.classList.toggle('open')}});
+    // W1 預設展開
+    var w1=box.querySelector('.wk:not(.locked)');if(w1)w1.classList.add('open');
+  }catch(e){
+    var code=e.code||e.message||'';
+    if(/permission|not-found/.test(code)) box.innerHTML='<div class="card">此級計畫尚未上架,或請重新整理。若你剛訂閱,登出再登入即可解鎖。</div>';
+    else box.innerHTML='<div class="card">載入失敗:'+esc(code)+'</div>';
+  }
+}
+
+auth.onAuthStateChanged(async function(u){
+  user=u;
+  document.getElementById('loginLink').textContent=u?'登出':'登入';
+  entitled=false;
+  if(u){
+    try{
+      var us=await db.doc('users/'+u.uid).get();
+      var sub=(us.data()||{}).subscription||{};
+      entitled=['active','trialing','cancelled','lifetime'].indexOf(sub.status)>=0 && (sub.expiresAt||0)>Date.now();
+      if(!entitled){var sa=await db.doc('sprint_access/'+u.uid).get();entitled=sa.exists}
+    }catch(e){}
+  }
+  renderTabs();load();
+});
+</script>
+</body>
+</html>
