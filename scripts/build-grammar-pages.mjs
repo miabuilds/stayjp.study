@@ -133,6 +133,43 @@ ${body}
 </html>`;
 }
 
+// ---- 推薦參考書(聯盟預留位)----
+// AFF_ID 填聯盟會員 ID 後重跑本腳本,469 頁的書籍連結全部帶上分潤參數。
+// 未填時輸出乾淨的博客來搜尋連結(對讀者一樣有用,只是沒抽成)。
+const AFF_ID = '';   // 例:聯盟網/通路王發的 ID
+const bookUrl = (title) => {
+  const base = `https://search.books.com.tw/search/query/key/${encodeURIComponent(title)}`;
+  return AFF_ID ? `${base}?aff=${AFF_ID}` : base;
+};
+const BOOKS = {
+  n5: [
+    { t: '大家的日本語 初級 I', d: '零基礎最通用的教科書,課文+句型循序漸進' },
+    { t: 'TRY! 日本語能力試驗 N5', d: '以文法為軸的應試整理,配合本站文法頁複習' },
+  ],
+  n4: [
+    { t: '大家的日本語 初級 II', d: '接續初級 I,涵蓋 N4 主要句型' },
+    { t: 'TRY! 日本語能力試驗 N4', d: '文法應試導向,例句貼近真題' },
+  ],
+  n3: [
+    { t: 'TRY! 日本語能力試驗 N3', d: '從 N4 銜接 N3 的首選,文法脈絡清楚' },
+    { t: '日本語総まとめ N3 文法', d: '一天兩頁的節奏,適合搭配每日 30 分鐘計畫' },
+  ],
+  n2: [
+    { t: '新完全マスター 文法 N2', d: '公認 N2 文法最完整,難度扎實' },
+    { t: '日本語総まとめ N2 文法', d: '整理簡潔,考前快速過一輪用' },
+  ],
+  n1: [
+    { t: '新完全マスター 文法 N1', d: 'N1 文法系統化整理的定番' },
+    { t: '日本語総まとめ N1 文法', d: '輕量版複習,搭配模考抓弱點' },
+  ],
+};
+const booksBox = (lv) => {
+  const list = BOOKS[lv] || BOOKS.n2;
+  return `
+<h2 class="sec">搭配的紙本參考書</h2>
+<div class="rel">${list.map(b => `<a href="${bookUrl(b.t)}" target="_blank" rel="noopener sponsored">📚 ${esc(b.t)}<br><span style="font-size:12.5px;color:var(--tx3);font-weight:400">${esc(b.d)}</span></a>`).join('')}</div>`;
+};
+
 const ctaBox = lv => `
 <div class="cta">
   <p><strong>看懂了,考試時認得出來嗎?</strong><br>到練習工具做「${LEVEL_LABEL[lv].slice(0, 2)} 文法測驗」,答錯的會自動排進 SRS 間隔複習,考前自動幫你複習到熟。</p>
@@ -182,6 +219,8 @@ ${it.eg.map(e => `<div class="eg"><div class="j" lang="ja">${escKeepEm(e.j)}</di
 
 ${ctaBox(lv)}
 
+${booksBox(lv)}
+
 ${related.length ? `<h2 class="sec">同類文法(${esc(it.cat)})</h2>
 <div class="rel">${related.map(r => `<a href="${r.id}.html">${esc(r.t)}</a>`).join('')}</div>` : ''}
 
@@ -205,7 +244,8 @@ ${related.length ? `<h2 class="sec">同類文法(${esc(it.cat)})</h2>
 ${cats.map(c => `<div class="cat-h">${esc(c)}</div>
 <ul class="list">${items.filter(o => o.cat === c).map(o =>
   `<li><a href="${o.id}.html"><span>${esc(o.t)}</span><span class="hint">${esc(stripTags(o.ex).slice(0, 24))}</span></a></li>`).join('\n')}</ul>`).join('\n')}
-${ctaBox(lv)}`;
+${ctaBox(lv)}
+${booksBox(lv)}`;
 
   writeFileSync(join(OUT, `${lv}.html`), shell({
     title: `JLPT ${LV} 文法一覽(${items.length} 項)|意味・接続・例句`,
@@ -274,6 +314,8 @@ ${c.words.map(w => `<tr><td class="w" lang="ja">${esc(w.w)}${w.r && w.r !== w.w 
 ${c.eg.map(e => `<div class="eg"><div class="j" lang="ja">${escKeepEm(e.j)}</div><div class="z">${esc(e.z)}</div></div>`).join('\n')}
 
 ${cmpCta}
+
+${booksBox(/n3/i.test(c.level) && !/n2/i.test(c.level) ? 'n3' : 'n2')}
 
 ${related.length ? `<h2 class="sec">更多 ${esc(c.level)} 易混淆</h2>
 <div class="rel">${related.map(r => `<a href="${r.id}.html">${esc(r.title.replace(/\s+vs\s+/g, '・'))}</a>`).join('')}</div>` : ''}

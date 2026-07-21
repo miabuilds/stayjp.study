@@ -63,6 +63,15 @@ service cloud.firestore {
       allow read, write: if false;
     }
 
+    // 衝刺計畫預購名單 — sprint.html 登記;一人一筆(docId=uid),admin 可讀
+    match /sprint_waitlist/{uid} {
+      allow read: if request.auth != null &&
+        request.auth.token.email in ['stayjpplan@gmail.com', 'abc83327@gmail.com'];
+      allow create, update: if request.auth != null && request.auth.uid == uid
+        && request.resource.data.uid == uid;
+      allow delete: if false;
+    }
+
     // 進度資料(srs_data 等大 blob,各 key gzip bytes)— 從 users/{uid} 搬出,避免撞 1MiB。
     // 本人可讀寫自己;admin 可讀(debug)。無金流欄位,owner 可寫無自封 premium 風險。
     match /user_progress/{uid} {
