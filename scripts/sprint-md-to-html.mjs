@@ -24,7 +24,11 @@ th{background:#B8362A;color:#fff;text-align:left;padding:6px 8px}td{border:1px s
 tr:nth-child(even) td{background:#FAF8F3}
 code{background:#F2EEE5;padding:1px 4px;border-radius:3px;font-size:11px}
 hr{border:0;border-top:1px solid #E5DECF;margin:16px 0}
-.foot{color:#a9a9a9;font-size:10px;font-style:italic}`;
+.foot{color:#a9a9a9;font-size:10px;font-style:italic}
+.gp{margin:8px 0 2px;font-size:12px;page-break-inside:avoid}
+.gp b{color:#B8362A}
+.gsub{margin:0 0 0 16px;font-size:11px;color:#3a3a3a;line-height:1.6}
+.gsub.eg{color:#6a6a6a}`;
 
 function mdToHtml(md) {
   const lines = md.split('\n');
@@ -39,6 +43,12 @@ function mdToHtml(md) {
       if (!inTbl) { closeUl(); html += '<table><thead><tr>' + cells.map(c => `<th>${inline(c)}</th>`).join('') + '</tr></thead><tbody>'; inTbl = true; continue; }
       html += '<tr>' + cells.map(c => `<td>${inline(c)}</td>`).join('') + '</tr>'; continue;
     } else closeTbl();
+    // 編號文法點:「1. **標題**」
+    const om = l.match(/^\d+\. (.+)/);
+    if (om) { closeUl(); html += `<div class=gp>${inline(om[1])}</div>`; continue; }
+    // 縮排子項:「   - 接續:… / 例:…」
+    const sm = l.match(/^\s+- (.+)/);
+    if (sm) { closeUl(); const cls = /^例/.test(sm[1]) ? 'gsub eg' : 'gsub'; html += `<div class="${cls}">${inline(sm[1])}</div>`; continue; }
     if (/^### /.test(l)) { closeUl(); html += `<h3>${inline(l.slice(4))}</h3>`; continue; }
     if (/^## /.test(l)) { closeUl(); html += `<h2>${inline(l.slice(3))}</h2>`; continue; }
     if (/^# /.test(l)) { closeUl(); html += `<h1>${inline(l.slice(2))}</h1>`; continue; }
