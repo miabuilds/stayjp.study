@@ -194,17 +194,19 @@
       body = `${msg}<br>升級 <b>Premium</b>，即可<strong>無限次</strong>使用所有練習工具。`;
       primary = { label: '查看訂閱方案 →', act: 'plans' };
     } else if (canOfferTrial) {
-      body = `${msg}<br>用 Google 登入即送 <strong>3 天全功能試用</strong>——SRS、模考、跟讀全部無限，<b>不用信用卡</b>。`;
+      // 內文維持單一文字節點(不夾 strong),translate-layer 才能整句 exact-match 翻譯
+      body = `${msg}<br>用 Google 登入即送 3 天全功能試用——SRS、模考、跟讀全部無限，不用信用卡。`;
       primary = { label: '🎁 Google 登入，免費試 3 天', act: 'login' };
       secondary = { label: '直接看訂閱方案 →', act: 'plans' };
     } else {
-      body = `${msg}<br>升級 <b>Premium</b>，所有練習工具<strong>無限次</strong>使用。`;
+      body = `${msg}<br>升級 Premium，所有練習工具無限次使用。`;
       primary = { label: '解鎖無限練習 →', act: 'plans' };
     }
 
+    // 每行維持單一文字節點(不夾 <b>),translate-layer 的 pattern 才能整句翻成英文
     const metaLines = [];
-    if (!isNative && cd) metaLines.push(`⏳ 距離 ${cd.label} JLPT 還有 <b>${cd.days} 天</b>`);
-    if (!isNative) metaLines.push(`<span id="pwEbLine" style="display:none">🐦 早鳥年費 NT$990・只剩 <b id="pwEbLeft"></b> 名</span>`);
+    if (!isNative && cd) metaLines.push(`⏳ 距離 ${cd.label} JLPT 還有 ${cd.days} 天`);
+    if (!isNative) metaLines.push(`<span id="pwEbLine" style="display:none"></span>`);
     if (!isNative && !canOfferTrial) metaLines.push('✓ 7 天內無條件全額退費，隨時可取消');
 
     const wrap = document.createElement('div');
@@ -245,8 +247,10 @@
       fetchEarlyBirdLeft().then(left => {
         if (!left || left <= 0) return;
         const line = document.getElementById('pwEbLine');
-        const n = document.getElementById('pwEbLeft');
-        if (line && n) { n.textContent = left; line.style.display = ''; }
+        if (!line) return;
+        line.textContent = `🐦 早鳥年費 NT$990・只剩 ${left} 名`;
+        line.style.display = '';
+        if (window.UITranslate && UITranslate.active()) UITranslate.walk(line);
       });
     }
   }

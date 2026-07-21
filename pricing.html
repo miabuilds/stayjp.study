@@ -183,8 +183,8 @@ a:hover{text-decoration:underline}
   <!-- === 推薦碼(KOL)=== -->
   <div id="refBox" style="max-width:440px;margin:8px auto 0;padding:13px 15px;background:var(--bg3);border:1px solid var(--bd);border-radius:var(--r)">
     <div style="font-size:13px;color:var(--tx2);margin-bottom:8px">🎟 有推薦碼?輸入後付費訂閱成功多送 <b style="color:var(--tx)">7 天</b>(選填):</div>
-    <div style="display:flex;gap:8px">
-      <input id="refInput" placeholder="推薦碼" autocapitalize="characters" style="flex:1;padding:9px 11px;border:1px solid var(--bd);border-radius:9px;background:var(--bg);color:var(--tx);font-size:14px;text-transform:uppercase">
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <input id="refInput" placeholder="推薦碼" autocapitalize="characters" style="flex:1;min-width:120px;padding:9px 11px;border:1px solid var(--bd);border-radius:9px;background:var(--bg);color:var(--tx);font-size:14px;text-transform:uppercase">
       <button type="button" onclick="applyRefCode()" style="white-space:nowrap;padding:9px 18px;border-radius:9px;border:none;background:var(--ac);color:#fff;font-weight:600;cursor:pointer">套用</button>
       <button type="button" id="refClear" onclick="clearRefCode()" style="display:none;white-space:nowrap;padding:9px 14px;border-radius:9px;border:1px solid var(--bd);background:var(--bg);color:var(--tx2);cursor:pointer">清除</button>
     </div>
