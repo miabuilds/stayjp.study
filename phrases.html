@@ -179,5 +179,7 @@ render();
 (function(){ var s; try{s=localStorage.getItem('stayjp_about_lang');}catch(e){} setLang(s || ((navigator.language||'').toLowerCase().indexOf('zh')===0?'zh':'en')); })();
 if(window.speechSynthesis) speechSynthesis.getVoices();
 </script>
+<script src="i18n.js"></script>
+<script src="bilingual-sync.js"></script>
 </body>
 </html>
