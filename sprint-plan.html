@@ -39,6 +39,20 @@ td{border-top:1px solid var(--line);padding:7px 10px}
 .wk-h .lock{margin-left:auto;font-size:12px;color:var(--tx3);font-weight:400}
 .wk-h .free{margin-left:auto;font-size:11px;background:var(--ac);color:#fff;padding:2px 10px;border-radius:999px}
 .wk-body{padding:16px 18px;display:none}.wk.open .wk-body{display:block}
+.wk.cur{border-color:var(--ac);box-shadow:0 0 0 2px var(--ac-soft)}
+.wk-h .cur-tag{font-size:11px;background:var(--ac);color:#fff;padding:2px 9px;border-radius:999px;margin-left:6px}
+.wk-chk{display:flex;align-items:center;gap:8px;margin:2px 0 12px;font-size:13px;color:var(--tx2);cursor:pointer;user-select:none}
+.wk-chk input{width:16px;height:16px;accent-color:var(--ac);cursor:pointer}
+.tools{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;padding-top:12px;border-top:1px dashed var(--line)}
+.tools a{font-size:13px;background:var(--bg3);border:1px solid var(--bd);border-radius:999px;padding:6px 14px;color:var(--tx);font-weight:600}
+.tools a:hover{border-color:var(--ac);color:var(--ac);text-decoration:none}
+.prog{background:var(--bg2);border:1px solid var(--line);border-radius:14px;padding:18px 20px;margin-bottom:18px}
+.prog h3{font-family:var(--serif);font-size:16px;margin-bottom:10px}
+.prog-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;font-size:14px}
+.prog input[type=date]{padding:7px 10px;border:1px solid var(--bd);border-radius:8px;background:var(--bg);color:var(--tx);font-family:inherit}
+.prog-bar{height:8px;border-radius:999px;background:var(--bg3);overflow:hidden;margin-top:12px}
+.prog-bar i{display:block;height:100%;background:var(--ac);transition:width .3s}
+.prog .today{margin-top:10px;font-size:14px}.prog .today b{color:var(--ac)}
 .gp{margin:12px 0 2px;font-weight:700}.gp .t{color:var(--ac)}
 .gsub{margin-left:14px;font-size:13.5px;color:var(--tx2)}
 .gsub.eg{color:var(--tx3);font-style:normal}
@@ -83,6 +97,25 @@ var LEVELS=['n5','n4','n3','n2','n1'];
 var curLv=(location.hash.replace('#','')||'n4').toLowerCase();
 if(LEVELS.indexOf(curLv)<0)curLv='n4';
 var entitled=false, user=null;
+var progress={};   // { lv: { examDate:'YYYY-MM-DD', done:{1:true,...} } }
+var WEEK_COUNT=13; // 8 打底 + 3 實戰 + 2 衝刺
+var TOOL_URL='index.html';
+
+function lvProg(){ progress[curLv]=progress[curLv]||{done:{}}; if(!progress[curLv].done)progress[curLv].done={}; return progress[curLv]; }
+function saveProgress(){
+  if(!user)return;
+  db.doc('users/'+user.uid).set({sprint_progress:progress},{merge:true}).catch(function(){});
+}
+// 依考試日算「今天該在第幾週」:開跑=考前90天,W1=第1週
+function currentWeek(){
+  var p=lvProg(); if(!p.examDate)return 0;
+  var exam=new Date(p.examDate+'T00:00:00'); var start=new Date(exam.getTime()-90*86400000);
+  var now=new Date(); now.setHours(0,0,0,0);
+  if(now<start)return 0;
+  var w=Math.floor((now-start)/(7*86400000))+1;
+  return Math.min(WEEK_COUNT, Math.max(1,w));
+}
+function daysToExam(){ var p=lvProg(); if(!p.examDate)return null; var d=Math.ceil((new Date(p.examDate+'T00:00:00')-new Date())/86400000); return d; }
 
 document.getElementById('loginLink').onclick=function(e){e.preventDefault();if(user){auth.signOut()}else{auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()).catch(function(){})}};
 
@@ -110,9 +143,11 @@ function metaHtml(m){
 function mdBold(s){return s.replace(/\*\*(.+?)\*\*/g,'<b>$1</b>')}
 
 function weekHtml(wk,unlocked){
-  var head='<div class="wk-h" data-n="'+wk.n+'"><span class="n">W'+wk.n+'</span> '+esc(wk.cats.join('・'))
-    +(wk.free?'<span class="free">免費試讀</span>':(unlocked?'<span class="lock">▾</span>':'<span class="lock">🔒 訂閱解鎖</span>'))+'</div>';
-  if(!wk.free && !unlocked) return '<div class="wk locked">'+head+'</div>';
+  var cur=currentWeek()===wk.n;
+  var done=!!lvProg().done[wk.n];
+  if(!wk.free && !unlocked){
+    return '<div class="wk locked"><div class="wk-h"><span class="n">W'+wk.n+'</span> '+esc(wk.cats.join('・'))+'<span class="lock">🔒 訂閱解鎖</span></div></div>';
+  }
   var g=wk.grammar.map(function(x,i){
     return '<div class="gp"><span class="t">'+(i+1)+'. '+esc(x.t)+'</span></div>'
       +'<div class="gsub">接續:'+esc(x.p)+'</div>'
@@ -122,8 +157,27 @@ function weekHtml(wk,unlocked){
   var v=wk.vocab;
   var samp=(v.samples||[]).map(function(s){return esc(s.w)+'('+esc(s.r)+')='+esc(s.m)}).join('、');
   var vocab='<div class="vocab"><b>本週單字</b>:第 '+v.from+'–'+v.to+' 字（'+esc(v.fw)+' → '+esc(v.lw)+'），約 '+v.perDay+'/天。<br>抽樣重點:'+samp+'。</div>';
-  return '<div class="wk"><div class="wk-h" data-n="'+wk.n+'"><span class="n">W'+wk.n+'</span> '+esc(wk.cats.join('・'))
-    +(wk.free?'<span class="free">免費試讀</span>':'<span class="lock">▾</span>')+'</div><div class="wk-body">'+g+vocab+'</div></div>';
+  var chk='<label class="wk-chk"><input type="checkbox" class="done-chk" data-n="'+wk.n+'"'+(done?' checked':'')+'> 本週完成(打勾記錄進度)</label>';
+  var tools='<div class="tools"><a href="'+TOOL_URL+'#grammar">→ 去練這週文法</a><a href="'+TOOL_URL+'#vocab">→ 去背這批單字</a><a href="'+TOOL_URL+'#exam">→ 做一回模考</a></div>';
+  return '<div class="wk'+(cur?' cur':'')+'"><div class="wk-h" data-n="'+wk.n+'"><span class="n">W'+wk.n+'</span> '+esc(wk.cats.join('・'))
+    +(cur?'<span class="cur-tag">本週</span>':'')
+    +(wk.free?'<span class="free">免費試讀</span>':'<span class="lock">'+(done?'✓':'▾')+'</span>')+'</div>'
+    +'<div class="wk-body">'+chk+g+vocab+tools+'</div></div>';
+}
+
+function progressCard(m){
+  var p=lvProg();
+  var doneN=Object.keys(p.done).filter(function(k){return p.done[k]}).length;
+  var pct=Math.round(doneN/WEEK_COUNT*100);
+  var cw=currentWeek(), dte=daysToExam();
+  var todayLine='';
+  if(cw>0){ todayLine='<div class="today">你的進度應該在 <b>第 '+cw+' 週</b>'+(dte!=null?'・距考試 <b>'+dte+' 天</b>':'')+'。往下捲到 W'+cw+' 開始今天的份量。</div>'; }
+  else if(dte!=null){ todayLine='<div class="today">距考試 <b>'+dte+' 天</b>。'+(dte>90?'還沒到 90 天開跑點,可以先預習 W1。':'')+'</div>'; }
+  return '<div class="prog"><h3>📅 我的進度('+curLv.toUpperCase()+')</h3>'
+    +'<div class="prog-row"><span>設定考試日期:</span><input type="date" id="examDate" value="'+(p.examDate||'')+'"><span style="color:var(--tx3);font-size:13px">設定後自動算你每天該讀到哪</span></div>'
+    +todayLine
+    +'<div class="prog-bar"><i style="width:'+pct+'%"></i></div>'
+    +'<div style="font-size:13px;color:var(--tx2);margin-top:6px">已完成 '+doneN+' / '+WEEK_COUNT+' 週('+pct+'%)</div></div>';
 }
 
 async function load(){
@@ -133,13 +187,17 @@ async function load(){
     var meta=await db.doc('sprint_content/'+curLv+'_meta').get();
     if(!meta.exists){box.innerHTML='<div class="card">此級內容尚未上架。</div>';return}
     var m=meta.data();
-    var html=metaHtml(m);
-    // 逐週讀取(鎖住的週前端不抓內容,只有解鎖才抓)
+    var html='';
+    if(user) html+=progressCard(m);
+    html+=metaHtml(m);
     html+='<h2 class="sec">打底期 8 週 — 文法精讀 × 單字</h2>';
     if(!entitled){
-      html+='<div class="paywall"><p>W1 免費試讀。解鎖 W2–W'+m.weekCount+' 完整逐週計畫 + 實戰/衝刺期規劃,訂閱即可。</p><a class="btn" href="pricing.html">看訂閱方案 →</a></div>';
+      html+='<div class="paywall"><p>W1 免費試讀。解鎖 W2–W'+m.weekCount+' 完整逐週計畫 + 實戰/衝刺期規劃,訂閱 Premium 即可(早鳥年費 NT$990,還含全站工具無限用)。</p><a class="btn" href="pricing.html">看訂閱方案 →</a></div>';
     }
     var wrap=document.createElement('div');wrap.innerHTML=html;box.innerHTML='';box.appendChild(wrap);
+    // 綁定考試日期
+    var de=document.getElementById('examDate');
+    if(de)de.onchange=function(){lvProg().examDate=de.value;saveProgress();load()};
     for(var n=1;n<=m.weekCount;n++){
       var unlocked=entitled||n===1;
       var holder=document.createElement('div');
@@ -152,8 +210,20 @@ async function load(){
       box.appendChild(holder.firstChild);
     }
     [].forEach.call(box.querySelectorAll('.wk:not(.locked) .wk-h'),function(h){h.onclick=function(){h.parentNode.classList.toggle('open')}});
-    // W1 預設展開
-    var w1=box.querySelector('.wk:not(.locked)');if(w1)w1.classList.add('open');
+    // 完成打勾
+    [].forEach.call(box.querySelectorAll('.done-chk'),function(c){c.onclick=function(ev){
+      ev.stopPropagation();
+      lvProg().done[c.dataset.n]=c.checked; saveProgress();
+      var lk=c.closest('.wk').querySelector('.wk-h .lock'); if(lk)lk.textContent=c.checked?'✓':'▾';
+      // 更新進度條
+      var p=lvProg(),dn=Object.keys(p.done).filter(function(k){return p.done[k]}).length;
+      var bar=box.querySelector('.prog-bar i'); if(bar)bar.style.width=Math.round(dn/WEEK_COUNT*100)+'%';
+    };});
+    // 預設展開「本週」,沒設考試日則展開 W1
+    var cw=currentWeek();
+    var target=cw>0?box.querySelector('.wk .n')&&[].filter.call(box.querySelectorAll('.wk:not(.locked)'),function(w){return w.querySelector('.n').textContent==='W'+cw})[0]:null;
+    if(!target)target=box.querySelector('.wk:not(.locked)');
+    if(target){target.classList.add('open');}
   }catch(e){
     var code=e.code||e.message||'';
     if(/permission|not-found/.test(code)) box.innerHTML='<div class="card">此級計畫尚未上架,或請重新整理。若你剛訂閱,登出再登入即可解鎖。</div>';
@@ -165,12 +235,15 @@ auth.onAuthStateChanged(async function(u){
   user=u;
   document.getElementById('loginLink').textContent=u?'登出':'登入';
   entitled=false;
+  progress={};
   if(u){
     try{
       var us=await db.doc('users/'+u.uid).get();
-      var sub=(us.data()||{}).subscription||{};
+      var ud=us.data()||{};
+      var sub=ud.subscription||{};
       entitled=['active','trialing','cancelled','lifetime'].indexOf(sub.status)>=0 && (sub.expiresAt||0)>Date.now();
       if(!entitled){var sa=await db.doc('sprint_access/'+u.uid).get();entitled=sa.exists}
+      if(ud.sprint_progress)progress=ud.sprint_progress;
     }catch(e){}
   }
   renderTabs();load();

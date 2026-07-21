@@ -84,22 +84,19 @@ ul.inc li small{color:var(--tx3);display:block;font-size:13px}
   </ul>
 
   <div class="price-box">
-    <div class="old">正式價 NT$1,990</div>
-    <div class="now">NT$1,490</div>
-    <div class="note">預購限量 50 名・上線時以此價優先購買,不買也不會被扣款</div>
-    <a class="cta-btn" href="sprint-plan.html" style="text-decoration:none;display:inline-block">📖 免費試讀 W1 →</a>
-    <div style="margin:10px 0"></div>
-    <button class="cta-btn" id="waitBtn" onclick="joinWaitlist()" style="background:transparent;color:var(--ac);border:1.5px solid var(--ac)">🔖 用 Google 登入,搶預購名額</button>
-    <div id="waitMsg"></div>
-    <div class="cta-sub">登記不用付款、不用信用卡。計畫上線時 Email 通知你,用預購價買不買都隨你。<br>已是 Premium 會員?衝刺計畫上線時你會拿到會員專屬折扣。</div>
+    <div class="now" style="font-size:26px">W1 免費試讀</div>
+    <div class="note" style="margin:8px 0 4px">N5–N1 五級都有・不用信用卡・登入就能看第一週完整計畫</div>
+    <div class="note" style="color:var(--ac);font-weight:700">訂閱 Premium 即解鎖全 13 週(早鳥年費 NT$990,平均一天不到 3 元)</div>
+    <a class="cta-btn" href="sprint-plan.html" style="text-decoration:none;display:inline-block;margin-top:14px">📖 免費開始讀 W1 →</a>
+    <div class="cta-sub">衝刺計畫是 Premium 訂閱的加值內容——訂一年,全站工具無限用,還送這整套五級計畫。<br>W1 先免費跟著做,覺得有幫助再訂閱解鎖後面 12 週。</div>
   </div>
 
   <h2 class="sec">常見問題</h2>
   <div class="faqp">
-    <details><summary>跟訂閱 Premium 差在哪?</summary><div class="a">Premium 是「工具無限用」;衝刺計畫是「教你怎麼用、每天用多少」的作戰日程。工具是引擎,計畫是導航——搭配用效果最好,但衝刺計畫本身不需要 Premium 也能跟(免費額度照走,只是每天要分批)。</div></details>
-    <details><summary>我是 N4/N5 程度可以買嗎?</summary><div class="a">首發版本針對 N3 / N2(12 月場人數最多的兩級)。N4/N5 版本會依預購回饋決定要不要做——登記時可以備註你的級別。</div></details>
-    <details><summary>90 天不夠怎麼辦?</summary><div class="a">計畫以 9/7(考前 90 天)開跑設計,晚加入有「壓縮版」對照表(60 天/45 天)。12 月考不過,下一場 7 月可以直接重跑一輪,計畫不過期。</div></details>
-    <details><summary>預購要先付錢嗎?</summary><div class="a">不用。現在只是登記,上線時 Email 通知你,用 NT$1,490 預購價購買;不買也不會有任何費用。</div></details>
+    <details><summary>要另外付費買計畫嗎?</summary><div class="a">不用單獨買。衝刺計畫是 <b>Premium 訂閱的加值內容</b>——訂一年(早鳥 NT$990)就送 N5–N1 全套計畫,而且全站工具也一起無限用。W1 永遠免費,先跟著做再決定要不要訂。</div></details>
+    <details><summary>跟訂閱 Premium 差在哪?</summary><div class="a">Premium 解鎖「工具無限用」+「這套計畫」。計畫是導航(每天做什麼),工具是引擎(實際練)。訂閱一次兩個都有。</div></details>
+    <details><summary>哪些級別有?</summary><div class="a">N5、N4、N3、N2、N1 <b>五級都有</b>,每級 13 週逐週計畫,內容(文法接續・例句・單字)與網站題庫完全一致。</div></details>
+    <details><summary>90 天不夠怎麼辦?</summary><div class="a">計畫以考前 90 天開跑設計,晚加入有「壓縮版」對照表(60/45/30 天)。這次考不過,下一場可直接重跑一輪,計畫不過期。</div></details>
   </div>
 </main>
 <footer class="ft">
@@ -123,46 +120,6 @@ ul.inc li small{color:var(--tx3);display:block;font-size:13px}
   el.textContent='⏳ 距離 '+(next.getMonth()+1)+'/'+next.getDate()+' JLPT 還有 '+days+' 天';
   el.style.display='inline-flex';
 })();
-
-// 預購登記:Google 登入 → 寫 sprint_waitlist/{uid}(一人一筆,重複點是更新)
-if (!firebase.apps.length) firebase.initializeApp({
-  apiKey:'AIzaSyDnmg2XOuvwgE8m8xCF5sS4o0nQYoUplPI',
-  authDomain:'jpnote-1bdd6.firebaseapp.com',
-  projectId:'jpnote-1bdd6'
-});
-try { firebase.firestore().settings({ experimentalAutoDetectLongPolling:true, useFetchStreams:false }); } catch(e){}
-var _db = firebase.firestore(), _auth = firebase.auth();
-
-function _mark(uid, email) {
-  return _db.doc('sprint_waitlist/' + uid).set({
-    uid: uid, email: email || '',
-    ts: firebase.firestore.FieldValue.serverTimestamp(),
-    src: document.referrer || ''
-  }, { merge: true });
-}
-function _done() {
-  var b = document.getElementById('waitBtn'), m = document.getElementById('waitMsg');
-  b.textContent = '✓ 已登記,上線時 Email 通知你'; b.disabled = true;
-  m.style.color = '#16A34A'; m.textContent = '搞定!回去繼續今天的 20 個單字吧 →';
-  try { gtag('event', 'sprint_waitlist_join'); } catch(e){}
-}
-function joinWaitlist() {
-  var m = document.getElementById('waitMsg');
-  var u = _auth.currentUser;
-  if (u) { _mark(u.uid, u.email).then(_done).catch(function(){ m.style.color='#EF4444'; m.textContent='登記失敗,請再試一次'; }); return; }
-  var p = new firebase.auth.GoogleAuthProvider();
-  _auth.signInWithPopup(p).then(function(r){
-    return _mark(r.user.uid, r.user.email).then(_done);
-  }).catch(function(e){
-    if (e && (e.code==='auth/popup-closed-by-user'||e.code==='auth/cancelled-popup-request')) return;
-    m.style.color='#EF4444'; m.textContent='登入失敗,請改用系統瀏覽器(Safari/Chrome)開啟本頁再試';
-  });
-}
-// 已登入且已登記過 → 按鈕直接顯示完成狀態
-_auth.onAuthStateChanged(function(u){
-  if (!u) return;
-  _db.doc('sprint_waitlist/' + u.uid).get().then(function(d){ if (d.exists) _done(); }).catch(function(){});
-});
 </script>
 </body>
 </html>
