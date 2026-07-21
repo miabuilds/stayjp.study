@@ -103,6 +103,13 @@ a:hover{text-decoration:underline}
  <span class="lbl">UID</span>
  <span class="val" id="userUid" style="font-family:monospace;font-size:11px">—</span>
  </div>
+ <div class="status-row">
+ <span class="lbl">Email 通知</span>
+ <span class="val"><label style="display:inline-flex;align-items:center;gap:8px;cursor:pointer;user-select:none">
+   <input type="checkbox" id="mailOptIn" onchange="toggleMailOpt(this.checked)" style="width:16px;height:16px;accent-color:var(--ac,#B8362A);cursor:pointer">
+   <span id="mailOptTxt" style="font-size:13px;color:var(--tx2)">—</span>
+ </label></span>
+ </div>
  <div class="actions">
  <button class="btn" onclick="logout()">登出</button>
  <!-- 刪除帳號:只在原生 App 內顯示(Apple 5.1.1(v) 要求);網頁用戶看不到。由 initDeleteAccount() 解鎖 -->
@@ -294,7 +301,31 @@ auth.onAuthStateChanged(user => {
  loadSubscription();
  loadEarlyBird();
  loadInviteCard();
+ loadMailOpt();
 });
+
+// Email 通知偏好:users/{uid}.email_optout(true=不寄考季提醒/試用到期信)。開關顯示為「接收」語意。
+function loadMailOpt() {
+ if (!currentUser) return;
+ db.doc('users/' + currentUser.uid).get().then(s => {
+   const optout = (s.data() || {}).email_optout === true;
+   const cb = document.getElementById('mailOptIn');
+   const tx = document.getElementById('mailOptTxt');
+   if (cb) cb.checked = !optout;
+   if (tx) tx.textContent = optout ? '已關閉(不會收到備考提醒)' : '接收備考提醒與重要通知';
+ }).catch(() => {});
+}
+function toggleMailOpt(on) {
+ if (!currentUser) return;
+ const tx = document.getElementById('mailOptTxt');
+ db.doc('users/' + currentUser.uid).set({ email_optout: !on }, { merge: true }).then(() => {
+   if (tx) tx.textContent = on ? '接收備考提醒與重要通知' : '已關閉(不會收到備考提醒)';
+ }).catch(() => {
+   if (tx) tx.textContent = '儲存失敗,請重試';
+   const cb = document.getElementById('mailOptIn');
+   if (cb) cb.checked = !on;
+ });
+}
 // 還原前:有快取先樂觀顯示 appView(訂閱卡等 onAuthStateChanged 回來才載入);
 // 4s 沒回呼且仍未登入 → 回退顯示 gate,讓使用者可重新登入,不卡在空白/假已登入。
 try { const _c = _acctReadCache(); if (_c) _acctShowApp(_c); } catch (e) {}
