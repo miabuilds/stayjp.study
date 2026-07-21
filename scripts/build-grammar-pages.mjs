@@ -1,5 +1,7 @@
 #!/usr/bin/env node
-// build-grammar-pages.mjs — 從 grammar-n5..n1.js 產生 SEO 靜態文法頁
+// build-grammar-pages.mjs — 從 grammar-n5..n1.js + confusables.js 產生 SEO 靜態頁
+//   grammar/  文法點頁(382)+ 級別索引 + 總索引
+//   compare/  易混淆詞比較頁(80)+ 索引 —「やっと ようやく 違い」類搜尋的著陸頁
 //
 // 為什麼:練習工具是 JS 單頁,Google 吃不到 382 個文法點的長尾搜尋
 // (「〜において 意味」「〜わけにはいかない 中文」…)。每個文法點產一頁
@@ -80,6 +82,15 @@ h2.sec::before{content:'';width:18px;height:2px;background:var(--ac)}
 .list a:hover{color:var(--ac);text-decoration:none}
 .list .hint{color:var(--tx3);font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:55%}
 .cat-h{font-family:var(--serif);font-size:16px;color:var(--ac);margin:28px 0 4px}
+.cmp-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:12px;background:var(--bg2)}
+.cmp{width:100%;border-collapse:collapse;font-size:14px;min-width:520px}
+.cmp th{background:var(--bg3);color:var(--tx2);font-size:12px;letter-spacing:.05em;text-align:left;padding:10px 14px;border-bottom:1px solid var(--line)}
+.cmp td{padding:12px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+.cmp tr:last-child td{border-bottom:none}
+.cmp .w{font-family:var(--serif);font-size:16px;font-weight:700;white-space:nowrap}
+.cmp .r{font-size:12px;color:var(--tx3);font-weight:400}
+.cmp .m{white-space:nowrap;color:var(--ac);font-weight:600}
+.tip{border-left:3px solid var(--ac);background:var(--ac-soft,rgba(184,54,42,.06));border-radius:0 10px 10px 0;padding:14px 18px;font-size:15px;line-height:1.9}
 .ft{border-top:1px solid var(--line);padding:28px 24px;font-size:12px;color:var(--tx3);text-align:center}
 .ft a{color:var(--tx2);margin:0 8px}
 `.trim();
@@ -217,10 +228,90 @@ writeFileSync(join(OUT, 'index.html'), shell({
 <p style="color:var(--tx2);margin-bottom:24px">N5 到 N1 共 ${total} 個文法點,每項都有接續、意味與例句中譯。</p>
 <ul class="list">
 ${LEVELS.map(lv => `<li><a href="${lv}.html"><span>JLPT ${lv.toUpperCase()} 文法(${LEVEL_LABEL[lv]})</span><span class="hint">${data[lv].length} 項</span></a></li>`).join('\n')}
+<li><a href="../compare/index.html"><span>易混淆詞比較(やっと・ようやく 這種)</span><span class="hint">80 組</span></a></li>
 </ul>
 ${ctaBox('n3')}`,
 }));
 urls.push(`${SITE}/grammar/`);
+
+// ---- 易混淆詞比較頁(compare/)----
+const CMP_OUT = join(ROOT, 'compare');
+mkdirSync(CMP_OUT, { recursive: true });
+const cfs = new Function(`${readFileSync(join(ROOT, 'confusables.js'), 'utf8')}; return CONFUSABLES;`)();
+
+const cmpCta = `
+<div class="cta">
+  <p><strong>看懂了,選擇題裡還分得出來嗎?</strong><br>單字測驗有「易混淆挑戰」模式,專考這些一字之差,答錯自動進 SRS 複習到熟。</p>
+  <a class="btn" href="../index.html">免費做易混淆挑戰 →</a>
+</div>`;
+
+cfs.forEach((c, i) => {
+  const prev = cfs[i - 1], next = cfs[i + 1];
+  const related = cfs.filter(o => o.level === c.level && o.id !== c.id).slice(0, 6);
+  const tDot = c.title.replace(/\s+vs\s+/g, '・');
+  const title = `${tDot} 差別在哪?|JLPT ${c.level} 易混淆詞比較`;
+  const descTip = stripTags(c.tip).replace(/\s+/g, ' ').slice(0, 90);
+  const desc = `「${tDot}」的差別:${descTip}${descTip.length >= 90 ? '…' : ''} 附用法比較表與例句中譯,可免費線上練習。`;
+  const canonical = `${SITE}/compare/${c.id}.html`;
+
+  const body = `
+<div class="crumb"><a href="../home.html">首頁</a> › <a href="index.html">易混淆詞比較</a> › ${esc(tDot)}</div>
+<h1>${esc(tDot)}</h1>
+<div class="meta"><span class="tag lv">JLPT ${esc(c.level)}</span><span class="tag">易混淆</span></div>
+
+<h2 class="sec">用法比較</h2>
+<div class="cmp-wrap"><table class="cmp">
+<thead><tr><th>詞</th><th>意味</th><th>使い分け</th></tr></thead>
+<tbody>
+${c.words.map(w => `<tr><td class="w" lang="ja">${esc(w.w)}${w.r && w.r !== w.w ? `<div class="r">${esc(w.r)}</div>` : ''}</td><td class="m">${esc(w.m)}</td><td>${esc(w.note || '')}</td></tr>`).join('\n')}
+</tbody>
+</table></div>
+
+<h2 class="sec">記憶訣竅</h2>
+<div class="tip">${esc(stripTags(c.tip))}</div>
+
+<h2 class="sec">例句</h2>
+${c.eg.map(e => `<div class="eg"><div class="j" lang="ja">${escKeepEm(e.j)}</div><div class="z">${esc(e.z)}</div></div>`).join('\n')}
+
+${cmpCta}
+
+${related.length ? `<h2 class="sec">更多 ${esc(c.level)} 易混淆</h2>
+<div class="rel">${related.map(r => `<a href="${r.id}.html">${esc(r.title.replace(/\s+vs\s+/g, '・'))}</a>`).join('')}</div>` : ''}
+
+<div class="pn">
+  <span>${prev ? `← <a href="${prev.id}.html">${esc(prev.title.replace(/\s+vs\s+/g, '・'))}</a>` : ''}</span>
+  <span>${next ? `<a href="${next.id}.html">${esc(next.title.replace(/\s+vs\s+/g, '・'))}</a> →` : ''}</span>
+</div>`;
+
+  const jsonld = {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: `${tDot} — JLPT ${c.level} 易混淆詞比較`,
+    description: desc,
+    inLanguage: 'zh-Hant',
+    author: { '@type': 'Organization', name: '日本再留計劃 StayJP Study', url: SITE },
+    mainEntityOfPage: canonical,
+  };
+  writeFileSync(join(CMP_OUT, `${c.id}.html`), shell({ title, desc, canonical, jsonld, body }));
+  urls.push(canonical);
+});
+
+// compare 索引(依級別分組)
+const cfLevels = [...new Set(cfs.map(c => c.level))];
+writeFileSync(join(CMP_OUT, 'index.html'), shell({
+  title: `JLPT 易混淆詞比較(${cfs.length} 組)|やっと・ようやく 差別這種一次搞懂`,
+  desc: `JLPT N3~N2 共 ${cfs.length} 組易混淆單字比較:意味、使い分け、記憶訣竅與例句,免費查閱與測驗。`,
+  canonical: `${SITE}/compare/`,
+  body: `
+<div class="crumb"><a href="../home.html">首頁</a> › 易混淆詞比較</div>
+<h1>JLPT 易混淆詞比較</h1>
+<p style="color:var(--tx2);margin-bottom:24px">「やっと」和「ようやく」差在哪?${cfs.length} 組考試最愛考的一字之差,每組都有比較表、記憶訣竅和例句。也可以到<a href="../grammar/index.html">文法索引</a>查文法點。</p>
+${cfLevels.map(lv => `<div class="cat-h">JLPT ${esc(lv)}</div>
+<ul class="list">${cfs.filter(c => c.level === lv).map(c =>
+  `<li><a href="${c.id}.html"><span>${esc(c.title.replace(/\s+vs\s+/g, '・'))}</span><span class="hint">${esc(c.words.map(w => w.m).filter((m, i2, a) => a.indexOf(m) === i2).join('/').slice(0, 20))}</span></a></li>`).join('\n')}</ul>`).join('\n')}
+${cmpCta}`,
+}));
+urls.push(`${SITE}/compare/`);
 
 // ---- sitemap ----
 const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
