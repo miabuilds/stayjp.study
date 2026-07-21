@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>營運看板 — 日本再留計劃</title>
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" href="stayjpplan.png" type="image/png">
+<script>(function(){var t=localStorage.getItem('theme');if(t)document.documentElement.setAttribute('data-theme',t);else if(matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches)document.documentElement.setAttribute('data-theme','dark')})();</script>
+<style>
+:root{--bg:#FAF8F3;--bg2:#FFF;--bg3:#F2EEE5;--tx:#1C1C1E;--tx2:#6A6A6A;--tx3:#A9A9A9;--ac:#B8362A;--ac2:#2F5D7A;--good:#16A34A;--bd:#E5DECF;--serif:"Hiragino Mincho ProN","Noto Serif JP","Songti TC",serif}
+[data-theme="dark"]{--bg:#121113;--bg2:#1B1A1C;--bg3:#1F1E20;--tx:#EDE8DE;--tx2:#8F8A7E;--tx3:#5D5A53;--ac:#E4715F;--ac2:#7FA5C2;--good:#4ADE80;--bd:#2C2A27}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","PingFang TC",system-ui,sans-serif;background:var(--bg);color:var(--tx);line-height:1.6;-webkit-font-smoothing:antialiased}
+.hd{border-bottom:1px solid var(--bd);padding:14px 20px;display:flex;align-items:center;gap:12px}
+.hd h1{font-family:var(--serif);font-size:16px;font-weight:700}
+.hd .r{margin-left:auto;font-size:12px;color:var(--tx3)}
+main{max-width:900px;margin:0 auto;padding:24px 20px 80px}
+.gate{min-height:70vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center}
+.gate h2{font-family:var(--serif);font-size:20px}.gate p{color:var(--tx2);font-size:14px}
+.btn{padding:11px 22px;border:1px solid var(--ac);background:var(--ac);color:#fff;border-radius:999px;cursor:pointer;font-size:14px;font-weight:600;font-family:inherit}
+.btn.sec{background:transparent;color:var(--tx2);border-color:var(--bd)}
+.updated{font-size:12px;color:var(--tx3);margin-bottom:16px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;margin-bottom:26px}
+.kpi{background:var(--bg2);border:1px solid var(--bd);border-radius:14px;padding:18px 20px}
+.kpi .lbl{font-size:12px;color:var(--tx2);letter-spacing:.03em;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.kpi .num{font-family:var(--serif);font-size:34px;font-weight:800;line-height:1;color:var(--tx)}
+.kpi .num small{font-size:15px;font-weight:600;color:var(--tx3)}
+.kpi .sub{font-size:12px;color:var(--tx3);margin-top:8px}
+.kpi.hl{border-color:var(--ac)}
+.kpi.hl .num{color:var(--ac)}
+.bar{height:6px;border-radius:999px;background:var(--bg3);overflow:hidden;margin-top:10px}
+.bar i{display:block;height:100%;background:var(--ac)}
+h3.sec{font-family:var(--serif);font-size:15px;color:var(--tx2);margin:8px 0 12px;font-weight:700}
+.err{color:var(--ac);font-size:13px}
+.loading{color:var(--tx3)}
+.foot{font-size:12px;color:var(--tx3);margin-top:24px;line-height:1.9}
+</style>
+</head>
+<body>
+<header class="hd">
+  <h1>營運看板</h1>
+  <span class="r" id="who"></span>
+</header>
+
+<main>
+  <div id="gate" class="gate" style="display:none">
+    <h2>營運看板</h2>
+    <p>限管理員登入查看。</p>
+    <button class="btn" id="loginBtn">用 Google 登入</button>
+    <div id="gateMsg" class="err"></div>
+  </div>
+
+  <div id="app" style="display:none">
+    <div class="updated" id="updated">載入中…</div>
+
+    <h3 class="sec">💰 轉換 / 訂閱</h3>
+    <div class="grid">
+      <div class="kpi hl"><div class="lbl">🐦 早鳥剩餘名額</div><div class="num" id="ebLeft">—</div><div class="bar"><i id="ebBar" style="width:0"></i></div><div class="sub" id="ebSub"></div></div>
+      <div class="kpi"><div class="lbl">📝 註冊會員</div><div class="num" id="members">—</div><div class="sub">users collection 總數</div></div>
+      <div class="kpi hl"><div class="lbl">🔖 衝刺計畫預購</div><div class="num" id="sprint">—</div><div class="sub">sprint_waitlist 登記數</div></div>
+    </div>
+
+    <h3 class="sec">📈 流量 / 使用</h3>
+    <div class="grid">
+      <div class="kpi"><div class="lbl">👥 累積學習者</div><div class="num" id="learners">—</div><div class="sub">GA newUsers</div></div>
+      <div class="kpi"><div class="lbl">🟢 此刻在線</div><div class="num" id="active">—</div><div class="sub">過去 30 分鐘</div></div>
+    </div>
+
+    <h3 class="sec">✉️ Email</h3>
+    <div class="grid">
+      <div class="kpi"><div class="lbl">📤 今日排寄</div><div class="num" id="mailToday">—</div><div class="sub">mail queue（今日）</div></div>
+      <div class="kpi"><div class="lbl">📬 累計寄出</div><div class="num" id="mailTotal">—</div><div class="sub">mail queue 總數</div></div>
+    </div>
+
+    <div class="foot" id="foot"></div>
+    <button class="btn sec" onclick="location.reload()">🔄 重新整理</button>
+  </div>
+</main>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script>
+var ADMIN = ['stayjpplan@gmail.com','abc83327@gmail.com'];
+if (!firebase.apps.length) firebase.initializeApp({
+  apiKey:'AIzaSyDnmg2XOuvwgE8m8xCF5sS4o0nQYoUplPI',
+  authDomain:'jpnote-1bdd6.firebaseapp.com',
+  projectId:'jpnote-1bdd6'
+});
+try { firebase.firestore().settings({ experimentalAutoDetectLongPolling:true, useFetchStreams:false }); } catch(e){}
+var db = firebase.firestore(), auth = firebase.auth();
+
+function showGate(msg){ document.getElementById('gate').style.display='flex'; document.getElementById('app').style.display='none'; if(msg) document.getElementById('gateMsg').textContent=msg; }
+function showApp(){ document.getElementById('gate').style.display='none'; document.getElementById('app').style.display='block'; }
+document.getElementById('loginBtn').onclick = function(){
+  auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()).catch(function(e){
+    if(e&&/popup-closed|cancelled/.test(e.code||''))return;
+    showGate('登入失敗,請用系統瀏覽器開啟');
+  });
+};
+
+// 用 count() 聚合查詢:每個統計只算 1 次讀取,不會掃全表
+function countOf(col, build){
+  var q = build ? build(db.collection(col)) : db.collection(col);
+  return q.count().get().then(function(s){ return s.data().count; }).catch(function(){ return null; });
+}
+function put(id, v, suffix){ var el=document.getElementById(id); if(!el)return; el.innerHTML = (v==null?'<span class="err">—</span>':(v.toLocaleString()+(suffix||''))); }
+
+function load(){
+  var startToday = new Date(); startToday.setHours(0,0,0,0);
+  var ts = firebase.firestore.Timestamp.fromDate(startToday);
+
+  // 早鳥 + stats(公開讀)
+  db.doc('counters/early_bird').get().then(function(d){
+    var x=d.data()||{}, lim=x.limit||100, used=x.count||0, left=Math.max(0,lim-used);
+    put('ebLeft', left, ' <small>/ '+lim+'</small>');
+    document.getElementById('ebBar').style.width=(used/lim*100)+'%';
+    document.getElementById('ebSub').textContent='已售 '+used+' 名';
+  }).catch(function(){ put('ebLeft',null); });
+
+  db.doc('stats/global').get().then(function(d){
+    var x=d.data()||{}; put('learners', x.learners!=null?x.learners:null); put('active', x.activeNow!=null?x.activeNow:null);
+  }).catch(function(){ put('learners',null); put('active',null); });
+
+  // count() 聚合(admin 權限)
+  countOf('users').then(function(n){ put('members', n); });
+  countOf('sprint_waitlist').then(function(n){ put('sprint', n); });
+  countOf('mail').then(function(n){ put('mailTotal', n); });
+  countOf('mail', function(c){ return c.where('_createdAt','>=',ts); }).then(function(n){
+    put('mailToday', n);
+    if(n==null) document.getElementById('foot').innerHTML='※ 今日寄信數需要 _createdAt 索引,若顯示 — 請點主控台提示的建立索引連結(只有 cron 寄的信有此欄位,手動測試信不算)。';
+  });
+
+  var now=new Date();
+  document.getElementById('updated').textContent='更新於 '+now.toLocaleString('zh-TW');
+}
+
+auth.onAuthStateChanged(function(u){
+  if(!u){ showGate(); return; }
+  document.getElementById('who').textContent=u.email||'';
+  if(ADMIN.indexOf((u.email||'').toLowerCase())<0){ showGate('此帳號非管理員。'); return; }
+  showApp(); load();
+});
+</script>
+</body>
+</html>

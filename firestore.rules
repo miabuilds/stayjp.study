@@ -163,6 +163,13 @@ service cloud.firestore {
       allow write: if false;
     }
 
+    // 寄信 queue(Trigger Email 擴充套件用)— cron/擴充套件寫,admin 讀(看板統計今日寄信量)
+    match /mail/{docId} {
+      allow read: if request.auth != null &&
+        request.auth.token.email in ['stayjpplan@gmail.com', 'abc83327@gmail.com'];
+      allow write: if false;   // 只 Cloud Function(Admin SDK)寫,繞過此規則
+    }
+
     // 學習內容主檔 — vocab / grammar / listening / reading / confusables 集中。
     // 前端 + App 都讀同一份；寫入限 SA（migration script 用 JWT）。
     match /content/{doc} {
