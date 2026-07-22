@@ -129,7 +129,7 @@ function renderTabs(){
 }
 
 function metaHtml(m){
-  var rows=m.sections.map(function(s){return '<tr><td>'+esc(s[0])+'</td><td>'+s[1]+'</td><td>'+s[2]+'</td></tr>'}).join('');
+  var rows=m.sections.map(function(s){return '<tr><td>'+esc(s.name)+'</td><td>'+s.max+'</td><td>'+s.min+'</td></tr>'}).join('');
   var cfs=(m.confusables||[]).slice(0,12).map(function(c){return '<li><b>'+esc(c.words.join('／'))+'</b> — '+esc(c.tip)+'。</li>'}).join('');
   return '<div class="card">'
     +'<h2 class="sec">考試結構與合格線</h2>'
