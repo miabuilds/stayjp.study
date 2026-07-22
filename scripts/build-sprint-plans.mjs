@@ -278,7 +278,7 @@ function buildData(lv) {
     const step = Math.ceil(vs.length / 6);
     return {
       n: w + 1,
-      free: w === 0,   // W1 免費試讀
+      free: true,   // A 策略:整套免費,當引流/回訪漏斗;靠工具「無限練習」轉訂閱
       cats: [...new Set(gs.map(g => g.cat))],
       grammar: gs.map(g => ({ t: g.t, p: g.p, ex: strip(g.ex), eg: g.eg && g.eg[0] ? { j: strip(g.eg[0].j), z: g.eg[0].z } : null })),
       vocab: { from: vs[0].n, to: vs[vs.length - 1].n, fw: vs[0].w, fr: vs[0].r, lw: vs[vs.length - 1].w, lr: vs[vs.length - 1].r, perDay: step,

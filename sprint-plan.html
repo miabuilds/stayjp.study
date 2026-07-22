@@ -191,9 +191,7 @@ async function load(){
     if(user) html+=progressCard(m);
     html+=metaHtml(m);
     html+='<h2 class="sec">打底期 8 週 — 文法精讀 × 單字</h2>';
-    if(!entitled){
-      html+='<div class="paywall"><p>W1 免費試讀。解鎖 W2–W'+m.weekCount+' 完整逐週計畫 + 實戰/衝刺期規劃,訂閱 Premium 即可(早鳥年費 NT$990,還含全站工具無限用)。</p><a class="btn" href="pricing.html">看訂閱方案 →</a></div>';
-    }
+    html+='<div class="paywall" style="border-style:solid"><p><b>整套計畫完全免費</b>,照著每天練就對了。真正的加速器是「無限次練習」——免費版每個工具每天 1 次,想一次練完整週的量,升級 Premium(早鳥 NT$990/年,平均一天不到 3 元)。</p><a class="btn" href="pricing.html">看無限練習方案 →</a></div>';
     var wrap=document.createElement('div');wrap.innerHTML=html;box.innerHTML='';box.appendChild(wrap);
     // 綁定考試日期
     var de=document.getElementById('examDate');
