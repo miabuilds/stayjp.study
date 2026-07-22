@@ -288,7 +288,8 @@ function buildData(lv) {
 
   return {
     level: LV, pass: E.pass, combined: E.combined, times: E.times,
-    sections: E.sections, strategy: STRATEGY[lv],
+    // Firestore 不允許巢狀陣列 → 轉成物件陣列
+    sections: E.sections.map(s => ({ name: s[0], max: s[1], min: s[2] })), strategy: STRATEGY[lv],
     counts: { vocab: vocab.length, grammar: grammar.length, confusables: cfs.length },
     perDay, heavyVocab: vocab.length > 1500,
     confusables: cfs.map(c => ({ words: c.words.map(w => w.w), tip: strip(c.tip).split('。')[0] })),
