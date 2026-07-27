@@ -966,9 +966,11 @@ a:hover { text-decoration: underline; }
   const cardLearners = document.getElementById('learnersCard');
   const cardActive = document.getElementById('activeNowCard');
 
-  // Firestore onSnapshot：cron 每 10 分鐘寫一次，前端自動更新顯示
-  // 防呆：沒數據或值非正整數就整張卡藏起來，不要顯示「—」或空白
-  ref.onSnapshot(snap => {
+  // 讀一次就好（原本用 onSnapshot 即時監聽 → cron 每 10 分寫一次時，所有在線首頁訪客
+  // 全部被重新計一次讀取，讀取量隨「在線人數 × 寫入次數」暴增，是帳單主因之一）。
+  // 首頁人數不需即時跳動，載入時 get 一次即可，省下大量 Firestore 讀取。
+  // 防呆：沒數據或值非正整數就整張卡藏起來，不要顯示「—」或空白。
+  ref.get().then(snap => {
     const d = snap.exists ? snap.data() : {};
     if (Number.isFinite(d.learners) && d.learners > 0) {
       elLearners.textContent = d.learners.toLocaleString() + '+';
@@ -982,7 +984,7 @@ a:hover { text-decoration: underline; }
     } else {
       cardActive.style.display = 'none';
     }
-  }, () => {
+  }).catch(() => {
     cardLearners.style.display = 'none';
     cardActive.style.display = 'none';
   });
