@@ -16,7 +16,7 @@ export const paymentHealth = functions.onRequest(
   {
     region: "asia-east1",
     invoker: "public",
-    secrets: [...ECPAY_SECRETS, ...PAYPAL_SECRETS],
+    secrets: [...ECPAY_SECRETS, ...PAYPAL_SECRETS, "HEALTH_CHECK_KEY"],
     timeoutSeconds: 30,
     memory: "256MiB",
     maxInstances: 2,   // 公開端點防濫用:限制實例數,避免被狂打灌爆成本 / 打爆金流 API
