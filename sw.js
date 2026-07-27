@@ -1,4 +1,4 @@
-const CACHE_NAME = 'stayjp-v200';
+const CACHE_NAME = 'stayjp-v201';
 const ASSETS = [
   './',
   './index.html',

@@ -21,6 +21,10 @@ window.ContentLoader = (function () {
   const MASTER_URL = `${BASE}/master`;
   const MANIFEST_URL = `${BASE}/manifest`;
   const CACHE_KEY = 'stayjp_content_v1';
+  // 靜態內容檔(GitHub Pages / CDN,免費流量)。優先讀這個；讀不到才退回 Firestore(下方)。
+  // 內容更新流程：跑 scripts/export-content-static.cjs 重新產生這兩個檔 → 部署。
+  const STATIC_VERSION_URL = 'content-version.json';
+  const STATIC_DATA_URL = 'content-data.json';
 
   function setGlobals(data) {
     if (!data) return;
@@ -95,14 +99,37 @@ window.ContentLoader = (function () {
     return { version, data: JSON.parse(payload) };
   }
 
-  // 先試分片;任何失敗 → 回退整包(確保永不斷站)
+  // ── 靜態檔(GitHub Pages / CDN,免費流量) ──
+  async function fetchStaticVersion() {
+    const r = await fetch(STATIC_VERSION_URL, { cache: 'no-cache' });
+    if (!r.ok) throw new Error('static version ' + r.status);
+    const j = await r.json();
+    if (!j || !j.version) throw new Error('static version 缺 version');
+    return j.version;
+  }
+  async function fetchStatic() {
+    const version = await fetchStaticVersion();
+    // URL 帶版本號:同版本 → CDN/瀏覽器/SW 快取命中(0 流量);版本一變 → URL 變 → 自動抓新檔
+    const r = await fetch(STATIC_DATA_URL + '?v=' + encodeURIComponent(version));
+    if (!r.ok) throw new Error('static data ' + r.status);
+    const o = await r.json();
+    if (!o || !o.data) throw new Error('static data 缺 data');
+    return { version: o.version || version, data: o.data };
+  }
+
+  // 先試靜態檔(免費 CDN);失敗 → 退回 Firestore 分片 → 再退回整包(確保永不斷站)
+  // window.__contentSrc 記錄實際來源(static / firestore-*),方便驗證與監控。
   async function fetchContent() {
-    try { return await fetchSharded(); }
-    catch (e) { return await fetchMaster(); }
+    try { const r = await fetchStatic(); try { window.__contentSrc = 'static'; } catch (_) {} return r; }
+    catch (e0) {
+      try { const r = await fetchSharded(); try { window.__contentSrc = 'firestore-shard'; } catch (_) {} return r; }
+      catch (e1) { const r = await fetchMaster(); try { window.__contentSrc = 'firestore-master'; } catch (_) {} return r; }
+    }
   }
 
   async function fetchVersion() {
-    // 優先看 manifest.version;沒有再看 master.version
+    // 先看靜態版本;讀不到再看 Firestore(manifest → master)
+    try { return await fetchStaticVersion(); } catch (_) { /* 落到 Firestore */ }
     try {
       const r = await fetch(MANIFEST_URL + '?mask.fieldPaths=version');
       if (r.ok) { const j = await r.json(); const v = j.fields && j.fields.version && j.fields.version.stringValue; if (v) return v; }
