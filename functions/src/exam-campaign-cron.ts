@@ -99,40 +99,52 @@ export const examCampaignCron = functions.onSchedule(
     const flag = `${examKey}_${wave}`;            // e.g. "2026-12_d90"
     const examLabel = `${exam.getUTCMonth() + 1}/${exam.getUTCDate()}`;
 
-    const snap = await db.collection("users").get();
-    let sent = 0, skipped = 0;
-    for (const d of snap.docs) {
-      if (sent >= DAILY_CAP) break;               // 額度用完,明天這支再跑會繼續(窗有 7 天)
-      const u = d.data() as Record<string, any>;
-      if (u.email_optout === true) { skipped++; continue; }
-      if (u.campaigns && u.campaigns[flag]) { skipped++; continue; }   // 這一波已寄過
+    // 分頁掃描 users,避免一次把整個集合載進記憶體(用戶成長後會撞記憶體/timeout);
+    // 達每日上限就停,不再往後抓。(讀取次數本身很便宜,這裡主要是記憶體/擴充性防護。)
+    let sent = 0, skipped = 0, scanned = 0;
+    const PAGE = 500;
+    let cursor: string | null = null;
+    while (sent < DAILY_CAP) {
+      let q = db.collection("users").orderBy(admin.firestore.FieldPath.documentId()).limit(PAGE);
+      if (cursor) q = q.startAfter(cursor);
+      const snap = await q.get();
+      if (snap.empty) break;
+      for (const d of snap.docs) {
+        if (sent >= DAILY_CAP) break;             // 額度用完,明天這支再跑會繼續(窗有 7 天)
+        scanned++;
+        const u = d.data() as Record<string, any>;
+        if (u.email_optout === true) { skipped++; continue; }
+        if (u.campaigns && u.campaigns[flag]) { skipped++; continue; }   // 這一波已寄過
 
-      let email = "", name = "";
-      try {
-        const au = await admin.auth().getUser(d.id);
-        email = au.email || "";
-        name = (au.displayName || "").split(" ")[0];
-      } catch { /* 帳號已刪 */ }
-      if (!email) {
-        // 沒 email 也標記,免得每天重查 auth 浪費配額
+        let email = "", name = "";
+        try {
+          const au = await admin.auth().getUser(d.id);
+          email = au.email || "";
+          name = (au.displayName || "").split(" ")[0];
+        } catch { /* 帳號已刪 */ }
+        if (!email) {
+          // 沒 email 也標記,免得每天重查 auth 浪費配額
+          await d.ref.set({ campaigns: { [flag]: admin.firestore.FieldValue.serverTimestamp() } }, { merge: true });
+          skipped++; continue;
+        }
+
+        const sub = u.subscription || {};
+        const isPaid = ["active", "trialing", "cancelled"].includes(sub.status) && Number(sub.expiresAt || 0) > now;
+        const m = wave === "d90" ? mailD90(name, examLabel, daysLeft) : mailD30(name, daysLeft, isPaid);
+
+        await db.collection("mail").add({
+          to: email,
+          message: { subject: m.subject, html: m.html },
+          _campaign: `exam_${flag}`,
+          _uid: d.id,
+          _createdAt: admin.firestore.FieldValue.serverTimestamp(),
+        });
         await d.ref.set({ campaigns: { [flag]: admin.firestore.FieldValue.serverTimestamp() } }, { merge: true });
-        skipped++; continue;
+        sent++;
       }
-
-      const sub = u.subscription || {};
-      const isPaid = ["active", "trialing", "cancelled"].includes(sub.status) && Number(sub.expiresAt || 0) > now;
-      const m = wave === "d90" ? mailD90(name, examLabel, daysLeft) : mailD30(name, daysLeft, isPaid);
-
-      await db.collection("mail").add({
-        to: email,
-        message: { subject: m.subject, html: m.html },
-        _campaign: `exam_${flag}`,
-        _uid: d.id,
-        _createdAt: admin.firestore.FieldValue.serverTimestamp(),
-      });
-      await d.ref.set({ campaigns: { [flag]: admin.firestore.FieldValue.serverTimestamp() } }, { merge: true });
-      sent++;
+      if (snap.size < PAGE) break;                // 最後一頁
+      cursor = snap.docs[snap.docs.length - 1].id;
     }
-    console.log(`[examCampaign] ${flag}:考前 ${daysLeft} 天,本輪排寄 ${sent} 封,跳過 ${skipped},會員總數 ${snap.size}`);
+    console.log(`[examCampaign] ${flag}:考前 ${daysLeft} 天,本輪排寄 ${sent} 封,跳過 ${skipped},掃描 ${scanned}`);
   }
 );

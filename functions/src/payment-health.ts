@@ -19,8 +19,17 @@ export const paymentHealth = functions.onRequest(
     secrets: [...ECPAY_SECRETS, ...PAYPAL_SECRETS],
     timeoutSeconds: 30,
     memory: "256MiB",
+    maxInstances: 2,   // 公開端點防濫用:限制實例數,避免被狂打灌爆成本 / 打爆金流 API
   },
-  async (_req, res) => {
+  async (req, res) => {
+    // 選用認證:若有設 HEALTH_CHECK_KEY,要求 ?key= 相符(GitHub Action 會帶)。沒設就跳過
+    // (maxInstances 已擋住成本濫用)。要開強認證:把 HEALTH_CHECK_KEY 加進上面 secrets 陣列 +
+    // `firebase functions:secrets:set HEALTH_CHECK_KEY` + GitHub repo secret 同名同值 + 部署。
+    const expectedKey = process.env.HEALTH_CHECK_KEY;
+    if (expectedKey && req.query.key !== expectedKey) {
+      res.status(403).json({ ok: false, error: "forbidden" });
+      return;
+    }
     const checks: Record<string, unknown> = {};
     let ok = true;
 
