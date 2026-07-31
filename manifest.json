@@ -3,7 +3,7 @@
   "short_name": "日本再留計劃",
   "description": "免費 JLPT N5~N1 線上備考工具：單字、文法、模擬考、SRS 間隔複習、聽力讀解。",
   "lang": "zh-Hant",
-  "start_url": "./",
+  "start_url": "./app.html",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
