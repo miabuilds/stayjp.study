@@ -135,6 +135,8 @@ function showForm(user){
   area.innerHTML=`
     <p style="color:var(--tx2);margin-bottom:6px">歡迎 ${esc(user.displayName||user.email)}!填一下資料就能拿到專屬連結:</p>
     <input id="pName" placeholder="顯示名稱 / 頻道名(給我們對帳用)" value="${esc(user.displayName||'')}">
+    <input id="pCode" placeholder="自訂推薦碼(選填,例:DOUBLEOJ)" maxlength="16" autocapitalize="characters" style="text-transform:uppercase">
+    <div class="muted" style="margin-top:4px">好記好推廣~ 4–16 碼英文或數字,留空則自動幫你產生。</div>
     <input id="pPlat" placeholder="你的主要平台連結(YouTube/IG/Threads…,選填)">
     <select id="pPayM"><option value="">收款方式(可之後補)</option><option value="bank">台灣銀行轉帳</option><option value="paypal">PayPal</option></select>
     <input id="pPayA" placeholder="收款帳號 / PayPal Email(選填,結算前補齊即可)">
@@ -147,10 +149,10 @@ function showForm(user){
     btn.disabled=true; const msg=document.getElementById('joinMsg'); msg.className='muted'; msg.textContent='處理中…';
     try{
       const t=await auth.currentUser.getIdToken();
-      const body={ agree:true, name:document.getElementById('pName').value, platform:document.getElementById('pPlat').value, payout_method:document.getElementById('pPayM').value, payout_account:document.getElementById('pPayA').value };
+      const body={ agree:true, name:document.getElementById('pName').value, platform:document.getElementById('pPlat').value, payout_method:document.getElementById('pPayM').value, payout_account:document.getElementById('pPayA').value, desired_code:document.getElementById('pCode').value };
       const r=await fetch(FN_JOIN,{method:'POST',headers:{'Authorization':'Bearer '+t,'Content-Type':'application/json'},body:JSON.stringify(body)});
       const d=await r.json();
-      if(d.code) showLink(d); else { msg.className='err'; msg.textContent='加入失敗:'+esc(d.error||'unknown'); btn.disabled=false; }
+      if(d.code) showLink(d); else { msg.className='err'; msg.textContent=esc(d.reason||d.error||'加入失敗,請稍後再試'); btn.disabled=false; }
     }catch(e){ msg.className='err'; msg.textContent='加入失敗,請稍後再試。'; btn.disabled=false; }
   };
 }
@@ -167,6 +169,14 @@ function showLink(d){
       ${navigator.share?'<button class="btn sec" style="padding:11px 20px;font-size:14px" onclick="shareLink()">分享</button>':''}
     </div>
     <div id="joinMsg" class="muted" style="margin-top:10px">你的推薦碼:<b>${esc(d.code)}</b>(App 受眾可到帳號頁輸入此碼歸因)。</div>
+    <details style="margin-top:10px"><summary style="cursor:pointer;font-size:14px;color:var(--ac)">✏️ 換一個更好記的碼</summary>
+      <div style="margin-top:8px">
+        <input id="chgCode" placeholder="新推薦碼(4–16 碼英數,例:DOUBLEOJ)" maxlength="16" autocapitalize="characters" style="text-transform:uppercase">
+        <div class="muted" style="margin-top:4px">只有在你的碼還沒有人使用時才能更改;改了之後舊連結就會失效,記得用新的。</div>
+        <div style="margin-top:10px"><button class="btn sec" id="chgBtn" onclick="changeCode()">更改推薦碼</button></div>
+        <div id="chgMsg" class="muted" style="margin-top:8px"></div>
+      </div>
+    </details>
     <div style="margin-top:18px;padding-top:16px;border-top:1px solid var(--bd)">
       <div style="font-weight:700;margin-bottom:4px">💰 收款資料</div>
       <p class="muted" style="margin:0 0 10px">累積分潤滿 NT$1,000 於每月結算,款項匯到這裡。結算前補齊即可、可隨時修改。</p>
@@ -220,6 +230,19 @@ function setupPayout(p){
 }
 function copyLink(){ const el=document.getElementById('myLink'); (navigator.clipboard?navigator.clipboard.writeText(el.value):Promise.reject()).then(()=>{ const m=document.getElementById('joinMsg'); m.className='muted ok'; m.textContent='✓ 已複製,貼給你的觀眾吧!'; }).catch(()=>{ el.removeAttribute('readonly'); el.select(); try{document.execCommand('copy');}catch(e){} }); }
 function shareLink(){ if(navigator.share) navigator.share({ title:'日本再留計劃 · 免費 JLPT 學習工具', text:'用我的連結註冊 StayJP,還多送你 7 天 Premium!', url:window.__link }).catch(()=>{}); }
+async function changeCode(){
+  const inp=document.getElementById('chgCode'), msg=document.getElementById('chgMsg'), btn=document.getElementById('chgBtn');
+  const code=(inp.value||'').trim();
+  if(!code){ msg.className='err'; msg.textContent='請先輸入新的推薦碼。'; return; }
+  btn.disabled=true; msg.className='muted'; msg.textContent='處理中…';
+  try{
+    const t=await auth.currentUser.getIdToken();
+    const r=await fetch(FN_JOIN,{method:'POST',headers:{'Authorization':'Bearer '+t,'Content-Type':'application/json'},body:JSON.stringify({desired_code:code})});
+    const d=await r.json();
+    if(d.code){ showLink(d); }   // 成功(含改名)→ 重繪整塊,顯示新碼與新連結
+    else { msg.className='err'; msg.textContent=esc(d.reason||d.error||'更改失敗'); btn.disabled=false; }
+  }catch(e){ msg.className='err'; msg.textContent='更改失敗,請稍後再試。'; btn.disabled=false; }
+}
 </script>
 <script src="i18n.js"></script>
 <script src="ui-map.js"></script>
