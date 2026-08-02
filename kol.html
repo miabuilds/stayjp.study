@@ -23,6 +23,16 @@
   .note{font-size:12px;color:var(--tx3);line-height:1.7}
   .err{color:#EF4444;font-size:14px;text-align:center;padding:20px 0}
   .loading{color:var(--tx2);text-align:center;padding:30px 0}
+  .range-box{margin-top:18px;padding-top:16px;border-top:1px solid var(--bd)}
+  .range-title{font-size:14px;font-weight:700;margin-bottom:10px}
+  .range-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .range-row input[type=date]{flex:1;min-width:120px;padding:9px 10px;border:1px solid var(--bd);border-radius:9px;background:var(--bg);color:var(--tx);font-size:14px}
+  .range-row span{color:var(--tx2)}
+  .range-row button{background:var(--ac);color:#fff;border:none;border-radius:9px;padding:9px 18px;font-size:14px;font-weight:600;cursor:pointer;white-space:nowrap}
+  .range-row button:disabled{opacity:.5;cursor:not-allowed}
+  .range-result{margin-top:12px;font-size:14px;color:var(--tx2);line-height:1.8;min-height:20px}
+  .range-result b{color:var(--tx);font-size:17px}
+  .range-result .money{color:#16A34A}
 </style>
 </head>
 <body>
@@ -54,18 +64,48 @@
         }
         title.textContent = '推薦碼 ' + d.code;
         kolEl.textContent = d.kol ? (d.kol + ' 的成效') : '';
+        const pad = n => (n < 10 ? '0' : '') + n;
+        const iso = dt => dt.getFullYear() + '-' + pad(dt.getMonth() + 1) + '-' + pad(dt.getDate());
+        const now = new Date();
+        const first = new Date(now.getFullYear(), now.getMonth(), 1);
         body.innerHTML =
           '<div class="stats">' +
             '<div class="stat"><div class="v">' + d.total + '</div><div class="l">帶來人數</div></div>' +
             '<div class="stat paid"><div class="v">' + d.paid + '</div><div class="l">已付費</div></div>' +
             '<div class="stat trial"><div class="v">' + d.trialing + '</div><div class="l">試用中</div></div>' +
           '</div>' +
-          '<div class="note">「帶來人數」= 透過你的推薦碼註冊的人;「已付費」= 其中目前付費訂閱中(結算依據);「試用中」= 免費試用尚未轉付費。數字即時更新。</div>';
+          '<div class="note">「帶來人數」= 透過你的推薦碼註冊的人;「已付費」= 其中目前付費訂閱中(結算依據);「試用中」= 免費試用尚未轉付費。數字即時更新。</div>' +
+          '<div class="range-box">' +
+            '<div class="range-title">📅 期間查詢</div>' +
+            '<div class="range-row"><input type="date" id="rFrom" value="' + iso(first) + '"><span>~</span><input type="date" id="rTo" value="' + iso(now) + '"><button id="rBtn">查詢</button></div>' +
+            '<div id="rResult" class="range-result">選好日期,查這段期間的<b style="font-size:14px">成交筆數</b>與<b style="font-size:14px">分潤金額</b>。</div>' +
+          '</div>';
+        document.getElementById('rBtn').onclick = queryRange;
       })
       .catch(() => {
         title.textContent = '連線失敗';
         body.innerHTML = '<div class="err">網路連線失敗,請稍後重新整理。</div>';
       });
+  }
+
+  function queryRange() {
+    const btn = document.getElementById('rBtn');
+    const res = document.getElementById('rResult');
+    const from = document.getElementById('rFrom').value;
+    const to = document.getElementById('rTo').value;
+    if (!from || !to) { res.innerHTML = '<span style="color:#EF4444">請選擇起訖日期。</span>'; return; }
+    if (from > to) { res.innerHTML = '<span style="color:#EF4444">起始日不能晚於結束日。</span>'; return; }
+    btn.disabled = true; res.textContent = '查詢中…';
+    fetch(FN + '?code=' + encodeURIComponent(code) + '&t=' + encodeURIComponent(t) + '&from=' + from + '&to=' + to)
+      .then(r => r.json())
+      .then(d => {
+        btn.disabled = false;
+        const rg = d && d.range;
+        if (!rg) { res.innerHTML = '<span style="color:#EF4444">查詢失敗,請稍後再試。</span>'; return; }
+        res.innerHTML = rg.from + ' ~ ' + rg.to + '<br>成交 <b>' + rg.conversions + '</b> 筆 · 分潤 <b class="money">NT$' + (rg.commission_twd || 0).toLocaleString() + '</b>' +
+          '<br><span style="font-size:12px;color:var(--tx3)">(不含已退費/作廢;金額為預估分潤,實際以結算為準)</span>';
+      })
+      .catch(() => { btn.disabled = false; res.innerHTML = '<span style="color:#EF4444">連線失敗,請稍後再試。</span>'; });
   }
 </script>
 <script src="i18n.js"></script>

@@ -60,6 +60,20 @@
       </div>
     </div>
 
+    <!-- 期間分潤統計(依 commissions.created_at,重用已載入資料,不額外讀取) -->
+    <div class="card">
+      <h2>📅 期間分潤統計</h2>
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px">
+        <input type="date" id="rangeFrom" style="padding:8px 10px;border:1px solid var(--bd);border-radius:8px;background:var(--bg2);color:var(--tx);font-size:14px">
+        <span style="color:var(--tx2)">~</span>
+        <input type="date" id="rangeTo" style="padding:8px 10px;border:1px solid var(--bd);border-radius:8px;background:var(--bg2);color:var(--tx);font-size:14px">
+        <button class="btn" onclick="applyRange()">查詢</button>
+        <button class="btn" style="background:var(--bg2);color:var(--tx2)" onclick="setRangeThisMonth()">本月</button>
+      </div>
+      <div class="muted" style="margin-bottom:10px">依「成交日(付款時間)」統計這段期間每個碼帶來幾筆成交、產生多少分潤(不含退費/作廢)。</div>
+      <div id="rangeTable"></div>
+    </div>
+
     <!-- 推薦碼管理 -->
     <div class="card">
       <h2>推薦碼管理</h2>
@@ -171,6 +185,10 @@ async function loadPayout() {
     // 讀真實分潤紀錄(commissions)+ ref_codes 名稱對照
     const [csnap, rsnap] = await Promise.all([ db.collection('commissions').get(), db.collection('ref_codes').get() ]);
     const nameByCode = {}, payByCode = {}; rsnap.forEach(d => { const c = d.data(); nameByCode[d.id] = c.kol || ''; payByCode[d.id] = c.payout || null; });
+    // 快取原始 commissions 給「期間分潤統計」重用(不再額外讀 Firestore)
+    window.__commRows = []; csnap.forEach(d => { const c = d.data(); window.__commRows.push({ code: c.code || '?', state: c.state || 'pending', amount: Number(c.amount_twd) || 0, gross: Number(c.gross_twd) || 0, created: Number(c.created_at) || 0 }); });
+    window.__nameByCode = nameByCode;
+    setRangeThisMonth();   // 預設顯示本月統計
     const payStr = p => !p ? '<span style="color:var(--tx3)">未填收款</span>' : ((p.method === 'paypal' ? 'PayPal ' : '銀行 ') + (p.account || '(未填帳號)'));
     const g = {};   // code → { pending, locked, paid }
     csnap.forEach(d => { const c = d.data(); const code = c.code || '?'; const st = c.state || 'pending'; const a = Number(c.amount_twd) || 0;
@@ -189,6 +207,30 @@ async function loadPayout() {
       + rows.map(r => `<tr><td>${r.kol||'—'}</td><td><code>${r.code}</code></td><td class="num" style="color:var(--tx2)">NT$${r.pending.toLocaleString()}</td><td class="num"><b style="color:${r.locked>=1000?'#16A34A':'var(--tx2)'}">NT$${r.locked.toLocaleString()}</b>${r.locked>=1000?' 🔔':''}</td><td class="num" style="color:var(--tx3)">NT$${r.paid.toLocaleString()}</td><td style="font-size:12px">${payStr(payByCode[r.code])}${r.locked>0?` <button class="btn" style="font-size:11px;padding:3px 8px;margin-left:6px" onclick="settleKol('${r.code}',${r.locked})">標記已付款</button>`:''}</td></tr>`).join('')
       + `<tr><td colspan="2" style="text-align:right;font-weight:700">合計</td><td class="num">NT$${tP.toLocaleString()}</td><td class="num"><b>NT$${tL.toLocaleString()}</b></td><td class="num">NT$${tPaid.toLocaleString()}</td><td></td></tr></tbody></table>`;
   } catch(e){ box.textContent='讀取失敗:'+e.message; }
+}
+
+// 期間分潤統計:純前端篩 window.__commRows(已載入)依 created_at,不額外讀取
+function setRangeThisMonth() {
+  const now = new Date(), first = new Date(now.getFullYear(), now.getMonth(), 1);
+  const pad = n => (n < 10 ? '0' : '') + n, iso = d => d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+  const f = document.getElementById('rangeFrom'), t = document.getElementById('rangeTo');
+  if (f) f.value = iso(first); if (t) t.value = iso(now);
+  applyRange();
+}
+function applyRange() {
+  const box = document.getElementById('rangeTable'); if (!box) return;
+  const rows = window.__commRows || [], names = window.__nameByCode || {};
+  const fromV = (document.getElementById('rangeFrom') || {}).value, toV = (document.getElementById('rangeTo') || {}).value;
+  if (!fromV || !toV) { box.innerHTML = '<div class="muted">請選起訖日期。</div>'; return; }
+  if (fromV > toV) { box.innerHTML = '<div class="muted" style="color:#EF4444">起始日不能晚於結束日。</div>'; return; }
+  const fromMs = Date.parse(fromV + 'T00:00:00+08:00'), toMs = Date.parse(toV + 'T23:59:59+08:00');
+  const g = {};
+  rows.forEach(r => { if (r.state === 'void') return; if (r.created < fromMs || r.created > toMs) return; const x = g[r.code] = g[r.code] || { conv: 0, amount: 0, gross: 0 }; x.conv++; x.amount += r.amount; x.gross += r.gross; });
+  const codes = Object.keys(g).sort((a, b) => g[b].amount - g[a].amount);
+  if (!codes.length) { box.innerHTML = '<div class="muted">這段期間沒有成交紀錄。</div>'; return; }
+  let tc = 0, ta = 0, tg = 0;
+  const bodyRows = codes.map(c => { const x = g[c]; tc += x.conv; ta += x.amount; tg += x.gross; return `<tr><td>${names[c] || '—'}</td><td><code>${c}</code></td><td class="num">${x.conv}</td><td class="num" style="color:var(--tx3)">NT$${x.gross.toLocaleString()}</td><td class="num"><b style="color:#16A34A">NT$${x.amount.toLocaleString()}</b></td></tr>`; }).join('');
+  box.innerHTML = `<table><thead><tr><th>KOL</th><th>碼</th><th class="num">成交筆數</th><th class="num">帶來營收(毛)</th><th class="num">分潤</th></tr></thead><tbody>${bodyRows}<tr><td colspan="2" style="text-align:right;font-weight:700">合計</td><td class="num"><b>${tc}</b></td><td class="num">NT$${tg.toLocaleString()}</td><td class="num"><b style="color:#16A34A">NT$${ta.toLocaleString()}</b></td></tr></tbody></table>`;
 }
 
 async function settleKol(code, locked) {
