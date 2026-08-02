@@ -2117,6 +2117,7 @@ const Shadow = (() => {
   let pendingTimer = null;
   let speed = 1.0; // 0.75 / 1 / 1.25
   let repeatWindow = true; // include shadow-repeat pause between plays
+  let manualAdvance = false; // 手動換句:播完一句後等使用者按 ▶,不自動跳(給念得慢的人)
 
   function open() {
     closeOverlay();
@@ -2139,6 +2140,7 @@ const Shadow = (() => {
       <div class="shadow-options">
         <label>速度 <select id="shadowSpeed"><option value="0.75">0.75x</option><option value="1" selected>1x</option><option value="1.25">1.25x</option></select></label>
         <label><input type="checkbox" id="shadowRepeat" checked> 跟讀停頓</label>
+        <label title="念完自己按 ▶ 才換句,不會念到一半被切走"><input type="checkbox" id="shadowManual"> 手動換句</label>
       </div>
       <div class="shadow-hint">Space 暫停 · ← → 切換 · R 重播 · Esc 退出</div>
     </div>`;
@@ -2161,6 +2163,12 @@ const Shadow = (() => {
     });
     document.getElementById('shadowRepeat').addEventListener('change', e => {
       repeatWindow = e.target.checked;
+    });
+    document.getElementById('shadowManual').addEventListener('change', e => {
+      manualAdvance = e.target.checked;
+      // 切成自動且正卡在等待換句 → 立刻續播下一句;切成手動則清掉待跳的計時器
+      if (!manualAdvance && stage === 5) { stage = 0; next(); }
+      else if (manualAdvance && pendingTimer) { clearTimeout(pendingTimer); pendingTimer = null; setStatus('🎤 念完按 ▶ 換下一句'); stage = 5; }
     });
     document.addEventListener('keydown', onKey);
   }
@@ -2377,6 +2385,12 @@ const Shadow = (() => {
       renderItem();
       playOnce(item.j, () => {
         if (paused) return;
+        if (manualAdvance) {
+          // 手動模式:播完停住等使用者按 ▶,不硬跳(念得慢也不會被切走)
+          stage = 5;
+          setStatus('🎤 念完按 ▶ 換下一句');
+          return;
+        }
         if (repeatWindow) {
           stage = 1;
           setStatus('🎤 跟著念…');
