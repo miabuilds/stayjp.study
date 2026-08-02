@@ -2118,6 +2118,8 @@ const Shadow = (() => {
   let speed = 1.0; // 0.75 / 1 / 1.25
   let repeatWindow = true; // include shadow-repeat pause between plays
   let manualAdvance = false; // 手動換句:播完一句後等使用者按 ▶,不自動跳(給念得慢的人)
+  // 錄音對比(純本機:MediaRecorder → objectURL 回放,不上傳、不進 Firestore)
+  let recStream = null, mediaRec = null, recChunks = [], recUrl = null, recAudio = null, recording = false;
 
   function open() {
     closeOverlay();
@@ -2137,10 +2139,16 @@ const Shadow = (() => {
         <button class="shadow-btn shadow-btn-main" data-act="toggle" title="暫停/繼續 (Space)">⏸</button>
         <button class="shadow-btn" data-act="next" title="下一句 (→)">▶</button>
       </div>
+      <div id="shadowRecBar" style="display:none;margin-top:12px;text-align:center">
+        <button id="recToggleBtn" data-act="rec" style="border:none;background:#B8362A;color:#fff;border-radius:22px;padding:9px 18px;font-size:14px;font-weight:600;cursor:pointer;margin:0 4px">⏺ 開始錄音</button>
+        <button id="recPlayBtn" data-act="playrec" disabled style="border:1px solid var(--bd,#ccc);background:transparent;color:var(--tx,#333);border-radius:22px;padding:9px 18px;font-size:14px;cursor:pointer;margin:0 4px;opacity:.45">▶ 聽我的</button>
+        <div id="recHint" style="font-size:12px;color:var(--tx2,#888);margin-top:7px">錄下自己念的,再按 ↻ 聽原音對比(只存在你手機、不會上傳)</div>
+      </div>
       <div class="shadow-options">
         <label>速度 <select id="shadowSpeed"><option value="0.75">0.75x</option><option value="1" selected>1x</option><option value="1.25">1.25x</option></select></label>
         <label><input type="checkbox" id="shadowRepeat" checked> 跟讀停頓</label>
         <label title="念完自己按 ▶ 才換句,不會念到一半被切走"><input type="checkbox" id="shadowManual"> 手動換句</label>
+        <label title="錄下自己念的,和原音對比(只存本機,不上傳)"><input type="checkbox" id="shadowRec"> 🎤 錄音對比</label>
       </div>
       <div class="shadow-hint">Space 暫停 · ← → 切換 · R 重播 · Esc 退出</div>
     </div>`;
@@ -2155,6 +2163,8 @@ const Shadow = (() => {
       else if (act === 'replay') replay();
       else if (act === 'toggle') togglePause();
       else if (act === 'fav') toggleFavCurrent();
+      else if (act === 'rec') toggleRec();
+      else if (act === 'playrec') playRec();
       else if (act === 'exit') exit();
     });
     document.getElementById('shadowSpeed').addEventListener('change', e => {
@@ -2163,6 +2173,11 @@ const Shadow = (() => {
     });
     document.getElementById('shadowRepeat').addEventListener('change', e => {
       repeatWindow = e.target.checked;
+    });
+    document.getElementById('shadowRec').addEventListener('change', e => {
+      const bar = document.getElementById('shadowRecBar');
+      if (e.target.checked) { if (bar) bar.style.display = 'block'; }
+      else { if (bar) bar.style.display = 'none'; if (recording) stopRec(); }
     });
     document.getElementById('shadowManual').addEventListener('change', e => {
       manualAdvance = e.target.checked;
@@ -2447,8 +2462,58 @@ const Shadow = (() => {
   }
   function exit(reachedEnd) {
     clearTimer();
+    stopRec();                       // 離開時停止錄音、釋放麥克風
+    if (recStream) { try { recStream.getTracks().forEach(t => t.stop()); } catch (e) {} recStream = null; }
+    if (recAudio) { try { recAudio.pause(); } catch (e) {} recAudio = null; }
+    if (recUrl) { try { URL.revokeObjectURL(recUrl); } catch (e) {} recUrl = null; }
     closeOverlay();
     if (reachedEnd) track('shadow_complete', { count: queue.length, mode: currentMode, level: currentLevel });
+  }
+
+  // === 錄音對比(純本機)===
+  async function toggleRec() {
+    if (recording) { stopRec(); return; }
+    const hint = document.getElementById('recHint'), btn = document.getElementById('recToggleBtn');
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia || typeof MediaRecorder === 'undefined') {
+      if (hint) hint.textContent = '此瀏覽器不支援錄音,換 Safari/Chrome 試試。'; return;
+    }
+    try {
+      recStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    } catch (e) {
+      if (hint) hint.textContent = '🚫 沒有麥克風權限 — 請在瀏覽器允許麥克風後再試。'; return;
+    }
+    recChunks = [];
+    try { mediaRec = new MediaRecorder(recStream); }
+    catch (e) { if (hint) hint.textContent = '錄音啟動失敗,請重試。'; return; }
+    mediaRec.ondataavailable = ev => { if (ev.data && ev.data.size) recChunks.push(ev.data); };
+    mediaRec.onstop = () => {
+      if (recUrl) { try { URL.revokeObjectURL(recUrl); } catch (e) {} }
+      const blob = new Blob(recChunks, { type: (recChunks[0] && recChunks[0].type) || 'audio/webm' });
+      recUrl = URL.createObjectURL(blob);
+      const pb = document.getElementById('recPlayBtn');
+      if (pb) { pb.disabled = false; pb.style.opacity = '1'; }
+      if (hint) hint.textContent = '✓ 已錄音,按「聽我的」和原音(↻)對比';
+      if (recStream) { try { recStream.getTracks().forEach(t => t.stop()); } catch (e) {} recStream = null; }  // 用完就關麥克風
+    };
+    mediaRec.start();
+    recording = true;
+    if (btn) { btn.textContent = '⏹ 停止錄音'; btn.style.background = '#555'; }
+    if (hint) hint.textContent = '🎤 錄音中… 念完按「停止錄音」';
+  }
+  function stopRec() {
+    if (mediaRec && recording) { try { mediaRec.stop(); } catch (e) {} }
+    recording = false;
+    const btn = document.getElementById('recToggleBtn');
+    if (btn) { btn.textContent = '⏺ 開始錄音'; btn.style.background = '#B8362A'; }
+  }
+  function playRec() {
+    if (!recUrl) return;
+    // 先停掉正在播的原音/朗讀,避免和自己的錄音疊在一起
+    try { if (window.speechSynthesis) speechSynthesis.cancel(); } catch (e) {}
+    try { if (_sharedAudio) _sharedAudio.pause(); } catch (e) {}
+    try { if (recAudio) recAudio.pause(); } catch (e) {}
+    recAudio = new Audio(recUrl);
+    recAudio.play().catch(() => {});
   }
 
   // Collect playable texts from currently rendered grammar / vocab list.
