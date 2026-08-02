@@ -125,7 +125,7 @@ const GrammarDrill = (() => {
             const pureJ = e.j.replace(/<[^>]+>/g,'').replace(/'/g,"\\'");
             const spk = `<svg class="spk-inline" style="width:16px;height:16px;cursor:pointer;vertical-align:middle;margin-left:4px;stroke:#2563EB;fill:none;stroke-width:2;opacity:.7" onclick="event.stopPropagation();speak('${pureJ}')" viewBox="0 0 24 24"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.54 8.46a5 5 0 010 7.07M19.07 4.93a10 10 0 010 14.14"/></svg>`;
             const z = typeof cvt==='function' ? cvt(e.z) : e.z;
-            return '<div style="padding:3px 0"><span style="color:#2563EB">'+e.j+'</span>'+spk+'<br><span style="color:var(--tx2);font-size:12px">'+z+'</span></div>';
+            return '<div style="padding:3px 0"><span style="color:#2563EB">'+(window.furiganaHTMLRich?window.furiganaHTMLRich(e.j):e.j)+'</span>'+spk+'<br><span style="color:var(--tx2);font-size:12px">'+z+'</span></div>';
           }).join('')}</div>
           <div class="srs-btns">
             <button class="srs-btn srs-hard" onclick="event.stopPropagation();GrammarDrill.rate(false)">${t('gd_hard')}</button>

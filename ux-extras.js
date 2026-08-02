@@ -97,6 +97,16 @@
     } catch (e) { /* no-op */ }
   }
 
+  // 保留既有簡單標籤(如例句裡標文法點的 <em>)的版本:只對「標籤外的純文字」上 ruby,
+  // 標籤原樣穿過。用於文法卡 / 易混淆詞 / 文法練習等 e.j 含 <em> 的例句。
+  function furiganaHTMLRich(html) {
+    if (html == null) return '';
+    return String(html).split(/(<[^>]+>)/).map(function (seg) {
+      return seg.charAt(0) === '<' ? seg : furiganaHTML(seg);
+    }).join('');
+  }
+
   window.furiganaHTML = furiganaHTML;
+  window.furiganaHTMLRich = furiganaHTMLRich;
   window.showToast = showToast;
 })();

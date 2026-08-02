@@ -554,6 +554,9 @@ body.profile-view .mn { margin-left: 0; max-width: none; }   /* 滿版 → 內�
 .gc .ex:active { background: var(--bg3); }
 .gc .ex:last-child { margin-bottom: 0; }
 .gc .ex .j { font-size: 14px; color: var(--ac2); font-weight: 500; line-height: 1.7; }
+/* 文法/易混淆例句的 furigana：小、灰、行高留白，與單字卡 .exj 一致 */
+.gc .ex .j:has(rt), .cf-eg .ex .j:has(rt) { line-height: 2.1; }
+.gc .ex .j rt, .cf-eg .ex .j rt { font-size: .58em; color: var(--tx2); font-weight: 400; letter-spacing: 0; }
 .ex-spk {
   width: 16px; height: 16px; cursor: pointer;
   vertical-align: middle; margin-left: 6px;
@@ -3461,7 +3464,7 @@ function renderConfuse() {
       h += '<div class="cf-eg">';
       cf.eg.forEach(e => {
         const pureJ = e.j.replace(/<[^>]+>/g,'').replace(/'/g,"\\'");
-        h += '<div class="ex" onclick="event.stopPropagation();speak(\''+pureJ+'\')" title="'+enOr('點方框唸例句','Tap box to hear')+'"><div class="j">'+e.j+'<svg class="ex-spk" onclick="event.stopPropagation();speak(\''+pureJ+'\')" viewBox="0 0 24 24"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.54 8.46a5 5 0 010 7.07M19.07 4.93a10 10 0 010 14.14"/></svg></div><div class="z">'+cvt(e.z)+'</div></div>';
+        h += '<div class="ex" onclick="event.stopPropagation();speak(\''+pureJ+'\')" title="'+enOr('點方框唸例句','Tap box to hear')+'"><div class="j">'+(window.furiganaHTMLRich?window.furiganaHTMLRich(e.j):e.j)+'<svg class="ex-spk" onclick="event.stopPropagation();speak(\''+pureJ+'\')" viewBox="0 0 24 24"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.54 8.46a5 5 0 010 7.07M19.07 4.93a10 10 0 010 14.14"/></svg></div><div class="z">'+cvt(e.z)+'</div></div>';
       });
       h += '</div>';
     }
@@ -3550,7 +3553,7 @@ function render() {
       const reportUrl = `mailto:stayjpplan@gmail.com?subject=${encodeURIComponent('[文法錯誤] ' + d.id + ' ' + d.t)}&body=${encodeURIComponent('文法 ID：' + d.id + '\n文法名：' + d.t + '\n\n錯誤描述：\n（請說明哪裡有錯，例如：接續格式、例句語感、中譯…）\n')}`;
       h += `<div class="gc" id="${d.id}"><div class="gh" onclick="toggleCard(this,event)"><span class="gn">${idx}</span><span class="gt">${d.t}</span>${(currentLevel==='n5'&&d.n)?'<span class="gbadge-adv">'+enOr('進階','Advanced')+'</span>':''}<svg class="star ${isFav?'on':''}" onclick="event.stopPropagation();toggleFav('${d.id}')" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg class="arr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div><div class="gb"><div class="gx"><div class="pt">${d.p}</div><div class="ep">${cvt(d.ex)}</div><div class="eg">${d.eg.map(e=>{
         const pureJ = e.j.replace(/<[^>]+>/g,'').replace(/'/g,"\\'");
-        return `<div class="ex" onclick="speak('${pureJ}')" title="${enOr('點方框唸例句','Tap box to hear')}"><div class="j">${e.j}<svg class="ex-spk" onclick="event.stopPropagation();speak('${pureJ}')" viewBox="0 0 24 24"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.54 8.46a5 5 0 010 7.07M19.07 4.93a10 10 0 010 14.14"/></svg></div><div class="z">${cvt(e.z)}</div></div>`;
+        return `<div class="ex" onclick="speak('${pureJ}')" title="${enOr('點方框唸例句','Tap box to hear')}"><div class="j">${window.furiganaHTMLRich?window.furiganaHTMLRich(e.j):e.j}<svg class="ex-spk" onclick="event.stopPropagation();speak('${pureJ}')" viewBox="0 0 24 24"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.54 8.46a5 5 0 010 7.07M19.07 4.93a10 10 0 010 14.14"/></svg></div><div class="z">${cvt(e.z)}</div></div>`;
       }).join('')}</div>${d.n?(currentLevel==='n5'?`<div class="nt-collapse"><button type="button" class="nt-toggle" onclick="event.stopPropagation();toggleNote(this)">展開說明 ▾</button><div class="nt nt-hidden">${cvt(d.n)}</div></div>`:`<div class="nt">${cvt(d.n)}</div>`):''}<a class="gc-report" href="${reportUrl}" target="_blank" rel="noopener">${t('report_error')}</a></div></div></div>`;
     });
     h += '</section>';
