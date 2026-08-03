@@ -2082,16 +2082,43 @@ function syncTtsSpeedSlider() {
   sl.value = String(v);
   if (lbl) lbl.textContent = v.toFixed(2).replace(/\.?0+$/, '') + 'x';
 }
+// 共用一個 Audio 元件(每次 new Audio 會造成延遲、手機音訊未暖機時第一次點常卡 1-2 秒或無聲)。
 let __ttsAudio = null;
+let __ttsUnlocked = false;
+function getTtsAudio() {
+  if (!__ttsAudio) { __ttsAudio = new Audio(); __ttsAudio.preload = 'auto'; }
+  return __ttsAudio;
+}
+// 首次使用者手勢先播一段極短靜音,喚醒手機音訊系統 → 之後第一次真的播放不會卡。
+function unlockTtsAudio() {
+  if (__ttsUnlocked) return;
+  __ttsUnlocked = true;
+  const a = getTtsAudio();
+  try {
+    a.src = 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAESsAAABAAgAZGF0YQAAAAA=';
+    const p = a.play();
+    if (p && p.then) p.then(() => { try { a.pause(); a.currentTime = 0; } catch (e) {} }).catch(() => {});
+  } catch (e) {}
+}
+document.addEventListener('touchstart', unlockTtsAudio, { once: true, passive: true, capture: true });
+document.addEventListener('mousedown', unlockTtsAudio, { once: true, capture: true });
+
+// SpeechSynthesis 備援:語音清單非同步載入,先快取+監聽,避免第一次抓不到日文語音而無聲。
+let __jaVoice = null;
+function loadJaVoice() {
+  if (!window.speechSynthesis) return;
+  const vs = speechSynthesis.getVoices();
+  __jaVoice = vs.find(v => v.lang && v.lang.toLowerCase().startsWith('ja')) || null;
+}
+if (window.speechSynthesis) { loadJaVoice(); try { speechSynthesis.onvoiceschanged = loadJaVoice; } catch (e) {} }
 function speakBrowser(text) {
   if (!window.speechSynthesis) return;
   speechSynthesis.cancel();
   const u = new SpeechSynthesisUtterance(hiraToKata(text));
   u.lang = 'ja-JP';
   u.rate = 0.85 * getTtsSpeed();  // 0.85 是 base rate，再乘使用者設定
-  const voices = speechSynthesis.getVoices();
-  const jaVoice = voices.find(v => v.lang.startsWith('ja'));
-  if (jaVoice) u.voice = jaVoice;
+  if (!__jaVoice) loadJaVoice();
+  if (__jaVoice) u.voice = __jaVoice;
   speechSynthesis.speak(u);
 }
 function speak(text) {
@@ -2099,13 +2126,16 @@ function speak(text) {
   if (!t) return;
   // Stop any audio currently playing (browser TTS or previous mp3).
   if (window.speechSynthesis) speechSynthesis.cancel();
-  if (__ttsAudio) { try { __ttsAudio.pause(); } catch (e) {} __ttsAudio = null; }
   const hash = window.__TTS && window.__TTS[t];
   track('audio_play', { source: hash ? 'voicevox' : 'browser_tts', mode: currentMode });
   if (hash) {
-    __ttsAudio = new Audio('audio/tts/' + hash + '.mp3');
-    __ttsAudio.playbackRate = getTtsSpeed();
-    __ttsAudio.play().catch(() => speakBrowser(t));
+    const a = getTtsAudio();               // 共用元件:設 src 直接播,不再每次 new
+    try { a.pause(); } catch (e) {}
+    a.onerror = () => speakBrowser(t);     // mp3 載入失敗 → 退瀏覽器語音
+    a.src = 'audio/tts/' + hash + '.mp3';
+    a.playbackRate = getTtsSpeed();
+    a.currentTime = 0;
+    a.play().catch(() => speakBrowser(t));
     return;
   }
   speakBrowser(t);
