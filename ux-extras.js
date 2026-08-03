@@ -68,10 +68,13 @@
   function rubyOf(sub, rd) {
     var tailM = sub.match(/[ぁ-ゖ]+$/);
     var tail = tailM ? tailM[0] : '';
-    if (tail && rd.slice(-tail.length) === tail) {
-      var kj = sub.slice(0, sub.length - tail.length);
-      var kjRd = rd.slice(0, rd.length - tail.length);
-      return '<ruby>' + escapeHtml(kj) + '<rt>' + escapeHtml(kjRd) + '</rt></ruby>' + escapeHtml(tail);
+    if (tail) {
+      if (rd.slice(-tail.length) === tail) {
+        var kj = sub.slice(0, sub.length - tail.length);
+        var kjRd = rd.slice(0, rd.length - tail.length);
+        return '<ruby>' + escapeHtml(kj) + '<rt>' + escapeHtml(kjRd) + '</rt></ruby>' + escapeHtml(tail);
+      }
+      return escapeHtml(sub);   // 讀音尾對不上送假名(字典 entry 壞)→ 純文字,不上多餘 ruby
     }
     return '<ruby>' + escapeHtml(sub) + '<rt>' + escapeHtml(rd) + '</rt></ruby>';
   }

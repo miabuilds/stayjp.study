@@ -56,6 +56,9 @@ for (const line of lines) {
   // 太短可疑（讀音比漢字短，通常代表 Gemini 漏字）
   const hasHiraganaTail = /[ぁ-ゖ]/.test(kanji);
   if (!hasHiraganaTail && reading.length < kanji.length) reasons.push(`TOO_SHORT(reading=${reading.length} kanji=${kanji.length})`);
+  // 送假名尾一致性：key 尾若有送假名,reading 尾必須相同(否則是截斷/漏字,渲染時剝離失敗→furigana 多餘蓋在已是假名的字上)
+  const okuM = kanji.match(/[ぁ-ゖ]+$/);
+  if (okuM && !reading.endsWith(okuM[0])) reasons.push(`OKURIGANA_MISMATCH(key尾=${okuM[0]},reading=${reading})`);
   if (reasons.length) {
     flagged.push({ kanji, reading, reasons });
   } else {

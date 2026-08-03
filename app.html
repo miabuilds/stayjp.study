@@ -2322,10 +2322,15 @@ const Shadow = (() => {
         // hiragana 尾巴維持純文字，避免 ruby 視覺上蓋到假名
         const tailM = tok.match(/[ぁ-ゖ]+$/);
         const tail = tailM ? tailM[0] : '';
-        if (tail && rd.endsWith(tail)) {
-          const kj = tok.slice(0, tok.length - tail.length);
-          const kjRd = rd.slice(0, rd.length - tail.length);
-          out += `<ruby>${escapeHtml(kj)}<rt>${escapeHtml(kjRd)}</rt></ruby>${escapeHtml(tail)}`;
+        if (tail) {
+          if (rd.endsWith(tail)) {
+            const kj = tok.slice(0, tok.length - tail.length);
+            const kjRd = rd.slice(0, rd.length - tail.length);
+            out += `<ruby>${escapeHtml(kj)}<rt>${escapeHtml(kjRd)}</rt></ruby>${escapeHtml(tail)}`;
+          } else {
+            // 讀音尾對不上送假名（字典 entry 截斷/壞）→ 不上 ruby,避免把 furigana 多餘蓋在已是假名的字上
+            out += escapeHtml(tok);
+          }
         } else {
           out += `<ruby>${escapeHtml(tok)}<rt>${escapeHtml(rd)}</rt></ruby>`;
         }
