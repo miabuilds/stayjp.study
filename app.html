@@ -2009,6 +2009,7 @@ function switchMode(mode) {
   localStorage.setItem('lastMode', currentMode);
   localStorage.setItem('lastLevel', currentLevel);
   doRender();
+  if (typeof fixHeaderHeight === 'function') fixHeaderHeight();   // 切換後重算側欄高度,避免長清單底部滾不到
 }
 function updateTabs() {
   const bar = document.getElementById('tabsBar');
@@ -3708,12 +3709,19 @@ window.addEventListener('scroll',()=>{
 function fixHeaderHeight() {
   const hd = document.querySelector('.hd');
   const h = hd.offsetHeight;
+  // 底部導覽列(.ftb 固定於底)會蓋住側欄底部 → 側欄高度要扣掉它,否則最後幾個分類卡在底欄後面滾不到。
+  // 用 window.innerHeight(手機實際可視高)而非 100vh(手機含網址列會偏大,底部會超出畫面)。
+  const ftb = document.querySelector('.ftb');
+  const fh = (ftb && getComputedStyle(ftb).display !== 'none') ? ftb.offsetHeight : 0;
   document.querySelector('.mn').style.paddingTop = (h + 12) + 'px';
-  document.querySelector('.sd').style.top = h + 'px';
-  document.querySelector('.sd').style.height = 'calc(100vh - ' + h + 'px)';
+  const sd = document.querySelector('.sd');
+  sd.style.top = h + 'px';
+  sd.style.height = Math.max(0, window.innerHeight - h - fh) + 'px';
   document.documentElement.style.scrollPaddingTop = (h + 12) + 'px';
 }
 window.addEventListener('resize', fixHeaderHeight);
+window.addEventListener('orientationchange', () => setTimeout(fixHeaderHeight, 100));
+if (window.visualViewport) window.visualViewport.addEventListener('resize', fixHeaderHeight);  // 手機網址列縮放時重算
 
 // [本地複查暫時停用 SW —— 部署前把 (false && …) 改回 ('serviceWorker' in navigator)]
 if ('serviceWorker' in navigator) {
