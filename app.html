@@ -2537,7 +2537,8 @@ const Shadow = (() => {
       const z = ex.querySelector('.z');
       if (!j) return;
       // Grammar j contains <em> markup — strip via textContent
-      const jText = (j.cloneNode(true), j.textContent || '').replace(/[\s　]+$/,'').trim();
+      const _c = j.cloneNode(true); _c.querySelectorAll('rt, svg').forEach(el => el.remove());
+      const jText = (_c.textContent || '').replace(/[\s　]+$/,'').trim();
       // The .j also contains the speaker SVG label; strip it
       const cleanJ = jText.replace(/[ \s]*$/, '').trim();
       if (cleanJ) out.push({ j: cleanJ, z: z ? z.textContent : '' });
