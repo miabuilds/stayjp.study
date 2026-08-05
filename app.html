@@ -2547,6 +2547,10 @@ const Shadow = (() => {
       if (hint) hint.textContent = '✓ 已錄音,按「聽我的」和原音(↻)對比';
       if (recStream) { try { recStream.getTracks().forEach(t => t.stop()); } catch (e) {} recStream = null; }  // 用完就關麥克風
     };
+    // 錄音時先暫停跟讀播放(TTS/自動跳),避免原音蓋到錄音、造成卡頓
+    if (!paused) { paused = true; clearTimer(); }
+    try { if (window.speechSynthesis) speechSynthesis.cancel(); } catch (e) {}
+    try { if (_sharedAudio) _sharedAudio.pause(); } catch (e) {}
     mediaRec.start();
     recording = true;
     if (btn) { btn.textContent = '⏹ 停止錄音'; btn.style.background = '#555'; }
@@ -2560,11 +2564,15 @@ const Shadow = (() => {
   }
   function playRec() {
     if (!recUrl) return;
-    // 先停掉正在播的原音/朗讀,避免和自己的錄音疊在一起
+    // 先停掉正在播的原音/朗讀 + 暫停跟讀,避免和自己的錄音疊在一起造成卡頓
+    if (!paused) { paused = true; clearTimer(); }
     try { if (window.speechSynthesis) speechSynthesis.cancel(); } catch (e) {}
     try { if (_sharedAudio) _sharedAudio.pause(); } catch (e) {}
-    try { if (recAudio) recAudio.pause(); } catch (e) {}
-    recAudio = new Audio(recUrl);
+    // 共用一個播放元件(不每次 new Audio),回放更順
+    if (!recAudio) { recAudio = new Audio(); recAudio.preload = 'auto'; }
+    try { recAudio.pause(); } catch (e) {}
+    recAudio.src = recUrl;
+    recAudio.currentTime = 0;
     recAudio.play().catch(() => {});
   }
 
