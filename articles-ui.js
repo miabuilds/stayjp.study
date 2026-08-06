@@ -43,13 +43,24 @@ window.Articles = (function () {
       '.art-spk{display:inline-flex;vertical-align:middle;width:17px;height:17px;margin-left:6px;color:var(--ac,#d4654a);cursor:pointer;opacity:.7}',
       '.art-spk:hover{opacity:1}',
       '.art-tr{font-size:14px;line-height:1.8;color:var(--tx2,#8a8a8a);margin:-6px 0 16px;padding-left:11px;border-left:2px solid var(--bd,#e5e5e5)}',
-      '.art-sec-h{font-size:15px;font-weight:800;color:var(--tx,#2c2c2c);margin:26px 0 10px;padding-top:16px;border-top:1px solid var(--bd,#e8e5e0)}',
-      '.art-v{display:flex;align-items:baseline;gap:8px;padding:8px 0;border-bottom:1px dashed var(--bd,#eee);font-size:15px}',
-      '.art-v-w{font-weight:700;font-family:"Hiragino Mincho ProN","Noto Serif JP",serif;color:var(--tx,#2c2c2c);min-width:70px}',
+      '.art-acc{margin-top:12px;border:1px solid var(--bd,#e8e5e0);border-radius:12px;overflow:hidden;background:var(--bg2,#fff)}',
+      '.art-acc-h{width:100%;text-align:left;background:none;border:none;padding:14px 15px;font-size:15px;font-weight:700;color:var(--tx,#2c2c2c);cursor:pointer;display:flex;align-items:center}',
+      '.art-acc-arr{margin-left:auto;color:var(--tx3,#aaa);font-size:13px}',
+      '.art-cnt{font-size:12px;color:#fff;background:var(--ac2,#e8734a);border-radius:20px;padding:1px 8px;margin-left:7px;font-weight:700}',
+      '.art-acc-body{padding:2px 15px 12px}',
+      '.art-acc-body.art-acc-hidden{display:none}',
+      '.art-v{display:flex;align-items:baseline;gap:8px;padding:9px 0;border-bottom:1px dashed var(--bd,#eee);font-size:15px}',
+      '.art-v:last-child{border-bottom:none}',
+      '.art-v-w{font-weight:700;font-family:"Hiragino Mincho ProN","Noto Serif JP",serif;color:var(--tx,#2c2c2c);min-width:76px}',
       '.art-v-r{font-size:12px;color:var(--ac2,#e8734a)}',
       '.art-v-m{color:var(--tx2,#777);margin-left:auto;text-align:right}',
-      '.art-g{background:var(--bg3,#f0ede8);border-radius:10px;padding:10px 13px;margin-bottom:8px;font-size:14px;line-height:1.75;color:var(--tx,#333)}',
-      '.art-g b{color:var(--ac,#d4654a);font-family:"Hiragino Mincho ProN","Noto Serif JP",serif}',
+      '.art-g{padding:12px 0;border-bottom:1px dashed var(--bd,#eee)}',
+      '.art-g:last-child{border-bottom:none}',
+      '.art-g-t{font-size:16px;font-family:"Hiragino Mincho ProN","Noto Serif JP",serif}',
+      '.art-g-t b{color:var(--ac,#d4654a)}',
+      '.art-g-n{font-size:14px;color:var(--tx2,#777);line-height:1.75;margin-top:3px}',
+      '.art-gd-btn{margin-top:8px;background:none;border:1px solid var(--bd,#ddd);color:var(--ac2,#e8734a);border-radius:8px;padding:5px 11px;font-size:13px;cursor:pointer}',
+      '.art-gd-body.art-acc-hidden{display:none}',
       '.art-done-btn{display:block;width:100%;margin-top:26px;border:none;background:var(--ac,#d4654a);color:#fff;border-radius:12px;padding:13px;font-size:15px;font-weight:600;cursor:pointer}'
     ].join('');
     document.head.appendChild(st);
@@ -121,19 +132,18 @@ window.Articles = (function () {
       if (trans[i]) h += '<div class="art-tr" style="display:none">' + esc(trans[i]) + '</div>';   // 逐段中譯(中譯鍵開才顯示)
     });
     h += '</div>';
-    // ── 講解:重點單字 ──
+    // ── 講解(可收合,預設收起→閱讀畫面乾淨直覺)──
     if (a.vocab && a.vocab.length) {
-      h += '<div class="art-sec-h">📖 ' + enOr('重點單字', 'Key words') + '</div>';
-      a.vocab.forEach(function (v) {
-        h += '<div class="art-v"><span class="art-v-w">' + esc(v.w) + '</span><span class="art-v-r">' + esc(v.r) + '</span><span class="art-v-m">' + esc(v.m) + '</span></div>';
-      });
+      var vh = a.vocab.map(function (v) { return '<div class="art-v"><span class="art-v-w">' + esc(v.w) + '</span><span class="art-v-r">' + esc(v.r) + '</span><span class="art-v-m">' + esc(v.m) + '</span></div>'; }).join('');
+      h += accHtml('📖 ' + enOr('重點單字', 'Key words') + ' <span class="art-cnt">' + a.vocab.length + '</span>', vh);
     }
-    // ── 講解:文法重點 ──
     if (a.grammar && a.grammar.length) {
-      h += '<div class="art-sec-h">📐 ' + enOr('文法重點', 'Grammar points') + '</div>';
-      a.grammar.forEach(function (g) {
-        h += '<div class="art-g"><b>' + esc(g.t) + '</b>　' + esc(g.note) + '</div>';
-      });
+      var gh = a.grammar.map(function (g) {
+        var deep = (g.id && window.GRAMMAR_DETAIL && window.GRAMMAR_DETAIL[g.id]) ?
+          '<button class="art-gd-btn" onclick="Articles.gd(this,\'' + g.id + '\')">📖 ' + enOr('看完整詳解', 'Full explanation') + ' ▾</button><div class="art-gd-body art-acc-hidden"></div>' : '';
+        return '<div class="art-g"><div class="art-g-t"><b>' + esc(g.t) + '</b></div><div class="art-g-n">' + esc(g.note) + '</div>' + deep + '</div>';
+      }).join('');
+      h += accHtml('📐 ' + enOr('文法重點', 'Grammar') + ' <span class="art-cnt">' + a.grammar.length + '</span>', gh);
     }
     h += '<button class="art-done-btn" onclick="Articles.done()">' + enOr('✓ 讀完了', '✓ Mark as read') + '</button></div></div>';
     var d = document.createElement('div'); d.innerHTML = h; document.body.appendChild(d.firstChild);
@@ -162,5 +172,21 @@ window.Articles = (function () {
     setTimeout(open, 600);
   }
 
-  return { open: open, close: close, read: read, toggleFuri: toggleFuri, toggleZh: toggleZh, speak: speakPara, done: done };
+  function accHtml(title, body) {
+    return '<div class="art-acc"><button class="art-acc-h" onclick="Articles.acc(this)">' + title + '<span class="art-acc-arr">▾</span></button><div class="art-acc-body art-acc-hidden">' + body + '</div></div>';
+  }
+  function acc(btn) {
+    var b = btn.nextElementSibling; var hidden = b.classList.toggle('art-acc-hidden');
+    var arr = btn.querySelector('.art-acc-arr'); if (arr) arr.textContent = hidden ? '▾' : '▴';
+  }
+  function gd(btn, id) {
+    var body = btn.nextElementSibling; var hidden = body.classList.toggle('art-acc-hidden');
+    if (!hidden && !body.innerHTML && window.GRAMMAR_DETAIL && window.GRAMMAR_DETAIL[id]) {
+      var inner = (typeof grammarDetailHTML === 'function') ? grammarDetailHTML(window.GRAMMAR_DETAIL[id]) : window.GRAMMAR_DETAIL[id];
+      body.innerHTML = '<div class="gd-body" style="display:block;margin-top:8px">' + inner + '</div>';
+    }
+    btn.textContent = hidden ? '📖 ' + enOr('看完整詳解', 'Full explanation') + ' ▾' : enOr('收合', 'Hide') + ' ▴';
+  }
+
+  return { open: open, close: close, read: read, toggleFuri: toggleFuri, toggleZh: toggleZh, speak: speakPara, done: done, acc: acc, gd: gd };
 })();
