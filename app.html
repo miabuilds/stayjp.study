@@ -4073,7 +4073,7 @@ if(location.hash){const el=document.querySelector(location.hash);if(el&&el.class
     } catch (_) {}
   }
   if (typeof Listening !== 'undefined' && Listening.setItems) Listening.setItems(window.LISTENING_ITEMS || []);
-  if (typeof Reading !== 'undefined' && Reading.setPassages) Reading.setPassages(window.READING_PASSAGES || []);
+  if (typeof Reading !== 'undefined' && Reading.setPassages) Reading.setPassages((window.READING_PASSAGES || []).concat(window.READING_EXTRA || []));
 
   // 一次性遷移：把舊版 favorites.v{lv} 的單字 ★ 收藏併入 word_notebook（單字池統一）
   if (!localStorage.getItem('migrated_vocab_fav_v1')) {
@@ -4154,6 +4154,7 @@ function toggleDetail(btn) {
 <script src="mock-exam.js"></script>
 <script src="reading-listening-en.js"></script>
 <script src="reading.js"></script>
+<script src="reading-extra.js"></script>
 <script src="articles.js"></script>
 <script src="articles-ui.js"></script>
 <script src="listening.js"></script>
