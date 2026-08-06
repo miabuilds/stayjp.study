@@ -112,6 +112,17 @@ while ((ls = scriptRe.exec(listenSrc))) {
   add(raw.replace(/\n/g, '。'), 'listening');
 }
 
+// Articles — 文章閱讀:每篇 body 拆句,去空白(前端 speak 的 key 是去空白的句子)
+const artCode = fs.readFileSync(path.join(ROOT, 'articles.js'), 'utf8');
+const articles = (new Function('window', artCode + '; return window.ARTICLES;'))({}) || [];
+for (const a of articles) {
+  const sents = (a.body || '').match(/[^。！？]+[。！？]?/g) || [];
+  for (const s of sents) {
+    const clean = s.replace(/\s/g, '');
+    if (clean) add(clean, `article#${a.id}`);
+  }
+}
+
 // ---- write --------------------------------------------------------------
 const out = [...map.entries()]
   .map(([text, sources]) => ({ text, hash: hashText(text), sources: [...sources] }))
