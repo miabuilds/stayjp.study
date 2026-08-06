@@ -72,7 +72,8 @@ window.Articles = (function () {
 
   function speakPara(btn) {
     var t = btn.getAttribute('data-t') || '';
-    if (t && typeof speak === 'function') speak(t);
+    // 只播預錄 mp3(__TTS 有 hash 才播),絕不 fallback 到瀏覽器語音
+    if (t && window.__TTS && window.__TTS[t] && typeof speak === 'function') speak(t);
   }
 
   function read(id) {
@@ -91,8 +92,15 @@ window.Articles = (function () {
       '</div>' +
       '<div id="artBody" class="' + (furiOn ? '' : 'art-nofuri') + '">';
     paras.forEach(function (p) {
-      h += '<div class="art-para">' + fr(p) +
-        '<svg class="art-spk" data-t="' + esc(p.replace(/\s/g, '')) + '" onclick="Articles.speak(this)" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-left:6px"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.54 8.46a5 5 0 010 7.07M19.07 4.93a10 10 0 010 14.14"/></svg></div>';
+      // 逐句渲染:每句只在有「預錄 TTS」時才顯示 🔊(絕不用瀏覽器語音);沒生成前就不顯示
+      var sents = p.match(/[^。！？]+[。！？]?/g) || [p];
+      var inner = sents.map(function (s) {
+        var clean = s.replace(/\s/g, '');
+        var hasTts = window.__TTS && window.__TTS[clean];
+        var spk = hasTts ? '<svg class="art-spk" data-t="' + esc(clean) + '" onclick="Articles.speak(this)" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.54 8.46a5 5 0 010 7.07M19.07 4.93a10 10 0 010 14.14"/></svg>' : '';
+        return fr(s) + spk;
+      }).join('');
+      h += '<div class="art-para">' + inner + '</div>';
     });
     h += '</div>' +
       '<div id="artZh" style="display:none;color:var(--tx2,#888);font-size:14px;line-height:1.9;background:var(--bg3,#f0ede8);border-radius:12px;padding:12px 15px;margin-top:8px">' + esc(a.summary_zh) + '</div>' +
