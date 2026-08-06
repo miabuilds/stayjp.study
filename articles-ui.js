@@ -56,6 +56,9 @@ window.Articles = (function () {
     var h = '<div class="art-mask" id="artMask"><div class="art-wrap">' +
       '<div class="art-top"><b>📖 ' + enOr('文章閱讀', 'Reading') + '</b><span class="art-x" onclick="Articles.close()">✕</span></div>' +
       '<div class="art-sub">' + enOr('讀短文、點單字查意思、聽發音,自然記住單字。', 'Read, tap words to look them up, and build vocabulary.') + '</div>';
+    if (window.ToolQuota && window.ToolQuota.shouldGate && window.ToolQuota.shouldGate()) {
+      h += '<div class="art-sub" style="color:var(--ac,#d4654a);font-weight:600">🔒 ' + enOr('免費版每天可試讀 1 篇,升級後無限暢讀。', 'Free: 1 article/day. Upgrade for unlimited.') + '</div>';
+    }
     LEVELS.forEach(function (lv) {
       var arr = byLv[lv] || []; if (!arr.length) return;
       h += '<div class="art-lv">' + LVN[lv] + '</div>';
@@ -79,6 +82,11 @@ window.Articles = (function () {
   function read(id) {
     ensureCss();
     var a = list().find(function (x) { return x.id === id; }); if (!a) return;
+    // 免費版:只能試讀 1 篇(每天);已讀過的可重看,開「新的一篇」超過額度 → 付費牆
+    if (!readSet()[id] && window.ToolQuota && window.ToolQuota.shouldGate && window.ToolQuota.shouldGate()) {
+      if (!window.ToolQuota.canUse('article')) { window.ToolQuota.showPaywall('article'); return; }
+      window.ToolQuota.consume('article');
+    }
     curId = id;
     var paras = String(a.body).split('\n').filter(function (p) { return p.trim(); });
     var spk = '<svg class="art-spk" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.54 8.46a5 5 0 010 7.07M19.07 4.93a10 10 0 010 14.14"/></svg>';
