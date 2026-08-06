@@ -42,7 +42,15 @@ window.Articles = (function () {
       '.art-nofuri rt{display:none}',
       '.art-spk{display:inline-flex;vertical-align:middle;width:17px;height:17px;margin-left:6px;color:var(--ac,#d4654a);cursor:pointer;opacity:.7}',
       '.art-spk:hover{opacity:1}',
-      '.art-done-btn{display:block;width:100%;margin-top:22px;border:none;background:var(--ac,#d4654a);color:#fff;border-radius:12px;padding:13px;font-size:15px;font-weight:600;cursor:pointer}'
+      '.art-tr{font-size:14px;line-height:1.8;color:var(--tx2,#8a8a8a);margin:-6px 0 16px;padding-left:11px;border-left:2px solid var(--bd,#e5e5e5)}',
+      '.art-sec-h{font-size:15px;font-weight:800;color:var(--tx,#2c2c2c);margin:26px 0 10px;padding-top:16px;border-top:1px solid var(--bd,#e8e5e0)}',
+      '.art-v{display:flex;align-items:baseline;gap:8px;padding:8px 0;border-bottom:1px dashed var(--bd,#eee);font-size:15px}',
+      '.art-v-w{font-weight:700;font-family:"Hiragino Mincho ProN","Noto Serif JP",serif;color:var(--tx,#2c2c2c);min-width:70px}',
+      '.art-v-r{font-size:12px;color:var(--ac2,#e8734a)}',
+      '.art-v-m{color:var(--tx2,#777);margin-left:auto;text-align:right}',
+      '.art-g{background:var(--bg3,#f0ede8);border-radius:10px;padding:10px 13px;margin-bottom:8px;font-size:14px;line-height:1.75;color:var(--tx,#333)}',
+      '.art-g b{color:var(--ac,#d4654a);font-family:"Hiragino Mincho ProN","Noto Serif JP",serif}',
+      '.art-done-btn{display:block;width:100%;margin-top:26px;border:none;background:var(--ac,#d4654a);color:#fff;border-radius:12px;padding:13px;font-size:15px;font-weight:600;cursor:pointer}'
     ].join('');
     document.head.appendChild(st);
   }
@@ -99,7 +107,8 @@ window.Articles = (function () {
       '<button class="art-btn" id="artZhBtn" onclick="Articles.toggleZh()">' + enOr('中譯', 'Meaning') + '</button>' +
       '</div>' +
       '<div id="artBody" class="' + (furiOn ? '' : 'art-nofuri') + '">';
-    paras.forEach(function (p) {
+    var trans = a.trans || [];
+    paras.forEach(function (p, i) {
       // 逐句渲染:每句只在有「預錄 TTS」時才顯示 🔊(絕不用瀏覽器語音);沒生成前就不顯示
       var sents = p.match(/[^。！？]+[。！？]?/g) || [p];
       var inner = sents.map(function (s) {
@@ -109,11 +118,24 @@ window.Articles = (function () {
         return fr(s) + spk;
       }).join('');
       h += '<div class="art-para">' + inner + '</div>';
+      if (trans[i]) h += '<div class="art-tr" style="display:none">' + esc(trans[i]) + '</div>';   // 逐段中譯(中譯鍵開才顯示)
     });
-    h += '</div>' +
-      '<div id="artZh" style="display:none;color:var(--tx2,#888);font-size:14px;line-height:1.9;background:var(--bg3,#f0ede8);border-radius:12px;padding:12px 15px;margin-top:8px">' + esc(a.summary_zh) + '</div>' +
-      '<button class="art-done-btn" onclick="Articles.done()">' + enOr('✓ 讀完了', '✓ Mark as read') + '</button>' +
-      '</div></div>';
+    h += '</div>';
+    // ── 講解:重點單字 ──
+    if (a.vocab && a.vocab.length) {
+      h += '<div class="art-sec-h">📖 ' + enOr('重點單字', 'Key words') + '</div>';
+      a.vocab.forEach(function (v) {
+        h += '<div class="art-v"><span class="art-v-w">' + esc(v.w) + '</span><span class="art-v-r">' + esc(v.r) + '</span><span class="art-v-m">' + esc(v.m) + '</span></div>';
+      });
+    }
+    // ── 講解:文法重點 ──
+    if (a.grammar && a.grammar.length) {
+      h += '<div class="art-sec-h">📐 ' + enOr('文法重點', 'Grammar points') + '</div>';
+      a.grammar.forEach(function (g) {
+        h += '<div class="art-g"><b>' + esc(g.t) + '</b>　' + esc(g.note) + '</div>';
+      });
+    }
+    h += '<button class="art-done-btn" onclick="Articles.done()">' + enOr('✓ 讀完了', '✓ Mark as read') + '</button></div></div>';
     var d = document.createElement('div'); d.innerHTML = h; document.body.appendChild(d.firstChild);
     document.getElementById('artMask').scrollTop = 0;
     try { if (typeof track === 'function') track('article_read', { id: id, level: a.level }); } catch (e) {}
@@ -126,9 +148,12 @@ window.Articles = (function () {
     if (btn) btn.classList.toggle('on', furiOn);
   }
   function toggleZh() {
-    var z = document.getElementById('artZh'), btn = document.getElementById('artZhBtn');
-    if (!z) return; var show = z.style.display === 'none';
-    z.style.display = show ? 'block' : 'none'; if (btn) btn.classList.toggle('on', show);
+    var btn = document.getElementById('artZhBtn');
+    var trs = document.querySelectorAll('#artMask .art-tr');
+    if (!trs.length) return;
+    var show = trs[0].style.display === 'none';
+    [].forEach.call(trs, function (t) { t.style.display = show ? 'block' : 'none'; });
+    if (btn) btn.classList.toggle('on', show);
   }
   function done() {
     if (curId) markRead(curId);
