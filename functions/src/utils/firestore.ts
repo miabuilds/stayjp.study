@@ -124,7 +124,9 @@ export async function rewardReferrerOnPayment(friendUid: string, isSandbox: bool
 // 狀態:pending(付款,鎖定期內)→ locked(過 30 天無退費,可領)→ paid(已結算匯款);
 //       void = 退費/退單作廢(clawback)。精算金額給後台結算與付款用。
 const COMMISSION_LOCK_DAYS = 30;
-const KOL_FEE = { web: 0.0275, app: 0.15 };   // 綠界 / Apple·Google SBP
+// 平台手續費(算「利潤」用,分潤抽在利潤上)。web 綠界2.75% / app Apple·Google SBP 15% /
+// paypal 收款約5.45%(實測990×4收3744)+提領2.5%≈7.8%(小額含固定費,實際%會浮動)。
+const KOL_FEE = { web: 0.0275, app: 0.15, paypal: 0.078 };
 
 export interface CommissionDoc {
   code: string;
@@ -154,7 +156,7 @@ export interface CommissionDoc {
  */
 export async function recordKolCommission(
   buyerUid: string,
-  opts: { plan: string; gross_twd: number; source: "web" | "app"; txnId: string; isSandbox: boolean; isFirstPayment: boolean },
+  opts: { plan: string; gross_twd: number; source: "web" | "app" | "paypal"; txnId: string; isSandbox: boolean; isFirstPayment: boolean },
 ): Promise<void> {
   const { plan, gross_twd, source, txnId, isSandbox, isFirstPayment } = opts;
   if (isSandbox || !isFirstPayment || !(gross_twd > 0)) return;              // 只算首筆真實付款
@@ -169,7 +171,7 @@ export async function recordKolCommission(
   if (c.status === "suspended") return;                                      // 停權不產生新分潤
   const ref = db.doc(`commissions/${code}_${buyerUid}`);                     // 冪等:一碼一買家一筆
   if ((await ref.get()).exists) return;
-  const fee = source === "app" ? KOL_FEE.app : KOL_FEE.web;
+  const fee = (KOL_FEE as Record<string, number>)[source] ?? KOL_FEE.web;
   const profit = Math.round(gross_twd * (1 - fee));
   const fixed = typeof c.commission_fixed === "number" ? c.commission_fixed : null;
   const rate = typeof c.commission_pct === "number" ? c.commission_pct : 20;
