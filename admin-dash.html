@@ -1,0 +1,286 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>總覽後台 — 日本再留計劃</title>
+<style>
+  :root{ --bg:#eef1f6;--panel:#fff;--ink:#141821;--ink2:#5b6474;--ink3:#94a0b3;--line:#e3e8f0;--hair:#eef1f6;--accent:#4f46e5;--accent-soft:#eef0fe;--ok:#0f9d58;--ok-bg:#e6f4ec;--warn:#c77700;--warn-bg:#fbf0dd;--mute:#64748b;--mute-bg:#eef1f5;--bad:#d93b3b;--bad-bg:#fbe6e4;--orange:#e8734a;--sh:0 1px 2px rgba(20,25,40,.05),0 8px 24px rgba(20,25,40,.06); }
+  @media (prefers-color-scheme:dark){ :root{ --bg:#0f1218;--panel:#171b24;--ink:#eef1f6;--ink2:#a3adbf;--ink3:#6b7688;--line:#28303d;--hair:#1e242e;--accent:#8b87ff;--accent-soft:#23233f;--ok:#43c47d;--ok-bg:#12301f;--warn:#e6a94a;--warn-bg:#322612;--mute:#94a3b8;--mute-bg:#232a35;--bad:#f0736b;--bad-bg:#361c1a;--orange:#f08a63;--sh:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.4);} }
+  *{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,"PingFang TC","Noto Sans TC",sans-serif}
+  body{background:var(--bg);color:var(--ink);min-height:100vh;font-size:14px;-webkit-font-smoothing:antialiased}
+  .num{font-variant-numeric:tabular-nums}
+  .hd{position:sticky;top:0;background:var(--bg);border-bottom:1px solid var(--line);padding:11px 16px;display:flex;align-items:center;gap:10px;z-index:20;flex-wrap:wrap}
+  .hd b{font-size:15px}.hd .sp{flex:1}
+  .hd a{color:var(--accent);text-decoration:none;font-size:13px}
+  .chip{font-size:11px;background:var(--accent-soft);color:var(--accent);padding:3px 9px;border-radius:20px;font-weight:700}
+  .wrap{max-width:1060px;margin:0 auto;padding:16px}
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:16px;box-shadow:var(--sh);margin-bottom:16px;overflow:hidden}
+  .ph{display:flex;align-items:center;gap:8px;padding:13px 16px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+  .ph h2{font-size:15px;margin:0}
+  .ph .hint{font-size:11.5px;color:var(--ink3);margin-left:auto}
+  .pb{padding:14px 16px}
+  /* date bar */
+  .daterow{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  input[type=date],input[type=search]{padding:8px 10px;border:1px solid var(--line);border-radius:9px;background:var(--panel);color:var(--ink);font-size:14px}
+  .btn{background:var(--panel);border:1px solid var(--line);border-radius:9px;padding:8px 13px;color:var(--ink);cursor:pointer;font-size:13px;font-weight:600}
+  .btn:hover{border-color:var(--accent)} .btn.pri{background:var(--accent);color:#fff;border-color:var(--accent)}
+  /* KPI */
+  .kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+  .kpi{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:13px 14px;box-shadow:var(--sh)}
+  .kpi .l{font-size:11.5px;color:var(--ink2);font-weight:600}
+  .kpi .v{font-size:20px;font-weight:800;margin-top:6px;letter-spacing:-.02em}
+  .kpi .d{font-size:10.5px;color:var(--ink3);margin-top:2px}
+  .kpi.hero{background:linear-gradient(140deg,var(--accent),#7c73ff);color:#fff;border:none}
+  .kpi.hero .l,.kpi.hero .d{color:rgba(255,255,255,.85)}
+  /* plan counts */
+  .plans{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+  .plan{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 14px;box-shadow:var(--sh)}
+  .plan .pn{font-size:12.5px;color:var(--ink2);font-weight:600}
+  .plan .pc{font-size:22px;font-weight:800;margin-top:4px} .plan .pc small{font-size:12px;color:var(--ink3);font-weight:600}
+  /* tables */
+  .scroll{overflow-x:auto}
+  table{width:100%;border-collapse:collapse;font-size:13px;min-width:560px}
+  th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--hair);white-space:nowrap}
+  thead th{font-size:11px;letter-spacing:.03em;color:var(--ink3);font-weight:700;background:var(--hair)}
+  td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
+  tbody tr.click{cursor:pointer} tbody tr.click:hover{background:var(--accent-soft)}
+  .who{font-weight:700}.who small{display:block;font-weight:400;color:var(--ink3);font-size:11px;margin-top:1px}
+  .pill{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;line-height:1.6}
+  .p-ok{background:var(--ok-bg);color:var(--ok)}.p-warn{background:var(--warn-bg);color:var(--warn)}.p-mute{background:var(--mute-bg);color:var(--mute)}.p-bad{background:var(--bad-bg);color:var(--bad)}
+  .payable{font-weight:800;color:var(--ok)}
+  .rowtot td{background:var(--accent-soft);font-weight:800}
+  .banner{padding:10px 13px;border-radius:10px;font-size:12.5px;margin:0 16px 12px;background:var(--accent-soft);color:var(--accent);border:1px solid var(--accent)}
+  .muted{color:var(--ink3);font-size:11.5px;line-height:1.7}
+  /* gate */
+  .gate{min-height:100vh;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:14px}
+  /* modal */
+  .mask{position:fixed;inset:0;background:rgba(10,12,18,.5);z-index:100;display:flex;align-items:flex-end;justify-content:center;padding:0}
+  .modal{background:var(--panel);width:100%;max-width:520px;border-radius:18px 18px 0 0;box-shadow:var(--sh);max-height:90vh;overflow-y:auto}
+  .modal .mh{position:sticky;top:0;background:var(--panel);display:flex;align-items:center;gap:10px;padding:15px 18px;border-bottom:1px solid var(--line)}
+  .modal .mh b{font-size:16px}.modal .mx{margin-left:auto;cursor:pointer;color:var(--ink3);font-size:20px;border:none;background:none}
+  .kv{display:flex;padding:11px 18px;border-bottom:1px solid var(--hair);gap:12px}
+  .kv .k{color:var(--ink2);font-size:12.5px;width:96px;flex-shrink:0}
+  .kv .v{font-weight:600;font-size:13.5px}
+  @media(min-width:560px){.mask{align-items:center}.modal{border-radius:18px}}
+  @media(max-width:860px){.kpis{grid-template-columns:repeat(2,1fr)}.kpi.hero{grid-column:1/-1}.plans{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+<div id="gate" class="gate" style="display:none">
+  <b>總覽後台</b>
+  <button id="loginBtn" class="btn pri">用 Google 登入(限 admin)</button>
+  <div id="errMsg" style="color:var(--bad);font-size:13px"></div>
+</div>
+
+<div id="app" style="display:none">
+  <div class="hd">
+    <b>📊 總覽後台</b><span class="chip" id="meInfo"></span><span class="sp"></span>
+    <a href="admin.html">主後台</a><a href="admin-kol.html">推薦碼</a><a href="#" onclick="logout();return false">登出</a>
+  </div>
+  <div class="wrap">
+
+    <div class="panel">
+      <div class="ph"><h2>期間</h2><span class="hint">影響營收/分潤等「本期」數字;各方案人數與待付款為即時</span></div>
+      <div class="pb"><div class="daterow">
+        <input type="date" id="from"><span style="color:var(--ink2)">~</span><input type="date" id="to">
+        <button class="btn pri" onclick="apply()">查詢</button>
+        <button class="btn" onclick="setThisMonth()">本月</button>
+        <button class="btn" onclick="setAll()">全部</button>
+        <span id="periodLbl" class="muted" style="margin-left:4px"></span>
+      </div></div>
+    </div>
+
+    <div class="kpis" id="kpis" style="margin-bottom:16px"></div>
+
+    <div class="panel">
+      <div class="ph"><h2>📦 各方案訂購中</h2><span class="hint">status = active / trialing(即時)</span></div>
+      <div class="pb"><div class="plans" id="plans"></div></div>
+    </div>
+
+    <div class="panel">
+      <div class="ph"><h2>💰 分潤付款 · 待付</h2><span class="hint">金額取自 commissions 帳本,非估算</span></div>
+      <div id="payoutBanner"></div>
+      <div class="scroll" id="payoutTable"><div class="pb muted">載入中…</div></div>
+      <div class="pb muted">pending 未滿 30 天不可付 → locked 可付款 → paid 已付。退款自動扣回。滿 NT$1,000(🔔)建議每月匯款。</div>
+    </div>
+
+    <div class="panel">
+      <div class="ph"><h2>👥 會員明細</h2><span class="hint">點一列看完整詳情</span></div>
+      <div class="pb"><input type="search" id="memSearch" placeholder="搜尋 email / 方案 / 碼…" style="width:100%" oninput="renderMembers()"></div>
+      <div class="scroll" id="memTable"><div class="pb muted">載入中…</div></div>
+    </div>
+
+  </div>
+</div>
+
+<div id="modalHost"></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script>
+const ADMIN_EMAILS = ['stayjpplan@gmail.com', 'abc83327@gmail.com'];
+const fbConfig = { apiKey:"AIzaSyDnmg2XOuvwgE8m8xCF5sS4o0nQYoUplPI", authDomain:"jpnote-1bdd6.firebaseapp.com", projectId:"jpnote-1bdd6", storageBucket:"jpnote-1bdd6.firebasestorage.app", messagingSenderId:"666368174384" };
+if (!firebase.apps.length) firebase.initializeApp(fbConfig);
+try { firebase.firestore().settings({ experimentalAutoDetectLongPolling:true, useFetchStreams:false }); } catch(e){}
+const db = firebase.firestore(), auth = firebase.auth();
+const FN_LIST_SUBS = 'https://asia-east1-jpnote-1bdd6.cloudfunctions.net/adminListSubscribers';
+const FN_SETTLE = 'https://asia-east1-jpnote-1bdd6.cloudfunctions.net/adminSettleKolPayout';
+
+const PLAN_NAME = { monthly:'月費', yearly:'年費', yearly_early_bird:'早鳥年費', lifetime:'買斷' };
+const PLAN_ORDER = ['monthly','yearly','yearly_early_bird','lifetime'];
+const FEE_BY_SOURCE = { app:0.15, web:0.0275 };   // 用於缺 profit_twd 時回推(舊資料)
+const fmt = n => 'NT$' + (Math.round(Number(n)||0)).toLocaleString();
+const esc = s => String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+const dt = ms => { if(!ms) return '—'; const d=new Date(Number(ms)); if(isNaN(d)) return '—'; const p=n=>(n<10?'0':'')+n; return (''+d.getFullYear()).slice(2)+'/'+p(d.getMonth()+1)+'/'+p(d.getDate()); };
+
+let SUBS=[], COMMS=[], REFMAP={};   // 全域資料
+let FROM=0, TO=0;
+
+auth.onAuthStateChanged(user => {
+  const gate=document.getElementById('gate'), app=document.getElementById('app');
+  if (!user || !ADMIN_EMAILS.includes((user.email||'').toLowerCase())) {
+    gate.style.display='flex'; app.style.display='none';
+    if (user && !ADMIN_EMAILS.includes((user.email||'').toLowerCase())) { document.getElementById('errMsg').textContent=user.email+' 不是 admin'; auth.signOut(); }
+    return;
+  }
+  gate.style.display='none'; app.style.display='block';
+  document.getElementById('meInfo').textContent=user.email;
+  loadData();
+});
+document.getElementById('loginBtn').onclick = () => {
+  const p=new firebase.auth.GoogleAuthProvider(); p.setCustomParameters({prompt:'select_account'});
+  auth.signInWithPopup(p).catch(err=>{ if(/popup-closed|cancelled-popup/.test(err.code||''))return; document.getElementById('errMsg').textContent='登入失敗:'+err.message; });
+};
+function logout(){ auth.signOut(); location.reload(); }
+
+async function loadData(){
+  try {
+    const t = await auth.currentUser.getIdToken();
+    const [subsRes, csnap, rsnap] = await Promise.all([
+      fetch(FN_LIST_SUBS,{method:'POST',headers:{Authorization:'Bearer '+t}}).then(r=>r.json()).catch(()=>({})),
+      db.collection('commissions').get(),
+      db.collection('ref_codes').get()
+    ]);
+    SUBS = (subsRes && subsRes.subscribers) ? subsRes.subscribers : [];
+    COMMS = []; csnap.forEach(d=>{ const c=d.data(); COMMS.push({
+      code:c.code||'?', buyer:c.buyer_uid||'', plan:c.plan||'', state:c.state||'pending', source:c.source||'web',
+      gross:Number(c.gross_twd)||0, fee:Number(c.fee_twd)||0, profit:(c.profit_twd!=null?Number(c.profit_twd):null), amount:Number(c.amount_twd)||0,
+      created:Number(c.created_at)||Number(c.paid_at)||0
+    }); });
+    REFMAP={}; rsnap.forEach(d=>{ const c=d.data(); REFMAP[d.id]={ kol:c.kol||'', payout:c.payout||null, pct:(c.commission_pct!=null?c.commission_pct:20), type:c.type||'kol' }; });
+    setThisMonth();          // 預設本月,會呼叫 apply() → renderAll()
+    renderPayout(); renderPlans(); renderMembers();
+  } catch(e){ document.getElementById('kpis').innerHTML='<div class="muted" style="padding:16px">讀取失敗:'+esc(e.message)+'</div>'; }
+}
+
+// profit(利潤):優先用存下的 profit_twd,缺則用 gross×(1-手續費) 回推
+function profitOf(c){ if(c.profit!=null) return c.profit; const f=FEE_BY_SOURCE[c.source]!=null?FEE_BY_SOURCE[c.source]:0.0275; return Math.round(c.gross*(1-f)); }
+
+function setThisMonth(){ const n=new Date(),f=new Date(n.getFullYear(),n.getMonth(),1); document.getElementById('from').value=iso(f); document.getElementById('to').value=iso(n); apply(); }
+function setAll(){ document.getElementById('from').value=''; document.getElementById('to').value=''; apply(); }
+function iso(d){ const p=n=>(n<10?'0':'')+n; return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate()); }
+function apply(){
+  const fv=document.getElementById('from').value, tv=document.getElementById('to').value;
+  FROM = fv ? Date.parse(fv+'T00:00:00+08:00') : 0;
+  TO = tv ? Date.parse(tv+'T23:59:59+08:00') : Infinity;
+  document.getElementById('periodLbl').textContent = (fv||tv) ? ('期間:'+(fv||'—')+' ~ '+(tv||'—')) : '期間:全部';
+  renderKpis();
+}
+function inPeriod(c){ return c.created>=FROM && c.created<=TO; }
+
+function renderKpis(){
+  let rev=0, fee=0, comm=0, net=0, conv=0;
+  COMMS.forEach(c=>{ if(c.state==='void'||!inPeriod(c))return; conv++; const pf=profitOf(c); rev+=c.gross; fee+=(c.gross-pf); comm+=c.amount; net+=(pf-c.amount); });
+  const activeSubs = SUBS.filter(s=>!s.is_sandbox && (s.status==='active'||s.status==='trialing')).length;
+  document.getElementById('kpis').innerHTML =
+    kpi('本期營收(首購)', fmt(rev), conv+' 筆首購') +
+    kpi('平台手續費', '−'+fmt(fee), '綠界/IAP/PayPal') +
+    kpi('分潤支出', '−'+fmt(comm), '應付 KOL') +
+    kpi('淨收入(扣分潤後)', fmt(net), '營收−手續費−分潤', true) +
+    kpi('有效訂閱', activeSubs, 'active+trialing(即時)');
+}
+function kpi(l,v,d,hero){ return '<div class="kpi'+(hero?' hero':'')+'"><div class="l">'+l+'</div><div class="v num">'+v+'</div><div class="d">'+d+'</div></div>'; }
+
+function renderPlans(){
+  const g={}; PLAN_ORDER.forEach(p=>g[p]={a:0,t:0});
+  SUBS.forEach(s=>{ if(s.is_sandbox)return; const p=s.plan; if(!g[p])g[p]={a:0,t:0}; if(s.status==='active')g[p].a++; else if(s.status==='trialing')g[p].t++; });
+  document.getElementById('plans').innerHTML = PLAN_ORDER.map(p=>{ const x=g[p]||{a:0,t:0};
+    return '<div class="plan"><div class="pn">'+(PLAN_NAME[p]||p)+'</div><div class="pc num">'+x.a+' <small>訂閱中'+(x.t?' · '+x.t+' 試用':'')+'</small></div></div>'; }).join('');
+}
+
+function renderPayout(){
+  const box=document.getElementById('payoutTable'), banner=document.getElementById('payoutBanner');
+  const g={}; COMMS.forEach(c=>{ const r=g[c.code]=g[c.code]||{pending:0,locked:0,paid:0}; if(r[c.state]!=null)r[c.state]+=c.amount; });
+  const codes=Object.keys(g); if(!codes.length){ box.innerHTML='<div class="pb muted">尚無分潤紀錄。</div>'; banner.style.display='none'; return; }
+  let tP=0,tL=0,tPaid=0;
+  const rows=codes.map(code=>{ const r=g[code]; tP+=r.pending;tL+=r.locked;tPaid+=r.paid; const rm=REFMAP[code]||{}; return {code,kol:rm.kol||'',payout:rm.payout,...r}; }).sort((a,b)=>b.locked-a.locked);
+  const due=rows.filter(r=>r.locked>=1000);
+  banner.style.display='block';
+  banner.innerHTML = tL>0 ? ('🔔 可結算(已鎖定)<b>'+fmt(tL)+'</b>,其中滿 NT$1,000 該匯:<b>'+due.length+'</b> 位。待確認 '+fmt(tP)+'、累計已付 '+fmt(tPaid)+'。') : ('待確認 '+fmt(tP)+';尚無可領。累計已付 '+fmt(tPaid)+'。');
+  const payStr=p=>!p?'<span style="color:var(--ink3)">未填收款</span>':('銀行 '+esc(p.account||'(未填帳號)'));
+  box.innerHTML='<table><thead><tr><th>KOL</th><th>碼</th><th class="n">待確認</th><th class="n">可領</th><th class="n">已付</th><th>收款 / 結算</th></tr></thead><tbody>'
+    + rows.map(r=>'<tr><td class="who">'+esc(r.kol||'—')+'</td><td><code>'+esc(r.code)+'</code></td><td class="n" style="color:var(--ink3)">'+fmt(r.pending)+'</td><td class="n"><b style="color:'+(r.locked>=1000?'var(--ok)':'var(--ink2)')+'">'+fmt(r.locked)+'</b>'+(r.locked>=1000?' 🔔':'')+'</td><td class="n" style="color:var(--ink3)">'+fmt(r.paid)+'</td><td style="font-size:12px">'+payStr(r.payout)+(r.locked>0?' <button class="btn" style="padding:4px 9px;font-size:11px" onclick="settle(\''+r.code+'\','+r.locked+')">標記已付</button>':'')+'</td></tr>').join('')
+    + '<tr class="rowtot"><td colspan="2" style="text-align:right">合計</td><td class="n">'+fmt(tP)+'</td><td class="n">'+fmt(tL)+'</td><td class="n">'+fmt(tPaid)+'</td><td></td></tr></tbody></table>';
+}
+
+function payMethod(s){ if(s.source==='app')return 'App 內購'; if(s.ecpay_order)return '綠界(卡/ATM/超商)'; return 'PayPal / 其他'; }
+function statusPill(st){ const m={active:['p-ok','active'],trialing:['p-ok','trialing'],cancelled:['p-warn','cancelled'],expired:['p-mute','expired'],refunded:['p-bad','refunded'],voided:['p-bad','voided']}; const x=m[st]||['p-mute',st||'—']; return '<span class="pill '+x[0]+'">'+x[1]+'</span>'; }
+
+function renderMembers(){
+  const q=(document.getElementById('memSearch').value||'').toLowerCase();
+  let list=SUBS.filter(s=>!s.is_sandbox);
+  if(q) list=list.filter(s=>((s.email||'')+' '+(PLAN_NAME[s.plan]||s.plan||'')+' '+(s.ref_code||'')).toLowerCase().includes(q));
+  list.sort((a,b)=>(Number(b.startedAt)||0)-(Number(a.startedAt)||0));
+  const box=document.getElementById('memTable');
+  if(!list.length){ box.innerHTML='<div class="pb muted">沒有符合的會員。</div>'; return; }
+  box.innerHTML='<table><thead><tr><th>會員</th><th>方案</th><th>狀態</th><th>來源</th><th>介紹碼</th><th>開始</th><th>到期</th><th>續訂</th></tr></thead><tbody>'
+    + list.map((s,i)=>{ const ref=s.ref_code?((REFMAP[s.ref_code]&&REFMAP[s.ref_code].kol)?esc(REFMAP[s.ref_code].kol)+' <small>'+esc(s.ref_code)+'</small>':esc(s.ref_code)):'<span style="color:var(--ink3)">直接註冊</span>';
+      return '<tr class="click" onclick="showMember('+i+')" data-i="'+i+'"><td class="who">'+esc(maskEmail(s.email))+'</td><td>'+esc(PLAN_NAME[s.plan]||s.plan||'—')+'</td><td>'+statusPill(s.status)+'</td><td><span class="pill p-mute">'+(s.source||'—')+'</span></td><td class="who" style="font-weight:400">'+ref+'</td><td class="num">'+dt(s.startedAt)+'</td><td class="num">'+(s.plan==='lifetime'?'—':dt(s.expiresAt))+'</td><td>'+(s.plan==='lifetime'?'<span class="pill p-mute">買斷</span>':(s.willRenew?'<span class="pill p-ok">會續</span>':'<span class="pill p-warn">不續</span>'))+'</td></tr>'; }).join('')
+    + '</tbody></table>';
+  window.__memList=list;
+}
+function maskEmail(e){ e=e||''; const i=e.indexOf('@'); if(i<3)return e; return e.slice(0,3)+'***'+e.slice(i); }
+
+function showMember(i){
+  const s=(window.__memList||[])[i]; if(!s)return;
+  const comm=COMMS.find(c=>c.buyer===s.uid);
+  const rm=s.ref_code?REFMAP[s.ref_code]:null;
+  const rows=[
+    ['Email', esc(s.email||'—')],
+    ['方案', esc(PLAN_NAME[s.plan]||s.plan||'—')+(s.is_early_bird?' <span class="pill p-ok">早鳥</span>':'')],
+    ['狀態', statusPill(s.status)],
+    ['來源', '<span class="pill p-mute">'+(s.source||'—')+'</span>'],
+    ['付款方式', esc(payMethod(s))],
+    ['介紹碼', s.ref_code?('<code>'+esc(s.ref_code)+'</code>'+(rm&&rm.kol?' · '+esc(rm.kol):'')):'<span style="color:var(--ink3)">直接註冊(無介紹)</span>'],
+    ['開始時間', dt(s.startedAt)],
+    ['到期時間', s.plan==='lifetime'?'買斷(無到期)':dt(s.expiresAt)],
+    ['是否續訂', s.plan==='lifetime'?'買斷':(s.willRenew?'會續訂':'不續訂')],
+    ['綠界單號', esc(s.ecpay_order||'—')],
+    ['本人分潤', comm?('此人替 <code>'+esc(comm.code)+'</code> 帶來分潤 '+fmt(comm.amount)+' <span class="pill '+(comm.state==='paid'?'p-mute':comm.state==='locked'?'p-ok':'p-warn')+'">'+comm.state+'</span>'):'—'],
+    ['UID', '<span style="font-size:11px;color:var(--ink3)">'+esc(s.uid||'—')+'</span>']
+  ];
+  document.getElementById('modalHost').innerHTML =
+    '<div class="mask" onclick="if(event.target===this)closeModal()"><div class="modal">'
+    + '<div class="mh"><b>'+esc(maskEmail(s.email))+'</b><button class="mx" onclick="closeModal()">✕</button></div>'
+    + rows.map(r=>'<div class="kv"><div class="k">'+r[0]+'</div><div class="v">'+r[1]+'</div></div>').join('')
+    + '<div class="pb muted">註:「註冊時間」需後端提供 Auth 建立時間,下一步加入;目前以訂閱開始時間為準。</div>'
+    + '</div></div>';
+}
+function closeModal(){ document.getElementById('modalHost').innerHTML=''; }
+
+async function settle(code, locked){
+  if(!confirm('確認已把 '+code+' 的可領分潤 '+fmt(locked)+' 匯款了嗎?\n按確定=標記已付(建立結算紀錄、轉已付款、扣抵退款負債)。實際匯款請自行完成。'))return;
+  try{ const t=await auth.currentUser.getIdToken();
+    const r=await fetch(FN_SETTLE,{method:'POST',headers:{Authorization:'Bearer '+t,'Content-Type':'application/json'},body:JSON.stringify({code})});
+    const d=await r.json();
+    if(!r.ok||!d.ok){ alert('結算失敗:'+(d.error||r.status)); return; }
+    alert(d.nothing?'此碼目前沒有可結算分潤。':('✓ 已結算 '+code+':'+d.count+' 筆,淨額 '+fmt(d.net_twd||0)+(d.clawback_twd?'(扣退款負債 '+fmt(d.clawback_twd)+')':'')));
+    loadData();
+  }catch(e){ alert('結算失敗:'+e.message); }
+}
+</script>
+</body>
+</html>
