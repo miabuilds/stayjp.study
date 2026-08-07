@@ -58,7 +58,7 @@
     var g = window.GRAMMAR_KANJI_READINGS;
     if (g) for (var key in g) { if (!READ[key]) READ[key] = g[key]; }
     // 少數「詞級」讀音,在例句幾乎必為此讀,讓它蓋過 vocab 的單字多音(最中=さいちゅう 非さなか;〜得る=うる 非える)。
-    var OVERRIDE = { '最中': 'さいちゅう', '得る': 'うる' };
+    var OVERRIDE = { '最中': 'さいちゅう', '得る': 'うる', '休み中': 'やすみちゅう' };
     for (var ok in OVERRIDE) READ[ok] = OVERRIDE[ok];
     return { READ: READ, ENTRY: ENTRY, CONJ: CONJ };
   }
@@ -109,6 +109,9 @@
     var out = '', i = 0;
     while (i < text.length) {
       if (!isKanji(text[i])) { out += escapeHtml(text[i]); i++; continue; }
+      if (text[i] === '数' && /[かヶヵ]/.test(text[i + 1] || '')) {   // 数か月/数ヶ国 → すう(非かず)
+        out += '<ruby>数<rt>すう</rt></ruby>'; i++; continue;
+      }
       if (i > 0) {
         var _pc = text[i - 1];
         if (COUNTER_READ[text[i]] && /[0-9０-９]/.test(_pc)) {   // 數字+計數字:10月→がつ、3年→ねん
