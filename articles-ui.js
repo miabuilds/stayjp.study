@@ -14,6 +14,7 @@ window.Articles = (function () {
   function readSet() { try { return JSON.parse(localStorage.getItem('article_read')) || {}; } catch (e) { return {}; } }
   function markRead(id) { var s = readSet(); s[id] = Date.now(); localStorage.setItem('article_read', JSON.stringify(s)); if (typeof saveAllCloud === 'function') try { saveAllCloud(); } catch (e) {} }
   function fr(text) { return window.furiganaHTMLRich ? window.furiganaHTMLRich(text) : esc(text); }
+  function imgUrl(id) { return 'images/articles/' + id + '.jpg'; }   // 封面圖(CC0/公共領域);載入失敗自動退回漸層＋emoji
   function hasTts(t) { return !!(window.__TTS && window.__TTS[t]); }
   function ttsPath(t) { return window.ttsUrl ? window.ttsUrl(window.__TTS[t]) : 'audio/tts/' + window.__TTS[t] + '.mp3'; }
   function topicEmoji(t) {
@@ -42,16 +43,21 @@ window.Articles = (function () {
       '.art-card{display:flex;gap:13px;align-items:center;background:var(--bg2,#fff);border:1px solid var(--bd,#e8e5e0);border-radius:16px;padding:12px;margin-bottom:11px;cursor:pointer;transition:transform .1s,border-color .15s;box-shadow:0 1px 2px rgba(0,0,0,.03)}',
       '.art-card:active{transform:scale(.98)}',
       '.art-card:hover{border-color:var(--ac2,#e8734a)}',
-      '.art-thumb{width:64px;height:64px;border-radius:13px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:30px;color:#fff}',
+      '.art-thumb{width:64px;height:64px;border-radius:13px;flex-shrink:0;position:relative;overflow:hidden;color:#fff}',
+      '.art-th-e{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:30px}',
+      '.art-th-i{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}',
       '.art-card-b{min-width:0;flex:1}',
       '.art-card-t{font-size:16.5px;font-weight:700;color:var(--tx,#2c2c2c);font-family:"Hiragino Mincho ProN","Noto Serif JP",serif;line-height:1.35}',
       '.art-card-z{font-size:13px;color:var(--tx2,#888);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
       '.art-badge{display:inline-block;font-size:10.5px;font-weight:800;padding:2px 8px;border-radius:20px;color:#fff;margin-bottom:4px}',
       '.art-done{color:#16a34a;font-size:14px;margin-left:4px}',
       // hero
-      '.art-hero{padding:22px 18px 18px;color:#fff;position:relative}',
+      '.art-hero{padding:22px 18px 18px;color:#fff;position:relative;overflow:hidden;min-height:150px;display:flex;flex-direction:column;justify-content:flex-end}',
+      '.art-hero-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}',
+      '.art-hero-ov{position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.12) 0%,rgba(0,0,0,.32) 55%,rgba(0,0,0,.62) 100%)}',
+      '.art-hero-in{position:relative}',
       '.art-hero .he{font-size:40px;line-height:1}',
-      '.art-hero .hb{display:inline-block;font-size:11px;font-weight:800;padding:2px 9px;border-radius:20px;background:rgba(255,255,255,.25);margin:12px 0 6px}',
+      '.art-hero .hb{display:inline-block;font-size:11px;font-weight:800;padding:2px 9px;border-radius:20px;background:rgba(0,0,0,.35);backdrop-filter:blur(2px);margin:0 0 6px}',
       '.art-hero .ht{font-size:25px;font-weight:800;font-family:"Hiragino Mincho ProN","Noto Serif JP",serif;line-height:1.35;margin:2px 0}',
       '.art-hero .ht rt{font-size:.5em;opacity:.85;font-weight:400}',
       '.art-hero .hz{font-size:14px;opacity:.9;margin-top:4px}',
@@ -133,7 +139,7 @@ window.Articles = (function () {
       arr.forEach(function (a) {
         var g = LVC[a.level] || LVC.n5;
         h += '<div class="art-card" onclick="Articles.read(\'' + a.id + '\')">' +
-          '<div class="art-thumb" style="background:linear-gradient(135deg,' + g[0] + ',' + g[1] + ')">' + topicEmoji(a.topic + a.title) + '</div>' +
+          '<div class="art-thumb" style="background:linear-gradient(135deg,' + g[0] + ',' + g[1] + ')"><span class="art-th-e">' + topicEmoji(a.topic + a.title) + '</span><img class="art-th-i" src="' + imgUrl(a.id) + '" alt="" loading="lazy" onerror="this.remove()"></div>' +
           '<div class="art-card-b">' +
           '<span class="art-badge" style="background:' + g[1] + '">' + LVN[a.level] + '</span>' + (read[a.id] ? '<span class="art-done">✓</span>' : '') +
           '<div class="art-card-t">' + esc(a.title) + '</div>' +
@@ -162,10 +168,12 @@ window.Articles = (function () {
       '<span class="tt">' + esc(a.title_zh) + '</span>' +
       '<button class="art-ic" onclick="Articles.close()">✕</button></div>' +
       '<div class="art-hero" style="background:linear-gradient(135deg,' + g[0] + ',' + g[1] + ')">' +
-      '<div class="he">' + topicEmoji(a.topic + a.title) + '</div>' +
+      '<img class="art-hero-bg" src="' + imgUrl(a.id) + '" alt="" onerror="this.remove()">' +
+      '<div class="art-hero-ov"></div>' +
+      '<div class="art-hero-in">' +
       '<div class="hb">' + LVN[a.level] + '　' + esc(a.topic) + '</div>' +
       '<div class="ht">' + fr(a.title) + '</div>' +
-      '<div class="hz">' + esc(a.title_zh) + '</div></div>' +
+      '<div class="hz">' + esc(a.title_zh) + '</div></div></div>' +
       // toolbar
       '<div class="art-tools">' +
       '<button class="art-tbtn on" id="artFuriBtn" onclick="Articles.toggleFuri()">あ ' + enOr('假名', 'Kana') + '</button>' +

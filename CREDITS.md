@@ -15,3 +15,7 @@
 3. 若對筆順資料本身進行修改衍生並散布，將以相同 CC BY-SA 3.0 授權釋出。
 
 存放位置：`assets/kanjivg/kana/`（142 個單字元假名，平假名＋片假名，清音／濁音／半濁音）。
+
+## 文章封面圖 — Openverse（CC0 / 公共領域）
+
+`images/articles/*.jpg` 為文章閱讀清單與 hero 的封面圖，透過 [Openverse](https://openverse.org) 搜尋、僅取 **CC0（公眾領域貢獻）與 Public Domain Mark（PDM）** 授權之圖片。此類授權**可自由商用、無需標註**；此處仍記錄來源以示尊重。已縮為 400×400 JPG。
