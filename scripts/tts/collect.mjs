@@ -121,6 +121,11 @@ for (const a of articles) {
     const clean = s.replace(/\s/g, '');
     if (clean) add(clean, `article#${a.id}`);
   }
+  // 重點單字的讀音也要有語音(單字分頁的 🔊)。讀音優先,退回漢字。
+  for (const v of (a.vocab || [])) {
+    const w = (v.r || v.w || '').trim();
+    if (w) add(w, `article-vocab#${a.id}`);
+  }
 }
 
 // 五十音 — 每個假名的發音(平假名當 key)

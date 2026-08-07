@@ -82,17 +82,19 @@ window.Articles = (function () {
       // vocab / grammar lists
       '.art-v{display:flex;align-items:center;gap:10px;padding:13px 2px;border-bottom:1px solid var(--bd,#eee)}',
       '.art-v:last-child{border-bottom:none}',
-      '.art-v-spk{border:none;background:var(--brand-soft,#f6e3dd);color:var(--ac,#d4654a);width:38px;height:38px;border-radius:50%;font-size:16px;cursor:pointer;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center}',
+      '.art-v-spk{border:none;background:rgba(232,115,74,.14);color:#e8734a;width:38px;height:38px;border-radius:50%;font-size:16px;cursor:pointer;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center}',
       '.art-v-spk:active{transform:scale(.9)}',
       '.art-v-w{font-weight:700;font-family:"Hiragino Mincho ProN","Noto Serif JP",serif;color:var(--tx,#2c2c2c);font-size:17px}',
-      '.art-v-r{font-size:12.5px;color:var(--ac2,#e8734a);margin-top:1px}',
+      '.art-v-r{font-size:12.5px;color:#e8734a;margin-top:1px}',
       '.art-v-m{color:var(--tx2,#777);margin-left:auto;text-align:right;font-size:14px;padding-left:8px}',
       '.art-g{padding:13px 14px;margin-bottom:10px;border-radius:12px;background:rgba(37,99,235,.05);border:1px solid rgba(37,99,235,.16);border-left:4px solid #2563eb}',
       '.art-g-t{font-size:17px;font-family:"Hiragino Mincho ProN","Noto Serif JP",serif;font-weight:700}',
       '.art-g-t b{color:#2563eb}',
       '.art-g-n{font-size:14.5px;color:var(--tx,#3a3a3a);line-height:1.85;margin-top:5px}',
       // 文章 tab 底部內嵌文法區
-      '.art-inline-g{margin-top:26px;padding-top:18px;border-top:1px dashed var(--bd,#e0e0e0)}',
+      '.art-inline-v{margin-top:26px;padding-top:16px;border-top:2px solid rgba(232,115,74,.4)}',
+      '.art-iv-h{font-size:15px;font-weight:800;color:#e8734a;margin-bottom:2px}',
+      '.art-inline-g{margin-top:24px;padding-top:16px;border-top:2px solid rgba(37,99,235,.4)}',
       '.art-ig-h{font-size:15px;font-weight:800;color:#2563eb;margin-bottom:12px}',
       '.art-gd-btn{margin-top:10px;background:none;border:1px solid var(--bd,#ddd);color:var(--ac2,#e8734a);border-radius:10px;padding:9px 15px;font-size:13.5px;font-weight:600;cursor:pointer;min-height:40px}',
       '.art-gd-body.art-hidden{display:none}',
@@ -185,10 +187,8 @@ window.Articles = (function () {
       '</div>' +
       // tabs
       '<div class="art-tabs">' +
-      tabBtn('read', '📖 ' + enOr('文章', 'Text')) +
+      tabBtn('read', '📖 ' + enOr('文章·單字·文法', 'Text')) +
       tabBtn('quiz', '✍️ ' + enOr('測驗', 'Quiz')) +
-      tabBtn('vocab', '📕 ' + enOr('單字', 'Words') + (a.vocab ? ' ' + a.vocab.length : '')) +
-      tabBtn('grammar', '📐 ' + enOr('文法', 'Grammar') + (a.grammar ? ' ' + a.grammar.length : '')) +
       '</div>' +
       '<div class="art-cnt" id="artContent"></div>' +
       '</div>' +
@@ -246,22 +246,28 @@ window.Articles = (function () {
       var trHtml = trans[pi] ? '<div class="art-tr" style="display:' + (zhOn ? 'block' : 'none') + '">' + esc(trans[pi]) + '</div>' : '';
       return '<div class="art-para" style="font-size:' + FS[fsIdx] + '">' + inner + '</div>' + trHtml;
     }).join('');
-    // 讀完往下就是「本篇文法」,不用切分頁即可對照(藍色區隔正文)
+    // 讀完往下:重點單字(橘) + 本篇文法(藍),同一頁對照,不用切分頁
+    if (a.vocab && a.vocab.length) {
+      body += '<div class="art-inline-v"><div class="art-iv-h">📕 ' + enOr('重點單字', 'Key words') + '</div>' + vocabCardsHtml(a) + '</div>';
+    }
     if (a.grammar && a.grammar.length) {
-      body += '<div class="art-inline-g"><div class="art-ig-h">📐 ' + enOr('本篇文法', 'Grammar here') + '</div>' + grammarCardsHtml(a) + '</div>';
+      body += '<div class="art-inline-g"><div class="art-ig-h">📐 ' + enOr('本篇文法', 'Grammar') + '</div>' + grammarCardsHtml(a) + '</div>';
     }
     c.className = 'art-cnt' + (furiOn ? '' : ' art-nofuri');
     c.innerHTML = body;
     setPText();
   }
 
-  function renderVocab(a, c) {
-    if (!a.vocab || !a.vocab.length) { c.innerHTML = emptyMsg(enOr('這篇沒有重點單字', 'No key words')); return; }
-    c.className = 'art-cnt';
-    c.innerHTML = a.vocab.map(function (v) {
+  function vocabCardsHtml(a) {
+    return (a.vocab || []).map(function (v) {
       var spk = hasTts(v.r || v.w) ? '<button class="art-v-spk" onclick="Articles.say(\'' + esc(v.r || v.w) + '\')">🔊</button>' : '<span style="width:38px;flex-shrink:0"></span>';
       return '<div class="art-v">' + spk + '<div style="min-width:0"><div class="art-v-w">' + esc(v.w) + '</div><div class="art-v-r">' + esc(v.r) + '</div></div><div class="art-v-m">' + esc(v.m) + '</div></div>';
     }).join('');
+  }
+  function renderVocab(a, c) {
+    if (!a.vocab || !a.vocab.length) { c.innerHTML = emptyMsg(enOr('這篇沒有重點單字', 'No key words')); return; }
+    c.className = 'art-cnt';
+    c.innerHTML = vocabCardsHtml(a);
   }
 
   function grammarCardsHtml(a) {
