@@ -105,10 +105,12 @@
 
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <script>
 const fbConfig={ apiKey:"AIzaSyDnmg2XOuvwgE8m8xCF5sS4o0nQYoUplPI", authDomain:"jpnote-1bdd6.firebaseapp.com", projectId:"jpnote-1bdd6", storageBucket:"jpnote-1bdd6.firebasestorage.app", messagingSenderId:"666368174384" };
 if(!firebase.apps.length) firebase.initializeApp(fbConfig);
 const auth=firebase.auth();
+const db=firebase.firestore();
 const FN_JOIN='https://asia-east1-jpnote-1bdd6.cloudfunctions.net/partnerJoin';
 const FN_PAYOUT='https://asia-east1-jpnote-1bdd6.cloudfunctions.net/partnerUpdatePayout';
 const SITE='https://stayjp.study';
@@ -189,11 +191,32 @@ function showLink(d){
       <input id="uPayA" placeholder="收款帳號 / PayPal Email">
       <div style="margin-top:12px"><button class="btn sec" id="savePayBtn">儲存收款資料</button></div>
       <div id="payMsg" class="muted" style="margin-top:8px"></div>
+    </div>
+    <div style="margin-top:18px;padding-top:16px;border-top:1px solid var(--bd)">
+      <div style="font-weight:700;margin-bottom:4px">🔔 通知請款</div>
+      <p class="muted" style="margin:0 0 10px">確認你的成效頁「可領分潤」已達 NT$1,000 後,按這裡通知站方安排結算匯款(每月結算,次月 15 日前入帳)。</p>
+      <button class="btn" id="notifyPayBtn" style="padding:11px 18px" onclick="requestPayout()">通知站方我要請款</button>
+      <div id="notifyMsg" class="muted" style="margin-top:8px"></div>
     </div>`;
-  window.__link=link;
+  window.__link=link; window.__code=d.code;
   setupPayout(d.payout);
 }
 
+async function requestPayout(){
+  const btn=document.getElementById('notifyPayBtn'), msg=document.getElementById('notifyMsg');
+  const u=auth.currentUser; if(!u){ msg.textContent='請先登入。'; return; }
+  btn.disabled=true;
+  try{
+    await db.collection('feedback').add({
+      type:'other',
+      message:'【KOL 請款通知】推薦碼 '+(window.__code||'?')+' 申請結算匯款。請至分潤後台確認可領金額後安排付款。',
+      uid:u.uid, email:u.email||'', kol_payout_request:true, code:(window.__code||''),
+      createdAt:Date.now()
+    });
+    msg.style.color='var(--ac)'; msg.textContent='✓ 已通知站方,我們會於下次結算安排匯款。';
+    btn.textContent='已通知 ✓';
+  }catch(e){ btn.disabled=false; msg.textContent='通知失敗:'+esc(e.message); }
+}
 function setupPayout(p){
   const m=document.getElementById('uPayM'), bankRow=document.getElementById('bankRow'),
         bank=document.getElementById('uPayBank'), name=document.getElementById('uPayName'),
