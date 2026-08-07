@@ -57,6 +57,9 @@
     });
     var g = window.GRAMMAR_KANJI_READINGS;
     if (g) for (var key in g) { if (!READ[key]) READ[key] = g[key]; }
+    // 少數「詞級」讀音,在例句幾乎必為此讀,讓它蓋過 vocab 的單字多音(最中=さいちゅう 非さなか;〜得る=うる 非える)。
+    var OVERRIDE = { '最中': 'さいちゅう', '得る': 'うる' };
+    for (var ok in OVERRIDE) READ[ok] = OVERRIDE[ok];
     return { READ: READ, ENTRY: ENTRY, CONJ: CONJ };
   }
   function dict() {
@@ -98,12 +101,23 @@
       + ' data-f="' + escAttr(data.f || '') + '">' + inner + '</span>';
   }
 
+  // 數字 + 計數漢字 → 計數讀音(規則且高頻;避開不規則的 日/分/人)。前一字為阿拉伯或全形數字時套用。
+  var COUNTER_READ = { '月': 'がつ', '年': 'ねん', '円': 'えん', '時': 'じ' };
   function furiganaHTML(text) {
     if (text == null) return '';
     var dc = dict();
     var out = '', i = 0;
     while (i < text.length) {
       if (!isKanji(text[i])) { out += escapeHtml(text[i]); i++; continue; }
+      if (i > 0) {
+        var _pc = text[i - 1];
+        if (COUNTER_READ[text[i]] && /[0-9０-９]/.test(_pc)) {   // 數字+計數字:10月→がつ、3年→ねん
+          out += '<ruby>' + escapeHtml(text[i]) + '<rt>' + COUNTER_READ[text[i]] + '</rt></ruby>'; i++; continue;
+        }
+        if (text[i] === '月' && /[かヶヵ]/.test(_pc)) {          // か月/ヶ月 → げつ(いっかげつ)
+          out += '<ruby>月<rt>げつ</rt></ruby>'; i++; continue;
+        }
+      }
       var matched = null;
       for (var len = Math.min(12, text.length - i); len >= 1; len--) {
         var sub = text.substr(i, len);
