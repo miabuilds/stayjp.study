@@ -15,7 +15,7 @@ window.Articles = (function () {
   function markRead(id) { var s = readSet(); s[id] = Date.now(); localStorage.setItem('article_read', JSON.stringify(s)); if (typeof saveAllCloud === 'function') try { saveAllCloud(); } catch (e) {} }
   function fr(text) { return window.furiganaHTMLRich ? window.furiganaHTMLRich(text) : esc(text); }
   function hasTts(t) { return !!(window.__TTS && window.__TTS[t]); }
-  function ttsPath(t) { return 'audio/tts/' + window.__TTS[t] + '.mp3'; }
+  function ttsPath(t) { return window.ttsUrl ? window.ttsUrl(window.__TTS[t]) : 'audio/tts/' + window.__TTS[t] + '.mp3'; }
   function topicEmoji(t) {
     t = t || '';
     var map = [['電車|交通|通勤', '🚃'], ['京都|旅|観光|旅行', '⛩️'], ['一人|暮|生活|家', '🏠'], ['銭湯|風呂|温泉', '♨️'], ['少子|人口|社会', '👶'], ['飲み|酒|會社|会社|仕事|職場', '🍶'], ['空気|人間関係', '💬'], ['報連相|ビジネス', '📋'], ['AI|学び|勉強|技術', '🤖'], ['観光|公害|環境', '🌏'], ['食|料理|ご飯', '🍚'], ['天気|季節', '🌤️'], ['一日|朝|日課', '⏰']];
