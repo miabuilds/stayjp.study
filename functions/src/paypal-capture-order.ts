@@ -10,6 +10,7 @@ import { capturePaypalOrder } from "./utils/paypal";
 import {
   db, writeSubscription, writeTransaction, writePaymentFailure,
   nowMs, plusDays, tryReserveEarlyBird, emailHash, SubscriptionDoc,
+  getSubscription, rewardReferrerOnPayment, recordKolCommission,
 } from "./utils/firestore";
 
 if (admin.apps.length === 0) admin.initializeApp();
@@ -62,6 +63,8 @@ export const paypalCaptureOrder = functions.onRequest(
       if (!dup.empty) { res.json({ ok: true, plan, duplicate: true }); return; }
 
       const planInfo = PLANS[plan];
+      const prevSub = await getSubscription(uid);
+      const isFirstPayment = !prevSub || prevSub.status !== "active";   // 判首購(KOL 分潤只抽首筆)
       const isEarlyBird = plan === "yearly_early_bird" ? await tryReserveEarlyBird() : false;
 
       const newSub: SubscriptionDoc = {
@@ -105,6 +108,11 @@ export const paypalCaptureOrder = functions.onRequest(
         email_hash: decoded.email ? emailHash(decoded.email) : undefined,
         note: `PayPal USD ${cap.amountUsd}${isEarlyBird ? " · 早鳥" : ""}`,
       });
+
+      // 推薦好友 +7 天 / KOL 分潤(首筆真付款)。best-effort、冪等,失敗不影響已開通。
+      await rewardReferrerOnPayment(uid, false).catch(e => console.error("rewardReferrer(paypal) 略過:", e));
+      await recordKolCommission(uid, { plan, gross_twd: planInfo.price_twd, source: "paypal", txnId: cap.captureId, isSandbox: false, isFirstPayment })
+        .catch(e => console.error("recordKolCommission(paypal) 略過:", e));
 
       res.json({ ok: true, plan });
     } catch (err) {
