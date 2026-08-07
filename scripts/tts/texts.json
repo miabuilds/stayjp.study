@@ -1791,6 +1791,13 @@
     ]
   },
   {
+    "text": "あさしっかり食べると、一日元気にすごせます。",
+    "hash": "47003c017fb3",
+    "sources": [
+      "article#a-n5-2"
+    ]
+  },
+  {
     "text": "あさって",
     "hash": "5aa4954b69b1",
     "sources": [
@@ -2138,7 +2145,8 @@
     "text": "あつまる",
     "hash": "3f2c608e9617",
     "sources": [
-      "vocab-n4"
+      "vocab-n4",
+      "article-vocab#a-n4-1"
     ]
   },
   {
@@ -3507,7 +3515,8 @@
     "hash": "ffb8cc30801c",
     "sources": [
       "vocab-n3",
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n3-2"
     ]
   },
   {
@@ -3598,7 +3607,8 @@
     "text": "ありがたい",
     "hash": "4e2e982e218a",
     "sources": [
-      "vocab-n3"
+      "vocab-n3",
+      "article-vocab#a-n3-2"
     ]
   },
   {
@@ -4889,7 +4899,8 @@
     "sources": [
       "vocab-n5",
       "vocab-n3",
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n5-2"
     ]
   },
   {
@@ -4897,6 +4908,13 @@
     "hash": "554937f57c50",
     "sources": [
       "article#a-n5-2"
+    ]
+  },
+  {
+    "text": "いそがしい毎日ですが、すこしずつ日本語が上手になって、うれしいです。",
+    "hash": "de9870c10a10",
+    "sources": [
+      "article#a-n5-1"
     ]
   },
   {
@@ -5693,7 +5711,8 @@
     "text": "いはん",
     "hash": "67a2f70abe14",
     "sources": [
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n4-2"
     ]
   },
   {
@@ -6625,7 +6644,8 @@
     "hash": "39e0a1c48e37",
     "sources": [
       "vocab-n4",
-      "vocab-n3"
+      "vocab-n3",
+      "article-vocab#a-n4-1"
     ]
   },
   {
@@ -7069,7 +7089,8 @@
     "hash": "2384137227a2",
     "sources": [
       "vocab-n3",
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n4-2"
     ]
   },
   {
@@ -7886,7 +7907,8 @@
     "hash": "92bd468284ea",
     "sources": [
       "vocab-n5",
-      "vocab-n4"
+      "vocab-n4",
+      "article-vocab#a-n5-1"
     ]
   },
   {
@@ -8149,6 +8171,13 @@
     ]
   },
   {
+    "text": "おしよせる",
+    "hash": "5b520843a76a",
+    "sources": [
+      "article-vocab#a-n2-4"
+    ]
+  },
+  {
     "text": "おす",
     "hash": "0f40454243d0",
     "sources": [
@@ -8397,6 +8426,13 @@
     ]
   },
   {
+    "text": "おとずれる",
+    "hash": "ce09c1dbee9f",
+    "sources": [
+      "article-vocab#a-n4-3"
+    ]
+  },
+  {
     "text": "おととい",
     "hash": "d236a1dc0fee",
     "sources": [
@@ -8571,7 +8607,8 @@
     "text": "おびやかす",
     "hash": "182a86f28ac6",
     "sources": [
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n2-4"
     ]
   },
   {
@@ -8732,6 +8769,13 @@
     ]
   },
   {
+    "text": "おもいやり",
+    "hash": "bc94d8cd3cfe",
+    "sources": [
+      "article-vocab#a-n4-2"
+    ]
+  },
+  {
     "text": "おもう",
     "hash": "52fdea2cb03a",
     "sources": [
@@ -8866,7 +8910,8 @@
     "text": "およぼす",
     "hash": "545bc8b15291",
     "sources": [
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n1-1"
     ]
   },
   {
@@ -9129,6 +9174,13 @@
     ]
   },
   {
+    "text": "お花見のしゅうかんは古くからあり、むかしの人もさくらを見て春をたのしみました。",
+    "hash": "b7f187460e3f",
+    "sources": [
+      "article#a-n4-1"
+    ]
+  },
+  {
     "text": "お願いしたいんですけど…",
     "hash": "72e8aea88a41",
     "sources": [
@@ -9336,6 +9388,13 @@
     "hash": "84e41ee9c42c",
     "sources": [
       "vocab-n1#拝読する"
+    ]
+  },
+  {
+    "text": "お酒にたよらなくても、ふだんの会話でしんらいをきずけるのが理想だろう。",
+    "hash": "84636fc0e291",
+    "sources": [
+      "article#a-n3-5"
     ]
   },
   {
@@ -9867,7 +9926,8 @@
     "text": "かいしゃ",
     "hash": "605cbfae5612",
     "sources": [
-      "vocab-n5"
+      "vocab-n5",
+      "article-vocab#a-n5-1"
     ]
   },
   {
@@ -10280,7 +10340,8 @@
     "hash": "0b2aa9996c59",
     "sources": [
       "vocab-n5",
-      "vocab-n4"
+      "vocab-n4",
+      "article-vocab#a-n5-1"
     ]
   },
   {
@@ -10302,6 +10363,13 @@
     "hash": "a4660c0c4fa6",
     "sources": [
       "vocab-n1"
+    ]
+  },
+  {
+    "text": "かかえこむ",
+    "hash": "d52a46722fc2",
+    "sources": [
+      "article-vocab#a-n2-3"
     ]
   },
   {
@@ -10331,6 +10399,13 @@
     "hash": "a90cd81404cf",
     "sources": [
       "vocab-n2"
+    ]
+  },
+  {
+    "text": "かかせない",
+    "hash": "b54be8309f61",
+    "sources": [
+      "article-vocab#a-n3-1"
     ]
   },
   {
@@ -13002,7 +13077,8 @@
     "text": "きがる",
     "hash": "4d1eb4988873",
     "sources": [
-      "vocab-n3"
+      "vocab-n3",
+      "article-vocab#a-n3-5"
     ]
   },
   {
@@ -13010,7 +13086,8 @@
     "hash": "47ccd237f6ea",
     "sources": [
       "vocab-n3",
-      "vocab-n1"
+      "vocab-n1",
+      "article-vocab#a-n4-1"
     ]
   },
   {
@@ -13286,6 +13363,13 @@
     "sources": [
       "vocab-n4",
       "vocab-n3"
+    ]
+  },
+  {
+    "text": "きずく",
+    "hash": "57c206ed978f",
+    "sources": [
+      "article-vocab#a-n2-3"
     ]
   },
   {
@@ -14535,7 +14619,8 @@
     "text": "きょうせい",
     "hash": "6c32474ebc74",
     "sources": [
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n3-5"
     ]
   },
   {
@@ -14903,7 +14988,8 @@
     "hash": "6c8ee12377a4",
     "sources": [
       "vocab-n3",
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n3-3"
     ]
   },
   {
@@ -15235,7 +15321,8 @@
     "text": "ぎんみ",
     "hash": "ec38c238272d",
     "sources": [
-      "vocab-n1"
+      "vocab-n1",
+      "article-vocab#a-n1-2"
     ]
   },
   {
@@ -15278,6 +15365,13 @@
     "hash": "6e159a91b7ce",
     "sources": [
       "kana"
+    ]
+  },
+  {
+    "text": "ぐあい",
+    "hash": "6c778d16cbb0",
+    "sources": [
+      "article-vocab#a-n2-3"
     ]
   },
   {
@@ -15663,6 +15757,13 @@
     "sources": [
       "vocab-n3",
       "vocab-n2"
+    ]
+  },
+  {
+    "text": "くべつ",
+    "hash": "11fac5fb79d6",
+    "sources": [
+      "article-vocab#a-n2-1"
     ]
   },
   {
@@ -17757,7 +17858,8 @@
     "hash": "5001898c1e8c",
     "sources": [
       "vocab-n3",
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n3-3"
     ]
   },
   {
@@ -17926,6 +18028,13 @@
   {
     "text": "こうしたマナーの背景には、「まわりの人にめいわくをかけない」という日本の考え方があります。",
     "hash": "5eaf734d51ac",
+    "sources": [
+      "article#a-n4-2"
+    ]
+  },
+  {
+    "text": "こうしたマナーは、たくさんの人が気もちよく電車を使うためのものです。",
+    "hash": "c6370c12b070",
     "sources": [
       "article#a-n4-2"
     ]
@@ -20141,6 +20250,13 @@
     "hash": "d09f65e0a9d9",
     "sources": [
       "vocab-n1#弾力"
+    ]
+  },
+  {
+    "text": "このまますすめば、はたらく人がへり、社会ぜんたいをささえることがむずかしくなる。",
+    "hash": "fc88feb1a838",
+    "sources": [
+      "article#a-n3-4"
     ]
   },
   {
@@ -25055,6 +25171,13 @@
     ]
   },
   {
+    "text": "これからは、それぞれの人に合ったはたらき方をえらべる社会がもとめられている。",
+    "hash": "c99a15bd3834",
+    "sources": [
+      "article#a-n2-1"
+    ]
+  },
+  {
     "text": "これからもっと難しくなっていくだろう。",
     "hash": "b58677c0ab26",
     "sources": [
@@ -26141,6 +26264,13 @@
     ]
   },
   {
+    "text": "さく",
+    "hash": "f5884a069628",
+    "sources": [
+      "article-vocab#a-n4-1"
+    ]
+  },
+  {
     "text": "さくいてき",
     "hash": "a6158f10060b",
     "sources": [
@@ -26288,7 +26418,8 @@
     "hash": "8339edb68452",
     "sources": [
       "vocab-n3",
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n3-4"
     ]
   },
   {
@@ -26573,6 +26704,13 @@
     "hash": "46fed4265eaf",
     "sources": [
       "vocab-n2"
+    ]
+  },
+  {
+    "text": "さっする",
+    "hash": "7e9c530a4ca0",
+    "sources": [
+      "article-vocab#a-n2-2"
     ]
   },
   {
@@ -27325,6 +27463,20 @@
     ]
   },
   {
+    "text": "しかし、便利さのうらには、二十四時間はたらく人の苦労や、食品ロスなどの問題もかくれている。",
+    "hash": "084d831faadc",
+    "sources": [
+      "article#a-n3-1"
+    ]
+  },
+  {
+    "text": "しかしさいきんのわかい人の中には、しごととプライベートをきちんと分けたいと考える人もふえている。",
+    "hash": "3ca2faa0a7a3",
+    "sources": [
+      "article#a-n3-5"
+    ]
+  },
+  {
     "text": "じがじさん",
     "hash": "80858ae3d2ee",
     "sources": [
@@ -27767,7 +27919,8 @@
     "hash": "75d440e93bca",
     "sources": [
       "vocab-n5",
-      "vocab-n3"
+      "vocab-n3",
+      "article-vocab#a-n4-2"
     ]
   },
   {
@@ -28545,7 +28698,8 @@
     "text": "しはらい",
     "hash": "d34821cfeb4f",
     "sources": [
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n3-1"
     ]
   },
   {
@@ -29338,6 +29492,13 @@
     ]
   },
   {
+    "text": "しゅうまつはあまりしごとがありません。",
+    "hash": "6c8cb8c07037",
+    "sources": [
+      "article#a-n5-1"
+    ]
+  },
+  {
     "text": "じゅうみん",
     "hash": "ccb1e8ef980e",
     "sources": [
@@ -29763,6 +29924,13 @@
     "hash": "aa764c912301",
     "sources": [
       "vocab-n3"
+    ]
+  },
+  {
+    "text": "しゅと",
+    "hash": "4fcbdd3869f7",
+    "sources": [
+      "article-vocab#a-n4-3"
     ]
   },
   {
@@ -30373,6 +30541,13 @@
     "hash": "44c5b903aa43",
     "sources": [
       "vocab-n1"
+    ]
+  },
+  {
+    "text": "しょうとつ",
+    "hash": "a5197f7afc73",
+    "sources": [
+      "article-vocab#a-n2-2"
     ]
   },
   {
@@ -31178,7 +31353,8 @@
     "hash": "90733bcadccf",
     "sources": [
       "vocab-n3",
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n1-1"
     ]
   },
   {
@@ -31595,7 +31771,8 @@
     "hash": "90cd3b85508f",
     "sources": [
       "vocab-n3",
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n2-3"
     ]
   },
   {
@@ -32791,7 +32968,8 @@
     "hash": "dea47ad83e82",
     "sources": [
       "vocab-n3",
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n2-4"
     ]
   },
   {
@@ -33335,7 +33513,8 @@
     "hash": "325b66152b62",
     "sources": [
       "vocab-n3",
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n1-1"
     ]
   },
   {
@@ -34028,7 +34207,8 @@
     "text": "せんたく",
     "hash": "131cca8a7a63",
     "sources": [
-      "vocab-n3"
+      "vocab-n3",
+      "article-vocab#a-n3-2"
     ]
   },
   {
@@ -36172,7 +36352,8 @@
     "hash": "e2bc4254309b",
     "sources": [
       "vocab-n3",
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n3-1"
     ]
   },
   {
@@ -36217,6 +36398,13 @@
     "hash": "cbe08f1462fe",
     "sources": [
       "vocab-n1"
+    ]
+  },
+  {
+    "text": "そんちょう",
+    "hash": "59876051dfb8",
+    "sources": [
+      "article-vocab#a-n2-4"
     ]
   },
   {
@@ -36587,7 +36775,8 @@
     "hash": "3a4a0a7dd530",
     "sources": [
       "vocab-n3",
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n3-4"
     ]
   },
   {
@@ -37407,6 +37596,13 @@
     ]
   },
   {
+    "text": "ただ、ばしょとりやゴミのもんだいもあるので、マナーをまもることが大切です。",
+    "hash": "75fe0ea1401a",
+    "sources": [
+      "article#a-n4-1"
+    ]
+  },
+  {
     "text": "ただい",
     "hash": "d91ee0f5a00c",
     "sources": [
@@ -37870,6 +38066,13 @@
     ]
   },
   {
+    "text": "たのしみ",
+    "hash": "29d27921e5e9",
+    "sources": [
+      "article-vocab#a-n4-1"
+    ]
+  },
+  {
     "text": "たのむ",
     "hash": "75ae2b2a464e",
     "sources": [
@@ -38108,7 +38311,8 @@
     "text": "たよう",
     "hash": "fab75802c865",
     "sources": [
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n3-5"
     ]
   },
   {
@@ -39172,6 +39376,13 @@
     ]
   },
   {
+    "text": "ちょうせい",
+    "hash": "66bf3424235b",
+    "sources": [
+      "article-vocab#a-n2-1"
+    ]
+  },
+  {
     "text": "ちょうせいする",
     "hash": "5489a0ff8b25",
     "sources": [
@@ -39316,7 +39527,8 @@
     "text": "ちょうわ",
     "hash": "776c9fff59a0",
     "sources": [
-      "vocab-n1"
+      "vocab-n1",
+      "article-vocab#a-n2-2"
     ]
   },
   {
@@ -39969,7 +40181,8 @@
     "text": "つくる",
     "hash": "848fff571296",
     "sources": [
-      "vocab-n5"
+      "vocab-n5",
+      "article-vocab#a-n5-1"
     ]
   },
   {
@@ -40081,6 +40294,13 @@
     "hash": "9799eb362c7e",
     "sources": [
       "vocab-n1"
+    ]
+  },
+  {
+    "text": "つながり",
+    "hash": "021d22620491",
+    "sources": [
+      "article-vocab#a-n3-3"
     ]
   },
   {
@@ -40209,6 +40429,13 @@
     "sources": [
       "vocab-n3",
       "vocab-n2"
+    ]
+  },
+  {
+    "text": "つみかさね",
+    "hash": "ba190ec785c1",
+    "sources": [
+      "article-vocab#a-n1-1"
     ]
   },
   {
@@ -41243,6 +41470,13 @@
     ]
   },
   {
+    "text": "テレワークのふきゅうによって、はたらく場所や時間のじゆうどが高まった一方で、しごとと生活の境目があいまいになるという課題も生まれた。",
+    "hash": "a5c2302cb2be",
+    "sources": [
+      "article#a-n2-1"
+    ]
+  },
+  {
     "text": "てをやく",
     "hash": "e73fe93fc406",
     "sources": [
@@ -41520,7 +41754,8 @@
     "hash": "5f786a3b6746",
     "sources": [
       "vocab-n3",
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n5-2"
     ]
   },
   {
@@ -41714,6 +41949,13 @@
     "hash": "8d675b330820",
     "sources": [
       "vocab-n5"
+    ]
+  },
+  {
+    "text": "といなおす",
+    "hash": "05ae4490cfb3",
+    "sources": [
+      "article-vocab#a-n1-2"
     ]
   },
   {
@@ -42302,7 +42544,8 @@
     "sources": [
       "vocab-n4",
       "vocab-n3",
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n3-5"
     ]
   },
   {
@@ -42563,7 +42806,8 @@
     "hash": "28f036ae9238",
     "sources": [
       "vocab-n3",
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n2-2"
     ]
   },
   {
@@ -43260,6 +43504,13 @@
     ]
   },
   {
+    "text": "ともだちとこうえんをさんぽしたり、えいがを見たりします。",
+    "hash": "c1e9b6ce9ae4",
+    "sources": [
+      "article#a-n5-1"
+    ]
+  },
+  {
     "text": "ともなう",
     "hash": "2974ef522e63",
     "sources": [
@@ -43312,7 +43563,8 @@
     "text": "とりいれる",
     "hash": "d7e1c6d06fe3",
     "sources": [
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n2-1"
     ]
   },
   {
@@ -45233,7 +45485,8 @@
     "text": "にんき",
     "hash": "5e2aef54b9cf",
     "sources": [
-      "vocab-n3"
+      "vocab-n3",
+      "article-vocab#a-n5-2"
     ]
   },
   {
@@ -45807,7 +46060,8 @@
     "text": "のこる",
     "hash": "6add59dfb8bf",
     "sources": [
-      "vocab-n3"
+      "vocab-n3",
+      "article-vocab#a-n4-3"
     ]
   },
   {
@@ -47148,14 +47402,16 @@
     "text": "はっそう",
     "hash": "0b25c90ec021",
     "sources": [
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n3-1"
     ]
   },
   {
     "text": "はったつ",
     "hash": "55c3d1692a82",
     "sources": [
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n2-1"
     ]
   },
   {
@@ -47713,7 +47969,8 @@
     "hash": "4c36f3ad7922",
     "sources": [
       "vocab-n3",
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n3-2"
     ]
   },
   {
@@ -47763,6 +48020,13 @@
     "hash": "030fdb39fba4",
     "sources": [
       "vocab-n1"
+    ]
+  },
+  {
+    "text": "パンとコーヒーの朝ごはんも人気ですが、わたしはやっぱりごはんとみそしるが好きです。",
+    "hash": "b6ddc83ef6d5",
+    "sources": [
+      "article#a-n5-2"
     ]
   },
   {
@@ -47948,7 +48212,8 @@
     "hash": "90b7b7081ee0",
     "sources": [
       "vocab-n3",
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n1-1"
     ]
   },
   {
@@ -48440,7 +48705,8 @@
     "hash": "7068172baaf4",
     "sources": [
       "vocab-n4",
-      "vocab-n3"
+      "vocab-n3",
+      "article-vocab#a-n2-1"
     ]
   },
   {
@@ -48507,6 +48773,13 @@
     "hash": "e361805f0229",
     "sources": [
       "vocab-n2"
+    ]
+  },
+  {
+    "text": "ひとりぐらし",
+    "hash": "6fd86d25d2c2",
+    "sources": [
+      "article-vocab#a-n3-2"
     ]
   },
   {
@@ -48970,7 +49243,8 @@
     "text": "ひる",
     "hash": "b20c67bcce59",
     "sources": [
-      "vocab-n5"
+      "vocab-n5",
+      "article-vocab#a-n5-1"
     ]
   },
   {
@@ -49085,6 +49359,13 @@
     "hash": "05abb16ab5a8",
     "sources": [
       "vocab-n4"
+    ]
+  },
+  {
+    "text": "ひろまる",
+    "hash": "c7efcd2d6d65",
+    "sources": [
+      "article-vocab#a-n3-3"
     ]
   },
   {
@@ -49434,7 +49715,8 @@
     "hash": "816754c075f0",
     "sources": [
       "vocab-n2",
-      "vocab-n1"
+      "vocab-n1",
+      "article-vocab#a-n1-2"
     ]
   },
   {
@@ -49821,7 +50103,8 @@
     "hash": "9a99fcdab969",
     "sources": [
       "vocab-n3",
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n3-4"
     ]
   },
   {
@@ -50470,6 +50753,13 @@
     ]
   },
   {
+    "text": "ふんいき",
+    "hash": "071a042ae961",
+    "sources": [
+      "article-vocab#a-n2-2"
+    ]
+  },
+  {
     "text": "ふんか",
     "hash": "020f8dfe25b1",
     "sources": [
@@ -50946,7 +51236,8 @@
     "hash": "2d3c0459806d",
     "sources": [
       "vocab-n4",
-      "vocab-n3"
+      "vocab-n3",
+      "article-vocab#a-n3-4"
     ]
   },
   {
@@ -51191,7 +51482,8 @@
     "sources": [
       "vocab-n5",
       "vocab-n3",
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n3-1"
     ]
   },
   {
@@ -52173,7 +52465,8 @@
     "text": "ほんしつ",
     "hash": "a8c8fb4ea506",
     "sources": [
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n1-2"
     ]
   },
   {
@@ -52215,7 +52508,8 @@
     "text": "ほんね",
     "hash": "f9b03ffd4d5c",
     "sources": [
-      "vocab-n3"
+      "vocab-n3",
+      "article-vocab#a-n3-5"
     ]
   },
   {
@@ -52389,7 +52683,8 @@
     "hash": "001231e16256",
     "sources": [
       "vocab-n5",
-      "vocab-n3"
+      "vocab-n3",
+      "article-vocab#a-n4-3"
     ]
   },
   {
@@ -52911,7 +53206,8 @@
     "sources": [
       "vocab-n4",
       "vocab-n3",
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n2-3"
     ]
   },
   {
@@ -53160,7 +53456,8 @@
     "text": "みきわめる",
     "hash": "409483fd4088",
     "sources": [
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n1-2"
     ]
   },
   {
@@ -53452,7 +53749,8 @@
     "hash": "104ad1579085",
     "sources": [
       "vocab-n3",
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n3-3"
     ]
   },
   {
@@ -53641,7 +53939,8 @@
     "hash": "a7baa98e1842",
     "sources": [
       "vocab-n3",
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n4-3"
     ]
   },
   {
@@ -55549,7 +55848,8 @@
     "hash": "1b7df364167f",
     "sources": [
       "vocab-n4",
-      "vocab-n3"
+      "vocab-n3",
+      "article-vocab#a-n5-2"
     ]
   },
   {
@@ -56133,6 +56433,13 @@
     "hash": "d22c50013741",
     "sources": [
       "vocab-n1"
+    ]
+  },
+  {
+    "text": "ゆうせんせき",
+    "hash": "b539d8e8de82",
+    "sources": [
+      "article-vocab#a-n4-2"
     ]
   },
   {
@@ -57333,7 +57640,8 @@
     "hash": "1845a4ac0387",
     "sources": [
       "vocab-n3",
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n2-4"
     ]
   },
   {
@@ -57847,6 +58155,13 @@
     "sources": [
       "vocab-n5",
       "vocab-n4"
+    ]
+  },
+  {
+    "text": "りょうりつ",
+    "hash": "ced611a98172",
+    "sources": [
+      "article-vocab#a-n3-4"
     ]
   },
   {
@@ -58559,7 +58874,8 @@
     "text": "わかい",
     "hash": "0db75c20df45",
     "sources": [
-      "vocab-n5"
+      "vocab-n5",
+      "article-vocab#a-n5-2"
     ]
   },
   {
@@ -59963,6 +60279,13 @@
     ]
   },
   {
+    "text": "一人だとさびしいこともあるが、そのぶん自分の時間をじゆうに使える。",
+    "hash": "a5fef95c8d27",
+    "sources": [
+      "article#a-n3-2"
+    ]
+  },
+  {
     "text": "一人では食べきれない量が出てきた。",
     "hash": "4b6b8a609bb9",
     "sources": [
@@ -59995,6 +60318,13 @@
     "hash": "cbd44acc8704",
     "sources": [
       "vocab-n5#寂しい"
+    ]
+  },
+  {
+    "text": "一人ひとりの小さな行動のつみかさねが、やがて大きな変化を生むことを忘れてはならない。",
+    "hash": "be1ce5aaed5c",
+    "sources": [
+      "article#a-n1-1"
     ]
   },
   {
@@ -62085,6 +62415,13 @@
     ]
   },
   {
+    "text": "温暖化は遠い国の話ではなく、私たちの食卓やくらしに直接かかわる問題である。",
+    "hash": "14921ec39878",
+    "sources": [
+      "article#a-n1-1"
+    ]
+  },
+  {
     "text": "温度が下がるにつれて、この油の粘性は目に見えて高くなっていく。",
     "hash": "b078626869a8",
     "sources": [
@@ -62904,6 +63241,13 @@
     ]
   },
   {
+    "text": "家におふろがふえたいま、その数はへっているが、そのあたたかさを見直す人も多い。",
+    "hash": "6aea8d86710a",
+    "sources": [
+      "article#a-n3-3"
+    ]
+  },
+  {
     "text": "家に帰ったら、すぐ寝た。",
     "hash": "0a70b6a10224",
     "sources": [
@@ -63041,6 +63385,13 @@
     "hash": "10b3cb03aa7d",
     "sources": [
       "grammar-n3#n3-63"
+    ]
+  },
+  {
+    "text": "家族のありがたさに気づいたのも、はなれてくらしはじめてからだった。",
+    "hash": "9dab86b51f15",
+    "sources": [
+      "article#a-n3-2"
     ]
   },
   {
@@ -65669,6 +66020,13 @@
     ]
   },
   {
+    "text": "観光は地域にお金をもたらす一方で、住民の生活をおびやかすこともある。",
+    "hash": "72295f069905",
+    "sources": [
+      "article#a-n2-4"
+    ]
+  },
+  {
     "text": "観光は地域に大きな利益をもたらす一方で、「観光公害」と呼ばれる問題も生んでいる。",
     "hash": "224faf503c01",
     "sources": [
@@ -66623,6 +66981,13 @@
     ]
   },
   {
+    "text": "逆に、こまめな情報の共有は、チーム全体の信頼とこうりつを高めてくれる。",
+    "hash": "0d2da7c18d60",
+    "sources": [
+      "article#a-n2-3"
+    ]
+  },
+  {
     "text": "逆に、こまめに情報を共有していれば、まわりが早く助けることができる。",
     "hash": "e109531ae23a",
     "sources": [
@@ -67318,6 +67683,13 @@
   {
     "text": "京都は、千年以上むかしに日本の首都だった町です。",
     "hash": "c64603f1b9e4",
+    "sources": [
+      "article#a-n4-3"
+    ]
+  },
+  {
+    "text": "京都はきせつごとにちがうかおを見せてくれます。",
+    "hash": "f3e5bf0fde99",
     "sources": [
       "article#a-n4-3"
     ]
@@ -68126,6 +68498,13 @@
     "hash": "478bffc17e57",
     "sources": [
       "vocab-n2#窒素"
+    ]
+  },
+  {
+    "text": "空気を読むことは、相手を思いやるやさしさにもなるが、行きすぎると自分の意見が言えなくなる。",
+    "hash": "bd814735ad93",
+    "sources": [
+      "article#a-n2-2"
     ]
   },
   {
@@ -70529,6 +70908,13 @@
     "hash": "afe697257b06",
     "sources": [
       "vocab-n1#しみじみ"
+    ]
+  },
+  {
+    "text": "古いたてものを守りながら、新しい文化も取り入れているところが、京都のみりょくです。",
+    "hash": "6772e4863a3c",
+    "sources": [
+      "article#a-n4-3"
     ]
   },
   {
@@ -77799,6 +78185,13 @@
     ]
   },
   {
+    "text": "自分だけでなく、まわりの人のことも考えると、みんなが快適にすごせます。",
+    "hash": "ac3ba1992307",
+    "sources": [
+      "article#a-n4-2"
+    ]
+  },
+  {
     "text": "自分だけ先に帰ってしまったことに、今でもどこか後ろめたい気持ちが残っている。",
     "hash": "f9b7f05c966a",
     "sources": [
@@ -80776,6 +81169,13 @@
     ]
   },
   {
+    "text": "春はさくら、秋はもみじがとてもきれいです。",
+    "hash": "e1720a8be049",
+    "sources": [
+      "article#a-n4-3"
+    ]
+  },
+  {
     "text": "春は桜、秋は紅葉がとても美しく、季節ごとにちがう顔を見せてくれます。",
     "hash": "c062ddbff6fb",
     "sources": [
@@ -81494,6 +81894,13 @@
     "hash": "fbaa3f45219f",
     "sources": [
       "vocab-n3#減少する"
+    ]
+  },
+  {
+    "text": "少子化のはいけいには、けっこんや子育てにかかるふたんの大きさがあると言われる。",
+    "hash": "e434445e1dcb",
+    "sources": [
+      "article#a-n3-4"
     ]
   },
   {
@@ -86952,6 +87359,13 @@
     ]
   },
   {
+    "text": "銭湯はただ体をあらうばしょではなく、ちいきの人が顔を合わせる場でもあった。",
+    "hash": "646d55a356a8",
+    "sources": [
+      "article#a-n3-3"
+    ]
+  },
+  {
     "text": "前回の失敗に懲りて、今度は事前に入念な準備をした。",
     "hash": "765a50d6c0bb",
     "sources": [
@@ -89304,6 +89718,13 @@
     ]
   },
   {
+    "text": "大切なのは、まわりに合わせることと、自分の考えを伝えることのバランスだろう。",
+    "hash": "17378fd7cbd4",
+    "sources": [
+      "article#a-n2-2"
+    ]
+  },
+  {
     "text": "大切なのは、訪れる側が地元への敬意を忘れないことだろう。",
     "hash": "f15677ce8f3b",
     "sources": [
@@ -89665,6 +90086,13 @@
     "hash": "1e4792083f53",
     "sources": [
       "confusables-word"
+    ]
+  },
+  {
+    "text": "知識をためこむことより、それをどうつかい、どう判断するかが、これからの学びの中心になるだろう。",
+    "hash": "dd915cbe940d",
+    "sources": [
+      "article#a-n1-2"
     ]
   },
   {
@@ -93618,6 +94046,13 @@
   {
     "text": "答えが簡単に手に入る時代だからこそ、「なぜそうなるのか」を問い続ける姿勢が、これまで以上に重要になっている。",
     "hash": "61f4b1a69b81",
+    "sources": [
+      "article#a-n1-2"
+    ]
+  },
+  {
+    "text": "答えをすぐに出してくれるAIがある時代だからこそ、「なぜそうなるのか」を問いつづける姿勢がいっそう重要になる。",
+    "hash": "fec4b13271cf",
     "sources": [
       "article#a-n1-2"
     ]
@@ -101857,6 +102292,13 @@
     ]
   },
   {
+    "text": "便利さを当たり前だと思わず、そのしくみをささえる人のことも考えたい。",
+    "hash": "a1a7d83441e1",
+    "sources": [
+      "article#a-n3-1"
+    ]
+  },
+  {
     "text": "便利になったとはいうものの、失われたものも少なくない。",
     "hash": "72a63003a60a",
     "sources": [
@@ -102228,6 +102670,13 @@
     ]
   },
   {
+    "text": "報連相がうまくいかないしょくばでは、小さなミスが大きな問題に発展しやすい。",
+    "hash": "d0832919407c",
+    "sources": [
+      "article#a-n2-3"
+    ]
+  },
+  {
     "text": "報連相は、単なるルールではない。",
     "hash": "ec39de710619",
     "sources": [
@@ -102253,6 +102702,13 @@
     "hash": "556a2a618509",
     "sources": [
       "vocab-n1#附則"
+    ]
+  },
+  {
+    "text": "訪れる人と住む人、どちらも気もちよくいられるしくみづくりが、いま求められている。",
+    "hash": "58a74f21b7e5",
+    "sources": [
+      "article#a-n2-4"
     ]
   },
   {
