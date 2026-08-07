@@ -63,6 +63,19 @@
     if (!_d || Object.keys(_d.READ).length === 0) _d = buildDict();
     return _d;
   }
+  // 動態併入額外詞條(如文章的重點單字),讓它們在內文也能 ruby+即點即查。
+  // 只對「含漢字的詞」有效(假名詞沒漢字,不會被 furigana 掃到)。
+  function addEntries(list) {
+    try {
+      var d = dict();
+      (list || []).forEach(function (e) {
+        if (!e || !e.w) return;
+        var r = e.r || e.w;
+        if (!d.READ[e.w]) d.READ[e.w] = r;
+        if (!d.ENTRY[e.w] || !d.ENTRY[e.w].m) d.ENTRY[e.w] = { r: r, m: e.m || '', c: e.c || '' };
+      });
+    } catch (err) { /* no-op */ }
+  }
 
   // 建 ruby(漢字+送假名的 token 只在漢字部分加 ruby,假名尾維持純文字)
   function rubyOf(sub, rd) {
@@ -233,5 +246,6 @@
 
   window.furiganaHTML = furiganaHTML;
   window.furiganaHTMLRich = furiganaHTMLRich;
+  window.furiAddEntries = addEntries;
   window.showToast = showToast;
 })();
