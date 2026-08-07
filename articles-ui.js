@@ -74,7 +74,8 @@ window.Articles = (function () {
       '.art-cnt{padding:16px 18px}',
       '.art-para{line-height:2.25;color:var(--tx,#2c2c2c);margin:0 0 6px;font-family:"Hiragino Mincho ProN","Noto Serif JP",serif}',
       '.art-para rt{font-size:.5em;color:var(--tx2,#8a8a8a);font-weight:400}',
-      '.art-para .jlk{cursor:pointer}',
+      '.art-para .jlk{cursor:pointer;color:#e8734a;border-bottom:1px solid rgba(232,115,74,.5)}',
+      '.art-para .jlk rt{color:var(--tx2,#8a8a8a)}',
       '.art-s{border-radius:6px;transition:background .2s;padding:1px 0}',
       '.art-s.on{background:rgba(232,115,74,.16)}',
       '.art-nofuri rt{display:none}',
@@ -165,6 +166,7 @@ window.Articles = (function () {
       window.ToolQuota.consume('article');
     }
     markRead(id);   // 進入即標記已讀(✓);之後重看免計額度
+    if (window.furiAddEntries) window.furiAddEntries(a.vocab);   // 讓本篇重點單字(含漢字者)在內文也可點查
     close();        // 先移除清單那層 overlay,避免兩層 artMask 疊著(內文被蓋成空白)
     curId = id; curTab = 'read';
     var g = LVC[a.level] || LVC.n5;
