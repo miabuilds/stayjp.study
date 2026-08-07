@@ -81,8 +81,11 @@ window.Articles = (function () {
       '.art-nofuri rt{display:none}',
       '.art-tr{font-size:14px;line-height:1.85;color:var(--tx2,#8a8a8a);margin:2px 0 16px;padding-left:12px;border-left:3px solid var(--bd,#e5e5e5)}',
       // vocab / grammar lists
-      '.art-v{display:flex;align-items:center;gap:10px;padding:13px 2px;border-bottom:1px solid var(--bd,#eee)}',
+      '.art-v{display:flex;align-items:center;gap:10px;padding:13px 8px;border-bottom:1px solid var(--bd,#eee);border-radius:10px}',
       '.art-v:last-child{border-bottom:none}',
+      '.art-v-click{cursor:pointer}',
+      '.art-v-click:active{background:rgba(232,115,74,.1)}',
+      '.art-v-click:hover{background:rgba(232,115,74,.05)}',
       '.art-v-spk{border:none;background:rgba(232,115,74,.14);color:#e8734a;width:38px;height:38px;border-radius:50%;font-size:16px;cursor:pointer;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center}',
       '.art-v-spk:active{transform:scale(.9)}',
       '.art-v-w{font-weight:700;font-family:"Hiragino Mincho ProN","Noto Serif JP",serif;color:var(--tx,#2c2c2c);font-size:17px}',
@@ -262,8 +265,11 @@ window.Articles = (function () {
 
   function vocabCardsHtml(a) {
     return (a.vocab || []).map(function (v) {
-      var spk = hasTts(v.r || v.w) ? '<button class="art-v-spk" onclick="Articles.say(\'' + esc(v.r || v.w) + '\')">🔊</button>' : '<span style="width:38px;flex-shrink:0"></span>';
-      return '<div class="art-v">' + spk + '<div style="min-width:0"><div class="art-v-w">' + esc(v.w) + '</div><div class="art-v-r">' + esc(v.r) + '</div></div><div class="art-v-m">' + esc(v.m) + '</div></div>';
+      var key = v.r || v.w, playable = hasTts(key);
+      var spk = playable ? '<span class="art-v-spk">🔊</span>' : '<span style="width:38px;flex-shrink:0"></span>';
+      // 整行可點播放(不只喇叭);沒預錄音檔的行不綁 onclick、不上手指游標
+      var clk = playable ? ' art-v-click" onclick="Articles.say(\'' + esc(key) + '\')' : '';
+      return '<div class="art-v' + clk + '">' + spk + '<div style="min-width:0"><div class="art-v-w">' + esc(v.w) + '</div><div class="art-v-r">' + esc(v.r) + '</div></div><div class="art-v-m">' + esc(v.m) + '</div></div>';
     }).join('');
   }
   function renderVocab(a, c) {
