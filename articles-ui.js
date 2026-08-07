@@ -87,11 +87,13 @@ window.Articles = (function () {
       '.art-v-w{font-weight:700;font-family:"Hiragino Mincho ProN","Noto Serif JP",serif;color:var(--tx,#2c2c2c);font-size:17px}',
       '.art-v-r{font-size:12.5px;color:var(--ac2,#e8734a);margin-top:1px}',
       '.art-v-m{color:var(--tx2,#777);margin-left:auto;text-align:right;font-size:14px;padding-left:8px}',
-      '.art-g{padding:15px 0;border-bottom:1px solid var(--bd,#eee)}',
-      '.art-g:last-child{border-bottom:none}',
+      '.art-g{padding:13px 14px;margin-bottom:10px;border-radius:12px;background:rgba(37,99,235,.05);border:1px solid rgba(37,99,235,.16);border-left:4px solid #2563eb}',
       '.art-g-t{font-size:17px;font-family:"Hiragino Mincho ProN","Noto Serif JP",serif;font-weight:700}',
-      '.art-g-t b{color:var(--ac,#d4654a)}',
-      '.art-g-n{font-size:14.5px;color:var(--tx2,#777);line-height:1.8;margin-top:5px}',
+      '.art-g-t b{color:#2563eb}',
+      '.art-g-n{font-size:14.5px;color:var(--tx,#3a3a3a);line-height:1.85;margin-top:5px}',
+      // 文章 tab 底部內嵌文法區
+      '.art-inline-g{margin-top:26px;padding-top:18px;border-top:1px dashed var(--bd,#e0e0e0)}',
+      '.art-ig-h{font-size:15px;font-weight:800;color:#2563eb;margin-bottom:12px}',
       '.art-gd-btn{margin-top:10px;background:none;border:1px solid var(--bd,#ddd);color:var(--ac2,#e8734a);border-radius:10px;padding:9px 15px;font-size:13.5px;font-weight:600;cursor:pointer;min-height:40px}',
       '.art-gd-body.art-hidden{display:none}',
       // quiz
@@ -244,6 +246,10 @@ window.Articles = (function () {
       var trHtml = trans[pi] ? '<div class="art-tr" style="display:' + (zhOn ? 'block' : 'none') + '">' + esc(trans[pi]) + '</div>' : '';
       return '<div class="art-para" style="font-size:' + FS[fsIdx] + '">' + inner + '</div>' + trHtml;
     }).join('');
+    // 讀完往下就是「本篇文法」,不用切分頁即可對照(藍色區隔正文)
+    if (a.grammar && a.grammar.length) {
+      body += '<div class="art-inline-g"><div class="art-ig-h">📐 ' + enOr('本篇文法', 'Grammar here') + '</div>' + grammarCardsHtml(a) + '</div>';
+    }
     c.className = 'art-cnt' + (furiOn ? '' : ' art-nofuri');
     c.innerHTML = body;
     setPText();
@@ -258,14 +264,17 @@ window.Articles = (function () {
     }).join('');
   }
 
-  function renderGrammar(a, c) {
-    if (!a.grammar || !a.grammar.length) { c.innerHTML = emptyMsg(enOr('這篇沒有文法重點', 'No grammar')); return; }
-    c.className = 'art-cnt';
-    c.innerHTML = a.grammar.map(function (gm) {
+  function grammarCardsHtml(a) {
+    return (a.grammar || []).map(function (gm) {
       var deep = (gm.id && window.GRAMMAR_DETAIL && window.GRAMMAR_DETAIL[gm.id]) ?
         '<button class="art-gd-btn" onclick="Articles.gd(this,\'' + gm.id + '\')">📖 ' + enOr('看完整詳解', 'Full explanation') + ' ▾</button><div class="art-gd-body art-hidden"></div>' : '';
       return '<div class="art-g"><div class="art-g-t"><b>' + esc(gm.t) + '</b></div><div class="art-g-n">' + esc(gm.note) + '</div>' + deep + '</div>';
     }).join('');
+  }
+  function renderGrammar(a, c) {
+    if (!a.grammar || !a.grammar.length) { c.innerHTML = emptyMsg(enOr('這篇沒有文法重點', 'No grammar')); return; }
+    c.className = 'art-cnt';
+    c.innerHTML = grammarCardsHtml(a);
   }
 
   // 測驗 tab:單字快測(看詞→選中文意思),干擾項來自本篇其他單字,不足補其他文章
