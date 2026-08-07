@@ -1421,6 +1421,13 @@
     ]
   },
   {
+    "text": "あ",
+    "hash": "98fdfc0a7426",
+    "sources": [
+      "kana"
+    ]
+  },
+  {
     "text": "あ、お父さん、お帰りなさい。",
     "hash": "05d9a08a20e9",
     "sources": [
@@ -4167,6 +4174,13 @@
     ]
   },
   {
+    "text": "い",
+    "hash": "3c01c77f19cd",
+    "sources": [
+      "kana"
+    ]
+  },
+  {
     "text": "いあつする",
     "hash": "9c0458559544",
     "sources": [
@@ -6144,6 +6158,13 @@
     ]
   },
   {
+    "text": "う",
+    "hash": "af2b29a995c7",
+    "sources": [
+      "kana"
+    ]
+  },
+  {
     "text": "ういういしい",
     "hash": "dbebe56b2a56",
     "sources": [
@@ -6982,7 +7003,8 @@
     "text": "え",
     "hash": "a60311a2fc88",
     "sources": [
-      "vocab-n4"
+      "vocab-n4",
+      "kana"
     ]
   },
   {
@@ -7473,6 +7495,13 @@
     "sources": [
       "vocab-n4",
       "vocab-n3"
+    ]
+  },
+  {
+    "text": "お",
+    "hash": "ac6bc7de7112",
+    "sources": [
+      "kana"
     ]
   },
   {
@@ -9594,6 +9623,20 @@
     "hash": "f32fd81e32d9",
     "sources": [
       "grammar-n1#n1-60"
+    ]
+  },
+  {
+    "text": "か",
+    "hash": "288c9e077190",
+    "sources": [
+      "kana"
+    ]
+  },
+  {
+    "text": "が",
+    "hash": "a142816563b3",
+    "sources": [
+      "kana"
     ]
   },
   {
@@ -12843,7 +12886,15 @@
     "text": "き",
     "hash": "27acc76c0055",
     "sources": [
-      "vocab-n5"
+      "vocab-n5",
+      "kana"
+    ]
+  },
+  {
+    "text": "ぎ",
+    "hash": "9a77c2df496e",
+    "sources": [
+      "kana"
     ]
   },
   {
@@ -13868,6 +13919,20 @@
     ]
   },
   {
+    "text": "きゃ",
+    "hash": "b2b7e45bf39e",
+    "sources": [
+      "kana"
+    ]
+  },
+  {
+    "text": "ぎゃ",
+    "hash": "95e3d0ad8f6f",
+    "sources": [
+      "kana"
+    ]
+  },
+  {
     "text": "きゃく",
     "hash": "c9378644db6b",
     "sources": [
@@ -13972,6 +14037,20 @@
     "hash": "f81bd683bcf6",
     "sources": [
       "vocab-n3#炎"
+    ]
+  },
+  {
+    "text": "きゅ",
+    "hash": "298ab383a42d",
+    "sources": [
+      "kana"
+    ]
+  },
+  {
+    "text": "ぎゅ",
+    "hash": "81a5e9e8a034",
+    "sources": [
+      "kana"
     ]
   },
   {
@@ -14218,6 +14297,20 @@
     "sources": [
       "vocab-n3",
       "vocab-n2"
+    ]
+  },
+  {
+    "text": "きょ",
+    "hash": "d9ee3c16a677",
+    "sources": [
+      "kana"
+    ]
+  },
+  {
+    "text": "ぎょ",
+    "hash": "08831cb24c9b",
+    "sources": [
+      "kana"
     ]
   },
   {
@@ -15174,6 +15267,20 @@
     ]
   },
   {
+    "text": "く",
+    "hash": "ac94e112183c",
+    "sources": [
+      "kana"
+    ]
+  },
+  {
+    "text": "ぐ",
+    "hash": "6e159a91b7ce",
+    "sources": [
+      "kana"
+    ]
+  },
+  {
     "text": "くいあらためる",
     "hash": "da4a1fe6a006",
     "sources": [
@@ -15945,7 +16052,15 @@
     "text": "け",
     "hash": "d32afeb0abe6",
     "sources": [
-      "vocab-n4"
+      "vocab-n4",
+      "kana"
+    ]
+  },
+  {
+    "text": "げ",
+    "hash": "9167af511d53",
+    "sources": [
+      "kana"
     ]
   },
   {
@@ -17367,6 +17482,20 @@
     "hash": "1a49c96ea6ca",
     "sources": [
       "vocab-n1"
+    ]
+  },
+  {
+    "text": "こ",
+    "hash": "91714b00e5a3",
+    "sources": [
+      "kana"
+    ]
+  },
+  {
+    "text": "ご",
+    "hash": "27a87259d93f",
+    "sources": [
+      "kana"
     ]
   },
   {
@@ -25563,6 +25692,20 @@
     ]
   },
   {
+    "text": "さ",
+    "hash": "7a4faed063b6",
+    "sources": [
+      "kana"
+    ]
+  },
+  {
+    "text": "ざ",
+    "hash": "d08b42329511",
+    "sources": [
+      "kana"
+    ]
+  },
+  {
     "text": "ざあざあ",
     "hash": "4774a5ed509f",
     "sources": [
@@ -26984,6 +27127,20 @@
     "hash": "2e6a0f383a03",
     "sources": [
       "vocab-n1"
+    ]
+  },
+  {
+    "text": "し",
+    "hash": "812f45bfcf7e",
+    "sources": [
+      "kana"
+    ]
+  },
+  {
+    "text": "じ",
+    "hash": "41f11fe610d4",
+    "sources": [
+      "kana"
     ]
   },
   {
@@ -28621,10 +28778,18 @@
     ]
   },
   {
+    "text": "しゃ",
+    "hash": "b6e3f9666c7a",
+    "sources": [
+      "kana"
+    ]
+  },
+  {
     "text": "じゃ",
     "hash": "d91490197bd6",
     "sources": [
-      "vocab-n4"
+      "vocab-n4",
+      "kana"
     ]
   },
   {
@@ -28811,6 +28976,20 @@
     "hash": "8f726dfea9d1",
     "sources": [
       "confusables-eg"
+    ]
+  },
+  {
+    "text": "しゅ",
+    "hash": "64d073703829",
+    "sources": [
+      "kana"
+    ]
+  },
+  {
+    "text": "じゅ",
+    "hash": "567ca1db796e",
+    "sources": [
+      "kana"
     ]
   },
   {
@@ -29787,6 +29966,20 @@
     "hash": "6ea91e77a38f",
     "sources": [
       "vocab-n1"
+    ]
+  },
+  {
+    "text": "しょ",
+    "hash": "7a5aea55155b",
+    "sources": [
+      "kana"
+    ]
+  },
+  {
+    "text": "じょ",
+    "hash": "115759838422",
+    "sources": [
+      "kana"
     ]
   },
   {
@@ -31481,14 +31674,16 @@
     "hash": "5b8252a1e93f",
     "sources": [
       "vocab-n4",
-      "vocab-n3"
+      "vocab-n3",
+      "kana"
     ]
   },
   {
     "text": "ず",
     "hash": "e77eb4831e6a",
     "sources": [
-      "vocab-n3"
+      "vocab-n3",
+      "kana"
     ]
   },
   {
@@ -32425,7 +32620,15 @@
     "hash": "e1c730bd83c3",
     "sources": [
       "vocab-n5",
-      "vocab-n4"
+      "vocab-n4",
+      "kana"
+    ]
+  },
+  {
+    "text": "ぜ",
+    "hash": "8759dfeb913a",
+    "sources": [
+      "kana"
     ]
   },
   {
@@ -34064,6 +34267,20 @@
     "hash": "461a2341c8b7",
     "sources": [
       "vocab-n2"
+    ]
+  },
+  {
+    "text": "そ",
+    "hash": "b345d8cc8368",
+    "sources": [
+      "kana"
+    ]
+  },
+  {
+    "text": "ぞ",
+    "hash": "bad314622d68",
+    "sources": [
+      "kana"
     ]
   },
   {
@@ -36133,6 +36350,20 @@
     "hash": "4bdc89d7758f",
     "sources": [
       "vocab-n1"
+    ]
+  },
+  {
+    "text": "た",
+    "hash": "cf4d17f99d10",
+    "sources": [
+      "kana"
+    ]
+  },
+  {
+    "text": "だ",
+    "hash": "b3d236275fac",
+    "sources": [
+      "kana"
     ]
   },
   {
@@ -38277,7 +38508,15 @@
     "hash": "e022bea2e9d6",
     "sources": [
       "vocab-n4",
-      "vocab-n3"
+      "vocab-n3",
+      "kana"
+    ]
+  },
+  {
+    "text": "ぢ",
+    "hash": "139b8c6e1d18",
+    "sources": [
+      "kana"
     ]
   },
   {
@@ -38627,6 +38866,13 @@
     ]
   },
   {
+    "text": "ちゃ",
+    "hash": "062957be362f",
+    "sources": [
+      "kana"
+    ]
+  },
+  {
     "text": "チャイムが鳴るが早いか、子供たちは教室を飛び出した。",
     "hash": "edc34ac83a1e",
     "sources": [
@@ -38697,6 +38943,13 @@
       "vocab-n5",
       "vocab-n4",
       "vocab-n3"
+    ]
+  },
+  {
+    "text": "ちゅ",
+    "hash": "619fdc4f9348",
+    "sources": [
+      "kana"
     ]
   },
   {
@@ -38845,6 +39098,13 @@
     "sources": [
       "vocab-n4",
       "vocab-n3"
+    ]
+  },
+  {
+    "text": "ちょ",
+    "hash": "4def51326a2d",
+    "sources": [
+      "kana"
     ]
   },
   {
@@ -39354,6 +39614,20 @@
     "hash": "96a563648ebc",
     "sources": [
       "vocab-n1"
+    ]
+  },
+  {
+    "text": "つ",
+    "hash": "0c414c812bd8",
+    "sources": [
+      "kana"
+    ]
+  },
+  {
+    "text": "づ",
+    "hash": "600f5ab1c0a4",
+    "sources": [
+      "kana"
     ]
   },
   {
@@ -40036,7 +40310,15 @@
     "text": "て",
     "hash": "e2d970611589",
     "sources": [
-      "vocab-n5"
+      "vocab-n5",
+      "kana"
+    ]
+  },
+  {
+    "text": "で",
+    "hash": "7350618fcec3",
+    "sources": [
+      "kana"
     ]
   },
   {
@@ -41346,7 +41628,15 @@
     "text": "と",
     "hash": "a986a7bc9e03",
     "sources": [
-      "vocab-n5"
+      "vocab-n5",
+      "kana"
+    ]
+  },
+  {
+    "text": "ど",
+    "hash": "76504d613664",
+    "sources": [
+      "kana"
     ]
   },
   {
@@ -43797,6 +44087,13 @@
     ]
   },
   {
+    "text": "な",
+    "hash": "478d2f9eb192",
+    "sources": [
+      "kana"
+    ]
+  },
+  {
     "text": "ないかく",
     "hash": "ecab394d0fdb",
     "sources": [
@@ -44520,6 +44817,13 @@
     ]
   },
   {
+    "text": "に",
+    "hash": "de3d1ecc94b2",
+    "sources": [
+      "kana"
+    ]
+  },
+  {
     "text": "にあう",
     "hash": "d69564e334a8",
     "sources": [
@@ -44767,10 +45071,24 @@
     ]
   },
   {
+    "text": "にゃ",
+    "hash": "be4c29664dfd",
+    "sources": [
+      "kana"
+    ]
+  },
+  {
     "text": "にやにや",
     "hash": "7e9d81c2106d",
     "sources": [
       "vocab-n3"
+    ]
+  },
+  {
+    "text": "にゅ",
+    "hash": "658da3d97ec6",
+    "sources": [
+      "kana"
     ]
   },
   {
@@ -44853,6 +45171,13 @@
     "hash": "5b9e1d23b3ad",
     "sources": [
       "vocab-n1"
+    ]
+  },
+  {
+    "text": "にょ",
+    "hash": "0954bcc57525",
+    "sources": [
+      "kana"
     ]
   },
   {
@@ -44977,6 +45302,13 @@
     ]
   },
   {
+    "text": "ぬ",
+    "hash": "ad142ed0573d",
+    "sources": [
+      "kana"
+    ]
+  },
+  {
     "text": "ぬう",
     "hash": "760a2689115a",
     "sources": [
@@ -45060,7 +45392,8 @@
     "text": "ね",
     "hash": "3a104bbe569e",
     "sources": [
-      "vocab-n3"
+      "vocab-n3",
+      "kana"
     ]
   },
   {
@@ -45318,6 +45651,13 @@
     "sources": [
       "vocab-n3",
       "vocab-n2"
+    ]
+  },
+  {
+    "text": "の",
+    "hash": "56377d14d4ef",
+    "sources": [
+      "kana"
     ]
   },
   {
@@ -45659,7 +45999,22 @@
     "hash": "1fa0519cfd09",
     "sources": [
       "vocab-n5",
-      "vocab-n4"
+      "vocab-n4",
+      "kana"
+    ]
+  },
+  {
+    "text": "ば",
+    "hash": "d8c158e0a2d1",
+    "sources": [
+      "kana"
+    ]
+  },
+  {
+    "text": "ぱ",
+    "hash": "81223f8ee527",
+    "sources": [
+      "kana"
     ]
   },
   {
@@ -47520,7 +47875,22 @@
     "text": "ひ",
     "hash": "469e92c9cf65",
     "sources": [
-      "vocab-n4"
+      "vocab-n4",
+      "kana"
+    ]
+  },
+  {
+    "text": "び",
+    "hash": "5fb5aba49978",
+    "sources": [
+      "kana"
+    ]
+  },
+  {
+    "text": "ぴ",
+    "hash": "749766f43a50",
+    "sources": [
+      "kana"
     ]
   },
   {
@@ -48265,6 +48635,27 @@
     ]
   },
   {
+    "text": "ひゃ",
+    "hash": "f28cd0be883a",
+    "sources": [
+      "kana"
+    ]
+  },
+  {
+    "text": "びゃ",
+    "hash": "4d8780b09f52",
+    "sources": [
+      "kana"
+    ]
+  },
+  {
+    "text": "ぴゃ",
+    "hash": "ef826d2af5c0",
+    "sources": [
+      "kana"
+    ]
+  },
+  {
     "text": "ひやく",
     "hash": "96ca611a8e81",
     "sources": [
@@ -48294,10 +48685,52 @@
     ]
   },
   {
+    "text": "ひゅ",
+    "hash": "e0e6bdfbd67b",
+    "sources": [
+      "kana"
+    ]
+  },
+  {
     "text": "ひゆ",
     "hash": "cf3074dbfdeb",
     "sources": [
       "vocab-n1"
+    ]
+  },
+  {
+    "text": "びゅ",
+    "hash": "747dbd8ebca5",
+    "sources": [
+      "kana"
+    ]
+  },
+  {
+    "text": "ぴゅ",
+    "hash": "984576b5cea2",
+    "sources": [
+      "kana"
+    ]
+  },
+  {
+    "text": "ひょ",
+    "hash": "0627f890934c",
+    "sources": [
+      "kana"
+    ]
+  },
+  {
+    "text": "びょ",
+    "hash": "0a1cc845facd",
+    "sources": [
+      "kana"
+    ]
+  },
+  {
+    "text": "ぴょ",
+    "hash": "220216f18a88",
+    "sources": [
+      "kana"
     ]
   },
   {
@@ -48716,6 +49149,27 @@
     "hash": "20b663368619",
     "sources": [
       "vocab-n1"
+    ]
+  },
+  {
+    "text": "ふ",
+    "hash": "382a438fd4c5",
+    "sources": [
+      "kana"
+    ]
+  },
+  {
+    "text": "ぶ",
+    "hash": "82b3fbb77164",
+    "sources": [
+      "kana"
+    ]
+  },
+  {
+    "text": "ぷ",
+    "hash": "224fecb16293",
+    "sources": [
+      "kana"
     ]
   },
   {
@@ -50236,6 +50690,27 @@
     ]
   },
   {
+    "text": "へ",
+    "hash": "72c746d609d4",
+    "sources": [
+      "kana"
+    ]
+  },
+  {
+    "text": "べ",
+    "hash": "eefc5770b9dc",
+    "sources": [
+      "kana"
+    ]
+  },
+  {
+    "text": "ぺ",
+    "hash": "bd1d8044336d",
+    "sources": [
+      "kana"
+    ]
+  },
+  {
     "text": "へいおん",
     "hash": "7eac48da30fb",
     "sources": [
@@ -50731,6 +51206,27 @@
     "hash": "9b46f08505d8",
     "sources": [
       "vocab-n5#貸す"
+    ]
+  },
+  {
+    "text": "ほ",
+    "hash": "5a340fe4758d",
+    "sources": [
+      "kana"
+    ]
+  },
+  {
+    "text": "ぼ",
+    "hash": "7ebddc850724",
+    "sources": [
+      "kana"
+    ]
+  },
+  {
+    "text": "ぽ",
+    "hash": "06b58547dc73",
+    "sources": [
+      "kana"
     ]
   },
   {
@@ -51798,6 +52294,13 @@
     ]
   },
   {
+    "text": "ま",
+    "hash": "400805e5a9e2",
+    "sources": [
+      "kana"
+    ]
+  },
+  {
     "text": "まあ",
     "hash": "9412f36021aa",
     "sources": [
@@ -52546,7 +53049,8 @@
     "text": "み",
     "hash": "1c5425dae8c9",
     "sources": [
-      "vocab-n3"
+      "vocab-n3",
+      "kana"
     ]
   },
   {
@@ -53061,6 +53565,13 @@
     ]
   },
   {
+    "text": "みゃ",
+    "hash": "0eb0633f6c68",
+    "sources": [
+      "kana"
+    ]
+  },
+  {
     "text": "みゃくはく",
     "hash": "a972e6e392d4",
     "sources": [
@@ -53080,6 +53591,20 @@
     "hash": "2ea11dac162c",
     "sources": [
       "vocab-n3"
+    ]
+  },
+  {
+    "text": "みゅ",
+    "hash": "5bd384349a78",
+    "sources": [
+      "kana"
+    ]
+  },
+  {
+    "text": "みょ",
+    "hash": "6617e33d9583",
+    "sources": [
+      "kana"
     ]
   },
   {
@@ -53321,6 +53846,13 @@
     "hash": "9513fca4aa3d",
     "sources": [
       "vocab-n1"
+    ]
+  },
+  {
+    "text": "む",
+    "hash": "50029791cb9f",
+    "sources": [
+      "kana"
     ]
   },
   {
@@ -53672,7 +54204,8 @@
     "text": "め",
     "hash": "634540f05d98",
     "sources": [
-      "vocab-n5"
+      "vocab-n5",
+      "kana"
     ]
   },
   {
@@ -54152,6 +54685,13 @@
     "hash": "f61ad9af7a43",
     "sources": [
       "vocab-n1"
+    ]
+  },
+  {
+    "text": "も",
+    "hash": "3c6945772d72",
+    "sources": [
+      "kana"
     ]
   },
   {
@@ -54976,7 +55516,8 @@
     "text": "や",
     "hash": "bdab1b17397d",
     "sources": [
-      "vocab-n5"
+      "vocab-n5",
+      "kana"
     ]
   },
   {
@@ -55420,7 +55961,8 @@
     "text": "ゆ",
     "hash": "44567171f335",
     "sources": [
-      "vocab-n4"
+      "vocab-n4",
+      "kana"
     ]
   },
   {
@@ -55944,6 +56486,13 @@
     "sources": [
       "vocab-n3",
       "vocab-n2"
+    ]
+  },
+  {
+    "text": "よ",
+    "hash": "6f46f7d4a286",
+    "sources": [
+      "kana"
     ]
   },
   {
@@ -56622,6 +57171,13 @@
     ]
   },
   {
+    "text": "ら",
+    "hash": "ba7526a5c03f",
+    "sources": [
+      "kana"
+    ]
+  },
+  {
     "text": "ラーメンをはじめ、寿司や天ぷらも外国人に人気だ。",
     "hash": "b461ebdafae7",
     "sources": [
@@ -56742,6 +57298,13 @@
       "vocab-n4",
       "vocab-n3",
       "vocab-n2"
+    ]
+  },
+  {
+    "text": "り",
+    "hash": "71d1c63e507f",
+    "sources": [
+      "kana"
     ]
   },
   {
@@ -57052,6 +57615,20 @@
     ]
   },
   {
+    "text": "りゃ",
+    "hash": "f58558332c0c",
+    "sources": [
+      "kana"
+    ]
+  },
+  {
+    "text": "りゅ",
+    "hash": "73c41f0e483e",
+    "sources": [
+      "kana"
+    ]
+  },
+  {
     "text": "りゆう",
     "hash": "af7636a228b7",
     "sources": [
@@ -57115,6 +57692,13 @@
     "hash": "f8f58cd6703f",
     "sources": [
       "vocab-n1"
+    ]
+  },
+  {
+    "text": "りょ",
+    "hash": "1ab62bb6d7b6",
+    "sources": [
+      "kana"
     ]
   },
   {
@@ -57410,6 +57994,13 @@
     ]
   },
   {
+    "text": "る",
+    "hash": "ffab9d02a311",
+    "sources": [
+      "kana"
+    ]
+  },
+  {
     "text": "るいじ",
     "hash": "17eb4ed46555",
     "sources": [
@@ -57435,6 +58026,13 @@
     "hash": "c949a3a7220f",
     "sources": [
       "vocab-n1"
+    ]
+  },
+  {
+    "text": "れ",
+    "hash": "df82f999c7fb",
+    "sources": [
+      "kana"
     ]
   },
   {
@@ -57693,6 +58291,13 @@
     ]
   },
   {
+    "text": "ろ",
+    "hash": "eb766006aba2",
+    "sources": [
+      "kana"
+    ]
+  },
+  {
     "text": "ろうか",
     "hash": "0433421652f9",
     "sources": [
@@ -57927,6 +58532,13 @@
     "sources": [
       "vocab-n3",
       "vocab-n2"
+    ]
+  },
+  {
+    "text": "わ",
+    "hash": "dedb707d8398",
+    "sources": [
+      "kana"
     ]
   },
   {
@@ -58753,6 +59365,20 @@
     "hash": "778a277d96b4",
     "sources": [
       "vocab-n5"
+    ]
+  },
+  {
+    "text": "を",
+    "hash": "eba95ba0c666",
+    "sources": [
+      "kana"
+    ]
+  },
+  {
+    "text": "ん",
+    "hash": "48a866bfdaf9",
+    "sources": [
+      "kana"
     ]
   },
   {

@@ -123,6 +123,15 @@ for (const a of articles) {
   }
 }
 
+// 五十音 — 每個假名的發音(平假名當 key)
+const kanaCode = fs.readFileSync(path.join(ROOT, 'kana.js'), 'utf8');
+const KANA = (new Function('window', kanaCode + '; return window.KANA;'))({}) || {};
+for (const sec of Object.values(KANA)) {
+  for (const row of sec) {
+    for (const c of row) { if (c && c.h) add(c.h, 'kana'); }
+  }
+}
+
 // ---- write --------------------------------------------------------------
 const out = [...map.entries()]
   .map(([text, sources]) => ({ text, hash: hashText(text), sources: [...sources] }))
