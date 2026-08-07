@@ -1942,6 +1942,18 @@ function getVocabFavSet(lv) {
     return s;
   } catch(e) { return new Set(); }
 }
+// 文章「點字→收藏」用:加入生字本(與 word_notebook 同格式,含雲端同步)。給 ux-extras 的查詢彈窗呼叫。
+window.stayjpHasWord = function(w){ try { return (JSON.parse(localStorage.getItem('word_notebook'))||[]).some(x=>x&&x.w===w); } catch(e){ return false; } };
+window.stayjpAddWord = function(w, r, m, lv){
+  lv = lv || (typeof currentLevel !== 'undefined' ? currentLevel : 'n5');
+  let nb; try { nb = JSON.parse(localStorage.getItem('word_notebook')) || []; } catch(e){ nb = []; }
+  if (nb.some(x => x && x.w === w)) return 'exists';
+  nb.push({ w: w, r: r||w, m: m||'', lv: lv, added: new Date().toISOString() });
+  localStorage.setItem('word_notebook', JSON.stringify(nb));
+  if (typeof saveAllCloud === 'function') { try { saveAllCloud(); } catch(e){} }
+  if (typeof updateFavCount === 'function') { try { updateFavCount(); } catch(e){} }
+  return 'added';
+};
 function toggleFav(id) {
   if (currentMode === 'vocab') {
     const lv = currentLevel;
