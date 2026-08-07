@@ -161,6 +161,7 @@ window.Articles = (function () {
       window.ToolQuota.consume('article');
     }
     markRead(id);   // 進入即標記已讀(✓);之後重看免計額度
+    close();        // 先移除清單那層 overlay,避免兩層 artMask 疊著(內文被蓋成空白)
     curId = id; curTab = 'read';
     var g = LVC[a.level] || LVC.n5;
     var h = '<div class="art-mask" id="artMask"><div class="art-wrap">' +

@@ -127,8 +127,12 @@
     var st = document.createElement('style');
     st.id = 'jlkCss';
     st.textContent = [
-      '.jlk{cursor:pointer;border-radius:3px;transition:background .12s}',
+      '.jlk{cursor:pointer;border-radius:3px;transition:background .12s;border-bottom:1.5px dotted rgba(214,101,74,.45)}',
       '.jlk:hover,.jlk:focus{background:rgba(214,101,74,.14);outline:none}',
+      '#jlkPop .jacts{display:flex;gap:8px;margin-top:12px}',
+      '#jlkPop .jact{flex:1;border:1px solid var(--bd,#e0e0e0);background:var(--bg,#faf9f6);color:var(--tx,#333);border-radius:10px;padding:9px 6px;font-size:13px;font-weight:700;cursor:pointer}',
+      '#jlkPop .jact:active{transform:scale(.96)}',
+      '#jlkPop .jact.on{background:var(--ac,#d4654a);color:#fff;border-color:var(--ac,#d4654a)}',
       '#jlkPop{position:fixed;z-index:100000;max-width:min(300px,88vw);background:var(--bg2,#fff);color:var(--tx,#222);border:1px solid var(--bd,#e5e5e5);border-radius:14px;box-shadow:0 12px 38px rgba(0,0,0,.28);padding:14px 16px;font-size:14px;line-height:1.7;-webkit-font-smoothing:antialiased;font-family:-apple-system,"PingFang TC","Noto Sans TC",sans-serif}',
       '#jlkPop .jw{font-size:21px;font-weight:700;font-family:"Hiragino Mincho ProN","Noto Serif JP",serif;color:var(--tx,#1c1c1e)}',
       '#jlkPop .jr{font-size:13px;color:var(--tx2,#8a8a8a);margin-left:7px}',
@@ -153,7 +157,8 @@
       + '<div><span class="jw">' + escapeHtml(data.w) + '</span><span class="jr">' + escapeHtml(data.r) + '</span></div>'
       + (tags ? '<div class="jtags">' + tags + '</div>' : '')
       + '<div class="jm">' + escapeHtml(data.m || '（暫無解釋）') + '</div>'
-      + (data.f ? '<div class="jbase">辭書形（原形）：<b>' + escapeHtml(data.w) + '</b></div>' : '');
+      + (data.f ? '<div class="jbase">辭書形（原形）：<b>' + escapeHtml(data.w) + '</b></div>' : '')
+      + '<div class="jacts"><button class="jact jact-spk" type="button">🔊 發音</button><button class="jact jact-fav" type="button">☆ 收藏</button></div>';
     document.body.appendChild(pop);
     // 定位在被點詞附近,夾在視窗內
     var r = anchor.getBoundingClientRect();
@@ -164,6 +169,21 @@
     pop.style.left = left + 'px';
     pop.style.top = top + 'px';
     pop.querySelector('.jx').addEventListener('click', function (e) { e.stopPropagation(); closePop(); });
+    // 🔊 發音(用預錄 mp3,沒有就退瀏覽器語音,交給 speak 判斷)
+    var spk = pop.querySelector('.jact-spk');
+    if (spk) spk.addEventListener('click', function (e) { e.stopPropagation(); if (typeof speak === 'function') speak(data.r || data.w); });
+    // ☆ 收藏 → 生字本
+    var fav = pop.querySelector('.jact-fav');
+    if (fav) {
+      if (window.stayjpHasWord && window.stayjpHasWord(data.w)) { fav.textContent = '★ 已收藏'; fav.classList.add('on'); }
+      fav.addEventListener('click', function (e) {
+        e.stopPropagation();
+        if (!window.stayjpAddWord) { showToast('收藏功能未載入'); return; }
+        var res = window.stayjpAddWord(data.w, data.r, data.m);
+        fav.textContent = '★ 已收藏'; fav.classList.add('on');
+        showToast(res === 'exists' ? '已在生字本 📖' : '已加入生字本 📖');
+      });
+    }
     _pop = pop;
   }
   // 捕獲階段:點到 .jlk → 查詢並阻止事件(不觸發例句框的播音/卡片收合)
