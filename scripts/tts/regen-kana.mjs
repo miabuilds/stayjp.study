@@ -25,16 +25,16 @@ async function main() {
     try {
       const q = await audioQuery(k);
       // ── 清晰度調整 ──
-      q.speedScale = 0.85;           // 放慢,咬字清楚
-      q.prePhonemeLength = 0.25;     // 前面補靜音,開頭不被切
-      q.postPhonemeLength = 0.35;    // 後面補靜音,尾音完整
-      q.volumeScale = 1.15;          // 音量微升
-      q.intonationScale = 1.1;       // 抑揚略強,單音更飽滿
+      // 自然參數:上一版音量1.15削波(分岔)、母音拉太長(虛)、抑揚過強→這版改回自然。
+      q.speedScale = 0.9;            // 稍慢,清楚但不拖
+      q.prePhonemeLength = 0.1;      // 少量前置靜音
+      q.postPhonemeLength = 0.15;    // 少量尾靜音,尾音不切
+      q.volumeScale = 1.0;           // 不加音量(避免削波/爆音)
+      q.intonationScale = 1.0;       // 自然抑揚
       for (const p of (q.accent_phrases || [])) {
         const m0 = p.moras && p.moras[0];
         if (m0 && m0.consonant && WEAK.has(m0.consonant)) {
-          m0.consonant_length = (m0.consonant_length || 0.05) * 2.2;  // 弱子音加長
-          m0.vowel_length = (m0.vowel_length || 0.07) * 1.25;
+          m0.consonant_length = (m0.consonant_length || 0.05) * 1.3;  // 弱子音很輕的加長;不動母音(避免變虛)
         }
       }
       const wav = await synthesis(q);
