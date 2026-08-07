@@ -160,7 +160,7 @@ export interface CommissionDoc {
  */
 export async function recordKolCommission(
   buyerUid: string,
-  opts: { plan: string; gross_twd: number; source: "web" | "app"; txnId: string; isSandbox: boolean; isFirstPayment: boolean },
+  opts: { plan: string; gross_twd: number; source: "web" | "app" | "paypal"; txnId: string; isSandbox: boolean; isFirstPayment: boolean },
 ): Promise<void> {
   const { plan, gross_twd, source, txnId, isSandbox, isFirstPayment } = opts;
   if (isSandbox || !isFirstPayment || !(gross_twd > 0)) return;              // 只算首筆真實付款
@@ -175,7 +175,7 @@ export async function recordKolCommission(
   if (c.status === "suspended") return;                                      // 停權不產生新分潤
   const ref = db.doc(`commissions/${code}_${buyerUid}`);                     // 冪等:一碼一買家一筆
   if ((await ref.get()).exists) return;
-  const fee = source === "app" ? KOL_FEE.app : KOL_FEE.web;
+  const fee = (KOL_FEE as Record<string, number>)[source] ?? KOL_FEE.web;
   const profit = Math.round(gross_twd * (1 - fee));
   const fixed = typeof c.commission_fixed === "number" ? c.commission_fixed : null;
   const rate = typeof c.commission_pct === "number" ? c.commission_pct : 20;
