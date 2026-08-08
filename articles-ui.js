@@ -12,6 +12,8 @@ window.Articles = (function () {
   // 三語:en→英文;zh-CN→OpenCC 轉簡(cvt);zh-TW→原樣繁體
   function enOr(zh, en) { try { var l = (typeof I18n !== 'undefined' && I18n.getLang) ? I18n.getLang() : (localStorage.getItem('ui_lang') || 'zh-TW'); if (l === 'en') return en; return (typeof cvt === 'function') ? cvt(zh) : zh; } catch (e) { return zh; } }
   function zc(s) { try { return (typeof cvt === 'function') ? cvt(s) : s; } catch (e) { return s; } }   // 中文內容(中譯/意思):簡中轉簡,其餘原樣
+  function isEn() { try { return ((typeof I18n !== 'undefined' && I18n.getLang) ? I18n.getLang() : localStorage.getItem('ui_lang')) === 'en'; } catch (e) { return false; } }
+  function Lc(zh, en) { return isEn() ? (en || zh) : zc(zh); }   // 內容三語:en→英文;繁→原樣;簡→cvt
   function esc(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
   function readSet() { try { return JSON.parse(localStorage.getItem('article_read')) || {}; } catch (e) { return {}; } }
   function markRead(id) { var s = readSet(); s[id] = Date.now(); localStorage.setItem('article_read', JSON.stringify(s)); if (typeof saveAllCloud === 'function') try { saveAllCloud(); } catch (e) {} }
@@ -195,7 +197,7 @@ window.Articles = (function () {
           '<div class="art-thumb" style="background:linear-gradient(135deg,' + g[0] + ',' + g[1] + ')"><span class="art-th-e">' + topicEmoji(a.topic + a.title) + '</span><img class="art-th-i" src="' + imgUrl(a.id) + '" alt="" loading="lazy" onerror="this.remove()"><span class="art-th-badge">' + LVN[a.level] + '</span></div>' +
           '<div class="art-card-b">' +
           '<div class="art-card-t">' + esc(a.title) + (read[a.id] ? '<span class="art-done">✓</span>' : '') + '</div>' +
-          '<div class="art-card-z">' + esc(zc(a.title_zh)) + ' · ' + esc(zc(a.topic)) + '</div>' +
+          '<div class="art-card-z">' + esc(Lc(a.title_zh,a.title_en)) + ' · ' + esc(Lc(a.topic,a.topic_en)) + '</div>' +
           '</div></div>';
       });
     });
@@ -220,15 +222,15 @@ window.Articles = (function () {
     var g = LVC[a.level] || LVC.n5;
     var h = '<div class="art-mask" id="artMask"><div class="art-wrap">' +
       '<div class="art-top"><button class="art-back" onclick="Articles.open()"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>返回</button>' +
-      '<span class="tt">' + esc(zc(a.title_zh)) + '</span>' +
+      '<span class="tt">' + esc(Lc(a.title_zh,a.title_en)) + '</span>' +
       '<button class="art-ic" onclick="Articles.close()">✕</button></div>' +
       '<div class="art-hero" style="background:linear-gradient(135deg,' + g[0] + ',' + g[1] + ')">' +
       '<img class="art-hero-bg" src="' + imgUrl(a.id) + '" alt="" onerror="this.remove()">' +
       '<div class="art-hero-ov"></div>' +
       '<div class="art-hero-in">' +
-      '<div class="hb">' + LVN[a.level] + '　' + esc(zc(a.topic)) + '</div>' +
+      '<div class="hb">' + LVN[a.level] + '　' + esc(Lc(a.topic,a.topic_en)) + '</div>' +
       '<div class="ht">' + fr(a.title) + '</div>' +
-      '<div class="hz">' + esc(zc(a.title_zh)) + '</div></div></div>' +
+      '<div class="hz">' + esc(Lc(a.title_zh,a.title_en)) + '</div></div></div>' +
       // toolbar
       '<div class="art-tools">' +
       '<button class="art-tbtn on" id="artFuriBtn" onclick="Articles.toggleFuri()">あ ' + enOr('假名', 'Kana') + '</button>' +
@@ -293,7 +295,7 @@ window.Articles = (function () {
         }
         return '<span class="art-s">' + fr(s) + '</span>';
       }).join('');
-      var trHtml = trans[pi] ? '<div class="art-tr" style="display:' + (zhOn ? 'block' : 'none') + '">' + esc(zc(trans[pi])) + '</div>' : '';
+      var trHtml = trans[pi] ? '<div class="art-tr" style="display:' + (zhOn ? 'block' : 'none') + '">' + esc(Lc(trans[pi],(a.trans_en||[])[pi])) + '</div>' : '';
       return '<div class="art-para" style="font-size:' + FS[fsIdx] + '">' + inner + '</div>' + trHtml;
     }).join('');
     // 讀完往下:重點單字(橘) + 本篇文法(藍),同一頁對照,不用切分頁
@@ -314,7 +316,7 @@ window.Articles = (function () {
       var spk = playable ? '<span class="art-v-spk">🔊</span>' : '<span style="width:38px;flex-shrink:0"></span>';
       // 整行可點播放(不只喇叭);沒預錄音檔的行不綁 onclick、不上手指游標
       var clk = playable ? ' art-v-click" onclick="Articles.say(\'' + esc(key) + '\')' : '';
-      return '<div class="art-v' + clk + '">' + spk + '<div style="min-width:0"><div class="art-v-w">' + esc(v.w) + '</div><div class="art-v-r">' + esc(v.r) + '</div></div><div class="art-v-m">' + esc(zc(v.m)) + '</div></div>';
+      return '<div class="art-v' + clk + '">' + spk + '<div style="min-width:0"><div class="art-v-w">' + esc(v.w) + '</div><div class="art-v-r">' + esc(v.r) + '</div></div><div class="art-v-m">' + esc(Lc(v.m,v.m_en)) + '</div></div>';
     }).join('');
   }
   function renderVocab(a, c) {
@@ -327,7 +329,7 @@ window.Articles = (function () {
     return (a.grammar || []).map(function (gm) {
       var deep = (gm.id && window.GRAMMAR_DETAIL && window.GRAMMAR_DETAIL[gm.id]) ?
         '<button class="art-gd-btn" onclick="Articles.gd(this,\'' + gm.id + '\')">📖 ' + enOr('看完整詳解', 'Full explanation') + ' ▾</button><div class="art-gd-body art-hidden"></div>' : '';
-      return '<div class="art-g"><div class="art-g-t"><b>' + esc(zc(gm.t)) + '</b></div><div class="art-g-n">' + esc(zc(gm.note)) + '</div>' + deep + '</div>';
+      return '<div class="art-g"><div class="art-g-t"><b>' + esc(Lc(gm.t,gm.t_en)) + '</b></div><div class="art-g-n">' + esc(Lc(gm.note,gm.note_en)) + '</div>' + deep + '</div>';
     }).join('');
   }
   function renderGrammar(a, c) {
