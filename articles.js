@@ -1,5 +1,6 @@
 // 文章閱讀(沉浸式分級閱讀,完整課文:內文+逐段中譯+重點單字+文法重點)。
 // 獨立於 content-data.json,不會被內容重匯出覆蓋。body 純日文→渲染時 furiganaHTMLRich 自動 furigana+即點即查,零 API。
+// 多語言:trans/m/note 為繁中(簡中由 OpenCC 轉);_en 欄為英文版。
 window.ARTICLES = [
   {
     "id": "a-n5-1",
@@ -21,45 +22,67 @@ window.ARTICLES = [
       {
         "w": "起きる",
         "r": "おきる",
-        "m": "起床"
+        "m": "起床",
+        "m_en": "to get up"
       },
       {
         "w": "顔",
         "r": "かお",
-        "m": "臉"
+        "m": "臉",
+        "m_en": "face"
       },
       {
         "w": "会社",
         "r": "かいしゃ",
-        "m": "公司"
+        "m": "公司",
+        "m_en": "company"
       },
       {
         "w": "昼",
         "r": "ひる",
-        "m": "中午"
+        "m": "中午",
+        "m_en": "noon"
       },
       {
         "w": "作る",
         "r": "つくる",
-        "m": "做、製作"
+        "m": "做、製作",
+        "m_en": "to make"
       }
     ],
     "grammar": [
       {
         "t": "に(時間)",
         "note": "時間點加「に」:六時に、十一時に。「毎朝」是相對時間,不加に。",
-        "id": "n5-19"
+        "id": "n5-19",
+        "t_en": "に (time)",
+        "note_en": "Add に to a point in time: 六時に, 十一時に. 「毎朝」 is a relative time, so no に."
       },
       {
         "t": "で(交通/地點)",
         "note": "交通工具用で:電車で;動作地點也用で:店で食べる。",
-        "id": "n5-21"
+        "id": "n5-21",
+        "t_en": "で (transport / place)",
+        "note_en": "で for means of transport: 電車で; also for the place of an action: 店で食べる."
       },
       {
         "t": "て形連接",
         "note": "動作接動作用て形:顔を洗って、朝ごはんを食べます。",
-        "id": "n5-53"
+        "id": "n5-53",
+        "t_en": "te-form linking",
+        "note_en": "Use the te-form to link one action to the next: 顔を洗って、朝ごはんを食べます."
       }
+    ],
+    "title_en": "My Day",
+    "topic_en": "Daily life",
+    "trans_en": [
+      "I get up at six every morning. I wash my face and eat breakfast.",
+      "I leave home at 7:30 and take the train to work. Work starts at nine.",
+      "At noon I eat ramen at a shop near the office. It is delicious.",
+      "I finish work at six in the evening. I go home and make dinner.",
+      "At night I study a little Japanese, and go to bed at eleven.",
+      "On weekends I have almost no work. I do things like walk in the park with friends or watch a movie.",
+      "Every day is busy, but my Japanese is getting better little by little, which makes me happy."
     ]
   },
   {
@@ -81,45 +104,66 @@ window.ARTICLES = [
       {
         "w": "伝統的",
         "r": "でんとうてき",
-        "m": "傳統的"
+        "m": "傳統的",
+        "m_en": "traditional"
       },
       {
         "w": "焼く",
         "r": "やく",
-        "m": "烤、燒"
+        "m": "烤、燒",
+        "m_en": "to grill / bake"
       },
       {
         "w": "人気",
         "r": "にんき",
-        "m": "受歡迎"
+        "m": "受歡迎",
+        "m_en": "popular"
       },
       {
         "w": "若い",
         "r": "わかい",
-        "m": "年輕的"
+        "m": "年輕的",
+        "m_en": "young"
       },
       {
         "w": "忙しい",
         "r": "いそがしい",
-        "m": "忙碌的"
+        "m": "忙碌的",
+        "m_en": "busy"
       }
     ],
     "grammar": [
       {
         "t": "や(部分列舉)",
         "note": "舉幾個代表、暗示還有其他:魚や卵、パンやコーヒー。",
-        "id": "n5-28"
+        "id": "n5-28",
+        "t_en": "や (partial listing)",
+        "note_en": "Lists a few representative items, implying there are others: 魚や卵, パンやコーヒー."
       },
       {
         "t": "だけ",
         "note": "「只有」:おにぎりだけ=只有飯糰。",
-        "id": "n5-38"
+        "id": "n5-38",
+        "t_en": "だけ",
+        "note_en": "\"only\": おにぎりだけ = only a rice ball."
       },
       {
         "t": "が人気があります",
         "note": "「~很受歡迎」,對象用が。",
-        "id": ""
+        "id": "",
+        "t_en": "〜が人気があります",
+        "note_en": "\"~ is popular\"; mark the thing with が."
       }
+    ],
+    "title_en": "Japanese Breakfast",
+    "topic_en": "Culture",
+    "trans_en": [
+      "A traditional Japanese breakfast is rice and miso soup.",
+      "Grilled fish and eggs are also common. Nori (seaweed) is popular too.",
+      "Recently, many people have bread and coffee for breakfast — young people especially.",
+      "On busy mornings, some people just eat a rice ball. What do people eat for breakfast in your country?",
+      "Bread and coffee is popular too, but I still prefer rice and miso soup.",
+      "Eat well in the morning and you can spend the whole day full of energy."
     ]
   },
   {
@@ -141,45 +185,66 @@ window.ARTICLES = [
       {
         "w": "咲く",
         "r": "さく",
-        "m": "(花)開"
+        "m": "(花)開",
+        "m_en": "to bloom"
       },
       {
         "w": "集まる",
         "r": "あつまる",
-        "m": "聚集"
+        "m": "聚集",
+        "m_en": "to gather"
       },
       {
         "w": "期間",
         "r": "きかん",
-        "m": "期間"
+        "m": "期間",
+        "m_en": "period"
       },
       {
         "w": "楽しみ",
         "r": "たのしみ",
-        "m": "期待、樂趣"
+        "m": "期待、樂趣",
+        "m_en": "looking forward to / a pleasure"
       },
       {
         "w": "美しい",
         "r": "うつくしい",
-        "m": "美麗的"
+        "m": "美麗的",
+        "m_en": "beautiful"
       }
     ],
     "grammar": [
       {
         "t": "~と(恆常條件)",
         "note": "「一~就~」自然結果:春になると、桜が咲く。",
-        "id": "n4-57"
+        "id": "n4-57",
+        "t_en": "〜と (natural result)",
+        "note_en": "\"as soon as ~\" for a natural result: 春になると、桜が咲く."
       },
       {
         "t": "~たり~たり",
         "note": "列舉代表動作、暗示還有:食べたり飲んだりする。",
-        "id": "n5-56"
+        "id": "n5-56",
+        "t_en": "〜たり〜たり",
+        "note_en": "Lists representative actions, implying others: 食べたり飲んだりする."
       },
       {
         "t": "~てみる",
         "note": "試著做看看:行ってみてください。",
-        "id": "n4-23"
+        "id": "n4-23",
+        "t_en": "〜てみる",
+        "note_en": "Try doing something: 行ってみてください."
       }
+    ],
+    "title_en": "Cherry Blossom Viewing",
+    "topic_en": "Culture",
+    "trans_en": [
+      "When spring comes, cherry blossoms bloom all over Japan.",
+      "People gather in parks and eat bento and drink under the blossoms. This is called \"hanami.\"",
+      "The blossoms are beautiful, but they only bloom for about a week, so everyone looks forward to this season.",
+      "Cherry blossoms lit up at night are beautiful too. Do go and see them once.",
+      "The custom of hanami is very old; people long ago also enjoyed spring watching the blossoms.",
+      "But there are problems like saving spots and litter, so keeping good manners matters."
     ]
   },
   {
@@ -201,45 +266,66 @@ window.ARTICLES = [
       {
         "w": "静か",
         "r": "しずか",
-        "m": "安靜"
+        "m": "安靜",
+        "m_en": "quiet"
       },
       {
         "w": "違反",
         "r": "いはん",
-        "m": "違反"
+        "m": "違反",
+        "m_en": "violation"
       },
       {
         "w": "優先席",
         "r": "ゆうせんせき",
-        "m": "博愛座"
+        "m": "博愛座",
+        "m_en": "priority seat"
       },
       {
         "w": "影響",
         "r": "えいきょう",
-        "m": "影響"
+        "m": "影響",
+        "m_en": "influence / effect"
       },
       {
         "w": "思いやり",
         "r": "おもいやり",
-        "m": "體貼、關懷"
+        "m": "體貼、關懷",
+        "m_en": "consideration / thoughtfulness"
       }
     ],
     "grammar": [
       {
         "t": "~たり~たり",
         "note": "列舉動作:読んだり、見たり、休んだり。",
-        "id": "n5-56"
+        "id": "n5-56",
+        "t_en": "〜たり〜たり",
+        "note_en": "Lists actions: 読んだり、見たり、休んだり."
       },
       {
         "t": "~ように言われる",
         "note": "被要求(做)~:電源を切るように言われる。",
-        "id": ""
+        "id": "",
+        "t_en": "〜ように言われる",
+        "note_en": "To be asked/told to do ~: 電源を切るように言われる."
       },
       {
         "t": "~という(名詞化引用)",
         "note": "「~という考え方」引用內容/名稱。",
-        "id": "n5-68"
+        "id": "n5-68",
+        "t_en": "〜という (quoting / naming)",
+        "note_en": "\"the idea/name called ~\" — quotes content or a name."
       }
+    ],
+    "title_en": "Etiquette on the Train",
+    "topic_en": "Everyday life",
+    "trans_en": [
+      "Japanese trains are very quiet. Many people read, look at their phones, or rest with their eyes closed.",
+      "Talking on the phone on the train is considered bad manners. When you need to, you get off at the station first.",
+      "Also, near the priority seats you may be asked to turn your phone off, because it could affect things like pacemakers.",
+      "Behind these manners is the Japanese idea of \"not causing trouble to those around you.\" More than rules, it is consideration for one another.",
+      "These manners exist so that many people can use the train comfortably.",
+      "When you think not only of yourself but of those around you, everyone can travel comfortably."
     ]
   },
   {
@@ -261,45 +347,66 @@ window.ARTICLES = [
       {
         "w": "首都",
         "r": "しゅと",
-        "m": "首都"
+        "m": "首都",
+        "m_en": "capital"
       },
       {
         "w": "残る",
         "r": "のこる",
-        "m": "留下、殘存"
+        "m": "留下、殘存",
+        "m_en": "to remain"
       },
       {
         "w": "訪れる",
         "r": "おとずれる",
-        "m": "造訪"
+        "m": "造訪",
+        "m_en": "to visit"
       },
       {
         "w": "曲がる",
         "r": "まがる",
-        "m": "轉彎"
+        "m": "轉彎",
+        "m_en": "to turn (a corner)"
       },
       {
         "w": "魅力",
         "r": "みりょく",
-        "m": "魅力"
+        "m": "魅力",
+        "m_en": "charm / appeal"
       }
     ],
     "grammar": [
       {
         "t": "~ごとに",
         "note": "「每~」:季節ごとに=每個季節。",
-        "id": ""
+        "id": "",
+        "t_en": "〜ごとに",
+        "note_en": "\"every ~\": 季節ごとに = every season."
       },
       {
         "t": "~ても(讓步)",
         "note": "「即使~也」:何度訪れてもあきない。",
-        "id": "n3-73"
+        "id": "n3-73",
+        "t_en": "〜ても (concession)",
+        "note_en": "\"even if ~\": 何度訪れてもあきない."
       },
       {
         "t": "~だけでなく",
         "note": "「不只~(還)」:観光地だけでなく、小さな店も。",
-        "id": "n2-27"
+        "id": "n2-27",
+        "t_en": "〜だけでなく",
+        "note_en": "\"not only ~ (but also)\": 観光地だけでなく、小さな店も."
       }
+    ],
+    "title_en": "Walking Through Kyoto, the Old Capital",
+    "topic_en": "Travel",
+    "trans_en": [
+      "Kyoto was Japan’s capital over a thousand years ago. Many old temples and shrines still remain there today.",
+      "Cherry blossoms in spring and red leaves in autumn are beautiful; each season shows a different face, so you never tire of it no matter how often you visit.",
+      "When traveling in Kyoto, it’s best to walk slowly without rushing. Turn down a side street and you’ll come across quiet temples and old-fashioned cafes.",
+      "Not just the famous sights — if you visit the small shops the locals go to, you’ll surely see the real charm of Kyoto.",
+      "Kyoto shows a different face each season. The cherry blossoms in spring and the red leaves in autumn are beautiful.",
+      "Protecting old buildings while also taking in new culture — that is exactly Kyoto’s charm."
     ]
   },
   {
@@ -321,45 +428,66 @@ window.ARTICLES = [
       {
         "w": "便利",
         "r": "べんり",
-        "m": "方便"
+        "m": "方便",
+        "m_en": "convenient"
       },
       {
         "w": "支払い",
         "r": "しはらい",
-        "m": "支付、繳費"
+        "m": "支付、繳費",
+        "m_en": "payment"
       },
       {
         "w": "発送",
         "r": "はっそう",
-        "m": "寄送"
+        "m": "寄送",
+        "m_en": "shipping / sending"
       },
       {
         "w": "欠かせない",
         "r": "かかせない",
-        "m": "不可或缺的"
+        "m": "不可或缺的",
+        "m_en": "indispensable"
       },
       {
         "w": "存在",
         "r": "そんざい",
-        "m": "存在"
+        "m": "存在",
+        "m_en": "existence / presence"
       }
     ],
     "grammar": [
       {
         "t": "~だけでなく",
         "note": "「不只~(還)」。",
-        "id": "n2-27"
+        "id": "n2-27",
+        "t_en": "〜だけでなく",
+        "note_en": "\"not only ~ (but also).\""
       },
       {
         "t": "~ので",
         "note": "「因為~」,較客觀委婉:ATM があるので。",
-        "id": "n4-7"
+        "id": "n4-7",
+        "t_en": "〜ので",
+        "note_en": "\"because ~,\" more objective and soft: ATM があるので."
       },
       {
         "t": "~おかげで",
         "note": "「多虧~」正面原因:サービスのおかげで。",
-        "id": "n3-6"
+        "id": "n3-6",
+        "t_en": "〜おかげで",
+        "note_en": "\"thanks to ~,\" a positive cause: サービスのおかげで."
       }
+    ],
+    "title_en": "The Convenience of Convenience Stores",
+    "topic_en": "Everyday life",
+    "trans_en": [
+      "Japanese convenience stores are open 24 hours and are very convenient.",
+      "You can buy not only food and drinks but also magazines and daily goods. You can even pay utility bills and send parcels.",
+      "Because there are bank ATMs, you can withdraw cash anytime. There are also machines for copying and booking tickets.",
+      "Thanks to these services, convenience stores have become an indispensable part of our lives.",
+      "However, behind that convenience hide the hard work of people working 24 hours and problems like food waste.",
+      "Rather than taking convenience for granted, I want to think about the people who support the system too."
     ]
   },
   {
@@ -381,45 +509,66 @@ window.ARTICLES = [
       {
         "w": "一人暮らし",
         "r": "ひとりぐらし",
-        "m": "獨居"
+        "m": "獨居",
+        "m_en": "living alone"
       },
       {
         "w": "洗濯",
         "r": "せんたく",
-        "m": "洗衣"
+        "m": "洗衣",
+        "m_en": "laundry"
       },
       {
         "w": "改めて",
         "r": "あらためて",
-        "m": "重新、再次"
+        "m": "重新、再次",
+        "m_en": "anew / again"
       },
       {
         "w": "判断",
         "r": "はんだん",
-        "m": "判斷"
+        "m": "判斷",
+        "m_en": "judgment"
       },
       {
         "w": "有難い",
         "r": "ありがたい",
-        "m": "值得感謝的"
+        "m": "值得感謝的",
+        "m_en": "grateful / to be thankful for"
       }
     ],
     "grammar": [
       {
         "t": "~てみると",
         "note": "「實際做了~之後(發現)」:暮らしてみると。",
-        "id": ""
+        "id": "",
+        "t_en": "〜てみると",
+        "note_en": "\"once you actually do ~ (you find that)\": 暮らしてみると."
       },
       {
         "t": "~なければならない",
         "note": "「必須~」義務:自分でやらなければならない。",
-        "id": "n4-16"
+        "id": "n4-16",
+        "t_en": "〜なければならない",
+        "note_en": "\"must ~,\" obligation: 自分でやらなければならない."
       },
       {
         "t": "~ようになる",
         "note": "「變得~」自然變化:考えるようになった。",
-        "id": "n3-40"
+        "id": "n3-40",
+        "t_en": "〜ようになる",
+        "note_en": "\"come to ~,\" a natural change: 考えるようになった."
       }
+    ],
+    "title_en": "What I Learned Living Alone",
+    "topic_en": "Everyday life",
+    "trans_en": [
+      "When I started university, I lived alone for the first time. At first, being free felt great.",
+      "But once I actually started living, I realized I had to do everything myself — cooking, laundry, cleaning. It made me newly aware of how much my parents had done for me.",
+      "I also began to think about how I spend money. Within a limited budget, you naturally learn to judge what you truly need.",
+      "Living alone has many hard parts, but it builds the ability to take care of yourself. And most of all, I came to appreciate my family more than before.",
+      "Being alone can be lonely, but in exchange you can use your own time freely.",
+      "Realizing how precious family is also came only after I started living apart from them."
     ]
   },
   {
@@ -441,45 +590,66 @@ window.ARTICLES = [
       {
         "w": "公共",
         "r": "こうきょう",
-        "m": "公共"
+        "m": "公共",
+        "m_en": "public"
       },
       {
         "w": "広まる",
         "r": "ひろまる",
-        "m": "普及、擴散"
+        "m": "普及、擴散",
+        "m_en": "to spread"
       },
       {
         "w": "見直す",
         "r": "みなおす",
-        "m": "重新看待、重新評價"
+        "m": "重新看待、重新評價",
+        "m_en": "to reappraise / see anew"
       },
       {
         "w": "つながり",
         "r": "つながり",
-        "m": "連結、關係"
+        "m": "連結、關係",
+        "m_en": "connection / bond"
       },
       {
         "w": "距離",
         "r": "きょり",
-        "m": "距離"
+        "m": "距離",
+        "m_en": "distance"
       }
     ],
     "grammar": [
       {
         "t": "~とは",
         "note": "「所謂~(是)」下定義:銭湯とは~のことだ。",
-        "id": ""
+        "id": "",
+        "t_en": "〜とは",
+        "note_en": "Defines a term: 銭湯とは~のことだ."
       },
       {
         "t": "~ていく",
         "note": "「逐漸~下去」變化趨勢:減っていった。",
-        "id": "n3-67"
+        "id": "n3-67",
+        "t_en": "〜ていく",
+        "note_en": "\"gradually ~,\" a trend of change: 減っていった."
       },
       {
         "t": "~つつある",
         "note": "「正逐漸~」書面:失いつつある。",
-        "id": "n2-1"
+        "id": "n2-1",
+        "t_en": "〜つつある",
+        "note_en": "\"is gradually ~,\" written style: 失いつつある."
       }
+    ],
+    "title_en": "The Culture of Public Bathhouses",
+    "topic_en": "Culture",
+    "trans_en": [
+      "A sento is a public bath everyone soaks in together. Long ago many homes had no bath, so the sento was an essential part of life.",
+      "As home baths spread, the number of sento kept falling. But recently their merits are being appreciated again.",
+      "Soaking slowly in a large bath relaxes not just the body but the mind. Sometimes you even strike up a natural conversation with a stranger sitting nearby.",
+      "Perhaps as we chase convenience too far, we are gradually losing our connections with people. The sento is a place that, in such times, reminds us of the closeness between people.",
+      "A sento is not just a place to wash the body; it was also a place where local people met and mingled.",
+      "Now that every home has a bath, their numbers are falling — but plenty of people are rediscovering that warmth."
     ]
   },
   {
@@ -501,45 +671,66 @@ window.ARTICLES = [
       {
         "w": "減る",
         "r": "へる",
-        "m": "減少"
+        "m": "減少",
+        "m_en": "to decrease"
       },
       {
         "w": "負担",
         "r": "ふたん",
-        "m": "負擔"
+        "m": "負擔",
+        "m_en": "burden"
       },
       {
         "w": "両立",
         "r": "りょうりつ",
-        "m": "兼顧、並立"
+        "m": "兼顧、並立",
+        "m_en": "balancing / having both"
       },
       {
         "w": "支える",
         "r": "ささえる",
-        "m": "支撐"
+        "m": "支撐",
+        "m_en": "to support"
       },
       {
         "w": "対策",
         "r": "たいさく",
-        "m": "對策"
+        "m": "對策",
+        "m_en": "countermeasure"
       }
     ],
     "grammar": [
       {
         "t": "~続ける",
         "note": "「持續~」:減り続けている。",
-        "id": "n4-27"
+        "id": "n4-27",
+        "t_en": "〜続ける",
+        "note_en": "\"keep ~ing\": 減り続けている."
       },
       {
         "t": "~たり~たりする",
         "note": "列舉可能情況:弱くなったり、立ちゆかなくなったり。",
-        "id": "n5-56"
+        "id": "n5-56",
+        "t_en": "〜たり〜たりする",
+        "note_en": "Lists possible situations: 弱くなったり、立ちゆかなくなったり."
       },
       {
         "t": "~おそれがある",
         "note": "「有~的危險/可能」負面:立ちゆかなくなるおそれがある。",
-        "id": ""
+        "id": "",
+        "t_en": "〜おそれがある",
+        "note_en": "\"there is a risk/danger of ~,\" negative: 立ちゆかなくなるおそれがある."
       }
+    ],
+    "title_en": "The Advancing Birth-Rate Decline",
+    "topic_en": "News",
+    "trans_en": [
+      "The number of children in Japan keeps falling. This is called \"shōshika\" (declining birth rate).",
+      "There is more than one cause. More people not marrying, the heavy cost of raising children, the difficulty of balancing work and childcare — various reasons are intertwined.",
+      "As children decrease, the future working population shrinks too. As a result, economic strength may weaken and the systems supporting the elderly may become hard to sustain.",
+      "The government is pushing various measures, but they are not enough yet. How society as a whole creates an environment where it’s easy to raise children is being tested.",
+      "The background of the declining birth rate is said to lie in the heavy burden of marriage and child-rearing.",
+      "If this continues, the working population will shrink, and supporting society as a whole will become difficult."
     ]
   },
   {
@@ -561,45 +752,66 @@ window.ARTICLES = [
       {
         "w": "同僚",
         "r": "どうりょう",
-        "m": "同事"
+        "m": "同事",
+        "m_en": "colleague"
       },
       {
         "w": "本音",
         "r": "ほんね",
-        "m": "真心話"
+        "m": "真心話",
+        "m_en": "true feelings / real intent"
       },
       {
         "w": "気軽",
         "r": "きがる",
-        "m": "輕鬆、隨意"
+        "m": "輕鬆、隨意",
+        "m_en": "casual / easygoing"
       },
       {
         "w": "強制",
         "r": "きょうせい",
-        "m": "強制"
+        "m": "強制",
+        "m_en": "compulsion / forcing"
       },
       {
         "w": "多様",
         "r": "たよう",
-        "m": "多元、多樣"
+        "m": "多元、多樣",
+        "m_en": "diverse"
       }
     ],
     "grammar": [
       {
         "t": "~にくい",
         "note": "「難以~」:言いにくい。",
-        "id": "n4-5"
+        "id": "n4-5",
+        "t_en": "〜にくい",
+        "note_en": "\"hard to ~\": 言いにくい."
       },
       {
         "t": "一方で",
         "note": "「另一方面」對比:~という人も多い。一方で、~。",
-        "id": "n2-14"
+        "id": "n2-14",
+        "t_en": "一方で",
+        "note_en": "\"on the other hand,\" contrast: ~という人も多い。一方で、~."
       },
       {
         "t": "~つつある",
         "note": "「正逐漸~」:変わりつつある。",
-        "id": "n2-1"
+        "id": "n2-1",
+        "t_en": "〜つつある",
+        "note_en": "\"is gradually ~\": 変わりつつある."
       }
+    ],
+    "title_en": "Nomunication (Bonding over Drinks)",
+    "topic_en": "Workplace",
+    "trans_en": [
+      "At Japanese companies, people often go drinking with colleagues or bosses after work. This is called \"nomunication\" (drinking + communication).",
+      "Over drinks, you can say things hard to say normally, and talk casually with your boss. Many see it as a good chance to deepen relationships.",
+      "On the other hand, among younger generations more people feel their after-work time is their own, and quite a few dislike being made to attend.",
+      "Now that ways of working and values have grown diverse, the form of \"nomunication\" may also be changing little by little.",
+      "But among young people today, more and more want to keep work and private life clearly separate.",
+      "The ideal is surely being able to build trust through everyday conversation, without relying on alcohol."
     ]
   },
   {
@@ -621,45 +833,66 @@ window.ARTICLES = [
       {
         "w": "発達",
         "r": "はったつ",
-        "m": "發達"
+        "m": "發達",
+        "m_en": "development"
       },
       {
         "w": "取り入れる",
         "r": "とりいれる",
-        "m": "採用、引進"
+        "m": "採用、引進",
+        "m_en": "to adopt / introduce"
       },
       {
         "w": "区別",
         "r": "くべつ",
-        "m": "區別"
+        "m": "區別",
+        "m_en": "distinction"
       },
       {
         "w": "調整",
         "r": "ちょうせい",
-        "m": "調整"
+        "m": "調整",
+        "m_en": "adjustment"
       },
       {
         "w": "必要",
         "r": "ひつよう",
-        "m": "必要"
+        "m": "必要",
+        "m_en": "necessary"
       }
     ],
     "grammar": [
       {
         "t": "~にともなって",
         "note": "「隨著~」連動變化:発達にともなって。",
-        "id": "n2-50"
+        "id": "n2-50",
+        "t_en": "〜にともなって",
+        "note_en": "\"along with ~,\" linked change: 発達にともなって."
       },
       {
         "t": "一方で",
         "note": "「另一方面」對比正反面。",
-        "id": "n2-14"
+        "id": "n2-14",
+        "t_en": "一方で",
+        "note_en": "\"on the other hand,\" contrasting two sides."
       },
       {
         "t": "~ていく",
         "note": "「~下去」持續:考えていく必要がある。",
-        "id": "n3-67"
+        "id": "n3-67",
+        "t_en": "〜ていく",
+        "note_en": "\"~ going forward,\" continuing: 考えていく必要がある."
       }
+    ],
+    "title_en": "Changing Ways of Working",
+    "topic_en": "Society",
+    "trans_en": [
+      "In recent years, with the development of the internet, the way we work has changed greatly.",
+      "More companies are adopting \"telework,\" working from home rather than going to the office. Commute time drops, but there is also the problem of work and life being hard to separate.",
+      "In addition, more people now work adjusting their own hours rather than fixed times.",
+      "To match such changes, we too need to rethink new ways of working.",
+      "With the spread of telework, freedom over where and when to work has risen; on the other hand, a new issue has emerged — the line between work and life blurring.",
+      "From now on, society needs an environment where each person can choose the way of working that suits them."
     ]
   },
   {
@@ -681,45 +914,66 @@ window.ARTICLES = [
       {
         "w": "雰囲気",
         "r": "ふんいき",
-        "m": "氣氛"
+        "m": "氣氛",
+        "m_en": "atmosphere / mood"
       },
       {
         "w": "察する",
         "r": "さっする",
-        "m": "察覺、體會"
+        "m": "察覺、體會",
+        "m_en": "to sense / perceive"
       },
       {
         "w": "衝突",
         "r": "しょうとつ",
-        "m": "衝突"
+        "m": "衝突",
+        "m_en": "conflict / collision"
       },
       {
         "w": "調和",
         "r": "ちょうわ",
-        "m": "和諧、調和"
+        "m": "和諧、調和",
+        "m_en": "harmony"
       },
       {
         "w": "特徴",
         "r": "とくちょう",
-        "m": "特徵"
+        "m": "特徵",
+        "m_en": "characteristic / feature"
       }
     ],
     "grammar": [
       {
         "t": "~うえで",
         "note": "「在~方面」:調和を保つうえで役立つ。",
-        "id": ""
+        "id": "",
+        "t_en": "〜うえで",
+        "note_en": "\"in terms of ~ / when doing ~\": 調和を保つうえで役立つ."
       },
       {
         "t": "その反面",
         "note": "「另一面、相反地」:役立つ。その反面、問題もある。",
-        "id": "n3-79"
+        "id": "n3-79",
+        "t_en": "その反面",
+        "note_en": "\"on the other hand / conversely\": 役立つ。その反面、問題もある."
       },
       {
         "t": "~べきではないだろうか",
         "note": "「不應該~嗎」委婉主張:大切にされるべきではないか。",
-        "id": "n3-61"
+        "id": "n3-61",
+        "t_en": "〜べきではないだろうか",
+        "note_en": "\"shouldn’t we ~?\" a soft assertion: 大切にされるべきではないか."
       }
+    ],
+    "title_en": "\"Reading the Air\"",
+    "topic_en": "Culture",
+    "trans_en": [
+      "Japanese has the phrase \"reading the air.\" It means sensing the mood of the moment and the other person’s feelings, and acting appropriately even without being told.",
+      "For example, when everyone in a meeting agrees, it takes courage for one person to voice an objection. Most people \"read the air\" and deliberately stay silent.",
+      "This sense has long been useful for avoiding conflict and keeping group harmony. But on the flip side, there’s the problem of truly necessary opinions going unsaid and minority voices being silenced.",
+      "The ability to read the air is indeed one feature of Japanese society. But shouldn’t the courage to sometimes not read it and speak up be valued too?",
+      "Reading the air can be a kindness — consideration for others — but taken too far, you become unable to voice your own opinion.",
+      "What matters is surely the balance between fitting in with those around you and expressing your own thoughts."
     ]
   },
   {
@@ -741,45 +995,66 @@ window.ARTICLES = [
       {
         "w": "具合",
         "r": "ぐあい",
-        "m": "狀況、情形"
+        "m": "狀況、情形",
+        "m_en": "condition / state"
       },
       {
         "w": "迷う",
         "r": "まよう",
-        "m": "猶豫、迷惘"
+        "m": "猶豫、迷惘",
+        "m_en": "to hesitate / be unsure"
       },
       {
         "w": "抱え込む",
         "r": "かかえこむ",
-        "m": "獨自承擔"
+        "m": "獨自承擔",
+        "m_en": "to bottle up / handle alone"
       },
       {
         "w": "信頼",
         "r": "しんらい",
-        "m": "信賴"
+        "m": "信賴",
+        "m_en": "trust"
       },
       {
         "w": "築く",
         "r": "きずく",
-        "m": "建立、構築"
+        "m": "建立、構築",
+        "m_en": "to build"
       }
     ],
     "grammar": [
       {
         "t": "~かどうか",
         "note": "「是否~」間接疑問:できるかどうかで変わる。",
-        "id": "n4-43"
+        "id": "n4-43",
+        "t_en": "〜かどうか",
+        "note_en": "\"whether or not ~,\" indirect question: できるかどうかで変わる."
       },
       {
         "t": "~かねない",
         "note": "「有可能~(壞事)」:トラブルに発展しかねない。",
-        "id": "n2-38"
+        "id": "n2-38",
+        "t_en": "〜かねない",
+        "note_en": "\"could end up ~ (something bad)\": トラブルに発展しかねない."
       },
       {
         "t": "~うえで",
         "note": "「在~方面」:チームで働くうえで。",
-        "id": ""
+        "id": "",
+        "t_en": "〜うえで",
+        "note_en": "\"in / for doing ~\": チームで働くうえで."
       }
+    ],
+    "title_en": "Report, Contact, Consult (Hō-Ren-Sō)",
+    "topic_en": "Workplace",
+    "trans_en": [
+      "When you join a Japanese company, the first thing you’re taught is the importance of \"hō-ren-sō.\" It’s a word made from the first characters of \"report, contact, consult.\"",
+      "Reporting progress to your boss, passing on necessary information to those involved, and consulting early when unsure — whether you can do these greatly changes how smoothly work goes.",
+      "If you carry a problem alone and report late, a small mistake can grow into big trouble. Conversely, if you share information diligently, those around you can help early.",
+      "Hō-ren-sō is not just a rule. In teamwork, it is the basic communication for building mutual trust.",
+      "In a workplace where hō-ren-sō doesn’t work well, small mistakes easily grow into big problems.",
+      "Conversely, sharing information diligently raises the whole team’s trust and efficiency."
     ]
   },
   {
@@ -801,45 +1076,66 @@ window.ARTICLES = [
       {
         "w": "押し寄せる",
         "r": "おしよせる",
-        "m": "湧入、蜂擁而至"
+        "m": "湧入、蜂擁而至",
+        "m_en": "to surge / flood in"
       },
       {
         "w": "利益",
         "r": "りえき",
-        "m": "利益"
+        "m": "利益",
+        "m_en": "profit"
       },
       {
         "w": "脅かす",
         "r": "おびやかす",
-        "m": "威脅"
+        "m": "威脅",
+        "m_en": "to threaten"
       },
       {
         "w": "制限",
         "r": "せいげん",
-        "m": "限制"
+        "m": "限制",
+        "m_en": "restriction / limit"
       },
       {
         "w": "尊重",
         "r": "そんちょう",
-        "m": "尊重"
+        "m": "尊重",
+        "m_en": "respect"
       }
     ],
     "grammar": [
       {
         "t": "~に対して",
         "note": "「針對~、對於~」:問題に対して。",
-        "id": "n3-2"
+        "id": "n3-2",
+        "t_en": "〜に対して",
+        "note_en": "\"toward / regarding ~\": 問題に対して."
       },
       {
         "t": "~かねない",
         "note": "「有可能~(壞事)」:失われかねない。",
-        "id": "n2-38"
+        "id": "n2-38",
+        "t_en": "〜かねない",
+        "note_en": "\"could end up ~ (bad)\": 失われかねない."
       },
       {
         "t": "~てこそ",
         "note": "「正因為~才」:尊重してこそ豊かになる。",
-        "id": ""
+        "id": "",
+        "t_en": "〜てこそ",
+        "note_en": "\"only by ~ (does it)\": 尊重してこそ豊かになる."
       }
+    ],
+    "title_en": "Thinking About Overtourism",
+    "topic_en": "Travel",
+    "trans_en": [
+      "In recent years, huge numbers of tourists from home and abroad flood popular sightseeing spots. While tourism brings great profit to a region, it has also created a problem called \"overtourism.\"",
+      "For example, roads packed with tourists so residents can’t get through, and rising litter and bad manners. People who lived quietly have had their daily lives threatened.",
+      "In response, some areas have limited visitor numbers or introduced a tourist tax. But if the rules are too strict, the appeal of tourism itself may be lost.",
+      "What matters is that visitors not forget respect for the place. Precisely by respecting that land’s culture and rules, tourism can become enriching for travelers and residents alike, can’t it?",
+      "Tourism brings money to a region, but on the other hand it can threaten residents’ lives.",
+      "What’s needed now is building a system where both visitors and residents can feel at ease."
     ]
   },
   {
@@ -861,45 +1157,66 @@ window.ARTICLES = [
       {
         "w": "及ぼす",
         "r": "およぼす",
-        "m": "造成、波及"
+        "m": "造成、波及",
+        "m_en": "to bring about / exert"
       },
       {
         "w": "被害",
         "r": "ひがい",
-        "m": "災害、損害"
+        "m": "災害、損害",
+        "m_en": "damage / harm"
       },
       {
         "w": "深刻",
         "r": "しんこく",
-        "m": "嚴重"
+        "m": "嚴重",
+        "m_en": "serious / grave"
       },
       {
         "w": "積み重ね",
         "r": "つみかさね",
-        "m": "累積"
+        "m": "累積",
+        "m_en": "accumulation"
       },
       {
         "w": "世代",
         "r": "せだい",
-        "m": "世代"
+        "m": "世代",
+        "m_en": "generation"
       }
     ],
     "grammar": [
       {
         "t": "~ばかりだ",
         "note": "「一味地、越來越~」單向變化:深刻さを増すばかりだ。",
-        "id": "n2-2"
+        "id": "n2-2",
+        "t_en": "〜ばかりだ",
+        "note_en": "\"only keeps ~ing,\" one-way change: 深刻さを増すばかりだ."
       },
       {
         "t": "~こそ",
         "note": "「正是~才」強調:積み重ねこそが変化につながる。",
-        "id": "n3-64"
+        "id": "n3-64",
+        "t_en": "〜こそ",
+        "note_en": "\"it is precisely ~ that,\" emphasis: 積み重ねこそが変化につながる."
       },
       {
         "t": "~ためにも",
         "note": "「為了~也」:世代に残すためにも行動を。",
-        "id": "n4-17"
+        "id": "n4-17",
+        "t_en": "〜ためにも",
+        "note_en": "\"for the sake of ~ too\": 世代に残すためにも行動を."
       }
+    ],
+    "title_en": "Global Warming and Our Lives",
+    "topic_en": "Environment",
+    "trans_en": [
+      "Global warming is no longer a matter of the distant future; it is a problem directly affecting our lives.",
+      "Crop damage from abnormal weather and disasters from rising sea levels grow worse year by year. Facing such a situation, one may feel there is little each person can do.",
+      "Yet small accumulations — cutting wasteful electricity use, using public transport more — are exactly the key that leads to major change.",
+      "To leave a rich earth for future generations, we are now called to put it into action.",
+      "Warming is not a matter of some far-off country; it is a problem directly tied to our dinner tables and daily lives.",
+      "We must not forget that the accumulation of each person’s small actions will, in time, bring about great change."
     ]
   },
   {
@@ -921,45 +1238,66 @@ window.ARTICLES = [
       {
         "w": "普及",
         "r": "ふきゅう",
-        "m": "普及"
+        "m": "普及",
+        "m_en": "spread / diffusion"
       },
       {
         "w": "本質",
         "r": "ほんしつ",
-        "m": "本質"
+        "m": "本質",
+        "m_en": "essence"
       },
       {
         "w": "見極める",
         "r": "みきわめる",
-        "m": "看清、辨別"
+        "m": "看清、辨別",
+        "m_en": "to discern / see clearly"
       },
       {
         "w": "吟味",
         "r": "ぎんみ",
-        "m": "仔細審視"
+        "m": "仔細審視",
+        "m_en": "careful examination"
       },
       {
         "w": "問い直す",
         "r": "といなおす",
-        "m": "重新追問"
+        "m": "重新追問",
+        "m_en": "to question anew"
       }
     ],
     "grammar": [
       {
         "t": "~により",
         "note": "「由於~、透過~」:普及により、低くなった。",
-        "id": "n3-4"
+        "id": "n3-4",
+        "t_en": "〜により",
+        "note_en": "\"due to / by means of ~\": 普及により、低くなった."
       },
       {
         "t": "~どころか",
         "note": "「別說~、非但~反而」:失われるどころか、問い直されている。",
-        "id": "n2-25"
+        "id": "n2-25",
+        "t_en": "〜どころか",
+        "note_en": "\"far from ~; on the contrary\": 失われるどころか、問い直されている."
       },
       {
         "t": "~からこそ",
         "note": "「正因為~才」:時代だからこそ、重要になっている。",
-        "id": "n2-9"
+        "id": "n2-9",
+        "t_en": "〜からこそ",
+        "note_en": "\"precisely because ~\": 時代だからこそ、重要になっている."
       }
+    ],
+    "title_en": "The Meaning of \"Learning\" in the AI Age",
+    "topic_en": "News",
+    "trans_en": [
+      "With the rapid spread of generative AI, the barrier to acquiring knowledge has dropped lower than ever. Ask a question and AI gives an answer in an instant.",
+      "In such times, one even hears voices saying \"humans no longer need to make the effort to learn.\" But that seems to misunderstand the essence of learning.",
+      "Learning is not just obtaining answers. Discerning whether information is correct, comparing multiple ideas, making your own judgment — it is precisely in this process that the ability to think is cultivated. Whether you can critically examine the answers AI gives depends on the depth of that person’s learning.",
+      "Precisely because it’s an age when answers come easily, the attitude of continuing to ask \"why is it so\" matters more than ever. The meaning of learning has not been lost; rather, it is being questioned anew.",
+      "Precisely because we live in an age when AI gives instant answers, the attitude of continuing to ask \"why\" becomes all the more important.",
+      "Rather than hoarding knowledge, how you use it and how you judge will become the core of learning from now on."
     ]
   }
 ];
