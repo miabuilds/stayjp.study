@@ -3,10 +3,17 @@
 window.Kana = (function () {
   'use strict';
   var script = 'h';   // 'h' 平假名 / 'k' 片假名
+  var chartMode = 'sound';   // 'sound' 點格發音(不跳頁) / 'stroke' 點格看筆順+描寫
   var SEC = [['seion', '清音'], ['dakuon', '濁音'], ['handakuon', '半濁音'], ['youon', '拗音']];
   function K() { return window.KANA || {}; }
   function enOr(zh, en) { try { return localStorage.getItem('ui_lang') === 'en' ? en : zh; } catch (e) { return zh; } }
-  function play(h) { if (h && window.__TTS && window.__TTS[h] && typeof speak === 'function') speak(h); }
+  // 播放走自帶 Audio + 版本號(?v=):純預錄 mp3(不用瀏覽器語音),改版 bump 版本號即強制抓新檔,避開 immutable 快取。
+  var KANA_AUDIO_VER = '2', _kAudio = null;
+  function play(h) {
+    if (!h || !window.__TTS || !window.__TTS[h]) return;
+    var base = window.ttsUrl ? window.ttsUrl(window.__TTS[h]) : 'audio/tts/' + window.__TTS[h] + '.mp3';
+    try { if (_kAudio) _kAudio.pause(); _kAudio = new Audio(base + (base.indexOf('?') < 0 ? '?v=' : '&v=') + KANA_AUDIO_VER); _kAudio.play().catch(function () {}); } catch (e) {}
+  }
   function hex(ch) { return ch.codePointAt(0).toString(16).padStart(5, '0'); }
   function single(ch) { return ch && [].concat.apply([], [ch]).join('').length && [...ch].length === 1; }
 
@@ -23,6 +30,15 @@ window.Kana = (function () {
       '.kana-tab{flex:1;min-width:90px;border:1px solid var(--bd,#ddd);background:var(--bg2,#fff);color:var(--tx2,#666);border-radius:10px;padding:9px;font-size:15px;font-weight:700;cursor:pointer}',
       '.kana-tab.on{background:var(--ac2,#e8734a);color:#fff;border-color:var(--ac2,#e8734a)}',
       '.kana-quiz-btn{border:none;background:var(--ac,#d4654a);color:#fff;border-radius:10px;padding:9px 16px;font-size:14px;font-weight:700;cursor:pointer}',
+      '.kana-modes{display:flex;gap:8px;margin:0 0 8px;flex-wrap:wrap}',
+      '.kana-mode-btn{border:1px solid var(--bd,#ddd);background:var(--bg2,#fff);color:var(--tx2,#666);border-radius:10px;padding:9px 15px;font-size:14px;font-weight:700;cursor:pointer;min-height:40px}',
+      '.kana-mode-btn.on{background:var(--ac2,#e8734a);color:#fff;border-color:var(--ac2,#e8734a)}',
+      '.kana-hint{font-size:12px;color:var(--tx3,#aaa);margin-bottom:6px}',
+      '.kana-cell-on{background:var(--ac2,#e8734a)!important}',
+      '.kana-cell-on .kana-c{color:#fff!important}',
+      '.kana-cell-on .kana-r{color:rgba(255,255,255,.9)!important}',
+      '.kana-back{border:none;background:none;cursor:pointer;color:var(--ac,#d4654a);font-size:15px;font-weight:700;padding:6px 10px 6px 4px;border-radius:10px;font-family:inherit}',
+      '.kana-back:active{background:rgba(212,101,74,.1)}',
       '.kana-sec-h{font-size:14px;font-weight:800;color:var(--ac,#d4654a);margin:20px 0 8px}',
       '.kana-grid{display:grid;gap:6px}',
       '.kana-grid.c5{grid-template-columns:repeat(5,1fr)}',
@@ -70,7 +86,8 @@ window.Kana = (function () {
         for (var i = 0; i < cols; i++) {
           var c = row[i];
           if (!c) { h += '<div class="kana-cell empty"></div>'; continue; }
-          h += '<div class="kana-cell" onclick="Kana.detail(\'' + c.h + '\')"><div class="kana-c">' + (script === 'h' ? c.h : c.k) + '</div><div class="kana-r">' + c.r + '</div></div>';
+          var oc = (chartMode === 'stroke') ? ('Kana.detail(\'' + c.h + '\')') : ('Kana.tap(this,\'' + c.h + '\')');
+          h += '<div class="kana-cell" onclick="' + oc + '"><div class="kana-c">' + (script === 'h' ? c.h : c.k) + '</div><div class="kana-r">' + c.r + '</div></div>';
         }
       });
       h += '</div>';
@@ -78,20 +95,33 @@ window.Kana = (function () {
     return h;
   }
 
-  function open() {
+  function open() { chartMode = 'sound'; renderChart(); }        // 進來就是「發音表」(點格出聲、不跳頁)
+  function openStroke() { chartMode = 'stroke'; renderChart(); }   // 筆順模式(點格看筆順+描寫)
+  function renderChart() {
     ensureCss(); close();
+    var soundHint = enOr('點任一格聽發音', 'Tap a kana to hear it');
+    var strokeHint = enOr('點任一格看筆順 + 描寫練習', 'Tap a kana for stroke order & tracing');
     var h = '<div id="kanaMask"><div class="kana-wrap">' +
       '<div class="kana-top"><b>あ ' + enOr('五十音', 'Kana') + '</b><span class="kana-x" onclick="Kana.close()">✕</span></div>' +
       '<div class="kana-tabs">' +
       '<button class="kana-tab ' + (script === 'h' ? 'on' : '') + '" onclick="Kana.setScript(\'h\')">ひらがな</button>' +
       '<button class="kana-tab ' + (script === 'k' ? 'on' : '') + '" onclick="Kana.setScript(\'k\')">カタカナ</button>' +
+      '</div>' +
+      '<div class="kana-modes">' +
+      '<button class="kana-mode-btn ' + (chartMode === 'sound' ? 'on' : '') + '" onclick="Kana.setMode(\'sound\')">🔊 ' + enOr('發音', 'Sound') + '</button>' +
+      '<button class="kana-mode-btn ' + (chartMode === 'stroke' ? 'on' : '') + '" onclick="Kana.setMode(\'stroke\')">✏️ ' + enOr('筆順練習', 'Strokes') + '</button>' +
       '<button class="kana-quiz-btn" onclick="Kana.quizMenu()">📝 ' + enOr('測驗', 'Quiz') + '</button>' +
       '</div>' +
-      '<div style="font-size:12px;color:var(--tx3,#aaa);margin-bottom:4px">' + enOr('點任一格:聽發音 + 看筆順', 'Tap a cell for sound & stroke order') + '</div>' +
+      '<div id="kanaHint" class="kana-hint">' + (chartMode === 'stroke' ? strokeHint : soundHint) + '</div>' +
       '<div id="kanaChart">' + chartHtml() + '</div>' +
       '</div></div>';
     var d = document.createElement('div'); d.innerHTML = h; document.body.appendChild(d.firstChild);
-    try { if (typeof track === 'function') track('kana_open', {}); } catch (e) {}
+    try { if (typeof track === 'function') track('kana_open', { mode: chartMode }); } catch (e) {}
+  }
+  function setMode(m) { chartMode = m; renderChart(); }   // 重繪:切換發音/筆順表(工具列高亮與提示自動正確)
+  function tap(el, h) {   // 發音模式:點格出聲 + 短暫高亮(不跳頁)
+    play(h);
+    if (el) { el.classList.add('kana-cell-on'); setTimeout(function () { el.classList.remove('kana-cell-on'); }, 420); }
   }
   function setScript(s) {
     script = s;
@@ -108,7 +138,7 @@ window.Kana = (function () {
     var ch = (script === 'k') ? c.k : c.h;
     var hasStroke = [...ch].length === 1; // 拗音(2字)無單一筆順檔
     w.innerHTML =
-      '<div class="kana-top"><b>' + enOr('五十音', 'Kana') + '</b><span class="kana-x" onclick="Kana.open()">✕</span></div>' +
+      '<div class="kana-top"><button class="kana-back" onclick="Kana.openStroke()">‹ ' + enOr('筆順表', 'Back') + '</button><b style="margin:0 auto 0 0">' + enOr('筆順・描寫', 'Strokes') + '</b><span class="kana-x" onclick="Kana.close()">✕</span></div>' +
       '<div class="kd-head"><span class="kd-big">' + ch + '</span><span class="kd-rom">' + c.r + '</span>' +
       '<button class="kd-spk" onclick="Kana.play(\'' + c.h + '\')">🔊</button></div>' +
       (hasStroke
@@ -251,5 +281,5 @@ window.Kana = (function () {
     setTimeout(function () { qIdx++; renderQ(); }, 800);
   }
 
-  return { open: open, close: close, setScript: setScript, play: play, detail: detail, strokeMode: strokeMode, quizMenu: quizMenu, quiz: quiz, answer: answer };
+  return { open: open, openStroke: openStroke, setMode: setMode, tap: tap, close: close, setScript: setScript, play: play, detail: detail, strokeMode: strokeMode, quizMenu: quizMenu, quiz: quiz, answer: answer };
 })();
