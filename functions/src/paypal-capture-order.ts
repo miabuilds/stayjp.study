@@ -110,6 +110,7 @@ export const paypalCaptureOrder = functions.onRequest(
       });
 
       // 推薦好友 +7 天 / KOL 分潤(首筆真付款)。best-effort、冪等,失敗不影響已開通。
+      // gross_twd 用方案台幣定價;source:"paypal" → 用 PayPal 手續費率(~7.8%)算利潤。
       await rewardReferrerOnPayment(uid, false).catch(e => console.error("rewardReferrer(paypal) 略過:", e));
       await recordKolCommission(uid, { plan, gross_twd: planInfo.price_twd, source: "paypal", txnId: cap.captureId, isSandbox: false, isFirstPayment })
         .catch(e => console.error("recordKolCommission(paypal) 略過:", e));

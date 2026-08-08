@@ -57,7 +57,7 @@
     });
     var g = window.GRAMMAR_KANJI_READINGS;
     if (g) for (var key in g) { if (!READ[key]) READ[key] = g[key]; }
-    // 少數「詞級」讀音在例句幾乎必為此讀,蓋過 vocab 單字多音(最中=さいちゅう;〜得る=うる)。
+    // 少數「詞級」讀音,在例句幾乎必為此讀,讓它蓋過 vocab 的單字多音(最中=さいちゅう 非さなか;〜得る=うる 非える)。
     var OVERRIDE = { '最中': 'さいちゅう', '得る': 'うる', '休み中': 'やすみちゅう' };
     for (var ok in OVERRIDE) READ[ok] = OVERRIDE[ok];
     return { READ: READ, ENTRY: ENTRY, CONJ: CONJ };
@@ -65,6 +65,19 @@
   function dict() {
     if (!_d || Object.keys(_d.READ).length === 0) _d = buildDict();
     return _d;
+  }
+  // 動態併入額外詞條(如文章的重點單字),讓它們在內文也能 ruby+即點即查。
+  // 只對「含漢字的詞」有效(假名詞沒漢字,不會被 furigana 掃到)。
+  function addEntries(list) {
+    try {
+      var d = dict();
+      (list || []).forEach(function (e) {
+        if (!e || !e.w) return;
+        var r = e.r || e.w;
+        if (!d.READ[e.w]) d.READ[e.w] = r;
+        if (!d.ENTRY[e.w] || !d.ENTRY[e.w].m) d.ENTRY[e.w] = { r: r, m: e.m || '', c: e.c || '' };
+      });
+    } catch (err) { /* no-op */ }
   }
 
   // 建 ruby(漢字+送假名的 token 只在漢字部分加 ruby,假名尾維持純文字)
@@ -88,7 +101,7 @@
       + ' data-f="' + escAttr(data.f || '') + '">' + inner + '</span>';
   }
 
-  // 數字 + 計數漢字 → 計數讀音(規則且高頻;避開不規則的 日/分/人)。
+  // 數字 + 計數漢字 → 計數讀音(規則且高頻;避開不規則的 日/分/人)。前一字為阿拉伯或全形數字時套用。
   var COUNTER_READ = { '月': 'がつ', '年': 'ねん', '円': 'えん', '時': 'じ' };
   function furiganaHTML(text) {
     if (text == null) return '';
@@ -101,10 +114,10 @@
       }
       if (i > 0) {
         var _pc = text[i - 1];
-        if (COUNTER_READ[text[i]] && /[0-9０-９]/.test(_pc)) {   // 10月→がつ、3年→ねん
+        if (COUNTER_READ[text[i]] && /[0-9０-９]/.test(_pc)) {   // 數字+計數字:10月→がつ、3年→ねん
           out += '<ruby>' + escapeHtml(text[i]) + '<rt>' + COUNTER_READ[text[i]] + '</rt></ruby>'; i++; continue;
         }
-        if (text[i] === '月' && /[かヶヵ]/.test(_pc)) {          // か月/ヶ月 → げつ
+        if (text[i] === '月' && /[かヶヵ]/.test(_pc)) {          // か月/ヶ月 → げつ(いっかげつ)
           out += '<ruby>月<rt>げつ</rt></ruby>'; i++; continue;
         }
       }
@@ -144,8 +157,12 @@
     var st = document.createElement('style');
     st.id = 'jlkCss';
     st.textContent = [
-      '.jlk{cursor:pointer;border-radius:3px;transition:background .12s}',
+      '.jlk{cursor:pointer;border-radius:3px;transition:background .12s;border-bottom:1.5px dotted rgba(214,101,74,.45)}',
       '.jlk:hover,.jlk:focus{background:rgba(214,101,74,.14);outline:none}',
+      '#jlkPop .jacts{display:flex;gap:8px;margin-top:12px}',
+      '#jlkPop .jact{flex:1;border:1px solid var(--bd,#e0e0e0);background:var(--bg,#faf9f6);color:var(--tx,#333);border-radius:10px;padding:9px 6px;font-size:13px;font-weight:700;cursor:pointer}',
+      '#jlkPop .jact:active{transform:scale(.96)}',
+      '#jlkPop .jact.on{background:var(--ac,#d4654a);color:#fff;border-color:var(--ac,#d4654a)}',
       '#jlkPop{position:fixed;z-index:100000;max-width:min(300px,88vw);background:var(--bg2,#fff);color:var(--tx,#222);border:1px solid var(--bd,#e5e5e5);border-radius:14px;box-shadow:0 12px 38px rgba(0,0,0,.28);padding:14px 16px;font-size:14px;line-height:1.7;-webkit-font-smoothing:antialiased;font-family:-apple-system,"PingFang TC","Noto Sans TC",sans-serif}',
       '#jlkPop .jw{font-size:21px;font-weight:700;font-family:"Hiragino Mincho ProN","Noto Serif JP",serif;color:var(--tx,#1c1c1e)}',
       '#jlkPop .jr{font-size:13px;color:var(--tx2,#8a8a8a);margin-left:7px}',
@@ -170,7 +187,8 @@
       + '<div><span class="jw">' + escapeHtml(data.w) + '</span><span class="jr">' + escapeHtml(data.r) + '</span></div>'
       + (tags ? '<div class="jtags">' + tags + '</div>' : '')
       + '<div class="jm">' + escapeHtml(data.m || '（暫無解釋）') + '</div>'
-      + (data.f ? '<div class="jbase">辭書形（原形）：<b>' + escapeHtml(data.w) + '</b></div>' : '');
+      + (data.f ? '<div class="jbase">辭書形（原形）：<b>' + escapeHtml(data.w) + '</b></div>' : '')
+      + '<div class="jacts"><button class="jact jact-spk" type="button">🔊 發音</button><button class="jact jact-fav" type="button">☆ 收藏</button></div>';
     document.body.appendChild(pop);
     // 定位在被點詞附近,夾在視窗內
     var r = anchor.getBoundingClientRect();
@@ -181,6 +199,24 @@
     pop.style.left = left + 'px';
     pop.style.top = top + 'px';
     pop.querySelector('.jx').addEventListener('click', function (e) { e.stopPropagation(); closePop(); });
+    // 🔊 發音(用預錄 mp3,沒有就退瀏覽器語音,交給 speak 判斷)
+    var spk = pop.querySelector('.jact-spk');
+    if (spk) spk.addEventListener('click', function (e) { e.stopPropagation(); if (typeof speak === 'function') speak(data.r || data.w); });
+    // ☆ 收藏 → 生字本
+    var fav = pop.querySelector('.jact-fav');
+    if (fav) {
+      if (window.stayjpHasWord && window.stayjpHasWord(data.w)) { fav.textContent = '★ 已收藏'; fav.classList.add('on'); }
+      fav.addEventListener('click', function (e) {
+        e.stopPropagation();
+        if (!window.stayjpAddWord) { showToast('收藏功能未載入'); return; }
+        var res = window.stayjpAddWord(data.w, data.r, data.m);
+        fav.textContent = '★ 已收藏'; fav.classList.add('on');
+        showToast(res === 'exists' ? '已在生字本 📖' : '已加入生字本 📖');
+      });
+    }
+    // 整張卡片點擊 = 發音(✕/發音/收藏 已各自 stopPropagation,不會誤觸)
+    pop.style.cursor = 'pointer';
+    pop.addEventListener('click', function () { if (typeof speak === 'function') speak(data.r || data.w); });
     _pop = pop;
   }
   // 捕獲階段:點到 .jlk → 查詢並阻止事件(不觸發例句框的播音/卡片收合)
@@ -230,5 +266,6 @@
 
   window.furiganaHTML = furiganaHTML;
   window.furiganaHTMLRich = furiganaHTMLRich;
+  window.furiAddEntries = addEntries;
   window.showToast = showToast;
 })();

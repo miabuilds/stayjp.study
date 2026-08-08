@@ -79,6 +79,7 @@
   </footer>
 </div>
 
+<script src="tts-config.js"></script>
 <script src="audio/tts/manifest.js"></script>
 <script>
 const SCENES = [
@@ -162,7 +163,7 @@ function speakLine(el){
   try{ if(window.speechSynthesis) speechSynthesis.cancel(); }catch(e){}
   if(_audio){ try{_audio.pause();}catch(e){} _audio=null; }
   const hash = window.__TTS && window.__TTS[t];
-  if(hash){ _audio = new Audio('audio/tts/'+hash+'.mp3'); _audio.play().catch(()=>browserSpeak(t)); }
+  if(hash){ _audio = new Audio(window.ttsUrl ? window.ttsUrl(hash) : 'audio/tts/'+hash+'.mp3'); _audio.play().catch(()=>browserSpeak(t)); }
   else browserSpeak(t);
 }
 function browserSpeak(t){

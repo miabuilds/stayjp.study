@@ -112,6 +112,31 @@ while ((ls = scriptRe.exec(listenSrc))) {
   add(raw.replace(/\n/g, '。'), 'listening');
 }
 
+// Articles — 文章閱讀:每篇 body 拆句,去空白(前端 speak 的 key 是去空白的句子)
+const artCode = fs.readFileSync(path.join(ROOT, 'articles.js'), 'utf8');
+const articles = (new Function('window', artCode + '; return window.ARTICLES;'))({}) || [];
+for (const a of articles) {
+  const sents = (a.body || '').match(/[^。！？]+[。！？]?/g) || [];
+  for (const s of sents) {
+    const clean = s.replace(/\s/g, '');
+    if (clean) add(clean, `article#${a.id}`);
+  }
+  // 重點單字的讀音也要有語音(單字分頁的 🔊)。讀音優先,退回漢字。
+  for (const v of (a.vocab || [])) {
+    const w = (v.r || v.w || '').trim();
+    if (w) add(w, `article-vocab#${a.id}`);
+  }
+}
+
+// 五十音 — 每個假名的發音(平假名當 key)
+const kanaCode = fs.readFileSync(path.join(ROOT, 'kana.js'), 'utf8');
+const KANA = (new Function('window', kanaCode + '; return window.KANA;'))({}) || {};
+for (const sec of Object.values(KANA)) {
+  for (const row of sec) {
+    for (const c of row) { if (c && c.h) add(c.h, 'kana'); }
+  }
+}
+
 // ---- write --------------------------------------------------------------
 const out = [...map.entries()]
   .map(([text, sources]) => ({ text, hash: hashText(text), sources: [...sources] }))
