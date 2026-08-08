@@ -1299,5 +1299,485 @@ window.ARTICLES = [
       "Precisely because we live in an age when AI gives instant answers, the attitude of continuing to ask \"why\" becomes all the more important.",
       "Rather than hoarding knowledge, how you use it and how you judge will become the core of learning from now on."
     ]
+    },
+  {
+    "id": "a-n5-3",
+    "level": "n5",
+    "topic": "家族",
+    "topic_en": "Family",
+    "title": "家族の写真",
+    "title_zh": "家人的照片",
+    "title_en": "A Family Photo",
+    "body": "これは わたしの かぞくの しゃしんです。ぜんぶで 五人 います。\nまんなかに いるのは ちちと ははです。ちちは 会社員で、ははは 先生です。\n右に いるのは あにです。あには 大学生で、サッカーが とても 上手です。\n左の 小さい 子は いもうとです。いもうとは 九さいで、絵を かくのが 好きです。\nわたしの かぞくは みんな 犬が 大好きです。しゃしんの 前に いるのが うちの 犬の「マロ」です。\n休みの日は、よく みんなで 公園へ 行って、しゃしんを とります。\nはなれて 住んでいますが、月に 一度は 電話で 話します。かぞくは わたしの たからものです。",
+    "trans": [
+      "這是我家人的照片。全部有五個人。",
+      "正中間的是爸爸和媽媽。爸爸是上班族,媽媽是老師。",
+      "右邊的是哥哥。哥哥是大學生,足球非常拿手。",
+      "左邊那個小小的孩子是妹妹。妹妹九歲,喜歡畫畫。",
+      "我家人全都很喜歡狗。照片前面那隻是我家的狗「マロ」。",
+      "放假的日子,常常大家一起去公園拍照。",
+      "雖然分開住,但每個月會通一次電話。家人是我的寶物。"
+    ],
+    "trans_en": [
+      "This is a photo of my family. There are five of us in total.",
+      "The two in the middle are my father and mother. My father is an office worker and my mother is a teacher.",
+      "On the right is my older brother. He's a university student and is very good at soccer.",
+      "The little child on the left is my younger sister. She is nine years old and loves drawing.",
+      "Everyone in my family loves dogs. The one in front in the photo is our dog, “Maro.”",
+      "On days off, we often go to the park together and take photos.",
+      "We live apart, but we talk on the phone once a month. My family is my treasure."
+    ],
+    "vocab": [
+      {
+        "w": "家族",
+        "r": "かぞく",
+        "m": "家人、家庭",
+        "m_en": "family"
+      },
+      {
+        "w": "会社員",
+        "r": "かいしゃいん",
+        "m": "上班族",
+        "m_en": "office worker"
+      },
+      {
+        "w": "大学生",
+        "r": "だいがくせい",
+        "m": "大學生",
+        "m_en": "university student"
+      },
+      {
+        "w": "好き",
+        "r": "すき",
+        "m": "喜歡",
+        "m_en": "to like; fond of"
+      },
+      {
+        "w": "宝物",
+        "r": "たからもの",
+        "m": "寶物",
+        "m_en": "treasure"
+      }
+    ],
+    "grammar": [
+      {
+        "t": "〜で(並列)",
+        "note": "名詞＋で 可連接兩個句子:「ちちは会社員で、ははは先生です」表示並列說明。",
+        "t_en": "〜で (linking)",
+        "note_en": "Noun + で links two clauses: 会社員で、…先生です (A is X, and B is Y)."
+      },
+      {
+        "t": "〜が(對象)",
+        "note": "能力或好惡的對象用が:「サッカーが上手」「犬が好き」。",
+        "t_en": "〜が (object of ability/liking)",
+        "note_en": "The object of ability or preference takes が: サッカーが上手, 犬が好き."
+      },
+      {
+        "t": "〜のが",
+        "note": "動詞＋のが 把動作變成名詞:「絵をかくのが好き」。",
+        "t_en": "Verb + のが",
+        "note_en": "Verb + のが nominalizes an action: 絵をかくのが好き (likes drawing)."
+      }
+    ]
+  },
+  {
+    "id": "a-n5-4",
+    "level": "n5",
+    "topic": "生活",
+    "topic_en": "Daily life",
+    "title": "コンビニで買い物",
+    "title_zh": "在便利商店買東西",
+    "title_en": "Shopping at a Convenience Store",
+    "body": "わたしは まいにち コンビニへ 行きます。会社の となりに あるので、とても べんりです。\n朝は おにぎりと コーヒーを 買います。ぜんぶで 三百円 ぐらいです。\nコンビニでは 電気代や 水道代も はらう ことが できます。\nたくはいびんを 出したり、お金を おろしたり する ことも できます。\n夜、おなかが すいた ときは、あたたかい おでんを 買います。ふゆは とくに 人気です。\nさいきんは 外国語の あんないも 多くて、外国から 来た 人にも やさしいです。\n小さい 店ですが、いろいろな ことが できて、日本の せいかつに かかせません。",
+    "trans": [
+      "我每天都會去便利商店。因為就在公司隔壁,非常方便。",
+      "早上買飯糰和咖啡。全部大概三百日圓。",
+      "在便利商店也可以繳電費和水費。",
+      "也可以寄宅配、領錢。",
+      "晚上肚子餓的時候,會買熱的關東煮。冬天特別受歡迎。",
+      "最近外語的標示也變多,對外國來的人也很友善。",
+      "雖然是小小的店,卻能做各種事,是日本生活不可或缺的存在。"
+    ],
+    "trans_en": [
+      "I go to the convenience store every day. It's right next to my office, so it's very convenient.",
+      "In the morning I buy a rice ball and coffee. It comes to about 300 yen in total.",
+      "At convenience stores you can also pay your electricity and water bills.",
+      "You can also send parcels and withdraw cash.",
+      "At night when I'm hungry, I buy warm oden. It's especially popular in winter.",
+      "Recently there are more foreign-language signs, so it's friendly to people from abroad too.",
+      "It's a small shop, but you can do all sorts of things there — it's indispensable to life in Japan."
+    ],
+    "vocab": [
+      {
+        "w": "便利",
+        "r": "べんり",
+        "m": "方便",
+        "m_en": "convenient"
+      },
+      {
+        "w": "払う",
+        "r": "はらう",
+        "m": "支付",
+        "m_en": "to pay"
+      },
+      {
+        "w": "出す",
+        "r": "だす",
+        "m": "寄出、拿出",
+        "m_en": "to send; put out"
+      },
+      {
+        "w": "人気",
+        "r": "にんき",
+        "m": "受歡迎",
+        "m_en": "popularity; popular"
+      },
+      {
+        "w": "生活",
+        "r": "せいかつ",
+        "m": "生活",
+        "m_en": "life; living"
+      }
+    ],
+    "grammar": [
+      {
+        "t": "〜ことができる",
+        "note": "動詞辞書形＋ことができる 表示能力/可能:「はらうことができる」。",
+        "t_en": "〜ことができる",
+        "note_en": "Dictionary form + ことができる = “can do”: はらうことができる."
+      },
+      {
+        "t": "〜たり〜たりする",
+        "note": "列舉數個動作:「出したり、おろしたりする」。",
+        "t_en": "〜たり〜たりする",
+        "note_en": "Lists example actions: 出したり、おろしたりする (send things, withdraw money, etc.)."
+      },
+      {
+        "t": "〜ので",
+        "note": "客觀原因用ので:「となりにあるので、べんりです」。",
+        "t_en": "〜ので (reason)",
+        "note_en": "ので gives an objective reason: となりにあるので (because it's next door)."
+      }
+    ]
+  },
+  {
+    "id": "a-n5-5",
+    "level": "n5",
+    "topic": "生活",
+    "topic_en": "Daily life",
+    "title": "わたしの町",
+    "title_zh": "我住的小鎮",
+    "title_en": "My Town",
+    "body": "わたしは 小さい 町に 住んでいます。海の 近くに あって、空気が きれいです。\n町には 大きな ビルは ありませんが、ゆうびんきょくや びょういん、スーパーが あります。\n駅から 家まで、あるいて 十分ぐらいです。とちゅうに 川が あって、はしを わたります。\n春には 川の そばの さくらが とても きれいで、たくさんの 人が 花見に 来ます。\n近くに 古い おてらが あって、しずかで 気もちが いいです。\n買い物には ちょっと ふべんですが、みんな しんせつで、すみやすい 町です。\nわたしは この 町が 大好きです。ずっと ここに 住みたいです。",
+    "trans": [
+      "我住在一個小鎮。就在海邊附近,空氣很乾淨。",
+      "鎮上雖然沒有大樓,但有郵局、醫院和超市。",
+      "從車站走到家,步行大約十分鐘。途中有一條河,要過橋。",
+      "春天河邊的櫻花非常漂亮,很多人來賞花。",
+      "附近有一座古老的寺廟,很安靜,很舒服。",
+      "買東西雖然有點不方便,但大家都很親切,是個好住的小鎮。",
+      "我非常喜歡這個小鎮。想一直住在這裡。"
+    ],
+    "trans_en": [
+      "I live in a small town. It's near the sea, and the air is clean.",
+      "There are no big buildings in town, but there's a post office, a hospital, and a supermarket.",
+      "From the station to my house is about a ten-minute walk. On the way there's a river, and I cross a bridge.",
+      "In spring the cherry blossoms by the river are very beautiful, and many people come to see them.",
+      "There's an old temple nearby; it's quiet and feels nice.",
+      "Shopping is a little inconvenient, but everyone is kind — it's an easy town to live in.",
+      "I really love this town. I want to live here forever."
+    ],
+    "vocab": [
+      {
+        "w": "住む",
+        "r": "すむ",
+        "m": "居住",
+        "m_en": "to live; reside"
+      },
+      {
+        "w": "近く",
+        "r": "ちかく",
+        "m": "附近",
+        "m_en": "nearby; vicinity"
+      },
+      {
+        "w": "渡る",
+        "r": "わたる",
+        "m": "渡過、越過",
+        "m_en": "to cross"
+      },
+      {
+        "w": "親切",
+        "r": "しんせつ",
+        "m": "親切",
+        "m_en": "kind"
+      },
+      {
+        "w": "静か",
+        "r": "しずか",
+        "m": "安靜",
+        "m_en": "quiet"
+      }
+    ],
+    "grammar": [
+      {
+        "t": "〜やすい",
+        "note": "動詞ます形＋やすい 表示容易:「すみやすい」容易住。",
+        "t_en": "〜やすい",
+        "note_en": "masu-stem + やすい = “easy to ~”: すみやすい (easy to live in)."
+      },
+      {
+        "t": "〜たい",
+        "note": "動詞ます形＋たい 表示願望:「住みたい」想住。",
+        "t_en": "〜たい",
+        "note_en": "masu-stem + たい = “want to ~”: 住みたい (want to live)."
+      },
+      {
+        "t": "〜が(逆接)",
+        "note": "「ふべんですが、しんせつです」前後相反用が。",
+        "t_en": "〜が (but)",
+        "note_en": "〜が connects contrasting clauses: inconvenient, but kind."
+      }
+    ]
+  },
+  {
+    "id": "a-n4-4",
+    "level": "n4",
+    "topic": "旅行",
+    "topic_en": "Travel",
+    "title": "はじめての一人旅",
+    "title_zh": "第一次一個人旅行",
+    "title_en": "My First Solo Trip",
+    "body": "先月、はじめて一人で旅行に行きました。行き先は、前から気になっていた金沢です。\n出発の前は少し不安でしたが、自分で計画を立てるのは思ったより楽しかったです。\n朝早く新幹線に乗って、昼過ぎに金沢に着きました。駅がとても大きくて、びっくりしました。\nまず有名な庭園を見に行きました。天気がよくて、写真をたくさん撮りました。\n夜は市場で新鮮な海の物を食べました。一人だったので、好きなものを好きなだけ注文できました。\n知らない町を一人で歩くのは、ちょっとさびしいけれど、自由でとても気持ちがよかったです。\nこの旅行で、一人でも何とかなるという自信がつきました。また行きたいと思います。",
+    "trans": [
+      "上個月,我第一次一個人去旅行。目的地是很久以前就一直很在意的金澤。",
+      "出發前有點不安,但自己安排計畫比想像中還要有趣。",
+      "一大早搭新幹線,過了中午就到金澤。車站非常大,嚇了我一跳。",
+      "首先去看了有名的庭園。天氣很好,拍了很多照片。",
+      "晚上在市場吃了新鮮的海產。因為一個人,可以想點什麼就點什麼、想吃多少就點多少。",
+      "一個人走在陌生的城鎮,雖然有點寂寞,卻很自由、非常舒暢。",
+      "這趟旅行讓我有了「就算一個人也能應付」的自信。我想再去。"
+    ],
+    "trans_en": [
+      "Last month I went on a trip by myself for the first time. My destination was Kanazawa, a place I'd been curious about for a long time.",
+      "Before leaving I was a little anxious, but planning everything myself was more fun than I'd expected.",
+      "I took the bullet train early in the morning and arrived in Kanazawa in the early afternoon. The station was so big it surprised me.",
+      "First I went to see a famous garden. The weather was nice and I took lots of photos.",
+      "At night I ate fresh seafood at the market. Since I was alone, I could order whatever I liked, as much as I liked.",
+      "Walking alone through an unfamiliar town was a little lonely, but it was free and felt wonderful.",
+      "This trip gave me the confidence that I can manage on my own. I want to go again."
+    ],
+    "vocab": [
+      {
+        "w": "一人旅",
+        "r": "ひとりたび",
+        "m": "獨自旅行",
+        "m_en": "solo travel"
+      },
+      {
+        "w": "計画を立てる",
+        "r": "けいかくをたてる",
+        "m": "訂計畫",
+        "m_en": "to make a plan"
+      },
+      {
+        "w": "新鮮",
+        "r": "しんせん",
+        "m": "新鮮",
+        "m_en": "fresh"
+      },
+      {
+        "w": "自由",
+        "r": "じゆう",
+        "m": "自由",
+        "m_en": "free; freedom"
+      },
+      {
+        "w": "自信",
+        "r": "じしん",
+        "m": "自信",
+        "m_en": "confidence"
+      }
+    ],
+    "grammar": [
+      {
+        "t": "〜より",
+        "note": "「思ったより楽しい」表示比預期更~。",
+        "t_en": "〜より (than)",
+        "note_en": "思ったより = “more ~ than expected”: 思ったより楽しい."
+      },
+      {
+        "t": "〜だけ",
+        "note": "「好きなだけ注文できる」表示到某個限度:想要多少就多少。",
+        "t_en": "〜だけ (as much as)",
+        "note_en": "〜だけ = “as much as”: 好きなだけ (as much as you like)."
+      },
+      {
+        "t": "〜という〜",
+        "note": "「何とかなるという自信」用という說明內容。",
+        "t_en": "〜という〜",
+        "note_en": "〜という〜 introduces content: 何とかなるという自信 (the confidence that it'll work out)."
+      }
+    ]
+  },
+  {
+    "id": "a-n4-5",
+    "level": "n4",
+    "topic": "仕事",
+    "topic_en": "Work",
+    "title": "アルバイトの一日",
+    "title_zh": "打工的一天",
+    "title_en": "A Day at My Part-Time Job",
+    "body": "わたしは大学に通いながら、カフェでアルバイトをしています。週に三回、夕方から夜までのシフトです。\n店に着いたら、まず制服に着がえて、手をきれいに洗います。\n仕事の内容は、注文を取ったり、コーヒーを作ったり、テーブルをかたづけたりすることです。\nいそがしい時間はとても大変ですが、お客さんに「ありがとう」と言われると、つかれが飛んでいきます。\nはじめのころは失敗ばかりで、先輩によく注意されました。でも、少しずつできることが増えてきました。\nアルバイトのおかげで、お金だけでなく、人との話し方やチームワークの大切さも学びました。\n勉強との両立は簡単ではありませんが、社会に出る前のいい経験になっていると思います。",
+    "trans": [
+      "我一邊上大學,一邊在咖啡廳打工。一週三次,傍晚到晚上的班。",
+      "到店裡後,先換上制服,把手洗乾淨。",
+      "工作內容是點餐、做咖啡、收拾桌子之類的。",
+      "忙的時段非常辛苦,但被客人說一聲「謝謝」,疲勞就飛走了。",
+      "剛開始老是出錯,常被前輩提醒。但能做的事一點一點變多了。",
+      "多虧了打工,不只是錢,我也學到和人說話的方式、還有團隊合作的重要。",
+      "要和課業兼顧並不簡單,但我覺得這是出社會前很好的經驗。"
+    ],
+    "trans_en": [
+      "While attending university, I work part-time at a café. My shifts are three times a week, from evening until night.",
+      "When I get to the shop, I first change into my uniform and wash my hands thoroughly.",
+      "The work involves taking orders, making coffee, clearing tables, and so on.",
+      "The busy hours are really tough, but when a customer says “thank you,” my tiredness just flies away.",
+      "At first I made nothing but mistakes and was often corrected by senior staff. But little by little I can do more.",
+      "Thanks to this job, I've learned not only about money but also how to talk with people and the importance of teamwork.",
+      "Balancing it with studying isn't easy, but I think it's good experience before entering the working world."
+    ],
+    "vocab": [
+      {
+        "w": "通う",
+        "r": "かよう",
+        "m": "往返、上(學/班)",
+        "m_en": "to commute; attend"
+      },
+      {
+        "w": "着がえる",
+        "r": "きがえる",
+        "m": "換衣服",
+        "m_en": "to change clothes"
+      },
+      {
+        "w": "片づける",
+        "r": "かたづける",
+        "m": "收拾、整理",
+        "m_en": "to tidy up"
+      },
+      {
+        "w": "先輩",
+        "r": "せんぱい",
+        "m": "前輩",
+        "m_en": "senior (colleague)"
+      },
+      {
+        "w": "経験",
+        "r": "けいけん",
+        "m": "經驗",
+        "m_en": "experience"
+      }
+    ],
+    "grammar": [
+      {
+        "t": "〜ながら",
+        "note": "動詞ます形＋ながら 表示同時做兩件事:「通いながら働く」。",
+        "t_en": "〜ながら (while)",
+        "note_en": "masu-stem + ながら = doing two things at once: 通いながら (while attending)."
+      },
+      {
+        "t": "〜ばかり",
+        "note": "「失敗ばかり」表示淨是、老是。",
+        "t_en": "〜ばかり (nothing but)",
+        "note_en": "〜ばかり = “nothing but”: 失敗ばかり (nothing but mistakes)."
+      },
+      {
+        "t": "〜おかげで",
+        "note": "「アルバイトのおかげで」表示好的原因/多虧。",
+        "t_en": "〜おかげで (thanks to)",
+        "note_en": "〜おかげで = “thanks to” (positive cause): アルバイトのおかげで."
+      }
+    ]
+  },
+  {
+    "id": "a-n3-6",
+    "level": "n3",
+    "topic": "文化",
+    "topic_en": "Culture",
+    "title": "日本の四季と年中行事",
+    "title_zh": "日本的四季與節慶",
+    "title_en": "Japan's Four Seasons and Annual Events",
+    "body": "日本には春夏秋冬という四つの季節があり、それぞれに合わせた行事が今も大切にされている。\n春は桜の季節だ。人々は公園に集まり、花の下で食事をしながら春の訪れを祝う。\n夏になると、各地で祭りや花火大会が開かれ、浴衣を着た人でにぎわう。\n秋は「食欲の秋」「読書の秋」とも言われ、涼しくなった空気の中で紅葉を楽しむ人が多い。\n冬には正月がある。家族が集まっておせち料理を食べ、神社に初詣に出かけるのが一般的だ。\nこうした行事は、季節の変化を感じ、家族や地域の人とのつながりを確かめる機会になっている。\n便利な生活の中でも、自然のリズムを大切にする心は、これからも受けつがれていくだろう。",
+    "trans": [
+      "日本有春夏秋冬四個季節,配合各季節的節慶至今仍被珍視。",
+      "春天是櫻花的季節。人們聚集在公園,在花下一邊用餐一邊慶祝春天的到來。",
+      "一到夏天,各地會舉辦祭典和煙火大會,穿著浴衣的人讓場面熱鬧非凡。",
+      "秋天被稱為「食慾之秋」「讀書之秋」,許多人在轉涼的空氣中欣賞紅葉。",
+      "冬天有新年。家人聚在一起吃御節料理、到神社初詣參拜,是很普遍的做法。",
+      "這些節慶成為人們感受季節變化、確認與家人及地方人們連結的機會。",
+      "即使在便利的生活中,珍惜自然節奏的心,想必今後也會繼續被傳承下去。"
+    ],
+    "trans_en": [
+      "Japan has four seasons — spring, summer, autumn, and winter — and events suited to each are still cherished today.",
+      "Spring is the season of cherry blossoms. People gather in parks and celebrate the arrival of spring while eating under the flowers.",
+      "When summer comes, festivals and fireworks displays are held all over, bustling with people in yukata.",
+      "Autumn is called “the autumn of appetite” and “the autumn of reading”; many enjoy the fall foliage in the cooler air.",
+      "Winter has the New Year. It's common for families to gather to eat osechi dishes and make the year's first shrine visit.",
+      "Such events have become occasions to feel the changing seasons and to reaffirm ties with family and the local community.",
+      "Even amid convenient modern life, the heart that values nature's rhythm will surely keep being passed on."
+    ],
+    "vocab": [
+      {
+        "w": "季節",
+        "r": "きせつ",
+        "m": "季節",
+        "m_en": "season"
+      },
+      {
+        "w": "行事",
+        "r": "ぎょうじ",
+        "m": "活動、節慶",
+        "m_en": "event; observance"
+      },
+      {
+        "w": "祝う",
+        "r": "いわう",
+        "m": "慶祝",
+        "m_en": "to celebrate"
+      },
+      {
+        "w": "一般的",
+        "r": "いっぱんてき",
+        "m": "普遍的",
+        "m_en": "general; common"
+      },
+      {
+        "w": "受けつぐ",
+        "r": "うけつぐ",
+        "m": "傳承、繼承",
+        "m_en": "to inherit; pass on"
+      }
+    ],
+    "grammar": [
+      {
+        "t": "〜に合わせて",
+        "note": "「季節に合わせた行事」表示配合某事物。",
+        "t_en": "〜に合わせて",
+        "note_en": "〜に合わせて = “to match / in line with”: 季節に合わせた行事."
+      },
+      {
+        "t": "〜と言われる",
+        "note": "「食欲の秋と言われる」表示一般這樣說/被稱為。",
+        "t_en": "〜と言われる",
+        "note_en": "〜と言われる = “is said to be / called”: 食欲の秋と言われる."
+      },
+      {
+        "t": "〜だろう",
+        "note": "「受けつがれていくだろう」表示推測。",
+        "t_en": "〜だろう (probably)",
+        "note_en": "〜だろう expresses conjecture: 受けつがれていくだろう (will surely be passed on)."
+      }
+    ]
   }
 ];
