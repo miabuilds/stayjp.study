@@ -14,6 +14,42 @@ window.Articles = (function () {
   function readSet() { try { return JSON.parse(localStorage.getItem('article_read')) || {}; } catch (e) { return {}; } }
   function markRead(id) { var s = readSet(); s[id] = Date.now(); localStorage.setItem('article_read', JSON.stringify(s)); if (typeof saveAllCloud === 'function') try { saveAllCloud(); } catch (e) {} }
   function fr(text) { return window.furiganaHTMLRich ? window.furiganaHTMLRich(text) : esc(text); }
+  // 「看過清單」記錄:用來算「有幾篇新文章」(開過清單就清紅標,非侵入式提醒)
+  function seenSet() { try { return JSON.parse(localStorage.getItem('article_seen')) || {}; } catch (e) { return {}; } }
+  function markSeen() { var s = {}; list().forEach(function (a) { s[a.id] = 1; }); localStorage.setItem('article_seen', JSON.stringify(s)); }
+  function ensureEntryCss() {
+    if (document.getElementById('artEntryCss')) return;
+    var st = document.createElement('style'); st.id = 'artEntryCss';
+    st.textContent = [
+      '.art-entry{display:flex;align-items:center;gap:13px;background:var(--bg2,#fff);border:1px solid rgba(0,0,0,.05);border-radius:16px;padding:12px;margin:0 0 14px;cursor:pointer;box-shadow:0 1px 2px rgba(30,25,20,.04),0 6px 16px rgba(30,25,20,.05);transition:transform .12s}',
+      '.art-entry:active{transform:scale(.99)}',
+      '.art-entry-thumb{width:60px;height:60px;border-radius:13px;overflow:hidden;position:relative;flex-shrink:0;background:linear-gradient(135deg,#fb7185,#e11d48);display:flex;align-items:center;justify-content:center}',
+      '.art-entry-thumb img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:saturate(.82) brightness(1.05) contrast(.9) sepia(.12)}',
+      '.art-entry-emoji{font-size:26px}',
+      '.art-entry-b{flex:1;min-width:0}',
+      '.art-entry-t{font-size:16px;font-weight:800;color:var(--tx,#2c2c2c);display:flex;align-items:center;gap:8px}',
+      '.art-entry-new{font-size:11px;font-weight:800;color:#fff;background:#ef4444;border-radius:20px;padding:1px 8px;line-height:1.6}',
+      '.art-entry-d{font-size:12.5px;color:var(--tx2,#888);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
+      '.art-entry-p{font-size:12px;color:var(--ac,#d4654a);font-weight:700;margin-top:3px}',
+      '.art-entry-go{color:var(--tx3,#bbb);font-size:24px;flex-shrink:0;padding-right:2px}'
+    ].join('');
+    document.head.appendChild(st);
+  }
+  // 首頁的文章入口卡(明顯、手機友善);顯示已讀進度 + 新文章紅標
+  function entryCardHtml() {
+    var arts = list(); if (!arts.length) return '';
+    ensureEntryCss();
+    var read = readSet(), seen = seenSet();
+    var readN = arts.filter(function (a) { return read[a.id]; }).length;
+    var newN = arts.filter(function (a) { return !seen[a.id]; }).length;
+    var badge = newN > 0 ? '<span class="art-entry-new">' + newN + ' ' + enOr('新', 'new') + '</span>' : '';
+    return '<div class="art-entry" onclick="Articles.open()">' +
+      '<div class="art-entry-thumb"><span class="art-entry-emoji">📖</span><img src="' + imgUrl('a-n4-1') + '" alt="" onerror="this.remove()"></div>' +
+      '<div class="art-entry-b"><div class="art-entry-t">' + enOr('文章閱讀', 'Reading') + badge + '</div>' +
+      '<div class="art-entry-d">' + enOr('每天一篇 · 點字查詢 · 真人發音', 'Daily reading · tap to look up · audio') + '</div>' +
+      '<div class="art-entry-p">' + enOr('已讀', 'Read') + ' ' + readN + ' / ' + arts.length + ' ' + enOr('篇', '') + '</div></div>' +
+      '<div class="art-entry-go">›</div></div>';
+  }
   function imgUrl(id) { return 'images/articles/' + id + '.jpg'; }   // 封面圖(CC0/公共領域);載入失敗自動退回漸層＋emoji
   function hasTts(t) { return !!(window.__TTS && window.__TTS[t]); }
   function ttsPath(t) { return window.ttsUrl ? window.ttsUrl(window.__TTS[t]) : 'audio/tts/' + window.__TTS[t] + '.mp3'; }
@@ -163,6 +199,7 @@ window.Articles = (function () {
     });
     h += '</div></div></div>';
     var d = document.createElement('div'); d.innerHTML = h; document.body.appendChild(d.firstChild);
+    markSeen();   // 開過清單 → 清掉首頁「N 新」紅標
     try { if (typeof track === 'function') track('article_open', {}); } catch (e) {}
   }
 
@@ -403,7 +440,7 @@ window.Articles = (function () {
   function done() { if (curId) markRead(curId); }
 
   return {
-    open: open, close: close, read: read, tab: tab,
+    open: open, close: close, read: read, tab: tab, entryCardHtml: entryCardHtml,
     toggleFuri: toggleFuri, toggleZh: toggleZh, cycleFs: cycleFs,
     playFrom: playFrom, togglePlay: togglePlay, cycleRate: cycleRate, say: say,
     answer: answer, gd: gd, done: done
