@@ -173,7 +173,11 @@ const Reading = (() => {
       }, 1000);
     }
 
-    const passageHtml = p.passage.replace(/\n/g, '<br>');
+    // 新式純文字 passage(無手工 ruby)→ 自動上 furigana + 即點即查(逐行處理保留換行);
+    // 舊式已含 <ruby> 的照原樣。
+    const passageHtml = (p.passage.indexOf('<ruby') === -1 && window.furiganaHTMLRich)
+      ? p.passage.split('\n').map(function (ln) { return window.furiganaHTMLRich(ln); }).join('<br>')
+      : p.passage.replace(/\n/g, '<br>');
     box.innerHTML = `
       <div class="qhd">
         <span style="display:flex;align-items:center;gap:6px">

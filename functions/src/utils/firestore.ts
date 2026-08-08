@@ -124,8 +124,12 @@ export async function rewardReferrerOnPayment(friendUid: string, isSandbox: bool
 // 狀態:pending(付款,鎖定期內)→ locked(過 30 天無退費,可領)→ paid(已結算匯款);
 //       void = 退費/退單作廢(clawback)。精算金額給後台結算與付款用。
 const COMMISSION_LOCK_DAYS = 30;
-// 平台手續費(算「利潤」用,分潤抽在利潤上)。web 綠界2.75% / app Apple·Google SBP 15% /
-// paypal 收款約5.45%(實測990×4收3744)+提領2.5%≈7.8%(小額含固定費,實際%會浮動)。
+// 平台手續費(用來算「利潤」,分潤抽在利潤上)。
+//   web    綠界 2.75%
+//   app    Apple/Google SBP 15%
+//   paypal 收款約 5.45%(依實測 990×4 收到 3744)+ 提領 2.5% ≈ 7.8%。
+//          註:PayPal 小額收款含固定費,實際%會隨金額浮動;之後接 PayPal 首購分潤時
+//          會優先用 PayPal 回傳的實際 paypal_fee + 2.5% 提領,較精準。
 const KOL_FEE = { web: 0.0275, app: 0.15, paypal: 0.078 };
 
 export interface CommissionDoc {

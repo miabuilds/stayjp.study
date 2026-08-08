@@ -64,7 +64,7 @@ const Listening = (() => {
     const myToken = __lsToken;
     const hash = window.__TTS && window.__TTS[t2];
     if (hash) {
-      const audio = new Audio('audio/tts/' + hash + '.mp3');
+      const audio = new Audio(window.ttsUrl ? window.ttsUrl(hash) : 'audio/tts/' + hash + '.mp3');
       audio.playbackRate = rate || 0.85;
       audio.play().then(() => {
         // 在 play() Promise resolve 之前若有更新的呼叫進來，這份音檔要作廢

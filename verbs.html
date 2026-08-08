@@ -1307,6 +1307,7 @@ document.addEventListener('DOMContentLoaded', () => PTQuiz.render());
 
 <script src="i18n.js"></script>
 <!-- TTS manifest: text -> pre-rendered VOICEVOX mp3 hash. -->
+<script src="tts-config.js"></script>
 <script src="audio/tts/manifest.js"></script>
 <script>
 // ========== I18N (繁/簡切換 via OpenCC runtime 轉換) ==========
@@ -1463,7 +1464,7 @@ function speak(text) {
   if (__ttsAudio) { try { __ttsAudio.pause(); } catch (e) {} __ttsAudio = null; }
   const hash = window.__TTS && window.__TTS[t];
   if (hash) {
-    __ttsAudio = new Audio('audio/tts/' + hash + '.mp3');
+    __ttsAudio = new Audio(window.ttsUrl ? window.ttsUrl(hash) : 'audio/tts/' + hash + '.mp3');
     __ttsAudio.play().catch(() => speakBrowser(t));
     return;
   }
