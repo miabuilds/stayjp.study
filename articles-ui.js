@@ -31,26 +31,32 @@ window.Articles = (function () {
       '.art-mask{position:fixed;inset:0;z-index:9000;background:var(--bg,#faf9f6);overflow-y:auto;-webkit-overflow-scrolling:touch}',
       '.art-wrap{max-width:640px;margin:0 auto;padding:0 0 120px}',
       // top bar
-      '.art-top{position:sticky;top:0;background:var(--bg,#faf9f6);display:flex;align-items:center;gap:6px;padding:10px 14px;border-bottom:1px solid var(--bd,#e8e5e0);z-index:5}',
-      '.art-top .tt{font-size:16px;font-weight:800;margin:0 auto 0 4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
-      '.art-ic{border:none;background:none;cursor:pointer;font-size:16px;color:var(--tx2,#888);width:40px;height:40px;border-radius:10px;display:inline-flex;align-items:center;justify-content:center}',
+      '.art-top{position:sticky;top:0;background:var(--bg,#faf9f6);display:flex;align-items:center;gap:8px;padding:8px 12px;border-bottom:1px solid var(--bd,#e8e5e0);z-index:5;min-height:54px}',
+      '.art-top .tt{font-size:16px;font-weight:800;margin:0 auto 0 2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
+      '.art-ic{border:none;background:none;cursor:pointer;font-size:19px;color:var(--tx2,#888);width:42px;height:42px;border-radius:12px;display:inline-flex;align-items:center;justify-content:center}',
       '.art-ic:active{background:var(--bd,#eee)}',
+      // 返回鍵:大箭頭+文字,清楚好按
+      '.art-back{display:inline-flex;align-items:center;gap:3px;border:none;background:none;cursor:pointer;color:var(--ac,#d4654a);font-size:15px;font-weight:700;padding:8px 12px 8px 6px;min-height:44px;border-radius:12px;font-family:inherit}',
+      '.art-back:active{background:rgba(212,101,74,.1)}',
+      '.art-back svg{width:22px;height:22px;stroke:currentColor;stroke-width:2.4;fill:none;stroke-linecap:round;stroke-linejoin:round}',
       // list
       '.art-lwrap{padding:14px 16px}',
       '.art-sub{color:var(--tx2,#888);font-size:13.5px;margin:2px 0 6px;line-height:1.6}',
       '.art-trial{background:var(--brand-soft,#f6e3dd);color:var(--ac,#d4654a);font-weight:700;font-size:13px;border-radius:10px;padding:9px 13px;margin:8px 0 4px}',
       '.art-lv{font-size:12px;font-weight:800;color:var(--tx3,#aaa);letter-spacing:.1em;margin:22px 0 10px}',
-      '.art-card{display:flex;gap:13px;align-items:center;background:var(--bg2,#fff);border:1px solid var(--bd,#e8e5e0);border-radius:16px;padding:12px;margin-bottom:11px;cursor:pointer;transition:transform .1s,border-color .15s;box-shadow:0 1px 2px rgba(0,0,0,.03)}',
-      '.art-card:active{transform:scale(.98)}',
-      '.art-card:hover{border-color:var(--ac2,#e8734a)}',
-      '.art-thumb{width:64px;height:64px;border-radius:13px;flex-shrink:0;position:relative;overflow:hidden;color:#fff}',
-      '.art-th-e{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:30px}',
+      '.art-card{display:flex;gap:15px;align-items:center;background:var(--bg2,#fff);border:1px solid rgba(0,0,0,.04);border-radius:18px;padding:14px;margin-bottom:12px;cursor:pointer;transition:transform .12s ease,box-shadow .15s ease;box-shadow:0 1px 2px rgba(30,25,20,.04),0 6px 16px rgba(30,25,20,.05)}',
+      '.art-card:active{transform:scale(.985)}',
+      '.art-card:hover{transform:translateY(-2px);box-shadow:0 2px 4px rgba(30,25,20,.06),0 12px 26px rgba(30,25,20,.1)}',
+      '.art-thumb{width:74px;height:74px;border-radius:16px;flex-shrink:0;position:relative;overflow:hidden;color:#fff;box-shadow:inset 0 0 0 1px rgba(0,0,0,.04)}',
+      '.art-th-e{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:34px}',
       '.art-th-i{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}',
+      '.art-th-badge{position:absolute;top:5px;left:5px;font-size:10px;font-weight:800;padding:2px 7px;border-radius:20px;color:#fff;background:rgba(0,0,0,.55);backdrop-filter:blur(3px);letter-spacing:.02em}',
       '.art-card-b{min-width:0;flex:1}',
-      '.art-card-t{font-size:16.5px;font-weight:700;color:var(--tx,#2c2c2c);font-family:"Hiragino Mincho ProN","Noto Serif JP",serif;line-height:1.35}',
-      '.art-card-z{font-size:13px;color:var(--tx2,#888);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
-      '.art-badge{display:inline-block;font-size:10.5px;font-weight:800;padding:2px 8px;border-radius:20px;color:#fff;margin-bottom:4px}',
-      '.art-done{color:#16a34a;font-size:14px;margin-left:4px}',
+      '.art-card-t{font-size:17px;font-weight:700;color:var(--tx,#2c2c2c);font-family:"Hiragino Mincho ProN","Noto Serif JP",serif;line-height:1.35;display:flex;align-items:center;gap:6px}',
+      '.art-done{color:#16a34a;font-size:15px;flex-shrink:0}',
+      '.art-card-z{font-size:13px;color:var(--tx2,#888);margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
+      '.art-lwrap{padding:16px 16px 4px}',
+      '.art-lv{font-size:12px;font-weight:800;color:var(--tx3,#aaa);letter-spacing:.12em;margin:22px 2px 12px}',
       // hero
       '.art-hero{padding:22px 18px 18px;color:#fff;position:relative;overflow:hidden;min-height:150px;display:flex;flex-direction:column;justify-content:flex-end}',
       '.art-hero-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}',
@@ -147,10 +153,9 @@ window.Articles = (function () {
       arr.forEach(function (a) {
         var g = LVC[a.level] || LVC.n5;
         h += '<div class="art-card" onclick="Articles.read(\'' + a.id + '\')">' +
-          '<div class="art-thumb" style="background:linear-gradient(135deg,' + g[0] + ',' + g[1] + ')"><span class="art-th-e">' + topicEmoji(a.topic + a.title) + '</span><img class="art-th-i" src="' + imgUrl(a.id) + '" alt="" loading="lazy" onerror="this.remove()"></div>' +
+          '<div class="art-thumb" style="background:linear-gradient(135deg,' + g[0] + ',' + g[1] + ')"><span class="art-th-e">' + topicEmoji(a.topic + a.title) + '</span><img class="art-th-i" src="' + imgUrl(a.id) + '" alt="" loading="lazy" onerror="this.remove()"><span class="art-th-badge">' + LVN[a.level] + '</span></div>' +
           '<div class="art-card-b">' +
-          '<span class="art-badge" style="background:' + g[1] + '">' + LVN[a.level] + '</span>' + (read[a.id] ? '<span class="art-done">✓</span>' : '') +
-          '<div class="art-card-t">' + esc(a.title) + '</div>' +
+          '<div class="art-card-t">' + esc(a.title) + (read[a.id] ? '<span class="art-done">✓</span>' : '') + '</div>' +
           '<div class="art-card-z">' + esc(a.title_zh) + ' · ' + esc(a.topic) + '</div>' +
           '</div></div>';
       });
@@ -174,7 +179,7 @@ window.Articles = (function () {
     curId = id; curTab = 'read';
     var g = LVC[a.level] || LVC.n5;
     var h = '<div class="art-mask" id="artMask"><div class="art-wrap">' +
-      '<div class="art-top"><button class="art-ic" onclick="Articles.open()">‹</button>' +
+      '<div class="art-top"><button class="art-back" onclick="Articles.open()"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>返回</button>' +
       '<span class="tt">' + esc(a.title_zh) + '</span>' +
       '<button class="art-ic" onclick="Articles.close()">✕</button></div>' +
       '<div class="art-hero" style="background:linear-gradient(135deg,' + g[0] + ',' + g[1] + ')">' +
