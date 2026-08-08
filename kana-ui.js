@@ -6,7 +6,8 @@ window.Kana = (function () {
   var chartMode = 'sound';   // 'sound' 點格發音(不跳頁) / 'stroke' 點格看筆順+描寫
   var SEC = [['seion', '清音'], ['dakuon', '濁音'], ['handakuon', '半濁音'], ['youon', '拗音']];
   function K() { return window.KANA || {}; }
-  function enOr(zh, en) { try { return localStorage.getItem('ui_lang') === 'en' ? en : zh; } catch (e) { return zh; } }
+  // 三語:en→英文;zh-CN→OpenCC 轉簡(cvt);zh-TW→原樣繁體
+  function enOr(zh, en) { try { var l = (typeof I18n !== 'undefined' && I18n.getLang) ? I18n.getLang() : (localStorage.getItem('ui_lang') || 'zh-TW'); if (l === 'en') return en; return (typeof cvt === 'function') ? cvt(zh) : zh; } catch (e) { return zh; } }
   // 播放走自帶 Audio + 版本號(?v=):純預錄 mp3(不用瀏覽器語音),改版 bump 版本號即強制抓新檔,避開 immutable 快取。
   var KANA_AUDIO_VER = '2', _kAudio = null;
   function play(h) {
