@@ -3458,6 +3458,7 @@ function renderVocab() {
 
   let h = '';
   if (!lf && !showFavOnly) {
+    h += (window.Articles && Articles.entryCardHtml ? Articles.entryCardHtml() : '');   // 首頁明顯的文章入口卡
     const lv = currentLevel.toUpperCase();
     const cnt = data.length;
     // Daily progress bar
@@ -3672,6 +3673,7 @@ function render() {
 
   let h = '';
   if (!lf && !showFavOnly) {
+    h += (window.Articles && Articles.entryCardHtml ? Articles.entryCardHtml() : '');   // 首頁明顯的文章入口卡
     const lv = currentLevel.toUpperCase();
     const cnt = data.length;
     h += `<div class="daily-bar">
