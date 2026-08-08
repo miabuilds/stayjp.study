@@ -347,6 +347,7 @@ window.Articles = (function () {
     renderQuizItem(c, a);
   }
   function pool() { var o = []; list().forEach(function (a) { (a.vocab || []).forEach(function (v) { if (v.m) o.push(v); }); }); return o; }
+  function vm(x) { return Lc(x.m, x.m_en); }   // 測驗選項的意思(依語言)
   function renderQuizItem(c, a) {
     c.className = 'art-cnt';
     if (quiz.idx >= quiz.list.length) {
@@ -357,14 +358,15 @@ window.Articles = (function () {
       return;
     }
     var v = quiz.list[quiz.idx];
-    var others = shuffle(pool().filter(function (x) { return x.m !== v.m; }));
-    var seen = {}, distinct = []; for (var i = 0; i < others.length && distinct.length < 3; i++) { if (!seen[others[i].m]) { seen[others[i].m] = 1; distinct.push(others[i].m); } }
-    var opts = shuffle([v.m].concat(distinct));
+    var correct = vm(v);   // 選項用當前語言的意思(en→英文;簡中→簡體)
+    var others = shuffle(pool().filter(function (x) { return vm(x) !== correct; }));
+    var seen = {}, distinct = []; for (var i = 0; i < others.length && distinct.length < 3; i++) { var m = vm(others[i]); if (!seen[m]) { seen[m] = 1; distinct.push(m); } }
+    var opts = shuffle([correct].concat(distinct));
     c.innerHTML = '<div class="aq"><div class="aq-prog">' + (quiz.idx + 1) + ' / ' + quiz.list.length + '　·　' + enOr('答對 ', 'Score ') + quiz.score + '</div>' +
       '<div class="aq-q" style="text-align:center">' + enOr('這個字是什麼意思?', 'What does this mean?') + '</div>' +
       '<div class="aq-w" onclick="Articles.say(\'' + esc(v.r || v.w) + '\')">' + esc(v.w) + '</div>' +
       '<div class="aq-r">' + esc(v.r) + (hasTts(v.r || v.w) ? ' 🔊' : '') + '</div>' +
-      '<div class="aq-opts">' + opts.map(function (o) { return '<button class="aq-opt" onclick="Articles.answer(this,\'' + esc(o).replace(/'/g, "\\'") + '\',\'' + esc(v.m).replace(/'/g, "\\'") + '\')">' + esc(o) + '</button>'; }).join('') + '</div></div>';
+      '<div class="aq-opts">' + opts.map(function (o) { return '<button class="aq-opt" onclick="Articles.answer(this,\'' + esc(o).replace(/'/g, "\\'") + '\',\'' + esc(correct).replace(/'/g, "\\'") + '\')">' + esc(o) + '</button>'; }).join('') + '</div></div>';
   }
   function answer(btn, chosen, correct) {
     var opts = btn.parentElement.querySelectorAll('.aq-opt');
