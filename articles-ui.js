@@ -47,9 +47,10 @@ window.Articles = (function () {
       '.art-card{display:flex;gap:15px;align-items:center;background:var(--bg2,#fff);border:1px solid rgba(0,0,0,.04);border-radius:18px;padding:14px;margin-bottom:12px;cursor:pointer;transition:transform .12s ease,box-shadow .15s ease;box-shadow:0 1px 2px rgba(30,25,20,.04),0 6px 16px rgba(30,25,20,.05)}',
       '.art-card:active{transform:scale(.985)}',
       '.art-card:hover{transform:translateY(-2px);box-shadow:0 2px 4px rgba(30,25,20,.06),0 12px 26px rgba(30,25,20,.1)}',
-      '.art-thumb{width:74px;height:74px;border-radius:16px;flex-shrink:0;position:relative;overflow:hidden;color:#fff;box-shadow:inset 0 0 0 1px rgba(0,0,0,.04)}',
-      '.art-th-e{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:34px}',
-      '.art-th-i{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}',
+      '.art-thumb{width:92px;height:92px;border-radius:16px;flex-shrink:0;position:relative;overflow:hidden;color:#fff;box-shadow:inset 0 0 0 1px rgba(0,0,0,.04)}',
+      '.art-th-e{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:40px}',
+      // 日系濾鏡:降飽和+微暖+提亮+柔對比,清新不豔;縮圖與 hero 共用
+      '.art-th-i{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:saturate(.82) brightness(1.06) contrast(.9) sepia(.12)}',
       '.art-th-badge{position:absolute;top:5px;left:5px;font-size:10px;font-weight:800;padding:2px 7px;border-radius:20px;color:#fff;background:rgba(0,0,0,.55);backdrop-filter:blur(3px);letter-spacing:.02em}',
       '.art-card-b{min-width:0;flex:1}',
       '.art-card-t{font-size:17px;font-weight:700;color:var(--tx,#2c2c2c);font-family:"Hiragino Mincho ProN","Noto Serif JP",serif;line-height:1.35;display:flex;align-items:center;gap:6px}',
@@ -59,7 +60,7 @@ window.Articles = (function () {
       '.art-lv{font-size:12px;font-weight:800;color:var(--tx3,#aaa);letter-spacing:.12em;margin:22px 2px 12px}',
       // hero
       '.art-hero{padding:22px 18px 18px;color:#fff;position:relative;overflow:hidden;min-height:150px;display:flex;flex-direction:column;justify-content:flex-end}',
-      '.art-hero-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}',
+      '.art-hero-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:saturate(.82) brightness(1.04) contrast(.9) sepia(.12)}',
       '.art-hero-ov{position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.12) 0%,rgba(0,0,0,.32) 55%,rgba(0,0,0,.62) 100%)}',
       '.art-hero-in{position:relative}',
       '.art-hero .he{font-size:40px;line-height:1}',
