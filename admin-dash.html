@@ -92,6 +92,7 @@
       </div></div>
     </div>
 
+    <div class="muted" style="font-size:12px;margin:2px 2px 8px">💡 金額類數字為「透過推薦碼帶進來的首購」口徑(取自 commissions 帳本、金額精準);非推薦的一般銷售不含分潤、不計入此處。「有效訂閱」為全站即時人數。</div>
     <div class="kpis" id="kpis" style="margin-bottom:16px"></div>
 
     <div class="panel">
@@ -196,11 +197,11 @@ function renderKpis(){
   COMMS.forEach(c=>{ if(c.state==='void'||!inPeriod(c))return; conv++; const pf=profitOf(c); rev+=c.gross; fee+=(c.gross-pf); comm+=c.amount; net+=(pf-c.amount); });
   const activeSubs = SUBS.filter(s=>!s.is_sandbox && (s.status==='active'||s.status==='trialing')).length;
   document.getElementById('kpis').innerHTML =
-    kpi('本期營收(首購)', fmt(rev), conv+' 筆首購') +
+    kpi('推薦帶來營收', fmt(rev), conv+' 筆(限推薦碼首購)') +
     kpi('平台手續費', '−'+fmt(fee), '綠界/IAP/PayPal') +
     kpi('分潤支出', '−'+fmt(comm), '應付 KOL') +
-    kpi('淨收入(扣分潤後)', fmt(net), '營收−手續費−分潤', true) +
-    kpi('有效訂閱', activeSubs, 'active+trialing(即時)');
+    kpi('妳淨得(扣分潤後)', fmt(net), '推薦單:營收−手續費−分潤', true) +
+    kpi('有效訂閱(全站)', activeSubs, 'active+trialing(即時)');
 }
 function kpi(l,v,d,hero){ return '<div class="kpi'+(hero?' hero':'')+'"><div class="l">'+l+'</div><div class="v num">'+v+'</div><div class="d">'+d+'</div></div>'; }
 
@@ -213,17 +214,18 @@ function renderPlans(){
 
 function renderPayout(){
   const box=document.getElementById('payoutTable'), banner=document.getElementById('payoutBanner');
-  const g={}; COMMS.forEach(c=>{ const r=g[c.code]=g[c.code]||{pending:0,locked:0,paid:0}; if(r[c.state]!=null)r[c.state]+=c.amount; });
-  const codes=Object.keys(g); if(!codes.length){ box.innerHTML='<div class="pb muted">尚無分潤紀錄。</div>'; banner.style.display='none'; return; }
-  let tP=0,tL=0,tPaid=0;
-  const rows=codes.map(code=>{ const r=g[code]; tP+=r.pending;tL+=r.locked;tPaid+=r.paid; const rm=REFMAP[code]||{}; return {code,kol:rm.kol||'',payout:rm.payout,...r}; }).sort((a,b)=>b.locked-a.locked);
+  // 每個碼:成交筆數 n、帶來營收 gross、妳淨得 mynet(=利潤−分潤)、以及分潤三態金額。void 不計。
+  const g={}; COMMS.forEach(c=>{ if(c.state==='void')return; const r=g[c.code]=g[c.code]||{pending:0,locked:0,paid:0,n:0,gross:0,mynet:0}; if(r[c.state]!=null)r[c.state]+=c.amount; r.n++; r.gross+=c.gross; r.mynet+=(profitOf(c)-c.amount); });
+  const codes=Object.keys(g); if(!codes.length){ box.innerHTML='<div class="pb muted">尚無分潤紀錄(還沒有人透過推薦碼付費成功)。</div>'; banner.style.display='none'; return; }
+  let tP=0,tL=0,tPaid=0,tN=0,tG=0,tNet=0;
+  const rows=codes.map(code=>{ const r=g[code]; tP+=r.pending;tL+=r.locked;tPaid+=r.paid;tN+=r.n;tG+=r.gross;tNet+=r.mynet; const rm=REFMAP[code]||{}; return {code,kol:rm.kol||'',payout:rm.payout,...r}; }).sort((a,b)=>b.gross-a.gross);
   const due=rows.filter(r=>r.locked>=1000);
   banner.style.display='block';
   banner.innerHTML = tL>0 ? ('🔔 可結算(已鎖定)<b>'+fmt(tL)+'</b>,其中滿 NT$1,000 該匯:<b>'+due.length+'</b> 位。待確認 '+fmt(tP)+'、累計已付 '+fmt(tPaid)+'。') : ('待確認 '+fmt(tP)+';尚無可領。累計已付 '+fmt(tPaid)+'。');
   const payStr=p=>!p?'<span style="color:var(--ink3)">未填收款</span>':('銀行 '+esc(p.account||'(未填帳號)'));
-  box.innerHTML='<table><thead><tr><th>KOL</th><th>碼</th><th class="n">待確認</th><th class="n">可領</th><th class="n">已付</th><th>收款 / 結算</th></tr></thead><tbody>'
-    + rows.map(r=>'<tr><td class="who">'+esc(r.kol||'—')+'</td><td><code>'+esc(r.code)+'</code></td><td class="n" style="color:var(--ink3)">'+fmt(r.pending)+'</td><td class="n"><b style="color:'+(r.locked>=1000?'var(--ok)':'var(--ink2)')+'">'+fmt(r.locked)+'</b>'+(r.locked>=1000?' 🔔':'')+'</td><td class="n" style="color:var(--ink3)">'+fmt(r.paid)+'</td><td style="font-size:12px">'+payStr(r.payout)+(r.locked>0?' <button class="btn" style="padding:4px 9px;font-size:11px" onclick="settle(\''+r.code+'\','+r.locked+')">標記已付</button>':'')+'</td></tr>').join('')
-    + '<tr class="rowtot"><td colspan="2" style="text-align:right">合計</td><td class="n">'+fmt(tP)+'</td><td class="n">'+fmt(tL)+'</td><td class="n">'+fmt(tPaid)+'</td><td></td></tr></tbody></table>';
+  box.innerHTML='<table><thead><tr><th>KOL</th><th>碼</th><th class="n">成交</th><th class="n">帶來營收</th><th class="n">妳淨得<br><small style="font-weight:400;color:var(--ink3)">扣手續費+分潤</small></th><th class="n">待確認</th><th class="n">可領</th><th class="n">已付</th><th>收款 / 結算</th></tr></thead><tbody>'
+    + rows.map(r=>'<tr><td class="who">'+esc(r.kol||'—')+'</td><td><code>'+esc(r.code)+'</code></td><td class="n">'+r.n+'</td><td class="n">'+fmt(r.gross)+'</td><td class="n"><b>'+fmt(r.mynet)+'</b></td><td class="n" style="color:var(--ink3)">'+fmt(r.pending)+'</td><td class="n"><b style="color:'+(r.locked>=1000?'var(--ok)':'var(--ink2)')+'">'+fmt(r.locked)+'</b>'+(r.locked>=1000?' 🔔':'')+'</td><td class="n" style="color:var(--ink3)">'+fmt(r.paid)+'</td><td style="font-size:12px">'+payStr(r.payout)+(r.locked>0?' <button class="btn" style="padding:4px 9px;font-size:11px" onclick="settle(\''+r.code+'\','+r.locked+')">標記已付</button>':'')+'</td></tr>').join('')
+    + '<tr class="rowtot"><td colspan="2" style="text-align:right">合計</td><td class="n">'+tN+'</td><td class="n">'+fmt(tG)+'</td><td class="n"><b>'+fmt(tNet)+'</b></td><td class="n">'+fmt(tP)+'</td><td class="n">'+fmt(tL)+'</td><td class="n">'+fmt(tPaid)+'</td><td></td></tr></tbody></table>';
 }
 
 function payMethod(s){ if(s.source==='app')return 'App 內購'; if(s.ecpay_order)return '綠界(卡/ATM/超商)'; return 'PayPal / 其他'; }

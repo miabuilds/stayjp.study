@@ -9,7 +9,7 @@ window.Kana = (function () {
   // 三語:en→英文;zh-CN→OpenCC 轉簡(cvt);zh-TW→原樣繁體
   function enOr(zh, en) { try { var l = (typeof I18n !== 'undefined' && I18n.getLang) ? I18n.getLang() : (localStorage.getItem('ui_lang') || 'zh-TW'); if (l === 'en') return en; return (typeof cvt === 'function') ? cvt(zh) : zh; } catch (e) { return zh; } }
   // 播放走自帶 Audio + 版本號(?v=):純預錄 mp3(不用瀏覽器語音),改版 bump 版本號即強制抓新檔,避開 immutable 快取。
-  var KANA_AUDIO_VER = '2', _kAudio = null;
+  var KANA_AUDIO_VER = '3', _kAudio = null;
   function play(h) {
     if (!h || !window.__TTS || !window.__TTS[h]) return;
     var base = window.ttsUrl ? window.ttsUrl(window.__TTS[h]) : 'audio/tts/' + window.__TTS[h] + '.mp3';
