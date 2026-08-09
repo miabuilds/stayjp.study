@@ -2383,6 +2383,13 @@
     ]
   },
   {
+    "text": "あには大学生で、サッカーがとても上手です。",
+    "hash": "94cf34a9043c",
+    "sources": [
+      "article#a-n5-3"
+    ]
+  },
+  {
     "text": "あねは きょねん 結婚しました。",
     "hash": "19c6aa043563",
     "sources": [
@@ -3663,6 +3670,13 @@
     ]
   },
   {
+    "text": "アルバイトのおかげで、お金だけでなく、人との話し方やチームワークの大切さも学びました。",
+    "hash": "6c1161ebebb6",
+    "sources": [
+      "article#a-n4-5"
+    ]
+  },
+  {
     "text": "アルバイトを増やして、収入を上げたいと思っています。",
     "hash": "871b23e8d299",
     "sources": [
@@ -4904,6 +4918,13 @@
     ]
   },
   {
+    "text": "いそがしい時間はとても大変ですが、お客さんに「ありがとう」と言われると、つかれが飛んでいきます。",
+    "hash": "5cbe48c73e8d",
+    "sources": [
+      "article#a-n4-5"
+    ]
+  },
+  {
     "text": "いそがしい朝は、おにぎりだけの人もいます。",
     "hash": "554937f57c50",
     "sources": [
@@ -5489,7 +5510,8 @@
     "text": "いっぱんてき",
     "hash": "ea5f6eabbd0f",
     "sources": [
-      "vocab-n3"
+      "vocab-n3",
+      "article-vocab#a-n3-6"
     ]
   },
   {
@@ -5826,6 +5848,13 @@
     ]
   },
   {
+    "text": "いもうとは九さいで、絵をかくのが好きです。",
+    "hash": "0f9db495780a",
+    "sources": [
+      "article#a-n5-3"
+    ]
+  },
+  {
     "text": "いやおうなしに",
     "hash": "a97d6a2c9547",
     "sources": [
@@ -5974,7 +6003,8 @@
     "text": "いわう",
     "hash": "78ecf87e6cd8",
     "sources": [
-      "vocab-n4"
+      "vocab-n4",
+      "article-vocab#a-n3-6"
     ]
   },
   {
@@ -6260,7 +6290,8 @@
     "text": "うけつぐ",
     "hash": "3a281236cdc6",
     "sources": [
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n3-6"
     ]
   },
   {
@@ -9936,7 +9967,8 @@
     "sources": [
       "vocab-n5",
       "vocab-n4",
-      "vocab-n3"
+      "vocab-n3",
+      "article-vocab#a-n5-3"
     ]
   },
   {
@@ -11170,7 +11202,8 @@
     "hash": "710a4d550b6e",
     "sources": [
       "vocab-n5",
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n5-3"
     ]
   },
   {
@@ -11178,6 +11211,13 @@
     "hash": "1f53c002846f",
     "sources": [
       "vocab-n5#食事する"
+    ]
+  },
+  {
+    "text": "かぞくはわたしのたからものです。",
+    "hash": "a65fd7d865b6",
+    "sources": [
+      "article#a-n5-3"
     ]
   },
   {
@@ -11240,7 +11280,8 @@
     "hash": "e66378f06773",
     "sources": [
       "vocab-n4",
-      "vocab-n3"
+      "vocab-n3",
+      "article-vocab#a-n4-5"
     ]
   },
   {
@@ -12068,7 +12109,8 @@
     "hash": "1f9c9ddb0ac4",
     "sources": [
       "vocab-n4",
-      "vocab-n3"
+      "vocab-n3",
+      "article-vocab#a-n4-5"
     ]
   },
   {
@@ -13059,6 +13101,13 @@
     ]
   },
   {
+    "text": "きがえる",
+    "hash": "1a9732773c15",
+    "sources": [
+      "article-vocab#a-n4-5"
+    ]
+  },
+  {
     "text": "きかく",
     "hash": "7084e45b23ef",
     "sources": [
@@ -13398,7 +13447,8 @@
     "text": "きせつ",
     "hash": "5d21e2f3c1f6",
     "sources": [
-      "vocab-n3"
+      "vocab-n3",
+      "article-vocab#a-n3-6"
     ]
   },
   {
@@ -14556,7 +14606,8 @@
     "hash": "90d473f63823",
     "sources": [
       "vocab-n3",
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n3-6"
     ]
   },
   {
@@ -16218,6 +16269,13 @@
     ]
   },
   {
+    "text": "けいかくをたてる",
+    "hash": "93aa645ac051",
+    "sources": [
+      "article-vocab#a-n4-4"
+    ]
+  },
+  {
     "text": "けいかする",
     "hash": "d07109335354",
     "sources": [
@@ -16263,7 +16321,8 @@
     "sources": [
       "vocab-n4",
       "vocab-n3",
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n4-5"
     ]
   },
   {
@@ -18037,6 +18096,13 @@
     "hash": "c6370c12b070",
     "sources": [
       "article#a-n4-2"
+    ]
+  },
+  {
+    "text": "こうした行事は、季節の変化を感じ、家族や地域の人とのつながりを確かめる機会になっている。",
+    "hash": "4296a228644a",
+    "sources": [
+      "article#a-n3-6"
     ]
   },
   {
@@ -24797,6 +24863,13 @@
     ]
   },
   {
+    "text": "この旅行で、一人でも何とかなるという自信がつきました。",
+    "hash": "69850c7411ad",
+    "sources": [
+      "article#a-n4-4"
+    ]
+  },
+  {
     "text": "この料金には、朝食代も含まれています。",
     "hash": "bf0b25e8bb65",
     "sources": [
@@ -25297,6 +25370,13 @@
     ]
   },
   {
+    "text": "これはわたしのかぞくのしゃしんです。",
+    "hash": "215ccb840c6b",
+    "sources": [
+      "article#a-n5-3"
+    ]
+  },
+  {
     "text": "これは個人的な見解にすぎない。",
     "hash": "206182a07d10",
     "sources": [
@@ -25646,6 +25726,13 @@
     ]
   },
   {
+    "text": "コンビニでは電気代や水道代もはらうことができます。",
+    "hash": "b8347b28d619",
+    "sources": [
+      "article#a-n5-4"
+    ]
+  },
+  {
     "text": "コンビニまで歩きます。",
     "hash": "cf8bdf013e2b",
     "sources": [
@@ -25876,6 +25963,13 @@
     "hash": "690e99521912",
     "sources": [
       "article#a-n5-2"
+    ]
+  },
+  {
+    "text": "さいきんは外国語のあんないも多くて、外国から来た人にもやさしいです。",
+    "hash": "003f9e507304",
+    "sources": [
+      "article#a-n5-4"
     ]
   },
   {
@@ -27911,7 +28005,8 @@
     "sources": [
       "vocab-n4",
       "vocab-n3",
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n4-4"
     ]
   },
   {
@@ -27920,7 +28015,8 @@
     "sources": [
       "vocab-n5",
       "vocab-n3",
-      "article-vocab#a-n4-2"
+      "article-vocab#a-n4-2",
+      "article-vocab#a-n5-5"
     ]
   },
   {
@@ -29035,6 +29131,13 @@
     ]
   },
   {
+    "text": "しゃしんの前にいるのがうちの犬の「マロ」です。",
+    "hash": "a162aa00685e",
+    "sources": [
+      "article#a-n5-3"
+    ]
+  },
+  {
     "text": "しゃせつ",
     "hash": "a2e045603dc4",
     "sources": [
@@ -29151,7 +29254,8 @@
     "hash": "bb1f06039b88",
     "sources": [
       "vocab-n3",
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n4-4"
     ]
   },
   {
@@ -31503,7 +31607,8 @@
       "vocab-n5",
       "vocab-n4",
       "vocab-n3",
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n5-5"
     ]
   },
   {
@@ -31512,7 +31617,8 @@
     "sources": [
       "vocab-n4",
       "vocab-n3",
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n4-4"
     ]
   },
   {
@@ -32171,7 +32277,8 @@
     "text": "すき",
     "hash": "01f5cef4b0aa",
     "sources": [
-      "vocab-n5"
+      "vocab-n5",
+      "article-vocab#a-n5-3"
     ]
   },
   {
@@ -32336,6 +32443,13 @@
     "hash": "48f70ea252b7",
     "sources": [
       "vocab-n2"
+    ]
+  },
+  {
+    "text": "ずっとここに住みたいです。",
+    "hash": "900344c283bf",
+    "sources": [
+      "article#a-n5-5"
     ]
   },
   {
@@ -32691,7 +32805,8 @@
     "sources": [
       "vocab-n5",
       "vocab-n3",
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n5-5"
     ]
   },
   {
@@ -32865,7 +32980,8 @@
     "hash": "58bff0a9927c",
     "sources": [
       "vocab-n3",
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n5-4"
     ]
   },
   {
@@ -34318,7 +34434,8 @@
     "text": "せんぱい",
     "hash": "67f74db94315",
     "sources": [
-      "vocab-n3"
+      "vocab-n3",
+      "article-vocab#a-n4-5"
     ]
   },
   {
@@ -34347,6 +34464,20 @@
     "hash": "c0e955ee2c44",
     "sources": [
       "vocab-n1"
+    ]
+  },
+  {
+    "text": "ぜんぶで五人います。",
+    "hash": "86c11222c979",
+    "sources": [
+      "article#a-n5-3"
+    ]
+  },
+  {
+    "text": "ぜんぶで三百円ぐらいです。",
+    "hash": "2ef169c78fcf",
+    "sources": [
+      "article#a-n5-4"
     ]
   },
   {
@@ -36665,6 +36796,13 @@
     ]
   },
   {
+    "text": "だいがくせい",
+    "hash": "304ca93218af",
+    "sources": [
+      "article-vocab#a-n5-3"
+    ]
+  },
+  {
     "text": "たいき",
     "hash": "b8a661c88cc9",
     "sources": [
@@ -37341,6 +37479,13 @@
     ]
   },
   {
+    "text": "たからもの",
+    "hash": "4134cf6b47de",
+    "sources": [
+      "article-vocab#a-n5-3"
+    ]
+  },
+  {
     "text": "たき",
     "hash": "4b178422ff7f",
     "sources": [
@@ -37409,6 +37554,13 @@
     "hash": "88def9f39755",
     "sources": [
       "vocab-n1"
+    ]
+  },
+  {
+    "text": "たくはいびんを出したり、お金をおろしたりすることもできます。",
+    "hash": "6edd2321b9ce",
+    "sources": [
+      "article#a-n5-4"
     ]
   },
   {
@@ -37526,7 +37678,8 @@
     "text": "だす",
     "hash": "7df1995ec75d",
     "sources": [
-      "vocab-n5"
+      "vocab-n5",
+      "article-vocab#a-n5-4"
     ]
   },
   {
@@ -38862,7 +39015,8 @@
     "hash": "96c2c5085215",
     "sources": [
       "vocab-n5",
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n5-5"
     ]
   },
   {
@@ -38985,6 +39139,13 @@
     "hash": "8615d6400704",
     "sources": [
       "vocab-n2"
+    ]
+  },
+  {
+    "text": "ちちは会社員で、ははは先生です。",
+    "hash": "ca16b2a5618b",
+    "sources": [
+      "article#a-n5-3"
     ]
   },
   {
@@ -41399,6 +41560,13 @@
     ]
   },
   {
+    "text": "でも、少しずつできることが増えてきました。",
+    "hash": "a6baec6132c0",
+    "sources": [
+      "article#a-n4-5"
+    ]
+  },
+  {
     "text": "てもいい",
     "hash": "eb2f7ec67936",
     "sources": [
@@ -43033,6 +43201,13 @@
     "hash": "a51a149cc1b2",
     "sources": [
       "vocab-n3"
+    ]
+  },
+  {
+    "text": "とちゅうに川があって、はしをわたります。",
+    "hash": "db1247611da7",
+    "sources": [
+      "article#a-n5-5"
     ]
   },
   {
@@ -45486,7 +45661,8 @@
     "hash": "5e2aef54b9cf",
     "sources": [
       "vocab-n3",
-      "article-vocab#a-n5-2"
+      "article-vocab#a-n5-2",
+      "article-vocab#a-n5-4"
     ]
   },
   {
@@ -46990,6 +47166,13 @@
     ]
   },
   {
+    "text": "はじめのころは失敗ばかりで、先輩によく注意されました。",
+    "hash": "4d1c20bd6a03",
+    "sources": [
+      "article#a-n4-5"
+    ]
+  },
+  {
     "text": "はじめまして",
     "hash": "75f97f586024",
     "sources": [
@@ -47591,6 +47774,13 @@
     ]
   },
   {
+    "text": "はなれて住んでいますが、月に一度は電話で話します。",
+    "hash": "1ee3e2e599e8",
+    "sources": [
+      "article#a-n5-3"
+    ]
+  },
+  {
     "text": "はなれる",
     "hash": "acc1dc1dc6de",
     "sources": [
@@ -47709,7 +47899,8 @@
     "text": "はらう",
     "hash": "30a0f08a89c3",
     "sources": [
-      "vocab-n3"
+      "vocab-n3",
+      "article-vocab#a-n5-4"
     ]
   },
   {
@@ -48780,6 +48971,13 @@
     "hash": "6fd86d25d2c2",
     "sources": [
       "article-vocab#a-n3-2"
+    ]
+  },
+  {
+    "text": "ひとりたび",
+    "hash": "4b59548796bb",
+    "sources": [
+      "article-vocab#a-n4-4"
     ]
   },
   {
@@ -50487,6 +50685,13 @@
     ]
   },
   {
+    "text": "ふゆはとくに人気です。",
+    "hash": "acc04bd7f8b3",
+    "sources": [
+      "article#a-n5-4"
+    ]
+  },
+  {
     "text": "ふよう",
     "hash": "fe3a8d83e19c",
     "sources": [
@@ -51483,7 +51688,8 @@
       "vocab-n5",
       "vocab-n3",
       "vocab-n2",
-      "article-vocab#a-n3-1"
+      "article-vocab#a-n3-1",
+      "article-vocab#a-n5-4"
     ]
   },
   {
@@ -52918,6 +53124,13 @@
     ]
   },
   {
+    "text": "まず有名な庭園を見に行きました。",
+    "hash": "535e16d33e28",
+    "sources": [
+      "article#a-n4-4"
+    ]
+  },
+  {
     "text": "まぜる",
     "hash": "fe5f0bde71fa",
     "sources": [
@@ -52981,6 +53194,13 @@
     "hash": "22e031359f13",
     "sources": [
       "vocab-n3#浅い"
+    ]
+  },
+  {
+    "text": "また行きたいと思います。",
+    "hash": "720438c4c4dc",
+    "sources": [
+      "article#a-n4-4"
     ]
   },
   {
@@ -53339,6 +53559,13 @@
     "sources": [
       "vocab-n3",
       "vocab-n2"
+    ]
+  },
+  {
+    "text": "まんなかにいるのはちちとははです。",
+    "hash": "168217a26ce4",
+    "sources": [
+      "article#a-n5-3"
     ]
   },
   {
@@ -59332,6 +59559,13 @@
     ]
   },
   {
+    "text": "わたしのかぞくはみんな犬が大好きです。",
+    "hash": "c3cfc0eb84f1",
+    "sources": [
+      "article#a-n5-3"
+    ]
+  },
+  {
     "text": "わたしのかばんは黒です。",
     "hash": "64387029fc74",
     "sources": [
@@ -59430,6 +59664,13 @@
     ]
   },
   {
+    "text": "わたしはこの町が大好きです。",
+    "hash": "6fdeba0c1eb3",
+    "sources": [
+      "article#a-n5-5"
+    ]
+  },
+  {
     "text": "わたしはスポーツがあまり好きではありません。",
     "hash": "acc1678ea031",
     "sources": [
@@ -59441,6 +59682,13 @@
     "hash": "258767c0f619",
     "sources": [
       "article#a-n5-1"
+    ]
+  },
+  {
+    "text": "わたしはまいにちコンビニへ行きます。",
+    "hash": "bdc00edb865d",
+    "sources": [
+      "article#a-n5-4"
     ]
   },
   {
@@ -59472,10 +59720,24 @@
     ]
   },
   {
+    "text": "わたしは小さい町に住んでいます。",
+    "hash": "e15e32499eb3",
+    "sources": [
+      "article#a-n5-5"
+    ]
+  },
+  {
     "text": "わたしは青が好きです。",
     "hash": "970ce3df158b",
     "sources": [
       "vocab-n5#青"
+    ]
+  },
+  {
+    "text": "わたしは大学に通いながら、カフェでアルバイトをしています。",
+    "hash": "b51d377c1fa0",
+    "sources": [
+      "article#a-n4-5"
     ]
   },
   {
@@ -59596,7 +59858,8 @@
     "text": "わたる",
     "hash": "c73f53f0957d",
     "sources": [
-      "vocab-n5"
+      "vocab-n5",
+      "article-vocab#a-n5-5"
     ]
   },
   {
@@ -60276,6 +60539,13 @@
     "hash": "de99b2c99b4e",
     "sources": [
       "confusables-eg"
+    ]
+  },
+  {
+    "text": "一人だったので、好きなものを好きなだけ注文できました。",
+    "hash": "abf68bbc4db4",
+    "sources": [
+      "article#a-n4-4"
     ]
   },
   {
@@ -61084,6 +61354,13 @@
     ]
   },
   {
+    "text": "右にいるのはあにです。",
+    "hash": "5643ff8711a7",
+    "sources": [
+      "article#a-n5-3"
+    ]
+  },
+  {
     "text": "雨がやんだあと、きれいな虹が出ました。",
     "hash": "eff77d14e8bb",
     "sources": [
@@ -61574,6 +61851,13 @@
     ]
   },
   {
+    "text": "駅がとても大きくて、びっくりしました。",
+    "hash": "91725d1bd296",
+    "sources": [
+      "article#a-n4-4"
+    ]
+  },
+  {
     "text": "駅から遠いので、歩くとかなり時間がかかります。",
     "hash": "4940fc7a40ae",
     "sources": [
@@ -61585,6 +61869,13 @@
     "hash": "8ad394ecd7ae",
     "sources": [
       "vocab-n2#不便"
+    ]
+  },
+  {
+    "text": "駅から家まで、あるいて十分ぐらいです。",
+    "hash": "340976073804",
+    "sources": [
+      "article#a-n5-5"
     ]
   },
   {
@@ -63066,6 +63357,13 @@
     ]
   },
   {
+    "text": "夏になると、各地で祭りや花火大会が開かれ、浴衣を着た人でにぎわう。",
+    "hash": "816456d8c2e5",
+    "sources": [
+      "article#a-n3-6"
+    ]
+  },
+  {
     "text": "夏になると、町でお祭りが開かれます。",
     "hash": "f92ddc31f028",
     "sources": [
@@ -63329,6 +63627,13 @@
     "hash": "42991b50824c",
     "sources": [
       "vocab-n2#何より"
+    ]
+  },
+  {
+    "text": "家族が集まっておせち料理を食べ、神社に初詣に出かけるのが一般的だ。",
+    "hash": "0ff39b92cdfd",
+    "sources": [
+      "article#a-n3-6"
     ]
   },
   {
@@ -64347,6 +64652,13 @@
     ]
   },
   {
+    "text": "会社のとなりにあるので、とてもべんりです。",
+    "hash": "3814e1a8f63a",
+    "sources": [
+      "article#a-n5-4"
+    ]
+  },
+  {
     "text": "会社の帰りにスーパーに寄って、夕飯の材料を買いました。",
     "hash": "2dd4d652dc61",
     "sources": [
@@ -64533,6 +64845,13 @@
     "hash": "11c95c680005",
     "sources": [
       "vocab-n3#砂"
+    ]
+  },
+  {
+    "text": "海の近くにあって、空気がきれいです。",
+    "hash": "292297bac399",
+    "sources": [
+      "article#a-n5-5"
     ]
   },
   {
@@ -67121,6 +67440,13 @@
     ]
   },
   {
+    "text": "休みの日は、よくみんなで公園へ行って、しゃしんをとります。",
+    "hash": "a7a7a68be9f2",
+    "sources": [
+      "article#a-n5-3"
+    ]
+  },
+  {
     "text": "休みの日は、家でのんびり過ごすのが好きだ。",
     "hash": "1994afa27082",
     "sources": [
@@ -68077,6 +68403,13 @@
     "hash": "2b2ed88542c2",
     "sources": [
       "vocab-n3#握る"
+    ]
+  },
+  {
+    "text": "近くに古いおてらがあって、しずかで気もちがいいです。",
+    "hash": "b3d02ce1bd88",
+    "sources": [
+      "article#a-n5-5"
     ]
   },
   {
@@ -71926,6 +72259,13 @@
     ]
   },
   {
+    "text": "行き先は、前から気になっていた金沢です。",
+    "hash": "05e6bedcd5e5",
+    "sources": [
+      "article#a-n4-4"
+    ]
+  },
+  {
     "text": "行列のできる店が全て美味しいとは限らない。",
     "hash": "eb931df952fa",
     "sources": [
@@ -73835,6 +74175,13 @@
     "hash": "2efb6490abb3",
     "sources": [
       "vocab-n1#こじれる"
+    ]
+  },
+  {
+    "text": "左の小さい子はいもうとです。",
+    "hash": "f764fc19cfe6",
+    "sources": [
+      "article#a-n5-3"
     ]
   },
   {
@@ -75781,6 +76128,13 @@
     "hash": "f4d3493c8711",
     "sources": [
       "article#a-n2-3"
+    ]
+  },
+  {
+    "text": "仕事の内容は、注文を取ったり、コーヒーを作ったり、テーブルをかたづけたりすることです。",
+    "hash": "f758773ae498",
+    "sources": [
+      "article#a-n4-5"
     ]
   },
   {
@@ -80335,6 +80689,13 @@
     ]
   },
   {
+    "text": "秋は「食欲の秋」「読書の秋」とも言われ、涼しくなった空気の中で紅葉を楽しむ人が多い。",
+    "hash": "d119dafac03f",
+    "sources": [
+      "article#a-n3-6"
+    ]
+  },
+  {
     "text": "終電にはぎりぎり間に合わなかったが、始発を待ってなんとか家にたどり着いた。",
     "hash": "34ddeadbd132",
     "sources": [
@@ -80374,6 +80735,13 @@
     "hash": "cc4e22af574c",
     "sources": [
       "confusables-word"
+    ]
+  },
+  {
+    "text": "週に三回、夕方から夜までのシフトです。",
+    "hash": "48e704f9bef9",
+    "sources": [
+      "article#a-n4-5"
     ]
   },
   {
@@ -81113,6 +81481,13 @@
     ]
   },
   {
+    "text": "出発の前は少し不安でしたが、自分で計画を立てるのは思ったより楽しかったです。",
+    "hash": "3b4043654a73",
+    "sources": [
+      "article#a-n4-4"
+    ]
+  },
+  {
     "text": "出発の直前に鏡が割れたのを、彼女は旅の凶兆ではないかと気に病んだ。",
     "hash": "043c7e734fc0",
     "sources": [
@@ -81169,6 +81544,13 @@
     ]
   },
   {
+    "text": "春には川のそばのさくらがとてもきれいで、たくさんの人が花見に来ます。",
+    "hash": "46a2de130eb5",
+    "sources": [
+      "article#a-n5-5"
+    ]
+  },
+  {
     "text": "春はさくら、秋はもみじがとてもきれいです。",
     "hash": "e1720a8be049",
     "sources": [
@@ -81180,6 +81562,13 @@
     "hash": "c062ddbff6fb",
     "sources": [
       "article#a-n4-3"
+    ]
+  },
+  {
+    "text": "春は桜の季節だ。",
+    "hash": "fd5ead5b11f9",
+    "sources": [
+      "article#a-n3-6"
     ]
   },
   {
@@ -81782,6 +82171,13 @@
     "hash": "48c4174b5aa1",
     "sources": [
       "grammar-n5#n5-46"
+    ]
+  },
+  {
+    "text": "小さい店ですが、いろいろなことができて、日本のせいかつにかかせません。",
+    "hash": "93d0c42198de",
+    "sources": [
+      "article#a-n5-4"
     ]
   },
   {
@@ -84929,6 +85325,13 @@
     ]
   },
   {
+    "text": "人々は公園に集まり、花の下で食事をしながら春の訪れを祝う。",
+    "hash": "3a90eb56d80e",
+    "sources": [
+      "article#a-n3-6"
+    ]
+  },
+  {
     "text": "人々は彼を英雄として崇め、その功績を語り継いだ。",
     "hash": "34329fa4c8d1",
     "sources": [
@@ -86551,6 +86954,13 @@
     "hash": "98f8ebb53c0b",
     "sources": [
       "vocab-n2#追い付く"
+    ]
+  },
+  {
+    "text": "先月、はじめて一人で旅行に行きました。",
+    "hash": "f9b3d88851e8",
+    "sources": [
+      "article#a-n4-4"
     ]
   },
   {
@@ -90082,6 +90492,13 @@
     ]
   },
   {
+    "text": "知らない町を一人で歩くのは、ちょっとさびしいけれど、自由でとても気持ちがよかったです。",
+    "hash": "35186c50e751",
+    "sources": [
+      "article#a-n4-4"
+    ]
+  },
+  {
     "text": "知る",
     "hash": "1e4792083f53",
     "sources": [
@@ -90908,6 +91325,13 @@
     ]
   },
   {
+    "text": "朝はおにぎりとコーヒーを買います。",
+    "hash": "6f2400672ce9",
+    "sources": [
+      "article#a-n5-4"
+    ]
+  },
+  {
     "text": "朝はパンを食べます。",
     "hash": "6e4568f549ee",
     "sources": [
@@ -90985,10 +91409,24 @@
     ]
   },
   {
+    "text": "朝早く新幹線に乗って、昼過ぎに金沢に着きました。",
+    "hash": "a51909ab539d",
+    "sources": [
+      "article#a-n4-4"
+    ]
+  },
+  {
     "text": "朝晩は少し寒さを感じるようになってきた。",
     "hash": "4db80cd7c1ad",
     "sources": [
       "vocab-n4#感じる"
+    ]
+  },
+  {
+    "text": "町には大きなビルはありませんが、ゆうびんきょくやびょういん、スーパーがあります。",
+    "hash": "d00c23bfb3a9",
+    "sources": [
+      "article#a-n5-5"
     ]
   },
   {
@@ -92609,6 +93047,13 @@
     ]
   },
   {
+    "text": "天気がよくて、写真をたくさん撮りました。",
+    "hash": "e5311e128136",
+    "sources": [
+      "article#a-n4-4"
+    ]
+  },
+  {
     "text": "天気が良ければ、出かけよう。",
     "hash": "80f7b85f8ed2",
     "sources": [
@@ -92704,6 +93149,13 @@
     "hash": "fd6583b8da3b",
     "sources": [
       "vocab-n5#色々"
+    ]
+  },
+  {
+    "text": "店に着いたら、まず制服に着がえて、手をきれいに洗います。",
+    "hash": "45140818f940",
+    "sources": [
+      "article#a-n4-5"
     ]
   },
   {
@@ -93677,6 +94129,13 @@
     "hash": "f31506b8689b",
     "sources": [
       "vocab-n5#雪"
+    ]
+  },
+  {
+    "text": "冬には正月がある。",
+    "hash": "aed8a9c20151",
+    "sources": [
+      "article#a-n3-6"
     ]
   },
   {
@@ -95157,6 +95616,13 @@
     ]
   },
   {
+    "text": "日本には春夏秋冬という四つの季節があり、それぞれに合わせた行事が今も大切にされている。",
+    "hash": "5356b3042d98",
+    "sources": [
+      "article#a-n3-6"
+    ]
+  },
+  {
     "text": "日本には有名なお祭りが多い。例えば、京都の祇園祭が挙げられる。",
     "hash": "314dcb9f2394",
     "sources": [
@@ -96226,6 +96692,13 @@
     "hash": "fd8f9585b2c4",
     "sources": [
       "vocab-n4#レジ"
+    ]
+  },
+  {
+    "text": "買い物にはちょっとふべんですが、みんなしんせつで、すみやすい町です。",
+    "hash": "e1e75c9a36cf",
+    "sources": [
+      "article#a-n5-5"
     ]
   },
   {
@@ -102299,6 +102772,13 @@
     ]
   },
   {
+    "text": "便利な生活の中でも、自然のリズムを大切にする心は、これからも受けつがれていくだろう。",
+    "hash": "c7f1fb5aae1f",
+    "sources": [
+      "article#a-n3-6"
+    ]
+  },
+  {
     "text": "便利になったとはいうものの、失われたものも少なくない。",
     "hash": "72a63003a60a",
     "sources": [
@@ -102324,6 +102804,13 @@
     "hash": "137f7a9a5b06",
     "sources": [
       "vocab-n4#邪魔"
+    ]
+  },
+  {
+    "text": "勉強との両立は簡単ではありませんが、社会に出る前のいい経験になっていると思います。",
+    "hash": "c530897e0dbe",
+    "sources": [
+      "article#a-n4-5"
     ]
   },
   {
@@ -105065,6 +105552,13 @@
     ]
   },
   {
+    "text": "夜、おなかがすいたときは、あたたかいおでんを買います。",
+    "hash": "2b2fa3040f8e",
+    "sources": [
+      "article#a-n5-4"
+    ]
+  },
+  {
     "text": "夜、ライトアップされたさくらもうつくしいです。",
     "hash": "65fa63fc636b",
     "sources": [
@@ -105118,6 +105612,13 @@
     "hash": "2cbee02bef18",
     "sources": [
       "vocab-n4#恐ろしい"
+    ]
+  },
+  {
+    "text": "夜は市場で新鮮な海の物を食べました。",
+    "hash": "39554c82f1af",
+    "sources": [
+      "article#a-n4-4"
     ]
   },
   {
