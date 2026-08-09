@@ -111,7 +111,7 @@ window.Kana = (function () {
       '<div class="kana-modes">' +
       '<button class="kana-mode-btn ' + (chartMode === 'sound' ? 'on' : '') + '" onclick="Kana.setMode(\'sound\')">🔊 ' + enOr('發音', 'Sound') + '</button>' +
       '<button class="kana-mode-btn ' + (chartMode === 'stroke' ? 'on' : '') + '" onclick="Kana.setMode(\'stroke\')">✏️ ' + enOr('筆順練習', 'Strokes') + '</button>' +
-      '<button class="kana-quiz-btn" onclick="Kana.quizMenu()">📝 ' + enOr('測驗', 'Quiz') + '</button>' +
+      '<button class="kana-quiz-btn" onclick="Kana.quiz(\'read\')">📝 ' + enOr('測驗', 'Quiz') + '</button>' +
       '</div>' +
       '<div id="kanaHint" class="kana-hint">' + (chartMode === 'stroke' ? strokeHint : soundHint) + '</div>' +
       '<div id="kanaChart">' + chartHtml() + '</div>' +
@@ -236,7 +236,6 @@ window.Kana = (function () {
     w.innerHTML = '<div class="kana-top"><b>📝 ' + enOr('選擇測驗', 'Choose quiz') + '</b><span class="kana-x" onclick="Kana.open()">✕</span></div>' +
       '<div class="kq-box"><div style="display:flex;flex-direction:column;gap:12px;max-width:320px;margin:20px auto">' +
       '<button class="kana-tab" style="padding:16px" onclick="Kana.quiz(\'read\')">🔤 ' + enOr('認讀測驗', 'Reading') + '<div style="font-size:12px;font-weight:400;color:var(--tx3,#aaa);margin-top:4px">' + enOr('看假名 → 選羅馬拼音', 'Kana → romaji') + '</div></button>' +
-      '<button class="kana-tab" style="padding:16px" onclick="Kana.quiz(\'stroke\')">✍️ ' + enOr('筆畫數測驗', 'Stroke count') + '<div style="font-size:12px;font-weight:400;color:var(--tx3,#aaa);margin-top:4px">' + enOr('看假名 → 選筆畫數', 'Kana → number of strokes') + '</div></button>' +
       '</div></div>';
   }
   function quiz(mode) {
