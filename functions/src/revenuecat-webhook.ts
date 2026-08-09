@@ -213,10 +213,16 @@ export const revenuecatWebhook = functions.onRequest(
 
         case "EXPIRATION": {
           // 到期是「結果」不是獨立金流事件 — 只改訂閱狀態,不寫交易列。
-          // (扣款失敗那筆已由 BILLING_ISSUE 記錄;若這裡也記 type:'fail' 會讓「一次扣款失敗」
-          //  在帳本長成兩列假「扣款失敗」,虛胖失敗數。稽核軌跡留在 log 即可。)
-          await patchSubscription(uid, { status: "expired", willRenew: false });
-          console.log("ℹ️ EXPIRATION (只改狀態,不入帳)", { uid, plan, txn: event.transaction_id });
+          // ⚠️ 防亂序/寬限期:Apple/RC 事件可能延遲或亂序送達。若目前到期日仍在未來,
+          //    代表已被較新的續訂(RENEWAL)延長 → 這是過期的舊事件,忽略,不可降級(否則誤鎖付費者
+          //    = wrongly_expired)。真的該過期時,連 expiresAt 一起拉到 now,狀態才不會跟到期日打架。
+          const curExp = await getSubscription(uid);
+          if (curExp && (curExp.expiresAt || 0) > nowMs()) {
+            console.log("⏭️ EXPIRATION 忽略(到期日仍在未來,已被較新續訂延長)", { uid, expiresAt: curExp.expiresAt, txn: event.transaction_id });
+          } else {
+            await patchSubscription(uid, { status: "expired", willRenew: false, expiresAt: nowMs() });
+            console.log("ℹ️ EXPIRATION (只改狀態,不入帳)", { uid, plan, txn: event.transaction_id });
+          }
           break;
         }
 

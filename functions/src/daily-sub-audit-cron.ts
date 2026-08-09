@@ -54,14 +54,23 @@ export const dailySubAuditCron = functions.onSchedule(
       }
     });
 
-    // 解析 email + 自動修 over_granted(到期卻仍開通 → 翻 expired)
+    // 解析 email + 自動修:
+    //   over_granted(到期卻仍開通 → 翻 expired)
+    //   wrongly_expired(到期日仍在未來卻被標 expired → 翻回 active,救回被誤鎖的付費者;expiresAt 不動)
+    //     安全:refund/chargeback 的狀態是 refunded 且 expiresAt 已被拉到 now,不會落入 wrongly_expired。
     let autoFixed = 0;
+    let autoHealed = 0;
     for (const iss of issues) {
       try { iss.email = (await admin.auth().getUser(iss.uid as string)).email || ""; } catch { iss.email = "(查無帳號)"; }
       if (iss.type === "over_granted") {
         try {
           await patchSubscription(iss.uid as string, { status: "expired", willRenew: false });
           iss.auto_fixed = true; autoFixed++;
+        } catch (e) { iss.auto_fixed = false; iss.fix_error = String(e); }
+      } else if (iss.type === "wrongly_expired") {
+        try {
+          await patchSubscription(iss.uid as string, { status: "active" });
+          iss.auto_fixed = true; autoHealed++;
         } catch (e) { iss.auto_fixed = false; iss.fix_error = String(e); }
       }
     }
@@ -71,6 +80,7 @@ export const dailySubAuditCron = functions.onSchedule(
       total: real,
       issue_count: issues.length,
       auto_fixed: autoFixed,
+      auto_healed: autoHealed,
       issues: issues.slice(0, 100),   // 後台顯示用,上限 100
     };
     await db.doc("system_alerts/sub_audit").set(summary);
