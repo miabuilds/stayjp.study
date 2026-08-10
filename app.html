@@ -2227,8 +2227,10 @@ const Shadow = (() => {
     // 發音檢查:只在「App 且有原生語音辨識(canSpeech)」時才顯示。
     // 瀏覽器的 Web Speech 走 Google 雲端、常回 network 錯誤(半成品觀感)→ 一律不在網頁顯示,
     // 等含原生模組的新 App build 上線才亮,避免 production 看到會壞的功能。
+    // 測試逃生門:網址帶 ?spktest=1 才在瀏覽器顯示(給自己用 iPhone Safari 測;一般 user 看不到 → production 乾淨)
+    const _spkTest = /[?&]spktest/.test(location.search);
     const _spkBar = document.getElementById('shadowSpkBar');
-    if (_spkBar) _spkBar.style.display = (spkIsNative() && window.STAYJP_NATIVE && window.STAYJP_NATIVE.canSpeech) ? 'block' : 'none';
+    if (_spkBar) _spkBar.style.display = ((spkIsNative() && window.STAYJP_NATIVE && window.STAYJP_NATIVE.canSpeech) || _spkTest) ? 'block' : 'none';
     requestAnimationFrame(() => mask.classList.add('on'));
     mask.addEventListener('click', e => {
       // 點按鈕本體或內部 svg / path 都算
