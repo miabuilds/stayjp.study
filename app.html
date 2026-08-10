@@ -2182,6 +2182,10 @@ const Shadow = (() => {
   let manualAdvance = false; // 手動換句:播完一句後等使用者按 ▶,不自動跳(給念得慢的人)
   // 錄音對比(純本機:MediaRecorder → objectURL 回放,不上傳、不進 Firestore)
   let recStream = null, mediaRec = null, recChunks = [], recUrl = null, recAudio = null, recording = false;
+  // 發音辨識(免費、不用 AI):瀏覽器用 Web Speech;App(WKWebView 無 Web Speech)→ STAYJP_NATIVE 橋接原生 SFSpeechRecognizer
+  const SR_CLS = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const spkIsNative = () => !!(window.STAYJP_NATIVE && window.STAYJP_NATIVE.isNativeApp);
+  let sr = null, listening = false, spkTimer = null, spkFinal = '';
 
   function open() {
     closeOverlay();
@@ -2201,6 +2205,11 @@ const Shadow = (() => {
         <button class="shadow-btn shadow-btn-main" data-act="toggle" title="暫停/繼續 (Space)">⏸</button>
         <button class="shadow-btn" data-act="next" title="下一句 (→)">▶</button>
       </div>
+      <div id="shadowSpkBar" style="display:none;margin-top:14px;text-align:center">
+        <button id="spkMicBtn" data-act="speak" title="念念看,我聽聽對不對" style="border:none;background:#2563eb;color:#fff;border-radius:22px;padding:9px 20px;font-size:14px;font-weight:600;cursor:pointer">🎤 發音檢查</button>
+        <div id="spkStatus" style="font-size:12px;color:var(--tx2,#888);margin-top:7px"></div>
+        <div id="spkResult" style="margin-top:8px"></div>
+      </div>
       <div id="shadowRecBar" style="display:none;margin-top:12px;text-align:center">
         <button id="recToggleBtn" data-act="rec" style="border:none;background:#B8362A;color:#fff;border-radius:22px;padding:9px 18px;font-size:14px;font-weight:600;cursor:pointer;margin:0 4px">⏺ 開始錄音</button>
         <button id="recPlayBtn" data-act="playrec" disabled style="border:1px solid var(--bd,#ccc);background:transparent;color:var(--tx,#333);border-radius:22px;padding:9px 18px;font-size:14px;cursor:pointer;margin:0 4px;opacity:.45">▶ 聽我的</button>
@@ -2215,6 +2224,10 @@ const Shadow = (() => {
       <div class="shadow-hint">Space 暫停 · ← → 切換 · R 重播 · Esc 退出</div>
     </div>`;
     document.body.appendChild(mask);
+    // 發音檢查:只有「瀏覽器支援 Web Speech」或「App 有宣告原生語音(canSpeech)」才顯示,
+    // 避免舊版 App(還沒原生語音模組)點了卡住。
+    const _spkBar = document.getElementById('shadowSpkBar');
+    if (_spkBar) _spkBar.style.display = (SR_CLS || (spkIsNative() && window.STAYJP_NATIVE && window.STAYJP_NATIVE.canSpeech)) ? 'block' : 'none';
     requestAnimationFrame(() => mask.classList.add('on'));
     mask.addEventListener('click', e => {
       // 點按鈕本體或內部 svg / path 都算
@@ -2227,6 +2240,7 @@ const Shadow = (() => {
       else if (act === 'fav') toggleFavCurrent();
       else if (act === 'rec') toggleRec();
       else if (act === 'playrec') playRec();
+      else if (act === 'speak') speechToggle();
       else if (act === 'exit') exit();
     });
     document.getElementById('shadowSpeed').addEventListener('change', e => {
@@ -2695,6 +2709,62 @@ const Shadow = (() => {
     let c = Object.keys(loadFavs()).length;
     try { c += (JSON.parse(localStorage.getItem('word_notebook')) || []).length; } catch(e) {}
     return c;
+  }
+
+  // ── 發音辨識(免費,不用 AI)──
+  function spkPost(o) { try { window.ReactNativeWebView && window.ReactNativeWebView.postMessage(JSON.stringify(o)); } catch (e) {} }
+  const kata2hira = s => String(s).replace(/[ァ-ヶ]/g, c => String.fromCharCode(c.charCodeAt(0) - 0x60));
+  const spkNorm = s => kata2hira(s).replace(/[\s　、。「」『』・,.!?！？…ー〜（）()]/g, '');
+  function spkScore(target, heard) {
+    // 目標句與辨識結果都轉平假名、去標點 → LCS 比對(分母取兩者較長,少念/多念都扣)
+    const a = [...spkNorm(target)], b = [...spkNorm(heard)], m = a.length, n = b.length;
+    if (!m || !n) return 0;
+    const dp = Array.from({ length: m + 1 }, () => new Array(n + 1).fill(0));
+    for (let i = 1; i <= m; i++) for (let j = 1; j <= n; j++) dp[i][j] = a[i - 1] === b[j - 1] ? dp[i - 1][j - 1] + 1 : Math.max(dp[i - 1][j], dp[i][j - 1]);
+    return Math.round(dp[m][n] / Math.max(m, n) * 100);
+  }
+  function setSpkBtn(on) { const b = document.getElementById('spkMicBtn'); if (b) { b.textContent = on ? '⏹ 停止' : '🎤 發音檢查'; b.style.background = on ? '#555' : '#2563eb'; } }
+  function spkErr(st, err) {
+    if (!st) return;
+    if (err === 'not-allowed' || err === 'service-not-allowed' || err === 'audio-capture') st.textContent = '🚫 需要麥克風權限才能辨識,請允許後再試。';
+    else if (err === 'network') st.textContent = '網路不穩,辨識失敗,請重試。';
+    else if (err === 'language-not-supported') st.textContent = '此裝置不支援日文辨識。';
+    else st.textContent = '沒聽清楚,再念一次看看 🙂';
+  }
+  function showSpkResult(heard) {
+    const it = queue[idx] || {}; const score = spkScore(it.j || '', heard);
+    const verdict = score >= 85 ? '完美!發音很清楚 🎉' : score >= 60 ? '不錯!再順一點就更好 👍' : '再念一次試試 💪';
+    const color = score >= 60 ? 'var(--ok,#16A34A)' : 'var(--ac,#e0563f)';
+    const res = document.getElementById('spkResult'); if (!res) return;
+    res.innerHTML = '<div style="background:var(--bg3,#f4f4f5);border-radius:12px;padding:12px 14px;max-width:340px;margin:0 auto">' +
+      '<div style="font-size:24px;font-weight:800;color:' + color + '">' + score + '%</div>' +
+      '<div style="font-size:13.5px;margin-top:2px">' + verdict + '</div>' +
+      '<div style="font-size:12px;color:var(--tx3,#999);margin-top:6px">我聽到:「' + heard + '」</div></div>';
+  }
+  function stopSpeech() { if (spkIsNative()) spkPost({ type: 'SPEECH_STOP' }); else { try { sr && sr.stop(); } catch (e) {} } }
+  function startSpeechNative(st) {
+    spkFinal = ''; listening = true; setSpkBtn(true); if (st) st.textContent = '🎤 聽你念…';
+    clearTimeout(spkTimer); spkTimer = setTimeout(() => spkPost({ type: 'SPEECH_STOP' }), 8000);
+    window.stayjpSpeechResult = (transcript, isFinal) => { if (isFinal) { if (transcript) spkFinal = transcript; } else if (transcript && st) st.textContent = '… ' + transcript; };
+    window.stayjpSpeechEnd = (err) => { listening = false; setSpkBtn(false); clearTimeout(spkTimer); if (spkFinal) { if (st) st.textContent = ''; showSpkResult(spkFinal); } else spkErr(st, err); };
+    spkPost({ type: 'SPEECH_START', lang: 'ja-JP' });
+  }
+  function speechToggle() {
+    if (listening) { stopSpeech(); return; }
+    const st = document.getElementById('spkStatus'), res = document.getElementById('spkResult');
+    if (res) res.innerHTML = '';
+    // 先停原音,避免蓋到辨識
+    paused = true; clearTimer(); if (audioEl) { try { audioEl.pause(); } catch (e) {} }
+    try { if (window.speechSynthesis) speechSynthesis.cancel(); } catch (e) {}
+    if (spkIsNative()) { startSpeechNative(st); return; }
+    if (!SR_CLS) { if (st) st.textContent = '這個瀏覽器不支援語音辨識,請用 Chrome/Safari 或 App。'; return; }
+    spkFinal = ''; let finalText = '', gotErr = '';
+    sr = new SR_CLS(); sr.lang = 'ja-JP'; sr.interimResults = true; sr.continuous = false; sr.maxAlternatives = 1;
+    sr.onstart = () => { listening = true; setSpkBtn(true); if (st) st.textContent = '🎤 聽你念…'; clearTimeout(spkTimer); spkTimer = setTimeout(() => { try { sr.stop(); } catch (e) {} }, 8000); };
+    sr.onresult = e => { let interim = ''; for (const r of e.results) (r.isFinal ? (finalText += r[0].transcript) : (interim += r[0].transcript)); if (interim && st) st.textContent = '… ' + interim; };
+    sr.onerror = ev => { gotErr = ev.error || 'error'; };
+    sr.onend = () => { listening = false; setSpkBtn(false); clearTimeout(spkTimer); if (finalText) { if (st) st.textContent = ''; showSpkResult(finalText); } else spkErr(st, gotErr); };
+    try { sr.start(); } catch (e) { if (st) st.textContent = '無法啟動辨識,請重試。'; }
   }
 
   return { startCurrent, startFavs, startGrammarFavs, start, favCount };
