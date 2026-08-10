@@ -2224,10 +2224,11 @@ const Shadow = (() => {
       <div class="shadow-hint">Space 暫停 · ← → 切換 · R 重播 · Esc 退出</div>
     </div>`;
     document.body.appendChild(mask);
-    // 發音檢查:只有「瀏覽器支援 Web Speech」或「App 有宣告原生語音(canSpeech)」才顯示,
-    // 避免舊版 App(還沒原生語音模組)點了卡住。
+    // 發音檢查:只在「App 且有原生語音辨識(canSpeech)」時才顯示。
+    // 瀏覽器的 Web Speech 走 Google 雲端、常回 network 錯誤(半成品觀感)→ 一律不在網頁顯示,
+    // 等含原生模組的新 App build 上線才亮,避免 production 看到會壞的功能。
     const _spkBar = document.getElementById('shadowSpkBar');
-    if (_spkBar) _spkBar.style.display = (SR_CLS || (spkIsNative() && window.STAYJP_NATIVE && window.STAYJP_NATIVE.canSpeech)) ? 'block' : 'none';
+    if (_spkBar) _spkBar.style.display = (spkIsNative() && window.STAYJP_NATIVE && window.STAYJP_NATIVE.canSpeech) ? 'block' : 'none';
     requestAnimationFrame(() => mask.classList.add('on'));
     mask.addEventListener('click', e => {
       // 點按鈕本體或內部 svg / path 都算
@@ -2727,7 +2728,7 @@ const Shadow = (() => {
   function spkErr(st, err) {
     if (!st) return;
     if (err === 'not-allowed' || err === 'service-not-allowed' || err === 'audio-capture') st.textContent = '🚫 需要麥克風權限才能辨識,請允許後再試。';
-    else if (err === 'network') st.textContent = '網路不穩,辨識失敗,請重試。';
+    else if (err === 'network') st.textContent = '瀏覽器辨識服務連線失敗(Chrome 雲端辨識偶爾會這樣);App 內用裝置原生辨識,不受影響。';
     else if (err === 'language-not-supported') st.textContent = '此裝置不支援日文辨識。';
     else st.textContent = '沒聽清楚,再念一次看看 🙂';
   }
