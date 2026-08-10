@@ -2550,15 +2550,21 @@ const Shadow = (() => {
       if (hint) hint.textContent = '🚫 沒有麥克風權限 — 請在瀏覽器允許麥克風後再試。'; return;
     }
     recChunks = [];
-    try { mediaRec = new MediaRecorder(recStream); }
+    // iOS 只支援 mp4/aac、桌機/Android 多為 webm/opus。挑一個瀏覽器實際支援的容器,
+    // 否則預設容器與實際編碼不符 → 回放常常「沒聲音」或延遲解碼。
+    const _recMime = ['audio/mp4', 'audio/aac', 'audio/webm;codecs=opus', 'audio/webm'].find(t => {
+      try { return window.MediaRecorder && MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported(t); } catch (e) { return false; }
+    });
+    try { mediaRec = _recMime ? new MediaRecorder(recStream, { mimeType: _recMime }) : new MediaRecorder(recStream); }
     catch (e) { if (hint) hint.textContent = '錄音啟動失敗,請重試。'; return; }
     mediaRec.ondataavailable = ev => { if (ev.data && ev.data.size) recChunks.push(ev.data); };
     mediaRec.onstop = () => {
       if (recUrl) { try { URL.revokeObjectURL(recUrl); } catch (e) {} }
-      const blob = new Blob(recChunks, { type: (recChunks[0] && recChunks[0].type) || 'audio/webm' });
+      const blob = new Blob(recChunks, { type: (mediaRec && mediaRec.mimeType) || (recChunks[0] && recChunks[0].type) || 'audio/mp4' });
       recUrl = URL.createObjectURL(blob);
       const pb = document.getElementById('recPlayBtn');
       if (pb) { pb.disabled = false; pb.style.opacity = '1'; }
+      setRecPlayBtn(false);   // 新錄音就緒 → 按鈕回到「▶ 聽我的」
       if (hint) hint.textContent = '✓ 已錄音,按「聽我的」和原音(↻)對比';
       if (recStream) { try { recStream.getTracks().forEach(t => t.stop()); } catch (e) {} recStream = null; }  // 用完就關麥克風
     };
@@ -2577,18 +2583,28 @@ const Shadow = (() => {
     const btn = document.getElementById('recToggleBtn');
     if (btn) { btn.textContent = '⏺ 開始錄音'; btn.style.background = '#B8362A'; }
   }
+  function setRecPlayBtn(playing) {
+    const pb = document.getElementById('recPlayBtn');
+    if (pb) pb.textContent = playing ? '⏹ 停止' : '▶ 聽我的';
+  }
   function playRec() {
     if (!recUrl) return;
+    // 正在播 → 再按一下就停(icon 已是 ⏹ 停止)
+    if (recAudio && !recAudio.paused) { try { recAudio.pause(); recAudio.currentTime = 0; } catch (e) {} setRecPlayBtn(false); return; }
     // 先停掉正在播的原音/朗讀 + 暫停跟讀,避免和自己的錄音疊在一起造成卡頓
     if (!paused) { paused = true; clearTimer(); }
     try { if (window.speechSynthesis) speechSynthesis.cancel(); } catch (e) {}
     try { if (_sharedAudio) _sharedAudio.pause(); } catch (e) {}
-    // 共用一個播放元件(不每次 new Audio),回放更順
-    if (!recAudio) { recAudio = new Audio(); recAudio.preload = 'auto'; }
+    // 共用一個播放元件(不每次 new Audio),回放更順;playsInline 讓 iOS 不跳全螢幕、走一般播放路徑
+    if (!recAudio) {
+      recAudio = new Audio(); recAudio.preload = 'auto'; recAudio.playsInline = true;
+      recAudio.addEventListener('ended', () => setRecPlayBtn(false));
+      recAudio.addEventListener('pause', () => setRecPlayBtn(false));
+    }
     try { recAudio.pause(); } catch (e) {}
     recAudio.src = recUrl;
     recAudio.currentTime = 0;
-    recAudio.play().catch(() => {});
+    recAudio.play().then(() => setRecPlayBtn(true)).catch(() => setRecPlayBtn(false));
   }
 
   // Collect playable texts from currently rendered grammar / vocab list.
