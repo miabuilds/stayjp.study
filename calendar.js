@@ -183,6 +183,7 @@ const Calendar = (() => {
       <span>${t('today_goal')}</span>
       <span class="cal-prog-bar">${bar}</span>
       <span class="cal-prog-pct">${pct}%</span>
+      <button onclick="if(window.dailyHelp)dailyHelp()" aria-label="說明" style="background:none;border:none;color:var(--ac2,#e8734a);cursor:pointer;font-size:12px;font-weight:700;padding:0 0 0 6px">ⓘ ${typeof enOr==='function'?enOr('說明','Help'):'說明'}</button>
     </div>`;
   }
 

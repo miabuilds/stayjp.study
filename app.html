@@ -3293,19 +3293,17 @@ function toggleDailyMode() {
 // 每日學習說明:回應使用者回饋「不知道怎麼拿到 100%」。點進度條旁的「ⓘ 說明」開啟。
 function dailyHelp() {
   if (document.getElementById('onbMask')) return;
-  const isG = (typeof currentMode !== 'undefined' && currentMode === 'grammar');
-  const per = isG ? GRAMMAR_DAILY_NEW : DAILY_NEW;
-  const unit = isG ? enOr(cvt('個文法'), ' grammar points') : enOr(cvt('個單字'), ' words');
   const rows = [
-    enOr(cvt('・上面那條「總進度」＝你在這個級別已經看過多少的比例。'), '· The “Total progress” bar shows how much of this level you\'ve covered.'),
-    enOr(cvt('・每天給你一批新的（' + per + unit + '）；讀完後按「下一批 ▶」，進度就會往前。'), '· Each day you get a new batch (' + per + unit + '). Finish it, tap “Next batch ▶”, and the bar moves forward.'),
-    enOr(cvt('・把整個級別跑完就是 100%——這是長期目標，不用一天做完，慢慢累積最有效 🙂'), '· Covering the whole level = 100%. It\'s a long-term goal — steady daily progress works best 🙂'),
-    enOr(cvt('・想更熟這批，可用「⚡ 快速背本批」或「🎧 跟讀本頁」加強。'), '· To reinforce today\'s batch, try “⚡ Flashcards” or “🎧 Shadow this page”.')
+    '<b>' + enOr(cvt('【今日目標】做滿 30 個學習動作，今天就 100%！'), '[Today’s goal] Do 30 study actions today to reach 100%!') + '</b>',
+    enOr(cvt('・一個動作＝背一張單字卡、答一題測驗、做一題文法、或複習一張，各算 1 個。'), '· One action = one flashcard, one quiz answer, one grammar question, or one review — each counts as 1.'),
+    enOr(cvt('・湊滿 30 個（可以混著做）就達成今天目標；連續達成會累積連勝 🔥'), '· Reach 30 (mix them freely) to complete today’s goal; keep it up to build your streak 🔥'),
+    '<br>' + '<b>' + enOr(cvt('【總進度】下面那條是長期進度'), '[Total progress] The lower bar is your long-term progress') + '</b>',
+    enOr(cvt('・每天一批新內容（單字 20／文法 10），讀完按「下一批 ▶」往前；把整個級別跑完就是 100%（慢慢累積最有效 🙂）'), '· Each day is a batch (20 vocab / 10 grammar). Tap “Next batch ▶” to advance; finishing the whole level = 100% (steady progress works best 🙂).')
   ];
   const m = document.createElement('div');
   m.id = 'onbMask'; m.className = 'onb-mask';
   m.innerHTML = '<div class="onb-card" role="dialog" aria-modal="true">'
-    + '<div class="onb-title">' + enOr(cvt('每日學習怎麼算？'), 'How daily study works') + '</div>'
+    + '<div class="onb-title">' + enOr(cvt('每日進度怎麼算？'), 'How daily progress works') + '</div>'
     + '<div class="onb-sub" style="text-align:left;line-height:1.85">' + rows.join('<br>') + '</div>'
     + '<button class="onb-start" onclick="_onbRemove()">' + enOr(cvt('知道了'), 'Got it') + '</button>'
     + '</div>';
