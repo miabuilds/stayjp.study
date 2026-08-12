@@ -1,4 +1,4 @@
-const CACHE_NAME = 'stayjp-v224';
+const CACHE_NAME = 'stayjp-v225';
 const ASSETS = [
   './',
   './index.html',
@@ -17,6 +17,7 @@ const ASSETS = [
   './grammar-kanji-readings.js',
   './ux-extras.js',
   './article-tokens.js',
+  './article-timings.js',
   './conjugate.js',
   './quiz.js',
   './srs.js',
