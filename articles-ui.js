@@ -18,6 +18,50 @@ window.Articles = (function () {
   function readSet() { try { return JSON.parse(localStorage.getItem('article_read')) || {}; } catch (e) { return {}; } }
   function markRead(id) { var s = readSet(); s[id] = Date.now(); localStorage.setItem('article_read', JSON.stringify(s)); if (typeof saveAllCloud === 'function') try { saveAllCloud(); } catch (e) {} }
   function fr(text) { return window.furiganaHTMLRich ? window.furiganaHTMLRich(text) : esc(text); }
+  // ── 逐詞渲染(離線 kuromoji 斷詞)：任何內容詞都可點查，furigana 更準 ──
+  function isKj(ch) { return /[一-鿿々]/.test(ch); }
+  // 把「表層+讀音」對齊成 ruby：只在漢字段上假名，前後假名維持原樣；對不上就整詞上 ruby
+  function rubyToken(surf, rd) {
+    if (!rd || !/[一-鿿々]/.test(surf)) return esc(surf);
+    var segs = surf.match(/[一-鿿々]+|[^一-鿿々]+/g) || [surf];
+    var whole = '<ruby>' + esc(surf) + '<rt>' + esc(rd) + '</rt></ruby>';
+    var out = '', ri = 0;
+    for (var i = 0; i < segs.length; i++) {
+      var seg = segs[i];
+      if (!isKj(seg[0])) {                         // 假名段：需與讀音對應位置吻合
+        if (rd.substr(ri, seg.length) === seg) { out += esc(seg); ri += seg.length; }
+        else return whole;
+      } else {
+        var nx = segs[i + 1];
+        if (nx && !isKj(nx[0])) {                   // 漢字段：讀到下一個假名段出現處
+          var pos = rd.indexOf(nx, ri);
+          if (pos < 0) return whole;
+          out += '<ruby>' + esc(seg) + '<rt>' + esc(rd.slice(ri, pos)) + '</rt></ruby>'; ri = pos;
+        } else {                                    // 結尾漢字段：吃掉剩餘讀音
+          out += '<ruby>' + esc(seg) + '<rt>' + esc(rd.slice(ri)) + '</rt></ruby>'; ri = rd.length;
+        }
+      }
+    }
+    return out;
+  }
+  function frTok(s) {
+    var clean = s.replace(/\s/g, '');
+    var toks = window.ARTICLE_TOKENS && window.ARTICLE_TOKENS[clean];
+    if (!toks) return fr(s);                        // 無斷詞資料 → 退回既有引擎
+    var look = window.furiLookup || function () { return null; };
+    return toks.map(function (t) {
+      var surf = t.s, base = t.b || surf;
+      var eSurf = look(surf);
+      var frd = (eSurf && eSurf.r) || t.r || '';    // furigana：VOCAB 人工讀音優先，否則 kuromoji 表層讀音
+      var inner = rubyToken(surf, frd);
+      if (!t.k) return inner;                        // 非內容詞：上 furigana 但不可點
+      var e = look(base) || eSurf;                  // 釋義：先查原形，再查表層
+      var w = base, r = (e && e.r) || t.r || frd || '', m = e ? Lc(e.m, e.m_en) : '', c = (e && e.c) || '';
+      var f = t.b ? enOr('活用形', 'conj.') : '';
+      return '<span class="jlk" role="button" tabindex="0" data-w="' + esc(w) + '" data-r="' + esc(r)
+        + '" data-m="' + esc(m) + '" data-c="' + esc(c) + '"' + (f ? ' data-f="' + esc(f) + '"' : '') + '>' + inner + '</span>';
+    }).join('');
+  }
   // 「看過清單」記錄:用來算「有幾篇新文章」(開過清單就清紅標,非侵入式提醒)
   function seenSet() { try { return JSON.parse(localStorage.getItem('article_seen')) || {}; } catch (e) { return {}; } }
   function markSeen() { var s = {}; list().forEach(function (a) { s[a.id] = 1; }); localStorage.setItem('article_seen', JSON.stringify(s)); }
@@ -287,15 +331,17 @@ window.Articles = (function () {
     var paras = String(a.body).split('\n').filter(function (p) { return p.trim(); });
     var trans = a.trans || [];
     sentSeq = []; var si = 0;
+    // N4↑ 用離線斷詞逐詞可點；N5 多空白分詞、假名易過度切分，沿用既有引擎
+    var frFn = (a.level === 'n5') ? fr : frTok;
     var body = paras.map(function (p, pi) {
       var sents = p.match(/[^。！？]+[。！？]?/g) || [p];
       var inner = sents.map(function (s) {
         var clean = s.replace(/\s/g, '');
         if (hasTts(clean)) {
           var idx = si++; sentSeq.push({ text: clean, i: idx });
-          return '<span class="art-s" id="artS' + idx + '" onclick="Articles.playFrom(' + idx + ')">' + fr(s) + '</span>';
+          return '<span class="art-s" id="artS' + idx + '" onclick="Articles.playFrom(' + idx + ')">' + frFn(s) + '</span>';
         }
-        return '<span class="art-s">' + fr(s) + '</span>';
+        return '<span class="art-s">' + frFn(s) + '</span>';
       }).join('');
       var trHtml = trans[pi] ? '<div class="art-tr" style="display:' + (zhOn ? 'block' : 'none') + '">' + esc(Lc(trans[pi],(a.trans_en||[])[pi])) + '</div>' : '';
       return '<div class="art-para" style="font-size:' + FS[fsIdx] + '">' + inner + '</div>' + trHtml;

@@ -186,9 +186,11 @@
     pop.innerHTML = '<span class="jx" role="button" aria-label="關閉">✕</span>'
       + '<div><span class="jw">' + escapeHtml(data.w) + '</span><span class="jr">' + escapeHtml(data.r) + '</span></div>'
       + (tags ? '<div class="jtags">' + tags + '</div>' : '')
-      + '<div class="jm">' + escapeHtml(data.m || '（暫無解釋）') + '</div>'
+      + '<div class="jm">' + escapeHtml(data.m || '（本站未收錄，可查辭典 ↓）') + '</div>'
       + (data.f ? '<div class="jbase">辭書形（原形）：<b>' + escapeHtml(data.w) + '</b></div>' : '')
-      + '<div class="jacts"><button class="jact jact-spk" type="button">🔊 發音</button><button class="jact jact-fav" type="button">☆ 收藏</button></div>';
+      + '<div class="jacts"><button class="jact jact-spk" type="button">🔊 發音</button><button class="jact jact-fav" type="button">☆ 收藏</button>'
+      + (data.m ? '' : '<a class="jact" href="https://jisho.org/search/' + encodeURIComponent(data.w) + '" target="_blank" rel="noopener" onclick="event.stopPropagation()">📖 Jisho</a>')
+      + '</div>';
     document.body.appendChild(pop);
     // 定位在被點詞附近,夾在視窗內
     var r = anchor.getBoundingClientRect();
@@ -267,5 +269,7 @@
   window.furiganaHTML = furiganaHTML;
   window.furiganaHTMLRich = furiganaHTMLRich;
   window.furiAddEntries = addEntries;
+  // 依詞查 VOCAB 釋義(供文章逐詞可點用):回 {r,m,c} 或 null。ENTRY 以含漢字的詞為 key。
+  window.furiLookup = function (w) { try { return dict().ENTRY[w] || null; } catch (e) { return null; } };
   window.showToast = showToast;
 })();
