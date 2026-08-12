@@ -216,6 +216,7 @@ const Reading = (() => {
     const q = currentPassage.questions[currentQ];
     const correct = idx === q.correct;
     if (correct) score++;
+    if (typeof Calendar !== 'undefined' && Calendar.logActivity) Calendar.logActivity('quiz');   // 讀解答題算進今日目標
     answered.push({ q: q.q, correct, chosenIdx: idx, correctIdx: q.correct, options: q.options });
     if (!correct && typeof Stats !== 'undefined' && Stats.addWrongQuestion) {
       const plainPassage = (currentPassage.passage || '').replace(/<rt>[^<]*<\/rt>/g, '').replace(/<\/?ruby>/g, '');

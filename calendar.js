@@ -179,10 +179,11 @@ const Calendar = (() => {
     const pct = Math.min(Math.round(summary.total / goal * 100), 100);
     const filled = Math.round(pct / 10);
     const bar = '█'.repeat(filled) + '░'.repeat(10 - filled);
+    const shown = Math.min(summary.total, goal);
     return `<div class="cal-progress">
       <span>${t('today_goal')}</span>
       <span class="cal-prog-bar">${bar}</span>
-      <span class="cal-prog-pct">${pct}%</span>
+      <span class="cal-prog-pct">${shown}/${goal}${pct >= 100 ? ' ✓' : ''}</span>
       <button onclick="if(window.dailyHelp)dailyHelp()" aria-label="說明" style="background:none;border:none;color:var(--ac2,#e8734a);cursor:pointer;font-size:12px;font-weight:700;padding:0 0 0 6px">ⓘ ${typeof enOr==='function'?enOr('說明','Help'):'說明'}</button>
     </div>`;
   }

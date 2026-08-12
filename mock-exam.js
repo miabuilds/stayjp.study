@@ -564,7 +564,9 @@ const MockExam = (() => {
     const section = sections[currentSection];
     const q = section.questions[currentQ];
     const correct = idx === q.correctIdx;
+    const firstAnswer = answers[currentSection][currentQ] == null || answers[currentSection][currentQ] === -1;
     answers[currentSection][currentQ] = idx;
+    if (firstAnswer && typeof Calendar !== 'undefined' && Calendar.logActivity) Calendar.logActivity('quiz');   // 模擬考答題算進今日目標(每題一次)
 
     // Highlight correct/wrong
     const opts = document.querySelectorAll('.me-opt');

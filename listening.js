@@ -280,6 +280,7 @@ const Listening = (() => {
     const item = queue[qIdx];
     const correct = optIdx === item.correct;
     if (correct) score++;
+    if (typeof Calendar !== 'undefined' && Calendar.logActivity) Calendar.logActivity('quiz');   // 聽解答題算進今日目標
     answered.push({ q: item.q, correct, type: item.type });
     markDone(item.id);  // 答過就標記，下輪不再抽到
     if (!correct && typeof Stats !== 'undefined' && Stats.addWrongQuestion) {
