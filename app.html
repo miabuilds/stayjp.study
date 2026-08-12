@@ -3270,6 +3270,22 @@ const DAILY_NEW = 20;
 const GRAMMAR_DAILY_NEW = 10;
 const DAILY_KEY = 'daily_progress';
 
+// 真實學習進度(取代舊的「翻到第幾個」totalOffset):learned=進過SRS的量、mastered=interval≥21
+function levelMastery(lv) {
+  try {
+    const srs = JSON.parse(localStorage.getItem('srs_data')) || {};
+    const es = Object.entries(srs).filter(([k]) => k.indexOf(lv + ':') === 0);
+    return { learned: es.length, mastered: es.filter(([, v]) => (v.interval || 0) >= 21).length };
+  } catch (e) { return { learned: 0, mastered: 0 }; }
+}
+function levelGrammarMastery(lv) {
+  try {
+    const g = JSON.parse(localStorage.getItem('grammar_srs')) || {};
+    const es = Object.entries(g).filter(([k]) => k.indexOf(lv + '-') === 0);
+    return { learned: es.length, mastered: es.filter(([, v]) => (v.interval || 0) >= 21).length };
+  } catch (e) { return { learned: 0, mastered: 0 }; }
+}
+
 function getDailyProgress(lv) {
   try {
     const d = JSON.parse(localStorage.getItem(DAILY_KEY) || '{}');
@@ -3297,8 +3313,9 @@ function dailyHelp() {
     '<b>' + enOr(cvt('【今日目標】做滿 30 個學習動作，今天就 100%！'), '[Today’s goal] Do 30 study actions today to reach 100%!') + '</b>',
     enOr(cvt('・一個動作＝背一張卡、答一題測驗／讀解／聽解／模擬考、做一題文法、複習一張、或讀一篇文章，各算 1 個。'), '· One action = a flashcard, a quiz/reading/listening/mock-exam answer, a grammar question, a review, or reading an article — each counts as 1.'),
     enOr(cvt('・湊滿 30 個（可以混著做）就達成今天目標；連續達成會累積連勝 🔥'), '· Reach 30 (mix them freely) to complete today’s goal; keep it up to build your streak 🔥'),
-    '<br>' + '<b>' + enOr(cvt('【總進度】下面那條是長期進度'), '[Total progress] The lower bar is your long-term progress') + '</b>',
-    enOr(cvt('・每天一批新內容（單字 20／文法 10），讀完按「下一批 ▶」往前；把整個級別跑完就是 100%（慢慢累積最有效 🙂）'), '· Each day is a batch (20 vocab / 10 grammar). Tap “Next batch ▶” to advance; finishing the whole level = 100% (steady progress works best 🙂).')
+    '<br>' + '<b>' + enOr(cvt('【總進度】下面那條是你「真的學會多少」'), '[Total progress] The lower bar is how much you\'ve actually learned') + '</b>',
+    enOr(cvt('・背過、測驗過的字會進「已學」；複習到夠熟就升級「熟練」。把整級學完就是 100%。'), '· Words you\'ve studied or quizzed count as “Learned”; reviewed until solid become “Mastered”. Finishing the level = 100%.'),
+    enOr(cvt('・「下一批 ▶」只是換今天顯示哪一批，不會灌水進度條 🙂'), '· “Next batch ▶” just changes which set you see today — it doesn\'t inflate the bar 🙂')
   ];
   const m = document.createElement('div');
   m.id = 'onbMask'; m.className = 'onb-mask';
@@ -3572,10 +3589,11 @@ function renderVocab() {
     h += (window.Articles && Articles.entryCardHtml ? Articles.entryCardHtml() : '');   // 首頁明顯的文章入口卡
     const lv = currentLevel.toUpperCase();
     const cnt = data.length;
-    // Daily progress bar
+    const vMas = levelMastery(currentLevel);
+    // Daily progress bar — 顯示真實學習度(已學/熟練),非翻頁位置
     h += `<div class="daily-bar">
-      <div class="dp"><div class="dp-lbl">${t('total_progress', { lv })}<button class="dp-help" onclick="dailyHelp()" aria-label="說明">ⓘ ${enOr('說明','Help')}</button></div><div class="dp-bar"><div class="dp-fill" style="width:${Math.round(prog.totalOffset/cnt*100)}%"></div></div>
-      <div class="dp-txt">${t('progress_txt', { n: prog.totalOffset, total: cnt, unit: t('unit_vocab') })}</div></div>
+      <div class="dp"><div class="dp-lbl">${t('total_progress', { lv })}<button class="dp-help" onclick="dailyHelp()" aria-label="說明">ⓘ ${enOr('說明','Help')}</button></div><div class="dp-bar"><div class="dp-fill" style="width:${Math.round(vMas.learned/cnt*100)}%"></div></div>
+      <div class="dp-txt">${enOr(cvt('已學'),'Learned')} ${vMas.learned} / ${cnt}${vMas.mastered ? ' ・' + enOr(cvt('熟練'),'mastered') + ' ' + vMas.mastered : ''}</div></div>
       <button class="daily-btn ${dailyMode?'on':''}" onclick="toggleDailyMode()">${dailyMode?t('show_all'):t('daily_mode')}</button>
       <button class="shadow-trigger" onclick="Shadow.startCurrent()" ${window.ToolQuota&&ToolQuota.isLocked&&ToolQuota.isLocked('shadow')?'style="opacity:.55"':''}>${window.ToolQuota&&ToolQuota.isLocked&&ToolQuota.isLocked('shadow')?'🔒':'🎧'} ${enOr('跟讀本頁','Shadow this page')}</button>
       ${dailyMode?`<button class="daily-btn" onclick="FlashCard.beginToday()" ${window.ToolQuota&&ToolQuota.isLocked&&ToolQuota.isLocked('flashcard')?'style="opacity:.55"':''}>${window.ToolQuota&&ToolQuota.isLocked&&ToolQuota.isLocked('flashcard')?'🔒':'⚡'} 快速背本批</button>`:''}
@@ -3787,9 +3805,10 @@ function render() {
     h += (window.Articles && Articles.entryCardHtml ? Articles.entryCardHtml() : '');   // 首頁明顯的文章入口卡
     const lv = currentLevel.toUpperCase();
     const cnt = data.length;
+    const gMas = levelGrammarMastery(currentLevel);
     h += `<div class="daily-bar">
-      <div class="dp"><div class="dp-lbl">${t('total_progress_grammar', { lv })}<button class="dp-help" onclick="dailyHelp()" aria-label="說明">ⓘ ${enOr('說明','Help')}</button></div><div class="dp-bar"><div class="dp-fill" style="width:${Math.round(gProg.totalOffset/cnt*100)}%"></div></div>
-      <div class="dp-txt">${t('progress_txt', { n: gProg.totalOffset, total: cnt, unit: t('unit_grammar') })}</div></div>
+      <div class="dp"><div class="dp-lbl">${t('total_progress_grammar', { lv })}<button class="dp-help" onclick="dailyHelp()" aria-label="說明">ⓘ ${enOr('說明','Help')}</button></div><div class="dp-bar"><div class="dp-fill" style="width:${Math.round(gMas.learned/cnt*100)}%"></div></div>
+      <div class="dp-txt">${enOr(cvt('已學'),'Learned')} ${gMas.learned} / ${cnt}${gMas.mastered ? ' ・' + enOr(cvt('熟練'),'mastered') + ' ' + gMas.mastered : ''}</div></div>
       <button class="daily-btn ${grammarDailyMode?'on':''}" onclick="toggleGrammarDailyMode()">${grammarDailyMode?t('show_all'):t('daily_mode')}</button>
       <button class="shadow-trigger" onclick="Shadow.startCurrent()" ${window.ToolQuota&&ToolQuota.isLocked&&ToolQuota.isLocked('shadow')?'style="opacity:.55"':''}>${window.ToolQuota&&ToolQuota.isLocked&&ToolQuota.isLocked('shadow')?'🔒':'🎧'} ${enOr('跟讀本頁','Shadow this page')}</button>
       ${currentLevel === 'n5' ? `<button class="shadow-trigger" style="background:var(--ac2);color:#fff" onclick="jumpToParticles()">📃 ${enOr('跳到助詞','Jump to particles')}</button>` : ''}
