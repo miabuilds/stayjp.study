@@ -479,7 +479,7 @@ window.Articles = (function () {
         var ct = au.currentTime;
         while (wi < tm.length - 1 && ct >= tm[wi]) wi++;
         if (wi !== lastWi) {
-          if (aws[lastWi]) aws[lastWi].classList.remove('cur');
+          [].forEach.call(el.querySelectorAll('.aw.cur'), function (w) { w.classList.remove('cur'); });
           if (aws[wi]) aws[wi].classList.add('cur');
           lastWi = wi;
         }
