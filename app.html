@@ -771,6 +771,8 @@ body.profile-view .mn { margin-left: 0; max-width: none; }   /* 滿版 → 內�
 }
 .daily-bar .dp { flex: 1 1 100%; min-width: 0; }
 .daily-bar .dp-lbl { font-size: 12px; color: var(--tx2); margin-bottom: 4px; }
+.daily-bar .dp-help { background: none; border: none; color: var(--ac2, #e8734a); font-size: 12px; font-weight: 700; cursor: pointer; padding: 0 0 0 6px; vertical-align: middle; }
+.daily-bar .dp-help:hover { text-decoration: underline; }
 .daily-bar .dp-bar { height: 6px; background: var(--prog-empty); border-radius: 3px; overflow: hidden; }
 .daily-bar .dp-fill { height: 100%; background: var(--ac2); border-radius: 3px; transition: width .3s var(--ease); }
 .daily-bar .dp-txt { font-size: 13px; color: var(--tx); margin-top: 3px; font-weight: 600; }
@@ -3288,6 +3290,28 @@ function toggleDailyMode() {
   dailyMode = !dailyMode;
   doRender();
 }
+// 每日學習說明:回應使用者回饋「不知道怎麼拿到 100%」。點進度條旁的「ⓘ 說明」開啟。
+function dailyHelp() {
+  if (document.getElementById('onbMask')) return;
+  const isG = (typeof currentMode !== 'undefined' && currentMode === 'grammar');
+  const per = isG ? GRAMMAR_DAILY_NEW : DAILY_NEW;
+  const unit = isG ? enOr(cvt('個文法'), ' grammar points') : enOr(cvt('個單字'), ' words');
+  const rows = [
+    enOr(cvt('・上面那條「總進度」＝你在這個級別已經看過多少的比例。'), '· The “Total progress” bar shows how much of this level you\'ve covered.'),
+    enOr(cvt('・每天給你一批新的（' + per + unit + '）；讀完後按「下一批 ▶」，進度就會往前。'), '· Each day you get a new batch (' + per + unit + '). Finish it, tap “Next batch ▶”, and the bar moves forward.'),
+    enOr(cvt('・把整個級別跑完就是 100%——這是長期目標，不用一天做完，慢慢累積最有效 🙂'), '· Covering the whole level = 100%. It\'s a long-term goal — steady daily progress works best 🙂'),
+    enOr(cvt('・想更熟這批，可用「⚡ 快速背本批」或「🎧 跟讀本頁」加強。'), '· To reinforce today\'s batch, try “⚡ Flashcards” or “🎧 Shadow this page”.')
+  ];
+  const m = document.createElement('div');
+  m.id = 'onbMask'; m.className = 'onb-mask';
+  m.innerHTML = '<div class="onb-card" role="dialog" aria-modal="true">'
+    + '<div class="onb-title">' + enOr(cvt('每日學習怎麼算？'), 'How daily study works') + '</div>'
+    + '<div class="onb-sub" style="text-align:left;line-height:1.85">' + rows.join('<br>') + '</div>'
+    + '<button class="onb-start" onclick="_onbRemove()">' + enOr(cvt('知道了'), 'Got it') + '</button>'
+    + '</div>';
+  document.body.appendChild(m);
+  requestAnimationFrame(() => m.classList.add('show'));
+}
 function nextDailyBatch() {
   const lv = currentLevel;
   const data = getVocabData(lv);
@@ -3552,7 +3576,7 @@ function renderVocab() {
     const cnt = data.length;
     // Daily progress bar
     h += `<div class="daily-bar">
-      <div class="dp"><div class="dp-lbl">${t('total_progress', { lv })}</div><div class="dp-bar"><div class="dp-fill" style="width:${Math.round(prog.totalOffset/cnt*100)}%"></div></div>
+      <div class="dp"><div class="dp-lbl">${t('total_progress', { lv })}<button class="dp-help" onclick="dailyHelp()" aria-label="說明">ⓘ ${enOr('說明','Help')}</button></div><div class="dp-bar"><div class="dp-fill" style="width:${Math.round(prog.totalOffset/cnt*100)}%"></div></div>
       <div class="dp-txt">${t('progress_txt', { n: prog.totalOffset, total: cnt, unit: t('unit_vocab') })}</div></div>
       <button class="daily-btn ${dailyMode?'on':''}" onclick="toggleDailyMode()">${dailyMode?t('show_all'):t('daily_mode')}</button>
       <button class="shadow-trigger" onclick="Shadow.startCurrent()" ${window.ToolQuota&&ToolQuota.isLocked&&ToolQuota.isLocked('shadow')?'style="opacity:.55"':''}>${window.ToolQuota&&ToolQuota.isLocked&&ToolQuota.isLocked('shadow')?'🔒':'🎧'} ${enOr('跟讀本頁','Shadow this page')}</button>
@@ -3766,7 +3790,7 @@ function render() {
     const lv = currentLevel.toUpperCase();
     const cnt = data.length;
     h += `<div class="daily-bar">
-      <div class="dp"><div class="dp-lbl">${t('total_progress_grammar', { lv })}</div><div class="dp-bar"><div class="dp-fill" style="width:${Math.round(gProg.totalOffset/cnt*100)}%"></div></div>
+      <div class="dp"><div class="dp-lbl">${t('total_progress_grammar', { lv })}<button class="dp-help" onclick="dailyHelp()" aria-label="說明">ⓘ ${enOr('說明','Help')}</button></div><div class="dp-bar"><div class="dp-fill" style="width:${Math.round(gProg.totalOffset/cnt*100)}%"></div></div>
       <div class="dp-txt">${t('progress_txt', { n: gProg.totalOffset, total: cnt, unit: t('unit_grammar') })}</div></div>
       <button class="daily-btn ${grammarDailyMode?'on':''}" onclick="toggleGrammarDailyMode()">${grammarDailyMode?t('show_all'):t('daily_mode')}</button>
       <button class="shadow-trigger" onclick="Shadow.startCurrent()" ${window.ToolQuota&&ToolQuota.isLocked&&ToolQuota.isLocked('shadow')?'style="opacity:.55"':''}>${window.ToolQuota&&ToolQuota.isLocked&&ToolQuota.isLocked('shadow')?'🔒':'🎧'} ${enOr('跟讀本頁','Shadow this page')}</button>
