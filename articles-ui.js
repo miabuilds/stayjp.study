@@ -54,11 +54,11 @@ window.Articles = (function () {
       var eSurf = look(surf);
       var frd = (eSurf && eSurf.r) || t.r || '';    // furigana：VOCAB 人工讀音優先，否則 kuromoji 表層讀音
       var inner = rubyToken(surf, frd);
-      if (!t.k) return inner;                        // 非內容詞：上 furigana 但不可點
+      if (!t.k) return '<span class="aw">' + inner + '</span>';   // 非內容詞：可定位(逐詞高亮)但不可點
       var e = look(base) || eSurf;                  // 釋義：先查原形，再查表層
       var w = base, r = (e && e.r) || t.r || frd || '', m = e ? Lc(e.m, e.m_en) : '', c = (e && e.c) || '';
       var f = t.b ? enOr('活用形', 'conj.') : '';
-      return '<span class="jlk" role="button" tabindex="0" data-w="' + esc(w) + '" data-r="' + esc(r)
+      return '<span class="aw jlk" role="button" tabindex="0" data-w="' + esc(w) + '" data-r="' + esc(r)
         + '" data-m="' + esc(m) + '" data-c="' + esc(c) + '"' + (f ? ' data-f="' + esc(f) + '"' : '') + '>' + inner + '</span>';
     }).join('');
   }
@@ -168,8 +168,11 @@ window.Articles = (function () {
       '.art-para .jlk{cursor:pointer;color:#e8734a;border-bottom:1px solid rgba(232,115,74,.5)}',
       '.art-para .jlk rt{color:var(--tx2,#8a8a8a)}',
       '.art-s{border-radius:6px;padding:1px 2px}',
-      // 播放中的句子:卡拉OK掃光 — 已唸到的部分較深橘,尚未唸的較淺,--p 由播放進度即時更新
-      '.art-s.on{background:linear-gradient(90deg,rgba(232,115,74,.36) 0%,rgba(232,115,74,.36) var(--p,0%),rgba(232,115,74,.13) var(--p,0%))}',
+      // 播放中的句子:整句淡橘底(標出正在唸的句)
+      '.art-s.on{background:rgba(232,115,74,.12)}',
+      // 逐詞高亮:依 VOICEVOX 每拍時長,把橘框移到「正在唸的那個詞」(對齊實際發音)
+      '.aw{border-radius:5px;padding:0 1px;transition:background .08s linear}',
+      '.art-s.on .aw.cur{background:rgba(232,115,74,.5);box-shadow:0 0 0 1px rgba(232,115,74,.3)}',
       '.art-nofuri rt{display:none}',
       '.art-tr{font-size:14px;line-height:1.85;color:var(--tx2,#8a8a8a);margin:2px 0 16px;padding-left:12px;border-left:3px solid var(--bd,#e5e5e5)}',
       // vocab / grammar lists
@@ -450,9 +453,10 @@ window.Articles = (function () {
   var RATES = [0.85, 1.0, 1.25];
   function setPText() { var e = document.getElementById('artPText'); if (e) e.textContent = (pl.idx >= 0 ? (pl.idx + 1) : '—') + ' / ' + (sentSeq.length || '—'); }
   function highlight(i) {
-    [].forEach.call(document.querySelectorAll('.art-s.on'), function (s) { s.classList.remove('on'); s.style.removeProperty('--p'); });
+    [].forEach.call(document.querySelectorAll('.art-s.on'), function (s) { s.classList.remove('on'); });
+    [].forEach.call(document.querySelectorAll('.aw.cur'), function (w) { w.classList.remove('cur'); });
     var el = document.getElementById('artS' + i);
-    if (el) { el.style.setProperty('--p', '0%'); el.classList.add('on'); el.scrollIntoView({ block: 'center', behavior: 'smooth' }); }
+    if (el) { el.classList.add('on'); el.scrollIntoView({ block: 'center', behavior: 'smooth' }); }
   }
   function playFrom(i) {
     if (!sentSeq.length) return;
@@ -462,13 +466,23 @@ window.Articles = (function () {
       if (n >= sentSeq.length) { pl.playing = false; pl.idx = -1; setBtn(); highlight(-1); setPText(); return; }
       pl.idx = n; highlight(n); setPText();
       var au = new Audio(ttsPath(sentSeq[n].text)); au.playbackRate = pl.rate; pl.audio = au;
-      // 卡拉OK掃光:依播放進度更新目前句子的 --p(唸到哪、橘色填到哪)
+      // 逐詞高亮:依 VOICEVOX 時間軸,把 .cur 框移到目前唸到的詞(對齊實際發音);無時間軸則整句淡底即可
+      var el = document.getElementById('artS' + n);
+      var tm = window.ARTICLE_TIMINGS && window.ARTICLE_TIMINGS[sentSeq[n].text];
+      var aws = el ? el.querySelectorAll('.aw') : [];
+      var useWord = tm && aws.length === tm.length;
+      var wi = 0, lastWi = -1;
       au.ontimeupdate = function () {
-        if (pl.token !== myToken || !au.duration) return;
-        var el = document.getElementById('artS' + n);
-        if (el) el.style.setProperty('--p', Math.min(100, au.currentTime / au.duration * 100).toFixed(1) + '%');
+        if (pl.token !== myToken || !useWord) return;
+        var ct = au.currentTime;
+        while (wi < tm.length - 1 && ct >= tm[wi]) wi++;
+        if (wi !== lastWi) {
+          if (aws[lastWi]) aws[lastWi].classList.remove('cur');
+          if (aws[wi]) aws[wi].classList.add('cur');
+          lastWi = wi;
+        }
       };
-      au.onended = function () { if (pl.token === myToken) { var e = document.getElementById('artS' + n); if (e) e.style.setProperty('--p', '100%'); step(n + 1); } };
+      au.onended = function () { if (pl.token === myToken) { if (aws[lastWi]) aws[lastWi].classList.remove('cur'); step(n + 1); } };
       au.play().catch(function () { if (pl.token === myToken) step(n + 1); });
     }
     pl.playing = true; setBtn(); step(i);
