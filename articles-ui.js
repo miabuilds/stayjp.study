@@ -62,6 +62,12 @@ window.Articles = (function () {
         + '" data-m="' + esc(m) + '" data-c="' + esc(c) + '"' + (f ? ' data-f="' + esc(f) + '"' : '') + '>' + inner + '</span>';
     }).join('');
   }
+  // N5:用課文原有的空格切詞塊(人工分詞)當高亮單位,塊內沿用既有引擎(furigana+可點),保留可讀空格
+  function frUnit(s) {
+    var units = s.split(/\s+/).filter(Boolean);
+    if (!units.length) return fr(s);
+    return units.map(function (u) { return '<span class="aw">' + fr(u) + '</span>'; }).join(' ');
+  }
   // 「看過清單」記錄:用來算「有幾篇新文章」(開過清單就清紅標,非侵入式提醒)
   function seenSet() { try { return JSON.parse(localStorage.getItem('article_seen')) || {}; } catch (e) { return {}; } }
   function markSeen() { var s = {}; list().forEach(function (a) { s[a.id] = 1; }); localStorage.setItem('article_seen', JSON.stringify(s)); }
@@ -335,8 +341,8 @@ window.Articles = (function () {
     var paras = String(a.body).split('\n').filter(function (p) { return p.trim(); });
     var trans = a.trans || [];
     sentSeq = []; var si = 0;
-    // N4↑ 用離線斷詞逐詞可點；N5 多空白分詞、假名易過度切分，沿用既有引擎
-    var frFn = (a.level === 'n5') ? fr : frTok;
+    // N4↑ 用離線斷詞逐詞可點；N5 用課文空格切的詞塊(人工分詞,保留空格)
+    var frFn = (a.level === 'n5') ? frUnit : frTok;
     var body = paras.map(function (p, pi) {
       var sents = p.match(/[^。！？]+[。！？]?/g) || [p];
       var inner = sents.map(function (s) {
