@@ -168,11 +168,12 @@ window.Articles = (function () {
       '.art-para .jlk{cursor:pointer;color:#e8734a;border-bottom:1px solid rgba(232,115,74,.5)}',
       '.art-para .jlk rt{color:var(--tx2,#8a8a8a)}',
       '.art-s{border-radius:6px;padding:1px 2px}',
-      // 播放中的句子:整句淡橘底(標出正在唸的句)
-      '.art-s.on{background:rgba(232,115,74,.12)}',
-      // 逐詞高亮:依 VOICEVOX 每拍時長,把橘框移到「正在唸的那個詞」(對齊實際發音)
-      '.aw{border-radius:5px;padding:0 1px;transition:background .08s linear}',
-      '.art-s.on .aw.cur{background:rgba(232,115,74,.5);box-shadow:0 0 0 1px rgba(232,115,74,.3)}',
+      // 逐詞高亮:依 VOICEVOX 每拍時長,橘框只框「正在唸的那個詞」(對齊實際發音)
+      '.aw{border-radius:5px;padding:0 1px;transition:background .1s linear}',
+      '.art-s.on .aw.cur{background:rgba(232,115,74,.85);color:#fff;box-shadow:0 0 0 2px rgba(232,115,74,.5)}',
+      '.art-s.on .aw.cur rt{color:rgba(255,255,255,.85)}',
+      // 無逐詞時間軸的句子(N5/少數對不齊):退回整句淡底
+      '.art-s.on.flat{background:rgba(232,115,74,.16)}',
       '.art-nofuri rt{display:none}',
       '.art-tr{font-size:14px;line-height:1.85;color:var(--tx2,#8a8a8a);margin:2px 0 16px;padding-left:12px;border-left:3px solid var(--bd,#e5e5e5)}',
       // vocab / grammar lists
@@ -453,7 +454,7 @@ window.Articles = (function () {
   var RATES = [0.85, 1.0, 1.25];
   function setPText() { var e = document.getElementById('artPText'); if (e) e.textContent = (pl.idx >= 0 ? (pl.idx + 1) : '—') + ' / ' + (sentSeq.length || '—'); }
   function highlight(i) {
-    [].forEach.call(document.querySelectorAll('.art-s.on'), function (s) { s.classList.remove('on'); });
+    [].forEach.call(document.querySelectorAll('.art-s.on'), function (s) { s.classList.remove('on', 'flat'); });
     [].forEach.call(document.querySelectorAll('.aw.cur'), function (w) { w.classList.remove('cur'); });
     var el = document.getElementById('artS' + i);
     if (el) { el.classList.add('on'); el.scrollIntoView({ block: 'center', behavior: 'smooth' }); }
@@ -471,6 +472,7 @@ window.Articles = (function () {
       var tm = window.ARTICLE_TIMINGS && window.ARTICLE_TIMINGS[sentSeq[n].text];
       var aws = el ? el.querySelectorAll('.aw') : [];
       var useWord = tm && aws.length === tm.length;
+      if (!useWord && el) el.classList.add('flat');   // 無逐詞時間軸 → 整句淡底(有指示、不會誤導)
       var wi = 0, lastWi = -1;
       au.ontimeupdate = function () {
         if (pl.token !== myToken || !useWord) return;
