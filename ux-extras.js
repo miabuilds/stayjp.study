@@ -172,12 +172,38 @@
       '#jlkPop .jbase{font-size:12px;color:var(--tx2,#8a8a8a);margin-top:8px;padding-top:8px;border-top:1px dashed var(--bd,#e5e5e5)}',
       '#jlkPop .jbase b{color:var(--tx,#222);font-size:15px;font-family:"Hiragino Mincho ProN","Noto Serif JP",serif}',
       '#jlkPop .jx{position:absolute;top:7px;right:11px;cursor:pointer;color:var(--tx3,#b0b0b0);font-size:15px;line-height:1;padding:4px}',
+      '#jlkPop .jfreq{margin-top:9px;font-size:12.5px;font-weight:700;color:var(--ac,#d4654a)}',
+      '#jlkPop .jfreq-dim{font-weight:600;color:var(--tx2,#8a8a8a)}',
+      '#jlkPop .jact-pulse{background:var(--ac,#d4654a);color:#fff;border-color:var(--ac,#d4654a);animation:jpulse 1.1s ease-in-out infinite}',
+      '@keyframes jpulse{0%,100%{box-shadow:0 0 0 0 rgba(212,101,74,.45)}50%{box-shadow:0 0 0 5px rgba(212,101,74,0)}}',
     ].join('');
     document.head.appendChild(st);
   }
   function closePop() { if (_pop) { _pop.remove(); _pop = null; } }
+  // 常查單字:自動記錄每次點查的次數,供「常查複習」用(存 localStorage)
+  function lookHist() { try { return JSON.parse(localStorage.getItem('lookup_history')) || {}; } catch (e) { return {}; } }
+  function recordLook(d) {
+    if (!d || !d.w) return 0;
+    try {
+      var h = lookHist(), e = h[d.w] || {};
+      e.n = (e.n || 0) + 1; e.t = Date.now();
+      if (d.r) e.r = d.r; if (d.m) e.m = d.m; if (d.c) e.c = d.c;
+      h[d.w] = e; localStorage.setItem('lookup_history', JSON.stringify(h));
+      return e.n;
+    } catch (e) { return 0; }
+  }
+  // 供未來「常查單字」複習頁取用:回傳依查詢次數排序、且尚未收藏的字
+  window.stayjpFreqWords = function (limit) {
+    var h = lookHist(), arr = [];
+    for (var w in h) { if (window.stayjpHasWord && window.stayjpHasWord(w)) continue; arr.push({ w: w, r: h[w].r || '', m: h[w].m || '', c: h[w].c || '', n: h[w].n || 0, t: h[w].t || 0 }); }
+    arr.sort(function (a, b) { return b.n - a.n || b.t - a.t; });
+    return limit ? arr.slice(0, limit) : arr;
+  };
   function showLookup(data, anchor) {
     ensureCss(); closePop();
+    var _ln = recordLook(data);   // 記錄本次點查,取得累計次數
+    var _saved = window.stayjpHasWord && window.stayjpHasWord(data.w);
+    var _nudge = (_ln >= 3 && !_saved);   // 常查且未收藏 → 提示收藏複習
     var pop = document.createElement('div');
     pop.id = 'jlkPop';
     var tags = '';
@@ -188,7 +214,9 @@
       + (tags ? '<div class="jtags">' + tags + '</div>' : '')
       + '<div class="jm">' + escapeHtml(data.m || '（本站未收錄，可查辭典 ↓）') + '</div>'
       + (data.f ? '<div class="jbase">辭書形（原形）：<b>' + escapeHtml(data.w) + '</b></div>' : '')
-      + '<div class="jacts"><button class="jact jact-spk" type="button">🔊 發音</button><button class="jact jact-fav" type="button">☆ 收藏</button>'
+      + (_nudge ? '<div class="jfreq">🔁 你查過這個字 ' + _ln + ' 次，收藏起來複習吧</div>'
+        : (_ln >= 2 ? '<div class="jfreq jfreq-dim">🔍 查過 ' + _ln + ' 次</div>' : ''))
+      + '<div class="jacts"><button class="jact jact-spk" type="button">🔊 發音</button><button class="jact jact-fav' + (_nudge ? ' jact-pulse' : '') + '" type="button">' + (_nudge ? '⭐ 收藏複習' : '☆ 收藏') + '</button>'
       + (data.m ? '' : '<a class="jact" href="https://jisho.org/search/' + encodeURIComponent(data.w) + '" target="_blank" rel="noopener" onclick="event.stopPropagation()">📖 Jisho</a>')
       + '</div>';
     document.body.appendChild(pop);
