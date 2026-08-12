@@ -337,7 +337,20 @@ window.Articles = (function () {
 
   // 文章 tab:逐句 span(可點播、連播高亮)+ 逐段中譯
   var sentSeq = [];   // [{text, i}] 有 TTS 的句子序列
+  // 文章閱讀也算進「今日目標」:每篇每天只計一次(重複開同一篇不重複加)
+  function logArticleReadActivity(id) {
+    try {
+      var today = new Date().toISOString().split('T')[0];
+      var d; try { d = JSON.parse(localStorage.getItem('article_activity_day')) || {}; } catch (e) { d = {}; }
+      if (d.date !== today) d = { date: today, ids: [] };
+      if (d.ids.indexOf(id) < 0) {
+        d.ids.push(id); localStorage.setItem('article_activity_day', JSON.stringify(d));
+        if (typeof Calendar !== 'undefined' && Calendar.logActivity) Calendar.logActivity('vocab');
+      }
+    } catch (e) {}
+  }
   function renderRead(a, c) {
+    logArticleReadActivity(a.id);
     var paras = String(a.body).split('\n').filter(function (p) { return p.trim(); });
     var trans = a.trans || [];
     sentSeq = []; var si = 0;
@@ -430,6 +443,7 @@ window.Articles = (function () {
     var opts = btn.parentElement.querySelectorAll('.aq-opt');
     [].forEach.call(opts, function (o) { o.onclick = null; if (o.textContent === correct) o.classList.add('ok'); });
     if (chosen === correct) quiz.score++; else btn.classList.add('ng');
+    if (typeof Calendar !== 'undefined' && Calendar.logActivity) Calendar.logActivity('quiz');   // 文章測驗答題算進今日目標
     setTimeout(function () { quiz.idx++; renderQuizItem(document.getElementById('artContent'), curArticle()); }, 750);
   }
 
