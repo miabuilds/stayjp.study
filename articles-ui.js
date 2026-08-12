@@ -123,8 +123,9 @@ window.Articles = (function () {
       '.art-para rt{font-size:.5em;color:var(--tx2,#8a8a8a);font-weight:400}',
       '.art-para .jlk{cursor:pointer;color:#e8734a;border-bottom:1px solid rgba(232,115,74,.5)}',
       '.art-para .jlk rt{color:var(--tx2,#8a8a8a)}',
-      '.art-s{border-radius:6px;transition:background .2s;padding:1px 0}',
-      '.art-s.on{background:rgba(232,115,74,.16)}',
+      '.art-s{border-radius:6px;padding:1px 2px}',
+      // 播放中的句子:卡拉OK掃光 — 已唸到的部分較深橘,尚未唸的較淺,--p 由播放進度即時更新
+      '.art-s.on{background:linear-gradient(90deg,rgba(232,115,74,.36) 0%,rgba(232,115,74,.36) var(--p,0%),rgba(232,115,74,.13) var(--p,0%))}',
       '.art-nofuri rt{display:none}',
       '.art-tr{font-size:14px;line-height:1.85;color:var(--tx2,#8a8a8a);margin:2px 0 16px;padding-left:12px;border-left:3px solid var(--bd,#e5e5e5)}',
       // vocab / grammar lists
@@ -403,9 +404,9 @@ window.Articles = (function () {
   var RATES = [0.85, 1.0, 1.25];
   function setPText() { var e = document.getElementById('artPText'); if (e) e.textContent = (pl.idx >= 0 ? (pl.idx + 1) : '—') + ' / ' + (sentSeq.length || '—'); }
   function highlight(i) {
-    [].forEach.call(document.querySelectorAll('.art-s.on'), function (s) { s.classList.remove('on'); });
+    [].forEach.call(document.querySelectorAll('.art-s.on'), function (s) { s.classList.remove('on'); s.style.removeProperty('--p'); });
     var el = document.getElementById('artS' + i);
-    if (el) { el.classList.add('on'); el.scrollIntoView({ block: 'center', behavior: 'smooth' }); }
+    if (el) { el.style.setProperty('--p', '0%'); el.classList.add('on'); el.scrollIntoView({ block: 'center', behavior: 'smooth' }); }
   }
   function playFrom(i) {
     if (!sentSeq.length) return;
@@ -415,7 +416,13 @@ window.Articles = (function () {
       if (n >= sentSeq.length) { pl.playing = false; pl.idx = -1; setBtn(); highlight(-1); setPText(); return; }
       pl.idx = n; highlight(n); setPText();
       var au = new Audio(ttsPath(sentSeq[n].text)); au.playbackRate = pl.rate; pl.audio = au;
-      au.onended = function () { if (pl.token === myToken) step(n + 1); };
+      // 卡拉OK掃光:依播放進度更新目前句子的 --p(唸到哪、橘色填到哪)
+      au.ontimeupdate = function () {
+        if (pl.token !== myToken || !au.duration) return;
+        var el = document.getElementById('artS' + n);
+        if (el) el.style.setProperty('--p', Math.min(100, au.currentTime / au.duration * 100).toFixed(1) + '%');
+      };
+      au.onended = function () { if (pl.token === myToken) { var e = document.getElementById('artS' + n); if (e) e.style.setProperty('--p', '100%'); step(n + 1); } };
       au.play().catch(function () { if (pl.token === myToken) step(n + 1); });
     }
     pl.playing = true; setBtn(); step(i);
