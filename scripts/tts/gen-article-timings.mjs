@@ -15,15 +15,16 @@ const isKana = s => /^[ぁ-ゖァ-ヶー]+$/.test(s);          // 含片假名
 // 詞的假名(供算拍數):含漢字用讀音 r;純假名用表層;其餘(標點/符號)0 拍
 const tokKana = t => isKanji(t.s) ? (t.r || '') : (isKana(t.s) ? t.s : '');
 
-// 收集所有文章句子(與前端 renderRead 一致的切句)
-const sents = [];
+// 收集所有文章句子(與前端 renderRead 一致的切句),帶原文(含空格)與級別
+// N5 用空格切的詞塊當高亮單位(人工分詞,比 kuromoji 準且保留可讀空格);其餘逐 token
+const items = [];
 const seen = new Set();
 for (const a of ARTICLES) {
   for (const p of String(a.body).split('\n')) {
     if (!p.trim()) continue;
     for (const s of (p.match(/[^。！？]+[。！？]?/g) || [])) {
       const clean = s.replace(/\s/g, '');
-      if (clean && !seen.has(clean)) { seen.add(clean); sents.push(clean); }
+      if (clean && !seen.has(clean)) { seen.add(clean); items.push({ clean, orig: s, level: a.level }); }
     }
   }
 }
@@ -31,7 +32,8 @@ for (const a of ARTICLES) {
 const ov = loadOverrides();
 const OUT = {};
 let ok = 0, skipSkip = 0, skipNoTok = 0, misalign = [];
-for (const sent of sents) {
+for (const item of items) {
+  const sent = item.clean;
   const toks = T[sent];
   if (!toks) { skipNoTok++; continue; }
   const fed = applyOverrides(sent, ov);
@@ -54,7 +56,20 @@ for (const sent of sents) {
     cum += ml; ends.push(+end.toFixed(2));
   }
   if (tokMora !== moraEnd.length) { misalign.push(sent + ` [拍不齊 tok${tokMora}/vox${moraEnd.length}]`); continue; }
-  OUT[sent] = ends;   // 每個 token 的結束秒數(長度=token數)
+  if (item.level === 'n5') {
+    // N5:空格切詞塊,每塊結束時間 = 該塊最後一個 token 的結束時間(邊界對齊到 token)
+    const units = item.orig.split(/\s+/).filter(Boolean);
+    let acc = 0; const tokEndChar = toks.map(tk => (acc += tk.s.length));   // 每 token 在 stripped 的結束字元位置
+    let cpos = 0, ti = 0; const unitEnds = [];
+    for (const u of units) {
+      cpos += u.replace(/\s/g, '').length;
+      while (ti < toks.length - 1 && tokEndChar[ti] < cpos) ti++;
+      unitEnds.push(ends[ti]);
+    }
+    OUT[sent] = unitEnds;   // 長度 = 詞塊數(前端 N5 也照空格切)
+  } else {
+    OUT[sent] = ends;       // 逐 token 的結束秒數
+  }
   ok++;
 }
 
