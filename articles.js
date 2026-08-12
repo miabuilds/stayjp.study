@@ -1779,5 +1779,368 @@ window.ARTICLES = [
         "note_en": "〜だろう expresses conjecture: 受けつがれていくだろう (will surely be passed on)."
       }
     ]
+  },
+  {
+    "id": "a-n4-6",
+    "level": "n4",
+    "topic": "文化",
+    "topic_en": "Culture",
+    "title": "夏祭り",
+    "title_zh": "夏日祭典",
+    "title_en": "Summer Festivals",
+    "body": "日本の夏には、あちこちで夏祭りが開かれます。夜になると、たくさんの人が浴衣を着て、神社やお寺に集まります。\n祭りの会場には、屋台がたくさん並んでいます。たこ焼きやかき氷を食べたり、金魚すくいをしたりして、みんな楽しそうです。\n夜の終わりには、大きな花火が上がります。ドンという大きな音がして、夜空に光が広がると、みんな「わあ」と声を上げます。\n夏祭りは、日本の夏の大切な思い出になる行事です。機会があれば、ぜひ浴衣を着て行ってみてください。",
+    "trans": [
+      "日本的夏天,各地都會舉辦夏日祭典。一到晚上,許多人就穿著浴衣,聚集到神社或寺廟。",
+      "祭典的會場擺著許多攤販。大家吃著章魚燒、刨冰,玩撈金魚,看起來都很開心。",
+      "夜晚接近尾聲時,會放大型煙火。伴隨著「咚」的一聲巨響,光芒在夜空中綻放,大家就發出「哇」的驚呼。",
+      "夏日祭典是能成為日本夏天重要回憶的活動。有機會的話,請務必穿上浴衣去體驗看看。"
+    ],
+    "trans_en": [
+      "In Japan's summer, festivals are held here and there. When night falls, many people put on yukata and gather at shrines and temples.",
+      "The festival grounds are lined with many stalls. People eat takoyaki and shaved ice, scoop goldfish, and everyone looks happy.",
+      "As the night ends, big fireworks go up. When light spreads across the night sky with a booming sound, everyone cries out 'wow'.",
+      "Summer festivals are events that become precious memories of the Japanese summer. If you get the chance, do try putting on a yukata and going."
+    ],
+    "vocab": [
+      {
+        "w": "夏祭り",
+        "r": "なつまつり",
+        "m": "夏日祭典",
+        "m_en": "summer festival"
+      },
+      {
+        "w": "開く",
+        "r": "ひらく",
+        "m": "舉辦、開",
+        "m_en": "to hold / open"
+      },
+      {
+        "w": "浴衣",
+        "r": "ゆかた",
+        "m": "浴衣(夏季和服)",
+        "m_en": "yukata"
+      },
+      {
+        "w": "神社",
+        "r": "じんじゃ",
+        "m": "神社",
+        "m_en": "shrine"
+      },
+      {
+        "w": "屋台",
+        "r": "やたい",
+        "m": "路邊攤、攤販",
+        "m_en": "food stall"
+      },
+      {
+        "w": "並ぶ",
+        "r": "ならぶ",
+        "m": "排列",
+        "m_en": "to line up"
+      },
+      {
+        "w": "金魚すくい",
+        "r": "きんぎょすくい",
+        "m": "撈金魚",
+        "m_en": "goldfish scooping"
+      },
+      {
+        "w": "花火",
+        "r": "はなび",
+        "m": "煙火",
+        "m_en": "fireworks"
+      },
+      {
+        "w": "夜空",
+        "r": "よぞら",
+        "m": "夜空",
+        "m_en": "night sky"
+      },
+      {
+        "w": "行事",
+        "r": "ぎょうじ",
+        "m": "活動、慣例儀式",
+        "m_en": "event"
+      },
+      {
+        "w": "機会",
+        "r": "きかい",
+        "m": "機會",
+        "m_en": "opportunity"
+      }
+    ],
+    "grammar": [
+      {
+        "t": "〜たり〜たりする",
+        "note": "列舉幾個動作:食べたり、すくいをしたり。",
+        "t_en": "〜たり〜たり",
+        "note_en": "listing actions: 食べたり、すくいをしたり."
+      },
+      {
+        "t": "〜と(自然結果)",
+        "note": "「光が広がると」一〜就〜,表示自然的結果。",
+        "id": "n4-57",
+        "t_en": "〜と (natural result)",
+        "note_en": "as soon as ~, a natural result: 光が広がると."
+      },
+      {
+        "t": "〜てみてください",
+        "note": "「行ってみてください」試著做做看。",
+        "id": "n4-23",
+        "t_en": "〜てみてください",
+        "note_en": "try doing ~: 行ってみてください."
+      }
+    ]
+  },
+  {
+    "id": "a-n3-7",
+    "level": "n3",
+    "topic": "生活",
+    "topic_en": "Daily Life",
+    "title": "熱中症に気をつけて",
+    "title_zh": "小心中暑",
+    "title_en": "Watch Out for Heatstroke",
+    "body": "近年、日本の夏はますます暑くなっている。特に七月から八月にかけて、気温が三十五度を超える日も珍しくない。\nこの暑さの中で気をつけなければならないのが、熱中症だ。体の水分が足りなくなると、めまいや頭痛が起こり、ひどい場合は命に関わることもある。\n熱中症を防ぐためには、のどがかわく前に、こまめに水を飲むことが大切だ。暑い時間帯の外出をさけたり、エアコンを上手に使ったりするのもよい。\n「自分はまだ大丈夫」と思っているうちに、体調が悪くなることも少なくない。周りの人と声をかけ合いながら、暑い夏を元気に乗り越えたい。",
+    "trans": [
+      "近年來,日本的夏天越來越熱。尤其是七月到八月這段期間,氣溫超過三十五度的日子也不稀奇。",
+      "在這樣的酷熱中必須注意的,就是中暑。當身體的水分不足時,會頭暈、頭痛,嚴重時甚至可能危及性命。",
+      "要預防中暑,重點是在口渴之前就勤加補充水分。避開炎熱時段外出、善用冷氣也是好方法。",
+      "在自以為「我還沒事」的時候,身體變差的情況並不少見。和周遭的人互相提醒,一起有精神地度過炎熱的夏天吧。"
+    ],
+    "trans_en": [
+      "In recent years, summers in Japan have grown hotter and hotter. Especially from July through August, days over 35 degrees are not unusual.",
+      "What you must watch out for in this heat is heatstroke. When the body runs low on water, dizziness and headaches set in, and in severe cases it can even become life-threatening.",
+      "To prevent heatstroke, the key is to drink water frequently, before you feel thirsty. It also helps to avoid going out during the hottest hours and to use air conditioning wisely.",
+      "It is not rare for your condition to worsen while you still think 'I'm fine.' Let's look out for one another and get through the hot summer in good health."
+    ],
+    "vocab": [
+      {
+        "w": "近年",
+        "r": "きんねん",
+        "m": "近年",
+        "m_en": "recent years"
+      },
+      {
+        "w": "熱中症",
+        "r": "ねっちゅうしょう",
+        "m": "中暑",
+        "m_en": "heatstroke"
+      },
+      {
+        "w": "気温",
+        "r": "きおん",
+        "m": "氣溫",
+        "m_en": "temperature"
+      },
+      {
+        "w": "超える",
+        "r": "こえる",
+        "m": "超過",
+        "m_en": "to exceed"
+      },
+      {
+        "w": "水分",
+        "r": "すいぶん",
+        "m": "水分",
+        "m_en": "moisture / hydration"
+      },
+      {
+        "w": "頭痛",
+        "r": "ずつう",
+        "m": "頭痛",
+        "m_en": "headache"
+      },
+      {
+        "w": "命",
+        "r": "いのち",
+        "m": "生命",
+        "m_en": "life"
+      },
+      {
+        "w": "関わる",
+        "r": "かかわる",
+        "m": "關係到、攸關",
+        "m_en": "to be at stake"
+      },
+      {
+        "w": "防ぐ",
+        "r": "ふせぐ",
+        "m": "預防",
+        "m_en": "to prevent"
+      },
+      {
+        "w": "時間帯",
+        "r": "じかんたい",
+        "m": "時段",
+        "m_en": "time period"
+      },
+      {
+        "w": "外出",
+        "r": "がいしゅつ",
+        "m": "外出",
+        "m_en": "going out"
+      },
+      {
+        "w": "体調",
+        "r": "たいちょう",
+        "m": "身體狀況",
+        "m_en": "physical condition"
+      },
+      {
+        "w": "乗り越える",
+        "r": "のりこえる",
+        "m": "克服、度過",
+        "m_en": "to overcome"
+      }
+    ],
+    "grammar": [
+      {
+        "t": "〜から〜にかけて",
+        "note": "「七月から八月にかけて」表示大致的期間範圍。",
+        "t_en": "〜から〜にかけて",
+        "note_en": "over the period from ~ to ~: 七月から八月にかけて."
+      },
+      {
+        "t": "〜うちに",
+        "note": "「思っているうちに」在〜的狀態持續期間(不知不覺就〜)。",
+        "id": "n3-13",
+        "t_en": "〜うちに",
+        "note_en": "while ~ still holds: 思っているうちに."
+      },
+      {
+        "t": "〜なければならない",
+        "note": "「気をつけなければならない」表示義務、非做不可。",
+        "t_en": "〜なければならない",
+        "note_en": "must ~: 気をつけなければならない."
+      }
+    ]
+  },
+  {
+    "id": "a-n2-5",
+    "level": "n2",
+    "topic": "社会",
+    "topic_en": "Society",
+    "title": "広がるキャッシュレス決済",
+    "title_zh": "普及中的無現金支付",
+    "title_en": "The Spread of Cashless Payment",
+    "body": "ここ数年、日本でもキャッシュレス決済が急速に広がってきた。以前は現金しか使えない店が多かったが、今ではスマートフォンやカードで支払える店が増えている。\nキャッシュレス決済には、支払いが早く、お金の管理がしやすいという利点がある。レジで小銭を探す必要がなく、いつ、いくら使ったかが記録として残るからだ。\n一方で、課題も残されている。停電や通信障害が起きると、支払いができなくなる恐れがある。使いすぎてしまう人や、機械の操作が苦手な高齢者への配慮も欠かせない。\n便利さと安心のバランスをどう取るか。現金とキャッシュレスがうまく共存できる社会が求められている。",
+    "trans": [
+      "近幾年,無現金支付在日本也迅速普及。以前只能用現金的店家很多,如今能用智慧型手機或信用卡付款的店家越來越多。",
+      "無現金支付有付款快、金錢管理容易的優點。因為不必在收銀台找零錢,而且何時、花了多少都會留下記錄。",
+      "另一方面,問題也還存在。一旦停電或通訊故障,就有可能無法付款。對於容易花過頭的人、以及不擅長操作機器的高齡者,也不能缺少體貼的考量。",
+      "便利與安心之間該如何取得平衡呢?我們需要的,是一個現金與無現金能好好共存的社會。"
+    ],
+    "trans_en": [
+      "Over the past few years, cashless payment has spread rapidly in Japan too. There used to be many shops that took only cash, but now more and more shops let you pay by smartphone or card.",
+      "Cashless payment has the advantages of quick payment and easy money management. You do not need to search for coins at the register, and a record remains of when and how much you spent.",
+      "On the other hand, problems remain. If there is a power outage or a communication failure, there is a risk that you cannot pay. Consideration for people who overspend and for elderly people who struggle with the machines is also essential.",
+      "How to balance convenience and peace of mind? A society where cash and cashless can coexist well is what is being called for."
+    ],
+    "vocab": [
+      {
+        "w": "決済",
+        "r": "けっさい",
+        "m": "結算、支付",
+        "m_en": "payment / settlement"
+      },
+      {
+        "w": "急速に",
+        "r": "きゅうそくに",
+        "m": "迅速地",
+        "m_en": "rapidly"
+      },
+      {
+        "w": "現金",
+        "r": "げんきん",
+        "m": "現金",
+        "m_en": "cash"
+      },
+      {
+        "w": "支払う",
+        "r": "しはらう",
+        "m": "支付",
+        "m_en": "to pay"
+      },
+      {
+        "w": "利点",
+        "r": "りてん",
+        "m": "優點",
+        "m_en": "advantage"
+      },
+      {
+        "w": "小銭",
+        "r": "こぜに",
+        "m": "零錢",
+        "m_en": "small change"
+      },
+      {
+        "w": "記録",
+        "r": "きろく",
+        "m": "記錄",
+        "m_en": "record"
+      },
+      {
+        "w": "課題",
+        "r": "かだい",
+        "m": "課題、待解問題",
+        "m_en": "issue / challenge"
+      },
+      {
+        "w": "停電",
+        "r": "ていでん",
+        "m": "停電",
+        "m_en": "power outage"
+      },
+      {
+        "w": "通信障害",
+        "r": "つうしんしょうがい",
+        "m": "通訊故障",
+        "m_en": "communication failure"
+      },
+      {
+        "w": "恐れ",
+        "r": "おそれ",
+        "m": "疑慮、風險",
+        "m_en": "risk / fear"
+      },
+      {
+        "w": "配慮",
+        "r": "はいりょ",
+        "m": "體貼、顧慮",
+        "m_en": "consideration"
+      },
+      {
+        "w": "共存",
+        "r": "きょうぞん",
+        "m": "共存",
+        "m_en": "coexistence"
+      },
+      {
+        "w": "求める",
+        "r": "もとめる",
+        "m": "尋求、要求",
+        "m_en": "to seek / demand"
+      }
+    ],
+    "grammar": [
+      {
+        "t": "〜てくる(變化)",
+        "note": "「広がってきた」表示到現在為止的變化、趨勢。",
+        "t_en": "〜てくる (gradual change)",
+        "note_en": "a change up to now: 広がってきた."
+      },
+      {
+        "t": "〜恐れがある",
+        "note": "「できなくなる恐れがある」表示有(不好的)可能性。",
+        "t_en": "〜恐れがある",
+        "note_en": "there is a risk that ~: できなくなる恐れがある."
+      },
+      {
+        "t": "一方(で)",
+        "note": "「一方で、課題も残されている」用來提出相對的另一面。",
+        "t_en": "一方(で) (on the other hand)",
+        "note_en": "presenting the other side: 一方で、課題も残されている."
+      }
+    ]
   }
 ];

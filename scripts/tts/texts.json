@@ -91,6 +91,13 @@
     ]
   },
   {
+    "text": "「自分はまだ大丈夫」と思っているうちに、体調が悪くなることも少なくない。",
+    "hash": "21f9ab4c56a5",
+    "sources": [
+      "article#a-n3-7"
+    ]
+  },
+  {
     "text": "「新しい仕事はどうですか。」「まあ、なんとかやっていますよ。」",
     "hash": "746d45f9cfb8",
     "sources": [
@@ -5702,6 +5709,13 @@
     ]
   },
   {
+    "text": "いのち",
+    "hash": "e18b12ff98eb",
+    "sources": [
+      "article-vocab#a-n3-7"
+    ]
+  },
+  {
     "text": "いのなかのかわず",
     "hash": "9232f83da14d",
     "sources": [
@@ -8290,6 +8304,13 @@
     ]
   },
   {
+    "text": "おそれ",
+    "hash": "1fceb4517960",
+    "sources": [
+      "article-vocab#a-n2-5"
+    ]
+  },
+  {
     "text": "おそれる",
     "hash": "a63a952ff855",
     "sources": [
@@ -10000,6 +10021,13 @@
     ]
   },
   {
+    "text": "がいしゅつ",
+    "hash": "f1c264d6942a",
+    "sources": [
+      "article-vocab#a-n3-7"
+    ]
+  },
+  {
     "text": "かいしょう",
     "hash": "e17b1d49bfb1",
     "sources": [
@@ -10474,6 +10502,13 @@
     "hash": "f20a1d9292fe",
     "sources": [
       "vocab-n5"
+    ]
+  },
+  {
+    "text": "かかわる",
+    "hash": "a91576bd0863",
+    "sources": [
+      "article-vocab#a-n3-7"
     ]
   },
   {
@@ -11244,7 +11279,8 @@
     "hash": "36b781436a14",
     "sources": [
       "vocab-n3",
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n2-5"
     ]
   },
   {
@@ -13081,7 +13117,8 @@
     "text": "きおん",
     "hash": "32d21dbe7f0f",
     "sources": [
-      "vocab-n3"
+      "vocab-n3",
+      "article-vocab#a-n3-7"
     ]
   },
   {
@@ -13090,7 +13127,8 @@
     "sources": [
       "vocab-n4",
       "vocab-n3",
-      "vocab-n1"
+      "vocab-n1",
+      "article-vocab#a-n4-6"
     ]
   },
   {
@@ -14160,6 +14198,13 @@
     ]
   },
   {
+    "text": "キャッシュレス決済には、支払いが早く、お金の管理がしやすいという利点がある。",
+    "hash": "f1f17c8e0763",
+    "sources": [
+      "article#a-n2-5"
+    ]
+  },
+  {
     "text": "きゃんせる",
     "hash": "5b5ebba3815e",
     "sources": [
@@ -14345,6 +14390,13 @@
     "sources": [
       "vocab-n3",
       "vocab-n2"
+    ]
+  },
+  {
+    "text": "きゅうそくに",
+    "hash": "ff59b4c78485",
+    "sources": [
+      "article-vocab#a-n2-5"
     ]
   },
   {
@@ -14607,7 +14659,8 @@
     "sources": [
       "vocab-n3",
       "vocab-n2",
-      "article-vocab#a-n3-6"
+      "article-vocab#a-n3-6",
+      "article-vocab#a-n4-6"
     ]
   },
   {
@@ -14723,6 +14776,13 @@
     "hash": "56a32531b735",
     "sources": [
       "vocab-n3"
+    ]
+  },
+  {
+    "text": "きょうぞん",
+    "hash": "697e0ae5c728",
+    "sources": [
+      "article-vocab#a-n2-5"
     ]
   },
   {
@@ -15164,7 +15224,8 @@
     "hash": "ce9fe1ec4321",
     "sources": [
       "vocab-n3",
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n2-5"
     ]
   },
   {
@@ -15245,6 +15306,13 @@
     "hash": "9481609b1034",
     "sources": [
       "vocab-n3"
+    ]
+  },
+  {
+    "text": "きんぎょすくい",
+    "hash": "2b998dccd726",
+    "sources": [
+      "article-vocab#a-n4-6"
     ]
   },
   {
@@ -15359,6 +15427,13 @@
     "sources": [
       "vocab-n3",
       "vocab-n2"
+    ]
+  },
+  {
+    "text": "きんねん",
+    "hash": "3b4b29d48368",
+    "sources": [
+      "article-vocab#a-n3-7"
     ]
   },
   {
@@ -16853,7 +16928,8 @@
     "text": "けっさい",
     "hash": "4cba5085abe2",
     "sources": [
-      "vocab-n1"
+      "vocab-n1",
+      "article-vocab#a-n2-5"
     ]
   },
   {
@@ -17155,7 +17231,8 @@
     "text": "げんきん",
     "hash": "65746967ebdc",
     "sources": [
-      "vocab-n4"
+      "vocab-n4",
+      "article-vocab#a-n2-5"
     ]
   },
   {
@@ -18656,7 +18733,8 @@
     "hash": "a23696f3f40d",
     "sources": [
       "vocab-n3",
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n3-7"
     ]
   },
   {
@@ -19202,6 +19280,13 @@
     ]
   },
   {
+    "text": "ここ数年、日本でもキャッシュレス決済が急速に広がってきた。",
+    "hash": "5cf13d3b6e14",
+    "sources": [
+      "article#a-n2-5"
+    ]
+  },
+  {
     "text": "ごさ",
     "hash": "f354c04c7966",
     "sources": [
@@ -19313,7 +19398,8 @@
     "text": "こぜに",
     "hash": "0689343d5fea",
     "sources": [
-      "vocab-n4"
+      "vocab-n4",
+      "article-vocab#a-n2-5"
     ]
   },
   {
@@ -22360,6 +22446,13 @@
     "hash": "945155e4e825",
     "sources": [
       "vocab-n4#経費"
+    ]
+  },
+  {
+    "text": "この暑さの中で気をつけなければならないのが、熱中症だ。",
+    "hash": "2cb01d7c0bd3",
+    "sources": [
+      "article#a-n3-7"
     ]
   },
   {
@@ -27671,6 +27764,13 @@
     ]
   },
   {
+    "text": "じかんたい",
+    "hash": "00ecab79cea6",
+    "sources": [
+      "article-vocab#a-n3-7"
+    ]
+  },
+  {
     "text": "しき",
     "hash": "369152f0a1a5",
     "sources": [
@@ -28796,6 +28896,13 @@
     "sources": [
       "vocab-n2",
       "article-vocab#a-n3-1"
+    ]
+  },
+  {
+    "text": "しはらう",
+    "hash": "b6eb39a06255",
+    "sources": [
+      "article-vocab#a-n2-5"
     ]
   },
   {
@@ -31537,7 +31644,8 @@
     "hash": "28770480597b",
     "sources": [
       "vocab-n4",
-      "vocab-n3"
+      "vocab-n3",
+      "article-vocab#a-n4-6"
     ]
   },
   {
@@ -32114,6 +32222,13 @@
     ]
   },
   {
+    "text": "すいぶん",
+    "hash": "f020ff79ef18",
+    "sources": [
+      "article-vocab#a-n3-7"
+    ]
+  },
+  {
     "text": "ずいぶん",
     "hash": "de5f05ddda59",
     "sources": [
@@ -32418,6 +32533,13 @@
     "hash": "eaa57037b32c",
     "sources": [
       "vocab-n2"
+    ]
+  },
+  {
+    "text": "ずつう",
+    "hash": "cccc822ca7a1",
+    "sources": [
+      "article-vocab#a-n3-7"
     ]
   },
   {
@@ -37141,6 +37263,13 @@
     ]
   },
   {
+    "text": "たいちょう",
+    "hash": "511d125af66a",
+    "sources": [
+      "article-vocab#a-n3-7"
+    ]
+  },
+  {
     "text": "だいちょう",
     "hash": "aa69aefacc25",
     "sources": [
@@ -37611,6 +37740,13 @@
     "hash": "8be46072ac7d",
     "sources": [
       "listening"
+    ]
+  },
+  {
+    "text": "たこ焼きやかき氷を食べたり、金魚すくいをしたりして、みんな楽しそうです。",
+    "hash": "3a158d53523c",
+    "sources": [
+      "article#a-n4-6"
     ]
   },
   {
@@ -40143,6 +40279,13 @@
     ]
   },
   {
+    "text": "つうしんしょうがい",
+    "hash": "e64ebed3f0ef",
+    "sources": [
+      "article-vocab#a-n2-5"
+    ]
+  },
+  {
     "text": "つうせつ",
     "hash": "3cd589139488",
     "sources": [
@@ -40888,6 +41031,13 @@
     "hash": "db602876f5f9",
     "sources": [
       "vocab-n1"
+    ]
+  },
+  {
+    "text": "ていでん",
+    "hash": "323e91322872",
+    "sources": [
+      "article-vocab#a-n2-5"
     ]
   },
   {
@@ -43995,6 +44145,13 @@
     ]
   },
   {
+    "text": "ドンという大きな音がして、夜空に光が広がると、みんな「わあ」と声を上げます。",
+    "hash": "0235201ff318",
+    "sources": [
+      "article#a-n4-6"
+    ]
+  },
+  {
     "text": "どんどん",
     "hash": "59b7bd7e6a70",
     "sources": [
@@ -44913,6 +45070,13 @@
     ]
   },
   {
+    "text": "なつまつり",
+    "hash": "0bff410ab7d8",
+    "sources": [
+      "article-vocab#a-n4-6"
+    ]
+  },
+  {
     "text": "なでる",
     "hash": "27d954ed5aa7",
     "sources": [
@@ -45107,7 +45271,8 @@
     "hash": "d763983631ab",
     "sources": [
       "vocab-n5",
-      "vocab-n4"
+      "vocab-n4",
+      "article-vocab#a-n4-6"
     ]
   },
   {
@@ -45951,6 +46116,13 @@
     ]
   },
   {
+    "text": "ねっちゅうしょう",
+    "hash": "946cdc0c3a90",
+    "sources": [
+      "article-vocab#a-n3-7"
+    ]
+  },
+  {
     "text": "ネットで注文した商品のお届けが遅れて、少し心配しました。",
     "hash": "7eb9f863da4c",
     "sources": [
@@ -46361,7 +46533,8 @@
     "hash": "39e14fab176b",
     "sources": [
       "vocab-n3",
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n3-7"
     ]
   },
   {
@@ -46794,6 +46967,13 @@
     "hash": "c3f4e2add1ed",
     "sources": [
       "vocab-n3"
+    ]
+  },
+  {
+    "text": "はいりょ",
+    "hash": "d67da0645e7e",
+    "sources": [
+      "article-vocab#a-n2-5"
     ]
   },
   {
@@ -47756,6 +47936,13 @@
     "hash": "c2b744909989",
     "sources": [
       "vocab-n2"
+    ]
+  },
+  {
+    "text": "はなび",
+    "hash": "58de676008bb",
+    "sources": [
+      "article-vocab#a-n4-6"
     ]
   },
   {
@@ -49420,7 +49607,8 @@
     "text": "ひらく",
     "hash": "c8dc2d63c277",
     "sources": [
-      "vocab-n4"
+      "vocab-n4",
+      "article-vocab#a-n4-6"
     ]
   },
   {
@@ -50237,6 +50425,13 @@
     "hash": "8d6f2191c198",
     "sources": [
       "vocab-n1"
+    ]
+  },
+  {
+    "text": "ふせぐ",
+    "hash": "ec5ca1018a82",
+    "sources": [
+      "article-vocab#a-n3-7"
     ]
   },
   {
@@ -55820,7 +56015,8 @@
     "hash": "cda28d06934a",
     "sources": [
       "vocab-n3",
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n2-5"
     ]
   },
   {
@@ -56195,6 +56391,13 @@
     "hash": "d1e61f2de960",
     "sources": [
       "vocab-n5"
+    ]
+  },
+  {
+    "text": "やたい",
+    "hash": "df27b6343d17",
+    "sources": [
+      "article-vocab#a-n4-6"
     ]
   },
   {
@@ -56836,6 +57039,13 @@
     ]
   },
   {
+    "text": "ゆかた",
+    "hash": "e9a513ba069b",
+    "sources": [
+      "article-vocab#a-n4-6"
+    ]
+  },
+  {
     "text": "ゆき",
     "hash": "fa6dfc8e60a1",
     "sources": [
@@ -57443,6 +57653,13 @@
     "hash": "13a2a55f368c",
     "sources": [
       "vocab-n1"
+    ]
+  },
+  {
+    "text": "よぞら",
+    "hash": "676948f42f0d",
+    "sources": [
+      "article-vocab#a-n4-6"
     ]
   },
   {
@@ -58083,7 +58300,8 @@
     "text": "りてん",
     "hash": "39467a869cd8",
     "sources": [
-      "vocab-n3"
+      "vocab-n3",
+      "article-vocab#a-n2-5"
     ]
   },
   {
@@ -58686,6 +58904,13 @@
     "hash": "f67d51ef0789",
     "sources": [
       "vocab-n2#伝票"
+    ]
+  },
+  {
+    "text": "レジで小銭を探す必要がなく、いつ、いくら使ったかが記録として残るからだ。",
+    "hash": "eee6ee0f0342",
+    "sources": [
+      "article#a-n2-5"
     ]
   },
   {
@@ -60080,6 +60305,13 @@
     ]
   },
   {
+    "text": "以前は現金しか使えない店が多かったが、今ではスマートフォンやカードで支払える店が増えている。",
+    "hash": "6d49951c0220",
+    "sources": [
+      "article#a-n2-5"
+    ]
+  },
+  {
     "text": "伊藤さんは建築家です。",
     "hash": "073694ea43d4",
     "sources": [
@@ -61050,6 +61282,13 @@
     "hash": "91ae1e93201b",
     "sources": [
       "vocab-n2#危うい"
+    ]
+  },
+  {
+    "text": "一方で、課題も残されている。",
+    "hash": "eade3f05283e",
+    "sources": [
+      "article#a-n2-5"
     ]
   },
   {
@@ -63522,6 +63761,13 @@
     "hash": "2133ac357565",
     "sources": [
       "confusables-eg"
+    ]
+  },
+  {
+    "text": "夏祭りは、日本の夏の大切な思い出になる行事です。",
+    "hash": "6b917dfab6eb",
+    "sources": [
+      "article#a-n4-6"
     ]
   },
   {
@@ -66698,6 +66944,13 @@
     ]
   },
   {
+    "text": "機会があれば、ぜひ浴衣を着て行ってみてください。",
+    "hash": "296db0184221",
+    "sources": [
+      "article#a-n4-6"
+    ]
+  },
+  {
     "text": "機械を導入したおかげで、以前に比べて作業がずいぶん楽になった。",
     "hash": "2de5758505f1",
     "sources": [
@@ -68494,6 +68747,13 @@
     "hash": "c0f5ad212e76",
     "sources": [
       "vocab-n2#遺伝子"
+    ]
+  },
+  {
+    "text": "近年、日本の夏はますます暑くなっている。",
+    "hash": "618ecbb45e72",
+    "sources": [
+      "article#a-n3-7"
     ]
   },
   {
@@ -70828,6 +71088,13 @@
     "hash": "a135a32f9fc4",
     "sources": [
       "grammar-n2#n2-5"
+    ]
+  },
+  {
+    "text": "現金とキャッシュレスがうまく共存できる社会が求められている。",
+    "hash": "602a0be72980",
+    "sources": [
+      "article#a-n2-5"
     ]
   },
   {
@@ -74934,6 +75201,13 @@
     ]
   },
   {
+    "text": "祭りの会場には、屋台がたくさん並んでいます。",
+    "hash": "5c767c9d06fb",
+    "sources": [
+      "article#a-n4-6"
+    ]
+  },
+  {
     "text": "祭りの太鼓の音を聞くと、故郷を離れて久しい私でさえ郷愁を誘われる。",
     "hash": "89f1612e2e70",
     "sources": [
@@ -76219,6 +76493,13 @@
     "hash": "68f2373a164f",
     "sources": [
       "vocab-n2#納品"
+    ]
+  },
+  {
+    "text": "使いすぎてしまう人や、機械の操作が苦手な高齢者への配慮も欠かせない。",
+    "hash": "a6e00f406348",
+    "sources": [
+      "article#a-n2-5"
     ]
   },
   {
@@ -80507,6 +80788,13 @@
     ]
   },
   {
+    "text": "周りの人と声をかけ合いながら、暑い夏を元気に乗り越えたい。",
+    "hash": "2115bd1c3a78",
+    "sources": [
+      "article#a-n3-7"
+    ]
+  },
+  {
     "text": "周囲がどれほど騒ごうと、彼は世俗の評価に超然として自らの道を歩んでいた。",
     "hash": "49788a0f7f3d",
     "sources": [
@@ -81884,6 +82172,13 @@
     "hash": "38b143b6098c",
     "sources": [
       "vocab-n3#酢"
+    ]
+  },
+  {
+    "text": "暑い時間帯の外出をさけたり、エアコンを上手に使ったりするのもよい。",
+    "hash": "25a54f3b2c4f",
+    "sources": [
+      "article#a-n3-7"
     ]
   },
   {
@@ -89295,6 +89590,13 @@
     ]
   },
   {
+    "text": "体の水分が足りなくなると、めまいや頭痛が起こり、ひどい場合は命に関わることもある。",
+    "hash": "bc7886a84b26",
+    "sources": [
+      "article#a-n3-7"
+    ]
+  },
+  {
     "text": "体を壊してから、健康の大切さに気づかされました。",
     "hash": "38713a36769b",
     "sources": [
@@ -92312,6 +92614,13 @@
     ]
   },
   {
+    "text": "停電や通信障害が起きると、支払いができなくなる恐れがある。",
+    "hash": "f6e13fa876af",
+    "sources": [
+      "article#a-n2-5"
+    ]
+  },
+  {
     "text": "定期検診で子宮に異常がないか毎年確認するようにしている。",
     "hash": "61c215a70e99",
     "sources": [
@@ -94979,6 +95288,13 @@
     ]
   },
   {
+    "text": "特に七月から八月にかけて、気温が三十五度を超える日も珍しくない。",
+    "hash": "0602235e44e6",
+    "sources": [
+      "article#a-n3-7"
+    ]
+  },
+  {
     "text": "特に予定もないので、駅前をぶらぶらしながら店を見ていた。",
     "hash": "bcf807b53655",
     "sources": [
@@ -95672,6 +95988,13 @@
     ]
   },
   {
+    "text": "日本の夏には、あちこちで夏祭りが開かれます。",
+    "hash": "fbaeabacdedd",
+    "sources": [
+      "article#a-n4-6"
+    ]
+  },
+  {
     "text": "日本の夏は蒸し暑いので、慣れていない外国人には少しつらいかもしれません。",
     "hash": "10da81321bc0",
     "sources": [
@@ -96292,6 +96615,13 @@
     "hash": "a565283369dd",
     "sources": [
       "vocab-n3#唸る"
+    ]
+  },
+  {
+    "text": "熱中症を防ぐためには、のどがかわく前に、こまめに水を飲むことが大切だ。",
+    "hash": "094a15cb3ca2",
+    "sources": [
+      "article#a-n3-7"
     ]
   },
   {
@@ -102751,6 +103081,13 @@
     ]
   },
   {
+    "text": "便利さと安心のバランスをどう取るか。",
+    "hash": "a069cd80cb52",
+    "sources": [
+      "article#a-n2-5"
+    ]
+  },
+  {
     "text": "便利さに慣れると、ともすれば感謝の気持ちを忘れがちだ。",
     "hash": "93bc263880ff",
     "sources": [
@@ -105594,6 +105931,13 @@
     ]
   },
   {
+    "text": "夜になると、たくさんの人が浴衣を着て、神社やお寺に集まります。",
+    "hash": "06aab8e6cdad",
+    "sources": [
+      "article#a-n4-6"
+    ]
+  },
+  {
     "text": "夜になると、街の灯りがつきます。",
     "hash": "185bf5f79fa1",
     "sources": [
@@ -105612,6 +105956,13 @@
     "hash": "2cbee02bef18",
     "sources": [
       "vocab-n4#恐ろしい"
+    ]
+  },
+  {
+    "text": "夜の終わりには、大きな花火が上がります。",
+    "hash": "559089a87e77",
+    "sources": [
+      "article#a-n4-6"
     ]
   },
   {
