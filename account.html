@@ -119,7 +119,11 @@ a:hover{text-decoration:underline}
  </div>
  <div class="actions">
  <button class="btn" onclick="logout()">登出</button>
- <!-- 刪除帳號:只在原生 App 內顯示(Apple 5.1.1(v) 要求);網頁用戶看不到。由 initDeleteAccount() 解鎖 -->
+ <!-- 刪除帳號:App 與網頁都要顯示。
+      Apple 5.1.1(v):App 內必須能刪除帳號。
+      Google Play:另外要求「不安裝 App 也能從網頁申請刪除帳號」,並在資料安全表單填一個
+      公開可存取的刪除網址 → 所以網頁不能再藏起來,否則上架會被退。
+      仍由 initDeleteAccount() 解鎖(要等 Firebase 還原登入狀態,未登入不該看到)。 -->
  <button class="btn" id="deleteAccountBtn" onclick="deleteAccount()" style="display:none;color:#EF4444;border-color:rgba(239,68,68,.4)">刪除帳號</button>
  </div>
  </div>
@@ -658,12 +662,14 @@ const FN_REFUND = 'https://refund-lsd7okt5qa-de.a.run.app';
 const FN_PAYPAL_REFUND = 'https://asia-east1-jpnote-1bdd6.cloudfunctions.net/paypalRefund';
 const FN_DELETE_ACCOUNT = 'https://deleteaccount-lsd7okt5qa-de.a.run.app';
 
-// 只在原生 App 的 WebView 內顯示「刪除帳號」(Apple 要求);網頁不顯示。
+// 「刪除帳號」App 與網頁都顯示(Google Play 要求網頁也要有刪除入口;Apple 要求 App 內有)。
+// 下面的「導向原生 paywall」才是 App 專屬。
 function initDeleteAccount() {
   try {
+    const b = document.getElementById('deleteAccountBtn');
+    if (b) b.style.display = '';
+
     if (window.STAYJP_NATIVE && window.STAYJP_NATIVE.isNativeApp) {
-      const b = document.getElementById('deleteAccountBtn');
-      if (b) b.style.display = '';
       // App 內:所有「查看方案/升級」連結改開原生 IAP paywall,不導到網頁金流頁(App Store 3.1.1)
       document.querySelectorAll('a[href$="pricing.html"]').forEach(function(a){
         a.removeAttribute('href');
@@ -685,7 +691,13 @@ initDeleteAccount();
 
 async function deleteAccount() {
   if (!currentUser) { alert('請先登入'); return; }
-  if (!confirm('確定要永久刪除帳號?\n\n• 你的學習進度、收藏、訂閱狀態將被清除,無法復原。\n• 若你有訂閱,刪除帳號「不會」自動停止扣款 — 請先到 Apple 設定 → 訂閱 取消,再刪帳號。\n\n仍要刪除?')) return;
+  // 取消訂閱的路徑各平台不同,講錯會讓人找不到而繼續被扣款。
+  var _p = (window.STAYJP_NATIVE && window.STAYJP_NATIVE.platform) || '';
+  var _cancelHint =
+    _p === 'android' ? 'Google Play →(右上頭像)付款與訂閱 → 訂閱項目 → StayJP → 取消'
+    : _p === 'ios'   ? 'iOS 設定 → 你的名字 → 訂閱項目 → StayJP → 取消'
+    : '你當初訂閱的管道(App Store / Google Play / 網頁金流)';
+  if (!confirm('確定要永久刪除帳號?\n\n• 你的學習進度、收藏、訂閱狀態將被清除,無法復原。\n• 若你有訂閱,刪除帳號「不會」自動停止扣款 — 請先到 ' + _cancelHint + ' 取消,再刪帳號。\n\n仍要刪除?')) return;
   try {
     const idToken = await currentUser.getIdToken();
     const res = await fetch(FN_DELETE_ACCOUNT, {
