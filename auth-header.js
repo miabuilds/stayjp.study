@@ -150,7 +150,7 @@
       var photo = user.photoURL || '';
       var img = photo ? '<img src="' + photo + '" alt="" onerror="this.style.display=\'none\'">' : '';
       var ADMIN = ['stayjpplan@gmail.com', 'abc83327@gmail.com'];
-      var adminLink = ADMIN.indexOf((user.email || '').toLowerCase()) > -1 ? '<a class="ahx-item" href="admin.html">🛠 管理後台</a>' : '';
+      var adminLink = ADMIN.indexOf((user.email || '').toLowerCase()) > -1 ? '<a class="ahx-item" href="admin-dash.html">🛠 管理後台</a>' : '';
       area.innerHTML =
         '<button class="ahx-btn" id="ahxMenuBtn" type="button">' + img + '<span class="ahx-name">' + name + '</span> ▾</button>' +
         '<div class="ahx-menu" id="ahxMenu">' +
