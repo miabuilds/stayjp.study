@@ -139,6 +139,8 @@ textarea.note:focus{outline:none;border-color:var(--ac)}
 </style>
 </head>
 <body>
+<script>if(new URLSearchParams(location.search).has('embed'))document.documentElement.classList.add('embed');</script>
+<style>.embed .hd h1,.embed .hd>a{display:none!important}.embed .hd{padding-top:8px}</style>
 
 <div id="gate" class="gate" style="display:none">
  <h1> Admin</h1>

@@ -15,6 +15,10 @@
   .hd b{font-size:15px}.hd .sp{flex:1}
   .hd a{color:var(--accent);text-decoration:none;font-size:13px}
   .chip{font-size:11px;background:var(--accent-soft);color:var(--accent);padding:3px 9px;border-radius:20px;font-weight:700}
+  .ntabs{display:flex;gap:4px;flex-wrap:wrap}
+  .ntab{font:inherit;font-size:13px;font-weight:600;border:1px solid var(--line);background:var(--panel);color:var(--ink2);padding:6px 12px;border-radius:9px;cursor:pointer;text-decoration:none;line-height:1.4;display:inline-block}
+  .ntab:hover{border-color:var(--accent);color:var(--accent)}
+  .ntab.on{background:var(--accent);color:#fff;border-color:var(--accent)}
   .wrap{max-width:1060px;margin:0 auto;padding:16px}
   .panel{background:var(--panel);border:1px solid var(--line);border-radius:16px;box-shadow:var(--sh);margin-bottom:16px;overflow:hidden}
   .ph{display:flex;align-items:center;gap:8px;padding:13px 16px;border-bottom:1px solid var(--line);flex-wrap:wrap}
@@ -89,10 +93,16 @@
 
 <div id="app" style="display:none">
   <div class="hd">
-    <b>📊 總覽後台</b><span class="chip" id="meInfo"></span><span class="sp"></span>
-    <a href="admin.html">主後台</a><a href="admin-kol.html">推薦碼</a><a href="#" onclick="logout();return false">登出</a>
+    <b>StayJP 後台</b>
+    <div class="ntabs">
+      <button id="ntOverview" class="ntab on" onclick="showTab('overview')">📊 總覽</button>
+      <button id="ntTools" class="ntab" onclick="showTab('tools')">🛠 完整操作</button>
+      <a class="ntab" href="admin-kol.html">🎟 KOL</a>
+    </div>
+    <span class="sp"></span><span class="chip" id="meInfo"></span>
+    <a href="#" onclick="logout();return false">登出</a>
   </div>
-  <div class="wrap">
+  <div class="wrap" id="paneOverview">
 
     <div class="hero-strip">
       <div class="hcard accent"><div class="hl">本期實際到手</div><div class="hv num" id="heroTake">—</div><div class="hd">扣手續費/退費/分潤/稅後(依期間)</div></div>
@@ -143,6 +153,7 @@
     </div>
 
   </div>
+  <div id="paneTools" style="display:none"><iframe id="toolsFrame" title="完整操作" style="width:100%;height:calc(100vh - 50px);border:0;display:block"></iframe></div>
 </div>
 
 <div id="modalHost"></div>
@@ -191,6 +202,16 @@ document.getElementById('loginBtn').onclick = () => {
   auth.signInWithPopup(p).catch(err=>{ if(/popup-closed|cancelled-popup/.test(err.code||''))return; document.getElementById('errMsg').textContent='登入失敗:'+err.message; });
 };
 function logout(){ auth.signOut(); location.reload(); }
+
+// 分頁:總覽(原生)/ 完整操作(嵌入現有 admin.html,程式碼不動 → 動錢的操作零風險)
+function showTab(t){
+  const ov=document.getElementById('paneOverview'), tl=document.getElementById('paneTools');
+  document.getElementById('ntOverview').classList.toggle('on', t==='overview');
+  document.getElementById('ntTools').classList.toggle('on', t==='tools');
+  ov.style.display = t==='overview' ? '' : 'none';
+  tl.style.display = t==='tools' ? 'block' : 'none';
+  if(t==='tools'){ const f=document.getElementById('toolsFrame'); if(!f.getAttribute('src')) f.setAttribute('src','admin.html?embed=1'); }
+}
 
 async function loadData(){
   try {
