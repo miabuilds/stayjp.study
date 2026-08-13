@@ -34,6 +34,19 @@
   .kpi .d{font-size:10.5px;color:var(--ink3);margin-top:2px}
   .kpi.hero{background:linear-gradient(140deg,var(--accent),#7c73ff);color:#fff;border:none}
   .kpi.hero .l,.kpi.hero .d{color:rgba(255,255,255,.85)}
+  /* hero strip:頂部主角數字 */
+  .hero-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+  .hcard{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:15px 17px;box-shadow:var(--sh);position:relative;overflow:hidden}
+  .hcard.accent{background:var(--accent);color:#fff;border:none}
+  .hcard .hl{font-size:12px;color:var(--ink2);font-weight:700}
+  .hcard.accent .hl{color:rgba(255,255,255,.88)}
+  .hcard .hv{font-size:26px;font-weight:800;margin-top:6px;letter-spacing:-.02em;line-height:1.1}
+  .hcard .hd{font-size:10.5px;color:var(--ink3);margin-top:4px}
+  .hcard.accent .hd{color:rgba(255,255,255,.82)}
+  .hdot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--ok);margin-right:5px;vertical-align:middle;animation:pulse 2s infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+  @media (prefers-reduced-motion:reduce){.hdot{animation:none}}
+  @media(max-width:860px){.hero-strip{grid-template-columns:repeat(2,1fr)}}
   /* plan counts */
   .plans{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
   .plan{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 14px;box-shadow:var(--sh)}
@@ -81,6 +94,13 @@
   </div>
   <div class="wrap">
 
+    <div class="hero-strip">
+      <div class="hcard accent"><div class="hl">本期實際到手</div><div class="hv num" id="heroTake">—</div><div class="hd">扣手續費/退費/分潤/稅後(依期間)</div></div>
+      <div class="hcard"><div class="hl">有效訂閱(全站)</div><div class="hv num" id="heroActive">—</div><div class="hd">active + trialing(即時)</div></div>
+      <div class="hcard"><div class="hl">今日瀏覽</div><div class="hv num" id="heroToday">—</div><div class="hd" id="heroTodayD">GA4(待部署)</div></div>
+      <div class="hcard"><div class="hl"><span class="hdot" id="heroDot" style="display:none"></span>在線中</div><div class="hv num" id="heroOnline">—</div><div class="hd">過去 30 分鐘</div></div>
+    </div>
+
     <div class="panel">
       <div class="ph"><h2>期間</h2><span class="hint">影響營收/分潤等「本期」數字;各方案人數與待付款為即時</span></div>
       <div class="pb"><div class="daterow">
@@ -94,6 +114,15 @@
 
     <div class="muted" style="font-size:12px;margin:2px 2px 8px">💡 金額類數字為「透過推薦碼帶進來的首購」口徑(取自 commissions 帳本、金額精準);非推薦的一般銷售不含分潤、不計入此處。「有效訂閱」為全站即時人數。</div>
     <div class="kpis" id="kpis" style="margin-bottom:16px"></div>
+
+    <div class="panel">
+      <div class="ph"><h2>💵 全站實收對帳</h2><span class="hint">全站真實金流(依上方期間);Apple 為牌價估算</span></div>
+      <div class="scroll" id="reconTable"><div class="pb muted">載入中…</div></div>
+      <div class="pb" style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;border-top:1px solid var(--hair)">
+        <label class="muted" style="display:flex;align-items:center;gap:6px">綜所稅估算 <input type="number" id="taxPct" value="10" min="0" max="40" step="0.5" style="width:66px" oninput="renderReconcile()">%</label>
+        <span class="muted" style="flex:1;min-width:220px">＊退費/退單已扣抵。Apple/Google 為牌價×85% 估算,真實入帳待接 App Store Connect 財報。</span>
+      </div>
+    </div>
 
     <div class="panel">
       <div class="ph"><h2>📦 各方案訂購中</h2><span class="hint">status = active / trialing(即時)</span></div>
@@ -129,15 +158,21 @@ try { firebase.firestore().settings({ experimentalAutoDetectLongPolling:true, us
 const db = firebase.firestore(), auth = firebase.auth();
 const FN_LIST_SUBS = 'https://asia-east1-jpnote-1bdd6.cloudfunctions.net/adminListSubscribers';
 const FN_SETTLE = 'https://asia-east1-jpnote-1bdd6.cloudfunctions.net/adminSettleKolPayout';
+const FN_GA_STATS = 'https://asia-east1-jpnote-1bdd6.cloudfunctions.net/adminGaStats';
 
 const PLAN_NAME = { monthly:'月費', yearly:'年費', yearly_early_bird:'早鳥年費', lifetime:'買斷' };
 const PLAN_ORDER = ['monthly','yearly','yearly_early_bird','lifetime'];
 const FEE_BY_SOURCE = { app:0.15, web:0.0275 };   // 用於缺 profit_twd 時回推(舊資料)
+// 全站對帳用:各管道真實手續費(對齊 functions/src/utils/firestore.ts 的 KOL_FEE)
+const RECON_FEE = { ecpay:0.0275, apple_iap:0.15, google:0.15, paypal:0.078, manual:0, gift:0 };
+const RECON_EST = new Set(['apple_iap','google']);   // amount_twd 為台幣牌價估算的管道
+const RECON_LBL = { ecpay:'綠界', apple_iap:'Apple', google:'Google', paypal:'PayPal', manual:'手動', gift:'贈送', unknown:'未知管道⚠️' };
+const toMs = v => { if(v==null)return 0; if(typeof v==='number')return v; if(typeof v.toMillis==='function')return v.toMillis(); if(v.seconds!=null)return v.seconds*1000; if(v._seconds!=null)return v._seconds*1000; return 0; };
 const fmt = n => 'NT$' + (Math.round(Number(n)||0)).toLocaleString();
 const esc = s => String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 const dt = ms => { if(!ms) return '—'; const d=new Date(Number(ms)); if(isNaN(d)) return '—'; const p=n=>(n<10?'0':'')+n; return (''+d.getFullYear()).slice(2)+'/'+p(d.getMonth()+1)+'/'+p(d.getDate()); };
 
-let SUBS=[], COMMS=[], REFMAP={};   // 全域資料
+let SUBS=[], COMMS=[], REFMAP={}, TXNS=[];   // 全域資料
 let FROM=0, TO=0;
 
 auth.onAuthStateChanged(user => {
@@ -160,11 +195,18 @@ function logout(){ auth.signOut(); location.reload(); }
 async function loadData(){
   try {
     const t = await auth.currentUser.getIdToken();
-    const [subsRes, csnap, rsnap] = await Promise.all([
+    const [subsRes, csnap, rsnap, tsnap] = await Promise.all([
       fetch(FN_LIST_SUBS,{method:'POST',headers:{Authorization:'Bearer '+t}}).then(r=>r.json()).catch(()=>({})),
       db.collection('commissions').get(),
-      db.collection('ref_codes').get()
+      db.collection('ref_codes').get(),
+      db.collection('transactions').get()   // 全站對帳:rules 允許 admin 讀
     ]);
+    // 對帳用交易:收入=success+amount>0;退費=refunded+amount<0;排除 failed / sandbox
+    TXNS=[]; tsnap.forEach(d=>{ const t=d.data();
+      if(t.is_sandbox===true) return;
+      if(t.status!=='success' && t.status!=='refunded') return;
+      TXNS.push({ pm:t.payment_method||'unknown', amt:Number(t.amount_twd)||0, type:t.type||'', ms:toMs(t.occurred_at) });
+    });
     SUBS = (subsRes && subsRes.subscribers) ? subsRes.subscribers : [];
     COMMS = []; csnap.forEach(d=>{ const c=d.data(); COMMS.push({
       code:c.code||'?', buyer:c.buyer_uid||'', plan:c.plan||'', state:c.state||'pending', source:c.source||'web',
@@ -174,7 +216,24 @@ async function loadData(){
     REFMAP={}; rsnap.forEach(d=>{ const c=d.data(); REFMAP[d.id]={ kol:c.kol||'', payout:c.payout||null, pct:(c.commission_pct!=null?c.commission_pct:20), type:c.type||'kol' }; });
     setThisMonth();          // 預設本月,會呼叫 apply() → renderAll()
     renderPayout(); renderPlans(); renderMembers();
+    loadGaStats(); if(!gaTimer) gaTimer=setInterval(loadGaStats, 90000);   // 瀏覽人數:即時 + 每 90 秒更新在線
   } catch(e){ document.getElementById('kpis').innerHTML='<div class="muted" style="padding:16px">讀取失敗:'+esc(e.message)+'</div>'; }
+}
+
+// 瀏覽人數(GA):失敗/未部署 → 靜默保持「—」,不影響其他面板
+let gaTimer=null;
+async function loadGaStats(){
+  try{
+    const t=await auth.currentUser.getIdToken();
+    const r=await fetch(FN_GA_STATS,{headers:{Authorization:'Bearer '+t}});
+    if(!r.ok) return;
+    const d=await r.json(); const set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
+    set('heroToday', Number(d.todayUsers||0).toLocaleString()+' 人');
+    const td=document.getElementById('heroTodayD'); if(td) td.textContent='瀏覽 '+Number(d.todayViews||0).toLocaleString()+' 次';
+    const online=Number(d.online||0);
+    set('heroOnline', online.toLocaleString()+' 人');
+    const dot=document.getElementById('heroDot'); if(dot) dot.style.display=online>0?'inline-block':'none';
+  }catch(e){ /* 尚未部署 / GA 失敗 → 保持 — */ }
 }
 
 // profit(利潤):優先用存下的 profit_twd,缺則用 gross×(1-手續費) 回推
@@ -189,6 +248,7 @@ function apply(){
   TO = tv ? Date.parse(tv+'T23:59:59+08:00') : Infinity;
   document.getElementById('periodLbl').textContent = (fv||tv) ? ('期間:'+(fv||'—')+' ~ '+(tv||'—')) : '期間:全部';
   renderKpis();
+  renderReconcile();
 }
 function inPeriod(c){ return c.created>=FROM && c.created<=TO; }
 
@@ -196,14 +256,58 @@ function renderKpis(){
   let rev=0, fee=0, comm=0, net=0, conv=0;
   COMMS.forEach(c=>{ if(c.state==='void'||!inPeriod(c))return; conv++; const pf=profitOf(c); rev+=c.gross; fee+=(c.gross-pf); comm+=c.amount; net+=(pf-c.amount); });
   const activeSubs = SUBS.filter(s=>!s.is_sandbox && (s.status==='active'||s.status==='trialing')).length;
+  const ha=document.getElementById('heroActive'); if(ha) ha.textContent=activeSubs;
   document.getElementById('kpis').innerHTML =
     kpi('推薦帶來營收', fmt(rev), conv+' 筆(限推薦碼首購)') +
     kpi('平台手續費', '−'+fmt(fee), '綠界/IAP/PayPal') +
     kpi('分潤支出', '−'+fmt(comm), '應付 KOL') +
-    kpi('妳淨得(扣分潤後)', fmt(net), '推薦單:營收−手續費−分潤', true) +
+    kpi('妳淨得(扣分潤後)', fmt(net), '推薦單:營收−手續費−分潤') +
     kpi('有效訂閱(全站)', activeSubs, 'active+trialing(即時)');
 }
 function kpi(l,v,d,hero){ return '<div class="kpi'+(hero?' hero':'')+'"><div class="l">'+l+'</div><div class="v num">'+v+'</div><div class="d">'+d+'</div></div>'; }
+
+// 全站實收對帳:各管道營收 −手續費 −退費 −KOL分潤 −稅 = 實際到手(依期間)
+function renderReconcile(){
+  const box=document.getElementById('reconTable'); if(!box) return;
+  const m={};
+  TXNS.forEach(t=>{
+    if(!(t.ms>=FROM && t.ms<=TO)) return;
+    if(t.amt===0) return;
+    const k=(t.pm in RECON_FEE)?t.pm:'unknown';
+    const r=m[k]=m[k]||{inc:0,ref:0,n:0,nr:0};
+    if(t.amt>0){ r.inc+=t.amt; r.n++; } else { r.ref+=t.amt; r.nr++; }
+  });
+  let gross=0,fee=0,refund=0;
+  const rows=Object.keys(m).sort((a,b)=>m[b].inc-m[a].inc).map(k=>{
+    const rate=RECON_FEE[k]||0, f=m[k].inc*rate;
+    gross+=m[k].inc; fee+=f; refund+=m[k].ref;
+    return {k,inc:m[k].inc,rate,fee,ref:m[k].ref,n:m[k].n,nr:m[k].nr,est:RECON_EST.has(k)};
+  });
+  let kol=0; COMMS.forEach(c=>{ if(c.state==='void')return; if(!(c.created>=FROM&&c.created<=TO))return; kol+=c.amount; });
+  const taxPct=Number(document.getElementById('taxPct').value)||0;
+  const preTax=gross-fee+refund-kol;                 // refund 為負
+  const tax=Math.max(0,preTax)*taxPct/100;
+  const take=preTax-tax;
+  const heroTake=document.getElementById('heroTake'); if(heroTake) heroTake.textContent=fmt(take);
+  if(!rows.length){ box.innerHTML='<div class="pb muted">此期間沒有金流交易。</div>'; return; }
+  const c=(v,st)=>'<td class="n"'+(st?' style="'+st+'"':'')+'>'+v+'</td>';
+  box.innerHTML='<table><thead><tr><th>管道</th><th class="n">營收</th><th class="n">手續費</th><th class="n">退費</th><th class="n">淨額</th><th class="n">筆數</th></tr></thead><tbody>'
+    + rows.map(r=>'<tr><td>'+RECON_LBL[r.k]+(r.est?' <span class="pill p-warn">估算</span>':'')+'</td>'
+        + c(fmt(r.inc)) + c('−'+fmt(r.fee),'color:var(--bad)')
+        + c(r.ref?fmt(r.ref):'—', r.ref?'color:var(--bad)':'color:var(--ink3)')
+        + c('<b>'+fmt(r.inc-r.fee)+'</b>')
+        + c(r.n+(r.nr?(' <span style="color:var(--bad)">+'+r.nr+'退</span>'):'')) + '</tr>').join('')
+    + '<tr class="rowtot"><td>合計</td>'+c(fmt(gross))+c('−'+fmt(fee))+c(refund?fmt(refund):'—')+c('<b>'+fmt(gross-fee)+'</b>')+'<td></td></tr>'
+    + '</tbody></table>'
+    + '<div class="pb" style="border-top:1px solid var(--hair)"><table style="min-width:0;max-width:340px"><tbody>'
+    + '<tr><td style="color:var(--ink2);border:none">營收合計</td>'+c(fmt(gross),'border:none')+'</tr>'
+    + '<tr><td style="color:var(--ink2);border:none">− 手續費</td>'+c('−'+fmt(fee),'border:none;color:var(--bad)')+'</tr>'
+    + '<tr><td style="color:var(--ink2);border:none">− 退費/退單</td>'+c(refund?fmt(refund):fmt(0),'border:none;color:var(--bad)')+'</tr>'
+    + '<tr><td style="color:var(--ink2);border:none">− KOL 分潤</td>'+c('−'+fmt(kol),'border:none;color:var(--bad)')+'</tr>'
+    + '<tr><td style="color:var(--ink2);border:none">− 綜所稅('+taxPct+'%)</td>'+c('−'+fmt(tax),'border:none;color:var(--bad)')+'</tr>'
+    + '<tr class="rowtot"><td style="border-radius:8px 0 0 8px">＝ 實際到手</td>'+c('<b>'+fmt(take)+'</b>','border-radius:0 8px 8px 0')+'</tr>'
+    + '</tbody></table></div>';
+}
 
 function renderPlans(){
   const g={}; PLAN_ORDER.forEach(p=>g[p]={a:0,t:0});
