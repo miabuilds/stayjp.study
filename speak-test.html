@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>口說練習(測試版)</title>
+<style>
+  :root{ --bg:#f3f5f2;--panel:#fff;--ink:#1b2320;--ink2:#5f6b67;--ink3:#93a09a;--line:#e3e8e2;--accent:#0f766e;--accent2:#0b5850;--soft:#0f766e12;--ok:#15803d;--bad:#c2410c;--warn:#b45309;--sh:0 1px 2px rgba(20,40,30,.05),0 8px 24px rgba(20,40,30,.06); }
+  @media(prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#111512;--panel:#191e1b;--ink:#e9eeea;--ink2:#9aa7a0;--ink3:#70807a;--line:#28302b;--accent:#2dd4bf;--accent2:#5eead4;--soft:#2dd4bf18;--ok:#4ade80;--bad:#fb923c;--warn:#fbbf24;--sh:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.3);}}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);font-family:-apple-system,"PingFang TC","Noto Sans TC",sans-serif;font-size:15px;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:640px;margin:0 auto;padding:20px 16px 60px}
+  .gate{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px}
+  .banner{background:var(--warn);color:#fff;font-size:12px;text-align:center;padding:6px}
+  .btn{font:inherit;font-weight:600;border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:10px;padding:9px 15px;cursor:pointer}
+  .btn:hover{border-color:var(--accent)} .btn.pri{background:var(--accent);color:#fff;border-color:var(--accent)} .btn.pri:hover{background:var(--accent2)}
+  .btn:disabled{opacity:.5;cursor:default}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:16px;box-shadow:var(--sh);padding:18px;margin-bottom:16px}
+  h1{font-size:18px;margin-bottom:2px} .sub{color:var(--ink2);font-size:12.5px;margin-bottom:16px}
+  .chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+  .chip{font-size:12px;border:1px solid var(--line);background:var(--panel);color:var(--ink2);border-radius:20px;padding:4px 11px;cursor:pointer}
+  .chip.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .jp{font-size:26px;font-weight:700;letter-spacing:.01em;line-height:1.35}
+  .kana{color:var(--accent2);font-size:15px;margin-top:4px} .zh{color:var(--ink2);font-size:14px;margin-top:6px}
+  .rowbtns{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+  .said{width:100%;min-height:46px;font:inherit;font-size:16px;border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:var(--bg);color:var(--ink);margin-top:10px}
+  .rec{font-size:15px}
+  .rec.on{background:var(--bad);color:#fff;border-color:var(--bad)}
+  .muted{color:var(--ink3);font-size:12px}
+  .ring{display:inline-flex;align-items:center;justify-content:center;width:64px;height:64px;border-radius:50%;font-size:22px;font-weight:800;color:#fff;flex-shrink:0}
+  .fb-head{display:flex;gap:14px;align-items:center;margin-bottom:12px}
+  .verdict{font-weight:700} .diff{color:var(--ink2);font-size:13px;margin-top:2px}
+  .pt{display:flex;gap:8px;align-items:flex-start;padding:7px 0;border-top:1px solid var(--line);font-size:13.5px}
+  .pt .ic{flex-shrink:0} .pt .lb{font-weight:600;width:52px;flex-shrink:0;color:var(--ink2)}
+  .corr{background:var(--soft);border-radius:10px;padding:10px 12px;margin-top:12px;font-size:15px}
+  .corr .r{color:var(--accent2);font-size:13px;margin-top:3px}
+  .tip{margin-top:10px;font-size:13.5px} .enc{margin-top:8px;font-size:14px;color:var(--ok);font-weight:600}
+  .err{color:var(--bad);font-size:13px;margin-top:8px}
+</style>
+</head>
+<body>
+<div class="banner">⚠ 測試版 · 限內部帳號 · 尚未上線</div>
+
+<div id="gate" class="gate" style="display:none">
+  <h1>口說練習(測試版)</h1>
+  <button id="loginBtn" class="btn pri">用 Google 登入(限 admin)</button>
+  <div id="gerr" class="err"></div>
+</div>
+
+<div id="app" class="wrap" style="display:none">
+  <h1>🎙 口說練習 <span class="muted" style="font-weight:400">測試版</span></h1>
+  <div class="sub">選句子 → 聽範例 → 念一次(或直接打字)→ 送出,看 AI 回饋。</div>
+
+  <div class="card">
+    <div class="chips" id="chips"></div>
+    <div class="jp" id="jp">—</div>
+    <div class="kana" id="kana"></div>
+    <div class="zh" id="zh"></div>
+    <div class="rowbtns">
+      <button class="btn" onclick="speak()">🔊 聽範例</button>
+      <button class="btn" onclick="prev()">← 上一句</button>
+      <button class="btn" onclick="next()">下一句 →</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div style="font-weight:600;margin-bottom:6px">換你念</div>
+    <div class="rowbtns">
+      <button id="recBtn" class="btn rec" onclick="toggleRec()">🎤 開始錄音</button>
+      <button class="btn pri" onclick="submit()">送出評分</button>
+    </div>
+    <input id="said" class="said" placeholder="辨識結果會出現在這;不準可直接改成你念的內容">
+    <div class="muted" style="margin-top:6px" id="recNote">用瀏覽器語音辨識(手機/Chrome 較準);不支援就直接打字。App 版之後改用系統原生辨識,更準。</div>
+  </div>
+
+  <div class="card" id="fbCard" style="display:none"></div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script>
+const ADMIN_EMAILS = ['stayjpplan@gmail.com','abc83327@gmail.com'];
+const fbConfig = { apiKey:"AIzaSyDnmg2XOuvwgE8m8xCF5sS4o0nQYoUplPI", authDomain:"jpnote-1bdd6.firebaseapp.com", projectId:"jpnote-1bdd6", storageBucket:"jpnote-1bdd6.firebasestorage.app", messagingSenderId:"666368174384" };
+if(!firebase.apps.length) firebase.initializeApp(fbConfig);
+const auth = firebase.auth();
+const FN_SPEAK = 'https://asia-east1-jpnote-1bdd6.cloudfunctions.net/speakFeedback';
+
+const S = (jp,kana,zh)=>({jp,kana,zh});
+const SENTS = [
+  S('はじめまして。','はじめまして。','初次見面。'),
+  S('わたしは台湾人です。','わたしはたいわんじんです。','我是台灣人。'),
+  S('日本語を勉強しています。','にほんごをべんきょうしています。','我正在學日文。'),
+  S('これはいくらですか。','これはいくらですか。','這個多少錢?'),
+  S('すみません、駅はどこですか。','すみません、えきはどこですか。','不好意思,車站在哪裡?'),
+  S('毎朝、七時に起きます。','まいあさ、しちじにおきます。','每天早上七點起床。'),
+  S('電車で会社に行きます。','でんしゃでかいしゃにいきます。','搭電車去公司。'),
+  S('お疲れさまです。','おつかれさまです。','辛苦了。'),
+  S('少し相談したいことがあります。','すこしそうだんしたいことがあります。','我有點事想商量。'),
+];
+let idx = 0;
+function cur(){ return SENTS[idx]; }
+
+function render(){
+  document.getElementById('jp').textContent = cur().jp;
+  document.getElementById('kana').textContent = cur().kana;
+  document.getElementById('zh').textContent = cur().zh;
+  document.getElementById('said').value = '';
+  document.getElementById('fbCard').style.display = 'none';
+  [...document.querySelectorAll('#chips .chip')].forEach((c,i)=>c.classList.toggle('on', i===idx));
+}
+function renderChips(){
+  document.getElementById('chips').innerHTML = SENTS.map((s,i)=>`<span class="chip" onclick="go(${i})">${i+1}</span>`).join('');
+}
+function go(i){ idx=i; stopRec(); render(); }
+function prev(){ if(idx>0){ idx--; stopRec(); render(); } }
+function next(){ if(idx<SENTS.length-1){ idx++; stopRec(); render(); } }
+
+// 瀏覽器語音合成當範例(粗略;App 版之後接更好聽的)
+function speak(){
+  try{ const u=new SpeechSynthesisUtterance(cur().kana); u.lang='ja-JP'; u.rate=.9;
+    const v=speechSynthesis.getVoices().find(x=>/ja/i.test(x.lang)); if(v)u.voice=v;
+    speechSynthesis.cancel(); speechSynthesis.speak(u);
+  }catch(e){}
+}
+
+// 瀏覽器語音辨識
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+let rec=null, recording=false;
+function toggleRec(){ recording ? stopRec() : startRec(); }
+function startRec(){
+  if(!SR){ document.getElementById('recNote').textContent='這個瀏覽器不支援語音辨識,請直接打字你念的內容。'; document.getElementById('said').focus(); return; }
+  rec = new SR(); rec.lang='ja-JP'; rec.interimResults=true; rec.continuous=false;
+  let finalTxt='';
+  rec.onresult = e=>{ let t=''; for(let i=0;i<e.results.length;i++) t+=e.results[i][0].transcript; document.getElementById('said').value=t; if(e.results[e.results.length-1].isFinal) finalTxt=t; };
+  rec.onerror = e=>{ document.getElementById('recNote').textContent='辨識出錯('+e.error+'),可直接打字。'; stopRec(); };
+  rec.onend = ()=>{ recording=false; const b=document.getElementById('recBtn'); b.classList.remove('on'); b.textContent='🎤 開始錄音'; };
+  try{ rec.start(); recording=true; const b=document.getElementById('recBtn'); b.classList.add('on'); b.textContent='⏹ 停止'; }catch(e){}
+}
+function stopRec(){ if(rec&&recording){ try{rec.stop();}catch(e){} } recording=false; const b=document.getElementById('recBtn'); if(b){b.classList.remove('on');b.textContent='🎤 開始錄音';} }
+
+async function submit(){
+  const said = (document.getElementById('said').value||'').trim();
+  const fb = document.getElementById('fbCard');
+  if(!said){ fb.style.display='block'; fb.innerHTML='<div class="err">先念一次或打字,再送出。</div>'; return; }
+  fb.style.display='block'; fb.innerHTML='<div class="muted">AI 評分中…</div>';
+  try{
+    const t = await auth.currentUser.getIdToken();
+    const r = await fetch(FN_SPEAK,{ method:'POST', headers:{'Content-Type':'application/json',Authorization:'Bearer '+t}, body:JSON.stringify({ target:{jp:cur().jp,kana:cur().kana}, said }) });
+    const d = await r.json();
+    if(!r.ok){ fb.innerHTML='<div class="err">失敗:'+(d.error||r.status)+'</div>'; return; }
+    renderFb(d);
+  }catch(e){ fb.innerHTML='<div class="err">錯誤:'+e.message+'</div>'; }
+}
+function renderFb(d){
+  const sc = Number(d.score)||0;
+  const col = sc>=85?'var(--ok)':sc>=60?'var(--warn)':'var(--bad)';
+  const pts = (d.points||[]).map(p=>`<div class="pt"><span class="ic">${p.ok?'✅':'⚠️'}</span><span class="lb">${esc(p.label||'')}</span><span>${esc(p.note||'')}</span></div>`).join('');
+  document.getElementById('fbCard').innerHTML =
+    `<div class="fb-head"><div class="ring" style="background:${col}">${sc}</div>
+       <div><div class="verdict" style="color:${col}">${d.matched?'念得不錯!':'再修一下'}</div><div class="diff">${esc(d.diff||'')}</div></div></div>`
+    + pts
+    + (d.corrected?`<div class="corr">正確說法:<b>${esc(d.corrected)}</b><div class="r">${esc(d.reading||'')}</div></div>`:'')
+    + (d.tip?`<div class="tip">💡 ${esc(d.tip)}</div>`:'')
+    + (d.encourage?`<div class="enc">${esc(d.encourage)}</div>`:'');
+}
+function esc(s){ return String(s==null?'':s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
+
+// auth
+auth.onAuthStateChanged(u=>{
+  const gate=document.getElementById('gate'), app=document.getElementById('app');
+  if(!u || !ADMIN_EMAILS.includes((u.email||'').toLowerCase())){
+    gate.style.display='flex'; app.style.display='none';
+    if(u && !ADMIN_EMAILS.includes((u.email||'').toLowerCase())){ document.getElementById('gerr').textContent=u.email+' 非測試帳號'; auth.signOut(); }
+    return;
+  }
+  gate.style.display='none'; app.style.display='block';
+  renderChips(); render();
+});
+document.getElementById('loginBtn').onclick=()=>{ const p=new firebase.auth.GoogleAuthProvider(); p.setCustomParameters({prompt:'select_account'}); auth.signInWithPopup(p).catch(e=>{ if(/popup-closed|cancelled/.test(e.code||''))return; document.getElementById('gerr').textContent='登入失敗:'+e.message; }); };
+</script>
+</body>
+</html>
