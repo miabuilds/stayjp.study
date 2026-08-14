@@ -3658,8 +3658,8 @@ function renderVocab() {
     VirtualList.init({
       container: vlContainer,
       items: vlItems,
-      itemHeight: 100,
-      buffer: 15,
+      itemHeight: 170,   // 僅估計值(未量測項用);真實高度由 VirtualList 渲染後量測修正,標題/卡片各自正確
+      buffer: 8,
       renderItem: (entry) => {
         if (entry.type === 'header') {
           return `<section class="cs"><h2><span class="ci2">${entry.cat.icon}</span>${catLabel(entry.cat.name)}<span style="font-size:12px;color:#999;font-weight:400;margin-left:auto">${t('cat_count_vocab', { n: entry.count })}</span></h2></section>`;
