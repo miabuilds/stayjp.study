@@ -53,11 +53,13 @@
       '.ahx-btn img{width:18px;height:18px;border-radius:50%}' +
       '.ahx-btn .ahx-name{display:inline-block;max-width:96px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;vertical-align:bottom}' +
       '.ahx-menu{position:absolute;top:calc(100% + 6px);right:0;background:var(--bg2,#fff);' +
-        'border:1px solid var(--bd,#ddd);border-radius:10px;min-width:180px;padding:4px;z-index:300;' +
-        'box-shadow:0 8px 24px rgba(0,0,0,.18);display:none}' +
+        'background-color:var(--bg2,#fff);border:1px solid var(--bd,#ddd);border-radius:10px;' +
+        'min-width:180px;padding:4px;z-index:2147483000;' +   /* 提到極高,保證蓋過任何頁面內容(避免被卡片堆疊透出) */
+        'box-shadow:0 8px 24px rgba(0,0,0,.18);display:none;isolation:isolate}' +
       '.ahx-menu.show{display:block}' +
       '.ahx-head{padding:10px 12px;border-bottom:1px solid var(--bd,#ddd);font-size:11px;' +
         'color:var(--tx3,#888);word-break:break-all}' +
+      '.ahx-head:empty{display:none}' +   /* email 空時不顯示空白列 */
       '.ahx-item{display:block;width:100%;text-align:left;background:none;border:0;padding:8px 12px;' +
         'font-size:13px;color:var(--tx,#222);cursor:pointer;border-radius:6px;text-decoration:none;font-family:inherit}' +
       '.ahx-item:hover{background:var(--bg3,#f0f0f0);text-decoration:none}' +
