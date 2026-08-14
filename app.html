@@ -1495,7 +1495,6 @@ html[data-fs="xlarge"] .cf-eg .ex .j{font-size:18px}
   <div data-i18n="copyright">&copy; 2026 再留計劃 — All rights reserved.</div>
   <div style="margin-top:4px" data-i18n="disclaimer">本站內容為原創整理，不隸屬於 JLPT 官方或任何教育機構。</div>
   <div style="margin-top:4px;font-size:12px;opacity:.7">語音：VOICEVOX:四国めたん</div>
-  <div style="margin-top:4px;font-size:12px;opacity:.6">合作夥伴：<a href="https://www.italki.com/affshare?ref=af32106882&utm_source=stayjp&utm_medium=footer" target="_blank" rel="sponsored noopener" style="color:inherit;text-decoration:underline" onclick="track('affiliate_click', { partner: 'italki', slot: 'footer' })">italki 線上日文家教</a></div>
   <div style="margin-top:4px"><span id="ftInfo"></span></div>
   <div style="margin-top:6px;opacity:.5"><a href="contact.html" data-i18n="feedback">意見回饋</a> · <a href="pricing.html" style="color:inherit">方案</a> · <a href="terms.html" style="color:inherit">服務條款</a> · <a href="privacy.html" style="color:inherit">隱私權</a> · <a href="refund.html" style="color:inherit">退費政策</a></div>
 </footer>
@@ -3267,16 +3266,8 @@ function affLink(key, slot) {
   return AFFILIATES[key] + sep + 'utm_source=stayjp&utm_medium=' + encodeURIComponent(slot);
 }
 function renderAffiliateBlock(slot) {
-  // Tasteful "recommended resources" card — looks like content, not a banner.
-  return `<section class="aff-block">
-    <div class="aff-title">📚 延伸學習資源</div>
-    <div class="aff-card">
-      <div class="aff-name">italki — 線上 1對1 日文老師</div>
-      <div class="aff-desc">想練口說？italki 有 N3+ 等級認證老師，新用戶首堂課享優惠。</div>
-      <a class="aff-cta" href="${affLink('italki', slot)}" target="_blank" rel="sponsored noopener" onclick="track('affiliate_click', { partner: 'italki', slot: '${slot}' })">找老師練口說 →</a>
-    </div>
-    <div class="aff-disclosure">＊ 透過上方連結註冊，本站可獲少量推薦回饋；對你的價格無影響，感謝支持本站持續更新。</div>
-  </section>`;
+  // 使用者要求移除所有 italki 廣告 → 全站不再顯示延伸學習資源卡。
+  return '';
 }
 
 // ========== DAILY MODE ==========
