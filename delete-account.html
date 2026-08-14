@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>刪除帳號 — 日本再留計劃</title>
+<!--
+  這一頁的存在理由:Google Play 的使用者資料政策要求「提供一個公開可存取的網址,
+  讓使用者不必安裝 App 也能申請刪除帳號與資料」,並把該網址填進 Play Console 的
+  資料安全表單。
+
+  刻意不放進導覽列 / 不做站內連結 / 標 noindex —— 只給 Play 表單使用,
+  一般網頁使用者的帳號頁(account.html)維持原樣,不會多出危險按鈕。
+  App 內的刪除入口仍在 account.html(Apple 5.1.1(v) 要求),兩邊互不影響。
+-->
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" href="stayjpplan.png?v=5" type="image/png">
+<style>
+:root{--bg:#FAF9F6;--bg2:#FFF;--bg3:#F3F1ED;--tx:#2C2C2C;--tx2:#7A7A7A;--tx3:#ACACAC;--ac:#D4654A;--ac2:#4A7FD4;--bd:#E8E5E0;--r:12px}
+@media(prefers-color-scheme:dark){:root{--bg:#1C1C1E;--bg2:#2C2C2E;--bg3:#242426;--tx:#E5E5E5;--tx2:#8E8E93;--tx3:#636366;--ac:#E8734A;--ac2:#6BA8F5;--bd:#3A3A3C}}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Noto Sans JP","PingFang TC",system-ui,sans-serif;background:var(--bg);color:var(--tx);line-height:1.7;font-size:14px;-webkit-font-smoothing:antialiased}
+.hd{border-bottom:1px solid var(--bd);padding:12px 20px}
+.hd h1{font-size:16px;font-weight:700;color:var(--ac)}
+.main{max-width:640px;margin:0 auto;padding:28px 20px 80px}
+h2{font-size:20px;margin-bottom:14px}
+.card{background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r);padding:22px;margin-bottom:18px}
+.warn{background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.25);border-radius:10px;padding:14px 16px;margin:16px 0}
+ul{margin:10px 0 0 20px}
+li{margin-bottom:6px}
+.btn{padding:11px 20px;border:1px solid var(--bd);background:var(--bg);color:var(--tx);border-radius:10px;cursor:pointer;font-size:14px;font-weight:600}
+.btn:hover{background:var(--bg3)}
+.btn.danger{color:#EF4444;border-color:rgba(239,68,68,.5)}
+.btn.danger:hover{background:rgba(239,68,68,.08)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.muted{color:var(--tx2);font-size:13px}
+#msg{margin-top:14px;font-size:13px}
+a{color:var(--ac2)}
+</style>
+</head>
+<body>
+
+<header class="hd"><h1><a href="./" style="color:inherit;text-decoration:none">日本再留計劃</a></h1></header>
+
+<main class="main">
+  <h2>刪除帳號與資料</h2>
+  <p class="muted">你可以在這裡永久刪除你的 StayJP 帳號與所有相關資料，不需要安裝 App。</p>
+
+  <div class="card">
+    <h3 style="font-size:15px;margin-bottom:8px">會被刪除的資料</h3>
+    <ul>
+      <li>帳號基本資料（Email、使用者 ID）</li>
+      <li>學習進度：SRS 複習排程、單字本、收藏、學習紀錄</li>
+      <li>設定：目標級別、考試日期、提醒時間</li>
+      <li>訂閱狀態紀錄</li>
+    </ul>
+    <p class="muted" style="margin-top:12px">交易與金流紀錄依稅務與法規需保留必要期間，之後一併刪除。</p>
+  </div>
+
+  <div class="warn">
+    <strong>先取消訂閱，再刪帳號。</strong>
+    <p style="margin-top:6px">刪除帳號<strong>不會</strong>自動停止扣款。請先到你當初訂閱的管道取消：</p>
+    <ul>
+      <li>Google Play → 付款與訂閱 → 訂閱項目 → StayJP → 取消</li>
+      <li>iOS 設定 → 你的名字 → 訂閱項目 → StayJP → 取消</li>
+      <li>網頁訂閱（綠界 / PayPal）→ 於<a href="account.html">我的帳號</a>頁關閉自動續訂</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3 style="font-size:15px;margin-bottom:10px">開始刪除</h3>
+    <p class="muted" style="margin-bottom:14px">請先用你要刪除的帳號登入，確認身分後才能刪除。</p>
+    <div id="signedOut">
+      <button class="btn" id="btnGoogle">用 Google 登入</button>
+      <button class="btn" id="btnApple" style="background:#000;color:#fff;border-color:#000">用 Apple 登入</button>
+    </div>
+    <div id="signedIn" style="display:none">
+      <p style="margin-bottom:12px">目前登入：<strong id="who">—</strong></p>
+      <button class="btn danger" id="btnDelete">永久刪除我的帳號</button>
+      <button class="btn" id="btnLogout">登出</button>
+    </div>
+    <div id="msg"></div>
+  </div>
+
+  <p class="muted">無法登入或有疑問？請來信 <a href="contact.html">聯絡我們</a>，我們會協助你完成刪除。</p>
+</main>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script>
+// 與站上其他頁面同一個 Firebase 專案(設定值本來就是公開的 client config)
+firebase.initializeApp({
+  apiKey: "AIzaSyDnmg2XOuvwgE8m8xCF5sS4o0nQYoUplPI",
+  authDomain: "jpnote-1bdd6.firebaseapp.com",
+  projectId: "jpnote-1bdd6",
+  storageBucket: "jpnote-1bdd6.firebasestorage.app",
+  messagingSenderId: "666368174384",
+  appId: "1:666368174384:web:30a5f16d50c082b13dc0f5"
+});
+var auth = firebase.auth();
+var FN_DELETE_ACCOUNT = 'https://deleteaccount-lsd7okt5qa-de.a.run.app';
+var $ = function (id) { return document.getElementById(id); };
+function say(text, color) { var m = $('msg'); m.textContent = text; m.style.color = color || 'var(--tx2)'; }
+
+auth.onAuthStateChanged(function (u) {
+  $('signedOut').style.display = u ? 'none' : '';
+  $('signedIn').style.display = u ? '' : 'none';
+  if (u) $('who').textContent = u.email || u.uid;
+});
+
+$('btnGoogle').onclick = function () {
+  auth.signInWithPopup(new firebase.auth.GoogleAuthProvider())
+    .catch(function (e) { say('登入失敗：' + (e && e.message || e), '#EF4444'); });
+};
+$('btnApple').onclick = function () {
+  auth.signInWithPopup(new firebase.auth.OAuthProvider('apple.com'))
+    .catch(function (e) { say('登入失敗：' + (e && e.message || e), '#EF4444'); });
+};
+$('btnLogout').onclick = function () { auth.signOut(); say(''); };
+
+$('btnDelete').onclick = async function () {
+  var u = auth.currentUser;
+  if (!u) { say('請先登入。', '#EF4444'); return; }
+  if (!confirm('確定要永久刪除帳號嗎?\n\n學習進度、收藏、訂閱狀態都會被清除,無法復原。\n若尚未取消訂閱,請先取消再刪除,否則會繼續扣款。')) return;
+  var btn = this;
+  btn.disabled = true;
+  say('刪除中…');
+  try {
+    var idToken = await u.getIdToken();
+    var res = await fetch(FN_DELETE_ACCOUNT, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + idToken }
+    });
+    var d = await res.json().catch(function () { return {}; });
+    if (!res.ok) {
+      btn.disabled = false;
+      say('刪除失敗：' + (d.message || d.error || res.status) + '，請稍後再試或來信聯絡我們。', '#EF4444');
+      return;
+    }
+    say('✓ 帳號已刪除。感謝你使用過 StayJP。', '#16A34A');
+    try { await auth.signOut(); } catch (e) {}
+  } catch (e) {
+    btn.disabled = false;
+    say('刪除失敗：' + (e && e.message || e) + '，請稍後再試或來信聯絡我們。', '#EF4444');
+  }
+};
+</script>
+</body>
+</html>
