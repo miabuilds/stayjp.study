@@ -284,6 +284,20 @@ textarea.note:focus{outline:none;border-color:var(--ac)}
  <div id="refCodeMsg" style="font-size:12px;margin-bottom:6px"></div>
  <div id="refCodeList" style="font-size:12px;color:var(--tx2)">—</div>
  </div>
+ <div style="background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r);padding:12px 16px;margin-bottom:14px;font-size:13px">
+ <strong>🎁 兌換碼(免費 Premium · 測試者/活動)</strong>
+ <span style="color:var(--tx3);margin-left:6px">用戶在帳號頁輸入 → 換一段免費 Premium(金額 0、不計營收、到期自動降回;有付費續扣者只加天數不動帳單)</span>
+ <div style="display:flex;gap:6px;flex-wrap:wrap;margin:8px 0">
+ <input id="rdCodeNew" placeholder="碼(留空自動產生)" style="padding:6px 10px;border:1px solid var(--bd);border-radius:8px;background:var(--bg);color:var(--tx);font-size:13px;text-transform:uppercase;width:150px">
+ <input id="rdDaysNew" type="number" min="1" value="30" title="天數" placeholder="天數" style="padding:6px 10px;border:1px solid var(--bd);border-radius:8px;background:var(--bg);color:var(--tx);font-size:13px;width:80px">
+ <input id="rdMaxNew" type="number" min="0" value="12" title="名額(0=不限)" placeholder="名額" style="padding:6px 10px;border:1px solid var(--bd);border-radius:8px;background:var(--bg);color:var(--tx);font-size:13px;width:80px">
+ <input id="rdLabelNew" placeholder="標籤(如 Android beta)" style="padding:6px 10px;border:1px solid var(--bd);border-radius:8px;background:var(--bg);color:var(--tx);font-size:13px;flex:1;min-width:120px">
+ <button class="btn" onclick="createRedeemCode()" style="font-size:12px;padding:5px 12px">建立</button>
+ <button class="btn" onclick="loadRedeemCodes()" style="font-size:11px;padding:5px 10px">↻</button>
+ </div>
+ <div id="rdCodeMsg" style="font-size:12px;margin-bottom:6px"></div>
+ <div id="rdCodeList" style="font-size:12px;color:var(--tx2)">—</div>
+ </div>
  <div id="subsList" style="font-size:13px;color:var(--tx2)">載入中…</div>
  </div>
 
@@ -1219,6 +1233,48 @@ function deleteRefCode(code, paid) {
 }
 function copyTxt(t) { (navigator.clipboard ? navigator.clipboard.writeText(t) : Promise.reject()).then(() => { const m = document.getElementById('refCodeMsg'); m.style.color = '#16A34A'; m.textContent = '已複製:' + t; }).catch(() => { const m = document.getElementById('refCodeMsg'); m.style.color = 'var(--tx2)'; m.textContent = t; }); }
 
+// ── 兌換碼管理(redeem_codes)── admin 客戶端寫;兌換發放走 redeemCode Cloud Function
+async function loadRedeemCodes() {
+  const box = document.getElementById('rdCodeList'); if (!box) return;
+  try {
+    const snap = await db.collection('redeem_codes').orderBy('created_at', 'desc').get();
+    if (snap.empty) { box.textContent = '尚無兌換碼。'; return; }
+    box.innerHTML = snap.docs.map(d => { const c = d.data(); const code = d.id;
+      const used = c.used_count || 0, max = c.max_uses || 0;
+      const exp = c.expires_at ? (' · 兌換截止 ' + new Date(Number(c.expires_at)).toLocaleDateString('zh-TW')) : '';
+      return `<div style="padding:8px 0;border-bottom:1px solid var(--bd)${c.active === false ? ';opacity:.5' : ''}">
+        <b>${code}</b> · 送 ${c.days || 30} 天${c.label ? (' · ' + escapeHtml(c.label)) : ''} ${c.active === false ? '<span style="color:#EF4444">(停用)</span>' : ''}
+        <span style="color:var(--tx2);margin-left:6px">已兌換 ${used}${max ? ('/' + max) : ' (名額不限)'}${exp}</span>
+        <div style="margin-top:4px;display:flex;gap:6px;flex-wrap:wrap">
+          <button class="btn" style="font-size:11px;padding:3px 8px" onclick="copyTxt('${code}')">複製碼</button>
+          <button class="btn" style="font-size:11px;padding:3px 8px" onclick="toggleRedeemCode('${code}',${c.active === false})">${c.active === false ? '啟用' : '停用'}</button>
+          <button class="btn danger" style="font-size:11px;padding:3px 8px" onclick="deleteRedeemCode('${code}')">刪除</button>
+        </div></div>`; }).join('');
+  } catch (e) { box.textContent = '讀取失敗:' + e.message; }
+}
+function createRedeemCode() {
+  let code = (document.getElementById('rdCodeNew').value || '').trim().toUpperCase().replace(/[^A-Z0-9_-]/g, '').slice(0, 32);
+  const days = Math.max(1, parseInt(document.getElementById('rdDaysNew').value, 10) || 30);
+  const max = Math.max(0, parseInt(document.getElementById('rdMaxNew').value, 10) || 0);
+  const label = (document.getElementById('rdLabelNew').value || '').trim().slice(0, 60);
+  const msg = document.getElementById('rdCodeMsg');
+  if (!code) code = 'BETA' + Math.random().toString(36).slice(2, 7).toUpperCase();   // 留空 → 自動產生
+  const ref = db.collection('redeem_codes').doc(code);
+  ref.get().then(d => {
+    if (d.exists) { msg.style.color = '#EF4444'; msg.textContent = '碼已存在:' + code; return; }
+    ref.set({ days, max_uses: max, label, active: true, used_count: 0, plan: 'yearly', created_at: Date.now() }).then(() => {
+      msg.style.color = '#16A34A'; msg.textContent = '✓ 已建立 ' + code + '(送 ' + days + ' 天,名額 ' + (max || '不限') + ')';
+      document.getElementById('rdCodeNew').value = ''; document.getElementById('rdLabelNew').value = '';
+      loadRedeemCodes();
+    }).catch(e => { msg.style.color = '#EF4444'; msg.textContent = '建立失敗:' + e.message; });
+  });
+}
+function toggleRedeemCode(code, activate) { db.collection('redeem_codes').doc(code).set({ active: !!activate }, { merge: true }).then(loadRedeemCodes); }
+function deleteRedeemCode(code) {
+  if (!confirm('刪除兌換碼 ' + code + '?\n(已經兌換過的人不受影響;只是這個碼之後不能再用)')) return;
+  db.collection('redeem_codes').doc(code).delete().then(loadRedeemCodes).catch(e => { const m = document.getElementById('rdCodeMsg'); m.style.color = '#EF4444'; m.textContent = '刪除失敗:' + e.message; });
+}
+
 // ── 每日訂閱稽核結果(由 dailySubAuditCron 寫進 system_alerts/sub_audit)──
 async function loadSubAudit() {
   const box = document.getElementById('subAudit');
@@ -1251,6 +1307,7 @@ async function loadSubAudit() {
 async function renderSubs() {
   loadSubAudit();
   freeAccess('list');   // 同時載入免費白名單清單
+  loadRedeemCodes();    // 兌換碼清單
   const box = document.getElementById('subsList');
   box.textContent = '載入中…';
   try {

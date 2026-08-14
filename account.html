@@ -119,11 +119,10 @@ a:hover{text-decoration:underline}
  </div>
  <div class="actions">
  <button class="btn" onclick="logout()">登出</button>
- <!-- 刪除帳號:App 與網頁都要顯示。
-      Apple 5.1.1(v):App 內必須能刪除帳號。
-      Google Play:另外要求「不安裝 App 也能從網頁申請刪除帳號」,並在資料安全表單填一個
-      公開可存取的刪除網址 → 所以網頁不能再藏起來,否則上架會被退。
-      仍由 initDeleteAccount() 解鎖(要等 Firebase 還原登入狀態,未登入不該看到)。 -->
+ <!-- 刪除帳號:維持「只在原生 App 內顯示」(Apple 5.1.1(v) 要求),網頁版帳號頁不變。
+      Google Play 另外要求的「不裝 App 也能從網頁申請刪除」不放在這裡,
+      改用獨立頁 delete-account.html(不進導覽,只填給 Play 的資料安全表單)——
+      這樣網頁使用者的帳號頁維持原樣,不會多出一顆危險按鈕。 -->
  <button class="btn" id="deleteAccountBtn" onclick="deleteAccount()" style="display:none;color:#EF4444;border-color:rgba(239,68,68,.4)">刪除帳號</button>
  </div>
  </div>
@@ -150,6 +149,15 @@ a:hover{text-decoration:underline}
  <div class="status-row" id="rowSource" style="display:none">
  <span class="lbl">購買來源</span>
  <span class="val" id="sourceLabel">—</span>
+ </div>
+
+ <div id="redeemBox" style="margin-top:14px;padding:12px;background:var(--bg3);border-radius:10px">
+ <div style="font-size:13px;color:var(--tx2);margin-bottom:8px">🎁 有兌換碼?輸入換取免費 Premium(測試者 / 活動):</div>
+ <div style="display:flex;gap:8px;flex-wrap:wrap">
+ <input id="redeemInput" placeholder="兌換碼" autocapitalize="characters" style="flex:1;min-width:120px;padding:8px 10px;border:1px solid var(--bd);border-radius:8px;background:var(--bg);color:var(--tx);font-size:14px;text-transform:uppercase">
+ <button class="btn" onclick="applyRedeemCode()" style="white-space:nowrap">兌換</button>
+ </div>
+ <div id="redeemMsg" style="font-size:12px;margin-top:6px;color:var(--tx3)"></div>
  </div>
 
  <div id="freeActions" style="display:none">
@@ -464,6 +472,26 @@ function shareInvite() {
 }
 
 // ── subscription ──
+async function applyRedeemCode(){
+  const inp=document.getElementById('redeemInput'), msg=document.getElementById('redeemMsg');
+  const code=(inp.value||'').trim().toUpperCase();
+  if(!code){ msg.style.color='var(--tx3)'; msg.textContent='請輸入兌換碼。'; return; }
+  const u=auth.currentUser;
+  if(!u){ msg.style.color='#EF4444'; msg.textContent='請先登入再兌換。'; return; }
+  msg.style.color='var(--tx2)'; msg.textContent='兌換中…';
+  try{
+    const idToken=await u.getIdToken();
+    const r=await fetch('https://asia-east1-jpnote-1bdd6.cloudfunctions.net/redeemCode',{
+      method:'POST', headers:{'Content-Type':'application/json',Authorization:'Bearer '+idToken}, body:JSON.stringify({code}) });
+    const d=await r.json();
+    if(!r.ok||!d.ok){ msg.style.color='#EF4444'; msg.textContent='兌換失敗:'+(d.reason||d.error||r.status); return; }
+    msg.style.color='#16A34A';
+    msg.textContent='✓ 兌換成功!免費 Premium '+d.days+' 天'+(d.expiresAt?(',到期 '+new Date(Number(d.expiresAt)).toLocaleDateString('zh-TW')):'')+'。';
+    inp.value='';
+    if(typeof loadSubscription==='function') loadSubscription();
+  }catch(e){ msg.style.color='#EF4444'; msg.textContent='兌換失敗:'+e.message; }
+}
+
 function loadSubscription() {
  db.collection('users').doc(currentUser.uid).onSnapshot(doc => {
  const data = doc.data() || {};
@@ -662,14 +690,13 @@ const FN_REFUND = 'https://refund-lsd7okt5qa-de.a.run.app';
 const FN_PAYPAL_REFUND = 'https://asia-east1-jpnote-1bdd6.cloudfunctions.net/paypalRefund';
 const FN_DELETE_ACCOUNT = 'https://deleteaccount-lsd7okt5qa-de.a.run.app';
 
-// 「刪除帳號」App 與網頁都顯示(Google Play 要求網頁也要有刪除入口;Apple 要求 App 內有)。
-// 下面的「導向原生 paywall」才是 App 專屬。
+// 只在原生 App 的 WebView 內顯示「刪除帳號」(Apple 5.1.1(v) 要求);網頁不顯示。
+// Google 要的「公開網頁刪除入口」走獨立頁 delete-account.html,不動這裡。
 function initDeleteAccount() {
   try {
-    const b = document.getElementById('deleteAccountBtn');
-    if (b) b.style.display = '';
-
     if (window.STAYJP_NATIVE && window.STAYJP_NATIVE.isNativeApp) {
+      const b = document.getElementById('deleteAccountBtn');
+      if (b) b.style.display = '';
       // App 內:所有「查看方案/升級」連結改開原生 IAP paywall,不導到網頁金流頁(App Store 3.1.1)
       document.querySelectorAll('a[href$="pricing.html"]').forEach(function(a){
         a.removeAttribute('href');
