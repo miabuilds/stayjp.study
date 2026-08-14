@@ -95,6 +95,11 @@ a:hover{text-decoration:underline}
  <button id="loginBtn" class="btn primary">用 Google 登入</button>
  <button id="loginApple" class="btn" style="background:#000;color:#fff;border:1px solid #000;margin-top:8px">  用 Apple 登入</button>
  <p id="loginAppleNote" style="font-size:12px;color:var(--tx3);margin-top:8px">在 App 用 Apple 付費的,用同一個 Apple ID 登入,網頁也是 Premium。</p>
+ <div id="inAppWarn" style="display:none;margin-top:14px;max-width:420px;padding:12px 14px;background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.4);border-radius:10px;font-size:13px;color:var(--tx);line-height:1.75;text-align:left">
+   ⚠️ 你正在 <b>App 內建瀏覽器</b>(LINE／IG／FB／Threads…)開啟,<b>社群登入會失敗</b>。<br>
+   請點右上／右下的「<b>⋯</b>」或「<b>⋮</b>」→ 選「<b>用預設瀏覽器開啟</b>」(Safari／Chrome),再登入。
+   <div style="margin-top:8px"><button class="btn" onclick="_copyThisUrl()" style="font-size:12px;padding:6px 12px">複製本頁連結</button></div>
+ </div>
  </div>
 
  <div id="appView" style="display:none">
@@ -350,7 +355,15 @@ function toggleMailOpt(on) {
 try { const _c = _acctReadCache(); if (_c) _acctShowApp(_c); } catch (e) {}
 setTimeout(function () { if (!_acctResolved && !currentUser) _acctShowGate(); }, 4000);
 
+// 內建瀏覽器(LINE/FB/IG/Threads/微信…)登入 Firebase 會壞(popup 被擋 → redirect 在分割儲存環境失敗
+// → firebaseapp.com「missing initial state」錯誤)。偵測到就擋下、教用外部瀏覽器開。
+function _isInApp(){ return /FBAN|FBAV|FB_IAB|Instagram|Line\/|MicroMessenger|Twitter|TikTok|KAKAOTALK|NAVER|Barcelona|BytedanceWebview/i.test(navigator.userAgent || ''); }
+function _copyThisUrl(){ const u=location.href; (navigator.clipboard? navigator.clipboard.writeText(u):Promise.reject()).then(()=>alert('連結已複製!貼到 Safari／Chrome 開啟再登入。')).catch(()=>prompt('複製這個連結,貼到 Safari／Chrome 開啟:', u)); }
+function _inAppBlockLogin(){ alert('你正在 App 內建瀏覽器(LINE／IG／Threads／FB／微信 等)開啟,社群登入會被擋、無法完成。\n\n請點右上／右下的「⋯」或「⋮」→ 選「用預設瀏覽器開啟」(Safari／Chrome),再登入。'); _copyThisUrl(); }
+try { if (_isInApp()) { var _w=document.getElementById('inAppWarn'); if(_w) _w.style.display='block'; } } catch(e){}
+
 document.getElementById('loginBtn').onclick = () => {
+ if (_isInApp()) { _inAppBlockLogin(); return; }
  const provider = new firebase.auth.GoogleAuthProvider();
  provider.setCustomParameters({ prompt: 'select_account' });
  auth.signInWithPopup(provider).catch(err => {
@@ -364,6 +377,7 @@ document.getElementById('loginBtn').onclick = () => {
 
 // Apple 登入(web):讓 iOS 用 Apple 付費者用同一 Apple ID 登入 → 同一 Firebase uid → 讀到同一份訂閱 → 網頁也 Premium
 document.getElementById('loginApple').onclick = () => {
+ if (_isInApp()) { _inAppBlockLogin(); return; }
  const provider = new firebase.auth.OAuthProvider('apple.com');
  provider.addScope('email'); provider.addScope('name');
  auth.signInWithPopup(provider).catch(err => {
