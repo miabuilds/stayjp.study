@@ -128,6 +128,17 @@ for (const a of articles) {
   }
 }
 
+// 生活會話 — phrases.html 的 SCENES[].lines[].jp(硬編在頁面內的對話句)。
+// 前端 speakLine 用 __TTS[l.jp] 找 mp3,沒有就沒喇叭圖示、點了也沒聲。歷史坑:同今日故事,
+// 對話句從沒被 collect 掃到 → 30 句幾乎全靜音。併進主流程根治。
+const phrasesHtml = fs.readFileSync(path.join(ROOT, 'phrases.html'), 'utf8');
+const phraseRe = /jp:\s*'((?:\\.|[^'\\])*)'/g;
+let ph;
+while ((ph = phraseRe.exec(phrasesHtml))) {
+  const j = ph[1].replace(/\\'/g, "'").replace(/\\\\/g, '\\');
+  add(j, 'phrases');
+}
+
 // 今日故事 — scripts/daily-stories/output/*.json,每篇 story.sentences[] 逐句。
 // 前端跟讀 key 與 tts.mjs 一致:s.r(讀音覆蓋)優先,退回 s.j。
 // 歷史坑:故事只由 scripts/daily-stories/tts.mjs 併進 manifest,但 generate.mjs 用
@@ -203,6 +214,7 @@ const EXPECTED_MIN = {
   'listening':        80,
   'verbs':            10,
   'daily-story':      500,
+  'phrases':          25,
 };
 const missing = [];
 for (const [src, min] of Object.entries(EXPECTED_MIN)) {
