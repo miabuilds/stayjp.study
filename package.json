@@ -8,6 +8,8 @@
     "check-readings": "node scripts/check-readings.js",
     "tts:collect": "node scripts/tts/collect.mjs",
     "tts:generate": "node scripts/tts/generate.mjs",
+    "tts:audit": "node scripts/tts/audit-pronunciation.mjs",
+    "tts": "node scripts/tts/collect.mjs && node scripts/tts/generate.mjs",
     "usage:generate": "node scripts/usage/generate.mjs"
   },
   "dependencies": {
