@@ -128,6 +128,22 @@ for (const a of articles) {
   }
 }
 
+// 今日故事 — scripts/daily-stories/output/*.json,每篇 story.sentences[] 逐句。
+// 前端跟讀 key 與 tts.mjs 一致:s.r(讀音覆蓋)優先,退回 s.j。
+// 歷史坑:故事只由 scripts/daily-stories/tts.mjs 併進 manifest,但 generate.mjs 用
+//   texts.json 重建 manifest 時會把它們洗掉 → 613 句全掉瀏覽器語音。併進主流程根治。
+const storiesDir = path.join(ROOT, 'scripts/daily-stories/output');
+if (fs.existsSync(storiesDir)) {
+  for (const f of fs.readdirSync(storiesDir).filter(f => f.endsWith('.json'))) {
+    const d = JSON.parse(fs.readFileSync(path.join(storiesDir, f), 'utf8'));
+    if (!d.pass) continue;
+    for (const s of d.story?.sentences || []) {
+      const t = (s.r || s.j || '').trim();
+      if (t) add(t, `daily-story#${f.replace('.json', '')}`);
+    }
+  }
+}
+
 // 五十音 — 每個假名的發音(平假名當 key)
 const kanaCode = fs.readFileSync(path.join(ROOT, 'kana.js'), 'utf8');
 const KANA = (new Function('window', kanaCode + '; return window.KANA;'))({}) || {};
@@ -186,6 +202,7 @@ const EXPECTED_MIN = {
   'confusables-eg':   100,
   'listening':        80,
   'verbs':            10,
+  'daily-story':      500,
 };
 const missing = [];
 for (const [src, min] of Object.entries(EXPECTED_MIN)) {
