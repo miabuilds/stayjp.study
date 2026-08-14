@@ -142,6 +142,18 @@ service cloud.firestore {
                      request.auth.token.email in ['stayjpplan@gmail.com', 'abc83327@gmail.com'];
     }
 
+    // 兌換碼(測試者/活動免費 Premium)— admin 後台管理;兌換的發放走 redeemCode Cloud Function
+    match /redeem_codes/{code} {
+      allow read, write: if request.auth != null &&
+                     request.auth.token.email in ['stayjpplan@gmail.com', 'abc83327@gmail.com'];
+    }
+    // 兌換紀錄 — 只 Cloud Function (Admin SDK) 寫,admin 可讀(稽核)
+    match /redeem_uses/{id} {
+      allow read: if request.auth != null &&
+                     request.auth.token.email in ['stayjpplan@gmail.com', 'abc83327@gmail.com'];
+      allow write: if false;
+    }
+
     // 系統告警(每日訂閱稽核結果)— Cloud Function (Admin SDK) 寫,admin 後台讀
     match /system_alerts/{doc} {
       allow read: if request.auth != null &&
