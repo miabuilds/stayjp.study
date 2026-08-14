@@ -2142,5 +2142,569 @@ window.ARTICLES = [
         "note_en": "presenting the other side: 一方で、課題も残されている."
       }
     ]
-  }
+  },
+{
+  "id": "a-n1-3",
+  "level": "n1",
+  "topic": "社会",
+  "topic_en": "Society",
+  "title": "少子高齢化という難題",
+  "title_zh": "少子高齡化這道難題",
+  "title_en": "The Challenge of an Aging, Shrinking Society",
+  "body": "日本は 世界でも 類を見ない 速さで 少子高齢化が 進んでいる。総人口に 占める 高齢者の 割合は 年々 上昇し、その 一方で 生まれる 子どもの 数は 減り続けている。\nこの 傾向が もたらす 影響は、社会保障制度の 根幹を 揺るがしかねない。年金や 医療、介護に かかる 費用は 増える 一方で、それを 支える 現役世代は 減っていくからだ。\n対策として、育児と 仕事の 両立を 支援する 制度の 充実や、外国人労働者の 受け入れ 拡大などが 議論されている。しかし、いずれも 一朝一夕に 解決できる 問題では ない。\n出生率が 下がる 背景には、経済的な 不安や 価値観の 多様化といった、複雑な 要因が 絡み合っている。単に 補助金を 配れば 済むという 話では ないのだ。\n少子高齢化は、もはや 避けて 通れない 現実で ある。社会全体で どう 向き合い、次の 世代に どのような 国を 残すのか。今こそ 真剣な 議論が 求められている。",
+  "trans": [
+    "日本正以世界上前所未見的速度邁向少子高齡化。高齡者在總人口中所占的比例逐年上升,另一方面,出生的孩子數量卻持續減少。",
+    "這股趨勢帶來的影響,恐怕會動搖社會保障制度的根基。因為年金、醫療、照護所需的費用不斷增加,而支撐這些的青壯世代卻愈來愈少。",
+    "作為對策,支援育兒與工作兼顧的制度該如何充實、是否擴大接納外籍勞工等等,都正在被討論。然而,這些都不是一朝一夕就能解決的問題。",
+    "出生率下降的背後,經濟上的不安、價值觀的多元化等等複雜的因素相互交織。並不是單靠發放補助金就能了事的。",
+    "少子高齡化已是無可迴避的現實。整個社會該如何面對、要留給下一代什麼樣的國家?此刻正需要一場認真的討論。"
+  ],
+  "trans_en": [
+    "Japan is aging and shrinking at a speed the world has never seen. The share of the elderly in the total population rises year by year, while the number of children being born keeps falling.",
+    "The impact of this trend could shake the very foundation of the social security system, because the costs of pensions, healthcare and nursing care keep rising while the working generation that supports them keeps shrinking.",
+    "Proposed measures — enriching systems that help people balance childcare and work, or widening the acceptance of foreign workers — are all being debated. Yet none can be solved overnight.",
+    "Behind the falling birth rate lie tangled, complex factors: economic anxiety, the diversification of values, and more. It is not something handouts alone can fix.",
+    "An aging, shrinking society is now an unavoidable reality. How should society as a whole face it, and what kind of country should we leave the next generation? A serious debate is needed now more than ever."
+  ],
+  "vocab": [
+    {
+      "w": "割合",
+      "r": "わりあい",
+      "m": "比例、比率",
+      "m_en": "proportion / ratio"
+    },
+    {
+      "w": "傾向",
+      "r": "けいこう",
+      "m": "傾向、趨勢",
+      "m_en": "tendency / trend"
+    },
+    {
+      "w": "根幹",
+      "r": "こんかん",
+      "m": "根基、核心",
+      "m_en": "foundation / core"
+    },
+    {
+      "w": "介護",
+      "r": "かいご",
+      "m": "照護、看護",
+      "m_en": "nursing care"
+    },
+    {
+      "w": "両立",
+      "r": "りょうりつ",
+      "m": "兼顧、並存",
+      "m_en": "balancing two things"
+    },
+    {
+      "w": "一朝一夕",
+      "r": "いっちょういっせき",
+      "m": "一朝一夕、短時間",
+      "m_en": "in a short time / overnight"
+    },
+    {
+      "w": "出生率",
+      "r": "しゅっしょうりつ",
+      "m": "出生率",
+      "m_en": "birth rate"
+    },
+    {
+      "w": "要因",
+      "r": "よういん",
+      "m": "因素、要因",
+      "m_en": "factor"
+    }
+  ],
+  "grammar": [
+    {
+      "t": "~かねない",
+      "note": "「有可能~(壞結果)」:根幹を揺るがしかねない=可能動搖根基。",
+      "t_en": "〜かねない",
+      "note_en": "\"could well (do something bad)\": 根幹を揺るがしかねない."
+    },
+    {
+      "t": "~一方で",
+      "note": "對比兩面:費用は増える一方で、現役世代は減る。",
+      "t_en": "〜一方で",
+      "note_en": "contrasting two sides: costs rise on one hand, the working generation shrinks on the other."
+    },
+    {
+      "t": "~ではないのだ",
+      "note": "強調否定、下結論:済むという話ではないのだ。",
+      "t_en": "〜ではないのだ",
+      "note_en": "emphatic negation / conclusion: it is not something that will simply do."
+    }
+  ]
+},
+{
+  "id": "a-n1-4",
+  "level": "n1",
+  "topic": "メディア",
+  "topic_en": "Media",
+  "title": "情報の海を泳ぐために",
+  "title_zh": "為了在資訊之海中泅泳",
+  "title_en": "Swimming Through a Sea of Information",
+  "body": "スマートフォンの 普及に よって、私たちは いつでも どこでも 膨大な 情報に 触れられる ように なった。だが、その 便利さの 裏には 見過ごせない 落とし穴が 潜んでいる。\nインターネット上には、真偽の 定かでない 情報が あふれている。中には、悪意を もって 拡散される デマも 少なくない。事実と 意見を 見分ける 力が、かつてないほど 求められている。\nさらに 厄介なのは、自分の 好みに 合う 情報ばかりが 表示される 仕組みだ。知らず知らずの うちに 視野が 狭まり、偏った 考えに 陥りやすくなる。\n大切なのは、一つの 情報を 鵜呑みに せず、複数の 情報源に あたって 確かめる 姿勢である。発信する 際にも、その 内容に 責任を 持たなければ ならない。\n情報を 正しく 読み解く 力は、もはや 一部の 専門家だけの ものでは ない。誰もが 身につけるべき、現代を 生き抜く ための 必須の 教養なのだ。",
+  "trans": [
+    "隨著智慧型手機的普及,我們變得隨時隨地都能接觸到龐大的資訊。但在那份便利的背後,潛藏著不可忽視的陷阱。",
+    "網路上充斥著真偽難辨的資訊。其中,懷著惡意被散播的假消息也不在少數。分辨事實與意見的能力,前所未有地被需要著。",
+    "更棘手的是,只顯示符合自己喜好資訊的機制。在不知不覺間視野變窄,容易陷入偏頗的想法。",
+    "重要的是,不囫圇吞棗地接受單一資訊,而是查閱多個資訊來源加以確認的態度。在發布時,也必須對其內容負起責任。",
+    "正確解讀資訊的能力,已不再是少數專家的專利。而是每個人都該具備、在現代生存下去所必需的素養。"
+  ],
+  "trans_en": [
+    "With the spread of smartphones, we can now reach vast amounts of information anytime, anywhere. But behind that convenience lurks a pitfall we cannot overlook.",
+    "The internet overflows with information of uncertain truth. Not a few are rumors spread with malice. The ability to tell fact from opinion is demanded as never before.",
+    "More troublesome still is the mechanism that shows only information matching your own tastes. Before you know it, your view narrows and you easily fall into biased thinking.",
+    "What matters is the attitude of not swallowing a single piece of information whole, but checking it against multiple sources. When you post, too, you must take responsibility for the content.",
+    "The power to read information correctly is no longer the preserve of a few experts. It is essential literacy that everyone should acquire to survive the modern age."
+  ],
+  "vocab": [
+    {
+      "w": "普及",
+      "r": "ふきゅう",
+      "m": "普及",
+      "m_en": "spread / diffusion"
+    },
+    {
+      "w": "膨大",
+      "r": "ぼうだい",
+      "m": "龐大",
+      "m_en": "enormous"
+    },
+    {
+      "w": "真偽",
+      "r": "しんぎ",
+      "m": "真偽",
+      "m_en": "truth or falsehood"
+    },
+    {
+      "w": "拡散",
+      "r": "かくさん",
+      "m": "擴散、散播",
+      "m_en": "to spread / diffuse"
+    },
+    {
+      "w": "厄介",
+      "r": "やっかい",
+      "m": "棘手、麻煩",
+      "m_en": "troublesome"
+    },
+    {
+      "w": "視野",
+      "r": "しや",
+      "m": "視野",
+      "m_en": "field of view / perspective"
+    },
+    {
+      "w": "鵜呑み",
+      "r": "うのみ",
+      "m": "囫圇吞棗、盲信",
+      "m_en": "swallowing whole / taking uncritically"
+    },
+    {
+      "w": "教養",
+      "r": "きょうよう",
+      "m": "素養、涵養",
+      "m_en": "cultivation / literacy"
+    }
+  ],
+  "grammar": [
+    {
+      "t": "~ずにはいられない/~ないうちに",
+      "note": "「知らず知らずのうちに」=在不知不覺間。",
+      "t_en": "〜ないうちに",
+      "note_en": "\"before you know it\": 知らず知らずのうちに."
+    },
+    {
+      "t": "~ばかり",
+      "note": "限定、偏重:好みに合う情報ばかりが表示される。",
+      "t_en": "〜ばかり",
+      "note_en": "only / nothing but: only information matching your tastes is shown."
+    },
+    {
+      "t": "もはや~ない",
+      "note": "「已不再~」:もはや専門家だけのものではない。",
+      "t_en": "もはや〜ない",
+      "note_en": "\"no longer\": no longer the preserve of experts alone."
+    }
+  ]
+},
+{
+  "id": "a-n1-5",
+  "level": "n1",
+  "topic": "社会",
+  "topic_en": "Society",
+  "title": "捨てられる食べ物",
+  "title_zh": "被丟棄的食物",
+  "title_en": "The Food We Throw Away",
+  "body": "まだ 食べられるのに 捨てられて しまう 食品、いわゆる 食品ロスが 世界的な 問題と なっている。日本でも 年間 数百万トンもの 食料が、無駄に 廃棄されている という。\nその 一方で、世界には 十分な 食事を とれない 人々が 大勢いる。豊かさの 象徴の ように 見える 飽食の 裏で、深刻な 不均衡が 生じているのだ。\n食品ロスは、家庭や 飲食店で 出る 食べ残しだけが 原因では ない。まだ 売れる はずの 商品が、賞味期限を 理由に 大量に 処分される 現状も 見逃せない。\nこの 問題の 解決には、企業の 取り組みは もちろん、一人ひとりの 意識の 変化が 欠かせない。買いすぎない、作りすぎない といった 心がけが、大きな 一歩と なる。\n限りある 資源を 大切に する ことは、次の 世代への 責任でも ある。食べ物を 無駄にしない 暮らしが、今 改めて 問われている。",
+  "trans": [
+    "明明還能吃卻被丟掉的食品,也就是所謂的食物浪費,已成為全球性的問題。據說在日本,每年也有數百萬噸的食物被白白廢棄。",
+    "另一方面,世界上有許多人無法獲得足夠的三餐。在看似富足象徵的飽食背後,正產生著嚴重的不均衡。",
+    "食物浪費的原因,並不只是家庭或餐廳產生的剩菜。原本應該還賣得出去的商品,卻以賞味期限為由被大量處理掉的現況,也不容忽視。",
+    "要解決這個問題,企業的努力自不待言,每一個人意識的轉變更是不可或缺。不買過量、不做過量這樣的用心,就會成為重要的一步。",
+    "珍惜有限的資源,也是對下一代的責任。不浪費食物的生活方式,如今再次被重新檢視。"
+  ],
+  "trans_en": [
+    "Food thrown away though still edible — so-called food loss — has become a worldwide problem. In Japan too, millions of tons of food are said to be wastefully discarded each year.",
+    "On the other hand, many people in the world cannot get enough to eat. Behind an abundance that looks like a symbol of wealth, a serious imbalance is arising.",
+    "Food loss is not caused only by leftovers from homes and restaurants. We cannot overlook the reality that products that should still sell are discarded in bulk on the grounds of best-before dates.",
+    "Solving this problem requires not only corporate efforts but also a change in each person's awareness. Small resolves — not overbuying, not overcooking — become a big step.",
+    "Cherishing limited resources is also a responsibility to the next generation. A way of life that does not waste food is now being questioned anew."
+  ],
+  "vocab": [
+    {
+      "w": "廃棄",
+      "r": "はいき",
+      "m": "廢棄、丟棄",
+      "m_en": "disposal / scrapping"
+    },
+    {
+      "w": "大勢",
+      "r": "おおぜい",
+      "m": "許多人",
+      "m_en": "a large number of people"
+    },
+    {
+      "w": "飽食",
+      "r": "ほうしょく",
+      "m": "飽食、豐衣足食",
+      "m_en": "gluttony / satiety"
+    },
+    {
+      "w": "不均衡",
+      "r": "ふきんこう",
+      "m": "不均衡",
+      "m_en": "imbalance"
+    },
+    {
+      "w": "賞味期限",
+      "r": "しょうみきげん",
+      "m": "賞味期限",
+      "m_en": "best-before date"
+    },
+    {
+      "w": "処分",
+      "r": "しょぶん",
+      "m": "處理、處分",
+      "m_en": "disposal"
+    },
+    {
+      "w": "欠かせない",
+      "r": "かかせない",
+      "m": "不可或缺",
+      "m_en": "indispensable"
+    },
+    {
+      "w": "資源",
+      "r": "しげん",
+      "m": "資源",
+      "m_en": "resources"
+    }
+  ],
+  "grammar": [
+    {
+      "t": "~のに",
+      "note": "逆接:まだ食べられるのに捨てられる。",
+      "t_en": "〜のに",
+      "note_en": "although: thrown away although still edible."
+    },
+    {
+      "t": "~はもちろん",
+      "note": "「~自不待言、更別提」:企業の取り組みはもちろん。",
+      "t_en": "〜はもちろん",
+      "note_en": "\"not only ... but also\": corporate efforts, of course, but also ..."
+    },
+    {
+      "t": "~ずにはいられない/見逃せない",
+      "note": "「不容忽視」:現状も見逃せない。",
+      "t_en": "〜見逃せない",
+      "note_en": "\"cannot overlook\": we cannot overlook this reality."
+    }
+  ]
+},
+{
+  "id": "a-n1-6",
+  "level": "n1",
+  "topic": "文化",
+  "topic_en": "Culture",
+  "title": "受け継がれるもの",
+  "title_zh": "被傳承下來的東西",
+  "title_en": "What Gets Passed Down",
+  "body": "各地に 伝わる 伝統文化や 職人の 技は、長い 年月を かけて 磨かれ、受け継がれて きた かけがえのない 財産で ある。しかし 今、その 多くが 存続の 危機に 瀕している。\n最大の 要因は、後継者の 不足だ。担い手の 高齢化が 進む 一方で、若者は 都市へと 流出し、技を 学ぼうとする 者は 年々 減っている。\n伝統を 守ると 言っても、ただ 昔の ままを 保てば よい という わけでは ない。時代の 変化に 応じて 新しい 価値を 生み出してこそ、文化は 生き続けられる。\n近年では、伝統工芸に 現代的な デザインを 取り入れたり、海外へ 発信したり する 試みも 広がりつつある。古いものと 新しいものの 融合が、活路を 開く 鍵と なる。\n先人が 築いてきた ものを 次の 世代へ どう つなぐか。それは、私たち 一人ひとりに 課された、重い 宿題なのかもしれない。",
+  "trans": [
+    "各地流傳的傳統文化與工匠的技藝,是歷經漫長歲月琢磨、傳承下來的無可取代的資產。然而如今,其中許多正瀕臨存續的危機。",
+    "最大的原因是後繼者的不足。在承擔者高齡化不斷加劇的同時,年輕人往都市外流,想學習技藝的人也逐年減少。",
+    "雖說要守護傳統,但並不是只要一味保持昔日原貌就好。唯有順應時代的變化、創造出新的價值,文化才能繼續存活。",
+    "近年來,將現代設計融入傳統工藝、或向海外發信這樣的嘗試也正逐漸擴展。舊事物與新事物的融合,成為開拓生路的關鍵。",
+    "如何將先人所建立的東西連接給下一個世代?那或許是加諸在我們每一個人身上的、沉重的功課。"
+  ],
+  "trans_en": [
+    "Traditional cultures and craftsmen's skills handed down across the land are irreplaceable treasures, honed and passed on over long years. Yet now, many of them face a crisis of survival.",
+    "The biggest factor is a shortage of successors. As those who carry the skills grow old, young people flow out to the cities, and those who would learn the crafts dwindle year by year.",
+    "Even if we speak of protecting tradition, it does not mean simply keeping things as they were. Only by creating new value in response to the changing times can a culture keep living.",
+    "In recent years, attempts to bring modern design into traditional crafts, or to send them out overseas, are spreading. A fusion of old and new becomes the key that opens a way forward.",
+    "How do we connect what our forebears built to the next generation? That may be a heavy piece of homework imposed on each and every one of us."
+  ],
+  "vocab": [
+    {
+      "w": "職人",
+      "r": "しょくにん",
+      "m": "工匠、職人",
+      "m_en": "craftsman"
+    },
+    {
+      "w": "存続",
+      "r": "そんぞく",
+      "m": "存續",
+      "m_en": "survival / continuation"
+    },
+    {
+      "w": "瀕して",
+      "r": "ひんして",
+      "m": "瀕臨",
+      "m_en": "to be on the verge of"
+    },
+    {
+      "w": "後継者",
+      "r": "こうけいしゃ",
+      "m": "後繼者、接班人",
+      "m_en": "successor"
+    },
+    {
+      "w": "担い手",
+      "r": "にないて",
+      "m": "承擔者、中堅",
+      "m_en": "bearer / one who carries on"
+    },
+    {
+      "w": "融合",
+      "r": "ゆうごう",
+      "m": "融合",
+      "m_en": "fusion"
+    },
+    {
+      "w": "活路",
+      "r": "かつろ",
+      "m": "生路、出路",
+      "m_en": "way out / lifeline"
+    },
+    {
+      "w": "先人",
+      "r": "せんじん",
+      "m": "先人、前人",
+      "m_en": "predecessors / forebears"
+    }
+  ],
+  "grammar": [
+    {
+      "t": "~てこそ",
+      "note": "「唯有~才」:新しい価値を生み出してこそ生き続けられる。",
+      "t_en": "〜てこそ",
+      "note_en": "\"only by doing\": only by creating new value can it survive."
+    },
+    {
+      "t": "~わけではない",
+      "note": "部分否定:昔のままを保てばよいというわけではない。",
+      "t_en": "〜わけではない",
+      "note_en": "\"it doesn't mean that\": it doesn't mean just keeping the old ways is fine."
+    },
+    {
+      "t": "~つつある",
+      "note": "「正逐漸~」:試みも広がりつつある。",
+      "t_en": "〜つつある",
+      "note_en": "\"is gradually ...\": such attempts are gradually spreading."
+    }
+  ]
+},
+{
+  "id": "a-n2-6",
+  "level": "n2",
+  "topic": "健康",
+  "topic_en": "Health",
+  "title": "眠りを大切に",
+  "title_zh": "重視睡眠",
+  "title_en": "Take Sleep Seriously",
+  "body": "忙しい 毎日の 中で、つい 削って しまいがちなのが 睡眠の 時間です。しかし、質の よい 睡眠は、健康な 生活を 送る うえで 欠かせない ものです。\n睡眠が 足りないと、集中力が 落ちたり、体調を 崩したり します。日中の 眠気で 仕事や 勉強が うまく いかない 人も 多いでしょう。\nよく 眠る ためには、まず 生活の リズムを 整える ことが 大切です。毎日 同じ 時間に 寝て、同じ 時間に 起きる 習慣を つけましょう。\nまた、寝る 前に スマートフォンを 見るのは できるだけ 避けた ほうが よいです。画面の 明るい 光は、脳を 目覚めさせて しまうからです。\nたった 数時間の 違いでも、毎日の 積み重ねは 大きな 差に なります。まずは 早めに 布団に 入る ことから 始めて みませんか。",
+  "trans": [
+    "在忙碌的每一天中,總是不知不覺就會被犧牲掉的,就是睡眠時間。然而,優質的睡眠,是過健康生活所不可或缺的。",
+    "睡眠不足的話,會導致注意力下降、身體狀況變差。想必也有很多人因為白天的睡意,使得工作或讀書都不順利。",
+    "為了睡得好,首先調整生活的節奏很重要。養成每天在同一時間睡、同一時間起床的習慣吧。",
+    "另外,睡前最好盡量避免看智慧型手機。因為螢幕明亮的光線,會使大腦清醒過來。",
+    "即使只是短短幾小時的差別,每天的累積也會變成很大的差距。要不要先從早點鑽進被窩開始試試看呢?"
+  ],
+  "trans_en": [
+    "In our busy days, the thing we tend to cut without thinking is sleep. Yet good-quality sleep is indispensable for living a healthy life.",
+    "When you don't get enough sleep, your concentration drops and your health suffers. Many people find work or study going badly because of daytime drowsiness.",
+    "To sleep well, the first important thing is to get your daily rhythm in order. Make a habit of going to bed and getting up at the same time every day.",
+    "Also, it is best to avoid looking at your smartphone before bed as much as possible, because the bright light of the screen wakes the brain up.",
+    "Even a difference of just a few hours adds up daily into a big gap. Why not start by getting into bed a little earlier?"
+  ],
+  "vocab": [
+    {
+      "w": "削って",
+      "r": "けずって",
+      "m": "削減、犧牲",
+      "m_en": "to cut down / shave off"
+    },
+    {
+      "w": "睡眠",
+      "r": "すいみん",
+      "m": "睡眠",
+      "m_en": "sleep"
+    },
+    {
+      "w": "欠かせない",
+      "r": "かかせない",
+      "m": "不可或缺",
+      "m_en": "indispensable"
+    },
+    {
+      "w": "集中力",
+      "r": "しゅうちゅうりょく",
+      "m": "注意力、專注力",
+      "m_en": "concentration"
+    },
+    {
+      "w": "眠気",
+      "r": "ねむけ",
+      "m": "睡意",
+      "m_en": "drowsiness"
+    },
+    {
+      "w": "整える",
+      "r": "ととのえる",
+      "m": "調整、整頓",
+      "m_en": "to arrange / put in order"
+    },
+    {
+      "w": "避けた",
+      "r": "さけた",
+      "m": "避開",
+      "m_en": "avoided"
+    },
+    {
+      "w": "積み重ね",
+      "r": "つみかさね",
+      "m": "累積",
+      "m_en": "accumulation"
+    }
+  ],
+  "grammar": [
+    {
+      "t": "~がち",
+      "note": "「容易、往往~」:つい削ってしまいがち。",
+      "t_en": "〜がち",
+      "note_en": "\"tend to\": we tend to cut sleep."
+    },
+    {
+      "t": "~うえで",
+      "note": "「在~方面」:健康な生活を送るうえで欠かせない。",
+      "t_en": "〜うえで",
+      "note_en": "\"in doing / for\": indispensable for living healthily."
+    },
+    {
+      "t": "~たほうがよい",
+      "note": "建議:スマホを見るのは避けたほうがよい。",
+      "t_en": "〜たほうがよい",
+      "note_en": "\"had better\": you had better avoid your phone."
+    }
+  ]
+},
+{
+  "id": "a-n2-7",
+  "level": "n2",
+  "topic": "生活",
+  "topic_en": "Daily life",
+  "title": "そなえあれば",
+  "title_zh": "有備無患",
+  "title_en": "Better Safe Than Sorry",
+  "body": "日本は 地震や 台風などの 自然災害が 多い 国です。いつ 起こるか 分からない 災害に、日ごろから 備えて おく ことが とても 大切です。\nまず、家庭で できる ことから 始めましょう。水や 食料、懐中電灯などを 用意して、すぐに 持ち出せる 場所に 置いて おくと 安心です。\n家族と 話し合って おく ことも 忘れては いけません。もし はぐれて しまった とき、どこで 集まるかを 決めて おけば、あわてずに 行動できます。\nまた、住んでいる 地域の 危険な 場所を 知って おく ことも 役に 立ちます。市役所などが 配る 地図を 見て、避難所までの 道を 確認して おきましょう。\n災害は 防げなくても、被害を 減らす ことは できます。ふだんの ちょっとした 心がけが、いざという ときに 自分や 家族を 守るのです。",
+  "trans": [
+    "日本是地震、颱風等自然災害多的國家。對於不知何時會發生的災害,平時就先做好準備非常重要。",
+    "首先,從家庭做得到的事情開始吧。準備好水、食物、手電筒等,放在能立刻帶出去的地方就令人安心。",
+    "和家人事先討論好也不能忘記。萬一走散的時候,只要事先決定好在哪裡集合,就能不慌張地行動。",
+    "另外,先了解自己居住地區的危險場所也很有幫助。看看市公所等發放的地圖,先確認到避難所的路吧。",
+    "就算災害無法防止,也能減少損害。平時一點點的用心,在緊要關頭就能守護自己和家人。"
+  ],
+  "trans_en": [
+    "Japan is a country with many natural disasters such as earthquakes and typhoons. It is very important to prepare in ordinary times for disasters that may strike at any moment.",
+    "First, let's start with what you can do at home. It is reassuring to prepare water, food, a flashlight and so on, and keep them where you can grab them at once.",
+    "Don't forget to talk things over with your family in advance. If you get separated, deciding where to gather beforehand lets you act without panicking.",
+    "It also helps to know the dangerous spots in the area where you live. Look at the map handed out by the city office and check the route to the evacuation site.",
+    "Even if disasters can't be prevented, damage can be reduced. A little everyday care is what protects you and your family when the moment comes."
+  ],
+  "vocab": [
+    {
+      "w": "災害",
+      "r": "さいがい",
+      "m": "災害",
+      "m_en": "disaster"
+    },
+    {
+      "w": "備えて",
+      "r": "そなえて",
+      "m": "防備、準備",
+      "m_en": "to prepare / guard against"
+    },
+    {
+      "w": "懐中電灯",
+      "r": "かいちゅうでんとう",
+      "m": "手電筒",
+      "m_en": "flashlight"
+    },
+    {
+      "w": "持ち出せる",
+      "r": "もちだせる",
+      "m": "能帶出、能取出",
+      "m_en": "can carry out"
+    },
+    {
+      "w": "避難所",
+      "r": "ひなんじょ",
+      "m": "避難所",
+      "m_en": "evacuation shelter"
+    },
+    {
+      "w": "被害",
+      "r": "ひがい",
+      "m": "損害、災情",
+      "m_en": "damage"
+    },
+    {
+      "w": "心がけ",
+      "r": "こころがけ",
+      "m": "用心、留意",
+      "m_en": "mindfulness / care"
+    },
+    {
+      "w": "守る",
+      "r": "まもる",
+      "m": "守護、保護",
+      "m_en": "to protect"
+    }
+  ],
+  "grammar": [
+    {
+      "t": "~ておく",
+      "note": "事先做好:備えておく、決めておく。",
+      "t_en": "〜ておく",
+      "note_en": "do in advance: prepare / decide beforehand."
+    },
+    {
+      "t": "~てはいけない",
+      "note": "禁止/不可:話し合っておくことも忘れてはいけない。",
+      "t_en": "〜てはいけない",
+      "note_en": "must not: you must not forget to talk it over."
+    },
+    {
+      "t": "いざというとき",
+      "note": "「緊要關頭、萬一時」慣用:いざというときに守る。",
+      "t_en": "いざというとき",
+      "note_en": "\"when it really matters / in an emergency.\""
+    }
+  ]
+}
 ];

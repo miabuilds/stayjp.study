@@ -5895,7 +5895,8 @@
     "text": "いっちょういっせき",
     "hash": "d38215f32abb",
     "sources": [
-      "vocab-n1"
+      "vocab-n1",
+      "article-vocab#a-n1-3"
     ]
   },
   {
@@ -6055,6 +6056,13 @@
     "hash": "600a520844d8",
     "sources": [
       "daily-story#n4_18"
+    ]
+  },
+  {
+    "text": "いつ起こるか分からない災害に、日ごろから備えておくことがとても大切です。",
+    "hash": "0a95909e1600",
+    "sources": [
+      "article#a-n2-7"
     ]
   },
   {
@@ -6610,6 +6618,13 @@
     "hash": "1c99f40781e1",
     "sources": [
       "vocab-n2#革命"
+    ]
+  },
+  {
+    "text": "インターネット上には、真偽の定かでない情報があふれている。",
+    "hash": "2eb904d56493",
+    "sources": [
+      "article#a-n1-4"
     ]
   },
   {
@@ -7275,6 +7290,13 @@
     "hash": "8b4552b0c6fe",
     "sources": [
       "vocab-n3"
+    ]
+  },
+  {
+    "text": "うのみ",
+    "hash": "32faeed926f6",
+    "sources": [
+      "article-vocab#a-n1-4"
     ]
   },
   {
@@ -8333,6 +8355,13 @@
     "hash": "20d1df196d31",
     "sources": [
       "vocab-n2"
+    ]
+  },
+  {
+    "text": "おおぜい",
+    "hash": "a333d4ad13ab",
+    "sources": [
+      "article-vocab#a-n1-5"
     ]
   },
   {
@@ -10586,7 +10615,8 @@
     "hash": "da23aca2d609",
     "sources": [
       "vocab-n2",
-      "vocab-n1"
+      "vocab-n1",
+      "article-vocab#a-n1-3"
     ]
   },
   {
@@ -10838,6 +10868,13 @@
     "hash": "8d7eb7a0e87e",
     "sources": [
       "vocab-n2"
+    ]
+  },
+  {
+    "text": "かいちゅうでんとう",
+    "hash": "0014b3929234",
+    "sources": [
+      "article-vocab#a-n2-7"
     ]
   },
   {
@@ -11179,7 +11216,9 @@
     "text": "かかせない",
     "hash": "b54be8309f61",
     "sources": [
-      "article-vocab#a-n3-1"
+      "article-vocab#a-n3-1",
+      "article-vocab#a-n1-5",
+      "article-vocab#a-n2-6"
     ]
   },
   {
@@ -11315,6 +11354,13 @@
     "hash": "ce5859ca16e4",
     "sources": [
       "vocab-n1"
+    ]
+  },
+  {
+    "text": "かくさん",
+    "hash": "7ac77f89d29b",
+    "sources": [
+      "article-vocab#a-n1-4"
     ]
   },
   {
@@ -12477,7 +12523,8 @@
     "text": "かつろ",
     "hash": "90f69d0a91cd",
     "sources": [
-      "vocab-n1"
+      "vocab-n1",
+      "article-vocab#a-n1-6"
     ]
   },
   {
@@ -15653,7 +15700,8 @@
     "text": "きょうよう",
     "hash": "f6531055a23e",
     "sources": [
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n1-4"
     ]
   },
   {
@@ -17175,7 +17223,8 @@
     "hash": "4a5d8d0813bb",
     "sources": [
       "vocab-n3",
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n1-3"
     ]
   },
   {
@@ -17544,6 +17593,13 @@
     "hash": "e85587b1264f",
     "sources": [
       "vocab-n5"
+    ]
+  },
+  {
+    "text": "けずって",
+    "hash": "93c0a9a23528",
+    "sources": [
+      "article-vocab#a-n2-6"
     ]
   },
   {
@@ -18772,6 +18828,13 @@
     ]
   },
   {
+    "text": "こうけいしゃ",
+    "hash": "78fa7cb29431",
+    "sources": [
+      "article-vocab#a-n1-6"
+    ]
+  },
+  {
     "text": "こうげきする",
     "hash": "49f3d7bd8256",
     "sources": [
@@ -19968,6 +20031,13 @@
       "vocab-n5",
       "vocab-n4",
       "vocab-n2"
+    ]
+  },
+  {
+    "text": "こころがけ",
+    "hash": "f32de43608aa",
+    "sources": [
+      "article-vocab#a-n2-7"
     ]
   },
   {
@@ -22124,6 +22194,13 @@
     "hash": "56ee30f8bd90",
     "sources": [
       "confusables-eg"
+    ]
+  },
+  {
+    "text": "この傾向がもたらす影響は、社会保障制度の根幹を揺るがしかねない。",
+    "hash": "1e5e95d0ff55",
+    "sources": [
+      "article#a-n1-3"
     ]
   },
   {
@@ -25495,6 +25572,13 @@
     ]
   },
   {
+    "text": "この問題の解決には、企業の取り組みはもちろん、一人ひとりの意識の変化が欠かせない。",
+    "hash": "fdb588e13e62",
+    "sources": [
+      "article#a-n1-5"
+    ]
+  },
+  {
     "text": "この問題の深刻さについて、多くの人がまだ十分に認識していない。",
     "hash": "32cfb41bed70",
     "sources": [
@@ -26385,6 +26469,13 @@
     ]
   },
   {
+    "text": "こんかん",
+    "hash": "9e036bf1d514",
+    "sources": [
+      "article-vocab#a-n1-3"
+    ]
+  },
+  {
     "text": "こんがんする",
     "hash": "b9f365a27c63",
     "sources": [
@@ -26804,7 +26895,8 @@
     "hash": "639315897ad5",
     "sources": [
       "vocab-n3",
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n2-7"
     ]
   },
   {
@@ -27338,6 +27430,13 @@
     "hash": "933ecba45eb9",
     "sources": [
       "vocab-n2"
+    ]
+  },
+  {
+    "text": "さけた",
+    "hash": "3dd8692bb23f",
+    "sources": [
+      "article-vocab#a-n2-6"
     ]
   },
   {
@@ -27917,6 +28016,13 @@
     ]
   },
   {
+    "text": "さらに厄介なのは、自分の好みに合う情報ばかりが表示される仕組みだ。",
+    "hash": "20ff1277b695",
+    "sources": [
+      "article#a-n1-4"
+    ]
+  },
+  {
     "text": "さらりーまん",
     "hash": "813da48175a5",
     "sources": [
@@ -28406,6 +28512,13 @@
     ]
   },
   {
+    "text": "しかし、いずれも一朝一夕に解決できる問題ではない。",
+    "hash": "d4d7b9abddbc",
+    "sources": [
+      "article#a-n1-3"
+    ]
+  },
+  {
     "text": "しかし、それは学ぶという行為の本質を見誤っているように思われる。",
     "hash": "8f556a143510",
     "sources": [
@@ -28417,6 +28530,13 @@
     "hash": "f15ed59eb627",
     "sources": [
       "article#a-n2-4"
+    ]
+  },
+  {
+    "text": "しかし、質のよい睡眠は、健康な生活を送るうえで欠かせないものです。",
+    "hash": "c67c9cc6797c",
+    "sources": [
+      "article#a-n2-6"
     ]
   },
   {
@@ -28466,6 +28586,13 @@
     "hash": "3f5ff3de78af",
     "sources": [
       "vocab-n2"
+    ]
+  },
+  {
+    "text": "しかし今、その多くが存続の危機に瀕している。",
+    "hash": "84dc2f84718a",
+    "sources": [
+      "article#a-n1-6"
     ]
   },
   {
@@ -28689,7 +28816,8 @@
     "hash": "9eb71ab00bc2",
     "sources": [
       "vocab-n3",
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n1-5"
     ]
   },
   {
@@ -29954,6 +30082,13 @@
     ]
   },
   {
+    "text": "しや",
+    "hash": "752803967f7a",
+    "sources": [
+      "article-vocab#a-n1-4"
+    ]
+  },
+  {
     "text": "じゃ",
     "hash": "d91490197bd6",
     "sources": [
@@ -30423,7 +30558,8 @@
     "text": "しゅうちゅうりょく",
     "hash": "316e7dce45ec",
     "sources": [
-      "vocab-n3"
+      "vocab-n3",
+      "article-vocab#a-n2-6"
     ]
   },
   {
@@ -30874,6 +31010,13 @@
     "hash": "a184e04654b0",
     "sources": [
       "vocab-n3"
+    ]
+  },
+  {
+    "text": "しゅっしょうりつ",
+    "hash": "45483d0bf08d",
+    "sources": [
+      "article-vocab#a-n1-3"
     ]
   },
   {
@@ -31721,6 +31864,13 @@
     ]
   },
   {
+    "text": "しょうみきげん",
+    "hash": "f2688333b62d",
+    "sources": [
+      "article-vocab#a-n1-5"
+    ]
+  },
+  {
     "text": "じょうみゃく",
     "hash": "964172c1dd8c",
     "sources": [
@@ -31904,6 +32054,13 @@
     ]
   },
   {
+    "text": "しょくにん",
+    "hash": "7288eeb6213b",
+    "sources": [
+      "article-vocab#a-n1-6"
+    ]
+  },
+  {
     "text": "しょくばい",
     "hash": "b21799d310ae",
     "sources": [
@@ -32067,6 +32224,13 @@
     "hash": "66aeb628014b",
     "sources": [
       "vocab-n2"
+    ]
+  },
+  {
+    "text": "しょぶん",
+    "hash": "3f9c4eed4bda",
+    "sources": [
+      "article-vocab#a-n1-5"
     ]
   },
   {
@@ -32303,7 +32467,8 @@
     "text": "しんぎ",
     "hash": "da8349aefaba",
     "sources": [
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n1-4"
     ]
   },
   {
@@ -33080,7 +33245,8 @@
     "text": "すいみん",
     "hash": "8771c539c3f7",
     "sources": [
-      "vocab-n3"
+      "vocab-n3",
+      "article-vocab#a-n2-6"
     ]
   },
   {
@@ -33626,6 +33792,13 @@
     "hash": "cc6a1a334a29",
     "sources": [
       "vocab-n2#普及"
+    ]
+  },
+  {
+    "text": "スマートフォンの普及によって、私たちはいつでもどこでも膨大な情報に触れられるようになった。",
+    "hash": "e240affa6e74",
+    "sources": [
+      "article#a-n1-4"
     ]
   },
   {
@@ -35251,6 +35424,13 @@
     ]
   },
   {
+    "text": "せんじん",
+    "hash": "259b857db12a",
+    "sources": [
+      "article-vocab#a-n1-6"
+    ]
+  },
+  {
     "text": "せんしんてき",
     "hash": "837f02905a78",
     "sources": [
@@ -36360,6 +36540,13 @@
     ]
   },
   {
+    "text": "そなえて",
+    "hash": "59f3a35b3c7b",
+    "sources": [
+      "article-vocab#a-n2-7"
+    ]
+  },
+  {
     "text": "そなえる",
     "hash": "46d30d3f9f47",
     "sources": [
@@ -36491,6 +36678,13 @@
     "hash": "a0ef785c0b80",
     "sources": [
       "vocab-n1#抉る"
+    ]
+  },
+  {
+    "text": "その一方で、世界には十分な食事をとれない人々が大勢いる。",
+    "hash": "bfe0c80d19c0",
+    "sources": [
+      "article#a-n1-5"
     ]
   },
   {
@@ -37355,6 +37549,13 @@
     ]
   },
   {
+    "text": "それは、私たち一人ひとりに課された、重い宿題なのかもしれない。",
+    "hash": "3e0747ff6cdc",
+    "sources": [
+      "article#a-n1-6"
+    ]
+  },
+  {
     "text": "それはさておき",
     "hash": "107e150a0cd1",
     "sources": [
@@ -37526,6 +37727,13 @@
     "sources": [
       "vocab-n4",
       "vocab-n2"
+    ]
+  },
+  {
+    "text": "そんぞく",
+    "hash": "959298744f9f",
+    "sources": [
+      "article-vocab#a-n1-6"
     ]
   },
   {
@@ -38403,6 +38611,13 @@
     ]
   },
   {
+    "text": "だが、その便利さの裏には見過ごせない落とし穴が潜んでいる。",
+    "hash": "e467e98e1036",
+    "sources": [
+      "article#a-n1-4"
+    ]
+  },
+  {
     "text": "だが、時には空気を読まずに声を上げる勇気もまた、大切にされるべきではないだろうか。",
     "hash": "fe6431433ae8",
     "sources": [
@@ -39023,6 +39238,13 @@
     "hash": "562ef071e2d1",
     "sources": [
       "vocab-n3#凄い"
+    ]
+  },
+  {
+    "text": "たった数時間の違いでも、毎日の積み重ねは大きな差になります。",
+    "hash": "2e9eeacc24c3",
+    "sources": [
+      "article#a-n2-6"
     ]
   },
   {
@@ -41663,7 +41885,8 @@
     "text": "つみかさね",
     "hash": "ba190ec785c1",
     "sources": [
-      "article-vocab#a-n1-1"
+      "article-vocab#a-n1-1",
+      "article-vocab#a-n2-6"
     ]
   },
   {
@@ -44581,7 +44804,8 @@
     "hash": "e18e30036ade",
     "sources": [
       "vocab-n3",
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n2-6"
     ]
   },
   {
@@ -46639,6 +46863,13 @@
     ]
   },
   {
+    "text": "にないて",
+    "hash": "ce484bdf171f",
+    "sources": [
+      "article-vocab#a-n1-6"
+    ]
+  },
+  {
     "text": "になう",
     "hash": "b94c7073997b",
     "sources": [
@@ -47210,6 +47441,13 @@
     ]
   },
   {
+    "text": "ねむけ",
+    "hash": "a21c64d8c472",
+    "sources": [
+      "article-vocab#a-n2-6"
+    ]
+  },
+  {
     "text": "ねもはもない",
     "hash": "a833523be379",
     "sources": [
@@ -47773,7 +48011,8 @@
     "text": "はいき",
     "hash": "5fb61991e35e",
     "sources": [
-      "vocab-n1"
+      "vocab-n1",
+      "article-vocab#a-n1-5"
     ]
   },
   {
@@ -49676,7 +49915,8 @@
     "sources": [
       "vocab-n3",
       "vocab-n2",
-      "article-vocab#a-n1-1"
+      "article-vocab#a-n1-1",
+      "article-vocab#a-n2-7"
     ]
   },
   {
@@ -50258,6 +50498,13 @@
     "sources": [
       "vocab-n3",
       "vocab-n2"
+    ]
+  },
+  {
+    "text": "ひなんじょ",
+    "hash": "92f06ebbdf49",
+    "sources": [
+      "article-vocab#a-n2-7"
     ]
   },
   {
@@ -50876,6 +51123,13 @@
     ]
   },
   {
+    "text": "ひんして",
+    "hash": "eb28803742cc",
+    "sources": [
+      "article-vocab#a-n1-6"
+    ]
+  },
+  {
     "text": "ひんじゃく",
     "hash": "9072cb648127",
     "sources": [
@@ -51187,7 +51441,8 @@
     "sources": [
       "vocab-n2",
       "vocab-n1",
-      "article-vocab#a-n1-2"
+      "article-vocab#a-n1-2",
+      "article-vocab#a-n1-4"
     ]
   },
   {
@@ -51212,6 +51467,13 @@
     "sources": [
       "vocab-n4",
       "vocab-n3"
+    ]
+  },
+  {
+    "text": "ふきんこう",
+    "hash": "a87bce4c58f8",
+    "sources": [
+      "article-vocab#a-n1-5"
     ]
   },
   {
@@ -51590,6 +51852,13 @@
     "hash": "cfc2cd1552b2",
     "sources": [
       "vocab-n2"
+    ]
+  },
+  {
+    "text": "ふだんのちょっとした心がけが、いざというときに自分や家族を守るのです。",
+    "hash": "5d7e601085dd",
+    "sources": [
+      "article#a-n2-7"
     ]
   },
   {
@@ -53240,6 +53509,13 @@
     ]
   },
   {
+    "text": "ほうしょく",
+    "hash": "286ded4a859c",
+    "sources": [
+      "article-vocab#a-n1-5"
+    ]
+  },
+  {
     "text": "ほうじょする",
     "hash": "f681d3616043",
     "sources": [
@@ -53322,7 +53598,8 @@
     "hash": "ea88bf9582a9",
     "sources": [
       "vocab-n3",
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n1-4"
     ]
   },
   {
@@ -54386,6 +54663,13 @@
     ]
   },
   {
+    "text": "まず、家庭でできることから始めましょう。",
+    "hash": "d5ac2814f405",
+    "sources": [
+      "article#a-n2-7"
+    ]
+  },
+  {
     "text": "ますい",
     "hash": "f240dce4dc9e",
     "sources": [
@@ -54413,6 +54697,13 @@
     "sources": [
       "vocab-n3",
       "vocab-n2"
+    ]
+  },
+  {
+    "text": "まずは早めに布団に入ることから始めてみませんか。",
+    "hash": "4cf2eec32400",
+    "sources": [
+      "article#a-n2-6"
     ]
   },
   {
@@ -54480,6 +54771,20 @@
     "hash": "ab77ed62fa23",
     "sources": [
       "article#a-n2-1"
+    ]
+  },
+  {
+    "text": "また、住んでいる地域の危険な場所を知っておくことも役に立ちます。",
+    "hash": "ffe57ce4138c",
+    "sources": [
+      "article#a-n2-7"
+    ]
+  },
+  {
+    "text": "また、寝る前にスマートフォンを見るのはできるだけ避けたほうがよいです。",
+    "hash": "34b869339bab",
+    "sources": [
+      "article#a-n2-6"
     ]
   },
   {
@@ -54558,6 +54863,20 @@
     "hash": "b652a5bc4ff3",
     "sources": [
       "confusables-eg"
+    ]
+  },
+  {
+    "text": "まだ食べられるのに捨てられてしまう食品、いわゆる食品ロスが世界的な問題となっている。",
+    "hash": "fae6de16b675",
+    "sources": [
+      "article#a-n1-5"
+    ]
+  },
+  {
+    "text": "まだ売れるはずの商品が、賞味期限を理由に大量に処分される現状も見逃せない。",
+    "hash": "aca23e347b43",
+    "sources": [
+      "article#a-n1-5"
     ]
   },
   {
@@ -54739,7 +55058,8 @@
     "hash": "392ec50afb52",
     "sources": [
       "vocab-n4",
-      "vocab-n3"
+      "vocab-n3",
+      "article-vocab#a-n2-7"
     ]
   },
   {
@@ -56986,6 +57306,13 @@
     ]
   },
   {
+    "text": "もしはぐれてしまったとき、どこで集まるかを決めておけば、あわてずに行動できます。",
+    "hash": "f529ffee470a",
+    "sources": [
+      "article#a-n2-7"
+    ]
+  },
+  {
     "text": "もし雨が降ったら、試合は中止になります。",
     "hash": "ea3b9cf4b231",
     "sources": [
@@ -57039,6 +57366,13 @@
     "hash": "a8b14edc9d32",
     "sources": [
       "vocab-n2"
+    ]
+  },
+  {
+    "text": "もちだせる",
+    "hash": "d416f6b90fcc",
+    "sources": [
+      "article-vocab#a-n2-7"
     ]
   },
   {
@@ -57587,7 +57921,8 @@
     "text": "やっかい",
     "hash": "801fdc1d6dbf",
     "sources": [
-      "vocab-n3"
+      "vocab-n3",
+      "article-vocab#a-n1-4"
     ]
   },
   {
@@ -57988,7 +58323,8 @@
     "text": "ゆうごう",
     "hash": "5cde8860452e",
     "sources": [
-      "vocab-n1"
+      "vocab-n1",
+      "article-vocab#a-n1-6"
     ]
   },
   {
@@ -58426,7 +58762,8 @@
     "text": "よういん",
     "hash": "3068017336d0",
     "sources": [
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n1-3"
     ]
   },
   {
@@ -58705,6 +59042,13 @@
     "hash": "170fe345f2a2",
     "sources": [
       "vocab-n4#合格"
+    ]
+  },
+  {
+    "text": "よく眠るためには、まず生活のリズムを整えることが大切です。",
+    "hash": "65565d8d62b2",
+    "sources": [
+      "article#a-n2-6"
     ]
   },
   {
@@ -59775,7 +60119,8 @@
     "text": "りょうりつ",
     "hash": "ced611a98172",
     "sources": [
-      "article-vocab#a-n3-4"
+      "article-vocab#a-n3-4",
+      "article-vocab#a-n1-3"
     ]
   },
   {
@@ -61320,7 +61665,8 @@
     "hash": "e7ee39bb91d3",
     "sources": [
       "vocab-n3",
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n1-3"
     ]
   },
   {
@@ -65325,6 +65671,13 @@
     ]
   },
   {
+    "text": "家族と話し合っておくことも忘れてはいけません。",
+    "hash": "c8745c724365",
+    "sources": [
+      "article#a-n2-7"
+    ]
+  },
+  {
     "text": "家族にさえ、まだ転職を話していない。",
     "hash": "10b3cb03aa7d",
     "sources": [
@@ -65980,6 +66333,13 @@
     "hash": "8bd0974f66f9",
     "sources": [
       "vocab-n2#画一的"
+    ]
+  },
+  {
+    "text": "画面の明るい光は、脳を目覚めさせてしまうからです。",
+    "hash": "d8d2033672f7",
+    "sources": [
+      "article#a-n2-6"
     ]
   },
   {
@@ -67114,6 +67474,13 @@
     "hash": "83c9431f3e81",
     "sources": [
       "vocab-n1#大同小異"
+    ]
+  },
+  {
+    "text": "各地に伝わる伝統文化や職人の技は、長い年月をかけて磨かれ、受け継がれてきたかけがえのない財産である。",
+    "hash": "d11867f50a98",
+    "sources": [
+      "article#a-n1-6"
     ]
   },
   {
@@ -70514,6 +70881,13 @@
     ]
   },
   {
+    "text": "近年では、伝統工芸に現代的なデザインを取り入れたり、海外へ発信したりする試みも広がりつつある。",
+    "hash": "4bb928886853",
+    "sources": [
+      "article#a-n1-6"
+    ]
+  },
+  {
     "text": "金のためなら親友さえ裏切るとは、口にするのも汚らわしい話だ。",
     "hash": "56ac547c482a",
     "sources": [
@@ -73303,6 +73677,13 @@
     ]
   },
   {
+    "text": "限りある資源を大切にすることは、次の世代への責任でもある。",
+    "hash": "34b3c0cf60da",
+    "sources": [
+      "article#a-n1-5"
+    ]
+  },
+  {
     "text": "限りある時間を、本当に大切な人と過ごしたいと最近つくづく思う。",
     "hash": "ee9b5c8967e5",
     "sources": [
@@ -73391,6 +73772,13 @@
     "hash": "a1d8e93e3950",
     "sources": [
       "vocab-n3#新しい"
+    ]
+  },
+  {
+    "text": "古いものと新しいものの融合が、活路を開く鍵となる。",
+    "hash": "6c08db0f05ec",
+    "sources": [
+      "article#a-n1-6"
     ]
   },
   {
@@ -75029,6 +75417,13 @@
     "hash": "66dae0e5caeb",
     "sources": [
       "grammar-n3#n3-64"
+    ]
+  },
+  {
+    "text": "今こそ真剣な議論が求められている。",
+    "hash": "cfe21a7928e7",
+    "sources": [
+      "article#a-n1-3"
     ]
   },
   {
@@ -77175,6 +77570,13 @@
     ]
   },
   {
+    "text": "最大の要因は、後継者の不足だ。",
+    "hash": "4d5766f6b3e2",
+    "sources": [
+      "article#a-n1-6"
+    ]
+  },
+  {
     "text": "最適な配合を見つけるまで、研究チームは何百回もの試行錯誤を重ねてきた。",
     "hash": "7be04d434445",
     "sources": [
@@ -77277,6 +77679,13 @@
     "hash": "c465d8298fe4",
     "sources": [
       "vocab-n1#挺身する"
+    ]
+  },
+  {
+    "text": "災害は防げなくても、被害を減らすことはできます。",
+    "hash": "3822f88477be",
+    "sources": [
+      "article#a-n2-7"
     ]
   },
   {
@@ -79401,6 +79810,13 @@
     ]
   },
   {
+    "text": "市役所などが配る地図を見て、避難所までの道を確認しておきましょう。",
+    "hash": "f8bbf0b8f12d",
+    "sources": [
+      "article#a-n2-7"
+    ]
+  },
+  {
     "text": "思わず",
     "hash": "6b022be8669a",
     "sources": [
@@ -80724,6 +81140,13 @@
     ]
   },
   {
+    "text": "事実と意見を見分ける力が、かつてないほど求められている。",
+    "hash": "d945b6e37311",
+    "sources": [
+      "article#a-n1-4"
+    ]
+  },
+  {
     "text": "事実と個人の意見をきちんと区別して話すことが大切だ。",
     "hash": "702f73931cdf",
     "sources": [
@@ -81043,6 +81466,13 @@
     "hash": "e75924b05728",
     "sources": [
       "vocab-n1#抗う"
+    ]
+  },
+  {
+    "text": "時代の変化に応じて新しい価値を生み出してこそ、文化は生き続けられる。",
+    "hash": "4968ee8fccd3",
+    "sources": [
+      "article#a-n1-6"
     ]
   },
   {
@@ -81946,6 +82376,13 @@
     "hash": "1199352b6f0c",
     "sources": [
       "article#a-n3-4"
+    ]
+  },
+  {
+    "text": "社会全体でどう向き合い、次の世代にどのような国を残すのか。",
+    "hash": "0c0ee6c2821f",
+    "sources": [
+      "article#a-n1-3"
     ]
   },
   {
@@ -84219,6 +84656,13 @@
     ]
   },
   {
+    "text": "出生率が下がる背景には、経済的な不安や価値観の多様化といった、複雑な要因が絡み合っている。",
+    "hash": "d38aa4c62587",
+    "sources": [
+      "article#a-n1-3"
+    ]
+  },
+  {
     "text": "出席者数が定員を大幅に下回ったため、講演会は中止された。",
     "hash": "acc7579669dd",
     "sources": [
@@ -85297,6 +85741,13 @@
     ]
   },
   {
+    "text": "少子高齢化は、もはや避けて通れない現実である。",
+    "hash": "fe61d954921c",
+    "sources": [
+      "article#a-n1-3"
+    ]
+  },
+  {
     "text": "少子高齢化への対応は、もはや先送りできない喫緊の課題である。",
     "hash": "a146a2681f13",
     "sources": [
@@ -86102,6 +86553,13 @@
     ]
   },
   {
+    "text": "情報を正しく読み解く力は、もはや一部の専門家だけのものではない。",
+    "hash": "06e5fa46985e",
+    "sources": [
+      "article#a-n1-4"
+    ]
+  },
+  {
     "text": "情報漏洩が発覚した以上、まずは被害を最小限に抑える善後策を講じるべきだ。",
     "hash": "42a6777ab438",
     "sources": [
@@ -86354,6 +86812,13 @@
     ]
   },
   {
+    "text": "食べ物を無駄にしない暮らしが、今改めて問われている。",
+    "hash": "0b330e5015e7",
+    "sources": [
+      "article#a-n1-5"
+    ]
+  },
+  {
     "text": "食べ歩き旅行は美味しいものずくめで、体重が増えた。",
     "hash": "c097d089115f",
     "sources": [
@@ -86421,6 +86886,13 @@
     "hash": "e3e737051215",
     "sources": [
       "grammar-n4#n4-6"
+    ]
+  },
+  {
+    "text": "食品ロスは、家庭や飲食店で出る食べ残しだけが原因ではない。",
+    "hash": "f95766c351d7",
+    "sources": [
+      "article#a-n1-5"
     ]
   },
   {
@@ -88778,6 +89250,13 @@
     ]
   },
   {
+    "text": "水や食料、懐中電灯などを用意して、すぐに持ち出せる場所に置いておくと安心です。",
+    "hash": "5d82c4893c6a",
+    "sources": [
+      "article#a-n2-7"
+    ]
+  },
+  {
     "text": "水を 一杯 ください。",
     "hash": "1f5bd6d63569",
     "sources": [
@@ -88824,6 +89303,13 @@
     "hash": "18df9872656e",
     "sources": [
       "vocab-n5#水曜日"
+    ]
+  },
+  {
+    "text": "睡眠が足りないと、集中力が落ちたり、体調を崩したりします。",
+    "hash": "4547999325e6",
+    "sources": [
+      "article#a-n2-6"
     ]
   },
   {
@@ -90266,6 +90752,13 @@
     "hash": "ea91daccb1d1",
     "sources": [
       "daily-story#n4_9"
+    ]
+  },
+  {
+    "text": "先人が築いてきたものを次の世代へどうつなぐか。",
+    "hash": "b8a9e430c4bd",
+    "sources": [
+      "article#a-n1-6"
     ]
   },
   {
@@ -92159,6 +92652,13 @@
     ]
   },
   {
+    "text": "総人口に占める高齢者の割合は年々上昇し、その一方で生まれる子どもの数は減り続けている。",
+    "hash": "e5f20b4dd210",
+    "sources": [
+      "article#a-n1-3"
+    ]
+  },
+  {
     "text": "荘厳な鐘の音とともに、壮麗な大聖堂が眼前にそびえ立っていた。",
     "hash": "2de33a46a98e",
     "sources": [
@@ -92744,6 +93244,13 @@
     "hash": "f5249a83f5d5",
     "sources": [
       "grammar-n2#n2-2"
+    ]
+  },
+  {
+    "text": "対策として、育児と仕事の両立を支援する制度の充実や、外国人労働者の受け入れ拡大などが議論されている。",
+    "hash": "d9d5df7a6594",
+    "sources": [
+      "article#a-n1-3"
     ]
   },
   {
@@ -93524,6 +94031,13 @@
     ]
   },
   {
+    "text": "大切なのは、一つの情報を鵜呑みにせず、複数の情報源にあたって確かめる姿勢である。",
+    "hash": "f772c3fbf9f6",
+    "sources": [
+      "article#a-n1-4"
+    ]
+  },
+  {
     "text": "大切なのは、訪れる側が地元への敬意を忘れないことだろう。",
     "hash": "f15677ce8f3b",
     "sources": [
@@ -93713,6 +94227,13 @@
     ]
   },
   {
+    "text": "誰もが身につけるべき、現代を生き抜くための必須の教養なのだ。",
+    "hash": "4e4d5bd9c530",
+    "sources": [
+      "article#a-n1-4"
+    ]
+  },
+  {
     "text": "誰も知らないはずがない有名な映画だ。",
     "hash": "b646adc8a480",
     "sources": [
@@ -93727,10 +94248,24 @@
     ]
   },
   {
+    "text": "単に補助金を配れば済むという話ではないのだ。",
+    "hash": "24d5cf54852f",
+    "sources": [
+      "article#a-n1-3"
+    ]
+  },
+  {
     "text": "単語を覚えるには、声に出して繰り返すのが効果的だと言われている。",
     "hash": "f5ff197a1ba5",
     "sources": [
       "vocab-n3#効果的"
+    ]
+  },
+  {
+    "text": "担い手の高齢化が進む一方で、若者は都市へと流出し、技を学ぼうとする者は年々減っている。",
+    "hash": "4018ff389ba3",
+    "sources": [
+      "article#a-n1-6"
     ]
   },
   {
@@ -93857,6 +94392,13 @@
     "hash": "7f74231b80d0",
     "sources": [
       "grammar-n2#n2-13"
+    ]
+  },
+  {
+    "text": "知らず知らずのうちに視野が狭まり、偏った考えに陥りやすくなる。",
+    "hash": "6a2264877fd9",
+    "sources": [
+      "article#a-n1-4"
     ]
   },
   {
@@ -94389,6 +94931,13 @@
     "hash": "24380fcacf1a",
     "sources": [
       "grammar-n5#n5-41"
+    ]
+  },
+  {
+    "text": "中には、悪意をもって拡散されるデマも少なくない。",
+    "hash": "0689dad3600f",
+    "sources": [
+      "article#a-n1-4"
     ]
   },
   {
@@ -96989,6 +97538,13 @@
     ]
   },
   {
+    "text": "伝統を守ると言っても、ただ昔のままを保てばよいというわけではない。",
+    "hash": "08a83570418c",
+    "sources": [
+      "article#a-n1-6"
+    ]
+  },
+  {
     "text": "伝統工芸の技術が失われつつある。",
     "hash": "6521aceed0bf",
     "sources": [
@@ -99306,6 +99862,13 @@
     ]
   },
   {
+    "text": "日中の眠気で仕事や勉強がうまくいかない人も多いでしょう。",
+    "hash": "e6ed8f8a5e83",
+    "sources": [
+      "article#a-n2-6"
+    ]
+  },
+  {
     "text": "日本での就職も考えましたが、海外で勉強することを計画しました。",
     "hash": "3df47316588c",
     "sources": [
@@ -99380,6 +99943,13 @@
     "hash": "199ceaed8e83",
     "sources": [
       "listening"
+    ]
+  },
+  {
+    "text": "日本でも年間数百万トンもの食料が、無駄に廃棄されているという。",
+    "hash": "042cc0675b94",
+    "sources": [
+      "article#a-n1-5"
     ]
   },
   {
@@ -99663,6 +100233,13 @@
     ]
   },
   {
+    "text": "日本は世界でも類を見ない速さで少子高齢化が進んでいる。",
+    "hash": "41e6f8b02296",
+    "sources": [
+      "article#a-n1-3"
+    ]
+  },
+  {
     "text": "日本は多くの食料を海外からの輸入に頼っている。",
     "hash": "2db789eab55e",
     "sources": [
@@ -99674,6 +100251,13 @@
     "hash": "826a0baf5565",
     "sources": [
       "vocab-n3#自然災害"
+    ]
+  },
+  {
+    "text": "日本は地震や台風などの自然災害が多い国です。",
+    "hash": "bb6fa6cfc066",
+    "sources": [
+      "article#a-n2-7"
     ]
   },
   {
@@ -100251,6 +100835,13 @@
     ]
   },
   {
+    "text": "年金や医療、介護にかかる費用は増える一方で、それを支える現役世代は減っていくからだ。",
+    "hash": "e99261aba09d",
+    "sources": [
+      "article#a-n1-3"
+    ]
+  },
+  {
     "text": "年始に取引先へ挨拶に伺うのは、この業界の慣例となっている。",
     "hash": "3080f472ee56",
     "sources": [
@@ -100616,6 +101207,13 @@
     ]
   },
   {
+    "text": "買いすぎない、作りすぎないといった心がけが、大きな一歩となる。",
+    "hash": "17cef220f3e5",
+    "sources": [
+      "article#a-n1-5"
+    ]
+  },
+  {
     "text": "買いたい。でも、予算オーバーだ。",
     "hash": "5880766fba7e",
     "sources": [
@@ -100809,6 +101407,13 @@
     "hash": "88e3013f2dee",
     "sources": [
       "vocab-n3#駆け込む"
+    ]
+  },
+  {
+    "text": "発信する際にも、その内容に責任を持たなければならない。",
+    "hash": "48cfce13adb2",
+    "sources": [
+      "article#a-n1-4"
     ]
   },
   {
@@ -107274,6 +107879,13 @@
     ]
   },
   {
+    "text": "豊かさの象徴のように見える飽食の裏で、深刻な不均衡が生じているのだ。",
+    "hash": "c5c885e7ffa6",
+    "sources": [
+      "article#a-n1-5"
+    ]
+  },
+  {
     "text": "豊かな自然、穏やかな風、爽やかな空気。",
     "hash": "688612ff567d",
     "sources": [
@@ -107404,6 +108016,13 @@
     "hash": "b8deb86d441c",
     "sources": [
       "vocab-n2#日常"
+    ]
+  },
+  {
+    "text": "忙しい毎日の中で、つい削ってしまいがちなのが睡眠の時間です。",
+    "hash": "ad15113db03a",
+    "sources": [
+      "article#a-n2-6"
     ]
   },
   {
@@ -108189,6 +108808,13 @@
     "hash": "e24d9999281f",
     "sources": [
       "vocab-n2#うんざり"
+    ]
+  },
+  {
+    "text": "毎日同じ時間に寝て、同じ時間に起きる習慣をつけましょう。",
+    "hash": "07ea725a67a0",
+    "sources": [
+      "article#a-n2-6"
     ]
   },
   {
