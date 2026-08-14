@@ -303,11 +303,20 @@ const MockExam = (() => {
       t5items.forEach(item => {
         const ex = item.eg && item.eg[0] ? item.eg[0] : null;
         if (!ex) return;
-        // Strip <em> tags to get pattern, then create blank
-        const pattern = item.t.replace(/^～/g, '').replace(/～$/g, '');
-        const sentence = ex.j.replace(/<em>/g, '').replace(/<\/em>/g, '');
-        // Create blank by removing the grammar pattern
-        const blankSentence = sentence.replace(new RegExp(escapeRegex(pattern.replace(/～/g, '.*?')), 'g'), '＿＿') || sentence;
+        // 挖空:直接把例句 <em>文法點</em> 換成 ＿＿。
+        // (原本用 item.t 比對挖空,遇到「～において・～における」這種多形式/活用
+        //  常對不上 → 退回顯示整句 → 答案 において 就露在題目裡。改用 <em> 精準挖空。)
+        let blankSentence;
+        if (/<em>[\s\S]*?<\/em>/.test(ex.j)) {
+          blankSentence = ex.j.replace(/<em>[\s\S]*?<\/em>/g, '＿＿');
+        } else {
+          // 極少數無 <em> 標記 → 退回 pattern 比對;仍挖不出就跳過此題,絕不露答案
+          const pattern = item.t.replace(/^～/g, '').replace(/～$/g, '');
+          const sentence = ex.j.replace(/<\/?em>/g, '');
+          blankSentence = sentence.replace(new RegExp(escapeRegex(pattern.replace(/～/g, '.*?')), 'g'), '＿＿');
+          if (blankSentence === sentence) return;   // 挖空失敗 → 不出這題
+        }
+        blankSentence = blankSentence.replace(/<\/?em>/g, '');   // 清掉殘留 em
 
         const wrongs = shuffle(grammar.filter(g => g.t !== item.t))
           .slice(0, 3).map(g => g.t);
