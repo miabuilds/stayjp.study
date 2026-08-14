@@ -2394,6 +2394,13 @@
     ]
   },
   {
+    "text": "あそこを右に曲がってください。",
+    "hash": "274ad86d6a80",
+    "sources": [
+      "phrases"
+    ]
+  },
+  {
     "text": "あそぶ",
     "hash": "bfa547ffc769",
     "sources": [
@@ -6405,6 +6412,13 @@
     ]
   },
   {
+    "text": "いらっしゃいませ。",
+    "hash": "4f045262bebe",
+    "sources": [
+      "phrases"
+    ]
+  },
+  {
     "text": "いらっしゃる",
     "hash": "5e30f1812446",
     "sources": [
@@ -9752,6 +9766,13 @@
     ]
   },
   {
+    "text": "お飲み物はいかがですか？",
+    "hash": "291cc81dc5b6",
+    "sources": [
+      "phrases"
+    ]
+  },
+  {
     "text": "お陰様で、試験に合格することができました。",
     "hash": "32f27a931f43",
     "sources": [
@@ -9763,6 +9784,13 @@
     "hash": "b7f187460e3f",
     "sources": [
       "article#a-n4-1"
+    ]
+  },
+  {
+    "text": "お会計お願いします。",
+    "hash": "d3ca185ba1c3",
+    "sources": [
+      "phrases"
     ]
   },
   {
@@ -10088,6 +10116,13 @@
     ]
   },
   {
+    "text": "お水で大丈夫です。",
+    "hash": "8306ec485d25",
+    "sources": [
+      "phrases"
+    ]
+  },
+  {
     "text": "お世話になったことは、決して忘れません。",
     "hash": "a702eacbe6c2",
     "sources": [
@@ -10361,6 +10396,13 @@
     ]
   },
   {
+    "text": "お弁当、温めますか？",
+    "hash": "2d4e17610e33",
+    "sources": [
+      "phrases"
+    ]
+  },
+  {
     "text": "お母さん、お誕生日おめでとう。",
     "hash": "0bb544cefbe5",
     "sources": [
@@ -10491,6 +10533,13 @@
     "hash": "be6e75af39c2",
     "sources": [
       "daily-story#n4_14"
+    ]
+  },
+  {
+    "text": "カードで払えますか？",
+    "hash": "f3f927216c2d",
+    "sources": [
+      "phrases"
     ]
   },
   {
@@ -24731,6 +24780,13 @@
     ]
   },
   {
+    "text": "この電車、渋谷に止まりますか？",
+    "hash": "1ad7d0f9299a",
+    "sources": [
+      "phrases"
+    ]
+  },
+  {
     "text": "この電車の終点、即ち私の故郷は、まだ二時間も先だ。",
     "hash": "404658d15a87",
     "sources": [
@@ -26174,6 +26230,20 @@
     "hash": "ac62cbc2adad",
     "sources": [
       "vocab-n5"
+    ]
+  },
+  {
+    "text": "これ、ひとつください。",
+    "hash": "f227d7136493",
+    "sources": [
+      "phrases"
+    ]
+  },
+  {
+    "text": "これ、試着できますか？",
+    "hash": "32e316406db6",
+    "sources": [
+      "phrases"
     ]
   },
   {
@@ -33879,6 +33949,13 @@
     ]
   },
   {
+    "text": "すみません、駅はどこですか？",
+    "hash": "c704f0d4d8fc",
+    "sources": [
+      "phrases"
+    ]
+  },
+  {
     "text": "すみません、駅はどこですか。",
     "hash": "77427f344049",
     "sources": [
@@ -33904,6 +33981,13 @@
     "hash": "c9432e6f2d94",
     "sources": [
       "vocab-n4#失礼します"
+    ]
+  },
+  {
+    "text": "すみません、注文いいですか？",
+    "hash": "7935d9ba7ccb",
+    "sources": [
+      "phrases"
     ]
   },
   {
@@ -40258,6 +40342,13 @@
     ]
   },
   {
+    "text": "チェックインお願いします。",
+    "hash": "e1ccb8ba8d98",
+    "sources": [
+      "phrases"
+    ]
+  },
+  {
     "text": "ちか",
     "hash": "a931ff9579cb",
     "sources": [
@@ -41095,6 +41186,13 @@
     "hash": "f855de492fe0",
     "sources": [
       "vocab-n5"
+    ]
+  },
+  {
+    "text": "ちょっと気分が悪いんです。",
+    "hash": "6a3c65486e47",
+    "sources": [
+      "phrases"
     ]
   },
   {
@@ -47991,6 +48089,20 @@
     "sources": [
       "vocab-n5",
       "vocab-n3"
+    ]
+  },
+  {
+    "text": "はい、お願いします。",
+    "hash": "25dff07919d2",
+    "sources": [
+      "phrases"
+    ]
+  },
+  {
+    "text": "はい、大丈夫ですよ。",
+    "hash": "b43f8b6a42f0",
+    "sources": [
+      "phrases"
     ]
   },
   {
@@ -57043,6 +57155,13 @@
     ]
   },
   {
+    "text": "もう一度お願いします。",
+    "hash": "2cbf885f7a5f",
+    "sources": [
+      "phrases"
+    ]
+  },
+  {
     "text": "もう帰りましたよ。",
     "hash": "5dd461452971",
     "sources": [
@@ -58653,6 +58772,13 @@
     "hash": "4f1fef2e41a5",
     "sources": [
       "grammar-n5#n5-67"
+    ]
+  },
+  {
+    "text": "ゆっくり話してもらえますか？",
+    "hash": "08421b658862",
+    "sources": [
+      "phrases"
     ]
   },
   {
@@ -63640,6 +63766,13 @@
     ]
   },
   {
+    "text": "英語できますか？",
+    "hash": "b2c55fb8082a",
+    "sources": [
+      "phrases"
+    ]
+  },
+  {
     "text": "英語でメールを送ります。",
     "hash": "bbbd06457d5c",
     "sources": [
@@ -66109,6 +66242,13 @@
     "hash": "db19a4f636e4",
     "sources": [
       "vocab-n4#サイン"
+    ]
+  },
+  {
+    "text": "荷物を預かってもらえますか？",
+    "hash": "b812cd7bd47f",
+    "sources": [
+      "phrases"
     ]
   },
   {
@@ -70773,6 +70913,13 @@
     "hash": "b3d02ce1bd88",
     "sources": [
       "article#a-n5-5"
+    ]
+  },
+  {
+    "text": "近くに薬局はありますか？",
+    "hash": "e2c92ea44bfe",
+    "sources": [
+      "phrases"
     ]
   },
   {
@@ -87968,6 +88115,13 @@
     ]
   },
   {
+    "text": "新宿までいくらですか？",
+    "hash": "0d2edda4113c",
+    "sources": [
+      "phrases"
+    ]
+  },
+  {
     "text": "新商品が発売されるが早いか、店頭から消えた。",
     "hash": "61232393ef6b",
     "sources": [
@@ -92904,6 +93058,13 @@
     ]
   },
   {
+    "text": "他の色はありますか？",
+    "hash": "81cba524aba6",
+    "sources": [
+      "phrases"
+    ]
+  },
+  {
     "text": "他人の成功を羨むより、自分の努力に目を向けるべきだ。",
     "hash": "1f0bceee8b7a",
     "sources": [
@@ -93321,6 +93482,13 @@
     "hash": "f00b4c9302a5",
     "sources": [
       "vocab-n1#胎盤"
+    ]
+  },
+  {
+    "text": "袋はご利用ですか？",
+    "hash": "501b6690c775",
+    "sources": [
+      "phrases"
     ]
   },
   {
@@ -93930,6 +94098,13 @@
     "hash": "5738372ebe83",
     "sources": [
       "vocab-n2#買収"
+    ]
+  },
+  {
+    "text": "大丈夫です。",
+    "hash": "9a493f082a41",
+    "sources": [
+      "phrases"
     ]
   },
   {
@@ -95295,6 +95470,13 @@
     "hash": "86affcb30c02",
     "sources": [
       "vocab-n5#食べる"
+    ]
+  },
+  {
+    "text": "朝ごはんは何時からですか？",
+    "hash": "09975cb337f0",
+    "sources": [
+      "phrases"
     ]
   },
   {
@@ -98920,7 +99102,8 @@
     "text": "頭が痛いです。",
     "hash": "d027258331ac",
     "sources": [
-      "vocab-n5#痛い"
+      "vocab-n5#痛い",
+      "phrases"
     ]
   },
   {
@@ -100265,6 +100448,13 @@
     "hash": "2640cbf3d1e8",
     "sources": [
       "vocab-n3#心強い"
+    ]
+  },
+  {
+    "text": "日本語がわかりません。",
+    "hash": "178bb124301d",
+    "sources": [
+      "phrases"
     ]
   },
   {
@@ -105846,6 +106036,13 @@
     "hash": "f95e8aeca2ac",
     "sources": [
       "daily-story#n5_5"
+    ]
+  },
+  {
+    "text": "病院に行きたいです。",
+    "hash": "0fd89ee9d437",
+    "sources": [
+      "phrases"
     ]
   },
   {
@@ -111769,6 +111966,13 @@
     "hash": "5f362cee98e4",
     "sources": [
       "grammar-n4#n4-35"
+    ]
+  },
+  {
+    "text": "予約した田中です。",
+    "hash": "084252674664",
+    "sources": [
+      "phrases"
     ]
   },
   {
