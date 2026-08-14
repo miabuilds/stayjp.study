@@ -298,6 +298,12 @@ textarea.note:focus{outline:none;border-color:var(--ac)}
  <div id="rdCodeMsg" style="font-size:12px;margin-bottom:6px"></div>
  <div id="rdCodeList" style="font-size:12px;color:var(--tx2)">—</div>
  </div>
+ <div style="background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r);padding:12px 16px;margin-bottom:14px;font-size:13px">
+ <strong>🎫 兌換紀錄</strong>
+ <span style="color:var(--tx3);margin-left:6px">誰用了兌換碼、什麼時候、目前訂閱狀態</span>
+ <button class="btn" onclick="loadRedeemUses()" style="font-size:11px;padding:3px 9px;margin-left:8px">↻</button>
+ <div id="redeemUsesList" style="font-size:12px;color:var(--tx2);margin-top:8px;overflow-x:auto">—</div>
+ </div>
  <div id="subsList" style="font-size:13px;color:var(--tx2)">載入中…</div>
  </div>
 
@@ -1270,6 +1276,24 @@ function createRedeemCode() {
   });
 }
 function toggleRedeemCode(code, activate) { db.collection('redeem_codes').doc(code).set({ active: !!activate }, { merge: true }).then(loadRedeemCodes); }
+async function loadRedeemUses() {
+  const box = document.getElementById('redeemUsesList'); if (!box) return;
+  box.textContent = '載入中…';
+  try {
+    const snap = await db.collection('redeem_uses').orderBy('redeemed_at', 'desc').limit(300).get();
+    if (snap.empty) { box.textContent = '尚無兌換紀錄。'; return; }
+    const subs = (typeof _allSubs !== 'undefined' && _allSubs) || [];
+    const byUid = {}; subs.forEach(s => { if (s.uid) byUid[s.uid] = s; });
+    box.innerHTML = '<table style="width:100%;border-collapse:collapse;font-size:12px;min-width:520px"><thead><tr>'
+      + ['時間', 'Email', '碼', '目前狀態'].map(h => `<th style="text-align:left;padding:6px 8px;color:var(--tx3);white-space:nowrap">${h}</th>`).join('')
+      + '</tr></thead><tbody>'
+      + snap.docs.map(d => { const x = d.data(); const s = byUid[x.uid];
+        const when = x.redeemed_at ? new Date(Number(x.redeemed_at)).toLocaleString('zh-TW', { hour12: false }) : '—';
+        const cur = s ? ((SUB_PLAN_TXT[s.plan] || s.plan || '') + ' · ' + (SUB_STATUS_TXT[s.status] || s.status || '') + (s.expiresAt ? ' · 到期 ' + new Date(Number(s.expiresAt)).toLocaleDateString('zh-TW') : '')) : '<span style="color:var(--tx3)">查無(未同步/已刪)</span>';
+        return '<tr style="border-top:1px solid var(--bd)"><td style="padding:6px 8px;white-space:nowrap">' + when + '</td><td style="padding:6px 8px">' + escapeHtml(x.email || x.uid || '—') + '</td><td style="padding:6px 8px"><code>' + escapeHtml(x.code || '') + '</code></td><td style="padding:6px 8px">' + cur + '</td></tr>';
+      }).join('') + '</tbody></table>';
+  } catch (e) { box.textContent = '讀取失敗:' + e.message + (/index/i.test(e.message) ? '(需要 Firestore 索引 → 點錯誤裡的連結建一下)' : ''); }
+}
 function deleteRedeemCode(code) {
   if (!confirm('刪除兌換碼 ' + code + '?\n(已經兌換過的人不受影響;只是這個碼之後不能再用)')) return;
   db.collection('redeem_codes').doc(code).delete().then(loadRedeemCodes).catch(e => { const m = document.getElementById('rdCodeMsg'); m.style.color = '#EF4444'; m.textContent = '刪除失敗:' + e.message; });
@@ -1318,6 +1342,7 @@ async function renderSubs() {
     _allSubs = data.subscribers || [];
     renderSubsTable();
     loadRefCodes();   // 放在 _allSubs 載入後 → 才能算每碼預估抽成
+    loadRedeemUses(); // 放在 _allSubs 後 → 兌換紀錄能配上現況
   } catch (e) { box.textContent = '錯誤:' + e.message; }
 }
 function renderSubsTable() {
