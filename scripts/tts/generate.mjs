@@ -9,6 +9,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
+import { spawnSync } from 'node:child_process';
 import {
   ROOT, OUT_DIR, MANIFEST_JS, TEXTS_JSON,
   loadOverrides, applyOverrides,
@@ -84,13 +85,17 @@ for (let i = 0; i < work.length; i++) {
   }
 }
 
+// manifest 內容變了(即使 made=0,例如新增內容源只補回對應)也要 bump sw,
+// 否則客戶端 cache 的舊 manifest 查不到新句 → 靜默掉瀏覽器語音(今日故事就是這樣壞的)。
+const _manifestBefore = fs.existsSync(MANIFEST_JS) ? fs.readFileSync(MANIFEST_JS, 'utf8') : '';
 const finalCount = writeManifest();
+const _manifestChanged = fs.readFileSync(MANIFEST_JS, 'utf8') !== _manifestBefore;
 
 console.log(`\nDone. made=${made} skipped=${skipped} failed=${failed}`);
 console.log(`Manifest entries: ${finalCount} → ${path.relative(ROOT, MANIFEST_JS)}`);
 
-// 重生過 mp3 就 bump sw.js 的 CACHE_NAME，否則 SW cache-first 會永遠回舊音檔
-if (made > 0) {
+// 生過 mp3 或 manifest 有變,就 bump sw.js 的 CACHE_NAME
+if (made > 0 || _manifestChanged) {
   const swPath = path.join(ROOT, 'sw.js');
   try {
     const sw = fs.readFileSync(swPath, 'utf8');
@@ -105,4 +110,10 @@ if (made > 0) {
   } catch (e) {
     console.warn(`sw.js bump failed: ${e.message}`);
   }
+}
+
+// 自動跑發音稽核(VOICEVOX 這時本來就開著,順手比對揪多音字誤讀;沒開會靜默跳過)。
+// 用 --no-audit 可略過。這樣「生語音」與「檢查發音」永遠綁在一起,不用人工另外跑。
+if (!args.includes('--no-audit')) {
+  spawnSync('node', [path.join(ROOT, 'scripts/tts/audit-pronunciation.mjs')], { stdio: 'inherit' });
 }
