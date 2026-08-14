@@ -115,10 +115,16 @@ const Quiz = (() => {
           distractors = distractors.concat(extra);
         }
       } else {
-        distractors = distractorPool.filter(d => {
-          if (quizType === 'word2meaning') return d.m !== word.m;
-          return d.w !== word.w; // meaning2word
-        }).sort(() => Math.random() - 0.5).slice(0, 3);
+        // 調難度:干擾項優先挑「同詞性」的真詞(全是名詞/動詞 → 不能靠語感一眼刪),
+        // 同詞性不足 3 個才用其他詞性補。比原本純隨機難、但仍是合理迷惑項。
+        const diff = d => quizType === 'word2meaning' ? d.m !== word.m : d.w !== word.w;
+        const rnd = arr => arr.sort(() => Math.random() - 0.5);
+        let pool = rnd(distractorPool.filter(d => diff(d) && d.c && d.c === word.c)).slice(0, 3);
+        if (pool.length < 3) {
+          const seen = new Set([word.w, ...pool.map(o => o.w)]);
+          pool = pool.concat(rnd(distractorPool.filter(d => diff(d) && !seen.has(d.w))).slice(0, 3 - pool.length));
+        }
+        distractors = pool;
       }
       const options = (typeof shuf === 'function' ? shuf([word, ...distractors]) : [word, ...distractors]);
       return { word, options, correctIdx: options.indexOf(word) };
@@ -129,6 +135,46 @@ const Quiz = (() => {
     if (quizType === 'word2meaning') return typeof cvt==='function'?cvt(item.m):item.m;
     if (quizType === 'meaning2word') return item.w + (item.w !== item.r ? '（' + item.r + '）' : '');
     return item.r;
+  }
+
+  // ── 詳解卡：答錯 / 我不會 時顯示，讓使用者看懂而非只有對錯 ──
+  const _POS = { '名': '名詞', '動': '動詞', 'い形': 'い形容詞', 'な形': 'な形容詞', '副': '副詞', '他': '其他' };
+  function _uiLang() { try { return localStorage.getItem('ui_lang') || 'zh-TW'; } catch (e) { return 'zh-TW'; } }
+  function explainCardHtml(word) {
+    const m = typeof cvt === 'function' ? cvt(word.m) : word.m;
+    const wFull = word.w + (word.w !== word.r ? '（' + word.r + '）' : '');
+    const pos = word.c ? `<span style="display:inline-block;padding:1px 9px;border-radius:999px;background:var(--bg2);color:var(--tx2);font-size:11px;margin-left:6px">${_POS[word.c] || word.c}</span>` : '';
+    let exHtml = '';
+    const ex = word.ex;
+    if (ex && ex.j) {
+      const tr = _uiLang() === 'en' ? (ex.e || '') : (typeof cvt === 'function' ? cvt(ex.z || '') : (ex.z || ''));
+      exHtml = `<div style="margin-top:8px;padding-top:8px;border-top:1px dashed var(--bd)">
+        <div style="font-size:14px;line-height:1.7;color:var(--tx)">${ex.j} <button onclick="Quiz.sayExample()" style="border:none;background:none;cursor:pointer;font-size:14px;padding:0" title="${_uiLang()==='en'?'Play':'播放'}">🔊</button></div>
+        ${tr ? `<div style="font-size:12px;color:var(--tx2);margin-top:3px">${tr}</div>` : ''}</div>`;
+    }
+    return `<div style="margin-top:12px;padding:12px 14px;background:var(--bg3);border-radius:10px;border:1px solid var(--bd);text-align:left">
+      <div style="font-size:15px;font-weight:700;color:var(--tx)">${wFull}${pos}</div>
+      <div style="font-size:13px;color:var(--tx2);margin-top:3px">${m}</div>${exHtml}</div>`;
+  }
+  // 把詳解卡 + 「下一題」注入題目框（不自動跳，讓使用者讀完再前進）
+  function _injectExplainNext(word) {
+    const box = document.getElementById('quizBox');
+    if (!box) return;
+    const d = document.getElementById('qDunno'); if (d) { d.disabled = true; d.style.opacity = '.5'; d.style.cursor = 'default'; }
+    const wrap = document.createElement('div');
+    const nextLabel = _uiLang() === 'en' ? 'Next →' : '下一題 →';
+    wrap.innerHTML = explainCardHtml(word) + `<button class="qstart" style="margin-top:10px">${nextLabel}</button>`;
+    box.appendChild(wrap);
+    // 防呆：作答那次 Enter/click 別順勢按到剛出現的按鈕（沿用 typing 的延遲綁定手法）
+    const btn = wrap.querySelector('.qstart');
+    btn.onclick = null;
+    const advance = () => { current++; current >= questions.length ? showResults() : renderQ(); };
+    setTimeout(() => { btn.onclick = advance; btn.focus(); }, 400);
+  }
+  // 播放目前這題的例句語音（用預錄 mp3；collect 已把 vocab ex.j 收進 manifest）
+  function sayExample() {
+    const q = questions[current];
+    if (q && q.word && q.word.ex && q.word.ex.j && typeof speak === 'function') speak(q.word.ex.j);
   }
 
   // 濁音/半濁音 → 清音基底（用於「差在哪」判斷）
@@ -186,6 +232,7 @@ const Quiz = (() => {
     } else {
       inp.style.borderColor = '#EF4444';
       if (fb) fb.innerHTML = `<span style="color:#EF4444">✗ ${t('ty_correct_is')}：<b>${q.word.r}</b></span>　<span style="color:var(--tx2)">${typingDiffHint(typed, q.word.r)}</span>`;
+      if (fb) fb.insertAdjacentHTML('afterend', explainCardHtml(q.word));   // 例句詳解卡
     }
     const advance = () => { current++; current >= questions.length ? showResults() : renderQ(); };
     if (ok) {
@@ -219,16 +266,16 @@ const Quiz = (() => {
     if (typeof showToast === 'function') showToast('🔖 已加入單字本：' + q.word.w);
     const b = document.getElementById('qDunno');
     if (b) { b.disabled = true; b.style.opacity = '.6'; b.style.cursor = 'default'; }
-    // 顯示正解
+    // 顯示正解 + 例句詳解卡（「我不會」也要能學到東西）
     if (quizType === 'typing') {
       const inp = document.getElementById('tyInput'); if (inp) inp.disabled = true;
       const fb = document.getElementById('tyFeedback');
       if (fb) fb.innerHTML = `<span style="color:var(--ac)">${t('ty_correct_is')}：<b>${q.word.r}</b></span>`;
+      const submit = document.querySelector('#quizBox .qstart'); if (submit) submit.style.display = 'none';
     } else {
       document.querySelectorAll('.qopt').forEach((el, i) => { el.disabled = true; if (i === q.correctIdx) el.classList.add('qcorrect'); });
     }
-    // 給時間看正解，再自動跳下一題（不用再按）
-    setTimeout(() => { current++; current >= questions.length ? showResults() : renderQ(); }, 1200);
+    _injectExplainNext(q.word);
   }
 
   function renderQ() {
@@ -261,7 +308,11 @@ const Quiz = (() => {
     if (!correct && typeof Stats !== 'undefined' && Stats.addToNotebook) Stats.addToNotebook(q.word.w, q.word.r, q.word.m, quizLevel);
     const opts = document.querySelectorAll('.qopt');
     opts.forEach((b, i) => { b.disabled = true; if (i === q.correctIdx) b.classList.add('qcorrect'); if (i === idx && !correct) b.classList.add('qwrong'); });
-    setTimeout(() => { current++; current >= questions.length ? showResults() : renderQ(); }, correct ? 500 : 1000);
+    if (correct) {
+      setTimeout(() => { current++; current >= questions.length ? showResults() : renderQ(); }, 500);
+    } else {
+      _injectExplainNext(q.word);   // 答錯 → 顯示例句詳解卡，讀完再手動前進
+    }
   }
 
   function showResults() {
@@ -282,18 +333,25 @@ const Quiz = (() => {
         const wFull = r.word.w + (r.word.w !== r.word.r ? '（'+r.word.r+'）' : '');
         const summary = wFull + ' — ' + m;
         if (r.correct) return '<div class="qr ok"><span class="qrc">✓</span> '+summary+'</div>';
+        // 錯題附例句(現成 vocab ex),讓結算頁不只有對錯
+        const exLine = (() => {
+          const ex = r.word.ex;
+          if (!ex || !ex.j) return '';
+          const tr = _uiLang() === 'en' ? (ex.e || '') : (typeof cvt === 'function' ? cvt(ex.z || '') : (ex.z || ''));
+          return `<div style="font-size:12px;color:var(--tx2);margin:4px 0 2px 22px;line-height:1.6">📝 ${ex.j}${tr ? '<br>' + tr : ''}</div>`;
+        })();
         // 「我不會」：只顯示正解，不顯示「你選了什麼」
         if (r.dunno) {
           const ca = r.typing ? r.word.r : disp(r.word);
-          return `<div class="qr ng"><span class="qrc">🔖</span> ${summary}　${t('ty_correct_is')}：${ca}</div>`;
+          return `<div class="qr ng"><span class="qrc">🔖</span> ${summary}　${t('ty_correct_is')}：${ca}${exLine}</div>`;
         }
         // 打字題錯：顯示你打的 + 正解
         if (r.typing) {
-          return `<div class="qr ng"><span class="qrc">✗</span> ${summary}　${t('ty_you_typed')}：${r.typed || '—'} → ${t('ty_correct_is')}：${r.word.r}</div>`;
+          return `<div class="qr ng"><span class="qrc">✗</span> ${summary}　${t('ty_you_typed')}：${r.typed || '—'} → ${t('ty_correct_is')}：${r.word.r}${exLine}</div>`;
         }
         // 錯題：依題型顯示正確答案（讀音題→讀音、中選日→漢字、看日選中→中譯）
         const correctAnswer = disp(r.word);
-        return `<div class="qr ng"><span class="qrc">✗</span> ${summary}　${t('quiz_you_chose', { chose: disp(r.options[r.chosenIdx]), correct: correctAnswer })}</div>`;
+        return `<div class="qr ng"><span class="qrc">✗</span> ${summary}　${t('quiz_you_chose', { chose: disp(r.options[r.chosenIdx]), correct: correctAnswer })}${exLine}</div>`;
       }).join('')}</div>
       <div class="qactions"><button class="qstart" onclick="Quiz.begin()">下一輪</button><button class="qstart" style="background:var(--bg3);color:var(--tx)" onclick="Quiz.retrySame()">再測同一批</button><button class="qclose" onclick="Quiz.close()">${t('quiz_back')}</button></div>`;
   }
@@ -307,5 +365,5 @@ const Quiz = (() => {
     renderQ();
   }
 
-  return { start, begin, answer, close, toggleKanji, retrySame, submitTyping, genPhoneticConfusables, markUnknown };
+  return { start, begin, answer, close, toggleKanji, retrySame, submitTyping, genPhoneticConfusables, markUnknown, sayExample };
 })();
