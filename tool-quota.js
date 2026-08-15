@@ -94,9 +94,13 @@
     if (!tool) tool = 'misc';
     const c = loadCount();
     if ((c[tool] || 0) >= PER_TOOL_LIMIT) return false;              // 同工具今天已試過
-    // 全站每日上限:已試滿 GLOBAL_DAILY_LIMIT 個不同工具,就不再開放新工具
-    const totalToday = Object.values(c).reduce((a, b) => a + b, 0);
-    if (totalToday >= GLOBAL_DAILY_LIMIT) return false;
+    // 全站每日上限:已試滿 GLOBAL_DAILY_LIMIT 個「不同工具」就不再開放新工具。
+    // 用「不同工具數」而非加總次數,且只數 TOOL_NAMES 裡的正式工具 —— 完全比照徽章顯示的
+    // 「今日已用 N 個工具」。原本用 Object.values 加總,遇到同一工具被 consume 多次(flashcard
+    // start+beginToday、shadow 4 個方法)或混入 misc 等雜項 key,會讓加總 >「不同工具數」,
+    // 害「明明只用 2 個、顯示也 2 個」卻擋掉第 3 個。
+    const usedCount = Object.keys(TOOL_NAMES).filter(t => (c[t] || 0) >= PER_TOOL_LIMIT).length;
+    if (usedCount >= GLOBAL_DAILY_LIMIT) return false;
     return true;
   }
   function consume(tool) {
