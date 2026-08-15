@@ -223,7 +223,8 @@ window.Articles = (function () {
       '.art-pb{border:none;background:none;color:#fff;cursor:pointer;width:44px;height:44px;border-radius:50%;font-size:18px;display:inline-flex;align-items:center;justify-content:center}',
       '.art-pb.main{background:var(--ac,#d4654a);width:50px;height:50px;font-size:22px}',
       '.art-pb:active{transform:scale(.92)}',
-      '.art-prate{border:none;background:rgba(255,255,255,.16);color:#fff;border-radius:20px;padding:0 12px;height:36px;font-size:13px;font-weight:700;cursor:pointer;min-width:52px}',
+      '.art-prate{background:rgba(255,255,255,.16);color:#fff;border-radius:20px;padding:0 10px;height:34px;font-size:13px;font-weight:700;min-width:50px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;font-variant-numeric:tabular-nums}',
+      '.art-rstep{width:38px;height:38px;font-size:22px;font-weight:700;flex-shrink:0}',
       '.art-ptext{font-size:12.5px;opacity:.85;margin:0 6px 0 4px;min-width:66px;font-variant-numeric:tabular-nums}',
       // done
       '.art-done-btn{display:block;width:100%;margin-top:24px;border:none;background:var(--ac,#d4654a);color:#fff;border-radius:14px;padding:15px;font-size:16px;font-weight:700;cursor:pointer;min-height:52px}'
@@ -305,7 +306,9 @@ window.Articles = (function () {
       '<button class="art-pb" onclick="Articles.playFrom(0)" title="' + enOr('從頭', 'Restart') + '">⏮</button>' +
       '<button class="art-pb main" id="artPlayBtn" onclick="Articles.togglePlay()">▶</button>' +
       '<span class="art-ptext" id="artPText">— / —</span>' +
-      '<button class="art-prate" id="artRate" onclick="Articles.cycleRate()">1.0×</button>' +
+      '<button class="art-pb art-rstep" onclick="Articles.stepRate(-1)" title="' + enOr('慢一點', 'Slower') + '" aria-label="' + enOr('慢一點', 'Slower') + '">−</button>' +
+      '<span class="art-prate" id="artRate">' + (pl.rate.toFixed(2).replace(/0$/, '')) + '×</span>' +
+      '<button class="art-pb art-rstep" onclick="Articles.stepRate(1)" title="' + enOr('快一點', 'Faster') + '" aria-label="' + enOr('快一點', 'Faster') + '">＋</button>' +
       '</div></div>' +
       '</div>';
     var d = document.createElement('div'); d.innerHTML = h; document.body.appendChild(d.firstChild);
@@ -470,8 +473,10 @@ window.Articles = (function () {
   }
 
   // ─────────── 底部連播播放器(自建 Audio 佇列,只播預錄 mp3)───────────
-  var pl = { audio: null, idx: -1, playing: false, rate: 1.0, token: 0 };
-  var RATES = [0.85, 1.0, 1.25];
+  // 朗讀速度:預設 0.85(使用者回饋 1.0 偏快、跟不上);記住上次選的。
+  var _savedRate = parseFloat(typeof localStorage !== 'undefined' && localStorage.getItem('art_rate'));
+  var pl = { audio: null, idx: -1, playing: false, rate: (_savedRate > 0 ? _savedRate : 0.85), token: 0 };
+  var RATES = [0.6, 0.75, 0.85, 1.0, 1.25, 1.5];
   function setPText() { var e = document.getElementById('artPText'); if (e) e.textContent = (pl.idx >= 0 ? (pl.idx + 1) : '—') + ' / ' + (sentSeq.length || '—'); }
   function highlight(i) {
     [].forEach.call(document.querySelectorAll('.art-s.on'), function (s) { s.classList.remove('on', 'flat'); });
@@ -517,9 +522,14 @@ window.Articles = (function () {
   }
   function stopPlay() { pl.token++; if (pl.audio) { try { pl.audio.pause(); pl.audio.src = ''; } catch (e) {} pl.audio = null; } pl.playing = false; setBtn(); }
   function setBtn() { var b = document.getElementById('artPlayBtn'); if (b) b.textContent = pl.playing ? '⏸' : '▶'; }
-  function cycleRate() {
-    var i = (RATES.indexOf(pl.rate) + 1) % RATES.length; pl.rate = RATES[i];
+  // 速度 −/＋ 步進(取代原本「點一下循環」,不用點一整圈才回到最慢)。記住選擇。
+  function stepRate(dir) {
+    var i = RATES.indexOf(pl.rate);
+    if (i < 0) { i = 0; for (var k = 1; k < RATES.length; k++) if (Math.abs(RATES[k] - pl.rate) < Math.abs(RATES[i] - pl.rate)) i = k; }
+    i = Math.max(0, Math.min(RATES.length - 1, i + dir));
+    pl.rate = RATES[i];
     var b = document.getElementById('artRate'); if (b) b.textContent = pl.rate.toFixed(2).replace(/0$/, '') + '×';
+    try { localStorage.setItem('art_rate', pl.rate); } catch (e) {}
     if (pl.audio) pl.audio.playbackRate = pl.rate;
   }
   // 單字/測驗單點發音(用預錄)
@@ -538,7 +548,7 @@ window.Articles = (function () {
   return {
     open: open, close: close, read: read, tab: tab, entryCardHtml: entryCardHtml,
     toggleFuri: toggleFuri, toggleZh: toggleZh, cycleFs: cycleFs,
-    playFrom: playFrom, togglePlay: togglePlay, cycleRate: cycleRate, say: say,
+    playFrom: playFrom, togglePlay: togglePlay, stepRate: stepRate, say: say,
     answer: answer, gd: gd, done: done
   };
 })();

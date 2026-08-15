@@ -63,6 +63,13 @@ const VirtualList = (() => {
     window.addEventListener('resize', onResize, { passive: true });
 
     onScroll();
+
+    // 首次渲染可能在字型/furigana 完全排版前量到錯的高度 → 卡片位置錯亂(例句跑到別欄位)。
+    // 字型載入完成後重新量測一次;另補一個 rAF 保險(排版穩定後)。
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(function () { if (container) remeasure(); });
+    }
+    requestAnimationFrame(function () { if (container) remeasure(); });
   }
 
   function onScroll() {
@@ -151,6 +158,10 @@ const VirtualList = (() => {
   // 不重建整個畫面 → 不閃爍、不影響其他區塊(分類展開狀態等)。
   function remeasure() {
     if (!container || !items.length) return;
+    // 必須先移除目前渲染的項目 → render() 才會重建並「重新量測」;
+    // 否則 render() 見到項目已在 rendered map 就跳過、量不到新高度,offsets 用估計值 → 重疊。
+    rendered.forEach(function (el) { el.remove(); });
+    rendered = new Map();
     heights = new Array(items.length);
     lastRange = '';
     rebuildOffsets();
