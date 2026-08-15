@@ -2,7 +2,7 @@
 <html lang="zh-Hant">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <link rel="canonical" href="https://stayjp.study/app.html">
 <title>日本再留計劃 — 免費 JLPT N5~N1 備考工具｜單字・文法・模考・複習</title>
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-2WP4D34LE3"></script>
@@ -1398,20 +1398,25 @@ body.profile-view .mn { margin-left: 0; max-width: none; }   /* 滿版 → 內�
 /* 英文模式:隱藏單字元中文分類圖示徽章(助/型/形/在/他…),分類名已英文 */
 html[lang="en"] .ci2 { display: none; }
 
-/* == 文字大小(data-fs:標準/大/特大)== 只放大學習內容,頂欄/導覽不動 → 不跑版。
-   單字卡是變動高度虛擬列表,字級變大會自動重量測,不會重疊。 */
+/* == 文字大小(data-fs:標準/大/特大)== 放大「學習內容」文字,頂欄/導覽/按鈕不動 → 不跑版。
+   單字卡是變動高度虛擬列表,字級變大會自動重量測(remeasure),不會重疊。
+   涵蓋:單字卡全部 + 文法卡(標題/句型/說明/例句/備註)+ 易混淆例句。 */
+/* ---- 大 (~+15%) ---- */
 html[data-fs="large"] .vw{font-size:23px}
 html[data-fs="large"] .vr,html[data-fs="large"] .vi .vex .exz{font-size:13.5px}
 html[data-fs="large"] .vm,html[data-fs="large"] .vi .vex .exj{font-size:16px}
-html[data-fs="large"] .gc .ep,html[data-fs="large"] .gc .ex .j{font-size:16px}
-html[data-fs="large"] .gc .ex .z{font-size:14.5px}
-html[data-fs="large"] .cf-eg .ex .j{font-size:16px}
+html[data-fs="large"] .gc .gt{font-size:18px}
+html[data-fs="large"] .gc .pt,html[data-fs="large"] .gc .ep{font-size:16px}
+html[data-fs="large"] .gc .ex .j,html[data-fs="large"] .cf-eg .ex .j{font-size:16px}
+html[data-fs="large"] .gc .ex .z,html[data-fs="large"] .gc .nt{font-size:15px}
+/* ---- 特大 (~+30%) ---- */
 html[data-fs="xlarge"] .vw{font-size:26px}
 html[data-fs="xlarge"] .vr,html[data-fs="xlarge"] .vi .vex .exz{font-size:15px}
 html[data-fs="xlarge"] .vm,html[data-fs="xlarge"] .vi .vex .exj{font-size:18px}
-html[data-fs="xlarge"] .gc .ep,html[data-fs="xlarge"] .gc .ex .j{font-size:18px}
-html[data-fs="xlarge"] .gc .ex .z{font-size:16px}
-html[data-fs="xlarge"] .cf-eg .ex .j{font-size:18px}
+html[data-fs="xlarge"] .gc .gt{font-size:21px}
+html[data-fs="xlarge"] .gc .pt,html[data-fs="xlarge"] .gc .ep{font-size:18px}
+html[data-fs="xlarge"] .gc .ex .j,html[data-fs="xlarge"] .cf-eg .ex .j{font-size:18px}
+html[data-fs="xlarge"] .gc .ex .z,html[data-fs="xlarge"] .gc .nt{font-size:17px}
 </style>
 </head>
 <body>
@@ -4168,7 +4173,11 @@ function cycleFontSize() {
   try { localStorage.setItem('fontSize', next); } catch (e) {}
   applyFontSize();
   if (typeof showToast === 'function') showToast('文字大小:' + FS_NAME[next]);
-  if (typeof doRender === 'function') doRender();   // 重繪 → 虛擬列表以新字級重新量測高度,不會重疊
+  // 字級是純 CSS,文字會就地重排;不整頁 doRender(那會閃一下、還把展開的分類收合掉)。
+  // 只有單字全列表用虛擬列表(絕對定位),卡片變高需重新量測位置 → 呼叫 remeasure(只重排列表)。
+  if (typeof VirtualList !== 'undefined' && VirtualList.isActive && VirtualList.isActive()) {
+    VirtualList.remeasure();
+  }
 }
 // 原生 App 主題橋(index.html 沒載 auth-header.js,故內嵌):切色 → 回報 data-theme + --bg 色碼,
 // 原生照著漆安全區(瀏海/底部)。一般瀏覽器無 STAYJP_NATIVE → 跳過。

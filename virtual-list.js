@@ -147,6 +147,16 @@ const VirtualList = (() => {
     return container !== null;
   }
 
+  // 清掉快取高度重新量測(字級改變等造成卡片高度變化時用)。只重排目前列表,
+  // 不重建整個畫面 → 不閃爍、不影響其他區塊(分類展開狀態等)。
+  function remeasure() {
+    if (!container || !items.length) return;
+    heights = new Array(items.length);
+    lastRange = '';
+    rebuildOffsets();
+    render();
+  }
+
   // 捲到第 i 個項目(側邊欄分類跳轉用)。扣掉固定頁首高度避免被遮。
   function scrollToIndex(i) {
     if (!container || !items.length) return;
@@ -162,5 +172,5 @@ const VirtualList = (() => {
     onScroll();
   }
 
-  return { init, destroy, isActive, scrollToIndex };
+  return { init, destroy, isActive, scrollToIndex, remeasure };
 })();
