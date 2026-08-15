@@ -340,7 +340,10 @@ select.lang-btn {
   background: var(--bg2); overflow-y: auto;
   padding: 12px 0; z-index: 90;
   border-right: 1px solid var(--bd);
+  overscroll-behavior: contain;          /* 捲到底不會把捲動傳給後面的頁 */
+  -webkit-overflow-scrolling: touch;     /* iOS 慣性捲動順暢 */
 }
+body.sd-locked { overflow: hidden; }     /* 側欄開啟時鎖背景,手指專心捲側欄 */
 /* 全站隱藏滾動條（保留滾動功能） */
 * { scrollbar-width: none; -ms-overflow-style: none; }
 *::-webkit-scrollbar { width: 0; height: 0; display: none; }
@@ -1417,6 +1420,10 @@ html[data-fs="xlarge"] .gc .gt{font-size:21px}
 html[data-fs="xlarge"] .gc .pt,html[data-fs="xlarge"] .gc .ep{font-size:18px}
 html[data-fs="xlarge"] .gc .ex .j,html[data-fs="xlarge"] .cf-eg .ex .j{font-size:18px}
 html[data-fs="xlarge"] .gc .ex .z,html[data-fs="xlarge"] .gc .nt{font-size:17px}
+/* ---- 測驗/模考/讀解/聽力等彈窗:整塊等比放大(zoom 涵蓋所有文字,連 inline 詳解卡也吃得到)。
+   zoom 會連框一起放大 → 同步用 calc 縮小框寬高,讓框維持原尺寸、只有內容變大,不溢出螢幕。 ---- */
+html[data-fs="large"] .quiz-box{zoom:1.15;width:calc(92%/1.15);max-width:calc(480px/1.15);max-height:calc(85vh/1.15)}
+html[data-fs="xlarge"] .quiz-box{zoom:1.28;width:calc(92%/1.28);max-width:calc(480px/1.28);max-height:calc(85vh/1.28)}
 </style>
 </head>
 <body>
@@ -3721,7 +3728,7 @@ function renderVocab() {
   VOCAB_CATS.forEach(cat => {
     const items = groups[cat.key];
     if (!items||!items.length) return;
-    sh += `<div class="ct" onclick="toggleCat(this)">${catLabel(cat.name)} (${items.length})</div><div class="ci" style="max-height:${Math.min(items.length, 51) * 40}px">`;
+    sh += `<div class="ct" onclick="toggleCat(this)">${catLabel(cat.name)} (${items.length})</div><div class="ci" style="max-height:${Math.min(items.length, 51) * 56}px">`;
     items.slice(0,50).forEach(d => { sh += `<a href="#vcat-${cat.key}" onclick="return vocabJump('${cat.key}')">${d.w} ${d.m}</a>`; });
     if(items.length>50) sh+=`<a href="#vcat-${cat.key}" style="color:var(--ac)" onclick="return vocabJump('${cat.key}')">${t('sidebar_more', { n: items.length-50 })}</a>`;
     sh += '</div>';
@@ -3892,8 +3899,13 @@ function render() {
 
 function toggleCard(h,e){if(e&&e.target&&e.target.closest&&e.target.closest('.star'))return;h.parentElement.classList.toggle('o')}
 function toggleCat(t){t.classList.toggle('c');t.nextElementSibling.classList.toggle('c')}
-function toggleSd(){document.getElementById('sd').classList.toggle('open');document.getElementById('overlay').classList.toggle('show')}
-function closeSdMobile(){if(innerWidth<=860){document.getElementById('sd').classList.remove('open');document.getElementById('overlay').classList.remove('show')}}
+function toggleSd(){
+  var open = document.getElementById('sd').classList.toggle('open');
+  document.getElementById('overlay').classList.toggle('show');
+  // 手機:側欄開啟時鎖住背景頁面捲動 → 手指才捲得動側欄(不會穿透去捲後面的頁)
+  document.body.classList.toggle('sd-locked', open && innerWidth <= 768);
+}
+function closeSdMobile(){if(innerWidth<=860){document.getElementById('sd').classList.remove('open');document.getElementById('overlay').classList.remove('show');document.body.classList.remove('sd-locked')}}
 
 window.addEventListener('scroll',()=>{
   document.getElementById('bt').classList.toggle('s',scrollY>300);
