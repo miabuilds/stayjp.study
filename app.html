@@ -3716,7 +3716,7 @@ function renderVocab() {
   VOCAB_CATS.forEach(cat => {
     const items = groups[cat.key];
     if (!items||!items.length) return;
-    sh += `<div class="ct" onclick="toggleCat(this)">${catLabel(cat.name)} (${items.length})</div><div class="ci" style="max-height:${Math.min(items.length*28,400)}px">`;
+    sh += `<div class="ct" onclick="toggleCat(this)">${catLabel(cat.name)} (${items.length})</div><div class="ci" style="max-height:${Math.min(items.length, 51) * 40}px">`;
     items.slice(0,50).forEach(d => { sh += `<a href="#vcat-${cat.key}" onclick="return vocabJump('${cat.key}')">${d.w} ${d.m}</a>`; });
     if(items.length>50) sh+=`<a href="#vcat-${cat.key}" style="color:var(--ac)" onclick="return vocabJump('${cat.key}')">${t('sidebar_more', { n: items.length-50 })}</a>`;
     sh += '</div>';
