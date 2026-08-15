@@ -526,6 +526,12 @@ async function submitForm(e) {
       email: currentUser.email || null,
       displayName: currentUser.displayName || null,
       ua: navigator.userAgent.slice(0, 200),
+      // 版本識別:封測期間會邊收回饋邊發版,沒有這個就分不出「還是有問題」的人
+      // 跑的是修正前還是修正後的版本。ua 只有機型與系統版本,看不出 App 版本。
+      // 原生端由 web.tsx 的 injectedJS 注入;純網頁使用者則記成 'web'。
+      appVer: (window.STAYJP_NATIVE && window.STAYJP_NATIVE.appVersion) || 'web',
+      updateId: (window.STAYJP_NATIVE && window.STAYJP_NATIVE.updateId) || null,
+      updateChannel: (window.STAYJP_NATIVE && window.STAYJP_NATIVE.updateChannel) || null,
       createdAt: firebase.firestore.FieldValue.serverTimestamp()
     });
     document.getElementById('contactForm').style.display = 'none';
