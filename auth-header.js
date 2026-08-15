@@ -17,6 +17,17 @@
   if (window.__authHeaderLoaded) return;          // 防重複載入
   window.__authHeaderLoaded = true;
 
+  // 已在原生 App 內 → 隱藏所有「下載 App」按鈕/連結(App Store / Google Play)。
+  // 已經在 App 裡了還叫人下載 App 很多餘;這些下載鈕只該在網頁瀏覽器出現。
+  try {
+    if (window.STAYJP_NATIVE && window.STAYJP_NATIVE.isNativeApp) {
+      document.documentElement.classList.add('stayjp-native');
+      var _naCss = document.createElement('style');
+      _naCss.textContent = 'html.stayjp-native a[href*="apps.apple.com"],html.stayjp-native a[href*="play.google.com"],html.stayjp-native .hero-cta.app,html.stayjp-native .app-download,html.stayjp-native [data-web-only]{display:none!important}';
+      document.head.appendChild(_naCss);
+    }
+  } catch (e) {}
+
   var FB_CONFIG = {
     apiKey: "AIzaSyDnmg2XOuvwgE8m8xCF5sS4o0nQYoUplPI",
     authDomain: "jpnote-1bdd6.firebaseapp.com",
