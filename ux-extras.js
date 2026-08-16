@@ -60,7 +60,22 @@
     // 少數「詞級」讀音,在例句幾乎必為此讀,讓它蓋過 vocab 的單字多音(最中=さいちゅう 非さなか;〜得る=うる 非える)。
     var OVERRIDE = { '最中': 'さいちゅう', '得る': 'うる', '休み中': 'やすみちゅう' };
     for (var ok in OVERRIDE) READ[ok] = OVERRIDE[ok];
-    return { READ: READ, ENTRY: ENTRY, CONJ: CONJ };
+
+    // 首字索引:漢字 → 以它開頭且長度>1 的詞條清單(依長度由長到短)。
+    // 用途見 furiganaHTML 的「詞被截斷」判斷。
+    var BYFIRST = {};
+    function idx(map) {
+      for (var w in map) {
+        if (w.length < 2) continue;
+        var c = w[0];
+        if (!isKanji(c)) continue;
+        (BYFIRST[c] || (BYFIRST[c] = [])).push(w);
+      }
+    }
+    idx(READ); idx(CONJ);
+    for (var bc in BYFIRST) BYFIRST[bc].sort(function (a, b) { return b.length - a.length; });
+
+    return { READ: READ, ENTRY: ENTRY, CONJ: CONJ, BYFIRST: BYFIRST };
   }
   function dict() {
     if (!_d || Object.keys(_d.READ).length === 0) _d = buildDict();
@@ -130,6 +145,23 @@
       // 單漢字 + 後接漢字 → 多音字風險高,不上 ruby(活用形有送假名尾、長度>1,不受此限)
       if (matched && matched.sub.length === 1 && !matched.conj && i + 1 < text.length && isKanji(text[i + 1])) {
         out += escapeHtml(text[i]); i++; continue;
+      }
+      // 單漢字 + 剩餘文字是某個長詞條的「前綴」→ 這個詞被截斷了(最常見成因:
+      // 例句用 <em> 標記文法點,把詞從中間切開,如「変わっ<em>てきました</em>」)。
+      // 此時單漢字比對到的往往是別的讀音(変→へん,實際該是 変わって→かわって)。
+      // 依本模組一貫原則「寧可不上 ruby 也不標錯讀音」→ 直接跳過不標。
+      if (matched && matched.sub.length === 1 && !matched.conj) {
+        var rest = text.substr(i);
+        var cands = dc.BYFIRST && dc.BYFIRST[text[i]];
+        if (cands) {
+          for (var ci = 0; ci < cands.length; ci++) {
+            // rest 是 cands[ci] 的真前綴,且不只有那個漢字本身 → 判定為被截斷
+            if (rest.length > 1 && cands[ci].length > rest.length && cands[ci].indexOf(rest) === 0) {
+              matched = null; break;
+            }
+          }
+        }
+        if (!matched) { out += escapeHtml(text[i]); i++; continue; }
       }
       if (matched) {
         var inner = rubyOf(matched.sub, matched.reading);
