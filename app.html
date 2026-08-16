@@ -1426,6 +1426,32 @@ html[data-fs="xlarge"] .gc .ex .z,html[data-fs="xlarge"] .gc .nt{font-size:17px}
    zoom 會連框一起放大 → 同步用 calc 縮小框寬高,讓框維持原尺寸、只有內容變大,不溢出螢幕。 ---- */
 html[data-fs="large"] .quiz-box{zoom:1.15;width:calc(92%/1.15);max-width:calc(480px/1.15);max-height:calc(85vh/1.15)}
 html[data-fs="xlarge"] .quiz-box{zoom:1.28;width:calc(92%/1.28);max-width:calc(480px/1.28);max-height:calc(85vh/1.28)}
+
+/* ── 字級 +1px 後的窄螢幕收斂(2026-08) ─────────────────────────────
+   放大字級後兩處變擠:
+   1) .hd-bar 是 9 個 flex 項目(文法/單字 + 分隔 + N5~N1 + 分隔 + ★),
+      #tabsBar 用 display:contents 所以等級鈕也是直接項目。
+      360px 下內容 409 > 框 360,最右邊的 ★ 被推出可視範圍。
+      → 縮 padding / gap / 藥丸左右內距,讓整條在常見手機寬度內塞得下。
+   2) 彈窗被 .onb-mask 的 padding:20px 夾成 320px,字放大後更擠。
+      → 窄螢幕把外距縮小、卡片內距收斂,實際內容區變寬。
+   只在窄螢幕生效,平板/桌機維持原設計。 */
+@media (max-width: 430px) {
+  .hd-bar { padding: 4px 8px; gap: 4px; }
+  .hd-bar .mode-pill,
+  .hd-bar .tab-pill,
+  .hd-bar .fav-pill { padding-left: 8px; padding-right: 8px; }
+  .onb-mask { padding: 12px; }
+  .onb-card { padding: 20px 14px; }
+}
+/* 極窄機(≤340px,如舊款小螢幕 Android)再收一段,讓 ★ 也進得來 */
+@media (max-width: 340px) {
+  .hd-bar { padding: 4px 6px; gap: 3px; }
+  .hd-bar .mode-pill,
+  .hd-bar .tab-pill,
+  .hd-bar .fav-pill { padding-left: 6px; padding-right: 6px; }
+  .hd-bar .hd-sep { margin-left: 1px; margin-right: 1px; }
+}
 </style>
 </head>
 <body>
