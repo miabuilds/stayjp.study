@@ -1444,6 +1444,22 @@ html[data-fs="xlarge"] .quiz-box{zoom:1.28;width:calc(92%/1.28);max-width:calc(4
   .onb-mask { padding: 12px; }
   .onb-card { padding: 20px 14px; }
 }
+/* .hd-top(標題列)在 ≤355px 會把最右邊的「登入」推出畫面:
+   內含 11 個項目(選單/標題/模式/進度/語言/字級A/主題/說明/連續/登入),
+   標題已被壓到 93px,其餘多為固定寬度按鈕。
+   → 窄螢幕收斂左右內距與間距,並讓標題可進一步縮短(過長時以 … 截斷),
+     確保最右邊的登入鈕一定在畫面內。 */
+@media (max-width: 380px) {
+  .hd-top { padding: 0 8px; gap: 4px; }
+  .hd-top > h1 { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .hd-top .theme-btn { padding-left: 4px; padding-right: 4px; }
+  .hd-top .streak-btn { padding-left: 6px; padding-right: 6px; }
+}
+@media (max-width: 320px) {
+  .hd-top { padding: 0 6px; gap: 3px; }
+  .hd-top .theme-btn { padding-left: 3px; padding-right: 3px; }
+}
+
 /* 極窄機(≤340px,如舊款小螢幕 Android)再收一段,讓 ★ 也進得來 */
 @media (max-width: 340px) {
   .hd-bar { padding: 4px 6px; gap: 3px; }
