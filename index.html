@@ -7,7 +7,12 @@
 <title>日本再留計劃 — 免費 JLPT N5~N1 備考工具｜單字・文法・模考・複習</title>
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-2WP4D34LE3"></script>
 <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','G-2WP4D34LE3',{'app_platform':(window.STAYJP_NATIVE&&window.STAYJP_NATIVE.isNativeApp)?'app':'web'});</script>
-<!-- 已在原生 App 裡 → 標記 html.stayjp-native,隱藏「下載 App」按鈕(早期執行、免閃爍) -->
+<!-- 已在原生 App 裡 → 標記 html.stayjp-native,隱藏「下載 App」按鈕(早期執行、免閃爍)
+     ⚠️ 下面這行 inline script 只在「當下」讀一次 STAYJP_NATIVE,iOS 可靠、Android 不可靠:
+        Android 的 injectedJavaScriptBeforeContentLoaded 是在 onPageStarted 才 evaluate,
+        會跟這行搶跑 → 讀到 undefined → class 沒加上 → App 裡照樣出現「下載 iOS App」。
+        真正的保險在 native-ui.js(會持續重試到偵測成功);這行留著是為了 iOS 上不閃爍。 -->
+<script src="native-ui.js"></script>
 <script>try{if(window.STAYJP_NATIVE&&window.STAYJP_NATIVE.isNativeApp)document.documentElement.classList.add('stayjp-native')}catch(e){}</script>
 <style>html.stayjp-native .hero-cta.app,html.stayjp-native a[href*="apps.apple.com"],html.stayjp-native a[href*="play.google.com"]{display:none!important}</style>
 <link rel="icon" href="stayjpplan.png?v=5" type="image/png">
