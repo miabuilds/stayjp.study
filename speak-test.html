@@ -77,6 +77,7 @@
   <div class="card" id="fbCard" style="display:none"></div>
 </div>
 
+<script src="audio/tts/manifest.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script>
@@ -116,12 +117,24 @@ function go(i){ idx=i; stopRec(); render(); }
 function prev(){ if(idx>0){ idx--; stopRec(); render(); } }
 function next(){ if(idx<SENTS.length-1){ idx++; stopRec(); render(); } }
 
-// 瀏覽器語音合成當範例(粗略;App 版之後接更好聽的)
-function speak(){
-  try{ const u=new SpeechSynthesisUtterance(cur().kana); u.lang='ja-JP'; u.rate=.9;
+// 範例發音:優先播 VOICEVOX 預生 mp3(__TTS,好聽),沒有才退回瀏覽器 TTS。與主站一致。
+let _demo=null;
+function browserSpeak(text){
+  try{ const u=new SpeechSynthesisUtterance(text); u.lang='ja-JP'; u.rate=.9;
     const v=speechSynthesis.getVoices().find(x=>/ja/i.test(x.lang)); if(v)u.voice=v;
     speechSynthesis.cancel(); speechSynthesis.speak(u);
   }catch(e){}
+}
+function speak(){
+  const jp=cur().jp;
+  try{ if(_demo){ _demo.pause(); _demo=null; } }catch(e){}
+  const hash = window.__TTS && window.__TTS[jp];
+  if(hash){
+    _demo = new Audio(window.ttsUrl ? window.ttsUrl(hash) : 'audio/tts/'+hash+'.mp3');
+    _demo.play().catch(()=>browserSpeak(cur().kana));
+  } else {
+    browserSpeak(cur().kana);
+  }
 }
 
 // 瀏覽器語音辨識

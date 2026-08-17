@@ -139,6 +139,16 @@ while ((ph = phraseRe.exec(phrasesHtml))) {
   add(j, 'phrases');
 }
 
+// AI 口說練習 — speak-test.html 的 SENTS（S('jp','kana','zh') 硬編）。
+// 「🔊 聽範例」原本用瀏覽器 TTS（超難聽），改成優先播 VOICEVOX mp3，key 用 jp。
+const speakTestHtml = fs.readFileSync(path.join(ROOT, 'speak-test.html'), 'utf8');
+const stRe = /S\('((?:\\.|[^'\\])*)'/g;
+let st;
+while ((st = stRe.exec(speakTestHtml))) {
+  const j = st[1].replace(/\\'/g, "'").replace(/\\\\/g, '\\');
+  add(j, 'speak-test');
+}
+
 // 今日故事 — scripts/daily-stories/output/*.json,每篇 story.sentences[] 逐句。
 // 前端跟讀 key 與 tts.mjs 一致:s.r(讀音覆蓋)優先,退回 s.j。
 // 歷史坑:故事只由 scripts/daily-stories/tts.mjs 併進 manifest,但 generate.mjs 用
@@ -215,6 +225,7 @@ const EXPECTED_MIN = {
   'verbs':            10,
   'daily-story':      500,
   'phrases':          25,
+  'speak-test':       8,
 };
 const missing = [];
 for (const [src, min] of Object.entries(EXPECTED_MIN)) {
