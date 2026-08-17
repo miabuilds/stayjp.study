@@ -139,6 +139,15 @@ while ((ph = phraseRe.exec(phrasesHtml))) {
   add(j, 'phrases');
 }
 
+// JLPT 刷題特區聴解 — jlpt-questions.js 的 at:'…'(合成用文本;au 是顯示原文不合成)。
+const jlptQSrc = fs.readFileSync(path.join(ROOT, 'jlpt-questions.js'), 'utf8');
+const atRe = /at:\s*'((?:\\.|[^'\\])*)'/g;
+let jq;
+while ((jq = atRe.exec(jlptQSrc))) {
+  const j = jq[1].replace(/\\'/g, "'").replace(/\\\\/g, '\\');
+  add(j, 'jlpt-listening');
+}
+
 // AI 口說練習 — speak-test.html 的 SENTS（S('jp','kana','zh') 硬編）。
 // 「🔊 聽範例」原本用瀏覽器 TTS（超難聽），改成優先播 VOICEVOX mp3，key 用 jp。
 const speakTestHtml = fs.readFileSync(path.join(ROOT, 'speak-test.html'), 'utf8');
@@ -226,6 +235,7 @@ const EXPECTED_MIN = {
   'daily-story':      500,
   'phrases':          25,
   'speak-test':       8,
+  'jlpt-listening':   15,
 };
 const missing = [];
 for (const [src, min] of Object.entries(EXPECTED_MIN)) {
