@@ -154,6 +154,19 @@ const SCENES = [
     desc:'你是不動產仲介,帶客人看房。你會介紹房子、說明租金與條件、回答問題、聊簽約流程。' },
   { k:'coworker', ic:'☕', t:'同事閒聊', d:'職場寒暄、約午餐', voice:'m',
     desc:'你是對方公司的同事,午休時間隨意閒聊,話題像天氣、工作近況、要不要一起吃午餐等,輕鬆自然。' },
+  { k:'cityhall', ic:'🏛️', t:'市役所辦手續', d:'遷入、保險、文件', voice:'f',
+    desc:'你是市役所窗口的職員,對方來辦手續(遷入登記、國民健康保險、文件申請等)。你會確認需要的證件、說明流程與填表方式,親切但公事公辦。' },
+  { k:'phone', ic:'📱', t:'辦手機門號', d:'方案、流量、合約', voice:'m',
+    desc:'你是電信門市的店員,對方來辦門號或換方案。你會介紹方案、問流量需求、說明合約與費用,並確認本人證件。' },
+  { k:'salon', ic:'💇', t:'剪頭髮', d:'描述髮型、長度', voice:'f',
+    desc:'你是美容院的設計師,客人來剪頭髮。你會問今天想怎麼剪、長度、髮型偏好,過程中閒聊幾句,結束確認滿不滿意。' },
+  { k:'izakaya', ic:'🍶', t:'居酒屋聚會', d:'點酒、聊天、乾杯', voice:'m',
+    desc:'你是一起來居酒屋的日本朋友,大家下班聚會。你會招呼點酒點菜、乾杯、聊工作與生活,口語輕鬆、氣氛熱絡。' },
+  { k:'delivery', ic:'📦', t:'宅配・退換貨', d:'重新配送、客服', voice:'f',
+    desc:'你是宅配公司或網購客服人員,對方要處理包裹問題(改配送時間、不在配達、退貨換貨)。你會確認單號、說明手續。' },
+  { k:'smalltalk', ic:'🌸', t:'鄰居寒暄', d:'垃圾日、天氣、近況', voice:'f',
+    desc:'你是對方的日本鄰居,在公寓門口或垃圾集中處碰到面。你會寒暄天氣、聊垃圾分類日、社區的事、隨意近況,親切自然。' },
+  { k:'custom', ic:'✏️', t:'自訂主題', d:'想聊什麼自己定', voice:'f', custom:true },
 ];
 const LEVELS = ['N5','N4','N3','N2','N1'];
 let activeLv = 'N4';
@@ -179,7 +192,16 @@ function backToPick(){ stopRec(); scene=null; history=[]; show('pick'); }
 
 // ── 開始 / 進行對話 ──
 function startChat(k){
-  scene = SCENES.find(s=>s.k===k); if(!scene) return;
+  const s0 = SCENES.find(s=>s.k===k); if(!s0) return;
+  if(s0.custom){
+    // 自訂主題:自由輸入想聊什麼,AI 照這個設定演
+    const topic = (prompt('想聊什麼?用一兩句描述情境或話題,例如:\n「我是店長,你是來應徵打工的人」\n「聊最近看的動漫」\n「你是我的日本朋友,幫我規劃九州旅行」')||'').trim();
+    if(!topic) return;
+    scene = { k:'custom', ic:'✏️', t: topic.length>12? topic.slice(0,12)+'…' : topic, voice:'f',
+      desc:'自訂情境(由學習者描述,請照著演):'+topic+'\n如果描述裡沒指定你的角色,就當一位聊得來的日本人,自然地聊這個話題。' };
+  } else {
+    scene = s0;
+  }
   history = [];
   document.getElementById('chatTtl').innerHTML = `${scene.ic} ${scene.t} <span class="muted" style="font-weight:400">· ${activeLv}</span>`;
   document.getElementById('msgs').innerHTML = '';
