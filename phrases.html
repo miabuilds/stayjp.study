@@ -28,6 +28,12 @@
   h1{font-family:var(--serif);font-size:clamp(26px,6vw,36px);margin:10px 0 8px;text-wrap:balance}
   .hero p{color:var(--tx2);font-size:15px}
   .hint{display:inline-flex;align-items:center;gap:6px;background:var(--bg2);border:1px solid var(--bd);border-radius:999px;padding:6px 14px;font-size:13px;color:var(--tx2);margin-top:14px}
+  /* 分類 tab:黏在頂部,橫向捲動,點一下只看該類 */
+  .cattabs{position:sticky;top:0;z-index:20;display:flex;gap:8px;overflow-x:auto;padding:12px 18px;margin:0 -18px 4px;background:var(--bg);border-bottom:1px solid var(--bd);-webkit-overflow-scrolling:touch;scrollbar-width:none}
+  .cattabs::-webkit-scrollbar{display:none}
+  .cattab{flex-shrink:0;border:1.5px solid var(--bd);background:var(--bg2);color:var(--tx2);border-radius:999px;padding:8px 16px;font-size:14px;font-weight:600;cursor:pointer;white-space:nowrap;font-family:inherit;transition:.15s}
+  .cattab.on{background:var(--ac);border-color:var(--ac);color:#fff}
+  .cattab:active{transform:scale(.96)}
   .scene{margin:26px 0;background:var(--bg2);border:1px solid var(--bd);border-radius:22px;padding:16px 16px 20px;box-shadow:0 10px 30px -18px rgba(0,0,0,.25)}
   .scene .head{display:flex;align-items:center;gap:10px;margin-bottom:14px}
   .scene .ic{width:44px;height:44px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0}
@@ -71,6 +77,7 @@
     <div class="hint">👆 <span data-t="zh">點任何一句日文,就會唸給你聽</span><span data-t="en">Tap any Japanese line to hear it</span></div>
   </div>
 
+  <div class="cattabs" id="cattabs"></div>
   <div id="scenes"></div>
 
   <footer>
@@ -83,8 +90,19 @@
 <script src="tts-config.js"></script>
 <script src="audio/tts/manifest.js"></script>
 <script>
+// 分類(點一下只看該類,不用一直往下滑)
+const CATS = [
+  { k:'food',   ic:'🍜', zh:'吃喝',    en:'Food & drink' },
+  { k:'trans',  ic:'🚉', zh:'交通',    en:'Getting around' },
+  { k:'shop',   ic:'🛍️', zh:'購物',    en:'Shopping' },
+  { k:'hotel',  ic:'🏨', zh:'住宿',    en:'Hotel' },
+  { k:'help',   ic:'🆘', zh:'緊急求助', en:'Help & health' },
+  { k:'social', ic:'🗣️', zh:'寒暄社交', en:'Social & basics' },
+];
+
 const SCENES = [
-  { ic:'🏪', bg:'var(--blue)', zh:'便利商店', en:'Convenience store', lines:[
+  // ── 吃喝 ──────────────────────────────
+  { cat:'food', ic:'🏪', bg:'var(--blue)', zh:'便利商店', en:'Convenience store', lines:[
     { w:'🧑‍💼', side:'you', jp:'いらっしゃいませ。', rm:'Irasshaimase.', zh:'歡迎光臨。', en:'Welcome.' },
     { w:'🧑‍💼', side:'you', jp:'お弁当、温めますか？', rm:'Obentō, atatamemasu ka?', zh:'便當要幫你加熱嗎？', en:'Shall I heat up your bento?' },
     { w:'🙋', side:'me', jp:'はい、お願いします。', rm:'Hai, onegaishimasu.', zh:'好,麻煩你了。', en:'Yes, please.' },
@@ -92,7 +110,7 @@ const SCENES = [
     { w:'🙋', side:'me', jp:'大丈夫です。', rm:'Daijōbu desu.', zh:'不用,謝謝。', en:"No, I'm good." },
   ], tipZh:'「大丈夫です」在這裡是婉拒——日本人很少直接說「不要」。', tipEn:'"Daijōbu desu" here means "no thanks" — a soft way to decline.' },
 
-  { ic:'🍜', bg:'var(--ac)', zh:'餐廳點餐', en:'Ordering at a restaurant', lines:[
+  { cat:'food', ic:'🍜', bg:'var(--ac)', zh:'餐廳點餐', en:'Ordering at a restaurant', lines:[
     { w:'🙋', side:'me', jp:'すみません、注文いいですか？', rm:'Sumimasen, chūmon ii desu ka?', zh:'不好意思,可以點餐了嗎？', en:'Excuse me, can I order?' },
     { w:'🙋', side:'me', jp:'これ、ひとつください。', rm:'Kore, hitotsu kudasai.', zh:'這個給我一份。', en:"I'll have one of these." },
     { w:'🧑‍🍳', side:'you', jp:'お飲み物はいかがですか？', rm:'O-nomimono wa ikaga desu ka?', zh:'要喝點什麼嗎？', en:'Anything to drink?' },
@@ -100,35 +118,110 @@ const SCENES = [
     { w:'🙋', side:'me', jp:'お会計お願いします。', rm:'O-kaikei onegaishimasu.', zh:'買單,麻煩你。', en:'Check, please.' },
   ], tipZh:'先說「すみません」叫店員,幾乎萬用。', tipEn:'Start with "Sumimasen" to get staff’s attention — works almost everywhere.' },
 
-  { ic:'🚉', bg:'var(--green)', zh:'問路・車站', en:'Directions & stations', lines:[
+  { cat:'food', ic:'☕', bg:'var(--green)', zh:'咖啡廳', en:'At a café', lines:[
+    { w:'🙋', side:'me', jp:'ホットコーヒーのMサイズください。', rm:'Hotto kōhī no emu-saizu kudasai.', zh:'我要一杯中杯熱咖啡。', en:'A medium hot coffee, please.' },
+    { w:'🧑‍💼', side:'you', jp:'店内でお召し上がりですか？', rm:'Tennai de o-meshiagari desu ka?', zh:'內用嗎？', en:'For here?' },
+    { w:'🙋', side:'me', jp:'持ち帰りでお願いします。', rm:'Mochikaeri de onegaishimasu.', zh:'外帶,謝謝。', en:'To go, please.' },
+    { w:'🙋', side:'me', jp:'Wi-Fiは使えますか？', rm:'Waifai wa tsukaemasu ka?', zh:'有 Wi-Fi 可以用嗎？', en:'Is there Wi-Fi?' },
+  ], tipZh:'內用=店内(てんない)、外帶=持ち帰り(もちかえり)、Take out 也通。', tipEn:'"For here" = tennai, "to go" = mochikaeri (or just "take out").' },
+
+  { cat:'food', ic:'🍶', bg:'var(--ac)', zh:'居酒屋', en:'Izakaya (pub)', lines:[
+    { w:'🙋', side:'me', jp:'とりあえず生ビールください。', rm:'Toriaezu nama-bīru kudasai.', zh:'先來杯生啤。', en:"A draft beer to start, please." },
+    { w:'🙋', side:'me', jp:'おすすめは何ですか？', rm:'Osusume wa nan desu ka?', zh:'有什麼推薦的？', en:"What do you recommend?" },
+    { w:'🙋', side:'me', jp:'取り皿もらえますか？', rm:'Torizara moraemasu ka?', zh:'可以給我小盤子嗎？', en:'Could I get a small plate?' },
+    { w:'👫', side:'me', jp:'乾杯！', rm:'Kanpai!', zh:'乾杯!', en:'Cheers!' },
+  ], tipZh:'「とりあえず生」是居酒屋神句——先來杯生啤再慢慢看菜單。', tipEn:'"Toriaezu nama" (a draft to start) is the classic izakaya opener.' },
+
+  // ── 交通 ──────────────────────────────
+  { cat:'trans', ic:'🚉', bg:'var(--green)', zh:'問路・車站', en:'Directions & stations', lines:[
     { w:'🙋', side:'me', jp:'すみません、駅はどこですか？', rm:'Sumimasen, eki wa doko desu ka?', zh:'不好意思,車站在哪裡？', en:"Excuse me, where's the station?" },
     { w:'🙋', side:'me', jp:'この電車、渋谷に止まりますか？', rm:'Kono densha, Shibuya ni tomarimasu ka?', zh:'這班車有停澀谷嗎？', en:'Does this train stop at Shibuya?' },
     { w:'🙋', side:'me', jp:'新宿までいくらですか？', rm:'Shinjuku made ikura desu ka?', zh:'到新宿多少錢？', en:'How much to Shinjuku?' },
     { w:'🧑', side:'you', jp:'あそこを右に曲がってください。', rm:'Asoko o migi ni magatte kudasai.', zh:'在那邊右轉。', en:'Turn right over there.' },
   ], tipZh:'聽不懂方向沒關係,加一句「地図で見せてもらえますか？」(可以用地圖指給我看嗎)。', tipEn:'Lost? Try "Chizu de misete moraemasu ka?" — "Can you show me on a map?"' },
 
-  { ic:'🛍️', bg:'var(--pink)', zh:'購物', en:'Shopping', lines:[
+  { cat:'trans', ic:'🎫', bg:'var(--blue)', zh:'買票・搭車', en:'Buying tickets', lines:[
+    { w:'🙋', side:'me', jp:'新宿までの切符、一枚ください。', rm:'Shinjuku made no kippu, ichimai kudasai.', zh:'一張到新宿的票。', en:'One ticket to Shinjuku, please.' },
+    { w:'🙋', side:'me', jp:'ICカードにチャージしたいです。', rm:'IC kādo ni chāji shitai desu.', zh:'我想幫 IC 卡儲值。', en:'I want to top up my IC card.' },
+    { w:'🙋', side:'me', jp:'何番線ですか？', rm:'Nanbansen desu ka?', zh:'幾號月台？', en:'Which platform?' },
+    { w:'🙋', side:'me', jp:'次の電車は何時ですか？', rm:'Tsugi no densha wa nanji desu ka?', zh:'下一班車幾點？', en:"When's the next train?" },
+  ], tipZh:'Suica／PASMO 這類 IC 卡最方便,一嗶就上車,不用每次買票。', tipEn:'An IC card (Suica/PASMO) lets you just tap in — no buying tickets each time.' },
+
+  { cat:'trans', ic:'🚕', bg:'var(--yellow)', zh:'計程車', en:'Taxi', lines:[
+    { w:'🙋', side:'me', jp:'このホテルまでお願いします。', rm:'Kono hoteru made onegaishimasu.', zh:'麻煩到這間飯店。', en:'To this hotel, please.' },
+    { w:'🙋', side:'me', jp:'どのくらいかかりますか？', rm:'Dono kurai kakarimasu ka?', zh:'大概要多久？', en:'About how long will it take?' },
+    { w:'🙋', side:'me', jp:'ここで止めてください。', rm:'Koko de tomete kudasai.', zh:'在這裡停就好。', en:'Please stop here.' },
+    { w:'🙋', side:'me', jp:'領収書をください。', rm:'Ryōshūsho o kudasai.', zh:'請給我收據。', en:'Could I have a receipt?' },
+  ], tipZh:'講不清地址就把手機地圖／飯店名片給司機看最快。', tipEn:"Can't say the address? Just show the driver your phone map or hotel card." },
+
+  // ── 購物 ──────────────────────────────
+  { cat:'shop', ic:'👕', bg:'var(--pink)', zh:'買衣服', en:'Trying on clothes', lines:[
     { w:'🙋', side:'me', jp:'これ、試着できますか？', rm:'Kore, shichaku dekimasu ka?', zh:'這個可以試穿嗎？', en:'Can I try this on?' },
     { w:'🙋', side:'me', jp:'他の色はありますか？', rm:'Hoka no iro wa arimasu ka?', zh:'有其他顏色嗎？', en:'Do you have other colors?' },
+    { w:'🙋', side:'me', jp:'ワンサイズ大きいのはありますか？', rm:'Wan-saizu ōkii no wa arimasu ka?', zh:'有大一號的嗎？', en:'Do you have one size up?' },
     { w:'🙋', side:'me', jp:'カードで払えますか？', rm:'Kādo de haraemasu ka?', zh:'可以刷卡嗎？', en:'Can I pay by card?' },
-    { w:'🧑‍💼', side:'you', jp:'はい、大丈夫ですよ。', rm:'Hai, daijōbu desu yo.', zh:'可以的,沒問題。', en:'Yes, of course.' },
-  ], tipZh:'免稅要護照,問「免税できますか？」(menzei dekimasu ka)。', tipEn:'For tax-free, ask "Menzei dekimasu ka?" and bring your passport.' },
+  ], tipZh:'尺寸太小說「小さい(ちいさい)」、太大說「大きい(おおきい)」。', tipEn:'Too small = chiisai, too big = ōkii.' },
 
-  { ic:'🏨', bg:'var(--blue)', zh:'飯店', en:'At the hotel', lines:[
+  { cat:'shop', ic:'💊', bg:'var(--green)', zh:'藥妝店', en:'Drugstore', lines:[
+    { w:'🙋', side:'me', jp:'風邪薬はどこですか？', rm:'Kazegusuri wa doko desu ka?', zh:'感冒藥在哪裡？', en:'Where is the cold medicine?' },
+    { w:'🙋', side:'me', jp:'これ、一番人気ですか？', rm:'Kore, ichiban ninki desu ka?', zh:'這個最熱門嗎？', en:'Is this the most popular one?' },
+    { w:'🙋', side:'me', jp:'免税できますか？', rm:'Menzei dekimasu ka?', zh:'可以免稅嗎？', en:'Can I get this tax-free?' },
+    { w:'🧑‍💼', side:'you', jp:'パスポートをお願いします。', rm:'Pasupōto o onegaishimasu.', zh:'請出示護照。', en:'Your passport, please.' },
+  ], tipZh:'免稅要帶護照,通常有專屬結帳櫃台(免税レジ)。', tipEn:'Tax-free needs your passport — look for the "免税" (tax-free) register.' },
+
+  { cat:'shop', ic:'🧾', bg:'var(--ac)', zh:'結帳', en:'At checkout', lines:[
+    { w:'🧑‍💼', side:'you', jp:'ポイントカードはお持ちですか？', rm:'Pointo kādo wa o-mochi desu ka?', zh:'有集點卡嗎？', en:'Do you have a point card?' },
+    { w:'🙋', side:'me', jp:'ないです。', rm:'Nai desu.', zh:'沒有。', en:"I don't." },
+    { w:'🙋', side:'me', jp:'別々で払えますか？', rm:'Betsubetsu de haraemasu ka?', zh:'可以分開結帳嗎？', en:'Can we pay separately?' },
+    { w:'🙋', side:'me', jp:'レシートください。', rm:'Reshīto kudasai.', zh:'請給我收據。', en:'Receipt, please.' },
+  ] },
+
+  // ── 住宿 ──────────────────────────────
+  { cat:'hotel', ic:'🏨', bg:'var(--blue)', zh:'入住 (Check-in)', en:'Checking in', lines:[
     { w:'🙋', side:'me', jp:'チェックインお願いします。', rm:'Chekku-in onegaishimasu.', zh:'我要 check-in。', en:'Check-in, please.' },
     { w:'🙋', side:'me', jp:'予約した田中です。', rm:'Yoyaku shita Tanaka desu.', zh:'我是有預約的田中。', en:'I have a reservation under Tanaka.' },
     { w:'🙋', side:'me', jp:'朝ごはんは何時からですか？', rm:'Asagohan wa nanji kara desu ka?', zh:'早餐幾點開始？', en:'What time does breakfast start?' },
     { w:'🙋', side:'me', jp:'荷物を預かってもらえますか？', rm:'Nimotsu o azukatte moraemasu ka?', zh:'可以幫我寄放行李嗎？', en:'Could you hold my luggage?' },
   ] },
 
-  { ic:'🤒', bg:'var(--ac)', zh:'身體不舒服', en:'Feeling unwell', lines:[
+  { cat:'hotel', ic:'🛎️', bg:'var(--pink)', zh:'客房需求・退房', en:'Room requests & check-out', lines:[
+    { w:'🙋', side:'me', jp:'タオルをもう一枚もらえますか？', rm:'Taoru o mō ichimai moraemasu ka?', zh:'可以再給我一條毛巾嗎？', en:'Could I get one more towel?' },
+    { w:'🙋', side:'me', jp:'Wi-Fiのパスワードを教えてください。', rm:'Waifai no pasuwādo o oshiete kudasai.', zh:'請告訴我 Wi-Fi 密碼。', en:'Could you tell me the Wi-Fi password?' },
+    { w:'🙋', side:'me', jp:'部屋の鍵をなくしました。', rm:'Heya no kagi o nakushimashita.', zh:'我把房間鑰匙弄丟了。', en:'I lost my room key.' },
+    { w:'🙋', side:'me', jp:'チェックアウトお願いします。', rm:'Chekku-auto onegaishimasu.', zh:'我要退房。', en:'Check-out, please.' },
+  ] },
+
+  // ── 緊急求助 ──────────────────────────
+  { cat:'help', ic:'🤒', bg:'var(--ac)', zh:'身體不舒服', en:'Feeling unwell', lines:[
     { w:'🙋', side:'me', jp:'ちょっと気分が悪いんです。', rm:'Chotto kibun ga warui n desu.', zh:'我有點不舒服。', en:'I feel a bit unwell.' },
     { w:'🙋', side:'me', jp:'頭が痛いです。', rm:'Atama ga itai desu.', zh:'我頭痛。', en:'I have a headache.' },
     { w:'🙋', side:'me', jp:'近くに薬局はありますか？', rm:'Chikaku ni yakkyoku wa arimasu ka?', zh:'附近有藥局嗎？', en:'Is there a pharmacy nearby?' },
     { w:'🙋', side:'me', jp:'病院に行きたいです。', rm:'Byōin ni ikitai desu.', zh:'我想去醫院。', en:'I want to go to a hospital.' },
   ], tipZh:'緊急時記住:救護車是「119」,警察是「110」。', tipEn:'Emergency: ambulance is 119, police is 110.' },
 
-  { ic:'🙏', bg:'var(--yellow)', zh:'超好用萬用句', en:'Lifesaver phrases', lines:[
+  { cat:'help', ic:'😨', bg:'var(--pink)', zh:'遺失・求助', en:'Lost items & help', lines:[
+    { w:'🙋', side:'me', jp:'助けてください。', rm:'Tasukete kudasai.', zh:'請幫幫我。', en:'Please help me.' },
+    { w:'🙋', side:'me', jp:'財布をなくしました。', rm:'Saifu o nakushimashita.', zh:'我錢包不見了。', en:'I lost my wallet.' },
+    { w:'🙋', side:'me', jp:'スマホを電車に忘れました。', rm:'Sumaho o densha ni wasuremashita.', zh:'我手機忘在電車上了。', en:'I left my phone on the train.' },
+    { w:'🙋', side:'me', jp:'警察を呼んでください。', rm:'Keisatsu o yonde kudasai.', zh:'請幫我叫警察。', en:'Please call the police.' },
+  ], tipZh:'東西掉了找「交番(こうばん)」——街角的小型派出所,幫忙報失物很方便。', tipEn:'Lost something? Find a "kōban" — a small neighborhood police box; they help with lost items.' },
+
+  // ── 寒暄社交 ──────────────────────────
+  { cat:'social', ic:'👋', bg:'var(--green)', zh:'打招呼・自我介紹', en:'Greetings & intro', lines:[
+    { w:'🙋', side:'me', jp:'はじめまして。', rm:'Hajimemashite.', zh:'初次見面。', en:'Nice to meet you.' },
+    { w:'🙋', side:'me', jp:'台湾から来ました。', rm:'Taiwan kara kimashita.', zh:'我從台灣來。', en:"I'm from Taiwan." },
+    { w:'🙋', side:'me', jp:'よろしくお願いします。', rm:'Yoroshiku onegaishimasu.', zh:'請多指教。', en:'Nice to meet you (please treat me well).' },
+    { w:'🧑', side:'you', jp:'こちらこそ。', rm:'Kochira koso.', zh:'彼此彼此。', en:'Likewise.' },
+  ], tipZh:'「よろしくお願いします」超萬用——初次見面、拜託別人、結尾都能用。', tipEn:'"Yoroshiku onegaishimasu" is super versatile — for intros, requests, and sign-offs.' },
+
+  { cat:'social', ic:'🙇', bg:'var(--yellow)', zh:'道謝・道歉', en:'Thanks & sorry', lines:[
+    { w:'🙋', side:'me', jp:'ありがとうございます。', rm:'Arigatō gozaimasu.', zh:'謝謝你。', en:'Thank you.' },
+    { w:'🙋', side:'me', jp:'本当に助かりました。', rm:'Hontō ni tasukarimashita.', zh:'真的幫了大忙。', en:'You really saved me.' },
+    { w:'🙋', side:'me', jp:'すみません、大丈夫ですか？', rm:'Sumimasen, daijōbu desu ka?', zh:'抱歉,你還好嗎？', en:'Sorry — are you okay?' },
+    { w:'🧑', side:'you', jp:'気にしないでください。', rm:'Ki ni shinaide kudasai.', zh:'別在意。', en:"Don't worry about it." },
+  ], tipZh:'「すみません」同時是「抱歉」和「不好意思／謝謝」,是日本最萬用的一句。', tipEn:'"Sumimasen" means both "sorry" and "excuse me / thanks" — Japan\'s most useful word.' },
+
+  { cat:'social', ic:'🙏', bg:'var(--ac)', zh:'超好用萬用句', en:'Lifesaver phrases', lines:[
     { w:'🙋', side:'me', jp:'もう一度お願いします。', rm:'Mō ichido onegaishimasu.', zh:'請再說一次。', en:'Once more, please.' },
     { w:'🙋', side:'me', jp:'ゆっくり話してもらえますか？', rm:'Yukkuri hanashite moraemasu ka?', zh:'可以說慢一點嗎？', en:'Could you speak slowly?' },
     { w:'🙋', side:'me', jp:'日本語がわかりません。', rm:'Nihongo ga wakarimasen.', zh:'我不懂日文。', en:"I don't understand Japanese." },
@@ -138,8 +231,9 @@ const SCENES = [
 
 const esc = s => String(s||'').replace(/[<>&"]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));
 const SPK = '<svg class="spk" viewBox="0 0 24 24"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.54 8.46a5 5 0 010 7.07M19.07 4.93a10 10 0 010 14.14"/></svg>';
-function render(){
-  document.getElementById('scenes').innerHTML = SCENES.map(s => `
+let activeCat = CATS[0].k;
+function sceneHtml(s){
+  return `
     <div class="scene">
       <div class="head">
         <div class="ic" style="background:${s.bg};color:#fff">${s.ic}</div>
@@ -155,8 +249,23 @@ function render(){
           </div>
         </div>`).join('')}
       ${s.tipZh ? `<div class="tip"><span data-t="zh">💡 ${esc(s.tipZh)}</span><span data-t="en">💡 ${esc(s.tipEn)}</span></div>` : ''}
-    </div>`).join('');
+    </div>`;
 }
+function renderTabs(){
+  document.getElementById('cattabs').innerHTML = CATS.map(c =>
+    `<button class="cattab ${c.k===activeCat?'on':''}" onclick="pickCat('${c.k}')"><span data-t="zh">${c.ic} ${c.zh}</span><span data-t="en">${c.ic} ${c.en}</span></button>`
+  ).join('');
+}
+function renderScenes(){
+  document.getElementById('scenes').innerHTML = SCENES.filter(s => s.cat === activeCat).map(sceneHtml).join('');
+}
+function pickCat(k){
+  activeCat = k;
+  renderTabs();
+  renderScenes();
+  window.scrollTo({ top: 0, behavior: 'smooth' });   // 切分類回頂端從頭看
+}
+function render(){ renderTabs(); renderScenes(); }
 // 發音:優先 VOICEVOX(__TTS 有的話),否則瀏覽器 TTS。與主站一致。
 let _audio = null;
 function speakLine(el){
