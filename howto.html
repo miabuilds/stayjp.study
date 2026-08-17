@@ -6,7 +6,10 @@
 <title>使用教學 — 30 秒上手 StayJP｜日本再留計劃</title>
 <!-- 在原生 App 內隱藏「下載 App」按鈕與平台專屬文字(見 native-ui.js) -->
 <script src="native-ui.js"></script>
-<meta name="description" content="StayJP 使用教學:選程度、背單字卡、學文法、線上模考、每天 SRS 間隔複習。網頁與 iOS App 皆可,Google 登入送 3 天免費試用。">
+<meta name="description" content="StayJP 使用教學:選程度、背單字卡(附例句朗讀)、學文法與動詞變化、生活會話、文章朗讀可調語速、線上計時模考、每天 SRS 間隔複習、字體大小可調。網頁與手機 App 皆可,Google 登入送 3 天免費試用。"><link rel="canonical" href="https://stayjp.study/howto.html">
+<meta property="og:title" content="使用教學 — 30 秒上手 StayJP">
+<meta property="og:description" content="選程度、背單字卡、學文法與動詞變化、生活會話、文章朗讀、計時模考、SRS 每日複習。免費開始。">
+<meta property="og:type" content="article">
 <style>
   :root{ --bg:#F6F4EF;--bg2:#FFFFFF;--tx:#2C2C2C;--tx2:#6B6B6B;--tx3:#9A9A9A;--ac:#C6553B;--ac2:#D4654A;--bd:#E7E3DC;--serif:"Noto Serif TC","Songti TC",serif; }
   @media (prefers-color-scheme:dark){ :root{ --bg:#161615;--bg2:#211F1D;--tx:#EDEBE7;--tx2:#A7A29B;--tx3:#6E6A64;--ac:#E8734A;--ac2:#E8734A;--bd:#332F2B; }}
@@ -32,6 +35,11 @@
   .tips{list-style:none;display:grid;gap:9px}
   .tips li{padding-left:26px;position:relative;font-size:15px}
   .tips li::before{content:"💡";position:absolute;left:0}
+  .feat{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px}
+  .feat a{display:block;background:var(--bg2);border:1px solid var(--bd);border-radius:12px;padding:14px 16px;text-decoration:none;color:var(--tx)}
+  .feat a:hover{border-color:var(--ac)}
+  .feat .ft{font-weight:700;font-size:15px;margin-bottom:2px}
+  .feat .fd{font-size:13.5px;color:var(--tx2)}
   .cta{display:flex;gap:12px;flex-wrap:wrap;margin-top:8px}
   .btn{display:inline-flex;align-items:center;gap:8px;background:var(--ac);color:#fff;border-radius:100px;padding:13px 26px;font-size:15px;font-weight:600;text-decoration:none}
   .btn.sec{background:transparent;color:var(--ac);border:1.5px solid var(--ac)}
@@ -55,7 +63,7 @@
   <div class="hero">
     <div class="eyebrow" data-t="zh">使用教學</div><div class="eyebrow" data-t="en">How to use</div>
     <h1><span data-t="zh">30 秒上手</span><span data-t="en">Get started in 30 seconds</span></h1>
-    <p class="lead"><span data-t="zh">不用註冊也能先逛。想存進度就用 Google 登入,還送免費試用(網頁 3 天、iOS App 7 天)。以下是最順的學習流程:</span><span data-t="en">Browse without signing up. To save progress, sign in with Google — a free trial is included (3 days on web, 7 days on the iOS app). Here's the smoothest way to study:</span></p>
+    <p class="lead"><span data-t="zh">不用註冊也能先逛。想存進度就用 Google 登入,還送免費試用。以下是最順的學習流程:</span><span data-t="en">Browse without signing up. To save progress, sign in with Google — a free trial is included. Here's the smoothest way to study:</span></p>
   </div>
 
   <ol class="steps">
@@ -67,11 +75,28 @@
   </ol>
 
   <section>
+    <h2><span data-t="zh">不只單字卡:全部功能</span><span data-t="en">Beyond flashcards: everything inside</span></h2>
+    <div class="feat">
+      <a href="app.html"><div class="ft">📚 <span data-t="zh">單字卡 + 朗讀</span><span data-t="en">Vocab cards + audio</span></div><div class="fd"><span data-t="zh">每個字附例句、翻譯與真人般語音,點卡就唸。</span><span data-t="en">Every word has an example, translation, and natural audio — tap to hear.</span></div></a>
+      <a href="app.html"><div class="ft">📝 <span data-t="zh">文法 + 詳解</span><span data-t="en">Grammar + explanations</span></div><div class="fd"><span data-t="zh">接續、語感與例句朗讀;測驗答錯自動附上解說卡。</span><span data-t="en">Usage, nuance, spoken examples; wrong answers get an explanation card.</span></div></a>
+      <a href="verbs.html"><div class="ft">🔄 <span data-t="zh">動詞變化</span><span data-t="en">Verb conjugation</span></div><div class="fd"><span data-t="zh">て形、可能、意向、使役、受身、自他動詞逐項練。</span><span data-t="en">Drill て-form, potential, volitional, causative, passive, transitivity.</span></div></a>
+      <a href="phrases.html"><div class="ft">🗣️ <span data-t="zh">生活會話(分類)</span><span data-t="en">Everyday phrases (by scene)</span></div><div class="fd"><span data-t="zh">用餐、交通、購物、住宿、求助等場景分類,一按就唸。</span><span data-t="en">Food, transport, shopping, hotel, help — grouped by scene, tap to hear.</span></div></a>
+      <a href="app.html"><div class="ft">📖 <span data-t="zh">文章朗讀(可調語速)</span><span data-t="en">Article reading (adjustable speed)</span></div><div class="fd"><span data-t="zh">分級短文邊聽邊讀,語速 −/+ 自己調,還有今日故事。</span><span data-t="en">Leveled passages read aloud; adjust speed with −/+, plus a daily story.</span></div></a>
+      <a href="app.html"><div class="ft">⏱️ <span data-t="zh">計時模擬考</span><span data-t="en">Timed mock exam</span></div><div class="fd"><span data-t="zh">仿真題型計時作答,看分數、分享成績卡。</span><span data-t="en">Realistic timed questions, scored, with a shareable result card.</span></div></a>
+      <a href="app.html"><div class="ft">🧠 <span data-t="zh">SRS 間隔複習</span><span data-t="en">SRS spaced review</span></div><div class="fd"><span data-t="zh">依記憶曲線排程,不熟的自動多見幾次。</span><span data-t="en">Scheduled to your memory curve; weak items reappear more often.</span></div></a>
+      <a href="app.html"><div class="ft">🔤 <span data-t="zh">字體大小可調</span><span data-t="en">Adjustable text size</span></div><div class="fd"><span data-t="zh">按「A」放大全站文字,看得更舒服。</span><span data-t="en">Tap "A" to enlarge text across the whole app for easier reading.</span></div></a>
+    </div>
+  </section>
+
+  <section>
     <h2><span data-t="zh">小技巧</span><span data-t="en">Tips</span></h2>
     <ul class="tips">
       <li><span data-t="zh">通勤、排隊的零碎時間背幾張卡,累積很快。</span><span data-t="en">Study a few cards during commutes or waiting — it adds up fast.</span></li>
       <li><span data-t="zh">跟著例句「跟讀」練發音與語調。</span><span data-t="en">Shadow the example sentences to practice pronunciation and intonation.</span></li>
       <li><span data-t="zh">易混淆的近義詞,用「易混淆詞比較」一次搞懂。</span><span data-t="en">Sort out similar words with the confusable-words comparison.</span></li>
+      <li><span data-t="zh">讀文章覺得太快?用播放列的 −/+ 把語速調到你聽得懂的速度。</span><span data-t="en">Article too fast? Use the −/+ on the player to set a speed you can follow.</span></li>
+      <li><span data-t="zh">字太小就按右上的「A」放大;整站文字(含測驗彈窗)都會跟著變大。</span><span data-t="en">Text too small? Tap "A" to enlarge everything, quiz pop-ups included.</span></li>
+      <li><span data-t="zh">加到主畫面就能當 App 用,通勤沒網路也能背(PWA 離線)。</span><span data-t="en">Add to your home screen to use it like an app — works offline on the go (PWA).</span></li>
       <li><span data-t="zh">免費版每個工具每天都能用;想無限次再升級 Premium。</span><span data-t="en">Free gives you each tool daily; upgrade to Premium for unlimited use.</span></li>
     </ul>
   </section>
@@ -79,7 +104,8 @@
   <section>
     <div class="cta">
       <a class="btn" href="app.html"><span data-t="zh">現在開始 →</span><span data-t="en">Start now →</span></a>
-      <a class="btn sec" href="https://apps.apple.com/app/id6778227353"><span data-t="zh">下載 iOS App</span><span data-t="en">Download iOS App</span></a>
+      <a class="btn sec app-ios" href="https://apps.apple.com/app/id6778227353"><span data-t="zh">下載 iOS App</span><span data-t="en">Get it on iOS</span></a>
+      <a class="btn sec app-android" href="https://play.google.com/store/apps/details?id=com.stayjp.app"><span data-t="zh">下載 Android App</span><span data-t="en">Get it on Android</span></a>
     </div>
   </section>
 
@@ -90,6 +116,21 @@
     <a href="pricing.html" data-t="zh">方案</a><a href="pricing.html" data-t="en">Pricing</a>
   </footer>
 </div>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "HowTo",
+  "name": "如何用 StayJP 準備 JLPT",
+  "description": "選程度、背單字卡、學文法與動詞變化、做計時模考、每天用 SRS 間隔複習。",
+  "step": [
+    {"@type":"HowToStep","name":"選你的程度","text":"第一次進來選 N5–N1,之後隨時可改。不確定就從 N5 開始。"},
+    {"@type":"HowToStep","name":"背單字卡","text":"在「單字」分頁一張張看,點卡片就唸出來,每個字都有例句與翻譯,想複習就按 ★ 收藏。"},
+    {"@type":"HowToStep","name":"學文法與動詞變化","text":"在「文法」分頁看接續與語感、點例句就唸;到「動詞變化」練 て形、可能、使役、受身等。"},
+    {"@type":"HowToStep","name":"模擬考","text":"做計時模擬考測實力,考完看成績並可分享成績卡。"},
+    {"@type":"HowToStep","name":"每天複習(SRS)","text":"每天回來清「複習」,系統依記憶曲線排程,不熟的自動多見幾次。"}
+  ]
+}
+</script>
 <script>
   function setLang(l){ document.body.setAttribute('data-lang', l); document.documentElement.lang = l==='en'?'en':'zh-Hant'; try{ localStorage.setItem('stayjp_about_lang', l); }catch(e){} }
   function toggleLang(){ setLang(document.body.getAttribute('data-lang')==='zh'?'en':'zh'); }
