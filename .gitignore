@@ -38,3 +38,14 @@ SPRINT-*.print.html
 sprint-content.json
 ai-local/
 ai-local/models/
+
+# 私人分析工具 + 洞察(含營收/轉換數字,repo 是 public,只留本機、絕不 push)
+FUNNEL-FINDINGS.md
+scripts/funnel-cohort.mjs
+scripts/revenue-reconcile.mjs
+
+# 一次性測試腳本與稽核 log(留本機參考,不進 git)
+_audit_pron.mjs
+ve2e.mjs
+scripts/tts/pron-audit.log
+ai_e2e.png
