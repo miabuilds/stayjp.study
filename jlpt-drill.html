@@ -65,6 +65,27 @@
   .rbtns button{font:inherit;font-size:14px;font-weight:600;border:1px solid var(--bd);background:var(--bg2);color:var(--tx);border-radius:10px;padding:10px 18px;cursor:pointer}
   .rbtns .pri{background:var(--ac);color:#fff;border-color:var(--ac)}
   .muted{color:var(--tx3);font-size:12.5px}
+  .playbtn{display:block;font:inherit;font-size:15px;font-weight:700;background:var(--soft);color:var(--ac);border:1.5px solid var(--ac);border-radius:12px;padding:10px 18px;cursor:pointer;margin-bottom:12px}
+  .playbtn:hover{background:var(--ac);color:#fff}
+  .exambtn{margin-top:14px;width:100%;background:var(--ac);border:0;border-radius:14px;padding:15px;font:inherit;font-size:15.5px;font-weight:700;color:#fff;cursor:pointer}
+  .exambtn:hover{background:var(--ac2)}
+  .exam-set{background:var(--bg2);border:1px solid var(--bd);border-radius:14px;padding:16px;margin-top:10px;display:none}
+  .exam-set.show{display:block}
+  .exam-set .row{display:flex;align-items:center;gap:10px;margin-bottom:12px;font-size:14.5px}
+  .tgl{display:inline-flex;border:1px solid var(--bd);border-radius:10px;overflow:hidden}
+  .tgl button{font:inherit;font-size:13.5px;padding:7px 16px;border:0;background:var(--bg);color:var(--tx2);cursor:pointer}
+  .tgl button.on{background:var(--ac);color:#fff}
+  .timerbar{font-variant-numeric:tabular-nums;font-weight:800;font-size:15px;color:var(--ac)}
+  .timerbar.warn{color:var(--bad)}
+  .exam-sec{font-size:12px;color:var(--ac);font-weight:700;margin-bottom:6px}
+  .rv-q{background:var(--bg2);border:1px solid var(--bd);border-radius:14px;padding:16px;margin-bottom:12px}
+  .rv-q .st{font-size:15.5px;line-height:1.8;margin-bottom:8px}
+  .rv-q .st u{text-decoration-color:var(--ac);font-weight:700}
+  .rv-q .yours{font-size:13.5px;margin:4px 0}
+  .rv-q .yours.ok{color:var(--ok)} .rv-q .yours.ng{color:var(--bad)}
+  .rv-q .xp2{background:var(--soft);border-radius:10px;padding:10px 12px;font-size:13.5px;line-height:1.7;margin-top:8px}
+  .secline{display:flex;gap:10px;align-items:center;font-size:14px;padding:7px 0;border-top:1px solid var(--bd)}
+  .secline .sn{flex:1} .secline .ss{font-weight:700;font-variant-numeric:tabular-nums}
   .tc .tbar{display:block;height:4px;background:var(--bg3);border-radius:4px;margin-top:5px;overflow:hidden}
   .tc .tbar i{display:block;height:100%;background:var(--ac);border-radius:4px}
   .rec-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px}
@@ -96,6 +117,15 @@
     <div class="types" id="types"></div>
     <button class="wrongbtn" id="wrongBtn" onclick="startWrong()">📕 錯題本 — 重刷答錯的題(<span id="wrongCount">0</span>)</button>
     <button class="wrongbtn" id="recBtn" onclick="showRecords()" style="display:none">📊 刷題紀錄 — 做過哪些題、正答率、場次歷史</button>
+    <button class="exambtn" onclick="toggleExamSet()">📝 模擬試験 — 各題型組一份完整考卷</button>
+    <div class="exam-set" id="examSet">
+      <div class="row"><span>計時模式</span>
+        <span class="tgl"><button id="tgOn" class="on" onclick="setTimed(true)">⏱ 計時</button><button id="tgOff" onclick="setTimed(false)">不計時</button></span>
+        <span class="muted" id="examTimeNote"></span>
+      </div>
+      <div class="row muted" id="examCompNote" style="margin-bottom:12px"></div>
+      <button class="exambtn" style="margin-top:0" onclick="startExam()">開始 <span id="examLvLabel"></span> 模擬試験</button>
+    </div>
     <p class="muted" style="margin-top:14px">題庫持續增加中。發現任何題目有疑義,請用<a href="contact.html" style="color:var(--ac)">意見回饋</a>告訴我們,查證後立即修正。</p>
   </div>
 
@@ -116,6 +146,37 @@
       </div>
     </div>
     <button class="nextbtn" id="nextBtn" onclick="nextQ()">下一題 →</button>
+  </div>
+
+  <!-- 模擬考畫面 -->
+  <div id="exam" style="display:none">
+    <div class="qbar">
+      <span class="qt" id="examTitle"></span>
+      <span class="timerbar" id="examTimer"></span>
+      <span class="qnum" id="examNum"></span>
+      <button onclick="confirmQuitExam()">交卷</button>
+    </div>
+    <div class="qcard">
+      <div class="exam-sec" id="examSec"></div>
+      <div class="qstem" id="examStem"></div>
+      <div class="qhint" id="examHint"></div>
+      <div class="opts" id="examOpts"></div>
+    </div>
+  </div>
+
+  <!-- 模擬考成績畫面 -->
+  <div id="examResult" style="display:none">
+    <div class="qbar">
+      <span class="qt">📝 模擬試験 結果</span>
+      <button onclick="backHome()">回選單</button>
+    </div>
+    <div class="rcard" style="margin-bottom:16px">
+      <div class="rscore" id="exScore"></div>
+      <div class="rsub" id="exSub"></div>
+      <div id="exSecs" style="margin-top:14px;text-align:left"></div>
+    </div>
+    <h3 style="font-size:15px;margin:0 0 10px">逐題回顧(含詳解)</h3>
+    <div id="exReview"></div>
   </div>
 
   <!-- 刷題紀錄畫面 -->
@@ -144,6 +205,7 @@
 
 <script src="jlpt-questions.js"></script>
 <script src="jlpt-questions-gen.js"></script>
+<script src="audio/tts/manifest.js"></script>
 <script>
 // ========== JLPT 刷題特區 ==========
 // 題庫在 jlpt-questions.js(window.JLPT_Q):精編靜態題,每題附詳解。
@@ -155,6 +217,7 @@ const TYPES = [
   { k:'grammar', tt:'文法形式', tj:'文法形式の判断', td:'選出文法上正確的說法' },
   { k:'order',   tt:'句子重組', tj:'文の組み立て', td:'選出放在 ★ 位置的詞' },
   { k:'reading', tt:'読解・短文', tj:'内容理解', td:'讀短文,選出正確答案' },
+  { k:'listening', tt:'聴解', tj:'聴解', td:'聽音檔,選出正確答案' },
 ];
 const LEVELS = ['n5','n4','n3','n2','n1'];
 let lv = localStorage.getItem('jd_lv') || 'n5';
@@ -215,7 +278,7 @@ function showRecords(){
   document.getElementById('recBody').innerHTML = html;
   show('records');
 }
-function pickLv(l){ lv=l; localStorage.setItem('jd_lv',l); renderHome(); }
+function pickLv(l){ lv=l; localStorage.setItem('jd_lv',l); renderHome(); updateExamNotes(); }
 
 function startDrill(tk){
   curType = TYPES.find(t=>t.k===tk); isWrongMode=false;
@@ -238,17 +301,30 @@ function startWrong(){
   document.getElementById('drillTitle').textContent = '📕 錯題本';
   show('drill'); renderQ();
 }
+// 聴解播放:__TTS[at] → mp3;新題自動停掉上一題的聲音
+let _au=null;
+function playAu(){
+  const q = queue[qi]; if(!q || !q.at) return;
+  try{ if(_au){ _au.pause(); _au=null; } }catch(e){}
+  const hash = window.__TTS && window.__TTS[q.at];
+  if(hash){ _au = new Audio('audio/tts/'+hash+'.mp3'); _au.play().catch(()=>{}); }
+}
+function stopAu(){ try{ if(_au){ _au.pause(); _au=null; } }catch(e){} }
 function renderQ(){
   const q = queue[qi];
+  stopAu();
   document.getElementById('qnum').textContent = (qi+1)+' / '+queue.length;
-  document.getElementById('qstem').innerHTML = stem(q);
-  document.getElementById('qhint').textContent = q.h || '';
+  // 聴解:題面只有問題+播放鈕,不顯示原文(答完才在詳解看 script)
+  document.getElementById('qstem').innerHTML =
+    (q.t==='listening' ? '<button class="playbtn" onclick="playAu()">▶ 音声を聞く</button>' : '') + stem(q);
+  document.getElementById('qhint').textContent = q.h || (q.t==='listening' ? '可以重複播放' : '');
   // 選項固定亂序,但記住正確答案文字
   const opts = shuffle(q.o.map((t,i)=>({t,ok:i===q.a})));
   document.getElementById('opts').innerHTML = opts.map((o,i)=>
     `<button class="opt" data-ok="${o.ok?1:0}" onclick="answer(this,${o.ok?1:0})"><span class="no">${i+1}</span><span>${esc(o.t)}</span></button>`).join('');
   document.getElementById('explain').style.display='none';
   document.getElementById('nextBtn').style.display='none';
+  if(q.t==='listening') playAu();   // 進題自動播一次
 }
 function answer(el, ok){
   const q = queue[qi];
@@ -266,7 +342,9 @@ function answer(el, ok){
   const v = document.getElementById('verdict');
   v.textContent = ok? '✅ 答對了!':'❌ 答錯了';
   v.className = 'verdict '+(ok?'ok':'ng');
-  document.getElementById('xp').innerHTML = q.x;   // 詳解(題庫內含 <b> 標記,自行控管內容安全)
+  // 詳解(題庫內含 <b> 標記,自行控管內容安全);聴解附上音檔原文
+  document.getElementById('xp').innerHTML =
+    (q.au ? '<div style="margin-bottom:8px;padding-bottom:8px;border-bottom:1px dashed var(--bd)"><b>スクリプト:</b>'+esc(q.au)+'</div>' : '') + q.x;
   document.getElementById('explain').style.display='block';
   document.getElementById('nextBtn').style.display='block';
   document.getElementById('nextBtn').textContent = qi<queue.length-1? '下一題 →':'看結果';
@@ -284,7 +362,144 @@ function finish(){
 }
 function retrySame(){ if(isWrongMode) startWrong(); else if(curType) startDrill(curType.k); }
 function quitDrill(){ backHome(); }
-function backHome(){ renderHome(); show('home'); }
+function backHome(){ stopExamTimer(); stopAu(); renderHome(); show('home'); }
+
+// ═══════════ 模擬試験 ═══════════
+// 組卷公式:照真題比例每題型抽 N 題;每題配秒算總時限。狀態全集中在 EX,結束必清 timer。
+const EXAM_COMP = [ ['kanji',5],['hyoki',5],['context',5],['para',3],['grammar',5],['order',3],['reading',2],['listening',2] ];
+const SEC_TIME = { kanji:45, hyoki:45, context:45, para:45, grammar:60, order:60, reading:150, listening:60 };
+let EX = null;          // {qs:[{q,pick(亂序後選項),ans(使用者選的索引|null)}], idx, timed, endAt, timer}
+let examTimed = true;
+
+function examComp(){  // 依當前級別實際庫存夾住抽題數
+  const byType = {};
+  bank().forEach(q=>{ if(q.lv===lv){ (byType[q.t]=byType[q.t]||[]).push(q); } });
+  return EXAM_COMP.map(([t,n])=>[t, Math.min(n, (byType[t]||[]).length)]).filter(([,n])=>n>0);
+}
+function examSeconds(comp){ return comp.reduce((s,[t,n])=>s+n*(SEC_TIME[t]||60),0); }
+function toggleExamSet(){
+  const el=document.getElementById('examSet'); el.classList.toggle('show');
+  updateExamNotes();
+}
+function setTimed(b){ examTimed=b;
+  document.getElementById('tgOn').classList.toggle('on',b);
+  document.getElementById('tgOff').classList.toggle('on',!b);
+  updateExamNotes();
+}
+function updateExamNotes(){
+  const comp = examComp();
+  const total = comp.reduce((s,[,n])=>s+n,0);
+  const mins = Math.ceil(examSeconds(comp)/60);
+  document.getElementById('examLvLabel').textContent = lv.toUpperCase();
+  document.getElementById('examTimeNote').textContent = examTimed? '時限 '+mins+' 分,時間到自動交卷':'不限時';
+  document.getElementById('examCompNote').textContent = '共 '+total+' 題:'+comp.map(([t,n])=>TYPES.find(x=>x.k===t).tt+'×'+n).join('、');
+}
+function startExam(){
+  stopExamTimer(); stopAu();
+  const byType = {};
+  bank().forEach(q=>{ if(q.lv===lv){ (byType[q.t]=byType[q.t]||[]).push(q); } });
+  const rec = getRec();
+  const qs = [];
+  for(const [t,n] of examComp()){
+    // 沒做過的優先,再抽做過的補滿
+    const fresh = shuffle((byType[t]||[]).filter(q=>!rec[q.id]));
+    const done  = shuffle((byType[t]||[]).filter(q=>rec[q.id]));
+    for(const q of fresh.concat(done).slice(0,n)){
+      qs.push({ q, pick: shuffle(q.o.map((txt,i)=>({txt,ok:i===q.a}))), ans:null });
+    }
+  }
+  if(!qs.length) return;
+  const secs = examSeconds(examComp());
+  EX = { qs, idx:0, timed:examTimed, endAt: examTimed? Date.now()+secs*1000 : 0, timer:null };
+  if(examTimed){
+    EX.timer = setInterval(tickExam, 500);
+  }
+  document.getElementById('examTitle').textContent = lv.toUpperCase()+' 模擬試験';
+  show('exam'); renderExamQ(); tickExam();
+}
+function tickExam(){
+  if(!EX) return;
+  const el = document.getElementById('examTimer');
+  if(!EX.timed){ el.textContent='∞'; el.classList.remove('warn'); return; }
+  const left = Math.max(0, EX.endAt - Date.now());
+  const m = Math.floor(left/60000), s = Math.floor(left%60000/1000);
+  el.textContent = m+':'+String(s).padStart(2,'0');
+  el.classList.toggle('warn', left < 60000);
+  if(left <= 0){ finishExam(true); }
+}
+function stopExamTimer(){ if(EX && EX.timer){ clearInterval(EX.timer); EX.timer=null; } }
+function renderExamQ(){
+  if(!EX) return;
+  stopAu();
+  const item = EX.qs[EX.idx], q = item.q;
+  const ty = TYPES.find(t=>t.k===q.t);
+  document.getElementById('examNum').textContent = (EX.idx+1)+' / '+EX.qs.length;
+  document.getElementById('examSec').textContent = ty? (ty.tj+' · '+ty.tt):'';
+  document.getElementById('examStem').innerHTML =
+    (q.t==='listening' ? '<button class="playbtn" onclick="playExamAu()">▶ 音声を聞く</button>' : '') + stem(q);
+  document.getElementById('examHint').textContent = q.h || '';
+  document.getElementById('examOpts').innerHTML = item.pick.map((o,i)=>
+    `<button class="opt" onclick="examAnswer(${i})"><span class="no">${i+1}</span><span>${esc(o.txt)}</span></button>`).join('');
+  if(q.t==='listening') playExamAu();
+}
+function playExamAu(){
+  if(!EX) return;
+  const q = EX.qs[EX.idx].q; if(!q.at) return;
+  try{ if(_au){ _au.pause(); _au=null; } }catch(e){}
+  const hash = window.__TTS && window.__TTS[q.at];
+  if(hash){ _au = new Audio('audio/tts/'+hash+'.mp3'); _au.play().catch(()=>{}); }
+}
+function examAnswer(i){
+  if(!EX || EX.qs[EX.idx].ans!==null) return;   // 防重複作答
+  EX.qs[EX.idx].ans = i;
+  if(EX.idx < EX.qs.length-1){ EX.idx++; renderExamQ(); window.scrollTo(0,0); }
+  else finishExam(false);
+}
+function confirmQuitExam(){
+  if(!EX) return;
+  const un = EX.qs.filter(x=>x.ans===null).length;
+  if(un>0 && !confirm('還有 '+un+' 題未作答,未答以 0 分計。確定交卷?')) return;
+  finishExam(false);
+}
+function finishExam(timeout){
+  if(!EX) return;
+  stopExamTimer(); stopAu();
+  const qs = EX.qs; EX = null;   // 先斷狀態,絕不重入
+  // 計分 + 寫入每題紀錄/錯題本
+  const rec = getRec(), w = getWrong();
+  let score = 0; const secStat = {};
+  for(const item of qs){
+    const ok = item.ans!==null && item.pick[item.ans].ok;
+    if(ok) score++;
+    const t = item.q.t;
+    secStat[t] = secStat[t]||{c:0,n:0}; secStat[t].n++; if(ok) secStat[t].c++;
+    const e = rec[item.q.id]||{n:0,c:0}; e.n++; if(ok)e.c++; e.last=today(); rec[item.q.id]=e;
+    if(!ok) w[item.q.id]=true; else if(w[item.q.id]) { /* 模擬考答對不移出錯題本,留給錯題本模式清 */ }
+  }
+  saveRec(rec); saveWrong(w);
+  pushHist({ d:today(), lv, t:'📝 模擬試験'+(timeout?'(時間到)':''), s:score, tot:qs.length });
+  // 成績畫面
+  const pct = Math.round(score/qs.length*100);
+  document.getElementById('exScore').textContent = score+' / '+qs.length;
+  document.getElementById('exSub').textContent = (timeout?'⏰ 時間到,自動交卷。':'')+(pct>=70?'合格圈內,穩住!':'看逐題回顧,錯的都有詳解。');
+  document.getElementById('exSecs').innerHTML = Object.entries(secStat).map(([t,s])=>{
+    const ty=TYPES.find(x=>x.k===t);
+    return `<div class="secline"><span class="sn">${ty?ty.tt:t}</span><span class="ss">${s.c} / ${s.n}</span></div>`;
+  }).join('');
+  document.getElementById('exReview').innerHTML = qs.map((item,i)=>{
+    const ok = item.ans!==null && item.pick[item.ans].ok;
+    const yours = item.ans===null? '(未作答)': item.pick[item.ans].txt;
+    const correct = item.q.o[item.q.a];
+    return `<div class="rv-q">
+      <div class="exam-sec">${i+1}. ${(TYPES.find(x=>x.k===item.q.t)||{}).tt||''}</div>
+      <div class="st">${stem(item.q)}</div>
+      <div class="yours ${ok?'ok':'ng'}">${ok?'✅':'❌'} 你的答案:${esc(yours)}</div>
+      ${ok?'':'<div class="yours ok">⭕ 正解:'+esc(correct)+'</div>'}
+      <div class="xp2">${item.q.au?'<b>スクリプト:</b>'+esc(item.q.au)+'<br>':''}${item.q.x}</div>
+    </div>`;
+  }).join('');
+  show('examResult');
+}
 
 renderHome();
 </script>
