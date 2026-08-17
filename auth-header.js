@@ -63,17 +63,20 @@
         'background-repeat:no-repeat;background-position:right 8px center;background-size:10px 6px}' +
       '.ahx-btn img{width:18px;height:18px;border-radius:50%}' +
       '.ahx-btn .ahx-name{display:inline-block;max-width:96px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;vertical-align:bottom}' +
-      '.ahx-menu{position:absolute;top:calc(100% + 6px);right:0;background:var(--bg2,#fff);' +
-        'background-color:var(--bg2,#fff);border:1px solid var(--bd,#ddd);border-radius:10px;' +
-        'min-width:180px;padding:4px;z-index:2147483000;' +   /* 提到極高,保證蓋過任何頁面內容(避免被卡片堆疊透出) */
-        'box-shadow:0 8px 24px rgba(0,0,0,.18);display:none;isolation:isolate}' +
+      '.ahx-menu{position:absolute;top:calc(100% + 8px);right:0;background:var(--bg2,#fff);' +
+        'background-color:var(--bg2,#fff);border:1px solid var(--bd,#ddd);border-radius:14px;' +
+        'min-width:210px;padding:6px;z-index:2147483000;' +   /* 提到極高,保證蓋過任何頁面內容(避免被卡片堆疊透出) */
+        'box-shadow:0 12px 32px rgba(0,0,0,.16),0 2px 6px rgba(0,0,0,.06);display:none;isolation:isolate}' +
       '.ahx-menu.show{display:block}' +
-      '.ahx-head{padding:10px 12px;border-bottom:1px solid var(--bd,#ddd);font-size:11px;' +
-        'color:var(--tx3,#888);word-break:break-all}' +
+      '.ahx-head{padding:6px 10px 9px;margin-bottom:4px;border-bottom:1px solid var(--bd,#ddd);font-size:11.5px;' +
+        'letter-spacing:.02em;color:var(--tx3,#888);word-break:break-all}' +
       '.ahx-head:empty{display:none}' +   /* email 空時不顯示空白列 */
-      '.ahx-item{display:block;width:100%;text-align:left;background:none;border:0;padding:8px 12px;' +
-        'font-size:13px;color:var(--tx,#222);cursor:pointer;border-radius:6px;text-decoration:none;font-family:inherit}' +
+      '.ahx-item{display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:none;border:0;' +
+        'padding:9px 10px;font-size:13.5px;font-weight:500;color:var(--tx,#222);cursor:pointer;border-radius:9px;' +
+        'text-decoration:none;font-family:inherit;transition:background .12s}' +
+      '.ahx-ic{width:20px;text-align:center;font-size:15px;flex-shrink:0;opacity:.85}' +
       '.ahx-item:hover{background:var(--bg3,#f0f0f0);text-decoration:none}' +
+      '.ahx-sep{height:1px;background:var(--bd,#e5e5e5);margin:5px 6px}' +
       '.ahx-item.danger{color:#DC2626}' +
       '.ahx-item.danger:hover{background:rgba(220,38,38,.08)}';
     document.head.appendChild(s);
@@ -163,15 +166,16 @@
       var photo = user.photoURL || '';
       var img = photo ? '<img src="' + photo + '" alt="" onerror="this.style.display=\'none\'">' : '';
       var ADMIN = ['stayjpplan@gmail.com', 'abc83327@gmail.com'];
-      var adminLink = ADMIN.indexOf((user.email || '').toLowerCase()) > -1 ? '<a class="ahx-item" href="admin-dash.html">🛠 管理後台</a>' : '';
+      var adminLink = ADMIN.indexOf((user.email || '').toLowerCase()) > -1 ? '<a class="ahx-item" href="admin-dash.html"><span class="ahx-ic">🛠</span>管理後台</a>' : '';
       area.innerHTML =
         '<button class="ahx-btn" id="ahxMenuBtn" type="button">' + img + '<span class="ahx-name">' + name + '</span> ▾</button>' +
         '<div class="ahx-menu" id="ahxMenu">' +
           '<div class="ahx-head">' + (user.email || '') + '</div>' +
-          '<a class="ahx-item" href="account.html">我的帳號</a>' +
-          '<a class="ahx-item" href="pricing.html">訂閱方案</a>' +
+          '<a class="ahx-item" href="account.html"><span class="ahx-ic">👤</span>我的帳號</a>' +
+          '<a class="ahx-item" href="pricing.html"><span class="ahx-ic">✨</span>訂閱方案</a>' +
           adminLink +
-          '<button class="ahx-item danger" id="ahxLogout" type="button">登出</button>' +
+          '<div class="ahx-sep"></div>' +
+          '<button class="ahx-item danger" id="ahxLogout" type="button"><span class="ahx-ic">⏻</span>登出</button>' +
         '</div>';
       area.querySelector('#ahxMenuBtn').onclick = function (e) {
         e.stopPropagation();
