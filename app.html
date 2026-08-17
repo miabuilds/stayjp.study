@@ -727,6 +727,9 @@ body.profile-view .mn { margin-left: 0; max-width: none; }   /* 滿版 → 內�
 .vi:hover { border-color: var(--ac2); }
 /* 控制項(喇叭/変/詞性/★)絕對定位右上 → 詞義、例句、虛線都滿版 */
 .vi .vx-ctrl { position: absolute; top: 12px; right: 12px; display: flex; align-items: center; gap: 8px; z-index: 1; }
+/* 例句語速切換(1→0.85→0.7→0.55循環,全站生效,存 tts_speed) */
+.vi .vspd { font-size: 11px; font-weight: 700; color: var(--tx3); border: 1.5px solid var(--bd); border-radius: 10px; padding: 2px 7px; cursor: pointer; user-select: none; font-variant-numeric: tabular-nums; }
+.vi .vspd.on { color: #fff; background: var(--ac2); border-color: var(--ac2); }
 .vi .vw { font-size: 20px; font-weight: 700; line-height: 1.3; color: var(--tx); font-family: "Hiragino Mincho ProN", "Noto Serif JP", serif; padding-right: 150px; }
 .vi .vr { font-size:13px; color: var(--ac2); margin-top: 2px; }
 .vi .vm { font-size:15px; color: var(--tx2); margin-top: 4px; }
@@ -2161,6 +2164,18 @@ function setTtsSpeed(v) {
   const lbl = document.getElementById('ttsSpeedLabel');
   if (lbl) lbl.textContent = f.toFixed(2).replace(/\.?0+$/, '') + 'x';
 }
+// 學習卡右上的語速切換鈕(回饋:例句跟不上想放慢)。循環 1→0.85→0.7→0.55,全站 speak() 都吃這個值
+function cycleTtsSpeed() {
+  const order = [1, 0.85, 0.7, 0.55];
+  const cur = getTtsSpeed();
+  let i = order.findIndex(v => Math.abs(v - cur) < 0.01);
+  const nx = order[(i + 1) % order.length];
+  setTtsSpeed(nx);
+  document.querySelectorAll('.vspd').forEach(el => {
+    el.textContent = (nx === 1 ? '1' : String(nx)) + '×';
+    el.classList.toggle('on', nx !== 1);
+  });
+}
 // 開啟更多選單時把 slider 初始值對到目前 setting
 function syncTtsSpeedSlider() {
   const sl = document.getElementById('ttsSpeedSlider');
@@ -2975,7 +2990,7 @@ const DailyStory = (() => {
       _audio.onended = onEnd;
       _audio.onerror = onEnd;
       _audio.src = window.ttsUrl ? window.ttsUrl(hash) : 'audio/tts/' + hash + '.mp3';
-      _audio.playbackRate = 0.95;
+      _audio.playbackRate = 0.95 * (typeof getTtsSpeed === 'function' ? getTtsSpeed() : 1);
       // play() 被 stopAudio 中斷會 reject;若已停止(token 變了)就別 fallback 到瀏覽器語音(否則關掉後還繼續講)
       _audio.play().catch(() => { if (myToken === _playToken) speakBrowser(text, onEnd); else onEnd && onEnd(); });
     } else {
@@ -2987,7 +3002,7 @@ const DailyStory = (() => {
     if (!window.speechSynthesis) { onEnd && onEnd(); return; }
     speechSynthesis.cancel();
     const u = new SpeechSynthesisUtterance(text);
-    u.lang = 'ja-JP'; u.rate = 0.9;
+    u.lang = 'ja-JP'; u.rate = 0.9 * (typeof getTtsSpeed === 'function' ? getTtsSpeed() : 1);
     const voices = speechSynthesis.getVoices();
     const ja = voices.find(v => v.lang.startsWith('ja'));
     if (ja) u.voice = ja;
@@ -3688,7 +3703,7 @@ function renderVocab() {
     const verbBtn = d.c === '動' ? `<button class="verb-btn" onclick="event.stopPropagation();openVerbModal('${esc1(d.w)}','${esc1(d.r||'')}')" title="變化表">変</button>` : '';
     const ex = d.ex ? `<div class="vex" data-nolang data-j="${(''+d.ex.j).replace(/"/g,'&quot;')}" onclick="event.stopPropagation();speak(this.dataset.j)" title="${enOr('點例句聽發音','Tap to hear')}"><span class="exj">${window.furiganaHTML?window.furiganaHTML(d.ex.j):d.ex.j}<svg class="vex-spk" viewBox="0 0 24 24"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.54 8.46a5 5 0 010 7.07M19.07 4.93a10 10 0 010 14.14"/></svg></span><span class="exz">${enOr(d.ex.z,d.ex.e||'')}</span></div>` : '';
     return `<div class="vi" data-fid="${d.w}" data-w="${d.w}" data-r="${d.r||''}">`
-      + `<div class="vx-ctrl">${spkSvg}${verbBtn}<span class="vp">${catLabel(catName)}</span><svg class="star ${isFav?'on':''}" onclick="event.stopPropagation();toggleFav('${esc1(d.w)}')" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>`
+      + `<div class="vx-ctrl"><span class="vspd${getTtsSpeed() !== 1 ? ' on' : ''}" onclick="event.stopPropagation();cycleTtsSpeed()" title="${enOr('語音速度(點擊切換)', 'Audio speed (tap to cycle)')}">${getTtsSpeed() === 1 ? '1' : getTtsSpeed()}×</span>${spkSvg}${verbBtn}<span class="vp">${catLabel(catName)}</span><svg class="star ${isFav?'on':''}" onclick="event.stopPropagation();toggleFav('${esc1(d.w)}')" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>`
       + `<div class="vw">${d.w}</div>${d.w!==d.r?`<div class="vr">${d.r}</div>`:''}<div class="vm">${cvt(d.m)}</div>`
       + ex
       + `</div>`;
@@ -4404,6 +4419,7 @@ function toggleDetail(btn) {
 <script src="articles.js"></script>
 <script src="article-tokens.js"></script>
 <script src="article-timings.js"></script>
+<script src="grammar-words.js"></script>
 <script src="articles-ui.js"></script>
 <script src="kana.js"></script>
 <script src="kana-strokes.js"></script>

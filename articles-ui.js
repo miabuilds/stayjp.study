@@ -54,8 +54,18 @@ window.Articles = (function () {
       var eSurf = look(surf);
       var frd = (eSurf && eSurf.r) || t.r || '';    // furigana：VOCAB 人工讀音優先，否則 kuromoji 表層讀音
       var inner = rubyToken(surf, frd);
-      if (!t.k) return '<span class="aw">' + inner + '</span>';   // 非內容詞：可定位(逐詞高亮)但不可點
+      if (!t.k) {
+        // 非內容詞(助詞/助動詞/語尾)：查機能語字典,有解釋就可點(回饋:初學者最想知道は、を、ます是什麼)
+        var gd = window.JP_FUNC || {};
+        var g = gd[surf] || (t.b && gd[t.b]);
+        if (g) {
+          return '<span class="aw jlk" role="button" tabindex="0" data-w="' + esc(surf) + '" data-r="' + esc(g.r || frd)
+            + '" data-m="' + esc(Lc(g.m, g.e)) + '" data-c="' + esc(g.c || '') + '">' + inner + '</span>';
+        }
+        return '<span class="aw">' + inner + '</span>';
+      }
       var e = look(base) || eSurf;                  // 釋義：先查原形，再查表層
+      if (!e && window.kanaLookup) e = window.kanaLookup(base) || window.kanaLookup(surf);   // 假名詞 fallback
       var w = base, r = (e && e.r) || t.r || frd || '', m = e ? Lc(e.m, e.m_en) : '', c = (e && e.c) || '';
       var f = t.b ? enOr('活用形', 'conj.') : '';
       return '<span class="aw jlk" role="button" tabindex="0" data-w="' + esc(w) + '" data-r="' + esc(r)
@@ -63,10 +73,109 @@ window.Articles = (function () {
     }).join('');
   }
   // N5:用課文原有的空格切詞塊(人工分詞)當高亮單位,塊內沿用既有引擎(furigana+可點),保留可讀空格
+  // ── 每字可查:詞塊內若一個可點詞都沒有(N5 假名文最常見),整塊嘗試解析讓初學者點什麼都有答案 ──
+  var GODAN_MASU = { 'き': 'く', 'ぎ': 'ぐ', 'し': 'す', 'ち': 'つ', 'に': 'ぬ', 'び': 'ぶ', 'み': 'む', 'り': 'る', 'い': 'う' };
+  // て形/た形/たり形 → 辞書形候選（あらって→あらう、でて→でる、さんぽしたり→さんぽ(する)）
+  var CONJ_TAIL = [
+    ['ったり', ['う', 'つ', 'る']], ['んだり', ['ぬ', 'ぶ', 'む']], ['いたり', ['く']], ['したり', ['す', 'する', '']], ['たり', ['る']],
+    ['って', ['う', 'つ', 'る']], ['んで', ['ぬ', 'ぶ', 'む']], ['いて', ['く']], ['いで', ['ぐ']], ['して', ['す', 'する', '']],
+    ['った', ['う', 'つ', 'る']], ['んだ', ['ぬ', 'ぶ', 'む']], ['いた', ['く']], ['いだ', ['ぐ']], ['した', ['す', 'する', '']],
+    ['て', ['る']], ['た', ['る']]
+  ];
+  function unitData(u) {
+    var gd = window.JP_FUNC || {};
+    var kl = window.kanaLookup || function () { return null; };
+    var fl = window.furiLookup || function () { return null; };
+    function hit(word, extra) {
+      if (!word) return null;
+      var g = gd[word];
+      if (g) return { w: word, r: g.r || '', m: Lc(g.m, g.e), c: g.c || '', f: extra || '' };
+      var e = fl(word);                              // 漢字詞(ENTRY)
+      if (e && e.m) return { w: word, r: e.r || '', m: zc(e.m), c: e.c || '', f: extra || '' };
+      var ke = kl(word);                             // 假名詞/讀音
+      if (ke) return { w: ke.w, r: ke.r || word, m: zc(ke.m), c: ke.c || '', f: extra || '' };
+      if ((word[0] === 'お' || word[0] === 'ご') && word.length > 2) {   // 美化語接頭:おひる→ひる
+        var p = hit(word.slice(1), extra);
+        if (p) { p.f = (p.f ? p.f + ' ' : '') + '＋' + word[0]; return p; }
+      }
+      // 時間/數量詞（六時、七時半、十一時、三十分…）：字典沒有,規則給意思
+      var tm = word.match(/^[0-9０-９〇一二三四五六七八九十百]+(時半|時|分|月|年|円|歳|回|人|日)$/);
+      if (tm) {
+        var TIME = { '時': '～點(時間)', '時半': '～點半', '分': '～分(鐘)', '月': '～月', '年': '～年', '円': '～日圓', '歳': '～歲', '回': '～次', '人': '～(個)人', '日': '～日(日期/天數)' };
+        return { w: word, r: '', m: zc(TIME[tm[1]]), c: enOr('時間・數量', 'time/counter'), f: extra || '' };
+      }
+      return null;
+    }
+    function stems(word, extraBase) {
+      var d0 = hit(word, extraBase);
+      if (d0) return d0;
+      // ます形還原：たべます→たべる(一段)、いきます→いく(五段)
+      var mm = word.match(/^(.+?)(ます|ました|ません|ましょう)$/);
+      if (mm) {
+        var stem = mm[1], last = stem.slice(-1);
+        var cands = [stem + 'る'];
+        if (GODAN_MASU[last]) cands.push(stem.slice(0, -1) + GODAN_MASU[last]);
+        var fla = enOr('ます形', 'polite form');
+        for (var i = 0; i < cands.length; i++) { var h = hit(cands[i], fla); if (h) return h; }
+      }
+      // て/た/たり形還原
+      for (var t = 0; t < CONJ_TAIL.length; t++) {
+        var tail = CONJ_TAIL[t][0];
+        if (word.length > tail.length && word.slice(-tail.length) === tail) {
+          var st = word.slice(0, -tail.length), reps = CONJ_TAIL[t][1];
+          var flb = enOr('活用形', 'conjugated');
+          for (var r2 = 0; r2 < reps.length; r2++) {
+            var cand = reps[r2] === '' ? st : st + reps[r2];
+            var h2 = hit(cand, flb);
+            if (h2) return h2;
+          }
+        }
+      }
+      // 去尾助詞：1 字優先(しごとは→しごと)、避免 2 字的「とは」誤切；最多兩層(へも)
+      var P1 = ['は', 'が', 'を', 'に', 'で', 'へ', 'と', 'も', 'の', 'や', 'か', 'ね', 'よ'];
+      var P2 = ['から', 'まで', 'では', 'には', 'へは', 'でも', 'にも', 'とは'];
+      var l1 = word.slice(-1), l2 = word.slice(-2);
+      if (word.length > 1 && P1.indexOf(l1) >= 0) {
+        var w1 = word.slice(0, -1);
+        var ha = hit(w1, '＋' + l1); if (ha) return ha;
+        var l1b = w1.slice(-1);
+        if (w1.length > 1 && P1.indexOf(l1b) >= 0) { var hb = hit(w1.slice(0, -1), '＋' + l1b + l1); if (hb) return hb; }
+      }
+      if (word.length > 2 && P2.indexOf(l2) >= 0) { var hc = hit(word.slice(0, -2), '＋' + l2); if (hc) return hc; }
+      return null;
+    }
+    var core = u.replace(/[、。！？!?，,\s]/g, '');
+    if (!core) return null;
+    // 先剝敬體/斷定語尾（おいしいです→おいしい、九時からです→九時から）
+    var COP = ['ですか', 'でした', 'です', 'だった'];
+    for (var c2 = 0; c2 < COP.length; c2++) {
+      var cop = COP[c2];
+      if (core.length > cop.length && core.slice(-cop.length) === cop) {
+        var dc = stems(core.slice(0, -cop.length), '＋' + cop);
+        if (dc) return dc;
+      }
+    }
+    return stems(core, '');
+  }
   function frUnit(s) {
     var units = s.split(/\s+/).filter(Boolean);
     if (!units.length) return fr(s);
-    return units.map(function (u) { return '<span class="aw">' + fr(u) + '</span>'; }).join(' ');
+    return units.map(function (u) {
+      var h = fr(u);
+      if (h.indexOf('jlk') >= 0) return '<span class="aw">' + h + '</span>';
+      // 整塊沒有可點詞 → 以標點細分,每個子塊各自解析（「あらって、あさごはんを」→ あらって / あさごはんを）
+      var chunks = u.match(/[^、。！？!?，,]+|[、。！？!?，,]+/g) || [u];
+      return chunks.map(function (ck) {
+        if (/^[、。！？!?，,]+$/.test(ck)) return esc(ck);
+        var d = unitData(ck);
+        var ch = fr(ck);
+        if (d) {
+          return '<span class="aw jlk" role="button" tabindex="0" data-w="' + esc(d.w) + '" data-r="' + esc(d.r)
+            + '" data-m="' + esc(d.m) + '" data-c="' + esc(d.c) + '"' + (d.f ? ' data-f="' + esc(d.f) + '"' : '') + '>' + ch + '</span>';
+        }
+        return '<span class="aw">' + ch + '</span>';
+      }).join('');
+    }).join(' ');
   }
   // 「看過清單」記錄:用來算「有幾篇新文章」(開過清單就清紅標,非侵入式提醒)
   function seenSet() { try { return JSON.parse(localStorage.getItem('article_seen')) || {}; } catch (e) { return {}; } }
@@ -182,6 +291,7 @@ window.Articles = (function () {
       '.art-s.on.flat{background:rgba(232,115,74,.16)}',
       '.art-nofuri rt{display:none}',
       '.art-tr{font-size:14px;line-height:1.85;color:var(--tx2,#8a8a8a);margin:2px 0 16px;padding-left:12px;border-left:3px solid var(--bd,#e5e5e5)}',
+      '.art-tr-s{display:block;font-size:13px;margin:2px 0 12px;padding-left:12px;border-left:3px solid var(--bd,#e5e5e5)}',
       // vocab / grammar lists
       '.art-v{display:flex;align-items:center;gap:10px;padding:13px 8px;border-bottom:1px solid var(--bd,#eee);border-radius:10px}',
       '.art-v:last-child{border-bottom:none}',
@@ -361,15 +471,27 @@ window.Articles = (function () {
     var frFn = (a.level === 'n5') ? frUnit : frTok;
     var body = paras.map(function (p, pi) {
       var sents = p.match(/[^。！？]+[。！？]?/g) || [p];
-      var inner = sents.map(function (s) {
+      // 逐句對照:翻譯句數能跟日文句數對上 → 每句日文下面直接放自己的翻譯
+      // (回饋:初學者開翻譯後不知道哪句對哪句);對不上就退回原本的整段翻譯
+      var trWhole = trans[pi] ? String(Lc(trans[pi], (a.trans_en || [])[pi])) : '';
+      var trParts = null;
+      if (trWhole && sents.length > 1) {
+        var parts = trWhole.match(/[^。．.!！?？]+[。．.!！?？]?/g) || [];
+        if (parts.length === sents.length) trParts = parts;
+      }
+      var inner = sents.map(function (s, sj) {
         var clean = s.replace(/\s/g, '');
+        var sp;
         if (hasTts(clean)) {
           var idx = si++; sentSeq.push({ text: clean, i: idx });
-          return '<span class="art-s" id="artS' + idx + '" onclick="Articles.playFrom(' + idx + ')">' + frFn(s) + '</span>';
+          sp = '<span class="art-s" id="artS' + idx + '" onclick="Articles.playFrom(' + idx + ')">' + frFn(s) + '</span>';
+        } else {
+          sp = '<span class="art-s">' + frFn(s) + '</span>';
         }
-        return '<span class="art-s">' + frFn(s) + '</span>';
+        var trS = trParts ? '<span class="art-tr art-tr-s" style="display:' + (zhOn ? 'block' : 'none') + '">' + esc(trParts[sj].trim()) + '</span>' : '';
+        return sp + trS;
       }).join('');
-      var trHtml = trans[pi] ? '<div class="art-tr" style="display:' + (zhOn ? 'block' : 'none') + '">' + esc(Lc(trans[pi],(a.trans_en||[])[pi])) + '</div>' : '';
+      var trHtml = (!trParts && trWhole) ? '<div class="art-tr" style="display:' + (zhOn ? 'block' : 'none') + '">' + esc(trWhole) + '</div>' : '';
       return '<div class="art-para" style="font-size:' + FS[fsIdx] + '">' + inner + '</div>' + trHtml;
     }).join('');
     // 讀完往下:重點單字(橘) + 本篇文法(藍),同一頁對照,不用切分頁
