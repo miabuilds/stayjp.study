@@ -366,8 +366,19 @@ function backHome(){ stopExamTimer(); stopAu(); renderHome(); show('home'); }
 
 // ═══════════ 模擬試験 ═══════════
 // 組卷公式:照真題比例每題型抽 N 題;每題配秒算總時限。狀態全集中在 EX,結束必清 timer。
-const EXAM_COMP = [ ['kanji',5],['hyoki',5],['context',5],['para',3],['grammar',5],['order',3],['reading',2],['listening',2] ];
+// 照真題結構分四部;比例仿真題(文字語彙最多題、文法次之、読解聴解受題庫限)
+const EXAM_COMP = [ ['kanji',6],['hyoki',5],['context',5],['para',4],['grammar',5],['order',3],['reading',4],['listening',4] ];
 const SEC_TIME = { kanji:45, hyoki:45, context:45, para:45, grammar:60, order:60, reading:150, listening:60 };
+// 真題分部(過場卡用);計分歸科:LK=言語知識、RD=読解、LS=聴解
+const EXAM_PARTS = [
+  { name:'第1部 言語知識(文字・語彙)', types:['kanji','hyoki','context','para'] },
+  { name:'第2部 言語知識(文法)',       types:['grammar','order'] },
+  { name:'第3部 読解',                  types:['reading'] },
+  { name:'第4部 聴解',                  types:['listening'] },
+];
+const SCORE_CAT = { kanji:'LK',hyoki:'LK',context:'LK',para:'LK',grammar:'LK',order:'LK',reading:'RD',listening:'LS' };
+// 官方合格線:總分(180 滿分)+各科最低門檻。N5/N4 官方是「言語知識・読解」合併 120 分制。
+const PASS = { n5:{total:80},n4:{total:90},n3:{total:95},n2:{total:90},n1:{total:100} };
 let EX = null;          // {qs:[{q,pick(亂序後選項),ans(使用者選的索引|null)}], idx, timed, endAt, timer}
 let examTimed = true;
 
@@ -399,18 +410,24 @@ function startExam(){
   const byType = {};
   bank().forEach(q=>{ if(q.lv===lv){ (byType[q.t]=byType[q.t]||[]).push(q); } });
   const rec = getRec();
-  const qs = [];
+  const picked = {};   // type -> [{q,pick,ans}]
   for(const [t,n] of examComp()){
     // 沒做過的優先,再抽做過的補滿
     const fresh = shuffle((byType[t]||[]).filter(q=>!rec[q.id]));
     const done  = shuffle((byType[t]||[]).filter(q=>rec[q.id]));
-    for(const q of fresh.concat(done).slice(0,n)){
-      qs.push({ q, pick: shuffle(q.o.map((txt,i)=>({txt,ok:i===q.a}))), ans:null });
-    }
+    picked[t] = fresh.concat(done).slice(0,n).map(q=>({ q, pick: shuffle(q.o.map((txt,i)=>({txt,ok:i===q.a}))), ans:null }));
+  }
+  // 照真題分部排:每部開頭插過場卡(不算題),部內題目照題型順序
+  const qs = []; const flow = [];
+  for(const part of EXAM_PARTS){
+    const items = part.types.flatMap(t=>picked[t]||[]);
+    if(!items.length) continue;
+    flow.push({ part: part.name, count: items.length });
+    for(const it of items){ flow.push(it); qs.push(it); }
   }
   if(!qs.length) return;
   const secs = examSeconds(examComp());
-  EX = { qs, idx:0, timed:examTimed, endAt: examTimed? Date.now()+secs*1000 : 0, timer:null };
+  EX = { qs, flow, idx:0, timed:examTimed, endAt: examTimed? Date.now()+secs*1000 : 0, timer:null };
   if(examTimed){
     EX.timer = setInterval(tickExam, 500);
   }
@@ -431,29 +448,48 @@ function stopExamTimer(){ if(EX && EX.timer){ clearInterval(EX.timer); EX.timer=
 function renderExamQ(){
   if(!EX) return;
   stopAu();
-  const item = EX.qs[EX.idx], q = item.q;
+  const node = EX.flow[EX.idx];
+  // 過場卡:第◯部開頭(不算題)
+  if(node.part){
+    document.getElementById('examNum').textContent = '';
+    document.getElementById('examSec').textContent = '';
+    document.getElementById('examStem').innerHTML =
+      '<div style="text-align:center;padding:14px 0"><div style="font-family:var(--serif);font-size:22px;font-weight:700;margin-bottom:6px">'+esc(node.part)+'</div>'+
+      '<div class="muted">'+node.count+' 題'+(node.part.includes('聴解')?' · 真題聽力只播一次,盡量一次聽懂':'')+'</div></div>';
+    document.getElementById('examHint').textContent = '';
+    document.getElementById('examOpts').innerHTML = '<button class="opt" onclick="examNext()" style="justify-content:center;font-weight:700;color:var(--ac)">開始 →</button>';
+    return;
+  }
+  const item = node, q = item.q;
   const ty = TYPES.find(t=>t.k===q.t);
-  document.getElementById('examNum').textContent = (EX.idx+1)+' / '+EX.qs.length;
+  const qNo = EX.qs.indexOf(item)+1;
+  document.getElementById('examNum').textContent = qNo+' / '+EX.qs.length;
   document.getElementById('examSec').textContent = ty? (ty.tj+' · '+ty.tt):'';
   document.getElementById('examStem').innerHTML =
-    (q.t==='listening' ? '<button class="playbtn" onclick="playExamAu()">▶ 音声を聞く</button>' : '') + stem(q);
+    (q.t==='listening' ? '<button class="playbtn" onclick="playExamAu()">▶ もう一度聞く(真題只播一次)</button>' : '') + stem(q);
   document.getElementById('examHint').textContent = q.h || '';
   document.getElementById('examOpts').innerHTML = item.pick.map((o,i)=>
     `<button class="opt" onclick="examAnswer(${i})"><span class="no">${i+1}</span><span>${esc(o.txt)}</span></button>`).join('');
   if(q.t==='listening') playExamAu();
 }
+function examNext(){
+  if(!EX) return;
+  if(EX.idx < EX.flow.length-1){ EX.idx++; renderExamQ(); window.scrollTo(0,0); }
+  else finishExam(false);
+}
 function playExamAu(){
   if(!EX) return;
-  const q = EX.qs[EX.idx].q; if(!q.at) return;
+  const node = EX.flow[EX.idx]; if(node.part || !node.q.at) return;
   try{ if(_au){ _au.pause(); _au=null; } }catch(e){}
-  const hash = window.__TTS && window.__TTS[q.at];
+  const hash = window.__TTS && window.__TTS[node.q.at];
   if(hash){ _au = new Audio('audio/tts/'+hash+'.mp3'); _au.play().catch(()=>{}); }
 }
 function examAnswer(i){
-  if(!EX || EX.qs[EX.idx].ans!==null) return;   // 防重複作答
-  EX.qs[EX.idx].ans = i;
-  if(EX.idx < EX.qs.length-1){ EX.idx++; renderExamQ(); window.scrollTo(0,0); }
-  else finishExam(false);
+  if(!EX) return;
+  const node = EX.flow[EX.idx];
+  if(node.part || node.ans!==null) return;   // 過場卡不作答;防重複作答
+  node.ans = i;
+  examNext();   // 依 flow 前進(最後一題→交卷)
 }
 function confirmQuitExam(){
   if(!EX) return;
@@ -478,14 +514,63 @@ function finishExam(timeout){
   }
   saveRec(rec); saveWrong(w);
   pushHist({ d:today(), lv, t:'📝 模擬試験'+(timeout?'(時間到)':''), s:score, tot:qs.length });
-  // 成績畫面
-  const pct = Math.round(score/qs.length*100);
-  document.getElementById('exScore').textContent = score+' / '+qs.length;
-  document.getElementById('exSub').textContent = (timeout?'⏰ 時間到,自動交卷。':'')+(pct>=70?'合格圈內,穩住!':'看逐題回顧,錯的都有詳解。');
-  document.getElementById('exSecs').innerHTML = Object.entries(secStat).map(([t,s])=>{
-    const ty=TYPES.find(x=>x.k===t);
-    return `<div class="secline"><span class="sn">${ty?ty.tt:t}</span><span class="ss">${s.c} / ${s.n}</span></div>`;
-  }).join('');
+  // ── JLPT 換算分析 ──────────────────────────
+  // 依官方計分結構換算 180 分制:N3–N1 三科各 60(言語知識/読解/聴解,科別門檻 19);
+  // N5/N4 官方是「言語知識・読解」合併 120(門檻 38)+ 聴解 60(門檻 19)。
+  const cat = { LK:{c:0,n:0}, RD:{c:0,n:0}, LS:{c:0,n:0} };
+  for(const [t,s] of Object.entries(secStat)){ const c=SCORE_CAT[t]; cat[c].c+=s.c; cat[c].n+=s.n; }
+  const rate = x=> x.n? x.c/x.n : 0;
+  const twoSection = (lv==='n5'||lv==='n4');
+  let scaled=[], total=0;
+  if(twoSection){
+    const lkrd = { c:cat.LK.c+cat.RD.c, n:cat.LK.n+cat.RD.n };
+    scaled = [
+      { name:'言語知識・読解', got: Math.round(rate(lkrd)*120), max:120, min:38 },
+      { name:'聴解',           got: Math.round(rate(cat.LS)*60), max:60,  min:19 },
+    ];
+  } else {
+    scaled = [
+      { name:'言語知識(文字・語彙・文法)', got: Math.round(rate(cat.LK)*60), max:60, min:19 },
+      { name:'読解', got: Math.round(rate(cat.RD)*60), max:60, min:19 },
+      { name:'聴解', got: Math.round(rate(cat.LS)*60), max:60, min:19 },
+    ];
+  }
+  total = scaled.reduce((s,x)=>s+x.got,0);
+  const passLine = PASS[lv].total;
+  const allSecOk = scaled.every(x=>x.got>=x.min);
+  const passed = total>=passLine && allSecOk;
+  const verdict = passed? '🎉 合格圏!照官方標準這個成績會過'
+    : (total>=passLine? '⚠️ 總分過線,但有科目低於最低門檻(官方規定單科不到門檻就不合格)'
+    : '還差 '+(passLine-total)+' 分到合格線,看下面的弱點各個擊破');
+  // 弱點題型(正答率最低的前兩個)+ 對應工具建議
+  const ADVICE = { kanji:['多刷「漢字讀音」+單字卡','jlpt-drill.html'], hyoki:['多刷「漢字表記」+單字卡','jlpt-drill.html'],
+    context:['刷「語彙填空」+讀單字卡例句','jlpt-drill.html'], para:['刷「近義替換」+易混淆詞比較','compare/index.html'],
+    grammar:['刷「文法形式」+文法練習','app.html'], order:['刷「句子重組」抓語順感','jlpt-drill.html'],
+    reading:['刷「読解」+每天讀一篇文章閱讀','app.html'], listening:['刷「聴解」+聽力練習跟讀','app.html'] };
+  const weak = Object.entries(secStat).map(([t,s])=>({t, r:s.n?s.c/s.n:1, n:s.n}))
+    .filter(x=>x.n>0 && x.r<1).sort((a,b)=>a.r-b.r).slice(0,2);
+  // ── 畫面 ──
+  document.getElementById('exScore').textContent = total+' / 180';
+  document.getElementById('exSub').innerHTML =
+    (timeout?'⏰ 時間到,自動交卷。<br>':'')+
+    '<b>'+verdict+'</b><br><span class="muted">答對 '+score+' / '+qs.length+' 題 · '+lv.toUpperCase()+' 合格線 '+passLine+' 分(依官方比例換算,樣本數少僅供參考)</span>';
+  document.getElementById('exSecs').innerHTML =
+    scaled.map(x=>{
+      const pc = Math.round(x.got/x.max*100);
+      const ok = x.got>=x.min;
+      return `<div class="secline"><span class="sn">${x.name} <span class="muted">(門檻 ${x.min})</span></span><span class="ss" style="color:${ok?'var(--ok)':'var(--bad)'}">${x.got} / ${x.max}</span></div>
+        <div class="tbar" style="height:6px;margin:2px 0 6px"><i style="width:${pc}%;background:${ok?'var(--ac)':'var(--bad)'}"></i></div>`;
+    }).join('')
+    + '<div style="margin-top:12px;border-top:1px solid var(--bd);padding-top:10px"><b style="font-size:14px">📌 弱點分析</b>'
+    + (weak.length? weak.map(x=>{
+        const ty=TYPES.find(y=>y.k===x.t); const ad=ADVICE[x.t];
+        return `<div class="secline" style="border:0;padding:5px 0"><span class="sn">${ty?ty.tt:x.t}(正答率 ${Math.round(x.r*100)}%)</span><a href="${ad[1]}" style="color:var(--ac);font-size:13px">${ad[0]} →</a></div>`;
+      }).join('') : '<div class="muted" style="padding:5px 0">全部題型都全對,沒有弱點,超穩 💪</div>')
+    + '</div>'
+    + Object.entries(secStat).map(([t,s])=>{
+        const ty=TYPES.find(x=>x.k===t);
+        return `<div class="secline"><span class="sn muted">${ty?ty.tt:t}</span><span class="ss muted">${s.c} / ${s.n}</span></div>`;
+      }).join('');
   document.getElementById('exReview').innerHTML = qs.map((item,i)=>{
     const ok = item.ans!==null && item.pick[item.ans].ok;
     const yours = item.ans===null? '(未作答)': item.pick[item.ans].txt;
