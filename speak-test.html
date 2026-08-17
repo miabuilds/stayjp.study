@@ -160,22 +160,40 @@ async function submit(){
   try{
     const t = await auth.currentUser.getIdToken();
     const r = await fetch(FN_SPEAK,{ method:'POST', headers:{'Content-Type':'application/json',Authorization:'Bearer '+t}, body:JSON.stringify({ target:{jp:cur().jp,kana:cur().kana}, said }) });
-    const d = await r.json();
-    if(!r.ok){ fb.innerHTML='<div class="err">失敗:'+(d.error||r.status)+'</div>'; return; }
-    renderFb(d);
+    if(!r.ok){ let d={}; try{ d=await r.json(); }catch(e){} fb.innerHTML='<div class="err">失敗:'+(d.error||r.status)+'</div>'; return; }
+    // 串流:邊收邊解析渲染,分數第一行就先出現
+    const reader = r.body.getReader(); const dec = new TextDecoder(); let full='';
+    while(true){ const {done,value}=await reader.read(); if(done)break; full += dec.decode(value,{stream:true}); renderStream(full,false); }
+    renderStream(full,true);
   }catch(e){ fb.innerHTML='<div class="err">錯誤:'+e.message+'</div>'; }
 }
-function renderFb(d){
-  const sc = Number(d.score)||0;
-  const col = sc>=85?'var(--ok)':sc>=60?'var(--warn)':'var(--bad)';
+// 逐行輕結構 → 物件。串流中最後一行可能不完整,parse 不到就先略過,下一段補齊再顯示。
+function parseFb(text){
+  const o={points:[]};
+  for(const line of String(text).split('\n')){
+    const m=line.match(/^(SCORE|VERDICT|DIFF|POINT|CORRECTED|READING|TIP|ENCOURAGE):\s?(.*)$/);
+    if(!m)continue;
+    const v=(m[2]||'').trim();
+    if(m[1]==='POINT'){ const p=v.split('|'); o.points.push({ok:/✅|對|good/i.test(p[0]||''),label:(p[1]||'').trim(),note:(p[2]||'').trim()}); }
+    else o[m[1].toLowerCase()]=v;
+  }
+  return o;
+}
+function renderStream(text, done){
+  const d=parseFb(text);
+  const sc=Number(d.score)||0;
+  const col=sc>=85?'var(--ok)':sc>=60?'var(--warn)':'var(--bad)';
+  const head = d.score!=null
+    ? `<div class="fb-head"><div class="ring" style="background:${col}">${sc}</div>
+         <div><div class="verdict" style="color:${col}">${esc(d.verdict||'')}</div><div class="diff">${esc(d.diff||'')}</div></div></div>`
+    : '<div class="muted">AI 評分中…</div>';
   const pts = (d.points||[]).map(p=>`<div class="pt"><span class="ic">${p.ok?'✅':'⚠️'}</span><span class="lb">${esc(p.label||'')}</span><span>${esc(p.note||'')}</span></div>`).join('');
   document.getElementById('fbCard').innerHTML =
-    `<div class="fb-head"><div class="ring" style="background:${col}">${sc}</div>
-       <div><div class="verdict" style="color:${col}">${d.matched?'念得不錯!':'再修一下'}</div><div class="diff">${esc(d.diff||'')}</div></div></div>`
-    + pts
+    head + pts
     + (d.corrected?`<div class="corr">正確說法:<b>${esc(d.corrected)}</b><div class="r">${esc(d.reading||'')}</div></div>`:'')
     + (d.tip?`<div class="tip">💡 ${esc(d.tip)}</div>`:'')
-    + (d.encourage?`<div class="enc">${esc(d.encourage)}</div>`:'');
+    + (d.encourage?`<div class="enc">${esc(d.encourage)}</div>`:'')
+    + (!done && d.score!=null?'<div class="muted" style="margin-top:8px">…</div>':'');
 }
 function esc(s){ return String(s==null?'':s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
 
