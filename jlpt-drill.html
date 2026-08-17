@@ -240,7 +240,7 @@ function esc(s){ return String(s==null?'':s).replace(/[&<>]/g,c=>({'&':'&amp;','
 function stem(q){ return esc(q.q).replace(/【(.+?)】/g,'<u>$1</u>').replace(/\(\s*\)/g,'(　　)').replace(/\n/g,'<br>'); }
 function shuffle(a){ const x=a.slice(); for(let i=x.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [x[i],x[j]]=[x[j],x[i]]; } return x; }
 
-function show(id){ ['home','drill','result','records'].forEach(x=>document.getElementById(x).style.display=x===id?'block':'none'); window.scrollTo(0,0); }
+function show(id){ ['home','drill','result','records','exam','examResult'].forEach(x=>document.getElementById(x).style.display=x===id?'block':'none'); window.scrollTo(0,0); }
 
 function renderHome(){
   document.getElementById('lvtabs').innerHTML = LEVELS.map(l=>
