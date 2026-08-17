@@ -331,5 +331,41 @@
   window.furiAddEntries = addEntries;
   // 依詞查 VOCAB 釋義(供文章逐詞可點用):回 {r,m,c} 或 null。ENTRY 以含漢字的詞為 key。
   window.furiLookup = function (w) { try { return dict().ENTRY[w] || null; } catch (e) { return null; } };
+  // ── 假名查詢:以「讀音/純假名表記」為 key(ENTRY 只收含漢字詞,假名詞查不到 → 初學者讀 N5 假名文全點不了)。
+  // 同音詞(かみ=紙/神/髪)列前三個讓學習者自己對上下文。lazy build,vocab 檔載完後第一次查才建索引。
+  var __kanaDict = null;
+  function kanaDict() {
+    if (__kanaDict) return __kanaDict;
+    var K = Object.create(null);
+    ['VOCAB_N5', 'VOCAB_N4', 'VOCAB_N3', 'VOCAB_N2', 'VOCAB_N1'].forEach(function (lvl) {
+      var arr = window[lvl];
+      if (!Array.isArray(arr)) return;
+      arr.forEach(function (v) {
+        if (!(v && v.w && v.r)) return;
+        var keys = [v.r];
+        if (v.w !== v.r && /^[ぁ-ゖーァ-ヶ]+$/.test(v.w)) keys.push(v.w);   // 純假名/片假名表記也當 key
+        keys.forEach(function (key) { (K[key] || (K[key] = [])).push(v); });
+      });
+    });
+    __kanaDict = K;
+    return K;
+  }
+  window.kanaLookup = function (kana) {
+    try {
+      var list = kanaDict()[kana];
+      if (!list || !list.length) return null;
+      var seen = Object.create(null), uniq = [];   // 同詞出現在多級 vocab → 去重
+      list.forEach(function (v) { if (!seen[v.w]) { seen[v.w] = 1; uniq.push(v); } });
+      if (uniq.length === 1) {
+        var v = uniq[0];
+        return { w: v.w, r: v.r, m: v.m || '', c: v.c || '' };
+      }
+      return {   // 同音詞:列出候選讓學習者對上下文
+        w: kana, r: '',
+        m: uniq.slice(0, 3).map(function (v2) { return v2.w + '：' + (v2.m || ''); }).join('；'),
+        c: ''
+      };
+    } catch (e) { return null; }
+  };
   window.showToast = showToast;
 })();
