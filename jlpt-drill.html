@@ -65,6 +65,16 @@
   .rbtns button{font:inherit;font-size:14px;font-weight:600;border:1px solid var(--bd);background:var(--bg2);color:var(--tx);border-radius:10px;padding:10px 18px;cursor:pointer}
   .rbtns .pri{background:var(--ac);color:#fff;border-color:var(--ac)}
   .muted{color:var(--tx3);font-size:12.5px}
+  .tc .tbar{display:block;height:4px;background:var(--bg3);border-radius:4px;margin-top:5px;overflow:hidden}
+  .tc .tbar i{display:block;height:100%;background:var(--ac);border-radius:4px}
+  .rec-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px}
+  .rec-cell{background:var(--bg2);border:1px solid var(--bd);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:2px}
+  .rec-cell b{font-size:16px;color:var(--ac)} .rec-cell span{font-size:12.5px;color:var(--tx2)}
+  .hist-row{display:flex;gap:10px;align-items:center;background:var(--bg2);border:1px solid var(--bd);border-radius:10px;padding:9px 13px;margin-bottom:7px;font-size:13.5px}
+  .hist-row .hd2{color:var(--tx3);font-size:12px;width:74px;flex-shrink:0}
+  .hist-row .hl{font-weight:800;color:var(--ac);width:34px;flex-shrink:0}
+  .hist-row .ht{flex:1;color:var(--tx2)}
+  .hist-row .hs{font-weight:700;font-variant-numeric:tabular-nums}
   footer{padding:30px 0;text-align:center;color:var(--tx3);font-size:12.5px}
 </style>
 </head>
@@ -85,6 +95,7 @@
     <div class="lvtabs" id="lvtabs"></div>
     <div class="types" id="types"></div>
     <button class="wrongbtn" id="wrongBtn" onclick="startWrong()">📕 錯題本 — 重刷答錯的題(<span id="wrongCount">0</span>)</button>
+    <button class="wrongbtn" id="recBtn" onclick="showRecords()" style="display:none">📊 刷題紀錄 — 做過哪些題、正答率、場次歷史</button>
     <p class="muted" style="margin-top:14px">題庫持續增加中。發現任何題目有疑義,請用<a href="contact.html" style="color:var(--ac)">意見回饋</a>告訴我們,查證後立即修正。</p>
   </div>
 
@@ -107,6 +118,15 @@
     <button class="nextbtn" id="nextBtn" onclick="nextQ()">下一題 →</button>
   </div>
 
+  <!-- 刷題紀錄畫面 -->
+  <div id="records" style="display:none">
+    <div class="qbar">
+      <span class="qt">📊 刷題紀錄</span>
+      <button onclick="backHome()">返回</button>
+    </div>
+    <div id="recBody"></div>
+  </div>
+
   <!-- 結果畫面 -->
   <div id="result" style="display:none">
     <div class="rcard">
@@ -123,6 +143,7 @@
 </div>
 
 <script src="jlpt-questions.js"></script>
+<script src="jlpt-questions-gen.js"></script>
 <script>
 // ========== JLPT 刷題特區 ==========
 // 題庫在 jlpt-questions.js(window.JLPT_Q):精編靜態題,每題附詳解。
@@ -138,36 +159,70 @@ let lv = localStorage.getItem('jd_lv') || 'n5';
 let queue = [], qi = 0, score = 0, curType = null, isWrongMode = false;
 const WKEY = 'jd_wrong';   // 錯題本:{id:true}
 
-function bank(){ return (window.JLPT_Q||[]); }
+function bank(){ return (window.JLPT_Q||[]).concat(window.JLPT_Q_GEN||[]); }
 function getWrong(){ try{ return JSON.parse(localStorage.getItem(WKEY))||{}; }catch(e){ return {}; } }
 function saveWrong(w){ localStorage.setItem(WKEY, JSON.stringify(w)); }
+// ── 刷題紀錄:每題做過幾次/對幾次 + 場次歷史 ──
+const RKEY='jd_rec', HKEY='jd_hist';
+function getRec(){ try{ return JSON.parse(localStorage.getItem(RKEY))||{}; }catch(e){ return {}; } }
+function saveRec(r){ localStorage.setItem(RKEY, JSON.stringify(r)); }
+function getHist(){ try{ return JSON.parse(localStorage.getItem(HKEY))||[]; }catch(e){ return []; } }
+function pushHist(h){ const a=getHist(); a.unshift(h); localStorage.setItem(HKEY, JSON.stringify(a.slice(0,100))); }
+function today(){ const d=new Date(); return d.getFullYear()+'/'+(d.getMonth()+1)+'/'+d.getDate(); }
 
 function esc(s){ return String(s==null?'':s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
 // 題幹裡用【】標的目標詞 → 底線強調
 function stem(q){ return esc(q.q).replace(/【(.+?)】/g,'<u>$1</u>').replace(/\(\s*\)/g,'(　　)'); }
 function shuffle(a){ const x=a.slice(); for(let i=x.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [x[i],x[j]]=[x[j],x[i]]; } return x; }
 
-function show(id){ ['home','drill','result'].forEach(x=>document.getElementById(x).style.display=x===id?'block':'none'); window.scrollTo(0,0); }
+function show(id){ ['home','drill','result','records'].forEach(x=>document.getElementById(x).style.display=x===id?'block':'none'); window.scrollTo(0,0); }
 
 function renderHome(){
   document.getElementById('lvtabs').innerHTML = LEVELS.map(l=>
     `<div class="lvtab${l===lv?' on':''}" onclick="pickLv('${l}')">${l.toUpperCase()}</div>`).join('');
-  const counts = {};
-  bank().forEach(q=>{ if(q.lv===lv) counts[q.t]=(counts[q.t]||0)+1; });
+  const rec = getRec();
+  const counts = {}, doneC = {};
+  bank().forEach(q=>{ if(q.lv===lv){ counts[q.t]=(counts[q.t]||0)+1; if(rec[q.id]) doneC[q.t]=(doneC[q.t]||0)+1; } });
   document.getElementById('types').innerHTML = TYPES.map(t=>{
     const n = counts[t.k]||0;
     if(!n) return '';
-    return `<div class="type" onclick="startDrill('${t.k}')"><div class="tj">${t.tj}</div><div class="tt">${t.tt}</div><div class="td">${t.td}</div><div class="tc">${n} 題</div></div>`;
+    const d = doneC[t.k]||0;
+    return `<div class="type" onclick="startDrill('${t.k}')"><div class="tj">${t.tj}</div><div class="tt">${t.tt}</div><div class="td">${t.td}</div><div class="tc">已做 ${d} / ${n} 題${d?`<span class="tbar"><i style="width:${Math.round(d/n*100)}%"></i></span>`:''}</div></div>`;
   }).join('');
   const w = Object.keys(getWrong()).length;
   document.getElementById('wrongCount').textContent = w;
   document.getElementById('wrongBtn').style.display = w? 'block':'none';
+  document.getElementById('recBtn').style.display = Object.keys(rec).length? 'block':'none';
+}
+// ── 刷題紀錄畫面 ──
+function showRecords(){
+  const rec = getRec(); const hist = getHist();
+  // 各級統計:已做 / 總題 / 正答率
+  const per = {};
+  bank().forEach(q=>{ per[q.lv]=per[q.lv]||{tot:0,done:0,n:0,c:0}; per[q.lv].tot++;
+    const e=rec[q.id]; if(e){ per[q.lv].done++; per[q.lv].n+=e.n; per[q.lv].c+=e.c; } });
+  let html = '<div class="rec-grid">'+LEVELS.map(l=>{
+    const p=per[l]||{tot:0,done:0,n:0,c:0};
+    const acc = p.n? Math.round(p.c/p.n*100):0;
+    return `<div class="rec-cell"><b>${l.toUpperCase()}</b><span>${p.done} / ${p.tot} 題</span><span>${p.n?('正答率 '+acc+'%'):'—'}</span></div>`;
+  }).join('')+'</div>';
+  html += '<h3 style="font-size:15px;margin:18px 0 8px">最近場次</h3>';
+  html += hist.length? hist.slice(0,30).map(h=>
+    `<div class="hist-row"><span class="hd2">${h.d}</span><span class="hl">${h.lv==='wrong'?'📕':h.lv.toUpperCase()}</span><span class="ht">${esc(h.t)}</span><span class="hs">${h.s} / ${h.tot}</span></div>`).join('')
+    : '<div class="muted">還沒有紀錄,先刷一輪吧!</div>';
+  document.getElementById('recBody').innerHTML = html;
+  show('records');
 }
 function pickLv(l){ lv=l; localStorage.setItem('jd_lv',l); renderHome(); }
 
 function startDrill(tk){
   curType = TYPES.find(t=>t.k===tk); isWrongMode=false;
-  queue = shuffle(bank().filter(q=>q.lv===lv && q.t===tk));
+  // 沒做過的優先出,做過的排後面(各自組內亂序);一輪 20 題,刷得動也記得住
+  const rec = getRec();
+  const all = bank().filter(q=>q.lv===lv && q.t===tk);
+  const fresh = shuffle(all.filter(q=>!rec[q.id]));
+  const done  = shuffle(all.filter(q=>rec[q.id]));
+  queue = fresh.concat(done).slice(0, 20);
   if(!queue.length) return;
   qi=0; score=0;
   document.getElementById('drillTitle').textContent = lv.toUpperCase()+' · '+curType.tt;
@@ -203,6 +258,9 @@ function answer(el, ok){
   const w = getWrong();
   if(ok){ score++; if(isWrongMode){ delete w[q.id]; saveWrong(w);} }
   else { w[q.id]=true; saveWrong(w); }
+  // 每題紀錄:做過幾次 n、對幾次 c、最後日期
+  const rec = getRec(); const e = rec[q.id]||{n:0,c:0};
+  e.n++; if(ok) e.c++; e.last=today(); rec[q.id]=e; saveRec(rec);
   const v = document.getElementById('verdict');
   v.textContent = ok? '✅ 答對了!':'❌ 答錯了';
   v.className = 'verdict '+(ok?'ok':'ng');
@@ -219,6 +277,7 @@ function finish(){
   const pct = Math.round(score/queue.length*100);
   document.getElementById('rscore').textContent = score+' / '+queue.length;
   document.getElementById('rsub').textContent = pct>=80? '很穩!繼續保持 💪':(pct>=60? '不錯,錯題本再刷一輪就熟了':'先看詳解弄懂,錯題本等你 📕');
+  pushHist({ d:today(), lv:isWrongMode?'wrong':lv, t:isWrongMode?'錯題本':(curType?curType.tt:''), s:score, tot:queue.length });
   show('result');
 }
 function retrySame(){ if(isWrongMode) startWrong(); else if(curType) startDrill(curType.k); }
