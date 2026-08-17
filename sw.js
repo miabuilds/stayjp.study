@@ -1,4 +1,4 @@
-const CACHE_NAME = 'stayjp-v261';
+const CACHE_NAME = 'stayjp-v262';
 const ASSETS = [
   './',
   './index.html',
@@ -7,6 +7,7 @@ const ASSETS = [
   './verbs.html',
   './jlpt-drill.html',
   './jlpt-questions.js',
+  './jlpt-questions-gen.js',
   './contact.html',
   // vocab-n*.js / grammar-n*.js / confusables.js 移除：資料已搬 Firestore content/master，
   // 由 content-loader.js 取 + localStorage 快取
