@@ -126,6 +126,38 @@ for (const lv of ['n5', 'n4', 'n3', 'n2', 'n1']) {
   console.log(`${lv}: 候選 ${cands.length} → 生成 ${n}`);
 }
 
+// ═══ 表記(讀音→選正確漢字):漢字読み的反向,同樣由已驗證資料保證正確 ═══
+// 干擾項=同級其他真實單字的「漢字寫法」,且讀音必須不同於目標讀音(避免同音字造成
+// 「其實也說得通」的歧義)。優先挑「開頭讀音相同或共用一個漢字」的詞,像真題一樣迷惑。
+const TARGET_H = { n5: 100, n4: 100, n3: 110, n2: 110, n1: 90 };
+for (const lv of ['n5', 'n4', 'n3', 'n2', 'n1']) {
+  const all = W[lv].filter(v => v.w && v.r && HAS_KANJI.test(v.w) && v.w !== v.r);
+  const cands = shuf(all.filter(v => v.m && v.ex && v.ex.j && v.ex.j.includes(v.w) && !usedWords.has(v.w)));
+  let n = 0;
+  for (const v of cands) {
+    if (n >= TARGET_H[lv]) break;
+    // 干擾池:同級、讀音≠目標、字形不同、不出現在例句裡
+    const sameStart = [], shareKanji = [], rest = [];
+    for (const o of all) {
+      if (o.w === v.w || o.r === v.r || v.ex.j.includes(o.w)) continue;
+      if (o.r[0] === v.r[0]) sameStart.push(o);
+      else if ([...o.w].some(c => v.w.includes(c) && HAS_KANJI.test(c))) shareKanji.push(o);
+      else rest.push(o);
+    }
+    const pool = shuf(sameStart).concat(shuf(shareKanji)).concat(shuf(rest));
+    const picks = [];
+    const seenW = new Set([v.w]);
+    for (const o of pool) { if (!seenW.has(o.w)) { seenW.add(o.w); picks.push(o); if (picks.length >= 3) break; } }
+    if (picks.length < 3) continue;
+    const q = v.ex.j.replace(v.w, `【${v.r}】`) + '(どう書きますか)';
+    const x = `<b>${v.r}=${v.w}</b>(${v.m})。<br>` + picks.map(p => `「${p.w}」讀「${p.r}」(${p.m}),讀音對不上`).join(';') + '。'
+      + `<br><span style="opacity:.8">例句:${v.ex.z || ''}</span>`;
+    gen.push({ id: `h-${lv}-${String(n + 1).padStart(3, '0')}`, lv, t: 'hyoki', q, o: [v.w, picks[0].w, picks[1].w, picks[2].w], a: 0, x });
+    n++;
+  }
+  console.log(`${lv} 表記: 生成 ${n}`);
+}
+
 const banner = `// 自動生成的 JLPT 漢字読み題庫 — 由 scripts/gen-jlpt-questions.mjs 產生,不要手改。
 // 正解讀音來自已驗證的 vocab-n*.js;干擾項按語音規則變形(撞上真實讀音者已剔除 ${skippedReal} 個)。
 // 重新生成:node scripts/gen-jlpt-questions.mjs

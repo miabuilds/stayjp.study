@@ -149,10 +149,12 @@
 // 題庫在 jlpt-questions.js(window.JLPT_Q):精編靜態題,每題附詳解。
 const TYPES = [
   { k:'kanji',   tt:'漢字讀音', tj:'漢字読み',   td:'選出底線漢字的正確讀音' },
+  { k:'hyoki',   tt:'漢字表記', tj:'表記',       td:'選出假名對應的正確漢字' },
   { k:'context', tt:'語彙填空', tj:'文脈規定',   td:'選出最適合放進(　)的詞' },
-  { k:'grammar', tt:'文法形式', tj:'文法形式の判断', td:'選出文法上正確的說法' },
   { k:'para',    tt:'近義替換', tj:'言い換え類義', td:'選出意思最接近的說法' },
+  { k:'grammar', tt:'文法形式', tj:'文法形式の判断', td:'選出文法上正確的說法' },
   { k:'order',   tt:'句子重組', tj:'文の組み立て', td:'選出放在 ★ 位置的詞' },
+  { k:'reading', tt:'読解・短文', tj:'内容理解', td:'讀短文,選出正確答案' },
 ];
 const LEVELS = ['n5','n4','n3','n2','n1'];
 let lv = localStorage.getItem('jd_lv') || 'n5';
@@ -172,7 +174,7 @@ function today(){ const d=new Date(); return d.getFullYear()+'/'+(d.getMonth()+1
 
 function esc(s){ return String(s==null?'':s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
 // 題幹裡用【】標的目標詞 → 底線強調
-function stem(q){ return esc(q.q).replace(/【(.+?)】/g,'<u>$1</u>').replace(/\(\s*\)/g,'(　　)'); }
+function stem(q){ return esc(q.q).replace(/【(.+?)】/g,'<u>$1</u>').replace(/\(\s*\)/g,'(　　)').replace(/\n/g,'<br>'); }
 function shuffle(a){ const x=a.slice(); for(let i=x.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [x[i],x[j]]=[x[j],x[i]]; } return x; }
 
 function show(id){ ['home','drill','result','records'].forEach(x=>document.getElementById(x).style.display=x===id?'block':'none'); window.scrollTo(0,0); }
