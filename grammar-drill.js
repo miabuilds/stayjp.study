@@ -119,8 +119,8 @@ const GrammarDrill = (() => {
         </div>
         <div id="gdBack" style="display:none">
           <div style="font-size:18px;font-weight:700;margin-bottom:8px">${g.t}</div>
-          <div style="background:#FEF3C7;border-radius:7px;padding:8px 12px;font-size:14px;font-weight:600;color:#92400E;border-left:3px solid #D97706;margin:8px 0">${g.p}</div>
-          <div style="font-size:14px;color:var(--tx);margin:8px 0;line-height:1.7">${typeof cvt==='function'?cvt(g.ex):g.ex}</div>
+          <div style="background:#FEF3C7;border-radius:7px;padding:8px 12px;font-size:14px;font-weight:600;color:#92400E;border-left:3px solid #D97706;margin:8px 0">${window.linkGrammarTerms?window.linkGrammarTerms(g.p):g.p}</div>
+          <div style="font-size:14px;color:var(--tx);margin:8px 0;line-height:1.7">${(function(){var s=typeof cvt==='function'?cvt(g.ex):g.ex;return window.linkGrammarTerms?window.linkGrammarTerms(s):s;})()}</div>
           <div style="margin:8px 0;font-size:13px">${g.eg.map(e=>{
             const pureJ = e.j.replace(/<[^>]+>/g,'').replace(/'/g,"\\'");
             const spk = `<svg class="spk-inline" style="width:16px;height:16px;cursor:pointer;vertical-align:middle;margin-left:4px;stroke:#2563EB;fill:none;stroke-width:2;opacity:.7" onclick="event.stopPropagation();speak('${pureJ}')" viewBox="0 0 24 24"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.54 8.46a5 5 0 010 7.07M19.07 4.93a10 10 0 010 14.14"/></svg>`;
