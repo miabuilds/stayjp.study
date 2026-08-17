@@ -3,8 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>JLPT N5–N1 各級指南 — 要會什麼、怎麼準備｜StayJP 日本再留計劃</title>
-<meta name="description" content="JLPT 日本語能力試驗 N5 到 N1 各級程度、單字/文法量與準備方向一次看懂。StayJP 提供各級免費單字卡、文法與模擬考。">
+<title>JLPT N5–N1 各級指南 — 要會什麼、怎麼計分、怎麼準備｜StayJP 日本再留計劃</title>
+<meta name="description" content="JLPT 日本語能力試驗 N5 到 N1 各級程度、單字/文法量、合格分數、考試日期與準備方向一次看懂。含各級比較表與常見問題。StayJP 提供各級免費單字卡、文法、動詞變化與模擬考。">
+<link rel="canonical" href="https://stayjp.study/jlpt.html">
+<meta property="og:title" content="JLPT N5–N1 各級指南 — 要會什麼、怎麼準備">
+<meta property="og:description" content="各級程度、單字量、合格分、考試日期一次看懂。免費單字卡、文法與模擬考。">
+<meta property="og:type" content="article">
 <style>
   :root{ --bg:#F6F4EF;--bg2:#FFFFFF;--tx:#2C2C2C;--tx2:#6B6B6B;--tx3:#9A9A9A;--ac:#C6553B;--ac2:#D4654A;--bd:#E7E3DC;--serif:"Noto Serif TC","Songti TC",serif; }
   @media (prefers-color-scheme:dark){ :root{ --bg:#161615;--bg2:#211F1D;--tx:#EDEBE7;--tx2:#A7A29B;--tx3:#6E6A64;--ac:#E8734A;--ac2:#E8734A;--bd:#332F2B; }}
@@ -19,17 +23,40 @@
   .hero{padding:40px 0 8px}
   .eyebrow{color:var(--ac);font-weight:700;font-size:13px;letter-spacing:.12em;text-transform:uppercase}
   h1{font-family:var(--serif);font-size:clamp(28px,5.5vw,40px);line-height:1.2;margin:12px 0 12px;text-wrap:balance}
+  h2{font-family:var(--serif);font-size:clamp(21px,3.6vw,26px);line-height:1.3;margin:0 0 6px;text-wrap:balance}
   .lead{color:var(--tx2);font-size:17px;max-width:620px}
+  section.blk{margin-top:38px}
+  .blk>p{color:var(--tx2);font-size:15px;margin:8px 0}
+  .tablewrap{overflow-x:auto;margin:16px 0;border:1px solid var(--bd);border-radius:14px}
+  table{border-collapse:collapse;width:100%;font-size:13.5px;min-width:520px}
+  th,td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--bd);vertical-align:top}
+  thead th{background:var(--bg2);color:var(--tx);font-weight:700;white-space:nowrap}
+  tbody tr:last-child td{border-bottom:0}
+  td .lb{display:inline-block;background:var(--ac);color:#fff;border-radius:6px;padding:1px 8px;font-weight:700;font-size:13px}
+  td.n{white-space:nowrap;font-variant-numeric:tabular-nums;color:var(--tx2)}
   .lvl{background:var(--bg2);border:1px solid var(--bd);border-radius:16px;padding:20px 22px;margin-top:16px}
   .lvl .tag{display:inline-flex;align-items:center;gap:8px;font-family:var(--serif);font-weight:700;font-size:22px}
   .lvl .tag .b{background:var(--ac);color:#fff;border-radius:8px;padding:2px 10px;font-size:16px;font-family:-apple-system,sans-serif}
   .lvl .meta{font-size:13px;color:var(--tx3);margin:4px 0 10px}
   .lvl p{font-size:15px;color:var(--tx2);margin:6px 0}
+  .lvl .use{font-size:14px;color:var(--tx);margin:8px 0 2px}
+  .lvl .use b{color:var(--ac)}
   .lvl .sj{font-size:14px;border-left:3px solid var(--ac);padding-left:12px;margin-top:10px;color:var(--tx)}
-  .cta{display:flex;gap:12px;flex-wrap:wrap;margin:24px 0}
+  .card{background:var(--bg2);border:1px solid var(--bd);border-radius:14px;padding:16px 18px;margin-top:12px}
+  .card h3{font-size:15.5px;margin:0 0 4px}
+  .card p{font-size:14.5px;color:var(--tx2);margin:2px 0}
+  .faq{border-top:1px solid var(--bd);padding:16px 0}
+  .faq:first-of-type{border-top:0}
+  .faq h3{font-size:16px;margin:0 0 6px}
+  .faq p{font-size:14.5px;color:var(--tx2);margin:0}
+  .links{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
+  .links a{display:inline-flex;align-items:center;gap:6px;background:var(--bg2);border:1px solid var(--bd);border-radius:100px;padding:9px 16px;font-size:14px;color:var(--tx);text-decoration:none}
+  .links a:hover{border-color:var(--ac);color:var(--ac)}
+  .cta{display:flex;gap:12px;flex-wrap:wrap;margin:28px 0 8px}
   .btn{display:inline-flex;align-items:center;gap:8px;background:var(--ac);color:#fff;border-radius:100px;padding:13px 26px;font-size:15px;font-weight:600;text-decoration:none}
   .btn:hover{background:var(--ac2)}
-  footer{padding:34px 0;text-align:center;color:var(--tx3);font-size:13px;border-top:1px solid var(--bd);margin-top:24px}
+  .note{font-size:13px;color:var(--tx3);margin-top:14px}
+  footer{padding:34px 0;text-align:center;color:var(--tx3);font-size:13px;border-top:1px solid var(--bd);margin-top:32px}
   footer a{color:var(--tx2)}
   [data-t]{display:none}
   body[data-lang="zh"] [data-t="zh"]{display:revert}
@@ -41,6 +68,7 @@
   <header>
     <span class="logo" data-t="zh">日本再留計劃</span><span class="logo" data-t="en">StayJP</span>
     <span class="sp"></span>
+    <a href="index.html" data-t="zh">首頁</a><a href="index.html" data-t="en">Home</a>
     <a href="about.html" data-t="zh">關於</a><a href="about.html" data-t="en">About</a>
     <button class="langbtn" onclick="toggleLang()"><span data-t="zh">EN</span><span data-t="en">中文</span></button>
   </header>
@@ -48,27 +76,60 @@
   <div class="hero">
     <div class="eyebrow" data-t="zh">JLPT 各級指南</div><div class="eyebrow" data-t="en">JLPT Level Guide</div>
     <h1><span data-t="zh">N5 到 N1,每一關要會什麼</span><span data-t="en">What each JLPT level takes</span></h1>
-    <p class="lead"><span data-t="zh">日本語能力試驗(JLPT)分五級,N5 最基礎、N1 最高。下面是各級的大致程度與準備方向——StayJP 每一級的單字、文法、模考都能免費開始。</span><span data-t="en">The JLPT has five levels, from N5 (basic) to N1 (advanced). Here's roughly what each level involves and how to prepare — StayJP covers vocabulary, grammar, and mock exams for every level, free to start.</span></p>
+    <p class="lead"><span data-t="zh">日本語能力試驗(JLPT)分五級,N5 最基礎、N1 最高。這頁一次講清楚:各級的程度、單字量、合格分數、考試日期,還有現實中能拿來做什麼——StayJP 每一級的單字、文法、模考都能免費開始。</span><span data-t="en">The JLPT has five levels, from N5 (basic) to N1 (advanced). This page covers it all: each level's difficulty, vocabulary size, passing score, test dates, and what it's actually good for — and StayJP covers vocab, grammar, and mock exams for every level, free to start.</span></p>
   </div>
+
+  <!-- 快速比較表 -->
+  <section class="blk">
+    <h2><span data-t="zh">五級一次比較</span><span data-t="en">All five levels at a glance</span></h2>
+    <div class="tablewrap">
+      <table>
+        <thead>
+          <tr>
+            <th><span data-t="zh">級別</span><span data-t="en">Level</span></th>
+            <th><span data-t="zh">單字量</span><span data-t="en">Vocab</span></th>
+            <th><span data-t="zh">學習時數</span><span data-t="en">Study hrs</span></th>
+            <th><span data-t="zh">合格分(滿分180)</span><span data-t="en">Pass (of 180)</span></th>
+            <th><span data-t="zh">大致能做什麼</span><span data-t="en">Roughly enables</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><span class="lb">N5</span></td><td class="n">~800</td><td class="n">~100</td><td class="n">80</td><td><span data-t="zh">看懂假名與基礎漢字、日常簡單句</span><span data-t="en">Kana + basic kanji, simple sentences</span></td></tr>
+          <tr><td><span class="lb">N4</span></td><td class="n">~1,500</td><td class="n">~300</td><td class="n">90</td><td><span data-t="zh">理解貼近日常的基本會話與短文</span><span data-t="en">Everyday basics and short passages</span></td></tr>
+          <tr><td><span class="lb">N3</span></td><td class="n">~3,700</td><td class="n">~450</td><td class="n">95</td><td><span data-t="zh">讀懂一般文章、聽懂接近自然語速</span><span data-t="en">General texts, near-natural speech</span></td></tr>
+          <tr><td><span class="lb">N2</span></td><td class="n">~6,000</td><td class="n">~600</td><td class="n">90</td><td><span data-t="zh">報章與書面日語;留學/求職常見門檻</span><span data-t="en">News + formal Japanese; study/work bar</span></td></tr>
+          <tr><td><span class="lb">N1</span></td><td class="n">~10,000+</td><td class="n">~900</td><td class="n">100</td><td><span data-t="zh">抽象、專業、邏輯性較高的日語</span><span data-t="en">Abstract, specialized, logical texts</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="note"><span data-t="zh">※ 單字量與時數為常見估計,實際依母語與基礎而異(華語者因漢字優勢通常更快)。合格分為官方各級總分門檻,另各節有最低分要求(見下方計分說明)。</span><span data-t="en">※ Vocab and hours are common estimates and vary by background (Chinese speakers often move faster thanks to kanji). Passing scores are official overall thresholds; each section also has a minimum (see scoring below).</span></p>
+  </section>
+
+  <!-- 各級細節 -->
+  <section class="blk">
+    <h2><span data-t="zh">各級細節</span><span data-t="en">Level by level</span></h2>
 
   <div class="lvl">
     <div class="tag"><span class="b">N5</span><span data-t="zh">入門</span><span data-t="en">Beginner</span></div>
     <div class="meta" data-t="zh">約 800 單字・基礎文法・約 100 小時學習</div><div class="meta" data-t="en">~800 words · basic grammar · ~100 study hours</div>
     <p><span data-t="zh">能看懂平假名、片假名與基本漢字,理解日常簡單句子。剛學完五十音後的第一關。</span><span data-t="en">Read hiragana, katakana, and basic kanji; understand simple everyday sentences. The first milestone after kana.</span></p>
-    <div class="sj"><span data-t="zh">StayJP:N5 單字卡(附例句)、基礎文法(です/ます、助詞、て形)、N5 模考一套。</span><span data-t="en">On StayJP: N5 vocab cards with examples, core grammar (です/ます, particles, て-form), and an N5 mock exam.</span></div>
+    <p class="use"><span data-t="zh"><b>現實用途:</b>自我介紹、看懂菜單與標示、旅遊基本溝通。多數人 3–6 個月可達。</span><span data-t="en"><b>Good for:</b> self-intro, reading menus and signs, basic travel. Reachable in ~3–6 months.</span></p>
+    <div class="sj"><span data-t="zh">StayJP:N5 單字卡(附例句與朗讀)、基礎文法(です/ます、助詞、て形)、N5 模考一套。</span><span data-t="en">On StayJP: N5 vocab cards with examples and audio, core grammar (です/ます, particles, て-form), and an N5 mock exam.</span></div>
   </div>
 
   <div class="lvl">
     <div class="tag"><span class="b">N4</span><span data-t="zh">基礎</span><span data-t="en">Elementary</span></div>
     <div class="meta" data-t="zh">約 1,500 單字・基礎文法完整・約 300 小時</div><div class="meta" data-t="en">~1,500 words · full basic grammar · ~300 hours</div>
-    <p><span data-t="zh">能理解貼近日常的基本日語,讀懂較簡單的文章與對話。</span><span data-t="en">Understand everyday Japanese and read simpler passages and conversations.</span></p>
-    <div class="sj"><span data-t="zh">StayJP:N4 單字與文法(可能形、意向形、條件形、授受表現)、模考。</span><span data-t="en">On StayJP: N4 vocab and grammar (potential, volitional, conditional, giving/receiving), plus mock exams.</span></div>
+    <p><span data-t="zh">能理解貼近日常的基本日語,讀懂較簡單的文章與對話。動詞變化開始成主角。</span><span data-t="en">Understand everyday Japanese and read simpler passages and conversations. Verb conjugation becomes central.</span></p>
+    <p class="use"><span data-t="zh"><b>現實用途:</b>日常生活會話、看懂簡單通知與訊息;打工面試的入門線。</span><span data-t="en"><b>Good for:</b> daily conversation, simple notices and messages; entry bar for part-time interviews.</span></p>
+    <div class="sj"><span data-t="zh">StayJP:N4 單字與文法(可能形、意向形、條件形、授受表現)、動詞變化練習、模考。</span><span data-t="en">On StayJP: N4 vocab and grammar (potential, volitional, conditional, giving/receiving), verb-conjugation drills, plus mock exams.</span></div>
   </div>
 
   <div class="lvl">
     <div class="tag"><span class="b">N3</span><span data-t="zh">中級・門檻</span><span data-t="en">Intermediate</span></div>
     <div class="meta" data-t="zh">約 3,700 單字・中級文法・約 450 小時</div><div class="meta" data-t="en">~3,700 words · intermediate grammar · ~450 hours</div>
     <p><span data-t="zh">承上啟下的關鍵一級,能讀懂一定程度的日常文章、聽懂接近自然語速的對話。很多人卡在這裡。</span><span data-t="en">The pivotal middle level — read everyday texts and follow near-natural speech. Many learners plateau here.</span></p>
+    <p class="use"><span data-t="zh"><b>現實用途:</b>部分服務業與現場工作的最低要求;通往 N2 的必經站。</span><span data-t="en"><b>Good for:</b> minimum for some service/on-site jobs; the necessary stop before N2.</span></p>
     <div class="sj"><span data-t="zh">StayJP:N3 大量單字+例句、敬語入門與使役/受身文法、易混淆詞比較、模考。</span><span data-t="en">On StayJP: lots of N3 vocab with examples, keigo basics and causative/passive grammar, confusable-word comparisons, and mock exams.</span></div>
   </div>
 
@@ -76,6 +137,7 @@
     <div class="tag"><span class="b">N2</span><span data-t="zh">中上級</span><span data-t="en">Upper-intermediate</span></div>
     <div class="meta" data-t="zh">約 6,000 單字・進階文法・留學/求職常見門檻</div><div class="meta" data-t="en">~6,000 words · advanced grammar · common for study/work</div>
     <p><span data-t="zh">能讀懂報章、理解較正式與書面的日語。留學、在日求職常要求 N2 以上。</span><span data-t="en">Read newspapers and understand more formal, written Japanese. Often required for study or work in Japan.</span></p>
+    <p class="use"><span data-t="zh"><b>現實用途:</b>多數企業求職門檻、專門學校與大學入學參考;高度人材簽證加 10 分。</span><span data-t="en"><b>Good for:</b> hiring bar at many companies, school/university reference; +10 points for the HSP visa.</span></p>
     <div class="sj"><span data-t="zh">StayJP:N2 單字+例句、書面與慣用文法、模考;搭配 SRS 間隔複習衝刺。</span><span data-t="en">On StayJP: N2 vocab with examples, written/idiomatic grammar, mock exams — paired with SRS to push through.</span></div>
   </div>
 
@@ -83,10 +145,61 @@
     <div class="tag"><span class="b">N1</span><span data-t="zh">高級・最高級</span><span data-t="en">Advanced</span></div>
     <div class="meta" data-t="zh">約 10,000+ 單字・高階文法・最高等級</div><div class="meta" data-t="en">~10,000+ words · advanced grammar · highest level</div>
     <p><span data-t="zh">能理解各種場合、抽象與邏輯性較高的日語,讀懂評論、專業文章。</span><span data-t="en">Understand Japanese across contexts, including abstract and logical content, editorials, and specialized texts.</span></p>
+    <p class="use"><span data-t="zh"><b>現實用途:</b>專業職、醫療/法律等領域、部分研究所要求;高度人材簽證加 15 分。</span><span data-t="en"><b>Good for:</b> professional roles, fields like medicine/law, some grad programs; +15 points for the HSP visa.</span></p>
     <div class="sj"><span data-t="zh">StayJP:N1 大量單字+例句、高階句型、模考,適合長期衝刺與維持手感。</span><span data-t="en">On StayJP: extensive N1 vocab with examples, advanced structures, and mock exams for long-term prep and upkeep.</span></div>
   </div>
+  </section>
 
-  <p style="font-size:13px;color:var(--tx3);margin-top:14px"><span data-t="zh">※ 單字量與時數為常見估計,實際依個人基礎而異。</span><span data-t="en">※ Word counts and hours are common estimates; actual needs vary by background.</span></p>
+  <!-- 考試怎麼考、怎麼計分 -->
+  <section class="blk">
+    <h2><span data-t="zh">JLPT 怎麼考、怎麼計分?</span><span data-t="en">How the JLPT works and is scored</span></h2>
+    <div class="card">
+      <h3><span data-t="zh">📅 考試日期與報名</span><span data-t="en">📅 Dates & registration</span></h3>
+      <p><span data-t="zh">一年舉辦兩次,通常在 <b>7 月與 12 月</b>的第一個星期日(部分海外考區一年只有一次)。報名多在考前約 2–3 個月開放,名額有限、常會額滿,建議提早卡位。</span><span data-t="en">Held twice a year, usually the first Sunday of <b>July and December</b> (some overseas sites run once a year). Registration opens ~2–3 months ahead and can fill up — sign up early.</span></p>
+    </div>
+    <div class="card">
+      <h3><span data-t="zh">📝 考試內容</span><span data-t="en">📝 Sections</span></h3>
+      <p><span data-t="zh">分三大塊:<b>言語知識</b>(文字・語彙・文法)、<b>読解</b>(閱讀)、<b>聴解</b>(聽力)。N4、N5 把「言語知識+読解」合併計分;N1–N3 三塊分開計分。全程約 2–3 小時,依級別而定。</span><span data-t="en">Three areas: <b>Language Knowledge</b> (vocab/grammar), <b>Reading</b>, and <b>Listening</b>. N4/N5 combine Language Knowledge + Reading into one score; N1–N3 score all three separately. The test runs ~2–3 hours depending on level.</span></p>
+    </div>
+    <div class="card">
+      <h3><span data-t="zh">🎯 計分與合格</span><span data-t="en">🎯 Scoring & passing</span></h3>
+      <p><span data-t="zh">總分 0–180。除了要達到<b>整體合格分</b>(N5:80、N4:90、N3:95、N2:90、N1:100),<b>每一節也要過最低門檻</b>(各節約 19/60)。就算總分夠,只要有一節掛零式偏低也不合格——所以三科要平均顧,不能只拚單字。</span><span data-t="en">Total 0–180. You must clear both the <b>overall pass mark</b> (N5:80, N4:90, N3:95, N2:90, N1:100) <b>and</b> a <b>per-section minimum</b> (~19/60 each). A high total won't save you if one section falls below its floor — so balance all three, don't only grind vocab.</span></p>
+    </div>
+  </section>
+
+  <!-- 該考哪一級 -->
+  <section class="blk">
+    <h2><span data-t="zh">我該從哪一級開始?</span><span data-t="en">Which level should I aim for?</span></h2>
+    <p><span data-t="zh">沒有硬性順序,可以直接報你有把握的級別。常見情境:</span><span data-t="en">There's no forced order — register for the level you can handle. Common cases:</span></p>
+    <div class="card"><h3><span data-t="zh">剛學完五十音</span><span data-t="en">Just finished kana</span></h3><p><span data-t="zh">從 <b>N5</b> 打底,建立助詞、動詞變化與基本句型的感覺。</span><span data-t="en">Start at <b>N5</b> to build particles, verb forms, and basic sentence patterns.</span></p></div>
+    <div class="card"><h3><span data-t="zh">想留學 / 上專門學校</span><span data-t="en">Studying / vocational school</span></h3><p><span data-t="zh">目標多半是 <b>N2</b>;先過 N3 建立中級底子,再往 N2 衝。</span><span data-t="en">The usual target is <b>N2</b>; clear N3 first, then push to N2.</span></p></div>
+    <div class="card"><h3><span data-t="zh">在日就職 / 續簽</span><span data-t="en">Working / renewing a visa in Japan</span></h3><p><span data-t="zh"><b>N2 以上</b>較有優勢;高度人材簽證 N2 加 10 分、N1 加 15 分。</span><span data-t="en"><b>N2+</b> helps most; the HSP visa gives +10 for N2 and +15 for N1.</span></p></div>
+  </section>
+
+  <!-- 用 StayJP 準備 -->
+  <section class="blk">
+    <h2><span data-t="zh">用 StayJP 準備每一級</span><span data-t="en">Prep every level with StayJP</span></h2>
+    <p><span data-t="zh">全部免費開始,登入送 3 天全功能試用。挑一個工具直接練:</span><span data-t="en">Free to start; sign in for a 3-day full-feature trial. Pick a tool and go:</span></p>
+    <div class="links">
+      <a href="app.html">📚 <span data-t="zh">單字卡</span><span data-t="en">Vocab cards</span></a>
+      <a href="app.html">📝 <span data-t="zh">文法</span><span data-t="en">Grammar</span></a>
+      <a href="verbs.html">🔄 <span data-t="zh">動詞變化</span><span data-t="en">Verb conjugation</span></a>
+      <a href="phrases.html">🗣️ <span data-t="zh">生活會話</span><span data-t="en">Everyday phrases</span></a>
+      <a href="app.html">⏱️ <span data-t="zh">計時模擬考</span><span data-t="en">Timed mock exam</span></a>
+      <a href="howto.html">💡 <span data-t="zh">使用教學</span><span data-t="en">How to use</span></a>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="blk">
+    <h2><span data-t="zh">常見問題</span><span data-t="en">FAQ</span></h2>
+    <div class="faq"><h3><span data-t="zh">JLPT 一年考幾次?</span><span data-t="en">How often is the JLPT held?</span></h3><p><span data-t="zh">一年兩次,通常在 7 月與 12 月;部分海外考區一年只有一次。報名約在考前 2–3 個月開放。</span><span data-t="en">Twice a year, usually July and December; some overseas sites run once a year. Registration opens ~2–3 months before.</span></p></div>
+    <div class="faq"><h3><span data-t="zh">在日本工作要 N 幾?</span><span data-t="en">What level do I need to work in Japan?</span></h3><p><span data-t="zh">沒有統一標準,但多數企業求職以 <b>N2</b> 為常見門檻,專業職常要 N1。高度人材簽證:N2 加 10 分、N1 加 15 分。</span><span data-t="en">There's no single rule, but <b>N2</b> is a common hiring bar and professional roles often want N1. HSP visa: +10 for N2, +15 for N1.</span></p></div>
+    <div class="faq"><h3><span data-t="zh">從零到 N2 要多久?</span><span data-t="en">How long from zero to N2?</span></h3><p><span data-t="zh">因人而異,常見估計是 <b>600 小時以上</b>的有效學習。華語母語者因漢字優勢,閱讀通常較快,但聽力與文法仍需扎實累積。</span><span data-t="en">It varies; a common estimate is <b>600+ hours</b> of effective study. Chinese speakers often read faster thanks to kanji, but listening and grammar still take steady work.</span></p></div>
+    <div class="faq"><h3><span data-t="zh">一定要按 N5→N1 順序考嗎?</span><span data-t="en">Do I have to take them in order?</span></h3><p><span data-t="zh">不用。可以直接報你有把握的級別,很多人第一次就考 N3 或 N2。</span><span data-t="en">No. Register for whatever level you can handle — many people start at N3 or N2.</span></p></div>
+    <div class="faq"><h3><span data-t="zh">總分夠了卻沒過,為什麼?</span><span data-t="en">I hit the total but still failed — why?</span></h3><p><span data-t="zh">因為每一節都有最低分門檻(各節約 19/60)。只要有一節低於門檻,即使總分達標也不合格。三科要平均準備。</span><span data-t="en">Each section has a minimum (~19/60). Fall below it in any one section and you fail even with a passing total. Balance all three.</span></p></div>
+    <div class="faq"><h3><span data-t="zh">StayJP 準備要付費嗎?</span><span data-t="en">Does StayJP cost money?</span></h3><p><span data-t="zh">免費就能開始,登入再送 3 天全功能試用;之後可選付費解鎖全部單字、文法與模考。</span><span data-t="en">Free to start, with a 3-day full-feature trial after signing in; a paid plan unlocks all vocab, grammar, and mock exams.</span></p></div>
+  </section>
 
   <div class="cta">
     <a class="btn" href="app.html"><span data-t="zh">選你的等級,開始學 →</span><span data-t="en">Pick your level and start →</span></a>
@@ -94,11 +207,26 @@
 
   <footer>
     日本再留計劃 (StayJP) ·
+    <a href="index.html" data-t="zh">首頁</a><a href="index.html" data-t="en">Home</a> ·
     <a href="about.html" data-t="zh">關於</a><a href="about.html" data-t="en">About</a> ·
     <a href="howto.html" data-t="zh">使用教學</a><a href="howto.html" data-t="en">How to use</a> ·
     <a href="pricing.html" data-t="zh">方案</a><a href="pricing.html" data-t="en">Pricing</a>
   </footer>
 </div>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {"@type":"Question","name":"JLPT 一年考幾次?","acceptedAnswer":{"@type":"Answer","text":"一年兩次,通常在 7 月與 12 月;部分海外考區一年只有一次。報名約在考前 2–3 個月開放。"}},
+    {"@type":"Question","name":"在日本工作要 JLPT N 幾?","acceptedAnswer":{"@type":"Answer","text":"沒有統一標準,但多數企業求職以 N2 為常見門檻,專業職常要 N1。高度人材簽證:N2 加 10 分、N1 加 15 分。"}},
+    {"@type":"Question","name":"從零到 JLPT N2 要多久?","acceptedAnswer":{"@type":"Answer","text":"因人而異,常見估計是 600 小時以上的有效學習。華語母語者因漢字優勢閱讀通常較快,但聽力與文法仍需扎實累積。"}},
+    {"@type":"Question","name":"一定要按 N5 到 N1 順序考嗎?","acceptedAnswer":{"@type":"Answer","text":"不用。可以直接報你有把握的級別,很多人第一次就考 N3 或 N2。"}},
+    {"@type":"Question","name":"JLPT 總分夠了卻沒過,為什麼?","acceptedAnswer":{"@type":"Answer","text":"因為每一節都有最低分門檻(各節約 19/60)。只要有一節低於門檻,即使總分達標也不合格。三科要平均準備。"}}
+  ]
+}
+</script>
 <script>
   function setLang(l){ document.body.setAttribute('data-lang', l); document.documentElement.lang = l==='en'?'en':'zh-Hant'; try{ localStorage.setItem('stayjp_about_lang', l); }catch(e){} }
   function toggleLang(){ setLang(document.body.getAttribute('data-lang')==='zh'?'en':'zh'); }

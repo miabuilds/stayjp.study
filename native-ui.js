@@ -20,6 +20,25 @@
   if (window.__stayjpNativeUI) return;      // 防重複載入
   window.__stayjpNativeUI = true;
 
+  // ── 網頁裝置偵測:讓「下載 App」鈕依裝置顯示對的商店 ──
+  // iOS 手機/平板 → 只顯示 App Store 鈕;Android → 只顯示 Google Play 鈕;桌機 → 兩個都顯示。
+  // 用法:兩顆鈕分別加 class="app-ios" / class="app-android"(含 <span data-t> 中英文字)。
+  // 原生 App 內另由下方 apply() 把兩家商店鈕一律隱藏(在 App 內叫人下載 App 很多餘)。
+  (function detectWebDevice() {
+    var ua = navigator.userAgent || '';
+    var isIOS = /iPhone|iPad|iPod/i.test(ua) || (/Macintosh/.test(ua) && typeof document !== 'undefined' && 'ontouchend' in document); // iPadOS 會偽裝成 Mac
+    var isAndroid = /Android/i.test(ua);
+    var root = document.documentElement;
+    root.classList.add(isIOS ? 'stayjp-dev-ios' : isAndroid ? 'stayjp-dev-android' : 'stayjp-dev-desktop');
+    var css = document.createElement('style');
+    css.textContent =
+      '.app-ios,.app-android{display:none}' +
+      'html.stayjp-dev-ios .app-ios{display:inline-flex}' +
+      'html.stayjp-dev-android .app-android{display:inline-flex}' +
+      'html.stayjp-dev-desktop .app-ios,html.stayjp-dev-desktop .app-android{display:inline-flex}';
+    (document.head || document.documentElement).appendChild(css);
+  })();
+
   var applied = false;
 
   function nativeInfo() {
