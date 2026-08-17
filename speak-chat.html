@@ -57,6 +57,13 @@
   .rec.on{background:var(--bad);color:#fff;border-color:var(--bad)}
   .muted{color:var(--ink3);font-size:12px;margin-top:6px}
   .err{color:var(--bad);font-size:13px;margin-top:6px}
+  .hints{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:10px}
+  .hints-lb{width:100%;font-size:12px;color:var(--ink3);margin-bottom:-2px}
+  .hint-chip{background:var(--soft);border:1px solid var(--accent);color:var(--ink);border-radius:14px;padding:7px 12px;font-size:14px;cursor:pointer;text-align:left;line-height:1.45;font-family:inherit}
+  .hint-chip:hover{background:var(--accent);color:#fff}
+  .hint-chip .hz{display:block;font-size:11px;opacity:.72;margin-top:1px}
+  .hint-chip:hover .hz{color:#fff;opacity:.9}
+  .cnbtn.off{opacity:.5;text-decoration:line-through}
 
   /* 點評 */
   .review{background:var(--panel);border:1px solid var(--line);border-radius:16px;box-shadow:var(--sh);padding:18px;margin-top:8px}
@@ -90,11 +97,13 @@
   <div id="chat" style="display:none">
     <div class="chatbar">
       <span class="ttl" id="chatTtl"></span>
+      <button class="btn sm cnbtn" id="cnBtn" onclick="toggleZh()" title="關掉中文,只靠日文和語音理解,練聽力">中文</button>
       <button class="btn sm" onclick="endChat()">結束・看點評</button>
       <button class="btn sm" onclick="backToPick()">換主題</button>
     </div>
     <div class="msgs" id="msgs"></div>
     <div class="inbar">
+      <div class="hints" id="hints"></div>
       <div class="inrow">
         <button id="recBtn" class="btn rec" onclick="toggleRec()">🎤</button>
         <textarea id="say" class="say" rows="1" placeholder="用說的或打字…"></textarea>
@@ -151,6 +160,8 @@ let activeLv = 'N4';
 let scene = null;
 let history = [];      // {role:'ai'|'me', text, kana, zh, coach}
 let busy = false;
+let showZh = true;     // 對話中是否顯示中文翻譯;關掉 → 只靠日文+語音理解,練聽力
+function toggleZh(){ showZh=!showZh; const b=document.getElementById('cnBtn'); if(b) b.classList.toggle('off',!showZh); renderMsgs(); }
 
 // ── 畫面切換 ──
 function show(id){ ['pick','chat','review'].forEach(x=>document.getElementById(x).style.display = x===id?'block':'none'); }
@@ -199,20 +210,35 @@ function aiBubble(m){
   return `<div class="msg ai"><div class="bubble ai">
     <div class="bjp"><span>${esc(jp)||'…'}</span>${jp?`<button class="spk" title="播放" onclick="playTTS(${JSON.stringify(jp).replace(/"/g,'&quot;')})">🔊</button>`:''}</div>
     ${m.kana?`<div class="bkana">${esc(m.kana)}</div>`:''}
-    ${m.zh?`<div class="bzh">${esc(m.zh)}</div>`:''}
+    ${(showZh && m.zh)?`<div class="bzh">${esc(m.zh)}</div>`:''}
   </div></div>`;
 }
 
 // 解析逐行輕結構
 function parseTurn(text){
-  const o={jp:'',kana:'',zh:'',coach:''};
+  const o={jp:'',kana:'',zh:'',coach:'',hints:[]};
   for(const line of String(text).split('\n')){
-    const m=line.match(/^(JP|KANA|ZH|COACH):\s?(.*)$/);
-    if(!m)continue;
-    o[m[1].toLowerCase()] = (m[2]||'').trim();
+    let m=line.match(/^(JP|KANA|ZH|COACH):\s?(.*)$/);
+    if(m){ o[m[1].toLowerCase()] = (m[2]||'').trim(); continue; }
+    m=line.match(/^HINT:\s?(.*)$/);
+    if(m){ const v=(m[1]||'').trim(); if(v) o.hints.push(v); }
   }
+  // COACH 有時會吐 <blank>/空白/無 之類佔位字 → 當作沒有提點
+  if(/^<?\s*(blank|空白?|無|なし|null|none|n\/a|[-—―])\s*>?$/i.test(o.coach)) o.coach='';
   return o;
 }
+// 「你可以這樣回」建議;點了填進輸入框讓你可再改
+function renderHints(hints){
+  const box=document.getElementById('hints'); if(!box) return;
+  if(!hints || !hints.length){ box.innerHTML=''; return; }
+  box.innerHTML = '<div class="hints-lb">💬 不知道怎麼接?可以這樣回(點了會填入,可再改):</div>' +
+    hints.slice(0,3).map(h=>{
+      const parts=String(h).split(/[｜|]/); const jp=(parts[0]||'').trim(); const zh=(parts[1]||'').trim();
+      if(!jp) return '';
+      return '<button class="hint-chip" onclick="useHint('+JSON.stringify(jp).replace(/"/g,'&quot;')+')">'+esc(jp)+(zh?'<span class="hz">'+esc(zh)+'</span>':'')+'</button>';
+    }).join('');
+}
+function useHint(jp){ const el=document.getElementById('say'); el.value=jp; autoGrow(); el.focus(); }
 
 async function turn(){
   if(busy) return; busy=true; setBusy(true);
@@ -226,7 +252,8 @@ async function turn(){
     const ai=parseTurn(full); ai.role='ai';
     history.push(ai);
     renderMsgs();
-    if(ai.jp) playTTS(ai.jp, scene.voice);   // 自動朗讀 AI 回話
+    renderHints(ai.hints);                    // 給「你可以這樣回」的建議
+    if(ai.jp) playTTS(ai.jp, scene.voice);    // 自動朗讀 AI 回話
   }catch(e){ renderMsgs(); appendErr(e.message); }
   finally{ busy=false; setBusy(false); }
 }
@@ -239,6 +266,7 @@ function sendMine(){
   stopRec();
   history.push({ role:'me', text:txt });
   el.value=''; autoGrow();
+  renderHints([]);   // 你已經回了 → 清掉上一輪建議
   renderMsgs();
   turn();
 }
@@ -284,9 +312,11 @@ function renderReview(text, done){
 function resumeChat(){ show('chat'); renderMsgs(); }
 
 // ── 雲端語音 TTS ──
-let _audio=null, _ttsCache={};
+// 防重複疊播:每次呼叫拿一個序號,先停掉正在播的;fetch 回來後若期間又有新的播放請求就放棄自己。
+let _audio=null, _ttsCache={}, _ttsSeq=0;
 async function playTTS(text, voice){
-  try{ if(_audio){ _audio.pause(); _audio=null; } }catch(e){}
+  const seq=++_ttsSeq;
+  try{ if(_audio){ _audio.pause(); _audio.currentTime=0; _audio=null; } }catch(e){}
   const key=(voice||'f')+'|'+text;
   try{
     let b64=_ttsCache[key];
@@ -297,6 +327,7 @@ async function playTTS(text, voice){
       if(!r.ok || !d.audio) return;   // 靜默失敗,不打斷對話
       b64=d.audio; _ttsCache[key]=b64;
     }
+    if(seq!==_ttsSeq) return;         // 期間又有人按/自動播 → 放棄,只留最新那次
     _audio=new Audio('data:audio/mp3;base64,'+b64); _audio.play().catch(()=>{});
   }catch(e){}
 }
