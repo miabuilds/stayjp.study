@@ -96,6 +96,7 @@ const CATS = [
   { k:'trans',  ic:'🚉', zh:'交通',    en:'Getting around' },
   { k:'shop',   ic:'🛍️', zh:'購物',    en:'Shopping' },
   { k:'hotel',  ic:'🏨', zh:'住宿',    en:'Hotel' },
+  { k:'life',   ic:'🏛️', zh:'生活手續', en:'Daily errands' },
   { k:'help',   ic:'🆘', zh:'緊急求助', en:'Help & health' },
   { k:'social', ic:'🗣️', zh:'寒暄社交', en:'Social & basics' },
 ];
@@ -227,6 +228,88 @@ const SCENES = [
     { w:'🙋', side:'me', jp:'日本語がわかりません。', rm:'Nihongo ga wakarimasen.', zh:'我不懂日文。', en:"I don't understand Japanese." },
     { w:'🙋', side:'me', jp:'英語できますか？', rm:'Eigo dekimasu ka?', zh:'你會說英文嗎？', en:'Do you speak English?' },
   ], tipZh:'這幾句學起來,卡住時都能救場 🙌', tipEn:'Memorize these — they’ll bail you out anytime 🙌' },
+
+  // ── 吃喝(追加)──────────────────────────
+  { cat:'food', ic:'🍜', bg:'var(--ac)', zh:'拉麵店・售票機', en:'Ramen shop (ticket machine)', lines:[
+    { w:'🧑‍🍳', side:'you', jp:'券売機で食券を買ってください。', rm:'Kenbaiki de shokken o katte kudasai.', zh:'請在售票機買餐券。', en:'Please buy a meal ticket at the machine.' },
+    { w:'🙋', side:'me', jp:'すみません、味は選べますか？', rm:'Sumimasen, aji wa erabemasu ka?', zh:'不好意思,口味可以選嗎？', en:'Excuse me, can I choose the flavor?' },
+    { w:'🧑‍🍳', side:'you', jp:'麺の硬さはどうしますか？', rm:'Men no katasa wa dō shimasu ka?', zh:'麵條要幾分硬？', en:'How firm would you like the noodles?' },
+    { w:'🙋', side:'me', jp:'普通でお願いします。', rm:'Futsū de onegaishimasu.', zh:'普通就好。', en:'Normal, please.' },
+    { w:'🙋', side:'me', jp:'替え玉お願いします。', rm:'Kaedama onegaishimasu.', zh:'我要加麵。', en:'Extra noodles, please.' },
+  ], tipZh:'很多拉麵店先在「券売機(けんばいき)」買食券再入座;加麵叫「替え玉(かえだま)」。', tipEn:'Many ramen shops use a ticket machine (kenbaiki) first; refill noodles = "kaedama".' },
+
+  // ── 交通(追加)──────────────────────────
+  { cat:'trans', ic:'🚌', bg:'var(--blue)', zh:'搭公車', en:'Taking the bus', lines:[
+    { w:'🙋', side:'me', jp:'このバス、東京駅に行きますか？', rm:'Kono basu, Tōkyō-eki ni ikimasu ka?', zh:'這班公車有到東京車站嗎？', en:'Does this bus go to Tokyo Station?' },
+    { w:'🧑‍✈️', side:'you', jp:'後ろのドアからお乗りください。', rm:'Ushiro no doa kara o-nori kudasai.', zh:'請從後門上車。', en:'Please board from the rear door.' },
+    { w:'🙋', side:'me', jp:'料金はいくらですか？', rm:'Ryōkin wa ikura desu ka?', zh:'車資多少錢？', en:'How much is the fare?' },
+    { w:'🙋', side:'me', jp:'両替できますか？', rm:'Ryōgae dekimasu ka?', zh:'可以換零錢嗎？', en:'Can I get change?' },
+    { w:'🧑‍✈️', side:'you', jp:'次、止まります。', rm:'Tsugi, tomarimasu.', zh:'下一站停車。', en:'Stopping at the next stop.' },
+  ], tipZh:'日本公車常「後門上、前門下」;沒零錢可在車上「両替(りょうがえ)」。', tipEn:'Buses often board at the rear, exit at the front; no coins? Use the on-board change machine (ryōgae).' },
+
+  // ── 購物(追加)──────────────────────────
+  { cat:'shop', ic:'🧾', bg:'var(--green)', zh:'退稅(免稅)', en:'Tax-free shopping', lines:[
+    { w:'🙋', side:'me', jp:'免税でお願いできますか？', rm:'Menzei de onegai dekimasu ka?', zh:'可以幫我辦免稅嗎？', en:'Can I get this tax-free?' },
+    { w:'🧑‍💼', side:'you', jp:'パスポートを見せてください。', rm:'Pasupōto o misete kudasai.', zh:'請出示護照。', en:'Your passport, please.' },
+    { w:'🙋', side:'me', jp:'いくら以上で免税になりますか？', rm:'Ikura ijō de menzei ni narimasu ka?', zh:'消費多少以上才能免稅？', en:"What's the minimum for tax-free?" },
+    { w:'🧑‍💼', side:'you', jp:'こちらの袋は開けないでください。', rm:'Kochira no fukuro wa akenaide kudasai.', zh:'這個密封袋請勿拆封。', en:"Please don't open this sealed bag." },
+  ], tipZh:'免税(めんぜい)要帶護照、當天達門檻;密封的商品離境前別拆。', tipEn:'Tax-free (menzei) needs your passport and a same-day minimum; keep sealed bags closed until you leave.' },
+
+  // ── 住宿(追加)──────────────────────────
+  { cat:'hotel', ic:'♨️', bg:'var(--ac)', zh:'溫泉旅館', en:'Hot-spring inn (ryokan)', lines:[
+    { w:'🙋', side:'me', jp:'温泉は何時まで入れますか？', rm:'Onsen wa nan-ji made hairemasu ka?', zh:'溫泉開放到幾點？', en:'Until what time is the hot spring open?' },
+    { w:'🙋', side:'me', jp:'夕食は部屋で食べられますか？', rm:'Yūshoku wa heya de taberaremasu ka?', zh:'晚餐可以在房間吃嗎？', en:'Can we have dinner in the room?' },
+    { w:'🧑‍💼', side:'you', jp:'浴衣のサイズはいかがですか？', rm:'Yukata no saizu wa ikaga desu ka?', zh:'浴衣的尺寸還合適嗎？', en:"How's the size of your yukata?" },
+    { w:'🙋', side:'me', jp:'貴重品を預かってもらえますか？', rm:'Kichōhin o azukatte moraemasu ka?', zh:'貴重物品可以幫忙保管嗎？', en:'Could you keep my valuables?' },
+  ], tipZh:'溫泉旅館常附「夕食(ゆうしょく)」;泡湯前換上「浴衣(ゆかた)」。', tipEn:'Ryokan often include dinner (yūshoku); change into a yukata before the bath.' },
+
+  // ── 生活手續 ────────────────────────────
+  { cat:'life', ic:'🏛️', bg:'var(--blue)', zh:'市役所辦手續', en:'City hall paperwork', lines:[
+    { w:'🙋', side:'me', jp:'すみません、転入の手続きをしたいんですが。', rm:'Sumimasen, tennyū no tetsuzuki o shitai n desu ga.', zh:'不好意思,我想辦遷入手續。', en:"Excuse me, I'd like to register my move-in." },
+    { w:'🧑‍💼', side:'you', jp:'在留カードとパスポートをお願いします。', rm:'Zairyū-kādo to pasupōto o onegaishimasu.', zh:'麻煩出示在留卡和護照。', en:'Your residence card and passport, please.' },
+    { w:'🙋', side:'me', jp:'この書類の書き方を教えてもらえますか？', rm:'Kono shorui no kakikata o oshiete moraemasu ka?', zh:'可以教我這份文件怎麼填嗎？', en:'Could you show me how to fill out this form?' },
+    { w:'🙋', side:'me', jp:'国民健康保険も一緒にできますか？', rm:'Kokumin-kenkō-hoken mo issho ni dekimasu ka?', zh:'國民健康保險可以一起辦嗎？', en:'Can I also sign up for national health insurance?' },
+    { w:'🧑‍💼', side:'you', jp:'番号札を取ってお待ちください。', rm:'Bangō-fuda o totte o-machi kudasai.', zh:'請抽號碼牌稍候。', en:'Please take a number and wait.' },
+  ], tipZh:'市役所窗口幾乎都要「在留カード」;「〜たいんですが」是很客氣的開場。', tipEn:'City-hall counters almost always need your residence card; "~tai n desu ga" is a polite opener.' },
+
+  { cat:'life', ic:'🏧', bg:'var(--green)', zh:'銀行・ATM', en:'Bank & ATM', lines:[
+    { w:'🙋', side:'me', jp:'口座を開きたいんですが。', rm:'Kōza o hirakitai n desu ga.', zh:'我想開戶。', en:"I'd like to open an account." },
+    { w:'🧑‍💼', side:'you', jp:'印鑑はお持ちですか？', rm:'Inkan wa o-mochi desu ka?', zh:'有帶印章嗎？', en:'Do you have a personal seal (inkan)?' },
+    { w:'🙋', side:'me', jp:'ATMでお金をおろしたいです。', rm:'Ei-tī-emu de o-kane o oroshitai desu.', zh:'我想用 ATM 領錢。', en:"I'd like to withdraw cash at the ATM." },
+    { w:'🙋', side:'me', jp:'振り込みはどうすればいいですか？', rm:'Furikomi wa dō sureba ii desu ka?', zh:'轉帳要怎麼操作？', en:'How do I make a transfer?' },
+  ], tipZh:'日本開戶常要「印鑑(いんかん)」;領錢=お金をおろす、轉帳=振り込み(ふりこみ)。', tipEn:'Opening an account often needs a seal (inkan); withdraw = "o-kane o orosu", transfer = "furikomi".' },
+
+  { cat:'life', ic:'📮', bg:'var(--ac)', zh:'郵局寄件', en:'At the post office', lines:[
+    { w:'🙋', side:'me', jp:'これを台湾まで送りたいです。', rm:'Kore o Taiwan made okuritai desu.', zh:'我想把這個寄到台灣。', en:"I'd like to send this to Taiwan." },
+    { w:'🧑‍💼', side:'you', jp:'航空便と船便、どちらにしますか？', rm:'Kōkūbin to funabin, dochira ni shimasu ka?', zh:'空運還是海運？', en:'Airmail or surface mail?' },
+    { w:'🙋', side:'me', jp:'一番早いのでお願いします。', rm:'Ichiban hayai no de onegaishimasu.', zh:'麻煩用最快的。', en:'The fastest option, please.' },
+    { w:'🧑‍💼', side:'you', jp:'中身は何ですか？', rm:'Nakami wa nan desu ka?', zh:'裡面是什麼？', en:"What's inside?" },
+    { w:'🙋', side:'me', jp:'切手はどこで買えますか？', rm:'Kitte wa doko de kaemasu ka?', zh:'郵票在哪裡買？', en:'Where can I buy stamps?' },
+  ], tipZh:'航空便(こうくうびん)=空運、船便(ふなびん)=海運;寄國際件會被問「中身(なかみ)」。', tipEn:'Airmail = kōkūbin, surface = funabin; for overseas parcels they ask what\'s inside (nakami).' },
+
+  { cat:'life', ic:'📱', bg:'var(--blue)', zh:'辦手機門號', en:'Getting a phone plan', lines:[
+    { w:'🙋', side:'me', jp:'プランを契約したいんですが。', rm:'Puran o keiyaku shitai n desu ga.', zh:'我想辦門號方案。', en:"I'd like to sign up for a phone plan." },
+    { w:'🧑‍💼', side:'you', jp:'本人確認書類はお持ちですか？', rm:'Honnin-kakunin-shorui wa o-mochi desu ka?', zh:'有帶本人證件嗎？', en:'Do you have ID for verification?' },
+    { w:'🙋', side:'me', jp:'一番安いプランはどれですか？', rm:'Ichiban yasui puran wa dore desu ka?', zh:'最便宜的方案是哪個？', en:'Which is the cheapest plan?' },
+    { w:'🙋', side:'me', jp:'データは月に何ギガ使えますか？', rm:'Dēta wa tsuki ni nan-giga tsukaemasu ka?', zh:'每月有幾 GB 流量？', en:'How many gigs a month do I get?' },
+  ], tipZh:'契約(けいやく)要帶「本人確認書類」(在留カード等);流量口語常說「ギガ」。', tipEn:'A contract (keiyaku) needs ID like your residence card; data is casually counted in "giga".' },
+
+  // ── 緊急求助(追加)──────────────────────
+  { cat:'help', ic:'💊', bg:'var(--green)', zh:'藥局買藥', en:'At the pharmacy', lines:[
+    { w:'🙋', side:'me', jp:'頭痛に効く薬はありますか？', rm:'Zutsū ni kiku kusuri wa arimasu ka?', zh:'有治頭痛的藥嗎？', en:'Do you have something for a headache?' },
+    { w:'🧑‍⚕️', side:'you', jp:'熱はありますか？', rm:'Netsu wa arimasu ka?', zh:'有發燒嗎？', en:'Do you have a fever?' },
+    { w:'🙋', side:'me', jp:'眠くならない薬がいいです。', rm:'Nemuku naranai kusuri ga ii desu.', zh:'我想要不會想睡的藥。', en:"I'd prefer one that won't make me drowsy." },
+    { w:'🧑‍⚕️', side:'you', jp:'食後に飲んでください。', rm:'Shokugo ni nonde kudasai.', zh:'請飯後服用。', en:'Take it after meals.' },
+  ], tipZh:'「〜に効く(きく)」=對…有效;飯後=食後(しょくご)、飯前=食前(しょくぜん)。', tipEn:'"~ni kiku" = works on ~; after meals = shokugo, before meals = shokuzen.' },
+
+  // ── 寒暄社交(追加)──────────────────────
+  { cat:'social', ic:'🌤️', bg:'var(--blue)', zh:'天氣・閒聊', en:'Weather & small talk', lines:[
+    { w:'🧑', side:'you', jp:'今日は暑いですね。', rm:'Kyō wa atsui desu ne.', zh:'今天好熱啊。', en:"It's hot today, isn't it?" },
+    { w:'🙋', side:'me', jp:'そうですね、本当に。', rm:'Sō desu ne, hontō ni.', zh:'是啊,真的。', en:'Yeah, really.' },
+    { w:'🧑', side:'you', jp:'お仕事は何をされているんですか？', rm:'O-shigoto wa nani o sarete iru n desu ka?', zh:'您從事什麼工作呢？', en:'What do you do for work?' },
+    { w:'🙋', side:'me', jp:'エンジニアをしています。', rm:'Enjinia o shite imasu.', zh:'我是工程師。', en:'I work as an engineer.' },
+    { w:'🙋', side:'me', jp:'また今度、ぜひ。', rm:'Mata kondo, zehi.', zh:'下次再一起吧。', en:"Let's do it again sometime." },
+  ], tipZh:'附和用「〜ですね」最自然;天氣是日本人最常見的破冰話題。', tipEn:'Agree with "~desu ne"; weather is the classic Japanese ice-breaker.' },
 ];
 
 const esc = s => String(s||'').replace(/[<>&"]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));

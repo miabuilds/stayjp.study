@@ -1771,6 +1771,13 @@
     ]
   },
   {
+    "text": "ATMでお金をおろしたいです。",
+    "hash": "dc63a8da49b4",
+    "sources": [
+      "phrases"
+    ]
+  },
+  {
     "text": "ICカードにチャージしたいです。",
     "hash": "5a54c3035246",
     "sources": [
@@ -5023,6 +5030,13 @@
     ]
   },
   {
+    "text": "いくら以上で免税になりますか？",
+    "hash": "dc6191b6e56e",
+    "sources": [
+      "phrases"
+    ]
+  },
+  {
     "text": "いくら熱心に改革案を訴えても、上層部の反応は暖簾に腕押しで、手応えがまるでない。",
     "hash": "af874cf0e30e",
     "sources": [
@@ -7983,6 +7997,13 @@
     ]
   },
   {
+    "text": "エンジニアをしています。",
+    "hash": "9cb1a67121f5",
+    "sources": [
+      "phrases"
+    ]
+  },
+  {
     "text": "えんしゅつ",
     "hash": "b014ca9db1c9",
     "sources": [
@@ -10064,6 +10085,13 @@
     "hash": "c98476e922bb",
     "sources": [
       "vocab-n5#六つ"
+    ]
+  },
+  {
+    "text": "お仕事は何をされているんですか？",
+    "hash": "6a2fbfda23c6",
+    "sources": [
+      "phrases"
     ]
   },
   {
@@ -20406,6 +20434,13 @@
     ]
   },
   {
+    "text": "こちらの袋は開けないでください。",
+    "hash": "28f727261d66",
+    "sources": [
+      "phrases"
+    ]
+  },
+  {
     "text": "こちらへどうぞ。",
     "hash": "9fd62ad5126b",
     "sources": [
@@ -21178,6 +21213,13 @@
     "hash": "ff18ffdeff17",
     "sources": [
       "vocab-n4#回す"
+    ]
+  },
+  {
+    "text": "このバス、東京駅に行きますか？",
+    "hash": "b5e6eb6ff3e9",
+    "sources": [
+      "phrases"
     ]
   },
   {
@@ -23419,6 +23461,13 @@
     "hash": "ef6f9469f11d",
     "sources": [
       "grammar-n4#n4-6"
+    ]
+  },
+  {
+    "text": "この書類の書き方を教えてもらえますか？",
+    "hash": "9408af465020",
+    "sources": [
+      "phrases"
     ]
   },
   {
@@ -26538,6 +26587,13 @@
     "hash": "9fd938cecf2a",
     "sources": [
       "article#a-n3-4"
+    ]
+  },
+  {
+    "text": "これを台湾まで送りたいです。",
+    "hash": "2e277566c04b",
+    "sources": [
+      "phrases"
     ]
   },
   {
@@ -34075,10 +34131,24 @@
     ]
   },
   {
+    "text": "すみません、転入の手続きをしたいんですが。",
+    "hash": "9aa2b43a60b7",
+    "sources": [
+      "phrases"
+    ]
+  },
+  {
     "text": "すみません、電話番号をもう一度教えてください。",
     "hash": "4f37739f54b6",
     "sources": [
       "vocab-n4#番号"
+    ]
+  },
+  {
+    "text": "すみません、味は選べますか？",
+    "hash": "d4668a980c45",
+    "sources": [
+      "phrases"
     ]
   },
   {
@@ -36256,6 +36326,13 @@
     "hash": "f7df6ac2474a",
     "sources": [
       "vocab-n5"
+    ]
+  },
+  {
+    "text": "そうですね、本当に。",
+    "hash": "ca7d0fb66a8f",
+    "sources": [
+      "phrases"
     ]
   },
   {
@@ -42440,6 +42517,13 @@
     "hash": "5e6ae81262f5",
     "sources": [
       "vocab-n4"
+    ]
+  },
+  {
+    "text": "データは月に何ギガ使えますか？",
+    "hash": "3e18963a8bf3",
+    "sources": [
+      "phrases"
     ]
   },
   {
@@ -49041,7 +49125,8 @@
     "text": "パスポートを見せてください。",
     "hash": "70bb8a51eec1",
     "sources": [
-      "vocab-n5#見せる"
+      "vocab-n5#見せる",
+      "phrases"
     ]
   },
   {
@@ -52536,6 +52621,13 @@
     ]
   },
   {
+    "text": "プランを契約したいんですが。",
+    "hash": "8db98927447e",
+    "sources": [
+      "phrases"
+    ]
+  },
+  {
     "text": "ふり",
     "hash": "96ac2b4dded8",
     "sources": [
@@ -55073,6 +55165,13 @@
     "hash": "720438c4c4dc",
     "sources": [
       "article#a-n4-4"
+    ]
+  },
+  {
+    "text": "また今度、ぜひ。",
+    "hash": "fa3f518c0277",
+    "sources": [
+      "phrases"
     ]
   },
   {
@@ -63059,6 +63158,20 @@
     ]
   },
   {
+    "text": "一番安いプランはどれですか？",
+    "hash": "09c4f14bb5f8",
+    "sources": [
+      "phrases"
+    ]
+  },
+  {
+    "text": "一番早いのでお願いします。",
+    "hash": "c5c2de988649",
+    "sources": [
+      "phrases"
+    ]
+  },
+  {
     "text": "一部の意見だけでなく、チーム全体の考えを聞いてから決めたいです。",
     "hash": "3c9041cc5c55",
     "sources": [
@@ -63238,6 +63351,13 @@
     "hash": "1c064512e716",
     "sources": [
       "vocab-n1#轟く"
+    ]
+  },
+  {
+    "text": "印鑑はお持ちですか？",
+    "hash": "7eb8bc3ff716",
+    "sources": [
+      "phrases"
     ]
   },
   {
@@ -64814,6 +64934,13 @@
     "hash": "32eae98223b0",
     "sources": [
       "vocab-n4#旅館"
+    ]
+  },
+  {
+    "text": "温泉は何時まで入れますか？",
+    "hash": "1ca8ba15ae5e",
+    "sources": [
+      "phrases"
     ]
   },
   {
@@ -69607,6 +69734,13 @@
     ]
   },
   {
+    "text": "貴重品を預かってもらえますか？",
+    "hash": "013f8b71637c",
+    "sources": [
+      "phrases"
+    ]
+  },
+  {
     "text": "起きたばかりで、頭がぼんやりしている。",
     "hash": "10090b46270e",
     "sources": [
@@ -72961,6 +73095,13 @@
     ]
   },
   {
+    "text": "券売機で食券を買ってください。",
+    "hash": "080c721dcd57",
+    "sources": [
+      "phrases"
+    ]
+  },
+  {
     "text": "喧騒を離れ、彼は緑に囲まれた閑静な住宅街に居を構えることにした。",
     "hash": "7b8a08da914a",
     "sources": [
@@ -74384,6 +74525,13 @@
     ]
   },
   {
+    "text": "後ろのドアからお乗りください。",
+    "hash": "e250b9495e1e",
+    "sources": [
+      "phrases"
+    ]
+  },
+  {
     "text": "後ろの人にも聞こえるように、マイクを使った。",
     "hash": "4489a4849ee4",
     "sources": [
@@ -74790,6 +74938,13 @@
     ]
   },
   {
+    "text": "口座を開きたいんですが。",
+    "hash": "bee3dce16668",
+    "sources": [
+      "phrases"
+    ]
+  },
+  {
     "text": "口先だけでなく、実際の行動で誠意を示すことが何より大切だ。",
     "hash": "e1abbfb8a123",
     "sources": [
@@ -75116,6 +75271,13 @@
     "hash": "b8f5ae5ccea5",
     "sources": [
       "vocab-n3#通り過ぎる"
+    ]
+  },
+  {
+    "text": "航空便と船便、どちらにしますか？",
+    "hash": "c16af05d5699",
+    "sources": [
+      "phrases"
     ]
   },
   {
@@ -75662,6 +75824,13 @@
     "hash": "6a7572e0bb45",
     "sources": [
       "vocab-n2#義務"
+    ]
+  },
+  {
+    "text": "国民健康保険も一緒にできますか？",
+    "hash": "4a00fc657a3c",
+    "sources": [
+      "phrases"
     ]
   },
   {
@@ -76572,6 +76741,13 @@
     "hash": "fcccf9b14bff",
     "sources": [
       "vocab-n4#なぜなら"
+    ]
+  },
+  {
+    "text": "今日は暑いですね。",
+    "hash": "5bd081f0fe21",
+    "sources": [
+      "phrases"
     ]
   },
   {
@@ -78169,6 +78345,13 @@
     "hash": "abfd40917a99",
     "sources": [
       "grammar-n4#n4-42"
+    ]
+  },
+  {
+    "text": "在留カードとパスポートをお願いします。",
+    "hash": "a7381701813e",
+    "sources": [
+      "phrases"
     ]
   },
   {
@@ -81851,6 +82034,13 @@
     "hash": "c8e6897da01c",
     "sources": [
       "vocab-n2#廃れる"
+    ]
+  },
+  {
+    "text": "次、止まります。",
+    "hash": "b4c1042cba82",
+    "sources": [
+      "phrases"
     ]
   },
   {
@@ -87204,6 +87394,13 @@
     ]
   },
   {
+    "text": "食後に飲んでください。",
+    "hash": "09139fda2724",
+    "sources": [
+      "phrases"
+    ]
+  },
+  {
     "text": "食後に薬を飲みます。",
     "hash": "004c33b58d46",
     "sources": [
@@ -87594,6 +87791,13 @@
     "hash": "54f84fb30c2b",
     "sources": [
       "vocab-n5#大丈夫"
+    ]
+  },
+  {
+    "text": "振り込みはどうすればいいですか？",
+    "hash": "69cb65386306",
+    "sources": [
+      "phrases"
     ]
   },
   {
@@ -90727,6 +90931,13 @@
     ]
   },
   {
+    "text": "切手はどこで買えますか？",
+    "hash": "fe1470832ccc",
+    "sources": [
+      "phrases"
+    ]
+  },
+  {
     "text": "切手を5枚ください。",
     "hash": "798ee2e7b710",
     "sources": [
@@ -93702,6 +93913,13 @@
     ]
   },
   {
+    "text": "替え玉お願いします。",
+    "hash": "d7575e83c6ef",
+    "sources": [
+      "phrases"
+    ]
+  },
+  {
     "text": "胎盤を通じて、母体から胎児へ栄養と酸素が届けられる。",
     "hash": "f00b4c9302a5",
     "sources": [
@@ -95372,6 +95590,13 @@
     "hash": "2b11fc29e10e",
     "sources": [
       "daily-story#n5_20"
+    ]
+  },
+  {
+    "text": "中身は何ですか？",
+    "hash": "5082159cc1ae",
+    "sources": [
+      "phrases"
     ]
   },
   {
@@ -99352,6 +99577,13 @@
     ]
   },
   {
+    "text": "頭痛に効く薬はありますか？",
+    "hash": "ad90e17f1832",
+    "sources": [
+      "phrases"
+    ]
+  },
+  {
     "text": "働きすぎて体を壊すとは、まさに現代人の典型的な失敗だ。",
     "hash": "2f409ea50f29",
     "sources": [
@@ -101235,6 +101467,13 @@
     ]
   },
   {
+    "text": "熱はありますか？",
+    "hash": "eb6517c0d58c",
+    "sources": [
+      "phrases"
+    ]
+  },
+  {
     "text": "熱中症を防ぐためには、のどがかわく前に、こまめに水を飲むことが大切だ。",
     "hash": "094a15cb3ca2",
     "sources": [
@@ -101989,6 +102228,13 @@
     "hash": "f61c4630c11e",
     "sources": [
       "vocab-n1#帰依"
+    ]
+  },
+  {
+    "text": "番号札を取ってお待ちください。",
+    "hash": "d8d8b764281b",
+    "sources": [
+      "phrases"
     ]
   },
   {
@@ -106494,6 +106740,13 @@
     ]
   },
   {
+    "text": "普通でお願いします。",
+    "hash": "be757e562b84",
+    "sources": [
+      "phrases"
+    ]
+  },
+  {
     "text": "普通なら三十分で着くのに、事故のせいで二時間もかかった。",
     "hash": "d11e802249df",
     "sources": [
@@ -108797,6 +109050,13 @@
     ]
   },
   {
+    "text": "本人確認書類はお持ちですか？",
+    "hash": "b42ba8d8352e",
+    "sources": [
+      "phrases"
+    ]
+  },
+  {
     "text": "本制度は公平かつ透明な手続きに基づいて運用されなければならない。",
     "hash": "71a922d1f785",
     "sources": [
@@ -109652,6 +109912,13 @@
     ]
   },
   {
+    "text": "眠くならない薬がいいです。",
+    "hash": "45511824f3b2",
+    "sources": [
+      "phrases"
+    ]
+  },
+  {
     "text": "眠れないほど楽しみにしていた。",
     "hash": "0fbef7458034",
     "sources": [
@@ -110282,6 +110549,13 @@
     ]
   },
   {
+    "text": "免税でお願いできますか？",
+    "hash": "e05a55b3a575",
+    "sources": [
+      "phrases"
+    ]
+  },
+  {
     "text": "免税できますか？",
     "hash": "4b18660bd89b",
     "sources": [
@@ -110503,6 +110777,13 @@
     "hash": "286bf6ed35ef",
     "sources": [
       "vocab-n3#乗り出す"
+    ]
+  },
+  {
+    "text": "麺の硬さはどうしますか？",
+    "hash": "4fe1cd8ed6ae",
+    "sources": [
+      "phrases"
     ]
   },
   {
@@ -111899,6 +112180,13 @@
     ]
   },
   {
+    "text": "夕食は部屋で食べられますか？",
+    "hash": "c81941a00e8b",
+    "sources": [
+      "phrases"
+    ]
+  },
+  {
     "text": "夕日で、空一面が真っ赤に染まっていてとてもきれいでした。",
     "hash": "ebca3a757af4",
     "sources": [
@@ -112477,6 +112765,13 @@
     "hash": "90233d4d6096",
     "sources": [
       "vocab-n1#隔離"
+    ]
+  },
+  {
+    "text": "浴衣のサイズはいかがですか？",
+    "hash": "e9da0e6d7a0d",
+    "sources": [
+      "phrases"
     ]
   },
   {
@@ -114132,6 +114427,13 @@
     ]
   },
   {
+    "text": "両替できますか？",
+    "hash": "e14c21507192",
+    "sources": [
+      "phrases"
+    ]
+  },
+  {
     "text": "両大国が軍縮交渉のテーブルに着いたこと自体、世界にとって画期的な一歩と言える。",
     "hash": "fa735382def6",
     "sources": [
@@ -114150,6 +114452,13 @@
     "hash": "176b63952426",
     "sources": [
       "vocab-n2#支払い"
+    ]
+  },
+  {
+    "text": "料金はいくらですか？",
+    "hash": "c61d9a135cd0",
+    "sources": [
+      "phrases"
     ]
   },
   {
