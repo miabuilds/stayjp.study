@@ -1771,6 +1771,13 @@
     ]
   },
   {
+    "text": "ICカードにチャージしたいです。",
+    "hash": "5a54c3035246",
+    "sources": [
+      "phrases"
+    ]
+  },
+  {
     "text": "IT業界は技術の進歩が目まぐるしく、常に学び続ける必要がある。",
     "hash": "bef68bc2a75b",
     "sources": [
@@ -1810,6 +1817,20 @@
     "hash": "34d4ee932528",
     "sources": [
       "confusables-word"
+    ]
+  },
+  {
+    "text": "Wi-Fiのパスワードを教えてください。",
+    "hash": "ae81b5bd6ce3",
+    "sources": [
+      "phrases"
+    ]
+  },
+  {
+    "text": "Wi-Fiは使えますか？",
+    "hash": "f13564224816",
+    "sources": [
+      "phrases"
     ]
   },
   {
@@ -4064,6 +4085,13 @@
     "hash": "24afcca10e22",
     "sources": [
       "vocab-n5"
+    ]
+  },
+  {
+    "text": "ありがとうございます。",
+    "hash": "29162a7b7170",
+    "sources": [
+      "phrases"
     ]
   },
   {
@@ -8789,6 +8817,13 @@
     "hash": "a4efd06ffe31",
     "sources": [
       "vocab-n1"
+    ]
+  },
+  {
+    "text": "おすすめは何ですか？",
+    "hash": "a677d5072ace",
+    "sources": [
+      "phrases"
     ]
   },
   {
@@ -19962,6 +19997,13 @@
     ]
   },
   {
+    "text": "ここで止めてください。",
+    "hash": "687c7a47f56f",
+    "sources": [
+      "phrases"
+    ]
+  },
+  {
     "text": "ここで写真を撮ってもいいですか。",
     "hash": "bce2f39b4ceb",
     "sources": [
@@ -20354,6 +20396,13 @@
     "hash": "51d2412b7717",
     "sources": [
       "grammar-n3#n3-64"
+    ]
+  },
+  {
+    "text": "こちらこそ。",
+    "hash": "876a30af46c5",
+    "sources": [
+      "phrases"
     ]
   },
   {
@@ -21262,6 +21311,13 @@
     "hash": "6b25a00f829a",
     "sources": [
       "confusables-eg"
+    ]
+  },
+  {
+    "text": "このホテルまでお願いします。",
+    "hash": "66b8a5ab311d",
+    "sources": [
+      "phrases"
     ]
   },
   {
@@ -26235,6 +26291,13 @@
   {
     "text": "これ、ひとつください。",
     "hash": "f227d7136493",
+    "sources": [
+      "phrases"
+    ]
+  },
+  {
+    "text": "これ、一番人気ですか？",
+    "hash": "6474f9375657",
     "sources": [
       "phrases"
     ]
@@ -33907,6 +33970,13 @@
     ]
   },
   {
+    "text": "スマホを電車に忘れました。",
+    "hash": "d10814ae9b2b",
+    "sources": [
+      "phrases"
+    ]
+  },
+  {
     "text": "すみません",
     "hash": "cce1862bcbd9",
     "sources": [
@@ -33981,6 +34051,13 @@
     "hash": "c9432e6f2d94",
     "sources": [
       "vocab-n4#失礼します"
+    ]
+  },
+  {
+    "text": "すみません、大丈夫ですか？",
+    "hash": "5b87b7027ec0",
+    "sources": [
+      "phrases"
     ]
   },
   {
@@ -38673,6 +38750,13 @@
     ]
   },
   {
+    "text": "タオルをもう一枚もらえますか？",
+    "hash": "92ffbc80916d",
+    "sources": [
+      "phrases"
+    ]
+  },
+  {
     "text": "タオルを元の場所に戻して、洗濯物も棚に戻ります。",
     "hash": "9e23b9ddc26d",
     "sources": [
@@ -40339,6 +40423,13 @@
     "hash": "7ef39b36a52a",
     "sources": [
       "vocab-n2"
+    ]
+  },
+  {
+    "text": "チェックアウトお願いします。",
+    "hash": "4c54581de1b7",
+    "sources": [
+      "phrases"
     ]
   },
   {
@@ -44993,6 +45084,13 @@
     ]
   },
   {
+    "text": "どのくらいかかりますか？",
+    "hash": "c1edb04df472",
+    "sources": [
+      "phrases"
+    ]
+  },
+  {
     "text": "どのような理由であれ、暴力は正当化できない。",
     "hash": "c1777794b82f",
     "sources": [
@@ -45198,6 +45296,13 @@
     "hash": "e0a9e2495d3e",
     "sources": [
       "vocab-n2"
+    ]
+  },
+  {
+    "text": "とりあえず生ビールください。",
+    "hash": "da09d9752ab8",
+    "sources": [
+      "phrases"
     ]
   },
   {
@@ -46055,6 +46160,13 @@
     "hash": "c27a39d01119",
     "sources": [
       "vocab-n1"
+    ]
+  },
+  {
+    "text": "ないです。",
+    "hash": "428edc581730",
+    "sources": [
+      "phrases"
     ]
   },
   {
@@ -48099,13 +48211,6 @@
     ]
   },
   {
-    "text": "はい、大丈夫ですよ。",
-    "hash": "b43f8b6a42f0",
-    "sources": [
-      "phrases"
-    ]
-  },
-  {
     "text": "はいあがる",
     "hash": "c589928ab417",
     "sources": [
@@ -48810,6 +48915,13 @@
     ]
   },
   {
+    "text": "はじめまして。",
+    "hash": "3c39203c48ca",
+    "sources": [
+      "phrases"
+    ]
+  },
+  {
     "text": "はじめる",
     "hash": "2ad3eddc09d1",
     "sources": [
@@ -48916,6 +49028,13 @@
     "hash": "1f8ebc91b73c",
     "sources": [
       "vocab-n4"
+    ]
+  },
+  {
+    "text": "パスポートをお願いします。",
+    "hash": "691f8ae39705",
+    "sources": [
+      "phrases"
     ]
   },
   {
@@ -53396,6 +53515,13 @@
     ]
   },
   {
+    "text": "ポイントカードはお持ちですか？",
+    "hash": "aaafcaee2ec2",
+    "sources": [
+      "phrases"
+    ]
+  },
+  {
     "text": "ほう",
     "hash": "061e47f77568",
     "sources": [
@@ -54163,6 +54289,13 @@
     "hash": "f15e8d791495",
     "sources": [
       "vocab-n2"
+    ]
+  },
+  {
+    "text": "ホットコーヒーのMサイズください。",
+    "hash": "5e34c8da5ac8",
+    "sources": [
+      "phrases"
     ]
   },
   {
@@ -59519,6 +59652,13 @@
     ]
   },
   {
+    "text": "よろしくお願いします。",
+    "hash": "e4996b3caa33",
+    "sources": [
+      "phrases"
+    ]
+  },
+  {
     "text": "よろよろ",
     "hash": "27dc2aae6bf2",
     "sources": [
@@ -60523,6 +60663,13 @@
     "hash": "aa86e673d5f9",
     "sources": [
       "vocab-n4"
+    ]
+  },
+  {
+    "text": "レシートください。",
+    "hash": "6edbabc3e0a2",
+    "sources": [
+      "phrases"
     ]
   },
   {
@@ -61824,6 +61971,13 @@
     "hash": "778a277d96b4",
     "sources": [
       "vocab-n5"
+    ]
+  },
+  {
+    "text": "ワンサイズ大きいのはありますか？",
+    "hash": "bfe3bf75de00",
+    "sources": [
+      "phrases"
     ]
   },
   {
@@ -65272,6 +65426,13 @@
     ]
   },
   {
+    "text": "何番線ですか？",
+    "hash": "293e321f427f",
+    "sources": [
+      "phrases"
+    ]
+  },
+  {
     "text": "何百年も前に築かれた石垣が、地震にも崩れず今なお堅牢に残っている。",
     "hash": "15fe45f6f418",
     "sources": [
@@ -67967,6 +68128,13 @@
     ]
   },
   {
+    "text": "乾杯！",
+    "hash": "5cf733a0d461",
+    "sources": [
+      "phrases"
+    ]
+  },
+  {
     "text": "寒いですから、ドアを閉めてください。",
     "hash": "1042cf695834",
     "sources": [
@@ -69149,6 +69317,13 @@
     "hash": "669f7b04be8c",
     "sources": [
       "daily-story#n4_24"
+    ]
+  },
+  {
+    "text": "気にしないでください。",
+    "hash": "4006df1d74db",
+    "sources": [
+      "phrases"
     ]
   },
   {
@@ -72307,6 +72482,13 @@
     "hash": "a63c90b662f4",
     "sources": [
       "vocab-n2#阻止する"
+    ]
+  },
+  {
+    "text": "警察を呼んでください。",
+    "hash": "8c1be7399fb8",
+    "sources": [
+      "phrases"
     ]
   },
   {
@@ -78081,6 +78263,13 @@
     ]
   },
   {
+    "text": "財布をなくしました。",
+    "hash": "05fa3e0f65aa",
+    "sources": [
+      "phrases"
+    ]
+  },
+  {
     "text": "財布を家に忘れて、本当に困っている。",
     "hash": "302b90e35fd5",
     "sources": [
@@ -81378,6 +81567,13 @@
     ]
   },
   {
+    "text": "持ち帰りでお願いします。",
+    "hash": "4767a1c8967f",
+    "sources": [
+      "phrases"
+    ]
+  },
+  {
     "text": "持病があるので、旅行のときも薬を欠かさず持って行きます。",
     "hash": "e079e229d0e9",
     "sources": [
@@ -81711,6 +81907,13 @@
     "hash": "4982f2abbb4d",
     "sources": [
       "vocab-n3#交差点"
+    ]
+  },
+  {
+    "text": "次の電車は何時ですか？",
+    "hash": "78c31e6059c6",
+    "sources": [
+      "phrases"
     ]
   },
   {
@@ -83244,6 +83447,13 @@
     "hash": "5d07ed615125",
     "sources": [
       "vocab-n1#苦境"
+    ]
+  },
+  {
+    "text": "取り皿もらえますか？",
+    "hash": "d9a0c8d0e883",
+    "sources": [
+      "phrases"
     ]
   },
   {
@@ -85521,6 +85731,13 @@
     "hash": "54d030641cdf",
     "sources": [
       "vocab-n2#妥当"
+    ]
+  },
+  {
+    "text": "助けてください。",
+    "hash": "c6566ed82493",
+    "sources": [
+      "phrases"
     ]
   },
   {
@@ -88117,6 +88334,13 @@
   {
     "text": "新宿までいくらですか？",
     "hash": "0d2edda4113c",
+    "sources": [
+      "phrases"
+    ]
+  },
+  {
+    "text": "新宿までの切符、一枚ください。",
+    "hash": "cbfb758b197d",
     "sources": [
       "phrases"
     ]
@@ -93821,6 +94045,13 @@
     ]
   },
   {
+    "text": "台湾から来ました。",
+    "hash": "f4d19e426da3",
+    "sources": [
+      "phrases"
+    ]
+  },
+  {
     "text": "大きなミスをしたせいで、彼は部長から課長に降格してしまった。",
     "hash": "b355cddb9b9c",
     "sources": [
@@ -97598,6 +97829,13 @@
     "hash": "2f1e7748af15",
     "sources": [
       "grammar-n3#n3-70"
+    ]
+  },
+  {
+    "text": "店内でお召し上がりですか？",
+    "hash": "cdaff7659ecf",
+    "sources": [
+      "phrases"
     ]
   },
   {
@@ -106662,6 +106900,13 @@
     ]
   },
   {
+    "text": "部屋の鍵をなくしました。",
+    "hash": "3ec7cc3442ac",
+    "sources": [
+      "phrases"
+    ]
+  },
+  {
     "text": "部屋の電気が付きました。",
     "hash": "136a6bbf7440",
     "sources": [
@@ -107079,6 +107324,13 @@
     "hash": "dded02204c83",
     "sources": [
       "grammar-n3#n3-35"
+    ]
+  },
+  {
+    "text": "風邪薬はどこですか？",
+    "hash": "987dd6e7615e",
+    "sources": [
+      "phrases"
     ]
   },
   {
@@ -107506,6 +107758,13 @@
     "hash": "53b5b791fdb5",
     "sources": [
       "confusables-word"
+    ]
+  },
+  {
+    "text": "別々で払えますか？",
+    "hash": "2021f4fd710f",
+    "sources": [
+      "phrases"
     ]
   },
   {
@@ -108563,6 +108822,13 @@
     "hash": "fe0890ade43c",
     "sources": [
       "vocab-n1#自問自答"
+    ]
+  },
+  {
+    "text": "本当に助かりました。",
+    "hash": "b2b1f574fb15",
+    "sources": [
+      "phrases"
     ]
   },
   {
@@ -110013,6 +110279,13 @@
     "hash": "14947b7e31d0",
     "sources": [
       "grammar-n4#n4-44"
+    ]
+  },
+  {
+    "text": "免税できますか？",
+    "hash": "4b18660bd89b",
+    "sources": [
+      "phrases"
     ]
   },
   {
@@ -114052,6 +114325,13 @@
     "hash": "a1e0b1aeab97",
     "sources": [
       "listening"
+    ]
+  },
+  {
+    "text": "領収書をください。",
+    "hash": "f8d0a97c0466",
+    "sources": [
+      "phrases"
     ]
   },
   {
