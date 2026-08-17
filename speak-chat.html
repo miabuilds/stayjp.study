@@ -1,0 +1,337 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>情境對話(測試版)</title>
+<style>
+  :root{ --bg:#f3f5f2;--panel:#fff;--ink:#1b2320;--ink2:#5f6b67;--ink3:#93a09a;--line:#e3e8e2;--accent:#0f766e;--accent2:#0b5850;--soft:#0f766e12;--me:#0f766e;--ai:#eef1ee;--ok:#15803d;--bad:#c2410c;--warn:#b45309;--sh:0 1px 2px rgba(20,40,30,.05),0 8px 24px rgba(20,40,30,.06); }
+  @media(prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#111512;--panel:#191e1b;--ink:#e9eeea;--ink2:#9aa7a0;--ink3:#70807a;--line:#28302b;--accent:#2dd4bf;--accent2:#5eead4;--soft:#2dd4bf18;--me:#0f766e;--ai:#20261f;--ok:#4ade80;--bad:#fb923c;--warn:#fbbf24;--sh:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.3);}}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);font-family:-apple-system,"PingFang TC","Noto Sans TC",sans-serif;font-size:15px;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:680px;margin:0 auto;padding:16px 14px 40px}
+  .gate{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px}
+  .banner{background:var(--warn);color:#fff;font-size:12px;text-align:center;padding:6px}
+  .btn{font:inherit;font-weight:600;border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:10px;padding:9px 15px;cursor:pointer}
+  .btn:hover{border-color:var(--accent)} .btn.pri{background:var(--accent);color:#fff;border-color:var(--accent)} .btn.pri:hover{background:var(--accent2)}
+  .btn:disabled{opacity:.5;cursor:default}
+  .btn.sm{padding:6px 11px;font-size:13px}
+  h1{font-size:18px;margin-bottom:2px} .sub{color:var(--ink2);font-size:12.5px;margin-bottom:14px}
+  a.back{color:var(--ink2);text-decoration:none;font-size:13px}
+
+  /* 選主題畫面 */
+  .lvtabs{display:flex;gap:6px;margin:12px 0}
+  .lvtab{flex:1;text-align:center;font-size:13px;font-weight:700;border:1px solid var(--line);background:var(--panel);color:var(--ink2);border-radius:10px;padding:8px 0;cursor:pointer}
+  .lvtab.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .lvtab small{display:block;font-size:10px;font-weight:500;opacity:.8;margin-top:1px}
+  .scenes{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-top:6px}
+  .scene{background:var(--panel);border:1px solid var(--line);border-radius:14px;box-shadow:var(--sh);padding:14px;cursor:pointer;transition:border-color .12s}
+  .scene:hover{border-color:var(--accent)}
+  .scene .ic{font-size:26px} .scene .t{font-weight:700;margin-top:6px} .scene .d{color:var(--ink2);font-size:12px;margin-top:2px;line-height:1.5}
+
+  /* 對話畫面 */
+  .chatbar{position:sticky;top:0;z-index:5;background:var(--bg);display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--line);margin-bottom:12px}
+  .chatbar .ttl{font-weight:700;font-size:15px;flex:1;display:flex;align-items:center;gap:7px}
+  .msgs{display:flex;flex-direction:column;gap:12px;min-height:40px}
+  .msg{display:flex;flex-direction:column;max-width:86%}
+  .msg.ai{align-self:flex-start;align-items:flex-start}
+  .msg.me{align-self:flex-end;align-items:flex-end}
+  .bubble{border-radius:16px;padding:11px 14px;line-height:1.5;position:relative}
+  .bubble.ai{background:var(--ai);border-bottom-left-radius:5px}
+  .bubble.me{background:var(--me);color:#fff;border-bottom-right-radius:5px}
+  .bjp{font-size:17px;font-weight:600}
+  .bubble.ai .bjp{display:flex;align-items:flex-start;gap:8px}
+  .spk{flex-shrink:0;cursor:pointer;border:0;background:none;color:var(--accent);font-size:15px;padding:0;line-height:1.4}
+  .bkana{color:var(--accent2);font-size:12.5px;margin-top:3px}
+  .bzh{color:var(--ink2);font-size:12.5px;margin-top:3px}
+  .msg.me .bkana,.msg.me .bzh{color:#ffffffcc}
+  .coach{align-self:flex-start;max-width:86%;background:var(--soft);border:1px solid var(--accent);border-radius:12px;padding:8px 12px;font-size:13px;color:var(--ink)}
+  .coach b{color:var(--accent)}
+  .typing{color:var(--ink3);font-size:13px;padding:4px 2px}
+
+  .inbar{position:sticky;bottom:0;background:var(--bg);padding-top:12px;margin-top:14px}
+  .inrow{display:flex;gap:8px;align-items:flex-end}
+  .say{flex:1;min-height:44px;max-height:120px;font:inherit;font-size:16px;border:1px solid var(--line);border-radius:12px;padding:10px 12px;background:var(--panel);color:var(--ink);resize:none}
+  .rec{font-size:16px;flex-shrink:0}
+  .rec.on{background:var(--bad);color:#fff;border-color:var(--bad)}
+  .muted{color:var(--ink3);font-size:12px;margin-top:6px}
+  .err{color:var(--bad);font-size:13px;margin-top:6px}
+
+  /* 點評 */
+  .review{background:var(--panel);border:1px solid var(--line);border-radius:16px;box-shadow:var(--sh);padding:18px;margin-top:8px}
+  .rv-head{display:flex;gap:14px;align-items:center;margin-bottom:12px}
+  .ring{display:inline-flex;align-items:center;justify-content:center;width:64px;height:64px;border-radius:50%;font-size:22px;font-weight:800;color:#fff;flex-shrink:0}
+  .rv-line{padding:8px 0;border-top:1px solid var(--line);font-size:14px}
+  .rv-line .lb{font-weight:700;color:var(--accent);margin-right:6px}
+</style>
+</head>
+<body>
+<div class="banner">⚠ 測試版 · 限內部帳號 · 尚未上線</div>
+
+<div id="gate" class="gate" style="display:none">
+  <h1>情境對話(測試版)</h1>
+  <button id="loginBtn" class="btn pri">用 Google 登入(限 admin)</button>
+  <div id="gerr" class="err"></div>
+</div>
+
+<div id="app" class="wrap" style="display:none">
+
+  <!-- 選主題 -->
+  <div id="pick">
+    <h1>🗣 情境對話 <span class="muted" style="font-weight:400">測試版</span></h1>
+    <div class="sub">選一個情境和難度,AI 會扮演對方跟你一來一往練對話。可以用說的(語音辨識)或打字。</div>
+    <div class="lvtabs" id="lvtabs"></div>
+    <div class="scenes" id="scenes"></div>
+    <div class="muted" style="margin-top:14px">💡 這是「對話」練習;想練單句跟讀請到 <a href="speak-test.html" style="color:var(--accent)">口說練習</a>。</div>
+  </div>
+
+  <!-- 對話 -->
+  <div id="chat" style="display:none">
+    <div class="chatbar">
+      <span class="ttl" id="chatTtl"></span>
+      <button class="btn sm" onclick="endChat()">結束・看點評</button>
+      <button class="btn sm" onclick="backToPick()">換主題</button>
+    </div>
+    <div class="msgs" id="msgs"></div>
+    <div class="inbar">
+      <div class="inrow">
+        <button id="recBtn" class="btn rec" onclick="toggleRec()">🎤</button>
+        <textarea id="say" class="say" rows="1" placeholder="用說的或打字…"></textarea>
+        <button class="btn pri" id="sendBtn" onclick="sendMine()">送出</button>
+      </div>
+      <div class="muted" id="inNote">🎤 用瀏覽器語音辨識(Chrome 較準);不準可直接改字再送。</div>
+    </div>
+  </div>
+
+  <!-- 點評 -->
+  <div id="review" style="display:none">
+    <div class="chatbar">
+      <span class="ttl">📋 對話點評</span>
+      <button class="btn sm" onclick="resumeChat()">回到對話</button>
+      <button class="btn sm" onclick="backToPick()">換主題</button>
+    </div>
+    <div class="review" id="reviewCard"></div>
+  </div>
+
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script>
+const fbConfig = { apiKey:"AIzaSyDnmg2XOuvwgE8m8xCF5sS4o0nQYoUplPI", authDomain:"jpnote-1bdd6.firebaseapp.com", projectId:"jpnote-1bdd6", storageBucket:"jpnote-1bdd6.firebasestorage.app", messagingSenderId:"666368174384" };
+if(!firebase.apps.length) firebase.initializeApp(fbConfig);
+const auth = firebase.auth();
+
+const ADMIN_EMAILS = ['stayjpplan@gmail.com','abc83327@gmail.com'];
+const FN_CHAT = 'https://asia-east1-jpnote-1bdd6.cloudfunctions.net/speakChat';
+const FN_TTS  = 'https://asia-east1-jpnote-1bdd6.cloudfunctions.net/ttsSpeak';
+
+// desc 是給 AI 的角色設定;voice 決定雲端語音性別。
+const SCENES = [
+  { k:'conbini', ic:'🏪', t:'便利商店', d:'結帳、加熱便當、集點', voice:'f',
+    desc:'你是日本便利商店(コンビニ)的店員,正在幫這位客人結帳。你會問要不要加熱、要不要袋子、有沒有集點卡等,並完成結帳。' },
+  { k:'resto', ic:'🍜', t:'餐廳點餐', d:'帶位、點餐、結帳', voice:'m',
+    desc:'你是日本餐廳的店員,從帶位、遞菜單、幫客人點餐、送餐到結帳都由你負責,自然地推進用餐流程。' },
+  { k:'station', ic:'🚉', t:'車站問路', d:'問路、買票、轉乘', voice:'m',
+    desc:'你是車站站務員或熱心的路人,客人向你問路、問怎麼買票或轉乘。你親切地指路、說明路線。' },
+  { k:'clinic', ic:'🏥', t:'看診拿藥', d:'掛號、說症狀、拿藥', voice:'f',
+    desc:'你是診所的櫃檯與護理人員,患者來看病。你會問哪裡不舒服、有沒有發燒、帶你保險證了嗎,並引導看診與拿藥。' },
+  { k:'shop', ic:'🛍️', t:'買衣服', d:'試穿、尺寸、退換', voice:'f',
+    desc:'你是服飾店店員,客人來買衣服。你會招呼、介紹、幫忙找尺寸、帶去試穿、說明能不能退換。' },
+  { k:'interview', ic:'💼', t:'工作面試', d:'自我介紹、問答', voice:'m',
+    desc:'你是日本公司的面試官,正在面試這位求職者。你會請對方自我介紹、問動機與經歷、聊工作條件,語氣禮貌正式。' },
+  { k:'house', ic:'🏠', t:'租屋看房', d:'租金、條件、簽約', voice:'f',
+    desc:'你是不動產仲介,帶客人看房。你會介紹房子、說明租金與條件、回答問題、聊簽約流程。' },
+  { k:'coworker', ic:'☕', t:'同事閒聊', d:'職場寒暄、約午餐', voice:'m',
+    desc:'你是對方公司的同事,午休時間隨意閒聊,話題像天氣、工作近況、要不要一起吃午餐等,輕鬆自然。' },
+];
+const LEVELS = ['N5','N4','N3','N2','N1'];
+let activeLv = 'N4';
+let scene = null;
+let history = [];      // {role:'ai'|'me', text, kana, zh, coach}
+let busy = false;
+
+// ── 畫面切換 ──
+function show(id){ ['pick','chat','review'].forEach(x=>document.getElementById(x).style.display = x===id?'block':'none'); }
+function renderLvTabs(){
+  const D={N5:'最基本',N4:'日常',N3:'中級',N2:'中上',N1:'高階'};
+  document.getElementById('lvtabs').innerHTML = LEVELS.map(lv=>
+    `<div class="lvtab${lv===activeLv?' on':''}" onclick="pickLv('${lv}')">${lv}<small>${D[lv]}</small></div>`).join('');
+}
+function pickLv(lv){ activeLv=lv; renderLvTabs(); }
+function renderScenes(){
+  document.getElementById('scenes').innerHTML = SCENES.map(s=>
+    `<div class="scene" onclick="startChat('${s.k}')"><div class="ic">${s.ic}</div><div class="t">${s.t}</div><div class="d">${s.d}</div></div>`).join('');
+}
+function backToPick(){ stopRec(); scene=null; history=[]; show('pick'); }
+
+// ── 開始 / 進行對話 ──
+function startChat(k){
+  scene = SCENES.find(s=>s.k===k); if(!scene) return;
+  history = [];
+  document.getElementById('chatTtl').innerHTML = `${scene.ic} ${scene.t} <span class="muted" style="font-weight:400">· ${activeLv}</span>`;
+  document.getElementById('msgs').innerHTML = '';
+  document.getElementById('say').value = '';
+  show('chat');
+  turn();   // AI 先開場
+}
+function esc(s){ return String(s==null?'':s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
+
+function renderMsgs(streamingAi){
+  const box = document.getElementById('msgs');
+  let html = '';
+  for(const m of history){
+    if(m.role==='me'){
+      html += `<div class="msg me"><div class="bubble me"><div class="bjp">${esc(m.text)}</div></div></div>`;
+    } else {
+      html += aiBubble(m);
+      if(m.coach) html += `<div class="coach"><b>教練</b>:${esc(m.coach)}</div>`;
+    }
+  }
+  if(streamingAi!=null) html += aiBubble(streamingAi) + '<div class="typing">…</div>';
+  box.innerHTML = html;
+  box.scrollIntoView({block:'end'});
+  window.scrollTo(0, document.body.scrollHeight);
+}
+function aiBubble(m){
+  const jp = m.jp || m.text || '';
+  return `<div class="msg ai"><div class="bubble ai">
+    <div class="bjp"><span>${esc(jp)||'…'}</span>${jp?`<button class="spk" title="播放" onclick="playTTS(${JSON.stringify(jp).replace(/"/g,'&quot;')})">🔊</button>`:''}</div>
+    ${m.kana?`<div class="bkana">${esc(m.kana)}</div>`:''}
+    ${m.zh?`<div class="bzh">${esc(m.zh)}</div>`:''}
+  </div></div>`;
+}
+
+// 解析逐行輕結構
+function parseTurn(text){
+  const o={jp:'',kana:'',zh:'',coach:''};
+  for(const line of String(text).split('\n')){
+    const m=line.match(/^(JP|KANA|ZH|COACH):\s?(.*)$/);
+    if(!m)continue;
+    o[m[1].toLowerCase()] = (m[2]||'').trim();
+  }
+  return o;
+}
+
+async function turn(){
+  if(busy) return; busy=true; setBusy(true);
+  try{
+    const t = await auth.currentUser.getIdToken();
+    const r = await fetch(FN_CHAT,{ method:'POST', headers:{'Content-Type':'application/json',Authorization:'Bearer '+t},
+      body:JSON.stringify({ mode:'chat', scene:scene.desc, level:activeLv, history:history.map(h=>({role:h.role,text:h.role==='ai'?(h.jp||h.text):h.text})) }) });
+    if(!r.ok){ let d={}; try{d=await r.json();}catch(e){} renderMsgs(); appendErr(d.error||('HTTP '+r.status)); return; }
+    const reader=r.body.getReader(); const dec=new TextDecoder(); let full='';
+    while(true){ const {done,value}=await reader.read(); if(done)break; full+=dec.decode(value,{stream:true}); renderMsgs(parseTurn(full)); }
+    const ai=parseTurn(full); ai.role='ai';
+    history.push(ai);
+    renderMsgs();
+    if(ai.jp) playTTS(ai.jp, scene.voice);   // 自動朗讀 AI 回話
+  }catch(e){ renderMsgs(); appendErr(e.message); }
+  finally{ busy=false; setBusy(false); }
+}
+function appendErr(msg){ const box=document.getElementById('msgs'); box.insertAdjacentHTML('beforeend',`<div class="err">出錯了:${esc(msg)}</div>`); }
+function setBusy(b){ document.getElementById('sendBtn').disabled=b; }
+
+function sendMine(){
+  const el=document.getElementById('say'); const txt=(el.value||'').trim();
+  if(!txt || busy) return;
+  stopRec();
+  history.push({ role:'me', text:txt });
+  el.value=''; autoGrow();
+  renderMsgs();
+  turn();
+}
+
+// ── 結束 → 點評 ──
+async function endChat(){
+  if(busy) return;
+  const mine = history.filter(h=>h.role==='me').length;
+  if(mine===0){ show('review'); document.getElementById('reviewCard').innerHTML='<div class="muted">還沒開始對話,先聊幾句再看點評 🙂</div>'; return; }
+  show('review');
+  const card=document.getElementById('reviewCard'); card.innerHTML='<div class="muted">整理你的表現中…</div>';
+  try{
+    const t=await auth.currentUser.getIdToken();
+    const r=await fetch(FN_CHAT,{ method:'POST', headers:{'Content-Type':'application/json',Authorization:'Bearer '+t},
+      body:JSON.stringify({ mode:'review', history:history.map(h=>({role:h.role,text:h.role==='ai'?(h.jp||h.text):h.text})) }) });
+    if(!r.ok){ let d={}; try{d=await r.json();}catch(e){} card.innerHTML='<div class="err">失敗:'+esc(d.error||r.status)+'</div>'; return; }
+    const reader=r.body.getReader(); const dec=new TextDecoder(); let full='';
+    while(true){ const {done,value}=await reader.read(); if(done)break; full+=dec.decode(value,{stream:true}); renderReview(full,false); }
+    renderReview(full,true);
+  }catch(e){ card.innerHTML='<div class="err">錯誤:'+esc(e.message)+'</div>'; }
+}
+function parseReview(text){
+  const o={};
+  for(const line of String(text).split('\n')){
+    const m=line.match(/^(SCORE|GOOD|IMPROVE|TIP|ENCOURAGE):\s?(.*)$/);
+    if(m) o[m[1].toLowerCase()]=(m[2]||'').trim();
+  }
+  return o;
+}
+function renderReview(text, done){
+  const d=parseReview(text); const sc=Number(d.score)||0;
+  const col=sc>=85?'var(--ok)':sc>=60?'var(--warn)':'var(--bad)';
+  const head = d.score!=null
+    ? `<div class="rv-head"><div class="ring" style="background:${col}">${sc}</div><div style="font-weight:700">這次對話的表現</div></div>`
+    : '<div class="muted">整理你的表現中…</div>';
+  document.getElementById('reviewCard').innerHTML = head
+    + (d.good?`<div class="rv-line"><span class="lb">做得好</span>${esc(d.good)}</div>`:'')
+    + (d.improve?`<div class="rv-line"><span class="lb">可加強</span>${esc(d.improve)}</div>`:'')
+    + (d.tip?`<div class="rv-line"><span class="lb">小建議</span>${esc(d.tip)}</div>`:'')
+    + (d.encourage?`<div class="rv-line" style="color:var(--ok);font-weight:600;border:0">${esc(d.encourage)}</div>`:'')
+    + (!done && d.score!=null?'<div class="muted" style="margin-top:6px">…</div>':'');
+}
+function resumeChat(){ show('chat'); renderMsgs(); }
+
+// ── 雲端語音 TTS ──
+let _audio=null, _ttsCache={};
+async function playTTS(text, voice){
+  try{ if(_audio){ _audio.pause(); _audio=null; } }catch(e){}
+  const key=(voice||'f')+'|'+text;
+  try{
+    let b64=_ttsCache[key];
+    if(!b64){
+      const t=await auth.currentUser.getIdToken();
+      const r=await fetch(FN_TTS,{ method:'POST', headers:{'Content-Type':'application/json',Authorization:'Bearer '+t}, body:JSON.stringify({ text, voice:voice||'f' }) });
+      const d=await r.json();
+      if(!r.ok || !d.audio) return;   // 靜默失敗,不打斷對話
+      b64=d.audio; _ttsCache[key]=b64;
+    }
+    _audio=new Audio('data:audio/mp3;base64,'+b64); _audio.play().catch(()=>{});
+  }catch(e){}
+}
+
+// ── 語音辨識 STT(瀏覽器) ──
+let rec=null, recording=false;
+function toggleRec(){ recording?stopRec():startRec(); }
+function startRec(){
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){ document.getElementById('inNote').textContent='這個瀏覽器不支援語音辨識,請直接打字。'; return; }
+  rec=new SR(); rec.lang='ja-JP'; rec.interimResults=true; rec.continuous=false;
+  rec.onresult=e=>{ let t=''; for(let i=0;i<e.results.length;i++)t+=e.results[i][0].transcript; const el=document.getElementById('say'); el.value=t; autoGrow(); };
+  rec.onend=()=>{ recording=false; updateRecBtn(); };
+  rec.onerror=()=>{ recording=false; updateRecBtn(); };
+  try{ rec.start(); recording=true; updateRecBtn(); }catch(e){}
+}
+function stopRec(){ try{ rec&&rec.stop(); }catch(e){} recording=false; updateRecBtn(); }
+function updateRecBtn(){ const b=document.getElementById('recBtn'); if(b) b.classList.toggle('on',recording); }
+
+function autoGrow(){ const el=document.getElementById('say'); if(!el)return; el.style.height='auto'; el.style.height=Math.min(120,el.scrollHeight)+'px'; }
+document.addEventListener('input',e=>{ if(e.target && e.target.id==='say') autoGrow(); });
+document.addEventListener('keydown',e=>{ if(e.target && e.target.id==='say' && e.key==='Enter' && !e.shiftKey){ e.preventDefault(); sendMine(); } });
+
+// ── auth ──
+auth.onAuthStateChanged(u=>{
+  const gate=document.getElementById('gate'), app=document.getElementById('app');
+  if(!u || !ADMIN_EMAILS.includes((u.email||'').toLowerCase())){
+    gate.style.display='flex'; app.style.display='none';
+    if(u && !ADMIN_EMAILS.includes((u.email||'').toLowerCase())){ document.getElementById('gerr').textContent=u.email+' 非測試帳號'; auth.signOut(); }
+    return;
+  }
+  gate.style.display='none'; app.style.display='block';
+  renderLvTabs(); renderScenes(); show('pick');
+});
+document.getElementById('loginBtn').onclick=()=>{ const p=new firebase.auth.GoogleAuthProvider(); p.setCustomParameters({prompt:'select_account'}); auth.signInWithPopup(p).catch(e=>{ if(/popup-closed|cancelled/.test(e.code||''))return; document.getElementById('gerr').textContent='登入失敗:'+e.message; }); };
+</script>
+</body>
+</html>
