@@ -21,6 +21,11 @@
   .chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
   .chip{font-size:12px;border:1px solid var(--line);background:var(--panel);color:var(--ink2);border-radius:20px;padding:4px 11px;cursor:pointer}
   .chip.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .lvtabs{display:flex;gap:6px;margin-bottom:14px}
+  .lvtab{flex:1;text-align:center;font-size:13px;font-weight:700;border:1px solid var(--line);background:var(--panel);color:var(--ink2);border-radius:10px;padding:8px 0;cursor:pointer}
+  .lvtab.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .lvtab small{display:block;font-size:10px;font-weight:500;opacity:.8;margin-top:1px}
+  .lvdesc{color:var(--ink2);font-size:12.5px;margin:-4px 0 12px}
   .jp{font-size:26px;font-weight:700;letter-spacing:.01em;line-height:1.35}
   .kana{color:var(--accent2);font-size:15px;margin-top:4px} .zh{color:var(--ink2);font-size:14px;margin-top:6px}
   .rowbtns{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
@@ -53,6 +58,8 @@
   <div class="sub">選句子 → 聽範例 → 念一次(或直接打字)→ 送出,看 AI 回饋。</div>
 
   <div class="card">
+    <div class="lvtabs" id="lvtabs"></div>
+    <div class="lvdesc" id="lvdesc"></div>
     <div class="chips" id="chips"></div>
     <div class="jp" id="jp">—</div>
     <div class="kana" id="kana"></div>
@@ -87,21 +94,65 @@ if(!firebase.apps.length) firebase.initializeApp(fbConfig);
 const auth = firebase.auth();
 const FN_SPEAK = 'https://asia-east1-jpnote-1bdd6.cloudfunctions.net/speakFeedback';
 
-const S = (jp,kana,zh)=>({jp,kana,zh});
+// jp=漢字句 / kana=假名讀音 / zh=中文 / lv=JLPT 等級。內容由淺入深、都是真的用得到的完整句。
+const S = (jp,kana,zh,lv)=>({jp,kana,zh,lv});
+const LV_DESC = {
+  N5:'旅遊・生活最基本:問路、點餐、購物,先能開口。',
+  N4:'日常辦事:預約、請求、表達需求,句子更完整。',
+  N3:'生活手續與工作日常:辦文件、改預約、請假、退貨。',
+  N2:'職場・商務:禮貌請求、商量、正式一點的應對。',
+  N1:'高階敬語:商務書面口語、鄭重委婉的表達。',
+};
 const SENTS = [
-  S('はじめまして。','はじめまして。','初次見面。'),
-  S('わたしは台湾人です。','わたしはたいわんじんです。','我是台灣人。'),
-  S('日本語を勉強しています。','にほんごをべんきょうしています。','我正在學日文。'),
-  S('これはいくらですか。','これはいくらですか。','這個多少錢?'),
-  S('すみません、駅はどこですか。','すみません、えきはどこですか。','不好意思,車站在哪裡?'),
-  S('毎朝、七時に起きます。','まいあさ、しちじにおきます。','每天早上七點起床。'),
-  S('電車で会社に行きます。','でんしゃでかいしゃにいきます。','搭電車去公司。'),
-  S('お疲れさまです。','おつかれさまです。','辛苦了。'),
-  S('少し相談したいことがあります。','すこしそうだんしたいことがあります。','我有點事想商量。'),
+  // ── N5:旅遊・生活最基本 ──
+  S('すみません、これをください。','すみません、これをください。','不好意思,請給我這個。','N5'),
+  S('お会計はいくらですか。','おかいけいはいくらですか。','請問一共多少錢?','N5'),
+  S('駅までどうやって行きますか。','えきまでどうやっていきますか。','到車站要怎麼走?','N5'),
+  S('写真を撮ってもいいですか。','しゃしんをとってもいいですか。','可以拍照嗎?','N5'),
+  S('もう少しゆっくりお願いします。','もうすこしゆっくりおねがいします。','請講慢一點。','N5'),
+  S('トイレはどこにありますか。','トイレはどこにありますか。','廁所在哪裡?','N5'),
+  S('英語のメニューはありますか。','えいごのメニューはありますか。','有英文菜單嗎?','N5'),
+  // ── N4:日常辦事 ──
+  S('予約したいんですが、空いていますか。','よやくしたいんですが、あいていますか。','我想預約,還有位子嗎?','N4'),
+  S('これ、別々に払えますか。','これ、べつべつにはらえますか。','這個可以分開付嗎?','N4'),
+  S('荷物をここに置いてもいいですか。','にもつをここにおいてもいいですか。','行李可以放這裡嗎?','N4'),
+  S('道に迷ってしまったんですが。','みちにまよってしまったんですが。','我迷路了…','N4'),
+  S('おすすめは何かありますか。','おすすめはなにかありますか。','有什麼推薦的嗎?','N4'),
+  S('もう一度説明してもらえますか。','もういちどせつめいしてもらえますか。','可以再說明一次嗎?','N4'),
+  // ── N3:生活手續・工作日常 ──
+  S('この書類の書き方を教えてもらえますか。','このしょるいのかきかたをおしえてもらえますか。','可以教我這份文件怎麼填嗎?','N3'),
+  S('予約を明日に変更したいんですが。','よやくをあしたにへんこうしたいんですが。','我想把預約改到明天。','N3'),
+  S('体調が悪いので、早退してもいいですか。','たいちょうがわるいので、そうたいしてもいいですか。','我身體不舒服,可以早退嗎?','N3'),
+  S('電車が遅れて、少し遅刻しそうです。','でんしゃがおくれて、すこしちこくしそうです。','電車誤點,我可能會遲到一下。','N3'),
+  S('これ、返品できますか。','これ、へんぴんできますか。','這個可以退貨嗎?','N3'),
+  S('領収書をもらえますか。','りょうしゅうしょをもらえますか。','可以給我收據嗎?','N3'),
+  // ── N2:職場・商務 ──
+  S('お手数ですが、確認していただけますか。','おてすうですが、かくにんしていただけますか。','麻煩您,可以幫我確認一下嗎?','N2'),
+  S('申し訳ありませんが、締め切りを延ばしていただけますか。','もうしわけありませんが、しめきりをのばしていただけますか。','很抱歉,可以延後截止日嗎?','N2'),
+  S('先日の件について、ご相談したいことがあります。','せんじつのけんについて、ごそうだんしたいことがあります。','關於前幾天那件事,我想跟您商量。','N2'),
+  S('この件は上司と相談してからお返事します。','このけんはじょうしとそうだんしてからおへんじします。','這件事我跟主管商量後再回覆您。','N2'),
+  S('恐れ入りますが、少々お待ちいただけますか。','おそれいりますが、しょうしょうおまちいただけますか。','不好意思,能請您稍等一下嗎?','N2'),
+  // ── N1:高階敬語 ──
+  S('ご多忙のところ恐縮ですが、お時間をいただけますでしょうか。','ごたぼうのところきょうしゅくですが、おじかんをいただけますでしょうか。','百忙之中打擾了,能占用您一點時間嗎?','N1'),
+  S('今回の件につきまして、忌憚のないご意見をお聞かせください。','こんかいのけんにつきまして、きたんのないごいけんをおきかせください。','關於這次的事,請不吝賜教。','N1'),
+  S('諸般の事情により、日程を再調整させていただきます。','しょはんのじじょうにより、にっていをさいちょうせいさせていただきます。','因種種因素,請容我重新安排日程。','N1'),
+  S('おっしゃることはごもっともですが、一点だけ確認させてください。','おっしゃることはごもっともですが、いってんだけかくにんさせてください。','您說的很有道理,但請容我確認一點。','N1'),
+  S('微力ではございますが、精一杯務めさせていただきます。','びりょくではございますが、せいいっぱいつとめさせていただきます。','雖然能力有限,我會全力以赴。','N1'),
 ];
+const LEVELS = ['N5','N4','N3','N2','N1'];
+let activeLv = 'N5';
 let idx = 0;
-function cur(){ return SENTS[idx]; }
+function list(){ return SENTS.filter(s=>s.lv===activeLv); }
+function cur(){ return list()[idx] || list()[0]; }
 
+function renderLvTabs(){
+  document.getElementById('lvtabs').innerHTML = LEVELS.map(lv=>{
+    const n = SENTS.filter(s=>s.lv===lv).length;
+    return `<div class="lvtab${lv===activeLv?' on':''}" onclick="pickLv('${lv}')">${lv}<small>${n} 句</small></div>`;
+  }).join('');
+  document.getElementById('lvdesc').textContent = LV_DESC[activeLv] || '';
+}
+function pickLv(lv){ activeLv=lv; idx=0; stopRec(); renderLvTabs(); renderChips(); render(); }
 function render(){
   document.getElementById('jp').textContent = cur().jp;
   document.getElementById('kana').textContent = cur().kana;
@@ -111,11 +162,11 @@ function render(){
   [...document.querySelectorAll('#chips .chip')].forEach((c,i)=>c.classList.toggle('on', i===idx));
 }
 function renderChips(){
-  document.getElementById('chips').innerHTML = SENTS.map((s,i)=>`<span class="chip" onclick="go(${i})">${i+1}</span>`).join('');
+  document.getElementById('chips').innerHTML = list().map((s,i)=>`<span class="chip" onclick="go(${i})">${i+1}</span>`).join('');
 }
 function go(i){ idx=i; stopRec(); render(); }
 function prev(){ if(idx>0){ idx--; stopRec(); render(); } }
-function next(){ if(idx<SENTS.length-1){ idx++; stopRec(); render(); } }
+function next(){ if(idx<list().length-1){ idx++; stopRec(); render(); } }
 
 // 範例發音:優先播 VOICEVOX 預生 mp3(__TTS,好聽),沒有才退回瀏覽器 TTS。與主站一致。
 let _demo=null;
@@ -206,7 +257,7 @@ auth.onAuthStateChanged(u=>{
     return;
   }
   gate.style.display='none'; app.style.display='block';
-  renderChips(); render();
+  renderLvTabs(); renderChips(); render();
 });
 document.getElementById('loginBtn').onclick=()=>{ const p=new firebase.auth.GoogleAuthProvider(); p.setCustomParameters({prompt:'select_account'}); auth.signInWithPopup(p).catch(e=>{ if(/popup-closed|cancelled/.test(e.code||''))return; document.getElementById('gerr').textContent='登入失敗:'+e.message; }); };
 </script>
