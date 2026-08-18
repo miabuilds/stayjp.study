@@ -286,6 +286,7 @@ window.Articles = (function () {
       '.art-para .jlk{cursor:pointer;color:#e8734a;border-bottom:1px solid rgba(232,115,74,.5)}',
       '.art-para .jlk rt{color:var(--tx2,#8a8a8a)}',
       '.art-s{border-radius:6px;padding:1px 2px}',
+      '.art-romaji{display:block;font-size:.72em;color:var(--tx3,#9a9a9a);letter-spacing:.01em;margin:2px 0 4px;line-height:1.5}',
       // 逐詞高亮:依 VOICEVOX 每拍時長,橘框只框「正在唸的那個詞」(對齊實際發音)
       '.aw{border-radius:5px;padding:0 1px;transition:background .1s linear}',
       '.art-s.on .aw.cur{background:rgba(232,115,74,.85);color:#fff;box-shadow:0 0 0 2px rgba(232,115,74,.5)}',
@@ -407,6 +408,7 @@ window.Articles = (function () {
       '<div class="art-tools">' +
       '<button class="art-tbtn on" id="artFuriBtn" onclick="Articles.toggleFuri()">あ ' + enOr('假名', 'Kana') + '</button>' +
       '<button class="art-tbtn" id="artZhBtn" onclick="Articles.toggleZh()">译 ' + enOr('中譯', 'CN') + '</button>' +
+      '<button class="art-tbtn' + (romaOn ? ' on' : '') + '" id="artRomaBtn" onclick="Articles.toggleRomaji()">Aa ' + enOr('羅馬拼音', 'Romaji') + '</button>' +
       '<button class="art-tbtn" id="artFsBtn" onclick="Articles.cycleFs()">Aa</button>' +
       '</div>' +
       // tabs
@@ -495,8 +497,10 @@ window.Articles = (function () {
         } else {
           sp = '<span class="art-s">' + frFn(s) + '</span>';
         }
+        var rj = romajiForSentence(clean);
+        var rjS = rj ? '<span class="art-romaji" style="display:' + (romaOn ? 'block' : 'none') + '">' + esc(rj) + '</span>' : '';
         var trS = trParts ? '<span class="art-tr art-tr-s" style="display:' + (zhOn ? 'block' : 'none') + '">' + esc(trParts[sj].trim()) + '</span>' : '';
-        return sp + trS;
+        return sp + rjS + trS;
       }).join('');
       var trHtml = (!trParts && trWhole) ? '<div class="art-tr" style="display:' + (zhOn ? 'block' : 'none') + '">' + esc(trWhole) + '</div>' : '';
       return '<div class="art-para" style="font-size:' + FS[fsIdx] + '">' + inner + '</div>' + trHtml;
@@ -582,8 +586,77 @@ window.Articles = (function () {
   function emptyMsg(t) { return '<div style="text-align:center;color:var(--tx3,#aaa);padding:40px 0;font-size:14px">' + t + '</div>'; }
   function shuffle(arr) { for (var i = arr.length - 1; i > 0; i--) { var j = Math.floor((typeof crypto !== 'undefined' && crypto.getRandomValues ? crypto.getRandomValues(new Uint32Array(1))[0] / 4294967296 : Math.random()) * (i + 1)); var t = arr[i]; arr[i] = arr[j]; arr[j] = t; } return arr; }
 
+  // ─────────── 羅馬拼音(Readle 對齊:初學者還不熟假名時的輔助)───────────
+  // 假名→黑本式羅馬字。長音直接展開母音(ou/aa),ん 在母音/や行前加 ',促音疊子音。
+  var ROMA = { 'きゃ':'kya','きゅ':'kyu','きょ':'kyo','しゃ':'sha','しゅ':'shu','しょ':'sho','ちゃ':'cha','ちゅ':'chu','ちょ':'cho','にゃ':'nya','にゅ':'nyu','にょ':'nyo','ひゃ':'hya','ひゅ':'hyu','ひょ':'hyo','みゃ':'mya','みゅ':'myu','みょ':'myo','りゃ':'rya','りゅ':'ryu','りょ':'ryo','ぎゃ':'gya','ぎゅ':'gyu','ぎょ':'gyo','じゃ':'ja','じゅ':'ju','じょ':'jo','びゃ':'bya','びゅ':'byu','びょ':'byo','ぴゃ':'pya','ぴゅ':'pyu','ぴょ':'pyo','ふぁ':'fa','ふぃ':'fi','ふぇ':'fe','ふぉ':'fo','うぃ':'wi','うぇ':'we','てぃ':'ti','でぃ':'di','ヴ':'vu',
+    'あ':'a','い':'i','う':'u','え':'e','お':'o','か':'ka','き':'ki','く':'ku','け':'ke','こ':'ko','さ':'sa','し':'shi','す':'su','せ':'se','そ':'so','た':'ta','ち':'chi','つ':'tsu','て':'te','と':'to','な':'na','に':'ni','ぬ':'nu','ね':'ne','の':'no','は':'ha','ひ':'hi','ふ':'fu','へ':'he','ほ':'ho','ま':'ma','み':'mi','む':'mu','め':'me','も':'mo','や':'ya','ゆ':'yu','よ':'yo','ら':'ra','り':'ri','る':'ru','れ':'re','ろ':'ro','わ':'wa','を':'o','ん':'n','が':'ga','ぎ':'gi','ぐ':'gu','げ':'ge','ご':'go','ざ':'za','じ':'ji','ず':'zu','ぜ':'ze','ぞ':'zo','だ':'da','ぢ':'ji','づ':'zu','で':'de','ど':'do','ば':'ba','び':'bi','ぶ':'bu','べ':'be','ぼ':'bo','ぱ':'pa','ぴ':'pi','ぷ':'pu','ぺ':'pe','ぽ':'po','ぁ':'a','ぃ':'i','ぅ':'u','ぇ':'e','ぉ':'o','ゎ':'wa' };
+  function kanaToRomaji(kana) {
+    var s = String(kana).replace(/[ァ-ヶ]/g, function (c) { return String.fromCharCode(c.charCodeAt(0) - 0x60); });
+    var out = '', i = 0;
+    while (i < s.length) {
+      var c = s[i];
+      if (c === 'っ') {   // 促音:疊下一個子音
+        var nx = ROMA[s.slice(i + 1, i + 3)] || ROMA[s[i + 1]] || '';
+        out += nx ? (nx[0] === 'c' ? 't' : nx[0]) : '';
+        i++; continue;
+      }
+      if (c === 'ー') {   // 長音記號:重複前一個母音
+        var last = out.match(/[aiueo](?=[^aiueo]*$)/); out += last ? last[0] : ''; i++; continue;
+      }
+      var two = ROMA[s.slice(i, i + 2)];
+      if (two) { out += (out.slice(-1) === 'n' && /^[aiueoy]/.test(two) ? "'" : '') + two; i += 2; continue; }
+      var one = ROMA[c];
+      if (one) { out += (out.slice(-1) === 'n' && /^[aiueoy]/.test(one) ? "'" : '') + one; i++; continue; }
+      if (/[、。,!?！?]/.test(c)) out += (c === '、' ? ', ' : c === '。' ? '. ' : c + ' ');
+      else out += c;   // 漢字等(理論上不會出現:輸入是讀音)
+      i++;
+    }
+    return out;
+  }
+  // 句子→羅馬拼音:沿用 frTok 的讀音優先序(vocab 人工讀音 > kuromoji)。
+  // 分寫規則(貼近教科書):內容詞・助詞之間空格;助動詞/語尾(ます/た/ない…)接前詞連寫;
+  // 助詞變音:は→wa、へ→e、を→o。
+  var PARTICLES = { 'は':'wa','へ':'e','を':'o','が':1,'に':1,'で':1,'と':1,'も':1,'や':1,'か':1,'ね':1,'よ':1,'な':1,'の':1,'から':1,'まで':1,'より':1,'だけ':1,'しか':1,'ばかり':1,'ほど':1,'くらい':1,'ぐらい':1,'など':1,'ずつ':1,'こそ':1,'さえ':1,'でも':1,'って':1,'ながら':1,'たり':1,'し':1,'ば':1,'ても':1,'のに':1,'ので':1 };
+  function romajiForSentence(clean) {
+    var toks = window.ARTICLE_TOKENS && window.ARTICLE_TOKENS[clean];
+    if (!toks) return null;
+    var look = window.furiLookup || function () { return null; };
+    // 先按「詞組」聚合假名,整組一次轉羅馬字 → 促音/長音跨 token 不會斷(あらっ+て=aratte)
+    var groups = [];   // {kana, fixed(助詞變音), p(助詞), punct(標點)}
+    for (var gi = 0; gi < toks.length; gi++) {
+      var t = toks[gi];
+      if (/^[、。!?！?,.]+$/.test(t.s)) { groups.push({ punct: t.s }); continue; }
+      if (!t.k && PARTICLES[t.s]) {
+        groups.push(typeof PARTICLES[t.s] === 'string' ? { fixed: PARTICLES[t.s], p: true } : { kana: (t.r || t.s), p: true });
+        continue;
+      }
+      var e = look(t.s);
+      var rd = (e && e.r) || t.r || t.s;
+      var prev = groups[groups.length - 1];
+      if (!t.k && prev && !prev.p && !prev.punct) { prev.kana += rd; continue; }   // 語尾(ます/た/て…)接前一個內容詞組
+      groups.push({ kana: rd });
+    }
+    var out = '';
+    groups.forEach(function (g) {
+      var piece = g.fixed || (g.punct ? kanaToRomaji(g.punct).trim() : kanaToRomaji(g.kana || ''));
+      if (!piece) return;
+      if (g.punct) { out = out.replace(/\s+$/, '') + piece + ' '; return; }
+      out += piece + ' ';
+    });
+    out = out.replace(/\s{2,}/g, ' ').trim();
+    if (/[ぁ-ゖァ-ヶ㐀-鿿]/.test(out)) return null;   // 斷詞資料爛的句子:不硬顯示殘缺 romaji
+    return out;
+  }
+
   // ─────────── 工具列 ───────────
   var zhOn = false;
+  var romaOn = (function () { try { return localStorage.getItem('art_romaji') === '1'; } catch (e) { return false; } })();
+  function toggleRomaji() {
+    romaOn = !romaOn;
+    try { localStorage.setItem('art_romaji', romaOn ? '1' : '0'); } catch (e) {}
+    var btn = document.getElementById('artRomaBtn'); if (btn) btn.classList.toggle('on', romaOn);
+    [].forEach.call(document.querySelectorAll('#artMask .art-romaji'), function (t) { t.style.display = romaOn ? 'block' : 'none'; });
+  }
   function toggleFuri() {
     furiOn = !furiOn;
     var c = document.getElementById('artContent'), btn = document.getElementById('artFuriBtn');
@@ -697,7 +770,7 @@ window.Articles = (function () {
 
   return {
     open: open, close: close, read: read, tab: tab, entryCardHtml: entryCardHtml,
-    toggleFuri: toggleFuri, toggleZh: toggleZh, cycleFs: cycleFs,
+    toggleFuri: toggleFuri, toggleZh: toggleZh, toggleRomaji: toggleRomaji, cycleFs: cycleFs,
     playFrom: playFrom, togglePlay: togglePlay, stepRate: stepRate, say: say,
     toggleRepeat: toggleRepeat, toggleSingle: toggleSingle,
     answer: answer, gd: gd, done: done
