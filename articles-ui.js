@@ -66,6 +66,7 @@ window.Articles = (function () {
       }
       var e = look(base) || eSurf;                  // 釋義：先查原形，再查表層
       if (!e && window.kanaLookup) e = window.kanaLookup(base) || window.kanaLookup(surf);   // 假名詞 fallback
+      if (!e && window.dictExtra) e = window.dictExtra(base) || window.dictExtra(surf);      // 文章補充字典(未收錄詞根治)
       var w = base, r = (e && e.r) || t.r || frd || '', m = e ? Lc(e.m, e.m_en) : '', c = (e && e.c) || '';
       var f = t.b ? enOr('活用形', 'conj.') : '';
       return '<span class="aw jlk" role="button" tabindex="0" data-w="' + esc(w) + '" data-r="' + esc(r)
@@ -94,6 +95,8 @@ window.Articles = (function () {
       if (e && e.m) return { w: word, r: e.r || '', m: zc(e.m), c: e.c || '', f: extra || '' };
       var ke = kl(word);                             // 假名詞/讀音
       if (ke) return { w: ke.w, r: ke.r || word, m: zc(ke.m), c: ke.c || '', f: extra || '' };
+      var xe = window.dictExtra && window.dictExtra(word);   // 文章補充字典
+      if (xe) return { w: word, r: xe.r || '', m: zc(xe.m), c: xe.c || '', f: extra || '' };
       if ((word[0] === 'お' || word[0] === 'ご') && word.length > 2) {   // 美化語接頭:おひる→ひる
         var p = hit(word.slice(1), extra);
         if (p) { p.f = (p.f ? p.f + ' ' : '') + '＋' + word[0]; return p; }
@@ -331,6 +334,8 @@ window.Articles = (function () {
       '.art-pbar{pointer-events:auto;display:flex;align-items:center;gap:6px;background:#2c2c2e;color:#fff;border:1px solid transparent;border-radius:40px;padding:7px 10px;box-shadow:0 6px 24px rgba(0,0,0,.28);max-width:420px;width:100%}',
       '[data-theme="dark"] .art-pbar{background:#2e2d33;border-color:rgba(255,255,255,.12);box-shadow:0 6px 24px rgba(0,0,0,.55)}',
       '.art-pb{border:none;background:none;color:#fff;cursor:pointer;width:44px;height:44px;border-radius:50%;font-size:18px;display:inline-flex;align-items:center;justify-content:center}',
+      '.art-pb.art-mode{width:auto;min-width:44px;padding:0 10px;font-size:14px;border-radius:22px;opacity:.65}',
+      '.art-pb.art-mode.on{opacity:1;background:rgba(255,255,255,.25);box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.7)}',
       '.art-pb.main{background:var(--ac,#d4654a);width:50px;height:50px;font-size:22px}',
       '.art-pb:active{transform:scale(.92)}',
       '.art-prate{background:rgba(255,255,255,.16);color:#fff;border-radius:20px;padding:0 10px;height:34px;font-size:13px;font-weight:700;min-width:50px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;font-variant-numeric:tabular-nums}',
@@ -419,6 +424,8 @@ window.Articles = (function () {
       '<button class="art-pb art-rstep" onclick="Articles.stepRate(-1)" title="' + enOr('慢一點', 'Slower') + '" aria-label="' + enOr('慢一點', 'Slower') + '">−</button>' +
       '<span class="art-prate" id="artRate">' + (pl.rate.toFixed(2).replace(/0$/, '')) + '×</span>' +
       '<button class="art-pb art-rstep" onclick="Articles.stepRate(1)" title="' + enOr('快一點', 'Faster') + '" aria-label="' + enOr('快一點', 'Faster') + '">＋</button>' +
+      '<button class="art-pb art-mode" id="artRepBtn" onclick="Articles.toggleRepeat()" title="' + enOr('重複播放這一句', 'Repeat sentence') + '">🔁</button>' +
+      '<button class="art-pb art-mode" id="artSingleBtn" onclick="Articles.toggleSingle()" title="' + enOr('只播這一句就停', 'Play one sentence') + '">' + enOr('單句', '1 sent.') + '</button>' +
       '</div></div>' +
       '</div>';
     var d = document.createElement('div'); d.innerHTML = h; document.body.appendChild(d.firstChild);
@@ -631,7 +638,14 @@ window.Articles = (function () {
           lastWi = wi;
         }
       };
-      au.onended = function () { if (pl.token === myToken) { if (aws[lastWi]) aws[lastWi].classList.remove('cur'); step(n + 1); } };
+      au.onended = function () {
+        if (pl.token !== myToken) return;
+        if (aws[lastWi]) aws[lastWi].classList.remove('cur');
+        // 播放模式(測試者回饋:像 Readle 的單句/重複):🔁=同句循環;單句=播完當句就停(再按▶重播當句)
+        if (pl.repeat) { step(n); return; }
+        if (pl.single) { pl.playing = false; pl.audio = null; setBtn(); return; }
+        step(n + 1);
+      };
       au.play().catch(function () { if (pl.token === myToken) step(n + 1); });
     }
     pl.playing = true; setBtn(); step(i);
@@ -654,6 +668,20 @@ window.Articles = (function () {
     try { localStorage.setItem('art_rate', pl.rate); } catch (e) {}
     if (pl.audio) pl.audio.playbackRate = pl.rate;
   }
+  // 播放模式切換:🔁 重複當句 / 單句播完即停(互斥:開一個關另一個)
+  function toggleRepeat() {
+    pl.repeat = !pl.repeat; if (pl.repeat) pl.single = false;
+    setModeBtns();
+  }
+  function toggleSingle() {
+    pl.single = !pl.single; if (pl.single) pl.repeat = false;
+    setModeBtns();
+  }
+  function setModeBtns() {
+    var r = document.getElementById('artRepBtn'), s = document.getElementById('artSingleBtn');
+    if (r) r.classList.toggle('on', !!pl.repeat);
+    if (s) s.classList.toggle('on', !!pl.single);
+  }
   // 單字/測驗單點發音(用預錄)
   function say(t) { if (hasTts(t) && typeof speak === 'function') speak(t); }
 
@@ -671,6 +699,7 @@ window.Articles = (function () {
     open: open, close: close, read: read, tab: tab, entryCardHtml: entryCardHtml,
     toggleFuri: toggleFuri, toggleZh: toggleZh, cycleFs: cycleFs,
     playFrom: playFrom, togglePlay: togglePlay, stepRate: stepRate, say: say,
+    toggleRepeat: toggleRepeat, toggleSingle: toggleSingle,
     answer: answer, gd: gd, done: done
   };
 })();
