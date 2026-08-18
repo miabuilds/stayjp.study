@@ -190,6 +190,8 @@
     //   網頁+未登入  → 主推「登入送 3 天全功能試用」(還沒體驗過完整價值,先給試用比直接要錢轉換高)
     //   網頁+已登入  → 主推方案,帶 JLPT 倒數 + 早鳥剩餘名額 + 退費安心線
     const isNative = !!(window.STAYJP_NATIVE && window.STAYJP_NATIVE.isNativeApp);
+    // iPhone 網頁訪客 → 導去 App 試用(iOS 綁卡試用轉換 40%,網頁只有 1.9%;額度用完是最高轉換時刻)
+    const isIOSWeb = !isNative && (/iPhone|iPad|iPod/i.test(navigator.userAgent) || (/Macintosh/.test(navigator.userAgent) && 'ontouchend' in document));
     const canOfferTrial = !isNative && !cachedUserEmail && typeof window.loginWith === 'function';
     const cd = jlptCountdown();
 
@@ -203,7 +205,7 @@
       primary = { label: '🎁 Google 登入，免費試 3 天', act: 'login' };
       secondary = { label: '直接看訂閱方案 →', act: 'plans' };
     } else {
-      body = `${msg}<br>升級 Premium，所有練習工具無限次使用。`;
+      body = `${msg}<br>你已經比多數人認真——升級 Premium 無限練，衝一次就過。`;
       primary = { label: '解鎖無限練習 →', act: 'plans' };
     }
 
@@ -224,6 +226,7 @@
         ${metaLines.length ? `<p class="pw-meta">${metaLines.join('<br>')}</p>` : ''}
         <button class="pw-btn pw-ok" id="pwOk">${primary.label}</button>
         ${secondary ? `<button class="pw-btn pw-alt" id="pwAlt">${secondary.label}</button>` : ''}
+        ${isIOSWeb ? `<a class="pw-btn pw-alt" style="display:block;text-decoration:none" href="https://apps.apple.com/app/id6778227353" target="_blank" rel="noopener">📱 用 iPhone App 免費試 7 天(網頁只有 3 天)</a>` : ''}
         <button class="pw-btn pw-cancel" id="pwCancel">稍後再說</button>
       </div>`;
     document.body.appendChild(wrap);
@@ -252,7 +255,7 @@
         if (!left || left <= 0) return;
         const line = document.getElementById('pwEbLine');
         if (!line) return;
-        line.textContent = `🐦 早鳥年費 NT$990・只剩 ${left} 名`;
+        line.textContent = `🐦 早鳥年費 NT$990・只剩 ${left} 名(額滿恢復 NT$1,490)`;
         line.style.display = '';
         if (window.UITranslate && UITranslate.active()) UITranslate.walk(line);
       });
@@ -273,7 +276,26 @@
   }
 
   // ── UI badge（只 owner 看得到）──
+  // 試用到期前 24h:頂部提醒條(轉換高點之一;每日最多出現一次,可關)
+  function maybeExpiryBanner() {
+    try {
+      const isNative = !!(window.STAYJP_NATIVE && window.STAYJP_NATIVE.isNativeApp);
+      if (isNative || isPremium() || !inTrial()) return;
+      if (trialDaysLeft() > 1) return;
+      const k = 'trial_exp_banner_' + new Date().toISOString().slice(0,10);
+      if (localStorage.getItem(k) || document.getElementById('trialExpBar')) return;
+      localStorage.setItem(k, '1');
+      const bar = document.createElement('div');
+      bar.id = 'trialExpBar';
+      bar.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:400;background:#B45309;color:#fff;font-size:13px;padding:9px 40px 9px 14px;text-align:center;line-height:1.5';
+      bar.innerHTML = '⏳ 試用明天到期——早鳥年費 NT$990 鎖住一整年(額滿恢復 1,490)'
+        + ' <a href="pricing.html" style="color:#FDE68A;font-weight:700;text-decoration:underline">看方案 →</a>'
+        + '<button onclick="this.parentElement.remove()" style="position:absolute;right:8px;top:6px;background:none;border:0;color:#fff;font-size:16px;cursor:pointer;padding:4px">✕</button>';
+      document.body.appendChild(bar);
+    } catch (e) {}
+  }
   function refreshBadge() {
+    maybeExpiryBanner();
     let badge = document.getElementById('quotaBadge');
     // App 沒有 3 天試用(走 Apple 7 天)→ App 一律不顯示「試用中 / 試用已結束」,只顯示免費版額度。網頁照常。
     const isNative = !!(window.STAYJP_NATIVE && window.STAYJP_NATIVE.isNativeApp);

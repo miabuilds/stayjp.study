@@ -4469,6 +4469,27 @@ function toggleDetail(btn) {
   try { window.Listening = Listening; } catch (e) {}
   try { window.Stats = Stats; } catch (e) {}
 </script>
+<script>
+// iPhone 網頁訪客 → 導去 App(iOS 試用轉換 40% vs 網頁 1.9%;App 內/已關過的不顯示)
+(function(){
+  try{
+    if(window.STAYJP_NATIVE && window.STAYJP_NATIVE.isNativeApp) return;
+    var ua=navigator.userAgent||'';
+    var ios=/iPhone|iPad|iPod/i.test(ua)||(/Macintosh/.test(ua)&&'ontouchend' in document);
+    if(!ios) return;
+    var until=parseInt(localStorage.getItem('ios_appbar_off')||'0',10);
+    if(Date.now()<until) return;
+    var bar=document.createElement('div');
+    bar.id='iosAppBar';
+    bar.style.cssText='position:sticky;top:0;z-index:390;background:#1D3557;color:#fff;font-size:13px;padding:9px 40px 9px 14px;text-align:center;line-height:1.5';
+    bar.innerHTML='📱 iPhone 用戶:App 內<b>免費試用 7 天</b>全功能(網頁只有 3 天) '
+      +'<a href="https://apps.apple.com/app/id6778227353" style="color:#A8DADC;font-weight:700;text-decoration:underline">下載 App →</a>'
+      +'<button style="position:absolute;right:8px;top:6px;background:none;border:0;color:#fff;font-size:16px;cursor:pointer;padding:4px" '
+      +'onclick="localStorage.setItem(\'ios_appbar_off\',String(Date.now()+30*86400000));this.parentElement.remove()">✕</button>';
+    document.addEventListener('DOMContentLoaded',function(){ document.body.insertBefore(bar,document.body.firstChild); });
+  }catch(e){}
+})();
+</script>
 <script src="tour.js"></script>
 <script src="tool-quota.js"></script>
 <!-- Cloudflare Web Analytics --><script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon="{&quot;token&quot;: &quot;0a94a20c2737440a86f55c4241011f68&quot;}"></script><!-- End Cloudflare Web Analytics -->
