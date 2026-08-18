@@ -264,6 +264,14 @@ select.lang-btn {
 }
 .fav-pill:hover { color: var(--ac); }
 .fav-pill.fav-on { color: var(--ac); }
+/* 首頁主推功能列(文章卡下方三張迷你卡) */
+.flag-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:0 0 12px}
+.flag-card{position:relative;display:flex;flex-direction:column;align-items:center;gap:3px;background:var(--bg2);border:1px solid var(--bd);border-radius:14px;padding:13px 6px 11px;text-decoration:none;color:var(--tx);text-align:center;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.flag-card:active{transform:scale(.97)}
+.fc-ic{font-size:24px;line-height:1.2}
+.fc-t{font-size:13px;font-weight:800}
+.fc-d{font-size:10.5px;color:var(--tx2);line-height:1.4}
+.fc-new{position:absolute;top:6px;right:6px;font-size:9px;background:#ef4444;color:#fff;border-radius:8px;padding:1px 5px;font-weight:800;line-height:1.5}
 .more-item {
   display: block; width: 100%; text-align: left;
   background: none; border: none; color: var(--tx);
@@ -3669,6 +3677,11 @@ function renderVocab() {
   let h = '';
   if (!lf && !showFavOnly) {
     h += (window.Articles && Articles.entryCardHtml ? Articles.entryCardHtml() : '');   // 首頁明顯的文章入口卡
+    h += '<div class="flag-row">'
+      + '<a class="flag-card" href="jlpt-drill.html"><span class="fc-new">NEW</span><span class="fc-ic">🎯</span><span class="fc-t">JLPT 刷題</span><span class="fc-d">1600+題 · 模擬試験</span></a>'
+      + '<a class="flag-card" href="speak-test.html"><span class="fc-new">NEW</span><span class="fc-ic">🎙</span><span class="fc-t">AI 口說評分</span><span class="fc-d">跟讀 · 即時回饋</span></a>'
+      + '<a class="flag-card" href="speak-chat.html"><span class="fc-new">NEW</span><span class="fc-ic">🗣</span><span class="fc-t">AI 情境對話</span><span class="fc-d">和 AI 多輪對話</span></a>'
+      + '</div>';   // 主推新功能列
     const lv = currentLevel.toUpperCase();
     const cnt = data.length;
     const vMas = levelMastery(currentLevel);
@@ -3885,6 +3898,11 @@ function render() {
   let h = '';
   if (!lf && !showFavOnly) {
     h += (window.Articles && Articles.entryCardHtml ? Articles.entryCardHtml() : '');   // 首頁明顯的文章入口卡
+    h += '<div class="flag-row">'
+      + '<a class="flag-card" href="jlpt-drill.html"><span class="fc-new">NEW</span><span class="fc-ic">🎯</span><span class="fc-t">JLPT 刷題</span><span class="fc-d">1600+題 · 模擬試験</span></a>'
+      + '<a class="flag-card" href="speak-test.html"><span class="fc-new">NEW</span><span class="fc-ic">🎙</span><span class="fc-t">AI 口說評分</span><span class="fc-d">跟讀 · 即時回饋</span></a>'
+      + '<a class="flag-card" href="speak-chat.html"><span class="fc-new">NEW</span><span class="fc-ic">🗣</span><span class="fc-t">AI 情境對話</span><span class="fc-d">和 AI 多輪對話</span></a>'
+      + '</div>';   // 主推新功能列
     const lv = currentLevel.toUpperCase();
     const cnt = data.length;
     const gMas = levelGrammarMastery(currentLevel);
