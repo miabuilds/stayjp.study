@@ -1533,7 +1533,7 @@ html[data-fs="xlarge"] .quiz-box{zoom:1.28;width:calc(92%/1.28);max-width:calc(4
   <button class="more-item" onclick="closeMore();FlashCard.start()">⚡ 快速背單字</button>
   <button class="more-item" onclick="closeMore();MockExam.start()" data-i18n="mock_exam">📝 模擬考</button>
   <a class="more-item" href="jlpt-drill.html">🎯 JLPT 刷題特區 <span style="font-size:9px;background:var(--ac);color:#fff;border-radius:8px;padding:1px 6px;vertical-align:middle">NEW</span></a>
-  <a class="more-item" href="speak-test.html">🎙 AI 口說練習 <span style="font-size:9px;background:var(--ac);color:#fff;border-radius:8px;padding:1px 6px;vertical-align:middle">NEW</span></a>
+  <a class="more-item" href="speak.html">🎙 AI 口說練習 <span style="font-size:9px;background:var(--ac);color:#fff;border-radius:8px;padding:1px 6px;vertical-align:middle">NEW</span></a>
   <a class="more-item" href="speak-chat.html">🗣 AI 情境對話 <span style="font-size:9px;background:var(--ac);color:#fff;border-radius:8px;padding:1px 6px;vertical-align:middle">NEW</span></a>
   <button class="more-item" onclick="closeMore();GrammarDrill.start()" data-i18n="grammar_drill">📖 文法練習</button>
   <button class="more-item" onclick="closeMore();KeigoQuiz.start()" data-i18n="keigo_practice">🎌 敬語練習</button>
@@ -3679,7 +3679,7 @@ function renderVocab() {
     h += (window.Articles && Articles.entryCardHtml ? Articles.entryCardHtml() : '');   // 首頁明顯的文章入口卡
     h += '<div class="flag-row">'
       + '<a class="flag-card" href="jlpt-drill.html"><span class="fc-new">NEW</span><span class="fc-ic">🎯</span><span class="fc-t">JLPT 刷題</span><span class="fc-d">1600+題 · 模擬試験</span></a>'
-      + '<a class="flag-card" href="speak-test.html"><span class="fc-new">NEW</span><span class="fc-ic">🎙</span><span class="fc-t">AI 口說評分</span><span class="fc-d">跟讀 · 即時回饋</span></a>'
+      + '<a class="flag-card" href="speak.html"><span class="fc-new">NEW</span><span class="fc-ic">🎙</span><span class="fc-t">AI 口說評分</span><span class="fc-d">跟讀 · 即時回饋</span></a>'
       + '<a class="flag-card" href="speak-chat.html"><span class="fc-new">NEW</span><span class="fc-ic">🗣</span><span class="fc-t">AI 情境對話</span><span class="fc-d">和 AI 多輪對話</span></a>'
       + '</div>';   // 主推新功能列
     const lv = currentLevel.toUpperCase();
@@ -3900,7 +3900,7 @@ function render() {
     h += (window.Articles && Articles.entryCardHtml ? Articles.entryCardHtml() : '');   // 首頁明顯的文章入口卡
     h += '<div class="flag-row">'
       + '<a class="flag-card" href="jlpt-drill.html"><span class="fc-new">NEW</span><span class="fc-ic">🎯</span><span class="fc-t">JLPT 刷題</span><span class="fc-d">1600+題 · 模擬試験</span></a>'
-      + '<a class="flag-card" href="speak-test.html"><span class="fc-new">NEW</span><span class="fc-ic">🎙</span><span class="fc-t">AI 口說評分</span><span class="fc-d">跟讀 · 即時回饋</span></a>'
+      + '<a class="flag-card" href="speak.html"><span class="fc-new">NEW</span><span class="fc-ic">🎙</span><span class="fc-t">AI 口說評分</span><span class="fc-d">跟讀 · 即時回饋</span></a>'
       + '<a class="flag-card" href="speak-chat.html"><span class="fc-new">NEW</span><span class="fc-ic">🗣</span><span class="fc-t">AI 情境對話</span><span class="fc-d">和 AI 多輪對話</span></a>'
       + '</div>';   // 主推新功能列
     const lv = currentLevel.toUpperCase();
