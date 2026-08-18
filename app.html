@@ -1520,7 +1520,7 @@ html[data-fs="xlarge"] .quiz-box{zoom:1.28;width:calc(92%/1.28);max-width:calc(4
   #moreMenu.open{opacity:1;visibility:visible;transform:translateX(0)}
 </style>
 <div id="moreBackdrop" onclick="closeMore()"></div>
-<div id="moreMenu" style="position:fixed;bottom:60px;right:8px;background:var(--bg2);border:1px solid var(--bd);border-radius:14px;padding:8px;z-index:250;box-shadow:0 4px 20px rgba(0,0,0,.12);min-width:140px">
+<div id="moreMenu" style="position:fixed;bottom:60px;right:8px;background:var(--bg2);border:1px solid var(--bd);border-radius:14px;padding:8px;z-index:250;box-shadow:0 4px 20px rgba(0,0,0,.12);min-width:140px;max-height:calc(100vh - 76px);overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch">
   <div style="font-size:10px;color:var(--tx3);padding:4px 12px 2px;text-transform:uppercase;letter-spacing:.5px">練習</div>
   <button class="more-item" onclick="closeMore();FlashCard.start()">⚡ 快速背單字</button>
   <button class="more-item" onclick="closeMore();MockExam.start()" data-i18n="mock_exam">📝 模擬考</button>
