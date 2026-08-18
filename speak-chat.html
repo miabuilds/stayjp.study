@@ -80,10 +80,6 @@
 <div id="boot" style="min-height:60vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;color:var(--ink3)"><div style="width:34px;height:34px;border:3px solid var(--line);border-top-color:var(--accent);border-radius:50%;animation:bspin .8s linear infinite"></div><div style="font-size:14px">載入中…</div></div>
 <style>@keyframes bspin{to{transform:rotate(360deg)}}</style>
 
-<div id="gate" class="gate" style="display:none">
-  <h1>🗣 AI 情境對話</h1>
-  <button id="loginBtn" class="btn pri">用 Google 登入開始</button>
-  <div id="gerr" class="err"></div>
 </div>
 
 <div id="app" class="wrap" style="display:none">
@@ -95,7 +91,7 @@
     <div class="sub">選一個情境和難度,AI 會扮演對方跟你一來一往練對話。可以用說的(語音辨識)或打字。免費體驗 1 場,Premium 每天 3 場。</div>
     <div class="lvtabs" id="lvtabs"></div>
     <div class="scenes" id="scenes"></div>
-    <div class="muted" style="margin-top:14px">💡 這是「對話」練習;想練單句跟讀請到 <a href="speak-test.html" style="color:var(--accent)">口說練習</a>。</div>
+    <div class="muted" style="margin-top:14px">💡 這是「對話」練習;想練單句跟讀請到 <a href="speak.html" style="color:var(--accent)">口說練習</a>。</div>
   </div>
 
   <!-- 對話 -->
@@ -196,7 +192,35 @@ function renderScenes(){
 function backToPick(){ stopRec(); scene=null; history=[]; show('pick'); }
 
 // ── 開始 / 進行對話 ──
+// 站上標準雙登入(照 auth-header.js)
+let _signingIn=false;
+function loginWith(p){
+  if(_signingIn) return; _signingIn=true;
+  var provider;
+  if(p==='apple'){ provider=new firebase.auth.OAuthProvider('apple.com'); provider.addScope('email'); provider.addScope('name'); }
+  else { provider=new firebase.auth.GoogleAuthProvider(); }
+  auth.signInWithPopup(provider).then(function(){ var g=document.getElementById('loginCard'); if(g)g.remove(); })
+    .catch(function(e){ var c=e&&e.code;
+      if(c==='auth/cancelled-popup-request'||c==='auth/popup-closed-by-user')return;
+      if(c==='auth/operation-not-allowed'){ alert('Apple 登入還在設定中,請先用 Google 登入。'); return; }
+      alert('登入失敗:'+(e&&e.message||e));
+    }).finally(function(){ _signingIn=false; });
+}
+function showLoginCard(){
+  if(document.getElementById('loginCard')) return;
+  const el=document.createElement('div'); el.id='loginCard';
+  el.innerHTML='<div style="position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:900" onclick="document.getElementById(\'loginCard\').remove()"></div>'
+    +'<div style="position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:901;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:24px;max-width:320px;width:88%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.3)">'
+    +'<div style="font-size:30px;margin-bottom:6px">🗣</div>'
+    +'<div style="font-weight:800;margin-bottom:4px">登入就能開始對話</div>'
+    +'<div class="muted" style="margin-bottom:16px">免費體驗 1 場,Premium 每天 3 場</div>'
+    +'<button class="btn pri" style="width:100%;margin-bottom:8px" onclick="loginWith(\'google\')">用 Google 登入</button>'
+    +'<button class="btn" style="width:100%" onclick="loginWith(\'apple\')"> 用 Apple 登入</button>'
+    +'</div>';
+  document.body.appendChild(el);
+}
 function startChat(k){
+  if(!auth.currentUser){ showLoginCard(); return; }
   const s0 = SCENES.find(s=>s.k===k); if(!s0) return;
   if(s0.custom){
     // 自訂主題:自由輸入想聊什麼,AI 照這個設定演
@@ -401,15 +425,9 @@ document.addEventListener('keydown',e=>{ if(e.target && e.target.id==='say' && e
 // ── auth ──
 auth.onAuthStateChanged(u=>{
   try{var _b=document.getElementById("boot"); if(_b)_b.remove();}catch(e){}
-  const gate=document.getElementById('gate'), app=document.getElementById('app');
-  if(!u){
-    gate.style.display='flex'; app.style.display='none';
-    return;
-  }
-  gate.style.display='none'; app.style.display='block';
+  document.getElementById('app').style.display='block';
   renderLvTabs(); renderScenes(); show('pick');
 });
-document.getElementById('loginBtn').onclick=()=>{ const p=new firebase.auth.GoogleAuthProvider(); p.setCustomParameters({prompt:'select_account'}); auth.signInWithPopup(p).catch(e=>{ if(/popup-closed|cancelled/.test(e.code||''))return; document.getElementById('gerr').textContent='登入失敗:'+e.message; }); };
 </script>
 </body>
 </html>
