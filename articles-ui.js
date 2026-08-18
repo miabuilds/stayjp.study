@@ -567,11 +567,11 @@ window.Articles = (function () {
   }
 
   // 測驗 tab:單字快測(看詞→選中文意思),干擾項來自本篇其他單字,不足補其他文章
-  var quiz = { list: [], idx: 0, score: 0 };
+  var quiz = { list: [], idx: 0, score: 0, wrongs: [] };
   function renderQuiz(a, c) {
     var vocab = (a.vocab || []).filter(function (v) { return v.w && v.m; });
     if (vocab.length < 4) { c.innerHTML = emptyMsg(enOr('這篇單字太少,無法出測驗', 'Not enough words to quiz')); return; }
-    quiz.list = shuffle(vocab.slice()).slice(0, Math.min(8, vocab.length)); quiz.idx = 0; quiz.score = 0;
+    quiz.list = shuffle(vocab.slice()).slice(0, Math.min(8, vocab.length)); quiz.idx = 0; quiz.score = 0; quiz.wrongs = [];
     renderQuizItem(c, a);
   }
   function pool() { var o = []; list().forEach(function (a) { (a.vocab || []).forEach(function (v) { if (v.m) o.push(v); }); }); return o; }
@@ -579,10 +579,21 @@ window.Articles = (function () {
   function renderQuizItem(c, a) {
     c.className = 'art-cnt';
     if (quiz.idx >= quiz.list.length) {
+      // 結束畫面:附「錯題複習」——列出答錯的字(讀音+意思+🔊),看完知道該補哪裡
+      var wrongHtml = '';
+      if (quiz.wrongs.length) {
+        wrongHtml = '<div style="text-align:left;max-width:420px;margin:18px auto 0;border-top:1px solid var(--bd,#e5e5e5);padding-top:14px">' +
+          '<div style="font-weight:800;font-size:14px;margin-bottom:8px">📕 ' + enOr('這幾個字再看一眼', 'Review these') + '</div>' +
+          quiz.wrongs.map(function (v) {
+            var spk = hasTts(v.r || v.w) ? ' <button style="border:none;background:none;cursor:pointer;font-size:14px" onclick="Articles.say(\'' + esc(v.r || v.w) + '\')">🔊</button>' : '';
+            return '<div style="padding:7px 0;border-bottom:1px dashed var(--bd,#eee);font-size:14.5px"><b>' + esc(v.w) + '</b> <span style="color:var(--ac,#d4654a)">' + esc(v.r || '') + '</span>' + spk + '<br><span style="color:var(--tx2,#888);font-size:13px">' + esc(vm(v)) + '</span></div>';
+          }).join('') + '</div>';
+      }
       c.innerHTML = '<div class="aq" style="text-align:center;padding:30px 0">' +
         '<div style="font-size:52px">' + (quiz.score >= quiz.list.length - 1 ? '🎉' : quiz.score >= quiz.list.length / 2 ? '👍' : '💪') + '</div>' +
         '<div style="font-size:24px;font-weight:800;margin:10px 0">' + quiz.score + ' / ' + quiz.list.length + '</div>' +
-        '<button class="art-gd-btn" style="margin:14px auto 0;display:inline-block" onclick="Articles.tab(\'quiz\')">' + enOr('再測一次', 'Again') + '</button></div>';
+        wrongHtml +
+        '<button class="art-gd-btn" style="margin:18px auto 0;display:inline-block" onclick="Articles.tab(\'quiz\')">' + enOr('再測一次', 'Again') + '</button></div>';
       return;
     }
     var v = quiz.list[quiz.idx];
@@ -599,10 +610,23 @@ window.Articles = (function () {
   function answer(btn, chosen, correct) {
     var opts = btn.parentElement.querySelectorAll('.aq-opt');
     [].forEach.call(opts, function (o) { o.onclick = null; if (o.textContent === correct) o.classList.add('ok'); });
-    if (chosen === correct) quiz.score++; else btn.classList.add('ng');
+    var v = quiz.list[quiz.idx];
+    var ok = chosen === correct;
+    if (ok) quiz.score++; else { btn.classList.add('ng'); quiz.wrongs.push(v); }
+    say(v.r || v.w);   // 對錯都自動唸這個字:字+聲再加深一次(回饋:早上只加到單字測驗,文章測驗漏了)
     if (typeof Calendar !== 'undefined' && Calendar.logActivity) Calendar.logActivity('quiz');   // 文章測驗答題算進今日目標
-    setTimeout(function () { quiz.idx++; renderQuizItem(document.getElementById('artContent'), curArticle()); }, 750);
+    if (ok) {
+      setTimeout(function () { quiz.idx++; renderQuizItem(document.getElementById('artContent'), curArticle()); }, 750);
+    } else {
+      // 答錯不自動跳:讓使用者看清正解(可再按 🔊 複習),自己按下一題才走
+      var aq = btn.closest('.aq');
+      if (aq) aq.insertAdjacentHTML('beforeend',
+        '<div style="text-align:center;margin-top:14px">' +
+        '<button style="border:none;background:none;cursor:pointer;font-size:14px;color:var(--ac,#d4654a);margin-right:14px" onclick="Articles.say(\'' + esc(v.r || v.w) + '\')">🔊 ' + enOr('再聽一次', 'Replay') + '</button>' +
+        '<button class="art-gd-btn" style="display:inline-block" onclick="Articles.quizNext()">' + enOr('下一題 →', 'Next →') + '</button></div>');
+    }
   }
+  function quizNext() { quiz.idx++; renderQuizItem(document.getElementById('artContent'), curArticle()); }
 
   function emptyMsg(t) { return '<div style="text-align:center;color:var(--tx3,#aaa);padding:40px 0;font-size:14px">' + t + '</div>'; }
   function shuffle(arr) { for (var i = arr.length - 1; i > 0; i--) { var j = Math.floor((typeof crypto !== 'undefined' && crypto.getRandomValues ? crypto.getRandomValues(new Uint32Array(1))[0] / 4294967296 : Math.random()) * (i + 1)); var t = arr[i]; arr[i] = arr[j]; arr[j] = t; } return arr; }
@@ -794,6 +818,6 @@ window.Articles = (function () {
     toggleFuri: toggleFuri, toggleZh: toggleZh, toggleRomaji: toggleRomaji, cycleFs: cycleFs,
     playFrom: playFrom, togglePlay: togglePlay, stepRate: stepRate, say: say,
     toggleRepeat: toggleRepeat, toggleSingle: toggleSingle,
-    answer: answer, gd: gd, done: done
+    answer: answer, quizNext: quizNext, gd: gd, done: done
   };
 })();
