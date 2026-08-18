@@ -113,8 +113,12 @@
       <h1>🎯 JLPT 刷題特區</h1>
       <p class="lead">照 JLPT 真題題型出題,每一題都有完整詳解——不只告訴你對錯,還講清楚錯的選項錯在哪。答錯自動進錯題本。</p>
     </div>
-    <div class="lvtabs" id="lvtabs"></div>
-    <div class="types" id="types"></div>
+    <div class="lvtabs" id="lvtabs" style="min-height:42px"></div>
+    <div class="types" id="types"><div style="grid-column:1/-1;display:flex;flex-direction:column;align-items:center;gap:10px;padding:36px 0;color:var(--tx3)">
+      <div style="width:30px;height:30px;border:3px solid var(--bd);border-top-color:var(--ac);border-radius:50%;animation:jdspin .8s linear infinite"></div>
+      <div style="font-size:13px">題庫載入中…</div>
+    </div></div>
+    <style>@keyframes jdspin{to{transform:rotate(360deg)}}</style>
     <button class="wrongbtn" id="wrongBtn" onclick="startWrong()">📕 錯題本 — 重刷答錯的題(<span id="wrongCount">0</span>)</button>
     <button class="wrongbtn" id="recBtn" onclick="showRecords()" style="display:none">📊 刷題紀錄 — 做過哪些題、正答率、場次歷史</button>
     <button class="exambtn" onclick="toggleExamSet()">📝 模擬試験 — 各題型組一份完整考卷</button>
@@ -205,7 +209,7 @@
 
 <script src="jlpt-questions.js"></script>
 <script src="jlpt-questions-gen.js"></script>
-<script src="audio/tts/manifest.js"></script>
+<script src="audio/tts/manifest.js" async></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
