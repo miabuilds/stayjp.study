@@ -67,6 +67,15 @@
   .hint-chip .hz{display:block;font-size:11px;opacity:.72;margin-top:1px}
   .hint-chip:hover .hz{color:#fff;opacity:.9}
   .cnbtn.off{opacity:.5;text-decoration:line-through}
+  .wchips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+  .wchip{font:inherit;font-size:12px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:4px 9px;cursor:pointer;color:var(--ink);display:inline-flex;gap:5px;align-items:baseline}
+  .wchip:hover{border-color:var(--accent)}
+  .wchip b{font-size:13px}
+  .wchip .wr{color:var(--accent2)}
+  .wchip .wz{color:var(--ink2)}
+  .hint-wrap{display:inline-flex;align-items:stretch;gap:4px}
+  .hint-spk{font:inherit;border:1px dashed var(--line);background:none;border-radius:12px;padding:0 9px;cursor:pointer;font-size:13px}
+  .hint-spk:hover{border-color:var(--accent)}
 
   /* 點評 */
   .review{background:var(--panel);border:1px solid var(--line);border-radius:16px;box-shadow:var(--sh);padding:18px;margin-top:8px}
@@ -262,6 +271,7 @@ function aiBubble(m){
     <div class="bjp"><span>${esc(jp)||'…'}</span>${jp?`<button class="spk" title="播放" onclick="playTTS(${JSON.stringify(jp).replace(/"/g,'&quot;')})">🔊</button>`:''}</div>
     ${m.kana?`<div class="bkana">${esc(m.kana)}</div>`:''}
     ${(showZh && m.zh)?`<div class="bzh">${esc(m.zh)}</div>`:''}
+    ${(showZh && m.words)?wordChips(m.words):''}
   </div></div>`;
 }
 
@@ -272,7 +282,9 @@ function parseTurn(text){
     let m=line.match(/^(JP|KANA|ZH|COACH):\s?(.*)$/);
     if(m){ o[m[1].toLowerCase()] = (m[2]||'').trim(); continue; }
     m=line.match(/^HINT:\s?(.*)$/);
-    if(m){ const v=(m[1]||'').trim(); if(v) o.hints.push(v); }
+    if(m){ const v=(m[1]||'').trim(); if(v) o.hints.push(v); continue; }
+    m=line.match(/^WORDS:\s?(.*)$/);
+    if(m){ o.words=(m[1]||'').trim(); }
   }
   // COACH 有時會吐 <blank>/空白/無 之類佔位字 → 當作沒有提點
   if(/^<?\s*(blank|空白?|無|なし|null|none|n\/a|[-—―])\s*>?$/i.test(o.coach)) o.coach='';
@@ -293,8 +305,20 @@ function expandHints(){
     _hints.slice(0,3).map(h=>{
       const parts=String(h).split(/[｜|]/); const jp=(parts[0]||'').trim(); const zh=(parts[1]||'').trim();
       if(!jp) return '';
-      return '<button class="hint-chip" onclick="useHint('+JSON.stringify(jp).replace(/"/g,'&quot;')+')">'+esc(jp)+(zh?'<span class="hz">'+esc(zh)+'</span>':'')+'</button>';
+      return '<span class="hint-wrap"><button class="hint-chip" onclick="useHint('+JSON.stringify(jp).replace(/"/g,'&quot;')+')">'+esc(jp)+(zh?'<span class="hz">'+esc(zh)+'</span>':'')+'</button>'
+        +'<button class="hint-spk" title="唸給我聽" onclick="event.stopPropagation();playTTS('+JSON.stringify(jp).replace(/"/g,'&quot;')+')">🔊</button></span>';
     }).join('');
+}
+// AI 回答的關鍵單字卡:単語|よみ|意思;分號隔開。點卡片唸該單字(雲端 TTS)
+function wordChips(words){
+  const items=String(words).split(/[;;]/).map(function(x){return x.trim();}).filter(Boolean);
+  if(!items.length) return '';
+  return '<div class="wchips">'+items.map(function(it){
+    const p=it.split(/[|｜]/); const w=(p[0]||'').trim(), r=(p[1]||'').trim(), zh=(p[2]||'').trim();
+    if(!w) return '';
+    return '<button class="wchip" onclick="event.stopPropagation();playTTS('+JSON.stringify(w).replace(/"/g,'&quot;')+')">'
+      +'<b>'+esc(w)+'</b>'+(r&&r!==w?'<span class="wr">'+esc(r)+'</span>':'')+(zh?'<span class="wz">'+esc(zh)+'</span>':'')+'</button>';
+  }).join('')+'</div>';
 }
 function useHint(jp){ const el=document.getElementById('say'); el.value=jp; autoGrow(); el.focus(); }
 

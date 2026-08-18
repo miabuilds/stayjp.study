@@ -1,4 +1,4 @@
-const CACHE_NAME = 'stayjp-v281';
+const CACHE_NAME = 'stayjp-v282';
 const ASSETS = [
   './',
   './index.html',
@@ -17,6 +17,7 @@ const ASSETS = [
   './ui-map.js',
   './translate-layer.js',
   './tool-quota.js',
+  './tour.js',
   './grammar-kanji-readings.js',
   './ux-extras.js',
   './article-tokens.js',
