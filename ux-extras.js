@@ -249,7 +249,7 @@
       + (_nudge ? '<div class="jfreq">🔁 你查過這個字 ' + _ln + ' 次，收藏起來複習吧</div>'
         : (_ln >= 2 ? '<div class="jfreq jfreq-dim">🔍 查過 ' + _ln + ' 次</div>' : ''))
       + '<div class="jacts"><button class="jact jact-spk" type="button">🔊 發音</button><button class="jact jact-fav' + (_nudge ? ' jact-pulse' : '') + '" type="button">' + (_nudge ? '⭐ 收藏複習' : '☆ 收藏') + '</button>'
-      + (data.m ? '' : '<a class="jact" href="https://jisho.org/search/' + encodeURIComponent(data.w) + '" target="_blank" rel="noopener" onclick="event.stopPropagation()">📖 Jisho</a>')
+      + (data.m ? '' : '<a class="jact" href="https://cjjc.weblio.jp/content/' + encodeURIComponent(data.w) + '" target="_blank" rel="noopener" onclick="event.stopPropagation()">📖 中文辭典</a><a class="jact" href="https://jisho.org/search/' + encodeURIComponent(data.w) + '" target="_blank" rel="noopener" onclick="event.stopPropagation()">Jisho</a>')
       + '</div>';
     document.body.appendChild(pop);
     // 定位在被點詞附近,夾在視窗內
@@ -350,6 +350,13 @@
     __kanaDict = K;
     return K;
   }
+  // 文章補充字典(article-dict.js):vocab 主庫沒收的詞。回 {r,m} 或 null。
+  window.dictExtra = function (w) {
+    try {
+      var d = window.ARTICLE_DICT && window.ARTICLE_DICT[w];
+      return d ? { r: d[0] || '', m: d[1] || '', c: '' } : null;
+    } catch (e) { return null; }
+  };
   window.kanaLookup = function (kana) {
     try {
       var list = kanaDict()[kana];
