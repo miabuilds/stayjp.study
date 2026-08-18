@@ -1534,6 +1534,7 @@ html[data-fs="xlarge"] .quiz-box{zoom:1.28;width:calc(92%/1.28);max-width:calc(4
   <button class="more-item" onclick="closeMore();MockExam.start()" data-i18n="mock_exam">📝 模擬考</button>
   <a class="more-item" href="jlpt-drill.html">🎯 JLPT 刷題特區 <span style="font-size:9px;background:var(--ac);color:#fff;border-radius:8px;padding:1px 6px;vertical-align:middle">NEW</span></a>
   <a class="more-item" href="speak.html">🎙 AI 口說練習 <span style="font-size:9px;background:var(--ac);color:#fff;border-radius:8px;padding:1px 6px;vertical-align:middle">NEW</span></a>
+  <button class="more-item" onclick="closeMore();if(window.Tour)Tour.start(true)">🧭 功能導覽</button>
   <a class="more-item" href="speak-chat.html">🗣 AI 情境對話 <span style="font-size:9px;background:var(--ac);color:#fff;border-radius:8px;padding:1px 6px;vertical-align:middle">NEW</span></a>
   <button class="more-item" onclick="closeMore();GrammarDrill.start()" data-i18n="grammar_drill">📖 文法練習</button>
   <button class="more-item" onclick="closeMore();KeigoQuiz.start()" data-i18n="keigo_practice">🎌 敬語練習</button>
@@ -3220,9 +3221,9 @@ function onbPick(lv) {
   if (!card) { onbFinish(); return; }
   card.innerHTML =
     '<div class="onb-title">' + enOr(cvt('準備好了!'), "You're all set!") + '</div>' +
-    '<div class="onb-sub">' + enOr('已幫你切到 ' + lv.toUpperCase() + ',先認識一下畫面:', 'Switched you to ' + lv.toUpperCase() + '. A quick tour of the screen:') + '</div>' +
-    quickTipsHTML() +
-    '<button class="onb-start" onclick="onbFinish()">' + enOr(cvt('開始學習'), 'Start learning') + '</button>';
+    '<div class="onb-sub">' + enOr('已幫你切到 ' + lv.toUpperCase() + '。功能不少,帶你 30 秒逛一圈?', 'Switched you to ' + lv.toUpperCase() + '. Want a 30-second tour?') + '</div>' +
+    '<button class="onb-start" onclick="onbFinish();setTimeout(function(){if(window.Tour)Tour.start(true)},350)">' + enOr(cvt('🧭 帶我看一圈'), '🧭 Show me around') + '</button>' +
+    '<button class="onb-skip" onclick="onbFinish()">' + enOr(cvt('先自己逛'), 'Explore on my own') + '</button>';
 }
 // 隨時重看的快速上手(由 header 的「?」觸發;不寫 onboarding_done、可重複開)
 function showQuickGuide() {
@@ -3233,7 +3234,8 @@ function showQuickGuide() {
     '<div class="onb-title">' + enOr(cvt('快速上手'), 'Quick Start') + '</div>' +
     '<div class="onb-sub">' + enOr(cvt('這個畫面怎麼用:'), 'How to use this screen:') + '</div>' +
     quickTipsHTML() +
-    '<button class="onb-start" onclick="_onbRemove()">' + enOr(cvt('知道了'), 'Got it') + '</button>' +
+    '<button class="onb-start" onclick="_onbRemove();setTimeout(function(){if(window.Tour)Tour.start(true)},300)">' + enOr(cvt('🧭 實地帶我看一圈'), '🧭 Walk me through') + '</button>' +
+    '<button class="onb-skip" onclick="_onbRemove()">' + enOr(cvt('知道了'), 'Got it') + '</button>' +
   '</div>';
   document.body.appendChild(m);
   requestAnimationFrame(() => m.classList.add('show'));
@@ -4467,6 +4469,7 @@ function toggleDetail(btn) {
   try { window.Listening = Listening; } catch (e) {}
   try { window.Stats = Stats; } catch (e) {}
 </script>
+<script src="tour.js"></script>
 <script src="tool-quota.js"></script>
 <!-- Cloudflare Web Analytics --><script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon="{&quot;token&quot;: &quot;0a94a20c2737440a86f55c4241011f68&quot;}"></script><!-- End Cloudflare Web Analytics -->
 </body>
