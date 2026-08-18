@@ -501,7 +501,11 @@ async function applyRedeemCode(){
     const d=await r.json();
     if(!r.ok||!d.ok){ msg.style.color='#EF4444'; msg.textContent='兌換失敗:'+(d.reason||d.error||r.status); return; }
     msg.style.color='#16A34A';
-    msg.textContent='✓ 兌換成功!免費 Premium '+d.days+' 天'+(d.expiresAt?(',到期 '+new Date(Number(d.expiresAt)).toLocaleDateString('zh-TW')):'')+'。';
+    if(d.type==='ai'){
+      msg.textContent='✓ 兌換成功!AI 加量包:+'+(d.aiEval||0)+' 次評分、+'+(d.aiChat||0)+' 場對話(用完每日額度會自動使用)。';
+    } else {
+      msg.textContent='✓ 兌換成功!免費 Premium '+d.days+' 天'+(d.expiresAt?(',到期 '+new Date(Number(d.expiresAt)).toLocaleDateString('zh-TW')):'')+'。';
+    }
     inp.value='';
     if(typeof loadSubscription==='function') loadSubscription();
   }catch(e){ msg.style.color='#EF4444'; msg.textContent='兌換失敗:'+e.message; }
