@@ -48,7 +48,8 @@
   .msg.me .bkana,.msg.me .bzh{color:#ffffffcc}
   .coach{align-self:flex-start;max-width:86%;background:var(--soft);border:1px solid var(--accent);border-radius:12px;padding:8px 12px;font-size:13px;color:var(--ink)}
   .coach b{color:var(--accent)}
-  .typing{color:var(--ink3);font-size:13px;padding:4px 2px}
+  .typing{color:var(--ink3);font-size:13px;padding:4px 2px;animation:tpulse 1.2s ease-in-out infinite}
+  @keyframes tpulse{0%,100%{opacity:.35}50%{opacity:1}}
 
   .inbar{position:sticky;bottom:0;background:var(--bg);padding-top:12px;margin-top:14px}
   .inrow{display:flex;gap:8px;align-items:flex-end}
@@ -90,6 +91,7 @@
 
   <!-- 選主題 -->
   <div id="pick">
+    <div style="margin-bottom:8px"><a href="#" onclick="if(history.length>1){history.back()}else{location.href='app.html'};return false" style="color:var(--ink3);text-decoration:none;font-size:14px">‹ 返回</a></div>
     <h1>🗣 情境對話 <span class="muted" style="font-weight:400">測試版</span></h1>
     <div class="sub">選一個情境和難度,AI 會扮演對方跟你一來一往練對話。可以用說的(語音辨識)或打字。</div>
     <div class="lvtabs" id="lvtabs"></div>
@@ -226,7 +228,7 @@ function renderMsgs(streamingAi){
       if(m.coach) html += `<div class="coach"><b>教練</b>:${esc(m.coach)}</div>`;
     }
   }
-  if(streamingAi!=null) html += aiBubble(streamingAi) + '<div class="typing">…</div>';
+  if(streamingAi!=null) html += aiBubble(streamingAi) + '<div class="typing">相手が入力中…</div>';
   box.innerHTML = html;
   box.scrollIntoView({block:'end'});
   window.scrollTo(0, document.body.scrollHeight);
@@ -275,6 +277,7 @@ function useHint(jp){ const el=document.getElementById('say'); el.value=jp; auto
 
 async function turn(){
   if(busy) return; busy=true; setBusy(true);
+  renderMsgs({jp:'',kana:'',zh:''});   // 立刻顯示「對方正在輸入…」,冷啟動/慢網路不空白
   try{
     const t = await auth.currentUser.getIdToken();
     const r = await fetch(FN_CHAT,{ method:'POST', headers:{'Content-Type':'application/json',Authorization:'Bearer '+t},
