@@ -354,6 +354,7 @@ function startDrill(tk){
   show('drill'); renderQ();
 }
 function startWrong(){
+  if(!jdUnlimited()){ showGateCard('錯題本重刷是 Premium 功能','你答錯的 '+Object.keys(getWrong()).length+' 題都幫你收好了——升級後一鍵重刷,補到全對。'); return; }
   const w = getWrong(); isWrongMode=true; curType=null;
   queue = shuffle(bank().filter(q=>w[q.id]));
   if(!queue.length) return;
@@ -628,6 +629,35 @@ function finishExam(timeout){
   document.getElementById('exSub').innerHTML =
     (timeout?'⏰ 時間到,自動交卷。<br>':'')+
     '<b>'+verdict+'</b><br><span class="muted">答對 '+score+' / '+qs.length+' 題 · '+lv.toUpperCase()+' 合格線 '+passLine+' 分(依官方比例換算,樣本數少僅供參考)</span>';
+  // 免費版:三科分析+弱點打碼(總分照給)——「差幾分、弱哪科」是升級最強理由
+  if (!jdUnlimited()) {
+    document.getElementById('exSecs').innerHTML =
+      '<div style="position:relative">' +
+        '<div style="filter:blur(7px);pointer-events:none;user-select:none">' +
+          scaled.map(x=>'<div class="secline"><span class="sn">'+x.name+'</span><span class="ss">'+x.got+' / '+x.max+'</span></div>').join('') +
+          '<div style="padding:10px 0"><b>📌 弱點分析</b><div class="secline"><span class="sn">●●●●(正答率 ●●%)</span></div><div class="secline"><span class="sn">●●●●(正答率 ●●%)</span></div></div>' +
+        '</div>' +
+        '<div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center">' +
+          '<div style="font-weight:800;font-size:15px">你距離合格線還差幾分、弱在哪一科?</div>' +
+          '<div style="font-size:13px;color:var(--tx2)">升級 Premium 看三科得分、門檻判定與弱點補強路線</div>' +
+          '<a href="pricing.html" style="background:var(--ac);color:#fff;border-radius:12px;padding:11px 22px;font-weight:700;text-decoration:none">解鎖完整分析 →</a>' +
+        '</div>' +
+      '</div>';
+    document.getElementById('exReview').innerHTML = qs.map((item,i)=>{
+      const ok = item.ans!==null && item.pick[item.ans].ok;
+      const yours = item.ans===null? '(未作答)': item.pick[item.ans].txt;
+      const correct = item.q.o[item.q.a];
+      return `<div class="rv-q">
+        <div class="exam-sec">${i+1}. ${(TYPES.find(x=>x.k===item.q.t)||{}).tt||''}</div>
+        <div class="st">${stem(item.q)}</div>
+        <div class="yours ${ok?'ok':'ng'}">${ok?'✅':'❌'} 你的答案:${esc(yours)}</div>
+        ${ok?'':'<div class="yours ok">⭕ 正解:'+esc(correct)+'</div>'}
+        <div class="xp2">${item.q.au?'<b>スクリプト:</b>'+esc(item.q.au)+'<br>':''}${item.q.x}</div>
+      </div>`;
+    }).join('');
+    show('examResult');
+    return;
+  }
   document.getElementById('exSecs').innerHTML =
     scaled.map(x=>{
       const pc = Math.round(x.got/x.max*100);
