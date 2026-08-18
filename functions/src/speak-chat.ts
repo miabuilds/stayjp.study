@@ -6,6 +6,7 @@
 import * as functions from "firebase-functions/v2/https";
 import { defineSecret } from "firebase-functions/params";
 import * as admin from "firebase-admin";
+import { getAiConfig, consumeQuota } from "./ai-quota";
 
 if (admin.apps.length === 0) admin.initializeApp();
 
@@ -95,7 +96,10 @@ export const speakChat = functions.onRequest(
     try {
       const idToken = (req.headers.authorization || "").replace(/^Bearer\s+/i, "");
       const decoded = await admin.auth().verifyIdToken(idToken);
-      if (!ADMIN_EMAILS.includes((decoded.email || "").toLowerCase())) {
+      const isAdmin = ADMIN_EMAILS.includes((decoded.email || "").toLowerCase());
+      const cfg = await getAiConfig();
+      // 測試期(public:false):非 admin 一律擋。開放後:admin 不計量,其他人走 quota。
+      if (!isAdmin && !cfg.public) {
         res.status(403).json({ error: "測試版限 admin 帳號" }); return;
       }
       const { mode, scene, level, history } = (req.body || {}) as {
@@ -103,8 +107,10 @@ export const speakChat = functions.onRequest(
         history?: Array<{ role?: string; text?: string }>;
       };
       const hist = Array.isArray(history) ? history.filter(h => h && h.text) : [];
+      const userTurns = hist.filter(h => h.role === "me").length;
 
       if (mode === "review") {
+        // 點評附屬於場,不另計量;歷史全量給(點評需要完整對話)
         const transcript = hist.map(h => `${h.role === "me" ? "學生" : "AI"}: ${h.text}`).join("\n");
         await streamAnthropic(res, ANTHROPIC_API_KEY.value(), REVIEW_SYSTEM,
           [{ role: "user", content: `這是對話紀錄:\n${transcript}\n\n請依格式輸出點評。` }]);
@@ -113,13 +119,24 @@ export const speakChat = functions.onRequest(
 
       // chat 模式
       if (!scene) { res.status(400).json({ error: "缺 scene" }); return; }
+      // 輪數封頂:單場成本天花板。前端同步自動收尾,這裡是護底。
+      if (userTurns >= cfg.maxTurns) {
+        res.status(429).json({ error: "turns", message: "這場聊得夠深了!按「結束・看點評」看表現吧 🙌" }); return;
+      }
+      // 開新場(還沒有任何 AI 發言)才消耗「場」額度
+      if (!isAdmin && !hist.some(h => h.role === "ai")) {
+        const blocked = await consumeQuota(decoded.uid, "chat", cfg);
+        if (blocked) { res.status(402).json({ error: "quota", message: blocked }); return; }
+      }
       const msgs: any[] = [];
       for (const h of hist) msgs.push({ role: h.role === "me" ? "user" : "assistant", content: String(h.text) });
-      if (msgs.length === 0 || msgs[msgs.length - 1].role !== "user") {
-        msgs.push({ role: "user", content: "（請你先自然開口,帶起這個情境的對話）" });
+      // 歷史截斷:只送最近 N 則(場景設定在 system 裡,舊對話對下一句影響小)→ input 不隨對話變長
+      const kept = msgs.slice(-cfg.historyKeep);
+      if (kept.length === 0 || kept[kept.length - 1].role !== "user") {
+        kept.push({ role: "user", content: "（請你先自然開口,帶起這個情境的對話）" });
       }
       const system = [{ type: "text", text: chatSystem(scene, level || "N4"), cache_control: { type: "ephemeral" } }];
-      await streamAnthropic(res, ANTHROPIC_API_KEY.value(), system, msgs);
+      await streamAnthropic(res, ANTHROPIC_API_KEY.value(), system, kept);
     } catch (e: any) {
       if (!res.headersSent) res.status(500).json({ error: String((e && e.message) || e) });
       else { try { res.end(); } catch { /* noop */ } }
