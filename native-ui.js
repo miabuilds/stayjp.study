@@ -25,17 +25,24 @@
   // 用法:兩顆鈕分別加 class="app-ios" / class="app-android"(含 <span data-t> 中英文字)。
   // 原生 App 內另由下方 apply() 把兩家商店鈕一律隱藏(在 App 內叫人下載 App 很多餘)。
   (function detectWebDevice() {
+    // ⚠️ Android App 還在 Google Play 封測、商店頁未公開 → 上架前一律隱藏 Android 下載鈕。
+    //    上架那天把這個改成 true 就全站顯示(index/about/howto/pricing 四處一起生效)。
+    var ANDROID_LIVE = false;
     var ua = navigator.userAgent || '';
     var isIOS = /iPhone|iPad|iPod/i.test(ua) || (/Macintosh/.test(ua) && typeof document !== 'undefined' && 'ontouchend' in document); // iPadOS 會偽裝成 Mac
     var isAndroid = /Android/i.test(ua);
     var root = document.documentElement;
     root.classList.add(isIOS ? 'stayjp-dev-ios' : isAndroid ? 'stayjp-dev-android' : 'stayjp-dev-desktop');
     var css = document.createElement('style');
+    // !important:頁面各自的按鈕樣式(a.hero-cta 等)specificity 較高,會蓋掉這裡的 display:none。
+    // App 內(stayjp-native)的隱藏規則 specificity 更高且同為 !important,依然優先 → App 內照舊全藏。
     css.textContent =
-      '.app-ios,.app-android{display:none}' +
-      'html.stayjp-dev-ios .app-ios{display:inline-flex}' +
-      'html.stayjp-dev-android .app-android{display:inline-flex}' +
-      'html.stayjp-dev-desktop .app-ios,html.stayjp-dev-desktop .app-android{display:inline-flex}';
+      '.app-ios,.app-android{display:none!important}' +
+      'html.stayjp-dev-ios .app-ios{display:inline-flex!important}' +
+      (ANDROID_LIVE
+        ? 'html.stayjp-dev-android .app-android{display:inline-flex!important}' +
+          'html.stayjp-dev-desktop .app-ios,html.stayjp-dev-desktop .app-android{display:inline-flex!important}'
+        : 'html.stayjp-dev-desktop .app-ios{display:inline-flex!important}');
     (document.head || document.documentElement).appendChild(css);
   })();
 
