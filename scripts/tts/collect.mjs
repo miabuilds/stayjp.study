@@ -148,9 +148,9 @@ while ((jq = atRe.exec(jlptQSrc))) {
   add(j, 'jlpt-listening');
 }
 
-// AI 口說練習 — speak-test.html 的 SENTS（S('jp','kana','zh') 硬編）。
+// AI 口說練習 — speak.html 的 SENTS（S('jp','kana','zh') 硬編）。
 // 「🔊 聽範例」原本用瀏覽器 TTS（超難聽），改成優先播 VOICEVOX mp3，key 用 jp。
-const speakTestHtml = fs.readFileSync(path.join(ROOT, 'speak-test.html'), 'utf8');
+const speakTestHtml = fs.readFileSync(path.join(ROOT, 'speak.html'), 'utf8');
 const stRe = /S\('((?:\\.|[^'\\])*)'/g;
 let st;
 while ((st = stRe.exec(speakTestHtml))) {
