@@ -134,6 +134,15 @@ window.Articles = (function () {
           }
         }
       }
+      // 去 copula 尾:毎日ですが→毎日、うれしいです→うれしい(長尾優先,含が/ね/よ組合)
+      var CP = ['でしたが', 'でしょうか', 'ですが', 'でしょう', 'でしたね', 'ですね', 'ですよ', 'でした', 'です'];
+      for (var cp = 0; cp < CP.length; cp++) {
+        var ct = CP[cp];
+        if (word.length > ct.length && word.slice(-ct.length) === ct) {
+          var hcp = hit(word.slice(0, -ct.length), '＋' + ct);
+          if (hcp) return hcp;
+        }
+      }
       // 去尾助詞：1 字優先(しごとは→しごと)、避免 2 字的「とは」誤切；最多兩層(へも)
       var P1 = ['は', 'が', 'を', 'に', 'で', 'へ', 'と', 'も', 'の', 'や', 'か', 'ね', 'よ'];
       var P2 = ['から', 'まで', 'では', 'には', 'へは', 'でも', 'にも', 'とは'];
