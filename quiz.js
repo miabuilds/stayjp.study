@@ -221,6 +221,7 @@ const Quiz = (() => {
     }
     const ok = typed === q.word.r;   // 只認假名讀音
     if (ok) score++;
+    _sayWord(q.word);
     results.push({ word: q.word, correct: ok, typed, typing: true });
     if (typeof SRS !== 'undefined' && SRS.record) SRS.record(quizLevel, q.word.w, ok);
     if (!ok && typeof Stats !== 'undefined' && Stats.addToNotebook) Stats.addToNotebook(q.word.w, q.word.r, q.word.m, quizLevel);
@@ -260,6 +261,7 @@ const Quiz = (() => {
   function markUnknown() {
     const q = questions[current];
     if (!q || !q.word) return;
+    _sayWord(q.word);
     if (typeof Stats !== 'undefined' && Stats.addToNotebook) Stats.addToNotebook(q.word.w, q.word.r, q.word.m, quizLevel, true);
     if (typeof SRS !== 'undefined' && SRS.record) SRS.record(quizLevel, q.word.w, false);   // 不會 → SRS 記錯，會再排複習
     results.push({ word: q.word, correct: false, dunno: true, options: q.options, correctIdx: q.correctIdx, typing: quizType === 'typing' });
@@ -299,10 +301,15 @@ const Quiz = (() => {
       <div class="qopts">${q.options.map((o,i) => '<button class="qopt" onclick="Quiz.answer('+i+')">'+disp(o)+'</button>').join('')}</div>`;
   }
 
+  // 答題後自動播單詞讀音(對錯都播):字+聲同時再加深一次印象
+  function _sayWord(w) {
+    try { if (w && typeof speak === 'function') speak(w.r || w.w); } catch (e) {}
+  }
   function answer(idx) {
     const q = questions[current];
     const correct = idx === q.correctIdx;
     if (correct) score++;
+    _sayWord(q.word);
     results.push({ word: q.word, correct, chosenIdx: idx, options: q.options, correctIdx: q.correctIdx });
     if (typeof SRS !== 'undefined' && SRS.record) SRS.record(quizLevel, q.word.w, correct);
     if (!correct && typeof Stats !== 'undefined' && Stats.addToNotebook) Stats.addToNotebook(q.word.w, q.word.r, q.word.m, quizLevel);

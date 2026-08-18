@@ -382,8 +382,21 @@ function renderQ(){
   document.getElementById('nextBtn').style.display='none';
   if(q.t==='listening') playAu();   // 進題自動播一次
 }
+// 漢字題答完自動播單詞讀音(對錯都播,字+聲加深印象)。
+// 漢字読み:正解選項就是讀音;表記:讀音在題幹【】裡。manifest 有 mp3 才播(單字庫讀音幾乎全涵蓋)。
+function sayWordAudio(q){
+  let kana = null;
+  if(q.t==='kanji') kana = q.o[q.a];
+  else if(q.t==='hyoki'){ const m = q.q.match(/【(.+?)】/); kana = m && m[1]; }
+  if(!kana) return;
+  const hash = window.__TTS && window.__TTS[kana];
+  if(!hash) return;
+  try{ if(_au){ _au.pause(); _au=null; } }catch(e){}
+  _au = new Audio('audio/tts/'+hash+'.mp3'); _au.play().catch(()=>{});
+}
 function answer(el, ok){
   const q = queue[qi];
+  sayWordAudio(q);
   document.querySelectorAll('.opt').forEach(b=>{
     b.disabled=true;
     if(b.getAttribute('data-ok')==='1') b.classList.add('correct'); else b.classList.add('dim');
