@@ -43,9 +43,32 @@ export const redeemCode = functions.onRequest(
         if (us.exists) return { err: "already", reason: "你已經兌換過這個碼了。" };
         tx.set(useRef, { code, uid, email, redeemed_at: nowMs() });
         tx.update(codeRef, { used_count: used + 1 });
-        return { ok: true as const, days: Math.max(1, Math.round(Number(c.days || 30))), plan: String(c.plan || "yearly"), label: String(c.label || "") };
+        return {
+          ok: true as const,
+          type: c.type === "ai" ? "ai" as const : "days" as const,
+          days: Math.max(1, Math.round(Number(c.days || 30))),
+          aiEval: Math.max(0, Math.round(Number(c.ai_eval || 0))),
+          aiChat: Math.max(0, Math.round(Number(c.ai_chat || 0))),
+          plan: String(c.plan || "yearly"), label: String(c.label || ""),
+        };
       });
       if ("err" in r) { res.status(400).json({ error: r.err, reason: r.reason }); return; }
+
+      // ── AI 加量包(買斷用戶的獎勵貨幣:送天數對終身會員無感,送 AI 次數才有感)──
+      // 不動 subscription;寫進 ai_usage/{uid} 的 bonus 池,超過每日/總量上限時優先扣 bonus。
+      if (r.type === "ai") {
+        await db.doc(`ai_usage/${uid}`).set({
+          bonusEval: admin.firestore.FieldValue.increment(r.aiEval),
+          bonusChat: admin.firestore.FieldValue.increment(r.aiChat),
+        }, { merge: true });
+        await writeTransaction({
+          uid, type: "gift", source: "web", plan: "yearly", amount_twd: 0, payment_method: "manual",
+          external_id: `redeem-${code}-${nowMs()}`, status: "success",
+          note: `redeem ${code} AI包 +${r.aiEval}評分/+${r.aiChat}對話${r.label ? ` (${r.label})` : ""}`,
+        });
+        res.json({ ok: true, type: "ai", aiEval: r.aiEval, aiChat: r.aiChat });
+        return;
+      }
 
       const days = r.days;
       const plan: PlanKey = (PLANS as any)[r.plan] ? (r.plan as PlanKey) : "yearly";

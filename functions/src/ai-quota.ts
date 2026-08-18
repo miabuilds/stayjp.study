@@ -62,13 +62,19 @@ export async function consumeQuota(uid: string, kind: "eval" | "chat" | "tts", c
       tx.set(ref, { ttsDay: day }, { merge: true });
       return null;
     }
+    // bonus 池(AI 加量包兌換碼):超過上限時優先扣 bonus 放行——買斷/訂閱/免費都適用
+    const bonusField = kind === "eval" ? "bonusEval" : "bonusChat";
+    const bonus = Number(u[bonusField] || 0);
     if (prem) {
       const field = kind === "eval" ? "evalDay" : "chatDay";
       const limit = kind === "eval" ? cfg.premEvalDaily : cfg.premChatDaily;
       const day = (u[field] && u[field].d === today) ? u[field] : { d: today, n: 0 };
-      if (day.n >= limit) return kind === "eval"
-        ? `今天的 AI 評分額度(${limit} 次)用完了,明天再來!`
-        : `今天的 AI 對話額度(${limit} 場)用完了,明天再來!`;
+      if (day.n >= limit) {
+        if (bonus > 0) { tx.set(ref, { [bonusField]: bonus - 1 }, { merge: true }); return null; }
+        return kind === "eval"
+          ? `今天的 AI 評分額度(${limit} 次)用完了,明天再來!`
+          : `今天的 AI 對話額度(${limit} 場)用完了,明天再來!`;
+      }
       day.n++;
       tx.set(ref, { [field]: day }, { merge: true });
       return null;
@@ -76,9 +82,12 @@ export async function consumeQuota(uid: string, kind: "eval" | "chat" | "tts", c
       const field = kind === "eval" ? "evalTotal" : "chatTotal";
       const limit = kind === "eval" ? cfg.freeEvalTotal : cfg.freeChatTotal;
       const n = u[field] || 0;
-      if (n >= limit) return kind === "eval"
-        ? `免費體驗的 ${limit} 次 AI 評分已用完。升級 Premium 每天 ${cfg.premEvalDaily} 次!`
-        : `免費體驗的 ${limit} 場 AI 對話已用完。升級 Premium 每天 ${cfg.premChatDaily} 場!`;
+      if (n >= limit) {
+        if (bonus > 0) { tx.set(ref, { [bonusField]: bonus - 1 }, { merge: true }); return null; }
+        return kind === "eval"
+          ? `免費體驗的 ${limit} 次 AI 評分已用完。升級 Premium 每天 ${cfg.premEvalDaily} 次!`
+          : `免費體驗的 ${limit} 場 AI 對話已用完。升級 Premium 每天 ${cfg.premChatDaily} 場!`;
+      }
       tx.set(ref, { [field]: n + 1 }, { merge: true });
       return null;
     }
