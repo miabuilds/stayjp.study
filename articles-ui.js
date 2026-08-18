@@ -283,10 +283,16 @@ window.Articles = (function () {
       '.art-cnt{padding:16px 18px}',
       '.art-para{line-height:2.25;color:var(--tx,#2c2c2c);margin:0 0 6px;font-family:"Hiragino Mincho ProN","Noto Serif JP",serif}',
       '.art-para rt{font-size:.5em;color:var(--tx2,#8a8a8a);font-weight:400}',
-      '.art-para .jlk{cursor:pointer;color:#e8734a;border-bottom:1px solid rgba(232,115,74,.5)}',
+      '.art-para .jlk{cursor:pointer;color:#e8734a;border-bottom:1px dashed rgba(232,115,74,.35)}',
       '.art-para .jlk rt{color:var(--tx2,#8a8a8a)}',
-      '.art-s{border-radius:6px;padding:1px 2px}',
-      '.art-romaji{display:block;font-size:.72em;color:var(--tx3,#9a9a9a);letter-spacing:.01em;margin:2px 0 4px;line-height:1.5}',
+      // 每句一個區塊(句子+羅馬拼音+中譯一組),句首有明確的 ▶ 播放鈕——
+      // 使用者回饋:單字都可點查字典,想「播這一句」反而沒地方點
+      '.art-s{display:block;position:relative;border-radius:10px;padding:2px 6px 2px 36px;margin:0 0 10px;min-height:30px}',
+      '.art-sp{position:absolute;left:0;top:.45em;width:26px;height:26px;border-radius:50%;border:1.5px solid rgba(232,115,74,.45);background:none;color:#e8734a;font-size:11px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;padding:0 0 0 2px}',
+      '.art-sp:hover{background:rgba(232,115,74,.12)}',
+      '.art-s.on .art-sp,.art-s.flat .art-sp{background:#e8734a;border-color:#e8734a;color:#fff}',
+      '.art-romaji{display:block;font-size:.72em;color:var(--tx3,#9a9a9a);letter-spacing:.01em;margin:-4px 0 10px 36px;line-height:1.5}',
+      '.art-tr-s{margin-left:36px}',
       // 逐詞高亮:依 VOICEVOX 每拍時長,橘框只框「正在唸的那個詞」(對齊實際發音)
       '.aw{border-radius:5px;padding:0 1px;transition:background .1s linear}',
       '.art-s.on .aw.cur{background:rgba(232,115,74,.85);color:#fff;box-shadow:0 0 0 2px rgba(232,115,74,.5)}',
@@ -332,11 +338,14 @@ window.Articles = (function () {
       // bottom player
       '.art-player{position:fixed;left:0;right:0;bottom:0;z-index:20;display:flex;justify-content:center;pointer-events:none;padding:0 12px calc(14px + env(safe-area-inset-bottom)) 12px}',
       '.art-player.hide{display:none}',
-      '.art-pbar{pointer-events:auto;display:flex;align-items:center;gap:6px;background:#2c2c2e;color:#fff;border:1px solid transparent;border-radius:40px;padding:7px 10px;box-shadow:0 6px 24px rgba(0,0,0,.28);max-width:420px;width:100%}',
+      '.art-pbar{pointer-events:auto;display:flex;align-items:center;gap:4px;background:#2c2c2e;color:#fff;border:1px solid transparent;border-radius:40px;padding:6px 10px;box-shadow:0 6px 24px rgba(0,0,0,.28);max-width:440px;width:100%}',
       '[data-theme="dark"] .art-pbar{background:#2e2d33;border-color:rgba(255,255,255,.12);box-shadow:0 6px 24px rgba(0,0,0,.55)}',
-      '.art-pb{border:none;background:none;color:#fff;cursor:pointer;width:44px;height:44px;border-radius:50%;font-size:18px;display:inline-flex;align-items:center;justify-content:center}',
-      '.art-pb.art-mode{width:auto;min-width:44px;padding:0 10px;font-size:14px;border-radius:22px;opacity:.65}',
+      // flex-shrink:0 防壓扁(bar 元件多時主播放鈕被壓成橢圓、「單句」被壓成直排)
+      '.art-pb{flex-shrink:0;white-space:nowrap;border:none;background:none;color:#fff;cursor:pointer;width:40px;height:40px;border-radius:50%;font-size:17px;display:inline-flex;align-items:center;justify-content:center}',
+      '.art-pb.main{width:46px;height:46px;background:#e8734a;font-size:19px}',
+      '.art-pb.art-mode{width:auto;min-width:40px;padding:0 9px;font-size:13px;border-radius:20px;opacity:.65}',
       '.art-pb.art-mode.on{opacity:1;background:rgba(255,255,255,.25);box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.7)}',
+      '.art-ptext{flex-shrink:0}',
       '.art-pb.main{background:var(--ac,#d4654a);width:50px;height:50px;font-size:22px}',
       '.art-pb:active{transform:scale(.92)}',
       '.art-prate{background:rgba(255,255,255,.16);color:#fff;border-radius:20px;padding:0 10px;height:34px;font-size:13px;font-weight:700;min-width:50px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;font-variant-numeric:tabular-nums}',
@@ -493,9 +502,12 @@ window.Articles = (function () {
         var sp;
         if (hasTts(clean)) {
           var idx = si++; sentSeq.push({ text: clean, i: idx });
-          sp = '<span class="art-s" id="artS' + idx + '" onclick="Articles.playFrom(' + idx + ')">' + frFn(s) + '</span>';
+          // 句首 ▶:明確的「播這一句」目標(單字都被字典點擊佔用,句子本身難點到)
+          sp = '<span class="art-s" id="artS' + idx + '" onclick="Articles.playFrom(' + idx + ')">' +
+            '<button class="art-sp" title="' + enOr('播放這句', 'Play sentence') + '" onclick="event.stopPropagation();Articles.playFrom(' + idx + ')">▶</button>' +
+            frFn(s) + '</span>';
         } else {
-          sp = '<span class="art-s">' + frFn(s) + '</span>';
+          sp = '<span class="art-s" style="padding-left:6px">' + frFn(s) + '</span>';
         }
         var rj = romajiForSentence(clean);
         var rjS = rj ? '<span class="art-romaji" style="display:' + (romaOn ? 'block' : 'none') + '">' + esc(rj) + '</span>' : '';
