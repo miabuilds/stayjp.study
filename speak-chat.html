@@ -428,19 +428,58 @@ async function playTTS(text, voice){
 }
 
 // ── 語音辨識 STT(瀏覽器) ──
-let rec=null, recording=false;
-function toggleRec(){ recording?stopRec():startRec(); }
-function startRec(){
+// ── 語音辨識(重寫版,修「第三輪就收不了音」)──
+// 三個舊坑:①舊實例沒 abort 釋放,幾輪後 Chrome 辨識服務卡死 → 每次 start 前先 abort 舊的
+// ②AI 語音還在播就開麥,部分裝置直接中斷 → 開麥前先停播音 ③錯誤靜默 → 顯示原因
+// 加碼補上先前的回饋:辨識「接續不覆蓋」(保留已輸入)、停頓自動續錄(按停或送出才真的停)
+let rec=null, recording=false, _wantRec=false, _recBase='';
+function toggleRec(){ recording||_wantRec ? stopRec() : startRec(); }
+function _newRec(){
   const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-  if(!SR){ document.getElementById('inNote').textContent='這個瀏覽器不支援語音辨識,請直接打字。'; return; }
-  rec=new SR(); rec.lang='ja-JP'; rec.interimResults=true; rec.continuous=false;
-  rec.onresult=e=>{ let t=''; for(let i=0;i<e.results.length;i++)t+=e.results[i][0].transcript; const el=document.getElementById('say'); el.value=t; autoGrow(); };
-  rec.onend=()=>{ recording=false; updateRecBtn(); };
-  rec.onerror=()=>{ recording=false; updateRecBtn(); };
-  try{ rec.start(); recording=true; updateRecBtn(); }catch(e){}
+  if(!SR){ document.getElementById('inNote').textContent='這個瀏覽器不支援語音辨識,請直接打字(手機 Chrome / Safari 支援)。'; return null; }
+  try{ if(rec){ rec.onend=null; rec.onerror=null; rec.onresult=null; rec.abort(); } }catch(e){}   // 釋放舊實例,防服務卡死
+  const r=new SR(); r.lang='ja-JP'; r.interimResults=true; r.continuous=true;
+  r.onresult=e=>{
+    let fin='', interim='';
+    for(let i=0;i<e.results.length;i++){ const t=e.results[i][0].transcript; if(e.results[i].isFinal) fin+=t; else interim+=t; }
+    const el=document.getElementById('say');
+    el.value=_recBase+fin+interim;   // 接在已輸入內容後面,不覆蓋
+    if(fin){ _recBase+=fin; }        // 確定段落併入 base,續錄時不會丟
+    autoGrow();
+  };
+  r.onerror=e=>{
+    const c=e&&e.error;
+    if(c==='not-allowed'||c==='service-not-allowed'){ _wantRec=false; document.getElementById('inNote').textContent='🎤 麥克風權限被擋了:請允許此網站使用麥克風後再試。'; }
+    else if(c==='no-speech'){ /* 沒聽到聲音:交給 onend 自動續錄 */ }
+    else if(c&&c!=='aborted'){ document.getElementById('inNote').textContent='🎤 辨識中斷('+c+'),再按一次麥克風重試。'; _wantRec=false; }
+  };
+  r.onend=()=>{
+    recording=false;
+    if(_wantRec){ setTimeout(()=>{ if(_wantRec) _startInstance(); },150); return; }   // 停頓自動續錄
+    updateRecBtn();
+  };
+  return r;
 }
-function stopRec(){ try{ rec&&rec.stop(); }catch(e){} recording=false; updateRecBtn(); }
-function updateRecBtn(){ const b=document.getElementById('recBtn'); if(b) b.classList.toggle('on',recording); }
+function _startInstance(){
+  rec=_newRec(); if(!rec) return;
+  try{ rec.start(); recording=true; updateRecBtn(); }
+  catch(e){ setTimeout(()=>{ try{ rec.start(); recording=true; updateRecBtn(); }catch(e2){ _wantRec=false; recording=false; updateRecBtn(); } },200); }
+}
+function startRec(){
+  try{ if(_audio){ _audio.pause(); _audio=null; } }catch(e){}   // 要講話先閉嘴:停掉正在播的 AI 語音,避免開麥被中斷
+  _wantRec=true;
+  _recBase=(document.getElementById('say').value||'');
+  if(_recBase && !/[\s、。]$/.test(_recBase)) _recBase+='';   // 接續原文
+  document.getElementById('inNote').textContent='🎤 錄音中…講完按停或直接按送出。';
+  _startInstance();
+}
+function stopRec(){
+  _wantRec=false;
+  try{ rec&&rec.stop(); }catch(e){}
+  recording=false; updateRecBtn();
+  const n=document.getElementById('inNote'); if(n) n.textContent='🎤 用瀏覽器語音辨識(Chrome 較準);不準可直接改字再送。';
+}
+function updateRecBtn(){ const b=document.getElementById('recBtn'); if(b) b.classList.toggle('on',recording||_wantRec); }
 
 function autoGrow(){ const el=document.getElementById('say'); if(!el)return; el.style.height='auto'; el.style.height=Math.min(120,el.scrollHeight)+'px'; }
 document.addEventListener('input',e=>{ if(e.target && e.target.id==='say') autoGrow(); });
