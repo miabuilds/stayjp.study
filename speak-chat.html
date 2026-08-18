@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex">
-<title>情境對話(測試版)</title>
+<title>AI 情境對話｜StayJP 日本再留計劃</title>
 <style>
   :root{ --bg:#f3f5f2;--panel:#fff;--ink:#1b2320;--ink2:#5f6b67;--ink3:#93a09a;--line:#e3e8e2;--accent:#0f766e;--accent2:#0b5850;--soft:#0f766e12;--me:#0f766e;--ai:#eef1ee;--ok:#15803d;--bad:#c2410c;--warn:#b45309;--sh:0 1px 2px rgba(20,40,30,.05),0 8px 24px rgba(20,40,30,.06); }
   @media(prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#111512;--panel:#191e1b;--ink:#e9eeea;--ink2:#9aa7a0;--ink3:#70807a;--line:#28302b;--accent:#2dd4bf;--accent2:#5eead4;--soft:#2dd4bf18;--me:#0f766e;--ai:#20261f;--ok:#4ade80;--bad:#fb923c;--warn:#fbbf24;--sh:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.3);}}
@@ -77,13 +77,12 @@
 </style>
 </head>
 <body>
-<div class="banner">⚠ 測試版 · 限內部帳號 · 尚未上線</div>
 <div id="boot" style="min-height:60vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;color:var(--ink3)"><div style="width:34px;height:34px;border:3px solid var(--line);border-top-color:var(--accent);border-radius:50%;animation:bspin .8s linear infinite"></div><div style="font-size:14px">載入中…</div></div>
 <style>@keyframes bspin{to{transform:rotate(360deg)}}</style>
 
 <div id="gate" class="gate" style="display:none">
-  <h1>情境對話(測試版)</h1>
-  <button id="loginBtn" class="btn pri">用 Google 登入(限 admin)</button>
+  <h1>🗣 AI 情境對話</h1>
+  <button id="loginBtn" class="btn pri">用 Google 登入開始</button>
   <div id="gerr" class="err"></div>
 </div>
 
@@ -92,8 +91,8 @@
   <!-- 選主題 -->
   <div id="pick">
     <div style="margin-bottom:8px"><a href="#" onclick="if(history.length>1){history.back()}else{location.href='app.html'};return false" style="color:var(--ink3);text-decoration:none;font-size:14px">‹ 返回</a></div>
-    <h1>🗣 情境對話 <span class="muted" style="font-weight:400">測試版</span></h1>
-    <div class="sub">選一個情境和難度,AI 會扮演對方跟你一來一往練對話。可以用說的(語音辨識)或打字。</div>
+    <h1>🗣 情境對話 <span class="muted" style="font-weight:400">Beta</span></h1>
+    <div class="sub">選一個情境和難度,AI 會扮演對方跟你一來一往練對話。可以用說的(語音辨識)或打字。免費體驗 1 場,Premium 每天 3 場。</div>
     <div class="lvtabs" id="lvtabs"></div>
     <div class="scenes" id="scenes"></div>
     <div class="muted" style="margin-top:14px">💡 這是「對話」練習;想練單句跟讀請到 <a href="speak-test.html" style="color:var(--accent)">口說練習</a>。</div>
@@ -403,9 +402,8 @@ document.addEventListener('keydown',e=>{ if(e.target && e.target.id==='say' && e
 auth.onAuthStateChanged(u=>{
   try{var _b=document.getElementById("boot"); if(_b)_b.remove();}catch(e){}
   const gate=document.getElementById('gate'), app=document.getElementById('app');
-  if(!u || !ADMIN_EMAILS.includes((u.email||'').toLowerCase())){
+  if(!u){
     gate.style.display='flex'; app.style.display='none';
-    if(u && !ADMIN_EMAILS.includes((u.email||'').toLowerCase())){ document.getElementById('gerr').textContent=u.email+' 非測試帳號'; auth.signOut(); }
     return;
   }
   gate.style.display='none'; app.style.display='block';
