@@ -206,9 +206,64 @@
 <script src="jlpt-questions.js"></script>
 <script src="jlpt-questions-gen.js"></script>
 <script src="audio/tts/manifest.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <script>
 // ========== JLPT 刷題特區 ==========
 // 題庫在 jlpt-questions.js(window.JLPT_Q):精編靜態題,每題附詳解。
+
+// ── 付費牆(2026-08 定案):免費=刷題每日 1 輪+模擬考總共 2 次;Premium/買斷=無限 ──
+// 題庫零成本,牆是為了轉換 → 前端 localStorage 計數即可(被清掉繞過可接受)。
+// Premium 判斷同 tool-quota.js:users/{uid}.subscription + App 原生 STAYJP_NATIVE.isPremium。
+const JD_ADMIN = ['stayjpplan@gmail.com','abc83327@gmail.com'];
+let jdPremium = false, jdAdmin = false;
+(function initAuth(){
+  try{
+    const cfg = { apiKey:"AIzaSyDnmg2XOuvwgE8m8xCF5sS4o0nQYoUplPI", authDomain:"jpnote-1bdd6.firebaseapp.com", projectId:"jpnote-1bdd6" };
+    if(!firebase.apps.length) firebase.initializeApp(cfg);
+    firebase.auth().onAuthStateChanged(u=>{
+      jdAdmin = !!(u && JD_ADMIN.includes((u.email||'').toLowerCase()));
+      if(!u){ jdPremium=false; return; }
+      firebase.firestore().doc('users/'+u.uid).get().then(s=>{
+        const sub=(s.data()||{}).subscription;
+        jdPremium = !!(sub && (sub.status==='active'||sub.status==='trialing'||sub.status==='cancelled') && (sub.expiresAt||0)>Date.now());
+      }).catch(()=>{});
+    });
+  }catch(e){}
+})();
+function jdUnlimited(){
+  if(jdPremium || jdAdmin) return true;
+  if(window.STAYJP_NATIVE && window.STAYJP_NATIVE.isNativeApp && window.STAYJP_NATIVE.isPremium) return true;
+  return false;
+}
+function jdGateDrill(){   // 免費:每日 1 輪(錯題本不算)
+  if(jdUnlimited()) return false;
+  const k='jd_day_'+today();
+  const n=parseInt(localStorage.getItem(k)||'0',10);
+  if(n>=1){ showGateCard('今天的免費刷題(1 輪 20 題)用完了','升級 Premium 無限刷題,錯題本、模擬試験也全部解鎖。'); return true; }
+  localStorage.setItem(k, String(n+1));
+  return false;
+}
+function jdGateExam(){    // 免費:模擬試験總共 2 次
+  if(jdUnlimited()) return false;
+  const n=parseInt(localStorage.getItem('jd_exam_used')||'0',10);
+  if(n>=2){ showGateCard('免費體驗的 2 次模擬試験用完了','升級 Premium 無限次模擬考,每次都有 180 分制分析與弱點報告。'); return true; }
+  localStorage.setItem('jd_exam_used', String(n+1));
+  return false;
+}
+function showGateCard(title, body){
+  const el=document.createElement('div');
+  el.id='gateCard';
+  el.innerHTML='<div style="position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:900" onclick="document.getElementById(\'gateCard\').remove()"></div>'+
+    '<div style="position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:901;background:var(--bg2);border:1px solid var(--bd);border-radius:16px;padding:24px;max-width:340px;width:88%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.3)">'+
+    '<div style="font-size:34px;margin-bottom:8px">🔒</div>'+
+    '<div style="font-weight:800;font-size:16px;margin-bottom:8px">'+title+'</div>'+
+    '<div style="font-size:13.5px;color:var(--tx2);line-height:1.7;margin-bottom:16px">'+body+'</div>'+
+    '<a href="pricing.html" style="display:block;background:var(--ac);color:#fff;border-radius:12px;padding:12px;font-weight:700;text-decoration:none">看訂閱方案 →</a>'+
+    '<button onclick="document.getElementById(\'gateCard\').remove()" style="font:inherit;background:none;border:0;color:var(--tx3);margin-top:10px;cursor:pointer;font-size:13px">先不用</button></div>';
+  document.body.appendChild(el);
+}
 const TYPES = [
   { k:'kanji',   tt:'漢字讀音', tj:'漢字読み',   td:'選出底線漢字的正確讀音' },
   { k:'hyoki',   tt:'漢字表記', tj:'表記',       td:'選出假名對應的正確漢字' },
@@ -281,6 +336,7 @@ function showRecords(){
 function pickLv(l){ lv=l; localStorage.setItem('jd_lv',l); renderHome(); updateExamNotes(); }
 
 function startDrill(tk){
+  if(jdGateDrill()) return;
   curType = TYPES.find(t=>t.k===tk); isWrongMode=false;
   // 沒做過的優先出,做過的排後面(各自組內亂序);一輪 20 題,刷得動也記得住
   const rec = getRec();
@@ -406,6 +462,7 @@ function updateExamNotes(){
   document.getElementById('examCompNote').textContent = '共 '+total+' 題:'+comp.map(([t,n])=>TYPES.find(x=>x.k===t).tt+'×'+n).join('、');
 }
 function startExam(){
+  if(jdGateExam()) return;
   stopExamTimer(); stopAu();
   const byType = {};
   bank().forEach(q=>{ if(q.lv===lv){ (byType[q.t]=byType[q.t]||[]).push(q); } });

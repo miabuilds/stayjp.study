@@ -7,6 +7,7 @@
 import * as functions from "firebase-functions/v2/https";
 import { defineSecret } from "firebase-functions/params";
 import * as admin from "firebase-admin";
+import { getAiConfig, consumeQuota } from "./ai-quota";
 
 if (admin.apps.length === 0) admin.initializeApp();
 
@@ -41,8 +42,14 @@ export const speakFeedback = functions.onRequest(
     try {
       const idToken = (req.headers.authorization || "").replace(/^Bearer\s+/i, "");
       const decoded = await admin.auth().verifyIdToken(idToken);
-      if (!ADMIN_EMAILS.includes((decoded.email || "").toLowerCase())) {
+      const isAdmin = ADMIN_EMAILS.includes((decoded.email || "").toLowerCase());
+      const cfg = await getAiConfig();
+      if (!isAdmin && !cfg.public) {
         res.status(403).json({ error: "測試版限 admin 帳號" }); return;
+      }
+      if (!isAdmin) {
+        const blocked = await consumeQuota(decoded.uid, "eval", cfg);
+        if (blocked) { res.status(402).json({ error: "quota", message: blocked }); return; }
       }
       const { target, said } = (req.body || {}) as { target?: { jp?: string; kana?: string }; said?: string };
       if (!target || !target.jp || !said) { res.status(400).json({ error: "缺 target.jp / said" }); return; }
