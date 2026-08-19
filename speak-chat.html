@@ -448,7 +448,7 @@ const NATIVE_STT = !!(window.STAYJP_NATIVE && window.STAYJP_NATIVE.canSpeech && 
 const _IN_APP0 = !!(window.STAYJP_NATIVE && window.STAYJP_NATIVE.isNativeApp && window.ReactNativeWebView);
 // App 內在提示列尾端帶 OTA 版次前 6 碼(⚙xxxxxx),一眼確認熱更新裝上了沒
 const NOTE_IDLE = (NATIVE_STT ? '🎤 講完按停或直接送出;不準可直接改字再送。' : '🎤 用瀏覽器語音辨識(Chrome 較準);不準可直接改字再送。')
-  + (_IN_APP0 ? ' ⚙'+String(window.STAYJP_NATIVE.updateId||'embedded').slice(0,6) : '');
+  + (_IN_APP0 ? ' ⚙'+String(window.STAYJP_NATIVE.updateId||'embedded').slice(-6) : '');   // 取尾 6 碼:updateId 開頭是時間序,尾碼才分得出版本
 function _nPost(o){ try{ window.ReactNativeWebView.postMessage(JSON.stringify(o)); }catch(e){} }
 if(NATIVE_STT){ var _n0=document.getElementById('inNote'); if(_n0) _n0.textContent=NOTE_IDLE; }
 // 舊版 App(1.0.5,無原生辨識模組)在 App 內走 WKWebView 瀏覽器辨識:錄完 iOS session 卡在錄音模式
