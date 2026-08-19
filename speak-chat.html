@@ -280,7 +280,7 @@ function parseTurn(text){
   const o={jp:'',kana:'',zh:'',coach:'',hints:[]};
   for(const line of String(text).split('\n')){
     let m=line.match(/^(JP|KANA|ZH|COACH):\s?(.*)$/);
-    if(m){ o[m[1].toLowerCase()] = (m[2]||'').trim(); continue; }
+    if(m){ const v=(m[2]||'').trim(); if(m[1]==='JP'){ if(v) o.jp=v; } else o[m[1].toLowerCase()]=v; continue; }   // JP 只收非空行:模型偶爾多吐一行空 JP,別把正文蓋掉
     m=line.match(/^HINT:\s?(.*)$/);
     if(m){ const v=(m[1]||'').trim(); if(v) o.hints.push(v); continue; }
     m=line.match(/^WORDS:\s?(.*)$/);
@@ -288,6 +288,8 @@ function parseTurn(text){
   }
   // COACH 有時會吐 <blank>/空白/無 之類佔位字 → 當作沒有提點
   if(/^<?\s*(blank|空白?|無|なし|null|none|n\/a|[-—―])\s*>?$/i.test(o.coach)) o.coach='';
+  // 防呆:模型格式跑掉沒給 JP 行時,拿假名行當主行(至少看得到、也播得出來),別讓泡泡剩「…」卡死
+  if(!o.jp && o.kana){ o.jp=o.kana; o._jpFromKana=true; }   // 代打標記:串流中假名是半句,不能拿去提前播
   return o;
 }
 // 「你可以這樣回」建議;點了填進輸入框讓你可再改
@@ -311,10 +313,12 @@ function expandHints(){
 }
 // AI 回答的關鍵單字卡:単語|よみ|意思;分號隔開。點卡片唸該單字(雲端 TTS)
 function wordChips(words){
-  const items=String(words).split(/[;;]/).map(function(x){return x.trim();}).filter(Boolean);
+  const items=String(words).split(/[;;﹔]/).map(function(x){return x.trim();}).filter(Boolean);
   if(!items.length) return '';
   return '<div class="wchips">'+items.map(function(it){
-    const p=it.split(/[|｜]/); const w=(p[0]||'').trim(), r=(p[1]||'').trim(), zh=(p[2]||'').trim();
+    const p=it.split(/[|｜]/); const w=(p[0]||'').trim(), r=(p[1]||'').trim();
+    let zh=(p[2]||'').trim();
+    zh=zh.split(/[;;﹔]/)[0].trim();   // 模型偶爾把下一個字擠進意思欄(「結帳金額;円」)→ 只留第一段
     if(!w) return '';
     return '<button class="wchip" onclick="event.stopPropagation();playTTS('+JSON.stringify(w).replace(/"/g,'&quot;')+')">'
       +'<b>'+esc(w)+'</b>'+(r&&r!==w?'<span class="wr">'+esc(r)+'</span>':'')+(zh?'<span class="wz">'+esc(zh)+'</span>':'')+'</button>';
@@ -339,7 +343,7 @@ async function turn(){
     const reader=r.body.getReader(); const dec=new TextDecoder(); let full=''; let spokenJp='';
     while(true){ const {done,value}=await reader.read(); if(done)break; full+=dec.decode(value,{stream:true}); const p=parseTurn(full); renderMsgs(p);
       // JP 一講完(後面 KANA/ZH 開始出現代表那行結束)就立刻播,不等 HINT 生完
-      if(!spokenJp && p.jp && (p.kana||p.zh)){ spokenJp=p.jp; playTTS(p.jp, scene.voice); } }
+      if(!spokenJp && p.jp && !p._jpFromKana && (p.kana||p.zh)){ spokenJp=p.jp; playTTS(p.jp, scene.voice); } }
     const ai=parseTurn(full); ai.role='ai';
     history.push(ai);
     renderMsgs();
@@ -457,6 +461,12 @@ const IN_APP = _IN_APP0;
 function _postRestore(){ if(IN_APP && !NATIVE_STT) _nPost({type:'AUDIO_RESTORE'}); }
 if(IN_APP){ var _nv0=document.getElementById('inNote'); if(_nv0) _nv0.textContent=NOTE_IDLE; }
 function _nStart(){
+  // 原生辨識從按下到真的收音有半秒延遲,太早講開頭會被吃掉。新版 App 會回報 audiostart:
+  // 先顯示「準備中」,收到事件才切「開講」;舊版沒事件就照舊直接顯示錄音中。
+  if(window.STAYJP_NATIVE.hasSpeechStartEvt){
+    document.getElementById('inNote').textContent='🎤 準備中…等一下再開口。';
+    window.stayjpSpeechStarted=function(){ if(_wantRec) document.getElementById('inNote').textContent='🎤 開講!講完按停或直接按送出。'; };
+  }
   window.stayjpSpeechResult=function(t,fin){
     if(t==null) return;
     const el=document.getElementById('say');
