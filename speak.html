@@ -258,7 +258,10 @@ function speak(){
   try{ if(_demo){ _demo.pause(); _demo=null; } }catch(e){}
   const hash = window.__TTS && window.__TTS[jp];
   if(hash){
-    _demo = new Audio(window.ttsUrl ? window.ttsUrl(hash) : 'audio/tts/'+hash+'.mp3');
+    const rel = window.ttsUrl ? window.ttsUrl(hash) : 'audio/tts/'+hash+'.mp3';
+    // App 內(有 OTA 的版本)交給原生播,繞開 WKWebView 錄音後播放被悶的問題
+    if(window.STAYJP_NATIVE && window.STAYJP_NATIVE.canPlayB64){ _nPost({type:'PLAY_URL', url:new URL(rel, location.href).href}); return; }
+    _demo = new Audio(rel);
     _demo.play().catch(()=>browserSpeak(cur().kana));
   } else {
     browserSpeak(cur().kana);
@@ -276,6 +279,7 @@ let rec=null, recording=false;
 function toggleRec(){ recording ? stopRec() : startRec(); }
 function _recBtnUI(on){ const b=document.getElementById('recBtn'); if(!b)return; b.classList.toggle('on',on); b.textContent=on?'⏹ 停止':'🎤 開始錄音'; }
 function startRec(){
+  if(window.STAYJP_NATIVE && window.STAYJP_NATIVE.canPlayB64) _nPost({type:'STOP_PLAY'});   // 開麥前停掉原生播放
   if(NATIVE_STT){
     window.stayjpSpeechResult=function(t,fin){ if(t) document.getElementById('said').value=t; };
     window.stayjpSpeechEnd=function(err){

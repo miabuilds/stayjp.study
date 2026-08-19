@@ -416,6 +416,7 @@ async function playTTS(text, voice){
   // → 之後看起來在錄其實沒錄。播之前先把錄音停乾淨(按鈕熄掉),使用者聽完再按麥克風。
   if(recording||_wantRec) stopRec();
   _postRestore();   // 播之前保險再還原一次(舊版 App session 可能還卡在錄音模式)
+  if(window.STAYJP_NATIVE && window.STAYJP_NATIVE.canPlayB64) _nPost({type:'STOP_PLAY'});   // 原生播放中就先停
   try{ if(_audio){ _audio.pause(); _audio.currentTime=0; _audio=null; } }catch(e){}
   const key=(voice||'f')+'|'+text;
   try{
@@ -428,6 +429,8 @@ async function playTTS(text, voice){
       b64=d.audio; _ttsCache[key]=b64;
     }
     if(seq!==_ttsSeq) return;         // 期間又有人按/自動播 → 放棄,只留最新那次
+    // App 內(有 OTA 的版本)交給原生 AVPlayer 播:WKWebView 錄過音後頁內播放會被 iOS 悶掉
+    if(window.STAYJP_NATIVE && window.STAYJP_NATIVE.canPlayB64){ _nPost({type:'PLAY_B64', b64:b64}); return; }
     _audio=new Audio('data:audio/mp3;base64,'+b64); _audio.play().catch(()=>{});
   }catch(e){}
 }
@@ -442,13 +445,17 @@ let rec=null, recording=false, _wantRec=false, _recBase='', _sessFin='';
 // WKWebView 的瀏覽器辨識不可靠(會亮著卻收不到音),而且 WebView 麥克風授權每次開 App 都重問;
 // 原生辨識穩定、權限是系統級只問一次。橋:postMessage SPEECH_START/STOP ← → stayjpSpeechResult/End。
 const NATIVE_STT = !!(window.STAYJP_NATIVE && window.STAYJP_NATIVE.canSpeech && window.ReactNativeWebView);
-const NOTE_IDLE = NATIVE_STT ? '🎤 講完按停或直接送出;不準可直接改字再送。' : '🎤 用瀏覽器語音辨識(Chrome 較準);不準可直接改字再送。';
+const _IN_APP0 = !!(window.STAYJP_NATIVE && window.STAYJP_NATIVE.isNativeApp && window.ReactNativeWebView);
+// App 內在提示列尾端帶 OTA 版次前 6 碼(⚙xxxxxx),一眼確認熱更新裝上了沒
+const NOTE_IDLE = (NATIVE_STT ? '🎤 講完按停或直接送出;不準可直接改字再送。' : '🎤 用瀏覽器語音辨識(Chrome 較準);不準可直接改字再送。')
+  + (_IN_APP0 ? ' ⚙'+String(window.STAYJP_NATIVE.updateId||'embedded').slice(0,6) : '');
 function _nPost(o){ try{ window.ReactNativeWebView.postMessage(JSON.stringify(o)); }catch(e){} }
 if(NATIVE_STT){ var _n0=document.getElementById('inNote'); if(_n0) _n0.textContent=NOTE_IDLE; }
 // 舊版 App(1.0.5,無原生辨識模組)在 App 內走 WKWebView 瀏覽器辨識:錄完 iOS session 卡在錄音模式
 // → 之後 TTS 沒聲音。錄音一結束就通知原生把 session 還原成播放(新版 App 的 OTA 有對應 handler)。
-const IN_APP = !!(window.STAYJP_NATIVE && window.STAYJP_NATIVE.isNativeApp && window.ReactNativeWebView);
+const IN_APP = _IN_APP0;
 function _postRestore(){ if(IN_APP && !NATIVE_STT) _nPost({type:'AUDIO_RESTORE'}); }
+if(IN_APP){ var _nv0=document.getElementById('inNote'); if(_nv0) _nv0.textContent=NOTE_IDLE; }
 function _nStart(){
   window.stayjpSpeechResult=function(t,fin){
     if(t==null) return;
@@ -506,6 +513,7 @@ function _startInstance(){
 }
 function startRec(){
   try{ if(_audio){ _audio.pause(); _audio=null; } }catch(e){}   // 要講話先閉嘴:停掉正在播的 AI 語音,避免開麥被中斷
+  if(window.STAYJP_NATIVE && window.STAYJP_NATIVE.canPlayB64) _nPost({type:'STOP_PLAY'});   // 原生播放也要停
   _wantRec=true;
   _recBase=(document.getElementById('say').value||'');
   if(_recBase && !/[\s、。]$/.test(_recBase)) _recBase+='';   // 接續原文
