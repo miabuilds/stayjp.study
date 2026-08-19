@@ -4483,8 +4483,12 @@ function toggleDetail(btn) {
     var bar=document.createElement('div');
     bar.id='iosAppBar';
     bar.style.cssText='position:sticky;top:0;z-index:390;background:#1D3557;color:#fff;font-size:13px;padding:9px 40px 9px 14px;text-align:center;line-height:1.5';
-    bar.innerHTML='📱 iPhone 用戶:App 內<b>免費試用 7 天</b>全功能(網頁只有 3 天) '
-      +'<a href="https://apps.apple.com/app/id6778227353" style="color:#A8DADC;font-weight:700;text-decoration:underline">下載 App →</a>'
+    var _ib=(function(){ try{ var l=localStorage.getItem('ui_lang')||'zh-TW';
+      if(l==='en') return ['📱 iPhone users: <b>7-day free trial</b> of everything in the app (web offers only 3) ','Get the app →'];
+      if(l==='zh-CN') return ['📱 iPhone 用户:App 内<b>免费试用 7 天</b>全功能(网页只有 3 天) ','下载 App →'];
+    }catch(e){} return ['📱 iPhone 用戶:App 內<b>免費試用 7 天</b>全功能(網頁只有 3 天) ','下載 App →']; })();
+    bar.innerHTML=_ib[0]
+      +'<a href="https://apps.apple.com/app/id6778227353" style="color:#A8DADC;font-weight:700;text-decoration:underline">'+_ib[1]+'</a>'
       +'<button style="position:absolute;right:8px;top:6px;background:none;border:0;color:#fff;font-size:16px;cursor:pointer;padding:4px" '
       +'onclick="localStorage.setItem(\'ios_appbar_off\',String(Date.now()+30*86400000));this.parentElement.remove()">✕</button>';
     document.addEventListener('DOMContentLoaded',function(){ document.body.insertBefore(bar,document.body.firstChild); });

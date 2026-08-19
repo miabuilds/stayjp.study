@@ -108,8 +108,8 @@
     <div class="chatbar">
       <span class="ttl" id="chatTtl"></span>
       <button class="btn sm cnbtn" id="cnBtn" onclick="toggleZh()" title="關掉中文,只靠日文和語音理解,練聽力">中文</button>
-      <button class="btn sm" onclick="endChat()">結束・看點評</button>
-      <button class="btn sm" onclick="backToPick()">換主題</button>
+      <button class="btn sm" id="endBtn" onclick="endChat()">結束・看點評</button>
+      <button class="btn sm" id="topicBtn" onclick="backToPick()">換主題</button>
     </div>
     <div class="msgs" id="msgs"></div>
     <div class="inbar">
@@ -126,18 +126,27 @@
   <!-- 點評 -->
   <div id="review" style="display:none">
     <div class="chatbar">
-      <span class="ttl">📋 對話點評</span>
-      <button class="btn sm" onclick="resumeChat()">回到對話</button>
-      <button class="btn sm" onclick="backToPick()">換主題</button>
+      <span class="ttl" id="rvTtl">📋 對話點評</span>
+      <button class="btn sm" id="resumeBtn" onclick="resumeChat()">回到對話</button>
+      <button class="btn sm" id="topicBtn2" onclick="backToPick()">換主題</button>
     </div>
     <div class="review" id="reviewCard"></div>
   </div>
 
 </div>
 
+<script src="i18n.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script>
+// ── 三語 shim:cvt(OpenCC 繁→簡)+ enOr(en 用英文,否則 cvt)──
+let _tw2cn=null;
+function ensureOpenCC(){ return new Promise(function(res){ if(_tw2cn)return res(_tw2cn); if(window.OpenCC){ _tw2cn=OpenCC.Converter({from:'tw',to:'cn'}); if(I18n.setConverter)I18n.setConverter(_tw2cn); return res(_tw2cn);} var s=document.createElement('script'); s.src='https://cdn.jsdelivr.net/npm/opencc-js@1.0.5/dist/umd/full.js'; s.onload=function(){ _tw2cn=OpenCC.Converter({from:'tw',to:'cn'}); if(I18n.setConverter)I18n.setConverter(_tw2cn); res(_tw2cn); }; s.onerror=function(){res(null)}; document.head.appendChild(s); }); }
+function cvt(x){ return (!x||I18n.getLang()!=='zh-CN'||!_tw2cn)?x:_tw2cn(x); }
+function enOr(zh,en){ return I18n.getLang()==='en'?en:cvt(zh); }
+function cvtStaticUI(root){ if(I18n.getLang()!=='zh-CN')return; var el=typeof root==='string'?document.getElementById(root):root; if(!el)return; if(!_tw2cn){ ensureOpenCC().then(function(){cvtStaticUI(el)}); return; } var kana=/[ぁ-ゖァ-ヺー]/; var w=document.createTreeWalker(el,NodeFilter.SHOW_TEXT); var list=[],n; while((n=w.nextNode()))list.push(n); list.forEach(function(node){ if(kana.test(node.nodeValue))return; var c=_tw2cn(node.nodeValue); if(c!==node.nodeValue)node.nodeValue=c; }); }
+if(I18n.getLang()==='zh-CN') ensureOpenCC();
+
 const fbConfig = { apiKey:"AIzaSyDnmg2XOuvwgE8m8xCF5sS4o0nQYoUplPI", authDomain:"jpnote-1bdd6.firebaseapp.com", projectId:"jpnote-1bdd6", storageBucket:"jpnote-1bdd6.firebasestorage.app", messagingSenderId:"666368174384" };
 if(!firebase.apps.length) firebase.initializeApp(fbConfig);
 const auth = firebase.auth();
@@ -146,37 +155,37 @@ const ADMIN_EMAILS = ['stayjpplan@gmail.com','abc83327@gmail.com'];
 const FN_CHAT = 'https://asia-east1-jpnote-1bdd6.cloudfunctions.net/speakChat';
 const FN_TTS  = 'https://asia-east1-jpnote-1bdd6.cloudfunctions.net/ttsSpeak';
 
-// desc 是給 AI 的角色設定;voice 決定雲端語音性別。
+// desc 是給 AI 的角色設定(不翻譯);voice 決定雲端語音性別。tE/dE 是英文顯示用。
 const SCENES = [
-  { k:'conbini', ic:'🏪', t:'便利商店', d:'結帳、加熱便當、集點', voice:'f',
+  { k:'conbini', ic:'🏪', t:'便利商店', d:'結帳、加熱便當、集點', tE:'Convenience store', dE:'Checkout, heating food, points', voice:'f',
     desc:'你是日本便利商店(コンビニ)的店員,正在幫這位客人結帳。你會問要不要加熱、要不要袋子、有沒有集點卡等,並完成結帳。' },
-  { k:'resto', ic:'🍜', t:'餐廳點餐', d:'帶位、點餐、結帳', voice:'m',
+  { k:'resto', ic:'🍜', t:'餐廳點餐', d:'帶位、點餐、結帳', tE:'Restaurant', dE:'Seating, ordering, paying', voice:'m',
     desc:'你是日本餐廳的店員,從帶位、遞菜單、幫客人點餐、送餐到結帳都由你負責,自然地推進用餐流程。' },
-  { k:'station', ic:'🚉', t:'車站問路', d:'問路、買票、轉乘', voice:'m',
+  { k:'station', ic:'🚉', t:'車站問路', d:'問路、買票、轉乘', tE:'At the station', dE:'Directions, tickets, transfers', voice:'m',
     desc:'你是車站站務員或熱心的路人,客人向你問路、問怎麼買票或轉乘。你親切地指路、說明路線。' },
-  { k:'clinic', ic:'🏥', t:'看診拿藥', d:'掛號、說症狀、拿藥', voice:'f',
+  { k:'clinic', ic:'🏥', t:'看診拿藥', d:'掛號、說症狀、拿藥', tE:'Clinic visit', dE:'Check-in, symptoms, medicine', voice:'f',
     desc:'你是診所的櫃檯與護理人員,患者來看病。你會問哪裡不舒服、有沒有發燒、帶你保險證了嗎,並引導看診與拿藥。' },
-  { k:'shop', ic:'🛍️', t:'買衣服', d:'試穿、尺寸、退換', voice:'f',
+  { k:'shop', ic:'🛍️', t:'買衣服', d:'試穿、尺寸、退換', tE:'Clothes shopping', dE:'Fitting, sizes, returns', voice:'f',
     desc:'你是服飾店店員,客人來買衣服。你會招呼、介紹、幫忙找尺寸、帶去試穿、說明能不能退換。' },
-  { k:'interview', ic:'💼', t:'工作面試', d:'自我介紹、問答', voice:'m',
+  { k:'interview', ic:'💼', t:'工作面試', d:'自我介紹、問答', tE:'Job interview', dE:'Self-intro, Q&A', voice:'m',
     desc:'你是日本公司的面試官,正在面試這位求職者。你會請對方自我介紹、問動機與經歷、聊工作條件,語氣禮貌正式。' },
-  { k:'house', ic:'🏠', t:'租屋看房', d:'租金、條件、簽約', voice:'f',
+  { k:'house', ic:'🏠', t:'租屋看房', d:'租金、條件、簽約', tE:'Apartment hunting', dE:'Rent, terms, contract', voice:'f',
     desc:'你是不動產仲介,帶客人看房。你會介紹房子、說明租金與條件、回答問題、聊簽約流程。' },
-  { k:'coworker', ic:'☕', t:'同事閒聊', d:'職場寒暄、約午餐', voice:'m',
+  { k:'coworker', ic:'☕', t:'同事閒聊', d:'職場寒暄、約午餐', tE:'Coworker chat', dE:'Small talk, lunch plans', voice:'m',
     desc:'你是對方公司的同事,午休時間隨意閒聊,話題像天氣、工作近況、要不要一起吃午餐等,輕鬆自然。' },
-  { k:'cityhall', ic:'🏛️', t:'市役所辦手續', d:'遷入、保險、文件', voice:'f',
+  { k:'cityhall', ic:'🏛️', t:'市役所辦手續', d:'遷入、保險、文件', tE:'City hall', dE:'Move-in, insurance, paperwork', voice:'f',
     desc:'你是市役所窗口的職員,對方來辦手續(遷入登記、國民健康保險、文件申請等)。你會確認需要的證件、說明流程與填表方式,親切但公事公辦。' },
-  { k:'phone', ic:'📱', t:'辦手機門號', d:'方案、流量、合約', voice:'m',
+  { k:'phone', ic:'📱', t:'辦手機門號', d:'方案、流量、合約', tE:'Phone plan', dE:'Plans, data, contract', voice:'m',
     desc:'你是電信門市的店員,對方來辦門號或換方案。你會介紹方案、問流量需求、說明合約與費用,並確認本人證件。' },
-  { k:'salon', ic:'💇', t:'剪頭髮', d:'描述髮型、長度', voice:'f',
+  { k:'salon', ic:'💇', t:'剪頭髮', d:'描述髮型、長度', tE:'Haircut', dE:'Style, length, small talk', voice:'f',
     desc:'你是美容院的設計師,客人來剪頭髮。你會問今天想怎麼剪、長度、髮型偏好,過程中閒聊幾句,結束確認滿不滿意。' },
-  { k:'izakaya', ic:'🍶', t:'居酒屋聚會', d:'點酒、聊天、乾杯', voice:'m',
+  { k:'izakaya', ic:'🍶', t:'居酒屋聚會', d:'點酒、聊天、乾杯', tE:'Izakaya night', dE:'Drinks, chatting, kanpai', voice:'m',
     desc:'你是一起來居酒屋的日本朋友,大家下班聚會。你會招呼點酒點菜、乾杯、聊工作與生活,口語輕鬆、氣氛熱絡。' },
-  { k:'delivery', ic:'📦', t:'宅配・退換貨', d:'重新配送、客服', voice:'f',
+  { k:'delivery', ic:'📦', t:'宅配・退換貨', d:'重新配送、客服', tE:'Delivery & returns', dE:'Redelivery, support', voice:'f',
     desc:'你是宅配公司或網購客服人員,對方要處理包裹問題(改配送時間、不在配達、退貨換貨)。你會確認單號、說明手續。' },
-  { k:'smalltalk', ic:'🌸', t:'鄰居寒暄', d:'垃圾日、天氣、近況', voice:'f',
+  { k:'smalltalk', ic:'🌸', t:'鄰居寒暄', d:'垃圾日、天氣、近況', tE:'Neighbor chat', dE:'Trash day, weather, life', voice:'f',
     desc:'你是對方的日本鄰居,在公寓門口或垃圾集中處碰到面。你會寒暄天氣、聊垃圾分類日、社區的事、隨意近況,親切自然。' },
-  { k:'custom', ic:'✏️', t:'自訂主題', d:'想聊什麼自己定', voice:'f', custom:true },
+  { k:'custom', ic:'✏️', t:'自訂主題', d:'想聊什麼自己定', tE:'Custom topic', dE:'You decide what to chat about', voice:'f', custom:true },
 ];
 const LEVELS = ['N5','N4','N3','N2','N1'];
 let activeLv = 'N4';
@@ -189,14 +198,15 @@ function toggleZh(){ showZh=!showZh; const b=document.getElementById('cnBtn'); i
 // ── 畫面切換 ──
 function show(id){ ['pick','chat','review'].forEach(x=>document.getElementById(x).style.display = x===id?'block':'none'); }
 function renderLvTabs(){
-  const D={N5:'最基本',N4:'日常',N3:'中級',N2:'中上',N1:'高階'};
+  const D={N5:enOr('最基本','Basics'),N4:enOr('日常','Daily'),N3:enOr('中級','Intermediate'),N2:enOr('中上','Upper-int'),N1:enOr('高階','Advanced')};
   document.getElementById('lvtabs').innerHTML = LEVELS.map(lv=>
     `<div class="lvtab${lv===activeLv?' on':''}" onclick="pickLv('${lv}')">${lv}<small>${D[lv]}</small></div>`).join('');
 }
 function pickLv(lv){ activeLv=lv; renderLvTabs(); }
+function sceneTitle(s){ return s.tE ? enOr(s.t, s.tE) : s.t; }   // custom 主題的 t 是使用者輸入,不翻
 function renderScenes(){
   document.getElementById('scenes').innerHTML = SCENES.map(s=>
-    `<div class="scene" onclick="startChat('${s.k}')"><div class="ic">${s.ic}</div><div class="t">${s.t}</div><div class="d">${s.d}</div></div>`).join('');
+    `<div class="scene" onclick="startChat('${s.k}')"><div class="ic">${s.ic}</div><div class="t">${esc(sceneTitle(s))}</div><div class="d">${esc(s.dE?enOr(s.d,s.dE):s.d)}</div></div>`).join('');
 }
 function backToPick(){ hardStopRec(); scene=null; history=[]; show('pick'); }
 
@@ -211,8 +221,8 @@ function loginWith(p){
   auth.signInWithPopup(provider).then(function(){ var g=document.getElementById('loginCard'); if(g)g.remove(); })
     .catch(function(e){ var c=e&&e.code;
       if(c==='auth/cancelled-popup-request'||c==='auth/popup-closed-by-user')return;
-      if(c==='auth/operation-not-allowed'){ alert('Apple 登入還在設定中,請先用 Google 登入。'); return; }
-      alert('登入失敗:'+(e&&e.message||e));
+      if(c==='auth/operation-not-allowed'){ alert(enOr('Apple 登入還在設定中,請先用 Google 登入。','Apple sign-in is still being set up — please use Google for now.')); return; }
+      alert(enOr('登入失敗:','Sign-in failed: ')+(e&&e.message||e));
     }).finally(function(){ _signingIn=false; });
 }
 function showLoginCard(){
@@ -221,10 +231,10 @@ function showLoginCard(){
   el.innerHTML='<div style="position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:900" onclick="document.getElementById(\'loginCard\').remove()"></div>'
     +'<div style="position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:901;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:24px;max-width:320px;width:88%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.3)">'
     +'<div style="font-size:30px;margin-bottom:6px">🗣</div>'
-    +'<div style="font-weight:800;margin-bottom:4px">登入就能開始對話</div>'
-    +'<div class="muted" style="margin-bottom:16px">免費體驗 1 場,Premium 每天 3 場</div>'
-    +'<button class="btn pri" style="width:100%;margin-bottom:8px" onclick="loginWith(\'google\')">用 Google 登入</button>'
-    +'<button class="btn" style="width:100%" onclick="loginWith(\'apple\')"> 用 Apple 登入</button>'
+    +'<div style="font-weight:800;margin-bottom:4px">'+enOr('登入就能開始對話','Sign in to start chatting')+'</div>'
+    +'<div class="muted" style="margin-bottom:16px">'+enOr('免費體驗 1 場,Premium 每天 3 場','1 free session; 3 per day with Premium')+'</div>'
+    +'<button class="btn pri" style="width:100%;margin-bottom:8px" onclick="loginWith(\'google\')">'+enOr('用 Google 登入','Sign in with Google')+'</button>'
+    +'<button class="btn" style="width:100%" onclick="loginWith(\'apple\')"> '+enOr('用 Apple 登入','Sign in with Apple')+'</button>'
     +'</div>';
   document.body.appendChild(el);
 }
@@ -233,7 +243,7 @@ function startChat(k){
   const s0 = SCENES.find(s=>s.k===k); if(!s0) return;
   if(s0.custom){
     // 自訂主題:自由輸入想聊什麼,AI 照這個設定演
-    const topic = (prompt('想聊什麼?用一兩句描述情境或話題,例如:\n「我是店長,你是來應徵打工的人」\n「聊最近看的動漫」\n「你是我的日本朋友,幫我規劃九州旅行」')||'').trim();
+    const topic = (prompt(enOr('想聊什麼?用一兩句描述情境或話題,例如:\n「我是店長,你是來應徵打工的人」\n「聊最近看的動漫」\n「你是我的日本朋友,幫我規劃九州旅行」','What do you want to talk about? Describe the scene or topic in a sentence or two, e.g.:\n"You are the manager interviewing me for a part-time job"\n"Chat about anime we watched lately"\n"You are my Japanese friend helping me plan a Kyushu trip"'))||'').trim();
     if(!topic) return;
     scene = { k:'custom', ic:'✏️', t: topic.length>12? topic.slice(0,12)+'…' : topic, voice:'f',
       desc:'自訂情境(由學習者描述,請照著演):'+topic+'\n如果描述裡沒指定你的角色,就當一位聊得來的日本人,自然地聊這個話題。' };
@@ -241,7 +251,7 @@ function startChat(k){
     scene = s0;
   }
   history = [];
-  document.getElementById('chatTtl').innerHTML = `${scene.ic} ${scene.t} <span class="muted" style="font-weight:400">· ${activeLv}</span>`;
+  document.getElementById('chatTtl').innerHTML = `${scene.ic} ${esc(sceneTitle(scene))} <span class="muted" style="font-weight:400">· ${activeLv}</span>`;
   document.getElementById('msgs').innerHTML = '';
   document.getElementById('say').value = '';
   show('chat');
@@ -257,7 +267,7 @@ function renderMsgs(streamingAi){
       html += `<div class="msg me"><div class="bubble me"><div class="bjp">${esc(m.text)}</div></div></div>`;
     } else {
       html += aiBubble(m);
-      if(m.coach) html += `<div class="coach"><b>教練</b>:${esc(m.coach)}</div>`;
+      if(m.coach) html += `<div class="coach"><b>${enOr('教練','Coach')}</b>:${esc(cvt(m.coach))}</div>`;
     }
   }
   if(streamingAi!=null) html += aiBubble(streamingAi) + '<div class="typing">相手が入力中…</div>';
@@ -268,9 +278,9 @@ function renderMsgs(streamingAi){
 function aiBubble(m){
   const jp = m.jp || m.text || '';
   return `<div class="msg ai"><div class="bubble ai">
-    <div class="bjp"><span>${esc(jp)||'…'}</span>${jp?`<button class="spk" title="播放" onclick="playTTS(${JSON.stringify(jp).replace(/"/g,'&quot;')})">🔊</button>`:''}</div>
+    <div class="bjp"><span>${esc(jp)||'…'}</span>${jp?`<button class="spk" title="${enOr('播放','Play')}" onclick="playTTS(${JSON.stringify(jp).replace(/"/g,'&quot;')})">🔊</button>`:''}</div>
     ${m.kana?`<div class="bkana">${esc(m.kana)}</div>`:''}
-    ${(showZh && m.zh)?`<div class="bzh">${esc(m.zh)}</div>`:''}
+    ${(showZh && m.zh)?`<div class="bzh">${esc(cvt(m.zh))}</div>`:''}
     ${(showZh && m.words)?wordChips(m.words):''}
   </div></div>`;
 }
@@ -299,16 +309,16 @@ function renderHints(hints){
   _hints = hints||[];
   const box=document.getElementById('hints'); if(!box) return;
   if(!_hints.length){ box.innerHTML=''; return; }
-  box.innerHTML = '<button class="hint-toggle" onclick="expandHints()">💡 不知道怎麼接?看提示</button>';
+  box.innerHTML = '<button class="hint-toggle" onclick="expandHints()">'+enOr('💡 不知道怎麼接?看提示','💡 Stuck? See hints')+'</button>';
 }
 function expandHints(){
   const box=document.getElementById('hints'); if(!box || !_hints.length) return;
-  box.innerHTML = '<div class="hints-lb">💬 可以這樣回(點了會填入,可再改):</div>' +
+  box.innerHTML = '<div class="hints-lb">'+enOr('💬 可以這樣回(點了會填入,可再改):','💬 You could say (tap to fill in, then edit):')+'</div>' +
     _hints.slice(0,3).map(h=>{
       const parts=String(h).split(/[｜|]/); const jp=(parts[0]||'').trim(); const zh=(parts[1]||'').trim();
       if(!jp) return '';
-      return '<span class="hint-wrap"><button class="hint-chip" onclick="useHint('+JSON.stringify(jp).replace(/"/g,'&quot;')+')">'+esc(jp)+(zh?'<span class="hz">'+esc(zh)+'</span>':'')+'</button>'
-        +'<button class="hint-spk" title="唸給我聽" onclick="event.stopPropagation();playTTS('+JSON.stringify(jp).replace(/"/g,'&quot;')+')">🔊</button></span>';
+      return '<span class="hint-wrap"><button class="hint-chip" onclick="useHint('+JSON.stringify(jp).replace(/"/g,'&quot;')+')">'+esc(jp)+(zh?'<span class="hz">'+esc(cvt(zh))+'</span>':'')+'</button>'
+        +'<button class="hint-spk" title="'+enOr('唸給我聽','Hear it')+'" onclick="event.stopPropagation();playTTS('+JSON.stringify(jp).replace(/"/g,'&quot;')+')">🔊</button></span>';
     }).join('');
 }
 // AI 回答的關鍵單字卡:単語|よみ|意思;分號隔開。點卡片唸該單字(雲端 TTS)
@@ -321,7 +331,7 @@ function wordChips(words){
     zh=zh.split(/[;;﹔]/)[0].trim();   // 模型偶爾把下一個字擠進意思欄(「結帳金額;円」)→ 只留第一段
     if(!w) return '';
     return '<button class="wchip" onclick="event.stopPropagation();playTTS('+JSON.stringify(w).replace(/"/g,'&quot;')+')">'
-      +'<b>'+esc(w)+'</b>'+(r&&r!==w?'<span class="wr">'+esc(r)+'</span>':'')+(zh?'<span class="wz">'+esc(zh)+'</span>':'')+'</button>';
+      +'<b>'+esc(w)+'</b>'+(r&&r!==w?'<span class="wr">'+esc(r)+'</span>':'')+(zh?'<span class="wz">'+esc(cvt(zh))+'</span>':'')+'</button>';
   }).join('')+'</div>';
 }
 function useHint(jp){ const el=document.getElementById('say'); el.value=jp; autoGrow(); el.focus(); }
@@ -332,12 +342,12 @@ async function turn(){
   try{
     const t = await auth.currentUser.getIdToken();
     const r = await fetch(FN_CHAT,{ method:'POST', headers:{'Content-Type':'application/json',Authorization:'Bearer '+t},
-      body:JSON.stringify({ mode:'chat', scene:scene.desc, level:activeLv, history:history.map(h=>({role:h.role,text:h.role==='ai'?(h.jp||h.text):h.text})) }) });
+      body:JSON.stringify({ mode:'chat', scene:scene.desc, level:activeLv, lang:I18n.getLang(), history:history.map(h=>({role:h.role,text:h.role==='ai'?(h.jp||h.text):h.text})) }) });
     if(!r.ok){
       let d={}; try{d=await r.json();}catch(e){}
       renderMsgs();
-      if(d.error==='turns'){ appendErr(d.message||'這場聊得夠深了'); setTimeout(endChat, 800); return; }   // 輪數到頂 → 自動進點評
-      if(d.error==='quota'){ appendErr((d.message||'額度用完了')+' → 到「訂閱方案」升級'); return; }
+      if(d.error==='turns'){ appendErr(cvt(d.message)||enOr('這場聊得夠深了','That was a good, long chat!')); setTimeout(endChat, 800); return; }   // 輪數到頂 → 自動進點評
+      if(d.error==='quota'){ appendErr((cvt(d.message)||enOr('額度用完了','Daily quota used up'))+enOr(' → 到「訂閱方案」升級',' → upgrade under "Plans"')); return; }
       appendErr(d.error||('HTTP '+r.status)); return;
     }
     const reader=r.body.getReader(); const dec=new TextDecoder(); let full=''; let spokenJp='';
@@ -353,7 +363,7 @@ async function turn(){
   }catch(e){ renderMsgs(); appendErr(e.message); }
   finally{ busy=false; setBusy(false); }
 }
-function appendErr(msg){ const box=document.getElementById('msgs'); box.insertAdjacentHTML('beforeend',`<div class="err">出錯了:${esc(msg)}</div>`); }
+function appendErr(msg){ const box=document.getElementById('msgs'); box.insertAdjacentHTML('beforeend',`<div class="err">${enOr('出錯了:','Error: ')}${esc(msg)}</div>`); }
 function setBusy(b){ document.getElementById('sendBtn').disabled=b; }
 
 function sendMine(){
@@ -361,7 +371,7 @@ function sendMine(){
   if(!txt || busy) return;
   // 每場 12 輪封頂(成本天花板):到頂自動進點評收尾
   if(history.filter(h=>h.role==='me').length >= 12){
-    appendErr('這場聊得很充實了!幫你整理點評 🙌'); setTimeout(endChat, 800); return;
+    appendErr(enOr('這場聊得很充實了!幫你整理點評 🙌','Great session! Putting together your review 🙌')); setTimeout(endChat, 800); return;
   }
   hardStopRec();
   history.push({ role:'me', text:txt });
@@ -375,18 +385,18 @@ function sendMine(){
 async function endChat(){
   if(busy) return;
   const mine = history.filter(h=>h.role==='me').length;
-  if(mine===0){ show('review'); document.getElementById('reviewCard').innerHTML='<div class="muted">還沒開始對話,先聊幾句再看點評 🙂</div>'; return; }
+  if(mine===0){ show('review'); document.getElementById('reviewCard').innerHTML='<div class="muted">'+enOr('還沒開始對話,先聊幾句再看點評 🙂','No conversation yet — chat a little first 🙂')+'</div>'; return; }
   show('review');
-  const card=document.getElementById('reviewCard'); card.innerHTML='<div class="muted">整理你的表現中…</div>';
+  const card=document.getElementById('reviewCard'); card.innerHTML='<div class="muted">'+enOr('整理你的表現中…','Reviewing your performance…')+'</div>';
   try{
     const t=await auth.currentUser.getIdToken();
     const r=await fetch(FN_CHAT,{ method:'POST', headers:{'Content-Type':'application/json',Authorization:'Bearer '+t},
-      body:JSON.stringify({ mode:'review', history:history.map(h=>({role:h.role,text:h.role==='ai'?(h.jp||h.text):h.text})) }) });
-    if(!r.ok){ let d={}; try{d=await r.json();}catch(e){} card.innerHTML='<div class="err">失敗:'+esc(d.error||r.status)+'</div>'; return; }
+      body:JSON.stringify({ mode:'review', lang:I18n.getLang(), history:history.map(h=>({role:h.role,text:h.role==='ai'?(h.jp||h.text):h.text})) }) });
+    if(!r.ok){ let d={}; try{d=await r.json();}catch(e){} card.innerHTML='<div class="err">'+enOr('失敗:','Failed: ')+esc(d.error||r.status)+'</div>'; return; }
     const reader=r.body.getReader(); const dec=new TextDecoder(); let full='';
     while(true){ const {done,value}=await reader.read(); if(done)break; full+=dec.decode(value,{stream:true}); renderReview(full,false); }
     renderReview(full,true);
-  }catch(e){ card.innerHTML='<div class="err">錯誤:'+esc(e.message)+'</div>'; }
+  }catch(e){ card.innerHTML='<div class="err">'+enOr('錯誤:','Error: ')+esc(e.message)+'</div>'; }
 }
 function parseReview(text){
   const o={};
@@ -400,13 +410,13 @@ function renderReview(text, done){
   const d=parseReview(text); const sc=Number(d.score)||0;
   const col=sc>=85?'var(--ok)':sc>=60?'var(--warn)':'var(--bad)';
   const head = d.score!=null
-    ? `<div class="rv-head"><div class="ring" style="background:${col}">${sc}</div><div style="font-weight:700">這次對話的表現</div></div>`
-    : '<div class="muted">整理你的表現中…</div>';
+    ? `<div class="rv-head"><div class="ring" style="background:${col}">${sc}</div><div style="font-weight:700">${enOr('這次對話的表現','How this chat went')}</div></div>`
+    : '<div class="muted">'+enOr('整理你的表現中…','Reviewing your performance…')+'</div>';
   document.getElementById('reviewCard').innerHTML = head
-    + (d.good?`<div class="rv-line"><span class="lb">做得好</span>${esc(d.good)}</div>`:'')
-    + (d.improve?`<div class="rv-line"><span class="lb">可加強</span>${esc(d.improve)}</div>`:'')
-    + (d.tip?`<div class="rv-line"><span class="lb">小建議</span>${esc(d.tip)}</div>`:'')
-    + (d.encourage?`<div class="rv-line" style="color:var(--ok);font-weight:600;border:0">${esc(d.encourage)}</div>`:'')
+    + (d.good?`<div class="rv-line"><span class="lb">${enOr('做得好','Well done')}</span>${esc(cvt(d.good))}</div>`:'')
+    + (d.improve?`<div class="rv-line"><span class="lb">${enOr('可加強','To improve')}</span>${esc(cvt(d.improve))}</div>`:'')
+    + (d.tip?`<div class="rv-line"><span class="lb">${enOr('小建議','Tip')}</span>${esc(cvt(d.tip))}</div>`:'')
+    + (d.encourage?`<div class="rv-line" style="color:var(--ok);font-weight:600;border:0">${esc(cvt(d.encourage))}</div>`:'')
     + (!done && d.score!=null?'<div class="muted" style="margin-top:6px">…</div>':'');
 }
 function resumeChat(){ show('chat'); renderMsgs(); }
@@ -451,21 +461,25 @@ let rec=null, recording=false, _wantRec=false, _recBase='', _sessFin='';
 const NATIVE_STT = !!(window.STAYJP_NATIVE && window.STAYJP_NATIVE.canSpeech && window.ReactNativeWebView);
 const _IN_APP0 = !!(window.STAYJP_NATIVE && window.STAYJP_NATIVE.isNativeApp && window.ReactNativeWebView);
 // App 內在提示列尾端帶 OTA 版次前 6 碼(⚙xxxxxx),一眼確認熱更新裝上了沒
-const NOTE_IDLE = (NATIVE_STT ? '🎤 講完按停或直接送出;不準可直接改字再送。' : '🎤 用瀏覽器語音辨識(Chrome 較準);不準可直接改字再送。')
-  + (_IN_APP0 ? ' ⚙'+String(window.STAYJP_NATIVE.updateId||'embedded').slice(-6) : '');   // 取尾 6 碼:updateId 開頭是時間序,尾碼才分得出版本
+// 改成函式:語言轉換(OpenCC)是非同步載入,取值時才算才能拿到正確語言版本
+function noteIdle(){
+  return (NATIVE_STT ? enOr('🎤 講完按停或直接送出;不準可直接改字再送。','🎤 Tap stop or just send when done; edit the text if it misheard.')
+                     : enOr('🎤 用瀏覽器語音辨識(Chrome 較準);不準可直接改字再送。','🎤 Uses browser speech recognition (Chrome is most accurate); edit the text if it misheard.'))
+    + (_IN_APP0 ? ' ⚙'+String(window.STAYJP_NATIVE.updateId||'embedded').slice(-6) : '');   // 取尾 6 碼:updateId 開頭是時間序,尾碼才分得出版本
+}
 function _nPost(o){ try{ window.ReactNativeWebView.postMessage(JSON.stringify(o)); }catch(e){} }
-if(NATIVE_STT){ var _n0=document.getElementById('inNote'); if(_n0) _n0.textContent=NOTE_IDLE; }
+if(NATIVE_STT){ var _n0=document.getElementById('inNote'); if(_n0) _n0.textContent=noteIdle(); }
 // 舊版 App(1.0.5,無原生辨識模組)在 App 內走 WKWebView 瀏覽器辨識:錄完 iOS session 卡在錄音模式
 // → 之後 TTS 沒聲音。錄音一結束就通知原生把 session 還原成播放(新版 App 的 OTA 有對應 handler)。
 const IN_APP = _IN_APP0;
 function _postRestore(){ if(IN_APP && !NATIVE_STT) _nPost({type:'AUDIO_RESTORE'}); }
-if(IN_APP){ var _nv0=document.getElementById('inNote'); if(_nv0) _nv0.textContent=NOTE_IDLE; }
+if(IN_APP){ var _nv0=document.getElementById('inNote'); if(_nv0) _nv0.textContent=noteIdle(); }
 function _nStart(){
   // 原生辨識從按下到真的收音有半秒延遲,太早講開頭會被吃掉。新版 App 會回報 audiostart:
   // 先顯示「準備中」,收到事件才切「開講」;舊版沒事件就照舊直接顯示錄音中。
   if(window.STAYJP_NATIVE.hasSpeechStartEvt){
-    document.getElementById('inNote').textContent='🎤 準備中…等一下再開口。';
-    window.stayjpSpeechStarted=function(){ if(_wantRec) document.getElementById('inNote').textContent='🎤 開講!講完按停或直接按送出。'; };
+    document.getElementById('inNote').textContent=enOr('🎤 準備中…等一下再開口。','🎤 Getting ready… wait a moment before speaking.');
+    window.stayjpSpeechStarted=function(){ if(_wantRec) document.getElementById('inNote').textContent=enOr('🎤 開講!講完按停或直接按送出。','🎤 Go ahead! Tap stop or just send when done.'); };
   }
   window.stayjpSpeechResult=function(t,fin){
     if(t==null) return;
@@ -476,8 +490,8 @@ function _nStart(){
   window.stayjpSpeechEnd=function(err){
     recording=false;
     if(_sessFin){ _recBase+=_sessFin; _sessFin=''; }
-    if(err==='not-allowed'){ _wantRec=false; updateRecBtn(); document.getElementById('inNote').textContent='🎤 麥克風權限被關了:請到 iPhone 設定 → StayJP 允許麥克風。'; return; }
-    if(err){ _wantRec=false; updateRecBtn(); document.getElementById('inNote').textContent='🎤 辨識中斷('+err+'),再按一次麥克風重試。'; return; }
+    if(err==='not-allowed'){ _wantRec=false; updateRecBtn(); document.getElementById('inNote').textContent=enOr('🎤 麥克風權限被關了:請到 iPhone 設定 → StayJP 允許麥克風。','🎤 Microphone access is off: allow it in iPhone Settings → StayJP.'); return; }
+    if(err){ _wantRec=false; updateRecBtn(); document.getElementById('inNote').textContent=enOr('🎤 辨識中斷('+err+'),再按一次麥克風重試。','🎤 Recognition stopped ('+err+') — tap the mic to retry.'); return; }
     if(_wantRec){ setTimeout(function(){ if(_wantRec){ _sessFin=''; recording=true; _nPost({type:'SPEECH_START',lang:'ja-JP'}); } },200); return; }   // 停頓自動續錄
     updateRecBtn();
   };
@@ -487,7 +501,7 @@ function _nStart(){
 function toggleRec(){ recording||_wantRec ? stopRec() : startRec(); }
 function _newRec(){
   const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-  if(!SR){ document.getElementById('inNote').textContent='這個瀏覽器不支援語音辨識,請直接打字(手機 Chrome / Safari 支援)。'; return null; }
+  if(!SR){ document.getElementById('inNote').textContent=enOr('這個瀏覽器不支援語音辨識,請直接打字(手機 Chrome / Safari 支援)。','Speech recognition is not supported in this browser — please type instead (mobile Chrome / Safari work).'); return null; }
   try{ if(rec){ rec.onend=null; rec.onerror=null; rec.onresult=null; rec.abort(); } }catch(e){}   // 釋放舊實例,防服務卡死
   const r=new SR(); r.lang='ja-JP'; r.interimResults=true; r.continuous=true;
   r.onresult=e=>{
@@ -502,9 +516,9 @@ function _newRec(){
   };
   r.onerror=e=>{
     const c=e&&e.error;
-    if(c==='not-allowed'||c==='service-not-allowed'){ _wantRec=false; document.getElementById('inNote').textContent='🎤 麥克風權限被擋了:請允許此網站使用麥克風後再試。'; }
+    if(c==='not-allowed'||c==='service-not-allowed'){ _wantRec=false; document.getElementById('inNote').textContent=enOr('🎤 麥克風權限被擋了:請允許此網站使用麥克風後再試。','🎤 Microphone blocked: allow mic access for this site and try again.'); }
     else if(c==='no-speech'){ /* 沒聽到聲音:交給 onend 自動續錄 */ }
-    else if(c&&c!=='aborted'){ document.getElementById('inNote').textContent='🎤 辨識中斷('+c+'),再按一次麥克風重試。'; _wantRec=false; }
+    else if(c&&c!=='aborted'){ document.getElementById('inNote').textContent=enOr('🎤 辨識中斷('+c+'),再按一次麥克風重試。','🎤 Recognition stopped ('+c+') — tap the mic to retry.'); _wantRec=false; }
   };
   r.onend=()=>{
     recording=false;
@@ -527,7 +541,7 @@ function startRec(){
   _wantRec=true;
   _recBase=(document.getElementById('say').value||'');
   if(_recBase && !/[\s、。]$/.test(_recBase)) _recBase+='';   // 接續原文
-  document.getElementById('inNote').textContent='🎤 錄音中…講完按停或直接按送出。';
+  document.getElementById('inNote').textContent=enOr('🎤 錄音中…講完按停或直接按送出。','🎤 Recording… tap stop or just send when done.');
   if(NATIVE_STT){ _nStart(); return; }
   _startInstance();
 }
@@ -536,7 +550,7 @@ function stopRec(){
   if(NATIVE_STT){ _nPost({type:'SPEECH_STOP'}); }   // 原生端 end 事件會回 stayjpSpeechEnd 併入 final
   else { try{ rec&&rec.stop(); }catch(e){} }
   recording=false; updateRecBtn();
-  const n=document.getElementById('inNote'); if(n) n.textContent=NOTE_IDLE;
+  const n=document.getElementById('inNote'); if(n) n.textContent=noteIdle();
 }
 // 送出訊息時用的「硬停」:輸入框已清空,引擎遲到的 onresult flush 絕不能再寫回舊文字
 // (之前用 stopRec 軟停,stop() 之後還會補一個 final 結果 → 送出後欄位又冒出剛講的話)
@@ -547,7 +561,7 @@ function hardStopRec(){
   rec=null; recording=false; _recBase=''; _sessFin='';
   updateRecBtn();
   _postRestore();   // abort 掉不會走 onend → 這裡直接還原
-  const n=document.getElementById('inNote'); if(n) n.textContent=NOTE_IDLE;
+  const n=document.getElementById('inNote'); if(n) n.textContent=noteIdle();
 }
 function updateRecBtn(){ const b=document.getElementById('recBtn'); if(b) b.classList.toggle('on',recording||_wantRec); }
 
@@ -555,11 +569,36 @@ function autoGrow(){ const el=document.getElementById('say'); if(!el)return; el.
 document.addEventListener('input',e=>{ if(e.target && e.target.id==='say') autoGrow(); });
 document.addEventListener('keydown',e=>{ if(e.target && e.target.id==='say' && e.key==='Enter' && !e.shiftKey){ e.preventDefault(); sendMine(); } });
 
+// ── 靜態 UI 三語:en 逐項換字、zh-CN 走 OpenCC 整頁轉(非同步,自帶重試)──
+(function initStaticI18n(){
+  const L=I18n.getLang();
+  if(L==='zh-CN'){ document.title='AI 情境对话｜StayJP 日本再留计划'; cvtStaticUI(document.body); return; }
+  if(L!=='en') return;
+  document.title='AI Conversation | StayJP';
+  const q=s=>document.querySelector(s);
+  const set=(el,txt)=>{ if(el) el.textContent=txt; };
+  set(q('#boot div:nth-child(2)'),'Loading…');
+  set(q('#pick a'),'‹ Back');
+  const h1=q('#pick h1'); if(h1) h1.innerHTML='🗣 Scenario Chat <span class="muted" style="font-weight:400">Beta</span>';
+  set(q('#pick .sub'),'Pick a scene and level — the AI plays the other person and chats with you turn by turn. Speak (speech recognition) or type. 1 free session; Premium gets 3 per day.');
+  const note=q('#pick > .muted'); if(note) note.innerHTML='💡 This is conversation practice — for single-sentence shadowing, go to <a href="speak.html" style="color:var(--accent)">Speaking practice</a>.';
+  const cn=q('#cnBtn'); if(cn){ cn.textContent='ZH'; cn.title='Hide Chinese translations and rely on Japanese + audio to train listening'; }
+  set(q('#endBtn'),'End & review');
+  set(q('#topicBtn'),'Change topic');
+  set(q('#topicBtn2'),'Change topic');
+  set(q('#resumeBtn'),'Back to chat');
+  set(q('#rvTtl'),'📋 Chat review');
+  const say=q('#say'); if(say) say.placeholder='Speak or type…';
+  set(q('#sendBtn'),'Send');
+  set(q('#inNote'),noteIdle());
+})();
+
 // ── auth ──
 auth.onAuthStateChanged(u=>{
   try{var _b=document.getElementById("boot"); if(_b)_b.remove();}catch(e){}
   document.getElementById('app').style.display='block';
   renderLvTabs(); renderScenes(); show('pick');
+  if(I18n.getLang()==='zh-CN') cvtStaticUI(document.body);   // 初次渲染可能早於 OpenCC 載完 → 再掃一次(自帶重試)
 });
 </script>
 </body>

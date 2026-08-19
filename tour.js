@@ -4,14 +4,15 @@
 // 觸發:新手選完程度後;重看:更多選單「🧭 功能導覽」、? 快速上手裡的按鈕。
 (function () {
   if (window.Tour) return;
+  function _en(zh, en) { try { var l = (typeof I18n !== 'undefined' && I18n.getLang) ? I18n.getLang() : (localStorage.getItem('ui_lang') || 'zh-TW'); if (l === 'en') return en; return (typeof cvt === 'function') ? cvt(zh) : zh; } catch (e) { return zh; } }
   var DONE_KEY = 'tour_done_v1';
   var steps = [
-    { sel: '#hdBar',      t: '切級別・切內容', d: '這裡選 N5–N1 程度,切換「文法 / 單字」。點 ★ 只看收藏。', pos: 'below' },
-    { sel: '.flag-row',   t: '主打功能', d: 'JLPT 刷題特區、AI 口說評分、AI 情境對話都在這,點卡片直接進。', pos: 'below' },
-    { sel: '.art-entry',  t: '每天讀一篇', d: '精選日文短文:點字查意思、逐句真人朗讀、讀完有測驗。', pos: 'below' },
-    { sel: '#ftb .ftb-btn:nth-child(2)', t: '測驗', d: '單字測驗在這;寫錯會有詳解卡,答完自動唸給你聽。', pos: 'above' },
-    { sel: '#ftb .ftb-btn:nth-child(3)', t: '複習(最重要!)', d: '每天回來清「複習」:系統照記憶曲線排程,背起來全靠這個。', pos: 'above' },
-    { sel: '#ftb .ftb-btn:last-child',   t: '更多工具', d: '模擬考、五十音、動詞變化、生活會話、聽力讀解…全收在「更多」。', pos: 'above' },
+    { sel: '#hdBar',      t: _en('切級別・切內容','Level & content'), d: _en('這裡選 N5–N1 程度,切換「文法 / 單字」。點 ★ 只看收藏。','Pick your N5–N1 level and switch between Grammar / Vocabulary. Tap ★ to see favorites only.'), pos: 'below' },
+    { sel: '.flag-row',   t: _en('主打功能','Flagship features'), d: _en('JLPT 刷題特區、AI 口說評分、AI 情境對話都在這,點卡片直接進。','JLPT Drills, AI Speaking Score and AI Conversation all live here — tap a card to jump in.'), pos: 'below' },
+    { sel: '.art-entry',  t: _en('每天讀一篇','Daily reading'), d: _en('精選日文短文:點字查意思、逐句真人朗讀、讀完有測驗。','Curated short articles: tap any word for its meaning, listen sentence by sentence, then take a quiz.'), pos: 'below' },
+    { sel: '#ftb .ftb-btn:nth-child(2)', t: _en('測驗','Quiz'), d: _en('單字測驗在這;寫錯會有詳解卡,答完自動唸給你聽。','Vocabulary quizzes live here; wrong answers get an explanation card and are read aloud.'), pos: 'above' },
+    { sel: '#ftb .ftb-btn:nth-child(3)', t: _en('複習(最重要!)','Review (the key!)'), d: _en('每天回來清「複習」:系統照記憶曲線排程,背起來全靠這個。','Come back daily to clear your reviews — spaced repetition is how words actually stick.'), pos: 'above' },
+    { sel: '#ftb .ftb-btn:last-child',   t: _en('更多工具','More tools'), d: _en('模擬考、五十音、動詞變化、生活會話、聽力讀解…全收在「更多」。','Mock exams, kana, verb conjugation, daily phrases, listening & reading — all under "More".'), pos: 'above' },
   ];
   var idx = 0, box = null, tip = null;
 
@@ -47,8 +48,8 @@
       box.style.width = (r.width + pad * 2) + 'px'; box.style.height = (r.height + pad * 2) + 'px';
       tip.innerHTML = '<div class="tt">' + s.t + '</div><div class="td">' + s.d + '</div>' +
         '<div class="tr"><span class="tn">' + (idx + 1) + ' / ' + steps.length + '</span>' +
-        '<button class="tskip" onclick="Tour.stop()">跳過</button>' +
-        '<button class="tnext" onclick="Tour.next()">' + (idx === steps.length - 1 ? '完成 ✓' : '下一步 →') + '</button></div>';
+        '<button class="tskip" onclick="Tour.stop()">' + _en('跳過','Skip') + '</button>' +
+        '<button class="tnext" onclick="Tour.next()">' + (idx === steps.length - 1 ? _en('完成 ✓','Done ✓') : _en('下一步 →','Next →')) + '</button></div>';
       var th = tip.offsetHeight || 150;
       var top = s.pos === 'above' ? (r.top - th - 14) : (r.bottom + 14);
       top = Math.max(12, Math.min(top, window.innerHeight - th - 12));

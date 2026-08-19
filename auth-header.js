@@ -168,7 +168,7 @@
       var ADMIN = ['stayjpplan@gmail.com', 'abc83327@gmail.com'];
       var adminLink = ADMIN.indexOf((user.email || '').toLowerCase()) > -1 ? '<a class="ahx-item" href="admin-dash.html"><span class="ahx-ic">🛠</span>管理後台</a>' : '';
       var upLink = (!isPremium() && !(window.STAYJP_NATIVE && window.STAYJP_NATIVE.isNativeApp))
-        ? '<a href="pricing.html" style="font-size:12px;font-weight:700;color:var(--ac,#d4654a);text-decoration:none;margin-right:8px;border:1px solid var(--ac,#d4654a);border-radius:20px;padding:4px 10px;white-space:nowrap">升級</a>' : '';
+        ? '<a href="pricing.html" style="font-size:12px;font-weight:700;color:var(--ac,#d4654a);text-decoration:none;margin-right:8px;border:1px solid var(--ac,#d4654a);border-radius:20px;padding:4px 10px;white-space:nowrap">' + (function(){ try{ var l=localStorage.getItem('ui_lang')||'zh-TW'; return l==='en'?'Upgrade':(l==='zh-CN'?'升级':'升級'); }catch(e){ return '升級'; } })() + '</a>' : '';
       area.innerHTML = upLink +
         '<button class="ahx-btn" id="ahxMenuBtn" type="button">' + img + '<span class="ahx-name">' + name + '</span> ▾</button>' +
         '<div class="ahx-menu" id="ahxMenu">' +

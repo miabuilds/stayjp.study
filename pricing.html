@@ -976,6 +976,13 @@ _auth.onAuthStateChanged(user => {
 <script src="native-ui.js"></script>
 <script defer src="auth-header.js"></script>
 <script src="i18n.js"></script>
+<script>
+// CSS ::before 徽章(彈性月付/最多人選…)translate-layer 碰不到 → 依語言蓋一段 style
+(function(){ try{ var l=(localStorage.getItem('ui_lang')||'zh-TW'); if(l==='zh-TW')return;
+  var css = l==='en' ? '.plan.entry::before{content:"Flexible monthly"}' : '.plan.entry::before{content:"弹性月付"}';
+  var st=document.createElement('style'); st.textContent=css; document.head.appendChild(st);
+}catch(e){} })();
+</script>
 <script src="ui-map.js"></script>
 <script src="translate-layer.js"></script>
 </body>
