@@ -198,7 +198,7 @@ function renderScenes(){
   document.getElementById('scenes').innerHTML = SCENES.map(s=>
     `<div class="scene" onclick="startChat('${s.k}')"><div class="ic">${s.ic}</div><div class="t">${s.t}</div><div class="d">${s.d}</div></div>`).join('');
 }
-function backToPick(){ stopRec(); scene=null; history=[]; show('pick'); }
+function backToPick(){ hardStopRec(); scene=null; history=[]; show('pick'); }
 
 // ── 開始 / 進行對話 ──
 // 站上標準雙登入(照 auth-header.js)
@@ -336,15 +336,16 @@ async function turn(){
       if(d.error==='quota'){ appendErr((d.message||'額度用完了')+' → 到「訂閱方案」升級'); return; }
       appendErr(d.error||('HTTP '+r.status)); return;
     }
-    const reader=r.body.getReader(); const dec=new TextDecoder(); let full=''; let spoke=false;
+    const reader=r.body.getReader(); const dec=new TextDecoder(); let full=''; let spokenJp='';
     while(true){ const {done,value}=await reader.read(); if(done)break; full+=dec.decode(value,{stream:true}); const p=parseTurn(full); renderMsgs(p);
       // JP 一講完(後面 KANA/ZH 開始出現代表那行結束)就立刻播,不等 HINT 生完
-      if(!spoke && p.jp && (p.kana||p.zh)){ spoke=true; playTTS(p.jp, scene.voice); } }
+      if(!spokenJp && p.jp && (p.kana||p.zh)){ spokenJp=p.jp; playTTS(p.jp, scene.voice); } }
     const ai=parseTurn(full); ai.role='ai';
     history.push(ai);
     renderMsgs();
     renderHints(ai.hints);                    // 給「你可以這樣回」的建議
-    if(!spoke && ai.jp) playTTS(ai.jp, scene.voice);    // 太快沒提前播到就補播
+    // 沒提前播到就補播;提前播的跟最終顯示不同(模型偶爾多吐一行 JP,後蓋前)→ 以畫面為準重播正確的
+    if(ai.jp && ai.jp!==spokenJp) playTTS(ai.jp, scene.voice);
   }catch(e){ renderMsgs(); appendErr(e.message); }
   finally{ busy=false; setBusy(false); }
 }
@@ -358,7 +359,7 @@ function sendMine(){
   if(history.filter(h=>h.role==='me').length >= 12){
     appendErr('這場聊得很充實了!幫你整理點評 🙌'); setTimeout(endChat, 800); return;
   }
-  stopRec();
+  hardStopRec();
   history.push({ role:'me', text:txt });
   el.value=''; autoGrow();
   renderHints([]);   // 你已經回了 → 清掉上一輪建議
@@ -432,7 +433,7 @@ async function playTTS(text, voice){
 // 三個舊坑:①舊實例沒 abort 釋放,幾輪後 Chrome 辨識服務卡死 → 每次 start 前先 abort 舊的
 // ②AI 語音還在播就開麥,部分裝置直接中斷 → 開麥前先停播音 ③錯誤靜默 → 顯示原因
 // 加碼補上先前的回饋:辨識「接續不覆蓋」(保留已輸入)、停頓自動續錄(按停或送出才真的停)
-let rec=null, recording=false, _wantRec=false, _recBase='';
+let rec=null, recording=false, _wantRec=false, _recBase='', _sessFin='';
 function toggleRec(){ recording||_wantRec ? stopRec() : startRec(); }
 function _newRec(){
   const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
@@ -443,8 +444,10 @@ function _newRec(){
     let fin='', interim='';
     for(let i=0;i<e.results.length;i++){ const t=e.results[i][0].transcript; if(e.results[i].isFinal) fin+=t; else interim+=t; }
     const el=document.getElementById('say');
+    // fin 是「這個實例至今全部」的確定段落(每次事件整批重算),所以只暫存、不累加進 base——
+    // 之前邊播邊累加會讓同一段被算兩次(base 已含 + fin 再含一次 → 文字出現兩次)
+    _sessFin=fin;
     el.value=_recBase+fin+interim;   // 接在已輸入內容後面,不覆蓋
-    if(fin){ _recBase+=fin; }        // 確定段落併入 base,續錄時不會丟
     autoGrow();
   };
   r.onerror=e=>{
@@ -455,12 +458,14 @@ function _newRec(){
   };
   r.onend=()=>{
     recording=false;
+    if(_sessFin){ _recBase+=_sessFin; _sessFin=''; }   // 實例結束才併入 base(新實例的 results 會歸零重來)
     if(_wantRec){ setTimeout(()=>{ if(_wantRec) _startInstance(); },150); return; }   // 停頓自動續錄
     updateRecBtn();
   };
   return r;
 }
 function _startInstance(){
+  _sessFin='';
   rec=_newRec(); if(!rec) return;
   try{ rec.start(); recording=true; updateRecBtn(); }
   catch(e){ setTimeout(()=>{ try{ rec.start(); recording=true; updateRecBtn(); }catch(e2){ _wantRec=false; recording=false; updateRecBtn(); } },200); }
@@ -477,6 +482,15 @@ function stopRec(){
   _wantRec=false;
   try{ rec&&rec.stop(); }catch(e){}
   recording=false; updateRecBtn();
+  const n=document.getElementById('inNote'); if(n) n.textContent='🎤 用瀏覽器語音辨識(Chrome 較準);不準可直接改字再送。';
+}
+// 送出訊息時用的「硬停」:輸入框已清空,引擎遲到的 onresult flush 絕不能再寫回舊文字
+// (之前用 stopRec 軟停,stop() 之後還會補一個 final 結果 → 送出後欄位又冒出剛講的話)
+function hardStopRec(){
+  _wantRec=false;
+  try{ if(rec){ rec.onend=null; rec.onerror=null; rec.onresult=null; rec.abort(); } }catch(e){}
+  rec=null; recording=false; _recBase=''; _sessFin='';
+  updateRecBtn();
   const n=document.getElementById('inNote'); if(n) n.textContent='🎤 用瀏覽器語音辨識(Chrome 較準);不準可直接改字再送。';
 }
 function updateRecBtn(){ const b=document.getElementById('recBtn'); if(b) b.classList.toggle('on',recording||_wantRec); }
