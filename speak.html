@@ -253,6 +253,7 @@ function browserSpeak(text){
 }
 function speak(){
   const jp=cur().jp;
+  if(recording) stopRec();   // 播音跟收音互斥:錄音中點示範,先把錄音停乾淨(不然手機麥克風被中斷、狀態卡在錄音中)
   try{ if(_demo){ _demo.pause(); _demo=null; } }catch(e){}
   const hash = window.__TTS && window.__TTS[jp];
   if(hash){
@@ -263,11 +264,25 @@ function speak(){
   }
 }
 
-// 瀏覽器語音辨識
+// 語音辨識:App 內走原生 SFSpeechRecognizer 橋(WKWebView 的瀏覽器辨識不穩、每次開 App 重問權限),瀏覽器才用 Web Speech
 const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+const NATIVE_STT = !!(window.STAYJP_NATIVE && window.STAYJP_NATIVE.canSpeech && window.ReactNativeWebView);
+function _nPost(o){ try{ window.ReactNativeWebView.postMessage(JSON.stringify(o)); }catch(e){} }
 let rec=null, recording=false;
 function toggleRec(){ recording ? stopRec() : startRec(); }
+function _recBtnUI(on){ const b=document.getElementById('recBtn'); if(!b)return; b.classList.toggle('on',on); b.textContent=on?'⏹ 停止':'🎤 開始錄音'; }
 function startRec(){
+  if(NATIVE_STT){
+    window.stayjpSpeechResult=function(t,fin){ if(t) document.getElementById('said').value=t; };
+    window.stayjpSpeechEnd=function(err){
+      recording=false; _recBtnUI(false);
+      if(err==='not-allowed') document.getElementById('recNote').textContent='🎤 麥克風權限被關了:請到 iPhone 設定 → StayJP 允許麥克風。';
+      else if(err) document.getElementById('recNote').textContent='辨識出錯('+err+'),可直接打字。';
+    };
+    recording=true; _recBtnUI(true);
+    _nPost({type:'SPEECH_START',lang:'ja-JP'});
+    return;
+  }
   if(!SR){ document.getElementById('recNote').textContent='這個瀏覽器不支援語音辨識,請直接打字你念的內容。'; document.getElementById('said').focus(); return; }
   rec = new SR(); rec.lang='ja-JP'; rec.interimResults=true; rec.continuous=false;
   let finalTxt='';
@@ -276,7 +291,7 @@ function startRec(){
   rec.onend = ()=>{ recording=false; const b=document.getElementById('recBtn'); b.classList.remove('on'); b.textContent='🎤 開始錄音'; };
   try{ rec.start(); recording=true; const b=document.getElementById('recBtn'); b.classList.add('on'); b.textContent='⏹ 停止'; }catch(e){}
 }
-function stopRec(){ if(rec&&recording){ try{rec.stop();}catch(e){} } recording=false; const b=document.getElementById('recBtn'); if(b){b.classList.remove('on');b.textContent='🎤 開始錄音';} }
+function stopRec(){ if(NATIVE_STT){ _nPost({type:'SPEECH_STOP'}); } else if(rec&&recording){ try{rec.stop();}catch(e){} } recording=false; _recBtnUI(false); }
 
 // 站上標準雙登入(照 auth-header.js):Google / Apple
 let _signingIn=false;

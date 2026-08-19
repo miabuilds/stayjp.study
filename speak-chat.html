@@ -437,6 +437,31 @@ async function playTTS(text, voice){
 // ②AI 語音還在播就開麥,部分裝置直接中斷 → 開麥前先停播音 ③錯誤靜默 → 顯示原因
 // 加碼補上先前的回饋:辨識「接續不覆蓋」(保留已輸入)、停頓自動續錄(按停或送出才真的停)
 let rec=null, recording=false, _wantRec=false, _recBase='', _sessFin='';
+// App 內改走「原生 SFSpeechRecognizer」橋(app.html 發音檢查同一條):
+// WKWebView 的瀏覽器辨識不可靠(會亮著卻收不到音),而且 WebView 麥克風授權每次開 App 都重問;
+// 原生辨識穩定、權限是系統級只問一次。橋:postMessage SPEECH_START/STOP ← → stayjpSpeechResult/End。
+const NATIVE_STT = !!(window.STAYJP_NATIVE && window.STAYJP_NATIVE.canSpeech && window.ReactNativeWebView);
+const NOTE_IDLE = NATIVE_STT ? '🎤 講完按停或直接送出;不準可直接改字再送。' : '🎤 用瀏覽器語音辨識(Chrome 較準);不準可直接改字再送。';
+function _nPost(o){ try{ window.ReactNativeWebView.postMessage(JSON.stringify(o)); }catch(e){} }
+if(NATIVE_STT){ var _n0=document.getElementById('inNote'); if(_n0) _n0.textContent=NOTE_IDLE; }
+function _nStart(){
+  window.stayjpSpeechResult=function(t,fin){
+    if(t==null) return;
+    const el=document.getElementById('say');
+    el.value=_recBase+t; autoGrow();          // 原生 transcript 是這一段的累積全文,直接接在 base 後
+    if(fin && t) _sessFin=t;
+  };
+  window.stayjpSpeechEnd=function(err){
+    recording=false;
+    if(_sessFin){ _recBase+=_sessFin; _sessFin=''; }
+    if(err==='not-allowed'){ _wantRec=false; updateRecBtn(); document.getElementById('inNote').textContent='🎤 麥克風權限被關了:請到 iPhone 設定 → StayJP 允許麥克風。'; return; }
+    if(err){ _wantRec=false; updateRecBtn(); document.getElementById('inNote').textContent='🎤 辨識中斷('+err+'),再按一次麥克風重試。'; return; }
+    if(_wantRec){ setTimeout(function(){ if(_wantRec){ _sessFin=''; recording=true; _nPost({type:'SPEECH_START',lang:'ja-JP'}); } },200); return; }   // 停頓自動續錄
+    updateRecBtn();
+  };
+  _sessFin=''; recording=true; updateRecBtn();
+  _nPost({type:'SPEECH_START',lang:'ja-JP'});
+}
 function toggleRec(){ recording||_wantRec ? stopRec() : startRec(); }
 function _newRec(){
   const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
@@ -479,22 +504,25 @@ function startRec(){
   _recBase=(document.getElementById('say').value||'');
   if(_recBase && !/[\s、。]$/.test(_recBase)) _recBase+='';   // 接續原文
   document.getElementById('inNote').textContent='🎤 錄音中…講完按停或直接按送出。';
+  if(NATIVE_STT){ _nStart(); return; }
   _startInstance();
 }
 function stopRec(){
   _wantRec=false;
-  try{ rec&&rec.stop(); }catch(e){}
+  if(NATIVE_STT){ _nPost({type:'SPEECH_STOP'}); }   // 原生端 end 事件會回 stayjpSpeechEnd 併入 final
+  else { try{ rec&&rec.stop(); }catch(e){} }
   recording=false; updateRecBtn();
-  const n=document.getElementById('inNote'); if(n) n.textContent='🎤 用瀏覽器語音辨識(Chrome 較準);不準可直接改字再送。';
+  const n=document.getElementById('inNote'); if(n) n.textContent=NOTE_IDLE;
 }
 // 送出訊息時用的「硬停」:輸入框已清空,引擎遲到的 onresult flush 絕不能再寫回舊文字
 // (之前用 stopRec 軟停,stop() 之後還會補一個 final 結果 → 送出後欄位又冒出剛講的話)
 function hardStopRec(){
   _wantRec=false;
+  if(NATIVE_STT){ window.stayjpSpeechResult=function(){}; window.stayjpSpeechEnd=function(){}; _nPost({type:'SPEECH_STOP'}); }   // 掐掉回呼,遲到結果不寫回
   try{ if(rec){ rec.onend=null; rec.onerror=null; rec.onresult=null; rec.abort(); } }catch(e){}
   rec=null; recording=false; _recBase=''; _sessFin='';
   updateRecBtn();
-  const n=document.getElementById('inNote'); if(n) n.textContent='🎤 用瀏覽器語音辨識(Chrome 較準);不準可直接改字再送。';
+  const n=document.getElementById('inNote'); if(n) n.textContent=NOTE_IDLE;
 }
 function updateRecBtn(){ const b=document.getElementById('recBtn'); if(b) b.classList.toggle('on',recording||_wantRec); }
 
