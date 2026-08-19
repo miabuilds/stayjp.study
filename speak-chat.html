@@ -412,6 +412,9 @@ function resumeChat(){ show('chat'); renderMsgs(); }
 let _audio=null, _ttsCache={}, _ttsSeq=0;
 async function playTTS(text, voice){
   const seq=++_ttsSeq;
+  // 播音跟收音互斥:錄音中點單字卡/提示喇叭,手機的麥克風會被播放中斷,但狀態還掛在「錄音中」
+  // → 之後看起來在錄其實沒錄。播之前先把錄音停乾淨(按鈕熄掉),使用者聽完再按麥克風。
+  if(recording||_wantRec) stopRec();
   try{ if(_audio){ _audio.pause(); _audio.currentTime=0; _audio=null; } }catch(e){}
   const key=(voice||'f')+'|'+text;
   try{
