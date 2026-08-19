@@ -15,9 +15,18 @@ const ANTHROPIC_API_KEY = defineSecret("ANTHROPIC_API_KEY");
 const ADMIN_EMAILS = ["stayjpplan@gmail.com", "abc83327@gmail.com"];
 const MODEL = "claude-haiku-4-5-20251001";   // 便宜快,對「比對兩句+中文回饋」夠用
 
-const SYSTEM = `你是 StayJP 的日語口說練習教練,學生是台灣的日語學習者。
+// 使用者介面語言 → 回饋語言(繁中預設;簡中/英文跟著 UI)
+function langName(lang?: string): string {
+  if (lang === "zh-CN") return "簡體中文";
+  if (lang === "en") return "English";
+  return "繁體中文";
+}
+
+function buildSystem(lang?: string): string {
+  const L = langName(lang);
+  return `你是 StayJP 的日語口說練習教練,學生是日語學習者。
 學生會「跟著念」一個目標句;系統把他念的內容(來自語音辨識)給你。
-請比較「目標句」與「學生念的」,用「繁體中文」給溫暖、具體、學得到東西的回饋。
+請比較「目標句」與「學生念的」,用「${L}」給溫暖、具體、學得到東西的回饋。`+`
 
 【最重要:別判錯】學生念的是「語音辨識結果」,寫法可能跟目標句不同,但**只要讀音一樣就是念對了,絕不能算錯**:
 - 漢字↔假名不同不算錯:例如「起きます」和「おきます」是同一個音;「七時」和「7時」是同一個音(しちじ)。
@@ -27,14 +36,15 @@ const SYSTEM = `你是 StayJP 的日語口說練習教練,學生是台灣的日�
 
 【輸出格式】嚴格照下面「逐行」輸出,一行一個欄位,不要 JSON、不要任何多餘文字或開場白。能先算出的先輸出(SCORE 第一行):
 SCORE: 0~100 的整數
-VERDICT: 一句話總評(念對就像「念得很好!」;要修就點出方向)
-DIFF: 最關鍵的一個差異;完全正確就寫「完全正確!」
-POINT: <✅或⚠️>|<類別:助詞/動詞/語順/完整度/用詞/自然度 擇一>|<具體、簡短、學得到的說明>
+VERDICT: 一句話總評,用${L}(念對就像「念得很好!」;要修就點出方向)
+DIFF: 最關鍵的一個差異,用${L};完全正確就寫「完全正確!」
+POINT: <✅或⚠️>|<類別:助詞/動詞/語順/完整度/用詞/自然度 擇一>|<具體、簡短、學得到的${L}說明>
 POINT: (POINT 這行重複 2~4 次,每次一個重點;至少一個正向、把做對的地方也講出來)
 CORRECTED: 正確且自然的日文(學生念對就回目標句本身)
 READING: CORRECTED 的整句假名讀音
-TIP: 一句馬上能照做的口說小建議(繁中,要具體,例如某個音怎麼發、語調往哪走)
-ENCOURAGE: 一句像真人教練的鼓勵(繁中、口語)`;
+TIP: 一句馬上能照做的口說小建議(用${L},要具體,例如某個音怎麼發、語調往哪走)
+ENCOURAGE: 一句像真人教練的鼓勵(用${L}、口語)`;
+}
 
 export const speakFeedback = functions.onRequest(
   { cors: true, region: "asia-east1", secrets: [ANTHROPIC_API_KEY] },
@@ -51,7 +61,7 @@ export const speakFeedback = functions.onRequest(
         const blocked = await consumeQuota(decoded.uid, "eval", cfg);
         if (blocked) { res.status(402).json({ error: "quota", message: blocked }); return; }
       }
-      const { target, said } = (req.body || {}) as { target?: { jp?: string; kana?: string }; said?: string };
+      const { target, said, lang } = (req.body || {}) as { target?: { jp?: string; kana?: string }; said?: string; lang?: string };
       if (!target || !target.jp || !said) { res.status(400).json({ error: "缺 target.jp / said" }); return; }
 
       const body = {
@@ -59,7 +69,7 @@ export const speakFeedback = functions.onRequest(
         max_tokens: 700,
         stream: true,
         // system 用陣列 + cache_control:這段長 prompt 每次都一樣 → 快取起來省 input 成本/延遲。
-        system: [{ type: "text", text: SYSTEM, cache_control: { type: "ephemeral" } }],
+        system: [{ type: "text", text: buildSystem(lang), cache_control: { type: "ephemeral" } }],
         messages: [{
           role: "user",
           content: `目標句(漢字):「${target.jp}」\n目標句(假名):「${target.kana || ""}」\n學生念的:「${said}」\n請只依格式逐行輸出。`,

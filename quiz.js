@@ -333,7 +333,7 @@ const Quiz = (() => {
     const box = document.getElementById('quizBox');
     // 新手前 3 次測驗:講 SRS 價值(為什麼明天要回來)——留存的關鍵一句
     const srsNote = h.length <= 3
-      ? '<div style="background:var(--soft,#C6553B14);border-radius:10px;padding:10px 14px;margin:10px 0;font-size:13.5px;line-height:1.7">🧠 剛剛做過的字,<b>明天會自動回來考你</b>——間隔重複就是背得起來的原因。明天記得回來清「複習」!</div>'
+      ? '<div style="background:var(--soft,#C6553B14);border-radius:10px;padding:10px 14px;margin:10px 0;font-size:13.5px;line-height:1.7">' + (typeof enOr==='function' ? enOr('🧠 剛剛做過的字,<b>明天會自動回來考你</b>——間隔重複就是背得起來的原因。明天記得回來清「複習」!','🧠 The words you just practiced <b>will come back to test you tomorrow</b> — spaced repetition is why they stick. Come back tomorrow and clear your reviews!') : '🧠 剛剛做過的字,<b>明天會自動回來考你</b>——間隔重複就是背得起來的原因。明天記得回來清「複習」!') + '</div>'
       : '';
     box.innerHTML = `
       <h3>${t('quiz_result')}</h3>${srsNote}

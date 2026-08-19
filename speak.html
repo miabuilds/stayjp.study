@@ -85,10 +85,44 @@
   <div class="card" id="fbCard" style="display:none"></div>
 </div>
 
+<script src="i18n.js"></script>
 <script src="audio/tts/manifest.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script>
+// ── i18n shim:簡中 OpenCC 即時轉換 + 英文 enOr() ──
+let _tw2cn=null;
+function ensureOpenCC(){ return new Promise(function(res){ if(_tw2cn)return res(_tw2cn); if(window.OpenCC){ _tw2cn=OpenCC.Converter({from:'tw',to:'cn'}); if(I18n.setConverter)I18n.setConverter(_tw2cn); return res(_tw2cn);} var s=document.createElement('script'); s.src='https://cdn.jsdelivr.net/npm/opencc-js@1.0.5/dist/umd/full.js'; s.onload=function(){ _tw2cn=OpenCC.Converter({from:'tw',to:'cn'}); if(I18n.setConverter)I18n.setConverter(_tw2cn); res(_tw2cn); }; s.onerror=function(){res(null)}; document.head.appendChild(s); }); }
+function cvt(x){ return (!x||I18n.getLang()!=='zh-CN'||!_tw2cn)?x:_tw2cn(x); }
+function enOr(zh,en){ return I18n.getLang()==='en'?en:cvt(zh); }
+function cvtStaticUI(root){ if(I18n.getLang()!=='zh-CN')return; var el=typeof root==='string'?document.getElementById(root):root; if(!el)return; if(!_tw2cn){ ensureOpenCC().then(function(){cvtStaticUI(el)}); return; } var kana=/[ぁ-ゖァ-ヺー]/; var w=document.createTreeWalker(el,NodeFilter.SHOW_TEXT); var list=[],n; while((n=w.nextNode()))list.push(n); list.forEach(function(node){ if(kana.test(node.nodeValue))return; var c=_tw2cn(node.nodeValue); if(c!==node.nodeValue)node.nodeValue=c; }); }
+if(I18n.getLang()==='zh-CN') ensureOpenCC();
+
+// 靜態 UI 三語:en 直接換字;zh-CN 等 OpenCC 載好後整頁轉簡(kana 內容跳過)
+(function initUILang(){
+  var L = I18n.getLang();
+  if(L==='en'){
+    document.title = 'AI Speaking Practice | StayJP';
+    var back=document.querySelector('#app a[href="#"]'); if(back) back.textContent='‹ Back';
+    var h1=document.querySelector('#app h1'); if(h1) h1.innerHTML='🎙 Speaking Practice <span class="muted" style="font-weight:400">Beta</span>';
+    var sub=document.querySelector('#app .sub'); if(sub) sub.innerHTML='Pick a sentence → listen to the example → say it once (or type it) → submit for AI feedback. Free trial: 10 AI reviews, Premium: 30 per day. Want back-and-forth conversation? Try <a href="speak-chat.html" style="color:var(--accent);font-weight:600">🗣 Scenario Chat</a>.';
+    var cards=document.querySelectorAll('#app .card');
+    var btns=cards[0]?cards[0].querySelectorAll('.rowbtns .btn'):[];
+    if(btns[0]) btns[0].textContent='🔊 Play example';
+    if(btns[1]) btns[1].textContent='← Previous';
+    if(btns[2]) btns[2].textContent='Next →';
+    var turn=cards[1]?cards[1].querySelector('div'):null; if(turn) turn.textContent='Your turn';
+    var rb=document.getElementById('recBtn'); if(rb) rb.textContent='🎤 Start recording';
+    var sb=cards[1]?cards[1].querySelector('.btn.pri'):null; if(sb) sb.textContent='Submit';
+    var said=document.getElementById('said'); if(said) said.placeholder="Recognition result appears here — edit it if it's off";
+    var rn=document.getElementById('recNote'); if(rn) rn.textContent="Uses your browser's speech recognition (best on mobile/Chrome); if it's unsupported, just type. The app will switch to native recognition later for better accuracy.";
+    var boot=document.querySelector('#boot div:last-child'); if(boot) boot.textContent='Loading…';
+  } else if(L==='zh-CN'){
+    var _cvT=setInterval(function(){ if(_tw2cn){ clearInterval(_cvT); document.title=_tw2cn(document.title); cvtStaticUI(document.body); } },120);
+    setTimeout(function(){ clearInterval(_cvT); },15000);
+  }
+})();
+
 const ADMIN_EMAILS = ['stayjpplan@gmail.com','abc83327@gmail.com'];
 const fbConfig = { apiKey:"AIzaSyDnmg2XOuvwgE8m8xCF5sS4o0nQYoUplPI", authDomain:"jpnote-1bdd6.firebaseapp.com", projectId:"jpnote-1bdd6", storageBucket:"jpnote-1bdd6.firebasestorage.app", messagingSenderId:"666368174384" };
 if(!firebase.apps.length) firebase.initializeApp(fbConfig);
@@ -98,12 +132,12 @@ const FN_SPEAK = 'https://asia-east1-jpnote-1bdd6.cloudfunctions.net/speakFeedba
 // jp=漢字句 / kana=假名讀音 / zh=中文 / lv=JLPT 等級 / cat=分類。內容由淺入深、都是真的用得到的完整句。
 const S = (jp,kana,zh,lv,cat)=>({jp,kana,zh,lv,cat});
 const CATS = [
-  { k:'all',    ic:'✨', name:'全部' },
-  { k:'daily',  ic:'🏠', name:'日常生活' },
-  { k:'travel', ic:'🚉', name:'外出・旅行' },
-  { k:'work',   ic:'💼', name:'職場・敬語' },
-  { k:'social', ic:'🗣️', name:'社交' },
-  { k:'feel',   ic:'💭', name:'心情・想法' },
+  { k:'all',    ic:'✨', name:'全部',       en:'All' },
+  { k:'daily',  ic:'🏠', name:'日常生活',   en:'Daily life' },
+  { k:'travel', ic:'🚉', name:'外出・旅行', en:'Out & travel' },
+  { k:'work',   ic:'💼', name:'職場・敬語', en:'Work & keigo' },
+  { k:'social', ic:'🗣️', name:'社交',       en:'Social' },
+  { k:'feel',   ic:'💭', name:'心情・想法', en:'Feelings' },
 ];
 const LV_DESC = {
   N5:'旅遊・生活最基本:問路、點餐、購物,先能開口。',
@@ -111,6 +145,13 @@ const LV_DESC = {
   N3:'生活手續與工作日常:辦文件、改預約、請假、退貨。',
   N2:'職場・商務:禮貌請求、商量、正式一點的應對。',
   N1:'高階敬語:商務書面口語、鄭重委婉的表達。',
+};
+const LV_DESC_EN = {
+  N5:'Travel & everyday basics: asking directions, ordering, shopping — just get talking.',
+  N4:'Everyday errands: reservations, requests, expressing what you need in fuller sentences.',
+  N3:'Paperwork & work life: filling out documents, changing bookings, taking leave, returns.',
+  N2:'Workplace & business: polite requests, consulting others, more formal exchanges.',
+  N1:'Advanced keigo: formal business speech, careful and indirect expression.',
 };
 const SENTS = [
   // ══ N5 ══
@@ -216,14 +257,14 @@ function cur(){ return list()[idx] || list()[0]; }
 function renderLvTabs(){
   document.getElementById('lvtabs').innerHTML = LEVELS.map(lv=>{
     const n = SENTS.filter(s=>s.lv===lv).length;
-    return `<div class="lvtab${lv===activeLv?' on':''}" onclick="pickLv('${lv}')">${lv}<small>${n} 句</small></div>`;
+    return `<div class="lvtab${lv===activeLv?' on':''}" onclick="pickLv('${lv}')">${lv}<small>${enOr(n+' 句', n+' sentences')}</small></div>`;
   }).join('');
-  document.getElementById('lvdesc').textContent = LV_DESC[activeLv] || '';
+  document.getElementById('lvdesc').textContent = enOr(LV_DESC[activeLv]||'', LV_DESC_EN[activeLv]||'');
   // 分類 chips:只顯示該級別有句子的分類(+全部)
   const has = new Set(SENTS.filter(s=>s.lv===activeLv).map(s=>s.cat));
   document.getElementById('cats').innerHTML = CATS.filter(c=>c.k==='all'||has.has(c.k)).map(c=>{
     const n = c.k==='all' ? SENTS.filter(s=>s.lv===activeLv).length : SENTS.filter(s=>s.lv===activeLv&&s.cat===c.k).length;
-    return `<span class="chip cat${c.k===activeCat?' on':''}" onclick="pickCat('${c.k}')">${c.ic} ${c.name} ${n}</span>`;
+    return `<span class="chip cat${c.k===activeCat?' on':''}" onclick="pickCat('${c.k}')">${c.ic} ${enOr(c.name,c.en)} ${n}</span>`;
   }).join('');
 }
 function pickLv(lv){ activeLv=lv; if(!SENTS.some(s=>s.lv===lv&&(activeCat==='all'||s.cat===activeCat))) activeCat='all'; idx=0; stopRec(); renderLvTabs(); renderChips(); render(); }
@@ -231,7 +272,7 @@ function pickCat(k){ activeCat=k; idx=0; stopRec(); renderLvTabs(); renderChips(
 function render(){
   document.getElementById('jp').textContent = cur().jp;
   document.getElementById('kana').textContent = cur().kana;
-  document.getElementById('zh').textContent = cur().zh;
+  document.getElementById('zh').textContent = cvt(cur().zh);
   document.getElementById('said').value = '';
   document.getElementById('fbCard').style.display = 'none';
   [...document.querySelectorAll('#chips .chip')].forEach((c,i)=>c.classList.toggle('on', i===idx));
@@ -277,27 +318,27 @@ const IN_APP = !!(window.STAYJP_NATIVE && window.STAYJP_NATIVE.isNativeApp && wi
 function _postRestore(){ if(IN_APP && !NATIVE_STT) _nPost({type:'AUDIO_RESTORE'}); }
 let rec=null, recording=false;
 function toggleRec(){ recording ? stopRec() : startRec(); }
-function _recBtnUI(on){ const b=document.getElementById('recBtn'); if(!b)return; b.classList.toggle('on',on); b.textContent=on?'⏹ 停止':'🎤 開始錄音'; }
+function _recBtnUI(on){ const b=document.getElementById('recBtn'); if(!b)return; b.classList.toggle('on',on); b.textContent=on?enOr('⏹ 停止','⏹ Stop'):enOr('🎤 開始錄音','🎤 Start recording'); }
 function startRec(){
   if(window.STAYJP_NATIVE && window.STAYJP_NATIVE.canPlayB64) _nPost({type:'STOP_PLAY'});   // 開麥前停掉原生播放
   if(NATIVE_STT){
     window.stayjpSpeechResult=function(t,fin){ if(t) document.getElementById('said').value=t; };
     window.stayjpSpeechEnd=function(err){
       recording=false; _recBtnUI(false);
-      if(err==='not-allowed') document.getElementById('recNote').textContent='🎤 麥克風權限被關了:請到 iPhone 設定 → StayJP 允許麥克風。';
-      else if(err) document.getElementById('recNote').textContent='辨識出錯('+err+'),可直接打字。';
+      if(err==='not-allowed') document.getElementById('recNote').textContent=enOr('🎤 麥克風權限被關了:請到 iPhone 設定 → StayJP 允許麥克風。','🎤 Microphone access is off. Go to iPhone Settings → StayJP and allow the microphone.');
+      else if(err) document.getElementById('recNote').textContent=enOr('辨識出錯('+err+'),可直接打字。','Recognition error ('+err+') — you can just type instead.');
     };
     recording=true; _recBtnUI(true);
     _nPost({type:'SPEECH_START',lang:'ja-JP'});
     return;
   }
-  if(!SR){ document.getElementById('recNote').textContent='這個瀏覽器不支援語音辨識,請直接打字你念的內容。'; document.getElementById('said').focus(); return; }
+  if(!SR){ document.getElementById('recNote').textContent=enOr('這個瀏覽器不支援語音辨識,請直接打字你念的內容。',"This browser doesn't support speech recognition — just type what you said."); document.getElementById('said').focus(); return; }
   rec = new SR(); rec.lang='ja-JP'; rec.interimResults=true; rec.continuous=false;
   let finalTxt='';
   rec.onresult = e=>{ let t=''; for(let i=0;i<e.results.length;i++) t+=e.results[i][0].transcript; document.getElementById('said').value=t; if(e.results[e.results.length-1].isFinal) finalTxt=t; };
-  rec.onerror = e=>{ document.getElementById('recNote').textContent='辨識出錯('+e.error+'),可直接打字。'; stopRec(); };
-  rec.onend = ()=>{ recording=false; const b=document.getElementById('recBtn'); b.classList.remove('on'); b.textContent='🎤 開始錄音'; _postRestore(); };
-  try{ rec.start(); recording=true; const b=document.getElementById('recBtn'); b.classList.add('on'); b.textContent='⏹ 停止'; }catch(e){}
+  rec.onerror = e=>{ document.getElementById('recNote').textContent=enOr('辨識出錯('+e.error+'),可直接打字。','Recognition error ('+e.error+') — you can just type instead.'); stopRec(); };
+  rec.onend = ()=>{ recording=false; _recBtnUI(false); _postRestore(); };
+  try{ rec.start(); recording=true; _recBtnUI(true); }catch(e){}
 }
 function stopRec(){ if(NATIVE_STT){ _nPost({type:'SPEECH_STOP'}); } else if(rec&&recording){ try{rec.stop();}catch(e){} } recording=false; _recBtnUI(false); }
 
@@ -311,38 +352,38 @@ function loginWith(p){
   auth.signInWithPopup(provider).then(function(){ var f=document.getElementById('fbCard'); if(f){f.style.display='none';} })
     .catch(function(e){ var c=e&&e.code;
       if(c==='auth/cancelled-popup-request'||c==='auth/popup-closed-by-user')return;
-      if(c==='auth/operation-not-allowed'){ alert('Apple 登入還在設定中,請先用 Google 登入。'); return; }
-      alert('登入失敗:'+(e&&e.message||e));
+      if(c==='auth/operation-not-allowed'){ alert(enOr('Apple 登入還在設定中,請先用 Google 登入。','Apple sign-in is still being set up — please use Google for now.')); return; }
+      alert(enOr('登入失敗:','Sign-in failed: ')+(e&&e.message||e));
     }).finally(function(){ _signingIn=false; });
 }
 function showLoginCard(){
   const fb=document.getElementById('fbCard');
   fb.style.display='block';
   fb.innerHTML='<div style="text-align:center;padding:6px 0">'
-    +'<div style="font-weight:700;margin-bottom:4px">登入就能用 AI 評分</div>'
-    +'<div class="muted" style="margin-bottom:14px">免費體驗 10 次,Premium 每天 30 次</div>'
+    +'<div style="font-weight:700;margin-bottom:4px">'+enOr('登入就能用 AI 評分','Sign in to use AI feedback')+'</div>'
+    +'<div class="muted" style="margin-bottom:14px">'+enOr('免費體驗 10 次,Premium 每天 30 次','Free trial: 10 reviews. Premium: 30 per day')+'</div>'
     +'<div class="rowbtns" style="justify-content:center">'
-    +'<button class="btn pri" onclick="loginWith(\'google\')">用 Google 登入</button>'
-    +'<button class="btn" onclick="loginWith(\'apple\')"> 用 Apple 登入</button>'
+    +'<button class="btn pri" onclick="loginWith(\'google\')">'+enOr('用 Google 登入','Sign in with Google')+'</button>'
+    +'<button class="btn" onclick="loginWith(\'apple\')">'+enOr(' 用 Apple 登入',' Sign in with Apple')+'</button>'
     +'</div></div>';
 }
 async function submit(){
   if(!auth.currentUser){ showLoginCard(); return; }
   const said = (document.getElementById('said').value||'').trim();
   const fb = document.getElementById('fbCard');
-  if(!said){ fb.style.display='block'; fb.innerHTML='<div class="err">先念一次或打字,再送出。</div>'; return; }
-  fb.style.display='block'; fb.innerHTML='<div class="muted">AI 評分中…</div>';
+  if(!said){ fb.style.display='block'; fb.innerHTML='<div class="err">'+enOr('先念一次或打字,再送出。','Say it once (or type it), then submit.')+'</div>'; return; }
+  fb.style.display='block'; fb.innerHTML='<div class="muted">'+enOr('AI 評分中…','AI is scoring…')+'</div>';
   try{
     const t = await auth.currentUser.getIdToken();
-    const r = await fetch(FN_SPEAK,{ method:'POST', headers:{'Content-Type':'application/json',Authorization:'Bearer '+t}, body:JSON.stringify({ target:{jp:cur().jp,kana:cur().kana}, said }) });
+    const r = await fetch(FN_SPEAK,{ method:'POST', headers:{'Content-Type':'application/json',Authorization:'Bearer '+t}, body:JSON.stringify({ target:{jp:cur().jp,kana:cur().kana}, said, lang:I18n.getLang() }) });
     if(!r.ok){ let d={}; try{ d=await r.json(); }catch(e){}
-    if(d.error==='quota'){ fb.innerHTML='<div class="err">'+(d.message||'額度用完了')+' <a href="pricing.html" style="color:var(--accent)">看方案 →</a></div>'; return; }
-    fb.innerHTML='<div class="err">失敗:'+(d.message||d.error||r.status)+'</div>'; return; }
+    if(d.error==='quota'){ fb.innerHTML='<div class="err">'+cvt(d.message||enOr('額度用完了',"You've used up your quota"))+' <a href="pricing.html" style="color:var(--accent)">'+enOr('看方案 →','See plans →')+'</a></div>'; return; }
+    fb.innerHTML='<div class="err">'+enOr('失敗:','Failed: ')+cvt(String(d.message||d.error||r.status))+'</div>'; return; }
     // 串流:邊收邊解析渲染,分數第一行就先出現
     const reader = r.body.getReader(); const dec = new TextDecoder(); let full='';
     while(true){ const {done,value}=await reader.read(); if(done)break; full += dec.decode(value,{stream:true}); renderStream(full,false); }
     renderStream(full,true);
-  }catch(e){ fb.innerHTML='<div class="err">錯誤:'+e.message+'</div>'; }
+  }catch(e){ fb.innerHTML='<div class="err">'+enOr('錯誤:','Error: ')+esc(e.message)+'</div>'; }
 }
 // 逐行輕結構 → 物件。串流中最後一行可能不完整,parse 不到就先略過,下一段補齊再顯示。
 function parseFb(text){
@@ -362,14 +403,14 @@ function renderStream(text, done){
   const col=sc>=85?'var(--ok)':sc>=60?'var(--warn)':'var(--bad)';
   const head = d.score!=null
     ? `<div class="fb-head"><div class="ring" style="background:${col}">${sc}</div>
-         <div><div class="verdict" style="color:${col}">${esc(d.verdict||'')}</div><div class="diff">${esc(d.diff||'')}</div></div></div>`
-    : '<div class="muted">AI 評分中…</div>';
-  const pts = (d.points||[]).map(p=>`<div class="pt"><span class="ic">${p.ok?'✅':'⚠️'}</span><span class="lb">${esc(p.label||'')}</span><span>${esc(p.note||'')}</span></div>`).join('');
+         <div><div class="verdict" style="color:${col}">${esc(cvt(d.verdict||''))}</div><div class="diff">${esc(cvt(d.diff||''))}</div></div></div>`
+    : '<div class="muted">'+enOr('AI 評分中…','AI is scoring…')+'</div>';
+  const pts = (d.points||[]).map(p=>`<div class="pt"><span class="ic">${p.ok?'✅':'⚠️'}</span><span class="lb">${esc(cvt(p.label||''))}</span><span>${esc(cvt(p.note||''))}</span></div>`).join('');
   document.getElementById('fbCard').innerHTML =
     head + pts
-    + (d.corrected?`<div class="corr">正確說法:<b>${esc(d.corrected)}</b><div class="r">${esc(d.reading||'')}</div></div>`:'')
-    + (d.tip?`<div class="tip">💡 ${esc(d.tip)}</div>`:'')
-    + (d.encourage?`<div class="enc">${esc(d.encourage)}</div>`:'')
+    + (d.corrected?`<div class="corr">${enOr('正確說法:','Correct version: ')}<b>${esc(d.corrected)}</b><div class="r">${esc(d.reading||'')}</div></div>`:'')
+    + (d.tip?`<div class="tip">💡 ${esc(cvt(d.tip))}</div>`:'')
+    + (d.encourage?`<div class="enc">${esc(cvt(d.encourage))}</div>`:'')
     + (!done && d.score!=null?'<div class="muted" style="margin-top:8px">…</div>':'');
 }
 function esc(s){ return String(s==null?'':s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
