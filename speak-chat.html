@@ -415,6 +415,7 @@ async function playTTS(text, voice){
   // 播音跟收音互斥:錄音中點單字卡/提示喇叭,手機的麥克風會被播放中斷,但狀態還掛在「錄音中」
   // → 之後看起來在錄其實沒錄。播之前先把錄音停乾淨(按鈕熄掉),使用者聽完再按麥克風。
   if(recording||_wantRec) stopRec();
+  _postRestore();   // 播之前保險再還原一次(舊版 App session 可能還卡在錄音模式)
   try{ if(_audio){ _audio.pause(); _audio.currentTime=0; _audio=null; } }catch(e){}
   const key=(voice||'f')+'|'+text;
   try{
@@ -444,6 +445,10 @@ const NATIVE_STT = !!(window.STAYJP_NATIVE && window.STAYJP_NATIVE.canSpeech && 
 const NOTE_IDLE = NATIVE_STT ? '🎤 講完按停或直接送出;不準可直接改字再送。' : '🎤 用瀏覽器語音辨識(Chrome 較準);不準可直接改字再送。';
 function _nPost(o){ try{ window.ReactNativeWebView.postMessage(JSON.stringify(o)); }catch(e){} }
 if(NATIVE_STT){ var _n0=document.getElementById('inNote'); if(_n0) _n0.textContent=NOTE_IDLE; }
+// 舊版 App(1.0.5,無原生辨識模組)在 App 內走 WKWebView 瀏覽器辨識:錄完 iOS session 卡在錄音模式
+// → 之後 TTS 沒聲音。錄音一結束就通知原生把 session 還原成播放(新版 App 的 OTA 有對應 handler)。
+const IN_APP = !!(window.STAYJP_NATIVE && window.STAYJP_NATIVE.isNativeApp && window.ReactNativeWebView);
+function _postRestore(){ if(IN_APP && !NATIVE_STT) _nPost({type:'AUDIO_RESTORE'}); }
 function _nStart(){
   window.stayjpSpeechResult=function(t,fin){
     if(t==null) return;
@@ -489,6 +494,7 @@ function _newRec(){
     if(_sessFin){ _recBase+=_sessFin; _sessFin=''; }   // 實例結束才併入 base(新實例的 results 會歸零重來)
     if(_wantRec){ setTimeout(()=>{ if(_wantRec) _startInstance(); },150); return; }   // 停頓自動續錄
     updateRecBtn();
+    _postRestore();   // 錄音真的結束了 → 舊版 App 要還原音訊 session,不然接下來 TTS 沒聲音
   };
   return r;
 }
@@ -522,6 +528,7 @@ function hardStopRec(){
   try{ if(rec){ rec.onend=null; rec.onerror=null; rec.onresult=null; rec.abort(); } }catch(e){}
   rec=null; recording=false; _recBase=''; _sessFin='';
   updateRecBtn();
+  _postRestore();   // abort 掉不會走 onend → 這裡直接還原
   const n=document.getElementById('inNote'); if(n) n.textContent=NOTE_IDLE;
 }
 function updateRecBtn(){ const b=document.getElementById('recBtn'); if(b) b.classList.toggle('on',recording||_wantRec); }
