@@ -254,6 +254,7 @@ function browserSpeak(text){
 function speak(){
   const jp=cur().jp;
   if(recording) stopRec();   // 播音跟收音互斥:錄音中點示範,先把錄音停乾淨(不然手機麥克風被中斷、狀態卡在錄音中)
+  _postRestore();            // 播之前保險還原音訊 session(舊版 App)
   try{ if(_demo){ _demo.pause(); _demo=null; } }catch(e){}
   const hash = window.__TTS && window.__TTS[jp];
   if(hash){
@@ -268,6 +269,9 @@ function speak(){
 const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
 const NATIVE_STT = !!(window.STAYJP_NATIVE && window.STAYJP_NATIVE.canSpeech && window.ReactNativeWebView);
 function _nPost(o){ try{ window.ReactNativeWebView.postMessage(JSON.stringify(o)); }catch(e){} }
+// 舊版 App(1.0.5 無原生辨識)走 WKWebView 瀏覽器辨識:錄完 session 卡錄音模式 → TTS 沒聲音;結束時通知原生還原
+const IN_APP = !!(window.STAYJP_NATIVE && window.STAYJP_NATIVE.isNativeApp && window.ReactNativeWebView);
+function _postRestore(){ if(IN_APP && !NATIVE_STT) _nPost({type:'AUDIO_RESTORE'}); }
 let rec=null, recording=false;
 function toggleRec(){ recording ? stopRec() : startRec(); }
 function _recBtnUI(on){ const b=document.getElementById('recBtn'); if(!b)return; b.classList.toggle('on',on); b.textContent=on?'⏹ 停止':'🎤 開始錄音'; }
@@ -288,7 +292,7 @@ function startRec(){
   let finalTxt='';
   rec.onresult = e=>{ let t=''; for(let i=0;i<e.results.length;i++) t+=e.results[i][0].transcript; document.getElementById('said').value=t; if(e.results[e.results.length-1].isFinal) finalTxt=t; };
   rec.onerror = e=>{ document.getElementById('recNote').textContent='辨識出錯('+e.error+'),可直接打字。'; stopRec(); };
-  rec.onend = ()=>{ recording=false; const b=document.getElementById('recBtn'); b.classList.remove('on'); b.textContent='🎤 開始錄音'; };
+  rec.onend = ()=>{ recording=false; const b=document.getElementById('recBtn'); b.classList.remove('on'); b.textContent='🎤 開始錄音'; _postRestore(); };
   try{ rec.start(); recording=true; const b=document.getElementById('recBtn'); b.classList.add('on'); b.textContent='⏹ 停止'; }catch(e){}
 }
 function stopRec(){ if(NATIVE_STT){ _nPost({type:'SPEECH_STOP'}); } else if(rec&&recording){ try{rec.stop();}catch(e){} } recording=false; _recBtnUI(false); }
