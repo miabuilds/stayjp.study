@@ -49,3 +49,4 @@ _audit_pron.mjs
 ve2e.mjs
 scripts/tts/pron-audit.log
 ai_e2e.png
+scripts/pricing-metrics.mjs

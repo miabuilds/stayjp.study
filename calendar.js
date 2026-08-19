@@ -204,6 +204,22 @@ const Calendar = (() => {
         <span class="cal-streak-sep">|</span>
         <span>${t('today_prefix')}${todayText}</span>`;
 
+    // Day-1 起點卡:完全零學習紀錄的新用戶,不給灰色熱力圖+0/30(負面訊號+資訊過載),
+    // 換成「目標倒數+今天只要 10 個」的單一行動起點。做過任何一個動作後就恢復正常儀表板。
+    if (Object.keys(getLog()).length === 0) {
+      var _d1 = (function () {
+        var exam = new Date('2026-12-06T00:00:00+09:00');   // 12 月第一個週日 JLPT
+        var days = Math.max(0, Math.ceil((exam - Date.now()) / 86400000));
+        return `<div class="cal-panel" style="text-align:center;padding:22px 16px">
+          <div style="font-size:13px;color:var(--ac,#d4654a);font-weight:800;letter-spacing:.05em">⏳ 距離 12/6 JLPT 還有 ${days} 天</div>
+          <div style="font-size:19px;font-weight:800;margin:8px 0 4px">今天先背 10 個字就好</div>
+          <div style="font-size:13px;color:var(--tx2,#888);margin-bottom:14px">明天它們會自動回來考你——這就是背得起來的原因。</div>
+          <button style="font:inherit;background:var(--ac,#d4654a);color:#fff;border:0;border-radius:12px;padding:12px 26px;font-weight:700;font-size:15px;cursor:pointer"
+            onclick="try{var el=document.querySelector('.gcard,.vcard,.card-item');el&&el.scrollIntoView({block:'center',behavior:'smooth'});}catch(e){}">開始今天的 10 個 →</button>
+        </div>`;
+      })();
+      return _d1;
+    }
     return `<div class="cal-panel">
       <div class="cal-streak">${streakInner}</div>
       ${buildHeatmap()}

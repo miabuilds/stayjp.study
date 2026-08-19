@@ -71,6 +71,8 @@ a:hover{text-decoration:underline}
 .plan-features li.disabled::before{content:"—";color:var(--tx3)}
 .plan-cta{display:block;text-align:center;padding:12px;background:var(--bg3);color:var(--tx);border-radius:10px;font-weight:600;font-size:14px;border:1px solid var(--bd)}
 .plan.featured .plan-cta{background:var(--ac);color:#fff;border-color:var(--ac)}
+.plan.best .plan-cta{background:#D946EF;color:#fff;border-color:#D946EF;font-size:15px}
+.plan.best .plan-cta:hover{background:#C026D3}
 /* 已訂閱狀態 */
 .plan-cta.is-current{background:var(--bg3);color:var(--tx2);border-color:var(--bd);cursor:default;opacity:.85}
 .plan.featured .plan-cta.is-current{background:var(--bg3);color:var(--tx2);border-color:var(--bd)}
@@ -123,7 +125,7 @@ a:hover{text-decoration:underline}
 
 /* 月費「入門首選」視覺區分（虛線邊框 + badge + 副標） */
 .plan.entry{border:1.5px dashed var(--ac2);position:relative}
-.plan.entry::before{content:"入門首選";position:absolute;top:-12px;right:16px;background:var(--ac2);color:#fff;font-size:11px;font-weight:700;padding:4px 12px;border-radius:999px}
+.plan.entry::before{content:"彈性月付";position:absolute;top:-12px;right:16px;background:var(--ac2);color:#fff;font-size:11px;font-weight:700;padding:4px 12px;border-radius:999px}
 .plan-subtitle{font-size:13px;font-weight:600;color:var(--ac2);background:rgba(74,127,212,.1);border-radius:8px;padding:7px 10px;margin-bottom:16px;text-align:center}
 </style>
 </head>
@@ -220,8 +222,9 @@ a:hover{text-decoration:underline}
         <li><strong>NT$990/年 自動續扣，續訂維持此價（標準年費 NT$1,490）</strong></li>
         <li>適合認同產品想長期支持的鐵粉</li>
         <li>同時僅 100 個有效名額，額滿即停售</li>
+        <li>7 天內無條件全額退費，隨時可取消</li>
       </ul>
-      <a class="plan-cta" href="javascript:void(0)" onclick="return startSubscribe(this)">訂閱</a>
+      <a class="plan-cta" href="javascript:void(0)" onclick="return startSubscribe(this)">搶下早鳥名額 →</a>
     </div>
 
     <div class="plan" data-plan="yearly">
