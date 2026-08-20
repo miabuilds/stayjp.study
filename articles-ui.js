@@ -358,6 +358,15 @@ window.Articles = (function () {
       '.art-pb.main{background:var(--ac,#d4654a);width:50px;height:50px;font-size:22px}',
       '.art-pb:active{transform:scale(.92)}',
       '.art-prate{background:rgba(255,255,255,.16);color:#fff;border-radius:20px;padding:0 10px;height:34px;font-size:13px;font-weight:700;min-width:50px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;font-variant-numeric:tabular-nums}',
+      // 窄螢幕(手機直立):全元件 flex-shrink:0 會讓總寬爆出去、「單句」被切——整條壓縮一號
+      '@media (max-width:430px){' +
+        '.art-pbar{gap:2px;padding:6px 8px}' +
+        '.art-pb{width:36px;height:36px;font-size:15px}' +
+        '.art-pb.main{width:44px;height:44px;font-size:18px}' +
+        '.art-prate{min-width:40px;padding:0 6px;height:30px;font-size:12px}' +
+        '.art-ptext{font-size:12px}' +
+        '.art-pb.art-mode{min-width:32px;padding:0 7px;font-size:12px}' +
+      '}',
       '.art-rstep{width:38px;height:38px;font-size:22px;font-weight:700;flex-shrink:0}',
       '.art-ptext{font-size:12.5px;opacity:.85;margin:0 6px 0 4px;min-width:66px;font-variant-numeric:tabular-nums}',
       // done
