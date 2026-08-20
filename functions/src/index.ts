@@ -34,6 +34,7 @@ export { partnerJoin } from "./partner-join";
 export { commissionLockCron } from "./commission-lock-cron";
 export { adminSettleKolPayout } from "./admin-settle-kol-payout";
 export { dailySubAuditCron } from "./daily-sub-audit-cron";
+export { earlybirdCloseCron } from "./earlybird-close-cron";
 export { adminFreeAccess } from "./admin-free-access";
 export { adminCleanupPending } from "./admin-cleanup-pending";
 export { adminRecomputeEarlyBird } from "./admin-recompute-earlybird";

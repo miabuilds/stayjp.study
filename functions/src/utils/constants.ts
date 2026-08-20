@@ -19,6 +19,8 @@ export const ECPAY_SECRETS = [
 ];
 
 export const EARLY_BIRD_LIMIT = 100;
+// 早鳥收官:此刻起不再接受「新購」早鳥(既有早鳥續扣不受影響——續扣走 callback 沿用 is_early_bird 原價)
+export const EARLY_BIRD_END_MS = Date.UTC(2026, 7, 27, 3, 0, 0);   // 2026-08-27 12:00 JST
 
 export type PlanKey = "monthly" | "yearly" | "yearly_early_bird" | "lifetime";
 export type Source = "web" | "app";

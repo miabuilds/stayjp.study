@@ -167,6 +167,11 @@
     return firebase.firestore().doc('counters/early_bird').get().then(snap => {
       const d = snap.data() || {};
       const lim = d.limit || 100;
+      // 收官(closed 旗標或過了 2026-08-27 12:00 JST)→ 一律回 0,所有早鳥行自動不顯示
+      if (d.closed === true || Date.now() >= Date.UTC(2026, 7, 27, 3, 0, 0)) {
+        try { localStorage.setItem('eb_left_cache', JSON.stringify({ left: 0, ts: Date.now() })); } catch (e) {}
+        return 0;
+      }
       const left = Math.max(0, Math.min(lim, lim - (d.count || 0)));
       try { localStorage.setItem('eb_left_cache', JSON.stringify({ left, ts: Date.now() })); } catch (e) {}
       return left;
@@ -255,7 +260,7 @@
         if (!left || left <= 0) return;
         const line = document.getElementById('pwEbLine');
         if (!line) return;
-        line.textContent = `🐦 早鳥年費 NT$990・只剩 ${left} 名(額滿恢復 NT$1,490)`;
+        line.textContent = `🐦 早鳥年費 NT$990・8/27 中午收官(之後恢復 NT$1,490)`;
         line.style.display = '';
         if (window.UITranslate && UITranslate.active()) UITranslate.walk(line);
       });
@@ -288,7 +293,7 @@
       const bar = document.createElement('div');
       bar.id = 'trialExpBar';
       bar.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:400;background:#B45309;color:#fff;font-size:13px;padding:9px 40px 9px 14px;text-align:center;line-height:1.5';
-      bar.innerHTML = '⏳ 試用明天到期——早鳥年費 NT$990 鎖住一整年(額滿恢復 1,490)'
+      bar.innerHTML = '⏳ 試用明天到期——早鳥年費 NT$990 只到 8/27 中午'
         + ' <a href="pricing.html" style="color:#FDE68A;font-weight:700;text-decoration:underline">看方案 →</a>'
         + '<button onclick="this.parentElement.remove()" style="position:absolute;right:8px;top:6px;background:none;border:0;color:#fff;font-size:16px;cursor:pointer;padding:4px">✕</button>';
       document.body.appendChild(bar);

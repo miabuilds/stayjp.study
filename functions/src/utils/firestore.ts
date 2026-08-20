@@ -8,7 +8,7 @@
 import * as admin from "firebase-admin";
 import crypto from "crypto";
 import {
-  EARLY_BIRD_LIMIT,
+  EARLY_BIRD_LIMIT, EARLY_BIRD_END_MS,
   PlanKey,
   Source,
   SubStatus,
@@ -314,11 +314,15 @@ export async function releaseEarlyBird(): Promise<void> {
   });
 }
 
-export async function getEarlyBirdCount(): Promise<{ count: number; limit: number }> {
+export async function getEarlyBirdCount(): Promise<{ count: number; limit: number; closed: boolean }> {
   const snap = await db.doc("counters/early_bird").get();
+  // closed = 到期(EARLY_BIRD_END_MS)或手動旗標(counters/early_bird.closed)。只擋「新購」;
+  // 續扣不經過這裡(ecpay-callback 沿用 is_early_bird,原價 990 續扣不受影響)。
+  const closed = nowMs() >= EARLY_BIRD_END_MS || snap.data()?.closed === true;
   return {
     count: (snap.data()?.count as number) || 0,
     limit: EARLY_BIRD_LIMIT,
+    closed,
   };
 }
 
@@ -445,8 +449,8 @@ export async function precheckSubscribe(uid: string, email: string): Promise<Pre
   const noEarlyBird = (bl?.refund_count ?? 0) >= REFUND_POLICY.no_early_bird_after_refunds;
 
   // 4. 早鳥名額還夠嗎?
-  const { count, limit } = await getEarlyBirdCount();
-  const earlyBirdOpen = count < limit;
+  const { count, limit, closed } = await getEarlyBirdCount();
+  const earlyBirdOpen = count < limit && !closed;
 
   // lifetime(買斷)= 一次性付款,只受「無 active 訂閱 + 非黑名單」限制(上面已擋),
   // 不受早鳥名額 / 退費資格影響 → 一律放行
