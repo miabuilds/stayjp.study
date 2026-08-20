@@ -5,7 +5,7 @@ import * as functions from "firebase-functions/v2/https";
 import * as admin from "firebase-admin";
 import { PAYPAL_SECRETS, PAYPAL_PRICES_USD, PlanKey } from "./utils/constants";
 import { createPaypalOrder } from "./utils/paypal";
-import { getSubscription, nowMs } from "./utils/firestore";
+import { getEarlyBirdCount, getSubscription, nowMs } from "./utils/firestore";
 
 if (admin.apps.length === 0) admin.initializeApp();
 
@@ -45,6 +45,15 @@ export const paypalCreateOrder = functions.onRequest(
           reason: "你目前已是付費會員,無需重複購買。若要更換方案,請先到帳號頁退費,或來信客服協助。",
         });
         return;
+      }
+
+      // 早鳥:名額滿或已收官 → 擋(和 precheckSubscribe 同一個閘門;PayPal 路徑原本漏了這關)
+      if (plan === "yearly_early_bird") {
+        const eb = await getEarlyBirdCount();
+        if (eb.closed || eb.count >= eb.limit) {
+          res.status(403).json({ error: "early_bird_closed", reason: "早鳥方案已結束,請改選一般年費。" });
+          return;
+        }
       }
 
       const orderId = await createPaypalOrder({ uid, plan, amountUsd });

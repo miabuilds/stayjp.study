@@ -457,23 +457,37 @@ const _auth = firebase.auth();
 // 早鳥剩餘名額顯示
 (async () => {
   try {
+    // 早鳥收官:2026-08-27 12:00 JST。closed 旗標(cron 寫入)/ 本機時鐘 / 名額歸零,任一成立就收
+    const EB_END = Date.UTC(2026, 7, 27, 3, 0, 0);
     const snap = await _db.doc('counters/early_bird').get();
     const data = snap.data() || {};
     const lim = data.limit || 100;
     const left = Math.max(0, Math.min(lim, lim - (data.count || 0)));   // 防 count 異常導致顯示爆掉
+    const ended = data.closed === true || Date.now() >= EB_END || left <= 0;
     const card = document.querySelector('.plan.best');
     if (!card) return;
     const name = card.querySelector('.plan-name');
-    if (name && left < 100) {
+    if (name && (ended || left < 100)) {
       const indicator = document.createElement('span');
       indicator.style.cssText = 'display:inline-block;background:#D946EF;color:#fff;font-size:11px;font-weight:700;padding:3px 10px;border-radius:999px;margin-left:6px';
-      indicator.textContent = left > 0 ? `剩 ${left} 名` : '已售完';
+      indicator.textContent = ended ? (typeof enOr==='function'?enOr('已結束','Ended'):'已結束') : `剩 ${left} 名`;
       name.appendChild(indicator);
     }
-    if (left <= 0) {
+    if (ended) {
       card.style.opacity = '0.55';
       const cta = card.querySelector('.plan-cta');
-      if (cta) { cta.textContent = '名額已滿'; cta.onclick = null; cta.href = 'javascript:void(0)'; }
+      if (cta) { cta.textContent = (typeof enOr==='function'?enOr('早鳥已收官','Early bird has ended'):'早鳥已收官'); cta.onclick = function(){return false;}; cta.href = 'javascript:void(0)'; }
+    } else {
+      // 收官倒數:掛在早鳥卡 CTA 上方,天數/小時動態算
+      const cd = document.createElement('div');
+      const hrsAll = Math.max(0, Math.floor((EB_END - Date.now()) / 3600000));
+      const dd = Math.floor(hrsAll / 24), hh = hrsAll % 24;
+      const twTxt = '⏳ 早鳥 8/27(三)中午 12:00 收官——剩 ' + (dd>0 ? dd+' 天 '+hh+' 小時' : hh+' 小時');
+      const enTxt = '⏳ Early bird ends Aug 27, 12:00 JST — ' + (dd>0 ? dd+'d '+hh+'h' : hh+'h') + ' left';
+      cd.style.cssText = 'font-size:12.5px;font-weight:700;color:#D946EF;margin:8px 0 2px';
+      cd.textContent = (typeof enOr==='function') ? enOr(twTxt, enTxt) : twTxt;
+      const cta = card.querySelector('.plan-cta');
+      if (cta) cta.parentNode.insertBefore(cd, cta);
     }
   } catch (e) { console.warn('early bird counter load fail', e); }
 })();
