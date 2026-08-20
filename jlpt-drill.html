@@ -312,6 +312,7 @@ function getWrong(){ try{ return JSON.parse(localStorage.getItem(WKEY))||{}; }ca
 function saveWrong(w){ localStorage.setItem(WKEY, JSON.stringify(w)); }
 // ── 刷題紀錄:每題做過幾次/對幾次 + 場次歷史 ──
 const RKEY='jd_rec', HKEY='jd_hist';
+let roundWrong=[];   // 本輪錯題明細 [{id, ch:你選的}],finish 時寫入場次紀錄供回顧
 function getRec(){ try{ return JSON.parse(localStorage.getItem(RKEY))||{}; }catch(e){ return {}; } }
 function saveRec(r){ localStorage.setItem(RKEY, JSON.stringify(r)); }
 function getHist(){ try{ return JSON.parse(localStorage.getItem(HKEY))||[]; }catch(e){ return []; } }
@@ -355,11 +356,28 @@ function showRecords(){
     return `<div class="rec-cell"><b>${l.toUpperCase()}</b><span>${enOr(p.done+' / '+p.tot+' 題',p.done+' / '+p.tot+' done')}</span><span>${p.n?enOr('正答率 '+acc+'%','Accuracy '+acc+'%'):'—'}</span></div>`;
   }).join('')+'</div>';
   html += '<h3 style="font-size:15px;margin:18px 0 8px">'+enOr('最近場次','Recent sessions')+'</h3>';
-  html += hist.length? hist.slice(0,30).map(h=>
-    `<div class="hist-row"><span class="hd2">${h.d}</span><span class="hl">${h.lv==='wrong'?'📕':h.lv.toUpperCase()}</span><span class="ht">${esc(histLabel(h.t))}</span><span class="hs">${h.s} / ${h.tot}</span></div>`).join('')
+  html += hist.length? hist.slice(0,30).map((h,hi)=>
+    `<div class="hist-row${(h.w&&h.w.length)?' hist-click':''}" ${(h.w&&h.w.length)?'onclick="toggleHistDetail('+hi+')" style="cursor:pointer"':''}><span class="hd2">${h.d}</span><span class="hl">${h.lv==='wrong'?'📕':h.lv.toUpperCase()}</span><span class="ht">${esc(histLabel(h.t))}</span><span class="hs">${h.s} / ${h.tot}${(h.w&&h.w.length)?' <span style="color:var(--ac);font-size:11px">▾'+enOr('看錯題','review')+'</span>':''}</span></div><div id="histDetail${hi}" style="display:none"></div>`).join('')
     : '<div class="muted">'+enOr('還沒有紀錄,先刷一輪吧!','No records yet — do a round first!')+'</div>';
   document.getElementById('recBody').innerHTML = html;
   show('records');
+}
+// 場次錯題回顧:點紀錄列展開,逐題顯示題目/你選的/正解/詳解(題目從題庫按 id 撈,題庫改版找不到就略過)
+function toggleHistDetail(hi){
+  const box=document.getElementById('histDetail'+hi); if(!box) return;
+  if(box.style.display!=='none'){ box.style.display='none'; return; }
+  const h=getHist()[hi]; if(!h||!h.w||!h.w.length) return;
+  const all=bank();
+  box.innerHTML = h.w.map(wr=>{
+    const q=all.find(x=>x.id===wr.id); if(!q) return '';
+    return '<div style="background:var(--bg2);border:1px solid var(--bd);border-radius:10px;padding:12px;margin:8px 0">'
+      + '<div style="font-size:15px;margin-bottom:6px">'+stem(q)+'</div>'
+      + (wr.ch?('<div style="font-size:13px;color:var(--bad,#c2410c)">'+enOr('你選:','You picked: ')+esc(wr.ch)+'</div>'):'')
+      + '<div style="font-size:13px;color:var(--ok,#15803d);margin:2px 0 6px">'+enOr('正解:','Answer: ')+esc(q.o[q.a])+'</div>'
+      + '<div style="font-size:13px;color:var(--tx2);line-height:1.7">'+q.x+'</div>'
+      + '</div>';
+  }).join('') || '<div class="muted">'+enOr('這場的題目已更新,無法回顧','These questions have since been updated')+'</div>';
+  box.style.display='block';
 }
 function pickLv(l){ lv=l; localStorage.setItem('jd_lv',l); renderHome(); updateExamNotes(); }
 
@@ -373,11 +391,12 @@ function startDrill(tk){
   const done  = shuffle(all.filter(q=>rec[q.id]));
   queue = fresh.concat(done).slice(0, 20);
   if(!queue.length) return;
-  qi=0; score=0;
+  qi=0; score=0; roundWrong=[];
   document.getElementById('drillTitle').textContent = lv.toUpperCase()+' · '+tyName(curType);
   show('drill'); renderQ();
 }
-function startWrong(){
+function _clearRound(){ roundWrong=[]; }
+function startWrong(){ _clearRound();
   if(!jdUnlimited()){ showGateCard(enOr('錯題本重刷是 Premium 功能','The wrong-answer notebook is a Premium feature'), enOr('你答錯的 '+Object.keys(getWrong()).length+' 題都幫你收好了——升級後一鍵重刷,補到全對。','All '+Object.keys(getWrong()).length+' questions you missed are saved here — upgrade to redrill them until you get every one right.')); return; }
   const w = getWrong(); isWrongMode=true; curType=null;
   queue = shuffle(bank().filter(q=>w[q.id]));
@@ -425,6 +444,7 @@ function sayWordAudio(q){
 }
 function answer(el, ok){
   const q = queue[qi];
+  if(!ok){ roundWrong.push({ id:q.id, ch:(el&&el.textContent||'').trim().slice(0,60) }); }   // 本輪錯題:題目+你選的
   sayWordAudio(q);
   document.querySelectorAll('.opt').forEach(b=>{
     b.disabled=true;
@@ -455,7 +475,7 @@ function finish(){
   const pct = Math.round(score/queue.length*100);
   document.getElementById('rscore').textContent = score+' / '+queue.length;
   document.getElementById('rsub').textContent = pct>=80? enOr('很穩!繼續保持 💪','Solid! Keep it up 💪'):(pct>=60? enOr('不錯,錯題本再刷一輪就熟了','Not bad — one more round in the wrong-answer notebook and you\'ll have it down'):enOr('先看詳解弄懂,錯題本等你 📕','Read the explanations first — the wrong-answer notebook is waiting 📕'));
-  pushHist({ d:today(), lv:isWrongMode?'wrong':lv, t:isWrongMode?'錯題本':(curType?curType.tt:''), s:score, tot:queue.length });
+  pushHist({ d:today(), lv:isWrongMode?'wrong':lv, t:isWrongMode?'錯題本':(curType?curType.tt:''), s:score, tot:queue.length, w:roundWrong.slice(0,30) });
   show('result');
 }
 function retrySame(){ if(isWrongMode) startWrong(); else if(curType) startDrill(curType.k); }
