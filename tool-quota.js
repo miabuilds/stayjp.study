@@ -111,6 +111,7 @@
     c[tool] = (c[tool] || 0) + 1;
     saveCount(c);
     refreshBadge();
+    consumeToast(tool);
     // 用完當下即時重繪學習列表 → 該工具按鈕立刻變 🔒,不用 reload
     try { if (typeof window.doRender === 'function') window.doRender(); } catch (e) {}
   }
@@ -419,6 +420,83 @@
   //               → 該 session 第一次才檢查額度 + 扣 1 次;之後同 session 續用(下一輪/下一張)免費
   // 解決:底部 bar「測驗/複習」一點就扣 → 消費者容易誤點掉額度。
   const _armed = {};   // _armed[tool]=true 表示此 session 尚未扣
+
+  // 扣款當下的透明提示:講清楚用了什麼、還剩幾個 → 消除「偷扣」感
+  function consumeToast(tool) {
+    try {
+      const lang = localStorage.getItem('ui_lang') || 'zh-TW';
+      const c = loadCount();
+      const usedCount = Object.keys(TOOL_NAMES).filter(k => (c[k] || 0) >= PER_TOOL_LIMIT).length;
+      const leftTools = Math.max(0, GLOBAL_DAILY_LIMIT - usedCount);
+      const name = TOOL_NAMES[tool] || tool;
+      const msg = lang === 'en'
+        ? `Free trial used: ${name} · ${leftTools} more tool${leftTools === 1 ? '' : 's'} today`
+        : (lang === 'zh-CN'
+          ? `已使用今日免费额度:${name} · 今天还可试 ${leftTools} 个工具`
+          : `已使用今日免費額度:${name}・今天還可試 ${leftTools} 個工具`);
+      let el = document.getElementById('tqToast');
+      if (!el) {
+        el = document.createElement('div');
+        el.id = 'tqToast';
+        el.style.cssText = 'position:fixed;left:50%;bottom:84px;transform:translateX(-50%);z-index:10001;'
+          + 'background:rgba(20,24,22,.92);color:#fff;font-size:13px;font-weight:600;padding:10px 18px;'
+          + 'border-radius:999px;box-shadow:0 8px 24px rgba(0,0,0,.35);opacity:0;transition:opacity .25s;'
+          + 'max-width:92vw;text-align:center;pointer-events:none';
+        document.body.appendChild(el);
+      }
+      el.textContent = msg;
+      requestAnimationFrame(() => { el.style.opacity = '1'; });
+      clearTimeout(el._t);
+      el._t = setTimeout(() => { el.style.opacity = '0'; }, 2600);
+    } catch (e) {}
+  }
+
+  // 通用「第一個學習動作才扣」:
+  //   startMethods:進入工具的方法 → 沒額度就在門口擋(內容型工具一進去就看得到東西);有額度只「武裝」不扣
+  //   chargeMethods:第一個學習動作(翻卡/答題/播放…)→ 武裝中第一次觸發才扣
+  //   opts.clickSelector:模組沒匯出動作方法時,用點擊代理(例:跟讀的控制鈕)
+  //   opts.presenceSelector+graceMs:自動播放型工具(跟讀/故事)開著超過 graceMs 仍在畫面上 → 視同使用
+  function gateEngage(obj, startMethods, chargeMethods, tool, opts) {
+    if (!obj) return;
+    opts = opts || {};
+    function charge() {
+      if (!_armed[tool]) return;
+      _armed[tool] = false;
+      consume(tool);
+    }
+    startMethods.forEach(m => {
+      if (typeof obj[m] !== 'function' || isAlreadyWrapped(obj[m])) return;
+      const orig = obj[m];
+      obj[m] = function(...args) {
+        /* __TQ_WRAPPED__ */
+        if (_gateDepth > 0) return orig.apply(this, args);
+        if (!canUse(tool)) { showPaywall(tool); return; }
+        _armed[tool] = true;
+        if (opts.presenceSelector && opts.graceMs) {
+          setTimeout(() => {
+            if (_armed[tool] && document.querySelector(opts.presenceSelector)) charge();
+          }, opts.graceMs);
+        }
+        _gateDepth++;
+        try { return orig.apply(this, args); } finally { _gateDepth--; }
+      };
+    });
+    (chargeMethods || []).forEach(m => {
+      if (typeof obj[m] !== 'function' || isAlreadyWrapped(obj[m])) return;
+      const orig = obj[m];
+      obj[m] = function(...args) {
+        /* __TQ_WRAPPED__ */
+        charge();
+        return orig.apply(this, args);
+      };
+    });
+    if (opts.clickSelector) {
+      document.addEventListener('click', (e) => {
+        if (!_armed[tool]) return;
+        if (e.target && e.target.closest && e.target.closest(opts.clickSelector)) charge();
+      }, true);
+    }
+  }
   function gateDeferred(obj, startMethod, beginMethod, tool) {
     if (!obj) return;
     if (typeof obj[startMethod] === 'function' && !isAlreadyWrapped(obj[startMethod])) {
@@ -449,17 +527,19 @@
     // 複習:點 tab(SRS.start)只顯示第一張卡正面=免費;翻卡後第一次「記得/不會」評分(rate)才扣
     const SRS_ = getGlobal('SRS');           if (SRS_) gateDeferred(SRS_, 'start', 'rate', 'srs');
     const FlashCard_ = getGlobal('FlashCard');
-    if (FlashCard_) { gateStart(FlashCard_, 'start', 'flashcard'); gateStart(FlashCard_, 'beginToday', 'flashcard'); }
+    if (FlashCard_) gateEngage(FlashCard_, ['start', 'beginToday'], ['flip', 'answer'], 'flashcard');   // 翻第一張卡才扣
     const Shadow_ = getGlobal('Shadow');
-    if (Shadow_) { gateStart(Shadow_, 'start', 'shadow'); gateStart(Shadow_, 'startCurrent', 'shadow'); gateStart(Shadow_, 'startFavs', 'shadow'); gateStart(Shadow_, 'startGrammarFavs', 'shadow'); }
-    const GrammarDrill_ = getGlobal('GrammarDrill'); if (GrammarDrill_) gateStart(GrammarDrill_, 'start', 'grammar');
+    if (Shadow_) gateEngage(Shadow_, ['start', 'startCurrent', 'startFavs', 'startGrammarFavs'], [], 'shadow',
+      { clickSelector: '.shadow-btn', presenceSelector: '.shadow-mask', graceMs: 10000 });   // 按控制鈕或聽超過 10 秒才扣
+    const GrammarDrill_ = getGlobal('GrammarDrill'); if (GrammarDrill_) gateEngage(GrammarDrill_, ['start', 'begin'], ['flip', 'rate', 'answerQuiz'], 'grammar');   // 翻卡/作答才扣
     // 測驗:點 tab(Quiz.start)只開設定/介紹頁=免費;按「開始測驗」(begin)才扣
     const Quiz_ = getGlobal('Quiz');         if (Quiz_) gateDeferred(Quiz_, 'start', 'begin', 'quiz');
-    const Reading_ = getGlobal('Reading');   if (Reading_) gateStart(Reading_, 'start', 'reading');
-    const Listening_ = getGlobal('Listening'); if (Listening_) gateStart(Listening_, 'start', 'listening');
+    const Reading_ = getGlobal('Reading');   if (Reading_) gateEngage(Reading_, ['start', 'begin'], ['answer'], 'reading');   // 答第一題才扣
+    const Listening_ = getGlobal('Listening'); if (Listening_) gateEngage(Listening_, ['start', 'begin'], ['play'], 'listening');   // 第一次播放才扣
     const Stats_ = getGlobal('Stats');
-    if (Stats_ && typeof Stats_.quizFavListening === 'function') gateStart(Stats_, 'quizFavListening', 'listening');
-    const DailyStory_ = getGlobal('DailyStory'); if (DailyStory_) gateStart(DailyStory_, 'open', 'story');
+    if (Stats_ && typeof Stats_.quizFavListening === 'function') gateStart(Stats_, 'quizFavListening', 'listening');   // 收藏聽力測驗:入口即題目,維持原邏輯
+    const DailyStory_ = getGlobal('DailyStory'); if (DailyStory_) gateEngage(DailyStory_, ['open'], ['playOne', 'playAll', 'toggleTrans'], 'story',
+      { presenceSelector: '.ds-body', graceMs: 10000 });   // 播放/看翻譯或停留超過 10 秒才扣
 
     // ── 模考 gating 已移進 mock-exam.js 的 beginExam ──
     // (外部 wrapper 抓不到 startSection [未 export] 也拿不到 examLevel,故在內部 gate)

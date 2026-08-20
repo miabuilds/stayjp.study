@@ -57,9 +57,62 @@ const Stats = (() => {
     else if (tab === 'settings') c.innerHTML = buildSettings();
   }
 
-  // 學習統計 = 總覽（成績圖 + 學習進度） + 考試紀錄
+  // 學習統計 = 總覽（成績圖 + 學習進度） + 新功能紀錄（刷題/AI 口說） + 考試紀錄
   function buildStatsCombined() {
-    return buildScoreChart() + buildProgress() + buildHistory();
+    return buildScoreChart() + buildProgress() + buildNewFeatures() + buildHistory();
+  }
+
+  // ── 新功能紀錄:JLPT 刷題 + AI 口說(之前「我的」完全看不到這些,像沒在用) ──
+  function _en2(zh, en) { try { return (typeof enOr === 'function') ? enOr(zh, en) : zh; } catch (e) { return zh; } }
+  function buildNewFeatures() {
+    let h = '';
+    // JLPT 刷題/模擬考(localStorage jd_hist,同網域共享)
+    try {
+      const jh = JSON.parse(localStorage.getItem('jd_hist')) || [];
+      if (!jh.length) {
+        h += `<div class="st-section"><div class="st-title">🎯 ${_en2('JLPT 刷題', 'JLPT Drills')}</div>
+          <div class="st-empty">${_en2('還沒刷過題——1,668 題等你來', 'No drills yet — 1,668 questions are waiting')} <a href="jlpt-drill.html" style="color:var(--ac);font-weight:700">${_en2('去刷題 →', 'Start →')}</a></div></div>`;
+      } else {
+        const done = jh.reduce((a, x) => a + (x.tot || 0), 0);
+        const right = jh.reduce((a, x) => a + (x.s || 0), 0);
+        const acc = done ? Math.round(right / done * 100) : 0;
+        const rows = jh.slice(0, 5).map(x =>
+          `<div style="display:flex;justify-content:space-between;font-size:13px;padding:4px 0;border-bottom:1px solid var(--bd)">
+            <span>${x.d}・${String(x.lv).toUpperCase()}・${x.t || ''}</span><span style="font-weight:700">${x.s}/${x.tot}</span></div>`).join('');
+        h += `<div class="st-section"><div class="st-title">🎯 ${_en2('JLPT 刷題', 'JLPT Drills')}
+            <a href="jlpt-drill.html" style="float:right;font-size:12.5px;color:var(--ac);font-weight:700">${_en2('繼續刷 →', 'Continue →')}</a></div>
+          <div style="font-size:13.5px;margin-bottom:6px">${_en2('累計 ' + done + ' 題・正答率 ' + acc + '%', done + ' questions · ' + acc + '% correct')}</div>
+          ${rows}</div>`;
+      }
+    } catch (e) {}
+    // AI 口說(ai_usage 讀自己的;登入才有)
+    h += `<div class="st-section"><div class="st-title">🎙 ${_en2('AI 口說', 'AI Speaking')}</div>
+      <div id="stAiUsage" class="st-empty">${_en2('載入中…', 'Loading…')}</div></div>`;
+    setTimeout(fillAiUsage, 50);
+    return h;
+  }
+  function fillAiUsage() {
+    const el = document.getElementById('stAiUsage');
+    if (!el) return;
+    try {
+      const u0 = (typeof firebase !== 'undefined' && firebase.auth) ? firebase.auth().currentUser : null;
+      if (!u0) { el.innerHTML = _en2('登入後可看 AI 對話/評分使用紀錄。', 'Sign in to see your AI chat & scoring records.') + ' <a href="speak-chat.html" style="color:var(--ac);font-weight:700">' + _en2('去試 AI 對話 →', 'Try AI chat →') + '</a>'; return; }
+      firebase.firestore().doc('ai_usage/' + u0.uid).get().then(snap => {
+        const u = snap.data() || {};
+        const d = new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10);
+        const chatToday = (u.chatDay && u.chatDay.d === d) ? u.chatDay.n : 0;
+        const evalToday = (u.evalDay && u.evalDay.d === d) ? u.evalDay.n : 0;
+        const chatAll = (u.chatTotal || 0) + chatToday, evalAll = (u.evalTotal || 0) + evalToday;
+        if (!chatAll && !evalAll) {
+          el.innerHTML = _en2('還沒用過——AI 陪你練口說,每句都給回饋。', 'Not yet — practice speaking with instant AI feedback.') + ' <a href="speak-chat.html" style="color:var(--ac);font-weight:700">' + _en2('去試 AI 對話 →', 'Try AI chat →') + '</a>';
+          return;
+        }
+        el.classList.remove('st-empty');
+        el.innerHTML = '<div style="font-size:13.5px;line-height:2">'
+          + '🗣 ' + _en2('對話:今天 ' + chatToday + ' 場', 'Chat: ' + chatToday + ' today') + '・🎙 ' + _en2('評分:今天 ' + evalToday + ' 次', 'Scoring: ' + evalToday + ' today')
+          + ' <a href="speak-chat.html" style="color:var(--ac);font-weight:700;margin-left:6px">' + _en2('繼續練 →', 'Keep going →') + '</a></div>';
+      }).catch(() => { el.textContent = _en2('紀錄載入失敗', 'Could not load records'); });
+    } catch (e) {}
   }
   // 我的詞庫 = 生詞本 + 不熟單字 + 錯題回顧
   function buildCollectionCombined() {
