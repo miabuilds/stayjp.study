@@ -339,6 +339,7 @@
   window.furiganaHTMLRich = furiganaHTMLRich;
   window.furiAddEntries = addEntries;
   // 依詞查 VOCAB 釋義(供文章逐詞可點用):回 {r,m,c} 或 null。ENTRY 以含漢字的詞為 key。
+  window.furiganaAddEntries = addEntries;   // 晚載詞庫(對話頁按需載 N3↑)併入字典
   window.furiLookup = function (w) { try { return dict().ENTRY[w] || null; } catch (e) { return null; } };
   // ── 假名查詢:以「讀音/純假名表記」為 key(ENTRY 只收含漢字詞,假名詞查不到 → 初學者讀 N5 假名文全點不了)。
   // 同音詞(かみ=紙/神/髪)列前三個讓學習者自己對上下文。lazy build,vocab 檔載完後第一次查才建索引。

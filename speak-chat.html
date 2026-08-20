@@ -45,6 +45,7 @@
   .bjp{font-size:17px;font-weight:600}
   .bubble.ai .bjp{display:flex;align-items:flex-start;gap:8px}
   .spk{flex-shrink:0;cursor:pointer;border:0;background:none;color:var(--accent);font-size:15px;padding:0;line-height:1.4}
+  .bjp ruby rt{display:none}   /* 泡泡下方已有整句假名行,ruby 讀音不重複顯示(點字查詢仍可用) */
   .bkana{color:var(--accent2);font-size:12.5px;margin-top:3px}
   .bzh{color:var(--ink2);font-size:12.5px;margin-top:3px}
   .msg.me .bkana,.msg.me .bzh{color:#ffffffcc}
@@ -138,6 +139,18 @@
 </div>
 
 <script src="i18n.js"></script>
+<script src="conjugate.js" defer></script>
+<script src="grammar-kanji-readings.js" defer></script>
+<script src="vocab-n5.js" defer></script>
+<script src="vocab-n4.js" defer></script>
+<script src="ux-extras.js" defer></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  // 頂層 const 不會掛上 window(站內老坑)→ 顯式掛,buildDict 讀 window[k] 才看得到
+  try { window.VOCAB_N5 = window.VOCAB_N5 || VOCAB_N5; } catch (e) {}
+  try { window.VOCAB_N4 = window.VOCAB_N4 || VOCAB_N4; } catch (e) {}
+});
+</script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script>
@@ -240,7 +253,21 @@ function showLoginCard(){
     +'</div>';
   document.body.appendChild(el);
 }
+const _dictLoaded={n5:1,n4:1};
+function ensureDictLv(lv){
+  lv=String(lv||'').toLowerCase();
+  if(!lv||_dictLoaded[lv]||['n5','n4'].includes(lv)) return;
+  _dictLoaded[lv]=1;
+  const sc=document.createElement('script'); sc.src='vocab-'+lv+'.js';
+  sc.onload=function(){ try{
+    const nm='VOCAB_'+lv.toUpperCase();
+    const arr=window[nm] || (new Function('return typeof '+nm+'!=="undefined"?'+nm+':null'))();
+    if(Array.isArray(arr)){ window[nm]=arr; if(window.furiganaAddEntries) window.furiganaAddEntries(arr); }
+  }catch(e){} };
+  document.head.appendChild(sc);
+}
 function startChat(k){
+  ensureDictLv(activeLv);
   if(!auth.currentUser){ showLoginCard(); return; }
   const s0 = SCENES.find(s=>s.k===k); if(!s0) return;
   if(s0.custom){
@@ -280,7 +307,7 @@ function renderMsgs(streamingAi){
 function aiBubble(m){
   const jp = m.jp || m.text || '';
   return `<div class="msg ai"><div class="bubble ai">
-    <div class="bjp"><span>${esc(jp)||'…'}</span>${jp?`<button class="spk" title="${enOr('播放','Play')}" onclick="playTTS(${JSON.stringify(jp).replace(/"/g,'&quot;')})">🔊</button>`:''}</div>
+    <div class="bjp"><span>${(jp&&window.furiganaHTMLRich)?window.furiganaHTMLRich(jp):(esc(jp)||'…')}</span>${jp?`<button class="spk" title="${enOr('播放','Play')}" onclick="playTTS(${JSON.stringify(jp).replace(/"/g,'&quot;')})">🔊</button>`:''}</div>
     ${m.kana?`<div class="bkana">${esc(m.kana)}</div>`:''}
     ${(showZh && m.zh)?`<div class="bzh">${esc(cvt(m.zh))}</div>`:''}
     ${(showZh && m.words)?wordChips(m.words):''}
