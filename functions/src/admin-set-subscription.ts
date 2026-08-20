@@ -58,11 +58,16 @@ export const adminSetSubscription = functions.onRequest(
           : PLANS[plan].price_twd;
 
         const existing = await getSubscription(uid);
+        // 贈送標記:0 元開通=贈送。但「原本就有有效付費訂閱」的人保持付費身分(不蓋成贈送),
+        // 依然算真實客戶;到期/退費/本來就是贈送的 → 標 is_gift。
+        const hadPaidActive = !!(existing && existing.is_gift !== true && (existing.expiresAt || 0) > nowMs()
+          && existing.status !== "refunded" && existing.status !== "expired");
         const sub: SubscriptionDoc = {
           source: "web",
           plan,
           status: "active",
           expiresAt,
+          is_gift: amount === 0 ? !hadPaidActive : false,
           // 手動補開(PayPal / 贈送)= 沒有定期定額約定 → 不會自動續訂。一律 false,報表才不會誤顯示「會續扣」。
           willRenew: false,
           startedAt: existing?.startedAt || nowMs(),

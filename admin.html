@@ -794,7 +794,7 @@ async function setSub(action) {
    msg.textContent = `✓ 完成(${action})`; msg.style.color = '#16A34A';
    const s = d.subscription;
    result.innerHTML = s
-     ? `最新狀態:<b>${SUB_PLAN_TXT[s.plan]||s.plan}</b> · ${SUB_STATUS_TXT[s.status]||s.status} · 到期 ${s.expiresAt ? new Date(Number(s.expiresAt)).toLocaleDateString('zh-TW') : '—'} · 續扣 ${s.willRenew?'是':'否'}`
+     ? `最新狀態:<b>${s.is_gift?'🎁 贈送':(SUB_PLAN_TXT[s.plan]||s.plan)}</b> · ${SUB_STATUS_TXT[s.status]||s.status} · 到期 ${s.expiresAt ? new Date(Number(s.expiresAt)).toLocaleDateString('zh-TW') : '—'} · 續扣 ${s.willRenew?'是':'否'}`
      : '(目前無訂閱)';
  } catch (e) { msg.textContent = '錯誤:' + e.message; msg.style.color = '#EF4444'; }
 }
@@ -1415,7 +1415,7 @@ function renderSubsTable() {
         <tbody>${pageList.map(s => `
           <tr style="border-bottom:1px solid var(--bd)${s.is_sandbox?';opacity:.55':''}">
             <td style="padding:8px 6px;color:var(--tx)">${s.is_sandbox?'<span style="color:#F59E0B">🧪測試</span> ':''}${s.email || s.uid.slice(0,8)}${s.is_early_bird?' <span style="color:#D946EF">★早鳥</span>':''}${s.ref_code?` <span style="color:#0EA5E9">🎟${s.ref_code}</span>`:''}</td>
-            <td style="padding:8px 6px">${SUB_PLAN_TXT[s.plan]||s.plan}</td>
+            <td style="padding:8px 6px">${s.is_gift?'🎁 贈送':(SUB_PLAN_TXT[s.plan]||s.plan)}</td>
             <td style="padding:8px 6px">${SUB_STATUS_TXT[s.status]||s.status}</td>
             <td style="padding:8px 6px">${s.plan==='lifetime'?'買斷':fmtDate(s.expiresAt)}</td>
             <td style="padding:8px 6px">${s.willRenew?'開':'關'}</td>

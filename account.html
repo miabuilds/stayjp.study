@@ -545,6 +545,7 @@ function renderSubscription(sub) {
 
  if (!sub) {
  planLabel.innerHTML = '免費版 <span class="badge b-free">FREE</span>';
+ try { db.doc('free_users/' + auth.currentUser.uid).get().then(function(s){ if (s.exists) planLabel.innerHTML = '🎟 受邀帳號 <span class="badge b-active">全功能</span>'; }).catch(function(){}); } catch (e) {}
  rowStatus.style.display = 'none';
  rowExpiry.style.display = 'none';
  rowRenew.style.display = 'none';
@@ -563,6 +564,7 @@ function renderSubscription(sub) {
  const isPrem = (sub.status === 'active' || sub.status === 'trialing' || sub.status === 'cancelled') && inPeriod;
  if (!isPrem) {
  planLabel.innerHTML = '免費版 <span class="badge b-free">FREE</span>';
+ try { db.doc('free_users/' + auth.currentUser.uid).get().then(function(s){ if (s.exists) planLabel.innerHTML = '🎟 受邀帳號 <span class="badge b-active">全功能</span>'; }).catch(function(){}); } catch (e) {}
  rowStatus.style.display = 'none';
  rowExpiry.style.display = 'none';
  rowRenew.style.display = 'none';
@@ -573,10 +575,11 @@ function renderSubscription(sub) {
  return;
  }
 
- // Plan label
- const pl = PLAN_LABELS[sub.plan] || sub.plan;
- const earlyBird = sub.is_early_bird ? '<span class="badge b-early-bird">早鳥鎖價</span>' : '';
+ // Plan label(is_gift = 手動贈送:不顯示方案名,顯示「贈送」)
+ const pl = sub.is_gift ? '🎁 贈送' : (PLAN_LABELS[sub.plan] || sub.plan);
+ const earlyBird = (!sub.is_gift && sub.is_early_bird) ? '<span class="badge b-early-bird">早鳥鎖價</span>' : '';
  planLabel.innerHTML = `${pl} ${earlyBird}`;
+ try { var _rb=document.getElementById('btnRefund'); if(_rb && sub.is_gift) _rb.style.display='none'; } catch(e){}
 
  // Status(只會是有權益的狀態;fallback 也給正面字樣,不再漏英文)
  const st = STATUS_LABELS[sub.status] || { text: 'Premium 會員', cls: 'b-active' };
@@ -664,6 +667,7 @@ function renderSubscription(sub) {
  // 已失效(退費 / 過期):不再顯示為有效方案,避免「目前方案 + 未來到期日」誤導。
  // 功能上 isPremium() 已排除這些狀態(全額退費=權限即止),UI 同步顯示為免費版。
  planLabel.innerHTML = '免費版 <span class="badge b-free">FREE</span>';
+ try { db.doc('free_users/' + auth.currentUser.uid).get().then(function(s){ if (s.exists) planLabel.innerHTML = '🎟 受邀帳號 <span class="badge b-active">全功能</span>'; }).catch(function(){}); } catch (e) {}
  rowExpiry.style.display = 'none';
  rowRenew.style.display = 'none';
  rowSource.style.display = 'none';

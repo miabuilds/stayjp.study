@@ -47,6 +47,7 @@ export const adminListSubscribers = functions.onRequest(
           expiresAt: s.expiresAt || null,
           startedAt: s.startedAt || null,
           is_early_bird: s.is_early_bird === true,
+          is_gift: s.is_gift === true,          // 手動贈送(0元)→ 後台顯示「贈送」、不計入付費客戶
           is_sandbox: s.is_sandbox === true,    // 沙盒測試購買(非真實付款)→ 後台區分測試/真實
           willRenew: s.willRenew === true,
           ecpay_order: s.ecpay_order || null,   // 有=綠界定期定額;無=手動/PayPal(報表用來區分付款方式)
