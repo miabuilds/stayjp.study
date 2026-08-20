@@ -2238,24 +2238,24 @@ function speakBrowser(text) {
   if (__jaVoice) u.voice = __jaVoice;
   speechSynthesis.speak(u);
 }
+let _spkSeq = 0;   // 連點防護:只有「最新一次」的錯誤才有意義,舊請求被中斷是正常現象
 function speak(text) {
   const t = (text || '').trim();
   if (!t) return;
-  // Stop any audio currently playing (browser TTS or previous mp3).
   if (window.speechSynthesis) speechSynthesis.cancel();
   const hash = window.__TTS && window.__TTS[t];
-  track('audio_play', { source: hash ? 'voicevox' : 'browser_tts', mode: currentMode });
-  if (hash) {
-    const a = getTtsAudio();               // 共用元件:設 src 直接播,不再每次 new
-    try { a.pause(); } catch (e) {}
-    a.onerror = () => speakBrowser(t);     // mp3 載入失敗 → 退瀏覽器語音
-    a.src = window.ttsUrl ? window.ttsUrl(hash) : 'audio/tts/' + hash + '.mp3';
-    a.playbackRate = getTtsSpeed();
-    a.currentTime = 0;
-    a.play().catch(() => speakBrowser(t));
-    return;
-  }
-  speakBrowser(t);
+  track('audio_play', { source: hash ? 'voicevox' : 'miss', mode: currentMode });
+  // 政策(2026-08 定案):絕不退瀏覽器機器音。沒預錄音檔=資料缺口,寧可靜默+記 log 讓我們補檔。
+  // 之前的坑:連點時前一個 play() 被中斷拋 AbortError → catch 誤觸發瀏覽器語音 →「有時機器音」。
+  if (!hash) { track('audio_miss', { text: t.slice(0, 40) }); return; }
+  const seq = ++_spkSeq;
+  const a = getTtsAudio();               // 共用元件:設 src 直接播,不再每次 new
+  try { a.pause(); } catch (e) {}
+  a.onerror = null;                      // 舊 src 的載入中斷錯誤,不做任何事
+  a.src = window.ttsUrl ? window.ttsUrl(hash) : 'audio/tts/' + hash + '.mp3';
+  a.playbackRate = getTtsSpeed();
+  a.currentTime = 0;
+  a.play().catch(() => { if (seq === _spkSeq) track('audio_play_fail', { text: t.slice(0, 40) }); });
 }
 if (window.speechSynthesis) speechSynthesis.getVoices();
 
