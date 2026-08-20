@@ -582,7 +582,7 @@ document.addEventListener('keydown',e=>{ if(e.target && e.target.id==='say' && e
   set(q('#boot div:nth-child(2)'),'Loading…');
   set(q('#pick a'),'‹ Back');
   const h1=q('#pick h1'); if(h1) h1.innerHTML='🗣 Scenario Chat <span class="muted" style="font-weight:400">Beta</span>';
-  set(q('#pick .sub'),'Pick a scene and level — the AI plays the other person and chats with you turn by turn. Speak (speech recognition) or type. 1 free session; Premium gets 3 per day.');
+  set(q('#pick .sub'),'Pick a scene and level — the AI plays the other person and chats with you turn by turn. Speak (speech recognition) or type. 1 free session; Premium gets 5 per day.');
   const note=q('#pick > .muted'); if(note) note.innerHTML='💡 This is conversation practice — for single-sentence shadowing, go to <a href="speak.html" style="color:var(--accent)">Speaking practice</a>.';
   const cn=q('#cnBtn'); if(cn){ cn.textContent='ZH'; cn.title='Hide Chinese translations and rely on Japanese + audio to train listening'; }
   set(q('#endBtn'),'End & review');
