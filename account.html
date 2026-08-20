@@ -157,6 +157,11 @@ a:hover{text-decoration:underline}
  <span class="val" id="sourceLabel">—</span>
  </div>
 
+ <div id="quotaBox" style="margin-top:14px;padding:12px;background:var(--bg3);border-radius:10px;display:none">
+ <div style="font-size:13px;font-weight:700;margin-bottom:8px">📊 今日額度</div>
+ <div id="quotaRows" style="font-size:13px;line-height:2;color:var(--tx2)"></div>
+ </div>
+
  <div id="redeemBox" style="margin-top:14px;padding:12px;background:var(--bg3);border-radius:10px">
  <div style="font-size:13px;color:var(--tx2);margin-bottom:8px">🎁 有兌換碼?輸入換取免費 Premium(測試者 / 活動):</div>
  <div style="display:flex;gap:8px;flex-wrap:wrap">
@@ -525,6 +530,7 @@ function loadSubscription() {
    if (m) { m.style.color = 'var(--tx3)'; m.textContent = rewarded ? ('已套用推薦碼:' + data.ref_code + '(7 天好康已發放 ✓,不可更改)') : ('目前推薦碼:' + data.ref_code + '(付費後多送 7 天;發放前可更改或清除)'); }
  }
  renderSubscription(sub);
+ renderQuotaBox(currentUser, sub);
  if (sub) loadTransactions(); else document.getElementById('txnCard').style.display = 'none';
  }, err => {
  console.warn('subscription load failed', err);
@@ -532,6 +538,48 @@ function loadSubscription() {
 }
 
 let _sub = null;
+// === 今日額度(透明化:練習工具 + AI;消除「偷扣」疑慮)===
+async function renderQuotaBox(user, sub) {
+  try {
+    const box = document.getElementById('quotaBox'); const rows = document.getElementById('quotaRows');
+    if (!box || !rows || !user) return;
+    const L = localStorage.getItem('ui_lang') || 'zh-TW';
+    const T = (tw, cn, en) => L === 'en' ? en : (L === 'zh-CN' ? cn : tw);
+    const now = Date.now();
+    const isPrem = !!(sub && (sub.status === 'active' || sub.status === 'trialing' || sub.status === 'cancelled') && sub.expiresAt > now);
+    let isFree = false;
+    try { isFree = (await db.doc('free_users/' + user.uid).get()).exists; } catch (e) {}
+    const premLike = isPrem || isFree;
+    let u = {}, cfg = { freeEvalTotal: 10, freeChatTotal: 1, premEvalDaily: 30, premChatDaily: 5 };
+    try { const s = await db.doc('ai_usage/' + user.uid).get(); u = s.data() || {}; } catch (e) {}
+    try { const c = await db.doc('config/ai').get(); if (c.exists) cfg = Object.assign(cfg, c.data()); } catch (e) {}
+    const d = new Date(now + 9 * 3600 * 1000).toISOString().slice(0, 10);
+    const chatUsed = (u.chatDay && u.chatDay.d === d) ? u.chatDay.n : 0;
+    const evalUsed = (u.evalDay && u.evalDay.d === d) ? u.evalDay.n : 0;
+    const lines = [];
+    if (premLike) {
+      lines.push('🛠 ' + T('練習工具:無限次', '练习工具:无限次', 'Practice tools: unlimited'));
+      lines.push('🗣 ' + T('AI 對話:今天 ' + chatUsed + ' / ' + cfg.premChatDaily + ' 場', 'AI 对话:今天 ' + chatUsed + ' / ' + cfg.premChatDaily + ' 场', 'AI chat: ' + chatUsed + ' / ' + cfg.premChatDaily + ' today'));
+      lines.push('🎙 ' + T('AI 口說評分:今天 ' + evalUsed + ' / ' + cfg.premEvalDaily + ' 次', 'AI 口说评分:今天 ' + evalUsed + ' / ' + cfg.premEvalDaily + ' 次', 'AI speaking score: ' + evalUsed + ' / ' + cfg.premEvalDaily + ' today'));
+    } else {
+      let c = {};
+      try { const dk = new Date(); const key = 'tool_usage_' + dk.getFullYear() + '-' + String(dk.getMonth() + 1).padStart(2, '0') + '-' + String(dk.getDate()).padStart(2, '0'); c = JSON.parse(localStorage.getItem(key)) || {}; } catch (e) {}
+      const NAMES = { srs: ['SRS 記憶卡', 'SRS 记忆卡', 'SRS cards'], flashcard: ['快速背單字', '快速背单字', 'Flashcards'], shadow: ['跟讀', '跟读', 'Shadowing'], grammar: ['文法練習', '文法练习', 'Grammar drill'], quiz: ['單字測驗', '单字测验', 'Vocab quiz'], reading: ['讀解', '读解', 'Reading'], listening: ['聽力', '听力', 'Listening'], story: ['今日故事', '今日故事', 'Daily story'] };
+      const usedTools = Object.keys(NAMES).filter(k => (c[k] || 0) >= 1);
+      lines.push('🛠 ' + T('練習工具:今天已試 ' + usedTools.length + ' / 3 個(每個工具每天 1 次)', '练习工具:今天已试 ' + usedTools.length + ' / 3 个(每个工具每天 1 次)', 'Practice tools: ' + usedTools.length + ' / 3 tried today (1 per tool per day)'));
+      if (usedTools.length) lines.push('　└ ' + usedTools.map(k => T(NAMES[k][0], NAMES[k][1], NAMES[k][2])).join('、'));
+      const chatLeft = Math.max(0, (cfg.freeChatTotal || 1) - (u.chatTotal || 0));
+      const evalLeft = Math.max(0, (cfg.freeEvalTotal || 10) - (u.evalTotal || 0));
+      lines.push('🗣 ' + T('AI 對話體驗:剩 ' + chatLeft + ' 場', 'AI 对话体验:剩 ' + chatLeft + ' 场', 'AI chat trial: ' + chatLeft + ' left'));
+      lines.push('🎙 ' + T('AI 評分體驗:剩 ' + evalLeft + ' 次', 'AI 评分体验:剩 ' + evalLeft + ' 次', 'AI scoring trial: ' + evalLeft + ' left'));
+    }
+    const bc = Number(u.bonusChat || 0), be = Number(u.bonusEval || 0);
+    if (bc > 0 || be > 0) lines.push('🎁 ' + T('加量包:對話 +' + bc + '・評分 +' + be, '加量包:对话 +' + bc + '・评分 +' + be, 'Booster pack: chat +' + bc + ' · scoring +' + be));
+    rows.innerHTML = lines.map(x => '<div>' + x + '</div>').join('');
+    box.style.display = 'block';
+  } catch (e) { /* 顯示失敗就不擋帳號頁 */ }
+}
+
 function renderSubscription(sub) {
  _sub = sub;
  const planLabel = document.getElementById('planLabel');

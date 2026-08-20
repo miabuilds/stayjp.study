@@ -113,6 +113,18 @@ service cloud.firestore {
       allow write: if false;  // 只有 Cloud Function (Admin SDK) 能寫
     }
 
+    // AI 用量(帳號頁「今日額度」顯示用)— 只能讀自己的;只有 Cloud Function 寫
+    match /ai_usage/{uid} {
+      allow read: if request.auth != null && request.auth.uid == uid;
+      allow write: if false;
+    }
+
+    // AI 額度參數(帳號頁顯示上限用;無敏感內容)
+    match /config/ai {
+      allow read: if true;
+      allow write: if false;
+    }
+
     // 早鳥計數器
     match /counters/{name} {
       allow read: if true;  // 前端 paywall 要顯示「剩 X 名」
