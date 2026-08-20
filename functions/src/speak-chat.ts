@@ -122,6 +122,23 @@ export const speakChat = functions.onRequest(
       const hist = Array.isArray(history) ? history.filter(h => h && h.text) : [];
       const userTurns = hist.filter(h => h.role === "me").length;
 
+      // 輸入轉日文:使用者打中文/英文 → 翻成自然日文讓對話繼續(附屬功能,不另計量)
+      if (mode === "toJa") {
+        const text = String(req.body?.text || "").slice(0, 200).trim();
+        if (!text) { res.status(400).json({ error: "missing_text" }); return; }
+        const up = await fetch("https://api.anthropic.com/v1/messages", {
+          method: "POST",
+          headers: { "content-type": "application/json", "x-api-key": ANTHROPIC_API_KEY.value(), "anthropic-version": "2023-06-01" },
+          body: JSON.stringify({ model: MODEL, max_tokens: 120,
+            system: "把使用者這句話轉成自然的日文口語(對話中的一句)。如果輸入本身已經是自然的日文,一字不改原樣返回。只輸出日文句子本身,絕不加解釋、引號或其他文字。",
+            messages: [{ role: "user", content: text }] }),
+        });
+        if (!up.ok) { res.status(502).json({ error: "translate_failed" }); return; }
+        const d: any = await up.json();
+        const ja = (d.content && d.content[0] && d.content[0].text || "").trim();
+        res.json({ ja }); return;
+      }
+
       if (mode === "review") {
         // 點評附屬於場,不另計量;歷史全量給(點評需要完整對話)
         const transcript = hist.map(h => `${h.role === "me" ? "學生" : "AI"}: ${h.text}`).join("\n");

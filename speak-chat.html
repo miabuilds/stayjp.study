@@ -293,7 +293,7 @@ function renderMsgs(streamingAi){
   let html = '';
   for(const m of history){
     if(m.role==='me'){
-      html += `<div class="msg me"><div class="bubble me"><div class="bjp">${esc(m.text)}</div></div></div>`;
+      html += `<div class="msg me"><div class="bubble me"><div class="bjp">${esc(m.text)}</div>${m.orig?`<div class="bzh">${esc(m.orig)}</div>`:''}</div></div>`;
     } else {
       html += aiBubble(m);
       if(m.coach) html += `<div class="coach"><b>${enOr('教練','Coach')}</b>:${esc(cvt(m.coach))}</div>`;
@@ -395,7 +395,14 @@ async function turn(){
 function appendErr(msg){ const box=document.getElementById('msgs'); box.insertAdjacentHTML('beforeend',`<div class="err">${enOr('出錯了:','Error: ')}${esc(msg)}</div>`); }
 function setBusy(b){ document.getElementById('sendBtn').disabled=b; }
 
-function sendMine(){
+// 非日文偵測:有假名=日文;有英文字母或純漢字(可能是中文)→ 丟後端正規化(自然日文會原樣返回)
+function needsJa(t){
+  if(/[ぁ-ゖァ-ヺー]/.test(t)) return false;
+  if(/[a-zA-Z]{2,}/.test(t)) return true;
+  if(/[\u4e00-\u9fff]/.test(t)) return true;
+  return false;
+}
+async function sendMine(){
   const el=document.getElementById('say'); const txt=(el.value||'').trim();
   if(!txt || busy) return;
   // 每場 12 輪封頂(成本天花板):到頂自動進點評收尾
@@ -403,7 +410,20 @@ function sendMine(){
     appendErr(enOr('這場聊得很充實了!幫你整理點評 🙌','Great session! Putting together your review 🙌')); setTimeout(endChat, 800); return;
   }
   hardStopRec();
-  history.push({ role:'me', text:txt });
+  let showTxt=txt, origTxt=null;
+  if(needsJa(txt) && auth.currentUser){
+    setBusy(true);
+    const n0=document.getElementById('inNote'); if(n0) n0.textContent=enOr('把你的話翻成日文中…','Translating to Japanese…');
+    try{
+      const tk=await auth.currentUser.getIdToken();
+      const r0=await fetch(FN_CHAT,{ method:'POST', headers:{'Content-Type':'application/json',Authorization:'Bearer '+tk}, body:JSON.stringify({ mode:'toJa', text:txt }) });
+      const d0=await r0.json();
+      if(r0.ok && d0.ja && d0.ja.trim() && d0.ja.trim()!==txt){ origTxt=txt; showTxt=d0.ja.trim(); }
+    }catch(e){}
+    setBusy(false);
+    const n1=document.getElementById('inNote'); if(n1) n1.textContent=noteIdle();
+  }
+  history.push({ role:'me', text:showTxt, orig:origTxt });
   el.value=''; autoGrow();
   renderHints([]);   // 你已經回了 → 清掉上一輪建議
   renderMsgs();
