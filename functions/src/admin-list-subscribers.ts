@@ -18,7 +18,7 @@ export const adminListSubscribers = functions.onRequest(
     invoker: "public",
     maxInstances: 2,
     timeoutSeconds: 60,
-    memory: "256MiB",
+    memory: "512MiB",
     concurrency: 10,
   },
   async (req, res) => {
@@ -32,12 +32,19 @@ export const adminListSubscribers = functions.onRequest(
         .where("subscription.status", "in", ["active", "trialing", "cancelled", "refunded", "expired"])
         .limit(500).get();
 
-      const subscribers = (await Promise.all(snap.docs.map(async (doc) => {
-        if (doc.id.startsWith("$RCAnonymousID")) return null;   // 匿名購買遺留的假 user doc → 不列入訂閱者
+      // email 反查改批次 getUsers(每批 100):原本 500 個逐一 getUser,高記憶體+慢 → OOM(2026-08-20 爆過)
+      const docsOk = snap.docs.filter((doc) => !doc.id.startsWith("$RCAnonymousID"));
+      const emailMap = new Map<string, string>();
+      for (let i = 0; i < docsOk.length; i += 100) {
+        try {
+          const batch = await admin.auth().getUsers(docsOk.slice(i, i + 100).map((doc) => ({ uid: doc.id })));
+          batch.users.forEach((u) => emailMap.set(u.uid, u.email || ""));
+        } catch { /* 整批失敗就留空 email,不擋清單 */ }
+      }
+      const subscribers = (await Promise.all(docsOk.map(async (doc) => {
         const d = doc.data();
         const s = (d.subscription || {}) as Record<string, unknown>;
-        let email = "";
-        try { email = (await admin.auth().getUser(doc.id)).email || ""; } catch { /* user 可能已刪 */ }
+        const email = emailMap.get(doc.id) || "";
         return {
           uid: doc.id,
           email,

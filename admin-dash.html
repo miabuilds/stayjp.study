@@ -333,9 +333,11 @@ function renderReconcile(){
 
 function renderPlans(){
   const g={}; PLAN_ORDER.forEach(p=>g[p]={a:0,t:0});
-  SUBS.forEach(s=>{ if(s.is_sandbox)return; const p=s.plan; if(!g[p])g[p]={a:0,t:0}; if(s.status==='active')g[p].a++; else if(s.status==='trialing')g[p].t++; });
+  let gift=0;   // 贈送(is_gift):不是付費客戶,不入方案數,另立一張卡
+  SUBS.forEach(s=>{ if(s.is_sandbox)return; if(s.is_gift){ if(s.status==='active'||s.status==='trialing')gift++; return; } const p=s.plan; if(!g[p])g[p]={a:0,t:0}; if(s.status==='active')g[p].a++; else if(s.status==='trialing')g[p].t++; });
   document.getElementById('plans').innerHTML = PLAN_ORDER.map(p=>{ const x=g[p]||{a:0,t:0};
-    return '<div class="plan"><div class="pn">'+(PLAN_NAME[p]||p)+'</div><div class="pc num">'+x.a+' <small>訂閱中'+(x.t?' · '+x.t+' 試用':'')+'</small></div></div>'; }).join('');
+    return '<div class="plan"><div class="pn">'+(PLAN_NAME[p]||p)+'</div><div class="pc num">'+x.a+' <small>訂閱中'+(x.t?' · '+x.t+' 試用':'')+'</small></div></div>'; }).join('')
+    + (gift?'<div class="plan" style="opacity:.6"><div class="pn">🎁 贈送</div><div class="pc num">'+gift+' <small>非付費</small></div></div>':'');
 }
 
 function renderPayout(){
