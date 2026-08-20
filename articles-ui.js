@@ -49,10 +49,17 @@ window.Articles = (function () {
     var toks = window.ARTICLE_TOKENS && window.ARTICLE_TOKENS[clean];
     if (!toks) return fr(s);                        // 無斷詞資料 → 退回既有引擎
     var look = window.furiLookup || function () { return null; };
-    return toks.map(function (t) {
+    var NUMK = /^[一二三四五六七八九十百千万]+$/;   // 純數字漢字 token
+    return toks.map(function (t, ti) {
       var surf = t.s, base = t.b || surf;
       var eSurf = look(surf);
-      var frd = (eSurf && eSurf.r) || t.r || '';    // furigana：VOCAB 人工讀音優先，否則 kuromoji 表層讀音
+      var isNum = NUMK.test(surf);
+      // 數字漢字:單字表的「單獨讀法」(十=とお)會蓋掉語境讀音(十時=じゅう)→ 數字一律用斷詞讀音;
+      // 連續數字串(二+十+四)逐字讀必錯(にとおよん)→ 整串不標注,寧可不標也不標錯
+      var prevNum = ti > 0 && NUMK.test(toks[ti - 1].s), nextNum = ti + 1 < toks.length && NUMK.test(toks[ti + 1].s);
+      var frd = isNum
+        ? ((prevNum || nextNum) ? '' : (t.r || ''))
+        : ((eSurf && eSurf.r) || t.r || '');        // furigana:VOCAB 人工讀音優先,否則 kuromoji 表層讀音
       var inner = rubyToken(surf, frd);
       if (!t.k) {
         // 非內容詞(助詞/助動詞/語尾)：查機能語字典,有解釋就可點(回饋:初學者最想知道は、を、ます是什麼)
@@ -685,7 +692,8 @@ window.Articles = (function () {
         continue;
       }
       var e = look(t.s);
-      var rd = (e && e.r) || t.r || t.s;
+      // 數字漢字同 frTok:不用單字表的單獨讀法(十=とお),用斷詞的語境讀音(じゅう)
+      var rd = /^[一二三四五六七八九十百千万]+$/.test(t.s) ? (t.r || t.s) : ((e && e.r) || t.r || t.s);
       var prev = groups[groups.length - 1];
       if (!t.k && prev && !prev.p && !prev.punct) { prev.kana += rd; continue; }   // 語尾(ます/た/て…)接前一個內容詞組
       groups.push({ kana: rd });
