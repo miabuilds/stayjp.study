@@ -543,7 +543,7 @@ async function renderRefunds() {
    return `<div style="border-bottom:1px solid var(--bd);padding:10px 0${done ? ';opacity:.5' : ''}">
      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
        <strong style="color:var(--tx)">${esc(x.email || x.uid)}</strong>
-       <span>· ${SUB_PLAN_TXT[x.plan] || x.plan || ''} · ${esc((x.pay_type || '').toUpperCase())}</span>
+       <span>· ${x.type==='gift'?'🎁 贈送':(SUB_PLAN_TXT[x.plan] || x.plan || '')} · ${esc((x.pay_type || '').toUpperCase())}</span>
        <span style="color:#16A34A;font-weight:600">實退 NT$${x.net_refund}</span>
        <span style="color:var(--tx3);font-size:11px">(退 ${x.refund_amount} − 手續費 ${x.transfer_fee}) · ${t}</span>
        ${done ? '<span style="color:var(--tx3);margin-left:auto">✓ 已處理</span>' : `<button class="btn" style="font-size:11px;padding:3px 9px;margin-left:auto" onclick="markRefundDone('${d.id}')">標記已處理</button>`}
@@ -573,7 +573,7 @@ async function loadPaypalPending() {
    box.innerHTML = snap.docs.map(d => {
      const x = d.data();
      const t = x.created_at && x.created_at.toDate ? x.created_at.toDate().toLocaleString('zh-TW') : '';
-     const plan = SUB_PLAN_TXT[x.plan] || x.plan || '—';
+     const plan = x.type==='gift' ? '🎁 贈送' : (SUB_PLAN_TXT[x.plan] || x.plan || '—');
      return `<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;border-bottom:1px solid var(--bd);padding:6px 0">
        <span style="color:var(--tx)">${x.email || x.uid}</span>
        <span>· ${plan}</span>
@@ -974,7 +974,7 @@ async function renderLedger() {
         time: fmt(x.occurred_at),
         who: uidEmail[x.uid] || x.uid || '',
         type: txnTypeLabel(x),
-        plan: SUB_PLAN_TXT[x.plan] || (x.plan && x.plan !== 'n/a' ? x.plan : ''),
+        plan: x.type==='gift' ? '贈送' : (SUB_PLAN_TXT[x.plan] || (x.plan && x.plan !== 'n/a' ? x.plan : '')),
         amount: amt,
         pay: PAY_TXT[x.payment_method] || x.payment_method || '',
         status: TXN_STATUS_TXT[x.status] || x.status || '',
@@ -998,7 +998,7 @@ async function renderLedger() {
         <td style="padding:6px 6px;white-space:nowrap">${x.is_sandbox?'<span style="color:#F59E0B">🧪</span> ':''}${fmt(x.occurred_at)}</td>
         <td style="padding:6px 6px">${esc(uidEmail[x.uid] || x.uid.slice(0, 10))}</td>
         <td style="padding:6px 6px;white-space:nowrap">${txnTypeLabel(x)}</td>
-        <td style="padding:6px 6px;white-space:nowrap">${SUB_PLAN_TXT[x.plan] || (x.plan && x.plan !== 'n/a' ? x.plan : '—')}</td>
+        <td style="padding:6px 6px;white-space:nowrap">${x.type==='gift' ? '🎁 贈送' : (SUB_PLAN_TXT[x.plan] || (x.plan && x.plan !== 'n/a' ? x.plan : '—'))}</td>
         <td style="padding:6px 6px;text-align:right;white-space:nowrap">${amtCell}</td>
         <td style="padding:6px 6px;white-space:nowrap">${PAY_TXT[x.payment_method] || x.payment_method || '—'}</td>
         <td style="padding:6px 6px">${TXN_STATUS_TXT[x.status] || x.status}</td>
@@ -1296,7 +1296,7 @@ async function loadRedeemUses() {
       + '</tr></thead><tbody>'
       + snap.docs.map(d => { const x = d.data(); const s = byUid[x.uid];
         const when = x.redeemed_at ? new Date(Number(x.redeemed_at)).toLocaleString('zh-TW', { hour12: false }) : '—';
-        const cur = s ? ((SUB_PLAN_TXT[s.plan] || s.plan || '') + ' · ' + (SUB_STATUS_TXT[s.status] || s.status || '') + (s.expiresAt ? ' · 到期 ' + new Date(Number(s.expiresAt)).toLocaleDateString('zh-TW') : '')) : '<span style="color:var(--tx3)">查無(未同步/已刪)</span>';
+        const cur = s ? ((s.is_gift ? '🎁 贈送' : (SUB_PLAN_TXT[s.plan] || s.plan || '')) + ' · ' + (SUB_STATUS_TXT[s.status] || s.status || '') + (s.expiresAt ? ' · 到期 ' + new Date(Number(s.expiresAt)).toLocaleDateString('zh-TW') : '')) : '<span style="color:var(--tx3)">查無(未同步/已刪)</span>';
         return '<tr style="border-top:1px solid var(--bd)"><td style="padding:6px 8px;white-space:nowrap">' + when + '</td><td style="padding:6px 8px">' + escapeHtml(x.email || x.uid || '—') + '</td><td style="padding:6px 8px"><code>' + escapeHtml(x.code || '') + '</code></td><td style="padding:6px 8px">' + cur + '</td></tr>';
       }).join('') + '</tbody></table>';
   } catch (e) { box.textContent = '讀取失敗:' + e.message + (/index/i.test(e.message) ? '(需要 Firestore 索引 → 點錯誤裡的連結建一下)' : ''); }
@@ -1465,7 +1465,7 @@ async function showTxns(uid, email) {
         if (incomplete) amtHTML = `<span style="color:var(--tx3);font-weight:400">NT$${Math.abs(amt).toLocaleString()} <small>未扣款</small></span>`;
         else if (amt !== 0) amtHTML = `<span style="color:${amt > 0 ? '#16A34A' : '#EF4444'}">${amt > 0 ? '+' : '-'}NT$${Math.abs(amt).toLocaleString()}</span>`;
         else amtHTML = '<span style="color:var(--tx3);font-weight:400">—</span>';
-        const plan = SUB_PLAN_TXT[x.plan] || (x.plan && x.plan !== 'n/a' ? x.plan : '');
+        const plan = x.type==='gift' ? '🎁 贈送' : (SUB_PLAN_TXT[x.plan] || (x.plan && x.plan !== 'n/a' ? x.plan : ''));
         return `<div class="txn-modal-card"${incomplete ? ' style="opacity:.6"' : ''}>
           <div class="t-top">
             <span class="t-type">${txnTypeLabel(x)}${plan ? ' · ' + plan : ''}</span>
