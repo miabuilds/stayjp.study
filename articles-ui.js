@@ -468,6 +468,7 @@ window.Articles = (function () {
     document.getElementById('artMask').scrollTop = 0;
     renderTab('read');
     try { if (typeof track === 'function') track('article_read', { id: id, level: a.level }); } catch (e) {}
+    preloadSent(0); preloadSent(1);   // 開文章先載前兩句,按播放零等待
   }
   function tabBtn(k, label) { return '<button class="art-tab' + (curTab === k ? ' on' : '') + '" data-tab="' + k + '" onclick="Articles.tab(\'' + k + '\')">' + label + '</button>'; }
 
@@ -529,7 +530,7 @@ window.Articles = (function () {
           var idx = si++; sentSeq.push({ text: clean, i: idx });
           // 句首 ▶:明確的「播這一句」目標(單字都被字典點擊佔用,句子本身難點到)
           sp = '<span class="art-s" id="artS' + idx + '" onclick="Articles.playFrom(' + idx + ')">' +
-            '<button class="art-sp" title="' + enOr('播放這句', 'Play sentence') + '" onclick="event.stopPropagation();Articles.playFrom(' + idx + ')">▶</button>' +
+            '<button class="art-sp" title="' + enOr('播放/暫停這句', 'Play / pause sentence') + '" onclick="event.stopPropagation();Articles.spTap(' + idx + ')">▶</button>' +
             frFn(s) + '</span>';
         } else {
           sp = '<span class="art-s" style="padding-left:6px">' + frFn(s) + '</span>';
@@ -739,7 +740,14 @@ window.Articles = (function () {
   // ─────────── 底部連播播放器(自建 Audio 佇列,只播預錄 mp3)───────────
   // 朗讀速度:預設 0.85(使用者回饋 1.0 偏快、跟不上);記住上次選的。
   var _savedRate = parseFloat(typeof localStorage !== 'undefined' && localStorage.getItem('art_rate'));
-  var pl = { audio: null, idx: -1, playing: false, rate: (_savedRate > 0 ? _savedRate : 0.85), token: 0 };
+  var pl = { audio: null, idx: -1, playing: false, rate: (_savedRate > 0 ? _savedRate : 0.85), token: 0, pre: {} };
+  // 預載句子 mp3:按播放才 new Audio 會先等下載(使用者回饋「按了好幾秒才播」)。
+  // 開文章先載前兩句;播放中滾動預載 n+1/n+2 → 按下即播、句間無縫。
+  function preloadSent(n) {
+    var it = sentSeq[n]; if (!it) return;
+    var k = it.text; if (pl.pre[k]) return;
+    try { var a = new Audio(ttsPath(k)); a.preload = 'auto'; pl.pre[k] = a; } catch (e) {}
+  }
   var RATES = [0.6, 0.75, 0.85, 1.0, 1.25, 1.5];
   function setPText() { var e = document.getElementById('artPText'); if (e) e.textContent = (pl.idx >= 0 ? (pl.idx + 1) : '—') + ' / ' + (sentSeq.length || '—'); }
   function highlight(i) {
@@ -754,8 +762,13 @@ window.Articles = (function () {
     var myToken = ++pl.token;
     function step(n) {
       if (n >= sentSeq.length) { pl.playing = false; pl.idx = -1; setBtn(); highlight(-1); setPText(); return; }
-      pl.idx = n; highlight(n); setPText();
-      var au = new Audio(ttsPath(sentSeq[n].text)); au.playbackRate = pl.rate; pl.audio = au;
+      pl.idx = n; highlight(n); setPText(); setBtn();
+      var _key = sentSeq[n].text;
+      var au = pl.pre[_key] || new Audio(ttsPath(_key));
+      delete pl.pre[_key];
+      try { au.currentTime = 0; } catch (e) {}
+      au.playbackRate = pl.rate; pl.audio = au;
+      preloadSent(n + 1); preloadSent(n + 2);
       // 逐詞高亮:依 VOICEVOX 時間軸,把 .cur 框移到目前唸到的詞(對齊實際發音);無時間軸則整句淡底即可
       var el = document.getElementById('artS' + n);
       var tm = window.ARTICLE_TIMINGS && window.ARTICLE_TIMINGS[sentSeq[n].text];
@@ -792,7 +805,17 @@ window.Articles = (function () {
     playFrom(pl.idx >= 0 ? pl.idx : 0);
   }
   function stopPlay() { pl.token++; if (pl.audio) { try { pl.audio.pause(); pl.audio.src = ''; } catch (e) {} pl.audio = null; } pl.playing = false; setBtn(); }
-  function setBtn() { var b = document.getElementById('artPlayBtn'); if (b) b.textContent = pl.playing ? '⏸' : '▶'; }
+  function setBtn() {
+    var b = document.getElementById('artPlayBtn'); if (b) b.textContent = pl.playing ? '⏸' : '▶';
+    // 單句 icon 跟主播放鈕同步:正在播的那句顯示 ⏸,其他都是 ▶(使用者回饋:只有下排會切換)
+    var sps = document.querySelectorAll('.art-sp');
+    for (var i = 0; i < sps.length; i++) sps[i].textContent = (pl.playing && i === pl.idx) ? '⏸' : '▶';
+  }
+  // 點句子旁的播放鈕:同句=暫停/續播;異句=從那句開始播
+  function spTap(i) {
+    if (pl.idx === i && pl.audio) { togglePlay(); return; }
+    playFrom(i);
+  }
   // 速度 −/＋ 步進(取代原本「點一下循環」,不用點一整圈才回到最慢)。記住選擇。
   function stepRate(dir) {
     var i = RATES.indexOf(pl.rate);
@@ -833,7 +856,7 @@ window.Articles = (function () {
   return {
     open: open, close: close, read: read, tab: tab, entryCardHtml: entryCardHtml,
     toggleFuri: toggleFuri, toggleZh: toggleZh, toggleRomaji: toggleRomaji, cycleFs: cycleFs,
-    playFrom: playFrom, togglePlay: togglePlay, stepRate: stepRate, say: say,
+    playFrom: playFrom, togglePlay: togglePlay, stepRate: stepRate, say: say, spTap: spTap,
     toggleRepeat: toggleRepeat, toggleSingle: toggleSingle,
     answer: answer, quizNext: quizNext, gd: gd, done: done
   };

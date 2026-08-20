@@ -71,11 +71,13 @@ const Listening = (() => {
         if (__lsToken !== myToken) { try { audio.pause(); audio.src=''; } catch(e){} return; }
         __lsAudio = audio;
       }).catch(() => {
-        if (__lsToken === myToken) speakBrowser(t2, rate);
+        // 全站政策:絕不退瀏覽器機器音。真載入失敗給提示,不出戲。
+        if (__lsToken === myToken && typeof showToast === 'function') showToast('音檔載入失敗,請檢查網路後再按一次 🔊');
       });
       return;
     }
-    speakBrowser(t2, rate);
+    // 沒預錄音檔=資料缺口(收集器已全量覆蓋,理論上不會走到);靜默並提示,不用機器音充數
+    if (typeof showToast === 'function') showToast('這題音檔暫缺,已記錄,近期補上 🙏');
   }
   function speakBrowser(text, rate) {
     if (!window.speechSynthesis) { alert(t('ls_no_tts')); return; }

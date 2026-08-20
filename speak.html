@@ -303,9 +303,9 @@ function speak(){
     // App 內(有 OTA 的版本)交給原生播,繞開 WKWebView 錄音後播放被悶的問題
     if(window.STAYJP_NATIVE && window.STAYJP_NATIVE.canPlayB64){ _nPost({type:'PLAY_URL', url:new URL(rel, location.href).href}); return; }
     _demo = new Audio(rel);
-    _demo.play().catch(()=>browserSpeak(cur().kana));
+    _demo.play().catch(()=>{});   // 連點中斷屬正常;真失敗也不退瀏覽器機器音(全站政策)
   } else {
-    browserSpeak(cur().kana);
+    document.getElementById('recNote').textContent = enOr('這句音檔暫缺,已記錄。可先自己念+送出評分。','Audio for this sentence is missing — you can still practice and submit.');
   }
 }
 
