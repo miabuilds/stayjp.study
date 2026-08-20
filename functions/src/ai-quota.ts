@@ -32,8 +32,14 @@ export async function getAiConfig(): Promise<AiConfig> {
 
 async function isPremium(uid: string): Promise<boolean> {
   try {
-    const snap = await admin.firestore().doc("users/" + uid).get();
-    const sub = (snap.data() || {}).subscription;
+    // 白名單(free_users/{uid})= Premium 等級:前端工具額度早就全開,AI 額度也要對齊,
+    // 否則白名單的人被當免費用戶(總量 1 場對話),用完就卡死——2026-08 KOL 實測踩到。
+    const [userSnap, freeSnap] = await Promise.all([
+      admin.firestore().doc("users/" + uid).get(),
+      admin.firestore().doc("free_users/" + uid).get(),
+    ]);
+    if (freeSnap.exists) return true;
+    const sub = (userSnap.data() || {}).subscription;
     if (!sub) return false;
     if (sub.status !== "active" && sub.status !== "trialing" && sub.status !== "cancelled") return false;
     return (sub.expiresAt || 0) > Date.now();
