@@ -448,6 +448,7 @@ const Stats = (() => {
   function _answerWeak(idx) {
     const s = Stats._wqState;
     const q = s.questions[s.cur];
+    try { if (q.word && typeof speak === 'function') speak(q.word.w); } catch (e) {}   // 答題即唸,字+聲同時加深
     const correct = idx === q.correctIdx;
     if (correct) s.score++;
     s.results.push({ word: q.word, correct, chosenIdx: idx, correctIdx: q.correctIdx, options: q.options });
@@ -591,6 +592,7 @@ const Stats = (() => {
   }
   function _wqAnswer(i) {
     const w = _wq.arr[_wq.cur];
+    try { if (typeof speak === 'function') speak(w.w || w.word); } catch (e) {}   // 答題即唸
     const ok = i === w.correctIdx;
     if (ok) _wq.correct++;
     document.querySelectorAll('#wqOpts .qopt').forEach((b, idx) => {

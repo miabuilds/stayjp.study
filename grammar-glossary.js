@@ -35,6 +35,14 @@
     '連体形': { d:'修飾名詞時用的形;常體動詞可直接接名詞。', e:'食べる+人・行った+店' }
   };
 
+  // 術語 → 站內文法條目(點 popup 裡的「完整說明」直接跳過去;含級別,解「不確定是 N 幾」)
+  var LINK = {
+    '普通形':'n5-45','普通体':'n5-45','丁寧形':'n5-13','丁寧体':'n5-13',
+    'ます形':'n5-41','連用形':'n5-41','て形':'n5-42','で形':'n5-42',
+    '辞書形':'n5-43','ない形':'n5-43','た形':'n5-44','なかった形':'n5-44',
+    '意向形':'n4-51','意志形':'n4-51','可能形':'n4-52','命令形':'n4-53','禁止形':'n4-53',
+    '条件形':'n4-54','ば形':'n4-54','受身形':'n4-59','受動形':'n4-59','使役形':'n4-60','使役受身形':'n4-61'
+  };
   var TERMS = Object.keys(G).sort(function (a, b) { return b.length - a.length; }); // 長的優先,避免「な形容詞」被「な形」搶
   function esc(s) { return String(s).replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
   var RE = new RegExp('(' + TERMS.map(esc).join('|') + ')', 'g');
@@ -64,8 +72,14 @@
     var g = G[term]; if (!g) return;
     var pop = document.getElementById('glossPop');
     if (!pop) { pop = document.createElement('div'); pop.id = 'glossPop'; document.body.appendChild(pop); }
+    var lid = LINK[term];
+    var lnk = '';
+    if (lid && typeof window.gotoGrammar === 'function') {
+      var lv = (lid.match(/^n\d/) || [''])[0].toUpperCase();
+      lnk = '<div style="margin-top:8px"><a href="#' + lid + '" onclick="gotoGrammar(\'' + lid + '\');return false;" style="color:var(--ac,#d4654a);font-weight:700;font-size:13px;text-decoration:none">📖 完整說明(' + lv + ')→</a></div>';
+    }
     pop.innerHTML = '<div class="gp-t">' + term + '</div><div class="gp-d">' + g.d + '</div>' +
-      (g.e ? '<div class="gp-e"><b>例:</b>' + g.e + '</div>' : '');
+      (g.e ? '<div class="gp-e"><b>例:</b>' + g.e + '</div>' : '') + lnk;
     pop.style.display = 'block';
     pop.style.visibility = 'hidden';
     // 先顯示量尺寸,再夾到視窗內

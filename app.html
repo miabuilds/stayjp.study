@@ -2126,6 +2126,18 @@ function updateTabs() {
     bar.innerHTML = lvs.map(l => `<button class="tab-pill ${currentLevel===l?'on':''}" onclick="switchLevel('${l}')">${l.toUpperCase()}</button>`).join('');
   }
 }
+// 跳到指定文法條目:切文法模式+對的級別 → 渲染完捲到該卡並展開(術語詞典 popup 的「完整說明」用)
+window.gotoGrammar = function (gid) {
+  var lv = (String(gid).match(/^(n\d)/) || [])[1];
+  if (!lv) return;
+  try { if (typeof hideGloss === 'function') hideGloss(); } catch (e) {}
+  if (currentMode !== 'grammar') switchMode('grammar');
+  if (currentLevel !== lv) switchLevel(lv);
+  setTimeout(function () {
+    var el = document.getElementById(gid);
+    if (el) { el.classList.add('o'); el.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+  }, 250);
+};
 function switchLevel(lv) {
   currentLevel = lv;
   localStorage.setItem('lastLevel', lv);
@@ -2239,6 +2251,25 @@ function speakBrowser(text) {
   speechSynthesis.speak(u);
 }
 let _spkSeq = 0;   // 連點防護:只有「最新一次」的錯誤才有意義,舊請求被中斷是正常現象
+// 音檔快取:一個 hash 一個 Audio。修「點 A 沒聲音、點 B 把 A 的下載取消掉」——共用單一元件時
+// 換 src 會中斷前一個下載;分開快取後各自載各自的,慢網路下最後點的那個載好就播,重訪秒響。
+const _ttsCache = {};
+const _ttsOrder = [];
+function _ttsAudioFor(hash) {
+  if (_ttsCache[hash]) return _ttsCache[hash];
+  const au = new Audio(window.ttsUrl ? window.ttsUrl(hash) : 'audio/tts/' + hash + '.mp3');
+  au.preload = 'auto';
+  _ttsCache[hash] = au; _ttsOrder.push(hash);
+  if (_ttsOrder.length > 60) { const old = _ttsOrder.shift(); try { _ttsCache[old].src = ''; } catch (e) {} delete _ttsCache[old]; }
+  return au;
+}
+// 預載一批文本的音檔(測驗下一題/下一張卡先載,點了零等待)
+window.preloadTts = function (texts) {
+  try { (texts || []).forEach(function (t2) {
+    const h = window.__TTS && window.__TTS[String(t2 || '').trim()];
+    if (h) _ttsAudioFor(h);
+  }); } catch (e) {}
+};
 function speak(text) {
   const t = (text || '').trim();
   if (!t) return;
@@ -2249,13 +2280,15 @@ function speak(text) {
   // 之前的坑:連點時前一個 play() 被中斷拋 AbortError → catch 誤觸發瀏覽器語音 →「有時機器音」。
   if (!hash) { track('audio_miss', { text: t.slice(0, 40) }); return; }
   const seq = ++_spkSeq;
-  const a = getTtsAudio();               // 共用元件:設 src 直接播,不再每次 new
-  try { a.pause(); } catch (e) {}
-  a.onerror = null;                      // 舊 src 的載入中斷錯誤,不做任何事
-  a.src = window.ttsUrl ? window.ttsUrl(hash) : 'audio/tts/' + hash + '.mp3';
-  a.playbackRate = getTtsSpeed();
-  a.currentTime = 0;
-  a.play().catch(() => { if (seq === _spkSeq) track('audio_play_fail', { text: t.slice(0, 40) }); });
+  // 停掉上一個正在播的(不取消它的下載,只暫停播放)
+  if (window._ttsNow) { try { window._ttsNow.pause(); } catch (e) {} }
+  const au = _ttsAudioFor(hash);
+  au.playbackRate = getTtsSpeed();
+  try { au.currentTime = 0; } catch (e) {}
+  window._ttsNow = au;
+  au.play().then(() => {
+    if (seq !== _spkSeq) { try { au.pause(); } catch (e) {} }   // 播出來時已被更新的點擊取代 → 收回
+  }).catch(() => { if (seq === _spkSeq) track('audio_play_fail', { text: t.slice(0, 40) }); });
 }
 if (window.speechSynthesis) speechSynthesis.getVoices();
 
@@ -3957,7 +3990,7 @@ function render() {
         } catch (e) { if (exText) speak(exText); }
       };
       const _gSpk = _gEx ? `<svg class="gt-spk" onclick="event.stopPropagation();playGrammarTitle('${d.id}','${_gEx}')" title="${enOr('唸文法+例句','Play pattern + example')}" aria-label="${enOr('唸文法+例句','Play pattern + example')}" viewBox="0 0 24 24"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.54 8.46a5 5 0 010 7.07M19.07 4.93a10 10 0 010 14.14"/></svg>` : '';
-      h += `<div class="gc" id="${d.id}"><div class="gh" onclick="toggleCard(this,event)"><span class="gn">${idx}</span><span class="gt">${d.t}</span>${_gSpk}${(currentLevel==='n5'&&d.n)?'<span class="gbadge-adv">'+enOr('進階','Advanced')+'</span>':''}<svg class="star ${isFav?'on':''}" onclick="event.stopPropagation();toggleFav('${d.id}')" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg class="arr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div><div class="gb"><div class="gx"><div class="pt">${d.p}</div><div class="ep">${cvt(d.ex)}</div>${(window.GRAMMAR_DETAIL&&window.GRAMMAR_DETAIL[d.id])?`<div class="gc-detail"><button type="button" class="gd-toggle" onclick="event.stopPropagation();toggleDetail(this)">📖 ${enOr('詳解','Deep dive')} ▾</button><div class="gd-body gd-hidden">${grammarDetailHTML(window.GRAMMAR_DETAIL[d.id])}</div></div>`:''}<div class="eg">${d.eg.map(e=>{
+      h += `<div class="gc" id="${d.id}"><div class="gh" onclick="toggleCard(this,event)"><span class="gn">${idx}</span><span class="gt">${d.t}</span>${_gSpk}${(currentLevel==='n5'&&d.n)?'<span class="gbadge-adv">'+enOr('進階','Advanced')+'</span>':''}<svg class="star ${isFav?'on':''}" onclick="event.stopPropagation();toggleFav('${d.id}')" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg class="arr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div><div class="gb"><div class="gx"><div class="pt">${window.linkGrammarTerms?window.linkGrammarTerms(d.p):d.p}</div><div class="ep">${(function(){var s=cvt(d.ex);return window.linkGrammarTerms?window.linkGrammarTerms(s):s;})()}</div>${(window.GRAMMAR_DETAIL&&window.GRAMMAR_DETAIL[d.id])?`<div class="gc-detail"><button type="button" class="gd-toggle" onclick="event.stopPropagation();toggleDetail(this)">📖 ${enOr('詳解','Deep dive')} ▾</button><div class="gd-body gd-hidden">${grammarDetailHTML(window.GRAMMAR_DETAIL[d.id])}</div></div>`:''}<div class="eg">${d.eg.map(e=>{
         const pureJ = e.j.replace(/<[^>]+>/g,'').replace(/'/g,"\\'");
         return `<div class="ex" onclick="speak('${pureJ}')" title="${enOr('點方框唸例句','Tap box to hear')}"><div class="j">${window.furiganaHTMLRich?window.furiganaHTMLRich(e.j):e.j}<svg class="ex-spk" onclick="event.stopPropagation();speak('${pureJ}')" viewBox="0 0 24 24"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.54 8.46a5 5 0 010 7.07M19.07 4.93a10 10 0 010 14.14"/></svg></div><div class="z">${cvt(e.z)}</div></div>`;
       }).join('')}</div>${d.n?(currentLevel==='n5'?`<div class="nt-collapse"><button type="button" class="nt-toggle" onclick="event.stopPropagation();toggleNote(this)">展開說明 ▾</button><div class="nt nt-hidden">${cvt(d.n)}</div></div>`:`<div class="nt">${cvt(d.n)}</div>`):''}<a class="gc-report" href="${reportUrl}" target="_blank" rel="noopener">${t('report_error')}</a></div></div></div>`;

@@ -573,6 +573,7 @@ const MockExam = (() => {
     const section = sections[currentSection];
     const q = section.questions[currentQ];
     const correct = idx === q.correctIdx;
+    try { if (q.word && q.word.w && typeof speak === 'function') speak(q.word.w); } catch (e) {}   // 答題即唸單字(對錯都唸)
     const firstAnswer = answers[currentSection][currentQ] == null || answers[currentSection][currentQ] === -1;
     answers[currentSection][currentQ] = idx;
     if (firstAnswer && typeof Calendar !== 'undefined' && Calendar.logActivity) Calendar.logActivity('quiz');   // 模擬考答題算進今日目標(每題一次)
