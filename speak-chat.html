@@ -45,7 +45,9 @@
   .bjp{font-size:17px;font-weight:600}
   .bubble.ai .bjp{display:flex;align-items:flex-start;gap:8px}
   .spk{flex-shrink:0;cursor:pointer;border:0;background:none;color:var(--accent);font-size:15px;padding:0;line-height:1.4}
-  .bjp ruby rt{display:none}   /* 泡泡下方已有整句假名行,ruby 讀音不重複顯示(點字查詢仍可用) */
+  .bjp ruby rt{font-size:10px;color:var(--accent2);font-weight:500}
+  .hint-chip ruby rt{font-size:9px;opacity:.85}
+  .hint-chip .jlk{pointer-events:none;border-bottom:none}   /* 提示卡整張是按鈕,字內不攔截點擊 */
   .bkana{color:var(--accent2);font-size:12.5px;margin-top:3px}
   .bzh{color:var(--ink2);font-size:12.5px;margin-top:3px}
   .msg.me .bkana,.msg.me .bzh{color:#ffffffcc}
@@ -308,7 +310,7 @@ function aiBubble(m){
   const jp = m.jp || m.text || '';
   return `<div class="msg ai"><div class="bubble ai">
     <div class="bjp"><span>${(jp&&window.furiganaHTMLRich)?window.furiganaHTMLRich(jp):(esc(jp)||'…')}</span>${jp?`<button class="spk" title="${enOr('播放','Play')}" onclick="playTTS(${JSON.stringify(jp).replace(/"/g,'&quot;')})">🔊</button>`:''}</div>
-    ${m.kana?`<div class="bkana">${esc(m.kana)}</div>`:''}
+
     ${(showZh && m.zh)?`<div class="bzh">${esc(cvt(m.zh))}</div>`:''}
     ${(showZh && m.words)?wordChips(m.words):''}
   </div></div>`;
@@ -346,7 +348,8 @@ function expandHints(){
     _hints.slice(0,3).map(h=>{
       const parts=String(h).split(/[｜|]/); const jp=(parts[0]||'').trim(); const zh=(parts[1]||'').trim();
       if(!jp) return '';
-      return '<span class="hint-wrap"><button class="hint-chip" onclick="useHint('+JSON.stringify(jp).replace(/"/g,'&quot;')+')">'+esc(jp)+(zh?'<span class="hz">'+esc(cvt(zh))+'</span>':'')+'</button>'
+      const jpHtml = window.furiganaHTMLRich ? window.furiganaHTMLRich(jp) : esc(jp);
+      return '<span class="hint-wrap"><button class="hint-chip" onclick="useHint('+JSON.stringify(jp).replace(/"/g,'&quot;')+')">'+jpHtml+(zh?'<span class="hz">'+esc(cvt(zh))+'</span>':'')+'</button>'
         +'<button class="hint-spk" title="'+enOr('唸給我聽','Hear it')+'" onclick="event.stopPropagation();playTTS('+JSON.stringify(jp).replace(/"/g,'&quot;')+')">🔊</button></span>';
     }).join('');
 }
