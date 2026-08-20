@@ -136,8 +136,9 @@ export const speakChat = functions.onRequest(
       if (userTurns >= cfg.maxTurns) {
         res.status(429).json({ error: "turns", message: "這場聊得夠深了!按「結束・看點評」看表現吧 🙌" }); return;
       }
-      // 開新場(還沒有任何 AI 發言)才消耗「場」額度
-      if (!isAdmin && !hist.some(h => h.role === "ai")) {
+      // 「使用者送出第一句」才消耗「場」額度——AI 開場白不扣。
+      // 之前在開場白就扣,點開情境看一眼就沒了,使用者覺得「我根本沒用過」(KOL 實測回饋)。
+      if (!isAdmin && userTurns === 1) {
         const blocked = await consumeQuota(decoded.uid, "chat", cfg);
         if (blocked) { res.status(402).json({ error: "quota", message: blocked }); return; }
       }
