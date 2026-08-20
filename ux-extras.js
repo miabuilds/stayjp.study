@@ -157,7 +157,16 @@
           for (var ci = 0; ci < cands.length; ci++) {
             // rest 是 cands[ci] 的真前綴,且不只有那個漢字本身 → 判定為被截斷
             if (rest.length > 1 && cands[ci].length > rest.length && cands[ci].indexOf(rest) === 0) {
-              matched = null; break;
+              // 升級:能從完整詞條安全反推漢字讀音就標對的,推不出來才不標。
+              // 條件:詞條=「這個漢字+純假名尾」且讀音以該假名尾結尾(変わって=かわって → 変=か)
+              var cw = cands[ci], crd = dc.READ[cw] || (dc.CONJ[cw] && dc.CONJ[cw].reading) || '';
+              var tail = cw.slice(1);
+              if (crd && /^[ぁ-ゖー]+$/.test(tail) && crd.length > tail.length && crd.slice(-tail.length) === tail) {
+                matched = { sub: text[i], reading: crd.slice(0, crd.length - tail.length), entry: null, conj: null, safe1: true };
+              } else {
+                matched = null;
+              }
+              break;
             }
           }
         }
