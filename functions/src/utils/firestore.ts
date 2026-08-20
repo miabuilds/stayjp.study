@@ -49,6 +49,7 @@ export interface SubscriptionDoc {
   google_txn?: string;
   paypal_capture?: string;   // PayPal 一次性付款的 capture id;有值 = 來源為 PayPal、退費要用它
   is_early_bird?: boolean;
+  is_gift?: boolean;           // 手動贈送(0 元開通)→ 用戶端顯示「贈送」、後台/報表不計入付費客戶
   is_sandbox?: boolean;        // Apple/Google 沙盒測試購買(非真實付款)→ 後台用來區分測試/真實
   pay_type?: "credit" | "atm" | "cvs" | "paypal";   // 綠界付款細分:信用卡(可續扣)/ATM/超商(一次性,不續扣)
   refund_requested_at?: admin.firestore.Timestamp;
