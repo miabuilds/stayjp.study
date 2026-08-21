@@ -1925,13 +1925,36 @@ function loadCloudData() {
         }
         localStorage.setItem(k, JSON.stringify(merged));
       } else {
-        // Object: cloud values win if newer, local wins otherwise
         const merged = { ...d[k] };
-        Object.entries(local).forEach(([key, val]) => {
-          if (!merged[key]) merged[key] = val;
-          else if (val && typeof val === 'object' && val.lastReview && (!merged[key].lastReview || val.lastReview > merged[key].lastReview)) merged[key] = val;
-        });
-        localStorage.setItem(k, JSON.stringify(merged));
+        if (k === 'study_log') {
+          // 學習日曆:按「日期聯集、同日各項取最大」合併——原本同日雲端整筆蓋本機,
+          // 而上傳又是整包覆蓋,兩台裝置輪流用會互吃日期 → 連勝天數兩邊不一致(用戶回報)。
+          let changed = false;
+          Object.entries(local).forEach(([date, val]) => {
+            const c = merged[date];
+            if (!c) { merged[date] = val; changed = true; }
+            else {
+              const mx = {
+                vocab: Math.max(c.vocab || 0, (val && val.vocab) || 0),
+                grammar: Math.max(c.grammar || 0, (val && val.grammar) || 0),
+                quiz: Math.max(c.quiz || 0, (val && val.quiz) || 0),
+                minutes: Math.max(c.minutes || 0, (val && val.minutes) || 0),
+              };
+              if (JSON.stringify(mx) !== JSON.stringify(c)) changed = true;
+              merged[date] = mx;
+            }
+          });
+          localStorage.setItem(k, JSON.stringify(merged));
+          // 本機有雲端沒有的資料 → 回寫,讓另一台下次載入就拿到聯集(雙向收斂)
+          if (changed) setTimeout(() => { try { saveAllCloud(); } catch (e) {} }, 1200);
+        } else {
+          // Object: cloud values win if newer, local wins otherwise
+          Object.entries(local).forEach(([key, val]) => {
+            if (!merged[key]) merged[key] = val;
+            else if (val && typeof val === 'object' && val.lastReview && (!merged[key].lastReview || val.lastReview > merged[key].lastReview)) merged[key] = val;
+          });
+          localStorage.setItem(k, JSON.stringify(merged));
+        }
       }
     });
     // Backfill study_log from quiz_history for dates missing from calendar
