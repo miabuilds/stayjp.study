@@ -220,6 +220,26 @@
     ].join('');
     document.head.appendChild(st);
   }
+  // 雲端發音兜底(預錄缺口):ttsSpeak function 以假名合成;記憶體快取,登出/失敗靜默
+  var _cloudCache = {};
+  var _cloudAu = null;
+  function cloudSay(kana) {
+    try {
+      if (!kana) return;
+      if (_cloudCache[kana]) { try { _cloudAu && _cloudAu.pause(); } catch (e2) {} _cloudAu = new Audio('data:audio/mp3;base64,' + _cloudCache[kana]); _cloudAu.play().catch(function(){}); return; }
+      var user = (typeof firebase !== 'undefined' && firebase.auth) ? firebase.auth().currentUser : null;
+      if (!user) return;
+      user.getIdToken().then(function (tk) {
+        return fetch('https://asia-east1-jpnote-1bdd6.cloudfunctions.net/ttsSpeak', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + tk }, body: JSON.stringify({ text: kana, voice: 'f' }) });
+      }).then(function (r) { return r.json(); }).then(function (d) {
+        if (!d || !d.audio) return;
+        _cloudCache[kana] = d.audio;
+        try { _cloudAu && _cloudAu.pause(); } catch (e2) {}
+        _cloudAu = new Audio('data:audio/mp3;base64,' + d.audio);
+        _cloudAu.play().catch(function(){});
+      }).catch(function(){});
+    } catch (e) {}
+  }
   function closePop() { if (_pop) { _pop.remove(); _pop = null; } }
   // 常查單字:自動記錄每次點查的次數,供「常查複習」用(存 localStorage)
   function lookHist() { try { return JSON.parse(localStorage.getItem('lookup_history')) || {}; } catch (e) { return {}; } }
@@ -270,9 +290,16 @@
     pop.style.left = left + 'px';
     pop.style.top = top + 'px';
     pop.querySelector('.jx').addEventListener('click', function (e) { e.stopPropagation(); closePop(); });
-    // 🔊 發音(用預錄 mp3,沒有就退瀏覽器語音,交給 speak 判斷)
+    // 🔊 發音:預錄 mp3 依「讀音→詞」順序找鍵(音檔有的以詞為鍵、有的以假名為鍵);
+    // 都沒有 → 登入者用雲端 TTS 以假名讀音即時合成(字音必對),絕不無聲、絕不瀏覽器機器音。
     var spk = pop.querySelector('.jact-spk');
-    if (spk) spk.addEventListener('click', function (e) { e.stopPropagation(); if (typeof speak === 'function') speak(data.r || data.w); });
+    if (spk) spk.addEventListener('click', function (e) {
+      e.stopPropagation();
+      var T = window.__TTS || {};
+      var key = T[data.r] ? data.r : (T[data.w] ? data.w : null);
+      if (key) { if (typeof speak === 'function') speak(key); return; }
+      cloudSay(data.r || data.w);
+    });
     // ☆ 收藏 → 生字本
     var fav = pop.querySelector('.jact-fav');
     if (fav) {
