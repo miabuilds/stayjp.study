@@ -8,7 +8,12 @@ window.Articles = (function () {
   var LVC = { n5: ['#34d399', '#059669'], n4: ['#22d3ee', '#0891b2'], n3: ['#60a5fa', '#2563eb'], n2: ['#a78bfa', '#7c3aed'], n1: ['#fb7185', '#e11d48'] };
   var furiOn = true, fsIdx = 1, curId = null, curTab = 'read';
   function posOn(){ try{ return localStorage.getItem('art_pos_off')!=='1'; }catch(e){ return true; } }
-  function togglePos(){ try{ localStorage.setItem('art_pos_off', posOn()?'1':'0'); }catch(e){} if(curId) read(curId); }
+  function togglePos(){
+    try{ localStorage.setItem('art_pos_off', posOn()?'1':'0'); }catch(e){}
+    var mk=document.querySelector('.art-mask'); if(mk) mk.classList.toggle('pos-off', !posOn());
+    var b=Array.from(document.querySelectorAll('.art-tbtn')).find(x=>x.textContent.indexOf('詞性')>=0||x.textContent.indexOf('POS')>=0);
+    if(b) b.classList.toggle('on', posOn());
+  }
   var FS = ['18px', '20px', '23px'];   // 字級三段
   function list() { return window.ARTICLES || []; }
   // 三語:en→英文;zh-CN→OpenCC 轉簡(cvt);zh-TW→原樣繁體
@@ -78,12 +83,7 @@ window.Articles = (function () {
       if (!e && window.dictExtra) e = window.dictExtra(base) || window.dictExtra(surf);      // 文章補充字典(未收錄詞根治)
       var w = base, r = (e && e.r) || t.r || frd || '', m = e ? Lc(e.m, e.m_en) : '', c = (e && e.c) || '';
       var f = t.b ? enOr('活用形', 'conj.') : '';
-      var posCls = '';
-      if (posOn()) {
-        if (/動/.test(c)) posCls = ' pos-v';
-        else if (/形/.test(c)) posCls = ' pos-a';
-        else if (/副/.test(c)) posCls = ' pos-adv';
-      }
+      var posCls = /動/.test(c) ? ' pos-v' : (/形/.test(c) ? ' pos-a' : (/副/.test(c) ? ' pos-adv' : ''));
       return '<span class="aw jlk' + posCls + '" role="button" tabindex="0" data-w="' + esc(w) + '" data-r="' + esc(r)
         + '" data-m="' + esc(m) + '" data-c="' + esc(c) + '"' + (f ? ' data-f="' + esc(f) + '"' : '') + '>' + inner + '</span>';
     }).join('');
@@ -197,7 +197,8 @@ window.Articles = (function () {
         var d = unitData(ck);
         var ch = fr(ck);
         if (d) {
-          return '<span class="aw jlk" role="button" tabindex="0" data-w="' + esc(d.w) + '" data-r="' + esc(d.r)
+          var pc = /動/.test(d.c||'') ? ' pos-v' : (/形/.test(d.c||'') ? ' pos-a' : (/副/.test(d.c||'') ? ' pos-adv' : ''));
+          return '<span class="aw jlk' + pc + '" role="button" tabindex="0" data-w="' + esc(d.w) + '" data-r="' + esc(d.r)
             + '" data-m="' + esc(d.m) + '" data-c="' + esc(d.c) + '"' + (d.f ? ' data-f="' + esc(d.f) + '"' : '') + '>' + ch + '</span>';
         }
         return '<span class="aw">' + ch + '</span>';
@@ -316,9 +317,10 @@ window.Articles = (function () {
       '.art-sp:hover{background:rgba(232,115,74,.12)}',
       '.art-s.on .art-sp,.art-s.flat .art-sp{background:#e8734a;border-color:#e8734a;color:#fff}',
       // 詞性淡底(可關):動詞=暖橘、形容詞=淡綠、副詞=淡紫;名詞不上色,保持乾淨
-      '.pos-v{background:rgba(232,115,74,.13);border-radius:4px}',
-      '.pos-a{background:rgba(64,160,90,.14);border-radius:4px}',
-      '.pos-adv{background:rgba(140,110,220,.14);border-radius:4px}',
+      '.art-mask .pos-v{background:rgba(232,115,74,.16);border-radius:4px}',
+      '.art-mask .pos-a{background:rgba(64,160,90,.17);border-radius:4px}',
+      '.art-mask .pos-adv{background:rgba(140,110,220,.18);border-radius:4px}',
+      '.art-mask.pos-off .pos-v,.art-mask.pos-off .pos-a,.art-mask.pos-off .pos-adv{background:none}',
       '.art-romaji{display:block;font-size:.72em;color:var(--tx3,#9a9a9a);letter-spacing:.01em;margin:-4px 0 10px 36px;line-height:1.5}',
       '.art-tr-s{margin-left:36px}',
       // 逐詞高亮:依 VOICEVOX 每拍時長,橘框只框「正在唸的那個詞」(對齊實際發音)
@@ -482,6 +484,7 @@ window.Articles = (function () {
     renderTab('read');
     try { if (typeof track === 'function') track('article_read', { id: id, level: a.level }); } catch (e) {}
     preloadSent(0); preloadSent(1);   // 開文章先載前兩句,按播放零等待
+    var _mk=document.querySelector('.art-mask'); if(_mk) _mk.classList.toggle('pos-off', !posOn());
   }
   function tabBtn(k, label) { return '<button class="art-tab' + (curTab === k ? ' on' : '') + '" data-tab="' + k + '" onclick="Articles.tab(\'' + k + '\')">' + label + '</button>'; }
 
