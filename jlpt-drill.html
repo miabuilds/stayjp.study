@@ -244,6 +244,8 @@ let jdPremium = false, jdAdmin = false;
     firebase.auth().onAuthStateChanged(u=>{
       jdAdmin = !!(u && JD_ADMIN.includes((u.email||'').toLowerCase()));
       if(!u){ jdPremium=false; return; }
+      // 白名單(free_users)= Premium 等級:刷題/模擬考也無限(2026-08-21 白名單用戶實測被當免費檔下)
+      firebase.firestore().doc('free_users/'+u.uid).get().then(fs2=>{ if(fs2.exists) jdPremium=true; }).catch(()=>{});
       firebase.firestore().doc('users/'+u.uid).get().then(s=>{
         const sub=(s.data()||{}).subscription;
         jdPremium = !!(sub && (sub.status==='active'||sub.status==='trialing'||sub.status==='cancelled') && (sub.expiresAt||0)>Date.now());
