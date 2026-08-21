@@ -6,7 +6,7 @@
 import * as functions from "firebase-functions/v2/https";
 import { defineSecret } from "firebase-functions/params";
 import * as admin from "firebase-admin";
-import { getAiConfig, consumeQuota } from "./ai-quota";
+import { getAiConfig, consumeQuota, recordAiUse } from "./ai-quota";
 
 if (admin.apps.length === 0) admin.initializeApp();
 
@@ -41,7 +41,10 @@ function chatSystem(sceneDesc: string, level: string, lang?: string): string {
 - 先想清楚對方那句話的「主語和對象」再回:學習者的句子常省略主語或問得不精準(例:他問「エアコンはありませんか」很可能是在問「你/你家」有沒有冷氣,不是說他自己沒有)。依情境推斷最合理的意思來接;真的模糊就在戲中自然地反問確認(「うちのエアコンのことですか?」),絕對不要把對方的提問誤當成他的自述。
 - 對方是學習者,若他上一句日語有明顯錯誤(助詞、動詞變化、用詞、不自然),在 COACH 用一句${L}溫和點出更好的說法;講得好就用 COACH 給一句具體鼓勵。
 - 對話自然走到尾聲時,可以帶到道別收尾。
-- 重要:對方常常「不知道要講什麼」。每一輪都要給 2~3 個 HINT,是「站在對方立場、他這時可以怎麼回你」的日文短句(貼合當下情境、難度符合等級、彼此不同、能把對話往前推),讓他有東西講、練得更深。
+- 重要:對方常常「不知道要講什麼」。每一輪都要給 2~3 個 HINT。HINT 的鐵則:
+  ①視角:HINT 是「對方(顧客/求職者/病人等,即使用者扮演的角色)」要說的台詞,**絕對不能是你自己角色(店員/面試官/醫生)會講的話**。寫之前自問:「這句話是店員說的還是客人說的?」是你這邊的就換掉。
+  ②關聯:每個 HINT 必須**直接回應你剛剛輸出的那句 JP**——你問了問題就給「回答那個問題」的選項;你陳述了事情就給「接著那件事」的回應。跟上一句無關的 HINT 一律不合格。
+  ③多樣:2~3 個彼此方向不同(肯定/否定/追問),難度符合等級,能把對話往前推。
 【輸出格式】嚴格逐行輸出,一行一個欄位,不要 JSON、不要多餘文字或旁白。JP/KANA/ZH 各恰好一行、缺一不可;每個欄位只輸出一次,想好再寫、絕對不要輸出到一半重來或補第二行 JP:
 JP: <你這個角色要講的日文(只有台詞本身)>
 KANA: <JP 的整句假名讀音>
@@ -158,6 +161,8 @@ export const speakChat = functions.onRequest(
       if (!isAdmin && userTurns === 1) {
         const blocked = await consumeQuota(decoded.uid, "chat", cfg);
         if (blocked) { res.status(402).json({ error: "quota", message: blocked }); return; }
+      } else if (isAdmin && userTurns === 1) {
+        void recordAiUse(decoded.uid, "chat");   // admin 不計量,但累計紀錄照記
       }
       const msgs: any[] = [];
       for (const h of hist) msgs.push({ role: h.role === "me" ? "user" : "assistant", content: String(h.text) });

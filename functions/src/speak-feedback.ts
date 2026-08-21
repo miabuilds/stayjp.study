@@ -7,7 +7,7 @@
 import * as functions from "firebase-functions/v2/https";
 import { defineSecret } from "firebase-functions/params";
 import * as admin from "firebase-admin";
-import { getAiConfig, consumeQuota } from "./ai-quota";
+import { getAiConfig, consumeQuota, recordAiUse } from "./ai-quota";
 
 if (admin.apps.length === 0) admin.initializeApp();
 
@@ -60,6 +60,8 @@ export const speakFeedback = functions.onRequest(
       if (!isAdmin) {
         const blocked = await consumeQuota(decoded.uid, "eval", cfg);
         if (blocked) { res.status(402).json({ error: "quota", message: blocked }); return; }
+      } else {
+        void recordAiUse(decoded.uid, "eval");
       }
       const { target, said, lang } = (req.body || {}) as { target?: { jp?: string; kana?: string }; said?: string; lang?: string };
       if (!target || !target.jp || !said) { res.status(400).json({ error: "缺 target.jp / said" }); return; }

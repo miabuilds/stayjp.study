@@ -102,14 +102,16 @@ const Stats = (() => {
         const d = new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10);
         const chatToday = (u.chatDay && u.chatDay.d === d) ? u.chatDay.n : 0;
         const evalToday = (u.evalDay && u.evalDay.d === d) ? u.evalDay.n : 0;
-        const chatAll = (u.chatTotal || 0) + chatToday, evalAll = (u.evalTotal || 0) + evalToday;
+        // 累計以 Life 欄位為準(2026-08-21 起後端每次使用都 +1;admin 也記)。舊資料退回 Total 估。
+        const chatAll = u.chatLife != null ? u.chatLife : ((u.chatTotal || 0) + chatToday);
+        const evalAll = u.evalLife != null ? u.evalLife : ((u.evalTotal || 0) + evalToday);
         if (!chatAll && !evalAll) {
           el.innerHTML = _en2('還沒用過——AI 陪你練口說,每句都給回饋。', 'Not yet — practice speaking with instant AI feedback.') + ' <a href="speak-chat.html" style="color:var(--ac);font-weight:700">' + _en2('去試 AI 對話 →', 'Try AI chat →') + '</a>';
           return;
         }
         el.classList.remove('st-empty');
         el.innerHTML = '<div style="font-size:13.5px;line-height:2">'
-          + '🗣 ' + _en2('對話:今天 ' + chatToday + ' 場', 'Chat: ' + chatToday + ' today') + '・🎙 ' + _en2('評分:今天 ' + evalToday + ' 次', 'Scoring: ' + evalToday + ' today')
+          + '🗣 ' + _en2('對話:累計 ' + chatAll + ' 場・今天 ' + chatToday, 'Chat: ' + chatAll + ' total · ' + chatToday + ' today') + '<br>🎙 ' + _en2('評分:累計 ' + evalAll + ' 次・今天 ' + evalToday, 'Scoring: ' + evalAll + ' total · ' + evalToday + ' today')
           + ' <a href="speak-chat.html" style="color:var(--ac);font-weight:700;margin-left:6px">' + _en2('繼續練 →', 'Keep going →') + '</a></div>';
       }).catch(() => { el.textContent = _en2('紀錄載入失敗', 'Could not load records'); });
     } catch (e) {}
