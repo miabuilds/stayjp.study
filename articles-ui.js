@@ -7,6 +7,8 @@ window.Articles = (function () {
   // 分級主題色(hero 漸層)
   var LVC = { n5: ['#34d399', '#059669'], n4: ['#22d3ee', '#0891b2'], n3: ['#60a5fa', '#2563eb'], n2: ['#a78bfa', '#7c3aed'], n1: ['#fb7185', '#e11d48'] };
   var furiOn = true, fsIdx = 1, curId = null, curTab = 'read';
+  function posOn(){ try{ return localStorage.getItem('art_pos_off')!=='1'; }catch(e){ return true; } }
+  function togglePos(){ try{ localStorage.setItem('art_pos_off', posOn()?'1':'0'); }catch(e){} if(curId) read(curId); }
   var FS = ['18px', '20px', '23px'];   // 字級三段
   function list() { return window.ARTICLES || []; }
   // 三語:en→英文;zh-CN→OpenCC 轉簡(cvt);zh-TW→原樣繁體
@@ -76,7 +78,13 @@ window.Articles = (function () {
       if (!e && window.dictExtra) e = window.dictExtra(base) || window.dictExtra(surf);      // 文章補充字典(未收錄詞根治)
       var w = base, r = (e && e.r) || t.r || frd || '', m = e ? Lc(e.m, e.m_en) : '', c = (e && e.c) || '';
       var f = t.b ? enOr('活用形', 'conj.') : '';
-      return '<span class="aw jlk" role="button" tabindex="0" data-w="' + esc(w) + '" data-r="' + esc(r)
+      var posCls = '';
+      if (posOn()) {
+        if (/動/.test(c)) posCls = ' pos-v';
+        else if (/形/.test(c)) posCls = ' pos-a';
+        else if (/副/.test(c)) posCls = ' pos-adv';
+      }
+      return '<span class="aw jlk' + posCls + '" role="button" tabindex="0" data-w="' + esc(w) + '" data-r="' + esc(r)
         + '" data-m="' + esc(m) + '" data-c="' + esc(c) + '"' + (f ? ' data-f="' + esc(f) + '"' : '') + '>' + inner + '</span>';
     }).join('');
   }
@@ -307,6 +315,10 @@ window.Articles = (function () {
       '.art-sp{position:absolute;left:0;top:.45em;width:26px;height:26px;border-radius:50%;border:1.5px solid rgba(232,115,74,.45);background:none;color:#e8734a;font-size:11px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;padding:0 0 0 2px}',
       '.art-sp:hover{background:rgba(232,115,74,.12)}',
       '.art-s.on .art-sp,.art-s.flat .art-sp{background:#e8734a;border-color:#e8734a;color:#fff}',
+      // 詞性淡底(可關):動詞=暖橘、形容詞=淡綠、副詞=淡紫;名詞不上色,保持乾淨
+      '.pos-v{background:rgba(232,115,74,.13);border-radius:4px}',
+      '.pos-a{background:rgba(64,160,90,.14);border-radius:4px}',
+      '.pos-adv{background:rgba(140,110,220,.14);border-radius:4px}',
       '.art-romaji{display:block;font-size:.72em;color:var(--tx3,#9a9a9a);letter-spacing:.01em;margin:-4px 0 10px 36px;line-height:1.5}',
       '.art-tr-s{margin-left:36px}',
       // 逐詞高亮:依 VOICEVOX 每拍時長,橘框只框「正在唸的那個詞」(對齊實際發音)
@@ -443,6 +455,7 @@ window.Articles = (function () {
       '<button class="art-tbtn on" id="artFuriBtn" onclick="Articles.toggleFuri()">あ ' + enOr('假名', 'Kana') + '</button>' +
       '<button class="art-tbtn" id="artZhBtn" onclick="Articles.toggleZh()">译 ' + enOr('中譯', 'CN') + '</button>' +
       '<button class="art-tbtn' + (romaOn ? ' on' : '') + '" id="artRomaBtn" onclick="Articles.toggleRomaji()">Aa ' + enOr('羅馬拼音', 'Romaji') + '</button>' +
+      '<button class="art-tbtn' + (posOn() ? ' on' : '') + '" onclick="Articles.togglePos()" title="' + enOr('動詞橘・形容詞綠・副詞紫', 'Verb orange · Adj green · Adv purple') + '">🎨 ' + enOr('詞性色', 'POS colors') + '</button>' +
       '<button class="art-tbtn" id="artFsBtn" onclick="Articles.cycleFs()">Aa</button>' +
       '</div>' +
       // tabs
@@ -856,7 +869,7 @@ window.Articles = (function () {
   return {
     open: open, close: close, read: read, tab: tab, entryCardHtml: entryCardHtml,
     toggleFuri: toggleFuri, toggleZh: toggleZh, toggleRomaji: toggleRomaji, cycleFs: cycleFs,
-    playFrom: playFrom, togglePlay: togglePlay, stepRate: stepRate, say: say, spTap: spTap,
+    playFrom: playFrom, togglePlay: togglePlay, stepRate: stepRate, say: say, spTap: spTap, togglePos: togglePos,
     toggleRepeat: toggleRepeat, toggleSingle: toggleSingle,
     answer: answer, quizNext: quizNext, gd: gd, done: done
   };
