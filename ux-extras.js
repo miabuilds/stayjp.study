@@ -110,7 +110,9 @@
     return '<ruby>' + escapeHtml(sub) + '<rt>' + escapeHtml(rd) + '</rt></ruby>';
   }
   function tapSpan(inner, data) {
-    return '<span class="jlk" role="button" tabindex="0"'
+    var c = data.c || '';
+    var pos = /動/.test(c) ? ' pos-v' : (/形/.test(c) ? ' pos-a' : (/副/.test(c) ? ' pos-adv' : ''));
+    return '<span class="jlk' + pos + '" role="button" tabindex="0"'
       + ' data-w="' + escAttr(data.w) + '" data-r="' + escAttr(data.r) + '"'
       + ' data-m="' + escAttr(data.m) + '" data-c="' + escAttr(data.c || '') + '"'
       + ' data-f="' + escAttr(data.f || '') + '">' + inner + '</span>';
