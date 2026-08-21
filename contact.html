@@ -488,6 +488,12 @@ auth.onAuthStateChanged(u => {
     promptEl.style.display = 'none';
     formEl.style.display = '';
     document.getElementById('userEmail').textContent = u.email || u.displayName || '已登入';
+    // Apple「隱藏郵件」轉發常收不到回覆 → 提醒留一個真的收得到的信箱(選填)
+    try {
+      var relay = /@privaterelay\.appleid\.com$/i.test(u.email || '');
+      var box = document.getElementById('relayBox');
+      if (box) box.style.display = relay ? 'block' : 'none';
+    } catch (e) {}
   } else {
     promptEl.style.display = '';
     formEl.style.display = 'none';
@@ -524,6 +530,7 @@ async function submitForm(e) {
       message: msg,
       uid: currentUser.uid,
       email: currentUser.email || null,
+      contact_email: (function(){ try{ var v=(document.getElementById('realEmail')||{}).value||''; v=v.trim(); return /.+@.+\..+/.test(v)?v.slice(0,120):null; }catch(e){ return null; } })(),
       displayName: currentUser.displayName || null,
       ua: navigator.userAgent.slice(0, 200),
       // 版本識別:封測期間會邊收回饋邊發版,沒有這個就分不出「還是有問題」的人
