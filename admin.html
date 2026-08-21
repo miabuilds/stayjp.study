@@ -639,6 +639,7 @@ function renderList() {
  const status = f.status || 'new';
  const type = f.type || 'other';
  const who = f.email || f.uid?.slice(0, 8) || '匿名';
+ const contact = f.contact_email ? ' <span style="color:var(--ok,#15803d);font-weight:700">📮 '+f.contact_email+'</span>' : (/@privaterelay\.appleid\.com$/i.test(f.email||'') ? ' <span style="color:var(--bad,#c2410c);font-size:11px">(隱藏信箱,可能回不到)</span>' : '');
  const date = f.createdAt?.toDate ? f.createdAt.toDate().toLocaleString('zh-TW', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }) : '-';
  const msg = (f.message || '').slice(0, 200);
  return `<div class="row ${currentFeedback?.id === f.id ? 'active' : ''}" data-id="${f.id}">
