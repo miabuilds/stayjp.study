@@ -320,6 +320,10 @@ window.Articles = (function () {
       '.art-mask .pos-v{background:rgba(232,115,74,.16);border-radius:4px}',
       '.art-mask .pos-a{background:rgba(64,160,90,.17);border-radius:4px}',
       '.art-mask .pos-adv{background:rgba(140,110,220,.18);border-radius:4px}',
+      // 深色模式:底色加亮一階+底線提示,字色不動(維持主題亮字,對比不打折)
+      '[data-theme="dark"] .art-mask .pos-v{background:rgba(232,115,74,.26);box-shadow:inset 0 -2px 0 rgba(232,115,74,.55)}',
+      '[data-theme="dark"] .art-mask .pos-a{background:rgba(74,222,128,.20);box-shadow:inset 0 -2px 0 rgba(74,222,128,.5)}',
+      '[data-theme="dark"] .art-mask .pos-adv{background:rgba(167,139,250,.22);box-shadow:inset 0 -2px 0 rgba(167,139,250,.5)}',
       '.art-mask.pos-off .pos-v,.art-mask.pos-off .pos-a,.art-mask.pos-off .pos-adv{background:none}',
       '.art-romaji{display:block;font-size:.72em;color:var(--tx3,#9a9a9a);letter-spacing:.01em;margin:-4px 0 10px 36px;line-height:1.5}',
       '.art-tr-s{margin-left:36px}',
