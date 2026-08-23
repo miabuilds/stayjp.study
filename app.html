@@ -3278,6 +3278,23 @@ function onbFinish() { localStorage.setItem('onboarding_done_v1', '1'); _onbRemo
     location.replace('onboarding-v2.html');
   }catch(e){}
 })();
+// onboarding v2 出口銜接:逛的人自動帶看一圈;要學的人直達今日學習,不打斷
+(function(){
+  try{
+    if (localStorage.getItem('ob_start_tour')) {
+      localStorage.removeItem('ob_start_tour');
+      setTimeout(function(){ if (window.Tour) Tour.start(true); }, 900);
+      return;
+    }
+    if (localStorage.getItem('ob_start_today')) {
+      localStorage.removeItem('ob_start_today');
+      setTimeout(function(){
+        try{ var el=document.querySelector('.gcard,.vcard,.card-item'); if(el) el.scrollIntoView({block:'center',behavior:'smooth'}); }catch(e){}
+        if (typeof showToast === 'function') showToast(enOr('想認識所有功能?更多 → 🧭 功能導覽','Want the full tour? More → 🧭 Feature tour'));
+      }, 1100);
+    }
+  }catch(e){}
+})();
 // 快速上手提示(引導第二步 + 「?」重看 共用)。豐富到 5 條,直接回答「這畫面在幹嘛」。
 function quickTipsHTML() {
   return '<div class="onb-tips">' +
