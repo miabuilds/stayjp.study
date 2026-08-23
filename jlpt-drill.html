@@ -55,6 +55,7 @@
   .explain .verdict{font-weight:800;font-size:15px;margin-bottom:6px}
   .explain .verdict.ok{color:var(--ok)} .explain .verdict.ng{color:var(--bad)}
   .explain .xp{background:var(--soft);border-radius:10px;padding:12px 14px;font-size:14.5px;line-height:1.8}
+  .explain .xp.good{background:color-mix(in srgb, var(--ok,#15803d) 12%, transparent)}
   .explain .xp b{color:var(--ac)}
   .nextbtn{margin-top:14px;width:100%;background:var(--ac);border:0;border-radius:12px;padding:13px;font:inherit;font-size:15px;font-weight:700;color:#fff;cursor:pointer;display:none}
   .nextbtn:hover{background:var(--ac2)}
@@ -244,11 +245,15 @@ let jdPremium = false, jdAdmin = false;
     firebase.auth().onAuthStateChanged(u=>{
       jdAdmin = !!(u && JD_ADMIN.includes((u.email||'').toLowerCase()));
       if(!u){ jdPremium=false; return; }
-      // 白名單(free_users)= Premium 等級:刷題/模擬考也無限(2026-08-21 白名單用戶實測被當免費檔下)
-      firebase.firestore().doc('free_users/'+u.uid).get().then(fs2=>{ if(fs2.exists) jdPremium=true; }).catch(()=>{});
+      // 白名單(free_users)= Premium 等級。⚠️ 兩個讀取並行,訂閱檢查「只能往 true 推,不能覆寫」
+      // (2026-08-23 修:原本無條件覆寫,白名單被訂閱檢查蓋回 false → 還是被當免費擋)
+      try{ if(localStorage.getItem('jd_prem_'+u.uid)==='1') jdPremium=true; }catch(e){}   // 上次結果快取,秒判
+      const _sync=()=>{ try{ localStorage.setItem('jd_prem_'+u.uid, jdPremium?'1':'0'); }catch(e){} try{ renderHome(); updateExamNotes(); }catch(e){} };
+      firebase.firestore().doc('free_users/'+u.uid).get().then(fs2=>{ if(fs2.exists){ jdPremium=true; _sync(); } }).catch(()=>{});
       firebase.firestore().doc('users/'+u.uid).get().then(s=>{
         const sub=(s.data()||{}).subscription;
-        jdPremium = !!(sub && (sub.status==='active'||sub.status==='trialing'||sub.status==='cancelled') && (sub.expiresAt||0)>Date.now());
+        if(!!(sub && (sub.status==='active'||sub.status==='trialing'||sub.status==='cancelled') && (sub.expiresAt||0)>Date.now())) jdPremium=true;
+        _sync();
       }).catch(()=>{});
     });
   }catch(e){}
@@ -465,6 +470,7 @@ function answer(el, ok){
   v.textContent = ok? enOr('✅ 答對了!','✅ Correct!'):enOr('❌ 答錯了','❌ Incorrect');
   v.className = 'verdict '+(ok?'ok':'ng');
   // 詳解(題庫內含 <b> 標記,自行控管內容安全);聴解附上音檔原文
+  document.getElementById('xp').classList.toggle('good', ok);   // 答對綠底、答錯橘底(固定橘會讓答對的人以為錯了)
   document.getElementById('xp').innerHTML =
     (q.au ? '<div style="margin-bottom:8px;padding-bottom:8px;border-bottom:1px dashed var(--bd)"><b>スクリプト:</b>'+esc(q.au)+'</div>' : '') + q.x;
   document.getElementById('explain').style.display='block';

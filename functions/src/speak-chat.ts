@@ -29,10 +29,12 @@ function langName(lang?: string): string {
   return "繁體中文";
 }
 
-function chatSystem(sceneDesc: string, level: string, lang?: string): string {
+function chatSystem(sceneDesc: string, level: string, lang?: string, userRole?: string): string {
   const L = langName(lang);
+  const UR = userRole || "與你互動的另一方";
   return `你是 StayJP 的日語「情境對話」練習夥伴,陪日語學習者練口說。使用者的介面語言是「${L}」——下面所有「${L}」欄位務必用該語言書寫。
 【你的角色與場景】${sceneDesc}
+【對方(使用者)的角色】${UR}。整場對話中,使用者永遠是「${UR}」,你永遠是場景設定裡的那個角色,雙方角色絕不互換。
 【對話難度】${LEVEL_DESC[level] || LEVEL_DESC.N4}
 【怎麼對話】
 - 完全進入角色,用符合這個場景的自然日語,不要像教科書、不要老師腔。
@@ -42,7 +44,7 @@ function chatSystem(sceneDesc: string, level: string, lang?: string): string {
 - 對方是學習者,若他上一句日語有明顯錯誤(助詞、動詞變化、用詞、不自然),在 COACH 用一句${L}溫和點出更好的說法;講得好就用 COACH 給一句具體鼓勵。
 - 對話自然走到尾聲時,可以帶到道別收尾。
 - 重要:對方常常「不知道要講什麼」。每一輪都要給 2~3 個 HINT。HINT 的鐵則:
-  ①視角:HINT 是「對方(顧客/求職者/病人等,即使用者扮演的角色)」要說的台詞,**絕對不能是你自己角色(店員/面試官/醫生)會講的話**。寫之前自問:「這句話是店員說的還是客人說的?」是你這邊的就換掉。
+  ①視角:HINT 是「${UR}」要說的台詞,**絕對不能是你自己角色會講的話**。每寫一個 HINT 前自問:「這句話是${UR}會說的嗎?」不是就整句換掉。例:場景是便利商店、你是店員、對方是顧客時——「温めますか?」是店員的話=不合格;「はい、お願いします」是顧客的話=合格。
   ②關聯:每個 HINT 必須**直接回應你剛剛輸出的那句 JP**——你問了問題就給「回答那個問題」的選項;你陳述了事情就給「接著那件事」的回應。跟上一句無關的 HINT 一律不合格。
   ③多樣:2~3 個彼此方向不同(肯定/否定/追問),難度符合等級,能把對話往前推。
 【輸出格式】嚴格逐行輸出,一行一個欄位,不要 JSON、不要多餘文字或旁白。JP/KANA/ZH 各恰好一行、缺一不可;每個欄位只輸出一次,想好再寫、絕對不要輸出到一半重來或補第二行 JP:
@@ -118,8 +120,8 @@ export const speakChat = functions.onRequest(
       if (!isAdmin && !cfg.public) {
         res.status(403).json({ error: "測試版限 admin 帳號" }); return;
       }
-      const { mode, scene, level, history, lang } = (req.body || {}) as {
-        mode?: string; scene?: string; level?: string; lang?: string;
+      const { mode, scene, level, history, lang, userRole } = (req.body || {}) as {
+        mode?: string; scene?: string; level?: string; lang?: string; userRole?: string;
         history?: Array<{ role?: string; text?: string }>;
       };
       const hist = Array.isArray(history) ? history.filter(h => h && h.text) : [];
@@ -171,7 +173,7 @@ export const speakChat = functions.onRequest(
       if (kept.length === 0 || kept[kept.length - 1].role !== "user") {
         kept.push({ role: "user", content: "（請你先自然開口,帶起這個情境的對話）" });
       }
-      const system = [{ type: "text", text: chatSystem(scene, level || "N4", lang), cache_control: { type: "ephemeral" } }];
+      const system = [{ type: "text", text: chatSystem(scene, level || "N4", lang, String(userRole || "").slice(0, 30)), cache_control: { type: "ephemeral" } }];
       await streamAnthropic(res, ANTHROPIC_API_KEY.value(), system, kept);
     } catch (e: any) {
       if (!res.headersSent) res.status(500).json({ error: String((e && e.message) || e) });

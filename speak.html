@@ -250,7 +250,7 @@ const SENTS = [
   S('拙い日本語ですが、精一杯お伝えします。','つたないにほんごですが、せいいっぱいおつたえします。','雖然日語還不夠好,我會盡力表達。','N1','feel'),
 ];
 const LEVELS = ['N5','N4','N3','N2','N1'];
-let activeLv = 'N5';
+let activeLv = (function(){ try{ return localStorage.getItem('sp_lv')||'N5'; }catch(e){ return 'N5'; } })();
 let activeCat = 'all';
 let idx = 0;
 function list(){ return SENTS.filter(s=>s.lv===activeLv && (activeCat==='all' || s.cat===activeCat)); }
@@ -269,7 +269,7 @@ function renderLvTabs(){
     return `<span class="chip cat${c.k===activeCat?' on':''}" onclick="pickCat('${c.k}')">${c.ic} ${enOr(c.name,c.en)} ${n}</span>`;
   }).join('');
 }
-function pickLv(lv){ activeLv=lv; if(!SENTS.some(s=>s.lv===lv&&(activeCat==='all'||s.cat===activeCat))) activeCat='all'; idx=0; stopRec(); renderLvTabs(); renderChips(); render(); }
+function pickLv(lv){ try{ localStorage.setItem('sp_lv',lv); }catch(e){} activeLv=lv; if(!SENTS.some(s=>s.lv===lv&&(activeCat==='all'||s.cat===activeCat))) activeCat='all'; idx=0; stopRec(); renderLvTabs(); renderChips(); render(); }
 function pickCat(k){ activeCat=k; idx=0; stopRec(); renderLvTabs(); renderChips(); render(); }
 function render(){
   document.getElementById('jp').textContent = cur().jp;
