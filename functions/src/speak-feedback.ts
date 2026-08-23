@@ -50,6 +50,7 @@ export const speakFeedback = functions.onRequest(
   { cors: true, region: "asia-east1", secrets: [ANTHROPIC_API_KEY] },
   async (req, res) => {
     try {
+      if (req.method !== "POST") { res.status(405).json({ error: "method_not_allowed" }); return; }   // 爬蟲 GET 戳門 → 405,不進錯誤日誌
       const idToken = (req.headers.authorization || "").replace(/^Bearer\s+/i, "");
       const decoded = await admin.auth().verifyIdToken(idToken);
       const isAdmin = ADMIN_EMAILS.includes((decoded.email || "").toLowerCase());
