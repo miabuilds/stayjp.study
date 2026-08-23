@@ -48,7 +48,7 @@ function chatSystem(sceneDesc: string, level: string, lang?: string, userRole?: 
   ②服務方句型警戒:「〜をお持ちします」「〜はいかがですか」「〜ましょうか?」這類**提供服務、詢問對方需求**的句子,幾乎都是店員/服務方的台詞。若「${UR}」是顧客、客人、乘客、患者這類「被服務的一方」,這些句型一律不合格——顧客說的是「〜をください」「〜はありますか」「お願いします」這種**提出需求**的話。
   ③關聯:每個 HINT 必須**直接回應你剛剛輸出的那句 JP**——你問了問題就給「回答那個問題」的選項;你陳述了事情就給「接著那件事」的回應。跟上一句無關的 HINT 一律不合格。
   ④多樣:2~3 個彼此方向不同(肯定/否定/追問),難度符合等級,能把對話往前推。
-【輸出格式】嚴格逐行輸出,一行一個欄位,不要 JSON、不要多餘文字或旁白。JP/KANA/ZH 各恰好一行、缺一不可;每個欄位只輸出一次,想好再寫、絕對不要輸出到一半重來或補第二行 JP:
+【輸出格式】嚴格逐行輸出,一行一個欄位,不要 JSON、不要多餘文字或旁白。對話歷史裡你先前的回覆只保留了 JP 行,但你每一輪「真正的輸出」永遠必須是下面完整的多行格式,絕對不能只輸出台詞本身。JP/KANA/ZH 各恰好一行、缺一不可;每個欄位只輸出一次,想好再寫、絕對不要輸出到一半重來或補第二行 JP:
 JP: <你這個角色要講的日文(只有台詞本身)>
 KANA: <JP 的整句假名讀音>
 ZH: <JP 的${L}翻譯>
@@ -117,6 +117,25 @@ async function guardHints(rawHints: string[], jp: string, g: HintGuard): Promise
   } catch { return rawHints; }
 }
 
+// 裸回修補:模型偶爾丟光格式只回一句台詞(診斷日誌實錘)。台詞本身已串流給前端(客戶端會救援顯示),
+// 這裡把缺的 KANA/ZH/WORDS/HINT 用 Haiku 當場補生,前端照常解析——使用者看到的只是「翻譯提示晚半秒出現」。
+async function repairBare(bare: string, g: HintGuard): Promise<string> {
+  try {
+    const up = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: { "content-type": "application/json", "x-api-key": g.apiKey, "anthropic-version": "2023-06-01" },
+      body: JSON.stringify({ model: MODEL, max_tokens: 300,
+        system: `你會拿到一句日語台詞(場景:${g.scene};說話者=AI 扮演的角色;聽者=使用者,角色是「${g.ur}」)。只輸出下列幾行、格式嚴格、不要其他文字:\nKANA: <整句假名讀音>\nZH: <這句的${g.langLabel}翻譯>\nWORDS: <句中關鍵單字1~3個,格式 単語|よみ|${g.langLabel}意思,用;隔開;句子太簡單就省略此行>\nHINT: ${g.ur}»<「${g.ur}」可以怎麼回的日文>｜<${g.langLabel}意思>\nHINT: ${g.ur}»<另一個不同方向的回法>｜<${g.langLabel}意思>`,
+        messages: [{ role: "user", content: bare }] }),
+    });
+    if (!up.ok) return "";
+    const d: any = await up.json();
+    if (d.usage) void trackAiCost(MODEL, { in: d.usage.input_tokens || 0, out: d.usage.output_tokens || 0 });
+    return String(d.content?.[0]?.text || "").split("\n")
+      .filter(l => /^(KANA|ZH|WORDS|HINT)[::]/.test(l.trim())).join("\n");
+  } catch { return ""; }
+}
+
 async function streamAnthropic(res: any, apiKey: string, system: any, messages: any[], model?: string, hintGuard?: HintGuard) {
   const upstream = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
@@ -172,10 +191,15 @@ async function streamAnthropic(res: any, apiKey: string, system: any, messages: 
     }
   }
   if (hintGuard) {
-    if (!/^\s*JP[::]/m.test(full)) console.warn("[format] 模型輸出缺 JP 行, model=" + (model || MODEL) + " raw=" + JSON.stringify(full.slice(0, 600)));
+    const hasJP = /^\s*JP[::]/m.test(full);
+    if (!hasJP) console.warn("[format] 模型輸出缺 JP 行, model=" + (model || MODEL) + " raw=" + JSON.stringify(full.slice(0, 600)));
     const withheld = full.slice(sent);
     if (!/(?:^|\n)HINT:/.test(withheld)) {
       if (withheld) res.write(withheld);       // 這輪沒有 HINT(或格式跑掉)→ 原樣放行
+      if (!hasJP && !/^\s*KANA[::]/m.test(full) && full.trim()) {
+        const extra = await repairBare(full.trim().split("\n")[0], hintGuard);   // 整包裸回 → 補生欄位
+        if (extra) res.write("\n" + extra);
+      }
     } else {
       const others: string[] = []; const hints: string[] = [];
       for (const ln of withheld.split("\n")) {
@@ -254,7 +278,9 @@ export const speakChat = functions.onRequest(
         void recordAiUse(decoded.uid, "chat");   // admin 不計量,但累計紀錄照記
       }
       const msgs: any[] = [];
-      for (const h of hist) msgs.push({ role: h.role === "me" ? "user" : "assistant", content: String(h.text) });
+      // AI 舊回覆補「JP: 」前綴:歷史只存台詞本身,模型往回看會模仿「自己以前沒格式」而丟格式
+      // (2026-08 診斷日誌實錘:聊越久越常整包裸回)。讓它看到的自己永遠是守格式的。
+      for (const h of hist) msgs.push({ role: h.role === "me" ? "user" : "assistant", content: h.role === "me" ? String(h.text) : "JP: " + String(h.text) });
       // 歷史截斷:只送最近 N 則(場景設定在 system 裡,舊對話對下一句影響小)→ input 不隨對話變長
       const kept = msgs.slice(-cfg.historyKeep);
       if (kept.length === 0 || kept[kept.length - 1].role !== "user") {
