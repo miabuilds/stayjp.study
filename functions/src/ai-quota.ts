@@ -20,6 +20,7 @@ const DEFAULTS = {
   historyKeep: 12,        // 送給模型的歷史訊息數上限(6輪),input 不隨對話無限長
   ttsDaily: 150,          // 雲端 TTS 每人每日粗上限(防拿 token 單獨刷合成;正常對話一天用不到)
   chatModel: "claude-haiku-4-5-20251001",   // 情境對話模型;config/ai 可熱切(如升 claude-sonnet-5 測試角色穩定度)
+  aiBudgetUsd: 50,        // 當月 Anthropic 估算成本上限(美金);超過自動把 chatModel 降回 Haiku(Mia 定調:別太貴)
 };
 
 export type AiConfig = typeof DEFAULTS;
@@ -120,4 +121,47 @@ export async function recordAiUse(uid: string, kind: "eval" | "chat"): Promise<v
       tx.set(ref, { [dayField]: day, [kind === "eval" ? "evalLife" : "chatLife"]: admin.firestore.FieldValue.increment(1) }, { merge: true });
     });
   } catch { /* 統計失敗不影響功能 */ }
+}
+
+// ── AI 成本記帳 + 超額自動降級 ──────────────────────────────────
+// 每次 Anthropic 呼叫結束後,用回傳的 usage 算出估算成本,累計到 counters/ai_cost_YYYY-MM。
+// 當月累計超過 config/ai.aiBudgetUsd 且 chatModel 不是 Haiku → 自動把 chatModel 降回 Haiku
+// (一次性,寫入 autoDowngradedAt;不會自動升回去,要人工再開)。
+// 全程 fire-and-forget:記帳失敗絕不影響對話功能。
+const HAIKU = "claude-haiku-4-5-20251001";
+// USD / 1M tokens [input, output];快取讀 0.1×input、快取寫 1.25×input
+const PRICE: Record<string, [number, number]> = {
+  "claude-sonnet-5": [3, 15],
+  "claude-sonnet-4-6": [3, 15],
+  "claude-haiku-4-5-20251001": [1, 5],
+  "claude-haiku-4-5": [1, 5],
+  "claude-opus-5": [5, 25],
+};
+
+export type AiUsage = { in: number; out: number; cacheRead?: number; cacheWrite?: number };
+
+export async function trackAiCost(model: string, u: AiUsage): Promise<void> {
+  try {
+    const [inP, outP] = PRICE[model] || [3, 15];   // 不認得的模型按 Sonnet 價算(寧可高估)
+    const usd = (u.in * inP + (u.cacheRead || 0) * inP * 0.1 + (u.cacheWrite || 0) * inP * 1.25 + u.out * outP) / 1e6;
+    if (!(usd > 0)) return;
+    const month = new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 7);   // 日本時間切月,與每日 quota 一致
+    const ref = admin.firestore().doc("counters/ai_cost_" + month);
+    const total = await admin.firestore().runTransaction(async (tx) => {
+      const snap = await tx.get(ref);
+      const cur = (snap.exists ? (snap.data() as any).usd : 0) || 0;
+      tx.set(ref, { usd: cur + usd, calls: admin.firestore.FieldValue.increment(1) }, { merge: true });
+      return cur + usd;
+    });
+    // 超額 → 自動降級(只降 chatModel;評分/審核本來就是 Haiku)
+    const cfgRef = admin.firestore().doc("config/ai");
+    const cfgSnap = await cfgRef.get();
+    const cfg: any = cfgSnap.exists ? cfgSnap.data() : {};
+    const budget = Number(cfg.aiBudgetUsd || DEFAULTS.aiBudgetUsd);
+    if (total > budget && cfg.chatModel && cfg.chatModel !== HAIKU) {
+      await cfgRef.set({ chatModel: HAIKU, autoDowngradedAt: new Date().toISOString(),
+        autoDowngradeNote: `當月估算成本 $${total.toFixed(2)} 超過預算 $${budget},chatModel 自動降回 Haiku` }, { merge: true });
+      console.warn(`[ai-cost] 超過預算($${total.toFixed(2)} > $${budget}),chatModel 已自動降回 Haiku`);
+    }
+  } catch { /* 記帳失敗不影響功能 */ }
 }
