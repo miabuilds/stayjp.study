@@ -498,11 +498,18 @@ function applySubscriptionState(sub) {
     && (sub.status === 'active' || sub.status === 'trialing' || sub.status === 'cancelled')
     && sub.expiresAt && sub.expiresAt > Date.now();
   if (!active) return;
+  // 已取消(不會再續扣)→ 沒有重複扣款風險,買斷要開放購買(用戶回饋:取消早鳥後想升買斷被擋死)。
+  // 仍在自動續訂 → 買斷鈕改成「先取消再買」的引導,不直接賣(避免訂閱繼續扣+買斷並存的重複收費)。
+  const cancelled = sub.status === 'cancelled';
+  const isLifetime = sub.plan === 'lifetime';
   const PLAN_TXT = { monthly: '月費', yearly: '年費', yearly_early_bird: '早鳥年費', lifetime: '買斷方案' };
   const banner = document.getElementById('subBanner');
   if (banner) {
-    banner.innerHTML = `你已是 <strong>${PLAN_TXT[sub.plan] || sub.plan}</strong> 訂閱會員，無需重複訂購。`
-      + `<br><a href="account.html">前往帳號管理（續訂 / 取消 / 退費）→</a>`;
+    banner.innerHTML = (cancelled && !isLifetime)
+      ? `你的 <strong>${PLAN_TXT[sub.plan] || sub.plan}</strong> 已取消續訂，可用到 ${new Date(sub.expiresAt).toLocaleDateString('zh-TW')}。想一次付清？可以直接購買買斷方案。`
+        + `<br><a href="account.html">前往帳號管理 →</a>`
+      : `你已是 <strong>${PLAN_TXT[sub.plan] || sub.plan}</strong> 訂閱會員，無需重複訂購。`
+        + `<br><a href="account.html">前往帳號管理（續訂 / 取消 / 退費）→</a>`;
     banner.style.display = 'block';
   }
   document.querySelectorAll('.plan').forEach(card => {
@@ -513,10 +520,16 @@ function applySubscriptionState(sub) {
       if (name && !name.querySelector('.cur-badge')) {
         name.insertAdjacentHTML('beforeend', '<span class="cur-badge">目前方案</span>');
       }
-      cta.textContent = '✓ 目前方案';
+      cta.textContent = cancelled ? '✓ 目前方案（已取消續訂）' : '✓ 目前方案';
       cta.classList.add('is-current');
       cta.onclick = () => false;
       cta.removeAttribute('href');
+    } else if (card.dataset.plan === 'lifetime' && !isLifetime) {
+      if (cancelled) return;   // 已取消 → 買斷卡保持原樣(可直接購買升級)
+      cta.textContent = '想改買斷？先取消訂閱 →';   // 續訂中 → 引導先取消,避免重複扣款
+      cta.classList.add('is-manage');
+      cta.onclick = null;
+      cta.setAttribute('href', 'account.html');
     } else {
       cta.textContent = '管理訂閱 →';
       cta.classList.add('is-manage');

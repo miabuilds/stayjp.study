@@ -211,6 +211,27 @@ export async function voidKolCommission(buyerUid: string, reason: string): Promi
  * 取最近一筆成功 charge transaction(subscribe / renew),回傳 ECPay TradeNo。
  * 退費 / cancel 用這個,不能用 subscription.ecpay_order(那是 MerchantTradeNo)。
  */
+// 退費金額基準:最近一筆「實際成功入帳」的綠界收款金額(subscribe/renew、success、amount_twd>0)。
+// ⚠️ 不能用 PLANS 現行牌價 —— 舊用戶被凍漲(早鳥續扣/legacy 149/調價前舊價)時「牌價 ≠ 實付」:
+//   按牌價比例退 → 多退虧錢;全額退超過原刷卡金額 → 綠界退刷直接被打回、用戶卡死。
+// 查詢條件與 getLatestSuccessTradeNo 完全相同(沿用既有索引),多抓幾筆在程式端挑金額。
+export async function getLatestSuccessChargeTwd(uid: string): Promise<number | null> {
+  const snap = await db.collection("transactions")
+    .where("uid", "==", uid)
+    .where("status", "==", "success")
+    .where("type", "in", ["subscribe", "renew"])
+    .orderBy("occurred_at", "desc")
+    .limit(5)
+    .get();
+  for (const doc of snap.docs) {
+    const d = doc.data();
+    if (d.payment_method === "ecpay" && typeof d.amount_twd === "number" && d.amount_twd > 0) {
+      return d.amount_twd;
+    }
+  }
+  return null;
+}
+
 export async function getLatestSuccessTradeNo(uid: string): Promise<string | null> {
   const snap = await db.collection("transactions")
     .where("uid", "==", uid)
@@ -415,9 +436,11 @@ export async function precheckSubscribe(uid: string, email: string): Promise<Pre
   // 1. 已有 active 訂閱?
   const sub = await getSubscription(uid);
   if (sub && (sub.status === "active") && sub.expiresAt > nowMs()) {
+    // 已取消(status=cancelled)刻意不擋:不會再續扣,升級買斷沒有重複收費風險(用戶回饋:取消早鳥後想買買斷被擋)。
     return {
       ok: false,
-      reason: `您在${sub.source === "app" ? " App" : "網頁"}已有訂閱(到期日:${new Date(sub.expiresAt).toLocaleDateString("zh-TW")}),不需重複訂閱。`,
+      reason: `您在${sub.source === "app" ? " App" : "網頁"}已有訂閱(到期日:${new Date(sub.expiresAt).toLocaleDateString("zh-TW")}),不需重複訂閱。`
+        + `想改買「買斷方案」的話,請先到帳號管理取消自動續訂(已付期間仍可使用),取消後即可購買。`,
     };
   }
 
