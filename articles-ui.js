@@ -312,7 +312,9 @@ window.Articles = (function () {
       '.art-para .jlk rt{color:var(--tx2,#8a8a8a)}',
       // 每句一個區塊(句子+羅馬拼音+中譯一組),句首有明確的 ▶ 播放鈕——
       // 使用者回饋:單字都可點查字典,想「播這一句」反而沒地方點
-      '.art-s{display:block;position:relative;border-radius:10px;padding:2px 6px 2px 36px;margin:0 0 10px;min-height:30px}',
+      '.art-s{display:block;position:relative;border-radius:10px;padding:3px 6px 3px 38px;margin:0 0 14px;min-height:30px;line-height:2.05;letter-spacing:.012em}',
+      '.art-para{margin-bottom:20px}',
+      '.art-sub{line-height:1.75}',
       '.art-sp{position:absolute;left:0;top:.45em;width:26px;height:26px;border-radius:50%;border:1.5px solid rgba(232,115,74,.45);background:none;color:#e8734a;font-size:11px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;padding:0 0 0 2px}',
       '.art-sp:hover{background:rgba(232,115,74,.12)}',
       '.art-s.on .art-sp,.art-s.flat .art-sp{background:#e8734a;border-color:#e8734a;color:#fff}',

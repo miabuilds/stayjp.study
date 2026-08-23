@@ -132,7 +132,14 @@ body {
 .hd-top {
   display: flex; align-items: center;
   padding: 0 16px; height: var(--hh); gap: 10px;
+  min-width: 0;
 }
+/* 大字級防破版:標題可縮+省略號,右側控制項不縮;名字上限寬(2026-08-23 用戶回報 iOS 大字級 header 滿出去) */
+.hd-top h1 { min-width: 0; flex: 0 1 auto; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.hd-top .menu-btn, .hd-top .theme-btn, .hd-top .streak-btn, .hd-top .auth-area, .hd-top .lang-btn { flex-shrink: 0; }
+.auth-area .ahx-name { max-width: 72px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: inline-block; vertical-align: bottom; }
+.hd-bar { overflow-x: auto; scrollbar-width: none; }
+.hd-bar::-webkit-scrollbar { display: none; }
 .hd-top h1 {
   color: var(--tx); font-size: 17px; font-weight: 800;
   white-space: nowrap; letter-spacing: -.3px;

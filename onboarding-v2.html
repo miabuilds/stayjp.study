@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>開始你的計畫｜日本再留計劃</title>
+<script>try{var _th=localStorage.getItem('theme');if(_th)document.documentElement.setAttribute('data-theme',_th);}catch(e){}</script>
+<style>
+  /* ── DEMO:新版 onboarding(未上線,僅預覽)。答案寫 demo_ 前綴,不碰真實狀態 ── */
+  :root{--bg:#FAF7F0;--bg2:#fff;--tx:#2A2320;--tx2:#7A6F63;--tx3:#B0A597;--bd:#EDE5D8;--ac:#C6553B;--ac2:#E8734A;--soft:#C6553B12;--ok:#3E8E5A;--sh:0 2px 8px rgba(90,60,30,.06),0 12px 32px rgba(90,60,30,.08)}
+  @media(prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#161513;--bg2:#211F1C;--tx:#EDEBE7;--tx2:#A7A29B;--tx3:#6E6A64;--bd:#332F2B;--ac:#E8734A;--ac2:#E8956F;--soft:#E8734A1c;--ok:#4ade80;--sh:0 2px 8px rgba(0,0,0,.3),0 12px 32px rgba(0,0,0,.35)}}
+  :root[data-theme=dark]{--bg:#161513;--bg2:#211F1C;--tx:#EDEBE7;--tx2:#A7A29B;--tx3:#6E6A64;--bd:#332F2B;--ac:#E8734A;--ac2:#E8956F;--soft:#E8734A1c;--ok:#4ade80;--sh:0 2px 8px rgba(0,0,0,.3),0 12px 32px rgba(0,0,0,.35)}
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{background:var(--bg);color:var(--tx);font-family:-apple-system,"PingFang TC","Noto Sans TC",sans-serif;-webkit-font-smoothing:antialiased;overflow:hidden}
+  .stage{position:relative;height:100dvh;max-width:560px;margin:0 auto;display:flex;flex-direction:column;padding:calc(14px + env(safe-area-inset-top)) 22px calc(18px + env(safe-area-inset-bottom))}
+
+  /* 頂列:進度 + 跳過 */
+  .top{display:flex;align-items:center;gap:14px;min-height:36px}
+  .dots{display:flex;gap:6px;flex:1}
+  .dot{height:4px;border-radius:4px;background:var(--bd);flex:1;overflow:hidden;position:relative}
+  .dot i{position:absolute;inset:0;background:var(--ac);border-radius:4px;transform:scaleX(0);transform-origin:left;transition:transform .45s cubic-bezier(.22,1,.36,1)}
+  .dot.on i{transform:scaleX(1)}
+  .skip{font-size:13px;color:var(--tx3);background:none;border:0;padding:8px;cursor:pointer;font-family:inherit}
+
+  /* 滑面 */
+  .deck{position:relative;flex:1;min-height:0}
+  .slide{position:absolute;inset:0;display:flex;flex-direction:column;opacity:0;transform:translateX(46px);transition:opacity .4s ease,transform .5s cubic-bezier(.22,1,.36,1);pointer-events:none;overflow-y:auto;padding:6px 2px 8px;-webkit-overflow-scrolling:touch}
+  .slide.on{opacity:1;transform:none;pointer-events:auto}
+  .slide.left{transform:translateX(-32px)}
+  .kick{font-size:13px;font-weight:800;color:var(--ac);letter-spacing:.12em;margin-top:18px}
+  h1{font-size:27px;font-weight:900;line-height:1.35;margin-top:8px;letter-spacing:.01em}
+  .sub{font-size:14.5px;color:var(--tx2);line-height:1.75;margin-top:8px}
+
+  /* 選項卡 */
+  .opts{display:flex;flex-direction:column;gap:10px;margin-top:22px}
+  .opt{display:flex;align-items:center;gap:14px;background:var(--bg2);border:1.5px solid var(--bd);border-radius:16px;padding:15px 16px;cursor:pointer;box-shadow:var(--sh);transition:border-color .15s,transform .12s;font-family:inherit;text-align:left;width:100%}
+  .opt:active{transform:scale(.98)}
+  .opt.sel{border-color:var(--ac);background:var(--soft)}
+  .opt .ic{font-size:24px;width:34px;text-align:center;flex-shrink:0}
+  .opt .t{font-size:16px;font-weight:700;line-height:1.4}
+  .opt .d{font-size:12.5px;color:var(--tx2);margin-top:2px;line-height:1.5}
+  .opt .chk{margin-left:auto;width:22px;height:22px;border-radius:50%;border:2px solid var(--bd);flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;transition:all .15s}
+  .opt.sel .chk{background:var(--ac);border-color:var(--ac)}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:22px}
+  .grid2 .opt{flex-direction:column;align-items:flex-start;gap:6px;padding:14px}
+
+  /* 底部主鈕 */
+  .cta{margin-top:14px}
+  .btn{width:100%;min-height:52px;border:0;border-radius:16px;background:var(--ac);color:#fff;font-size:16.5px;font-weight:800;font-family:inherit;cursor:pointer;box-shadow:0 10px 24px -8px var(--ac);transition:transform .12s,opacity .15s}
+  .btn:disabled{opacity:.35;box-shadow:none}
+  .btn:active{transform:scale(.97)}
+  .btn.ghost{background:none;color:var(--tx2);box-shadow:none;font-weight:600;min-height:44px;font-size:14px}
+
+  /* 歡迎頁 */
+  .hero{flex:1;display:flex;flex-direction:column;justify-content:center;text-align:center;padding-bottom:24px}
+  .hero .logo{font-size:15px;font-weight:900;letter-spacing:.24em;color:var(--ac)}
+  .hero h1{font-size:31px;margin-top:14px}
+  .hero .art{font-size:74px;margin:26px 0 10px;filter:drop-shadow(0 10px 18px rgba(198,85,59,.25))}
+  .hero .sub{max-width:330px;margin:10px auto 0}
+
+  /* 規劃中 → 結果 */
+  .calc{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;text-align:center}
+  .ring{width:74px;height:74px;border-radius:50%;border:5px solid var(--bd);border-top-color:var(--ac);animation:spin 1s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .plan{margin-top:20px;display:flex;flex-direction:column;gap:12px}
+  .stat{display:flex;align-items:center;gap:14px;background:var(--bg2);border:1px solid var(--bd);border-radius:16px;padding:14px 16px;box-shadow:var(--sh);opacity:0;transform:translateY(14px);transition:all .5s cubic-bezier(.22,1,.36,1)}
+  .stat.in{opacity:1;transform:none}
+  .stat .n{font-size:23px;font-weight:900;color:var(--ac);min-width:76px;text-align:center;font-variant-numeric:tabular-nums}
+  .stat .l{font-size:13.5px;color:var(--tx2);line-height:1.55}
+  .stat .l b{color:var(--tx);font-size:15px;display:block}
+  .trial{margin-top:14px;background:linear-gradient(135deg,var(--soft),transparent);border:1.5px dashed var(--ac);border-radius:16px;padding:14px 16px;font-size:13.5px;line-height:1.7;color:var(--tx2);opacity:0;transform:translateY(14px);transition:all .5s .35s cubic-bezier(.22,1,.36,1)}
+  .trial.in{opacity:1;transform:none}
+  .trial b{color:var(--ac)}
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="top">
+    <button class="skip" id="obBack" onclick="OB.back()" style="display:none;padding:8px 10px 8px 0;font-size:16px">‹</button>
+    <div class="dots" id="dots"></div>
+    <button class="skip" onclick="OB.skip()">略過</button>
+  </div>
+  <div class="deck" id="deck"></div>
+</div>
+<script>
+// ═══ 新版 onboarding DEMO ═══
+// 設計原則:一屏一問、大目標卡、選了自動前進(免多按下一步)、答案落地(demo_ 前綴)、
+// 結果頁把答案變成「個人化計畫」再自然帶到試用——問的每一題都被用到,不做問心酸的。
+const OB=(()=>{
+  const A={};   // answers
+  const save=(k,v)=>{ A[k]=v; try{ localStorage.setItem('demo_ob_'+k, v); }catch(e){} };
+
+  const slides=[
+    { id:'hello', html:`
+      <div class="hero">
+        <div class="logo">日本再留計劃</div>
+        <div class="art">🎯</div>
+        <h1>幾個問題,<br>幫你排好到考前的每一天</h1>
+        <div class="sub">30 秒設定。之後每天打開,今天該背什麼、該複習什麼,都已經排好了。</div>
+      </div>
+      <div class="cta"><button class="btn" onclick="OB.next()">開始 →</button></div>` },
+    { id:'goal', kick:'1 / 4・目標', h:'你想考哪一級?', sub:'不確定的話,從你聽過的難度選——之後隨時可以改。',
+      opts:[
+        {v:'n5',ic:'🌱',t:'N5',d:'剛起步,五十音之後的第一站'},
+        {v:'n4',ic:'🌿',t:'N4',d:'基礎日常會話'},
+        {v:'n3',ic:'🌳',t:'N3',d:'銜接中級,求職加分的起點'},
+        {v:'n2',ic:'⛰️',t:'N2',d:'工作簽證、日企求職的門檻'},
+        {v:'n1',ic:'🗻',t:'N1',d:'最高級,翻譯、專業職場'},
+      ], key:'goal' },
+    { id:'when', kick:'2 / 4・時間', h:'打算什麼時候考?', sub:'考試日決定每天的進度怎麼排。',
+      opts:[
+        {v:'2026-12-06',ic:'🍂',t:'今年 12 月(12/6)',d:'衝刺模式:每天進度會排緊一點'},
+        {v:'2027-07-04',ic:'🌸',t:'明年 7 月',d:'穩紮穩打,基礎打好'},
+        {v:'',ic:'🤔',t:'還沒決定',d:'先開始學,之後再設考試日'},
+      ], key:'exam' },
+    { id:'level', kick:'3 / 4・起點', h:'你現在的程度?', sub:'決定從哪裡開始,不浪費時間重學。',
+      opts:[
+        {v:'zero',ic:'✨',t:'全新開始',d:'從五十音出發'},
+        {v:'kana',ic:'🈴',t:'會五十音',d:'直接進單字和文法'},
+        {v:'some',ic:'📖',t:'學過一些',d:'N5–N4 程度,撿回來很快'},
+        {v:'restart',ic:'🔁',t:'以前學過,想重新開始',d:'快速複習+補洞'},
+      ], key:'level' },
+    { id:'time', kick:'4 / 4・節奏', h:'每天能花多少時間?', sub:'誠實選——排得動的計畫才走得遠。',
+      opts:[
+        {v:'10',ic:'☕',t:'10 分鐘',d:'每天 10 個字+複習'},
+        {v:'20',ic:'🚃',t:'20 分鐘',d:'單字+文法+一篇短文'},
+        {v:'40',ic:'🔥',t:'40 分鐘以上',d:'完整菜單:含刷題和口說'},
+      ], key:'mins' },
+    { id:'calc', html:`
+      <div class="calc" id="calcBox">
+        <div class="ring"></div>
+        <div style="font-size:16px;font-weight:700" id="calcTxt">正在為你規劃…</div>
+      </div>` },
+    { id:'done', html:`` },   // 動態生成
+  ];
+
+  let idx=0;
+  function dots(){
+    const visible=slides.length-2;   // hello 不算點,calc/done 共用最後一點
+    document.getElementById('dots').innerHTML=Array.from({length:5},(_,i)=>
+      '<div class="dot'+(i<=Math.min(idx-1,4)?' on':'')+'"><i></i></div>').join('');
+  }
+  function render(){
+    const d=document.getElementById('deck');
+    d.innerHTML=slides.map((s,i)=>{
+      let inner=s.html||'';
+      if(s.opts){
+        inner='<div class="kick">'+s.kick+'</div><h1>'+s.h+'</h1><div class="sub">'+s.sub+'</div>'+
+          '<div class="opts">'+s.opts.map(o=>
+            '<button class="opt" onclick="OB.pick(this,\''+s.key+'\',\''+o.v+'\')"><span class="ic">'+o.ic+'</span><span><span class="t">'+o.t+'</span><div class="d">'+o.d+'</div></span><span class="chk">✓</span></button>').join('')+'</div>';
+      }
+      return '<div class="slide'+(i===0?' on':'')+'" id="sl'+i+'">'+inner+'</div>';
+    }).join('');
+    dots();
+  }
+  function go(n){
+    const back = n < idx;
+    const cur=document.getElementById('sl'+idx);
+    if(cur){ cur.classList.remove('on'); cur.classList.toggle('left', !back); }   // 倒退時舊頁往右退場
+    idx=n;
+    const nx=document.getElementById('sl'+idx);
+    if(nx){ nx.classList.remove('left'); nx.classList.add('on'); }
+    dots();
+    // 返回鈕:問題頁(1~4)才顯示;歡迎/計算/結果頁不顯示
+    const bb=document.getElementById('obBack');
+    if(bb) bb.style.display = (idx>=1 && idx<=4) ? 'block' : 'none';
+    if(slides[idx].id==='calc') runCalc();
+  }
+  function next(){ go(Math.min(idx+1,slides.length-1)); }
+  function back(){ if(idx>=1) go(idx-1); }   // 填錯了?退回上一題,已選的答案保留
+  function pick(el,key,v){
+    el.parentElement.querySelectorAll('.opt').forEach(x=>x.classList.remove('sel'));
+    el.classList.add('sel');
+    save(key,v);
+    setTimeout(next,320);   // 選了自動前進——這就是「絲滑」的關鍵
+  }
+  function runCalc(){
+    // 個人化計算(真實邏輯:考試日→剩餘天數→每日字數)
+    const days = A.exam ? Math.max(14, Math.ceil((new Date(A.exam+'T00:00:00+09:00')-Date.now())/86400000)) : 105;
+    const per = A.mins==='10'?10 : A.mins==='40'?30 : 20;
+    const goal=(A.goal||'n5').toUpperCase();
+    setTimeout(()=>{
+      const done=slides.length-1;
+      document.getElementById('sl'+done).innerHTML=`
+        <div class="kick">你的專屬計畫</div>
+        <h1>${goal},${A.exam?'距離考試 '+days+' 天':'照自己的節奏'}</h1>
+        <div class="sub">照這個節奏走,考前可以完整過完 ${goal} 的單字與文法,還留出模擬考和複習的時間。</div>
+        <div class="plan">
+          <div class="stat" id="st1"><div class="n">${per}</div><div class="l"><b>每天新單字</b>搭配自動排程的複習,背過的不會忘</div></div>
+          <div class="stat" id="st2"><div class="n">${A.exam?days+'天':'自由'}</div><div class="l"><b>${A.exam?'倒數計畫':'無壓力模式'}</b>每天打開就知道今天做什麼</div></div>
+          <div class="stat" id="st3"><div class="n">1,668</div><div class="l"><b>JLPT 刷題+模擬考</b>考前實戰,錯的自動進錯題本</div></div>
+        </div>
+        <div class="trial" id="tr1">🎁 <b>7 天全功能免費試用</b>(不用信用卡)——SRS 複習、模擬考、AI 口說全開。試用結束自動變免費版,不會扣錢。</div>
+        <div class="cta" style="margin-top:18px">
+          <button class="btn" onclick="OB.finish(true)">開始今天的 ${per} 個 →</button>
+          <button class="btn ghost" onclick="OB.finish(false)">先逛逛就好</button>
+          <button class="btn ghost" style="min-height:36px" onclick="OB.go(1)">← 修改我的答案</button>
+        </div>
+        <div style="text-align:center;font-size:11.5px;color:var(--tx3);margin-top:2px">之後也能在「我的 → 設定」隨時修改目標和節奏</div>`;
+      go(done);
+      setTimeout(()=>{ ['st1','st2','st3','tr1'].forEach((id,i)=>setTimeout(()=>{const e=document.getElementById(id); if(e)e.classList.add('in');}, i*140)); },80);
+    },1400);
+  }
+  function skip(){ save('skipped','1'); finish(false); }
+  function finish(start){
+    // DEMO:正式版這裡寫真實 keys(base_level/goal_level/exam_date/daily target)+導向 app.html
+    alert('(DEMO 結束)正式版會在這裡寫入設定並進入'+(start?'今日學習':'首頁'));
+  }
+  render();
+  return { next, pick, skip, finish, back, go };
+})();
+</script>
+</body>
+</html>
