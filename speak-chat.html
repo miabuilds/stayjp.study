@@ -340,8 +340,28 @@ function parseTurn(text){
 // 「你可以這樣回」建議;點了填進輸入框讓你可再改
 // 提示預設收合:先自己想,想不出來再點「💡 提示」展開——直接亮答案就沒練到了。
 let _hints=[];
+// 角色標記驗證:後端要求模型每個 HINT 開頭寫「<使用者角色>»」——寫標記這個動作本身逼模型想清楚說話者;
+// 這裡再驗一次:標記對不上使用者角色的提示直接丟棄(寧可少一條提示,也不顯示店員台詞給顧客)。沒帶標記的照舊保留(相容舊格式)。
+function cleanHints(arr){
+  const ur=(scene&&scene.ur)||'';
+  const out=[];
+  for(let h of (arr||[])){
+    const i=h.indexOf('»');
+    if(i>-1&&i<=12){
+      const tag=h.slice(0,i).trim(), body=h.slice(i+1).trim();
+      // 只有「短且不含標點空白」的前綴才視為角色標記;句子內容裡剛好有»時(帶標點)整句原樣保留,不誤殺
+      const isTag=tag.length<=8&&!/[「」。、,.!?！?？\s｜|]/.test(tag);
+      if(isTag){
+        if(ur&&tag&&tag!==ur) continue;   // 模型自己標成別的角色 → 視角錯亂,丟棄
+        h=body;
+      }
+    }
+    if(h) out.push(h);
+  }
+  return out;
+}
 function renderHints(hints){
-  _hints = hints||[];
+  _hints = cleanHints(hints);
   const box=document.getElementById('hints'); if(!box) return;
   if(!_hints.length){ box.innerHTML=''; return; }
   box.innerHTML = '<button class="hint-toggle" onclick="expandHints()">'+enOr('💡 不知道怎麼接?看提示','💡 Stuck? See hints')+'</button>';

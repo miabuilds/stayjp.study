@@ -19,6 +19,7 @@ const DEFAULTS = {
   maxTurns: 12,           // 每場對話輪數封頂(成本天花板)
   historyKeep: 12,        // 送給模型的歷史訊息數上限(6輪),input 不隨對話無限長
   ttsDaily: 150,          // 雲端 TTS 每人每日粗上限(防拿 token 單獨刷合成;正常對話一天用不到)
+  chatModel: "claude-haiku-4-5-20251001",   // 情境對話模型;config/ai 可熱切(如升 claude-sonnet-5 測試角色穩定度)
 };
 
 export type AiConfig = typeof DEFAULTS;

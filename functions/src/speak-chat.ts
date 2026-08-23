@@ -44,18 +44,19 @@ function chatSystem(sceneDesc: string, level: string, lang?: string, userRole?: 
 - 對方是學習者,若他上一句日語有明顯錯誤(助詞、動詞變化、用詞、不自然),在 COACH 用一句${L}溫和點出更好的說法;講得好就用 COACH 給一句具體鼓勵。
 - 對話自然走到尾聲時,可以帶到道別收尾。
 - 重要:對方常常「不知道要講什麼」。每一輪都要給 2~3 個 HINT。HINT 的鐵則:
-  ①視角:HINT 是「${UR}」要說的台詞,**絕對不能是你自己角色會講的話**。每寫一個 HINT 前自問:「這句話是${UR}會說的嗎?」不是就整句換掉。例:場景是便利商店、你是店員、對方是顧客時——「温めますか?」是店員的話=不合格;「はい、お願いします」是顧客的話=合格。
-  ②關聯:每個 HINT 必須**直接回應你剛剛輸出的那句 JP**——你問了問題就給「回答那個問題」的選項;你陳述了事情就給「接著那件事」的回應。跟上一句無關的 HINT 一律不合格。
-  ③多樣:2~3 個彼此方向不同(肯定/否定/追問),難度符合等級,能把對話往前推。
+  ①視角:HINT 是「${UR}」要說的台詞,**絕對不能是你自己角色會講的話**。每個 HINT 的開頭必須先一字不差寫上「${UR}»」再接台詞——寫這個標記的同時自問:「這句話真的是${UR}會說的嗎?」不是就整句換掉。例:場景是便利商店、你是店員、對方是顧客時——「温めますか?」是店員的話=不合格;「はい、お願いします」是顧客的話=合格。
+  ②服務方句型警戒:「〜をお持ちします」「〜はいかがですか」「〜ましょうか?」這類**提供服務、詢問對方需求**的句子,幾乎都是店員/服務方的台詞。若「${UR}」是顧客、客人、乘客、患者這類「被服務的一方」,這些句型一律不合格——顧客說的是「〜をください」「〜はありますか」「お願いします」這種**提出需求**的話。
+  ③關聯:每個 HINT 必須**直接回應你剛剛輸出的那句 JP**——你問了問題就給「回答那個問題」的選項;你陳述了事情就給「接著那件事」的回應。跟上一句無關的 HINT 一律不合格。
+  ④多樣:2~3 個彼此方向不同(肯定/否定/追問),難度符合等級,能把對話往前推。
 【輸出格式】嚴格逐行輸出,一行一個欄位,不要 JSON、不要多餘文字或旁白。JP/KANA/ZH 各恰好一行、缺一不可;每個欄位只輸出一次,想好再寫、絕對不要輸出到一半重來或補第二行 JP:
 JP: <你這個角色要講的日文(只有台詞本身)>
 KANA: <JP 的整句假名讀音>
 ZH: <JP 的${L}翻譯>
 WORDS: <JP 裡的關鍵單字 2~4 個,格式:単語|よみ|${L}意思,單字之間用半形分號;隔開、三個欄位內文不可再出現分號。例:お弁当|おべんとう|便當;温める|あたためる|加熱……讀音絕對不能錯;句子太簡單就整行省略>
 COACH: <對對方「上一句」的簡短${L}提點或鼓勵。開場或沒必要時,整行直接不要輸出——絕對不要寫 <blank>、空白、無、なし 這類佔位字>
-HINT: <對方可以這樣回你的日文>｜<這句的${L}意思>
-HINT: <另一個不同方向的回法>｜<${L}意思>
-HINT: <再一個(可選)>｜<${L}意思>`;
+HINT: ${UR}»<對方可以這樣回你的日文>｜<這句的${L}意思>
+HINT: ${UR}»<另一個不同方向的回法>｜<${L}意思>
+HINT: ${UR}»<再一個(可選)>｜<${L}意思>`;
 }
 
 function reviewSystem(lang?: string): string {
@@ -71,11 +72,11 @@ TIP: 一句${L},下次馬上能用的小建議
 ENCOURAGE: 一句${L},像真人教練的鼓勵`;
 }
 
-async function streamAnthropic(res: any, apiKey: string, system: any, messages: any[]) {
+async function streamAnthropic(res: any, apiKey: string, system: any, messages: any[], model?: string) {
   const upstream = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
     headers: { "content-type": "application/json", "x-api-key": apiKey, "anthropic-version": "2023-06-01" },
-    body: JSON.stringify({ model: MODEL, max_tokens: 600, stream: true, system, messages }),
+    body: JSON.stringify({ model: model || MODEL, max_tokens: 600, stream: true, system, messages }),
   });
   if (!upstream.ok || !upstream.body) {
     const errTxt = await upstream.text().catch(() => "");
@@ -175,7 +176,7 @@ export const speakChat = functions.onRequest(
         kept.push({ role: "user", content: "（請你先自然開口,帶起這個情境的對話）" });
       }
       const system = [{ type: "text", text: chatSystem(scene, level || "N4", lang, String(userRole || "").slice(0, 30)), cache_control: { type: "ephemeral" } }];
-      await streamAnthropic(res, ANTHROPIC_API_KEY.value(), system, kept);
+      await streamAnthropic(res, ANTHROPIC_API_KEY.value(), system, kept, (cfg as any).chatModel);
     } catch (e: any) {
       if (!res.headersSent) res.status(500).json({ error: String((e && e.message) || e) });
       else { try { res.end(); } catch { /* noop */ } }
