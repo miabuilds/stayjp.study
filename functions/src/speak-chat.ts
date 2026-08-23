@@ -121,7 +121,7 @@ async function streamAnthropic(res: any, apiKey: string, system: any, messages: 
   const upstream = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
     headers: { "content-type": "application/json", "x-api-key": apiKey, "anthropic-version": "2023-06-01" },
-    body: JSON.stringify({ model: model || MODEL, max_tokens: 600, stream: true, system, messages }),
+    body: JSON.stringify({ model: model || MODEL, max_tokens: 800, stream: true, system, messages }),
   });
   if (!upstream.ok || !upstream.body) {
     const errTxt = await upstream.text().catch(() => "");
@@ -172,6 +172,7 @@ async function streamAnthropic(res: any, apiKey: string, system: any, messages: 
     }
   }
   if (hintGuard) {
+    if (!/^\s*JP[::]/m.test(full)) console.warn("[format] 模型輸出缺 JP 行, model=" + (model || MODEL) + " raw=" + JSON.stringify(full.slice(0, 600)));
     const withheld = full.slice(sent);
     if (!/(?:^|\n)HINT:/.test(withheld)) {
       if (withheld) res.write(withheld);       // 這輪沒有 HINT(或格式跑掉)→ 原樣放行
