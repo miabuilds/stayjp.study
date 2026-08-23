@@ -176,38 +176,38 @@ const FN_TTS  = 'https://asia-east1-jpnote-1bdd6.cloudfunctions.net/ttsSpeak';
 
 // desc 是給 AI 的角色設定(不翻譯);voice 決定雲端語音性別。tE/dE 是英文顯示用。
 const SCENES = [
-  { k:'conbini', jp:'コンビニ', yomi:'', ic:'🏪', t:'便利商店', d:'結帳、加熱便當、集點', tE:'Convenience store', dE:'Checkout, heating food, points', voice:'f',
+  { k:'conbini', ur:'顧客', jp:'コンビニ', yomi:'', ic:'🏪', t:'便利商店', d:'結帳、加熱便當、集點', tE:'Convenience store', dE:'Checkout, heating food, points', voice:'f',
     desc:'你是日本便利商店(コンビニ)的店員,正在幫這位客人結帳。你會問要不要加熱、要不要袋子、有沒有集點卡等,並完成結帳。' },
-  { k:'resto', jp:'注文', yomi:'ちゅうもん', ic:'🍜', t:'餐廳點餐', d:'帶位、點餐、結帳', tE:'Restaurant', dE:'Seating, ordering, paying', voice:'m',
+  { k:'resto', ur:'客人', jp:'注文', yomi:'ちゅうもん', ic:'🍜', t:'餐廳點餐', d:'帶位、點餐、結帳', tE:'Restaurant', dE:'Seating, ordering, paying', voice:'m',
     desc:'你是日本餐廳的店員,從帶位、遞菜單、幫客人點餐、送餐到結帳都由你負責,自然地推進用餐流程。' },
-  { k:'station', jp:'道案内', yomi:'みちあんない', ic:'🚉', t:'車站問路', d:'問路、買票、轉乘', tE:'At the station', dE:'Directions, tickets, transfers', voice:'m',
+  { k:'station', ur:'問路的旅客', jp:'道案内', yomi:'みちあんない', ic:'🚉', t:'車站問路', d:'問路、買票、轉乘', tE:'At the station', dE:'Directions, tickets, transfers', voice:'m',
     desc:'你是車站站務員或熱心的路人,客人向你問路、問怎麼買票或轉乘。你親切地指路、說明路線。' },
-  { k:'clinic', jp:'病院', yomi:'びょういん', ic:'🏥', t:'看診拿藥', d:'掛號、說症狀、拿藥', tE:'Clinic visit', dE:'Check-in, symptoms, medicine', voice:'f',
+  { k:'clinic', ur:'患者', jp:'病院', yomi:'びょういん', ic:'🏥', t:'看診拿藥', d:'掛號、說症狀、拿藥', tE:'Clinic visit', dE:'Check-in, symptoms, medicine', voice:'f',
     desc:'你是診所的櫃檯與護理人員,患者來看病。你會問哪裡不舒服、有沒有發燒、帶你保險證了嗎,並引導看診與拿藥。' },
-  { k:'shop', jp:'試着', yomi:'しちゃく', ic:'🛍️', t:'買衣服', d:'試穿、尺寸、退換', tE:'Clothes shopping', dE:'Fitting, sizes, returns', voice:'f',
+  { k:'shop', ur:'顧客', jp:'試着', yomi:'しちゃく', ic:'🛍️', t:'買衣服', d:'試穿、尺寸、退換', tE:'Clothes shopping', dE:'Fitting, sizes, returns', voice:'f',
     desc:'你是服飾店店員,客人來買衣服。你會招呼、介紹、幫忙找尺寸、帶去試穿、說明能不能退換。' },
-  { k:'interview', jp:'面接', yomi:'めんせつ', ic:'💼', t:'工作面試', d:'自我介紹、問答', tE:'Job interview', dE:'Self-intro, Q&A', voice:'m',
+  { k:'interview', ur:'求職者', jp:'面接', yomi:'めんせつ', ic:'💼', t:'工作面試', d:'自我介紹、問答', tE:'Job interview', dE:'Self-intro, Q&A', voice:'m',
     desc:'你是日本公司的面試官,正在面試這位求職者。你會請對方自我介紹、問動機與經歷、聊工作條件,語氣禮貌正式。' },
-  { k:'house', jp:'部屋探し', yomi:'へやさがし', ic:'🏠', t:'租屋看房', d:'租金、條件、簽約', tE:'Apartment hunting', dE:'Rent, terms, contract', voice:'f',
+  { k:'house', ur:'找房的客人', jp:'部屋探し', yomi:'へやさがし', ic:'🏠', t:'租屋看房', d:'租金、條件、簽約', tE:'Apartment hunting', dE:'Rent, terms, contract', voice:'f',
     desc:'你是不動產仲介,帶客人看房。你會介紹房子、說明租金與條件、回答問題、聊簽約流程。' },
-  { k:'coworker', jp:'雑談', yomi:'ざつだん', ic:'☕', t:'同事閒聊', d:'職場寒暄、約午餐', tE:'Coworker chat', dE:'Small talk, lunch plans', voice:'m',
+  { k:'coworker', ur:'同事', jp:'雑談', yomi:'ざつだん', ic:'☕', t:'同事閒聊', d:'職場寒暄、約午餐', tE:'Coworker chat', dE:'Small talk, lunch plans', voice:'m',
     desc:'你是對方公司的同事,午休時間隨意閒聊,話題像天氣、工作近況、要不要一起吃午餐等,輕鬆自然。' },
-  { k:'cityhall', jp:'市役所', yomi:'しやくしょ', ic:'🏛️', t:'市役所辦手續', d:'遷入、保險、文件', tE:'City hall', dE:'Move-in, insurance, paperwork', voice:'f',
+  { k:'cityhall', ur:'來辦手續的居民', jp:'市役所', yomi:'しやくしょ', ic:'🏛️', t:'市役所辦手續', d:'遷入、保險、文件', tE:'City hall', dE:'Move-in, insurance, paperwork', voice:'f',
     desc:'你是市役所窗口的職員,對方來辦手續(遷入登記、國民健康保險、文件申請等)。你會確認需要的證件、說明流程與填表方式,親切但公事公辦。' },
-  { k:'phone', jp:'携帯', yomi:'けいたい', ic:'📱', t:'辦手機門號', d:'方案、流量、合約', tE:'Phone plan', dE:'Plans, data, contract', voice:'m',
+  { k:'phone', ur:'辦門號的客人', jp:'携帯', yomi:'けいたい', ic:'📱', t:'辦手機門號', d:'方案、流量、合約', tE:'Phone plan', dE:'Plans, data, contract', voice:'m',
     desc:'你是電信門市的店員,對方來辦門號或換方案。你會介紹方案、問流量需求、說明合約與費用,並確認本人證件。' },
-  { k:'salon', jp:'美容院', yomi:'びよういん', ic:'💇', t:'剪頭髮', d:'描述髮型、長度', tE:'Haircut', dE:'Style, length, small talk', voice:'f',
+  { k:'salon', ur:'剪髮的客人', jp:'美容院', yomi:'びよういん', ic:'💇', t:'剪頭髮', d:'描述髮型、長度', tE:'Haircut', dE:'Style, length, small talk', voice:'f',
     desc:'你是美容院的設計師,客人來剪頭髮。你會問今天想怎麼剪、長度、髮型偏好,過程中閒聊幾句,結束確認滿不滿意。' },
-  { k:'izakaya', jp:'居酒屋', yomi:'いざかや', ic:'🍶', t:'居酒屋聚會', d:'點酒、聊天、乾杯', tE:'Izakaya night', dE:'Drinks, chatting, kanpai', voice:'m',
+  { k:'izakaya', ur:'一起喝酒的朋友', jp:'居酒屋', yomi:'いざかや', ic:'🍶', t:'居酒屋聚會', d:'點酒、聊天、乾杯', tE:'Izakaya night', dE:'Drinks, chatting, kanpai', voice:'m',
     desc:'你是一起來居酒屋的日本朋友,大家下班聚會。你會招呼點酒點菜、乾杯、聊工作與生活,口語輕鬆、氣氛熱絡。' },
-  { k:'delivery', jp:'宅配便', yomi:'たくはいびん', ic:'📦', t:'宅配・退換貨', d:'重新配送、客服', tE:'Delivery & returns', dE:'Redelivery, support', voice:'f',
+  { k:'delivery', ur:'收件人', jp:'宅配便', yomi:'たくはいびん', ic:'📦', t:'宅配・退換貨', d:'重新配送、客服', tE:'Delivery & returns', dE:'Redelivery, support', voice:'f',
     desc:'你是宅配公司或網購客服人員,對方要處理包裹問題(改配送時間、不在配達、退貨換貨)。你會確認單號、說明手續。' },
-  { k:'smalltalk', jp:'ご近所', yomi:'ごきんじょ', ic:'🌸', t:'鄰居寒暄', d:'垃圾日、天氣、近況', tE:'Neighbor chat', dE:'Trash day, weather, life', voice:'f',
+  { k:'smalltalk', ur:'鄰居', jp:'ご近所', yomi:'ごきんじょ', ic:'🌸', t:'鄰居寒暄', d:'垃圾日、天氣、近況', tE:'Neighbor chat', dE:'Trash day, weather, life', voice:'f',
     desc:'你是對方的日本鄰居,在公寓門口或垃圾集中處碰到面。你會寒暄天氣、聊垃圾分類日、社區的事、隨意近況,親切自然。' },
-  { k:'custom', jp:'自由トーク', yomi:'', ic:'✏️', t:'自訂主題', d:'想聊什麼自己定', tE:'Custom topic', dE:'You decide what to chat about', voice:'f', custom:true },
+  { k:'custom', ur:'對話的另一方', jp:'自由トーク', yomi:'', ic:'✏️', t:'自訂主題', d:'想聊什麼自己定', tE:'Custom topic', dE:'You decide what to chat about', voice:'f', custom:true },
 ];
 const LEVELS = ['N5','N4','N3','N2','N1'];
-let activeLv = 'N4';
+let activeLv = (function(){ try{ return localStorage.getItem('sc_lv')||'N4'; }catch(e){ return 'N4'; } })();   // 記住上次選的等級
 let scene = null;
 let history = [];      // {role:'ai'|'me', text, kana, zh, coach}
 let busy = false;
@@ -221,7 +221,7 @@ function renderLvTabs(){
   document.getElementById('lvtabs').innerHTML = LEVELS.map(lv=>
     `<div class="lvtab${lv===activeLv?' on':''}" onclick="pickLv('${lv}')">${lv}<small>${D[lv]}</small></div>`).join('');
 }
-function pickLv(lv){ activeLv=lv; renderLvTabs(); }
+function pickLv(lv){ try{ localStorage.setItem('sc_lv',lv); }catch(e){} activeLv=lv; renderLvTabs(); }
 function sceneTitle(s){ return s.tE ? enOr(s.t, s.tE) : s.t; }   // custom 主題的 t 是使用者輸入,不翻
 function renderScenes(){
   document.getElementById('scenes').innerHTML = SCENES.map(s=>
@@ -376,7 +376,7 @@ async function turn(){
   try{
     const t = await auth.currentUser.getIdToken();
     const r = await fetch(FN_CHAT,{ method:'POST', headers:{'Content-Type':'application/json',Authorization:'Bearer '+t},
-      body:JSON.stringify({ mode:'chat', scene:scene.desc, level:activeLv, lang:I18n.getLang(), history:history.map(h=>({role:h.role,text:h.role==='ai'?(h.jp||h.text):h.text})) }) });
+      body:JSON.stringify({ mode:'chat', scene:scene.desc, userRole:(scene.ur||''), level:activeLv, lang:I18n.getLang(), history:history.map(h=>({role:h.role,text:h.role==='ai'?(h.jp||h.text):h.text})) }) });
     if(!r.ok){
       let d={}; try{d=await r.json();}catch(e){}
       renderMsgs();
