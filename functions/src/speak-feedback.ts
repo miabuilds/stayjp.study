@@ -5,6 +5,7 @@
 // Claude key 只在後端(functions secret ANTHROPIC_API_KEY),絕不進前端。
 // ⚠️ 測試版:限 admin 呼叫 → 真實用戶打不到、不產生成本、不曝光。之後上線再改成 premium/quota 檢查。
 import * as functions from "firebase-functions/v2/https";
+import { trackAiCost } from "./ai-quota";
 import { defineSecret } from "firebase-functions/params";
 import * as admin from "firebase-admin";
 import { getAiConfig, consumeQuota, recordAiUse } from "./ai-quota";
@@ -101,6 +102,7 @@ export const speakFeedback = functions.onRequest(
       const reader = (upstream.body as any).getReader();
       const dec = new TextDecoder();
       let buf = "";
+      const usage = { in: 0, out: 0, cacheRead: 0, cacheWrite: 0 };
       for (;;) {
         const { done, value } = await reader.read();
         if (done) break;
@@ -114,6 +116,12 @@ export const speakFeedback = functions.onRequest(
           if (!data || data === "[DONE]") continue;
           try {
             const ev = JSON.parse(data);
+            if (ev.type === "message_start" && ev.message?.usage) {
+              usage.in = ev.message.usage.input_tokens || 0;
+              usage.cacheRead = ev.message.usage.cache_read_input_tokens || 0;
+              usage.cacheWrite = ev.message.usage.cache_creation_input_tokens || 0;
+            }
+            if (ev.type === "message_delta" && ev.usage) usage.out = ev.usage.output_tokens || usage.out;
             if (ev.type === "content_block_delta" && ev.delta?.type === "text_delta") {
               res.write(ev.delta.text);
             }
@@ -121,6 +129,7 @@ export const speakFeedback = functions.onRequest(
         }
       }
       res.end();
+      void trackAiCost(MODEL, usage);
     } catch (e: any) {
       if (!res.headersSent) res.status(500).json({ error: String((e && e.message) || e) });
       else { try { res.end(); } catch { /* noop */ } }

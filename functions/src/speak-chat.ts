@@ -6,7 +6,7 @@
 import * as functions from "firebase-functions/v2/https";
 import { defineSecret } from "firebase-functions/params";
 import * as admin from "firebase-admin";
-import { getAiConfig, consumeQuota, recordAiUse } from "./ai-quota";
+import { getAiConfig, consumeQuota, recordAiUse, trackAiCost } from "./ai-quota";
 
 if (admin.apps.length === 0) admin.initializeApp();
 
@@ -95,6 +95,7 @@ async function guardHints(rawHints: string[], jp: string, g: HintGuard): Promise
     });
     if (!up.ok) return rawHints;                                   // 審核掛了 → 放行原提示(fail-open)
     const d: any = await up.json();
+    if (d.usage) void trackAiCost(MODEL, { in: d.usage.input_tokens || 0, out: d.usage.output_tokens || 0 });
     const verdicts = String(d.content?.[0]?.text || "").split("\n").map(x => x.trim().toUpperCase());
     let kept = list.filter((_, i) => verdicts[i] !== "NG");        // 只有明確 NG 才丟
     if (!kept.length) {
@@ -108,6 +109,7 @@ async function guardHints(rawHints: string[], jp: string, g: HintGuard): Promise
       });
       if (rw.ok) {
         const rd: any = await rw.json();
+        if (rd.usage) void trackAiCost(MODEL, { in: rd.usage.input_tokens || 0, out: rd.usage.output_tokens || 0 });
         kept = String(rd.content?.[0]?.text || "").split("\n").map(x => x.trim()).filter(x => x.includes("｜")).slice(0, 2);
       }
     }
@@ -134,6 +136,7 @@ async function streamAnthropic(res: any, apiKey: string, system: any, messages: 
   let buf = "";
   let full = "";                 // 模型輸出全文
   let sent = 0;                  // 已轉發到的位置(hintGuard 模式用)
+  const usage = { in: 0, out: 0, cacheRead: 0, cacheWrite: 0 };   // 成本記帳用
   const HOLD = 8;                // 尾端保留字數,避免 "\nHINT:" 被 chunk 切一半漏攔
   const forward = () => {        // 轉發到「第一個 HINT 行」之前為止;HINT 之後全部攔下
     if (!hintGuard) return;
@@ -154,6 +157,12 @@ async function streamAnthropic(res: any, apiKey: string, system: any, messages: 
       if (!data || data === "[DONE]") continue;
       try {
         const ev = JSON.parse(data);
+        if (ev.type === "message_start" && ev.message?.usage) {
+          usage.in = ev.message.usage.input_tokens || 0;
+          usage.cacheRead = ev.message.usage.cache_read_input_tokens || 0;
+          usage.cacheWrite = ev.message.usage.cache_creation_input_tokens || 0;
+        }
+        if (ev.type === "message_delta" && ev.usage) usage.out = ev.usage.output_tokens || usage.out;
         if (ev.type === "content_block_delta" && ev.delta?.type === "text_delta") {
           const t = ev.delta.text;
           if (hintGuard) { full += t; forward(); }
@@ -180,6 +189,7 @@ async function streamAnthropic(res: any, apiKey: string, system: any, messages: 
     }
   }
   res.end();
+  void trackAiCost(model || MODEL, usage);   // fire-and-forget 記帳(含超額自動降級)
 }
 
 export const speakChat = functions.onRequest(
@@ -215,6 +225,7 @@ export const speakChat = functions.onRequest(
         });
         if (!up.ok) { res.status(502).json({ error: "translate_failed" }); return; }
         const d: any = await up.json();
+        if (d.usage) void trackAiCost(MODEL, { in: d.usage.input_tokens || 0, out: d.usage.output_tokens || 0 });
         const ja = (d.content && d.content[0] && d.content[0].text || "").trim();
         res.json({ ja }); return;
       }
