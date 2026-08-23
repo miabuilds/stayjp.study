@@ -1,6 +1,8 @@
 {
   "_comment": "Reading overrides applied to text BEFORE sending to VOICEVOX. Add entries when VOICEVOX mispronounces a word — value should be the correct kana. Use value \"__SKIP__\" to skip pre-rendered audio (falls back to browser TTS). Use prefix \"kana:\" to force explicit pitch accent via is_kana=true (e.g. \"kana:ハ'ガキ\" — ' marks the pitch-drop position). Use key prefix \"==\" for exact-match only (e.g. \"==は\" only fires when the whole text is exactly 「は」, won't break sentences containing は as a particle).",
   "船便": "ふなびん",
+  "分別": "ぶんべつ",
+  "一目で": "ひとめで",
   "より辛いですね": "よりからいですね",
   "日本の生活": "にほんの生活",
   "ご教示": "ごきょうじ",

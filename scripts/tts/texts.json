@@ -42,6 +42,13 @@
     ]
   },
   {
+    "text": "「いつから痛いですか」「アレルギーはありますか」など、聞かれることは大体決まっている。",
+    "hash": "39eebff31685",
+    "sources": [
+      "article#a-n3-8"
+    ]
+  },
+  {
     "text": "「ここはリビング、そこはキッチン、あそこはお風呂です。」",
     "hash": "bf1349f165ff",
     "sources": [
@@ -196,6 +203,13 @@
     ]
   },
   {
+    "text": "「ら抜き言葉」という言葉を聞いたことがあるだろうか。",
+    "hash": "dc79563b3e46",
+    "sources": [
+      "article#a-n1-7"
+    ]
+  },
+  {
     "text": "「一緒に行きますか。」「ええ、行きます。」",
     "hash": "286bc3927ccd",
     "sources": [
@@ -214,6 +228,13 @@
     "hash": "8cd739099ea3",
     "sources": [
       "vocab-n5#はい"
+    ]
+  },
+  {
+    "text": "「見られる」には受身・尊敬・可能という複数の意味があるが、「見れる」なら可能の意味だと一目で分かるからだ。",
+    "hash": "19643db5d821",
+    "sources": [
+      "article#a-n1-7"
     ]
   },
   {
@@ -249,6 +270,13 @@
     "hash": "21f9ab4c56a5",
     "sources": [
       "article#a-n3-7"
+    ]
+  },
+  {
+    "text": "「食べられる」を「食べれる」と言うような言い方で、正しくない日本語だと批判されることが多い。",
+    "hash": "492be388f56e",
+    "sources": [
+      "article#a-n1-7"
     ]
   },
   {
@@ -2379,6 +2407,13 @@
     ]
   },
   {
+    "text": "あしをはこぶ",
+    "hash": "26094e4de621",
+    "sources": [
+      "article-vocab#a-n2-8"
+    ]
+  },
+  {
     "text": "あせ",
     "hash": "7e8747a7c88a",
     "sources": [
@@ -2494,6 +2529,13 @@
     "sources": [
       "vocab-n5",
       "vocab-n3"
+    ]
+  },
+  {
+    "text": "あたらしいカメラがほしいですが、たかいですから、いまはおかねをためています。",
+    "hash": "10a15bf97270",
+    "sources": [
+      "article#a-n5-6"
     ]
   },
   {
@@ -4149,7 +4191,8 @@
     "text": "あるく",
     "hash": "4c92dbe45146",
     "sources": [
-      "vocab-n5"
+      "vocab-n5",
+      "article-vocab#a-n5-6"
     ]
   },
   {
@@ -5265,6 +5308,13 @@
     "hash": "b68960b205eb",
     "sources": [
       "vocab-n5"
+    ]
+  },
+  {
+    "text": "いじゅう",
+    "hash": "eb99f3d0f04a",
+    "sources": [
+      "article-vocab#a-n2-8"
     ]
   },
   {
@@ -6888,7 +6938,15 @@
     "hash": "c857fd410dd7",
     "sources": [
       "vocab-n4",
-      "vocab-n3"
+      "vocab-n3",
+      "article-vocab#a-n3-8"
+    ]
+  },
+  {
+    "text": "うけみ",
+    "hash": "6674ad4a08e3",
+    "sources": [
+      "article-vocab#a-n1-7"
     ]
   },
   {
@@ -8657,7 +8715,8 @@
     "hash": "54f051aa2e67",
     "sources": [
       "vocab-n5",
-      "vocab-n4"
+      "vocab-n4",
+      "article-vocab#a-n5-6"
     ]
   },
   {
@@ -9184,7 +9243,8 @@
     "hash": "f016214243c7",
     "sources": [
       "vocab-n4",
-      "vocab-n3"
+      "vocab-n3",
+      "article-vocab#a-n4-7"
     ]
   },
   {
@@ -12250,7 +12310,8 @@
     "sources": [
       "vocab-n3",
       "vocab-n2",
-      "article-vocab#a-n2-5"
+      "article-vocab#a-n2-5",
+      "article-vocab#a-n2-8"
     ]
   },
   {
@@ -15014,7 +15075,8 @@
     "text": "きまる",
     "hash": "0ea74a6603cc",
     "sources": [
-      "vocab-n4"
+      "vocab-n4",
+      "article-vocab#a-n4-7"
     ]
   },
   {
@@ -16189,6 +16251,13 @@
     "hash": "2b8c515b4475",
     "sources": [
       "vocab-n5"
+    ]
+  },
+  {
+    "text": "きれいなしゃしんがとれたとき、とてもうれしいです。",
+    "hash": "c2ca96630653",
+    "sources": [
+      "article#a-n5-6"
     ]
   },
   {
@@ -19681,7 +19750,8 @@
     "hash": "a4a62068b577",
     "sources": [
       "vocab-n3",
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n1-7"
     ]
   },
   {
@@ -26365,6 +26435,13 @@
     ]
   },
   {
+    "text": "ごみは「燃えるごみ」「燃えないごみ」「資源ごみ」などに分けなければなりません。",
+    "hash": "77e0b9e4b5a2",
+    "sources": [
+      "article#a-n4-7"
+    ]
+  },
+  {
     "text": "ごみばこ",
     "hash": "d5aa4b357803",
     "sources": [
@@ -28911,6 +28988,13 @@
     ]
   },
   {
+    "text": "しかし、移住は決して簡単なものではない。",
+    "hash": "20ad0eee6d6d",
+    "sources": [
+      "article#a-n2-8"
+    ]
+  },
+  {
     "text": "しかし、規制を強めすぎれば、観光そのものの魅力が失われかねない。",
     "hash": "f15ed59eb627",
     "sources": [
@@ -30566,7 +30650,8 @@
     "hash": "99b7c3e66e4b",
     "sources": [
       "vocab-n5",
-      "vocab-n4"
+      "vocab-n4",
+      "article-vocab#a-n5-6"
     ]
   },
   {
@@ -31547,7 +31632,8 @@
     "hash": "cc4c4663d635",
     "sources": [
       "vocab-n5",
-      "vocab-n4"
+      "vocab-n4",
+      "article-vocab#a-n5-6"
     ]
   },
   {
@@ -31933,7 +32019,8 @@
     "hash": "2618600cc03b",
     "sources": [
       "vocab-n3",
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n3-8"
     ]
   },
   {
@@ -32645,7 +32732,8 @@
     "text": "しょほうせん",
     "hash": "1a5a3bc266a9",
     "sources": [
-      "vocab-n3"
+      "vocab-n3",
+      "article-vocab#a-n3-8"
     ]
   },
   {
@@ -32984,7 +33072,8 @@
     "hash": "5d3cae0ce259",
     "sources": [
       "vocab-n3",
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n3-8"
     ]
   },
   {
@@ -36534,7 +36623,8 @@
     "hash": "bdab1a0128f0",
     "sources": [
       "vocab-n4",
-      "vocab-n3"
+      "vocab-n3",
+      "article-vocab#a-n3-8"
     ]
   },
   {
@@ -37888,6 +37978,13 @@
     ]
   },
   {
+    "text": "そもそも、言葉は常に変化し続けてきた。",
+    "hash": "a56288ec0339",
+    "sources": [
+      "article#a-n1-7"
+    ]
+  },
+  {
     "text": "そもそもこの計画には無理があったのだから、失敗したのも当然だ。",
     "hash": "805222ca1b77",
     "sources": [
@@ -38178,6 +38275,13 @@
     "hash": "ee7d30812667",
     "sources": [
       "vocab-n3"
+    ]
+  },
+  {
+    "text": "そんけい",
+    "hash": "9385022bfb50",
+    "sources": [
+      "article-vocab#a-n1-7"
     ]
   },
   {
@@ -39136,6 +39240,13 @@
     ]
   },
   {
+    "text": "だが、言語学の立場から見れば、これは単なる「乱れ」ではなく、合理的な変化だという見方もある。",
+    "hash": "56c9ff39a5be",
+    "sources": [
+      "article#a-n1-7"
+    ]
+  },
+  {
     "text": "だが、時には空気を読まずに声を上げる勇気もまた、大切にされるべきではないだろうか。",
     "hash": "fe6431433ae8",
     "sources": [
@@ -39414,7 +39525,8 @@
     "hash": "affccf241f14",
     "sources": [
       "vocab-n4",
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n2-8"
     ]
   },
   {
@@ -40243,7 +40355,8 @@
     "text": "ためる",
     "hash": "fb5cc59643f7",
     "sources": [
-      "vocab-n3"
+      "vocab-n3",
+      "article-vocab#a-n5-6"
     ]
   },
   {
@@ -40824,6 +40937,13 @@
       "vocab-n5",
       "vocab-n2",
       "article-vocab#a-n5-5"
+    ]
+  },
+  {
+    "text": "ちかづく",
+    "hash": "72fe1669368b",
+    "sources": [
+      "article-vocab#a-n1-7"
     ]
   },
   {
@@ -44776,6 +44896,13 @@
     ]
   },
   {
+    "text": "ときどきともだちにしゃしんをおくります。",
+    "hash": "b3ef2cab9c41",
+    "sources": [
+      "article#a-n5-6"
+    ]
+  },
+  {
     "text": "ときふせる",
     "hash": "553091be7218",
     "sources": [
@@ -44996,6 +45123,13 @@
     "hash": "554662dab345",
     "sources": [
       "vocab-n5"
+    ]
+  },
+  {
+    "text": "とけこむ",
+    "hash": "26312c67a9c5",
+    "sources": [
+      "article-vocab#a-n2-8"
     ]
   },
   {
@@ -45629,6 +45763,13 @@
     ]
   },
   {
+    "text": "ともだちは「じょうずですね」といいます。",
+    "hash": "95ae3d555c4b",
+    "sources": [
+      "article#a-n5-6"
+    ]
+  },
+  {
     "text": "ともなう",
     "hash": "2974ef522e63",
     "sources": [
@@ -45821,7 +45962,8 @@
     "sources": [
       "vocab-n5",
       "vocab-n3",
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n5-6"
     ]
   },
   {
@@ -46780,7 +46922,8 @@
     "text": "なげく",
     "hash": "574fa91c00b4",
     "sources": [
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n1-7"
     ]
   },
   {
@@ -47147,7 +47290,8 @@
     "sources": [
       "vocab-n4",
       "vocab-n3",
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n4-7"
     ]
   },
   {
@@ -49896,6 +50040,13 @@
     ]
   },
   {
+    "text": "はなやとりのしゃしんをとります。",
+    "hash": "7b02993d8e6d",
+    "sources": [
+      "article#a-n5-6"
+    ]
+  },
+  {
     "text": "はなれて住んでいますが、月に一度は電話で話します。",
     "hash": "1ee3e2e599e8",
     "sources": [
@@ -51138,7 +51289,8 @@
     "text": "ひはん",
     "hash": "fa16499c91ce",
     "sources": [
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n1-7"
     ]
   },
   {
@@ -51808,7 +51960,8 @@
     "hash": "3c5ebb1e89db",
     "sources": [
       "vocab-n3",
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n3-8"
     ]
   },
   {
@@ -52053,7 +52206,8 @@
       "vocab-n2",
       "vocab-n1",
       "article-vocab#a-n1-2",
-      "article-vocab#a-n1-4"
+      "article-vocab#a-n1-4",
+      "article-vocab#a-n2-8"
     ]
   },
   {
@@ -53307,6 +53461,13 @@
     ]
   },
   {
+    "text": "ぶんべつ",
+    "hash": "840e1bcac975",
+    "sources": [
+      "article-vocab#a-n4-7"
+    ]
+  },
+  {
     "text": "ぶんべん",
     "hash": "3097bf2dcff9",
     "sources": [
@@ -54457,6 +54618,13 @@
     ]
   },
   {
+    "text": "ほけんしょう",
+    "hash": "335f2870714c",
+    "sources": [
+      "article-vocab#a-n3-8"
+    ]
+  },
+  {
     "text": "ほけんりょう",
     "hash": "3d3672d6c513",
     "sources": [
@@ -54889,7 +55057,8 @@
     "hash": "a8c8fb4ea506",
     "sources": [
       "vocab-n2",
-      "article-vocab#a-n1-2"
+      "article-vocab#a-n1-2",
+      "article-vocab#a-n1-7"
     ]
   },
   {
@@ -55540,6 +55709,13 @@
     ]
   },
   {
+    "text": "まちがえる",
+    "hash": "e3d26cee4ef9",
+    "sources": [
+      "article-vocab#a-n4-7"
+    ]
+  },
+  {
     "text": "まつ",
     "hash": "0b898e3031a0",
     "sources": [
@@ -56142,6 +56318,13 @@
     ]
   },
   {
+    "text": "みだれ",
+    "hash": "0118b5054849",
+    "sources": [
+      "article-vocab#a-n1-7"
+    ]
+  },
+  {
     "text": "みち",
     "hash": "bd487055ce67",
     "sources": [
@@ -56695,6 +56878,13 @@
     "hash": "55b984b0de71",
     "sources": [
       "vocab-n2"
+    ]
+  },
+  {
+    "text": "むえん",
+    "hash": "2aa0b3259acf",
+    "sources": [
+      "article-vocab#a-n2-8"
     ]
   },
   {
@@ -57491,7 +57681,8 @@
     "hash": "27c02d41262d",
     "sources": [
       "vocab-n3",
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n4-7"
     ]
   },
   {
@@ -58557,6 +58748,13 @@
     ]
   },
   {
+    "text": "やすみの日はカメラをもって、まちをあるきます。",
+    "hash": "cd461ba30d12",
+    "sources": [
+      "article#a-n5-6"
+    ]
+  },
+  {
     "text": "やすむ",
     "hash": "d1e61f2de960",
     "sources": [
@@ -58581,7 +58779,8 @@
     "text": "やちん",
     "hash": "aff5f2a3f824",
     "sources": [
-      "vocab-n3"
+      "vocab-n3",
+      "article-vocab#a-n2-8"
     ]
   },
   {
@@ -58603,7 +58802,8 @@
     "text": "やっきょく",
     "hash": "92a3ac94cc37",
     "sources": [
-      "vocab-n3"
+      "vocab-n3",
+      "article-vocab#a-n3-8"
     ]
   },
   {
@@ -60534,6 +60734,13 @@
     ]
   },
   {
+    "text": "リモートワークの普及によって、どこに住んでいても仕事ができるようになったことが大きい。",
+    "hash": "9a3e9a439bdc",
+    "sources": [
+      "article#a-n2-8"
+    ]
+  },
+  {
     "text": "リモートワークの普及により、地方への移住を考える人が増えています。総務省の調査では、東京圏から地方への転出者数が、過去最高を記録したことが分かりました。特に三十代から四十代の働き盛りの世代に多い傾向が見られます。",
     "hash": "913935f5b486",
     "sources": [
@@ -61757,7 +61964,8 @@
     "hash": "4363c9d5b854",
     "sources": [
       "vocab-n3",
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n4-7"
     ]
   },
   {
@@ -62018,6 +62226,13 @@
     "hash": "e666169433c5",
     "sources": [
       "vocab-n5#白"
+    ]
+  },
+  {
+    "text": "わたしのしゅみはしゃしんをとることです。",
+    "hash": "59a5271fc5e2",
+    "sources": [
+      "article#a-n5-6"
     ]
   },
   {
@@ -66556,6 +66771,13 @@
     ]
   },
   {
+    "text": "家賃は都会の半分以下、通勤ラッシュとも無縁で、自然に囲まれた暮らしは魅力的に見える。",
+    "hash": "4885f7f95fa5",
+    "sources": [
+      "article#a-n2-8"
+    ]
+  },
+  {
     "text": "家賃を何ヶ月も払わなかったので、部屋を追い出されてしまいました。",
     "hash": "8614a6b58425",
     "sources": [
@@ -69423,6 +69645,13 @@
     "hash": "8707c73a6d9c",
     "sources": [
       "vocab-n4#素直"
+    ]
+  },
+  {
+    "text": "間違えると、ごみを持って行ってもらえないこともあります。",
+    "hash": "bb262efa7a9b",
+    "sources": [
+      "article#a-n4-7"
     ]
   },
   {
@@ -74429,6 +74658,13 @@
     ]
   },
   {
+    "text": "言葉が心配な人は、症状を紙に書いて見せるといい。",
+    "hash": "d732b1d6512b",
+    "sources": [
+      "article#a-n3-8"
+    ]
+  },
+  {
     "text": "言葉が足りなかったせいで、彼女に誤解されてしまったようです。",
     "hash": "ab37f0117990",
     "sources": [
@@ -76305,6 +76541,13 @@
     ]
   },
   {
+    "text": "今、私たちが「正しい」と信じている日本語も、百年前の人々から見れば乱れた言葉にほかならない。",
+    "hash": "5bdf82e45eaa",
+    "sources": [
+      "article#a-n1-7"
+    ]
+  },
+  {
     "text": "今、先生に手紙を書いています。葉書も書きたいから、後で切手と封筒を買いに行きます。",
     "hash": "1805802eebf0",
     "sources": [
@@ -77979,6 +78222,13 @@
     ]
   },
   {
+    "text": "最近、都会を離れて地方に移住する人が増えているという。",
+    "hash": "0e844586110c",
+    "sources": [
+      "article#a-n2-8"
+    ]
+  },
+  {
     "text": "最近、突然眠くなる日が多いです。",
     "hash": "bfb67e35319a",
     "sources": [
@@ -78452,6 +78702,13 @@
     "hash": "bb9812b915cc",
     "sources": [
       "vocab-n3#次第に"
+    ]
+  },
+  {
+    "text": "最初は面倒だと思いましたが、慣れると難しくありません。",
+    "hash": "d45394535663",
+    "sources": [
+      "article#a-n4-7"
     ]
   },
   {
@@ -83712,6 +83969,13 @@
     ]
   },
   {
+    "text": "車がなければ生活できない地域も多く、医療や教育の面で不便を感じることもある。",
+    "hash": "63fbc49c8087",
+    "sources": [
+      "article#a-n2-8"
+    ]
+  },
+  {
     "text": "車が水たまりを通ると、泥水が歩道まで跳ねてきました。",
     "hash": "e2309b0b62e3",
     "sources": [
@@ -85664,6 +85928,13 @@
     "hash": "842000a9cca6",
     "sources": [
       "vocab-n3#天気予報"
+    ]
+  },
+  {
+    "text": "出す曜日も決まっていて、私の町では燃えるごみは月曜日と木曜日です。",
+    "hash": "e2ea6c2a7bca",
+    "sources": [
+      "article#a-n4-7"
     ]
   },
   {
@@ -89830,6 +90101,13 @@
     "hash": "8c06b55bad40",
     "sources": [
       "confusables-eg"
+    ]
+  },
+  {
+    "text": "診察が終わると、処方箋をもらって、薬局で薬を受け取る。",
+    "hash": "19fc7236fb53",
+    "sources": [
+      "article#a-n3-8"
     ]
   },
   {
@@ -95252,6 +95530,13 @@
     ]
   },
   {
+    "text": "大切なのは、理想だけで決めるのではなく、実際に何度か足を運んで、その土地の暮らしを確かめることだろう。",
+    "hash": "e5012ebd6b71",
+    "sources": [
+      "article#a-n2-8"
+    ]
+  },
+  {
     "text": "大切な書類は、すべてこの引き出しに収めてあります。",
     "hash": "0aa5ae3131a8",
     "sources": [
@@ -95718,6 +96003,13 @@
     "hash": "ab41d2325550",
     "sources": [
       "vocab-n3#促進"
+    ]
+  },
+  {
+    "text": "地域の人間関係に溶け込めるかどうかも、大きな課題だと言われている。",
+    "hash": "1299755fb1f9",
+    "sources": [
+      "article#a-n2-8"
     ]
   },
   {
@@ -96712,6 +97004,13 @@
     "hash": "a51909ab539d",
     "sources": [
       "article#a-n4-4"
+    ]
+  },
+  {
+    "text": "朝八時までに、決められた場所に出します。",
+    "hash": "4f0e35d7f1d7",
+    "sources": [
+      "article#a-n4-7"
     ]
   },
   {
@@ -98770,6 +99069,13 @@
     "hash": "7672d14409e6",
     "sources": [
       "confusables-word"
+    ]
+  },
+  {
+    "text": "伝える方法はいくらでもある。",
+    "hash": "60db8aced362",
+    "sources": [
+      "article#a-n3-8"
     ]
   },
   {
@@ -101238,6 +101544,13 @@
     ]
   },
   {
+    "text": "日本で初めて熱を出したとき、どうすればいいか分からなくて、とても不安だった。",
+    "hash": "a87d88ebcee9",
+    "sources": [
+      "article#a-n3-8"
+    ]
+  },
+  {
     "text": "日本で働いた経験があります。",
     "hash": "3bd45b14c7d7",
     "sources": [
@@ -101298,6 +101611,13 @@
     "hash": "93fd1d95ad97",
     "sources": [
       "daily-story#n5_35"
+    ]
+  },
+  {
+    "text": "日本に住み始めて、一番驚いたのはごみの出し方です。",
+    "hash": "47f361b16844",
+    "sources": [
+      "article#a-n4-7"
     ]
   },
   {
@@ -107183,6 +107503,13 @@
     ]
   },
   {
+    "text": "病院では、最初に保険証を出して、問診票に症状を書く。",
+    "hash": "6e8ff47c4d79",
+    "sources": [
+      "article#a-n3-8"
+    ]
+  },
+  {
     "text": "病院にいるおじいさんを見に行きました。",
     "hash": "f95e8aeca2ac",
     "sources": [
@@ -108506,6 +108833,13 @@
     ]
   },
   {
+    "text": "分別のおかげで、町はいつもきれいです。",
+    "hash": "7ce3c7b5d75f",
+    "sources": [
+      "article#a-n4-7"
+    ]
+  },
+  {
     "text": "噴火で流れ出た溶岩は、麓の集落を飲み込む勢いで斜面を下っていった。",
     "hash": "cea135497505",
     "sources": [
@@ -108744,6 +109078,13 @@
     ]
   },
   {
+    "text": "変化を嘆くより、なぜそう変わるのかを考えるほうが、言葉の本質に近づけるのではないだろうか。",
+    "hash": "917302345c5e",
+    "sources": [
+      "article#a-n1-7"
+    ]
+  },
+  {
     "text": "片道5時間、急行を使ったら6時間かかります。",
     "hash": "51820ad34d5b",
     "sources": [
@@ -108874,6 +109215,13 @@
     "hash": "b39d204082de",
     "sources": [
       "vocab-n1#保釈"
+    ]
+  },
+  {
+    "text": "保険に入っていれば、自分で払うのは三割だけだからだ。",
+    "hash": "6cd557b5bc6f",
+    "sources": [
+      "article#a-n3-8"
     ]
   },
   {
@@ -112707,6 +113055,13 @@
     ]
   },
   {
+    "text": "友達に相談すると、「まず近くの内科に行ったほうがいいよ」と教えてくれた。",
+    "hash": "e1604aba78a0",
+    "sources": [
+      "article#a-n3-8"
+    ]
+  },
+  {
     "text": "友達に電話して、しばらく話しました。",
     "hash": "eab30e4bada1",
     "sources": [
@@ -115182,6 +115537,13 @@
     "hash": "c61d9a135cd0",
     "sources": [
       "phrases"
+    ]
+  },
+  {
+    "text": "料金は思ったより安かった。",
+    "hash": "465845c08622",
+    "sources": [
+      "article#a-n3-8"
     ]
   },
   {

@@ -2706,5 +2706,222 @@ window.ARTICLES = [
       "note_en": "\"when it really matters / in an emergency.\""
     }
   ]
+},
+{
+  "id": "a-n5-6",
+  "level": "n5",
+  "topic": "趣味",
+  "topic_en": "Hobby",
+  "title": "わたしの しゅみ",
+  "title_zh": "我的興趣",
+  "title_en": "My Hobby",
+  "body": "わたしの しゅみは しゃしんを とる ことです。\nやすみの 日は カメラを もって、まちを あるきます。\nはなや とりの しゃしんを とります。\nきれいな しゃしんが とれた とき、とても うれしいです。\nときどき ともだちに しゃしんを おくります。\nともだちは 「じょうずですね」と いいます。\nあたらしい カメラが ほしいですが、たかいですから、いまは おかねを ためて います。",
+  "trans": [
+    "我的興趣是拍照。",
+    "假日會帶著相機,在街上走走。",
+    "拍花和鳥的照片。",
+    "拍到漂亮的照片時,非常開心。",
+    "有時候會把照片傳給朋友。",
+    "朋友會說:「拍得真好呢。」",
+    "雖然想要新相機,但因為很貴,現在正在存錢。"
+  ],
+  "trans_en": [
+    "My hobby is taking photos.",
+    "On my days off, I take my camera and walk around town.",
+    "I take pictures of flowers and birds.",
+    "When I get a beautiful shot, I feel really happy.",
+    "Sometimes I send photos to my friends.",
+    "My friends say, \"You're really good!\"",
+    "I want a new camera, but it's expensive, so for now I'm saving money."
+  ],
+  "vocab": [
+    { "w": "趣味", "r": "しゅみ", "m": "興趣、嗜好", "m_en": "hobby" },
+    { "w": "写真", "r": "しゃしん", "m": "照片", "m_en": "photo" },
+    { "w": "撮る", "r": "とる", "m": "拍(照)", "m_en": "to take (a photo)" },
+    { "w": "歩く", "r": "あるく", "m": "走路、步行", "m_en": "to walk" },
+    { "w": "送る", "r": "おくる", "m": "寄送、傳送", "m_en": "to send" },
+    { "w": "貯める", "r": "ためる", "m": "存(錢)", "m_en": "to save (money)" }
+  ],
+  "grammar": [
+    { "t": "しゅみは~ことです", "note": "「我的興趣是做~」:名詞化的こと收尾。しゅみは しゃしんを とる ことです。", "t_en": "しゅみは〜ことです", "note_en": "\"My hobby is (doing) ~\": nominalize the verb with こと." },
+    { "t": "~とき", "note": "「~的時候」:とれた とき(拍到的時候)。", "id": "n5-59", "t_en": "〜とき", "note_en": "\"when ~\": とれた とき = when I managed to take (a good photo)." },
+    { "t": "~が ほしい", "note": "「想要~(東西)」:カメラが ほしいです。想要的對象用が。", "t_en": "〜が ほしい", "note_en": "\"I want ~ (a thing)\": the desired object takes が." }
+  ]
+},
+{
+  "id": "a-n4-7",
+  "level": "n4",
+  "topic": "生活",
+  "topic_en": "Life",
+  "title": "ごみの出し方",
+  "title_zh": "垃圾的丟法",
+  "title_en": "How to Take Out the Trash",
+  "body": "日本に住み始めて、一番驚いたのはごみの出し方です。\nごみは「燃えるごみ」「燃えないごみ」「資源ごみ」などに分けなければなりません。\n出す曜日も決まっていて、私の町では燃えるごみは月曜日と木曜日です。\n朝八時までに、決められた場所に出します。\n間違えると、ごみを持って行ってもらえないこともあります。\n最初は面倒だと思いましたが、慣れると難しくありません。\n分別のおかげで、町はいつもきれいです。",
+  "trans": [
+    "開始住在日本之後,最讓我驚訝的就是垃圾的丟法。",
+    "垃圾必須分成「可燃垃圾」「不可燃垃圾」「資源垃圾」等等。",
+    "丟垃圾的星期幾也是固定的,在我住的城鎮,可燃垃圾是星期一和星期四。",
+    "要在早上八點之前,拿到指定的地點丟。",
+    "如果分錯了,垃圾有時候會不被收走。",
+    "一開始覺得很麻煩,但習慣之後就不難了。",
+    "多虧了垃圾分類,城鎮總是很乾淨。"
+  ],
+  "trans_en": [
+    "After I started living in Japan, what surprised me most was how to take out the trash.",
+    "Trash must be separated into \"burnable,\" \"non-burnable,\" \"recyclable,\" and so on.",
+    "The collection days are fixed, too — in my town, burnable trash goes out on Mondays and Thursdays.",
+    "You take it to the designated spot by eight in the morning.",
+    "If you sort it wrong, sometimes they won't take it away.",
+    "At first I thought it was a hassle, but once you get used to it, it isn't hard.",
+    "Thanks to the sorting system, the town is always clean."
+  ],
+  "vocab": [
+    { "w": "驚く", "r": "おどろく", "m": "驚訝、吃驚", "m_en": "to be surprised" },
+    { "w": "分ける", "r": "わける", "m": "分開、分類", "m_en": "to separate, to sort" },
+    { "w": "決まる", "r": "きまる", "m": "被決定、固定", "m_en": "to be decided, to be fixed" },
+    { "w": "間違える", "r": "まちがえる", "m": "弄錯", "m_en": "to make a mistake" },
+    { "w": "面倒", "r": "めんどう", "m": "麻煩", "m_en": "troublesome, a hassle" },
+    { "w": "慣れる", "r": "なれる", "m": "習慣", "m_en": "to get used to" },
+    { "w": "分別", "r": "ぶんべつ", "m": "(垃圾)分類", "m_en": "sorting (trash)" }
+  ],
+  "grammar": [
+    { "t": "~なければなりません", "note": "「必須~」:分けなければなりません(必須分類)。", "id": "n4-16", "t_en": "〜なければなりません", "note_en": "\"must ~\": 分けなければなりません = must sort." },
+    { "t": "~までに", "note": "「在~之前(期限)」:朝八時までに出します。までに是期限,まで是持續。", "t_en": "〜までに", "note_en": "\"by ~ (deadline)\": までに marks a deadline; まで marks duration." },
+    { "t": "~てもらえない", "note": "「無法讓對方為自己做~」:持って行ってもらえない(不被收走)。てもらう的可能否定形。", "id": "n3-69", "t_en": "〜てもらえない", "note_en": "\"can't get someone to do ~ for you\": potential-negative of てもらう." },
+    { "t": "~おかげで", "note": "「多虧~、託~的福」:分別のおかげで、町はきれいです。", "id": "n3-6", "t_en": "〜おかげで", "note_en": "\"thanks to ~\": used for positive results." }
+  ]
+},
+{
+  "id": "a-n3-8",
+  "level": "n3",
+  "topic": "生活",
+  "topic_en": "Life",
+  "title": "日本で病院に行く",
+  "title_zh": "在日本看醫生",
+  "title_en": "Going to the Doctor in Japan",
+  "body": "日本で初めて熱を出したとき、どうすればいいか分からなくて、とても不安だった。\n友達に相談すると、「まず近くの内科に行ったほうがいいよ」と教えてくれた。\n病院では、最初に保険証を出して、問診票に症状を書く。\n「いつから痛いですか」「アレルギーはありますか」など、聞かれることは大体決まっている。\n診察が終わると、処方箋をもらって、薬局で薬を受け取る。\n料金は思ったより安かった。保険に入っていれば、自分で払うのは三割だけだからだ。\n言葉が心配な人は、症状を紙に書いて見せるといい。伝える方法はいくらでもある。",
+  "trans": [
+    "在日本第一次發燒的時候,我不知道該怎麼辦,非常不安。",
+    "找朋友商量,朋友告訴我:「先去附近的內科比較好喔。」",
+    "在醫院,首先出示健保卡,然後在問診表上寫下症狀。",
+    "「從什麼時候開始痛?」「有過敏嗎?」等等,會被問的問題大致上是固定的。",
+    "看診結束後,拿到處方箋,再到藥局領藥。",
+    "費用比想像中便宜。因為只要有加入健保,自己付的就只有三成。",
+    "擔心語言不通的人,可以把症狀寫在紙上給醫生看。要把意思傳達出去,方法要多少有多少。"
+  ],
+  "trans_en": [
+    "The first time I ran a fever in Japan, I had no idea what to do and felt really anxious.",
+    "When I asked a friend, they told me, \"You should go to a nearby internal medicine clinic first.\"",
+    "At the clinic, you first show your health insurance card, then write your symptoms on a questionnaire.",
+    "\"Since when has it hurt?\" \"Do you have any allergies?\" — the questions they ask are mostly the same.",
+    "After the examination, you get a prescription and pick up your medicine at a pharmacy.",
+    "It cost less than I expected — if you're enrolled in health insurance, you only pay thirty percent yourself.",
+    "If you're worried about the language, write your symptoms on paper and show them. There are plenty of ways to get your meaning across."
+  ],
+  "vocab": [
+    { "w": "不安", "r": "ふあん", "m": "不安", "m_en": "anxious, uneasy" },
+    { "w": "相談", "r": "そうだん", "m": "商量、諮詢", "m_en": "consultation" },
+    { "w": "保険証", "r": "ほけんしょう", "m": "健保卡", "m_en": "health insurance card" },
+    { "w": "症状", "r": "しょうじょう", "m": "症狀", "m_en": "symptom" },
+    { "w": "診察", "r": "しんさつ", "m": "看診、診察", "m_en": "medical examination" },
+    { "w": "処方箋", "r": "しょほうせん", "m": "處方箋", "m_en": "prescription" },
+    { "w": "薬局", "r": "やっきょく", "m": "藥局", "m_en": "pharmacy" },
+    { "w": "受け取る", "r": "うけとる", "m": "領取、收下", "m_en": "to receive, to pick up" }
+  ],
+  "grammar": [
+    { "t": "~たほうがいい", "note": "「~比較好(建議)」:行ったほうがいい。", "id": "n4-11", "t_en": "〜たほうがいい", "note_en": "\"you should ~ / it's better to ~\": advice." },
+    { "t": "~と(條件)", "note": "「一~就…」:相談すると、教えてくれた/診察が終わると。前句成立,後句自然接著發生。", "t_en": "〜と (conditional)", "note_en": "\"when/once ~\": the second clause follows naturally from the first." },
+    { "t": "~より", "note": "「比~」:思ったより安かった(比想像中便宜)。", "t_en": "〜より", "note_en": "\"than ~\": 思ったより = than I expected." },
+    { "t": "~といい", "note": "「~就好、建議~」:書いて見せるといい。", "t_en": "〜といい", "note_en": "\"it's a good idea to ~\": gentle suggestion." }
+  ]
+},
+{
+  "id": "a-n2-8",
+  "level": "n2",
+  "topic": "社会",
+  "topic_en": "Society",
+  "title": "地方移住という選択",
+  "title_zh": "移居鄉間這個選項",
+  "title_en": "Moving to the Countryside",
+  "body": "最近、都会を離れて地方に移住する人が増えているという。\nリモートワークの普及によって、どこに住んでいても仕事ができるようになったことが大きい。\n家賃は都会の半分以下、通勤ラッシュとも無縁で、自然に囲まれた暮らしは魅力的に見える。\nしかし、移住は決して簡単なものではない。\n車がなければ生活できない地域も多く、医療や教育の面で不便を感じることもある。\n地域の人間関係に溶け込めるかどうかも、大きな課題だと言われている。\n大切なのは、理想だけで決めるのではなく、実際に何度か足を運んで、その土地の暮らしを確かめることだろう。",
+  "trans": [
+    "據說最近離開都市、移居鄉間的人越來越多。",
+    "很大的原因是,隨著遠距工作的普及,不管住在哪裡都能工作了。",
+    "房租不到都市的一半,又與通勤尖峰無緣,被大自然環繞的生活看起來很有魅力。",
+    "但是,移居絕對不是件簡單的事。",
+    "沒有車就無法生活的地區很多,在醫療和教育方面有時也會感到不便。",
+    "能不能融入當地的人際關係,據說也是一大課題。",
+    "重要的應該是:不要只憑理想做決定,而是實際多跑幾趟,親自確認那塊土地上的生活。"
+  ],
+  "trans_en": [
+    "These days, more and more people are said to be leaving the city and moving to the countryside.",
+    "A big reason is that with the spread of remote work, you can now work wherever you live.",
+    "Rent is less than half of what it is in the city, there's no commuter rush, and a life surrounded by nature looks appealing.",
+    "However, relocating is by no means easy.",
+    "In many areas you can't get by without a car, and you may find healthcare and education inconvenient.",
+    "Whether you can blend into the local community is also said to be a major challenge.",
+    "What matters is not deciding on ideals alone, but actually visiting several times and seeing for yourself what life there is like."
+  ],
+  "vocab": [
+    { "w": "移住", "r": "いじゅう", "m": "移居", "m_en": "migration, relocation" },
+    { "w": "普及", "r": "ふきゅう", "m": "普及", "m_en": "spread, diffusion" },
+    { "w": "家賃", "r": "やちん", "m": "房租", "m_en": "rent" },
+    { "w": "無縁", "r": "むえん", "m": "無緣、不相干", "m_en": "unrelated, free from" },
+    { "w": "溶け込む", "r": "とけこむ", "m": "融入", "m_en": "to blend in, to fit in" },
+    { "w": "課題", "r": "かだい", "m": "課題、待解決的問題", "m_en": "challenge, issue" },
+    { "w": "足を運ぶ", "r": "あしをはこぶ", "m": "親自前往、跑一趟", "m_en": "to go in person, to visit" },
+    { "w": "確かめる", "r": "たしかめる", "m": "確認", "m_en": "to confirm, to make sure" }
+  ],
+  "grammar": [
+    { "t": "~という(傳聞)", "note": "「據說~」:増えているという。句尾的という表示傳聞、引述。", "id": "n5-68", "t_en": "〜という (hearsay)", "note_en": "sentence-final という reports hearsay: \"it is said that ~.\"" },
+    { "t": "~によって", "note": "「由於~、隨著~」:普及によって~ようになった。表原因/手段。", "id": "n3-4", "t_en": "〜によって", "note_en": "\"due to / by means of ~\": cause or means." },
+    { "t": "決して~ない", "note": "「絕對不~」:決して簡単なものではない。與否定呼應的副詞。", "t_en": "決して〜ない", "note_en": "\"by no means ~\": adverb that pairs with a negative." },
+    { "t": "~かどうか", "note": "「是否~」:溶け込めるかどうか。", "id": "n4-43", "t_en": "〜かどうか", "note_en": "\"whether or not ~.\"" },
+    { "t": "~のではなく", "note": "「不是~而是…」:理想だけで決めるのではなく、実際に確かめる。", "t_en": "〜のではなく", "note_en": "\"not ~ but rather ...\"" }
+  ]
+},
+{
+  "id": "a-n1-7",
+  "level": "n1",
+  "topic": "言語",
+  "topic_en": "Language",
+  "title": "変わりゆく日本語",
+  "title_zh": "持續改變的日語",
+  "title_en": "The Ever-Changing Japanese Language",
+  "body": "「ら抜き言葉」という言葉を聞いたことがあるだろうか。\n「食べられる」を「食べれる」と言うような言い方で、正しくない日本語だと批判されることが多い。\nだが、言語学の立場から見れば、これは単なる「乱れ」ではなく、合理的な変化だという見方もある。\n「見られる」には受身・尊敬・可能という複数の意味があるが、「見れる」なら可能の意味だと一目で分かるからだ。\nそもそも、言葉は常に変化し続けてきた。\n今、私たちが「正しい」と信じている日本語も、百年前の人々から見れば乱れた言葉にほかならない。\n変化を嘆くより、なぜそう変わるのかを考えるほうが、言葉の本質に近づけるのではないだろうか。",
+  "trans": [
+    "你聽過「ら抜き言葉(去ら詞)」這個詞嗎?",
+    "就是把「食べられる」說成「食べれる」這類說法,常被批評是不正確的日語。",
+    "但從語言學的立場來看,也有一種觀點認為:這不是單純的「語言混亂」,而是一種合理的變化。",
+    "因為「見られる」同時有被動、尊敬、可能等多種意思,而「見れる」的話,一眼就能看出是「能看」的意思。",
+    "說到底,語言本來就一直在變化。",
+    "如今我們深信「正確」的日語,在一百年前的人看來,也不外乎就是一種走樣的語言。",
+    "與其感嘆變化,不如去思考「為什麼會這樣變」——這樣或許才更能接近語言的本質,不是嗎?"
+  ],
+  "trans_en": [
+    "Have you ever heard of \"ra-nuki kotoba\" (ra-dropped words)?",
+    "It refers to saying 食べれる instead of 食べられる — a usage often criticized as incorrect Japanese.",
+    "From a linguistics standpoint, however, some see it not as mere \"corruption\" but as a rational change.",
+    "見られる carries multiple meanings — passive, honorific, and potential — while 見れる can only mean \"can see,\" clear at a glance.",
+    "Language, after all, has never stopped changing.",
+    "Even the Japanese we now believe to be \"correct\" would be nothing other than corrupted speech in the eyes of people a hundred years ago.",
+    "Rather than lamenting change, perhaps asking why it happens brings us closer to the true nature of language."
+  ],
+  "vocab": [
+    { "w": "批判", "r": "ひはん", "m": "批評、批判", "m_en": "criticism" },
+    { "w": "乱れ", "r": "みだれ", "m": "混亂、走樣", "m_en": "disorder, corruption (of language)" },
+    { "w": "合理的", "r": "ごうりてき", "m": "合理的", "m_en": "rational" },
+    { "w": "受身", "r": "うけみ", "m": "被動(語態)", "m_en": "passive (voice)" },
+    { "w": "尊敬", "r": "そんけい", "m": "尊敬", "m_en": "respect, honorific" },
+    { "w": "嘆く", "r": "なげく", "m": "感嘆、悲嘆", "m_en": "to lament" },
+    { "w": "本質", "r": "ほんしつ", "m": "本質", "m_en": "essence, true nature" },
+    { "w": "近づく", "r": "ちかづく", "m": "接近", "m_en": "to approach, to get closer" }
+  ],
+  "grammar": [
+    { "t": "~にほかならない", "note": "「不外乎是~、正是~」:乱れた言葉にほかならない。斷定的書面語。", "id": "n2-56", "t_en": "〜にほかならない", "note_en": "\"is nothing other than ~\": emphatic, written style." },
+    { "t": "~ゆく", "note": "「逐漸~(書面語)」:変わりゆく日本語。ていく的文語形,表持續變化。", "t_en": "〜ゆく", "note_en": "literary form of ていく: gradual, ongoing change." },
+    { "t": "単なる~ではなく", "note": "「不是單純的~」:単なる「乱れ」ではなく、合理的な変化。", "t_en": "単なる〜ではなく", "note_en": "\"not merely ~ (but ...).\"" },
+    { "t": "~のではないだろうか", "note": "「不是~嗎(委婉主張)」:近づけるのではないだろうか。以反問委婉表達意見。", "t_en": "〜のではないだろうか", "note_en": "\"isn't it that ~?\": soft assertion via rhetorical question." }
+  ]
 }
 ];

@@ -30,7 +30,7 @@ const hasKanji = s => /[一-鿿々]/.test(s);
 const CONTENT = new Set(['名詞', '動詞', '形容詞', '副詞', '連体詞', '感動詞']);
 // kuromoji 同音字誤讀修正(furigana 顯示用;表層完全相符才套)。每輪對全表套用=冪等。
 // 「正しく」kuromoji 常誤判成 まさしく(誠然),文中幾乎都是 ただしく(正確地)。
-const READING_FIX = { '正しく': 'ただしく' };
+const READING_FIX = { '正しく': 'ただしく', '一目': 'ひとめ' };
 
 const ARTICLES = (new Function('window', fs.readFileSync(path.join(ROOT, 'articles.js'), 'utf8') + ';return window.ARTICLES;'))({}) || [];
 let TOKENS = {};
