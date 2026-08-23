@@ -433,15 +433,26 @@ export interface PrecheckResult {
  * - 早鳥名額用完 → 排除 early_bird
  */
 export async function precheckSubscribe(uid: string, email: string): Promise<PrecheckResult> {
-  // 1. 已有 active 訂閱?
+  // 1. 已有未到期的訂閱?
+  // 「已取消續訂」的判定要看兩個訊號:網頁取消寫 status="cancelled";App(Apple/Google)取消
+  // 只會由 RC webhook 寫 willRenew=false、status 保持 active/trialing 不變——只看 status 會誤擋(用戶回饋實錘)。
   const sub = await getSubscription(uid);
-  if (sub && (sub.status === "active") && sub.expiresAt > nowMs()) {
-    // 已取消(status=cancelled)刻意不擋:不會再續扣,升級買斷沒有重複收費風險(用戶回饋:取消早鳥後想買買斷被擋)。
-    return {
-      ok: false,
-      reason: `您在${sub.source === "app" ? " App" : "網頁"}已有訂閱(到期日:${new Date(sub.expiresAt).toLocaleDateString("zh-TW")}),不需重複訂閱。`
-        + `想改買「買斷方案」的話,請先到帳號管理取消自動續訂(已付期間仍可使用),取消後即可購買。`,
-    };
+  if (sub && sub.expiresAt > nowMs()
+      && (sub.status === "active" || sub.status === "trialing" || sub.status === "cancelled")) {
+    const noRenew = (sub as any).willRenew === false || sub.status === "cancelled";
+    if (noRenew && sub.plan !== "lifetime") {
+      // 不會再續扣 → 開放「買斷」升級(零重複收費風險)。
+      // 訂閱類仍不賣:新訂單會蓋掉 subscription doc,把人家已付的剩餘天數吃掉。
+      return { ok: true, allowed_plans: ["lifetime"] };
+    }
+    if (sub.status === "active" || (sub.status === "trialing" && sub.source === "app")) {
+      // 仍在自動續訂(含 App 試用中未取消):直接再買會變成雙重扣款 → 擋+給升級路徑
+      return {
+        ok: false,
+        reason: `您在${sub.source === "app" ? " App" : "網頁"}已有訂閱(到期日:${new Date(sub.expiresAt).toLocaleDateString("zh-TW")}),不需重複訂閱。`
+          + `想改買「買斷方案」的話,請先取消自動續訂(已付/試用期間仍可使用),取消後即可購買。`,
+      };
+    }
   }
 
   // 1.5 防連點重複扣款:近 10 分鐘已有「處理中(pending)」的訂閱結帳 → 擋。

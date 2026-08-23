@@ -40,11 +40,16 @@ export const paypalCreateOrder = functions.onRequest(
       const existing = await getSubscription(uid);
       if (existing && existing.status !== "refunded" && existing.status !== "expired"
           && (existing.expiresAt || 0) > nowMs()) {
-        res.status(409).json({
-          error: "already_subscribed",
-          reason: "你目前已是付費會員,無需重複購買。若要更換方案,請先到帳號頁退費,或來信客服協助。",
-        });
-        return;
+        // 已取消續訂(willRenew=false 或 status=cancelled)且要買的是買斷 → 放行升級(不會重複扣款)
+        const noRenew = (existing as any).willRenew === false || existing.status === "cancelled";
+        const lifetimeUpgrade = noRenew && plan === "lifetime" && existing.plan !== "lifetime";
+        if (!lifetimeUpgrade) {
+          res.status(409).json({
+            error: "already_subscribed",
+            reason: "你目前已是付費會員,無需重複購買。想改買「買斷」請先取消自動續訂,取消後即可購買;其他需求請來信客服。",
+          });
+          return;
+        }
       }
 
       // 早鳥:名額滿或已收官 → 擋(和 precheckSubscribe 同一個閘門;PayPal 路徑原本漏了這關)

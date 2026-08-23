@@ -500,7 +500,7 @@ function applySubscriptionState(sub) {
   if (!active) return;
   // 已取消(不會再續扣)→ 沒有重複扣款風險,買斷要開放購買(用戶回饋:取消早鳥後想升買斷被擋死)。
   // 仍在自動續訂 → 買斷鈕改成「先取消再買」的引導,不直接賣(避免訂閱繼續扣+買斷並存的重複收費)。
-  const cancelled = sub.status === 'cancelled';
+  const cancelled = sub.status === 'cancelled' || sub.willRenew === false;   // App 取消只寫 willRenew:false,status 不變
   const isLifetime = sub.plan === 'lifetime';
   const PLAN_TXT = { monthly: '月費', yearly: '年費', yearly_early_bird: '早鳥年費', lifetime: '買斷方案' };
   const banner = document.getElementById('subBanner');
