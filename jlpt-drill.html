@@ -644,7 +644,10 @@ function finishExam(timeout){
     if(!ok) w[item.q.id]=true; else if(w[item.q.id]) { /* 模擬考答對不移出錯題本,留給錯題本模式清 */ }
   }
   saveRec(rec); saveWrong(w);
-  pushHist({ d:today(), lv, t:'📝 模擬試験'+(timeout?'(時間到)':''), s:score, tot:qs.length });
+  // 錯題明細(含未作答)→ 場次紀錄可逐題回顧(你選的/正解/詳解)
+  const _exWrong = qs.filter(it=>!(it.ans!==null && it.pick[it.ans].ok))
+    .map(it=>({ id:it.q.id, ch: it.ans===null ? '(未作答)' : String(it.pick[it.ans].txt||'').slice(0,60) })).slice(0,40);
+  pushHist({ d:today(), lv, t:'📝 模擬試験'+(timeout?'(時間到)':''), s:score, tot:qs.length, w:_exWrong });
   // ── JLPT 換算分析 ──────────────────────────
   // 依官方計分結構換算 180 分制:N3–N1 三科各 60(言語知識/読解/聴解,科別門檻 19);
   // N5/N4 官方是「言語知識・読解」合併 120(門檻 38)+ 聴解 60(門檻 19)。

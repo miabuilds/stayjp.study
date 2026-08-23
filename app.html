@@ -3269,6 +3269,15 @@ function _onbRemove() {
   if (m) { m.classList.remove('show'); setTimeout(() => m.remove(), 300); }
 }
 function onbFinish() { localStorage.setItem('onboarding_done_v1', '1'); _onbRemove(); }
+// 新版引導(onboarding-v2):全新訪客導過去;做過任一版引導、或已有學習痕跡的不打擾
+(function(){
+  try{
+    if (localStorage.getItem('onboarding_done_v1') || localStorage.getItem('ob_v2_done')) return;
+    if (localStorage.getItem('base_level') || localStorage.getItem('goal_level')) return;
+    if (Object.keys(JSON.parse(localStorage.getItem('study_log')||'{}')).length) return;
+    location.replace('onboarding-v2.html');
+  }catch(e){}
+})();
 // 快速上手提示(引導第二步 + 「?」重看 共用)。豐富到 5 條,直接回答「這畫面在幹嘛」。
 function quickTipsHTML() {
   return '<div class="onb-tips">' +
@@ -3424,7 +3433,7 @@ function renderAffiliateBlock(slot) {
 // ========== DAILY MODE ==========
 let dailyMode = true;
 let grammarDailyMode = true;
-const DAILY_NEW = 20;
+const DAILY_NEW = (function(){ try{ const v=parseInt(localStorage.getItem('daily_new')||'',10); return [10,20,30].includes(v)?v:20; }catch(e){ return 20; } })();   // onboarding 選的每日節奏(10/20/30);offset 以字數計,改值安全
 const GRAMMAR_DAILY_NEW = 10;
 const DAILY_KEY = 'daily_progress';
 

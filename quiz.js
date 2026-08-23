@@ -325,7 +325,12 @@ const Quiz = (() => {
   function showResults() {
     const pct = Math.round(score / questions.length * 100);
     const h = JSON.parse(localStorage.getItem('quiz_history') || '[]');
-    h.push({ date: new Date().toISOString(), level: quizLevel, type: quizType, score, total: questions.length });
+    // 錯題明細:單字/讀音/意思/你答的 → 「我的」頁可展開回顧(有跡可循,不是只有分數)
+    const _wr = results.filter(r=>!r.correct).slice(0,15).map(r=>({
+      w:r.word.w, r:r.word.r, m:(r.word.m||'').slice(0,40),
+      ch: r.typed!=null ? String(r.typed).slice(0,30) : (r.options&&r.chosenIdx!=null ? String((r.options[r.chosenIdx]||{}).m||(r.options[r.chosenIdx]||{}).w||'').slice(0,30) : '')
+    }));
+    h.push({ date: new Date().toISOString(), level: quizLevel, type: quizType, score, total: questions.length, wrong:_wr });
     if (h.length > 200) h.splice(0, h.length - 200);
     localStorage.setItem('quiz_history', JSON.stringify(h));
     if (typeof Calendar !== 'undefined') Calendar.logActivity('quiz');
