@@ -10,6 +10,8 @@
   :root{ --bg:#f3f5f2;--panel:#fff;--ink:#1b2320;--ink2:#5f6b67;--ink3:#93a09a;--line:#e3e8e2;--accent:#0f766e;--accent2:#0b5850;--soft:#0f766e12;--me:#0f766e;--ai:#eef1ee;--ok:#15803d;--bad:#c2410c;--warn:#b45309;--sh:0 1px 2px rgba(20,40,30,.05),0 8px 24px rgba(20,40,30,.06); }
   @media(prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#111512;--panel:#191e1b;--ink:#e9eeea;--ink2:#9aa7a0;--ink3:#70807a;--line:#28302b;--accent:#2dd4bf;--accent2:#5eead4;--soft:#2dd4bf18;--me:#0f766e;--ai:#20261f;--ok:#4ade80;--bad:#fb923c;--warn:#fbbf24;--sh:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.3);}}
   :root[data-theme=dark]{--bg:#111512;--panel:#191e1b;--ink:#e9eeea;--ink2:#9aa7a0;--ink3:#70807a;--line:#28302b;--accent:#2dd4bf;--accent2:#5eead4;--soft:#2dd4bf18;--me:#0f766e;--ai:#20261f;--ok:#4ade80;--bad:#fb923c;--warn:#fbbf24;--sh:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.3);}
+  .backbtn{display:inline-flex;align-items:center;gap:6px;min-height:40px;padding:8px 14px 8px 10px;border-radius:12px;background:var(--panel);border:1px solid var(--line);color:var(--ink2);text-decoration:none;font-size:14.5px;font-weight:600;line-height:1}
+  .backbtn:active{transform:scale(.96)}
   *{box-sizing:border-box;margin:0;padding:0}
   body{background:var(--bg);color:var(--ink);font-family:-apple-system,"PingFang TC","Noto Sans TC",sans-serif;font-size:15px;-webkit-font-smoothing:antialiased}
   .wrap{max-width:680px;margin:0 auto;padding:16px 14px 40px}
@@ -102,7 +104,7 @@
 
   <!-- 選主題 -->
   <div id="pick">
-    <div style="margin-bottom:8px"><a href="#" onclick="if(history.length>1){history.back()}else{location.href='app.html'};return false" style="color:var(--ink3);text-decoration:none;font-size:14px">‹ 返回</a></div>
+    <div style="margin-bottom:8px"><a href="#" class="backbtn" onclick="if(history.length>1){history.back()}else{location.href='app.html'};return false"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>返回</a></div>
     <h1>🗣 情境對話 <span class="muted" style="font-weight:400">Beta</span></h1>
     <div class="sub">選一個情境和難度,AI 會扮演對方跟你一來一往練對話。可以用說的(語音辨識)或打字。免費體驗 1 場,Premium 每天 5 場。</div>
     <div class="lvtabs" id="lvtabs"></div>
