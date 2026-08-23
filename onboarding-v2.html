@@ -216,6 +216,7 @@ const OB=(()=>{
       localStorage.setItem('base_level', (A.level==='some'||A.level==='restart') ? 'n5' : 'none');
       if(A.mins) localStorage.setItem('daily_new', A.mins==='10'?'10':(A.mins==='40'?'30':'20'));
       if(start) localStorage.setItem('ob_start_today','1');   // app 首頁自動捲到今日學習
+      else localStorage.setItem('ob_start_tour','1');          // 先逛逛 → 首頁自動開功能導覽(可跳過)
     }catch(e){}
     location.href='app.html';
   }
