@@ -57,6 +57,22 @@ const Stats = (() => {
     else if (tab === 'settings') c.innerHTML = buildSettings();
   }
 
+  // 場次錯題回顧:點紀錄列展開(單字測驗;有跡可循,不只看分數)
+  function _toggleQh(i) {
+    const box = document.getElementById('qhDetail' + i);
+    if (!box) return;
+    if (box.style.display !== 'none') { box.style.display = 'none'; return; }
+    const r = getHistory().slice(-50).reverse()[i];
+    if (!r || !r.wrong || !r.wrong.length) return;
+    box.innerHTML = r.wrong.map(x =>
+      '<div style="display:flex;align-items:center;gap:10px;background:var(--bg2);border:1px solid var(--bd);border-radius:10px;padding:9px 12px;margin:5px 0;font-size:13px">'
+      + '<button onclick="event.stopPropagation();if(typeof speak===\'function\')speak(\'' + String(x.w).replace(/'/g,'') + '\')" style="border:0;background:none;cursor:pointer;font-size:15px">🔊</button>'
+      + '<span><b style="font-size:15px">' + x.w + '</b>' + (x.r && x.r !== x.w ? '<span style="color:var(--ac2);margin-left:6px">' + x.r + '</span>' : '') + '<span style="color:var(--tx2);margin-left:8px">' + (typeof cvt === 'function' ? cvt(x.m || '') : (x.m || '')) + '</span></span>'
+      + (x.ch ? '<span style="margin-left:auto;color:var(--wrong,#dc2626);font-size:12px">' + _en2('你答:', 'You: ') + x.ch + '</span>' : '')
+      + '</div>').join('');
+    box.style.display = 'block';
+  }
+
   // 學習統計 = 總覽（成績圖 + 學習進度） + 新功能紀錄（刷題/AI 口說） + 考試紀錄
   function buildStatsCombined() {
     return buildScoreChart() + buildProgress() + buildNewFeatures() + buildHistory();
@@ -137,13 +153,16 @@ const Stats = (() => {
       const color = pct >= 80 ? 'var(--correct,#16a34a)' : pct >= 60 ? 'var(--ok-tx,#ca8a04)' : 'var(--wrong,#dc2626)';
       const date = new Date(r.date).toLocaleDateString('zh-TW', {month:'numeric',day:'numeric',hour:'numeric',minute:'numeric'});
       const typeMap = {word2meaning: t('type_ja_zh'), meaning2word: t('type_zh_ja'), reading: t('type_reading')};
-      h += '<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--bd);font-size:13px">';
+      const hasW = r.wrong && r.wrong.length;
+      h += '<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--bd);font-size:13px'+(hasW?';cursor:pointer':'')+'"'+(hasW?' onclick="Stats._toggleQh('+i+')"':'')+'>';
       h += '<span style="min-width:35px;font-weight:700;color:'+color+'">'+pct+'%</span>';
       h += '<span style="min-width:28px;font-size:11px;color:var(--ac2);font-weight:600">'+r.level.toUpperCase()+'</span>';
       h += '<span style="flex:1;color:var(--tx2);font-size:12px">'+(typeMap[r.type]||r.type)+'</span>';
       h += '<span style="font-size:11px;color:var(--tx3)">'+r.score+'/'+r.total+'</span>';
       h += '<span style="font-size:10px;color:var(--tx3)">'+date+'</span>';
+      if (hasW) h += '<span style="font-size:11px;color:var(--ac)">▾'+_en2('看錯題','review')+'</span>';
       h += '</div>';
+      if (hasW) h += '<div id="qhDetail'+i+'" style="display:none;padding:4px 0 10px"></div>';
     });
     h += '</div></div>';
     // 錯題重考按鈕
@@ -714,5 +733,5 @@ const Stats = (() => {
     _renderFL();
   }
 
-  return { open, openProfile, close, switchTab, quizWeak, retryWrong, _answerWeak, addToNotebook, removeFromNotebook, quizNotebook, reviewNotebook, addWrongQuestion, getWrongQuestions, removeWrongQuestion, quizWrongQuestions, _wqAnswer, _wqNext, _wqRemoveAndNext, quizFavListening, _flReplay, _flAnswer, _flNext };
+  return { open, openProfile, close, switchTab, _toggleQh, quizWeak, retryWrong, _answerWeak, addToNotebook, removeFromNotebook, quizNotebook, reviewNotebook, addWrongQuestion, getWrongQuestions, removeWrongQuestion, quizWrongQuestions, _wqAnswer, _wqNext, _wqRemoveAndNext, quizFavListening, _flReplay, _flAnswer, _flNext };
 })();
