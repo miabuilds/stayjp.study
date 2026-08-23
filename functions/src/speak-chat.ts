@@ -72,7 +72,50 @@ TIP: 一句${L},下次馬上能用的小建議
 ENCOURAGE: 一句${L},像真人教練的鼓勵`;
 }
 
-async function streamAnthropic(res: any, apiKey: string, system: any, messages: any[], model?: string) {
+// hintGuard:HINT 提示句的「生成後審核」。便宜模型偶爾把對方角色的台詞當提示(店員台詞給顧客)——
+// prompt 層面已盡力(角色標記+服務方句型規則),這裡是最後一道硬防線:
+// 串流照常轉發正文(JP/KANA/ZH/COACH,不增加首句延遲),但 HINT 區塊先攔下,
+// 用一個超小的審核呼叫逐條判「是不是使用者角色會說的+接不接得上這輪的 JP」,NG 的丟掉;全滅就重寫兩條。成本 ~$0.0005/輪。
+type HintGuard = { apiKey: string; scene: string; ur: string; langLabel: string };
+
+function stripTag(h: string, ur: string): string {
+  return h.replace(new RegExp("^\\s*" + ur.replace(/[.*+?^$()\[\]{}|\\]/g, "\\$&") + "\\s*»\\s*"), "").trim();
+}
+
+async function guardHints(rawHints: string[], jp: string, g: HintGuard): Promise<string[]> {
+  const list = rawHints.map(h => stripTag(h, g.ur)).filter(Boolean).slice(0, 4);
+  if (!list.length || !g.ur) return rawHints;
+  try {
+    const sys = `場景:${g.scene}\n對話裡,「${g.ur}」是使用者(學習者)的角色;另一方(AI 扮演的角色)剛說了:「${jp}」。\n下面每行是一句要給使用者的「回話建議」(格式:日文｜意思)。逐行判斷兩件事:\n(1)這句台詞是「${g.ur}」這個角色會說的話(絕不能是對方角色的台詞——例如使用者是顧客時,「お持ちします」「〜はいかがですか」這種服務方句子就是 NG);\n(2)作為對「${jp}」的回應是自然通順的。\n兩者都成立輸出 OK,否則輸出 NG。一行對應一行、只輸出 OK 或 NG,不要任何其他文字。`;
+    const up = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: { "content-type": "application/json", "x-api-key": g.apiKey, "anthropic-version": "2023-06-01" },
+      body: JSON.stringify({ model: MODEL, max_tokens: 60, system: sys,
+        messages: [{ role: "user", content: list.map((h, i) => `${i + 1}. ${h}`).join("\n") }] }),
+    });
+    if (!up.ok) return rawHints;                                   // 審核掛了 → 放行原提示(fail-open)
+    const d: any = await up.json();
+    const verdicts = String(d.content?.[0]?.text || "").split("\n").map(x => x.trim().toUpperCase());
+    let kept = list.filter((_, i) => verdicts[i] !== "NG");        // 只有明確 NG 才丟
+    if (!kept.length) {
+      // 全滅 → 用審核模型重寫兩條(比沒有提示好)
+      const rw = await fetch("https://api.anthropic.com/v1/messages", {
+        method: "POST",
+        headers: { "content-type": "application/json", "x-api-key": g.apiKey, "anthropic-version": "2023-06-01" },
+        body: JSON.stringify({ model: MODEL, max_tokens: 200,
+          system: `場景:${g.scene}。使用者的角色:${g.ur}。對方(AI 角色)剛說:「${jp}」。\n請給 2 條「${g.ur}」可以怎麼回的建議。一行一條,格式:<日文>｜<這句的${g.langLabel}意思>。只輸出這兩行,不要編號或其他文字。`,
+          messages: [{ role: "user", content: "請輸出建議。" }] }),
+      });
+      if (rw.ok) {
+        const rd: any = await rw.json();
+        kept = String(rd.content?.[0]?.text || "").split("\n").map(x => x.trim()).filter(x => x.includes("｜")).slice(0, 2);
+      }
+    }
+    return kept.map(h => g.ur + "»" + h);
+  } catch { return rawHints; }
+}
+
+async function streamAnthropic(res: any, apiKey: string, system: any, messages: any[], model?: string, hintGuard?: HintGuard) {
   const upstream = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
     headers: { "content-type": "application/json", "x-api-key": apiKey, "anthropic-version": "2023-06-01" },
@@ -89,6 +132,15 @@ async function streamAnthropic(res: any, apiKey: string, system: any, messages: 
   const reader = (upstream.body as any).getReader();
   const dec = new TextDecoder();
   let buf = "";
+  let full = "";                 // 模型輸出全文
+  let sent = 0;                  // 已轉發到的位置(hintGuard 模式用)
+  const HOLD = 8;                // 尾端保留字數,避免 "\nHINT:" 被 chunk 切一半漏攔
+  const forward = () => {        // 轉發到「第一個 HINT 行」之前為止;HINT 之後全部攔下
+    if (!hintGuard) return;
+    const m = full.search(/(?:^|\n)HINT:/);
+    const limit = m === -1 ? Math.max(sent, full.length - HOLD) : (full[m] === "\n" ? m + 1 : m);
+    if (limit > sent) { res.write(full.slice(sent, limit)); sent = limit; }
+  };
   for (;;) {
     const { done, value } = await reader.read();
     if (done) break;
@@ -102,8 +154,29 @@ async function streamAnthropic(res: any, apiKey: string, system: any, messages: 
       if (!data || data === "[DONE]") continue;
       try {
         const ev = JSON.parse(data);
-        if (ev.type === "content_block_delta" && ev.delta?.type === "text_delta") res.write(ev.delta.text);
+        if (ev.type === "content_block_delta" && ev.delta?.type === "text_delta") {
+          const t = ev.delta.text;
+          if (hintGuard) { full += t; forward(); }
+          else res.write(t);
+        }
       } catch { /* 半行/非 JSON 事件,略過 */ }
+    }
+  }
+  if (hintGuard) {
+    const withheld = full.slice(sent);
+    if (!/(?:^|\n)HINT:/.test(withheld)) {
+      if (withheld) res.write(withheld);       // 這輪沒有 HINT(或格式跑掉)→ 原樣放行
+    } else {
+      const others: string[] = []; const hints: string[] = [];
+      for (const ln of withheld.split("\n")) {
+        const m = ln.match(/^\s*HINT:\s?(.*)$/);
+        if (m) { if (m[1].trim()) hints.push(m[1].trim()); }
+        else if (ln.trim()) others.push(ln);
+      }
+      if (others.length) res.write(others.join("\n") + "\n");
+      const jp = (full.match(/^JP:\s?(.*)$/m) || [])[1] || "";
+      const verified = await guardHints(hints, jp.trim(), hintGuard);
+      for (const h of verified) res.write("\nHINT: " + h);
     }
   }
   res.end();
@@ -176,7 +249,11 @@ export const speakChat = functions.onRequest(
         kept.push({ role: "user", content: "（請你先自然開口,帶起這個情境的對話）" });
       }
       const system = [{ type: "text", text: chatSystem(scene, level || "N4", lang, String(userRole || "").slice(0, 30)), cache_control: { type: "ephemeral" } }];
-      await streamAnthropic(res, ANTHROPIC_API_KEY.value(), system, kept, (cfg as any).chatModel);
+      const urStr = String(userRole || "").slice(0, 30);
+      const guard: HintGuard | undefined = urStr
+        ? { apiKey: ANTHROPIC_API_KEY.value(), scene: String(scene).slice(0, 300), ur: urStr, langLabel: langName(lang) }
+        : undefined;
+      await streamAnthropic(res, ANTHROPIC_API_KEY.value(), system, kept, (cfg as any).chatModel, guard);
     } catch (e: any) {
       if (!res.headersSent) res.status(500).json({ error: String((e && e.message) || e) });
       else { try { res.end(); } catch { /* noop */ } }
