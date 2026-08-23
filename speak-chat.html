@@ -323,18 +323,26 @@ function aiBubble(m){
 // 解析逐行輕結構
 function parseTurn(text){
   const o={jp:'',kana:'',zh:'',coach:'',hints:[]};
+  const bare=[];   // 沒有任何欄位前綴的行(模型偶爾漏打 JP: 前綴,台詞變裸行)
   for(const line of String(text).split('\n')){
-    let m=line.match(/^(JP|KANA|ZH|COACH):\s?(.*)$/);
+    let m=line.match(/^\s*(JP|KANA|ZH|COACH)[::]\s?(.*)$/);   // 全形冒號也收:模型偶爾打成「JP:」
     if(m){ const v=(m[2]||'').trim(); if(m[1]==='JP'){ if(v) o.jp=v; } else o[m[1].toLowerCase()]=v; continue; }   // JP 只收非空行:模型偶爾多吐一行空 JP,別把正文蓋掉
-    m=line.match(/^HINT:\s?(.*)$/);
+    m=line.match(/^\s*HINT[::]\s?(.*)$/);
     if(m){ const v=(m[1]||'').trim(); if(v) o.hints.push(v); continue; }
-    m=line.match(/^WORDS:\s?(.*)$/);
-    if(m){ o.words=(m[1]||'').trim(); }
+    m=line.match(/^\s*WORDS[::]\s?(.*)$/);
+    if(m){ o.words=(m[1]||'').trim(); continue; }
+    if(line.trim()) bare.push(line.trim());
   }
   // COACH 有時會吐 <blank>/空白/無 之類佔位字 → 當作沒有提點
   if(/^<?\s*(blank|空白?|無|なし|null|none|n\/a|[-—―])\s*>?$/i.test(o.coach)) o.coach='';
   // 防呆:模型格式跑掉沒給 JP 行時,拿假名行當主行(至少看得到、也播得出來),別讓泡泡剩「…」卡死
   if(!o.jp && o.kana){ o.jp=o.kana; o._jpFromKana=true; }   // 代打標記:串流中假名是半句,不能拿去提前播
+  // 最後一道救援:JP/KANA 都沒有,但有含日文的裸行 → 那就是漏了前綴的台詞(2026-08 Sonnet 實測踩到:
+  // 泡泡卡「…」但 WORDS/COACH 都在——對話三行整組漏前綴)。取第一個含日文字元的裸行當 JP。
+  if(!o.jp && bare.length){
+    const jline=bare.find(l=>/[ぁ-ゖァ-ヺ一-鿿]/.test(l)&&!/^【/.test(l));
+    if(jline){ o.jp=jline; o._jpFromKana=true; }   // 同樣標代打:串流中裸行可能是半句,不提前播
+  }
   return o;
 }
 // 「你可以這樣回」建議;點了填進輸入框讓你可再改
