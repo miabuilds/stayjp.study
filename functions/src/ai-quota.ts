@@ -96,16 +96,27 @@ export async function consumeQuota(uid: string, kind: "eval" | "chat" | "tts", c
           ? `免費體驗的 ${limit} 次 AI 評分已用完。升級 Premium 每天 ${cfg.premEvalDaily} 次!`
           : `免費體驗的 ${limit} 場 AI 對話已用完。升級 Premium 每天 ${cfg.premChatDaily} 場!`;
       }
-      tx.set(ref, { [field]: n + 1, [lifeField]: admin.firestore.FieldValue.increment(1) }, { merge: true });
+      const dayField = kind === "eval" ? "evalDay" : "chatDay";
+      const day2 = (u[dayField] && u[dayField].d === today) ? u[dayField] : { d: today, n: 0 };
+      day2.n++;   // 顯示用的「今天」計數;免費額度仍以總量判斷,不受影響
+      tx.set(ref, { [field]: n + 1, [dayField]: day2, [lifeField]: admin.firestore.FieldValue.increment(1) }, { merge: true });
       return null;
     }
   });
 }
 
-// 純記錄(不檢查額度):admin 不計量但「我的」頁也要看得到紀錄
+// 純記錄(不檢查額度):admin 不計量但「我的」頁也要看得到紀錄(累計+今天都記)
 export async function recordAiUse(uid: string, kind: "eval" | "chat"): Promise<void> {
   try {
-    await admin.firestore().doc("ai_usage/" + uid).set(
-      { [kind === "eval" ? "evalLife" : "chatLife"]: admin.firestore.FieldValue.increment(1) }, { merge: true });
+    const ref = admin.firestore().doc("ai_usage/" + uid);
+    const today = dayKey();
+    const dayField = kind === "eval" ? "evalDay" : "chatDay";
+    await admin.firestore().runTransaction(async (tx) => {
+      const snap = await tx.get(ref);
+      const u: any = snap.exists ? snap.data() : {};
+      const day = (u[dayField] && u[dayField].d === today) ? u[dayField] : { d: today, n: 0 };
+      day.n++;
+      tx.set(ref, { [dayField]: day, [kind === "eval" ? "evalLife" : "chatLife"]: admin.firestore.FieldValue.increment(1) }, { merge: true });
+    });
   } catch { /* 統計失敗不影響功能 */ }
 }
