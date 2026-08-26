@@ -248,12 +248,20 @@ let jdPremium = false, jdAdmin = false;
       if(!u){ jdPremium=false; return; }
       // 白名單(free_users)= Premium 等級。⚠️ 兩個讀取並行,訂閱檢查「只能往 true 推,不能覆寫」
       // (2026-08-23 修:原本無條件覆寫,白名單被訂閱檢查蓋回 false → 還是被當免費擋)
-      try{ if(localStorage.getItem('jd_prem_'+u.uid)==='1') jdPremium=true; }catch(e){}   // 上次結果快取,秒判
-      const _sync=()=>{ try{ localStorage.setItem('jd_prem_'+u.uid, jdPremium?'1':'0'); }catch(e){} try{ renderHome(); updateExamNotes(); }catch(e){} };
-      firebase.firestore().doc('free_users/'+u.uid).get().then(fs2=>{ if(fs2.exists){ jdPremium=true; _sync(); } }).catch(()=>{});
+      try{ if(localStorage.getItem('jd_prem_'+u.uid)==='1') jdPremium=true; }catch(e){}   // 上次結果快取,秒判(樂觀先亮,下面權威覆核)
+      // ⚠️ 降級路徑必須存在:快取只推 true + 檢查只推 true = 訂閱過期後永遠免費當 Premium(審查實錘的營收洞)。
+      // 做法:兩個來源「都有結論」後,以 (白名單 || 有效訂閱) 為準覆寫(含降到 false),並寫回快取。
+      let _wl=null, _sub=null;   // null=還沒回來;查詢失敗保持 null(網路爛時不降級,寧可放行)
+      const _sync=()=>{
+        if(_wl!==null && _sub!==null) jdPremium = _wl || _sub || jdAdmin;   // 兩邊都有權威結論 → 覆寫(可降級)
+        else if(_wl===true || _sub===true) jdPremium=true;                   // 只有單邊回來 → 先推 true
+        try{ if(_wl!==null&&_sub!==null) localStorage.setItem('jd_prem_'+u.uid, jdPremium?'1':'0'); }catch(e){}
+        try{ renderHome(); updateExamNotes(); }catch(e){}
+      };
+      firebase.firestore().doc('free_users/'+u.uid).get().then(fs2=>{ _wl=fs2.exists; _sync(); }).catch(()=>{});
       firebase.firestore().doc('users/'+u.uid).get().then(s=>{
         const sub=(s.data()||{}).subscription;
-        if(!!(sub && (sub.status==='active'||sub.status==='trialing'||sub.status==='cancelled') && (sub.expiresAt||0)>Date.now())) jdPremium=true;
+        _sub=!!(sub && (sub.status==='active'||sub.status==='trialing'||sub.status==='cancelled') && (sub.expiresAt||0)>Date.now());
         _sync();
       }).catch(()=>{});
     });
@@ -392,7 +400,6 @@ function toggleHistDetail(hi){
 function pickLv(l){ lv=l; localStorage.setItem('jd_lv',l); renderHome(); updateExamNotes(); }
 
 function startDrill(tk){
-  if(jdGateDrill()) return;
   curType = TYPES.find(t=>t.k===tk); isWrongMode=false;
   // 沒做過的優先出,做過的排後面(各自組內亂序);一輪 20 題,刷得動也記得住
   const rec = getRec();
@@ -401,6 +408,7 @@ function startDrill(tk){
   const done  = shuffle(all.filter(q=>rec[q.id]));
   queue = fresh.concat(done).slice(0, 20);
   if(!queue.length) return;
+  if(jdGateDrill()) return;   // 確認有題才扣額度(空題庫白扣一輪)
   qi=0; score=0; roundWrong=[];
   document.getElementById('drillTitle').textContent = lv.toUpperCase()+' · '+tyName(curType);
   show('drill'); renderQ();
@@ -454,7 +462,7 @@ function sayWordAudio(q){
 }
 function answer(el, ok){
   const q = queue[qi];
-  if(!ok){ roundWrong.push({ id:q.id, ch:(el&&el.textContent||'').trim().slice(0,60) }); }   // 本輪錯題:題目+你選的
+  if(!ok){ const _t=(el&&el.querySelector&&el.querySelector('.no'))?Array.from(el.childNodes).filter(n=>!(n.classList&&n.classList.contains('no'))).map(n=>n.textContent).join(''):(el&&el.textContent||''); roundWrong.push({ id:q.id, ch:_t.trim().slice(0,60) }); }   // 你選的:去掉選項編號 span
   sayWordAudio(q);
   document.querySelectorAll('.opt').forEach(b=>{
     b.disabled=true;
@@ -483,6 +491,7 @@ function nextQ(){
   else finish();
 }
 function finish(){
+  stopAu();   // 最後一題是聽解時,結果頁不該繼續放音
   const pct = Math.round(score/queue.length*100);
   document.getElementById('rscore').textContent = score+' / '+queue.length;
   document.getElementById('rsub').textContent = pct>=80? enOr('很穩!繼續保持 💪','Solid! Keep it up 💪'):(pct>=60? enOr('不錯,錯題本再刷一輪就熟了','Not bad — one more round in the wrong-answer notebook and you\'ll have it down'):enOr('先看詳解弄懂,錯題本等你 📕','Read the explanations first — the wrong-answer notebook is waiting 📕'));
@@ -537,7 +546,6 @@ function updateExamNotes(){
     + (jdUnlimited() ? '' : '<br><span style="color:var(--ac);font-weight:700">'+enOr('🎟 免費體驗剩 '+Math.max(0,2-usedEx)+' 次','🎟 '+Math.max(0,2-usedEx)+' free tries left')+'</span>'+enOr('(Premium 無限次)',' (unlimited with Premium)'));
 }
 function startExam(){
-  if(jdGateExam()) return;
   stopExamTimer(); stopAu();
   const byType = {};
   bank().forEach(q=>{ if(q.lv===lv){ (byType[q.t]=byType[q.t]||[]).push(q); } });
@@ -549,6 +557,9 @@ function startExam(){
     const done  = shuffle((byType[t]||[]).filter(q=>rec[q.id]));
     picked[t] = fresh.concat(done).slice(0,n).map(q=>({ q, pick: shuffle(q.o.map((txt,i)=>({txt,ok:i===q.a}))), ans:null }));
   }
+  const _totalPicked = Object.values(picked).reduce((a,b)=>a+b.length,0);
+  if(!_totalPicked) return;
+  if(jdGateExam()) return;   // 確認有題才扣次數(免費 2 次很珍貴,不能白燒)
   // 照真題分部排:每部開頭插過場卡(不算題),部內題目照題型順序
   const qs = []; const flow = [];
   for(const part of EXAM_PARTS){
@@ -641,6 +652,7 @@ function finishExam(timeout){
     if(ok) score++;
     const t = item.q.t;
     secStat[t] = secStat[t]||{c:0,n:0}; secStat[t].n++; if(ok) secStat[t].c++;
+    if(item.ans===null) continue;   // 沒作答(時間到自動交卷)的題:計入本場分數,但不寫刷題紀錄、不進錯題本——沒看過的題不該灌水統計
     const e = rec[item.q.id]||{n:0,c:0}; e.n++; if(ok)e.c++; e.last=today(); rec[item.q.id]=e;
     if(!ok) w[item.q.id]=true; else if(w[item.q.id]) { /* 模擬考答對不移出錯題本,留給錯題本模式清 */ }
   }

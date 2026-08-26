@@ -34,6 +34,8 @@ W.n1 = loadVocab('vocab-n1.js', 'VOCAB_N1');
 // 全部真實讀音集合(變形若撞上任何真實讀音 → 丟棄,絕不讓「錯項其實是對的」)
 const REAL = new Set();
 for (const lv of Object.keys(W)) for (const v of W[lv]) if (v.r) REAL.add(v.r);
+// 字典收錄的合法口語形/異讀:不在 vocab 但真實存在,拿來當錯項會誤判(審查實錘:ほんとに)
+for (const r of ['ほんとに','ほんと','ゆうめし','あした','あす']) REAL.add(r);
 
 // 手寫題已用過的詞(【詞】出現在 jlpt-questions.js 的題幹)→ 跳過,避免重複
 const handSrc = fs.readFileSync(path.join(ROOT, 'jlpt-questions.js'), 'utf8');
