@@ -610,7 +610,7 @@ async function playTTS(text, voice){
 // 三個舊坑:①舊實例沒 abort 釋放,幾輪後 Chrome 辨識服務卡死 → 每次 start 前先 abort 舊的
 // ②AI 語音還在播就開麥,部分裝置直接中斷 → 開麥前先停播音 ③錯誤靜默 → 顯示原因
 // 加碼補上先前的回饋:辨識「接續不覆蓋」(保留已輸入)、停頓自動續錄(按停或送出才真的停)
-let rec=null, recording=false, _wantRec=false, _recBase='', _sessFin='';
+let rec=null, recording=false, _wantRec=false, _recBase='', _sessFin='', _lastFin='';   // _lastFin=上一段已併入的定案文字(double-final 去重專用;不能拿整個 input 比,會吃掉「唸出與輸入框相同字」的正常輸入)
 // App 內改走「原生 SFSpeechRecognizer」橋(app.html 發音檢查同一條):
 // WKWebView 的瀏覽器辨識不可靠(會亮著卻收不到音),而且 WebView 麥克風授權每次開 App 都重問;
 // 原生辨識穩定、權限是系統級只問一次。橋:postMessage SPEECH_START/STOP ← → stayjpSpeechResult/End。
@@ -639,14 +639,14 @@ function _nStart(){
   }
   window.stayjpSpeechResult=function(t,fin){
     if(t==null) return;
-    if(t && _recBase.trim().endsWith(t.trim())) return;   // 已併進 base 的段落被重送(double-final)→ 忽略,不重複顯示
+    if(t && _lastFin && t.trim()===_lastFin.trim()) return;   // 上一段定案文字被原封重送(double-final)→ 忽略;只比對上段辨識結果,不比 input(v334 拿整個 input 比,把「唸出與提示句相同的字」整段吃掉=錄音不靈敏,已修)
     const el=document.getElementById('say');
     el.value=_recBase+t; autoGrow();          // 原生 transcript 是這一段的累積全文,直接接在 base 後
     if(fin && t) _sessFin=t;
   };
   window.stayjpSpeechEnd=function(err){
     recording=false;
-    if(_sessFin){ if(!_recBase.trim().endsWith(_sessFin.trim())) _recBase+=_sessFin; _sessFin=''; }   // 防同段被 double-final 疊加
+    if(_sessFin){ if(_sessFin.trim()!==_lastFin.trim()) _recBase+=_sessFin; _lastFin=_sessFin; _sessFin=''; }   // 防 double-final 疊加(只比上段定案文字)
     if(err==='not-allowed'){ _wantRec=false; updateRecBtn(); document.getElementById('inNote').textContent=enOr('🎤 麥克風權限被關了:請到 iPhone 設定 → StayJP 允許麥克風。','🎤 Microphone access is off: allow it in iPhone Settings → StayJP.'); return; }
     if(err){ _wantRec=false; updateRecBtn(); document.getElementById('inNote').textContent=enOr('🎤 辨識中斷('+err+'),再按一次麥克風重試。','🎤 Recognition stopped ('+err+') — tap the mic to retry.'); return; }
     if(_wantRec){ setTimeout(function(){ if(_wantRec){ _sessFin=''; recording=true; _nPost({type:'SPEECH_START',lang:'ja-JP'}); } },200); return; }   // 停頓自動續錄
@@ -685,7 +685,7 @@ function _newRec(){
   };
   r.onend=()=>{
     recording=false;
-    if(_sessFin){ if(!_recBase.trim().endsWith(_sessFin.trim())) _recBase+=_sessFin; _sessFin=''; }   // 實例結束才併入 base(新實例 results 歸零);endsWith 防同段疊加
+    if(_sessFin){ if(_sessFin.trim()!==_lastFin.trim()) _recBase+=_sessFin; _lastFin=_sessFin; _sessFin=''; }   // 實例結束才併入 base(新實例 results 歸零);只比上段定案文字防疊加
     if(_wantRec){ setTimeout(()=>{ if(_wantRec) _startInstance(); },150); return; }   // 停頓自動續錄
     updateRecBtn();
     _postRestore();   // 錄音真的結束了 → 舊版 App 要還原音訊 session,不然接下來 TTS 沒聲音
@@ -702,7 +702,7 @@ function startRec(){
   try{ if(_audio){ _audio.pause(); _audio=null; } }catch(e){}   // 要講話先閉嘴:停掉正在播的 AI 語音,避免開麥被中斷
   if(window.STAYJP_NATIVE && window.STAYJP_NATIVE.canPlayB64) _nPost({type:'STOP_PLAY'});   // 原生播放也要停
   _wantRec=true;
-  _recBase=(document.getElementById('say').value||'');
+  _recBase=(document.getElementById('say').value||''); _lastFin='';   // 新錄音起點:input 既有文字(含點提示帶入的)不參與去重
   if(_recBase && !/[\s、。]$/.test(_recBase)) _recBase+='';   // 接續原文
   document.getElementById('inNote').textContent=enOr('🎤 錄音中…講完按停或直接按送出。','🎤 Recording… tap stop or just send when done.');
   if(NATIVE_STT){ _nStart(); return; }
