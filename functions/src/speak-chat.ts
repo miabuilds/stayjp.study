@@ -91,6 +91,7 @@ async function guardHints(rawHints: string[], jp: string, g: HintGuard): Promise
     const up = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
       headers: { "content-type": "application/json", "x-api-key": g.apiKey, "anthropic-version": "2023-06-01" },
+      signal: (AbortSignal as any).timeout ? (AbortSignal as any).timeout(20000) : undefined,
       body: JSON.stringify({ model: MODEL, max_tokens: 60, system: sys,
         messages: [{ role: "user", content: list.map((h, i) => `${i + 1}. ${h}`).join("\n") }] }),
     });
@@ -104,6 +105,7 @@ async function guardHints(rawHints: string[], jp: string, g: HintGuard): Promise
       const rw = await fetch("https://api.anthropic.com/v1/messages", {
         method: "POST",
         headers: { "content-type": "application/json", "x-api-key": g.apiKey, "anthropic-version": "2023-06-01" },
+        signal: (AbortSignal as any).timeout ? (AbortSignal as any).timeout(20000) : undefined,
         body: JSON.stringify({ model: MODEL, max_tokens: 200,
           system: `場景:${g.scene}。使用者的角色:${g.ur}。對方(AI 角色)剛說:「${jp}」。\n請給 2 條「${g.ur}」可以怎麼回的建議。一行一條,格式:<日文>｜<這句的${g.langLabel}意思>。只輸出這兩行,不要編號或其他文字。`,
           messages: [{ role: "user", content: "請輸出建議。" }] }),
@@ -214,8 +216,8 @@ async function streamAnthropic(res: any, apiKey: string, system: any, messages: 
       for (const h of verified) res.write("\nHINT: " + h);
     }
   }
+  await trackAiCost(model || MODEL, usage).catch(() => {});   // 必須在 res.end() 前:Cloud Run 回應結束即凍結 CPU,之後的寫入常丟
   res.end();
-  void trackAiCost(model || MODEL, usage);   // fire-and-forget 記帳(含超額自動降級)
 }
 
 export const speakChat = functions.onRequest(
@@ -224,7 +226,9 @@ export const speakChat = functions.onRequest(
     try {
       if (req.method !== "POST") { res.status(405).json({ error: "method_not_allowed" }); return; }   // 爬蟲 GET 戳門 → 405,不進錯誤日誌
       const idToken = (req.headers.authorization || "").replace(/^Bearer\s+/i, "");
-      const decoded = await admin.auth().verifyIdToken(idToken);
+      let decoded: admin.auth.DecodedIdToken;
+      try { decoded = await admin.auth().verifyIdToken(idToken); }
+      catch { res.status(401).json({ error: "auth", message: "請重新登入" }); return; }
       const isAdmin = ADMIN_EMAILS.includes((decoded.email || "").toLowerCase());
       const cfg = await getAiConfig();
       // 測試期(public:false):非 admin 一律擋。開放後:admin 不計量,其他人走 quota。
@@ -238,13 +242,32 @@ export const speakChat = functions.onRequest(
       const hist = Array.isArray(history) ? history.filter(h => h && h.text) : [];
       const userTurns = hist.filter(h => h.role === "me").length;
 
-      // 輸入轉日文:使用者打中文/英文 → 翻成自然日文讓對話繼續(附屬功能,不另計量)
+      // 伺服器端輪數保險絲:userTurns/場數都算在 client 送來的 history 上,惡意 client 可造假繞過「場」扣費。
+      // 不重構計費,直接加每日硬上限(admin 除外):對話輪數與 toJa 次數各自封頂,成本有天花板。
+      async function dayFuse(field: string, limit: number): Promise<boolean> {
+        try {
+          const ref = admin.firestore().doc("ai_usage/" + decoded.uid);
+          const today = new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10);
+          return await admin.firestore().runTransaction(async (tx) => {
+            const u: any = (await tx.get(ref)).data() || {};
+            const day = (u[field] && u[field].d === today) ? u[field] : { d: today, n: 0 };
+            if (day.n >= limit) return false;
+            day.n++;
+            tx.set(ref, { [field]: day }, { merge: true });
+            return true;
+          });
+        } catch { return true; }   // 保險絲壞了不擋正常人
+      }
+
+      // 輸入轉日文:使用者打中文/英文 → 翻成自然日文讓對話繼續(附屬功能,不細計量,但有每日硬上限防刷)
       if (mode === "toJa") {
         const text = String(req.body?.text || "").slice(0, 200).trim();
         if (!text) { res.status(400).json({ error: "missing_text" }); return; }
+        if (!isAdmin && !(await dayFuse("toJaDay", 120))) { res.status(429).json({ error: "quota", message: "今天的翻譯輔助用量已達上限,明天再來!" }); return; }
         const up = await fetch("https://api.anthropic.com/v1/messages", {
           method: "POST",
           headers: { "content-type": "application/json", "x-api-key": ANTHROPIC_API_KEY.value(), "anthropic-version": "2023-06-01" },
+          signal: (AbortSignal as any).timeout ? (AbortSignal as any).timeout(20000) : undefined,
           body: JSON.stringify({ model: MODEL, max_tokens: 120,
             system: "把使用者這句話轉成自然的日文口語(對話中的一句)。如果輸入本身已經是自然的日文,一字不改原樣返回。只輸出日文句子本身,絕不加解釋、引號或其他文字。",
             messages: [{ role: "user", content: text }] }),
@@ -267,8 +290,13 @@ export const speakChat = functions.onRequest(
       // chat 模式
       if (!scene) { res.status(400).json({ error: "缺 scene" }); return; }
       // 輪數封頂:單場成本天花板。前端同步自動收尾,這裡是護底。
-      if (userTurns >= cfg.maxTurns) {
+      if (userTurns > cfg.maxTurns) {
         res.status(429).json({ error: "turns", message: "這場聊得夠深了!按「結束・看點評」看表現吧 🙌" }); return;
+      }
+      // 每日輪數硬上限(成本天花板;正常人打不到:premium 5場×12輪=60)
+      const turnCap = 80;
+      if (!isAdmin && userTurns >= 1 && !(await dayFuse("chatTurnDay", turnCap))) {
+        res.status(429).json({ error: "quota", message: "今天的對話輪數已達上限,明天再來!" }); return;
       }
       // 「使用者送出第一句」才消耗「場」額度——AI 開場白不扣。
       // 之前在開場白就扣,點開情境看一眼就沒了,使用者覺得「我根本沒用過」(KOL 實測回饋)。
@@ -278,21 +306,22 @@ export const speakChat = functions.onRequest(
       } else if (isAdmin && userTurns === 1) {
         void recordAiUse(decoded.uid, "chat");   // admin 不計量,但累計紀錄照記
       }
+      const sceneStr = String(scene).slice(0, 400);
       const msgs: any[] = [];
       // 歷史裡 AI 舊回覆存「台詞本身」(不加 JP: 前綴)。
       // 教訓:曾為了防「模仿自己裸回」加過 JP: 前綴,結果模型把上一輪看成「只輸出到 JP 的未完格式塊」,
       // 這一輪去「補完上輪的 KANA/ZH/HINT」而完全無視使用者最新訊息(日誌實錘:重複問已回答的問題)。
       // 裸回問題交給 repairBare 兜底即可,前綴弊大於利。
-      for (const h of hist) msgs.push({ role: h.role === "me" ? "user" : "assistant", content: String(h.text) });
+      for (const h of hist) msgs.push({ role: h.role === "me" ? "user" : "assistant", content: String(h.text).slice(0, 400) });
       // 歷史截斷:只送最近 N 則(場景設定在 system 裡,舊對話對下一句影響小)→ input 不隨對話變長
       const kept = msgs.slice(-cfg.historyKeep);
       if (kept.length === 0 || kept[kept.length - 1].role !== "user") {
         kept.push({ role: "user", content: "（請你先自然開口,帶起這個情境的對話）" });
       }
-      const system = [{ type: "text", text: chatSystem(scene, level || "N4", lang, String(userRole || "").slice(0, 30)), cache_control: { type: "ephemeral" } }];
+      const system = [{ type: "text", text: chatSystem(sceneStr, level || "N4", lang, String(userRole || "").slice(0, 30)), cache_control: { type: "ephemeral" } }];
       const urStr = String(userRole || "").slice(0, 30);
       const guard: HintGuard | undefined = urStr
-        ? { apiKey: ANTHROPIC_API_KEY.value(), scene: String(scene).slice(0, 300), ur: urStr, langLabel: langName(lang) }
+        ? { apiKey: ANTHROPIC_API_KEY.value(), scene: sceneStr.slice(0, 300), ur: urStr, langLabel: langName(lang) }
         : undefined;
       await streamAnthropic(res, ANTHROPIC_API_KEY.value(), system, kept, (cfg as any).chatModel, guard);
     } catch (e: any) {

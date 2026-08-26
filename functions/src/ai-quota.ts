@@ -80,7 +80,7 @@ export async function consumeQuota(uid: string, kind: "eval" | "chat" | "tts", c
       const limit = kind === "eval" ? cfg.premEvalDaily : cfg.premChatDaily;
       const day = (u[field] && u[field].d === today) ? u[field] : { d: today, n: 0 };
       if (day.n >= limit) {
-        if (bonus > 0) { tx.set(ref, { [bonusField]: bonus - 1, [lifeField]: admin.firestore.FieldValue.increment(1) }, { merge: true }); return null; }
+        if (bonus > 0) { day.n++; tx.set(ref, { [field]: day, [bonusField]: bonus - 1, [lifeField]: admin.firestore.FieldValue.increment(1) }, { merge: true }); return null; }   // 顯示計數同步(「我的」頁今日數)
         return kind === "eval"
           ? `今天的 AI 評分額度(${limit} 次)用完了,明天再來!`
           : `今天的 AI 對話額度(${limit} 場)用完了,明天再來!`;
@@ -93,7 +93,12 @@ export async function consumeQuota(uid: string, kind: "eval" | "chat" | "tts", c
       const limit = kind === "eval" ? cfg.freeEvalTotal : cfg.freeChatTotal;
       const n = u[field] || 0;
       if (n >= limit) {
-        if (bonus > 0) { tx.set(ref, { [bonusField]: bonus - 1, [lifeField]: admin.firestore.FieldValue.increment(1) }, { merge: true }); return null; }
+        if (bonus > 0) {
+          const dayF = kind === "eval" ? "evalDay" : "chatDay";
+          const dv = (u[dayF] && u[dayF].d === today) ? u[dayF] : { d: today, n: 0 };
+          dv.n++;
+          tx.set(ref, { [dayF]: dv, [bonusField]: bonus - 1, [lifeField]: admin.firestore.FieldValue.increment(1) }, { merge: true }); return null;
+        }
         return kind === "eval"
           ? `免費體驗的 ${limit} 次 AI 評分已用完。升級 Premium 每天 ${cfg.premEvalDaily} 次!`
           : `免費體驗的 ${limit} 場 AI 對話已用完。升級 Premium 每天 ${cfg.premChatDaily} 場!`;

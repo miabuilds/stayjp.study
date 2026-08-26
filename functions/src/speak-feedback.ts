@@ -53,20 +53,23 @@ export const speakFeedback = functions.onRequest(
     try {
       if (req.method !== "POST") { res.status(405).json({ error: "method_not_allowed" }); return; }   // 爬蟲 GET 戳門 → 405,不進錯誤日誌
       const idToken = (req.headers.authorization || "").replace(/^Bearer\s+/i, "");
-      const decoded = await admin.auth().verifyIdToken(idToken);
+      let decoded: admin.auth.DecodedIdToken;
+      try { decoded = await admin.auth().verifyIdToken(idToken); }
+      catch { res.status(401).json({ error: "auth", message: "請重新登入" }); return; }
       const isAdmin = ADMIN_EMAILS.includes((decoded.email || "").toLowerCase());
       const cfg = await getAiConfig();
       if (!isAdmin && !cfg.public) {
         res.status(403).json({ error: "測試版限 admin 帳號" }); return;
       }
+      // 先驗 body 再扣額度:缺欄位的失敗請求不該白燒使用者的評分次數
+      const { target, said, lang } = (req.body || {}) as { target?: { jp?: string; kana?: string }; said?: string; lang?: string };
+      if (!target || !target.jp || !said) { res.status(400).json({ error: "缺 target.jp / said" }); return; }
       if (!isAdmin) {
         const blocked = await consumeQuota(decoded.uid, "eval", cfg);
         if (blocked) { res.status(402).json({ error: "quota", message: blocked }); return; }
       } else {
         void recordAiUse(decoded.uid, "eval");
       }
-      const { target, said, lang } = (req.body || {}) as { target?: { jp?: string; kana?: string }; said?: string; lang?: string };
-      if (!target || !target.jp || !said) { res.status(400).json({ error: "缺 target.jp / said" }); return; }
 
       const body = {
         model: MODEL,
@@ -128,8 +131,8 @@ export const speakFeedback = functions.onRequest(
           } catch { /* 半行/非 JSON 事件,略過 */ }
         }
       }
+      await trackAiCost(MODEL, usage).catch(() => {});   // res.end() 前:Cloud Run 回應結束即凍 CPU
       res.end();
-      void trackAiCost(MODEL, usage);
     } catch (e: any) {
       if (!res.headersSent) res.status(500).json({ error: String((e && e.message) || e) });
       else { try { res.end(); } catch { /* noop */ } }

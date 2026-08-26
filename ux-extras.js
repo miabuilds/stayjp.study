@@ -197,8 +197,13 @@
   // 保留既有簡單標籤(如例句標文法點的 <em>):只對標籤外文字上 furigana/可點,標籤原樣穿過
   function furiganaHTMLRich(html) {
     if (html == null) return '';
+    // 標籤白名單:只有內容裡合法會出現的排版標籤放行(文法例句的 <em>、既有 ruby 等);
+    // 其他一律轉義——AI 生成的台詞會經過這裡進 innerHTML,模型被誘導輸出 <img onerror=…> 這類
+    // 標籤時不轉義就是 stored XSS(對話紀錄回放同路徑,審查實錘)。
+    var SAFE_TAG = /^<\/?(em|b|i|u|strong|br|ruby|rt|rp|span)((\s+(class|style)="[^"<>]*")*\s*\/?)>$/i;   // 屬性只准 class/style(雙引號):span onclick=… 這種一律轉義
     return String(html).split(/(<[^>]+>)/).map(function (seg) {
-      return seg.charAt(0) === '<' ? seg : furiganaHTML(seg);
+      if (seg.charAt(0) === '<') return SAFE_TAG.test(seg) ? seg : escapeHtml(seg);
+      return furiganaHTML(seg);
     }).join('');
   }
 
