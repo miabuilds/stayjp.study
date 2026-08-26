@@ -110,6 +110,7 @@
     <div class="lvtabs" id="lvtabs"></div>
     <div class="scenes" id="scenes"></div>
     <div class="muted" style="margin-top:14px">💡 這是「對話」練習;想練單句跟讀請到 <a href="speak.html" style="color:var(--accent)">口說練習</a>。</div>
+    <div style="margin-top:10px"><button class="btn sm" onclick="openLogs()">🕘 對話紀錄</button></div>
   </div>
 
   <!-- 對話 -->
@@ -130,6 +131,23 @@
       </div>
       <div class="muted" id="inNote">🎤 用瀏覽器語音辨識(Chrome 較準);不準可直接改字再送。</div>
     </div>
+  </div>
+
+  <!-- 對話紀錄清單 -->
+  <div id="logs" style="display:none">
+    <div class="chatbar">
+      <span class="ttl">🕘 對話紀錄</span>
+      <button class="btn sm" onclick="show('pick')">返回</button>
+    </div>
+    <div id="logList" class="review"></div>
+  </div>
+  <!-- 紀錄回放 -->
+  <div id="logview" style="display:none">
+    <div class="chatbar">
+      <span class="ttl" id="lvTtl"></span>
+      <button class="btn sm" onclick="show('logs')">返回列表</button>
+    </div>
+    <div class="msgs" id="logMsgs"></div>
   </div>
 
   <!-- 點評 -->
@@ -159,6 +177,7 @@ document.addEventListener('DOMContentLoaded', function () {
 </script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <script>
 // ── 三語 shim:cvt(OpenCC 繁→簡)+ enOr(en 用英文,否則 cvt)──
 let _tw2cn=null;
@@ -171,6 +190,7 @@ if(I18n.getLang()==='zh-CN') ensureOpenCC();
 const fbConfig = { apiKey:"AIzaSyDnmg2XOuvwgE8m8xCF5sS4o0nQYoUplPI", authDomain:"jpnote-1bdd6.firebaseapp.com", projectId:"jpnote-1bdd6", storageBucket:"jpnote-1bdd6.firebasestorage.app", messagingSenderId:"666368174384" };
 if(!firebase.apps.length) firebase.initializeApp(fbConfig);
 const auth = firebase.auth();
+const db = firebase.firestore();
 
 const ADMIN_EMAILS = ['stayjpplan@gmail.com','abc83327@gmail.com'];
 const FN_CHAT = 'https://asia-east1-jpnote-1bdd6.cloudfunctions.net/speakChat';
@@ -217,7 +237,7 @@ let showZh = true;     // 對話中是否顯示中文翻譯;關掉 → 只靠日
 function toggleZh(){ showZh=!showZh; const b=document.getElementById('cnBtn'); if(b) b.classList.toggle('off',!showZh); renderMsgs(); }
 
 // ── 畫面切換 ──
-function show(id){ ['pick','chat','review'].forEach(x=>document.getElementById(x).style.display = x===id?'block':'none'); }
+function show(id){ ['pick','chat','review','logs','logview'].forEach(x=>document.getElementById(x).style.display = x===id?'block':'none'); }
 function renderLvTabs(){
   const D={N5:enOr('最基本','Basics'),N4:enOr('日常','Daily'),N3:enOr('中級','Intermediate'),N2:enOr('中上','Upper-int'),N1:enOr('高階','Advanced')};
   document.getElementById('lvtabs').innerHTML = LEVELS.map(lv=>
@@ -229,7 +249,7 @@ function renderScenes(){
   document.getElementById('scenes').innerHTML = SCENES.map(s=>
     `<div class="scene" onclick="startChat('${s.k}')"><div class="jpw">${s.yomi?`<ruby>${esc(s.jp)}<rt>${esc(s.yomi)}</rt></ruby>`:esc(s.jp)}</div><div class="t">${esc(sceneTitle(s))}</div><div class="d">${esc(s.dE?enOr(s.d,s.dE):s.d)}</div></div>`).join('');
 }
-function backToPick(){ hardStopRec(); scene=null; history=[]; show('pick'); }
+function backToPick(){ hardStopRec(); scene=null; history=[]; _logSaved=false; show('pick'); }
 
 // ── 開始 / 進行對話 ──
 // 站上標準雙登入(照 auth-header.js)
@@ -285,7 +305,7 @@ function startChat(k){
   } else {
     scene = s0;
   }
-  history = [];
+  history = []; _logSaved=false;
   document.getElementById('chatTtl').innerHTML = `<span style="color:var(--accent);font-weight:800">${esc(scene.jp||'')}</span> ${esc(sceneTitle(scene))} <span class="muted" style="font-weight:400">· ${activeLv}</span>`;
   document.getElementById('msgs').innerHTML = '';
   document.getElementById('say').value = '';
@@ -480,7 +500,59 @@ async function endChat(){
     const reader=r.body.getReader(); const dec=new TextDecoder(); let full='';
     while(true){ const {done,value}=await reader.read(); if(done)break; full+=dec.decode(value,{stream:true}); renderReview(full,false); }
     renderReview(full,true);
+    saveChatLog(parseReview(full));   // 點評出來=一場完整對話 → 存紀錄(使用者要求)
   }catch(e){ card.innerHTML='<div class="err">'+enOr('錯誤:','Error: ')+esc(e.message)+'</div>'; }
+}
+
+// ── 對話紀錄:存在 users/{uid}/chat_logs,本人可讀寫(rules 已開);只留最近 20 場 ──
+var _logSaved=false;   // 同一場只存一次(重看點評不重複存;var 提升避免 TDZ)
+async function saveChatLog(rv){
+  try{
+    const u=auth.currentUser; if(!u||_logSaved) return;
+    const msgs=history.map(h=>h.role==='me'
+      ? {r:'m', jp:h.text||''}
+      : {r:'a', jp:h.jp||h.text||'', zh:h.zh||''}).filter(m=>m.jp).slice(0,30);
+    if(!msgs.length) return;
+    const col=db.collection('users/'+u.uid+'/chat_logs');
+    await col.add({ ts:Date.now(), sceneK:scene.k||'', sceneIc:scene.ic||'💬', sceneT:scene.t||'',
+      lv:activeLv, voice:scene.voice||'f', score:Number(rv&&rv.score)||null, msgs });
+    _logSaved=true;
+    // 修剪:只留最近 20 場(拿 40 筆夠判斷,超過的刪掉)
+    const snap=await col.orderBy('ts','desc').limit(40).get();
+    snap.docs.slice(20).forEach(d=>{ d.ref.delete().catch(()=>{}); });
+  }catch(e){ console.warn('chat log save fail', e); }
+}
+async function openLogs(){
+  show('logs');
+  const box=document.getElementById('logList');
+  const u=auth.currentUser;
+  if(!u){ box.innerHTML='<div class="muted">'+enOr('登入後才能保存與查看對話紀錄。','Sign in to keep and view your chat history.')+'</div>'; return; }
+  box.innerHTML='<div class="muted">'+enOr('載入中…','Loading…')+'</div>';
+  try{
+    const snap=await db.collection('users/'+u.uid+'/chat_logs').orderBy('ts','desc').limit(20).get();
+    if(snap.empty){ box.innerHTML='<div class="muted">'+enOr('還沒有紀錄。完成一場對話並看完點評,就會自動保存在這裡。','No records yet. Finish a chat and view the review — it will be saved here.')+'</div>'; return; }
+    window.__logs={};
+    box.innerHTML=snap.docs.map(d=>{ const v=d.data(); window.__logs[d.id]=v;
+      const dt=new Date(v.ts); const ds=(dt.getMonth()+1)+'/'+dt.getDate()+' '+String(dt.getHours()).padStart(2,'0')+':'+String(dt.getMinutes()).padStart(2,'0');
+      return '<div class="hist-row" style="display:flex;gap:10px;align-items:center;padding:12px 4px;border-bottom:1px solid var(--line);cursor:pointer" onclick="viewLog(\''+d.id+'\')">'
+        +'<span style="font-size:20px">'+esc(v.sceneIc||'💬')+'</span>'
+        +'<span style="flex:1"><b>'+esc(cvt(v.sceneT||''))+'</b> <span class="muted">· '+esc(v.lv||'')+' · '+ds+'</span></span>'
+        +(v.score!=null?'<span style="font-weight:700;color:'+(v.score>=85?'var(--ok)':v.score>=60?'var(--warn)':'var(--bad)')+'">'+v.score+'</span>':'')
+        +'<span class="muted">›</span></div>'; }).join('');
+  }catch(e){ box.innerHTML='<div class="err">'+enOr('載入失敗:','Load failed: ')+esc(e.message)+'</div>'; }
+}
+function viewLog(id){
+  const v=(window.__logs||{})[id]; if(!v) return;
+  show('logview');
+  document.getElementById('lvTtl').textContent=(v.sceneIc||'💬')+' '+cvt(v.sceneT||'')+' · '+(v.lv||'');
+  const wrap=document.getElementById('logMsgs');
+  wrap.innerHTML=(v.msgs||[]).map(function(m,i){
+    if(m.r==='m') return '<div class="msg me"><div class="bubble me"><div class="bjp">'+esc(m.jp)+'</div></div></div>';
+    return '<div class="msg ai"><div class="bubble ai">'
+      +'<div class="bjp">'+(window.furiganaHTMLRich?furiganaHTMLRich(m.jp):esc(m.jp))+' <button class="spk" onclick="playTTS(window.__logs[\''+id+'\'].msgs['+i+'].jp,\''+(v.voice||'f')+'\')">🔊</button></div>'
+      +(m.zh?'<div class="bzh">'+esc(cvt(m.zh))+'</div>':'')
+      +'</div></div>'; }).join('')
+    +(v.score!=null?'<div class="muted" style="text-align:center;padding:12px">'+enOr('這場得分:','Score: ')+'<b>'+v.score+'</b></div>':'');
 }
 function parseReview(text){
   const o={};
@@ -567,13 +639,14 @@ function _nStart(){
   }
   window.stayjpSpeechResult=function(t,fin){
     if(t==null) return;
+    if(t && _recBase.trim().endsWith(t.trim())) return;   // 已併進 base 的段落被重送(double-final)→ 忽略,不重複顯示
     const el=document.getElementById('say');
     el.value=_recBase+t; autoGrow();          // 原生 transcript 是這一段的累積全文,直接接在 base 後
     if(fin && t) _sessFin=t;
   };
   window.stayjpSpeechEnd=function(err){
     recording=false;
-    if(_sessFin){ _recBase+=_sessFin; _sessFin=''; }
+    if(_sessFin){ if(!_recBase.trim().endsWith(_sessFin.trim())) _recBase+=_sessFin; _sessFin=''; }   // 防同段被 double-final 疊加
     if(err==='not-allowed'){ _wantRec=false; updateRecBtn(); document.getElementById('inNote').textContent=enOr('🎤 麥克風權限被關了:請到 iPhone 設定 → StayJP 允許麥克風。','🎤 Microphone access is off: allow it in iPhone Settings → StayJP.'); return; }
     if(err){ _wantRec=false; updateRecBtn(); document.getElementById('inNote').textContent=enOr('🎤 辨識中斷('+err+'),再按一次麥克風重試。','🎤 Recognition stopped ('+err+') — tap the mic to retry.'); return; }
     if(_wantRec){ setTimeout(function(){ if(_wantRec){ _sessFin=''; recording=true; _nPost({type:'SPEECH_START',lang:'ja-JP'}); } },200); return; }   // 停頓自動續錄
@@ -589,8 +662,14 @@ function _newRec(){
   try{ if(rec){ rec.onend=null; rec.onerror=null; rec.onresult=null; rec.abort(); } }catch(e){}   // 釋放舊實例,防服務卡死
   const r=new SR(); r.lang='ja-JP'; r.interimResults=true; r.continuous=true;
   r.onresult=e=>{
-    let fin='', interim='';
-    for(let i=0;i<e.results.length;i++){ const t=e.results[i][0].transcript; if(e.results[i].isFinal) fin+=t; else interim+=t; }
+    let fin='', interim='', prevSeg='';
+    for(let i=0;i<e.results.length;i++){ const t=e.results[i][0].transcript;
+      if(e.results[i].isFinal){
+        if(t.trim()&&t.trim()===prevSeg.trim()) continue;   // Android Chrome 災情:同一段 final 會重複出現在 results → 去重(使用者回饋:講一個字重複出現好幾次)
+        fin+=t; prevSeg=t;
+      } else interim+=t;
+    }
+    if(interim.trim()&&(prevSeg.trim()===interim.trim()||fin.trim().endsWith(interim.trim()))) interim='';   // 定案後同一段又被當 interim 重播 → 不重複顯示
     const el=document.getElementById('say');
     // fin 是「這個實例至今全部」的確定段落(每次事件整批重算),所以只暫存、不累加進 base——
     // 之前邊播邊累加會讓同一段被算兩次(base 已含 + fin 再含一次 → 文字出現兩次)
@@ -606,7 +685,7 @@ function _newRec(){
   };
   r.onend=()=>{
     recording=false;
-    if(_sessFin){ _recBase+=_sessFin; _sessFin=''; }   // 實例結束才併入 base(新實例的 results 會歸零重來)
+    if(_sessFin){ if(!_recBase.trim().endsWith(_sessFin.trim())) _recBase+=_sessFin; _sessFin=''; }   // 實例結束才併入 base(新實例 results 歸零);endsWith 防同段疊加
     if(_wantRec){ setTimeout(()=>{ if(_wantRec) _startInstance(); },150); return; }   // 停頓自動續錄
     updateRecBtn();
     _postRestore();   // 錄音真的結束了 → 舊版 App 要還原音訊 session,不然接下來 TTS 沒聲音

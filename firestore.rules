@@ -56,6 +56,11 @@ service cloud.firestore {
       allow update: if request.auth != null && request.auth.uid == userId
                     && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['subscription', 'trial_started_at'])
                     && refCodeUpdateOk();
+
+      // AI 情境對話紀錄(speak-chat 保存的逐場對話)— 純學習資料,本人讀寫刪
+      match /chat_logs/{logId} {
+        allow read, write, delete: if request.auth != null && request.auth.uid == userId;
+      }
     }
 
     // 用過試用的 email 記錄(startTrial 後端寫)— client 完全碰不到,防鑽試用。
@@ -121,6 +126,13 @@ service cloud.firestore {
 
     // AI 額度參數(帳號頁顯示上限用;無敏感內容)
     match /config/ai {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    // 免費制世代切換參數(tool-quota.js 總次數包;無敏感內容)
+    // packStartMs=0/文件不存在 = 未啟用,全員維持原每日制
+    match /config/quota {
       allow read: if true;
       allow write: if false;
     }
