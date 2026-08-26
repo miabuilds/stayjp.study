@@ -10,7 +10,7 @@ import { capturePaypalOrder } from "./utils/paypal";
 import {
   db, writeSubscription, writeTransaction, writePaymentFailure,
   nowMs, plusDays, tryReserveEarlyBird, emailHash, SubscriptionDoc,
-  getSubscription, rewardReferrerOnPayment, recordKolCommission,
+  getSubscription, getRefCode, rewardReferrerOnPayment, recordKolCommission,
 } from "./utils/firestore";
 
 if (admin.apps.length === 0) admin.initializeApp();
@@ -56,6 +56,13 @@ export const paypalCaptureOrder = functions.onRequest(
         res.status(400).json({ error: "bad_plan", plan });
         return;
       }
+      // 實收 USD 對照現行價目:不一致(通常=改價瞬間的在途訂單,金額鎖在建單當下)→
+      // 錢已扣、照常開通,但標記在帳本 note + log,對帳時看得到差異。
+      const expectedUsd = PAYPAL_PRICES_USD[plan]!;
+      const usdMismatch = Number.isFinite(cap.amountUsd) && Math.abs(cap.amountUsd - expectedUsd) > 0.005;
+      if (usdMismatch) {
+        console.warn("paypalCapture 金額與現行價目不符(在途改價?)", { uid, plan, paid: cap.amountUsd, expected: expectedUsd, captureId: cap.captureId });
+      }
 
       // 3. 去重:同一筆 captureId 已入帳 → 直接回 ok,不重複開通
       const dup = await db.collection("transactions")
@@ -78,6 +85,17 @@ export const paypalCaptureOrder = functions.onRequest(
         is_early_bird: isEarlyBird,
         failed_retries: 0,
       };
+      // 推薦碼好康:與綠界/Apple 同一套——真實付款+有 ref_code+沒發過 → 到期日 +7 天(一次性)。
+      // (審查抓漏:PayPal 路徑原本只獎推薦人/記 KOL 分潤,被推薦人的 +7 漏發)
+      if (prevSub?.ref_bonus_at) {
+        newSub.ref_bonus_at = prevSub.ref_bonus_at;
+      } else if (plan !== "lifetime") {
+        const refCode = await getRefCode(uid);
+        if (refCode) {
+          newSub.expiresAt = newSub.expiresAt + 7 * 864e5;
+          newSub.ref_bonus_at = nowMs();
+        }
+      }
 
       // 4. 開通。寫入失敗(極少數:users/{uid} 索引/體積超限)→ 進人工佇列,但仍回 ok。
       try {
@@ -106,7 +124,7 @@ export const paypalCaptureOrder = functions.onRequest(
         amount_twd: planInfo.price_twd, payment_method: "paypal",
         external_id: cap.captureId, status: "success",
         email_hash: decoded.email ? emailHash(decoded.email) : undefined,
-        note: `PayPal USD ${cap.amountUsd}${isEarlyBird ? " · 早鳥" : ""}`,
+        note: `PayPal USD ${cap.amountUsd}${isEarlyBird ? " · 早鳥" : ""}${usdMismatch ? ` · ⚠️與現行價目不符(應收US$${expectedUsd})` : ""}`,
       });
 
       // 推薦好友 +7 天 / KOL 分潤(首筆真付款)。best-effort、冪等,失敗不影響已開通。

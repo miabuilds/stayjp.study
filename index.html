@@ -635,6 +635,14 @@ a:hover { text-decoration: underline; }
 .trust-row b { color: var(--ac); font-weight: 700; }
 @media(max-width:800px) { .voices { grid-template-columns: 1fr; } }
 </style>
+<script>
+// 推薦碼歸因落地:分享連結是 /?ref=CODE(account 頁邀請卡產生)。先存 localStorage,
+// 登入後由 app.html 寫進 users.ref_code、付費時後端發雙方 +7 天。沒這段,分享連結的碼會直接蒸發(審查抓漏)。
+try {
+  var _rm = (location.search || '').match(/[?&]ref=([A-Za-z0-9_-]{1,32})/);
+  if (_rm) localStorage.setItem('stayjp_ref', _rm[1].toUpperCase());
+} catch (e) {}
+</script>
 </head>
 <body>
 
