@@ -72,8 +72,10 @@
     <div class="zh" id="zh"></div>
     <div class="rowbtns">
       <button class="btn" onclick="speak()">🔊 聽範例</button>
+      <button class="btn" id="favBtn" onclick="favToggle()" title="收藏這句">☆</button>
       <button class="btn" onclick="prev()">← 上一句</button>
       <button class="btn" onclick="next()">下一句 →</button>
+      <button class="btn" onclick="FavSents.open()">⭐ 收藏句</button>
     </div>
   </div>
 
@@ -95,6 +97,8 @@
 <script src="speak-ruby.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="fav-sents.js"></script>
 <script>
 // ── i18n shim:簡中 OpenCC 即時轉換 + 英文 enOr() ──
 let _tw2cn=null;
@@ -338,8 +342,14 @@ function renderLvTabs(){
 }
 function pickLv(lv){ try{ localStorage.setItem('sp_lv',lv); }catch(e){} activeLv=lv; if(!SENTS.some(s=>s.lv===lv&&(activeCat==='all'||s.cat===activeCat))) activeCat='all'; idx=0; stopRec(); renderLvTabs(); renderChips(); render(); }
 function pickCat(k){ activeCat=k; idx=0; stopRec(); renderLvTabs(); renderChips(); render(); }
+async function favToggle(){
+  const c=cur(); if(!c||!window.FavSents) return;
+  const r=await FavSents.toggle({jp:c.jp,kana:c.kana,zh:c.zh,src:'speak',v:'f'});
+  const fb=document.getElementById('favBtn'); if(fb&&r!==null) fb.textContent=r?'★':'☆';
+}
 function render(){
   // 漢字直接標逐詞假名(離線 kuromoji 生成、與手寫假名核對過才收錄;沒有的句子退回純文字+下方整句假名行)
+  try{ const fb=document.getElementById('favBtn'); if(fb) fb.textContent = (window.FavSents&&FavSents.isFav(cur().jp))?'★':'☆'; }catch(e){}
   const _rb=(window.SPEAK_RUBY||{})[cur().jp];
   if(_rb) document.getElementById('jp').innerHTML=_rb;
   else document.getElementById('jp').textContent = cur().jp;
@@ -493,6 +503,10 @@ auth.onAuthStateChanged(u=>{
   document.getElementById('app').style.display='block';
   renderLvTabs(); renderChips(); render();
 });
+
+// 收藏句:登入後預載清單,☆ 亮暗才正確;面板移除句子後同步當前 ☆
+firebase.auth().onAuthStateChanged(function(u){ if(u&&window.FavSents) FavSents.load(true).then(function(){ try{render();}catch(e){} }); });
+if(window.FavSents) FavSents._onChange=function(){ try{render();}catch(e){} };
 </script>
 </body>
 </html>
