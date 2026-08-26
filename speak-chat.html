@@ -110,7 +110,7 @@
     <div class="lvtabs" id="lvtabs"></div>
     <div class="scenes" id="scenes"></div>
     <div class="muted" style="margin-top:14px">💡 這是「對話」練習;想練單句跟讀請到 <a href="speak.html" style="color:var(--accent)">口說練習</a>。</div>
-    <div style="margin-top:10px"><button class="btn sm" onclick="openLogs()">🕘 對話紀錄</button></div>
+    <div style="margin-top:10px"><button class="btn sm" onclick="openLogs()">🕘 對話紀錄</button> <button class="btn sm" onclick="FavSents.open()">⭐ 收藏句</button></div>
   </div>
 
   <!-- 對話 -->
@@ -178,6 +178,7 @@ document.addEventListener('DOMContentLoaded', function () {
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="fav-sents.js"></script>
 <script>
 // ── 三語 shim:cvt(OpenCC 繁→簡)+ enOr(en 用英文,否則 cvt)──
 let _tw2cn=null;
@@ -333,7 +334,7 @@ function renderMsgs(streamingAi){
 function aiBubble(m){
   const jp = m.jp || m.text || '';
   return `<div class="msg ai"><div class="bubble ai">
-    <div class="bjp"><span>${(jp&&window.furiganaHTMLRich)?window.furiganaHTMLRich(jp):(esc(jp)||'…')}</span>${jp?`<button class="spk" title="${enOr('播放','Play')}" onclick="playTTS(${JSON.stringify(jp).replace(/"/g,'&quot;')}, scene&&scene.voice)">🔊</button>`:''}</div>
+    <div class="bjp"><span>${(jp&&window.furiganaHTMLRich)?window.furiganaHTMLRich(jp):(esc(jp)||'…')}</span>${jp?`<button class="spk" title="${enOr('播放','Play')}" onclick="playTTS(${JSON.stringify(jp).replace(/"/g,'&quot;')}, scene&&scene.voice)">🔊</button><button class="spk favstar" title="${enOr('收藏這句','Save this sentence')}" onclick="favFromBubble(this)" data-jp="${esc(jp)}" data-kana="${esc(m.kana||'')}" data-zh="${esc(m.zh||'')}">${(window.FavSents&&FavSents.isFav(jp))?'★':'☆'}</button>`:''}</div>
 
     ${(showZh && m.zh)?`<div class="bzh">${esc(cvt(m.zh))}</div>`:''}
     ${(showZh && m.words)?wordChips(m.words):''}
@@ -367,6 +368,12 @@ function parseTurn(text){
 }
 // 「你可以這樣回」建議;點了填進輸入框讓你可再改
 // 提示預設收合:先自己想,想不出來再點「💡 提示」展開——直接亮答案就沒練到了。
+async function favFromBubble(btn){
+  if(!window.FavSents) return;
+  const r=await FavSents.toggle({jp:btn.dataset.jp,kana:btn.dataset.kana,zh:btn.dataset.zh,src:'chat',v:(scene&&scene.voice)||'f'});
+  if(r!==null) btn.textContent=r?'★':'☆';
+}
+firebase.auth().onAuthStateChanged(function(u){ if(u&&window.FavSents) FavSents.load(true); });
 let _hints=[];
 // 角色標記驗證:後端要求模型每個 HINT 開頭寫「<使用者角色>»」——寫標記這個動作本身逼模型想清楚說話者;
 // 這裡再驗一次:標記對不上使用者角色的提示直接丟棄(寧可少一條提示,也不顯示店員台詞給顧客)。沒帶標記的照舊保留(相容舊格式)。
@@ -523,7 +530,7 @@ async function saveChatLog(rv){
     const u=auth.currentUser; if(!u) return;
     const msgs=history.map(h=>h.role==='me'
       ? {r:'m', jp:h.text||''}
-      : {r:'a', jp:h.jp||h.text||'', zh:h.zh||'', c:h.coach||''}).filter(m=>m.jp).slice(0,30);
+      : {r:'a', jp:h.jp||h.text||'', zh:h.zh||'', k:h.kana||'', c:h.coach||''}).filter(m=>m.jp).slice(0,30);
     if(!msgs.length) return;
     const col=db.collection('users/'+u.uid+'/chat_logs');
     rv=rv||{};
@@ -568,7 +575,7 @@ function viewLog(id){
     if(m.r==='m') return '<div class="msg me"><div class="bubble me"><div class="bjp">'+esc(m.jp)+'</div></div></div>';
     // furigana 必須包在單一 <span> 裡:.bubble.ai .bjp 是 flex,裸放會讓每個 ruby 變獨立 flex item 排成直欄(跑版實錘)
     return '<div class="msg ai"><div class="bubble ai">'
-      +'<div class="bjp"><span>'+(window.furiganaHTMLRich?furiganaHTMLRich(m.jp):esc(m.jp))+'</span><button class="spk" onclick="playTTS(window.__logs[\''+id+'\'].msgs['+i+'].jp,\''+(v.voice||'f')+'\')">🔊</button></div>'
+      +'<div class="bjp"><span>'+(window.furiganaHTMLRich?furiganaHTMLRich(m.jp):esc(m.jp))+'</span><button class="spk" onclick="playTTS(window.__logs[\''+id+'\'].msgs['+i+'].jp,\''+(v.voice||'f')+'\')">🔊</button><button class="spk" onclick="favFromBubble(this)" data-jp="'+esc(m.jp)+'" data-kana="'+esc(m.k||'')+'" data-zh="'+esc(m.zh||'')+'">'+((window.FavSents&&FavSents.isFav(m.jp))?'★':'☆')+'</button></div>'
       +(m.zh?'<div class="bzh">'+esc(cvt(m.zh))+'</div>':'')
       +'</div></div>'
       +(m.c?'<div class="coach"><b>'+enOr('教練','Coach')+'</b>:'+esc(cvt(m.c))+'</div>':''); }).join('')
