@@ -144,6 +144,15 @@
         if (dc.READ[sub]) { matched = { sub: sub, reading: dc.READ[sub], entry: dc.ENTRY[sub] || null, conj: null }; break; }
         if (dc.CONJ[sub]) { matched = { sub: sub, reading: dc.CONJ[sub].reading, entry: null, conj: dc.CONJ[sub] }; break; }
       }
+      // 行った/行って:行く(いく)與 行う(おこなう)的た/て形同字面,活用展開互相覆蓋,標音會亂猜
+      // (用戶回饋:〜ついでに例句「取りに行った」被標成おこなった)。語境判讀:
+      // 前一字是「を」= 他動詞受詞 → 行う(会議を行った);其他(に/へ/で/句首…)→ 行く。全語料掃過無反例。
+      if (matched && matched.sub.charAt(0) === '行' && matched.sub.charAt(1) === 'っ') {
+        var pv = i > 0 ? text[i - 1] : '';
+        var r0 = matched.reading || '';
+        if (pv === 'を') { if (r0.indexOf('い') === 0) matched.reading = 'おこな' + r0.slice(1); }
+        else { if (r0.indexOf('おこな') === 0) matched.reading = 'い' + r0.slice(3); }
+      }
       // 單漢字 + 後接漢字 → 多音字風險高,不上 ruby(活用形有送假名尾、長度>1,不受此限)
       if (matched && matched.sub.length === 1 && !matched.conj && i + 1 < text.length && isKanji(text[i + 1])) {
         out += escapeHtml(text[i]); i++; continue;
