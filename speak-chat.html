@@ -511,11 +511,14 @@ async function saveChatLog(rv){
     const u=auth.currentUser; if(!u||_logSaved) return;
     const msgs=history.map(h=>h.role==='me'
       ? {r:'m', jp:h.text||''}
-      : {r:'a', jp:h.jp||h.text||'', zh:h.zh||''}).filter(m=>m.jp).slice(0,30);
+      : {r:'a', jp:h.jp||h.text||'', zh:h.zh||'', c:h.coach||''}).filter(m=>m.jp).slice(0,30);
     if(!msgs.length) return;
     const col=db.collection('users/'+u.uid+'/chat_logs');
+    rv=rv||{};
     await col.add({ ts:Date.now(), sceneK:scene.k||'', sceneIc:scene.ic||'💬', sceneT:scene.t||'',
-      lv:activeLv, voice:scene.voice||'f', score:Number(rv&&rv.score)||null, msgs });
+      lv:activeLv, voice:scene.voice||'f', score:Number(rv.score)||null,
+      // 總點評也保留:使用者要能回頭看「錯在哪、怎樣更好」(用戶回饋)
+      good:rv.good||'', improve:rv.improve||'', tip:rv.tip||'', msgs });
     _logSaved=true;
     // 修剪:只留最近 20 場(拿 40 筆夠判斷,超過的刪掉)
     const snap=await col.orderBy('ts','desc').limit(40).get();
@@ -548,11 +551,20 @@ function viewLog(id){
   const wrap=document.getElementById('logMsgs');
   wrap.innerHTML=(v.msgs||[]).map(function(m,i){
     if(m.r==='m') return '<div class="msg me"><div class="bubble me"><div class="bjp">'+esc(m.jp)+'</div></div></div>';
+    // furigana 必須包在單一 <span> 裡:.bubble.ai .bjp 是 flex,裸放會讓每個 ruby 變獨立 flex item 排成直欄(跑版實錘)
     return '<div class="msg ai"><div class="bubble ai">'
-      +'<div class="bjp">'+(window.furiganaHTMLRich?furiganaHTMLRich(m.jp):esc(m.jp))+' <button class="spk" onclick="playTTS(window.__logs[\''+id+'\'].msgs['+i+'].jp,\''+(v.voice||'f')+'\')">🔊</button></div>'
+      +'<div class="bjp"><span>'+(window.furiganaHTMLRich?furiganaHTMLRich(m.jp):esc(m.jp))+'</span><button class="spk" onclick="playTTS(window.__logs[\''+id+'\'].msgs['+i+'].jp,\''+(v.voice||'f')+'\')">🔊</button></div>'
       +(m.zh?'<div class="bzh">'+esc(cvt(m.zh))+'</div>':'')
-      +'</div></div>'; }).join('')
-    +(v.score!=null?'<div class="muted" style="text-align:center;padding:12px">'+enOr('這場得分:','Score: ')+'<b>'+v.score+'</b></div>':'');
+      +'</div></div>'
+      +(m.c?'<div class="coach"><b>'+enOr('教練','Coach')+'</b>:'+esc(cvt(m.c))+'</div>':''); }).join('')
+    +((v.score!=null||v.good||v.improve||v.tip)
+      ? '<div class="coach" style="margin-top:14px;max-width:100%">'
+        +(v.score!=null?'<div style="font-weight:700;margin-bottom:6px">'+enOr('這場得分:','Score: ')+v.score+'</div>':'')
+        +(v.good?'<div>👍 '+esc(cvt(v.good))+'</div>':'')
+        +(v.improve?'<div style="margin-top:4px">✏️ '+esc(cvt(v.improve))+'</div>':'')
+        +(v.tip?'<div style="margin-top:4px">💡 '+esc(cvt(v.tip))+'</div>':'')
+        +'</div>'
+      : '');
 }
 function parseReview(text){
   const o={};
