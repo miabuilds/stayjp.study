@@ -104,6 +104,12 @@ export const revenuecatWebhook = functions.onRequest(
       if (typeof event.price_in_purchased_currency === "number") rcMoney.amount_paid = event.price_in_purchased_currency;
       // 沙盒(測試)vs 正式(真實付款)→ 寫進 subscription/交易,後台才分得出測試帳號與真實金流
       const isSandbox = event.environment === "SANDBOX";
+      // 台幣結帳時 amount_twd/KOL 分潤改記「實付」而非現行牌價:
+      // 調價後凍漲的舊訂戶續訂(Apple/Google 照舊價扣)若記新牌價 → 營收灌水 + KOL 佣金多付。
+      // 非台幣(外國人)拿不到匯率 → 維持牌價估計(既有行為,對帳已知僅供參考)。
+      const paidTwd = rcMoney.currency === "TWD"
+        && typeof rcMoney.amount_paid === "number" && rcMoney.amount_paid > 0
+        ? Math.round(rcMoney.amount_paid) : null;
 
       switch (type) {
         case "INITIAL_PURCHASE":
@@ -167,8 +173,8 @@ export const revenuecatWebhook = functions.onRequest(
             source: "app",
             plan,
             // 免費試用(period_type=TRIAL)沒實際扣款 → amount_twd 記 0,不灌營收;
-            // 試用轉正的 RENEWAL(period_type=NORMAL)才是第一筆真實收款 → 記牌價。
-            amount_twd: event.period_type === "TRIAL" ? 0 : planInfo.price_twd,
+            // 試用轉正的 RENEWAL(period_type=NORMAL)才是第一筆真實收款 → 台幣單記實付,其餘記牌價估計。
+            amount_twd: event.period_type === "TRIAL" ? 0 : (paidTwd ?? planInfo.price_twd),
             ...rcMoney,   // 實際幣別 + 實付金額(外國人/非台幣);試用時 amount_paid 本就 0
             is_sandbox: isSandbox,
             payment_method: event.store === "PLAY_STORE" ? "google_billing" : "apple_iap",
@@ -184,7 +190,7 @@ export const revenuecatWebhook = functions.onRequest(
           // KOL 分潤:首筆真付款轉化 → 產 pending 分潤(試用 gross=0 自動略過;續訂非首筆略過)
           await recordKolCommission(uid, {
             plan,
-            gross_twd: event.period_type === "TRIAL" ? 0 : planInfo.price_twd,
+            gross_twd: event.period_type === "TRIAL" ? 0 : (paidTwd ?? planInfo.price_twd),
             source: "app",
             txnId: event.transaction_id || event.original_transaction_id || "",
             isSandbox,
@@ -345,7 +351,25 @@ async function fetchAndWriteFromRc(uid: string): Promise<"written" | "no-entitle
     is_early_bird: existing?.is_early_bird === true,
     failed_retries: 0,
   };
+  // 推薦碼好康(匿名購買→登入歸戶的補發點):
+  // 購買當下帳號是匿名的,INITIAL_PURCHASE 讀不到 ref_code → +7/推薦人獎勵/KOL 分潤全漏(審查抓漏)。
+  // 在這裡補跑。「剩餘權益 > 8 天」一石二鳥排除試用(7天)與沙盒(幾分鐘~幾小時),不必另查 RC。
+  // 同時修:原本重寫 sub 沒帶舊 ref_bonus_at → 旗標丟失,之後續訂會重複 +7。
+  let grantBonus = false;
+  if (existing?.ref_bonus_at) {
+    sub.ref_bonus_at = existing.ref_bonus_at;
+  } else if (plan !== "lifetime" && (expiresAt - nowMs()) > 8 * 864e5) {
+    const refCode = await getRefCode(uid);
+    if (refCode) { sub.expiresAt = expiresAt + 7 * 864e5; sub.ref_bonus_at = nowMs(); grantBonus = true; }
+  }
   await writeSubscription(uid, sub);
+  if (grantBonus || (!existing?.ref_bonus_at && (expiresAt - nowMs()) > 8 * 864e5)) {
+    // 推薦人 +7 / KOL 分潤(各自冪等:referrer_paid_at / commissions doc id;重送不重複)
+    await rewardReferrerOnPayment(uid, false).catch(e => console.error("rewardReferrer(transfer) 略過:", e));
+    await recordKolCommission(uid, { plan, gross_twd: PLANS[plan].price_twd, source: "app",
+      txnId: `transfer_${uid}`, isSandbox: false, isFirstPayment: existing?.status !== "active" })
+      .catch(e => console.error("recordKolCommission(transfer) 略過:", e));
+  }
   // 帳號頁交易明細:補一筆「App 訂閱(登入歸戶)」。amount_twd=0 → 不重複計營收
   //（真實付款/試用已在購買當下記過,可能在匿名 id 名下)。冪等 id 防 TRANSFER 重送重複寫。
   await writeTransaction({
