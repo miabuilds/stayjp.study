@@ -280,7 +280,7 @@ function inPeriod(c){ return c.created>=FROM && c.created<=TO; }
 
 function renderKpis(){
   let rev=0, fee=0, comm=0, net=0, conv=0;
-  COMMS.forEach(c=>{ if(c.state==='void'||!inPeriod(c))return; conv++; const pf=profitOf(c); rev+=c.gross; fee+=(c.gross-pf); comm+=c.amount; net+=(pf-c.amount); });
+  COMMS.forEach(c=>{ if(c.state==='void'||!inPeriod(c))return; if(c.plan!=='adjustment')conv++; const pf=profitOf(c); rev+=c.gross; fee+=(c.gross-pf); comm+=c.amount; net+=(pf-c.amount); });
   const activeSubs = SUBS.filter(s=>!s.is_sandbox && (s.status==='active'||s.status==='trialing')).length;
   const ha=document.getElementById('heroActive'); if(ha) ha.textContent=activeSubs;
   document.getElementById('kpis').innerHTML =
@@ -374,7 +374,7 @@ function renderPlans(){
 function renderPayout(){
   const box=document.getElementById('payoutTable'), banner=document.getElementById('payoutBanner');
   // 每個碼:成交筆數 n、帶來營收 gross、妳淨得 mynet(=利潤−分潤)、以及分潤三態金額。void 不計。
-  const g={}; COMMS.forEach(c=>{ if(c.state==='void')return; const r=g[c.code]=g[c.code]||{pending:0,locked:0,paid:0,n:0,gross:0,mynet:0}; if(r[c.state]!=null)r[c.state]+=c.amount; r.n++; r.gross+=c.gross; r.mynet+=(profitOf(c)-c.amount); });
+  const g={}; COMMS.forEach(c=>{ if(c.state==='void')return; const r=g[c.code]=g[c.code]||{pending:0,locked:0,paid:0,n:0,gross:0,mynet:0}; if(r[c.state]!=null)r[c.state]+=c.amount; if(c.plan!=='adjustment')r.n++; r.gross+=c.gross; r.mynet+=(profitOf(c)-c.amount); });
   const codes=Object.keys(g); if(!codes.length){ box.innerHTML='<div class="pb muted">尚無分潤紀錄(還沒有人透過推薦碼付費成功)。</div>'; banner.style.display='none'; return; }
   let tP=0,tL=0,tPaid=0,tN=0,tG=0,tNet=0;
   const rows=codes.map(code=>{ const r=g[code]; tP+=r.pending;tL+=r.locked;tPaid+=r.paid;tN+=r.n;tG+=r.gross;tNet+=r.mynet; const rm=REFMAP[code]||{}; return {code,kol:rm.kol||'',payout:rm.payout,...r}; }).sort((a,b)=>b.gross-a.gross);
