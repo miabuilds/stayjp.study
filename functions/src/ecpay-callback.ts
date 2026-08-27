@@ -19,7 +19,7 @@ import { PLANS, PlanKey, ECPAY_SECRETS } from "./utils/constants";
 import { verifyCheckMacValue } from "./utils/ecpay";
 import {
   writeTransaction, getSubscription, writeSubscription, patchSubscription, getRefCode,
-  rewardReferrerOnPayment, recordKolCommission,
+  rewardReferrerOnPayment, recordKolCommission, grantAiBonus,
   tryReserveEarlyBird, releaseEarlyBird, writePaymentFailure,
   nowMs, plusDays, SubscriptionDoc, db,
 } from "./utils/firestore";
@@ -153,11 +153,15 @@ export const ecpayCallback = functions.onRequest(
         // 與 Apple webhook 同一套邏輯,讓 web 訂閱也享同樣好康(數位邊際成本≈0)。
         if (existingSub?.ref_bonus_at) {
           newSub.ref_bonus_at = existingSub.ref_bonus_at;
-        } else if (plan !== "lifetime") {
+        } else {
           const refCode = await getRefCode(uid);
-          if (refCode) {
+          if (refCode && plan !== "lifetime") {
             newSub.expiresAt = newSub.expiresAt + 7 * 864e5;
             newSub.ref_bonus_at = nowMs();
+          } else if (refCode) {
+            // 買斷:+7 天對無限期無意義 → 發 AI 加量包(2026-08-27 起,買斷戶的推薦貨幣)
+            newSub.ref_bonus_at = nowMs();
+            await grantAiBonus(uid, "推薦碼＋購買買斷 → AI 加量包").catch(e => console.error("grantAiBonus(ecpay) 略過:", e));
           }
         }
         try {

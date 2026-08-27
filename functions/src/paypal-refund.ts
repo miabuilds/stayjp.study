@@ -6,7 +6,7 @@ import * as admin from "firebase-admin";
 import { PLANS, REFUND_POLICY, PAYPAL_SECRETS } from "./utils/constants";
 import { refundPaypalCapture } from "./utils/paypal";
 import {
-  getSubscription, patchSubscription, writeTransaction,
+  db, getSubscription, patchSubscription, writeTransaction,
   recordRefund, releaseEarlyBird, nowMs, emailHash,
 } from "./utils/firestore";
 
@@ -54,11 +54,26 @@ export const paypalRefund = functions.onRequest(
       // 退款(全額)
       const refundId = await refundPaypalCapture(sub.paypal_capture);
 
+      // 帳本沖銷金額 = 原購買入帳的 amount_twd(不能用現行牌價:調價後牌價變了,
+      // 用新牌價沖舊帳會讓帳本收支對不平)。查不到才 fallback 牌價。
+      let origTwd = PLANS[sub.plan]?.price_twd || 0;
+      try {
+        const orig = await db.collection("transactions")
+          .where("external_id", "==", sub.paypal_capture)
+          .where("status", "==", "success")
+          .limit(1)
+          .get();
+        if (!orig.empty) {
+          const a = orig.docs[0].data().amount_twd;
+          if (typeof a === "number" && a > 0) origTwd = a;
+        }
+      } catch (e) { console.warn("paypalRefund: 查原購買入帳失敗,fallback 牌價沖銷:", e); }
+
       // 訂閱降級 + 記帳
       await patchSubscription(uid, { status: "refunded", willRenew: false });
       await writeTransaction({
         uid, type: "refund", source: "web", plan: sub.plan,
-        amount_twd: -(PLANS[sub.plan]?.price_twd || 0),
+        amount_twd: -origTwd,
         payment_method: "paypal", external_id: refundId || sub.paypal_capture,
         status: "refunded",
         email_hash: email ? emailHash(email) : undefined,
