@@ -38,7 +38,10 @@ export const kolStats = functions.onRequest(
       snap.forEach((d) => {
         total++;
         const sub = (d.data().subscription || {}) as Record<string, unknown>;
-        if (sub.status === "active") paid++;
+        // 已付費=真實付費且權益還在:active+「cancelled(取消續訂但未到期)」都算——
+        // 取消續訂的人錢已付、分潤照發,只算 active 會讓「已付費」和「成交筆數」對不上(KOL 實際回報過)。
+        const exp = Number(sub.expiresAt || 0);
+        if ((sub.status === "active" || sub.status === "cancelled") && exp > Date.now()) paid++;
         else if (sub.status === "trialing") trialing++;
       });
 
