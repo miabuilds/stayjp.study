@@ -65,7 +65,15 @@ export const adminListSubscribers = functions.onRequest(
       // 依到期日新到舊排序
       subscribers.sort((a, b) => (Number(b.expiresAt) || 0) - (Number(a.expiresAt) || 0));
 
-      res.json({ ok: true, count: subscribers.length, subscribers });
+      // 推薦碼身分對照(碼 → KOL 名/用戶碼):後台歸因欄顯示用
+      const codes = [...new Set(subscribers.map((x) => x.ref_code).filter(Boolean))] as string[];
+      const refMap: Record<string, { type: string; kol: string }> = {};
+      if (codes.length) {
+        const snaps = await db.getAll(...codes.map((c) => db.doc("ref_codes/" + c)));
+        snaps.forEach((sn) => { if (sn.exists) { const c = sn.data() || {}; refMap[sn.id] = { type: String(c.type || "kol"), kol: String(c.kol || "") }; } });
+      }
+
+      res.json({ ok: true, count: subscribers.length, subscribers, ref_map: refMap });
     } catch (err) {
       console.error("adminListSubscribers error:", err);
       res.status(500).json({ error: "internal", message: String(err) });
