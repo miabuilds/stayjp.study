@@ -126,21 +126,20 @@ function logout(){ auth.signOut(); location.reload(); }
 const REF_PLAN_PRICE = { monthly:150, yearly:1490, yearly_early_bird:990, lifetime:2990 };
 const REF_FEE = { app:0.15, web:0.0275 };
 let _allSubs = [];
-function refCommissionFor(code, pct) {
-  if (!pct || !Array.isArray(_allSubs)) return { paid:0, amount:0, total:0 };
-  let paid=0, amount=0, total=0;
-  _allSubs.forEach(s => {
-    if (s.ref_code !== code || s.is_sandbox) return;
-    total++;
-    if (s.status !== 'active') return;
-    paid++;
-    const price = REF_PLAN_PRICE[s.plan] || 0;
-    const fee = s.source === 'app' ? REF_FEE.app : REF_FEE.web;
-    amount += price * (1 - fee) * (pct/100);
-  });
-  return { paid, amount: Math.round(amount), total };
+// 統計以「分潤帳本(commissions)」為準,不再拿目前訂閱狀態現場重估——
+// 舊算法三個坑(2026-08-27 Mia 抓到 666666 顯示 582 但實際成交 775):
+// ①只算 status=active → 取消續訂的付費者被漏掉 ②金額用牌價重估,和帳本實記對不上 ③「帶來人數」定義和 KOL 成效頁不同。
+function refCommissionFor(code) {
+  const rows = (_allComms||[]).filter(c => c.code === code && c.state !== 'void');
+  const deals = rows.length;
+  const amount = rows.reduce((a,c)=>a+(Number(c.amount_twd)||0), 0);
+  // 「目前付費中」= 歸因到此碼且權益還在的訂閱(active/cancelled 未到期都算,和 KOL 成效頁一致)
+  const paying = (_allSubs||[]).filter(s => s.ref_code===code && !s.is_sandbox && !s.is_gift
+    && (s.status==='active'||s.status==='cancelled') && Number(s.expiresAt||0)>Date.now()).length;
+  return { deals, amount, paying };
 }
 
+let _allComms = [];
 async function loadAll() {
   // 先抓訂閱者(算歸因/抽成),再畫兩塊
   try {
@@ -149,6 +148,10 @@ async function loadAll() {
     const data = await res.json();
     _allSubs = (res.ok && data.subscribers) ? data.subscribers : [];
   } catch(e) { _allSubs = []; }
+  try {
+    const cs = await db.collection('commissions').get();
+    _allComms = cs.docs.map(d => d.data());
+  } catch(e) { _allComms = []; }
   loadRefCodes();
   loadPayout();
 }
@@ -164,10 +167,10 @@ async function loadRefCodes() {
       const refLink = 'https://stayjp.study/?ref='+code;
       const kolLink = KOL_PAGE+'?code='+code+'&t='+(c.token||'');
       const pct = c.commission_pct != null ? c.commission_pct : 20;
-      const comm = refCommissionFor(code, pct);
+      const comm = refCommissionFor(code);
       return `<div style="padding:8px 0;border-bottom:1px solid var(--bd)${c.active===false?';opacity:.5':''}">
         <b>${code}</b> · ${c.kol||''} ${c.active===false?'<span style="color:#EF4444">(停用)</span>':''}
-        <span style="color:var(--tx2);margin-left:6px">抽成 ${pct}% · 帶來 ${comm.total} 人 · 付費 ${comm.paid} 人 · 預估分潤 <b style="color:#16A34A">NT$${comm.amount.toLocaleString()}</b></span>
+        <span style="color:var(--tx2);margin-left:6px">抽成 ${pct}% · 成交 ${comm.deals} 筆 · 目前付費中 ${comm.paying} 人 · 分潤(帳本) <b style="color:#16A34A">NT$${comm.amount.toLocaleString()}</b></span>
         <div style="margin-top:4px;display:flex;gap:6px;flex-wrap:wrap">
           <button class="btn" style="font-size:11px;padding:3px 8px" onclick="copyTxt('${refLink}')">複製推薦連結</button>
           ${c.token ? `<button class="btn" style="font-size:11px;padding:3px 8px" onclick="copyTxt('${kolLink}')">複製 KOL 查詢頁連結</button>` : '<span style="font-size:11px;color:var(--tx3)">(無 token,不提供查詢頁)</span>'}
