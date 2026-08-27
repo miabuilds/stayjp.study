@@ -194,7 +194,11 @@ export const revenuecatWebhook = functions.onRequest(
             source: "app",
             txnId: event.transaction_id || event.original_transaction_id || "",
             isSandbox,
-            isFirstPayment: type === "INITIAL_PURCHASE" || type === "NON_RENEWING_PURCHASE",
+            // 「試用→轉正」的 RENEWAL 就是這位買家的首筆真付款:不算首筆的話,App 走試用的訂閱
+            // 分潤永遠記不到(INITIAL 時 gross=0 略過、RENEWAL 又被 isFirstPayment=false 擋——兩頭踢皮球,2026-08-27 抓到)。
+            // 冪等仍由 commissions/{code_buyer} doc id 保證,重送/誤判都不會重複入帳。
+            isFirstPayment: type === "INITIAL_PURCHASE" || type === "NON_RENEWING_PURCHASE"
+              || (type === "RENEWAL" && existingSub?.status === "trialing"),
           }).catch(e => console.error("recordKolCommission(rc) 略過:", e));
           break;
         }
