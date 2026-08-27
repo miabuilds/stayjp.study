@@ -20,8 +20,8 @@ import { PLANS, REFUND_POLICY, ecpayConfig, ecpayRefundEndpoint, ecpayPeriodQuer
 import { checkMacValue } from "./utils/ecpay";
 import {
   getSubscription, patchSubscription, writeTransaction,
-  recordRefund, releaseEarlyBird, getLatestSuccessTradeNo, nowMs, emailHash,
-  voidKolCommission,
+  recordRefund, releaseEarlyBird, getLatestSuccessTradeNo, getLatestSuccessChargeTwd,
+  nowMs, emailHash, voidKolCommission,
 } from "./utils/firestore";
 
 if (admin.apps.length === 0) admin.initializeApp();
@@ -136,6 +136,11 @@ export const refund = functions.onRequest(
 
       // 計算退費金額
       const planInfo = PLANS[sub.plan];
+      // ⚠️ 退費基準 = 用戶「實際付過」的最近一筆金額,不是 PLANS 現行牌價。
+      // 凍漲的舊用戶(早鳥續扣/legacy 149/調價前舊價)牌價 ≠ 實付:按牌價退會多退(虧錢),
+      // 全額退超過原刷卡金額還會被綠界退刷打回(可退刷額度不足)→ 用戶卡死。
+      // 找不到帳本紀錄(理論上不會)才 fallback 牌價。
+      const paidTwd = (await getLatestSuccessChargeTwd(uid)) ?? planInfo.price_twd;
       const startedAt = sub.startedAt;
       const now = nowMs();
       const daysSinceStart = Math.floor((now - startedAt) / (24 * 60 * 60 * 1000));
@@ -147,7 +152,7 @@ export const refund = functions.onRequest(
       if (sub.plan === "lifetime") {
         // Lifetime 7 天內全退,7 天後拒絕(memory 規則)
         if (daysSinceStart <= REFUND_POLICY.full_refund_days) {
-          refundAmount = planInfo.price_twd;
+          refundAmount = paidTwd;
           refundReason = "終身方案 7 天內全額退";
         } else {
           res.status(400).json({
@@ -158,12 +163,12 @@ export const refund = functions.onRequest(
         }
       } else if (daysSinceStart <= REFUND_POLICY.full_refund_days) {
         // 一般訂閱 7 天內 全退
-        refundAmount = planInfo.price_twd;
+        refundAmount = paidTwd;
         refundReason = "首次訂閱 7 天內全額退";
       } else {
-        // 一般訂閱 7 天後 按剩餘比例退;上限為單期價(續扣多期者 daysRemaining 可能 > period_days,
-        // 退到「最近一筆 charge」超過該筆金額會被綠界退刷打回 → cap 在單期價)
-        refundAmount = Math.min(planInfo.price_twd, Math.floor(planInfo.price_twd * daysRemaining / planInfo.period_days));
+        // 一般訂閱 7 天後 按剩餘比例退;上限為單期實付(續扣多期者 daysRemaining 可能 > period_days,
+        // 退到「最近一筆 charge」超過該筆金額會被綠界退刷打回 → cap 在單期實付)
+        refundAmount = Math.min(paidTwd, Math.floor(paidTwd * daysRemaining / planInfo.period_days));
         refundReason = `按剩餘 ${daysRemaining} 天比例退`;
         if (refundAmount <= 0) {
           res.status(400).json({ error: "no_refundable_amount", reason: "已用完訂閱期,無可退費。" });
@@ -239,7 +244,7 @@ export const refund = functions.onRequest(
       // 不另打查詢 API,改採「依序嘗試、取第一個 RtnCode=1」:
       //   全額退(7 天內)→ R → E → N(任一結算狀態都能退到錢)
       //   部分退(逾 7 天,必已關帳)→ 只用 R(E/N 僅全額,不可用於部分退)
-      const isFullRefund = refundAmount === planInfo.price_twd;
+      const isFullRefund = refundAmount === paidTwd;
       const actions = isFullRefund ? ["R", "E", "N"] : ["R"];
 
       let ecpayMsg = "";       // 失敗時回報用

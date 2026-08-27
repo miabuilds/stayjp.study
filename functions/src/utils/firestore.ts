@@ -85,6 +85,23 @@ export async function patchSubscription(
   await db.doc(`users/${uid}`).set({ subscription: subPatch }, { merge: true });
 }
 
+// ───── AI 加量包發放(推薦獎勵的「買斷戶貨幣」)─────────────────────
+// 買斷戶不缺天數:被推薦人買買斷、或推薦人自己是買斷戶時,+7 天是空氣 →
+// 改發 AI 加量包(對話 +5 場、評分 +15 次,一次性,寫進 ai_usage 的 bonus 池,額度系統優先扣 bonus)。
+// 2026-08-27 Mia 拍板(數量取小)。成本 ~US$1/份,只在真實付款時發。
+export const REF_AI_BONUS = { chat: 5, eval: 15 };
+export async function grantAiBonus(uid: string, note: string): Promise<void> {
+  await db.doc(`ai_usage/${uid}`).set({
+    bonusChat: FieldValue.increment(REF_AI_BONUS.chat),
+    bonusEval: FieldValue.increment(REF_AI_BONUS.eval),
+  }, { merge: true });
+  await writeTransaction({
+    uid, type: "gift", source: "web", plan: "lifetime",
+    amount_twd: 0, payment_method: "manual", external_id: `aibonus-${uid}-${nowMs()}`,
+    status: "success", note,
+  });
+}
+
 /**
  * 用戶推薦好友 · 雙向獎勵的「獎推薦人」那半:朋友真實付費後,給碼主(推薦人)+7 天 premium。
  * 從兩支付款 callback 呼叫(朋友首次真付費點);best-effort、包在 try 外層不影響主流程。
@@ -106,17 +123,21 @@ export async function rewardReferrerOnPayment(friendUid: string, isSandbox: bool
   if (!c || c.type !== "user") return;                 // 只有用戶個人碼獎碼主;KOL 碼不走這
   const ownerUid = c.owner_uid as string | undefined;
   if (!ownerUid || ownerUid === friendUid) return;      // 防自我推薦
-  // 獎推薦人 +7 天(延長或發放 premium);isPremium 認 expiresAt,plan 只是載體
+  // 獎推薦人:訂閱戶 +7 天;買斷戶(天數無意義)改發 AI 加量包(2026-08-27 起)
   const ownerSub = await getSubscription(ownerUid);
-  const base = Math.max(nowMs(), ownerSub?.expiresAt || 0);
-  const patch: Partial<SubscriptionDoc> = { status: "active", expiresAt: base + 7 * 864e5, willRenew: ownerSub?.willRenew ?? false };
-  if (!ownerSub) { patch.plan = "monthly"; patch.source = "web"; patch.startedAt = nowMs(); }
-  await patchSubscription(ownerUid, patch);
-  await writeTransaction({
-    uid: ownerUid, type: "gift", source: "web", plan: ownerSub?.plan || "monthly",
-    amount_twd: 0, payment_method: "manual", external_id: `referral-${friendUid}-${nowMs()}`,
-    status: "success", note: `推薦好友(${friendUid})付費 → 獎勵推薦人 +7 天`,
-  });
+  if (ownerSub?.plan === "lifetime") {
+    await grantAiBonus(ownerUid, `推薦好友(${friendUid})付費 → 推薦人為買斷戶,發 AI 加量包(對話+${REF_AI_BONUS.chat}/評分+${REF_AI_BONUS.eval})`);
+  } else {
+    const base = Math.max(nowMs(), ownerSub?.expiresAt || 0);
+    const patch: Partial<SubscriptionDoc> = { status: "active", expiresAt: base + 7 * 864e5, willRenew: ownerSub?.willRenew ?? false };
+    if (!ownerSub) { patch.plan = "monthly"; patch.source = "web"; patch.startedAt = nowMs(); }
+    await patchSubscription(ownerUid, patch);
+    await writeTransaction({
+      uid: ownerUid, type: "gift", source: "web", plan: ownerSub?.plan || "monthly",
+      amount_twd: 0, payment_method: "manual", external_id: `referral-${friendUid}-${nowMs()}`,
+      status: "success", note: `推薦好友(${friendUid})付費 → 獎勵推薦人 +7 天`,
+    });
+  }
   await db.doc(`users/${friendUid}`).set({ referrer_paid_at: nowMs() }, { merge: true });
 }
 

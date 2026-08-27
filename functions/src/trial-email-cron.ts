@@ -16,6 +16,7 @@
 import * as functions from "firebase-functions/v2/scheduler";
 import * as admin from "firebase-admin";
 import { db, nowMs } from "./utils/firestore";
+import { EARLY_BIRD_END_MS } from "./utils/constants";
 
 if (admin.apps.length === 0) admin.initializeApp();
 
@@ -61,12 +62,17 @@ export const trialEmailCron = functions.onSchedule(
       .where("trial_started_at", "<=", to)
       .get();
 
-    // 早鳥剩餘(一輪只讀一次)
+    // 早鳥剩餘(一輪只讀一次)。收官(closed 旗標 或 過了 2026-08-27 12:00 JST)→ 一律 0,
+    // 否則收官後還在寄「早鳥 990」但後端已擋新購 → 用戶點進去買不到,信變詐騙感。
     let ebLeft: number | null = null;
     try {
       const eb = (await db.doc("counters/early_bird").get()).data() || {};
-      const lim = Number(eb.limit || 100);
-      ebLeft = Math.max(0, Math.min(lim, lim - Number(eb.count || 0)));
+      if (eb.closed === true || now >= EARLY_BIRD_END_MS) {
+        ebLeft = 0;
+      } else {
+        const lim = Number(eb.limit || 100);
+        ebLeft = Math.max(0, Math.min(lim, lim - Number(eb.count || 0)));
+      }
     } catch { /* 讀不到就走無早鳥文案 */ }
 
     let sent = 0, skipped = 0;

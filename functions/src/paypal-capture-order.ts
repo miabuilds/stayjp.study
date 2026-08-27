@@ -10,7 +10,7 @@ import { capturePaypalOrder } from "./utils/paypal";
 import {
   db, writeSubscription, writeTransaction, writePaymentFailure,
   nowMs, plusDays, tryReserveEarlyBird, emailHash, SubscriptionDoc,
-  getSubscription, getRefCode, rewardReferrerOnPayment, recordKolCommission,
+  getSubscription, getRefCode, rewardReferrerOnPayment, recordKolCommission, grantAiBonus,
 } from "./utils/firestore";
 
 if (admin.apps.length === 0) admin.initializeApp();
@@ -89,11 +89,14 @@ export const paypalCaptureOrder = functions.onRequest(
       // (審查抓漏:PayPal 路徑原本只獎推薦人/記 KOL 分潤,被推薦人的 +7 漏發)
       if (prevSub?.ref_bonus_at) {
         newSub.ref_bonus_at = prevSub.ref_bonus_at;
-      } else if (plan !== "lifetime") {
+      } else {
         const refCode = await getRefCode(uid);
-        if (refCode) {
+        if (refCode && plan !== "lifetime") {
           newSub.expiresAt = newSub.expiresAt + 7 * 864e5;
           newSub.ref_bonus_at = nowMs();
+        } else if (refCode) {
+          newSub.ref_bonus_at = nowMs();   // 買斷:發 AI 加量包
+          await grantAiBonus(uid, "推薦碼＋購買買斷(PayPal)→ AI 加量包").catch(e => console.error("grantAiBonus(paypal) 略過:", e));
         }
       }
 
