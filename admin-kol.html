@@ -131,7 +131,7 @@ let _allSubs = [];
 // ①只算 status=active → 取消續訂的付費者被漏掉 ②金額用牌價重估,和帳本實記對不上 ③「帶來人數」定義和 KOL 成效頁不同。
 function refCommissionFor(code) {
   const rows = (_allComms||[]).filter(c => c.code === code && c.state !== 'void');
-  const deals = rows.length;
+  const deals = rows.filter(c => c.plan !== 'adjustment').length;   // 調整/補償項不算成交
   const amount = rows.reduce((a,c)=>a+(Number(c.amount_twd)||0), 0);
   // 「目前付費中」= 歸因到此碼且權益還在的訂閱(active/cancelled 未到期都算,和 KOL 成效頁一致)
   const paying = (_allSubs||[]).filter(s => s.ref_code===code && !s.is_sandbox && !s.is_gift

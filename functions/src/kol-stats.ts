@@ -60,7 +60,10 @@ export const kolStats = functions.onRequest(
           csnap.forEach((d) => {
             const cc = d.data() as Record<string, unknown>;
             const t = Number(cc.created_at) || 0;
-            if (cc.state !== "void" && t >= fromMs && t <= toMs) { conversions++; commission_twd += Number(cc.amount_twd) || 0; }
+            if (cc.state !== "void" && t >= fromMs && t <= toMs) {
+              if (cc.plan !== "adjustment") conversions++;   // 調整/補償項(如補漏洞的推廣費)計金額、不計成交筆數
+              commission_twd += Number(cc.amount_twd) || 0;
+            }
           });
           range = { from: fromStr, to: toStr, conversions, commission_twd };
         }
