@@ -820,11 +820,14 @@ body.profile-view .mn { margin-left: 0; max-width: none; }   /* 滿版 → 內�
 
 /* == Responsive: Mobile (max-width: 768px) == */
 @media (max-width: 768px) {
-  :root { --hh: 44px; }
+  :root { --hh: 86px; }   /* 兩行:第一列 44 + 搜尋欄一列(整站的 hd-bar/側欄/內容 padding 都吃這個變數) */
   .hd-top { padding: 0 12px; gap: 6px; }
   .hd-top h1 { font-size:16px; }
   /* 手機版藏搜尋框、關於連結、語言按鈕 — 確保「登入」按鈕一定看得到 */
-  .hd-top .sb { display: none; }
+  /* 手機版搜尋欄:原本整個藏掉(用戶回饋想要)→ 改成換行滿版,不擠壓第一列 */
+  .hd-top { flex-wrap: wrap; align-content: flex-start; padding-top: 4px; }
+  .hd-top .sb { order: 9; flex: 1 0 100%; max-width: none; margin: 2px 0 0; }
+  .hd-top .sb input { height: 32px; font-size: 14px; }
   .hd-top > a[data-i18n="about"] { display: none; }
   .hd-top .lang-btn { display: none; }
   /* 把登入按鈕推到右邊 + 視覺強化 */

@@ -58,7 +58,10 @@
     var g = window.GRAMMAR_KANJI_READINGS;
     if (g) for (var key in g) { if (!READ[key]) READ[key] = g[key]; }
     // 少數「詞級」讀音,在例句幾乎必為此讀,讓它蓋過 vocab 的單字多音(最中=さいちゅう 非さなか;〜得る=うる 非える)。
-    var OVERRIDE = { '最中': 'さいちゅう', '得る': 'うる', '休み中': 'やすみちゅう' };
+    var OVERRIDE = { '最中': 'さいちゅう', '得る': 'うる', '休み中': 'やすみちゅう',
+      // 楽しむ(動詞)不在單字庫,而 N4 有單字「楽=らく」搶走單漢字 → 楽しみます被標成らく(2026-08-28 用戶報錯)。
+      // 詞級蓋過去:活用開頭全列(楽しく/楽しかった 由 楽しく/楽しか 前綴吃到)。
+      '楽しみ': 'たのしみ', '楽しん': 'たのしん', '楽しむ': 'たのしむ', '楽しめ': 'たのしめ', '楽しく': 'たのしく', '楽しか': 'たのしか' };
     for (var ok in OVERRIDE) READ[ok] = OVERRIDE[ok];
 
     // 首字索引:漢字 → 以它開頭且長度>1 的詞條清單(依長度由長到短)。
@@ -78,7 +81,12 @@
     return { READ: READ, ENTRY: ENTRY, CONJ: CONJ, BYFIRST: BYFIRST };
   }
   function dict() {
-    if (!_d || Object.keys(_d.READ).length === 0) _d = buildDict();
+    // 字典快取要跟著單字檔載入進度失效:文法列表常在 vocab-n3~n1 載完前就先渲染,
+    // 早建的字典缺整詞(如 楽しむ),單漢字就被標成錯讀(楽しみます→らく;2026-08-28 用戶報錯實錘)。
+    // 單字總量變了 → 下次呼叫時重建(惰性,最多重建幾次,成本可接受)。
+    var n = 0;
+    ['VOCAB_N5','VOCAB_N4','VOCAB_N3','VOCAB_N2','VOCAB_N1'].forEach(function (k) { var v = window[k]; if (v && v.length) n += v.length; });
+    if (!_d || _d._srcCount !== n || Object.keys(_d.READ).length === 0) { _d = buildDict(); _d._srcCount = n; }
     return _d;
   }
   // 動態併入額外詞條(如文章的重點單字),讓它們在內文也能 ruby+即點即查。
