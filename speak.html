@@ -508,5 +508,6 @@ auth.onAuthStateChanged(u=>{
 firebase.auth().onAuthStateChanged(function(u){ if(u&&window.FavSents) FavSents.load(true).then(function(){ try{render();}catch(e){} }); });
 if(window.FavSents) FavSents._onChange=function(){ try{render();}catch(e){} };
 </script>
+<script src="font-scale.js"></script>
 </body>
 </html>
