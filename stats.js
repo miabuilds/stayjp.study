@@ -1,5 +1,18 @@
 // ========== LEARNING STATS ==========
 const Stats = (() => {
+  // 通用 toast(全站原本沒有實作 → showToast 呼叫全落空)。中央下方浮現、1.6 秒淡出。
+  if (!window.showToast) window.showToast = function (msg) {
+    try {
+      var el = document.getElementById('_gToast');
+      if (!el) { el = document.createElement('div'); el.id = '_gToast';
+        el.style.cssText = 'position:fixed;left:50%;bottom:88px;transform:translateX(-50%) translateY(8px);z-index:100002;background:rgba(0,0,0,.82);color:#fff;padding:10px 18px;border-radius:22px;font-size:14px;font-weight:600;font-family:-apple-system,"PingFang TC",sans-serif;box-shadow:0 6px 20px rgba(0,0,0,.28);opacity:0;transition:opacity .2s,transform .2s;pointer-events:none;max-width:80vw;text-align:center';
+        document.body.appendChild(el); }
+      el.textContent = msg;
+      clearTimeout(el._t);
+      requestAnimationFrame(function () { el.style.opacity = '1'; el.style.transform = 'translateX(-50%) translateY(0)'; });
+      el._t = setTimeout(function () { el.style.opacity = '0'; el.style.transform = 'translateX(-50%) translateY(8px)'; }, 1600);
+    } catch (e) {}
+  };
   function getHistory() {
     try { return JSON.parse(localStorage.getItem('quiz_history')) || []; } catch(e) { return []; }
   }
