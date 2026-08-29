@@ -10,13 +10,23 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
+    // Admin 判定:白名單 email + 必須已驗證(email_verified)。
+    // 沒有 email_verified 的話,若專案哪天開了 Email/Password provider,
+    // 有人用同名 email 註冊未驗證帳號就能冒充 admin → 全站個資淪陷。加這道防線擋死。
+    function isAdmin() {
+      return request.auth != null
+        && request.auth.token.email_verified == true
+        && request.auth.token.email in ['stayjpplan@gmail.com', 'abc83327@gmail.com'];
+    }
+
+
     // 使用者私人資料（收藏 / 學習進度 / 複習資料 / 訂閱狀態）
     // 結構：users/{uid} → { favorites, quiz_history, srs_data, subscription, ... }
     // owner 可讀寫自己;admin email 可讀(report / debug 用,不能寫)
     match /users/{userId} {
       allow read: if request.auth != null && (
                     request.auth.uid == userId ||
-                    request.auth.token.email in ['stayjpplan@gmail.com', 'abc83327@gmail.com']
+                    isAdmin()
                   );
 
       // 推薦碼歸因防竄改:ref_code 只能設成「存在、啟用、未停權、且不是自己的」碼。
@@ -71,7 +81,7 @@ service cloud.firestore {
     // 衝刺計畫預購名單 — sprint.html 登記;一人一筆(docId=uid),admin 可讀
     match /sprint_waitlist/{uid} {
       allow read: if request.auth != null &&
-        request.auth.token.email in ['stayjpplan@gmail.com', 'abc83327@gmail.com'];
+        isAdmin();
       allow create, update: if request.auth != null && request.auth.uid == uid
         && request.resource.data.uid == uid;
       allow delete: if false;
@@ -90,7 +100,7 @@ service cloud.firestore {
     match /sprint_content/{docId} {
       allow read: if resource.data.get('free', false) == true || sprintEntitled();
       allow write: if request.auth != null &&
-        request.auth.token.email in ['stayjpplan@gmail.com', 'abc83327@gmail.com'];
+        isAdmin();
     }
     // 衝刺計畫購買者(未來單獨售出時,Cloud Function 寫;現階段訂閱者即解鎖)
     match /sprint_access/{uid} {
@@ -103,7 +113,7 @@ service cloud.firestore {
     match /user_progress/{uid} {
       allow read: if request.auth != null && (
                     request.auth.uid == uid ||
-                    request.auth.token.email in ['stayjpplan@gmail.com', 'abc83327@gmail.com']
+                    isAdmin()
                   );
       allow write: if request.auth != null && request.auth.uid == uid;
     }
@@ -112,7 +122,7 @@ service cloud.firestore {
     // 結構:transactions/{txnId} → { uid, type, amount_twd, ... }
     match /transactions/{txnId} {
       allow read: if request.auth != null && (
-                    request.auth.token.email in ['stayjpplan@gmail.com', 'abc83327@gmail.com'] ||
+                    isAdmin() ||
                     resource.data.uid == request.auth.uid
                   );
       allow write: if false;  // 只有 Cloud Function (Admin SDK) 能寫
@@ -156,32 +166,32 @@ service cloud.firestore {
     match /paypal_pending/{id} {
       allow create: if request.auth != null && request.resource.data.uid == request.auth.uid;
       allow read: if request.auth != null &&
-                     request.auth.token.email in ['stayjpplan@gmail.com', 'abc83327@gmail.com'];
+                     isAdmin();
       allow update, delete: if false;
     }
 
     // KOL 推薦碼登錄表 — admin 後台建立/管理;KOL 自助查詢走 Cloud Function(Admin SDK)不直接讀
     match /ref_codes/{code} {
       allow read, write: if request.auth != null &&
-                     request.auth.token.email in ['stayjpplan@gmail.com', 'abc83327@gmail.com'];
+                     isAdmin();
     }
 
     // 兌換碼(測試者/活動免費 Premium)— admin 後台管理;兌換的發放走 redeemCode Cloud Function
     match /redeem_codes/{code} {
       allow read, write: if request.auth != null &&
-                     request.auth.token.email in ['stayjpplan@gmail.com', 'abc83327@gmail.com'];
+                     isAdmin();
     }
     // 兌換紀錄 — 只 Cloud Function (Admin SDK) 寫,admin 可讀(稽核)
     match /redeem_uses/{id} {
       allow read: if request.auth != null &&
-                     request.auth.token.email in ['stayjpplan@gmail.com', 'abc83327@gmail.com'];
+                     isAdmin();
       allow write: if false;
     }
 
     // 系統告警(每日訂閱稽核結果)— Cloud Function (Admin SDK) 寫,admin 後台讀
     match /system_alerts/{doc} {
       allow read: if request.auth != null &&
-                     request.auth.token.email in ['stayjpplan@gmail.com', 'abc83327@gmail.com'];
+                     isAdmin();
       allow write: if false;
     }
 
@@ -189,7 +199,7 @@ service cloud.firestore {
     // 只有 Cloud Function 能讀寫;前端不該知道誰在黑名單
     match /blacklist/{emailHash} {
       allow read: if request.auth != null &&
-                     request.auth.token.email in ['stayjpplan@gmail.com', 'abc83327@gmail.com'];
+                     isAdmin();
       allow write: if false;
     }
 
@@ -199,7 +209,7 @@ service cloud.firestore {
     match /feedback/{docId} {
       allow read, update, delete: if
         request.auth != null &&
-        request.auth.token.email in ['stayjpplan@gmail.com', 'abc83327@gmail.com'];
+        isAdmin();
       allow create: if
         request.auth != null &&
         request.resource.data.uid == request.auth.uid &&
@@ -223,7 +233,7 @@ service cloud.firestore {
     // 寄信 queue(Trigger Email 擴充套件用)— cron/擴充套件寫,admin 讀(看板統計今日寄信量)
     match /mail/{docId} {
       allow read: if request.auth != null &&
-        request.auth.token.email in ['stayjpplan@gmail.com', 'abc83327@gmail.com'];
+        isAdmin();
       allow write: if false;   // 只 Cloud Function(Admin SDK)寫,繞過此規則
     }
 
@@ -236,14 +246,12 @@ service cloud.firestore {
 
     // ATM 人工退款申請 — Cloud Function(Admin SDK)寫入;admin 後台讀 + 標記已處理。
     match /refund_requests/{id} {
-      allow read, write: if request.auth != null &&
-                    request.auth.token.email in ['stayjpplan@gmail.com', 'abc83327@gmail.com'];
+      allow read, write: if isAdmin();
     }
 
     // KOL 分潤紀錄 — Cloud Function(Admin SDK)寫,admin 後台唯讀對帳/結算
     match /commissions/{id} {
-      allow read: if request.auth != null &&
-                    request.auth.token.email in ['stayjpplan@gmail.com', 'abc83327@gmail.com'];
+      allow read: if isAdmin();
       allow write: if false;
     }
 

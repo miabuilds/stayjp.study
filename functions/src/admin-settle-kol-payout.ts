@@ -16,10 +16,10 @@ export const adminSettleKolPayout = functions.onRequest(
     try {
       const idToken = (req.headers.authorization || "").replace(/^Bearer\s+/i, "");
       if (!idToken) { res.status(401).json({ error: "missing_auth" }); return; }
-      let email = "";
-      try { email = (await admin.auth().verifyIdToken(idToken)).email || ""; }
+      let decoded: admin.auth.DecodedIdToken;
+      try { decoded = await admin.auth().verifyIdToken(idToken); }
       catch { res.status(401).json({ error: "invalid_auth" }); return; }
-      if (!OWNER_EMAILS.has(email)) { res.status(403).json({ error: "not_owner" }); return; }
+      if (!OWNER_EMAILS.has(decoded.email || "") || decoded.email_verified !== true) { res.status(403).json({ error: "not_owner" }); return; }
 
       const code = String(req.body?.code || "").toUpperCase().replace(/[^A-Z0-9_-]/g, "").slice(0, 32);
       if (!code) { res.status(400).json({ error: "missing_code" }); return; }
@@ -52,7 +52,7 @@ export const adminSettleKolPayout = functions.onRequest(
         gross_twd: gross, clawback_twd: clawbackAmt, net_twd: net,
         commission_ids: locked.map((d) => d.id),
         clawback_ids: clawbacks.map((d) => d.id),
-        settled_by: email, created_at: now, status: "paid", paid_at: now,
+        settled_by: decoded.email || "", created_at: now, status: "paid", paid_at: now,
       });
       locked.forEach((d) => batch.update(d.ref, { state: "paid", payout_id: payoutRef.id, paid_settled_at: now }));
       clawbacks.forEach((d) => batch.update(d.ref, { clawback_settled: true, clawback_payout_id: payoutRef.id }));

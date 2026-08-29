@@ -573,12 +573,12 @@ async function loadPaypalPending() {
    box.innerHTML = snap.docs.map(d => {
      const x = d.data();
      const t = x.created_at && x.created_at.toDate ? x.created_at.toDate().toLocaleString('zh-TW') : '';
-     const plan = x.type==='gift' ? '🎁 贈送' : (SUB_PLAN_TXT[x.plan] || x.plan || '—');
+     const plan = x.type==='gift' ? '🎁 贈送' : (SUB_PLAN_TXT[x.plan] || escapeHtml(x.plan||'') || '—');
      return `<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;border-bottom:1px solid var(--bd);padding:6px 0">
-       <span style="color:var(--tx)">${x.email || x.uid}</span>
+       <span style="color:var(--tx)">${escapeHtml(x.email || x.uid)}</span>
        <span>· ${plan}</span>
        <span style="color:var(--tx3);font-size:12px">· ${t}</span>
-       <button class="btn" style="font-size:11px;padding:3px 8px;margin-left:auto" onclick="document.getElementById('ssEmail').value='${esc(x.email)}';document.getElementById('ssPlan').value='${esc(x.plan)}';document.getElementById('ssEmail').scrollIntoView({block:'center'})">填入補開↑</button>
+       <button class="btn" style="font-size:11px;padding:3px 8px;margin-left:auto" onclick="document.getElementById('ssEmail').value=this.dataset.em;document.getElementById('ssPlan').value=this.dataset.pl;document.getElementById('ssEmail').scrollIntoView({block:'center'})" data-em="${escapeHtml(x.email||'')}" data-pl="${escapeHtml(x.plan||'')}">填入補開↑</button>
      </div>`;
    }).join('');
  } catch (e) { box.innerHTML = '<span style="color:#EF4444">讀取失敗:' + e.message + '</span>'; }
@@ -639,7 +639,7 @@ function renderList() {
  const status = f.status || 'new';
  const type = f.type || 'other';
  const who = f.email || f.uid?.slice(0, 8) || '匿名';
- const contact = f.contact_email ? ' <span style="color:var(--ok,#15803d);font-weight:700">📮 '+f.contact_email+'</span>' : (/@privaterelay\.appleid\.com$/i.test(f.email||'') ? ' <span style="color:var(--bad,#c2410c);font-size:11px">(隱藏信箱,可能回不到)</span>' : '');
+ const contact = f.contact_email ? ' <span style="color:var(--ok,#15803d);font-weight:700">📮 '+escapeHtml(f.contact_email)+'</span>' : (/@privaterelay\.appleid\.com$/i.test(f.email||'') ? ' <span style="color:var(--bad,#c2410c);font-size:11px">(隱藏信箱,可能回不到)</span>' : '');
  const date = f.createdAt?.toDate ? f.createdAt.toDate().toLocaleString('zh-TW', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }) : '-';
  const msg = (f.message || '').slice(0, 200);
  return `<div class="row ${currentFeedback?.id === f.id ? 'active' : ''}" data-id="${f.id}">
@@ -1205,7 +1205,7 @@ async function loadRefCodes() {
       const pct = c.commission_pct != null ? c.commission_pct : 20;
       const comm = refCommissionFor(code, pct);
       return `<div style="padding:8px 0;border-bottom:1px solid var(--bd)${c.active === false ? ';opacity:.5' : ''}">
-        <b>${code}</b> · ${c.kol || ''} ${c.active === false ? '<span style="color:#EF4444">(停用)</span>' : ''}
+        <b>${escapeHtml(code)}</b> · ${escapeHtml(c.kol || '')} ${c.active === false ? '<span style="color:#EF4444">(停用)</span>' : ''}
         <span style="color:var(--tx2);margin-left:6px">抽成 ${pct}% · 付費 ${comm.paid} 人 · 預估抽成 <b style="color:#16A34A">NT$${comm.amount.toLocaleString()}</b><span style="color:var(--tx3)">(利潤計,首筆)</span></span>
         <div style="margin-top:4px;display:flex;gap:6px;flex-wrap:wrap">
           <button class="btn" style="font-size:11px;padding:3px 8px" onclick="copyTxt('${refLink}')">複製推薦連結</button>

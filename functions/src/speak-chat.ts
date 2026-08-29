@@ -229,7 +229,7 @@ export const speakChat = functions.onRequest(
       let decoded: admin.auth.DecodedIdToken;
       try { decoded = await admin.auth().verifyIdToken(idToken); }
       catch { res.status(401).json({ error: "auth", message: "請重新登入" }); return; }
-      const isAdmin = ADMIN_EMAILS.includes((decoded.email || "").toLowerCase());
+      const isAdmin = ADMIN_EMAILS.includes((decoded.email || "").toLowerCase()) && decoded.email_verified === true;
       const cfg = await getAiConfig();
       // 測試期(public:false):非 admin 一律擋。開放後:admin 不計量,其他人走 quota。
       if (!isAdmin && !cfg.public) {

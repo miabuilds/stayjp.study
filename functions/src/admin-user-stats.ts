@@ -29,7 +29,7 @@ export const adminUserStats = functions.onRequest(
       const idToken = (req.headers.authorization || "").replace(/^Bearer\s+/i, "");
       if (!idToken) { res.status(401).json({ error: "missing_auth" }); return; }
       const decoded = await admin.auth().verifyIdToken(idToken);
-      if (!OWNER_EMAILS.has(decoded.email || "")) { res.status(403).json({ error: "not_owner" }); return; }
+      if (!OWNER_EMAILS.has(decoded.email || "") || decoded.email_verified !== true) { res.status(403).json({ error: "not_owner" }); return; }
 
       // 寫過資料的用戶(users 集合文件數)
       const usersAgg = await db.collection("users").count().get();
