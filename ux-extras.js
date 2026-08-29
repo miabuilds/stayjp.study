@@ -232,6 +232,14 @@
     }).join('');
   }
 
+  // 全站共用「回報錯誤」連結:任何地方要回報都用它(統一收件匣、統一格式)
+  function reportHref(kind, id, detail) {
+    var subj = '[回報·' + kind + '] ' + (id || '');
+    var body = detail + '\n\n錯誤描述(請補充哪裡怪):\n\n———\n頁面:' + (typeof location !== 'undefined' ? location.href : '');
+    return 'mailto:stayjpplan@gmail.com?subject=' + encodeURIComponent(subj) + '&body=' + encodeURIComponent(body);
+  }
+  window.stayjpReportHref = reportHref;
+
   // ===== 即點即查彈窗 =====
   var _pop = null;
   function ensureCss() {
@@ -244,6 +252,8 @@
       '#jlkPop .jacts{display:flex;gap:8px;margin-top:12px}',
       '#jlkPop .jact{flex:1;white-space:nowrap;text-align:center;border:1px solid var(--bd,#e0e0e0);background:var(--bg,#faf9f6);color:var(--tx,#333);border-radius:10px;padding:9px 6px;font-size:13px;font-weight:700;cursor:pointer}',
       '#jlkPop .jact:active{transform:scale(.96)}',
+      '#jlkPop .jreport{display:block;text-align:center;margin-top:10px;font-size:12px;color:var(--tx3,#9a9a9a);text-decoration:none}',
+      '#jlkPop .jreport:hover{color:var(--ac,#d4654a);text-decoration:underline}',
       '#jlkPop .jact.on{background:var(--ac,#d4654a);color:#fff;border-color:var(--ac,#d4654a)}',
       '#jlkPop{position:fixed;z-index:100000;max-width:min(300px,88vw);background:var(--bg2,#fff);color:var(--tx,#222);border:1px solid var(--bd,#e5e5e5);border-radius:14px;box-shadow:0 12px 38px rgba(0,0,0,.28);padding:14px 16px;font-size:14px;line-height:1.7;-webkit-font-smoothing:antialiased;font-family:-apple-system,"PingFang TC","Noto Sans TC",sans-serif}',
       '#jlkPop .jw{font-size:21px;font-weight:700;font-family:"Hiragino Mincho ProN","Noto Serif JP",serif;color:var(--tx,#1c1c1e)}',
@@ -320,7 +330,8 @@
         : (_ln >= 2 ? '<div class="jfreq jfreq-dim">🔍 查過 ' + _ln + ' 次</div>' : ''))
       + '<div class="jacts"><button class="jact jact-spk" type="button">🔊 發音</button><button class="jact jact-fav' + (_nudge ? ' jact-pulse' : '') + '" type="button">' + (_nudge ? '⭐ 收藏複習' : '☆ 收藏') + '</button>'
       + (data.m ? '' : '<a class="jact" href="https://cjjc.weblio.jp/content/' + encodeURIComponent(data.w) + '" target="_blank" rel="noopener" onclick="event.stopPropagation()">📖 中文辭典</a><a class="jact" href="https://jisho.org/search/' + encodeURIComponent(data.w) + '" target="_blank" rel="noopener" onclick="event.stopPropagation()">Jisho</a>')
-      + '</div>';
+      + '</div>'
+      + '<a class="jreport" href="' + reportHref('讀音/內容', data.w, '詞：' + data.w + '\n目前顯示讀音：' + (data.r || '') + '\n意思：' + (data.m || '')) + '" target="_blank" rel="noopener" onclick="event.stopPropagation()">🚩 這個字讀音/意思有誤?回報</a>';
     document.body.appendChild(pop);
     // 定位在被點詞附近,夾在視窗內
     var r = anchor.getBoundingClientRect();

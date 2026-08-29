@@ -345,6 +345,12 @@ let lv = localStorage.getItem('jd_lv') || 'n5';
 let queue = [], qi = 0, score = 0, curType = null, isWrongMode = false;
 const WKEY = 'jd_wrong';   // 錯題本:{id:true}
 
+// 全站共用「回報錯誤」連結(此頁未載 ux-extras,自帶一份同格式)
+window.stayjpReportHref = window.stayjpReportHref || function(kind,id,detail){
+  var subj='[回報·'+kind+'] '+(id||'');
+  var body=detail+'\n\n錯誤描述(請補充哪裡怪):\n\n———\n頁面:'+location.href;
+  return 'mailto:stayjpplan@gmail.com?subject='+encodeURIComponent(subj)+'&body='+encodeURIComponent(body);
+};
 function bank(){ return (window.JLPT_Q||[]).concat(window.JLPT_Q_GEN||[]); }
 function getWrong(){ try{ return JSON.parse(localStorage.getItem(WKEY))||{}; }catch(e){ return {}; } }
 function saveWrong(w){ localStorage.setItem(WKEY, JSON.stringify(w)); }
@@ -522,8 +528,10 @@ function answer(el, ok){
   v.className = 'verdict '+(ok?'ok':'ng');
   // 詳解(題庫內含 <b> 標記,自行控管內容安全);聴解附上音檔原文
   document.getElementById('xp').classList.toggle('good', ok);   // 答對綠底、答錯橘底(固定橘會讓答對的人以為錯了)
+  const _rep = window.stayjpReportHref ? window.stayjpReportHref('刷題 '+(q.id||''), q.id||'', '題目 ID：'+(q.id||'')+'\n題幹：'+((q.q||q.at||'').slice(0,80))+'\n正解：'+esc(q.o[q.a]||'')) : '';
   document.getElementById('xp').innerHTML =
-    (q.au ? '<div style="margin-bottom:8px;padding-bottom:8px;border-bottom:1px dashed var(--bd)"><b>スクリプト:</b>'+esc(q.au)+'</div>' : '') + q.x;
+    (q.au ? '<div style="margin-bottom:8px;padding-bottom:8px;border-bottom:1px dashed var(--bd)"><b>スクリプト:</b>'+esc(q.au)+'</div>' : '') + q.x
+    + (_rep ? '<a href="'+_rep+'" target="_blank" rel="noopener" style="display:block;text-align:right;margin-top:10px;font-size:12px;color:var(--tx3);text-decoration:none">🚩 '+enOr('這題有誤?回報','Report this question')+'</a>' : '');
   document.getElementById('explain').style.display='block';
   document.getElementById('nextBtn').style.display='block';
   document.getElementById('nextBtn').textContent = qi<queue.length-1? enOr('下一題 →','Next →'):enOr('看結果','See results');
