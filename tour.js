@@ -13,6 +13,7 @@
     { sel: '#ftb .ftb-btn:nth-child(2)', t: _en('測驗','Quiz'), d: _en('單字測驗在這;寫錯會有詳解卡,答完自動唸給你聽。','Vocabulary quizzes live here; wrong answers get an explanation card and are read aloud.'), pos: 'above' },
     { sel: '#ftb .ftb-btn:nth-child(3)', t: _en('複習(最重要!)','Review (the key!)'), d: _en('每天回來清「複習」:系統照記憶曲線排程,背起來全靠這個。','Come back daily to clear your reviews — spaced repetition is how words actually stick.'), pos: 'above' },
     { sel: '#ftb .ftb-btn:last-child',   t: _en('更多工具','More tools'), d: _en('模擬考、五十音、動詞變化、生活會話、聽力讀解…全收在「更多」。','Mock exams, kana, verb conjugation, daily phrases, listening & reading — all under "More".'), pos: 'above' },
+    { sel: '#ftb .ftb-btn:nth-child(4)', t: _en('設定都在「我的」','Settings live in "Me"'), d: _en('字體大小、朗讀語速、深色模式、程度目標、每日提醒——全在「我的 → 設定」一次調好。','Text size, playback speed, dark mode, your level & goal, daily reminders — all in "Me → Settings".'), pos: 'above' },
   ];
   var idx = 0, box = null, tip = null;
 
