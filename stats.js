@@ -515,14 +515,14 @@ const Stats = (() => {
       <div style="${box}">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px"><span style="font-size:16px">🔡</span><span style="font-weight:600;color:var(--tx)">文字大小</span></div>
         <div style="${seg}">
-          ${FS_OPTS.map(o=>`<button style="${chip(fs===o.k)}" onclick="Stats._setFont('${o.k}')">${o.n}</button>`).join('')}
+          ${FS_OPTS.map(o=>`<button style="${chip(fs===o.k)}" onclick="Stats._setFont('${o.k}',this)">${o.n}</button>`).join('')}
         </div>
       </div>
       <div style="${box}">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px"><span style="font-size:16px">🌓</span><span style="font-weight:600;color:var(--tx)">主題</span></div>
         <div style="${seg}">
-          <button style="${chip(!isDark)}" onclick="Stats._setTheme('light')">☀️ 淺色</button>
-          <button style="${chip(isDark)}" onclick="Stats._setTheme('dark')">🌙 深色</button>
+          <button style="${chip(!isDark)}" onclick="Stats._setTheme('light',this)">☀️ 淺色</button>
+          <button style="${chip(isDark)}" onclick="Stats._setTheme('dark',this)">🌙 深色</button>
         </div>
       </div>
       <div style="${box}">
@@ -536,9 +536,9 @@ const Stats = (() => {
       <div style="${box}">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><span style="font-size:16px">🎯</span><span style="font-weight:600;color:var(--tx)">我的程度</span></div>
         <div style="font-size:12px;color:var(--tx2);margin-bottom:10px">背單字會跳過你已學完的級數</div>
-        <div style="${seg}">${LVN.map(k=>`<button style="${chip(base===k)}" onclick="Stats._setLevel('base','${k}')">${LVL[k]}</button>`).join('')}</div>
+        <div style="${seg}">${LVN.map(k=>`<button style="${chip(base===k)}" onclick="Stats._setLevel('base','${k}',this)">${LVL[k]}</button>`).join('')}</div>
         <div style="display:flex;align-items:center;gap:8px;margin:14px 0 10px"><span style="font-size:16px">🏁</span><span style="font-weight:600;color:var(--tx)">目標考級</span></div>
-        <div style="${seg}">${GLN.map(k=>`<button style="${chip(goal===k)}" onclick="Stats._setLevel('goal','${k}')">${k.toUpperCase()}</button>`).join('')}</div>
+        <div style="${seg}">${GLN.map(k=>`<button style="${chip(goal===k)}" onclick="Stats._setLevel('goal','${k}',this)">${k.toUpperCase()}</button>`).join('')}</div>
       </div>
       ${isApp ? `<div style="${box}">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px"><span style="font-size:16px">⏰</span><span style="font-weight:600;color:var(--tx)">每日提醒</span>${rmOn?`<span style="margin-left:auto;font-size:12px;color:var(--ac);font-weight:600">已開 ${rmOn}</span>`:''}</div>
@@ -560,10 +560,12 @@ const Stats = (() => {
         <div style="flex:1"><div style="font-weight:600">意見回饋 / 回報錯誤</div><div style="font-size:12px;color:var(--tx2);margin-top:2px">內容有誤或想提建議都歡迎</div></div><span style="color:var(--tx3)">›</span>
       </a>`
   // 設定中心的 setter：呼叫既有全域函數(維持與 header/原位置同一套狀態),改完就地重畫設定 tab
-  function _setFont(k){ try{ localStorage.setItem('fontSize',k); }catch(e){} if(typeof applyFontSize==='function')applyFontSize(); switchTab('settings'); }
-  function _setTheme(mode){ const isDark=document.documentElement.getAttribute('data-theme')==='dark'; if((mode==='dark')!==isDark && typeof toggleTheme==='function') toggleTheme(); switchTab('settings'); }
-  function _setLevel(kind,v){ try{ localStorage.setItem(kind==='base'?'base_level':'goal_level', v); }catch(e){} if(typeof saveAllCloud==='function')saveAllCloud(); switchTab('settings'); if(typeof showToast==='function')showToast('已更新'); }
-  function _setReminder(){ const t=document.getElementById('setRmTime'); if(!t)return; if(typeof enableDailyReminder==='function')enableDailyReminder(t.value); else { try{ localStorage.setItem('reminder_time_pref',t.value); }catch(e){} } switchTab('settings'); if(typeof showToast==='function')showToast('提醒已設 '+t.value); }
+  // 就地把選取樣式套到這顆、同組其他顆還原(不整頁重畫→不跳走、不丟捲動位置,可連續設定多項)
+  function _markChip(el){ if(!el||!el.parentNode)return; [...el.parentNode.children].forEach(b=>{ b.style.border='1px solid var(--bd)'; b.style.background='transparent'; b.style.color='var(--tx)'; }); el.style.border='1px solid var(--ac)'; el.style.background='var(--ac)'; el.style.color='#fff'; }
+  function _setFont(k,el){ try{ localStorage.setItem('fontSize',k); }catch(e){} if(typeof applyFontSize==='function')applyFontSize(); _markChip(el); if(typeof showToast==='function')showToast('文字大小已更新'); }
+  function _setTheme(mode,el){ const isDark=document.documentElement.getAttribute('data-theme')==='dark'; if((mode==='dark')!==isDark && typeof toggleTheme==='function') toggleTheme(); _markChip(el); if(typeof showToast==='function')showToast('主題已切換'); }
+  function _setLevel(kind,v,el){ try{ localStorage.setItem(kind==='base'?'base_level':'goal_level', v); }catch(e){} if(typeof saveAllCloud==='function')saveAllCloud(); _markChip(el); if(typeof showToast==='function')showToast(kind==='base'?'程度已更新':'目標考級已更新'); }
+  function _setReminder(){ const t=document.getElementById('setRmTime'); if(!t)return; if(typeof enableDailyReminder==='function')enableDailyReminder(t.value); else { try{ localStorage.setItem('reminder_time_pref',t.value); }catch(e){} } if(typeof showToast==='function')showToast('提醒已設 '+t.value); }
   function _clearReminder(){ try{ localStorage.removeItem('reminder_time_pref'); }catch(e){}
     try{ if(window.STAYJP_NATIVE && window.STAYJP_NATIVE.isNativeApp && window.ReactNativeWebView) window.ReactNativeWebView.postMessage(JSON.stringify({type:'SET_REMINDER',payload:{time:'',cancel:true}})); }catch(e){}
     switchTab('settings'); if(typeof showToast==='function')showToast('提醒已關閉'); }
