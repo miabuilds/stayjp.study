@@ -50,22 +50,37 @@ export const kolStats = functions.onRequest(
       // 用 code 單欄查詢(自動索引)再於函式內篩時間,免建複合索引;單一 KOL 筆數少,讀取量極小。
       const fromStr = String((req.query.from || (req.body && req.body.from) || "")).slice(0, 10);
       const toStr = String((req.query.to || (req.body && req.body.to) || "")).slice(0, 10);
-      let range: { from: string; to: string; conversions: number; commission_twd: number } | null = null;
+      let range: { from: string; to: string; conversions: number; commission_twd: number; rows: any[] } | null = null;
       if (/^\d{4}-\d{2}-\d{2}$/.test(fromStr) && /^\d{4}-\d{2}-\d{2}$/.test(toStr)) {
         const fromMs = Date.parse(`${fromStr}T00:00:00+08:00`);   // 以台灣時間解讀使用者選的日期
         const toMs = Date.parse(`${toStr}T23:59:59+08:00`);
         if (!isNaN(fromMs) && !isNaN(toMs) && fromMs <= toMs) {
           const csnap = await db.collection("commissions").where("code", "==", code).get();
           let conversions = 0, commission_twd = 0;
+          const rows: any[] = [];
           csnap.forEach((d) => {
             const cc = d.data() as Record<string, unknown>;
             const t = Number(cc.created_at) || 0;
-            if (cc.state !== "void" && t >= fromMs && t <= toMs) {
+            if (t < fromMs || t > toMs) return;
+            const voided = cc.state === "void";
+            if (!voided) {
               if (cc.plan !== "adjustment") conversions++;   // 調整/補償項(如補漏洞的推廣費)計金額、不計成交筆數
               commission_twd += Number(cc.amount_twd) || 0;
             }
+            // 逐筆明細:方案 / 平台 / 金額 / 狀態(退款作廢) / 額外項理由
+            rows.push({
+              at: t,
+              plan: String(cc.plan || ""),
+              source: String(cc.source || "web"),   // web(綠界) / paypal / app(iOS/Android IAP)
+              amount: Number(cc.amount_twd) || 0,
+              state: String(cc.state || "pending"),  // pending / locked / paid / void
+              voided,
+              void_reason: voided ? String(cc.void_reason || "退款") : "",
+              note: cc.plan === "adjustment" ? String(cc.note || "") : "",
+            });
           });
-          range = { from: fromStr, to: toStr, conversions, commission_twd };
+          rows.sort((a, b) => b.at - a.at);
+          range = { from: fromStr, to: toStr, conversions, commission_twd, rows };
         }
       }
 

@@ -33,6 +33,17 @@
   .range-result{margin-top:12px;font-size:14px;color:var(--tx2);line-height:1.8;min-height:20px}
   .range-result b{color:var(--tx);font-size:17px}
   .range-result .money{color:#16A34A}
+  .dlist{margin-top:12px;display:flex;flex-direction:column;gap:6px}
+  .drow{display:flex;align-items:center;gap:8px;font-size:12.5px;padding:8px 10px;background:var(--bg2);border-radius:8px}
+  .drow .dp{font-weight:700;color:var(--tx)}
+  .drow .ds{color:var(--tx3);font-size:11px;background:var(--bg3);padding:1px 7px;border-radius:20px}
+  .drow .dm{margin-left:auto;font-weight:700;font-variant-numeric:tabular-nums}
+  .drow .dm.money{color:#16A34A}
+  .drow .dx{font-size:11px;color:var(--tx2)}
+  .drow .dd{color:var(--tx3);font-size:11px;min-width:34px;text-align:right}
+  .drow.voided{opacity:.55}
+  .drow.voided .dm{color:var(--tx3);text-decoration:line-through}
+  .drow.voided .dx{color:#EF4444}
 </style>
 </head>
 <body>
@@ -88,6 +99,7 @@
       });
   }
 
+  function esc(x){return String(x==null?"":x).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
   function queryRange() {
     const btn = document.getElementById('rBtn');
     const res = document.getElementById('rResult');
@@ -102,8 +114,20 @@
         btn.disabled = false;
         const rg = d && d.range;
         if (!rg) { res.innerHTML = '<span style="color:#EF4444">查詢失敗,請稍後再試。</span>'; return; }
+        var PLAN={lifetime:'買斷',yearly_early_bird:'早鳥年費',yearly:'年費',monthly:'月費',adjustment:'額外項目'};
+        var SRC={web:'網頁·綠界',paypal:'網頁·PayPal',app:'App內購'};
+        var list=(rg.rows||[]).map(function(r){
+          var when=new Date(r.at); var ds=(when.getMonth()+1)+'/'+when.getDate();
+          var planTxt = r.plan==='adjustment' ? ('額外:'+(r.note||'調整')) : (PLAN[r.plan]||r.plan||'—');
+          var srcTxt = SRC[r.source]||r.source;
+          var money = 'NT$'+(r.amount||0).toLocaleString();
+          if(r.voided) return '<div class="drow voided"><span class="dp">'+esc(planTxt)+'</span><span class="ds">'+esc(srcTxt)+'</span><span class="dm">'+money+'</span><span class="dx">✗ 已退費</span><span class="dd">'+ds+'</span></div>';
+          var stTxt = r.state==='paid'?'已付款':(r.state==='locked'?'可領':'鎖定中');
+          return '<div class="drow"><span class="dp">'+esc(planTxt)+'</span><span class="ds">'+esc(srcTxt)+'</span><span class="dm money">'+money+'</span><span class="dx">'+stTxt+'</span><span class="dd">'+ds+'</span></div>';
+        }).join('');
         res.innerHTML = rg.from + ' ~ ' + rg.to + '<br>成交 <b>' + rg.conversions + '</b> 筆 · 分潤 <b class="money">NT$' + (rg.commission_twd || 0).toLocaleString() + '</b>' +
-          '<br><span style="font-size:12px;color:var(--tx3)">(不含已退費/作廢;金額為預估分潤,實際以結算為準)</span>';
+          (list ? '<div class="dlist">'+list+'</div>' : '') +
+          '<br><span style="font-size:12px;color:var(--tx3)">(退費會標「已退費」不計入;金額為預估分潤,實際以結算為準。App 內購與網頁分成比例不同)</span>';
       })
       .catch(() => { btn.disabled = false; res.innerHTML = '<span style="color:#EF4444">連線失敗,請稍後再試。</span>'; });
   }
