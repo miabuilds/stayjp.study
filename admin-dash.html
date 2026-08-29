@@ -374,7 +374,7 @@ function renderPlans(){
 function renderPayout(){
   const box=document.getElementById('payoutTable'), banner=document.getElementById('payoutBanner');
   // 每個碼:成交筆數 n、帶來營收 gross、妳淨得 mynet(=利潤−分潤)、以及分潤三態金額。void 不計。
-  const g={}; COMMS.forEach(c=>{ if(c.state==='void')return; const r=g[c.code]=g[c.code]||{pending:0,locked:0,paid:0,n:0,gross:0,mynet:0}; if(r[c.state]!=null)r[c.state]+=c.amount; if(c.plan!=='adjustment')r.n++; r.gross+=c.gross; r.mynet+=(profitOf(c)-c.amount); });
+  const g={}; COMMS.forEach(c=>{ if(c.state==='void')return; const r=g[c.code]=g[c.code]||{pending:0,locked:0,paid:0,n:0,gross:0,mynet:0,web:0,app:0,paypal:0}; if(r[c.state]!=null)r[c.state]+=c.amount; if(c.plan!=='adjustment'){r.n++; const src=c.source==='app'?'app':(c.source==='paypal'?'paypal':'web'); r[src]++;} r.gross+=c.gross; r.mynet+=(profitOf(c)-c.amount); });
   const codes=Object.keys(g); if(!codes.length){ box.innerHTML='<div class="pb muted">尚無分潤紀錄(還沒有人透過推薦碼付費成功)。</div>'; banner.style.display='none'; return; }
   let tP=0,tL=0,tPaid=0,tN=0,tG=0,tNet=0;
   const rows=codes.map(code=>{ const r=g[code]; tP+=r.pending;tL+=r.locked;tPaid+=r.paid;tN+=r.n;tG+=r.gross;tNet+=r.mynet; const rm=REFMAP[code]||{}; return {code,kol:rm.kol||'',payout:rm.payout,...r}; }).sort((a,b)=>b.gross-a.gross);
@@ -382,11 +382,12 @@ function renderPayout(){
   banner.style.display='block';
   banner.innerHTML = tL>0 ? ('🔔 可結算(已鎖定)<b>'+fmt(tL)+'</b>,其中滿 NT$1,000 該匯:<b>'+due.length+'</b> 位。待確認 '+fmt(tP)+'、累計已付 '+fmt(tPaid)+'。') : ('待確認 '+fmt(tP)+';尚無可領。累計已付 '+fmt(tPaid)+'。');
   const payStr=p=>!p?'<span style="color:var(--ink3)">未填收款</span>':('銀行 '+esc(p.account||'(未填帳號)'));
-  box.innerHTML='<table><thead><tr><th>KOL</th><th>碼</th><th class="n">成交</th><th class="n">帶來營收</th><th class="n">妳淨得<br><small style="font-weight:400;color:var(--ink3)">扣手續費+分潤</small></th><th class="n">待確認</th><th class="n">可領</th><th class="n">已付</th><th>收款 / 結算</th></tr></thead><tbody>'
-    + rows.map(r=>'<tr><td class="who">'+esc(r.kol||'—')+'</td><td><code>'+esc(r.code)+'</code></td><td class="n">'+r.n+'</td><td class="n">'+fmt(r.gross)+'</td><td class="n"><b>'+fmt(r.mynet)+'</b></td><td class="n" style="color:var(--ink3)">'+fmt(r.pending)+'</td><td class="n"><b style="color:'+(r.locked>=1000?'var(--ok)':'var(--ink2)')+'">'+fmt(r.locked)+'</b>'+(r.locked>=1000?' 🔔':'')+'</td><td class="n" style="color:var(--ink3)">'+fmt(r.paid)+'</td><td style="font-size:12px">'+payStr(r.payout)+(r.locked>0?' <button class="btn" style="padding:4px 9px;font-size:11px" onclick="settle(\''+r.code+'\','+r.locked+')">標記已付</button>':'')+'</td></tr>').join('')
-    + '<tr class="rowtot"><td colspan="2" style="text-align:right">合計</td><td class="n">'+tN+'</td><td class="n">'+fmt(tG)+'</td><td class="n"><b>'+fmt(tNet)+'</b></td><td class="n">'+fmt(tP)+'</td><td class="n">'+fmt(tL)+'</td><td class="n">'+fmt(tPaid)+'</td><td></td></tr></tbody></table>';
+  box.innerHTML='<table><thead><tr><th>KOL</th><th>碼</th><th class="n">成交</th><th>平台</th><th class="n">帶來營收</th><th class="n">妳淨得<br><small style="font-weight:400;color:var(--ink3)">扣手續費+分潤</small></th><th class="n">待確認</th><th class="n">可領</th><th class="n">已付</th><th>收款 / 結算</th></tr></thead><tbody>'
+    + rows.map(r=>'<tr><td class="who">'+esc(r.kol||'—')+'</td><td><code>'+esc(r.code)+'</code></td><td class="n">'+r.n+'</td><td style="font-size:11px;line-height:1.5">'+platCell(r)+'</td><td class="n">'+fmt(r.gross)+'</td><td class="n"><b>'+fmt(r.mynet)+'</b></td><td class="n" style="color:var(--ink3)">'+fmt(r.pending)+'</td><td class="n"><b style="color:'+(r.locked>=1000?'var(--ok)':'var(--ink2)')+'">'+fmt(r.locked)+'</b>'+(r.locked>=1000?' 🔔':'')+'</td><td class="n" style="color:var(--ink3)">'+fmt(r.paid)+'</td><td style="font-size:12px">'+payStr(r.payout)+(r.locked>0?' <button class="btn" style="padding:4px 9px;font-size:11px" onclick="settle(\''+r.code+'\','+r.locked+')">標記已付</button>':'')+'</td></tr>').join('')
+    + '<tr class="rowtot"><td colspan="2" style="text-align:right">合計</td><td class="n">'+tN+'</td><td></td><td class="n">'+fmt(tG)+'</td><td class="n"><b>'+fmt(tNet)+'</b></td><td class="n">'+fmt(tP)+'</td><td class="n">'+fmt(tL)+'</td><td class="n">'+fmt(tPaid)+'</td><td></td></tr></tbody></table>';
 }
 
+function platCell(r){ var a=[]; if(r.web)a.push('綠界 '+r.web); if(r.paypal)a.push('PayPal '+r.paypal); if(r.app)a.push('App '+r.app); return a.length?a.join('<br>'):'<span style="color:var(--ink3)">—</span>'; }
 function payMethod(s){ if(s.source==='app')return 'App 內購'; if(s.ecpay_order)return '綠界(卡/ATM/超商)'; return 'PayPal / 其他'; }
 function statusPill(st){ const m={active:['p-ok','active'],trialing:['p-ok','trialing'],cancelled:['p-warn','cancelled'],expired:['p-mute','expired'],refunded:['p-bad','refunded'],voided:['p-bad','voided']}; const x=m[st]||['p-mute',st||'—']; return '<span class="pill '+x[0]+'">'+x[1]+'</span>'; }
 
