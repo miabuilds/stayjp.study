@@ -25,7 +25,17 @@
   .lvtabs{display:flex;gap:6px;margin:18px 0 10px}
   .lvtab{flex:1;text-align:center;font-size:14px;font-weight:700;border:1px solid var(--bd);background:var(--bg2);color:var(--tx2);border-radius:10px;padding:9px 0;cursor:pointer}
   .lvtab.on{background:var(--ac);color:#fff;border-color:var(--ac)}
-  .types{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:10px;margin-top:8px}
+  #types{margin-top:8px}
+  .skill{margin-top:22px}
+  .skill:first-child{margin-top:6px}
+  .skill-h{display:flex;align-items:center;gap:10px;margin-bottom:2px}
+  .skill-ic{font-size:22px}
+  .skill-tt{font-weight:800;font-size:17px;display:flex;flex-direction:column;line-height:1.15}
+  .skill-tt small{font-weight:500;font-size:12px;color:var(--tx3);margin-top:1px}
+  .skill-c{margin-left:auto;font-size:13px;color:var(--tx3);font-variant-numeric:tabular-nums;font-weight:600}
+  .skill-go{background:var(--ac);color:#fff;border:none;border-radius:999px;padding:6px 14px;font-size:12.5px;font-weight:700;cursor:pointer;white-space:nowrap}
+  .skill-go:active{transform:scale(.96)}
+  .types{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:10px;margin-top:10px}
   .type{background:var(--bg2);border:1px solid var(--bd);border-radius:14px;padding:14px 15px;cursor:pointer;transition:border-color .12s}
   .type:hover{border-color:var(--ac)}
   .type .tt{font-weight:700;font-size:15px}
@@ -118,7 +128,7 @@
       <p class="lead">照 JLPT 真題題型出題,每一題都有完整詳解——不只告訴你對錯,還講清楚錯的選項錯在哪。答錯自動進錯題本。</p>
     </div>
     <div class="lvtabs" id="lvtabs" style="min-height:42px"></div>
-    <div class="types" id="types"><div style="grid-column:1/-1;display:flex;flex-direction:column;align-items:center;gap:10px;padding:36px 0;color:var(--tx3)">
+    <div id="types"><div style="grid-column:1/-1;display:flex;flex-direction:column;align-items:center;gap:10px;padding:36px 0;color:var(--tx3)">
       <div style="width:30px;height:30px;border:3px solid var(--bd);border-top-color:var(--ac);border-radius:50%;animation:jdspin .8s linear infinite"></div>
       <div style="font-size:13px" id="loadingTxt">題庫載入中…</div>
     </div></div>
@@ -309,6 +319,16 @@ const TYPES = [
   { k:'reading', tt:'読解・短文', tj:'内容理解', td:'讀短文,選出正確答案', en:'Reading', tde:'Read a short passage and answer' },
   { k:'listening', tt:'聴解', tj:'聴解', td:'聽音檔,選出正確答案', en:'Listening', tde:'Listen to the audio and answer' },
 ];
+// JLPT 官方 4 大科目分組(migii 也是這樣分):把 8 個題型收進 4 科,新手一眼看懂「要練哪塊」
+const SKILLS = [
+  { k:'vocab',  ic:'📖', tt:'文字・語彙', en:'Vocabulary', sub:'漢字・詞彙・語感', sube:'Kanji, words, nuance', types:['kanji','hyoki','context','para'] },
+  { k:'gram',   ic:'✏️', tt:'文法',       en:'Grammar',    sub:'句型・語順',       sube:'Patterns & word order', types:['grammar','order'] },
+  { k:'read',   ic:'📄', tt:'読解',       en:'Reading',    sub:'短文閱讀理解',     sube:'Reading comprehension', types:['reading'] },
+  { k:'listen', ic:'🎧', tt:'聴解',       en:'Listening',  sub:'聽力理解',         sube:'Listening comprehension', types:['listening'] },
+];
+function skName(sk){ return I18n.getLang()==='en' ? sk.en : sk.tt; }
+function skSub(sk){ return I18n.getLang()==='en' ? sk.sube : sk.sub; }
+
 // 題型顯示名是日文術語:zh(繁簡)一律用 tt 原樣不轉,en 用英文
 function tyName(ty){ return I18n.getLang()==='en' ? (ty.en||ty.tt) : ty.tt; }
 function tyLabel(k){ const y=TYPES.find(x=>x.k===k); return y? tyName(y):''; }
@@ -350,11 +370,25 @@ function renderHome(){
   const rec = getRec();
   const counts = {}, doneC = {};
   bank().forEach(q=>{ if(q.lv===lv){ counts[q.t]=(counts[q.t]||0)+1; if(rec[q.id]) doneC[q.t]=(doneC[q.t]||0)+1; } });
-  document.getElementById('types').innerHTML = TYPES.map(t=>{
-    const n = counts[t.k]||0;
-    if(!n) return '';
-    const d = doneC[t.k]||0;
-    return `<div class="type" onclick="startDrill('${t.k}')"><div class="tj">${t.tj}</div><div class="tt">${tyName(t)}</div><div class="td">${tyDesc(t)}</div><div class="tc">${enOr(`已做 ${d} / ${n} 題`,`Done ${d} / ${n}`)}${d?`<span class="tbar"><i style="width:${Math.round(d/n*100)}%"></i></span>`:''}</div></div>`;
+  // 依 4 科目分組渲染:每科一個區塊(科目標頭+整科進度+「整科混練」鈕),底下才是細分題型
+  document.getElementById('types').innerHTML = SKILLS.map(sk=>{
+    const inSkill = sk.types.filter(k=>(counts[k]||0)>0);
+    if(!inSkill.length) return '';
+    const skN = inSkill.reduce((a,k)=>a+(counts[k]||0),0);
+    const skD = inSkill.reduce((a,k)=>a+(doneC[k]||0),0);
+    const cards = inSkill.map(k=>{
+      const t = TYPES.find(x=>x.k===k); const n=counts[k]||0, d=doneC[k]||0;
+      return `<div class="type" onclick="startDrill('${k}')"><div class="tt">${tyName(t)}</div><div class="tj">${t.tj}</div><div class="td">${tyDesc(t)}</div><div class="tc">${enOr(`${d} / ${n}`,`${d} / ${n}`)}${d?`<span class="tbar"><i style="width:${Math.round(d/n*100)}%"></i></span>`:''}</div></div>`;
+    }).join('');
+    return `<div class="skill">
+      <div class="skill-h">
+        <span class="skill-ic">${sk.ic}</span>
+        <span class="skill-tt">${skName(sk)}<small>${skSub(sk)}</small></span>
+        <span class="skill-c">${skD}/${skN}</span>
+        <button class="skill-go" onclick="startDrill('skill:${sk.k}')">${enOr('整科混練 →','Mix →')}</button>
+      </div>
+      <div class="types">${cards}</div>
+    </div>`;
   }).join('');
   const w = Object.keys(getWrong()).length;
   document.getElementById('wrongCount').textContent = w;
@@ -400,17 +434,25 @@ function toggleHistDetail(hi){
 function pickLv(l){ lv=l; localStorage.setItem('jd_lv',l); renderHome(); updateExamNotes(); }
 
 function startDrill(tk){
-  curType = TYPES.find(t=>t.k===tk); isWrongMode=false;
+  isWrongMode=false;
+  let typeKeys, title;
+  if(tk && tk.indexOf('skill:')===0){          // 整科混練:該科所有題型混在一起出
+    const sk = SKILLS.find(x=>x.k===tk.slice(6));
+    if(!sk) return;
+    typeKeys = sk.types; curType = null; title = skName(sk);
+  } else {
+    curType = TYPES.find(t=>t.k===tk); typeKeys=[tk]; title = curType? tyName(curType):'';
+  }
   // 沒做過的優先出,做過的排後面(各自組內亂序);一輪 20 題,刷得動也記得住
   const rec = getRec();
-  const all = bank().filter(q=>q.lv===lv && q.t===tk);
+  const all = bank().filter(q=>q.lv===lv && typeKeys.indexOf(q.t)>-1);
   const fresh = shuffle(all.filter(q=>!rec[q.id]));
   const done  = shuffle(all.filter(q=>rec[q.id]));
   queue = fresh.concat(done).slice(0, 20);
   if(!queue.length) return;
   if(jdGateDrill()) return;   // 確認有題才扣額度(空題庫白扣一輪)
   qi=0; score=0; roundWrong=[];
-  document.getElementById('drillTitle').textContent = lv.toUpperCase()+' · '+tyName(curType);
+  document.getElementById('drillTitle').textContent = lv.toUpperCase()+' · '+title;
   show('drill'); renderQ();
 }
 function _clearRound(){ roundWrong=[]; }
