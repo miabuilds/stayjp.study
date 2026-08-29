@@ -4843,6 +4843,13 @@
     ]
   },
   {
+    "text": "いい天気ですね。ところで、あの件はどうなりましたか。",
+    "hash": "664a731d120f",
+    "sources": [
+      "conjunctions"
+    ]
+  },
+  {
     "text": "いう",
     "hash": "aceb263ec79a",
     "sources": [
@@ -19929,6 +19936,13 @@
     ]
   },
   {
+    "text": "コーヒーにしますか。それとも、紅茶にしますか。",
+    "hash": "67639558ed4d",
+    "sources": [
+      "conjunctions"
+    ]
+  },
+  {
     "text": "コーヒーになさいますか、それとも紅茶になさいますか。",
     "hash": "9eefee0246ba",
     "sources": [
@@ -25152,6 +25166,13 @@
     ]
   },
   {
+    "text": "この店は安い。それに、味もいい。",
+    "hash": "c05a4eeb7d64",
+    "sources": [
+      "conjunctions"
+    ]
+  },
+  {
     "text": "この店は安いです。そのうえ、料理もおいしいです。",
     "hash": "0308acd72105",
     "sources": [
@@ -28477,6 +28498,13 @@
     "sources": [
       "vocab-n4",
       "vocab-n3"
+    ]
+  },
+  {
+    "text": "さて、本日の議題に入りましょう。",
+    "hash": "254bb1106a7b",
+    "sources": [
+      "conjunctions"
     ]
   },
   {
@@ -43721,6 +43749,13 @@
     ]
   },
   {
+    "text": "では、また来週お会いしましょう。",
+    "hash": "67438d77c774",
+    "sources": [
+      "conjunctions"
+    ]
+  },
+  {
     "text": "では、準備も整いました。さて、そろそろ始めましょうか。",
     "hash": "fec9727f8578",
     "sources": [
@@ -54221,6 +54256,13 @@
     ]
   },
   {
+    "text": "ペンまたは鉛筆で記入してください。",
+    "hash": "5269c3747789",
+    "sources": [
+      "conjunctions"
+    ]
+  },
+  {
     "text": "ペンまたは鉛筆で書いてください。",
     "hash": "83ca2839f462",
     "sources": [
@@ -55023,6 +55065,13 @@
     ]
   },
   {
+    "text": "ボタンを押した。すると、ドアが開いた。",
+    "hash": "3d5e0eb935fc",
+    "sources": [
+      "conjunctions"
+    ]
+  },
+  {
     "text": "ボタンを押した。すると、画面に突然エラーが表示された。",
     "hash": "ef36a5b1ca77",
     "sources": [
@@ -55693,6 +55742,13 @@
       "vocab-n5",
       "vocab-n4",
       "vocab-n2"
+    ]
+  },
+  {
+    "text": "まず、お湯を沸かします。",
+    "hash": "c909e2368d1b",
+    "sources": [
+      "conjunctions"
     ]
   },
   {
@@ -62948,6 +63004,13 @@
     ]
   },
   {
+    "text": "安いものより、むしろ長く使えるものがいい。",
+    "hash": "59453ae7bea1",
+    "sources": [
+      "conjunctions"
+    ]
+  },
+  {
     "text": "安い式場は逆に小さくて、二人で座れないくらいでした。",
     "hash": "3ff8ccc6ac02",
     "sources": [
@@ -64394,6 +64457,13 @@
     "hash": "3bfb17a9d211",
     "sources": [
       "vocab-n3#場合"
+    ]
+  },
+  {
+    "text": "雨が降っていた。だから試合は中止になった。",
+    "hash": "bb9d08bc93f7",
+    "sources": [
+      "conjunctions"
     ]
   },
   {
@@ -66198,6 +66268,13 @@
     ]
   },
   {
+    "text": "何度も失敗した。それでも、彼は諦めなかった。",
+    "hash": "bb2f523e14f3",
+    "sources": [
+      "conjunctions"
+    ]
+  },
+  {
     "text": "何度も失敗したが、あきらめずに続けたおかげで実験は成功した。",
     "hash": "a6dae230f570",
     "sources": [
@@ -67133,6 +67210,13 @@
     "hash": "adbc488e3fa3",
     "sources": [
       "vocab-n5#など"
+    ]
+  },
+  {
+    "text": "果物、例えばりんごやバナナが好きだ。",
+    "hash": "afe17741cde1",
+    "sources": [
+      "conjunctions"
     ]
   },
   {
@@ -68767,6 +68851,13 @@
     ]
   },
   {
+    "text": "外出は控えるべきだ。なぜなら、感染が広がっているからだ。",
+    "hash": "fb5180b00135",
+    "sources": [
+      "conjunctions"
+    ]
+  },
+  {
     "text": "外食ばかりしています。",
     "hash": "fce09b954fce",
     "sources": [
@@ -69880,6 +69971,13 @@
     ]
   },
   {
+    "text": "簡単だと思っていた。ところが、実際はとても難しかった。",
+    "hash": "d238f2ac3b79",
+    "sources": [
+      "conjunctions"
+    ]
+  },
+  {
     "text": "簡単どころか、想像以上に難しかった。",
     "hash": "a68e052136d2",
     "sources": [
@@ -70129,6 +70227,13 @@
     "hash": "c71a2608abb9",
     "sources": [
       "daily-story#n4_10"
+    ]
+  },
+  {
+    "text": "顔を洗った。そして、朝ごはんを食べた。",
+    "hash": "1a5626f1b9ea",
+    "sources": [
+      "conjunctions"
     ]
   },
   {
@@ -72848,6 +72953,13 @@
     "hash": "0c0e72403186",
     "sources": [
       "vocab-n4#一方"
+    ]
+  },
+  {
+    "text": "兄は活発だ。一方、弟は静かだ。",
+    "hash": "ed8557c5e8d2",
+    "sources": [
+      "conjunctions"
     ]
   },
   {
@@ -76374,6 +76486,13 @@
     ]
   },
   {
+    "text": "高いですけれども、品質はいいです。",
+    "hash": "61bfdc6faa1c",
+    "sources": [
+      "conjunctions"
+    ]
+  },
+  {
     "text": "高いものがいいとは限らない。",
     "hash": "f6a3f8f0bca0",
     "sources": [
@@ -78935,6 +79054,13 @@
     "hash": "430d3ea614b9",
     "sources": [
       "vocab-n4#最後に"
+    ]
+  },
+  {
+    "text": "最後に、塩で味を調えます。",
+    "hash": "f7d9a9656196",
+    "sources": [
+      "conjunctions"
     ]
   },
   {
@@ -83229,6 +83355,13 @@
     ]
   },
   {
+    "text": "次に、野菜を切ります。",
+    "hash": "1375bd518d51",
+    "sources": [
+      "conjunctions"
+    ]
+  },
+  {
     "text": "次の駅で乗り換えれば、乗り換えなしで空港まで行けます。",
     "hash": "82577b84c31e",
     "sources": [
@@ -85273,6 +85406,13 @@
     ]
   },
   {
+    "text": "首都、すなわち東京に本社を置く。",
+    "hash": "eaeaae6c6d30",
+    "sources": [
+      "conjunctions"
+    ]
+  },
+  {
     "text": "受ける",
     "hash": "14380f3f178d",
     "sources": [
@@ -86605,6 +86745,13 @@
     ]
   },
   {
+    "text": "春になった。とはいえ、まだ朝は寒い。",
+    "hash": "66eda14eb3a9",
+    "sources": [
+      "conjunctions"
+    ]
+  },
+  {
     "text": "春になったら、この庭にひまわりの種を蒔こうと思っている。",
     "hash": "a48e56c12c8a",
     "sources": [
@@ -87113,6 +87260,13 @@
     "hash": "6f77642d7a1b",
     "sources": [
       "grammar-n3#n3-36"
+    ]
+  },
+  {
+    "text": "書類に不備があった。したがって、申請は受理されなかった。",
+    "hash": "cd80b09fc986",
+    "sources": [
+      "conjunctions"
     ]
   },
   {
@@ -88544,6 +88698,13 @@
     ]
   },
   {
+    "text": "色々言ったが、要するに、準備不足だった。",
+    "hash": "c677e3f7759a",
+    "sources": [
+      "conjunctions"
+    ]
+  },
+  {
     "text": "色々考えましたが、やっぱり最初の案が一番いいと思います。",
     "hash": "9db1d49253ff",
     "sources": [
@@ -89606,6 +89767,13 @@
     "hash": "3ec90ee5f0d6",
     "sources": [
       "vocab-n2#抑制"
+    ]
+  },
+  {
+    "text": "新しくて、しかも安い。",
+    "hash": "295036f7bbf4",
+    "sources": [
+      "conjunctions"
     ]
   },
   {
@@ -95504,6 +95672,13 @@
     ]
   },
   {
+    "text": "台風が接近している。そのため、明日は休校です。",
+    "hash": "ee4be9a52eb1",
+    "sources": [
+      "conjunctions"
+    ]
+  },
+  {
     "text": "台風が接近しているため、住民は早めに避難するよう呼びかけられた。",
     "hash": "f2b09d70dc03",
     "sources": [
@@ -95865,6 +96040,13 @@
     "hash": "92a0d5cf2ebe",
     "sources": [
       "vocab-n4#社会"
+    ]
+  },
+  {
+    "text": "大学を卒業した。その後、日本で就職した。",
+    "hash": "f9550f47b996",
+    "sources": [
+      "conjunctions"
     ]
   },
   {
@@ -100383,6 +100565,13 @@
     ]
   },
   {
+    "text": "努力した。しかし、結果は出なかった。",
+    "hash": "f34efcd08574",
+    "sources": [
+      "conjunctions"
+    ]
+  },
+  {
     "text": "努力したので、成績が上がりました。",
     "hash": "94d683ff8608",
     "sources": [
@@ -100985,6 +101174,13 @@
     ]
   },
   {
+    "text": "当日は雨天でした。また、風も強かった。",
+    "hash": "5468759d8efe",
+    "sources": [
+      "conjunctions"
+    ]
+  },
+  {
     "text": "当日は台風の接近が予想される。従って、イベントは中止とさせていただきます。",
     "hash": "a450803424cb",
     "sources": [
@@ -101399,6 +101595,13 @@
     ]
   },
   {
+    "text": "道が混んでいた。それで遅刻してしまった。",
+    "hash": "3a61925a1b89",
+    "sources": [
+      "conjunctions"
+    ]
+  },
+  {
     "text": "道が分からなかったので、駅員さんに尋ねました。",
     "hash": "f025e622df39",
     "sources": [
@@ -101431,6 +101634,13 @@
     "hash": "76069ab77e6e",
     "sources": [
       "speak-test"
+    ]
+  },
+  {
+    "text": "道に迷った。その上、雨まで降ってきた。",
+    "hash": "40aaa08f2251",
+    "sources": [
+      "conjunctions"
     ]
   },
   {
@@ -102946,6 +103156,13 @@
     ]
   },
   {
+    "text": "入場は無料です。ただし、飲食は禁止です。",
+    "hash": "c2f6cfedae07",
+    "sources": [
+      "conjunctions"
+    ]
+  },
+  {
     "text": "入場は無料です。ただし、事前の予約が必要となります。",
     "hash": "524778622ccf",
     "sources": [
@@ -103588,6 +103805,13 @@
     "hash": "fe9e0b3eb7f3",
     "sources": [
       "jlpt-listening"
+    ]
+  },
+  {
+    "text": "売上が伸びた。さらに、来年も拡大する予定だ。",
+    "hash": "1ce2da93f31c",
+    "sources": [
+      "conjunctions"
     ]
   },
   {
@@ -104905,6 +105129,13 @@
     "hash": "64cbe9c0827c",
     "sources": [
       "vocab-n2#緻密"
+    ]
+  },
+  {
+    "text": "彼は、いわばチームの心臓だ。",
+    "hash": "e39d1baf50d7",
+    "sources": [
+      "conjunctions"
     ]
   },
   {
@@ -106560,6 +106791,13 @@
     ]
   },
   {
+    "text": "彼は約束を守らない。つまり、信用できない。",
+    "hash": "aee43aaefa62",
+    "sources": [
+      "conjunctions"
+    ]
+  },
+  {
     "text": "彼は約束を必ず守るので、みんなに信頼されています。",
     "hash": "a34267c1a5f1",
     "sources": [
@@ -107614,6 +107852,13 @@
     "hash": "9028c26c0859",
     "sources": [
       "confusables-eg"
+    ]
+  },
+  {
+    "text": "疲れた。でも、もう少し頑張ろう。",
+    "hash": "ad8675608162",
+    "sources": [
+      "conjunctions"
     ]
   },
   {

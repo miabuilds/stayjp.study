@@ -148,6 +148,15 @@ while ((jq = atRe.exec(jlptQSrc))) {
   add(j, 'jlpt-listening');
 }
 
+// 接続詞總整理 — conjunctions.html 的 CONJ 例句(eg:'…')。前端 speak(eg) 播 __TTS[eg]。
+const conjHtml = fs.readFileSync(path.join(ROOT, 'conjunctions.html'), 'utf8');
+const egRe = /eg:\s*'((?:\\.|[^'\\])*)'/g;
+let cj;
+while ((cj = egRe.exec(conjHtml))) {
+  const j = cj[1].replace(/\\'/g, "'").replace(/\\\\/g, '\\');
+  add(j, 'conjunctions');
+}
+
 // AI 口說練習 — speak.html 的 SENTS（S('jp','kana','zh') 硬編）。
 // 「🔊 聽範例」原本用瀏覽器 TTS（超難聽），改成優先播 VOICEVOX mp3，key 用 jp。
 const speakTestHtml = fs.readFileSync(path.join(ROOT, 'speak.html'), 'utf8');
