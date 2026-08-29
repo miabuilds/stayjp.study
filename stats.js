@@ -36,6 +36,8 @@ const Stats = (() => {
     if (btns[3]) btns[3].classList.add('on'); // 「我的」 is index 3
     mn.innerHTML = '<div style="padding:16px;max-width:880px;margin:0 auto">' + buildHTML(false) + '</div>';
     document.getElementById('quizBg').classList.remove('show');
+    // 回頂部:從捲到下面的「學習」頁切過來時,舊 scrollY 會被夾到這頁的底 → 看起來像「跳到頁尾」
+    try { window.scrollTo(0, 0); } catch (e) {}
   }
 
   function close() {
@@ -78,6 +80,7 @@ const Stats = (() => {
     if (tab === 'stats') c.innerHTML = buildStatsCombined();
     else if (tab === 'collection') c.innerHTML = buildCollectionCombined();
     else if (tab === 'settings') c.innerHTML = buildSettings();
+    try { window.scrollTo(0, 0); } catch (e) {}   // 換子分頁也回頂部,不停在上一個分頁的捲動位置
   }
 
   // 場次錯題回顧:點紀錄列展開(單字測驗;有跡可循,不只看分數)
