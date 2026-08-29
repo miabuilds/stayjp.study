@@ -48,10 +48,20 @@ const Stats = (() => {
     // 3 個 sub-tab：學習統計（總覽+考試紀錄）/ 我的詞庫（生詞本+不熟+錯題）/ 設定
     const wqCnt = getWrongQuestions().length;
     const nbCnt = getNotebook().length;
-    h += '<div style="display:flex;gap:4px;margin-bottom:14px;overflow-x:auto;scrollbar-width:none">';
-    h += `<button class="qo-btn stat-tab on" data-tab="stats" onclick="Stats.switchTab('stats')">📊 學習統計</button>`;
-    h += `<button class="qo-btn stat-tab" data-tab="collection" onclick="Stats.switchTab('collection')">📚 我的詞庫${nbCnt+wqCnt?` (${nbCnt+wqCnt})`:''}</button>`;
-    h += `<button class="qo-btn stat-tab" data-tab="settings" onclick="Stats.switchTab('settings')">⚙️ 設定</button>`;
+    // 滿版分段分頁:原本是無樣式預設按鈕放橫向捲動列(連選中態都看不出、字放大更亂)。
+    // 改成 flex:1 三等分填滿整列 + 選中態(對齊 JLPT 刷題 .lvtab 樣式);字級放大時
+    // white-space:normal 讓文字自動換行不破版,不再擠成一團或出現橫向捲軸。
+    h += `<style>
+    .stat-tabs{display:flex;gap:6px;margin-bottom:14px}
+    .stat-tab{flex:1;min-width:0;text-align:center;font-size:14px;font-weight:700;line-height:1.2;
+      border:1px solid var(--bd);background:var(--bg2);color:var(--tx2);
+      border-radius:10px;padding:9px 4px;cursor:pointer;white-space:normal}
+    .stat-tab.on{background:var(--ac);color:#fff;border-color:var(--ac)}
+    </style>`;
+    h += '<div class="stat-tabs">';
+    h += `<button class="stat-tab on" data-tab="stats" onclick="Stats.switchTab('stats')">📊 學習統計</button>`;
+    h += `<button class="stat-tab" data-tab="collection" onclick="Stats.switchTab('collection')">📚 我的詞庫${nbCnt+wqCnt?` (${nbCnt+wqCnt})`:''}</button>`;
+    h += `<button class="stat-tab" data-tab="settings" onclick="Stats.switchTab('settings')">⚙️ 設定</button>`;
     h += '</div>';
     h += '<div id="statContent">';
     h += buildStatsCombined();
