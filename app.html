@@ -1912,7 +1912,11 @@ function loadCloudData() {
     }
     // Merge all other synced data (study_log, word_notebook, grammar_srs, daily_progress, mock_exam_history)
     SYNC_KEYS.forEach(k => {
-      if (!d[k]) return;
+      if (d[k] == null || d[k] === '') return;
+      if (SCALAR_SYNC_KEYS.has(k)) {   // 純字串(程度/目標/考試日):直接還原,不進 JSON 合併(否則 JSON.parse 炸掉整段還原)
+        if (typeof d[k] === 'string') localStorage.setItem(k, d[k]);
+        return;
+      }
       const local = JSON.parse(localStorage.getItem(k) || (Array.isArray(d[k]) ? '[]' : '{}'));
       if (Array.isArray(d[k])) {
         let merged;
@@ -2050,11 +2054,15 @@ function saveSRSCloud() {
 }
 // ── Sync ALL data ──
 const SYNC_KEYS = ['study_log','word_notebook','grammar_srs','daily_progress','mock_exam_history','exam_date','base_level','goal_level','reading_done','reading_scores','listening_scores','listening_done','shadow_favs','wrong_questions'];
+const SCALAR_SYNC_KEYS = new Set(['exam_date','base_level','goal_level']);   // 純字串值:不可 JSON.parse/stringify(JSON.parse('n3')會炸→之前這三個永遠沒同步到雲端,用戶回報「程度填過卻不記得」)
 function saveAllCloud() {
   if (!currentUser || !db) return;
   const payload = {};
   SYNC_KEYS.forEach(k => {
-    try { const v = localStorage.getItem(k); if (v) payload[k] = JSON.parse(v); } catch(e) {}
+    try {
+      const v = localStorage.getItem(k); if (v == null || v === '') return;
+      payload[k] = SCALAR_SYNC_KEYS.has(k) ? v : JSON.parse(v);   // 純字串直接存,別 JSON.parse
+    } catch(e) {}
   });
   if (Object.keys(payload).length) db.collection('users').doc(currentUser.uid).set(payload, { merge: true });
   // 大 key 另壓縮雙寫 user_progress(小純量 exam_date/base_level/goal_level/daily_progress 續留 users)
