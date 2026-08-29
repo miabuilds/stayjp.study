@@ -48,6 +48,8 @@
   let subLoaded = false;   // 登入用戶的訂閱 doc 是否已載入(避免載入空窗誤判免費 → 訂閱者跳額度 badge)
   let cachedTrialStart = null;   // 免費試用起始(ms);登入用戶享 TRIAL_DAYS 天全功能無限
   let trialWriteDone = false;    // 防呆:trial_started_at 一個 session 只寫一次(避免 serverTimestamp pending 期間重複寫)
+  let trialResolved = false;     // 試用資格是否已「定案」(拿到 trial_started_at,或後端明確回 eligible:false)。
+                                 // 未定案前(剛登入→startTrial 寫回 trial_started_at 的空窗)不 gate,避免新用戶被誤判額度用完。
   const TRIAL_DAYS = 3;
   function inTrial() {
     return cachedTrialStart != null && Date.now() < cachedTrialStart + TRIAL_DAYS * 86400000;
@@ -71,6 +73,11 @@
     if (cachedUserEmail && !subLoaded) return false;  // 登入用戶:訂閱狀態還沒載完前先不擋(訂閱者 doc 載入慢時不會誤跳額度 badge)
     if (isPremium()) return false;     // 付費用戶(登入 + 有效訂閱)→ 不擋
     if (inTrial()) return false;       // 登入用戶 3 天全功能免費試用 → 不擋
+    // 試用判定中(網頁剛登入,startTrial 還沒把 trial_started_at 寫回來)→ 先不擋,避免這個空窗
+    // 把「即將拿到 3 天試用」的新用戶誤判成免費額度用完(用戶回報:登入顯示試用中卻馬上說沒額度)。
+    // App 走 Apple 原生試用、不發網頁 3 天試用 → 排除,維持 App 正常 gating。
+    if (cachedUserEmail && !isPremium() && cachedTrialStart == null && !trialResolved
+        && !(window.STAYJP_NATIVE && window.STAYJP_NATIVE.isNativeApp)) return false;
     if (cachedUserEmail && QUOTA_WHITELIST.has(cachedUserEmail.toLowerCase())) return false;  // owner / 免費白名單帳號 → 永遠免擋
     if (cachedFreeAccess) return false;  // 管理員後台授予免費(free_users/{uid})→ 免擋
     if (!LAUNCHED) return false;       // 未開閘:過渡期不 gate 任何真實用戶(開閘時把 LAUNCHED 改 true)
@@ -355,7 +362,7 @@
     if (typeof firebase === 'undefined' || !firebase.auth) return;
     firebase.auth().onAuthStateChanged(user => {
       authReady = true;
-      cachedTrialStart = null; trialWriteDone = false;   // 換帳號/登出 → 重置試用狀態,重新依該 user 的 doc 評估
+      cachedTrialStart = null; trialWriteDone = false; trialResolved = false;   // 換帳號/登出 → 重置試用狀態,重新依該 user 的 doc 評估
       if (!user) { cachedUserEmail = null; cachedSub = null; cachedFreeAccess = false; subLoaded = true; refreshBadge(); rerenderTools(); return; }
       cachedUserEmail = user.email || null;
       subLoaded = false;   // 換 user → 重新等這個 user 的訂閱載入
@@ -371,8 +378,8 @@
         cachedSub = data.subscription || null;
         // 免費試用:讀 trial_started_at(server 時戳);沒有 + 非付費 → 第一次登入即開啟 3 天試用(只設一次)
         const ts = data.trial_started_at;
-        if (ts && typeof ts.toMillis === 'function') cachedTrialStart = ts.toMillis();
-        else if (ts && ts.seconds) cachedTrialStart = ts.seconds * 1000;
+        if (ts && typeof ts.toMillis === 'function') { cachedTrialStart = ts.toMillis(); trialResolved = true; }
+        else if (ts && ts.seconds) { cachedTrialStart = ts.seconds * 1000; trialResolved = true; }
         // App 不自動發 3 天免綁卡試用 → App 的試用走 Apple 原生「7 天免費試用」(按訂閱才開始),
         // 避免兩套試用打架 + 吃掉轉換(已免費 3 天誰還按訂閱)。網頁維持自動 3 天(網頁沒有 Apple 試用)。
         else if (!ts && !isPremium() && !(window.STAYJP_NATIVE && window.STAYJP_NATIVE.isNativeApp)) {
@@ -385,7 +392,13 @@
               return fetch('https://asia-east1-jpnote-1bdd6.cloudfunctions.net/startTrial', {
                 method: 'POST', headers: { Authorization: 'Bearer ' + tok }
               });
-            }).catch(function () {});
+            }).then(function (r) { return r ? r.json() : null; })
+              .then(function (j) {
+                // eligible:true → 後端已寫 trial_started_at,此 onSnapshot 會再回來把 cachedTrialStart 帶起(inTrial 生效)。
+                // eligible:false(用過試用/已付費)→ 沒有網頁試用 → 定案,恢復正常 gating。
+                if (j && j.eligible === false) { trialResolved = true; refreshBadge(); applyGating(); rerenderTools(); }
+              })
+              .catch(function () {});   // 網路失敗:維持未定案(不擋),下次載入再試,避免誤擋轉換中的用戶
           }
         }
         subLoaded = true;
