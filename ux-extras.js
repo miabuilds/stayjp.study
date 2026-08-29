@@ -43,8 +43,12 @@
       if (!CONJ[surface]) CONJ[surface] = { base: v.w, r: v.r, m: v.m || '', c: v.c || '', label: FORM_LABEL[fk], reading: fr };
     });
   }
+  // 高頻多音字:單獨出現(非整詞匹配)時,讀音太看語境,標了常錯(中=なか/ちゅう、下=した/お/か…)。
+  // 這些字「只在被整詞匹配到時才標」,單漢字裸出現一律不標。人工精選 vocab 稽核揪出的高頻錯源。
+  var AMBIG_KANJI = {}; '中上下方何時月日人分実悪話足語少年数散関他代通書得生気間目手口心力名前後外内多大小高長重軽近遠明暗開閉入出立行来見聞言思知作使者楽物味試都今逆食干引決降'.split('').forEach(function(c){ AMBIG_KANJI[c]=1; });
   function buildDict() {
     var READ = Object.create(null), ENTRY = Object.create(null), CONJ = Object.create(null);
+    var STEM1 = Object.create(null);   // 活用詞(動/形)的「單漢字語干」→ 裸出現不標(分かる的分、悪い的悪、実る的実…)
     ['VOCAB_N5', 'VOCAB_N4', 'VOCAB_N3', 'VOCAB_N2', 'VOCAB_N1'].forEach(function (k) {
       var arr = window[k];
       if (!Array.isArray(arr)) return;
@@ -52,7 +56,12 @@
         if (!(v && v.w && v.r && v.w !== v.r && isKanji(v.w))) return;
         if (!READ[v.w]) READ[v.w] = v.r;
         if (!ENTRY[v.w]) ENTRY[v.w] = { r: v.r, m: v.m || '', c: v.c || '' };
-        if (v.c && /動/.test(v.c)) addConj(CONJ, v);       // 動詞 → 展開活用形供反查
+        if (v.c && /[動形]/.test(v.c)) {   // 動詞/形容詞:記語干、展開活用
+          var mm = v.w.match(/[ぁ-ゖ]+$/); var okr = mm ? mm[0] : '';
+          var kp = okr ? v.w.slice(0, v.w.length - okr.length) : v.w;
+          if (kp.length === 1 && isKanji(kp)) STEM1[kp] = 1;
+          if (/動/.test(v.c)) addConj(CONJ, v);
+        }
       });
     });
     var g = window.GRAMMAR_KANJI_READINGS;
@@ -78,7 +87,8 @@
     idx(READ); idx(CONJ);
     for (var bc in BYFIRST) BYFIRST[bc].sort(function (a, b) { return b.length - a.length; });
 
-    return { READ: READ, ENTRY: ENTRY, CONJ: CONJ, BYFIRST: BYFIRST };
+    for (var ak in AMBIG_KANJI) STEM1[ak] = 1;   // 多音字也併進「裸出現不標」集
+    return { READ: READ, ENTRY: ENTRY, CONJ: CONJ, BYFIRST: BYFIRST, NOBARE: STEM1 };
   }
   function dict() {
     // 字典快取要跟著單字檔載入進度失效:文法列表常在 vocab-n3~n1 載完前就先渲染,
@@ -111,10 +121,12 @@
       if (rd.slice(-tail.length) === tail) {
         var kj = sub.slice(0, sub.length - tail.length);
         var kjRd = rd.slice(0, rd.length - tail.length);
+        if (!kjRd) return escapeHtml(sub);   // 漢字段讀音為空(壞資料)→ 純文字,不渲染空 ruby
         return '<ruby>' + escapeHtml(kj) + '<rt>' + escapeHtml(kjRd) + '</rt></ruby>' + escapeHtml(tail);
       }
       return escapeHtml(sub);   // 讀音尾對不上送假名(字典 entry 壞)→ 純文字,不上多餘 ruby
     }
+    if (!rd) return escapeHtml(sub);   // 讀音空 → 不渲染空 ruby
     return '<ruby>' + escapeHtml(sub) + '<rt>' + escapeHtml(rd) + '</rt></ruby>';
   }
   function tapSpan(inner, data) {
@@ -161,8 +173,13 @@
         if (pv === 'を') { if (r0.indexOf('い') === 0) matched.reading = 'おこな' + r0.slice(1); }
         else { if (r0.indexOf('おこな') === 0) matched.reading = 'い' + r0.slice(3); }
       }
-      // 單漢字 + 後接漢字 → 多音字風險高,不上 ruby(活用形有送假名尾、長度>1,不受此限)
-      if (matched && matched.sub.length === 1 && !matched.conj && i + 1 < text.length && isKanji(text[i + 1])) {
+      // 單漢字「貼著別的漢字」(前或後任一側)→ 這是漢語複合詞的一部分,單字讀音多半是錯的
+      //   後接漢字:新○(新提案的新→しん 非あたら)  前接漢字:○者(離職者的者→しゃ 非もの)
+      // 複合詞不一定用哪個音(者接漢字可しゃ可もの:離職者/若者),無法靠規則猜 → 一律不標,寧缺勿錯。
+      // (活用形有送假名尾、長度>1,走 conj 分支不受此限;真的整詞在字典裡的會先以長詞匹配到,也不受影響。)
+      if (matched && matched.sub.length === 1 && !matched.conj &&
+          ((i + 1 < text.length && isKanji(text[i + 1])) || (i > 0 && isKanji(text[i - 1]))
+           || (dc.NOBARE && dc.NOBARE[matched.sub]))) {   // 多音字/活用語干 裸出現 → 不標(語境不定,標了常錯)
         out += escapeHtml(text[i]); i++; continue;
       }
       // 單漢字 + 剩餘文字是某個長詞條的「前綴」→ 這個詞被截斷了(最常見成因:
