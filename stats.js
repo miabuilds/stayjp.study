@@ -555,24 +555,10 @@ const Stats = (() => {
   }
   const FS_OPTS = [{k:'normal',n:'標準 A'},{k:'large',n:'大 A+'},{k:'xlarge',n:'特大 A++'}];
   const _OLD_SETTINGS_TAIL = `
-      <div style="background:var(--bg2);border-radius:12px;padding:16px;margin-bottom:12px">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
-          <span style="font-size:16px">🔊</span>
-          <span style="font-weight:600;color:var(--tx)">語速</span>
-          <span style="margin-left:auto;font-variant-numeric:tabular-nums;color:var(--ac);font-weight:600" id="ttsSpeedLabel">${curSpeed}x</span>
-        </div>
-        <input type="range" id="ttsSpeedSlider" min="0.5" max="1.5" step="0.05" value="${speedVal}" style="width:100%;display:block" oninput="setTtsSpeed(this.value)">
-        <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--tx3);margin-top:4px">
-          <span>0.5x 慢</span><span>1.0x 標準</span><span>1.5x 快</span>
-        </div>
-      </div>
-      <a href="contact.html" style="display:flex;align-items:center;gap:12px;padding:14px 16px;background:var(--bg2);border-radius:12px;color:var(--tx);text-decoration:none;border:1px solid transparent" onmouseover="this.style.borderColor='var(--ac)'" onmouseout="this.style.borderColor='transparent'">
+      <a href="contact.html" style="display:flex;align-items:center;gap:12px;padding:14px 16px;background:var(--bg2);border-radius:12px;color:var(--tx);text-decoration:none">
         <span style="font-size:20px">💬</span>
-        <div style="flex:1">
-          <div style="font-weight:600">意見回饋</div>
-          <div style="font-size:12px;color:var(--tx2);margin-top:2px">回報內容錯誤 / 提建議</div>
-        </div>
-      </a>`;
+        <div style="flex:1"><div style="font-weight:600">意見回饋 / 回報錯誤</div><div style="font-size:12px;color:var(--tx2);margin-top:2px">內容有誤或想提建議都歡迎</div></div><span style="color:var(--tx3)">›</span>
+      </a>`
   // 設定中心的 setter：呼叫既有全域函數(維持與 header/原位置同一套狀態),改完就地重畫設定 tab
   function _setFont(k){ try{ localStorage.setItem('fontSize',k); }catch(e){} if(typeof applyFontSize==='function')applyFontSize(); switchTab('settings'); }
   function _setTheme(mode){ const isDark=document.documentElement.getAttribute('data-theme')==='dark'; if((mode==='dark')!==isDark && typeof toggleTheme==='function') toggleTheme(); switchTab('settings'); }
