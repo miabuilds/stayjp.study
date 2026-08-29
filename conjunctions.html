@@ -41,8 +41,10 @@
   .conj-zh{font-weight:700;font-size:14.5px}
   .conj-nuance{color:var(--tx2);font-size:13.5px;margin-top:5px;line-height:1.7}
   .conj-nuance b{color:var(--ac)}
-  .eg{display:flex;gap:9px;align-items:flex-start;margin-top:11px;background:var(--bg3);border-radius:10px;padding:10px 12px}
-  .eg .spk{flex-shrink:0;cursor:pointer;border:0;background:none;color:var(--ac);font-size:16px;padding:0;line-height:1.6}
+  .eg{display:flex;gap:9px;align-items:flex-start;margin-top:11px;background:var(--bg3);border:1px solid transparent;border-radius:10px;padding:10px 12px;cursor:pointer;transition:border-color .12s,transform .08s}
+  .eg:hover{border-color:var(--ac)}
+  .eg:active{transform:scale(.99)}
+  .eg .spk{flex-shrink:0;color:var(--ac);font-size:16px;line-height:1.6}
   .eg .egtx{flex:1}
   .eg .jp{font-size:16.5px;line-height:1.9}
   .eg .jp rt{font-size:10px;color:var(--ac2);font-weight:500}
@@ -167,8 +169,8 @@ function render(){
       <div class="conj">
         <div class="conj-top"><span class="conj-w">${fr(it.w)}</span><span class="conj-zh">${enOr(it.zh,it.zh)}</span></div>
         <div class="conj-nuance">${it.nu}</div>
-        <div class="eg">
-          <button class="spk" onclick="speak('${it.eg.replace(/'/g,"\\'")}')" title="聽發音">🔊</button>
+        <div class="eg" onclick="speak('${it.eg.replace(/'/g,"\\'")}')" title="點整句聽發音">
+          <span class="spk" aria-hidden="true">🔊</span>
           <div class="egtx"><div class="jp">${fr(it.eg)}</div><div class="zh">${esc(it.egz)}</div></div>
         </div>
       </div>`).join('');
