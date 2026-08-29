@@ -335,6 +335,8 @@ window.Articles = (function () {
       '.art-s.on .aw.cur rt{color:rgba(255,255,255,.85)}',
       // 無逐詞時間軸的句子(N5/少數對不齊):退回整句淡底
       '.art-s.on.flat{background:rgba(232,115,74,.16)}',
+      // 高亮中的句子:可點單字(.jlk)本來是橘字,疊在橘底上看不清 → 改深色文字,保留虛線底線的可點提示
+      '.art-s.on .jlk{color:var(--tx,#2c2c2c);border-bottom-color:var(--tx3,#9a9a9a)}',
       '.art-nofuri rt{display:none}',
       '.art-tr{font-size:14px;line-height:1.85;color:var(--tx2,#8a8a8a);margin:2px 0 16px;padding-left:12px;border-left:3px solid var(--bd,#e5e5e5)}',
       '.art-tr-s{display:block;font-size:13px;margin:2px 0 12px;padding-left:12px;border-left:3px solid var(--bd,#e5e5e5)}',
