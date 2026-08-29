@@ -496,12 +496,65 @@ const Stats = (() => {
     }, correct ? 500 : 1000);
   }
 
-  // ── 設定 tab ──
+  // ── 設定 tab（統一設定中心：字級/主題/語速/程度目標/提醒 全集中此處，原位置也保留）──
+  function _lsGet(k, d){ try { return localStorage.getItem(k) || d; } catch(e){ return d; } }
   function buildSettings() {
     const curSpeed = (typeof getTtsSpeed === 'function' ? getTtsSpeed() : 1).toFixed(2).replace(/\.?0+$/, '');
     const speedVal = typeof getTtsSpeed === 'function' ? getTtsSpeed() : 1;
-    // 語速 marker：在 slider 下面標 0.5 / 1 / 1.5 三個錨點
+    const fs = _lsGet('fontSize','normal');
+    const isDark = (typeof document!=='undefined') && document.documentElement.getAttribute('data-theme')==='dark';
+    const base = _lsGet('base_level','none'), goal = _lsGet('goal_level','');
+    const isApp = !!(window.STAYJP_NATIVE && window.STAYJP_NATIVE.isNativeApp);
+    const rmOn = _lsGet('reminder_time_pref','');
+    const box = 'background:var(--bg2);border-radius:12px;padding:16px;margin-bottom:12px';
+    const seg = 'display:flex;gap:6px;flex-wrap:wrap';
+    const chip = (on)=>'flex:1;min-width:72px;text-align:center;padding:9px 6px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;border:1px solid '+(on?'var(--ac)':'var(--bd)')+';background:'+(on?'var(--ac)':'transparent')+';color:'+(on?'#fff':'var(--tx)');
+    const LVN=['none','n5','n4','n3','n2'], LVL={none:'零基礎',n5:'N5',n4:'N4',n3:'N3',n2:'N2'};
+    const GLN=['n5','n4','n3','n2','n1'];
     return `
+      <div style="${box}">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px"><span style="font-size:16px">🔡</span><span style="font-weight:600;color:var(--tx)">文字大小</span></div>
+        <div style="${seg}">
+          ${FS_OPTS.map(o=>`<button style="${chip(fs===o.k)}" onclick="Stats._setFont('${o.k}')">${o.n}</button>`).join('')}
+        </div>
+      </div>
+      <div style="${box}">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px"><span style="font-size:16px">🌓</span><span style="font-weight:600;color:var(--tx)">主題</span></div>
+        <div style="${seg}">
+          <button style="${chip(!isDark)}" onclick="Stats._setTheme('light')">☀️ 淺色</button>
+          <button style="${chip(isDark)}" onclick="Stats._setTheme('dark')">🌙 深色</button>
+        </div>
+      </div>
+      <div style="${box}">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+          <span style="font-size:16px">🔊</span><span style="font-weight:600;color:var(--tx)">語速</span>
+          <span style="margin-left:auto;font-variant-numeric:tabular-nums;color:var(--ac);font-weight:600" id="ttsSpeedLabel">${curSpeed}x</span>
+        </div>
+        <input type="range" id="ttsSpeedSlider" min="0.5" max="1.5" step="0.05" value="${speedVal}" style="width:100%;display:block" oninput="setTtsSpeed(this.value)">
+        <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--tx3);margin-top:4px"><span>0.5x 慢</span><span>1.0x 標準</span><span>1.5x 快</span></div>
+      </div>
+      <div style="${box}">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><span style="font-size:16px">🎯</span><span style="font-weight:600;color:var(--tx)">我的程度</span></div>
+        <div style="font-size:12px;color:var(--tx2);margin-bottom:10px">背單字會跳過你已學完的級數</div>
+        <div style="${seg}">${LVN.map(k=>`<button style="${chip(base===k)}" onclick="Stats._setLevel('base','${k}')">${LVL[k]}</button>`).join('')}</div>
+        <div style="display:flex;align-items:center;gap:8px;margin:14px 0 10px"><span style="font-size:16px">🏁</span><span style="font-weight:600;color:var(--tx)">目標考級</span></div>
+        <div style="${seg}">${GLN.map(k=>`<button style="${chip(goal===k)}" onclick="Stats._setLevel('goal','${k}')">${k.toUpperCase()}</button>`).join('')}</div>
+      </div>
+      ${isApp ? `<div style="${box}">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px"><span style="font-size:16px">⏰</span><span style="font-weight:600;color:var(--tx)">每日提醒</span>${rmOn?`<span style="margin-left:auto;font-size:12px;color:var(--ac);font-weight:600">已開 ${rmOn}</span>`:''}</div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <input type="time" id="setRmTime" value="${rmOn||'20:00'}" style="font-size:17px;padding:7px 10px;border:1px solid var(--bd);border-radius:10px;background:var(--bg);color:var(--tx)">
+          <button style="flex:1;padding:9px;border-radius:10px;border:none;background:var(--ac);color:#fff;font-weight:700;cursor:pointer" onclick="Stats._setReminder()">${rmOn?'更新提醒':'開啟提醒'}</button>
+          ${rmOn?`<button style="padding:9px 12px;border-radius:10px;border:1px solid var(--bd);background:transparent;color:var(--tx2);cursor:pointer" onclick="Stats._clearReminder()">關閉</button>`:''}
+        </div>
+      </div>` : ''}
+      <a href="account.html" style="display:flex;align-items:center;gap:12px;padding:14px 16px;background:var(--bg2);border-radius:12px;color:var(--tx);text-decoration:none;margin-bottom:12px">
+        <span style="font-size:20px">👤</span><div style="flex:1"><div style="font-weight:600">我的帳號</div><div style="font-size:12px;color:var(--tx2);margin-top:2px">訂閱・登入・推薦碼</div></div><span style="color:var(--tx3)">›</span>
+      </a>
+      ${_OLD_SETTINGS_TAIL}`;
+  }
+  const FS_OPTS = [{k:'normal',n:'標準 A'},{k:'large',n:'大 A+'},{k:'xlarge',n:'特大 A++'}];
+  const _OLD_SETTINGS_TAIL = `
       <div style="background:var(--bg2);border-radius:12px;padding:16px;margin-bottom:12px">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
           <span style="font-size:16px">🔊</span>
@@ -520,7 +573,14 @@ const Stats = (() => {
           <div style="font-size:12px;color:var(--tx2);margin-top:2px">回報內容錯誤 / 提建議</div>
         </div>
       </a>`;
-  }
+  // 設定中心的 setter：呼叫既有全域函數(維持與 header/原位置同一套狀態),改完就地重畫設定 tab
+  function _setFont(k){ try{ localStorage.setItem('fontSize',k); }catch(e){} if(typeof applyFontSize==='function')applyFontSize(); switchTab('settings'); }
+  function _setTheme(mode){ const isDark=document.documentElement.getAttribute('data-theme')==='dark'; if((mode==='dark')!==isDark && typeof toggleTheme==='function') toggleTheme(); switchTab('settings'); }
+  function _setLevel(kind,v){ try{ localStorage.setItem(kind==='base'?'base_level':'goal_level', v); }catch(e){} if(typeof saveAllCloud==='function')saveAllCloud(); switchTab('settings'); if(typeof showToast==='function')showToast('已更新'); }
+  function _setReminder(){ const t=document.getElementById('setRmTime'); if(!t)return; if(typeof enableDailyReminder==='function')enableDailyReminder(t.value); else { try{ localStorage.setItem('reminder_time_pref',t.value); }catch(e){} } switchTab('settings'); if(typeof showToast==='function')showToast('提醒已設 '+t.value); }
+  function _clearReminder(){ try{ localStorage.removeItem('reminder_time_pref'); }catch(e){}
+    try{ if(window.STAYJP_NATIVE && window.STAYJP_NATIVE.isNativeApp && window.ReactNativeWebView) window.ReactNativeWebView.postMessage(JSON.stringify({type:'SET_REMINDER',payload:{time:'',cancel:true}})); }catch(e){}
+    switchTab('settings'); if(typeof showToast==='function')showToast('提醒已關閉'); }
 
   // ── 錯題回顧（聽力 / 閱讀 / 模考） ──
   function getWrongQuestions() {
@@ -733,5 +793,6 @@ const Stats = (() => {
     _renderFL();
   }
 
-  return { open, openProfile, close, switchTab, _toggleQh, quizWeak, retryWrong, _answerWeak, addToNotebook, removeFromNotebook, quizNotebook, reviewNotebook, addWrongQuestion, getWrongQuestions, removeWrongQuestion, quizWrongQuestions, _wqAnswer, _wqNext, _wqRemoveAndNext, quizFavListening, _flReplay, _flAnswer, _flNext };
+  return { open, openProfile, close, switchTab, _setFont, _setTheme, _setLevel, _setReminder, _clearReminder, _toggleQh, quizWeak, retryWrong, _answerWeak, addToNotebook, removeFromNotebook, quizNotebook, reviewNotebook, addWrongQuestion, getWrongQuestions, removeWrongQuestion, quizWrongQuestions, _wqAnswer, _wqNext, _wqRemoveAndNext, quizFavListening, _flReplay, _flAnswer, _flNext };
 })();
+try { window.Stats = Stats; } catch (e) {}
