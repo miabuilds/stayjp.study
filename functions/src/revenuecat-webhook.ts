@@ -9,6 +9,7 @@
 
 import * as functions from "firebase-functions/v2/https";
 import * as admin from "firebase-admin";
+import * as crypto from "crypto";
 import { PLANS, PlanKey } from "./utils/constants";
 import {
   writeSubscription, writeTransaction, getSubscription, getRefCode,
@@ -18,7 +19,6 @@ import {
 
 if (admin.apps.length === 0) admin.initializeApp();
 
-const REVENUECAT_AUTH_HEADER = process.env.REVENUECAT_WEBHOOK_SECRET || "";
 const ENTITLEMENT_ID = "StayJP Plan Premium";   // 跟 rc-sync-subscription.ts 一致
 
 export const revenuecatWebhook = functions.onRequest(
@@ -33,9 +33,15 @@ export const revenuecatWebhook = functions.onRequest(
   },
   async (req, res) => {
     try {
-      // 驗 RevenueCat shared secret(設定在 RevenueCat dashboard webhook config)
+      // 驗 RevenueCat shared secret。⚠️ 修:secret 以前在模組頂層讀 process.env,但 v2 secret
+      // 只在 handler 執行時才注入 env → 那個值永遠是空字串 → 驗證整段從沒生效(fail-open,可偽造事件)。
+      // 改成:handler 內讀取、secret 缺失一律拒絕(fail-closed)、timingSafeEqual 防時序側信道。
+      const secret = process.env.REVENUECAT_WEBHOOK_SECRET || "";
+      if (!secret) { console.error("[rc-webhook] WEBHOOK_SECRET 未設定,拒絕請求"); res.status(503).send("webhook not configured"); return; }
       const auth = req.headers.authorization || "";
-      if (REVENUECAT_AUTH_HEADER && auth !== `Bearer ${REVENUECAT_AUTH_HEADER}`) {
+      const expected = "Bearer " + secret;
+      const ab = Buffer.from(auth), eb = Buffer.from(expected);
+      if (ab.length !== eb.length || !crypto.timingSafeEqual(ab, eb)) {
         res.status(401).send("unauthorized");
         return;
       }

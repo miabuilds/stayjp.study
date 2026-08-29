@@ -27,7 +27,7 @@ export const adminErrorLog = functions.onRequest(
       const idToken = (req.headers.authorization || "").replace(/^Bearer\s+/i, "");
       if (!idToken) { res.status(401).json({ error: "missing_auth" }); return; }
       const decoded = await admin.auth().verifyIdToken(idToken);
-      if (!OWNER_EMAILS.has(decoded.email || "")) { res.status(403).json({ error: "not_owner" }); return; }
+      if (!OWNER_EMAILS.has(decoded.email || "") || decoded.email_verified !== true) { res.status(403).json({ error: "not_owner" }); return; }
 
       const hours = Math.min(168, Math.max(1, Number(req.body?.hours || 48)));
       const since = new Date(Date.now() - hours * 3600000).toISOString();

@@ -56,7 +56,7 @@ export const speakFeedback = functions.onRequest(
       let decoded: admin.auth.DecodedIdToken;
       try { decoded = await admin.auth().verifyIdToken(idToken); }
       catch { res.status(401).json({ error: "auth", message: "請重新登入" }); return; }
-      const isAdmin = ADMIN_EMAILS.includes((decoded.email || "").toLowerCase());
+      const isAdmin = ADMIN_EMAILS.includes((decoded.email || "").toLowerCase()) && decoded.email_verified === true;
       const cfg = await getAiConfig();
       if (!isAdmin && !cfg.public) {
         res.status(403).json({ error: "測試版限 admin 帳號" }); return;

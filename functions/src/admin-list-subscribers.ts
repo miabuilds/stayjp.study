@@ -26,7 +26,7 @@ export const adminListSubscribers = functions.onRequest(
       const idToken = (req.headers.authorization || "").replace(/^Bearer\s+/i, "");
       if (!idToken) { res.status(401).json({ error: "missing_auth" }); return; }
       const decoded = await admin.auth().verifyIdToken(idToken);
-      if (!OWNER_EMAILS.has(decoded.email || "")) { res.status(403).json({ error: "not_owner" }); return; }
+      if (!OWNER_EMAILS.has(decoded.email || "") || decoded.email_verified !== true) { res.status(403).json({ error: "not_owner" }); return; }
 
       const snap = await db.collection("users")
         .where("subscription.status", "in", ["active", "trialing", "cancelled", "refunded", "expired"])

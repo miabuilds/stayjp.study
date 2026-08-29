@@ -116,11 +116,18 @@ export const FAILED_PAYMENT_GRACE_DAYS = 14;
 
 // 環境設定 — 從 functions config 讀
 export function ecpayConfig() {
+  const isProduction = process.env.ECPAY_PRODUCTION === "true";
+  // ⚠️ 資安:正式環境「絕不」fallback 到綠界官方公開的 sandbox 測試金鑰。
+  // 否則若正式 secret 沒注入,驗簽會用「全世界都知道的金鑰」→ 任何人可偽造 callback 免費開通/封鎖帳號。
+  // 正式模式缺金鑰 → 直接丟錯(fail-closed);sandbox 才允許用公開測試金鑰。
+  if (isProduction && (!process.env.ECPAY_HASH_KEY || !process.env.ECPAY_HASH_IV || !process.env.ECPAY_MERCHANT_ID)) {
+    throw new Error("ECPay production 金鑰未設定,拒絕以測試金鑰運行");
+  }
   return {
-    merchantId: process.env.ECPAY_MERCHANT_ID || "3002607",     // sandbox default
-    hashKey:    process.env.ECPAY_HASH_KEY    || "pwFHCqoQZGmho4w6",
+    merchantId: process.env.ECPAY_MERCHANT_ID || "3002607",     // sandbox default(僅測試環境)
+    hashKey:    process.env.ECPAY_HASH_KEY    || "pwFHCqoQZGmho4w6",   // sandbox 公開金鑰(僅測試環境;正式已於上方擋掉)
     hashIV:     process.env.ECPAY_HASH_IV     || "EkRm7iFT261dpevs",
-    isProduction: process.env.ECPAY_PRODUCTION === "true",
+    isProduction,
     siteOrigin: process.env.SITE_ORIGIN || "https://stayjp.study",
     // 綠界 ECPay 的 callback URL — stayjp.study 是 GitHub Pages,沒有 /api/* proxy
     // 改用 Cloud Function 直接 public URL

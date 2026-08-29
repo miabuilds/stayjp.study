@@ -129,6 +129,7 @@ let _allSubs = [];
 // 統計以「分潤帳本(commissions)」為準,不再拿目前訂閱狀態現場重估——
 // 舊算法三個坑(2026-08-27 Mia 抓到 666666 顯示 582 但實際成交 775):
 // ①只算 status=active → 取消續訂的付費者被漏掉 ②金額用牌價重估,和帳本實記對不上 ③「帶來人數」定義和 KOL 成效頁不同。
+function esc(x){ return String(x==null?'':x).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 function refCommissionFor(code) {
   const rows = (_allComms||[]).filter(c => c.code === code && c.state !== 'void');
   const deals = rows.filter(c => c.plan !== 'adjustment').length;   // 調整/補償項不算成交
@@ -169,7 +170,7 @@ async function loadRefCodes() {
       const pct = c.commission_pct != null ? c.commission_pct : 20;
       const comm = refCommissionFor(code);
       return `<div style="padding:8px 0;border-bottom:1px solid var(--bd)${c.active===false?';opacity:.5':''}">
-        <b>${code}</b> · ${c.kol||''} ${c.active===false?'<span style="color:#EF4444">(停用)</span>':''}
+        <b>${esc(code)}</b> · ${esc(c.kol||'')} ${c.active===false?'<span style="color:#EF4444">(停用)</span>':''}
         <span style="color:var(--tx2);margin-left:6px">抽成 ${pct}% · 成交 ${comm.deals} 筆 · 目前付費中 ${comm.paying} 人 · 分潤(帳本) <b style="color:#16A34A">NT$${comm.amount.toLocaleString()}</b></span>
         <div style="margin-top:4px;display:flex;gap:6px;flex-wrap:wrap">
           <button class="btn" style="font-size:11px;padding:3px 8px" onclick="copyTxt('${refLink}')">複製推薦連結</button>
@@ -192,7 +193,7 @@ async function loadPayout() {
     window.__commRows = []; csnap.forEach(d => { const c = d.data(); window.__commRows.push({ code: c.code || '?', state: c.state || 'pending', amount: Number(c.amount_twd) || 0, gross: Number(c.gross_twd) || 0, created: Number(c.created_at) || 0 }); });
     window.__nameByCode = nameByCode;
     setRangeThisMonth();   // 預設顯示本月統計
-    const payStr = p => !p ? '<span style="color:var(--tx3)">未填收款</span>' : ((p.method === 'paypal' ? 'PayPal ' : '銀行 ') + (p.account || '(未填帳號)'));
+    const payStr = p => !p ? '<span style="color:var(--tx3)">未填收款</span>' : ((p.method === 'paypal' ? 'PayPal ' : '銀行 ') + esc(p.account || '(未填帳號)'));
     const g = {};   // code → { pending, locked, paid }
     csnap.forEach(d => { const c = d.data(); const code = c.code || '?'; const st = c.state || 'pending'; const a = Number(c.amount_twd) || 0;
       const r = g[code] = g[code] || { pending:0, locked:0, paid:0 }; if (r[st] != null) r[st] += a; });
@@ -207,7 +208,7 @@ async function loadPayout() {
       ? `🔔 本期<b>可結算(已鎖定)NT$${tL.toLocaleString()}</b>,其中滿 NT$1,000 該匯款:<b>${due.length}</b> 位。待確認(鎖定期內)NT$${tP.toLocaleString()}、累計已付款 NT$${tPaid.toLocaleString()}。`
       : `待確認(鎖定期內)NT$${tP.toLocaleString()};尚無已鎖定可領金額。累計已付款 NT$${tPaid.toLocaleString()}。`;
     box.innerHTML = `<table><thead><tr><th>KOL</th><th>碼</th><th class="num">待確認</th><th class="num">可領(鎖定)</th><th class="num">已付款</th><th>收款 / 結算</th></tr></thead><tbody>`
-      + rows.map(r => `<tr><td>${r.kol||'—'}</td><td><code>${r.code}</code></td><td class="num" style="color:var(--tx2)">NT$${r.pending.toLocaleString()}</td><td class="num"><b style="color:${r.locked>=1000?'#16A34A':'var(--tx2)'}">NT$${r.locked.toLocaleString()}</b>${r.locked>=1000?' 🔔':''}</td><td class="num" style="color:var(--tx3)">NT$${r.paid.toLocaleString()}</td><td style="font-size:12px">${payStr(payByCode[r.code])}${r.locked>0?` <button class="btn" style="font-size:11px;padding:3px 8px;margin-left:6px" onclick="settleKol('${r.code}',${r.locked})">標記已付款</button>`:''}</td></tr>`).join('')
+      + rows.map(r => `<tr><td>${esc(r.kol||'—')}</td><td><code>${esc(r.code)}</code></td><td class="num" style="color:var(--tx2)">NT$${r.pending.toLocaleString()}</td><td class="num"><b style="color:${r.locked>=1000?'#16A34A':'var(--tx2)'}">NT$${r.locked.toLocaleString()}</b>${r.locked>=1000?' 🔔':''}</td><td class="num" style="color:var(--tx3)">NT$${r.paid.toLocaleString()}</td><td style="font-size:12px">${payStr(payByCode[r.code])}${r.locked>0?` <button class="btn" style="font-size:11px;padding:3px 8px;margin-left:6px" onclick="settleKol('${r.code}',${r.locked})">標記已付款</button>`:''}</td></tr>`).join('')
       + `<tr><td colspan="2" style="text-align:right;font-weight:700">合計</td><td class="num">NT$${tP.toLocaleString()}</td><td class="num"><b>NT$${tL.toLocaleString()}</b></td><td class="num">NT$${tPaid.toLocaleString()}</td><td></td></tr></tbody></table>`;
   } catch(e){ box.textContent='讀取失敗:'+e.message; }
 }

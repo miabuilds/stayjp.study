@@ -28,7 +28,7 @@ export const adminUnblockUser = functions.onRequest(
       const idToken = (req.headers.authorization || "").replace(/^Bearer\s+/i, "");
       if (!idToken) { res.status(401).json({ error: "missing_auth" }); return; }
       const decoded = await admin.auth().verifyIdToken(idToken);
-      if (!OWNER_EMAILS.has(decoded.email || "")) { res.status(403).json({ error: "not_owner" }); return; }
+      if (!OWNER_EMAILS.has(decoded.email || "") || decoded.email_verified !== true) { res.status(403).json({ error: "not_owner" }); return; }
 
       const targetEmail = String(req.body?.email || "").trim();
       if (!targetEmail) { res.status(400).json({ error: "missing_email" }); return; }

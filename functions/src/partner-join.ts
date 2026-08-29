@@ -141,10 +141,11 @@ export const partnerJoin = functions.onRequest(
       if (!agree) { res.status(400).json({ error: "must_agree_terms" }); return; }
 
       // 顯示名稱 / 平台 / 收款方式(選填,之後可在後台補;金額大時才需身分資料)
-      const displayName = String(body.name || "").slice(0, 60);
-      const platform = String(body.platform || "").slice(0, 200);
+      const strip = (x: string) => x.replace(/[<>]/g, "");   // 縱深防禦:去掉角括號,後台顯示不會被當標籤(XSS)
+      const displayName = strip(String(body.name || "").slice(0, 60));
+      const platform = strip(String(body.platform || "").slice(0, 200));
       const payoutMethod = ["bank", "paypal"].includes(body.payout_method) ? body.payout_method : "";
-      const payoutAccount = String(body.payout_account || "").slice(0, 120);
+      const payoutAccount = strip(String(body.payout_account || "").slice(0, 120));
       const token = genToken();
       const baseData = {
         type: "kol",

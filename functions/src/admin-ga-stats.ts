@@ -33,7 +33,7 @@ export const adminGaStats = functions.onRequest(
     try {
       const idToken = (req.headers.authorization || "").replace(/^Bearer\s+/i, "");
       const decoded = await admin.auth().verifyIdToken(idToken);
-      if (!ADMIN_EMAILS.includes((decoded.email || "").toLowerCase())) {
+      if (!ADMIN_EMAILS.includes((decoded.email || "").toLowerCase()) || decoded.email_verified !== true) {
         res.status(403).json({ error: "not admin" }); return;
       }
       const [rep, rt] = await Promise.all([

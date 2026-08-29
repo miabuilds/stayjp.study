@@ -28,7 +28,7 @@ export const ttsSpeak = functions.onRequest(
       if (req.method !== "POST") { res.status(405).json({ error: "method_not_allowed" }); return; }   // 爬蟲 GET 戳門 → 405,不進錯誤日誌
       const idToken = (req.headers.authorization || "").replace(/^Bearer\s+/i, "");
       const decoded = await admin.auth().verifyIdToken(idToken);
-      const isAdmin = ADMIN_EMAILS.includes((decoded.email || "").toLowerCase());
+      const isAdmin = ADMIN_EMAILS.includes((decoded.email || "").toLowerCase()) && decoded.email_verified === true;
       const cfg = await getAiConfig();
       if (!isAdmin && !cfg.public) {
         res.status(403).json({ error: "測試版限 admin 帳號" }); return;
