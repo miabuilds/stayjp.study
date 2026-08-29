@@ -7,9 +7,10 @@
 <title>AI 情境對話｜StayJP 日本再留計劃</title>
 <script>try{var _th=localStorage.getItem('theme');if(_th)document.documentElement.setAttribute('data-theme',_th);}catch(e){}</script>
 <style>
-  :root{ --bg:#f3f5f2;--panel:#fff;--ink:#1b2320;--ink2:#5f6b67;--ink3:#93a09a;--line:#e3e8e2;--accent:#0f766e;--accent2:#0b5850;--soft:#0f766e12;--me:#0f766e;--ai:#eef1ee;--ok:#15803d;--bad:#c2410c;--warn:#b45309;--sh:0 1px 2px rgba(20,40,30,.05),0 8px 24px rgba(20,40,30,.06); }
-  @media(prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#111512;--panel:#191e1b;--ink:#e9eeea;--ink2:#9aa7a0;--ink3:#70807a;--line:#28302b;--accent:#2dd4bf;--accent2:#5eead4;--soft:#2dd4bf18;--me:#0f766e;--ai:#20261f;--ok:#4ade80;--bad:#fb923c;--warn:#fbbf24;--sh:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.3);}}
-  :root[data-theme=dark]{--bg:#111512;--panel:#191e1b;--ink:#e9eeea;--ink2:#9aa7a0;--ink3:#70807a;--line:#28302b;--accent:#2dd4bf;--accent2:#5eead4;--soft:#2dd4bf18;--me:#0f766e;--ai:#20261f;--ok:#4ade80;--bad:#fb923c;--warn:#fbbf24;--sh:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.3);}
+  /* 全站統一配色(暖米底+赭紅+襯線),對齊 JLPT 刷題/主站。保留舊變數名 → 元件規則零改動即換膚 */
+  :root{ --bg:#F6F4EF;--panel:#FFFFFF;--bg3:#EFECE5;--ink:#2C2C2C;--ink2:#6B6B6B;--ink3:#9A9A9A;--line:#E7E3DC;--accent:#C6553B;--accent2:#D4654A;--soft:#C6553B14;--me:#C6553B;--ai:#EFECE5;--ok:#15803d;--bad:#c2410c;--warn:#b45309;--serif:"Noto Serif TC","Songti TC",serif;--sh:0 1px 2px rgba(40,30,20,.05),0 8px 24px rgba(40,30,20,.06); }
+  @media(prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#161615;--panel:#211F1D;--bg3:#2A2724;--ink:#EDEBE7;--ink2:#A7A29B;--ink3:#6E6A64;--line:#332F2B;--accent:#E8734A;--accent2:#E8734A;--soft:#E8734A1c;--me:#C6553B;--ai:#2A2724;--ok:#4ade80;--bad:#fb923c;--warn:#fbbf24;--sh:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.3);}}
+  :root[data-theme=dark]{--bg:#161615;--panel:#211F1D;--bg3:#2A2724;--ink:#EDEBE7;--ink2:#A7A29B;--ink3:#6E6A64;--line:#332F2B;--accent:#E8734A;--accent2:#E8734A;--soft:#E8734A1c;--me:#C6553B;--ai:#2A2724;--ok:#4ade80;--bad:#fb923c;--warn:#fbbf24;--sh:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.3);}
   .backbtn{display:inline-flex;align-items:center;gap:6px;min-height:40px;padding:8px 14px 8px 10px;border-radius:12px;background:var(--panel);border:1px solid var(--line);color:var(--ink2);text-decoration:none;font-size:14.5px;font-weight:600;line-height:1}
   .backbtn:active{transform:scale(.96)}
   *{box-sizing:border-box;margin:0;padding:0}
@@ -21,7 +22,7 @@
   .btn:hover{border-color:var(--accent)} .btn.pri{background:var(--accent);color:#fff;border-color:var(--accent)} .btn.pri:hover{background:var(--accent2)}
   .btn:disabled{opacity:.5;cursor:default}
   .btn.sm{padding:6px 11px;font-size:13px}
-  h1{font-size:18px;margin-bottom:2px} .sub{color:var(--ink2);font-size:12.5px;margin-bottom:14px}
+  h1{font-family:var(--serif);font-size:clamp(23px,4.6vw,29px);font-weight:700;line-height:1.25;margin-bottom:5px;text-wrap:balance} .sub{color:var(--ink2);font-size:13px;line-height:1.6;margin-bottom:14px}
   a.back{color:var(--ink2);text-decoration:none;font-size:13px}
 
   /* 選主題畫面 */
