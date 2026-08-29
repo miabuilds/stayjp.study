@@ -3328,6 +3328,13 @@ function quickTipsHTML() {
 function onbPick(lv) {
   try { if (currentMode !== 'grammar') switchMode('grammar'); } catch (e) {}
   try { switchLevel(lv); } catch (e) {}
+  // 統一記憶:選的程度存成 goal_level(目標考級)+標記引導完成,跟 onboarding-v2 / 快速背單字同一組 key,
+  // 並推雲端——之前這裡只切畫面沒存,導致「歡迎彈窗選過程度,快速背單字還是空的、又問一次」(用戶回報)。
+  try {
+    if (!localStorage.getItem('goal_level')) localStorage.setItem('goal_level', lv);
+    localStorage.setItem('onboarding_done_v1', '1');
+    if (typeof saveAllCloud === 'function') saveAllCloud();
+  } catch (e) {}
   const card = document.querySelector('#onbMask .onb-card');
   if (!card) { onbFinish(); return; }
   card.innerHTML =
