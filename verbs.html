@@ -528,10 +528,12 @@ td.hl { color: var(--em-color); font-weight: 600; }
     </div>
     <div class="card-b"><div class="card-x">
       <div class="tip">日語只有<strong>兩個</strong>不規則動詞：<strong>する</strong>（做）和<strong>来る（くる）</strong>（來）。但「する」可以和名詞結合（勉強する、運動する），所以實際上數量很多。</div>
+      <div class="tbl-wrap sticky-col">
       <table style="margin-top:10px"><tr><th>動詞</th><th>ます形</th><th>ない形</th><th>て形</th><th>た形</th></tr>
       <tr><td class="vb">する <button class="spk" onclick="speak('する')"><svg viewBox="0 0 24 24"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M19.07 4.93a10 10 0 010 14.14M15.54 8.46a5 5 0 010 7.07"/></svg></button></td><td>します</td><td>しない</td><td>して</td><td>した</td></tr>
       <tr><td class="vb">来る <button class="spk" onclick="speak('来る')"><svg viewBox="0 0 24 24"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M19.07 4.93a10 10 0 010 14.14M15.54 8.46a5 5 0 010 7.07"/></svg></button></td><td>来ます（きます）</td><td>来ない（こない）</td><td>来て（きて）</td><td>来た（きた）</td></tr>
       </table>
+      </div>
       <div class="danger" style="margin-top:12px">
         <strong>注意「来る」的讀音變化！</strong><br>
         辞書形：<strong>くる</strong> ／ ます形：<strong>きます</strong> ／ ない形：<strong>こない</strong> ／ て形：<strong>きて</strong><br>
@@ -551,6 +553,7 @@ td.hl { color: var(--em-color); font-weight: 600; }
       <div class="danger">
         <strong>這些動詞字尾是「-いる」或「-える」，看起來像一段動詞，但實際上是五段動詞！</strong>只能靠記憶來分辨。
       </div>
+      <div class="tbl-wrap sticky-col">
       <table style="margin-top:10px"><tr><th>動詞</th><th>讀音</th><th>意思</th><th>ます形（五段！）</th></tr>
       <tr><td class="vb">帰る</td><td>かえる</td><td>回去</td><td>帰<strong>り</strong>ます</td></tr>
       <tr><td class="vb">知る</td><td>しる</td><td>知道</td><td>知<strong>り</strong>ます</td></tr>
@@ -573,6 +576,7 @@ td.hl { color: var(--em-color); font-weight: 600; }
       <tr><td class="vb">減る</td><td>へる</td><td>減少</td><td>減<strong>り</strong>ます</td></tr>
       <tr><td class="vb">参る</td><td>まいる</td><td>去（謙讓）</td><td>参<strong>り</strong>ます</td></tr>
       </table>
+      </div>
       <div class="tip" style="margin-top:12px">
         <strong>記憶訣竅：</strong>如果一個「〜いる/える」結尾的動詞，你不確定它是哪一類，最安全的方法就是查字典確認。常見的陷阱動詞就這些，背下來就好。
       </div>
@@ -1757,5 +1761,6 @@ function updateScore() {
 <script src="ui-map.js"></script>
 <script src="translate-layer.js"></script>
 <script src="font-scale.js"></script>
+<script src="back-to-top.js"></script>
 </body>
 </html>

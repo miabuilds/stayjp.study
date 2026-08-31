@@ -46,7 +46,7 @@
   "description": "免費 JLPT N5~N1 線上備考工具。7710+ 單字、382 文法點、模擬考、SRS 間隔複習、聽力讀解練習。",
   "offers": [
     { "@type": "Offer", "name": "免費版", "price": "0", "priceCurrency": "TWD" },
-    { "@type": "Offer", "name": "早鳥年費", "price": "990", "priceCurrency": "TWD" },
+    { "@type": "Offer", "name": "月費訂閱", "price": "299", "priceCurrency": "TWD" },
     { "@type": "Offer", "name": "年費訂閱", "price": "1490", "priceCurrency": "TWD" },
     { "@type": "Offer", "name": "買斷方案", "price": "2990", "priceCurrency": "TWD" }
   ]
@@ -848,16 +848,16 @@ try {
     <div class="pt-mascot reveal" aria-hidden="true"><img src="images/mascot/tanuki-stand.png" alt=""></div>
     <div class="pt-grid">
       <div class="pt-card pt-featured reveal">
-        <div class="pt-badge pt-badge-best" id="ebBadge">🐦 限量 100 名 · 最划算</div>
-        <div class="pt-name">早鳥年費</div>
-        <div class="pt-price"><span>NT$</span>990<small>/ 年</small></div>
-        <div class="pt-desc">NT$990/年・自動續扣（月均 NT$82）· 比標準年費省 NT$500</div>
-      </div>
-      <div class="pt-card reveal reveal-d1">
-        <div class="pt-badge">省 17%</div>
+        <div class="pt-badge pt-badge-best">⏰ 9/7 起調漲 · 現在訂鎖此價</div>
         <div class="pt-name">年費訂閱</div>
         <div class="pt-price"><span>NT$</span>1,490<small>/ 年</small></div>
-        <div class="pt-desc">平均 NT$124 / 月 · 長期備考首選</div>
+        <div class="pt-desc">平均 NT$124 / 月 · 9/7 前訂閱，續扣終身鎖 NT$1,490</div>
+      </div>
+      <div class="pt-card reveal reveal-d1">
+        <div class="pt-badge">彈性月付</div>
+        <div class="pt-name">月費訂閱</div>
+        <div class="pt-price"><span>NT$</span>299<small>/ 月</small></div>
+        <div class="pt-desc">先試一個月 · 隨時可取消</div>
       </div>
       <div class="pt-card reveal reveal-d2">
         <div class="pt-badge" style="background:#F59E0B;color:#fff">🏆 一次解決</div>
@@ -873,7 +873,7 @@ try {
       <span><b>✓</b> 繁中介面・N5–N1 全等級</span>
       <span><b>✓</b> 單字・文法・模考・跟讀一站式</span>
     </div>
-    <p class="reveal" style="text-align:center;margin-top:18px;font-size:14px;color:var(--tx2)">考前一兩個月衝刺？另有<strong style="color:var(--tx)">月費 NT$150</strong>，隨時可取消。</p>
+    <p class="reveal" style="text-align:center;margin-top:18px;font-size:14px;color:var(--tx2)">⏰ 年費將於 9/7(一)調漲——現在訂閱 NT$1,490，往後續扣都鎖這個價。</p>
     <div style="text-align:center;margin-top:32px">
       <a href="pricing.html" class="hero-cta" style="background:var(--tx);color:var(--bg)">查看完整方案
         <svg style="width:16px;height:16px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
@@ -1050,16 +1050,7 @@ try {
     cardActive.style.display = 'none';
   });
 
-  // 早鳥剩餘名額 — 與 pricing.html 讀同一個 counters/early_bird;讀不到就維持原文案
-  db.doc('counters/early_bird').get().then(snap => {
-    const d = snap.data() || {};
-    const lim = d.limit || 100;
-    const left = Math.max(0, Math.min(lim, lim - (d.count || 0)));
-    const badge = document.getElementById('ebBadge');
-    if (!badge) return;
-    if (left <= 0) badge.textContent = '早鳥名額已滿';
-    else if (left < lim) badge.textContent = `🐦 早鳥限量 ${lim} 名・只剩 ${left} 名`;
-  }).catch(() => {});
+  // (早鳥 2026-08-27 收官,首頁改推年費調漲倒數;剩餘名額 badge 已移除)
 })();
 </script>
 
@@ -1259,5 +1250,6 @@ initTheme();
 <script defer src="auth-header.js"></script>
 <script src="ui-map.js"></script>
 <script src="translate-layer.js"></script>
+<script src="back-to-top.js"></script>
 </body>
 </html>
