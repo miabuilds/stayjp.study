@@ -2165,3 +2165,5 @@ const VOCAB_N2 = [
 {w:"ひいては",r:"ひいては",m:"進而",c:"他",ex:{j:"日々の小さな努力の積み重ねが、ひいては大きな成功へとつながっていくのだ。",z:"每天點滴努力的累積，進而會連結到巨大的成功。",e:"The accumulation of small daily efforts leads, in the end, to great success."}},
 {w:"延いては",r:"ひいては",m:"進而",c:"他",ex:{j:"従業員の健康を守ることは、延いては会社全体の生産性の向上にもつながる。",z:"守護員工的健康，進而也會促進整個公司生產力的提升。",e:"Protecting employees' health leads, by extension, to an improvement in the productivity of the whole company."}}
 ];
+
+try{ window.VOCAB_N2 = window.VOCAB_N2 || VOCAB_N2; }catch(e){}

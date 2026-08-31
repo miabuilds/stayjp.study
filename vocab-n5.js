@@ -762,3 +762,5 @@ const VOCAB_N5 = [
 {w:"あのう",r:"あのう",m:"那個(語氣)",c:"他",ex:{j:"あのう、駅は どこですか。",z:"那個…請問車站在哪裡?",e:"Um, where is the station?"}},
 {w:"ええと",r:"ええと",m:"嗯(思考)",c:"他",ex:{j:"ええと、私の 名前は 田中です。",z:"嗯…我的名字是田中。",e:"Um, my name is Tanaka."}}
 ];
+
+try{ window.VOCAB_N5 = window.VOCAB_N5 || VOCAB_N5; }catch(e){}

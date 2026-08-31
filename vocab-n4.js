@@ -756,3 +756,5 @@ const VOCAB_N4 = [
 {w:"お邪魔します",r:"おじゃまします",m:"打擾了",c:"他",ex:{j:"こんにちは、お邪魔します。ここに座ってもいいですか。",z:"你好,打擾了。我可以坐這裡嗎?",e:"Hello, sorry to intrude. May I sit here?"}},
 {w:"ご馳走様",r:"ごちそうさま",m:"多謝款待",c:"他",ex:{j:"とてもおいしかったです。ご馳走様でした。",z:"非常好吃。多謝款待。",e:"It was very delicious. Thank you for the meal."}}
 ];
+
+try{ window.VOCAB_N4 = window.VOCAB_N4 || VOCAB_N4; }catch(e){}
