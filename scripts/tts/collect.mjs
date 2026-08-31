@@ -157,6 +157,21 @@ while ((cj = egRe.exec(conjHtml))) {
   add(j, 'conjunctions');
 }
 
+// 必學基礎 — essentials.html 的資料陣列(數字/量詞/時間/日期/家族/疑問詞/助詞)。
+// 前端 speak(讀音);替讀「よん / し」只念第一個。取資料段(純字面陣列)eval 出來收字串。
+try {
+  const essHtml = fs.readFileSync(path.join(ROOT, 'essentials.html'), 'utf8');
+  const dataSeg = essHtml.slice(essHtml.indexOf('// ══════════ 資料'), essHtml.indexOf('// ══════════ icon'));
+  const arrs = (new Function(dataSeg + '; return {NUM,NUM_CH,COUNTERS,JI,FUN,YOUBI,GATSU,NICHI,KAZOKU,GIMON,JOSHI};'))();
+  const say = y => String(y).split('/')[0].trim();
+  for (const key of ['NUM', 'NUM_CH', 'JI', 'FUN', 'YOUBI', 'GATSU', 'NICHI', 'GIMON']) {
+    for (const r of arrs[key]) add(say(r[1]), 'essentials');
+  }
+  for (const c of arrs.COUNTERS) for (const r of c.rows) add(say(r[1]), 'essentials');
+  for (const k of arrs.KAZOKU) { add(say(k[1]), 'essentials'); add(say(k[3]), 'essentials'); }
+  for (const j of arrs.JOSHI) add(j[4], 'essentials');   // 助詞例句(kana 整句)
+} catch (e) { console.error('essentials collect fail:', e.message); }
+
 // AI 口說練習 — speak.html 的 SENTS（S('jp','kana','zh') 硬編）。
 // 「🔊 聽範例」原本用瀏覽器 TTS（超難聽），改成優先播 VOICEVOX mp3，key 用 jp。
 const speakTestHtml = fs.readFileSync(path.join(ROOT, 'speak.html'), 'utf8');

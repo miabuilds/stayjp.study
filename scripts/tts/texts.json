@@ -2901,10 +2901,24 @@
     ]
   },
   {
+    "text": "あに",
+    "hash": "4205b176ccb4",
+    "sources": [
+      "essentials"
+    ]
+  },
+  {
     "text": "あには大学生で、サッカーがとても上手です。",
     "hash": "94cf34a9043c",
     "sources": [
       "article#a-n5-3"
+    ]
+  },
+  {
+    "text": "あね",
+    "hash": "be83b76cc2a4",
+    "sources": [
+      "essentials"
     ]
   },
   {
@@ -5097,7 +5111,8 @@
     "text": "いくつ",
     "hash": "0105b5ca5d3f",
     "sources": [
-      "vocab-n5"
+      "vocab-n5",
+      "essentials"
     ]
   },
   {
@@ -5118,7 +5133,8 @@
     "text": "いくら",
     "hash": "b90e2e1a940b",
     "sources": [
-      "vocab-n5"
+      "vocab-n5",
+      "essentials"
     ]
   },
   {
@@ -5692,11 +5708,25 @@
     ]
   },
   {
+    "text": "いち",
+    "hash": "e0ef1ee214c0",
+    "sources": [
+      "essentials"
+    ]
+  },
+  {
     "text": "いちおう",
     "hash": "d4c39d389cef",
     "sources": [
       "vocab-n3",
       "vocab-n2"
+    ]
+  },
+  {
+    "text": "いちおく",
+    "hash": "8e8bbd5fc441",
+    "sources": [
+      "essentials"
     ]
   },
   {
@@ -5711,7 +5741,8 @@
     "text": "いちがつ",
     "hash": "32ef2f95c071",
     "sources": [
-      "vocab-n5"
+      "vocab-n5",
+      "essentials"
     ]
   },
   {
@@ -5729,6 +5760,13 @@
     ]
   },
   {
+    "text": "いちじ",
+    "hash": "ae83794b6e28",
+    "sources": [
+      "essentials"
+    ]
+  },
+  {
     "text": "いちじるしい",
     "hash": "fbaed673d1a1",
     "sources": [
@@ -5741,6 +5779,13 @@
     "hash": "ca19d3b52132",
     "sources": [
       "vocab-n1"
+    ]
+  },
+  {
+    "text": "いちだい",
+    "hash": "71c5053c27e2",
+    "sources": [
+      "essentials"
     ]
   },
   {
@@ -5763,6 +5808,20 @@
     "hash": "419d11f5e0ff",
     "sources": [
       "vocab-n5"
+    ]
+  },
+  {
+    "text": "いちまい",
+    "hash": "8237759abbd8",
+    "sources": [
+      "essentials"
+    ]
+  },
+  {
+    "text": "いちまん",
+    "hash": "c9f06a631254",
+    "sources": [
+      "essentials"
     ]
   },
   {
@@ -5818,14 +5877,23 @@
     "text": "いつ",
     "hash": "2d6221baa73f",
     "sources": [
-      "vocab-n5"
+      "vocab-n5",
+      "essentials"
     ]
   },
   {
     "text": "いつか",
     "hash": "325bbd592cf3",
     "sources": [
-      "confusables-word"
+      "confusables-word",
+      "essentials"
+    ]
+  },
+  {
+    "text": "いっかい",
+    "hash": "98af5c57e6a2",
+    "sources": [
+      "essentials"
     ]
   },
   {
@@ -5900,6 +5968,13 @@
     ]
   },
   {
+    "text": "いっこ",
+    "hash": "6314f671d146",
+    "sources": [
+      "essentials"
+    ]
+  },
+  {
     "text": "いっこうに",
     "hash": "bff1b73496ce",
     "sources": [
@@ -5911,7 +5986,15 @@
     "hash": "c4af3d6a1ba6",
     "sources": [
       "vocab-n3",
-      "vocab-n2"
+      "vocab-n2",
+      "essentials"
+    ]
+  },
+  {
+    "text": "いっさつ",
+    "hash": "02b9078b7130",
+    "sources": [
+      "essentials"
     ]
   },
   {
@@ -6072,7 +6155,8 @@
     "text": "いつつ",
     "hash": "9a4151395fe1",
     "sources": [
-      "vocab-n5"
+      "vocab-n5",
+      "essentials"
     ]
   },
   {
@@ -6094,6 +6178,13 @@
     "hash": "24cfb32ae9df",
     "sources": [
       "vocab-n5"
+    ]
+  },
+  {
+    "text": "いっぱい",
+    "hash": "d2de6b00c6cf",
+    "sources": [
+      "essentials"
     ]
   },
   {
@@ -6120,6 +6211,20 @@
     ]
   },
   {
+    "text": "いっぴき",
+    "hash": "be2be88286e9",
+    "sources": [
+      "essentials"
+    ]
+  },
+  {
+    "text": "いっぷん",
+    "hash": "c82df96d3357",
+    "sources": [
+      "essentials"
+    ]
+  },
+  {
     "text": "いっぺんする",
     "hash": "c0869a1e3f94",
     "sources": [
@@ -6140,6 +6245,13 @@
     "hash": "360282ed3ab4",
     "sources": [
       "vocab-n2"
+    ]
+  },
+  {
+    "text": "いっぽん",
+    "hash": "8680d3c18fc2",
+    "sources": [
+      "essentials"
     ]
   },
   {
@@ -6483,7 +6595,15 @@
     "text": "いもうと",
     "hash": "3f5b4e6556fa",
     "sources": [
-      "vocab-n5"
+      "vocab-n5",
+      "essentials"
+    ]
+  },
+  {
+    "text": "いもうとさん",
+    "hash": "255152449334",
+    "sources": [
+      "essentials"
     ]
   },
   {
@@ -8304,6 +8424,13 @@
     ]
   },
   {
+    "text": "おいくつ",
+    "hash": "cdf769849c20",
+    "sources": [
+      "essentials"
+    ]
+  },
+  {
     "text": "おいこす",
     "hash": "a4c48f3c71ea",
     "sources": [
@@ -8609,7 +8736,8 @@
     "text": "おかあさん",
     "hash": "a2a755f4c07f",
     "sources": [
-      "vocab-n5"
+      "vocab-n5",
+      "essentials"
     ]
   },
   {
@@ -8698,7 +8826,8 @@
     "text": "おくさん",
     "hash": "9205624fde3b",
     "sources": [
-      "vocab-n5"
+      "vocab-n5",
+      "essentials"
     ]
   },
   {
@@ -8858,7 +8987,8 @@
     "text": "おじいさん",
     "hash": "f309e91869f7",
     "sources": [
-      "vocab-n5"
+      "vocab-n5",
+      "essentials"
     ]
   },
   {
@@ -8945,6 +9075,13 @@
     "sources": [
       "vocab-n5",
       "vocab-n4"
+    ]
+  },
+  {
+    "text": "おじょうさん",
+    "hash": "9ba2313c1548",
+    "sources": [
+      "essentials"
     ]
   },
   {
@@ -9174,6 +9311,13 @@
     ]
   },
   {
+    "text": "おっと",
+    "hash": "248a8daf6a81",
+    "sources": [
+      "essentials"
+    ]
+  },
+  {
     "text": "おつり",
     "hash": "d474bc8d1cbb",
     "sources": [
@@ -9198,14 +9342,23 @@
     "text": "おとうさん",
     "hash": "35e78f55d014",
     "sources": [
-      "vocab-n5"
+      "vocab-n5",
+      "essentials"
     ]
   },
   {
     "text": "おとうと",
     "hash": "f4b1936b0927",
     "sources": [
-      "vocab-n5"
+      "vocab-n5",
+      "essentials"
+    ]
+  },
+  {
+    "text": "おとうとさん",
+    "hash": "56caed973ccc",
+    "sources": [
+      "essentials"
     ]
   },
   {
@@ -9321,7 +9474,8 @@
     "text": "おにいさん",
     "hash": "ecaf215b0381",
     "sources": [
-      "vocab-n5"
+      "vocab-n5",
+      "essentials"
     ]
   },
   {
@@ -9342,7 +9496,8 @@
     "text": "おねえさん",
     "hash": "8cf44fafbf93",
     "sources": [
-      "vocab-n5"
+      "vocab-n5",
+      "essentials"
     ]
   },
   {
@@ -9378,7 +9533,8 @@
     "text": "おばあさん",
     "hash": "55ab764826fe",
     "sources": [
-      "vocab-n5"
+      "vocab-n5",
+      "essentials"
     ]
   },
   {
@@ -12339,7 +12495,8 @@
     "sources": [
       "vocab-n5",
       "vocab-n2",
-      "article-vocab#a-n5-3"
+      "article-vocab#a-n5-3",
+      "essentials"
     ]
   },
   {
@@ -13270,7 +13427,8 @@
     "text": "かようび",
     "hash": "f99c2b5c538a",
     "sources": [
-      "vocab-n5"
+      "vocab-n5",
+      "essentials"
     ]
   },
   {
@@ -15354,7 +15512,8 @@
     "text": "きゅう",
     "hash": "850ea8378a58",
     "sources": [
-      "vocab-n4"
+      "vocab-n4",
+      "essentials"
     ]
   },
   {
@@ -15415,6 +15574,13 @@
     "sources": [
       "vocab-n3",
       "vocab-n2"
+    ]
+  },
+  {
+    "text": "きゅうこ",
+    "hash": "fc3ccc1aea7d",
+    "sources": [
+      "essentials"
     ]
   },
   {
@@ -15565,6 +15731,48 @@
     "hash": "309edf148b9c",
     "sources": [
       "vocab-n5"
+    ]
+  },
+  {
+    "text": "きゅうにん",
+    "hash": "290de1f770cf",
+    "sources": [
+      "essentials"
+    ]
+  },
+  {
+    "text": "きゅうはい",
+    "hash": "304260588500",
+    "sources": [
+      "essentials"
+    ]
+  },
+  {
+    "text": "きゅうひき",
+    "hash": "a31575675029",
+    "sources": [
+      "essentials"
+    ]
+  },
+  {
+    "text": "きゅうふん",
+    "hash": "a8b67298a312",
+    "sources": [
+      "essentials"
+    ]
+  },
+  {
+    "text": "きゅうほん",
+    "hash": "d3a40e47ca4f",
+    "sources": [
+      "essentials"
+    ]
+  },
+  {
+    "text": "きゅうまい",
+    "hash": "69642f5805d5",
+    "sources": [
+      "essentials"
     ]
   },
   {
@@ -16186,6 +16394,13 @@
     ]
   },
   {
+    "text": "きょねんよりあつい",
+    "hash": "48c6f8133625",
+    "sources": [
+      "essentials"
+    ]
+  },
+  {
     "text": "きょひする",
     "hash": "9628576ef3ae",
     "sources": [
@@ -16588,7 +16803,8 @@
     "text": "きんようび",
     "hash": "0cbed1b75501",
     "sources": [
-      "vocab-n5"
+      "vocab-n5",
+      "essentials"
     ]
   },
   {
@@ -16708,7 +16924,8 @@
     "text": "くがつ",
     "hash": "df2a89c66dab",
     "sources": [
-      "vocab-n5"
+      "vocab-n5",
+      "essentials"
     ]
   },
   {
@@ -16774,6 +16991,20 @@
     "hash": "320b74691993",
     "sources": [
       "vocab-n3"
+    ]
+  },
+  {
+    "text": "くじ",
+    "hash": "7d77eb0b8aea",
+    "sources": [
+      "essentials"
+    ]
+  },
+  {
+    "text": "くじからはたらく",
+    "hash": "9214885dfeda",
+    "sources": [
+      "essentials"
     ]
   },
   {
@@ -18186,7 +18417,8 @@
     "text": "げつようび",
     "hash": "13856bbf7c54",
     "sources": [
-      "vocab-n5"
+      "vocab-n5",
+      "essentials"
     ]
   },
   {
@@ -18887,6 +19119,7 @@
     "text": "ご",
     "hash": "27a87259d93f",
     "sources": [
+      "essentials",
       "kana"
     ]
   },
@@ -20036,6 +20269,13 @@
     ]
   },
   {
+    "text": "ごかぞく",
+    "hash": "45cd9c5eb849",
+    "sources": [
+      "essentials"
+    ]
+  },
+  {
     "text": "こかつ",
     "hash": "3f4b8e179c10",
     "sources": [
@@ -20046,7 +20286,8 @@
     "text": "ごがつ",
     "hash": "57ea2d449bc6",
     "sources": [
-      "vocab-n5"
+      "vocab-n5",
+      "essentials"
     ]
   },
   {
@@ -20208,6 +20449,13 @@
     ]
   },
   {
+    "text": "ごこ",
+    "hash": "68f6592fe7f5",
+    "sources": [
+      "essentials"
+    ]
+  },
+  {
     "text": "ごご",
     "hash": "8338e52c2a4e",
     "sources": [
@@ -20341,10 +20589,18 @@
     ]
   },
   {
+    "text": "ここのか",
+    "hash": "653cb7badef7",
+    "sources": [
+      "essentials"
+    ]
+  },
+  {
     "text": "ここのつ",
     "hash": "54178e61dc94",
     "sources": [
-      "vocab-n5"
+      "vocab-n5",
+      "essentials"
     ]
   },
   {
@@ -20500,6 +20756,13 @@
     ]
   },
   {
+    "text": "ごじ",
+    "hash": "4752e5f0d223",
+    "sources": [
+      "essentials"
+    ]
+  },
+  {
     "text": "こじする",
     "hash": "f650d97d8632",
     "sources": [
@@ -20518,6 +20781,20 @@
     "hash": "6931f4f8dfaf",
     "sources": [
       "vocab-n1"
+    ]
+  },
+  {
+    "text": "ごじまでまつ",
+    "hash": "c715b5946450",
+    "sources": [
+      "essentials"
+    ]
+  },
+  {
+    "text": "ごしゅじん",
+    "hash": "bcae670a1852",
+    "sources": [
+      "essentials"
     ]
   },
   {
@@ -20934,6 +21211,13 @@
     "hash": "9f8fed496380",
     "sources": [
       "vocab-n1"
+    ]
+  },
+  {
+    "text": "ごにん",
+    "hash": "8350d168eafb",
+    "sources": [
+      "essentials"
     ]
   },
   {
@@ -26511,6 +26795,13 @@
     ]
   },
   {
+    "text": "ごはい",
+    "hash": "af53faa425f5",
+    "sources": [
+      "essentials"
+    ]
+  },
+  {
     "text": "こはば",
     "hash": "5e1cb9d35e6a",
     "sources": [
@@ -26537,6 +26828,13 @@
     "hash": "dd125a25dd13",
     "sources": [
       "vocab-n5#まだ"
+    ]
+  },
+  {
+    "text": "ごはんをたべる",
+    "hash": "5687095df042",
+    "sources": [
+      "essentials"
     ]
   },
   {
@@ -26568,10 +26866,24 @@
     ]
   },
   {
+    "text": "ごひき",
+    "hash": "9f0e68a522b3",
+    "sources": [
+      "essentials"
+    ]
+  },
+  {
     "text": "こぶする",
     "hash": "20a001754ee8",
     "sources": [
       "vocab-n1"
+    ]
+  },
+  {
+    "text": "ごふん",
+    "hash": "593100bf1c1a",
+    "sources": [
+      "essentials"
     ]
   },
   {
@@ -26586,6 +26898,20 @@
     "hash": "eb2284db438e",
     "sources": [
       "vocab-n3"
+    ]
+  },
+  {
+    "text": "ごほん",
+    "hash": "2200cc29d94c",
+    "sources": [
+      "essentials"
+    ]
+  },
+  {
+    "text": "ごまい",
+    "hash": "4e8f745fcc33",
+    "sources": [
+      "essentials"
     ]
   },
   {
@@ -26728,6 +27054,13 @@
     "hash": "d78f9a61da76",
     "sources": [
       "vocab-n1"
+    ]
+  },
+  {
+    "text": "ごりょうしん",
+    "hash": "613bfd4d393f",
+    "sources": [
+      "essentials"
     ]
   },
   {
@@ -28778,12 +29111,26 @@
     ]
   },
   {
+    "text": "さん",
+    "hash": "0d0fd2531ac7",
+    "sources": [
+      "essentials"
+    ]
+  },
+  {
     "text": "さんか",
     "hash": "39da743ba25a",
     "sources": [
       "vocab-n3",
       "vocab-n2",
       "vocab-n1"
+    ]
+  },
+  {
+    "text": "さんがい",
+    "hash": "025ebbdb456b",
+    "sources": [
+      "essentials"
     ]
   },
   {
@@ -28812,7 +29159,8 @@
     "text": "さんがつ",
     "hash": "4a9cd0b6c4ab",
     "sources": [
-      "vocab-n5"
+      "vocab-n5",
+      "essentials"
     ]
   },
   {
@@ -28846,6 +29194,13 @@
     ]
   },
   {
+    "text": "さんこ",
+    "hash": "59123d42d851",
+    "sources": [
+      "essentials"
+    ]
+  },
+  {
     "text": "さんこうする",
     "hash": "4855db6d7f0b",
     "sources": [
@@ -28860,10 +29215,24 @@
     ]
   },
   {
+    "text": "さんさい",
+    "hash": "3c96e759ec9d",
+    "sources": [
+      "essentials"
+    ]
+  },
+  {
     "text": "さんざん迷ったあげく、結局購入を見送った。",
     "hash": "e42e4c16c093",
     "sources": [
       "grammar-n2#n2-60"
+    ]
+  },
+  {
+    "text": "さんじ",
+    "hash": "9959160f14aa",
+    "sources": [
+      "essentials"
     ]
   },
   {
@@ -28878,6 +29247,13 @@
     "hash": "484eb3f77220",
     "sources": [
       "vocab-n1"
+    ]
+  },
+  {
+    "text": "さんじゅっぷん",
+    "hash": "ed9bdcd391c8",
+    "sources": [
+      "essentials"
     ]
   },
   {
@@ -28920,7 +29296,8 @@
     "text": "さんぜん",
     "hash": "18784f29397b",
     "sources": [
-      "vocab-n1"
+      "vocab-n1",
+      "essentials"
     ]
   },
   {
@@ -28960,6 +29337,13 @@
     ]
   },
   {
+    "text": "さんにん",
+    "hash": "4c585e93c466",
+    "sources": [
+      "essentials"
+    ]
+  },
+  {
     "text": "ざんにん",
     "hash": "2e873757553c",
     "sources": [
@@ -28975,6 +29359,13 @@
     ]
   },
   {
+    "text": "さんばい",
+    "hash": "e8f9ca6f7597",
+    "sources": [
+      "essentials"
+    ]
+  },
+  {
     "text": "さんぱい",
     "hash": "13141c51bebb",
     "sources": [
@@ -28982,10 +29373,31 @@
     ]
   },
   {
+    "text": "さんびき",
+    "hash": "f554084389a8",
+    "sources": [
+      "essentials"
+    ]
+  },
+  {
+    "text": "さんびゃく",
+    "hash": "62a35da52be8",
+    "sources": [
+      "essentials"
+    ]
+  },
+  {
     "text": "さんぶん",
     "hash": "10dd143b7e8b",
     "sources": [
       "vocab-n1"
+    ]
+  },
+  {
+    "text": "さんぷん",
+    "hash": "83f9d1705203",
+    "sources": [
+      "essentials"
     ]
   },
   {
@@ -29008,6 +29420,20 @@
     "sources": [
       "vocab-n5",
       "vocab-n4"
+    ]
+  },
+  {
+    "text": "さんぼん",
+    "hash": "1d71c3859bbc",
+    "sources": [
+      "essentials"
+    ]
+  },
+  {
+    "text": "さんまい",
+    "hash": "dcf037b4e300",
+    "sources": [
+      "essentials"
     ]
   },
   {
@@ -29314,7 +29740,8 @@
     "text": "しがつ",
     "hash": "d506f13026a3",
     "sources": [
-      "vocab-n5"
+      "vocab-n5",
+      "essentials"
     ]
   },
   {
@@ -29956,7 +30383,22 @@
     "text": "しちがつ",
     "hash": "9f4aedbfe59b",
     "sources": [
-      "vocab-n5"
+      "vocab-n5",
+      "essentials"
+    ]
+  },
+  {
+    "text": "しちじ",
+    "hash": "cd1583669d37",
+    "sources": [
+      "essentials"
+    ]
+  },
+  {
+    "text": "しちじにおきる",
+    "hash": "5562896fc00e",
+    "sources": [
+      "essentials"
     ]
   },
   {
@@ -29971,6 +30413,13 @@
     "hash": "1191205d536f",
     "sources": [
       "vocab-n1"
+    ]
+  },
+  {
+    "text": "しちにん",
+    "hash": "90c3d20cbced",
+    "sources": [
+      "essentials"
     ]
   },
   {
@@ -31020,6 +31469,13 @@
     ]
   },
   {
+    "text": "じゅう",
+    "hash": "c3c54579ea2a",
+    "sources": [
+      "essentials"
+    ]
+  },
+  {
     "text": "じゆう",
     "hash": "bb1f06039b88",
     "sources": [
@@ -31032,7 +31488,15 @@
     "text": "じゅういちがつ",
     "hash": "c9f52fe37008",
     "sources": [
-      "vocab-n5"
+      "vocab-n5",
+      "essentials"
+    ]
+  },
+  {
+    "text": "じゅういちじ",
+    "hash": "c1c7bb6bb8e2",
+    "sources": [
+      "essentials"
     ]
   },
   {
@@ -31068,7 +31532,8 @@
     "text": "じゅうがつ",
     "hash": "e40de08b2d12",
     "sources": [
-      "vocab-n5"
+      "vocab-n5",
+      "essentials"
     ]
   },
   {
@@ -31129,6 +31594,13 @@
     "hash": "b2bfccdf434d",
     "sources": [
       "vocab-n3"
+    ]
+  },
+  {
+    "text": "じゅうじ",
+    "hash": "c8c93d6d0c76",
+    "sources": [
+      "essentials"
     ]
   },
   {
@@ -31297,7 +31769,15 @@
     "text": "じゅうにがつ",
     "hash": "1a7de102f8e1",
     "sources": [
-      "vocab-n5"
+      "vocab-n5",
+      "essentials"
+    ]
+  },
+  {
+    "text": "じゅうにじ",
+    "hash": "e6fc99a7f3d0",
+    "sources": [
+      "essentials"
     ]
   },
   {
@@ -31321,6 +31801,13 @@
     "hash": "4a7aaf40029e",
     "sources": [
       "vocab-n2"
+    ]
+  },
+  {
+    "text": "じゅうにん",
+    "hash": "ebf7f656f69d",
+    "sources": [
+      "essentials"
     ]
   },
   {
@@ -31367,6 +31854,13 @@
     ]
   },
   {
+    "text": "じゅうまい",
+    "hash": "cc175128c9d7",
+    "sources": [
+      "essentials"
+    ]
+  },
+  {
     "text": "しゅうまつはあまりしごとがありません。",
     "hash": "6c8cb8c07037",
     "sources": [
@@ -31400,6 +31894,13 @@
     "hash": "3f4eb4442eaf",
     "sources": [
       "vocab-n3"
+    ]
+  },
+  {
+    "text": "じゅうよっか",
+    "hash": "106d2b4de8d2",
+    "sources": [
+      "essentials"
     ]
   },
   {
@@ -31666,6 +32167,13 @@
     ]
   },
   {
+    "text": "じゅっこ",
+    "hash": "c91cde12b455",
+    "sources": [
+      "essentials"
+    ]
+  },
+  {
     "text": "しゅっこうする",
     "hash": "12a2424dbba6",
     "sources": [
@@ -31677,6 +32185,13 @@
     "hash": "5b5225f3e684",
     "sources": [
       "vocab-n3"
+    ]
+  },
+  {
+    "text": "じゅっさい",
+    "hash": "0a56bfc0ac60",
+    "sources": [
+      "essentials"
     ]
   },
   {
@@ -31771,6 +32286,13 @@
     ]
   },
   {
+    "text": "じゅっぱい",
+    "hash": "5aa495fdc78c",
+    "sources": [
+      "essentials"
+    ]
+  },
+  {
     "text": "しゅっぱつ",
     "hash": "33422fb46dfd",
     "sources": [
@@ -31806,6 +32328,27 @@
     "hash": "aa764c912301",
     "sources": [
       "vocab-n3"
+    ]
+  },
+  {
+    "text": "じゅっぴき",
+    "hash": "5839d1ac23df",
+    "sources": [
+      "essentials"
+    ]
+  },
+  {
+    "text": "じゅっぷん",
+    "hash": "f149751bbf78",
+    "sources": [
+      "essentials"
+    ]
+  },
+  {
+    "text": "じゅっぽん",
+    "hash": "22bc1bcacee4",
+    "sources": [
+      "essentials"
     ]
   },
   {
@@ -33952,7 +34495,8 @@
     "text": "すいようび",
     "hash": "18d9cd747a1b",
     "sources": [
-      "vocab-n5"
+      "vocab-n5",
+      "essentials"
     ]
   },
   {
@@ -36057,6 +36601,13 @@
     ]
   },
   {
+    "text": "ゼロ",
+    "hash": "d3a4ab7b3e1d",
+    "sources": [
+      "essentials"
+    ]
+  },
+  {
     "text": "せろん",
     "hash": "3c2379e11142",
     "sources": [
@@ -36074,7 +36625,8 @@
     "text": "せん",
     "hash": "9d8b7f0ee360",
     "sources": [
-      "vocab-n3"
+      "vocab-n3",
+      "essentials"
     ]
   },
   {
@@ -38175,14 +38727,16 @@
     "text": "そふ",
     "hash": "95206a00f9d1",
     "sources": [
-      "vocab-n4"
+      "vocab-n4",
+      "essentials"
     ]
   },
   {
     "text": "そぼ",
     "hash": "8ab28d9b2e2d",
     "sources": [
-      "vocab-n4"
+      "vocab-n4",
+      "essentials"
     ]
   },
   {
@@ -40684,7 +41238,15 @@
     "text": "だれ",
     "hash": "2fb84bb825f8",
     "sources": [
-      "vocab-n5"
+      "vocab-n5",
+      "essentials"
+    ]
+  },
+  {
+    "text": "だれがきましたか",
+    "hash": "ec7b3e8f8667",
+    "sources": [
+      "essentials"
     ]
   },
   {
@@ -41319,6 +41881,13 @@
     "hash": "8615d6400704",
     "sources": [
       "vocab-n2"
+    ]
+  },
+  {
+    "text": "ちち",
+    "hash": "2d59d2ea9134",
+    "sources": [
+      "essentials"
     ]
   },
   {
@@ -42243,6 +42812,13 @@
     ]
   },
   {
+    "text": "ついたち",
+    "hash": "4c0fa67609ee",
+    "sources": [
+      "essentials"
+    ]
+  },
+  {
     "text": "ついとう",
     "hash": "7693abcbfc92",
     "sources": [
@@ -42753,6 +43329,13 @@
     "hash": "9f7f41b3c3cd",
     "sources": [
       "vocab-n2"
+    ]
+  },
+  {
+    "text": "つま",
+    "hash": "0be683867ee9",
+    "sources": [
+      "essentials"
     ]
   },
   {
@@ -44467,7 +45050,8 @@
     "text": "どう",
     "hash": "95f7d9ec06d8",
     "sources": [
-      "vocab-n5"
+      "vocab-n5",
+      "essentials"
     ]
   },
   {
@@ -44628,7 +45212,8 @@
     "text": "どうして",
     "hash": "0dfa61bfb6d7",
     "sources": [
-      "vocab-n5"
+      "vocab-n5",
+      "essentials"
     ]
   },
   {
@@ -45064,7 +45649,8 @@
     "text": "とお",
     "hash": "3edf7389c1df",
     "sources": [
-      "vocab-n5"
+      "vocab-n5",
+      "essentials"
     ]
   },
   {
@@ -45072,6 +45658,13 @@
     "hash": "429a9494df3b",
     "sources": [
       "vocab-n5"
+    ]
+  },
+  {
+    "text": "とおか",
+    "hash": "3061a0812422",
+    "sources": [
+      "essentials"
     ]
   },
   {
@@ -45404,7 +45997,8 @@
     "text": "どこ",
     "hash": "27b6a68a3360",
     "sources": [
-      "vocab-n5"
+      "vocab-n5",
+      "essentials"
     ]
   },
   {
@@ -45497,6 +46091,13 @@
     ]
   },
   {
+    "text": "としょかんでべんきょうする",
+    "hash": "60db82825878",
+    "sources": [
+      "essentials"
+    ]
+  },
+  {
     "text": "としょかんは、月曜日から金曜日まで開いています。土曜日と日曜日は休みです。",
     "hash": "3d935c139499",
     "sources": [
@@ -45550,7 +46151,8 @@
     "text": "どちら",
     "hash": "92e9d13dac68",
     "sources": [
-      "vocab-n5"
+      "vocab-n5",
+      "essentials"
     ]
   },
   {
@@ -45846,7 +46448,8 @@
     "text": "どの",
     "hash": "88d5e5900e84",
     "sources": [
-      "vocab-n5"
+      "vocab-n5",
+      "essentials"
     ]
   },
   {
@@ -46030,6 +46633,13 @@
     ]
   },
   {
+    "text": "ともだちとはなす",
+    "hash": "e6cb65dcb1a1",
+    "sources": [
+      "essentials"
+    ]
+  },
+  {
     "text": "ともだちは「じょうずですね」といいます。",
     "hash": "95ae3d555c4b",
     "sources": [
@@ -46054,7 +46664,8 @@
     "text": "どようび",
     "hash": "d9ccde3f8f77",
     "sources": [
-      "vocab-n5"
+      "vocab-n5",
+      "essentials"
     ]
   },
   {
@@ -46244,7 +46855,8 @@
     "text": "どれ",
     "hash": "793b833d8a25",
     "sources": [
-      "vocab-n5"
+      "vocab-n5",
+      "essentials"
     ]
   },
   {
@@ -46372,7 +46984,8 @@
     "text": "どんな",
     "hash": "3b11d8fbf1d2",
     "sources": [
-      "vocab-n5"
+      "vocab-n5",
+      "essentials"
     ]
   },
   {
@@ -47272,7 +47885,8 @@
     "hash": "0971a54fbc31",
     "sources": [
       "vocab-n5",
-      "vocab-n2"
+      "vocab-n2",
+      "essentials"
     ]
   },
   {
@@ -47330,6 +47944,20 @@
     ]
   },
   {
+    "text": "なな",
+    "hash": "1e0b17cf5100",
+    "sources": [
+      "essentials"
+    ]
+  },
+  {
+    "text": "ななこ",
+    "hash": "32f37888e9c1",
+    "sources": [
+      "essentials"
+    ]
+  },
+  {
     "text": "ななころびやおき",
     "hash": "eacba3376dd3",
     "sources": [
@@ -47340,14 +47968,51 @@
     "text": "ななつ",
     "hash": "3d15e9f5daa9",
     "sources": [
-      "vocab-n5"
+      "vocab-n5",
+      "essentials"
+    ]
+  },
+  {
+    "text": "ななはい",
+    "hash": "42f022a09849",
+    "sources": [
+      "essentials"
+    ]
+  },
+  {
+    "text": "ななひき",
+    "hash": "bfb18361d37d",
+    "sources": [
+      "essentials"
+    ]
+  },
+  {
+    "text": "ななふん",
+    "hash": "49c630c15285",
+    "sources": [
+      "essentials"
+    ]
+  },
+  {
+    "text": "ななほん",
+    "hash": "c7d279331b9b",
+    "sources": [
+      "essentials"
+    ]
+  },
+  {
+    "text": "ななまい",
+    "hash": "6e03ee2d01fa",
+    "sources": [
+      "essentials"
     ]
   },
   {
     "text": "なに",
     "hash": "b41e23d04a56",
     "sources": [
-      "vocab-n5"
+      "vocab-n5",
+      "essentials"
     ]
   },
   {
@@ -47406,6 +48071,13 @@
     "hash": "5e56a7c38938",
     "sources": [
       "vocab-n2"
+    ]
+  },
+  {
+    "text": "なのか",
+    "hash": "0206a74112de",
+    "sources": [
+      "essentials"
     ]
   },
   {
@@ -47562,6 +48234,20 @@
     ]
   },
   {
+    "text": "なんかい",
+    "hash": "c329dc6de312",
+    "sources": [
+      "essentials"
+    ]
+  },
+  {
+    "text": "なんがつ",
+    "hash": "7ca2912c500b",
+    "sources": [
+      "essentials"
+    ]
+  },
+  {
     "text": "なんきょく",
     "hash": "ab309340db6c",
     "sources": [
@@ -47573,6 +48259,20 @@
     "hash": "f232deedc346",
     "sources": [
       "vocab-n1"
+    ]
+  },
+  {
+    "text": "なんさい",
+    "hash": "e313d4648f74",
+    "sources": [
+      "essentials"
+    ]
+  },
+  {
+    "text": "なんじ",
+    "hash": "8acf078cd9d5",
+    "sources": [
+      "essentials"
     ]
   },
   {
@@ -47634,6 +48334,20 @@
     ]
   },
   {
+    "text": "なんにち",
+    "hash": "18a01cf43ffe",
+    "sources": [
+      "essentials"
+    ]
+  },
+  {
+    "text": "なんぷん",
+    "hash": "99fb508d488d",
+    "sources": [
+      "essentials"
+    ]
+  },
+  {
     "text": "なんぼく",
     "hash": "ddf355702d40",
     "sources": [
@@ -47648,9 +48362,17 @@
     ]
   },
   {
+    "text": "なんようび",
+    "hash": "3cc7ae940d52",
+    "sources": [
+      "essentials"
+    ]
+  },
+  {
     "text": "に",
     "hash": "de3d1ecc94b2",
     "sources": [
+      "essentials",
       "kana"
     ]
   },
@@ -47701,7 +48423,8 @@
     "text": "にがつ",
     "hash": "aab2ac2d9387",
     "sources": [
-      "vocab-n5"
+      "vocab-n5",
+      "essentials"
     ]
   },
   {
@@ -47761,10 +48484,24 @@
     ]
   },
   {
+    "text": "にこ",
+    "hash": "885600554cac",
+    "sources": [
+      "essentials"
+    ]
+  },
+  {
     "text": "にこにこ",
     "hash": "1f0ae67403c2",
     "sources": [
       "vocab-n3"
+    ]
+  },
+  {
+    "text": "にさい",
+    "hash": "c5f05d13b81e",
+    "sources": [
+      "essentials"
     ]
   },
   {
@@ -47786,7 +48523,8 @@
     "hash": "caae763ebfb0",
     "sources": [
       "vocab-n4",
-      "vocab-n3"
+      "vocab-n3",
+      "essentials"
     ]
   },
   {
@@ -47794,6 +48532,13 @@
     "hash": "042744e75247",
     "sources": [
       "vocab-n1"
+    ]
+  },
+  {
+    "text": "にじゅうよっか",
+    "hash": "474ea60ffd92",
+    "sources": [
+      "essentials"
     ]
   },
   {
@@ -47815,7 +48560,8 @@
     "text": "にちようび",
     "hash": "8254487a7be4",
     "sources": [
-      "vocab-n5"
+      "vocab-n5",
+      "essentials"
     ]
   },
   {
@@ -47870,6 +48616,20 @@
     ]
   },
   {
+    "text": "にはい",
+    "hash": "90fe1d825474",
+    "sources": [
+      "essentials"
+    ]
+  },
+  {
+    "text": "にひき",
+    "hash": "7f0f781b5095",
+    "sources": [
+      "essentials"
+    ]
+  },
+  {
     "text": "にぶい",
     "hash": "e202c596bd3a",
     "sources": [
@@ -47879,10 +48639,18 @@
     ]
   },
   {
+    "text": "にふん",
+    "hash": "8e609bbd5e4d",
+    "sources": [
+      "essentials"
+    ]
+  },
+  {
     "text": "にほん",
     "hash": "01b64b5814b8",
     "sources": [
-      "vocab-n5"
+      "vocab-n5",
+      "essentials"
     ]
   },
   {
@@ -47890,6 +48658,20 @@
     "hash": "f31040750b56",
     "sources": [
       "vocab-n5"
+    ]
+  },
+  {
+    "text": "にほんへいく",
+    "hash": "12eab4f81f28",
+    "sources": [
+      "essentials"
+    ]
+  },
+  {
+    "text": "にまい",
+    "hash": "28918447de96",
+    "sources": [
+      "essentials"
     ]
   },
   {
@@ -49959,6 +50741,13 @@
     ]
   },
   {
+    "text": "はたち",
+    "hash": "8d87abccdd0d",
+    "sources": [
+      "essentials"
+    ]
+  },
+  {
     "text": "はたらく",
     "hash": "5f2df93aa0a4",
     "sources": [
@@ -49973,10 +50762,18 @@
     ]
   },
   {
+    "text": "はち",
+    "hash": "17728bef111e",
+    "sources": [
+      "essentials"
+    ]
+  },
+  {
     "text": "はちがつ",
     "hash": "b6c630b5c723",
     "sources": [
-      "vocab-n5"
+      "vocab-n5",
+      "essentials"
     ]
   },
   {
@@ -49984,6 +50781,34 @@
     "hash": "ad5969808505",
     "sources": [
       "vocab-n1"
+    ]
+  },
+  {
+    "text": "はちじ",
+    "hash": "479ce52807e4",
+    "sources": [
+      "essentials"
+    ]
+  },
+  {
+    "text": "はちにん",
+    "hash": "fa917a77aa62",
+    "sources": [
+      "essentials"
+    ]
+  },
+  {
+    "text": "はちまい",
+    "hash": "906b9913708c",
+    "sources": [
+      "essentials"
+    ]
+  },
+  {
+    "text": "はつか",
+    "hash": "bcaea1130826",
+    "sources": [
+      "essentials"
     ]
   },
   {
@@ -50079,10 +50904,24 @@
     ]
   },
   {
+    "text": "はっこ",
+    "hash": "81ad2a5da29a",
+    "sources": [
+      "essentials"
+    ]
+  },
+  {
     "text": "ばっこする",
     "hash": "1a23d39fd31e",
     "sources": [
       "vocab-n1"
+    ]
+  },
+  {
+    "text": "はっさい",
+    "hash": "c9ecd97c8968",
+    "sources": [
+      "essentials"
     ]
   },
   {
@@ -50105,6 +50944,13 @@
     "sources": [
       "vocab-n3",
       "vocab-n2"
+    ]
+  },
+  {
+    "text": "はっせん",
+    "hash": "f4d686dfb861",
+    "sources": [
+      "essentials"
     ]
   },
   {
@@ -50153,6 +50999,27 @@
     ]
   },
   {
+    "text": "はっぱい",
+    "hash": "532548edffb5",
+    "sources": [
+      "essentials"
+    ]
+  },
+  {
+    "text": "はっぴき",
+    "hash": "491975cb3c4f",
+    "sources": [
+      "essentials"
+    ]
+  },
+  {
+    "text": "はっぴゃく",
+    "hash": "a9b65c1993ae",
+    "sources": [
+      "essentials"
+    ]
+  },
+  {
     "text": "はっぴょう",
     "hash": "acc6683647ee",
     "sources": [
@@ -50169,6 +51036,13 @@
     ]
   },
   {
+    "text": "はっぷん",
+    "hash": "2b66d465a8d9",
+    "sources": [
+      "essentials"
+    ]
+  },
+  {
     "text": "はっぽうびじん",
     "hash": "45ce8050c152",
     "sources": [
@@ -50180,6 +51054,13 @@
     "hash": "2bc4c5a3d8bf",
     "sources": [
       "vocab-n1"
+    ]
+  },
+  {
+    "text": "はっぽん",
+    "hash": "276adbe0f317",
+    "sources": [
+      "essentials"
     ]
   },
   {
@@ -50354,6 +51235,13 @@
     "hash": "dc10b4fca93a",
     "sources": [
       "vocab-n3"
+    ]
+  },
+  {
+    "text": "はは",
+    "hash": "0ef29b925c1d",
+    "sources": [
+      "essentials"
     ]
   },
   {
@@ -51490,7 +52378,8 @@
     "text": "ひとつ",
     "hash": "b9a975d70cb6",
     "sources": [
-      "vocab-n5"
+      "vocab-n5",
+      "essentials"
     ]
   },
   {
@@ -51505,6 +52394,13 @@
     "hash": "e361805f0229",
     "sources": [
       "vocab-n2"
+    ]
+  },
+  {
+    "text": "ひとり",
+    "hash": "a724db40a081",
+    "sources": [
+      "essentials"
     ]
   },
   {
@@ -51673,6 +52569,13 @@
     "hash": "ef826d2af5c0",
     "sources": [
       "kana"
+    ]
+  },
+  {
+    "text": "ひゃく",
+    "hash": "1119c7bdbd3b",
+    "sources": [
+      "essentials"
     ]
   },
   {
@@ -52867,7 +53770,15 @@
     "text": "ふたつ",
     "hash": "c9ffe5da8047",
     "sources": [
-      "vocab-n5"
+      "vocab-n5",
+      "essentials"
+    ]
+  },
+  {
+    "text": "ふたり",
+    "hash": "864b1bb2e9ac",
+    "sources": [
+      "essentials"
     ]
   },
   {
@@ -52914,6 +53825,13 @@
       "vocab-n5",
       "vocab-n4",
       "vocab-n3"
+    ]
+  },
+  {
+    "text": "ふつか",
+    "hash": "08006d48544c",
+    "sources": [
+      "essentials"
     ]
   },
   {
@@ -56642,6 +57560,13 @@
     ]
   },
   {
+    "text": "みっか",
+    "hash": "94fae99f7c2c",
+    "sources": [
+      "essentials"
+    ]
+  },
+  {
     "text": "みっかぼうず",
     "hash": "e2741ebc671c",
     "sources": [
@@ -56675,7 +57600,8 @@
     "text": "みっつ",
     "hash": "a51025928299",
     "sources": [
-      "vocab-n5"
+      "vocab-n5",
+      "essentials"
     ]
   },
   {
@@ -57162,6 +58088,13 @@
     ]
   },
   {
+    "text": "むいか",
+    "hash": "6cd7fb86722e",
+    "sources": [
+      "essentials"
+    ]
+  },
+  {
     "text": "むいしき",
     "hash": "55b984b0de71",
     "sources": [
@@ -57334,7 +58267,15 @@
     "hash": "dc3bc67a4cc0",
     "sources": [
       "vocab-n5",
-      "vocab-n4"
+      "vocab-n4",
+      "essentials"
+    ]
+  },
+  {
+    "text": "むすこさん",
+    "hash": "0538dc2fc764",
+    "sources": [
+      "essentials"
     ]
   },
   {
@@ -57349,7 +58290,8 @@
     "hash": "26554faeec82",
     "sources": [
       "vocab-n5",
-      "vocab-n4"
+      "vocab-n4",
+      "essentials"
     ]
   },
   {
@@ -57386,7 +58328,8 @@
     "text": "むっつ",
     "hash": "90e3a4ab0658",
     "sources": [
-      "vocab-n5"
+      "vocab-n5",
+      "essentials"
     ]
   },
   {
@@ -58365,7 +59308,8 @@
     "text": "もくようび",
     "hash": "561867c6f768",
     "sources": [
-      "vocab-n5"
+      "vocab-n5",
+      "essentials"
     ]
   },
   {
@@ -59098,7 +60042,8 @@
     "text": "やっつ",
     "hash": "88e3abac66bc",
     "sources": [
-      "vocab-n5"
+      "vocab-n5",
+      "essentials"
     ]
   },
   {
@@ -59936,6 +60881,13 @@
     ]
   },
   {
+    "text": "ようか",
+    "hash": "fd475f59137b",
+    "sources": [
+      "essentials"
+    ]
+  },
+  {
     "text": "ようかい",
     "hash": "f6db5fad71b1",
     "sources": [
@@ -60268,6 +61220,13 @@
     ]
   },
   {
+    "text": "よじ",
+    "hash": "c4f7d845e204",
+    "sources": [
+      "essentials"
+    ]
+  },
+  {
     "text": "よしん",
     "hash": "3f94e80a1ba9",
     "sources": [
@@ -60338,10 +61297,18 @@
     ]
   },
   {
+    "text": "よっか",
+    "hash": "9513786f2995",
+    "sources": [
+      "essentials"
+    ]
+  },
+  {
     "text": "よっつ",
     "hash": "50df20e65716",
     "sources": [
-      "vocab-n5"
+      "vocab-n5",
+      "essentials"
     ]
   },
   {
@@ -60366,6 +61333,13 @@
     "sources": [
       "vocab-n3",
       "vocab-n2"
+    ]
+  },
+  {
+    "text": "よにん",
+    "hash": "0334228227c0",
+    "sources": [
+      "essentials"
     ]
   },
   {
@@ -60597,10 +61571,66 @@
     ]
   },
   {
+    "text": "よん",
+    "hash": "ceb4a54e2de4",
+    "sources": [
+      "essentials"
+    ]
+  },
+  {
+    "text": "よんこ",
+    "hash": "396788dcbd2c",
+    "sources": [
+      "essentials"
+    ]
+  },
+  {
+    "text": "よんさい",
+    "hash": "8ce49a810428",
+    "sources": [
+      "essentials"
+    ]
+  },
+  {
     "text": "よんどころなく",
     "hash": "83b32a9aaa85",
     "sources": [
       "vocab-n1"
+    ]
+  },
+  {
+    "text": "よんはい",
+    "hash": "9079bfaca18f",
+    "sources": [
+      "essentials"
+    ]
+  },
+  {
+    "text": "よんひき",
+    "hash": "86510bcf8691",
+    "sources": [
+      "essentials"
+    ]
+  },
+  {
+    "text": "よんぷん",
+    "hash": "cef82f0ac721",
+    "sources": [
+      "essentials"
+    ]
+  },
+  {
+    "text": "よんほん",
+    "hash": "8cdd29d57e0e",
+    "sources": [
+      "essentials"
+    ]
+  },
+  {
+    "text": "よんまい",
+    "hash": "c5cd03e8a3f1",
+    "sources": [
+      "essentials"
     ]
   },
   {
@@ -61223,7 +62253,8 @@
     "hash": "6d01d02cd792",
     "sources": [
       "vocab-n5",
-      "vocab-n2"
+      "vocab-n2",
+      "essentials"
     ]
   },
   {
@@ -61879,14 +62910,23 @@
     "text": "ろく",
     "hash": "ea67c234af27",
     "sources": [
-      "vocab-n1"
+      "vocab-n1",
+      "essentials"
     ]
   },
   {
     "text": "ろくがつ",
     "hash": "a90e3dd14be7",
     "sources": [
-      "vocab-n5"
+      "vocab-n5",
+      "essentials"
+    ]
+  },
+  {
+    "text": "ろくじ",
+    "hash": "39f340d7449a",
+    "sources": [
+      "essentials"
     ]
   },
   {
@@ -61898,6 +62938,13 @@
     ]
   },
   {
+    "text": "ろくにん",
+    "hash": "6903a8efbe2b",
+    "sources": [
+      "essentials"
+    ]
+  },
+  {
     "text": "ろくに寝ていない。",
     "hash": "8447cafb58d7",
     "sources": [
@@ -61905,10 +62952,59 @@
     ]
   },
   {
+    "text": "ろくまい",
+    "hash": "ba59da32416c",
+    "sources": [
+      "essentials"
+    ]
+  },
+  {
     "text": "ろこつ",
     "hash": "3236f5178bb5",
     "sources": [
       "vocab-n2"
+    ]
+  },
+  {
+    "text": "ろっこ",
+    "hash": "67553298538b",
+    "sources": [
+      "essentials"
+    ]
+  },
+  {
+    "text": "ろっぱい",
+    "hash": "0fff0b979b86",
+    "sources": [
+      "essentials"
+    ]
+  },
+  {
+    "text": "ろっぴき",
+    "hash": "0cf709d6d251",
+    "sources": [
+      "essentials"
+    ]
+  },
+  {
+    "text": "ろっぴゃく",
+    "hash": "0f768bb16127",
+    "sources": [
+      "essentials"
+    ]
+  },
+  {
+    "text": "ろっぷん",
+    "hash": "f80934b5c025",
+    "sources": [
+      "essentials"
+    ]
+  },
+  {
+    "text": "ろっぽん",
+    "hash": "682c7687539f",
+    "sources": [
+      "essentials"
     ]
   },
   {
@@ -62531,6 +63627,13 @@
     ]
   },
   {
+    "text": "わたしのほん",
+    "hash": "469445ddfdc4",
+    "sources": [
+      "essentials"
+    ]
+  },
+  {
     "text": "わたしの後ろに立ってください。",
     "hash": "878ca1e7c6af",
     "sources": [
@@ -62598,6 +63701,13 @@
     "hash": "0ebe4705960f",
     "sources": [
       "listening"
+    ]
+  },
+  {
+    "text": "わたしはがくせいです",
+    "hash": "15ed7e6f5756",
+    "sources": [
+      "essentials"
     ]
   },
   {
@@ -62801,6 +63911,13 @@
     "hash": "02424a209c0f",
     "sources": [
       "vocab-n4#得意"
+    ]
+  },
+  {
+    "text": "わたしもいきます",
+    "hash": "d8fe8f6e56c1",
+    "sources": [
+      "essentials"
     ]
   },
   {
