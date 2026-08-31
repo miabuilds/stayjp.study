@@ -2115,3 +2115,5 @@ const VOCAB_N3 = [
 {w:"もぐもぐ",r:"もぐもぐ",m:"(閉嘴)咀嚼",c:"副",ex:{j:"子供が何かをもぐもぐ食べている。",z:"小孩正在嘴巴閉著嚼東西。",e:"The child is munching on something."}},
 {w:"ごくごく",r:"ごくごく",m:"咕嘟咕嘟(喝)",c:"副",ex:{j:"冷たい水をごくごく飲んだ。",z:"咕嘟咕嘟地喝下冰水。",e:"I gulped down the cold water."}}
 ];
+
+try{ window.VOCAB_N3 = window.VOCAB_N3 || VOCAB_N3; }catch(e){}

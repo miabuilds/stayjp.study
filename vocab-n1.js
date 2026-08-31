@@ -2007,3 +2007,5 @@ const VOCAB_N1 = [
 {w:"喫緊",r:"きっきん",m:"當務之急",c:"他",ex:{j:"少子高齢化への対応は、もはや先送りできない喫緊の課題である。",z:"因應少子高齡化,已是不容再拖延的當務之急。",e:"Addressing the declining birthrate and aging population is a pressing issue that can no longer be postponed."}},
 {w:"焦眉の急",r:"しょうびのきゅう",m:"燃眉之急",c:"他",ex:{j:"資金繰りの改善は、この会社にとって焦眉の急となっている。",z:"改善資金週轉,對這家公司而言已是燃眉之急。",e:"Improving cash flow has become a matter of the utmost urgency for this company."}},
 ];
+
+try{ window.VOCAB_N1 = window.VOCAB_N1 || VOCAB_N1; }catch(e){}
