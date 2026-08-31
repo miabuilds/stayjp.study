@@ -65,6 +65,33 @@
   .note b{color:var(--ac)}
   footer{padding:30px 0 8px;text-align:center;color:var(--tx3);font-size:12.5px}
   ruby rt{font-size:10px;color:var(--ac2);font-weight:500}
+  /* 學法 + 測驗 */
+  .howto{background:var(--soft);border-radius:12px;padding:12px 15px;margin:14px 0 12px;font-size:13.5px;line-height:1.8}
+  .howto b{color:var(--ac)}
+  .quizbtn{width:100%;background:var(--ac);color:#fff;border:0;border-radius:14px;padding:14px;font:inherit;font-size:16px;font-weight:800;cursor:pointer;transition:background .12s}
+  .quizbtn:hover{background:var(--ac2)} .quizbtn:active{transform:scale(.99)}
+  .qbg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:900;align-items:center;justify-content:center;padding:16px}
+  .qbg.show{display:flex}
+  .qbox{background:var(--bg2);border:1px solid var(--bd);border-radius:18px;padding:22px 20px;max-width:440px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+  .qhead{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;font-size:13px;color:var(--tx3);font-weight:700}
+  .qhead .x{background:none;border:0;color:var(--tx3);font-size:20px;cursor:pointer;line-height:1}
+  .qbar{height:5px;background:var(--bg3);border-radius:4px;overflow:hidden;margin-bottom:18px}
+  .qbar i{display:block;height:100%;background:var(--ac);border-radius:4px;transition:width .3s}
+  .qq{text-align:center;margin-bottom:6px;font-size:13px;color:var(--tx2)}
+  .qform{text-align:center;font-weight:800;font-size:32px;margin-bottom:18px;font-family:var(--serif)}
+  .qopts{display:grid;gap:10px}
+  .qopt{font:inherit;font-size:18px;font-weight:700;background:var(--bg);border:1.5px solid var(--bd);border-radius:12px;padding:13px;cursor:pointer;color:var(--tx);transition:border-color .12s,transform .07s}
+  .qopt:hover{border-color:var(--ac)} .qopt:active{transform:scale(.98)}
+  .qopt.ok{border-color:var(--ok);background:color-mix(in srgb,var(--ok) 12%,transparent);color:var(--ok)}
+  .qopt.ng{border-color:var(--bad);background:color-mix(in srgb,var(--bad) 12%,transparent);color:var(--bad)}
+  .qopt:disabled{cursor:default}
+  .qnext{width:100%;margin-top:16px;background:var(--ac);color:#fff;border:0;border-radius:12px;padding:13px;font:inherit;font-size:15px;font-weight:800;cursor:pointer;display:none}
+  .qnext.show{display:block}
+  .qresult{text-align:center}
+  .qscore{font-family:var(--serif);font-size:46px;font-weight:800;color:var(--ac)}
+  .qrsub{color:var(--tx2);font-size:14px;margin:4px 0 18px}
+  .qrbtns{display:flex;gap:10px} .qrbtns button{flex:1;font:inherit;font-size:14px;font-weight:700;border-radius:12px;padding:12px;cursor:pointer;border:1px solid var(--bd);background:var(--bg2);color:var(--tx)}
+  .qrbtns .pri{background:var(--ac);color:#fff;border-color:var(--ac)}
 </style>
 </head>
 <body>
@@ -78,10 +105,19 @@
   <div class="hero">
     <h1>📚 必學基礎</h1>
     <p class="lead">每本教材第一章、卻最實用的東西:<b style="color:var(--ac)">數字與量詞、時間日期曜日、家族稱謂、疑問詞與助詞</b>。這些是開口說日文的地基——先把這裡背熟,刷題和會話都會順很多。每個詞點一下就能聽發音。</p>
+    <div class="howto">
+      <b>怎麼用最有效:</b>①先<b>點過一輪聽發音</b>,耳朵先熟 → ②蓋住假名、只看左邊念念看 → ③用下面的「<b>隨堂測驗</b>」抽考自己,錯的會自動重複出現。紅字的地方(4/7/9、變音、日期)最容易錯,多測幾次。
+    </div>
+    <button class="quizbtn" onclick="Quiz.start()">🎯 隨堂測驗 · 抽考 10 題</button>
   </div>
 
   <nav class="toc" id="toc"></nav>
   <div id="list"></div>
+
+  <!-- 測驗覆蓋層 -->
+  <div id="quizBg" class="qbg" onclick="if(event.target===this)Quiz.close()">
+    <div class="qbox" id="quizBox"></div>
+  </div>
 
   <div class="note">
     <b>紅色</b> 標的是特別容易念錯的地方:數字的 <b>4(よん/し)・7(なな/しち)・9(きゅう/く)</b>、量詞變音(<b>本 ほん→ぼん→ぽん</b>)、日期的 <b>ついたち・はつか</b>。這些不是規則能推的,直接記起來最快。
@@ -259,6 +295,97 @@ function render(){
   document.getElementById('list').innerHTML = h;
 }
 render();
+
+// ══════════ 隨堂測驗 ══════════
+// 從同一批資料出題:顯示「形」問「讀音」,干擾選項取自同組(較像真的會混淆的)。
+const Quiz = (function(){
+  const prim = y => String(y).split('/')[0].trim();
+  // 建題庫:每題 {form, ans, pool(同組讀音陣列)}
+  function buildPool(){
+    const groups = [];
+    const push = (rows, mapForm, mapYomi) => {
+      const g = rows.map(r=>({form:mapForm(r), ans:prim(mapYomi(r))})).filter(x=>x.form && x.ans && x.form!==x.ans);
+      if(g.length>=2) groups.push(g);
+    };
+    push(NUM.filter(r=>!/[／\/]/.test(r[0])&&/[0-9]/.test(r[0])), r=>r[0], r=>r[1]);
+    push(JI, r=>r[0], r=>r[1]); push(FUN, r=>r[0], r=>r[1]);
+    push(GATSU, r=>r[0], r=>r[1]); push(NICHI, r=>r[0], r=>r[1]);
+    push(YOUBI, r=>r[0], r=>r[1]);
+    COUNTERS.forEach(c=>push(c.rows, r=>r[0], r=>r[1]));
+    push(KAZOKU, k=>k[0], k=>k[1]);   // 自家
+    push(KAZOKU, k=>k[2], k=>k[3]);   // 他家
+    return groups;
+  }
+  const GROUPS = buildPool();
+  let queue=[], qi=0, score=0, wrongs=[], picked=null;
+
+  function pick(n){
+    // 每組隨機抽幾題,湊 n 題
+    const flat=[];
+    GROUPS.forEach(g=>{ const s=[...g].sort(()=>Math.random()-.5).slice(0,3); s.forEach(item=>flat.push({item,group:g})); });
+    return flat.sort(()=>Math.random()-.5).slice(0,n);
+  }
+  function start(){
+    queue=pick(10); qi=0; score=0; wrongs=[];
+    document.getElementById('quizBg').classList.add('show');
+    renderQ();
+  }
+  function close(){ document.getElementById('quizBg').classList.remove('show'); try{if(_audio)_audio.pause();}catch(e){} }
+  function renderQ(){
+    const q=queue[qi]; picked=null;
+    const {item,group}=q;
+    // 4 選項:正解 + 同組 3 個不重複干擾
+    const opts=[item.ans];
+    const dpool=[...new Set(group.map(x=>x.ans).filter(a=>a!==item.ans))].sort(()=>Math.random()-.5);
+    for(const d of dpool){ if(opts.length>=4) break; opts.push(d); }
+    while(opts.length<4){ opts.push('？'+opts.length); }
+    opts.sort(()=>Math.random()-.5);
+    const box=document.getElementById('quizBox');
+    box.innerHTML = `
+      <div class="qhead"><span>第 ${qi+1} / ${queue.length} 題　分數 ${score}</span><button class="x" onclick="Quiz.close()">✕</button></div>
+      <div class="qbar"><i style="width:${qi/queue.length*100}%"></i></div>
+      <div class="qq">這個怎麼念?(念念看再選)</div>
+      <div class="qform">${esc(item.form)}</div>
+      <div class="qopts">${opts.map(o=>`<button class="qopt" onclick="Quiz.answer(this,'${esc(o)}')">${esc(o)}</button>`).join('')}</div>
+      <button class="qnext" id="qnext" onclick="Quiz.next()">${qi+1>=queue.length?'看結果 →':'下一題 →'}</button>`;
+  }
+  function answer(btn, val){
+    if(picked!==null) return;
+    const q=queue[qi]; picked=val;
+    const correct=q.item.ans;
+    speak(correct);   // 聽正確發音
+    document.querySelectorAll('.qopt').forEach(b=>{
+      b.disabled=true;
+      if(b.textContent===correct) b.classList.add('ok');
+      else if(b===btn) b.classList.add('ng');
+    });
+    if(val===correct) score++;
+    else wrongs.push(q);
+    document.getElementById('qnext').classList.add('show');
+  }
+  function next(){
+    qi++;
+    if(qi>=queue.length){ result(); return; }
+    renderQ();
+  }
+  function result(){
+    // 錯題再考一輪
+    const box=document.getElementById('quizBox');
+    const pct=Math.round(score/queue.length*100);
+    const msg = pct>=90?'太強了!這些你很熟 🎉' : pct>=60?'不錯,錯的再看一下就更穩' : '多測幾次,紅字的地方特別練';
+    box.innerHTML=`<div class="qresult">
+      <div class="qscore">${score}/${queue.length}</div>
+      <div class="qrsub">${msg}</div>
+      <div class="qrbtns">
+        ${wrongs.length?`<button onclick="Quiz.retryWrong()">只重考錯的 (${wrongs.length})</button>`:''}
+        <button class="pri" onclick="Quiz.start()">再抽 10 題</button>
+      </div>
+      <button style="margin-top:12px;background:none;border:0;color:var(--tx3);font:inherit;font-size:13px;cursor:pointer" onclick="Quiz.close()">關閉</button>
+    </div>`;
+  }
+  function retryWrong(){ queue=[...wrongs].sort(()=>Math.random()-.5); qi=0; score=0; wrongs=[]; renderQ(); }
+  return { start, close, answer, next, retryWrong };
+})();
 </script>
 <script src="font-scale.js"></script>
 </body>

@@ -225,6 +225,7 @@
 </div>
 
 <script src="jlpt-questions.js"></script>
+<script src="jlpt-q-trans.js"></script>
 <script src="jlpt-questions-gen.js"></script>
 <script src="audio/tts/manifest.js" async></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
@@ -550,8 +551,10 @@ function answer(el, ok){
   // 詳解(題庫內含 <b> 標記,自行控管內容安全);聴解附上音檔原文
   document.getElementById('xp').classList.toggle('good', ok);   // 答對綠底、答錯橘底(固定橘會讓答對的人以為錯了)
   const _rep = window.stayjpReportHref ? window.stayjpReportHref('刷題 '+(q.id||''), q.id||'', '題目 ID：'+(q.id||'')+'\n題幹：'+((q.q||q.at||'').slice(0,80))+'\n正解：'+esc(q.o[q.a]||'')) : '';
+  const _tr = (window.JLPT_Q_TRANS && JLPT_Q_TRANS[q.id]) ? JLPT_Q_TRANS[q.id] : '';
   document.getElementById('xp').innerHTML =
     (q.au ? '<div style="margin-bottom:8px;padding-bottom:8px;border-bottom:1px dashed var(--bd)"><b>スクリプト:</b>'+esc(q.au)+'</div>' : '') + q.x
+    + (_tr ? '<div style="margin-top:10px;padding-top:9px;border-top:1px dashed var(--bd);color:var(--tx2);font-size:13.5px;line-height:1.75"><b style="color:var(--ac)">整句翻譯</b>　'+esc(_tr)+'</div>' : '')
     + (_rep ? '<a href="'+_rep+'" target="_blank" rel="noopener" style="display:block;text-align:right;margin-top:10px;font-size:12px;color:var(--tx3);text-decoration:none">🚩 '+enOr('這題有誤?回報','Report this question')+'</a>' : '');
   document.getElementById('explain').style.display='block';
   document.getElementById('nextBtn').style.display='block';
