@@ -216,7 +216,7 @@ const Calendar = (() => {
           <div style="font-size:19px;font-weight:800;margin:8px 0 4px">${_e('今天先背 10 個字就好','Just learn 10 words today')}</div>
           <div style="font-size:13px;color:var(--tx2,#888);margin-bottom:14px">${_e('明天它們會自動回來考你——這就是背得起來的原因。','They will come back to test you tomorrow — that is how they stick.')}</div>
           <button style="font:inherit;background:var(--ac,#d4654a);color:#fff;border:0;border-radius:12px;padding:12px 26px;font-weight:700;font-size:15px;cursor:pointer"
-            onclick="try{var el=document.querySelector('.gcard,.vcard,.card-item');el&&el.scrollIntoView({block:'center',behavior:'smooth'});}catch(e){}">${_e('開始今天的 10 個 →','Start today\'s 10 →')}</button>
+            onclick="try{FlashCard.beginToday();}catch(e){alert('${_e('載入中,請稍候再試','Loading, please try again')}');}">${_e('開始今天的 10 個 →','Start today\'s 10 →')}</button>
         </div>`;
       })();
       return _d1;
