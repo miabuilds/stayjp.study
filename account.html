@@ -223,16 +223,12 @@ a:hover{text-decoration:underline}
  <div class="txn-list" id="txnList">載入中…</div>
  </div>
 
- <!-- 早鳥剩餘名額 -->
+ <!-- 價格調整預告(早鳥 2026-08-27 已收官) -->
  <div class="card">
- <h2> 早鳥優惠</h2>
- <div class="status-row">
- <span class="lbl">剩餘名額</span>
- <span class="val" id="earlyBirdCount">— / 100</span>
- </div>
+ <h2>⏰ 價格調整預告</h2>
  <p style="font-size:13px;color:var(--tx2);margin-top:14px">
- 前 100 訂戶限定:NT$990 / 年,自動續扣,<strong>續訂維持此價(標準年費 NT$1,490)</strong>。
- 滿額後新訂戶就是 NT$1,490 / 年。
+ 年費將於 9/7(一)調漲。9/7 前訂閱 NT$1,490,往後每年續扣都鎖這個價。
+ 已訂閱的用戶(含早鳥)完全不受影響,續扣永遠維持你當初的價格。
  </p>
  <div class="actions">
  <a href="pricing.html" class="btn primary">查看方案</a>
@@ -971,18 +967,8 @@ function loadTransactions() {
  });
 }
 
-// ── early bird counter (public read) ──
-async function loadEarlyBird() {
- try {
- const doc = await db.collection('counters').doc('early_bird').get();
- const used = doc.exists ? (doc.data().count || 0) : 0;
- const limit = doc.exists ? (doc.data().limit || 100) : 100;
- const left = Math.max(0, Math.min(limit, limit - used));   // 防 count 異常(負數/超量)導致顯示爆掉
- document.getElementById('earlyBirdCount').textContent = `${left} / ${limit}`;
- } catch (e) {
- document.getElementById('earlyBirdCount').textContent = '100 / 100';
- }
-}
+// ── early bird counter:2026-08-27 收官,卡片改為價格調整預告,不再讀名額 ──
+async function loadEarlyBird() {}
 </script>
 
 <script src="counter.js"></script>

@@ -167,17 +167,27 @@
       var img = photo ? '<img src="' + photo + '" alt="" onerror="this.style.display=\'none\'">' : '';
       var ADMIN = ['stayjpplan@gmail.com', 'abc83327@gmail.com'];
       var adminLink = ADMIN.indexOf((user.email || '').toLowerCase()) > -1 ? '<a class="ahx-item" href="admin-dash.html"><span class="ahx-ic">🛠</span>管理後台</a>' : '';
-      // 白名單(free_users)視同 Premium:不顯示升級鈕。結果快取在 localStorage(同步可讀),登入時背景刷新
+      // 白名單(free_users)/有效訂閱 視同 Premium:不顯示升級鈕。結果快取在 localStorage(同步可讀),登入時背景刷新。
+      // ⚠️ 這裡不能呼叫 isPremium()——那是 tool-quota.js IIFE 內部的函式,此檔拿不到(2026-08 曾因此
+      // ReferenceError 讓所有「非白名單登入用戶」整個 header 渲染失敗、App 內 RC_LOGIN 也被擋)。
       var _wl = false; try { _wl = localStorage.getItem('ahx_wl_' + user.uid) === '1'; } catch (e) {}
+      var _prem = false; try { _prem = localStorage.getItem('ahx_prem_' + user.uid) === '1'; } catch (e) {}
       try {
         if (typeof firebase !== 'undefined' && firebase.firestore) {
           firebase.firestore().doc('free_users/' + user.uid).get().then(function (s) {
             try { localStorage.setItem('ahx_wl_' + user.uid, s.exists ? '1' : '0'); } catch (e2) {}
             if (s.exists) { var el = document.getElementById('ahxUpLink'); if (el) el.style.display = 'none'; }
           }).catch(function () {});
+          firebase.firestore().doc('users/' + user.uid).get().then(function (s) {
+            var sub = (s.data() || {}).subscription || null;
+            var ok = !!sub && (sub.status === 'active' || sub.status === 'trialing' || sub.status === 'cancelled')
+              && Number(sub.expiresAt || 0) > Date.now();
+            try { localStorage.setItem('ahx_prem_' + user.uid, ok ? '1' : '0'); } catch (e2) {}
+            if (ok) { var el = document.getElementById('ahxUpLink'); if (el) el.style.display = 'none'; }
+          }).catch(function () {});
         }
       } catch (e) {}
-      var upLink = (!_wl && !isPremium() && !(window.STAYJP_NATIVE && window.STAYJP_NATIVE.isNativeApp))
+      var upLink = (!_wl && !_prem && !(window.STAYJP_NATIVE && window.STAYJP_NATIVE.isNativeApp))
         ? '<a id="ahxUpLink" href="pricing.html" style="font-size:12px;font-weight:700;color:var(--ac,#d4654a);text-decoration:none;margin-right:8px;border:1px solid var(--ac,#d4654a);border-radius:20px;padding:4px 10px;white-space:nowrap">' + (function(){ try{ var l=localStorage.getItem('ui_lang')||'zh-TW'; return l==='en'?'Upgrade':(l==='zh-CN'?'升级':'升級'); }catch(e){ return '升級'; } })() + '</a>' : '';
       area.innerHTML = upLink +
         '<button class="ahx-btn" id="ahxMenuBtn" type="button">' + img + '<span class="ahx-name">' + name + '</span> ▾</button>' +
