@@ -1,7 +1,7 @@
 # 2026-09 調價日 Runbook（漲價當天照這份做）
 
 > 決策（2026-08-23 拍板，**2026-08-31 更新**）：**舊用戶全部凍漲，只有新購走新價**。
-> 新價：月訂 150→**299（三平台一致，2026-08-31 已提前執行，見下方狀態）**、
+> 新價：月訂 150→**290（Apple 價格點無 299 → 取 290 三平台一致；2026-08-31 已執行完畢：網頁 live、iOS 排 9/1 生效並保留舊訂戶、Play 待上架日）**、
 > 年費 1,490→**官網 1,790 / App Store・Play 1,990**（官網便宜 200＝把 Apple 抽成差還給用戶，
 > Apple 政策 OK——但 **app 內任何地方不得出現官網價/導購文字**，含 WebView）、
 > 買斷 2,990→**4,990（三平台一致）**。早鳥 990 已於 8/27 12:00 JST 收官。
@@ -16,7 +16,7 @@
   （舊 runbook 寫先後端——那是護欄加上前的順序，已失效。反過來會把所有購買擋死）
 - **早鳥殘留清理**：index 早鳥卡→年費調漲卡、account 早鳥名額卡→調價預告卡、PayPal 早鳥按鈕/手動連結移除
   （收官後留著=海外用戶會付錢買不到東西）
-- **PayPal 新增標準年費 US$48**（早鳥下架後海外只剩買斷可買的缺口）；9/7 要改 58
+- ~~PayPal 年費~~ → **PayPal 已於 8/31 全面下架**（Mia 決定：使用量極低，海外導 App 內購買）。前端入口全移除（ppManual/ppAuto/SDK/goPayPal），後端 functions 保留供既有買家退費/對帳；9/7 不用動任何 PayPal 的東西
 - **年費 9/7 調漲倒數文案**：pricing/index/account/tool-quota 試用橫幅/trial-email，ui-map EN 全數同步
 - 已驗收：tsc/build ✓、ui-map 語法 ✓、pricing/index 本機截圖 ✓、PLAN_TERMS eval=299/1490 ✓、退費用實付基準 ✓
 
@@ -81,10 +81,7 @@ git add -A && git commit && git push   # 前端(GitHub Pages)
 monthly  299(8/31 已改,不動)
 yearly   price_twd: 1490 → 1790   ← 官網價(商店 1,990 在 ASC/Play 各自設,互不相干)
 lifetime price_twd: 2990 → 4990
-PAYPAL_PRICES_USD:
-     yearly: 48 → 58    (≈1790/31)
-     lifetime: 96 → 159 (≈4990/31.3)
-     yearly_early_bird: 32 留著不動(收官,後端已擋新購)
+PAYPAL_PRICES_USD: 不用動——PayPal 已下架,前端無入口(表只剩退費對帳用)
 ```
 ⚠️ **部署順序（2026-08-31 起,因 expected_twd 護欄,與舊版相反）：先 push 前端 Pages、
 curl 確認上線、再 deploy functions。** 中間短暫「顯示新價、實扣舊價」（少收無害）；
