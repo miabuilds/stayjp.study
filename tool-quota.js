@@ -29,6 +29,48 @@
     quiz: '單字測驗', reading: '讀解', listening: '聽力', story: '今日故事',
   };
 
+  // ── 免費制世代切換(2026-09 調價配套):每日配額 → 總次數包 ──
+  // config/quota(Firestore,公開唯讀,同 config/ai 模式)決定是否啟用;
+  // 預設(文件不存在 / packStartMs=0)= 全員走原每日制,行為零改變。
+  //   packStartMs : ms epoch。>0 才啟用;「此時間之後註冊」的帳號走總次數包。
+  //   packTotal   : 免費總次數(所有工具共用一包,用完即止,不每日重置)。預設 30。
+  //   packAnon    : 未登入訪客是否也走總次數包(預設 true;設 false 訪客維持每日制)。
+  // ⚠️ 舊用戶(packStartMs 之前註冊的帳號)永遠走原每日制,完全不受影響。
+  const QUOTA_CFG_DEFAULTS = { packStartMs: 0, packTotal: 30, packAnon: true };
+  let quotaCfg = QUOTA_CFG_DEFAULTS;
+  try {
+    const _qc = JSON.parse(localStorage.getItem('quota_cfg_cache') || 'null');
+    if (_qc && _qc.v) quotaCfg = Object.assign({}, QUOTA_CFG_DEFAULTS, _qc.v);
+  } catch (e) {}
+  function refreshQuotaCfg() {
+    try {
+      const cached = JSON.parse(localStorage.getItem('quota_cfg_cache') || 'null');
+      if (cached && Date.now() - cached.ts < 600000) return;   // 10 分鐘快取,同 eb_left_cache
+    } catch (e) {}
+    if (typeof firebase === 'undefined' || !firebase.firestore) return;
+    firebase.firestore().doc('config/quota').get().then(snap => {
+      const v = (snap.exists ? snap.data() : null) || {};
+      quotaCfg = Object.assign({}, QUOTA_CFG_DEFAULTS, v);
+      try { localStorage.setItem('quota_cfg_cache', JSON.stringify({ v, ts: Date.now() })); } catch (e) {}
+      refreshBadge();
+    }).catch(() => {});
+  }
+  let cachedUserCreatedMs = null;   // Firebase Auth metadata.creationTime(登入時設;判斷新舊世代用)
+  function usesPack() {
+    const startMs = Number(quotaCfg.packStartMs || 0);
+    if (!(startMs > 0)) return false;                    // 未啟用 → 全員舊制
+    if (cachedUserEmail) return cachedUserCreatedMs != null && cachedUserCreatedMs >= startMs;
+    return quotaCfg.packAnon !== false;                  // 未登入訪客
+  }
+  function packTotal() { return Math.max(0, Number(quotaCfg.packTotal || 0)); }
+  function packUsed() {
+    let n = 0;
+    try { n = parseInt(localStorage.getItem('tool_pack_used') || '0', 10) || 0; } catch (e) {}
+    return n;
+  }
+  function packLeft() { return Math.max(0, packTotal() - packUsed()); }
+  function uiLang() { try { return localStorage.getItem('ui_lang') || 'zh-TW'; } catch (e) { return 'zh-TW'; } }
+
   function dateKey() {
     const d = new Date();
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
@@ -99,6 +141,7 @@
       return localStorage.getItem('mock_completed_' + tool.replace('mock_exam_', '')) !== '1';
     }
     if (!tool) tool = 'misc';
+    if (usesPack()) return packLeft() > 0;   // 總次數包世代:一包共用,有剩即可用任何工具
     const c = loadCount();
     if ((c[tool] || 0) >= PER_TOOL_LIMIT) return false;              // 同工具今天已試過
     // 全站每日上限:已試滿 GLOBAL_DAILY_LIMIT 個「不同工具」就不再開放新工具。
@@ -114,6 +157,13 @@
     if (!shouldGate()) return;
     if (tool && tool.startsWith('mock_exam_')) return; // 模考另記
     if (!tool) tool = 'misc';
+    if (usesPack()) {
+      try { localStorage.setItem('tool_pack_used', String(packUsed() + 1)); } catch (e) {}
+      refreshBadge();
+      consumeToast(tool);
+      try { if (typeof window.doRender === 'function') window.doRender(); } catch (e) {}
+      return;
+    }
     const c = loadCount();
     c[tool] = (c[tool] || 0) + 1;
     saveCount(c);
@@ -193,11 +243,20 @@
     const name = TOOL_NAMES[tool] || '這個工具';
     // 區分:此工具已試過 vs 今天免費試用工具數已達全站上限(挡到沒試過的新工具)
     const usedThis = !isMock && tool && (loadCount()[tool] || 0) >= PER_TOOL_LIMIT;
+    // 總次數包世代:文案帶動態數字(packTotal 可遠端調),exact-match 翻譯層吃不到 → 手動三語
+    const packMsg = (function () {
+      const l = uiLang(), n = packTotal();
+      return l === 'en' ? `You've used all <strong>${n} free practice credits</strong>.`
+        : l === 'zh-CN' ? `免费体验共 <strong>${n} 次练习</strong>，你的次数已全部用完。`
+          : `免費體驗共 <strong>${n} 次練習</strong>，你的次數已全部用完。`;
+    })();
     const msg = isMock
       ? `免費版每等級可試 1 套模考，你已完成過 <strong>${tool.replace('mock_exam_','').toUpperCase()}</strong>。`
-      : usedThis
-        ? `免費版每個工具每天可免費試 1 次，<strong>「${name}」今天已經試過了</strong>。`
-        : `免費版每天可免費試用 <strong>${GLOBAL_DAILY_LIMIT} 個練習工具</strong>，今天的次數已用完。`;
+      : usesPack()
+        ? packMsg
+        : usedThis
+          ? `免費版每個工具每天可免費試 1 次，<strong>「${name}」今天已經試過了</strong>。`
+          : `免費版每天可免費試用 <strong>${GLOBAL_DAILY_LIMIT} 個練習工具</strong>，今天的次數已用完。`;
     // 分流:額度用完的當下是轉換率最高的時刻,依狀態給不同的下一步
     //   App 內      → 維持原生 paywall(不提台幣價,Apple 定價/審核不同)
     //   網頁+未登入  → 主推「登入送 3 天全功能試用」(還沒體驗過完整價值,先給試用比直接要錢轉換高)
@@ -301,7 +360,11 @@
       const bar = document.createElement('div');
       bar.id = 'trialExpBar';
       bar.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:400;background:#B45309;color:#fff;font-size:13px;padding:9px 40px 9px 14px;text-align:center;line-height:1.5';
-      bar.innerHTML = '⏳ 試用明天到期——早鳥年費 NT$990 只到 8/27 中午'
+      // 8/27 12:00 JST 早鳥收官後,橫幅不能再賣 990(買不到了)→ 自動換一般文案
+      const ebStillOn = Date.now() < Date.UTC(2026, 7, 27, 3, 0, 0);
+      bar.innerHTML = (ebStillOn
+          ? '⏳ 試用明天到期——早鳥年費 NT$990 只到 8/27 中午'
+          : '⏳ 試用明天到期——年費 9/7 起調漲，現在訂閱鎖 NT$1,490')
         + ' <a href="pricing.html" style="color:#FDE68A;font-weight:700;text-decoration:underline">看方案 →</a>'
         + '<button onclick="this.parentElement.remove()" style="position:absolute;right:8px;top:6px;background:none;border:0;color:#fff;font-size:16px;cursor:pointer;padding:4px">✕</button>';
       document.body.appendChild(bar);
@@ -343,6 +406,18 @@
       if (typeof cvtStaticUI === 'function') cvtStaticUI(badge);
       return;
     }
+    if (usesPack()) {
+      // 總次數包世代:數字動態(遠端可調)→ 手動三語,不走翻譯層
+      const l = uiLang(), left = packLeft(), total = packTotal();
+      const t1 = l === 'en' ? 'Free credits' : (l === 'zh-CN' ? '免费体验次数' : '免費體驗次數');
+      const t2 = l === 'en' ? `${left} / ${total} left` : (l === 'zh-CN' ? `还剩 ${left} / ${total} 次` : `還剩 ${left} / ${total} 次`);
+      badge.title = l === 'en' ? 'Free credits. Tap to see plans.' : '免費體驗次數。點擊查看訂閱方案。';
+      badge.innerHTML = `
+        <div style="font-weight:700;margin-bottom:2px">${t1}</div>
+        <div style="color:${left <= 5 ? '#F59E0B' : '#fff'}">${t2}</div>
+      `;
+      return;
+    }
     const c = loadCount();
     const usedTools = Object.keys(TOOL_NAMES).filter(t => (c[t] || 0) >= PER_TOOL_LIMIT);
     badge.innerHTML = `
@@ -363,8 +438,13 @@
     firebase.auth().onAuthStateChanged(user => {
       authReady = true;
       cachedTrialStart = null; trialWriteDone = false; trialResolved = false;   // 換帳號/登出 → 重置試用狀態,重新依該 user 的 doc 評估
+      cachedUserCreatedMs = null;
       if (!user) { cachedUserEmail = null; cachedSub = null; cachedFreeAccess = false; subLoaded = true; refreshBadge(); rerenderTools(); return; }
       cachedUserEmail = user.email || null;
+      // 註冊時間(判斷免費制世代:packStartMs 之後註冊 → 總次數包;之前 → 原每日制)
+      try {
+        if (user.metadata && user.metadata.creationTime) cachedUserCreatedMs = Date.parse(user.metadata.creationTime) || null;
+      } catch (e) {}
       subLoaded = false;   // 換 user → 重新等這個 user 的訂閱載入
       // 兜底:萬一訂閱 onSnapshot 一直沒回(極端),8 秒後恢復 gating,避免免費登入用戶逃逸
       setTimeout(() => { if (!subLoaded) { subLoaded = true; refreshBadge(); rerenderTools(); } }, 8000);
@@ -442,11 +522,17 @@
       const usedCount = Object.keys(TOOL_NAMES).filter(k => (c[k] || 0) >= PER_TOOL_LIMIT).length;
       const leftTools = Math.max(0, GLOBAL_DAILY_LIMIT - usedCount);
       const name = TOOL_NAMES[tool] || tool;
-      const msg = lang === 'en'
-        ? `Free trial used: ${name} · ${leftTools} more tool${leftTools === 1 ? '' : 's'} today`
-        : (lang === 'zh-CN'
-          ? `已使用今日免费额度:${name} · 今天还可试 ${leftTools} 个工具`
-          : `已使用今日免費額度:${name}・今天還可試 ${leftTools} 個工具`);
+      const msg = usesPack()
+        ? (lang === 'en'
+          ? `Free credit used: ${name} · ${packLeft()} left`
+          : (lang === 'zh-CN'
+            ? `已使用免费体验次数:${name} · 还剩 ${packLeft()} 次`
+            : `已使用免費體驗次數:${name}・還剩 ${packLeft()} 次`))
+        : lang === 'en'
+          ? `Free trial used: ${name} · ${leftTools} more tool${leftTools === 1 ? '' : 's'} today`
+          : (lang === 'zh-CN'
+            ? `已使用今日免费额度:${name} · 今天还可试 ${leftTools} 个工具`
+            : `已使用今日免費額度:${name}・今天還可試 ${leftTools} 個工具`);
       let el = document.getElementById('tqToast');
       if (!el) {
         el = document.createElement('div');
@@ -572,6 +658,10 @@
   // 整排工具按鈕「下方一行」的低調升級提示：gating 中 + 今天有任一工具已用完才出現,否則回空字串。
   function upsellLine() {
     if (!shouldGate()) return '';
+    if (usesPack()) {
+      if (packLeft() > 0) return '';
+      return `<a href="pricing.html" class="quota-upsell-line">🔒 免費體驗次數用完了 · 升級無限使用 ↗</a>`;
+    }
     const c = loadCount();
     const anyUsed = Object.keys(TOOL_NAMES).some(t => (c[t] || 0) >= PER_TOOL_LIMIT);
     if (!anyUsed) return '';
@@ -595,10 +685,14 @@
       ['n5','n4','n3','n2','n1'].forEach(lv => localStorage.removeItem('mock_completed_' + lv));
       refreshBadge();
     },
+    // 總次數包(新世代免費制)測試/檢視用
+    _pack: () => ({ enabled: usesPack(), cfg: quotaCfg, used: packUsed(), left: packLeft(), createdMs: cachedUserCreatedMs }),
+    _resetPack: () => { localStorage.removeItem('tool_pack_used'); localStorage.removeItem('quota_cfg_cache'); refreshQuotaCfg(); refreshBadge(); },
   };
 
   function init() {
     watchSubscription();
+    refreshQuotaCfg();
     setTimeout(applyGating, 100);
     setTimeout(applyGating, 1000);
     setTimeout(refreshBadge, 200);

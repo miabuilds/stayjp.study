@@ -1,5 +1,9 @@
 // Stay-jp-notes 訂閱方案配置
-// 改價要同時改:pricing.html / home.html / stayjp-app/src/lib/subscription.ts
+// 改價要同時改:pricing.html(方案卡+PLAN_TERMS+meta) / index.html(方案卡+JSON-LD) /
+//   ui-map.js(改過的中文句要同步英文 key) / trial-email-cron.ts / stayjp-app/src/lib/subscription.ts
+//   / App Store Connect + Play Console(商店價各自獨立,要手動改)
+// 前端會把「頁面顯示的金額」以 expected_twd 送進 createPayment 核對,不一致會擋單
+// (防 service worker 舊快取頁顯示舊價、實扣新價)→ 改價要「先推 Pages、確認上線、再 deploy functions」
 
 import { defineSecret } from "firebase-functions/params";
 
@@ -34,7 +38,7 @@ export const PLANS: Record<PlanKey, {
   display_name: string;
 }> = {
   monthly: {
-    price_twd: 150,
+    price_twd: 299,   // 2026-08-31 調漲(原 150;既有月訂戶綠界照舊授權金額續扣,自動凍漲)
     period_days: 30,
     ecpay_period_type: "M",
     ecpay_frequency: 1,
@@ -94,9 +98,12 @@ export function paypalApiBase() {
     : "https://api-m.sandbox.paypal.com";
 }
 
-// PayPal 只開放「海外一次性方案」:早鳥年費 / 買斷(月費 / 標準年費走綠界定期定額)。
+// PayPal 只開放「海外一次性方案」:標準年費 / 買斷(月費走綠界定期定額;早鳥 2026-08-27 收官,
+// create-order 有 closed 閘門擋新購,此表保留 32 僅供對帳參考)。
 // 金額用 USD(PayPal 不直接收 TWD);對帳 ledger 仍記 TWD 標價(PLANS.price_twd)。
+// PayPal 是一次性付款不自動續訂 → 不在「續扣鎖價」承諾範圍;調價日(9/7)yearly 要同步改 ~58。
 export const PAYPAL_PRICES_USD: Partial<Record<PlanKey, number>> = {
+  yearly: 48,                // ≈ NT$1,490
   yearly_early_bird: 32,
   lifetime: 96,
 };

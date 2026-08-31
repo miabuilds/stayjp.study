@@ -26,7 +26,7 @@ const SITE = "https://stayjp.study";
 function buildHtml(name: string, ebLeft: number | null): { subject: string; html: string } {
   const ebLine = ebLeft && ebLeft > 0
     ? `<p style="margin:0 0 16px"><strong style="color:#B8362A">早鳥年費 NT$990/年</strong>(月均 82 元,限量 100 名,目前只剩 <strong>${ebLeft}</strong> 名)<br>續訂永遠鎖這個價,之後恢復標準價 NT$1,490。</p>`
-    : `<p style="margin:0 0 16px"><strong style="color:#B8362A">年費 NT$1,490/年</strong>(月均 124 元),整個備考週期完整覆蓋。</p>`;
+    : `<p style="margin:0 0 16px"><strong style="color:#B8362A">年費 NT$1,490/年</strong>(月均 124 元),整個備考週期完整覆蓋。<br>⏰ <strong>9/7 起調漲</strong>——現在訂閱,往後每年續扣都鎖 NT$1,490。</p>`;
   return {
     subject: "你的全功能試用,明天就到期了",
     html: `

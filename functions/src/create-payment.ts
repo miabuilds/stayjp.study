@@ -47,6 +47,17 @@ export const createPayment = functions.onRequest(
       const plan = (req.body?.plan || "") as PlanKey;
       if (!PLANS[plan]) { res.status(400).json({ error: "invalid_plan", plan }); return; }
 
+      // ── 2.5 核對前端顯示的金額(防 service worker 舊快取頁:畫面寫舊價、實際扣新價,
+      //        違反消保法「下單前明示金額」。前端從 PLAN_TERMS 帶 expected_twd,不一致就擋)──
+      const expectedTwd = Number(req.body?.expected_twd);
+      if (!Number.isFinite(expectedTwd) || expectedTwd !== PLANS[plan].price_twd) {
+        res.status(409).json({
+          error: "price_mismatch",
+          reason: "方案價格已更新,請重新整理頁面後再訂閱(未扣款)。",
+        });
+        return;
+      }
+
       const check = await precheckSubscribe(uid, email);
       if (!check.ok) { res.status(403).json({ error: "precheck_failed", reason: check.reason }); return; }
       if (!check.allowed_plans?.includes(plan)) {
