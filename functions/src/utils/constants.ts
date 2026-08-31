@@ -38,7 +38,7 @@ export const PLANS: Record<PlanKey, {
   display_name: string;
 }> = {
   monthly: {
-    price_twd: 299,   // 2026-08-31 調漲(原 150;既有月訂戶綠界照舊授權金額續扣,自動凍漲)
+    price_twd: 290,   // 2026-08-31 調漲(原 150;取 Apple 有的價格點 290 三平台對齊;既有月訂戶綠界照舊授權金額續扣,自動凍漲)
     period_days: 30,
     ecpay_period_type: "M",
     ecpay_frequency: 1,
@@ -98,8 +98,8 @@ export function paypalApiBase() {
     : "https://api-m.sandbox.paypal.com";
 }
 
-// PayPal 只開放「海外一次性方案」:標準年費 / 買斷(月費走綠界定期定額;早鳥 2026-08-27 收官,
-// create-order 有 closed 閘門擋新購,此表保留 32 僅供對帳參考)。
+// ⚠️ PayPal 已於 2026-08-31 全面下架(使用量極低,海外導 App 內購買)。前端入口已移除;
+// 後端 functions 保留只為既有 PayPal 買家的退費/對帳,此表僅供 paypal-refund 對帳參考。
 // 金額用 USD(PayPal 不直接收 TWD);對帳 ledger 仍記 TWD 標價(PLANS.price_twd)。
 // PayPal 是一次性付款不自動續訂 → 不在「續扣鎖價」承諾範圍;調價日(9/7)yearly 要同步改 ~58。
 export const PAYPAL_PRICES_USD: Partial<Record<PlanKey, number>> = {
