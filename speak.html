@@ -67,7 +67,7 @@
 
 <div id="app" class="wrap" style="display:none">
   <div style="margin-bottom:8px"><a href="#" class="backbtn" onclick="if(history.length>1){history.back()}else{location.href='app.html'};return false"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>返回</a></div>
-  <h1>🎙 口說練習 <span class="muted" style="font-weight:400">Beta</span></h1>
+  <h1>口說練習 <span class="muted" style="font-weight:400">Beta</span></h1>
   <div class="sub">選句子 → 聽範例 → 念一次(或直接打字)→ 送出,看 AI 回饋。　免費體驗 10 次 AI 評分,Premium 每天 30 次。想練「來回對話」試試 <a href="speak-chat.html" style="color:var(--accent);font-weight:600">🗣 情境對話</a>。</div>
 
   <div class="today" id="todayCard" style="display:none">
@@ -127,7 +127,7 @@ if(I18n.getLang()==='zh-CN') ensureOpenCC();
   if(L==='en'){
     document.title = 'AI Speaking Practice | StayJP';
     var back=document.querySelector('#app a[href="#"]'); if(back) back.textContent='‹ Back';
-    var h1=document.querySelector('#app h1'); if(h1) h1.innerHTML='🎙 Speaking Practice <span class="muted" style="font-weight:400">Beta</span>';
+    var h1=document.querySelector('#app h1'); if(h1) h1.innerHTML='Speaking Practice <span class="muted" style="font-weight:400">Beta</span>';
     var sub=document.querySelector('#app .sub'); if(sub) sub.innerHTML='Pick a sentence → listen to the example → say it once (or type it) → submit for AI feedback. Free trial: 10 AI reviews, Premium: 30 per day. Want back-and-forth conversation? Try <a href="speak-chat.html" style="color:var(--accent);font-weight:600">🗣 Scenario Chat</a>.';
     var cards=document.querySelectorAll('#app .card');
     var btns=cards[0]?cards[0].querySelectorAll('.rowbtns .btn'):[];
