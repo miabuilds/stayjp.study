@@ -251,7 +251,7 @@ function jaOr(ja_,en_){ return I18n.getLang()==='en'?en_:ja_; }
 // 題庫零成本,牆是為了轉換 → 前端 localStorage 計數即可(被清掉繞過可接受)。
 // Premium 判斷同 tool-quota.js:users/{uid}.subscription + App 原生 STAYJP_NATIVE.isPremium。
 const JD_ADMIN = ['stayjpplan@gmail.com','abc83327@gmail.com'];
-let jdPremium = false, jdAdmin = false;
+let jdPremium = false, jdAdmin = false, jdTrialStart = null;   // jdTrialStart:3 天網頁試用起始(ms)
 (function initAuth(){
   try{
     const cfg = { apiKey:"AIzaSyDnmg2XOuvwgE8m8xCF5sS4o0nQYoUplPI", authDomain:"jpnote-1bdd6.firebaseapp.com", projectId:"jpnote-1bdd6" };
@@ -273,15 +273,25 @@ let jdPremium = false, jdAdmin = false;
       };
       firebase.firestore().doc('free_users/'+u.uid).get().then(fs2=>{ _wl=fs2.exists; _sync(); }).catch(()=>{});
       firebase.firestore().doc('users/'+u.uid).get().then(s=>{
-        const sub=(s.data()||{}).subscription;
+        const d=s.data()||{};
+        const sub=d.subscription;
         _sub=!!(sub && (sub.status==='active'||sub.status==='trialing'||sub.status==='cancelled') && (sub.expiresAt||0)>Date.now());
+        // 3 天網頁試用(同 tool-quota.js):讀 trial_started_at。之前這頁漏認 → 試用者仍被當免費、每天只能刷 1 輪(用戶回報)
+        const ts=d.trial_started_at;
+        if(ts && typeof ts.toMillis==='function') jdTrialStart=ts.toMillis();
+        else if(ts && ts.seconds) jdTrialStart=ts.seconds*1000;
         _sync();
       }).catch(()=>{});
     });
   }catch(e){}
 })();
+function jdInTrial(){   // 3 天網頁全功能試用中?(App 走 Apple 試用,不套網頁 3 天)
+  if(window.STAYJP_NATIVE && window.STAYJP_NATIVE.isNativeApp) return false;
+  return jdTrialStart!=null && Date.now() < jdTrialStart + 3*86400000;
+}
 function jdUnlimited(){
   if(jdPremium || jdAdmin) return true;
+  if(jdInTrial()) return true;   // 試用期間 = 全功能無限,不擋刷題/模考
   if(window.STAYJP_NATIVE && window.STAYJP_NATIVE.isNativeApp && window.STAYJP_NATIVE.isPremium) return true;
   return false;
 }
