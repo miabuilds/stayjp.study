@@ -195,9 +195,12 @@ self.addEventListener('fetch', (e) => {
     || /\.(?:html|js|css)$/i.test(url.pathname);
 
   if (isCode) {
+    // cache:'reload' → 強制走網路、繞過瀏覽器自身的 HTTP 快取,避免抓到舊的(甚至是頁面還沒上線前的 404)版本。
+    // network-first 本來就要最新;離線時 catch 仍回 SW 快取的 fallback,不影響離線能力。
     e.respondWith(
-      fetch(e.request)
+      fetch(e.request, { cache: 'reload' })
         .then((response) => { cachePut(e.request, response); return rebuildIfRedirected(response); })
+        .catch(() => fetch(e.request).then((r) => { cachePut(e.request, r); return rebuildIfRedirected(r); }))
         .catch(() => fallback(e.request)),
     );
   } else {
