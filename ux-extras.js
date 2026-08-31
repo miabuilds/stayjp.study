@@ -157,6 +157,9 @@
         if (text[i] === '月' && /[かヶヵ]/.test(_pc)) {          // か月/ヶ月 → げつ(いっかげつ)
           out += '<ruby>月<rt>げつ</rt></ruby>'; i++; continue;
         }
+        if (text[i] === '半' && /[時分間]/.test(_pc)) {          // 時間半/一時間半/30分半 的 半 → はん(時間語境,非なかば)
+          out += '<ruby>半<rt>はん</rt></ruby>'; i++; continue;
+        }
       }
       var matched = null;
       for (var len = Math.min(12, text.length - i); len >= 1; len--) {
