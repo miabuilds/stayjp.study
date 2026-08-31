@@ -25,14 +25,17 @@
   .toc{display:flex;flex-wrap:wrap;gap:7px;margin:18px 0 6px}
   .toc a{font-size:13px;font-weight:700;text-decoration:none;color:var(--tx2);border:1px solid var(--bd);background:var(--bg2);border-radius:20px;padding:6px 13px;white-space:nowrap}
   .toc a:hover{border-color:var(--ac);color:var(--ac)}
-  /* 四大類:明顯上分隔線 + 標題底線,層次清楚不糊成一片 */
-  .cat{margin-top:18px;scroll-margin-top:14px;padding-top:30px;border-top:2px solid var(--bd)}
-  .cat:first-of-type{border-top:none;padding-top:4px}
-  .cat-h{display:flex;align-items:center;gap:11px;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--bd)}
-  .cat-ic{width:44px;height:44px;border-radius:12px;background:var(--soft);display:flex;align-items:center;justify-content:center;color:var(--ac);flex-shrink:0}
-  .cat-ic svg{width:23px;height:23px}
-  .cat-tt{font-weight:800;font-size:19px}
-  .cat-tt small{display:block;font-weight:500;font-size:12.5px;color:var(--tx3);margin-top:1px}
+  /* 四大類:同色系插畫 banner 當分隔,層次清楚又不無聊 */
+  .cat{margin-top:24px;scroll-margin-top:14px}
+  .cat-banner{display:flex;align-items:center;justify-content:space-between;gap:12px;
+    background:linear-gradient(105deg,var(--soft),transparent 78%);border:1px solid var(--bd);
+    border-radius:16px;padding:14px 6px 14px 18px;margin-bottom:14px;overflow:hidden}
+  .cb-txt{flex:1;min-width:0}
+  .cat-tt{font-weight:800;font-size:20px;font-family:var(--serif)}
+  .cat-tt small{display:block;font-family:-apple-system,"PingFang TC",sans-serif;font-weight:500;font-size:12px;color:var(--tx3);margin-top:2px;letter-spacing:.02em}
+  .cb-illus{flex-shrink:0}
+  .cb-illus svg{width:118px;height:80px;display:block}
+  @media (max-width:420px){ .cb-illus svg{width:92px;height:64px} }
   /* 子區塊標籤:左側赭紅條,一眼看出一個新群組開始 */
   .sub{font-weight:800;font-size:15px;margin:22px 0 9px;color:var(--ac);border-left:3px solid var(--ac);padding-left:9px;line-height:1.3}
   .sub small{font-weight:500;color:var(--tx3);font-size:12px;margin-left:4px}
@@ -107,9 +110,9 @@
 
   <div class="hero">
     <h1>📚 必學基礎</h1>
-    <p class="lead">每本教材第一章、卻最實用的東西:<b style="color:var(--ac)">數字與量詞、時間日期曜日、家族稱謂、疑問詞與助詞</b>。這些是開口說日文的地基——先把這裡背熟,刷題和會話都會順很多。每個詞點一下就能聽發音。</p>
+    <p class="lead">教材第一章最實用的基礎:<b style="color:var(--ac)">數字量詞、時間日期、家族、疑問詞與助詞</b>。地基打穩,刷題和會話都會順很多——每個詞點一下就能聽發音。</p>
     <div class="howto">
-      <b>怎麼用最有效:</b>①先<b>點過一輪聽發音</b>,耳朵先熟 → ②蓋住假名、只看左邊念念看 → ③用下面的「<b>隨堂測驗</b>」抽考自己,錯的會自動重複出現。紅字的地方(4/7/9、變音、日期)最容易錯,多測幾次。
+      <b>怎麼用:</b>①先點一輪聽發音 → ②蓋住假名自己念念看 → ③用下面「<b>隨堂測驗</b>」抽考。<b>紅字</b>(4/7/9、變音、日期)最容易錯。
     </div>
     <button class="quizbtn" onclick="Quiz.start()">🎯 隨堂測驗 · 抽考 10 題</button>
   </div>
@@ -258,19 +261,64 @@ const CATS = [
   { k:'qp', ic:ico('<circle cx="12" cy="12" r="9"/><path d="M9.5 9.2a2.5 2.5 0 1 1 3.6 2.3c-.9.4-1.2.9-1.2 1.8"/><circle cx="12" cy="16.8" r="0.6" fill="currentColor" stroke="none"/>'), tt:'疑問詞・基本助詞', en:'Question Words & Particles' },
 ];
 
+// ── 同色系扁平插畫(單色赭紅,主題感知;各大類 banner 用)──
+const ILLUS = {
+  // 算盤:數字與量詞
+  num: `<svg viewBox="0 0 124 84" fill="none">
+    <rect x="16" y="12" width="92" height="60" rx="9" fill="var(--soft)" stroke="var(--ac)" stroke-width="3"/>
+    <line x1="16" y1="30" x2="108" y2="30" stroke="var(--ac)" stroke-width="1.6" opacity=".35"/>
+    <line x1="16" y1="45" x2="108" y2="45" stroke="var(--ac)" stroke-width="1.6" opacity=".35"/>
+    <line x1="16" y1="60" x2="108" y2="60" stroke="var(--ac)" stroke-width="1.6" opacity=".35"/>
+    <circle cx="32" cy="30" r="6.5" fill="var(--ac)"/><circle cx="48" cy="30" r="6.5" fill="var(--ac)" opacity=".55"/><circle cx="90" cy="30" r="6.5" fill="var(--ac)" opacity=".3"/>
+    <circle cx="30" cy="45" r="6.5" fill="var(--ac)" opacity=".3"/><circle cx="72" cy="45" r="6.5" fill="var(--ac)"/><circle cx="88" cy="45" r="6.5" fill="var(--ac)" opacity=".55"/>
+    <circle cx="36" cy="60" r="6.5" fill="var(--ac)" opacity=".55"/><circle cx="52" cy="60" r="6.5" fill="var(--ac)"/><circle cx="92" cy="60" r="6.5" fill="var(--ac)" opacity=".3"/>
+  </svg>`,
+  // 時鐘+日曆:時間日期曜日
+  time: `<svg viewBox="0 0 124 84" fill="none">
+    <rect x="14" y="16" width="48" height="48" rx="8" fill="var(--soft)" stroke="var(--ac)" stroke-width="3"/>
+    <line x1="14" y1="30" x2="62" y2="30" stroke="var(--ac)" stroke-width="3"/>
+    <line x1="26" y1="12" x2="26" y2="22" stroke="var(--ac)" stroke-width="3.4" stroke-linecap="round"/>
+    <line x1="50" y1="12" x2="50" y2="22" stroke="var(--ac)" stroke-width="3.4" stroke-linecap="round"/>
+    <circle cx="30" cy="46" r="2.4" fill="var(--ac)"/><circle cx="42" cy="46" r="2.4" fill="var(--ac)" opacity=".5"/><circle cx="30" cy="56" r="2.4" fill="var(--ac)" opacity=".5"/>
+    <circle cx="86" cy="52" r="25" fill="var(--bg2)" stroke="var(--ac)" stroke-width="3.4"/>
+    <line x1="86" y1="52" x2="86" y2="37" stroke="var(--ac)" stroke-width="3.4" stroke-linecap="round"/>
+    <line x1="86" y1="52" x2="98" y2="57" stroke="var(--ac)" stroke-width="3.4" stroke-linecap="round"/>
+    <circle cx="86" cy="52" r="3" fill="var(--ac)"/>
+  </svg>`,
+  // 三個人形:家族
+  fam: `<svg viewBox="0 0 124 84" fill="none">
+    <circle cx="40" cy="30" r="12" fill="var(--ac)"/>
+    <path d="M22 72a18 18 0 0 1 36 0z" fill="var(--ac)"/>
+    <circle cx="86" cy="32" r="11" fill="var(--ac)" opacity=".55"/>
+    <path d="M70 72a16 16 0 0 1 32 0z" fill="var(--ac)" opacity=".55"/>
+    <circle cx="63" cy="48" r="8.5" fill="var(--ac)" opacity=".8"/>
+    <path d="M51 72a12 12 0 0 1 24 0z" fill="var(--ac)" opacity=".8"/>
+  </svg>`,
+  // 對話泡泡+問號:疑問詞・助詞
+  qp: `<svg viewBox="0 0 124 84" fill="none">
+    <path d="M20 14h48a11 11 0 0 1 11 11v16a11 11 0 0 1-11 11H42l-13 11 3-11a11 11 0 0 1-12-11V25a11 11 0 0 1 11-11z" fill="var(--soft)" stroke="var(--ac)" stroke-width="3"/>
+    <text x="45" y="42" font-size="26" font-weight="800" fill="var(--ac)" text-anchor="middle" font-family="serif">?</text>
+    <path d="M78 40h26a9 9 0 0 1 9 9v11a9 9 0 0 1-9 9h-4l3 10-11-10H78a9 9 0 0 1-9-9V49a9 9 0 0 1 9-9z" fill="var(--ac)"/>
+    <circle cx="83" cy="55" r="2.6" fill="#fff"/><circle cx="93" cy="55" r="2.6" fill="#fff"/><circle cx="103" cy="55" r="2.6" fill="#fff"/>
+  </svg>`,
+};
+function catBanner(c, illus){
+  return `<div class="cat-banner"><div class="cb-txt"><div class="cat-tt">${c.tt}<small>${c.en}</small></div></div><div class="cb-illus">${illus}</div></div>`;
+}
+
 function grid(rows, cls){ return `<div class="grid ${cls||'g5'}">`+rows.map(r=>cell(r[0], r[1], r[2], r[3])).join('')+`</div>`; }
 
 function render(){
   document.getElementById('toc').innerHTML = CATS.map(c=>`<a href="#${c.k}">${c.tt}</a>`).join('');
   let h='';
   // 1) 數字與量詞
-  h+=`<section class="cat" id="num"><div class="cat-h"><div class="cat-ic">${CATS[0].ic}</div><div class="cat-tt">${CATS[0].tt}<small>${CATS[0].en}</small></div></div>`;
-  h+=`<div class="sub">基本數字 <small>0〜億</small></div><div class="tip"><b>4・7・9</b> 有兩種念法,情境不同(如 4時=よじ、4月=しがつ、4個=よんこ)。</div>`+grid(NUM);
+  h+=`<section class="cat" id="num">`+catBanner(CATS[0], ILLUS.num);
+  h+=`<div class="sub">基本數字 <small>0〜億</small></div><div class="tip"><b>4・7・9</b> 各有兩種念法(4時よじ、4月しがつ、4個よんこ)。</div>`+grid(NUM);
   h+=`<div class="sub">百・千 的變音 <small>要特別記</small></div>`+grid(NUM_CH);
   COUNTERS.forEach(c=>{ h+=`<div class="sub">${esc(c.t)} <small>${esc(c.d)}</small></div>`+grid(c.rows); });
   h+=`</section>`;
   // 2) 時間日期曜日
-  h+=`<section class="cat" id="time"><div class="cat-h"><div class="cat-ic">${CATS[1].ic}</div><div class="cat-tt">${CATS[1].tt}<small>${CATS[1].en}</small></div></div>`;
+  h+=`<section class="cat" id="time">`+catBanner(CATS[1], ILLUS.time);
   h+=`<div class="sub">〜時 <small>幾點</small></div><div class="tip">注意 <b>4時よじ・7時しちじ・9時くじ</b>。</div>`+grid(JI);
   h+=`<div class="sub">〜分 <small>幾分</small></div><div class="tip">ぷん / ふん 交替,半 = 30分。</div>`+grid(FUN);
   h+=`<div class="sub">曜日 <small>星期</small></div>`+grid(YOUBI);
@@ -278,8 +326,8 @@ function render(){
   h+=`<div class="sub">〜日 <small>日期</small></div><div class="tip">1〜10 日、14/20/24 日 全是<b>不規則</b>和語念法,直接背。</div>`+grid(NICHI);
   h+=`</section>`;
   // 3) 家族
-  h+=`<section class="cat" id="fam"><div class="cat-h"><div class="cat-ic">${CATS[2].ic}</div><div class="cat-tt">${CATS[2].tt}<small>${CATS[2].en}</small></div></div>`;
-  h+=`<div class="tip">左邊是<b>講自己家人</b>(對外謙稱)、右邊是<b>稱呼別人家人</b>或當面叫(敬稱)。點任一邊聽發音。</div>`;
+  h+=`<section class="cat" id="fam">`+catBanner(CATS[2], ILLUS.fam);
+  h+=`<div class="tip">左=<b>講自己家人</b>(謙稱)、右=<b>稱呼別人家人</b>(敬稱)。點任一邊聽發音。</div>`;
   h+=`<div class="grid g2">`+KAZOKU.map(k=>`<div class="row2">
       <div class="a" onclick="speak('${esc(k[1])}')"><span class="f">${esc(k[0])}</span><span class="y">${esc(k[1])}</span></div>
       <span class="arrow">→</span>
@@ -287,7 +335,7 @@ function render(){
       <span class="z">${esc(k[4])}</span></div>`).join('')+`</div>`;
   h+=`</section>`;
   // 4) 疑問詞・助詞
-  h+=`<section class="cat" id="qp"><div class="cat-h"><div class="cat-ic">${CATS[3].ic}</div><div class="cat-tt">${CATS[3].tt}<small>${CATS[3].en}</small></div></div>`;
+  h+=`<section class="cat" id="qp">`+catBanner(CATS[3], ILLUS.qp);
   h+=`<div class="sub">疑問詞 <small>問句必備</small></div>`+grid(GIMON, 'g3');
   h+=`<div class="sub">基本助詞 <small>句子的關節</small></div><div class="tip"><b>は</b>讀「わ」、<b>へ</b>讀「え」、<b>を</b>讀「お」——寫法和讀音不同,先記住。</div>`;
   h+=JOSHI.map(j=>`<div class="ptc" onclick="speak('${esc(j[4])}')">
