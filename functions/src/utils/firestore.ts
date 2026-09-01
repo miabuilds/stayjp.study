@@ -89,7 +89,12 @@ export async function patchSubscription(
 // 買斷戶不缺天數:被推薦人買買斷、或推薦人自己是買斷戶時,+7 天是空氣 →
 // 改發 AI 加量包(對話 +5 場、評分 +15 次,一次性,寫進 ai_usage 的 bonus 池,額度系統優先扣 bonus)。
 // 2026-08-27 Mia 拍板(數量取小)。成本 ~US$1/份,只在真實付款時發。
-export const REF_AI_BONUS = { chat: 5, eval: 15 };
+export const REF_AI_BONUS = { chat: 5, eval: 30 };
+// 推薦獎勵天數(依方案分級,2026-09):月費 +7 天、年費/早鳥 +30 天(一個月)。
+// 買斷不走天數(對永久會員無感)→ 呼叫端改發 AI 加量包。雙邊(推薦人 + 被推薦買家)共用同一套。
+export function refBonusDays(plan: string | undefined): number {
+  return (plan === "yearly" || plan === "yearly_early_bird") ? 30 : 7;
+}
 export async function grantAiBonus(uid: string, note: string): Promise<void> {
   await db.doc(`ai_usage/${uid}`).set({
     bonusChat: FieldValue.increment(REF_AI_BONUS.chat),
@@ -128,14 +133,15 @@ export async function rewardReferrerOnPayment(friendUid: string, isSandbox: bool
   if (ownerSub?.plan === "lifetime") {
     await grantAiBonus(ownerUid, `推薦好友(${friendUid})付費 → 推薦人為買斷戶,發 AI 加量包(對話+${REF_AI_BONUS.chat}/評分+${REF_AI_BONUS.eval})`);
   } else {
+    const bonusDays = refBonusDays(ownerSub?.plan);   // 依推薦人自己的方案:月費 7 天、年費 30 天
     const base = Math.max(nowMs(), ownerSub?.expiresAt || 0);
-    const patch: Partial<SubscriptionDoc> = { status: "active", expiresAt: base + 7 * 864e5, willRenew: ownerSub?.willRenew ?? false };
+    const patch: Partial<SubscriptionDoc> = { status: "active", expiresAt: base + bonusDays * 864e5, willRenew: ownerSub?.willRenew ?? false };
     if (!ownerSub) { patch.plan = "monthly"; patch.source = "web"; patch.startedAt = nowMs(); }
     await patchSubscription(ownerUid, patch);
     await writeTransaction({
       uid: ownerUid, type: "gift", source: "web", plan: ownerSub?.plan || "monthly",
       amount_twd: 0, payment_method: "manual", external_id: `referral-${friendUid}-${nowMs()}`,
-      status: "success", note: `推薦好友(${friendUid})付費 → 獎勵推薦人 +7 天`,
+      status: "success", note: `推薦好友(${friendUid})付費 → 獎勵推薦人 +${bonusDays} 天`,
     });
   }
   await db.doc(`users/${friendUid}`).set({ referrer_paid_at: nowMs() }, { merge: true });

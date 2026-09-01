@@ -13,7 +13,7 @@ import * as crypto from "crypto";
 import { PLANS, PlanKey } from "./utils/constants";
 import {
   writeSubscription, writeTransaction, getSubscription, getRefCode,
-  rewardReferrerOnPayment, recordKolCommission, voidKolCommission, grantAiBonus,
+  rewardReferrerOnPayment, recordKolCommission, voidKolCommission, grantAiBonus, refBonusDays,
   patchSubscription, nowMs, plusDays, tryReserveEarlyBird, SubscriptionDoc,
 } from "./utils/firestore";
 
@@ -163,7 +163,7 @@ export const revenuecatWebhook = functions.onRequest(
           } else if (newSub.status === "active" && !isSandbox) {
             const refCode = await getRefCode(uid);
             if (refCode && finalPlan !== "lifetime") {
-              newSub.expiresAt = newSub.expiresAt + 7 * 864e5;   // 到期日 +7 天(我們的權益;Apple 計費週期不變)
+              newSub.expiresAt = newSub.expiresAt + refBonusDays(finalPlan) * 864e5;   // 依方案:月費+7、年費+30(我們的權益;Apple 計費週期不變)
               newSub.ref_bonus_at = nowMs();
             } else if (refCode) {
               newSub.ref_bonus_at = nowMs();   // 買斷:發 AI 加量包(天數對買斷無意義)
@@ -373,7 +373,7 @@ async function fetchAndWriteFromRc(uid: string): Promise<"written" | "no-entitle
     sub.ref_bonus_at = existing.ref_bonus_at;
   } else if ((expiresAt - nowMs()) > 8 * 864e5) {
     const refCode = await getRefCode(uid);
-    if (refCode && plan !== "lifetime") { sub.expiresAt = expiresAt + 7 * 864e5; sub.ref_bonus_at = nowMs(); grantBonus = true; }
+    if (refCode && plan !== "lifetime") { sub.expiresAt = expiresAt + refBonusDays(plan) * 864e5; sub.ref_bonus_at = nowMs(); grantBonus = true; }   // 依方案:月費+7、年費+30
     else if (refCode) { sub.ref_bonus_at = nowMs(); grantBonus = true;
       await grantAiBonus(uid, "推薦碼＋購買買斷(歸戶補發)→ AI 加量包").catch(e => console.error("grantAiBonus(transfer) 略過:", e)); }
   }

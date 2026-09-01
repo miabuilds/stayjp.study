@@ -10,7 +10,7 @@ import { capturePaypalOrder } from "./utils/paypal";
 import {
   db, writeSubscription, writeTransaction, writePaymentFailure,
   nowMs, plusDays, tryReserveEarlyBird, emailHash, SubscriptionDoc,
-  getSubscription, getRefCode, rewardReferrerOnPayment, recordKolCommission, grantAiBonus,
+  getSubscription, getRefCode, rewardReferrerOnPayment, recordKolCommission, grantAiBonus, refBonusDays,
 } from "./utils/firestore";
 
 if (admin.apps.length === 0) admin.initializeApp();
@@ -92,7 +92,7 @@ export const paypalCaptureOrder = functions.onRequest(
       } else {
         const refCode = await getRefCode(uid);
         if (refCode && plan !== "lifetime") {
-          newSub.expiresAt = newSub.expiresAt + 7 * 864e5;
+          newSub.expiresAt = newSub.expiresAt + refBonusDays(plan) * 864e5;   // 依方案:月費+7、年費+30
           newSub.ref_bonus_at = nowMs();
         } else if (refCode) {
           newSub.ref_bonus_at = nowMs();   // 買斷:發 AI 加量包

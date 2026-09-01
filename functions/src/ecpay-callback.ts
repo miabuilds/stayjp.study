@@ -19,7 +19,7 @@ import { PLANS, PlanKey, ECPAY_SECRETS } from "./utils/constants";
 import { verifyCheckMacValue } from "./utils/ecpay";
 import {
   writeTransaction, getSubscription, writeSubscription, patchSubscription, getRefCode,
-  rewardReferrerOnPayment, recordKolCommission, grantAiBonus,
+  rewardReferrerOnPayment, recordKolCommission, grantAiBonus, refBonusDays,
   tryReserveEarlyBird, releaseEarlyBird, writePaymentFailure,
   nowMs, plusDays, SubscriptionDoc, db,
 } from "./utils/firestore";
@@ -156,7 +156,7 @@ export const ecpayCallback = functions.onRequest(
         } else {
           const refCode = await getRefCode(uid);
           if (refCode && plan !== "lifetime") {
-            newSub.expiresAt = newSub.expiresAt + 7 * 864e5;
+            newSub.expiresAt = newSub.expiresAt + refBonusDays(plan) * 864e5;   // 依方案:月費+7、年費+30
             newSub.ref_bonus_at = nowMs();
           } else if (refCode) {
             // 買斷:+7 天對無限期無意義 → 發 AI 加量包(2026-08-27 起,買斷戶的推薦貨幣)
