@@ -1353,7 +1353,13 @@ async function loadRedeemUses() {
       + '</tr></thead><tbody>'
       + snap.docs.map(d => { const x = d.data(); const s = byUid[x.uid];
         const when = x.redeemed_at ? new Date(Number(x.redeemed_at)).toLocaleString('zh-TW', { hour12: false }) : '—';
-        const cur = s ? ((s.is_gift ? '🎁 贈送' : (SUB_PLAN_TXT[s.plan] || s.plan || '')) + ' · ' + (SUB_STATUS_TXT[s.status] || s.status || '') + (s.expiresAt ? ' · 到期 ' + new Date(Number(s.expiresAt)).toLocaleDateString('zh-TW') : '')) : '<span style="color:var(--tx3)">查無(未同步/已刪)</span>';
+        const exp = s ? (Number(s.expiresAt) || 0) : 0;
+        // 兌換紀錄面板:這裡每列都是「用兌換碼」的人。標記為贈送/兌換取得 + 有效性,
+        // 不要用一般訂閱的「年費 · 已付費」(兌換碼開的訂閱 plan 是預設值、金額 0,顯示已付費會誤導)。
+        const cur = !s ? '<span style="color:var(--tx3)">查無(未同步/已刪)</span>'
+          : ((s.is_gift ? '🎁 贈送' : (s.willRenew ? '付費訂閱' : '兌換取得'))
+             + ' · ' + (s.status === 'refunded' ? '已退費' : (exp > Date.now() ? '有效中' : '已過期'))
+             + (exp ? ' · 到期 ' + new Date(exp).toLocaleDateString('zh-TW') : ''));
         return '<tr style="border-top:1px solid var(--bd)"><td style="padding:6px 8px;white-space:nowrap">' + when + '</td><td style="padding:6px 8px">' + escapeHtml(x.email || x.uid || '—') + '</td><td style="padding:6px 8px"><code>' + escapeHtml(x.code || '') + '</code></td><td style="padding:6px 8px">' + cur + '</td></tr>';
       }).join('') + '</tbody></table>';
   } catch (e) { box.textContent = '讀取失敗:' + e.message + (/index/i.test(e.message) ? '(需要 Firestore 索引 → 點錯誤裡的連結建一下)' : ''); }
