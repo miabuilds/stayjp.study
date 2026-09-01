@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>領款 · 佣金協議簽署｜StayJP</title>
+<style>
+  :root{--bg:#FAF5EC;--card:#fff;--tx:#20262E;--tx2:#5E6670;--line:#E6DFD1;--nav:#213A54;--acc:#C6553B;--ok:#2E7D53}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.6 -apple-system,BlinkMacSystemFont,"Noto Sans TC","PingFang TC",sans-serif}
+  .wrap{max-width:640px;margin:0 auto;padding:24px 16px 60px}
+  h1{font-size:22px;margin:0 0 4px;color:var(--nav)}
+  .sub{color:var(--tx2);font-size:14px;margin:0 0 20px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:16px}
+  label{display:block;font-weight:700;font-size:14px;margin:14px 0 6px}
+  label .hint{font-weight:400;color:var(--tx2);font-size:12px}
+  input,textarea{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:10px;font:inherit;background:#fff;color:var(--tx)}
+  input:focus,textarea:focus{outline:2px solid var(--nav);border-color:var(--nav)}
+  textarea{resize:vertical;min-height:56px}
+  .pad{border:1px dashed #C9BFAC;border-radius:10px;background:#fff;touch-action:none}
+  .padrow{display:flex;align-items:center;gap:10px;margin-top:6px}
+  .btn{border:0;border-radius:999px;padding:12px 22px;font:700 16px/1 inherit;cursor:pointer}
+  .btn.primary{background:var(--acc);color:#fff;width:100%;padding:15px}
+  .btn.primary:disabled{background:#D9B3A8;cursor:not-allowed}
+  .btn.ghost{background:#F0EADD;color:var(--nav);padding:9px 14px;font-size:14px}
+  .note{background:#F6EFE2;border-radius:10px;padding:10px 12px;font-size:13px;color:var(--tx2);margin-top:8px}
+  .consent{display:flex;gap:10px;align-items:flex-start;margin:16px 0;font-size:14px}
+  .consent input{width:20px;height:20px;margin-top:2px;flex:none}
+  #gate,#err{padding:40px 8px;text-align:center;color:var(--tx2)}
+  #err{color:var(--acc)}
+  #done{text-align:center;padding:30px 10px}
+  #done .big{font-size:44px}
+  #done h2{color:var(--ok);margin:8px 0}
+  /* 協議預覽（= 會被 render 成 PDF 的內容）*/
+  #agreement{background:#fff;color:#111;border:1px solid var(--line);border-radius:8px;padding:26px;font-size:13px;line-height:1.7}
+  #agreement h3{text-align:center;font-size:17px;margin:0 0 14px}
+  #agreement .row{margin:3px 0}
+  #agreement .fill{border-bottom:1px solid #333;padding:0 6px;min-width:120px;display:inline-block}
+  #agreement ol{padding-left:20px;margin:8px 0}
+  #agreement li{margin:4px 0}
+  #agreement .sigbox{margin-top:16px;display:flex;justify-content:space-between;align-items:flex-end;gap:16px}
+  #agreement .sigimg{height:64px;max-width:220px;object-fit:contain;border-bottom:1px solid #333;min-width:160px}
+  .muted{color:var(--tx2);font-size:12px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>佣金領款 · 線上簽署</h1>
+  <p class="sub">簽署佣金協議並申請領款。送出後系統會把協議 PDF 寄給營運方並通知處理。</p>
+
+  <div id="gate">驗證連結中…</div>
+  <div id="err" hidden></div>
+
+  <div id="app" hidden>
+    <div class="card">
+      <div id="who" style="font-weight:700;color:var(--nav)"></div>
+      <div class="muted" id="claimhint" style="margin-top:4px"></div>
+
+      <label>法定姓名 <span class="hint">身分證上的全名</span></label>
+      <input id="fName" autocomplete="name" placeholder="王小明">
+
+      <label>身分證字號 <span class="hint">報稅開扣繳憑單用</span></label>
+      <input id="fId" inputmode="text" autocomplete="off" placeholder="A123456789" maxlength="10">
+
+      <label>戶籍地址</label>
+      <textarea id="fAddr" autocomplete="street-address" placeholder="縣市 / 區 / 路街 / 號樓"></textarea>
+
+      <label>收款帳戶 <span class="hint">銀行+分行+帳號 或 PayPal Email</span></label>
+      <textarea id="fAcct" placeholder="例：國泰世華 (013) 帳號 000-00-000000　或　PayPal: you@mail.com"></textarea>
+
+      <div class="note">🔒 身分證字號與戶籍地址<b>只會出現在寄給營運方的協議 PDF</b>，用於報稅開立扣繳憑單，<b>不會存進系統資料庫</b>。</div>
+
+      <label>手寫簽名 <span class="hint">用手指或滑鼠簽</span></label>
+      <canvas id="pad" class="pad" width="560" height="160" style="width:100%;height:160px"></canvas>
+      <div class="padrow"><button class="btn ghost" id="clearSig" type="button">清除重簽</button><span class="muted" id="sigState">尚未簽名</span></div>
+
+      <div class="consent">
+        <input type="checkbox" id="agree">
+        <label for="agree" style="margin:0;font-weight:400">我已閱讀下方協議，確認以上資料正確，並同意以此電子簽名簽署本佣金合作協議。</label>
+      </div>
+    </div>
+
+    <!-- 這塊 = 會被轉成 PDF 的協議本體 -->
+    <div id="agreement">
+      <h3>推薦佣金合作協議書</h3>
+      <div class="row">立協議書人　甲方（委託方）：StayJP／日本再留計劃 營運方</div>
+      <div class="row">乙方（推薦夥伴）：姓名 <span class="fill" id="aName"></span>　身分證字號 <span class="fill" id="aId"></span></div>
+      <div class="row">戶籍地址：<span class="fill" id="aAddr" style="min-width:320px"></span></div>
+      <div class="row">收款帳戶：<span class="fill" id="aAcct" style="min-width:320px"></span></div>
+      <div class="row">專屬推薦碼：<span class="fill" id="aCode"></span></div>
+      <ol>
+        <li>經乙方推薦碼／連結註冊之使用者<b>首次付費訂閱成功</b>，乙方得就該筆取得佣金＝利潤 × <span id="aPct">—</span>%（利潤＝售價−金流／App 商店手續費）；僅計首筆，續訂不計。</li>
+        <li>該筆於鑑賞期／結算前發生退費、退單、扣款失敗者，該筆佣金不計；已列入者甲方得於下期扣回。</li>
+        <li>結算採每月累積給付，<b>單次給付以未達 NT$20,000 為原則</b>；達 20,000 以上依法扣繳 10% 並開立憑單，或分次跨月給付。</li>
+        <li>本佣金屬乙方之<b>執行業務所得（佣金，代號 9A）</b>。甲方為扣繳義務人，於次年 1 月依法申報扣繳／免扣繳憑單；乙方應據實提供上列姓名、身分證字號、地址。</li>
+        <li>乙方以合法、不誤導方式推廣，不得偽稱官方、不得自買自推或人頭刷單；查證屬實者取消資格並追回已付佣金。</li>
+      </ol>
+      <div class="sigbox">
+        <div>乙方簽名：<br><img id="aSig" class="sigimg" alt=""></div>
+        <div style="text-align:right">簽署時間<br><span id="aDate"></span></div>
+      </div>
+    </div>
+
+    <button class="btn primary" id="submit" disabled>確認簽署並申請領款</button>
+    <p class="muted" style="text-align:center;margin-top:10px">送出前請再確認金額與帳戶。實際可領金額由系統依你未結算的分潤計算。</p>
+  </div>
+
+  <div id="done" hidden>
+    <div class="big">✅</div>
+    <h2>已送出！</h2>
+    <p id="doneMsg"></p>
+    <p class="muted">營運方會核對金額後轉帳。你可以關掉這個頁面了。</p>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+(function(){
+  'use strict';
+  var FN = 'https://asia-east1-jpnote-1bdd6.cloudfunctions.net';
+  var q = new URLSearchParams(location.search);
+  var code = (q.get('code')||'').toUpperCase().replace(/[^A-Z0-9_-]/g,'').slice(0,32);
+  var token = q.get('t')||'';
+  var $ = function(id){return document.getElementById(id);};
+  function show(el){el.hidden=false;} function hide(el){el.hidden=true;}
+  function fail(msg){hide($('gate'));var e=$('err');e.textContent=msg;show(e);}
+
+  if(!code||!token){ fail('連結不完整，請從你的成效頁（儀表板）的「我要領款」按鈕進來。'); return; }
+
+  // ── 驗證 token + 取得 KOL 名稱/抽成% ──
+  fetch(FN+'/kolStats?code='+encodeURIComponent(code)+'&t='+encodeURIComponent(token))
+    .then(function(r){return r.json();})
+    .then(function(d){
+      if(!d||!d.ok){ fail('連結失效或無權限，請回儀表板重新進入。'); return; }
+      hide($('gate')); show($('app'));
+      $('who').textContent = (d.kol||code)+'（推薦碼 '+code+'）';
+      $('claimhint').textContent = '簽署本協議後即申請領款；系統會依你目前未結算的分潤自動計算金額。';
+      $('aCode').textContent = code;
+      $('aPct').textContent = (d.commission_pct!=null? d.commission_pct : '（依合作約定）');
+      initForm();
+    })
+    .catch(function(){ fail('連線失敗，請稍後再試。'); });
+
+  function initForm(){
+    // 輸入即時同步到協議預覽
+    var map = {fName:'aName',fId:'aId',fAddr:'aAddr',fAcct:'aAcct'};
+    Object.keys(map).forEach(function(k){
+      $(k).addEventListener('input', function(){ $(map[k]).textContent = $(k).value; refresh(); });
+    });
+
+    // ── 簽名板 ──
+    var pad=$('pad'), ctx=pad.getContext('2d'), drawing=false, hasSig=false, last=null;
+    function resize(){ var r=pad.getBoundingClientRect(); pad.width=r.width*2; pad.height=r.height*2; ctx.scale(2,2); ctx.lineWidth=2.2; ctx.lineCap='round'; ctx.strokeStyle='#12233a'; }
+    resize();
+    function pos(e){ var r=pad.getBoundingClientRect(); var t=e.touches?e.touches[0]:e; return {x:t.clientX-r.left, y:t.clientY-r.top}; }
+    function start(e){ e.preventDefault(); drawing=true; last=pos(e); }
+    function move(e){ if(!drawing)return; e.preventDefault(); var p=pos(e); ctx.beginPath(); ctx.moveTo(last.x,last.y); ctx.lineTo(p.x,p.y); ctx.stroke(); last=p; hasSig=true; $('sigState').textContent='已簽名'; refresh(); }
+    function end(){ drawing=false; }
+    pad.addEventListener('mousedown',start); pad.addEventListener('mousemove',move); window.addEventListener('mouseup',end);
+    pad.addEventListener('touchstart',start,{passive:false}); pad.addEventListener('touchmove',move,{passive:false}); pad.addEventListener('touchend',end);
+    $('clearSig').addEventListener('click', function(){ ctx.clearRect(0,0,pad.width,pad.height); hasSig=false; $('sigState').textContent='尚未簽名'; $('aSig').removeAttribute('src'); refresh(); });
+
+    $('agree').addEventListener('change', refresh);
+
+    function refresh(){
+      // 簽名同步到協議
+      if(hasSig){ try{ $('aSig').src = pad.toDataURL('image/png'); }catch(e){} }
+      var ok = $('fName').value.trim() && $('fId').value.trim() && $('fAddr').value.trim() && $('fAcct').value.trim() && hasSig && $('agree').checked;
+      $('submit').disabled = !ok;
+    }
+
+    // ── 送出:協議 → PNG → PDF → 上傳 ──
+    $('submit').addEventListener('click', function(){
+      var btn=$('submit'); btn.disabled=true; btn.textContent='產生協議中…';
+      $('aDate').textContent = new Date().toLocaleString('zh-TW',{hour12:false});
+      var agEl=$('agreement');
+      html2canvas(agEl,{scale:2,backgroundColor:'#ffffff'}).then(function(canvas){
+        var img=canvas.toDataURL('image/png');
+        var jsPDF=window.jspdf.jsPDF;
+        var pdf=new jsPDF('p','mm','a4');
+        var pw=210, margin=10, iw=pw-margin*2;
+        var ih=canvas.height*iw/canvas.width;
+        var ph=297-margin*2;
+        if(ih<=ph){ pdf.addImage(img,'PNG',margin,margin,iw,ih); }
+        else{ // 太長 → 分頁
+          var drawn=0;
+          while(drawn<ih){ pdf.addImage(img,'PNG',margin,margin-drawn,iw,ih); drawn+=ph; if(drawn<ih)pdf.addPage(); }
+        }
+        var pdfB64=pdf.output('datauristring').split(',')[1];
+        btn.textContent='送出中…';
+        return fetch(FN+'/kolRequestPayout',{method:'POST',headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({code:code,t:token,holder_name:$('fName').value.trim(),account:$('fAcct').value.trim(),pdf_b64:pdfB64})});
+      }).then(function(r){return r.json();}).then(function(res){
+        if(!res||!res.ok){ throw new Error((res&&res.reason)||(res&&res.error)||'送出失敗'); }
+        hide($('app'));
+        $('doneMsg').textContent = '本次可領約 NT$'+ (res.amount||0) + '，協議已'+(res.emailSent?'寄給營運方':'記錄（信件稍後補寄）')+'。';
+        show($('done'));
+      }).catch(function(e){
+        btn.disabled=false; btn.textContent='確認簽署並申請領款';
+        alert('送出失敗:'+(e.message||e)+'\n請稍後再試,或聯絡我們。');
+      });
+    });
+  }
+})();
+</script>
+</body>
+</html>

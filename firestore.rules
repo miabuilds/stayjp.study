@@ -255,6 +255,15 @@ service cloud.firestore {
       allow write: if false;
     }
 
+    // KOL 線上簽署領款申請 — 只有 admin 能讀(後台請款清單);建立只走 Admin SDK
+    // (kolRequestPayout 函式);admin 僅可改 status/handled_at 標記已處理。不含身分證/地址。
+    match /payout_requests/{id} {
+      allow read: if isAdmin();
+      allow update: if isAdmin()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'handled_at']);
+      allow create, delete: if false;
+    }
+
     // 預設拒絕：未明確允許的所有路徑皆擋
     match /{document=**} {
       allow read, write: if false;

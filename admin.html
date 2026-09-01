@@ -162,6 +162,7 @@ textarea.note:focus{outline:none;border-color:var(--ac)}
  <button id="tabLedger"> 帳本</button>
  <button id="tabSetSub"> 訂閱管理</button>
  <button id="tabRefunds"> 退款申請</button>
+ <button id="tabPayouts"> 領款申請</button>
  <button id="tabErrLog"> 報錯</button>
  </div>
  <div class="me" id="meInfo"></div>
@@ -412,6 +413,17 @@ textarea.note:focus{outline:none;border-color:var(--ac)}
  <div style="font-size:12px;color:var(--tx3);margin-bottom:10px">ATM／超商付款無法自動退刷,用戶申請後列在這。你手動匯回「實退金額」給對方(手續費已扣),再到「訂閱管理」取消他的訂閱,然後按「標記已處理」。</div>
  <div id="rfList" style="font-size:12px;color:var(--tx2)">點「重新整理」載入。</div>
  </div>
+
+ <div id="wrapPayouts" class="stats">
+ <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:14px">
+ <h2 style="font-size:14px;color:var(--tx2);text-transform:uppercase;letter-spacing:.5px;margin:0">KOL 領款申請</h2>
+ <button class="btn" onclick="renderPayouts()" style="font-size:11px;padding:4px 10px">↻ 重新整理</button>
+ <label style="font-size:12px;color:var(--tx2)"><input type="checkbox" id="poShowDone" onchange="renderPayouts()"> 含已處理</label>
+ <span id="poCount" style="font-size:12px;color:var(--tx2)"></span>
+ </div>
+ <div style="font-size:12px;color:var(--tx3);margin-bottom:10px">KOL 在儀表板線上簽署佣金協議後列在這。已簽的協議 PDF(含身分證/地址)寄到 stayjpplan@gmail.com。你核對金額 → 轉帳(單次壓 NT$20,000 內免扣繳)→ 再到「訂閱管理」相關流程結算 commissions → 按「標記已處理」。身分證/地址不存這裡,只在 email 的 PDF。</div>
+ <div id="poList" style="font-size:12px;color:var(--tx2)">點「重新整理」載入。</div>
+ </div>
 </div>
 
 <!-- Firebase SDK -->
@@ -499,10 +511,13 @@ document.getElementById('tabSubs').onclick = () => switchTab('subs');
 document.getElementById('tabLedger').onclick = () => switchTab('ledger');
 document.getElementById('tabSetSub').onclick = () => switchTab('setsub');
 document.getElementById('tabRefunds').onclick = () => switchTab('refunds');
+document.getElementById('tabPayouts').onclick = () => switchTab('payouts');
 document.getElementById('tabErrLog').onclick = () => switchTab('errlog');
 function switchTab(tab) {
  document.getElementById('tabRefunds').classList.toggle('on', tab === 'refunds');
  document.getElementById('wrapRefunds').classList.toggle('on', tab === 'refunds');
+ document.getElementById('tabPayouts').classList.toggle('on', tab === 'payouts');
+ document.getElementById('wrapPayouts').classList.toggle('on', tab === 'payouts');
  document.getElementById('tabFeedback').classList.toggle('on', tab === 'feedback');
  document.getElementById('tabStats').classList.toggle('on', tab === 'stats');
  document.getElementById('tabSubs').classList.toggle('on', tab === 'subs');
@@ -521,6 +536,7 @@ function switchTab(tab) {
  if (tab === 'errlog') renderErrLog();
  if (tab === 'setsub') loadPaypalPending();
  if (tab === 'refunds') renderRefunds();
+ if (tab === 'payouts') renderPayouts();
 }
 
 // ATM 退款申請清單(refund_requests):用戶申請、你手動匯款後標記已處理
@@ -558,6 +574,46 @@ async function markRefundDone(id) {
  try {
   await db.collection('refund_requests').doc(id).set({ status: 'done', done_at: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true });
   renderRefunds();
+ } catch (e) { alert('標記失敗:' + e.message); }
+}
+
+// KOL 領款申請清單(payout_requests):KOL 線上簽協議後列這;你轉帳後標記已處理。身分證/地址只在 email 的 PDF。
+async function renderPayouts() {
+ const box = document.getElementById('poList');
+ const cnt = document.getElementById('poCount');
+ const showDone = document.getElementById('poShowDone').checked;
+ box.textContent = '載入中…';
+ try {
+  const snap = await db.collection('payout_requests').orderBy('created_at', 'desc').limit(200).get();
+  const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const pend = snap.docs.filter(d => (d.data().status || 'requested') !== 'done').length;
+  cnt.innerHTML = `待處理 ${pend} 筆` + (snap.size > pend ? ` · 共 ${snap.size}` : '');
+  const docs = snap.docs.filter(d => showDone || (d.data().status || 'requested') !== 'done');
+  if (!docs.length) { box.innerHTML = '<span style="color:var(--tx3)">目前沒有待處理的領款申請 🎉</span>'; return; }
+  box.innerHTML = docs.map(d => {
+   const x = d.data();
+   const t = x.created_at && x.created_at.toDate ? x.created_at.toDate().toLocaleString('zh-TW') : '';
+   const done = (x.status || 'requested') === 'done';
+   const mailWarn = x.email_sent === false ? '<span style="color:#EF4444">⚠ 信件未送出(去信箱找不到 PDF 的話,請 KOL 重簽或看 email_error)</span>' : '';
+   return `<div style="border-bottom:1px solid var(--bd);padding:10px 0${done ? ';opacity:.5' : ''}">
+     <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+       <strong style="color:var(--tx)">${esc(x.kol || x.code)}</strong>
+       <span style="color:var(--tx3)">碼 ${esc(x.code)}</span>
+       <span>· 法定姓名 ${esc(x.holder_name || '—')} · 帳戶 ${esc(x.account_masked || '—')}</span>
+       <span style="color:#16A34A;font-weight:600">可領 NT$${x.amount_snapshot} (${x.commission_count} 筆)</span>
+       <span style="color:var(--tx3);font-size:11px">· ${t}</span>
+       ${done ? '<span style="color:var(--tx3);margin-left:auto">✓ 已處理</span>' : `<button class="btn" style="font-size:11px;padding:3px 9px;margin-left:auto" onclick="markPayoutDone('${d.id}')">標記已處理</button>`}
+     </div>
+     <div style="margin-top:4px;color:var(--tx2)">📎 已簽協議 PDF 見 stayjpplan@gmail.com 信箱。${mailWarn}</div>
+   </div>`;
+  }).join('');
+ } catch (e) { box.innerHTML = '<span style="color:#EF4444">讀取失敗:' + e.message + '</span>'; }
+}
+async function markPayoutDone(id) {
+ if (!confirm('確認已轉帳給這位 KOL、標記為已處理?\n(記得單次撥款壓 NT$20,000 內免扣繳;並依需要結算他的 commissions)')) return;
+ try {
+  await db.collection('payout_requests').doc(id).set({ status: 'done', handled_at: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true });
+  renderPayouts();
  } catch (e) { alert('標記失敗:' + e.message); }
 }
 

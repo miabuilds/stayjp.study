@@ -84,7 +84,10 @@ export const kolStats = functions.onRequest(
         }
       }
 
-      res.json({ ok: true, code, kol: c.kol || "", total, paid, trialing, range });
+      res.json({
+        ok: true, code, kol: c.kol || "", total, paid, trialing, range,
+        commission_pct: typeof c.commission_pct === "number" ? c.commission_pct : null,
+      });
     } catch (err) {
       console.error("kolStats error:", err);
       res.status(500).json({ error: "internal" });
