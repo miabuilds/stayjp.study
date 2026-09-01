@@ -20,6 +20,8 @@ const Calendar = (() => {
     if (typeof saveAllCloud === 'function') saveAllCloud();
     // 留存:學完一次後(App)邀請開每日提醒。startReminderPrompt 會重試到離開測驗/引導畫面才彈。
     if (typeof startReminderPrompt === 'function') startReminderPrompt();
+    // App 內:通知原生累計評分時機(native-ui.js 已節流成每天最多一次)。純網頁無此函式,略過。
+    try { if (typeof window.STAYJP_studyDone === 'function') window.STAYJP_studyDone(); } catch (e) {}
   }
 
   // Calculate streaks

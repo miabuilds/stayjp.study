@@ -25,9 +25,9 @@
   // 用法:兩顆鈕分別加 class="app-ios" / class="app-android"(含 <span data-t> 中英文字)。
   // 原生 App 內另由下方 apply() 把兩家商店鈕一律隱藏(在 App 內叫人下載 App 很多餘)。
   (function detectWebDevice() {
-    // ⚠️ Android App 還在 Google Play 封測、商店頁未公開 → 上架前一律隱藏 Android 下載鈕。
-    //    上架那天把這個改成 true 就全站顯示(index/about/howto/pricing 四處一起生效)。
-    var ANDROID_LIVE = false;
+    // Android App 已於 2026-09 正式上架 Google Play(商店頁公開)→ 顯示 Android 下載鈕。
+    //    (封測期間為 false 全站隱藏;上架後翻 true,index/about/howto/pricing 四處一起亮。)
+    var ANDROID_LIVE = true;
     var ua = navigator.userAgent || '';
     var isIOS = /iPhone|iPad|iPod/i.test(ua) || (/Macintosh/.test(ua) && typeof document !== 'undefined' && 'ontouchend' in document); // iPadOS 會偽裝成 Mac
     var isAndroid = /Android/i.test(ua);
@@ -79,6 +79,78 @@
       'html.stayjp-android [data-platform~="android"],' +
       'html:not(.stayjp-native) [data-platform~="web"]{display:revert}';
     (document.head || document.documentElement).appendChild(css);
+
+    initUpdateCheck(info.platform);   // 有新版就在底部提醒去商店更新
+  }
+
+  // ── 學習完成 → 通知原生累計「評分時機」(每天最多一次,不要每個字都發)──
+  // 原生端 web.tsx 收 STUDY_DONE → recordStudyCompleted()+maybeAskForReview();
+  // 真正要不要跳評分交給 expo-store-review + 系統決定,這裡只負責「用了一陣子」的計次。
+  window.STAYJP_studyDone = function () {
+    try {
+      if (!window.ReactNativeWebView) return;               // 純網頁沒有這個 → 直接略過
+      var k = 'stayjp_review_signal_day';
+      var d = new Date().toISOString().slice(0, 10);
+      if (localStorage.getItem(k) === d) return;            // 今天已發過一次
+      localStorage.setItem(k, d);
+      window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'STUDY_DONE' }));
+    } catch (e) {}
+  };
+
+  // ── 新版更新提醒(只在原生 App 內)──
+  // 讀 /app-version.json 拿「商店最新版」跟 App 回報的執行版本比;舊了才在底部彈可關的提醒。
+  // 純網頁 / 拿不到 appVersion / 已是最新 → 什麼都不做。
+  function cmpVer(a, b) {   // a<b → -1;a==b → 0;a>b → 1
+    var pa = String(a).split('.').map(Number), pb = String(b).split('.').map(Number);
+    for (var i = 0; i < Math.max(pa.length, pb.length); i++) {
+      var x = pa[i] || 0, y = pb[i] || 0;
+      if (x !== y) return x < y ? -1 : 1;
+    }
+    return 0;
+  }
+  function initUpdateCheck(platform) {
+    try {
+      var n = window.STAYJP_NATIVE || {};
+      var cur = n.appVersion;                                // App 執行中的版本(由 web.tsx 注入)
+      if (!cur || (platform !== 'ios' && platform !== 'android')) return;
+      fetch('/app-version.json?t=' + Date.now(), { cache: 'no-store' })
+        .then(function (r) { return r.json(); })
+        .then(function (cfg) {
+          var latest = cfg && cfg.latest && cfg.latest[platform];
+          if (!latest || cmpVer(cur, latest) >= 0) return;   // 沒設定 / 已是最新
+          if (localStorage.getItem('stayjp_update_dismissed') === latest) return; // 這個新版已被關過
+          showUpdateBar(platform, latest);
+        })
+        .catch(function () {});
+    } catch (e) {}
+  }
+  function showUpdateBar(platform, latest) {
+    var storeUrl = platform === 'ios'
+      ? 'https://apps.apple.com/app/id6778227353'
+      : 'https://play.google.com/store/apps/details?id=com.stayjp.app';
+    var en = /^en/.test(localStorage.getItem('ui_lang') || '');
+    var bar = document.createElement('div');
+    bar.setAttribute('role', 'dialog');
+    bar.style.cssText = 'position:fixed;left:12px;right:12px;bottom:calc(14px + env(safe-area-inset-bottom));z-index:2147483000;background:#213A54;color:#fff;border-radius:14px;padding:12px 14px;display:flex;align-items:center;gap:10px;box-shadow:0 8px 30px rgba(0,0,0,.28);font:500 15px/1.4 -apple-system,BlinkMacSystemFont,"Noto Sans TC","PingFang TC",sans-serif';
+    var msg = document.createElement('div');
+    msg.style.cssText = 'flex:1;min-width:0';
+    msg.textContent = en ? 'A new version is available' : '有新版本可以更新囉';
+    var up = document.createElement('button');
+    up.textContent = en ? 'Update' : '更新';
+    up.style.cssText = 'flex:none;background:#C6553B;color:#fff;border:0;padding:9px 18px;border-radius:999px;font-weight:700;font-size:14px;cursor:pointer';
+    up.onclick = function () {
+      // 有原生橋 → 請原生開商店(最可靠);沒有就退而求其次直接導頁
+      try {
+        if (window.ReactNativeWebView) { window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'OPEN_STORE', url: storeUrl })); return; }
+      } catch (e) {}
+      try { window.location.href = storeUrl; } catch (e) {}
+    };
+    var later = document.createElement('button');
+    later.textContent = en ? 'Later' : '稍後';
+    later.style.cssText = 'flex:none;background:transparent;color:#cdd6e0;border:0;padding:9px 8px;font:inherit;cursor:pointer';
+    later.onclick = function () { try { localStorage.setItem('stayjp_update_dismissed', latest); } catch (e) {} bar.remove(); };
+    bar.appendChild(msg); bar.appendChild(up); bar.appendChild(later);
+    (document.body || document.documentElement).appendChild(bar);
   }
 
   function tick() {
