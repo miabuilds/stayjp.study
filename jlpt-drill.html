@@ -554,7 +554,7 @@ function answer(el, ok){
   const _tr = (window.JLPT_Q_TRANS && JLPT_Q_TRANS[q.id]) ? JLPT_Q_TRANS[q.id] : '';
   document.getElementById('xp').innerHTML =
     (q.au ? '<div style="margin-bottom:8px;padding-bottom:8px;border-bottom:1px dashed var(--bd)"><b>スクリプト:</b>'+esc(q.au)+'</div>' : '') + q.x
-    + (_tr ? '<div style="margin-top:10px;padding-top:9px;border-top:1px dashed var(--bd);color:var(--tx2);font-size:13.5px;line-height:1.75"><b style="color:var(--ac)">整句翻譯</b>　'+esc(_tr)+'</div>' : '')
+    + (_tr ? '<div style="margin-top:10px;padding-top:9px;border-top:1px dashed var(--bd)"><button type="button" onclick="var d=this.nextElementSibling;d.hidden=!d.hidden;this.textContent=d.hidden?'+"'"+'▸ '+enOr('顯示整句翻譯','Show translation')+"'"+':'+"'"+'▾ '+enOr('整句翻譯','Translation')+"'"+'" style="background:none;border:0;color:var(--ac);font:inherit;font-size:13px;font-weight:700;cursor:pointer;padding:0">▸ '+enOr('顯示整句翻譯','Show translation')+'</button><div hidden style="color:var(--tx2);font-size:13.5px;line-height:1.75;margin-top:6px">'+esc(_tr)+'</div></div>' : '')
     + (_rep ? '<a href="'+_rep+'" target="_blank" rel="noopener" style="display:block;text-align:right;margin-top:10px;font-size:12px;color:var(--tx3);text-decoration:none">🚩 '+enOr('這題有誤?回報','Report this question')+'</a>' : '');
   document.getElementById('explain').style.display='block';
   document.getElementById('nextBtn').style.display='block';
