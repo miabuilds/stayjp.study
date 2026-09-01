@@ -20,8 +20,10 @@ import * as nodemailer from "nodemailer";
 
 if (admin.apps.length === 0) admin.initializeApp();
 
-// 寄信帳號(收領款通知/存底的信箱);只需設這一個 secret = 該 Gmail 的「應用程式密碼」。
-const MAIL_ACCOUNT = "stayjpplan@gmail.com";
+// 寄件帳號 = app 密碼所屬的 Gmail(stayjpplan 無法產 app 密碼 → 改用 abc83327 寄件);
+// 收件 = 實際看信的信箱(stayjpplan)。兩者可不同:SMTP 驗證看寄件帳號,信寄到收件帳號。
+const MAIL_ACCOUNT = "abc83327@gmail.com";   // 寄件+SMTP 驗證(GMAIL_APP_PASSWORD 是這個帳號產的)
+const NOTIFY_TO = "stayjpplan@gmail.com";    // 收領款通知/PDF 存底的信箱
 const GMAIL_APP_PASSWORD = defineSecret("GMAIL_APP_PASSWORD");
 
 export const kolRequestPayout = functions.onRequest(
@@ -83,7 +85,7 @@ export const kolRequestPayout = functions.onRequest(
         });
         await transport.sendMail({
           from: `StayJP 領款系統 <${MAIL_ACCOUNT}>`,
-          to: MAIL_ACCOUNT,
+          to: NOTIFY_TO,
           subject: `[StayJP 領款申請] ${kol}（${code}）— 約 NT$${claimable}`,
           text:
             `有 KOL 線上簽署佣金協議並申請領款：\n\n` +
