@@ -72,11 +72,11 @@
 
   <div class="card">
     <h2>分潤怎麼算</h2>
-    <p style="color:var(--tx2)">被你推薦的人<b>首次付費訂閱</b>成功,你就賺該筆<b>利潤的 20%</b>(利潤 = 售價扣掉金流/商店手續費)。只算首筆,單純好懂:</p>
+    <p style="color:var(--tx2)">被你推薦的人<b>首次付費訂閱</b>成功,你就賺該筆<b>利潤的 10%</b>(利潤 = 售價扣掉金流/商店手續費)。只算首筆,單純好懂:</p>
     <div class="rate">
-      <div class="b"><div class="v">~NT$100</div><div class="l">帶來月費用戶</div></div>
-      <div class="b"><div class="v">~NT$170</div><div class="l">帶來年費用戶</div></div>
-      <div class="b"><div class="v">~NT$500</div><div class="l">帶來買斷用戶</div></div>
+      <div class="b"><div class="v">~NT$50</div><div class="l">帶來月費用戶</div></div>
+      <div class="b"><div class="v">~NT$85</div><div class="l">帶來年費用戶</div></div>
+      <div class="b"><div class="v">~NT$250</div><div class="l">帶來買斷用戶</div></div>
     </div>
     <p class="muted">實際金額依對方購買方案而定。付款後 30 天內若無退費即鎖定可領;期間退費/退單則該筆不計。累積達 NT$1,000 於每月結算,以銀行轉帳(台灣)或 PayPal(海外)付款。</p>
   </div>
@@ -164,7 +164,7 @@ function showLink(d){
   const stats=SITE+'/kol.html?code='+d.code+'&t='+encodeURIComponent(d.token||'');
   area.innerHTML=`
     <div class="ok" style="font-weight:700;font-size:16px">✓ 你已是合作夥伴!</div>
-    <p style="color:var(--tx2);margin-top:6px">分享這條專屬連結,對方註冊並付費後你就賺分潤(抽成 ${d.commission_pct||20}% 首筆利潤):</p>
+    <p style="color:var(--tx2);margin-top:6px">分享這條專屬連結,對方註冊並付費後你就賺分潤(抽成 ${d.commission_pct||10}% 首筆利潤):</p>
     <div class="linkbox"><input id="myLink" readonly value="${esc(link)}"><button class="btn" style="padding:11px 18px" onclick="copyLink()">複製</button></div>
     <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap">
       <a class="btn sec" href="${esc(stats)}" target="_blank" style="padding:11px 20px;font-size:14px">📊 看我的推薦成效</a>

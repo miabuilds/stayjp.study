@@ -13,7 +13,11 @@ import * as admin from "firebase-admin";
 if (admin.apps.length === 0) admin.initializeApp();
 const db = admin.firestore();
 
-const DEFAULT_COMMISSION_PCT = 20;
+// 新加入 KOL 的預設抽成。2026-09 起新申請一律 10%(原 20% 太高)。
+// 既有 KOL 不受影響:他們的 commission_pct 在建碼當下就寫死存進 ref_codes/{code},
+// 精算引擎(utils/firestore.ts)照該碼存的值算,不看這個 default;
+// 且引擎 fallback 仍保留 20,保護任何漏存欄位的舊碼(含探長J/英文探探長等)。
+const DEFAULT_COMMISSION_PCT = 10;
 const TERMS_VERSION = "2026-07-10";
 
 // 保留字(系統/官方語意)不給搶;粗俗字最小黑名單(自助發碼、綁身分,風險低,後台仍可覆核)
