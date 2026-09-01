@@ -80,10 +80,12 @@ export const redeemCode = functions.onRequest(
         // 有自動續扣的付費用戶 → 只加天數,方案/續扣/來源都不動(純加碼,不弄壞帳單)
         await patchSubscription(uid, { expiresAt: newExpiry });
       } else {
-        // 新 / 免費 / 過期 / 贈送用戶 → 開一段贈送 Premium
+        // 新 / 免費 / 過期 / 贈送用戶 → 開一段贈送 Premium。
+        // is_gift:true → 後台/報表不計入付費客戶、顯示「贈送」(否則兌換碼開的會被誤當付費年費)。
         await writeSubscription(uid, {
           source: "web", plan, status: "active", expiresAt: newExpiry, willRenew: false,
           startedAt: existing?.startedAt || nowMs(), is_early_bird: existing?.is_early_bird === true, failed_retries: 0,
+          is_gift: true,
         } as SubscriptionDoc);
       }
       await writeTransaction({
