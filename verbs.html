@@ -1288,8 +1288,8 @@ const PTQuiz = (function(){
     });
     const fb = document.getElementById('ptqFb');
     fb.innerHTML = ok
-      ? `<span style="color:#10B981">✓ 正解 — ${q.s.j.replace('___', '<strong>'+q.s.blank+'</strong>')}</span>`
-      : `<span style="color:#EF4444">✗ ${q.s.hint}</span><br><span style="color:var(--tx2)">正解：${q.s.j.replace('___','<strong>'+q.s.blank+'</strong>')}</span>`;
+      ? `<span style="color:#10B981"><i data-ic="check"></i> 正解 — ${q.s.j.replace('___', '<strong>'+q.s.blank+'</strong>')}</span>`
+      : `<span style="color:#EF4444"><i data-ic="x"></i> ${q.s.hint}</span><br><span style="color:var(--tx2)">正解：${q.s.j.replace('___','<strong>'+q.s.blank+'</strong>')}</span>`;
     updateScore();
     if (ok && streak > 0 && streak % 5 === 0) setTimeout(next, 800);
   }
@@ -1309,6 +1309,7 @@ document.addEventListener('DOMContentLoaded', () => PTQuiz.render());
   <div style="margin-top:4px;font-size:12px;opacity:.7">語音：VOICEVOX:四国めたん</div>
 </footer>
 
+<script src="icons.js"></script>
 <script src="i18n.js"></script>
 <!-- TTS manifest: text -> pre-rendered VOICEVOX mp3 hash. -->
 <script src="tts-config.js"></script>

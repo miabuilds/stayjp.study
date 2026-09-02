@@ -134,6 +134,7 @@
   <footer>StayJP 日本再留計劃 · <a href="app.html" style="color:var(--tx3)">學習工具</a></footer>
 </div>
 
+<script src="icons.js"></script>
 <script src="grammar-kanji-readings.js"></script>
 <script src="vocab-n5.js"></script>
 <script src="audio/tts/manifest.js"></script>
@@ -395,7 +396,7 @@ const Quiz = (function(){
     opts.sort(()=>Math.random()-.5);
     const box=document.getElementById('quizBox');
     box.innerHTML = `
-      <div class="qhead"><span>第 ${qi+1} / ${queue.length} 題　分數 ${score}</span><button class="x" onclick="Quiz.close()">✕</button></div>
+      <div class="qhead"><span>第 ${qi+1} / ${queue.length} 題　分數 ${score}</span><button class="x" onclick="Quiz.close()"><i data-ic="x"></i></button></div>
       <div class="qbar"><i style="width:${qi/queue.length*100}%"></i></div>
       <div class="qq">這個怎麼念?(念念看再選)</div>
       <div class="qform">${esc(item.form)}</div>
@@ -425,7 +426,7 @@ const Quiz = (function(){
     // 錯題再考一輪
     const box=document.getElementById('quizBox');
     const pct=Math.round(score/queue.length*100);
-    const msg = pct>=90?'太強了!這些你很熟 🎉' : pct>=60?'不錯,錯的再看一下就更穩' : '多測幾次,紅字的地方特別練';
+    const msg = pct>=90?'太強了!這些你很熟 ' : pct>=60?'不錯,錯的再看一下就更穩' : '多測幾次,紅字的地方特別練';
     box.innerHTML=`<div class="qresult">
       <div class="qscore">${score}/${queue.length}</div>
       <div class="qrsub">${msg}</div>
