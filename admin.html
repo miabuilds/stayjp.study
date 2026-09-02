@@ -1295,7 +1295,7 @@ function toggleRefCode(code, activate) {
   db.collection('ref_codes').doc(code).set({ active: !!activate }, { merge: true }).then(loadRefCodes);
 }
 function deleteRefCode(code, paid) {
-  const warn = paid > 0 ? `\n\n<i data-ic=warning></i> 此碼已有 ${paid} 位付費歸因者,刪除後 KOL 統計頁與即時歸因會失效(歷史交易/抽成仍可從帳本查)。` : '';
+  const warn = paid > 0 ? `\n\n此碼已有 ${paid} 位付費歸因者,刪除後 KOL 統計頁與即時歸因會失效(歷史交易/抽成仍可從帳本查)。` : '';
   if (!confirm('刪除推薦碼 ' + code + '?此動作不可復原。' + warn)) return;
   db.collection('ref_codes').doc(code).delete().then(loadRefCodes).catch(e => { const m = document.getElementById('refCodeMsg'); m.style.color = '#EF4444'; m.textContent = '刪除失敗:' + e.message; });
 }
