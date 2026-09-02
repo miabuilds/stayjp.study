@@ -13,6 +13,7 @@
         會跟這行搶跑 → 讀到 undefined → class 沒加上 → App 裡照樣出現「下載 iOS App」。
         真正的保險在 native-ui.js(會持續重試到偵測成功);這行留著是為了 iOS 上不閃爍。 -->
 <script src="native-ui.js"></script>
+<script src="icons.js"></script>
 <script>try{if(window.STAYJP_NATIVE&&window.STAYJP_NATIVE.isNativeApp)document.documentElement.classList.add('stayjp-native')}catch(e){}</script>
 <style>html.stayjp-native .hero-cta.app,html.stayjp-native a[href*="apps.apple.com"],html.stayjp-native a[href*="play.google.com"]{display:none!important}</style>
 <link rel="icon" href="stayjpplan.png?v=5" type="image/png">
@@ -777,11 +778,11 @@ try {
     <div class="eyebrow reveal">CHANGELOG · 近期更新</div>
     <h2 class="section-title reveal">一直在<em>偷偷變強</em>。</h2>
     <div class="changelog reveal reveal-d1">
-      <div class="cl-item"><span class="cl-date">2026.08</span><div class="cl-body"><span class="cl-tag">新功能</span><strong>🎯 JLPT 刷題特區</strong>——1,600+ 題照真題題型(漢字・語彙・文法・組句・読解・聴解),每題完整詳解講清楚「錯的選項錯在哪」;含錯題本、刷題紀錄,還有<strong>仿真模擬試験</strong>:分部計時、官方 180 分制換算與合格判定、弱點分析。</div></div>
-      <div class="cl-item"><span class="cl-date">2026.08</span><div class="cl-body"><span class="cl-tag">新功能</span><strong>🎙 AI 口說練習</strong>——87 句分級分類例句跟讀,AI 教練即時評分:哪個助詞念錯、哪裡不自然,講到你聽得懂。(免費體驗 10 次)</div></div>
-      <div class="cl-item"><span class="cl-date">2026.08</span><div class="cl-body"><span class="cl-tag">新功能</span><strong>🗣 AI 情境對話</strong>——選情境(便利商店、面試、市役所…)和 N5–N1 難度,AI 扮演對方跟你多輪對話,即時提點、結束給整體點評,還能自訂主題隨便聊。(免費體驗 1 場)</div></div>
-      <div class="cl-item"><span class="cl-date">2026.08</span><div class="cl-body"><span class="cl-tag">新功能</span><strong>📖 文章閱讀</strong>——精選日文短文,讀完附整篇中譯、重點單字與文法詳解,還能逐句聽真人語音朗讀,把單字、文法放回真正的文章裡記。(免費版可試讀一篇)</div></div>
-      <div class="cl-item"><span class="cl-date">2026.08</span><div class="cl-body"><span class="cl-tag">新功能</span><strong>🈂️ 五十音</strong>——平假名／片假名對照表,點一下就聽發音、看逐筆<strong>筆順動畫</strong>,還能<strong>描寫練習</strong>;另附認讀與筆畫數測驗。</div></div>
+      <div class="cl-item"><span class="cl-date">2026.08</span><div class="cl-body"><span class="cl-tag">新功能</span><strong>JLPT 刷題特區</strong>——1,600+ 題照真題題型(漢字・語彙・文法・組句・読解・聴解),每題完整詳解講清楚「錯的選項錯在哪」;含錯題本、刷題紀錄,還有<strong>仿真模擬試験</strong>:分部計時、官方 180 分制換算與合格判定、弱點分析。</div></div>
+      <div class="cl-item"><span class="cl-date">2026.08</span><div class="cl-body"><span class="cl-tag">新功能</span><strong>AI 口說練習</strong>——87 句分級分類例句跟讀,AI 教練即時評分:哪個助詞念錯、哪裡不自然,講到你聽得懂。(免費體驗 10 次)</div></div>
+      <div class="cl-item"><span class="cl-date">2026.08</span><div class="cl-body"><span class="cl-tag">新功能</span><strong>AI 情境對話</strong>——選情境(便利商店、面試、市役所…)和 N5–N1 難度,AI 扮演對方跟你多輪對話,即時提點、結束給整體點評,還能自訂主題隨便聊。(免費體驗 1 場)</div></div>
+      <div class="cl-item"><span class="cl-date">2026.08</span><div class="cl-body"><span class="cl-tag">新功能</span><strong>文章閱讀</strong>——精選日文短文,讀完附整篇中譯、重點單字與文法詳解,還能逐句聽真人語音朗讀,把單字、文法放回真正的文章裡記。(免費版可試讀一篇)</div></div>
+      <div class="cl-item"><span class="cl-date">2026.08</span><div class="cl-body"><span class="cl-tag">新功能</span><strong>五十音</strong>——平假名／片假名對照表,點一下就聽發音、看逐筆<strong>筆順動畫</strong>,還能<strong>描寫練習</strong>;另附認讀與筆畫數測驗。</div></div>
       <div class="cl-item"><span class="cl-date">2026.08</span><div class="cl-body"><span class="cl-tag">新功能</span>JLPT <strong>讀解題庫擴充</strong>——新增多篇 N4–N1 長文閱讀(說明文／論說／新聞風),純日文自動標假名、即點即查,每篇附理解題與解析。</div></div>
       <div class="cl-item"><span class="cl-date">2026.08</span><div class="cl-body"><span class="cl-tag">新功能</span><strong>每個文法點都有「詳解」了</strong>——全 382 個文法附上微語意／易混淆的深入說明(意味、接續、例句、近義比較、常見錯誤)。點文法卡裡的「📖 詳解」就看得到。</div></div>
       <div class="cl-item"><span class="cl-date">2026.08</span><div class="cl-body"><span class="cl-tag">新功能</span><strong>即點即查</strong>——讀例句時,點任何漢字詞就跳出辭書形、意思、詞性;動詞還會告訴你是什麼活用形(て形／ます形…),初學者不用再自己回推。</div></div>
@@ -829,12 +830,12 @@ try {
     <div class="eyebrow reveal">VOICES · 學員回饋</div>
     <h2 class="section-title reveal">用過的人，這麼說。</h2>
     <div class="voices">
-      <div class="voice-card reveal"><div class="voice-quote">「如果有付費項目，我非常願意支付！」</div><div class="voice-meta"><div class="voice-av">💬</div><div class="voice-handle"><strong>@ra****</strong>Threads 網友</div></div></div>
-      <div class="voice-card reveal reveal-d1"><div class="voice-quote">「太強了！版面乾淨、操作簡單直覺，會讓人想一直學習下去！」</div><div class="voice-meta"><div class="voice-av">💬</div><div class="voice-handle"><strong>@ju****</strong>Threads 網友</div></div></div>
-      <div class="voice-card reveal reveal-d2"><div class="voice-quote">「非常好用，謝謝你這麼用心開發！」</div><div class="voice-meta"><div class="voice-av">💬</div><div class="voice-handle"><strong>@ji****</strong>Threads 網友</div></div></div>
-      <div class="voice-card reveal"><div class="voice-quote">「很容易上手，花幾分鐘學習也沒壓力！」</div><div class="voice-meta"><div class="voice-av">💬</div><div class="voice-handle"><strong>@se****</strong>Threads 網友</div></div></div>
-      <div class="voice-card reveal reveal-d1"><div class="voice-quote">「同樣身為工程師，覺得很實用！」</div><div class="voice-meta"><div class="voice-av">💬</div><div class="voice-handle"><strong>@h.****</strong>Threads・工程師</div></div></div>
-      <div class="voice-card reveal reveal-d2"><div class="voice-quote">「對學習很有幫助，謝謝你 🙏」</div><div class="voice-meta"><div class="voice-av">💬</div><div class="voice-handle"><strong>@mo****</strong>Threads 網友</div></div></div>
+      <div class="voice-card reveal"><div class="voice-quote">「如果有付費項目，我非常願意支付！」</div><div class="voice-meta"><div class="voice-av"><i data-ic="chat" data-sz="18"></i></div><div class="voice-handle"><strong>@ra****</strong>Threads 網友</div></div></div>
+      <div class="voice-card reveal reveal-d1"><div class="voice-quote">「太強了！版面乾淨、操作簡單直覺，會讓人想一直學習下去！」</div><div class="voice-meta"><div class="voice-av"><i data-ic="chat" data-sz="18"></i></div><div class="voice-handle"><strong>@ju****</strong>Threads 網友</div></div></div>
+      <div class="voice-card reveal reveal-d2"><div class="voice-quote">「非常好用，謝謝你這麼用心開發！」</div><div class="voice-meta"><div class="voice-av"><i data-ic="chat" data-sz="18"></i></div><div class="voice-handle"><strong>@ji****</strong>Threads 網友</div></div></div>
+      <div class="voice-card reveal"><div class="voice-quote">「很容易上手，花幾分鐘學習也沒壓力！」</div><div class="voice-meta"><div class="voice-av"><i data-ic="chat" data-sz="18"></i></div><div class="voice-handle"><strong>@se****</strong>Threads 網友</div></div></div>
+      <div class="voice-card reveal reveal-d1"><div class="voice-quote">「同樣身為工程師，覺得很實用！」</div><div class="voice-meta"><div class="voice-av"><i data-ic="chat" data-sz="18"></i></div><div class="voice-handle"><strong>@h.****</strong>Threads・工程師</div></div></div>
+      <div class="voice-card reveal reveal-d2"><div class="voice-quote">「對學習很有幫助，謝謝你」</div><div class="voice-meta"><div class="voice-av"><i data-ic="chat" data-sz="18"></i></div><div class="voice-handle"><strong>@mo****</strong>Threads 網友</div></div></div>
     </div>
     <p style="font-size:12px;color:var(--tx3);text-align:center;margin-top:16px">※ 取自 Threads（脆）真實留言，原意未改；帳號已部分隱去以保護隱私。</p>
   </div>
@@ -848,7 +849,7 @@ try {
     <div class="pt-mascot reveal" aria-hidden="true"><img src="images/mascot/tanuki-stand.png" alt=""></div>
     <div class="pt-grid">
       <div class="pt-card pt-featured reveal">
-        <div class="pt-badge pt-badge-best">💎 最划算</div>
+        <div class="pt-badge pt-badge-best">最划算</div>
         <div class="pt-name">年費訂閱</div>
         <div class="pt-price"><span>NT$</span>1,490<small>/ 年</small></div>
         <div class="pt-desc">平均 NT$124 / 月 · 長期備考首選</div>
@@ -860,18 +861,18 @@ try {
         <div class="pt-desc">先試一個月 · 隨時可取消</div>
       </div>
       <div class="pt-card reveal reveal-d2">
-        <div class="pt-badge" style="background:#F59E0B;color:#fff">🏆 一次解決</div>
+        <div class="pt-badge" style="background:#F59E0B;color:#fff">一次解決</div>
         <div class="pt-name">買斷方案</div>
         <div class="pt-price"><span>NT$</span>2,990</div>
         <div class="pt-desc">一次付清 · 買斷功能 · 不再扣款</div>
       </div>
     </div>
     <div class="trust-row reveal">
-      <span><b>✓</b> 登入即送 3 天全功能試用</span>
-      <span><b>✓</b> 7 天無條件全額退費</span>
-      <span><b>✓</b> 隨時可取消</span>
-      <span><b>✓</b> 繁中介面・N5–N1 全等級</span>
-      <span><b>✓</b> 單字・文法・模考・跟讀一站式</span>
+      <span><i data-ic="check" data-sz="15"></i> 登入即送 3 天全功能試用</span>
+      <span><i data-ic="check" data-sz="15"></i> 7 天無條件全額退費</span>
+      <span><i data-ic="check" data-sz="15"></i> 隨時可取消</span>
+      <span><i data-ic="check" data-sz="15"></i> 繁中介面・N5–N1 全等級</span>
+      <span><i data-ic="check" data-sz="15"></i> 單字・文法・模考・跟讀一站式</span>
     </div>
     <div style="text-align:center;margin-top:32px">
       <a href="pricing.html" class="hero-cta" style="background:var(--tx);color:var(--bg)">查看完整方案
@@ -928,7 +929,7 @@ try {
       </div>
       <div class="stat-item reveal reveal-d5" id="activeNowCard" style="display:none">
         <div class="stat-number" id="activeNowCount" style="color:var(--ac);"></div>
-        <div class="stat-label">🟢 此刻在線</div>
+        <div class="stat-label"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#22C55E;vertical-align:middle;margin-right:5px"></span>此刻在線</div>
       </div>
     </div>
   </div>
@@ -978,7 +979,7 @@ try {
   <div class="ft-inner">
     <div>
       <div class="ft-brand">© 2026 · 日本再留計劃 / StayJP Study</div>
-      <div class="ft-legal">本站為原創學習整理，建議搭配 JLPT 官方教材使用。若發現內容有誤，歡迎點卡片上「🚩 回報此項錯誤」告知。不隸屬於 JLPT 官方或任何教育機構。</div>
+      <div class="ft-legal">本站為原創學習整理，建議搭配 JLPT 官方教材使用。若發現內容有誤，歡迎點卡片上「<i data-ic="flag" data-sz="13"></i> 回報此項錯誤」告知。不隸屬於 JLPT 官方或任何教育機構。</div>
     </div>
     <div>
       <a href="app.html">學習工具</a>
