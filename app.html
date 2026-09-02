@@ -279,6 +279,129 @@ select.lang-btn {
 .fc-t{font-size:13px;font-weight:800}
 .fc-d{font-size:10.5px;color:var(--tx2);line-height:1.4}
 .fc-new{position:absolute;top:6px;right:6px;font-size:9px;background:#ef4444;color:#fff;border-radius:8px;padding:1px 5px;font-weight:800;line-height:1.5}
+/* ===== 學習面板 Hub ===== */
+.hub-view #hdBar, .hub-view #favBtn, .hub-view .menu-btn { display: none !important; }
+.hub { max-width: 680px; margin: 0 auto; padding: 4px 0 20px; }
+@media (min-width: 860px) {
+  .hub { max-width: 1000px; display: grid; grid-template-columns: 336px 1fr; gap: 26px; align-items: start; }
+  .hub-left { position: sticky; top: calc(var(--hh) + 16px); }
+}
+.hub-left { min-width: 0; }
+.hub-right { min-width: 0; }
+.hub-hero { position: relative; overflow: hidden; background: linear-gradient(160deg, var(--soft, rgba(198,85,59,.10)), var(--bg2)); border: 1px solid var(--bd); border-radius: 20px; padding: 22px 18px 18px; text-align: center; margin: 0 0 14px; }
+.hub-hero-main { position: relative; z-index: 1; }
+.hub-mascot2 { width: 118px; height: auto; display: block; margin: 0 auto 8px; }
+.hub-hello { display: flex; flex-direction: column; align-items: center; gap: 9px; }
+/* 今日目標併進招呼卡:去掉自身外框,用上緣分隔線區隔 */
+.hub-hero .hub-goal { background: none; border: 0; box-shadow: none; border-radius: 0; text-align: left; padding: 14px 2px 0; margin: 16px 0 0; border-top: 1px solid var(--bd); }
+.hub-hero .hub-goal:active { transform: none; }
+.hub-hello h2 { font-size: 22px; font-weight: 800; margin: 0; letter-spacing: .01em; }
+.hub-petals { position: absolute; inset: 0; pointer-events: none; z-index: 0; }
+.hub-petals .bl { position: absolute; }
+.hub-petals .bl1 { width: 28px; top: 12px; left: 14px; fill: #E4A594; opacity: .55; transform: rotate(-12deg); }
+.hub-petals .bl2 { width: 19px; top: 30px; right: 18px; fill: #EABBAC; opacity: .5; transform: rotate(22deg); }
+.hub-petals .bl3 { width: 15px; bottom: 16px; left: 30px; fill: #E4A594; opacity: .45; transform: rotate(8deg); }
+.hub-petals .bl4 { width: 13px; bottom: 22px; right: 30px; fill: #EABBAC; opacity: .4; transform: rotate(-18deg); }
+.hub-foot { display: flex; flex-direction: column; align-items: center; margin-top: 24px; }
+.hub-foot img { width: 92px; height: auto; opacity: .95; }
+.hub-foot span { font-size: 12px; color: var(--tx3); margin-top: 6px; }
+.hub-hi .hub-streak { display:inline-flex; align-items:center; gap:5px; font-weight:800; font-size:14px; color:var(--ac); background:var(--bg2); border:1px solid var(--bd); border-radius:999px; padding:5px 11px; }
+.hub-goal { display:block; width:100%; text-align:left; background:var(--bg2); border:1px solid var(--bd); border-radius:16px; padding:14px 16px; margin:0 0 14px; cursor:pointer; color:inherit; }
+.hub-goal:active { transform: scale(.99); }
+.hub-goal-top { display:flex; align-items:baseline; justify-content:space-between; margin-bottom:9px; }
+.hub-goal-top b { font-size:14px; font-weight:800; }
+.hub-goal-top .hub-goal-n { font-size:13px; color:var(--tx2); font-weight:700; font-variant-numeric:tabular-nums; }
+.hub-goal-bar { height:9px; border-radius:999px; background:var(--bd); overflow:hidden; }
+.hub-goal-fill { height:100%; border-radius:999px; background:var(--ac); transition:width .5s ease; }
+.hub-goal-hint { margin-top:8px; font-size:11.5px; color:var(--tx3); }
+.hub-resume { display:flex; align-items:center; gap:10px; width:100%; background:var(--ac); color:#fff; border:0; border-radius:14px; padding:14px 16px; font-size:15px; font-weight:800; cursor:pointer; margin:0 0 18px; box-shadow:0 2px 10px rgba(198,85,59,.28); }
+.hub-resume:active { transform: scale(.99); }
+.hub-resume { white-space: nowrap; }
+.hub-resume .hr-play { font-size:17px; flex-shrink:0; }
+.hub-resume .hr-main { overflow:hidden; text-overflow:ellipsis; }
+.hub-resume .hr-sub { margin-left:auto; font-size:12px; font-weight:600; opacity:.9; flex-shrink:0; padding-left:8px; }
+.hub-sec { font-size:11px; color:var(--tx3); text-transform:uppercase; letter-spacing:.06em; font-weight:800; margin:0 2px 8px; }
+.hub-jlpt { position:relative; display:flex; align-items:center; gap:14px; background:linear-gradient(135deg,var(--ac),#a8482f); color:#fff; border-radius:18px; padding:18px 18px; text-decoration:none; margin:0 0 12px; box-shadow:0 3px 14px rgba(198,85,59,.3); }
+.hub-jlpt:active { transform: scale(.99); }
+.hub-jlpt .hj-ic { font-size:34px; line-height:1; flex-shrink:0; }
+.hub-jlpt .hj-t { font-size:17px; font-weight:900; }
+.hub-jlpt .hj-d { font-size:12px; opacity:.92; margin-top:2px; }
+.hub-jlpt .hj-new { position:absolute; top:12px; right:14px; font-size:9px; background:#fff; color:var(--ac); border-radius:8px; padding:1px 6px; font-weight:900; }
+.hub-jlpt .hj-arrow { margin-left:auto; font-size:20px; opacity:.85; }
+.hub-grid2 { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:0 0 18px; }
+.hub-card { position:relative; overflow:hidden; display:flex; flex-direction:column; gap:9px; background:var(--bg2); border:1px solid var(--bd); border-radius:16px; padding:16px 16px 15px; text-decoration:none; color:var(--tx); cursor:pointer; text-align:left; box-shadow:0 1px 3px rgba(0,0,0,.04); }
+.hub-card:active { transform: scale(.98); }
+.hub-card .hc-ic { width:46px; height:46px; border-radius:13px; background:var(--soft,rgba(198,85,59,.10)); display:flex; align-items:center; justify-content:center; color:var(--ac); font-size:23px; line-height:1; }
+.hub-card .hc-t { font-size:16px; font-weight:800; margin-top:1px; }
+.hub-card .hc-d { font-size:11.5px; color:var(--tx2); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%; }
+.hub-card .hc-wm { position:absolute; right:-14px; bottom:-18px; font-size:104px; color:var(--ac); opacity:.06; pointer-events:none; line-height:1; }
+.hub-card .hc-new { position:absolute; top:10px; right:11px; z-index:1; font-size:9px; background:#ef4444; color:#fff; border-radius:8px; padding:1px 6px; font-weight:800; }
+.hub-quick { display:flex; flex-wrap:wrap; gap:8px; }
+.hub-quick a, .hub-quick button { display:inline-flex; align-items:center; gap:6px; background:var(--bg2); border:1px solid var(--bd); border-radius:999px; padding:9px 14px; font-size:13px; font-weight:700; color:var(--tx); text-decoration:none; cursor:pointer; }
+.hub-quick a:active, .hub-quick button:active { transform: scale(.97); }
+.hub-quick .hq-ic { color:var(--ac); font-size:16px; }
+.hub-back { border:none; border-radius:20px; cursor:pointer; font-size:13px; font-weight:800; padding:5px 12px; white-space:nowrap; flex-shrink:0; background:var(--bg3); color:var(--ac); margin-right:2px; -webkit-tap-highlight-color:transparent; }
+.hub-back:active { transform: scale(.97); }
+.hub-motto { font-size: 12.5px; font-weight: 700; color: var(--ac); }
+.hub-art { margin: 0 0 18px; }
+.hub-art .art-entry { margin: 0 !important; }
+.hub-wod { display: flex; align-items: center; gap: 12px; background: var(--bg2); border: 1px solid var(--bd); border-radius: 14px; padding: 11px 14px; margin-top: 14px; box-shadow: 0 1px 3px rgba(0,0,0,.04); }
+.hub-wod-main { flex: 1; min-width: 0; }
+.hub-wod-lbl { font-size: 10px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--ac); }
+.hub-wod-w { font-size: 19px; font-weight: 800; line-height: 1.25; margin-top: 2px; }
+.hub-wod-sub { font-size: 12.5px; color: var(--tx2); margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.hub-wod-spk { flex-shrink: 0; width: 34px; height: 34px; border: none; border-radius: 50%; background: var(--soft, rgba(198,85,59,.10)); color: var(--ac); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; font-size: 16px; }
+.hub-wod-spk:active { transform: scale(.92); }
+/* 一點點動感:招呼浣熊漂浮、卡片進場、hover 微浮 */
+@keyframes hubBob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+@keyframes hubIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+.hub-mascot2 { animation: hubBob 3.2s ease-in-out infinite; }
+.hub-left, .hub-right > * { animation: hubIn .5s var(--ease) backwards; }
+.hub-right > *:nth-child(1) { animation-delay: .04s; }
+.hub-right > *:nth-child(2) { animation-delay: .10s; }
+.hub-right > *:nth-child(3) { animation-delay: .16s; }
+.hub-right > *:nth-child(4) { animation-delay: .22s; }
+.hub-right > *:nth-child(5) { animation-delay: .28s; }
+.hub-right > *:nth-child(6) { animation-delay: .34s; }
+.hub-jlpt, .hub-card, .hub-goal, .hub-resume { transition: transform .18s var(--ease), box-shadow .18s var(--ease); }
+@media (hover: hover) {
+  .hub-jlpt:hover { transform: translateY(-3px); box-shadow: 0 8px 22px rgba(198,85,59,.34); }
+  .hub-card:hover { transform: translateY(-3px); box-shadow: 0 8px 18px rgba(0,0,0,.10); }
+  .hub-card:hover .hc-ic { transform: scale(1.12); }
+  .hc-ic { transition: transform .18s var(--ease); }
+  .hub-resume:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(198,85,59,.36); }
+  .hub-quick a:hover, .hub-quick button:hover { border-color: var(--ac); color: var(--ac); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hub-mascot2, .hub-left, .hub-right > * { animation: none; }
+  .hub-goal-fill { transition: none; }
+}
+/* 面板手機版:更緊湊,一屏看到更多功能;招呼卡改左右排 */
+@media (max-width: 600px) {
+  .hub { padding: 2px 0 16px; }
+  .hub-left { margin-bottom: 12px; }              /* 疊層時左右欄之間留距,不再黏 */
+  .hub-hero { display: block; text-align: left; padding: 14px 15px; margin-bottom: 12px; }
+  .hub-hero-main { display: flex; align-items: center; gap: 13px; }
+  .hub-mascot2 { width: 66px; margin: 0; }
+  .hub-hello { align-items: flex-start; gap: 4px; }
+  .hub-hello h2 { font-size: 19px; }
+  .hub-hero .hub-goal { margin-top: 12px; padding-top: 12px; }
+  .hub-goal { padding: 12px 14px; margin-bottom: 12px; }
+  .hub-resume { padding: 12px 14px; }
+  .hub-resume .hr-sub { display: none; }   /* 手機:省掉「回到上次進度」,保持一行 */
+  .hub-wod { padding: 12px 14px; margin-top: 12px; }
+  .hub-wod-w { font-size: 21px; }
+  .hub-jlpt { padding: 13px 15px; margin-bottom: 10px; }
+  .hub-jlpt .hj-ic { font-size: 27px; }
+  .hub-grid2 { gap: 9px; margin-bottom: 13px; }
+  .hub-card { padding: 12px 13px; gap: 6px; }
+  .hub-card .hc-ic { width: 40px; height: 40px; font-size: 20px; }
+  .hub-card .hc-t { font-size: 15px; margin-top: 0; }
+  .hub-card .hc-wm { font-size: 84px; right: -12px; bottom: -14px; }
+  .hub-sec { margin: 0 2px 7px; }
+  .hub-foot { margin-top: 16px; }
+  .hub-foot img { width: 74px; }
+}
 .more-item {
   display: block; width: 100%; text-align: left;
   background: none; border: none; color: var(--tx);
@@ -422,6 +545,9 @@ select::-ms-expand { display: none; }
 /* 在「我的」頁:隱藏左側單字/文法清單(那清單在此無作用,點了沒反應),內容區補滿 */
 body.profile-view .sd { display: none; }
 body.profile-view .mn { margin-left: 0; max-width: none; }   /* 滿版 → 內層 (max-width:880;margin:0 auto) 自然水平置中 */
+/* 學習面板:同樣隱藏側欄(面板模式下清單目錄無意義)、主區滿版 → 內層 .hub 置中 */
+body.hub-view .sd { display: none; }
+body.hub-view .mn { margin-left: 0; max-width: none; }
 
 /* == Intro banner == */
 .intro {
@@ -1518,6 +1644,7 @@ try {
     </div>
   </div>
   <div class="hd-bar" id="hdBar">
+    <button class="hub-back" onclick="goHub()" aria-label="返回面板">‹ <span data-i18n="hub_panel">面板</span></button>
     <button class="mode-pill on" onclick="switchMode('grammar')" data-i18n="grammar">文法</button>
     <button class="mode-pill" onclick="switchMode('vocab')" data-i18n="vocab">單字</button>
     <div class="hd-sep"></div>
@@ -1528,7 +1655,7 @@ try {
 </header>
 <!-- Bottom nav -->
 <nav class="ftb" id="ftb">
-  <button class="ftb-btn on" onclick="switchBottomTab(this);deferRender()"><svg viewBox="0 0 24 24"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg><span data-i18n="learn">學習</span></button>
+  <button class="ftb-btn on" onclick="switchBottomTab(this);goHub()"><svg viewBox="0 0 24 24"><path d="M3 12l9-9 9 9M5 10v10h5v-6h4v6h5V10"/></svg><span data-i18n="learn_home">面板</span></button>
   <button class="ftb-btn" onclick="Quiz.start()"><svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg><span data-i18n="quiz">測驗</span></button>
   <button class="ftb-btn" id="reviewBtn" onclick="SRS.start()"><svg viewBox="0 0 24 24"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg><span data-i18n="review">複習</span></button>
   <button class="ftb-btn" onclick="Stats.openProfile()"><svg viewBox="0 0 24 24"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg><span data-i18n="tab_mine">我的</span></button>
@@ -2020,7 +2147,6 @@ function loadCloudData() {
     // 其他裝置下次登入就拿得到 → 修「火焰跨裝置連續、但月曆塗滿散落各機」(只有 backfill 時才推會漏掉)。
     if (typeof saveAllCloud === 'function') saveAllCloud();
     if (typeof SRS !== 'undefined') SRS.updateReviewCount();
-    if (typeof Calendar !== 'undefined') Calendar.renderPanel();
     // 回訪用戶在這台第一次登入、雲端資料剛載入 → 標記引導完成並關掉(避免對老用戶閃出新手引導)
     if (typeof _onbHasData === 'function' && _onbHasData()) {
       localStorage.setItem('onboarding_done_v1', '1');
@@ -2154,9 +2280,11 @@ let currentMode = (_savedMode === 'vocab' || _savedMode === 'confuse') ? _savedM
 let currentLevel = ['n5','n4','n3','n2','n1','all'].includes(_savedLevel) ? _savedLevel : 'n5';
 let showFavOnly = false;
 let searchTerm = '';
+let inHub = true;   // 進入點是學習面板;點單字/文法或搜尋才進清單
 
 // Restore saved mode/level UI on load
 (function initSavedState() {
+  document.body.classList.add('hub-view');   // 一律先看面板
   document.querySelectorAll('.mode-pill').forEach((b,i) => b.classList.toggle('on',
     (i===0&&currentMode==='grammar')||(i===1&&currentMode==='vocab')));
   document.getElementById('modeTitle').textContent = currentMode==='grammar'?t('grammar'):currentMode==='vocab'?t('vocab'):currentMode==='confuse'?t('compare'):'';
@@ -2164,6 +2292,8 @@ let searchTerm = '';
 })();
 
 function switchMode(mode) {
+  inHub = false;
+  document.body.classList.remove('hub-view');
   currentMode = mode;
   showFavOnly = false;
   document.getElementById('favBtn').classList.remove('fav-on');
@@ -2180,7 +2310,154 @@ function switchMode(mode) {
   localStorage.setItem('lastMode', currentMode);
   localStorage.setItem('lastLevel', currentLevel);
   doRender();
+  window.scrollTo(0, 0);   // 從面板點進單字/文法(或切模式)→ 回到畫面最上面
   if (typeof fixHeaderHeight === 'function') fixHeaderHeight();   // 切換後重算側欄高度,避免長清單底部滾不到
+}
+// ========== 學習面板 Hub ==========
+function goHub() {
+  inHub = true;
+  document.body.classList.add('hub-view');
+  document.body.classList.remove('profile-view');
+  showFavOnly = false;
+  searchTerm = '';
+  const s = document.getElementById('search'); if (s) s.value = '';
+  document.querySelectorAll('.ftb-btn').forEach((b, i) => b.classList.toggle('on', i === 0));
+  renderHub();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+window.goHub = goHub;
+function _hubToday() {
+  try {
+    const sl = JSON.parse(localStorage.getItem('study_log') || '{}');
+    const today = new Date().toISOString().split('T')[0];
+    const d = sl[today]; if (!d) return 0;
+    return (d.vocab || 0) + (d.grammar || 0) + (d.quiz || 0);
+  } catch (e) { return 0; }
+}
+function _hubStreak() {
+  try { return (JSON.parse(localStorage.getItem('streak_v1') || '{}').days) || 0; } catch (e) { return 0; }
+}
+function _hubEsc(s) { return ('' + (s == null ? '' : s)).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+// 每日一字:依日期挑一個字(同一天固定),勾起「這什麼意思?」的好奇心
+function _hubWordOfDay() {
+  try {
+    const lv = ['n5', 'n4', 'n3', 'n2', 'n1'].includes(localStorage.getItem('lastLevel')) ? localStorage.getItem('lastLevel') : 'n3';
+    const data = (typeof getVocabData === 'function') ? getVocabData(lv) : [];
+    if (!data || !data.length) return null;
+    const today = new Date().toISOString().split('T')[0];
+    let h = 0; for (let i = 0; i < today.length; i++) h = (h * 31 + today.charCodeAt(i)) >>> 0;
+    const w = data[h % data.length];
+    return w ? { lv: lv.toUpperCase(), w: w.w, r: w.r, m: w.m } : null;
+  } catch (e) { return null; }
+}
+window.hubSpeakWord = function () { const w = _hubWordOfDay(); if (w && typeof speak === 'function') speak(w.r || w.w); };
+// 達標小彩蛋:落下的花瓣 + 彩點,3.5 秒清掉。每天只放一次(第一次打開面板且已達標時)
+function hubConfetti() {
+  if (document.getElementById('hubConfetti')) return;
+  if (!document.getElementById('hubConfettiCss')) {
+    const st = document.createElement('style'); st.id = 'hubConfettiCss';
+    st.textContent = '@keyframes hubCf{0%{transform:translateY(-10vh) rotate(0);opacity:1}100%{transform:translateY(105vh) rotate(720deg);opacity:.9}}';
+    document.head.appendChild(st);
+  }
+  const wrap = document.createElement('div'); wrap.id = 'hubConfetti';
+  wrap.style.cssText = 'position:fixed;inset:0;pointer-events:none;z-index:9999;overflow:hidden';
+  const colors = ['#C6553B', '#E4A594', '#F5B841', '#3FA796', '#EFE7D8'];
+  for (let i = 0; i < 46; i++) {
+    const p = document.createElement('div');
+    const sz = 7 + Math.random() * 8, round = Math.random() > .5;
+    p.style.cssText = 'position:absolute;top:-8vh;left:' + (Math.random() * 100) + 'vw;width:' + sz + 'px;height:' + sz + 'px;background:' + colors[i % colors.length] + ';border-radius:' + (round ? '50%' : '2px') + ';animation:hubCf ' + (2 + Math.random() * 1.6) + 's cubic-bezier(.3,.6,.5,1) ' + (Math.random() * .5) + 's forwards';
+    wrap.appendChild(p);
+  }
+  document.body.appendChild(wrap);
+  setTimeout(() => wrap.remove(), 3800);
+}
+function renderHub() {
+  const mn = document.getElementById('mn');
+  if (!mn) return;
+  const L = (zh, en) => (typeof enOr === 'function' ? enOr(cvt(zh), en) : zh);
+  const h = new Date().getHours();
+  const greet = h < 5 ? 'こんばんは' : h < 11 ? 'おはよう' : h < 18 ? 'こんにちは' : 'こんばんは';
+  const streak = _hubStreak();
+  const done = _hubToday();
+  const GOAL = 30;
+  const pct = Math.min(100, Math.round(done / GOAL * 100));
+  let motto;
+  if (done >= GOAL) motto = L('今天達成了，太棒了！', 'Goal smashed today!');
+  else if (done > 0) motto = L('再 ' + (GOAL - done) + ' 個就達標，衝！', 'Just ' + (GOAL - done) + ' to go — push!');
+  else if (streak > 0) motto = L('別讓 ' + streak + ' 天連續斷掉，來 5 分鐘！', 'Keep your ' + streak + '-day streak — 5 min!');
+  else motto = L('今天還沒開始 — 先來 5 分鐘暖身？', 'Fresh start — warm up 5 min?');
+  const wod = _hubWordOfDay();
+  const lm = localStorage.getItem('lastMode');
+  const ll = (localStorage.getItem('lastLevel') || '').toUpperCase();
+  let resume = '';
+  if ((lm === 'vocab' || lm === 'grammar') && ll) {
+    const mlabel = lm === 'vocab' ? L('單字', 'Vocab') : L('文法', 'Grammar');
+    resume = '<button class="hub-resume" onclick="switchMode(\'' + lm + '\')"><span class="hr-play">▶</span><span class="hr-main">' + L('繼續上次', 'Continue') + '：' + mlabel + ' ' + ll + '</span><span class="hr-sub">' + L('回到上次進度', 'resume') + '</span></button>';
+  }
+  const blossom = c => '<svg class="bl ' + c + '" viewBox="0 0 40 40"><g><ellipse cx="20" cy="11" rx="4.6" ry="7.4"/><ellipse cx="20" cy="11" rx="4.6" ry="7.4" transform="rotate(72 20 20)"/><ellipse cx="20" cy="11" rx="4.6" ry="7.4" transform="rotate(144 20 20)"/><ellipse cx="20" cy="11" rx="4.6" ry="7.4" transform="rotate(216 20 20)"/><ellipse cx="20" cy="11" rx="4.6" ry="7.4" transform="rotate(288 20 20)"/></g><circle cx="20" cy="20" r="2.6" fill="#fff"/></svg>';
+  mn.innerHTML =
+    '<div class="hub">'
+    + '<aside class="hub-left">'
+      + '<div class="hub-hero">'
+        + '<div class="hub-petals">' + blossom('bl1') + blossom('bl2') + blossom('bl3') + blossom('bl4') + '</div>'
+        + '<div class="hub-hero-main">'
+          + '<img class="hub-mascot2" src="images/mascot/tanuki-stand.png" alt="">'
+          + '<div class="hub-hello"><h2>' + greet + '</h2>'
+            + (streak > 0 ? '<span class="hub-streak"><i data-ic=fire></i> ' + L('連續 ', '') + streak + L(' 天', 'd') + '</span>' : '')
+            + '<div class="hub-motto">' + motto + '</div>'
+          + '</div>'
+        + '</div>'
+        + '<button class="hub-goal" onclick="dailyHelp()">'
+          + '<div class="hub-goal-top"><b>' + L('今日目標', 'Today’s goal') + '</b><span class="hub-goal-n">' + done + ' / ' + GOAL + '</span></div>'
+          + '<div class="hub-goal-bar"><div class="hub-goal-fill" style="width:0"></div></div>'
+          + '<div class="hub-goal-hint">' + (done >= GOAL ? L('今天達成了，太強了！', 'Goal reached — nice!') : L('做滿 30 個學習動作就達標（背卡・答題・複習…混著做都算）', 'Do 30 study actions today — anything counts')) + '</div>'
+        + '</button>'
+      + '</div>'
+      + resume
+      + (wod ? '<div class="hub-wod">'
+        + '<div class="hub-wod-main">'
+          + '<div class="hub-wod-lbl">' + L('今日一字', 'Word of the day') + ' · ' + wod.lv + '</div>'
+          + '<div class="hub-wod-w">' + _hubEsc(wod.w) + '</div>'
+          + '<div class="hub-wod-sub">' + _hubEsc(wod.r) + ' ・ ' + _hubEsc(wod.m) + '</div>'
+        + '</div>'
+        + '<button class="hub-wod-spk" onclick="hubSpeakWord()" aria-label="' + L('播放發音', 'Play') + '"><i data-ic=volume></i></button>'
+      + '</div>' : '')
+    + '</aside>'
+    + '<div class="hub-right">'
+      + '<a class="hub-jlpt" href="jlpt-drill.html"><span class="hj-new">' + L('主打', 'TOP') + '</span><span class="hj-ic"><i data-ic=target></i></span><span><span class="hj-t">' + L('JLPT 刷題特區', 'JLPT Drills') + '</span><div class="hj-d">' + L('2,800+ 題照真題 · 模擬試験 · 錯題本', '2,800+ real-format questions') + '</div></span><span class="hj-arrow">›</span></a>'
+      + '<div class="hub-grid2">'
+        + '<a class="hub-card" href="speak.html"><i class="hc-wm" data-ic=mic></i><span class="hc-new">NEW</span><span class="hc-ic"><i data-ic=mic></i></span><span class="hc-t">' + L('AI 口說', 'AI Speaking') + '</span><span class="hc-d">' + L('跟讀 · 即時評分', 'Shadow + scoring') + '</span></a>'
+        + '<a class="hub-card" href="speak-chat.html"><i class="hc-wm" data-ic=speak></i><span class="hc-new">NEW</span><span class="hc-ic"><i data-ic=speak></i></span><span class="hc-t">' + L('AI 聊聊', 'AI Chat') + '</span><span class="hc-d">' + L('情境對話', 'Role-play chat') + '</span></a>'
+      + '</div>'
+      + ((window.Articles && Articles.entryCardHtml) ? '<div class="hub-art">' + Articles.entryCardHtml() + '</div>' : '')
+      + '<div class="hub-sec">' + L('背 · 記', 'Study') + '</div>'
+      + '<div class="hub-grid2">'
+        + '<button class="hub-card" onclick="switchMode(\'vocab\')"><i class="hc-wm" data-ic=book></i><span class="hc-ic"><i data-ic=book></i></span><span class="hc-t">' + L('單字', 'Vocabulary') + '</span><span class="hc-d">7,710' + L(' 詞 · N5–N1', ' words') + '</span></button>'
+        + '<button class="hub-card" onclick="switchMode(\'grammar\')"><i class="hc-wm" data-ic=edit></i><span class="hc-ic"><i data-ic=edit></i></span><span class="hc-t">' + L('文法', 'Grammar') + '</span><span class="hc-d">382' + L(' 點 · N5–N1', ' points') + '</span></button>'
+      + '</div>'
+      + '<div class="hub-sec">' + L('快捷', 'Quick') + '</div>'
+      + '<div class="hub-quick">'
+        + '<button onclick="SRS.start()"><span class="hq-ic"><i data-ic=refresh></i></span>' + L('複習', 'Review') + '</button>'
+        + '<button onclick="Kana.open()"><span class="hq-ic"><i data-ic=grid></i></span>' + L('五十音', 'Kana') + '</button>'
+        + '<button onclick="MockExam.start()"><span class="hq-ic"><i data-ic=clipboard></i></span>' + L('模擬考', 'Mock') + '</button>'
+        + '<button onclick="FlashCard.start()"><span class="hq-ic"><i data-ic=bolt></i></span>' + L('快速背單字', 'Flashcards') + '</button>'
+      + '</div>'
+      + '<div class="hub-foot"><img src="images/mascot/tanuki-think.png" alt=""><span>' + L('今天也一起加油！', 'Let’s study today!') + '</span></div>'
+    + '</div>'
+    + '</div>';
+  try { if (window.Icons && Icons.hydrate) Icons.hydrate(); } catch (e) {}
+  // 進度條載入時從 0 長到目標值,一點小動感
+  requestAnimationFrame(() => { const f = mn.querySelector('.hub-goal-fill'); if (f) f.style.width = pct + '%'; });
+  // 達標彩蛋:每天第一次打開面板且已達標時放一次
+  if (done >= GOAL) {
+    try {
+      const today = new Date().toISOString().split('T')[0];
+      if (localStorage.getItem('hub_celebrated') !== today) {
+        localStorage.setItem('hub_celebrated', today);
+        setTimeout(hubConfetti, 350);
+      }
+    } catch (e) {}
+  }
 }
 function updateTabs() {
   const bar = document.getElementById('tabsBar');
@@ -2222,17 +2499,18 @@ function toggleFavFilter() {
   document.getElementById('favBtn').classList.toggle('fav-on', showFavOnly);
   doRender();
 }
-let st; function onSearch(v) { clearTimeout(st); st = setTimeout(() => { searchTerm = v.trim().toLowerCase(); doRender(); }, 200); }
+let st; function onSearch(v) { clearTimeout(st); st = setTimeout(() => { searchTerm = v.trim().toLowerCase(); if (inHub && searchTerm) { inHub = false; document.body.classList.remove('hub-view'); } doRender(); }, 200); }
 window.doRender = doRender;   // 給 tool-quota:用完額度後即時重繪,<i data-ic=lock></i> 立刻顯示(免 reload)
 function doRender() {
   // 語言就緒前先不渲染內容:en/zh-CN 要先把英文疊層 / OpenCC 準備好,否則會先閃繁體再跳 → 外國/簡中使用者體驗差。
   // zh-TW 一開始就 ready;en/zh-CN 由 applyContentLang / ensureOpenCC 完成後設 true(有 3s fallback 防卡死)。
   if (!window._langReady) return;
+  if (inHub) { renderHub(); return; }
   document.body.classList.remove('profile-view');   // 回到學習列表 → 還原側邊欄(離開「我的」)
   if (currentMode==='vocab') renderVocab();
   else if (currentMode==='confuse') renderConfuse();
   else render();
-  if (typeof Calendar !== 'undefined') Calendar.renderPanel();
+  // 連續天數月曆已移出清單頁(面板顯示連續天數,不再重複);Calendar.logActivity 仍照常記錄學習日。
 }
 // ========== TTS ==========
 // Strategy: every spoken Japanese string has been pre-rendered with VOICEVOX
@@ -3812,12 +4090,7 @@ function renderVocab() {
 
   let h = '';
   if (!lf && !showFavOnly) {
-    h += (window.Articles && Articles.entryCardHtml ? Articles.entryCardHtml() : '');   // 首頁明顯的文章入口卡
-    h += '<div class="flag-row">'
-      + '<a class="flag-card" href="jlpt-drill.html"><span class="fc-new">NEW</span><span class="fc-ic"><i data-ic=target></i></span><span class="fc-t">JLPT 刷題</span><span class="fc-d">2800+題 · 模擬試験</span></a>'
-      + '<a class="flag-card" href="speak.html"><span class="fc-new">NEW</span><span class="fc-ic"><i data-ic=mic></i></span><span class="fc-t">AI 口說評分</span><span class="fc-d">跟讀 · 即時回饋</span></a>'
-      + '<a class="flag-card" href="speak-chat.html"><span class="fc-new">NEW</span><span class="fc-ic"><i data-ic=speak></i></span><span class="fc-t">AI 情境對話</span><span class="fc-d">和 AI 多輪對話</span></a>'
-      + '</div>';   // 主推新功能列
+    // 文章入口卡、JLPT/AI 捷徑列已移到「學習面板」(renderHub);清單頁不再重複。
     const lv = currentLevel.toUpperCase();
     const cnt = data.length;
     const vMas = levelMastery(currentLevel);
@@ -4033,12 +4306,7 @@ function render() {
 
   let h = '';
   if (!lf && !showFavOnly) {
-    h += (window.Articles && Articles.entryCardHtml ? Articles.entryCardHtml() : '');   // 首頁明顯的文章入口卡
-    h += '<div class="flag-row">'
-      + '<a class="flag-card" href="jlpt-drill.html"><span class="fc-new">NEW</span><span class="fc-ic"><i data-ic=target></i></span><span class="fc-t">JLPT 刷題</span><span class="fc-d">2800+題 · 模擬試験</span></a>'
-      + '<a class="flag-card" href="speak.html"><span class="fc-new">NEW</span><span class="fc-ic"><i data-ic=mic></i></span><span class="fc-t">AI 口說評分</span><span class="fc-d">跟讀 · 即時回饋</span></a>'
-      + '<a class="flag-card" href="speak-chat.html"><span class="fc-new">NEW</span><span class="fc-ic"><i data-ic=speak></i></span><span class="fc-t">AI 情境對話</span><span class="fc-d">和 AI 多輪對話</span></a>'
-      + '</div>';   // 主推新功能列
+    // 文章入口卡、JLPT/AI 捷徑列已移到「學習面板」(renderHub);清單頁不再重複。
     const lv = currentLevel.toUpperCase();
     const cnt = data.length;
     const gMas = levelGrammarMastery(currentLevel);
