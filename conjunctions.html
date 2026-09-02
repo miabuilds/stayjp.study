@@ -66,7 +66,7 @@
 
   <div class="hero">
     <h1><span class="zhs">接続詞・連接詞總整理</span><span class="ens">Japanese Conjunctions</span></h1>
-    <p class="lead"><span class="zhs">把句子接起來的「接続詞」依功能分成 8 類。同一類裡意思相近但語感、正式度、能不能放句首都不同——每個詞都附上中文意思、語感差異和例句(點 <i data-ic="volume"></i> 聽發音)。</span><span class="ens">The words that glue sentences together, grouped into 8 functions. Words in the same group differ in nuance, formality, and usage — each with meaning, notes, and an example (tap <i data-ic="volume"></i> to listen).</span></p>
+    <p class="lead"><span class="zhs">把句子接起來的「接続詞」依功能分成 8 類。同一類裡意思相近但語感、正式度、能不能放句首都不同——每個詞都附上中文意思、語感差異和例句(點 <i data-ic=volume></i> 聽發音)。</span><span class="ens">The words that glue sentences together, grouped into 8 functions. Words in the same group differ in nuance, formality, and usage — each with meaning, notes, and an example (tap <i data-ic=volume></i> to listen).</span></p>
   </div>
 
   <nav class="toc" id="toc"></nav>
@@ -90,7 +90,7 @@
 <script>
 // 接続詞資料:cat 分類;items[] = {w 詞, zh 中文, nu 語感, eg 例句(日), egz 例句中譯}
 const CATS = [
-  { k:'junsetsu', ic:'<i data-ic="arrowRight"></i>', tt:'順接（原因→結果）', en:'Cause → Result', items:[
+  { k:'junsetsu', ic:'<i data-ic=arrowRight></i>', tt:'順接（原因→結果）', en:'Cause → Result', items:[
     { w:'だから', zh:'所以、因此', nu:'口語最常用。<b>前面是原因,後面是理所當然的結果</b>。語氣直接,對長輩/正式場合可換「ですから」。', eg:'雨が降っていた。だから試合は中止になった。', egz:'那時在下雨,所以比賽取消了。' },
     { w:'それで', zh:'於是、因此', nu:'承接前句、帶出<b>接下來發生的事</b>,也用來催對方講下去(「それで?」=然後呢?)。比だから更「敘事」。', eg:'道が混んでいた。それで遅刻してしまった。', egz:'路上塞車,於是就遲到了。' },
     { w:'そのため', zh:'因此、為此', nu:'較<b>書面、正式</b>。強調前項是後項的直接原因,常見於新聞、說明文。', eg:'台風が接近している。そのため、明日は休校です。', egz:'颱風接近中,因此明天停課。' },
@@ -119,18 +119,18 @@ const CATS = [
     { w:'それとも', zh:'還是（疑問）', nu:'<b>用在問句</b>,讓對方二選一。', eg:'コーヒーにしますか。それとも、紅茶にしますか。', egz:'要咖啡?還是要紅茶?' },
     { w:'むしろ', zh:'反而、倒不如', nu:'否定前者、<b>更傾向後者</b>時用。', eg:'安いものより、むしろ長く使えるものがいい。', egz:'比起便宜的,反而是能用久的更好。' },
   ]},
-  { k:'iikae', ic:'<i data-ic="chat"></i>', tt:'說明・言い換え（換句話說）', en:'In other words', items:[
+  { k:'iikae', ic:'<i data-ic=chat></i>', tt:'說明・言い換え（換句話說）', en:'In other words', items:[
     { w:'つまり', zh:'也就是說、總之', nu:'<b>把前面的話換句話、做結論</b>。口語書面皆可。', eg:'彼は約束を守らない。つまり、信用できない。', egz:'他不守約,也就是說,不能信任。' },
     { w:'すなわち', zh:'即、換言之', nu:'<b>非常正式、書面</b>,學術、法律文常見,等同「=」。', eg:'首都、すなわち東京に本社を置く。', egz:'總公司設在首都,即東京。' },
     { w:'要するに', zh:'總之、簡言之', nu:'讀作「ようするに」。<b>把冗長內容濃縮成一句重點</b>。', eg:'色々言ったが、要するに、準備不足だった。', egz:'講了一堆,總之就是準備不足。' },
     { w:'なぜなら', zh:'因為（說明理由）', nu:'<b>先講結論、再補理由</b>,後面常配「〜からだ」。書面感。', eg:'外出は控えるべきだ。なぜなら、感染が広がっているからだ。', egz:'應該少外出,因為疫情正在擴散。' },
     { w:'ただし', zh:'但是、不過（附加條件）', nu:'<b>前面成立,但補一個例外/條件</b>。規則、說明常見。', eg:'入場は無料です。ただし、飲食は禁止です。', egz:'入場免費,但是禁止飲食。' },
   ]},
-  { k:'reiji', ic:'<i data-ic="pin"></i>', tt:'例示（舉例）', en:'For example', items:[
+  { k:'reiji', ic:'<i data-ic=pin></i>', tt:'例示（舉例）', en:'For example', items:[
     { w:'例えば', zh:'例如、比方說', nu:'讀作「たとえば」。<b>舉具體例子</b>,最常用。', eg:'果物、例えばりんごやバナナが好きだ。', egz:'水果,例如蘋果或香蕉,我很喜歡。' },
     { w:'いわば', zh:'可以說是、彷彿', nu:'<b>用比喻換個說法</b>,較文雅。', eg:'彼は、いわばチームの心臓だ。', egz:'他可以說是團隊的心臟。' },
   ]},
-  { k:'tenkan', ic:'<i data-ic="refresh"></i>', tt:'轉換話題', en:'Changing topic', items:[
+  { k:'tenkan', ic:'<i data-ic=refresh></i>', tt:'轉換話題', en:'Changing topic', items:[
     { w:'ところで', zh:'話說、對了', nu:'<b>轉換到不相關的新話題</b>,口語常用。', eg:'いい天気ですね。ところで、あの件はどうなりましたか。', egz:'天氣真好呢。對了,那件事後來怎麼樣了?' },
     { w:'さて', zh:'那麼、接下來', nu:'<b>告一段落、進入下一步</b>,主持、書信常見。', eg:'さて、本日の議題に入りましょう。', egz:'那麼,我們進入今天的議題吧。' },
     { w:'では', zh:'那麼', nu:'承前收尾或開啟下一步,口語「じゃ」。', eg:'では、また来週お会いしましょう。', egz:'那麼,下週再見。' },
@@ -171,7 +171,7 @@ function render(){
         <div class="conj-top"><span class="conj-w">${fr(it.w)}</span><span class="conj-zh">${enOr(it.zh,it.zh)}</span></div>
         <div class="conj-nuance">${it.nu}</div>
         <div class="eg" onclick="speak('${it.eg.replace(/'/g,"\\'")}')" title="點整句聽發音">
-          <span class="spk" aria-hidden="true"><i data-ic="volume"></i></span>
+          <span class="spk" aria-hidden="true"><i data-ic=volume></i></span>
           <div class="egtx"><div class="jp">${fr(it.eg)}</div><div class="zh">${esc(it.egz)}</div></div>
         </div>
       </div>`).join('');

@@ -79,8 +79,8 @@ const I18n = (() => {
   exam_history: '考試紀錄',
 
   // Calendar
-  streak_fire: '🔥 連續 {n} 天',
-  streak_empty: '🔥 開始你的第一天,養成每日學習習慣!',
+  streak_fire: ' 連續 {n} 天',
+  streak_empty: ' 開始你的第一天,養成每日學習習慣!',
   streak_longest: '最長 {n} 天',
   today_prefix: '今日：',
   today_learned: '已學 {n} 項',
@@ -111,7 +111,7 @@ const I18n = (() => {
   daily_desc: '第 {start}～{end} 個單字（共 {count} 個）。背完後點「下一批」進入下一組。',
   daily_desc_grammar: '第 {start}～{end} 個文法點（共 {count} 個）。看完後點「下一批」進入下一組。',
   daily_tag: '每日 {n} 個',
-  listen_tag: '🔊 點擊喇叭聽發音',
+  listen_tag: ' 點擊喇叭聽發音',
 
   // Vocab intro
   vocab_title: 'JLPT {lv} 單字表',
@@ -159,7 +159,7 @@ const I18n = (() => {
   type_ja_zh: '看日選中',
   type_zh_ja: '看中選日',
   type_reading: '選讀音',
-  type_typing: '✍️ 打字',
+  type_typing: '️ 打字',
   ty_sub: '看中文，輸入讀音（假名）',
   ty_placeholder: '輸入讀音…',
   ty_submit: '送出',
@@ -173,7 +173,7 @@ const I18n = (() => {
   no_wrong: '沒有錯題紀錄！先去測驗幾次吧。',
   notebook_title: '生詞本',
   notebook_count: '（{n} 個）',
-  notebook_empty: '還沒有收藏生詞。\n在單字卡片上長按或在測驗中答錯的詞會自動加入。\n也可以手動點擊單字旁的 📌 加入。',
+  notebook_empty: '還沒有收藏生詞。\n在單字卡片上長按或在測驗中答錯的詞會自動加入。\n也可以手動點擊單字旁的  加入。',
   notebook_quiz: '生詞本測驗',
   notebook_review: '逐一複習',
   notebook_min: '生詞本至少需要 4 個詞才能測驗！',
@@ -209,8 +209,8 @@ const I18n = (() => {
   quiz_no_data: '此級別無單字資料',
 
   // SRS
-  srs_new: '🆕 新詞',
-  srs_review: '📖 複習',
+  srs_new: ' 新詞',
+  srs_review: ' 複習',
   srs_flip: '點擊翻面查看答案',
   srs_hard: '不會',
   srs_ok: '記得',
@@ -239,8 +239,8 @@ const I18n = (() => {
   gd_due_empty: '目前沒有待複習的文法。複習會在你學過、隔一段時間後自動出現。先用「今日學習」或「新的」練習吧！',
   gd_start: '開始',
   gd_cancel: '取消',
-  gd_new: '🆕 新文法',
-  gd_review: '📖 複習',
+  gd_new: ' 新文法',
+  gd_review: ' 複習',
   gd_flip_hint: '看到文法名，試著回想接續和意思 → 點擊翻面',
   gd_hard: '不熟',
   gd_ok: '記得',
@@ -290,8 +290,8 @@ const I18n = (() => {
   rd_furigana_hide: '振假名：隱藏',
   rd_next: '下一題',
   rd_show_result: '查看結果',
-  rd_correct: '✓ 正確',
-  rd_wrong: '✗ 錯誤',
+  rd_correct: ' 正確',
+  rd_wrong: ' 錯誤',
   rd_time_used: '用時：{t}',
 
   // Listening
@@ -316,13 +316,13 @@ const I18n = (() => {
 
   // Footer
   copyright: '© 2026 日本再留計劃 — All rights reserved.',
-  disclaimer: '本站為原創學習整理，建議搭配 JLPT 官方教材使用。若發現內容有誤，歡迎點卡片上「🚩 回報此項錯誤」告知。不隸屬於 JLPT 官方或任何教育機構。',
+  disclaimer: '本站為原創學習整理，建議搭配 JLPT 官方教材使用。若發現內容有誤，歡迎點卡片上「 回報此項錯誤」告知。不隸屬於 JLPT 官方或任何教育機構。',
   ft_vocab: '全站收錄 N5~N1 共 {total} 個單字（本頁 {lv} {n} 個）',
   ft_confuse: '易混淆詞比較 {n} 組收錄',
   ft_grammar: 'N5～N1 共 {total} 個文法點',
 
   // Report error
-  report_error: '🚩 回報此項錯誤',
+  report_error: ' 回報此項錯誤',
 
   // Category count suffix
   cat_count_vocab: '{n} 個',
@@ -364,8 +364,8 @@ const I18n = (() => {
   feedback: '意见反馈',
   notebook: '生词本',
   exam_history: '考试记录',
-  streak_fire: '🔥 连续 {n} 天',
-  streak_empty: '🔥 开始你的第一天,养成每日学习习惯!',
+  streak_fire: ' 连续 {n} 天',
+  streak_empty: ' 开始你的第一天,养成每日学习习惯!',
   streak_longest: '最长 {n} 天',
   today_prefix: '今日：',
   today_learned: '已学 {n} 项',
@@ -394,7 +394,7 @@ const I18n = (() => {
   daily_desc: '第 {start}～{end} 个单词（共 {count} 个）。背完后点「下一批」进入下一组。',
   daily_desc_grammar: '第 {start}～{end} 个语法点（共 {count} 个）。看完后点「下一批」进入下一组。',
   daily_tag: '每日 {n} 个',
-  listen_tag: '🔊 点击喇叭听发音',
+  listen_tag: ' 点击喇叭听发音',
   vocab_title: 'JLPT {lv} 单词表',
   vocab_desc: '收录 {lv} 级别常考单词共 {n} 个，涵盖名词、动词、形容词、副词等词性。',
   vocab_tag: '{n} 单词',
@@ -432,7 +432,7 @@ const I18n = (() => {
   type_ja_zh: '看日选中',
   type_zh_ja: '看中选日',
   type_reading: '选读音',
-  type_typing: '✍️ 打字',
+  type_typing: '️ 打字',
   ty_sub: '看中文，输入读音（假名）',
   ty_placeholder: '输入读音…',
   ty_submit: '送出',
@@ -446,7 +446,7 @@ const I18n = (() => {
   no_wrong: '没有错题记录！先去测验几次吧。',
   notebook_title: '生词本',
   notebook_count: '（{n} 个）',
-  notebook_empty: '还没有收藏生词。\n在单词卡片上长按或在测验中答错的词会自动加入。\n也可以手动点击单词旁的 📌 加入。',
+  notebook_empty: '还没有收藏生词。\n在单词卡片上长按或在测验中答错的词会自动加入。\n也可以手动点击单词旁的  加入。',
   notebook_quiz: '生词本测验',
   notebook_review: '逐一复习',
   notebook_min: '生词本至少需要 4 个词才能测验！',
@@ -478,8 +478,8 @@ const I18n = (() => {
   quiz_retry: '再来一次',
   quiz_back: '返回',
   quiz_no_data: '此级别无单词资料',
-  srs_new: '🆕 新词',
-  srs_review: '📖 复习',
+  srs_new: ' 新词',
+  srs_review: ' 复习',
   srs_flip: '点击翻面查看答案',
   srs_hard: '不会',
   srs_ok: '记得',
@@ -506,8 +506,8 @@ const I18n = (() => {
   gd_due_empty: '目前没有待复习的文法。复习会在你学过、隔一段时间后自动出现。先用「今日学习」或「新的」练习吧！',
   gd_start: '开始',
   gd_cancel: '取消',
-  gd_new: '🆕 新语法',
-  gd_review: '📖 复习',
+  gd_new: ' 新语法',
+  gd_review: ' 复习',
   gd_flip_hint: '看到语法名，试着回想接续和意思 → 点击翻面',
   gd_hard: '不熟',
   gd_ok: '记得',
@@ -553,8 +553,8 @@ const I18n = (() => {
   rd_furigana_hide: '振假名：隐藏',
   rd_next: '下一题',
   rd_show_result: '查看结果',
-  rd_correct: '✓ 正确',
-  rd_wrong: '✗ 错误',
+  rd_correct: ' 正确',
+  rd_wrong: ' 错误',
   rd_time_used: '用时：{t}',
   ls_title: '听力练习',
   ls_subtitle: '使用浏览器语音合成聆听日语，回答理解问题',
@@ -575,11 +575,11 @@ const I18n = (() => {
   ls_close: '关闭',
   ls_no_tts: '您的浏览器不支持语音合成',
   copyright: '© 2026 再留计划 — All rights reserved.',
-  disclaimer: '本站为原创学习整理，建议搭配 JLPT 官方教材使用。若发现内容有误，欢迎点卡片上「🚩 回报此项错误」告知。不隶属于 JLPT 官方或任何教育机构。',
+  disclaimer: '本站为原创学习整理，建议搭配 JLPT 官方教材使用。若发现内容有误，欢迎点卡片上「 回报此项错误」告知。不隶属于 JLPT 官方或任何教育机构。',
   ft_vocab: '全站收录 N5~N1 共 {total} 个单词（本页 {lv} {n} 个）',
   ft_confuse: '易混淆词对比 {n} 组收录',
   ft_grammar: 'N5～N1 共 {total} 个语法点',
-  report_error: '🚩 回报此项错误',
+  report_error: ' 回报此项错误',
   cat_count_vocab: '{n} 个',
   cat_count_grammar: '{n} 项',
   page_title: '再留计划 — 免费 JLPT N5~N1 备考工具｜单词・语法・模考・复习',
@@ -587,7 +587,7 @@ const I18n = (() => {
   lang_label: '简',
 },
   
-  'en': {"tab_mine":"Me","site_name":"Japan Stay Plan","search_ph":"Search grammar or vocabulary...","about":"About","login":"Log in","logout":"Log out","login_fail":"Login failed: ","menu":"Menu","theme_toggle":"Toggle dark mode","quick_guide":"How to use","grammar":"Grammar","vocab":"Vocabulary","compare":"Compare","all":"All","learn":"Learn","quiz":"Quiz","review":"Review","stats":"Stats","more":"More","mock_exam":"Mock Exam","grammar_drill":"Grammar Practice","keigo_practice":"Keigo Practice","reading_practice":"Reading Practice","listening_practice":"Listening Practice","verb_conjugation":"Verb Conjugation","feedback":"Feedback","notebook":"Word Notebook","exam_history":"Exam History","streak_fire":"🔥 {n}-day streak","streak_empty":"🔥 Start day one — build your learning streak!","streak_longest":"Longest {n} days","today_prefix":"Today: ","today_learned":"{n} learned","today_not_started":"Not started yet","today_goal":"Today's goal: ","legend_less":"Less","legend_more":"More","cal_tooltip":"{date}: Vocab {v} · Grammar {g} · Quiz {q}","cal_tooltip_empty":"{date}: No activity","total_progress":"Total progress {lv}","total_progress_grammar":"Total progress {lv} grammar","progress_txt":"{n} / {total} {unit} covered","unit_vocab":"words","unit_grammar":"grammar points","daily_mode":"Daily Mode","show_all":"Show All","next_batch":"Next batch →","prev_batch":"← Previous batch","reset_progress":"Reset Progress","reset_confirm":"Reset daily progress for this level?\n(Cloud-synced data will also be overwritten)","cancel":"Cancel","daily_title":"Today's Study — {lv}","daily_title_grammar":"Today's Study — {lv} Grammar","daily_desc":"Words {start}–{end} of {count}. Tap \"Next batch\" once you've learned them.","daily_desc_grammar":"Grammar points {start}–{end} of {count}. Tap \"Next batch\" once you've read them.","daily_tag":"{n} per day","listen_tag":"🔊 Tap the speaker to hear it","vocab_title":"JLPT {lv} Vocabulary List","vocab_desc":"{n} commonly tested {lv} words covering nouns, verbs, adjectives, adverbs and more.","vocab_tag":"{n} words","grammar_title":"JLPT {lv} Grammar Notes","grammar_desc":"{n} complete {lv} grammar points with conjugation rules, examples and explanations.","grammar_tag":"{n} grammar points","brand_tag":"Japan Stay Plan","confuse_title":"Confusing Word Comparisons","confuse_desc":"N2 loves testing near-synonyms. Each set explains the difference with side-by-side examples to master the nuance.","confuse_tag":"{n} sets","confuse_expand":"Tap to expand","no_fav_vocab":"No saved words yet","no_result_vocab":"No matching words found","no_fav_grammar":"No saved grammar points yet","no_result_grammar":"No matching grammar found","no_result_confuse":"No matching comparisons found","sidebar_more":"…{n} more","stats_title":"Study Stats","tab_overview":"Overview","tab_history":"Exam History","tab_notebook":"Word Notebook","tab_weak":"Weak Spots","score_title":"Quiz Scores","score_empty":"No quiz records yet — give one a try!","score_recent":"Recent: {n}%","score_avg":"Average: {n}%","score_high":"Best: {n}%","score_total":"{n} attempts","progress_title":"Learning Progress","mastered":"Mastered {n}","learning":"Learning {n}","unlearned":"Not started {n}","history_title":"Quiz History (last 50)","history_empty":"No quiz history yet","type_ja_zh":"JP → meaning","type_zh_ja":"Meaning → JP","type_reading":"Pick the reading","type_typing":"✍️ Typing","ty_sub":"See the meaning, type the reading (kana)","ty_placeholder":"Type the reading…","ty_submit":"Submit","ty_correct_is":"Correct answer","ty_you_typed":"You typed","ty_diff_daku":"Off by a dakuten/handakuten (゛゜)","ty_diff_soku":"Off by a small tsu (っ)","ty_diff_long":"Off by a long vowel","ty_diff_other":"Kana spelling differs","retry_wrong":"Retry wrong answers","no_wrong":"No wrong answers yet! Try a few quizzes first.","notebook_title":"Word Notebook","notebook_count":"({n})","notebook_empty":"No saved words yet.\nLong-press a word card, or miss a word in a quiz, and it's added automatically.\nYou can also tap the 📌 next to a word to add it.","notebook_quiz":"Notebook Quiz","notebook_review":"Review one by one","notebook_min":"You need at least 4 words in your notebook to take a quiz!","notebook_empty_alert":"Your notebook is empty!","added_to_notebook":"{w} added to your notebook!","flip_hint":"Tap to flip","nb_next":"Next","nb_remove":"Got it, remove","nb_progress":"Notebook review {cur} / {total}","weak_title":"Weak Words","weak_subtitle":"(accuracy < 70%)","weak_empty":"No weak words found yet. Take a few more quizzes and the words you need to work on most will show up here!","weak_quiz":"Weak Words Quiz ({n})","weak_none":"No weak words!","weak_progress":"Weak words quiz {cur} / {total}","weak_result":"Weak Words Results","back_to_stats":"Back to stats","try_again":"Try again","quiz_title":"Vocabulary Quiz","quiz_level":"Level","quiz_type":"Question type","quiz_count":"Questions","quiz_start":"Start quiz","quiz_cancel":"Cancel","quiz_score":"Correct: {n}","quiz_reading_sub":"Pick the correct reading","quiz_result":"Quiz Results","quiz_you_chose":"You chose: {chose} → Correct: {correct}","quiz_retry":"Try again","quiz_back":"Back","quiz_no_data":"No vocabulary for this level","srs_new":"🆕 New","srs_review":"📖 Review","srs_flip":"Tap to flip and see the answer","srs_hard":"Didn't know","srs_ok":"Got it","srs_stats":"Learned {learned} ｜ Due {due} ｜ Mastered {mastered}","srs_stat_learned":"Learned {n}","srs_stat_due":"Due {n}","srs_stat_mastered":"Mastered {n}","srs_done":"Review complete!","srs_today":"Today's review: {n}","srs_total_learned":"Total learned: {n}","srs_total_mastered":"Mastered: {n}","srs_total_learning":"Learning: {n}","srs_no_review":"Nothing to review today! Head to Quiz mode to learn some new words.","gd_title":"Grammar Practice","gd_mode":"Mode","gd_flip_mode":"Flashcards","gd_quiz_mode":"Multiple choice","gd_range":"Range","gd_range_today":"Today's study","gd_range_due":"Due for review","gd_range_new":"New","gd_range_all":"All (random)","gd_today_empty":"You haven't studied any grammar today. Start in Grammar mode first, or choose \"New\" or \"All (random)\".","gd_due_empty":"Nothing to review right now. Reviews appear automatically a while after you learn something. Try \"Today's study\" or \"New\" for now!","gd_start":"Start","gd_cancel":"Cancel","gd_new":"🆕 New Grammar","gd_review":"📖 Review","gd_flip_hint":"See the grammar name, recall its usage and meaning → tap to flip","gd_hard":"Not sure","gd_ok":"Got it","gd_done":"Grammar practice complete!","gd_today":"Today's practice: {n} grammar points","gd_motivate":"Keep reviewing daily and you won't forget your grammar!","gd_retry":"Another round","gd_back":"Back","gd_result":"Grammar Quiz Results","gd_no_data":"No grammar data for this level","gd_no_match":"No grammar points match your filters!","me_title":"JLPT Mock Exam","me_subtitle":"Simulates a real JLPT exam, with Vocabulary + Grammar & Reading sections","me_structure":"Exam Structure","me_part1":"Part 1: Vocabulary — 25 questions / 15 min","me_part2":"Part 2: Grammar & Reading — 25 questions / 25 min","me_pass_line":"Pass mark: 60% or above overall","me_recent":"Recent Scores","me_start":"Start Mock Exam","me_cancel":"Cancel","me_part_n":"Part {n}","me_part_info":"{n} questions / {m} min","me_begin":"Begin","me_abandon":"Quit","me_time":"Time","me_passed":"You passed!","me_failed":"Not passed","me_pass_criteria":"Pass mark: 60% overall + 30% in each section","me_weak_areas":"Areas to work on","me_type_scores":"Scores by question type","me_retry":"Retake exam","me_back":"Back","me_no_data":"Not enough vocabulary at this level to build a mock exam","rd_title":"Reading Practice","rd_subtitle":"Read Japanese passages and answer comprehension questions","rd_timer":"Timer","rd_timer_on":"On","rd_timer_off":"Off","rd_start":"Start Practice","rd_cancel":"Cancel","rd_no_data":"No reading data for this level","rd_furigana_show":"Furigana: On","rd_furigana_hide":"Furigana: Off","rd_next":"Next","rd_show_result":"See Results","rd_correct":"✓ Correct","rd_wrong":"✗ Wrong","rd_time_used":"Time: {t}","ls_title":"Listening Practice","ls_subtitle":"Listen to Japanese via your browser's speech synthesis and answer comprehension questions","ls_hint":"Tip: requires browser support for Japanese speech (usually built into macOS/iOS/Android)","ls_mode":"Mode","ls_mode_test":"Test (2 plays max)","ls_mode_practice":"Practice (unlimited plays)","ls_all":"All","ls_start":"Start Practice","ls_cancel":"Cancel","ls_no_data":"No listening data for this level","ls_practice_info":"Practice mode: unlimited plays","ls_plays_left":"Plays left: {n}","ls_speed_normal":"Normal speed","ls_script":"Transcript:","ls_result":"Listening Results","ls_retry":"Another set","ls_close":"Close","ls_no_tts":"Your browser doesn't support speech synthesis","copyright":"© 2026 Stay in Japan Project — All rights reserved.","disclaimer":"This site is original study material; we recommend using it alongside official JLPT resources. Spot an error? Tap \"🚩 Report an error\" on the card to let us know. Not affiliated with JLPT or any educational institution.","ft_vocab":"{total} vocabulary words across N5–N1 ({n} on this {lv} page)","ft_confuse":"{n} sets of confusable words included","ft_grammar":"{total} grammar points across N5–N1","report_error":"🚩 Report an error","cat_count_vocab":"{n} words","cat_count_grammar":"{n} points","page_title":"Stay in Japan Project — Free JLPT N5–N1 Prep Tools | Vocabulary · Grammar · Mock Exams · Review","verbs_page_title":"Stay in Japan Project — Complete Verb Conjugation Guide","lang_label":"EN","months":["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],"weekdays":["Sun","Mon","Tue","Wed","Thu","Fri","Sat"]}
+  'en': {"tab_mine":"Me","site_name":"Japan Stay Plan","search_ph":"Search grammar or vocabulary...","about":"About","login":"Log in","logout":"Log out","login_fail":"Login failed: ","menu":"Menu","theme_toggle":"Toggle dark mode","quick_guide":"How to use","grammar":"Grammar","vocab":"Vocabulary","compare":"Compare","all":"All","learn":"Learn","quiz":"Quiz","review":"Review","stats":"Stats","more":"More","mock_exam":"Mock Exam","grammar_drill":"Grammar Practice","keigo_practice":"Keigo Practice","reading_practice":"Reading Practice","listening_practice":"Listening Practice","verb_conjugation":"Verb Conjugation","feedback":"Feedback","notebook":"Word Notebook","exam_history":"Exam History","streak_fire":" {n}-day streak","streak_empty":" Start day one — build your learning streak!","streak_longest":"Longest {n} days","today_prefix":"Today: ","today_learned":"{n} learned","today_not_started":"Not started yet","today_goal":"Today's goal: ","legend_less":"Less","legend_more":"More","cal_tooltip":"{date}: Vocab {v} · Grammar {g} · Quiz {q}","cal_tooltip_empty":"{date}: No activity","total_progress":"Total progress {lv}","total_progress_grammar":"Total progress {lv} grammar","progress_txt":"{n} / {total} {unit} covered","unit_vocab":"words","unit_grammar":"grammar points","daily_mode":"Daily Mode","show_all":"Show All","next_batch":"Next batch →","prev_batch":"← Previous batch","reset_progress":"Reset Progress","reset_confirm":"Reset daily progress for this level?\n(Cloud-synced data will also be overwritten)","cancel":"Cancel","daily_title":"Today's Study — {lv}","daily_title_grammar":"Today's Study — {lv} Grammar","daily_desc":"Words {start}–{end} of {count}. Tap \"Next batch\" once you've learned them.","daily_desc_grammar":"Grammar points {start}–{end} of {count}. Tap \"Next batch\" once you've read them.","daily_tag":"{n} per day","listen_tag":" Tap the speaker to hear it","vocab_title":"JLPT {lv} Vocabulary List","vocab_desc":"{n} commonly tested {lv} words covering nouns, verbs, adjectives, adverbs and more.","vocab_tag":"{n} words","grammar_title":"JLPT {lv} Grammar Notes","grammar_desc":"{n} complete {lv} grammar points with conjugation rules, examples and explanations.","grammar_tag":"{n} grammar points","brand_tag":"Japan Stay Plan","confuse_title":"Confusing Word Comparisons","confuse_desc":"N2 loves testing near-synonyms. Each set explains the difference with side-by-side examples to master the nuance.","confuse_tag":"{n} sets","confuse_expand":"Tap to expand","no_fav_vocab":"No saved words yet","no_result_vocab":"No matching words found","no_fav_grammar":"No saved grammar points yet","no_result_grammar":"No matching grammar found","no_result_confuse":"No matching comparisons found","sidebar_more":"…{n} more","stats_title":"Study Stats","tab_overview":"Overview","tab_history":"Exam History","tab_notebook":"Word Notebook","tab_weak":"Weak Spots","score_title":"Quiz Scores","score_empty":"No quiz records yet — give one a try!","score_recent":"Recent: {n}%","score_avg":"Average: {n}%","score_high":"Best: {n}%","score_total":"{n} attempts","progress_title":"Learning Progress","mastered":"Mastered {n}","learning":"Learning {n}","unlearned":"Not started {n}","history_title":"Quiz History (last 50)","history_empty":"No quiz history yet","type_ja_zh":"JP → meaning","type_zh_ja":"Meaning → JP","type_reading":"Pick the reading","type_typing":"️ Typing","ty_sub":"See the meaning, type the reading (kana)","ty_placeholder":"Type the reading…","ty_submit":"Submit","ty_correct_is":"Correct answer","ty_you_typed":"You typed","ty_diff_daku":"Off by a dakuten/handakuten (゛゜)","ty_diff_soku":"Off by a small tsu (っ)","ty_diff_long":"Off by a long vowel","ty_diff_other":"Kana spelling differs","retry_wrong":"Retry wrong answers","no_wrong":"No wrong answers yet! Try a few quizzes first.","notebook_title":"Word Notebook","notebook_count":"({n})","notebook_empty":"No saved words yet.\nLong-press a word card, or miss a word in a quiz, and it's added automatically.\nYou can also tap the  next to a word to add it.","notebook_quiz":"Notebook Quiz","notebook_review":"Review one by one","notebook_min":"You need at least 4 words in your notebook to take a quiz!","notebook_empty_alert":"Your notebook is empty!","added_to_notebook":"{w} added to your notebook!","flip_hint":"Tap to flip","nb_next":"Next","nb_remove":"Got it, remove","nb_progress":"Notebook review {cur} / {total}","weak_title":"Weak Words","weak_subtitle":"(accuracy < 70%)","weak_empty":"No weak words found yet. Take a few more quizzes and the words you need to work on most will show up here!","weak_quiz":"Weak Words Quiz ({n})","weak_none":"No weak words!","weak_progress":"Weak words quiz {cur} / {total}","weak_result":"Weak Words Results","back_to_stats":"Back to stats","try_again":"Try again","quiz_title":"Vocabulary Quiz","quiz_level":"Level","quiz_type":"Question type","quiz_count":"Questions","quiz_start":"Start quiz","quiz_cancel":"Cancel","quiz_score":"Correct: {n}","quiz_reading_sub":"Pick the correct reading","quiz_result":"Quiz Results","quiz_you_chose":"You chose: {chose} → Correct: {correct}","quiz_retry":"Try again","quiz_back":"Back","quiz_no_data":"No vocabulary for this level","srs_new":" New","srs_review":" Review","srs_flip":"Tap to flip and see the answer","srs_hard":"Didn't know","srs_ok":"Got it","srs_stats":"Learned {learned} ｜ Due {due} ｜ Mastered {mastered}","srs_stat_learned":"Learned {n}","srs_stat_due":"Due {n}","srs_stat_mastered":"Mastered {n}","srs_done":"Review complete!","srs_today":"Today's review: {n}","srs_total_learned":"Total learned: {n}","srs_total_mastered":"Mastered: {n}","srs_total_learning":"Learning: {n}","srs_no_review":"Nothing to review today! Head to Quiz mode to learn some new words.","gd_title":"Grammar Practice","gd_mode":"Mode","gd_flip_mode":"Flashcards","gd_quiz_mode":"Multiple choice","gd_range":"Range","gd_range_today":"Today's study","gd_range_due":"Due for review","gd_range_new":"New","gd_range_all":"All (random)","gd_today_empty":"You haven't studied any grammar today. Start in Grammar mode first, or choose \"New\" or \"All (random)\".","gd_due_empty":"Nothing to review right now. Reviews appear automatically a while after you learn something. Try \"Today's study\" or \"New\" for now!","gd_start":"Start","gd_cancel":"Cancel","gd_new":" New Grammar","gd_review":" Review","gd_flip_hint":"See the grammar name, recall its usage and meaning → tap to flip","gd_hard":"Not sure","gd_ok":"Got it","gd_done":"Grammar practice complete!","gd_today":"Today's practice: {n} grammar points","gd_motivate":"Keep reviewing daily and you won't forget your grammar!","gd_retry":"Another round","gd_back":"Back","gd_result":"Grammar Quiz Results","gd_no_data":"No grammar data for this level","gd_no_match":"No grammar points match your filters!","me_title":"JLPT Mock Exam","me_subtitle":"Simulates a real JLPT exam, with Vocabulary + Grammar & Reading sections","me_structure":"Exam Structure","me_part1":"Part 1: Vocabulary — 25 questions / 15 min","me_part2":"Part 2: Grammar & Reading — 25 questions / 25 min","me_pass_line":"Pass mark: 60% or above overall","me_recent":"Recent Scores","me_start":"Start Mock Exam","me_cancel":"Cancel","me_part_n":"Part {n}","me_part_info":"{n} questions / {m} min","me_begin":"Begin","me_abandon":"Quit","me_time":"Time","me_passed":"You passed!","me_failed":"Not passed","me_pass_criteria":"Pass mark: 60% overall + 30% in each section","me_weak_areas":"Areas to work on","me_type_scores":"Scores by question type","me_retry":"Retake exam","me_back":"Back","me_no_data":"Not enough vocabulary at this level to build a mock exam","rd_title":"Reading Practice","rd_subtitle":"Read Japanese passages and answer comprehension questions","rd_timer":"Timer","rd_timer_on":"On","rd_timer_off":"Off","rd_start":"Start Practice","rd_cancel":"Cancel","rd_no_data":"No reading data for this level","rd_furigana_show":"Furigana: On","rd_furigana_hide":"Furigana: Off","rd_next":"Next","rd_show_result":"See Results","rd_correct":" Correct","rd_wrong":" Wrong","rd_time_used":"Time: {t}","ls_title":"Listening Practice","ls_subtitle":"Listen to Japanese via your browser's speech synthesis and answer comprehension questions","ls_hint":"Tip: requires browser support for Japanese speech (usually built into macOS/iOS/Android)","ls_mode":"Mode","ls_mode_test":"Test (2 plays max)","ls_mode_practice":"Practice (unlimited plays)","ls_all":"All","ls_start":"Start Practice","ls_cancel":"Cancel","ls_no_data":"No listening data for this level","ls_practice_info":"Practice mode: unlimited plays","ls_plays_left":"Plays left: {n}","ls_speed_normal":"Normal speed","ls_script":"Transcript:","ls_result":"Listening Results","ls_retry":"Another set","ls_close":"Close","ls_no_tts":"Your browser doesn't support speech synthesis","copyright":"© 2026 Stay in Japan Project — All rights reserved.","disclaimer":"This site is original study material; we recommend using it alongside official JLPT resources. Spot an error? Tap \" Report an error\" on the card to let us know. Not affiliated with JLPT or any educational institution.","ft_vocab":"{total} vocabulary words across N5–N1 ({n} on this {lv} page)","ft_confuse":"{n} sets of confusable words included","ft_grammar":"{total} grammar points across N5–N1","report_error":" Report an error","cat_count_vocab":"{n} words","cat_count_grammar":"{n} points","page_title":"Stay in Japan Project — Free JLPT N5–N1 Prep Tools | Vocabulary · Grammar · Mock Exams · Review","verbs_page_title":"Stay in Japan Project — Complete Verb Conjugation Guide","lang_label":"EN","months":["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],"weekdays":["Sun","Mon","Tue","Wed","Thu","Fri","Sat"]}
 };
 
   // OpenCC 繁→簡 converter,由頁面在 OpenCC 載入後用 setConverter() 註冊。

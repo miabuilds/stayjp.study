@@ -4,7 +4,7 @@
  *   → icon 顏色自動跟著文字色走,深/淺色模式都安全,不必各自調色。
  *
  * 兩種用法:
- *   1) 靜態 HTML:  <i data-ic="mic"></i>  或  <i data-ic="flag" data-sz="16"></i>
+ *   1) 靜態 HTML:  <i data-ic=mic></i>  或  <i data-ic=flag data-sz=16></i>
  *      → DOMContentLoaded 後自動 hydrate 成 <svg>。動態插入的節點呼叫 window.hydrateIcons(root)。
  *   2) JS 產字串:  window.icon('mic')  或  window.icon('flag',{size:16})  → 回 <svg> 字串
  *
@@ -74,6 +74,12 @@
     bookmark: '<path d="M6 3h12v18l-6-4-6 4z"/>',
     clipboard:'<rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4a3 3 0 0 1 6 0"/><path d="M9 4h6v2H9z"/>',
     mail:     '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/>',
+    search: '<circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/>',
+    sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4 12H2M22 12h-2M5.6 5.6 7 7M17 17l1.4 1.4M18.4 5.6 17 7M7 17l-1.4 1.4"/>',
+    moon: '<path d="M21 12.8A8.5 8.5 0 1 1 11.2 3 6.5 6.5 0 0 0 21 12.8z"/>',
+    eye: '<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/>',
+    camera: '<path d="M3 8a2 2 0 0 1 2-2h2l1.5-2h5L20 6h-1a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><circle cx="12" cy="13" r="3.5"/>',
+    power: '<path d="M12 3v9"/><path d="M6.4 6.4a8 8 0 1 0 11.2 0"/>',
     coin:     '<circle cx="12" cy="12" r="9"/><path d="M15 9.5A3 3 0 0 0 12 8c-1.7 0-3 1-3 2.3 0 3 6 1.5 6 4.4C15 16 13.7 17 12 17a3 3 0 0 1-3-1.5"/><path d="M12 6.5v11"/>'
   };
 
@@ -109,7 +115,7 @@
   else document.addEventListener('DOMContentLoaded', function () { hydrate(); });
 
   // JS 動態插入的 <i data-ic> 也自動變 icon（rAF 節流,只掃未 hydrate 的,成本低）。
-  // 這樣靜態 HTML 與 JS 產生的內容都能用同一套 <i data-ic="x"> 寫法。
+  // 這樣靜態 HTML 與 JS 產生的內容都能用同一套 <i data-ic=x> 寫法。
   if (window.MutationObserver) {
     var pending = false;
     var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };

@@ -537,7 +537,7 @@ const MockExam = (() => {
       '<div class="qhd" style="align-items:center">' +
         '<span style="font-weight:600">' + section.name + '</span>' +
         '<span id="meTimer" style="font-weight:700;font-size:15px;font-variant-numeric:tabular-nums">--:--</span>' +
-        '<button class="qclose" style="width:auto;margin:0;padding:2px 10px" onclick="MockExam.close()"><i data-ic="x"></i></button>' +
+        '<button class="qclose" style="width:auto;margin:0;padding:2px 10px" onclick="MockExam.close()"><i data-ic=x></i></button>' +
       '</div>' +
       // Progress bar
       '<div style="height:4px;background:var(--prog-empty);border-radius:2px;margin-bottom:14px;overflow:hidden">' +
@@ -763,7 +763,7 @@ const MockExam = (() => {
 
     // Actions
     html += '<div class="qactions">' +
-      `<button class="qstart" onclick="MockExam.shareCard('${examLevel}',${totalScore},${totalQuestions},${totalPct},${finalPass ? 1 : 0},'${timeStr}')">📸 分享成績卡</button>` +
+      `<button class="qstart" onclick="MockExam.shareCard('${examLevel}',${totalScore},${totalQuestions},${totalPct},${finalPass ? 1 : 0},'${timeStr}')"><i data-ic=camera></i> 分享成績卡</button>` +
       `<button class="qstart" onclick="MockExam.beginExam()">${t('me_retry')}</button>` +
       `<button class="qclose" onclick="MockExam.close()">${t('me_back')}</button>` +
     '</div>';
@@ -822,7 +822,7 @@ const MockExam = (() => {
     ctx.fillText(pct + '%', 540, 630);
 
     // Pass / fail badge
-    const badgeText = passed ? '<i data-ic="check"></i> 達標' : '<i data-ic="x"></i> 繼續加油';
+    const badgeText = passed ? '<i data-ic=check></i> 達標' : '<i data-ic=x></i> 繼續加油';
     ctx.fillStyle = passed ? '#1C7F3F' : '#B8362A';
     ctx.font = 'bold 48px -apple-system, "Hiragino Sans", "PingFang TC", sans-serif';
     ctx.fillText(badgeText, 540, 740);

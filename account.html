@@ -97,7 +97,7 @@ a:hover{text-decoration:underline}
  <!-- 原文只提 Apple,Android 使用者看了會以為自己的訂閱不通用。改成兩邊都講。 -->
  <p id="loginAppleNote" style="font-size:12px;color:var(--tx3);margin-top:8px">在 App 內訂閱的,用當初購買時的同一個帳號登入(Apple 或 Google),網頁也是 Premium。</p>
  <div id="inAppWarn" style="display:none;margin-top:14px;max-width:420px;padding:12px 14px;background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.4);border-radius:10px;font-size:13px;color:var(--tx);line-height:1.75;text-align:left">
-   <i data-ic="warning"></i> 你正在 <b>App 內建瀏覽器</b>(LINE／IG／FB／Threads…)開啟,<b>社群登入會失敗</b>。<br>
+   <i data-ic=warning></i> 你正在 <b>App 內建瀏覽器</b>(LINE／IG／FB／Threads…)開啟,<b>社群登入會失敗</b>。<br>
    請點右上／右下的「<b>⋯</b>」或「<b>⋮</b>」→ 選「<b>用預設瀏覽器開啟</b>」(Safari／Chrome),再登入。
    <div style="margin-top:8px"><button class="btn" onclick="_copyThisUrl()" style="font-size:12px;padding:6px 12px">複製本頁連結</button></div>
  </div>
@@ -158,12 +158,12 @@ a:hover{text-decoration:underline}
  </div>
 
  <div id="quotaBox" style="margin-top:14px;padding:12px;background:var(--bg3);border-radius:10px;display:none">
- <div style="font-size:13px;font-weight:700;margin-bottom:8px"><i data-ic="chart"></i> 今日額度</div>
+ <div style="font-size:13px;font-weight:700;margin-bottom:8px"><i data-ic=chart></i> 今日額度</div>
  <div id="quotaRows" style="font-size:13px;line-height:2;color:var(--tx2)"></div>
  </div>
 
  <div id="redeemBox" style="margin-top:14px;padding:12px;background:var(--bg3);border-radius:10px">
- <div style="font-size:13px;color:var(--tx2);margin-bottom:8px"><i data-ic="gift"></i> 有兌換碼?輸入換取免費 Premium(測試者 / 活動):</div>
+ <div style="font-size:13px;color:var(--tx2);margin-bottom:8px"><i data-ic=gift></i> 有兌換碼?輸入換取免費 Premium(測試者 / 活動):</div>
  <div style="display:flex;gap:8px;flex-wrap:wrap">
  <input id="redeemInput" placeholder="兌換碼" autocapitalize="characters" style="flex:1;min-width:120px;padding:8px 10px;border:1px solid var(--bd);border-radius:8px;background:var(--bg);color:var(--tx);font-size:14px;text-transform:uppercase">
  <button class="btn" onclick="applyRedeemCode()" style="white-space:nowrap">兌換</button>
@@ -225,7 +225,7 @@ a:hover{text-decoration:underline}
 
  <!-- 價格調整預告(早鳥 2026-08-27 已收官) -->
  <div class="card">
- <h2><i data-ic="clock"></i> 價格調整預告</h2>
+ <h2><i data-ic=clock></i> 價格調整預告</h2>
  <p style="font-size:13px;color:var(--tx2);margin-top:14px">
  年費將於 9/7(一)調漲。9/7 前訂閱 NT$1,490,往後每年續扣都鎖這個價。
  已訂閱的用戶(含早鳥)完全不受影響,續扣永遠維持你當初的價格。
@@ -237,7 +237,7 @@ a:hover{text-decoration:underline}
 
  <!-- 邀請好友(雙向獎勵)-->
  <div class="card" id="inviteCard" style="display:none">
- <h2><i data-ic="gift"></i> 邀請好友,雙方都有獎</h2>
+ <h2><i data-ic=gift></i> 邀請好友,雙方都有獎</h2>
  <p style="font-size:13px;color:var(--tx2);margin-top:6px;line-height:1.7">
  把你的專屬連結分享給朋友。朋友用連結註冊並<strong>首次付費成功</strong>後,雙方都有獎:<strong>月費 +7 天</strong>、<strong>年費 +1 個月</strong>、<strong>買斷送 AI 加量包</strong>(對話 +5 場、評分 +30 次)。每推薦一位付費朋友發一次,<strong>無上限</strong>。
  </p>
@@ -293,8 +293,8 @@ const PLAN_LABELS = {
 };
 
 const STATUS_LABELS = {
- trialing: { text: '<i data-ic="gift"></i> 免費試用中', cls: 'b-active' },
- active: { text: '<i data-ic="check"></i> Premium 會員', cls: 'b-active' },
+ trialing: { text: '<i data-ic=gift></i> 免費試用中', cls: 'b-active' },
+ active: { text: '<i data-ic=check></i> Premium 會員', cls: 'b-active' },
  cancelled: { text: '使用中・到期後不續扣', cls: 'b-cancelled' },
  refunded: { text: '已退費', cls: 'b-refunded' },
  expired: { text: '已過期', cls: 'b-expired' },
@@ -436,7 +436,7 @@ function applyRefCode() {
      headers: { 'Authorization': 'Bearer ' + idToken },
    })).then(r => r.json()).then(v => {
      if (v && v.self) { msg.style.color = '#EF4444'; msg.textContent = '這是你自己的推薦碼,請把它分享給朋友 '; return; }
-     if (v && v.valid) store('<i data-ic="check"></i> 已套用 ' + raw + (v.kol ? '(' + v.kol + ')' : '') + ',付費後好康:月費多 7 天・年費多 1 個月・買斷送 AI 加量包!');
+     if (v && v.valid) store('<i data-ic=check></i> 已套用 ' + raw + (v.kol ? '(' + v.kol + ')' : '') + ',付費後好康:月費多 7 天・年費多 1 個月・買斷送 AI 加量包!');
      else if (v && v.error) store('已套用 ' + raw + '(暫時無法即時驗證)');
      else { msg.style.color = '#EF4444'; msg.textContent = '查無此推薦碼,請確認後再輸入。'; }
    }).catch(() => store('已套用 ' + raw + '(暫時無法驗證)'));
@@ -555,9 +555,9 @@ async function renderQuotaBox(user, sub) {
     const evalUsed = (u.evalDay && u.evalDay.d === d) ? u.evalDay.n : 0;
     const lines = [];
     if (premLike) {
-      lines.push('<i data-ic="tools"></i> ' + T('練習工具:無限次', '练习工具:无限次', 'Practice tools: unlimited'));
-      lines.push('<i data-ic="speak"></i> ' + T('AI 對話:今天 ' + chatUsed + ' / ' + cfg.premChatDaily + ' 場', 'AI 对话:今天 ' + chatUsed + ' / ' + cfg.premChatDaily + ' 场', 'AI chat: ' + chatUsed + ' / ' + cfg.premChatDaily + ' today'));
-      lines.push('<i data-ic="mic"></i> ' + T('AI 口說評分:今天 ' + evalUsed + ' / ' + cfg.premEvalDaily + ' 次', 'AI 口说评分:今天 ' + evalUsed + ' / ' + cfg.premEvalDaily + ' 次', 'AI speaking score: ' + evalUsed + ' / ' + cfg.premEvalDaily + ' today'));
+      lines.push('<i data-ic=tools></i> ' + T('練習工具:無限次', '练习工具:无限次', 'Practice tools: unlimited'));
+      lines.push('<i data-ic=speak></i> ' + T('AI 對話:今天 ' + chatUsed + ' / ' + cfg.premChatDaily + ' 場', 'AI 对话:今天 ' + chatUsed + ' / ' + cfg.premChatDaily + ' 场', 'AI chat: ' + chatUsed + ' / ' + cfg.premChatDaily + ' today'));
+      lines.push('<i data-ic=mic></i> ' + T('AI 口說評分:今天 ' + evalUsed + ' / ' + cfg.premEvalDaily + ' 次', 'AI 口说评分:今天 ' + evalUsed + ' / ' + cfg.premEvalDaily + ' 次', 'AI speaking score: ' + evalUsed + ' / ' + cfg.premEvalDaily + ' today'));
     } else {
       // 免費制世代:config/quota.packStartMs 之後註冊 → 總次數包;之前(舊用戶)→ 原每日制(顯示邏輯跟 tool-quota.js 一致)
       let qcfg = { packStartMs: 0, packTotal: 30 };
@@ -567,22 +567,22 @@ async function renderQuotaBox(user, sub) {
       if (onPack) {
         let pu = 0; try { pu = parseInt(localStorage.getItem('tool_pack_used') || '0', 10) || 0; } catch (e) {}
         const packLeft = Math.max(0, Number(qcfg.packTotal || 0) - pu);
-        lines.push('<i data-ic="tools"></i> ' + T('練習工具:免費體驗剩 ' + packLeft + ' / ' + qcfg.packTotal + ' 次', '练习工具:免费体验剩 ' + packLeft + ' / ' + qcfg.packTotal + ' 次', 'Practice tools: ' + packLeft + ' / ' + qcfg.packTotal + ' free credits left'));
+        lines.push('<i data-ic=tools></i> ' + T('練習工具:免費體驗剩 ' + packLeft + ' / ' + qcfg.packTotal + ' 次', '练习工具:免费体验剩 ' + packLeft + ' / ' + qcfg.packTotal + ' 次', 'Practice tools: ' + packLeft + ' / ' + qcfg.packTotal + ' free credits left'));
       } else {
       let c = {};
       try { const dk = new Date(); const key = 'tool_usage_' + dk.getFullYear() + '-' + String(dk.getMonth() + 1).padStart(2, '0') + '-' + String(dk.getDate()).padStart(2, '0'); c = JSON.parse(localStorage.getItem(key)) || {}; } catch (e) {}
       const NAMES = { srs: ['SRS 記憶卡', 'SRS 记忆卡', 'SRS cards'], flashcard: ['快速背單字', '快速背单字', 'Flashcards'], shadow: ['跟讀', '跟读', 'Shadowing'], grammar: ['文法練習', '文法练习', 'Grammar drill'], quiz: ['單字測驗', '单字测验', 'Vocab quiz'], reading: ['讀解', '读解', 'Reading'], listening: ['聽力', '听力', 'Listening'], story: ['今日故事', '今日故事', 'Daily story'] };
       const usedTools = Object.keys(NAMES).filter(k => (c[k] || 0) >= 1);
-      lines.push('<i data-ic="tools"></i> ' + T('練習工具:今天已試 ' + usedTools.length + ' / 3 個(每個工具每天 1 次)', '练习工具:今天已试 ' + usedTools.length + ' / 3 个(每个工具每天 1 次)', 'Practice tools: ' + usedTools.length + ' / 3 tried today (1 per tool per day)'));
+      lines.push('<i data-ic=tools></i> ' + T('練習工具:今天已試 ' + usedTools.length + ' / 3 個(每個工具每天 1 次)', '练习工具:今天已试 ' + usedTools.length + ' / 3 个(每个工具每天 1 次)', 'Practice tools: ' + usedTools.length + ' / 3 tried today (1 per tool per day)'));
       if (usedTools.length) lines.push('　└ ' + usedTools.map(k => T(NAMES[k][0], NAMES[k][1], NAMES[k][2])).join('、'));
       }
       const chatLeft = Math.max(0, (cfg.freeChatTotal || 1) - (u.chatTotal || 0));
       const evalLeft = Math.max(0, (cfg.freeEvalTotal || 10) - (u.evalTotal || 0));
-      lines.push('<i data-ic="speak"></i> ' + T('AI 對話體驗:剩 ' + chatLeft + ' 場', 'AI 对话体验:剩 ' + chatLeft + ' 场', 'AI chat trial: ' + chatLeft + ' left'));
-      lines.push('<i data-ic="mic"></i> ' + T('AI 評分體驗:剩 ' + evalLeft + ' 次', 'AI 评分体验:剩 ' + evalLeft + ' 次', 'AI scoring trial: ' + evalLeft + ' left'));
+      lines.push('<i data-ic=speak></i> ' + T('AI 對話體驗:剩 ' + chatLeft + ' 場', 'AI 对话体验:剩 ' + chatLeft + ' 场', 'AI chat trial: ' + chatLeft + ' left'));
+      lines.push('<i data-ic=mic></i> ' + T('AI 評分體驗:剩 ' + evalLeft + ' 次', 'AI 评分体验:剩 ' + evalLeft + ' 次', 'AI scoring trial: ' + evalLeft + ' left'));
     }
     const bc = Number(u.bonusChat || 0), be = Number(u.bonusEval || 0);
-    if (bc > 0 || be > 0) lines.push('<i data-ic="gift"></i> ' + T('加量包:對話 +' + bc + '・評分 +' + be, '加量包:对话 +' + bc + '・评分 +' + be, 'Booster pack: chat +' + bc + ' · scoring +' + be));
+    if (bc > 0 || be > 0) lines.push('<i data-ic=gift></i> ' + T('加量包:對話 +' + bc + '・評分 +' + be, '加量包:对话 +' + bc + '・评分 +' + be, 'Booster pack: chat +' + bc + ' · scoring +' + be));
     rows.innerHTML = lines.map(x => '<div>' + x + '</div>').join('');
     box.style.display = 'block';
   } catch (e) { /* 顯示失敗就不擋帳號頁 */ }
@@ -601,7 +601,7 @@ function renderSubscription(sub) {
 
  if (!sub) {
  planLabel.innerHTML = '免費版 <span class="badge b-free">FREE</span>';
- try { db.doc('free_users/' + auth.currentUser.uid).get().then(function(s){ if (s.exists) planLabel.innerHTML = '<i data-ic="ticket"></i> 受邀帳號 <span class="badge b-active">全功能</span>'; }).catch(function(){}); } catch (e) {}
+ try { db.doc('free_users/' + auth.currentUser.uid).get().then(function(s){ if (s.exists) planLabel.innerHTML = '<i data-ic=ticket></i> 受邀帳號 <span class="badge b-active">全功能</span>'; }).catch(function(){}); } catch (e) {}
  rowStatus.style.display = 'none';
  rowExpiry.style.display = 'none';
  rowRenew.style.display = 'none';
@@ -620,7 +620,7 @@ function renderSubscription(sub) {
  const isPrem = (sub.status === 'active' || sub.status === 'trialing' || sub.status === 'cancelled') && inPeriod;
  if (!isPrem) {
  planLabel.innerHTML = '免費版 <span class="badge b-free">FREE</span>';
- try { db.doc('free_users/' + auth.currentUser.uid).get().then(function(s){ if (s.exists) planLabel.innerHTML = '<i data-ic="ticket"></i> 受邀帳號 <span class="badge b-active">全功能</span>'; }).catch(function(){}); } catch (e) {}
+ try { db.doc('free_users/' + auth.currentUser.uid).get().then(function(s){ if (s.exists) planLabel.innerHTML = '<i data-ic=ticket></i> 受邀帳號 <span class="badge b-active">全功能</span>'; }).catch(function(){}); } catch (e) {}
  rowStatus.style.display = 'none';
  rowExpiry.style.display = 'none';
  rowRenew.style.display = 'none';
@@ -632,7 +632,7 @@ function renderSubscription(sub) {
  }
 
  // Plan label(is_gift = 手動贈送:不顯示方案名,顯示「贈送」)
- const pl = sub.is_gift ? '<i data-ic="gift"></i> 贈送' : (PLAN_LABELS[sub.plan] || sub.plan);
+ const pl = sub.is_gift ? '<i data-ic=gift></i> 贈送' : (PLAN_LABELS[sub.plan] || sub.plan);
  const earlyBird = (!sub.is_gift && sub.is_early_bird) ? '<span class="badge b-early-bird">早鳥鎖價</span>' : '';
  planLabel.innerHTML = `${pl} ${earlyBird}`;
  try { var _rb=document.getElementById('btnRefund'); if(_rb && sub.is_gift) _rb.style.display='none'; } catch(e){}
@@ -723,7 +723,7 @@ function renderSubscription(sub) {
  // 已失效(退費 / 過期):不再顯示為有效方案,避免「目前方案 + 未來到期日」誤導。
  // 功能上 isPremium() 已排除這些狀態(全額退費=權限即止),UI 同步顯示為免費版。
  planLabel.innerHTML = '免費版 <span class="badge b-free">FREE</span>';
- try { db.doc('free_users/' + auth.currentUser.uid).get().then(function(s){ if (s.exists) planLabel.innerHTML = '<i data-ic="ticket"></i> 受邀帳號 <span class="badge b-active">全功能</span>'; }).catch(function(){}); } catch (e) {}
+ try { db.doc('free_users/' + auth.currentUser.uid).get().then(function(s){ if (s.exists) planLabel.innerHTML = '<i data-ic=ticket></i> 受邀帳號 <span class="badge b-active">全功能</span>'; }).catch(function(){}); } catch (e) {}
  rowExpiry.style.display = 'none';
  rowRenew.style.display = 'none';
  rowSource.style.display = 'none';
@@ -876,8 +876,8 @@ async function requestRefund() {
  const isPaypal = !!(_sub && _sub.paypal_capture);
  const _en = (function(){ try { return localStorage.getItem('ui_lang') === 'en'; } catch(e){ return false; } })();
  const ebWarn = (_sub && _sub.is_early_bird)
-   ? (_en ? '\n• <i data-ic="warning"></i> Early-bird is a one-time limited offer: after a refund you can no longer subscribe at the early-bird price; future subscriptions are at the regular price (NT$1,490/yr).'
-          : '\n• <i data-ic="warning"></i> 早鳥為限量一次性優惠:退費後無法再以早鳥價訂閱,日後重新訂閱僅能用一般價(年費 NT$1,490)。')
+   ? (_en ? '\n• <i data-ic=warning></i> Early-bird is a one-time limited offer: after a refund you can no longer subscribe at the early-bird price; future subscriptions are at the regular price (NT$1,490/yr).'
+          : '\n• <i data-ic=warning></i> 早鳥為限量一次性優惠:退費後無法再以早鳥價訂閱,日後重新訂閱僅能用一般價(年費 NT$1,490)。')
    : '';
  const refundDesc = isPaypal
    ? (_en ? '• Funds are returned to your original payment method; timing depends on the payment provider / card issuer\n• First purchase only, within 7 days; contact support if past due'

@@ -185,7 +185,7 @@ const Calendar = (() => {
     return `<div class="cal-progress">
       <span>${t('today_goal')}</span>
       <span class="cal-prog-bar">${bar}</span>
-      <span class="cal-prog-pct">${shown}/${goal}${pct >= 100 ? ' <i data-ic="check"></i>' : ''}</span>
+      <span class="cal-prog-pct">${shown}/${goal}${pct >= 100 ? ' <i data-ic=check></i>' : ''}</span>
       <button onclick="if(window.dailyHelp)dailyHelp()" aria-label="說明" style="background:none;border:none;color:var(--ac2,#e8734a);cursor:pointer;font-size:12px;font-weight:700;padding:0 0 0 6px">ⓘ ${typeof enOr==='function'?enOr('說明','Help'):'說明'}</button>
     </div>`;
   }
@@ -214,7 +214,7 @@ const Calendar = (() => {
         var days = Math.max(0, Math.ceil((exam - Date.now()) / 86400000));
         var _e = (typeof enOr==='function') ? enOr : function(zh){ return zh; };
         return `<div class="cal-panel" style="text-align:center;padding:22px 16px">
-          <div style="font-size:13px;color:var(--ac,#d4654a);font-weight:800;letter-spacing:.05em">${_e('<i data-ic="clock"></i> 距離 12/6 JLPT 還有 '+days+' 天','<i data-ic="clock"></i> '+days+' days until the 12/6 JLPT')}</div>
+          <div style="font-size:13px;color:var(--ac,#d4654a);font-weight:800;letter-spacing:.05em">${_e('<i data-ic=clock></i> 距離 12/6 JLPT 還有 '+days+' 天','<i data-ic=clock></i> '+days+' days until the 12/6 JLPT')}</div>
           <div style="font-size:19px;font-weight:800;margin:8px 0 4px">${_e('今天先背 10 個字就好','Just learn 10 words today')}</div>
           <div style="font-size:13px;color:var(--tx2,#888);margin-bottom:14px">${_e('明天它們會自動回來考你——這就是背得起來的原因。','They will come back to test you tomorrow — that is how they stick.')}</div>
           <button style="font:inherit;background:var(--ac,#d4654a);color:#fff;border:0;border-radius:12px;padding:12px 26px;font-weight:700;font-size:15px;cursor:pointer"

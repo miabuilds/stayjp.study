@@ -25,7 +25,7 @@ const Quiz = (() => {
       </div></div>
       <div class="qf"><label>範圍</label><div class="qo" id="qRange">
         <button class="on" data-v="all">全部</button>
-        <button data-v="today"><i data-ic="book"></i> 今日學習</button>
+        <button data-v="today"><i data-ic=book></i> 今日學習</button>
       </div></div>
       <div class="qf"><label>${t('quiz_count')}</label><div class="qo" id="qCount">
         <button data-v="10">10</button><button class="on" data-v="20">20</button><button data-v="50">50</button>
@@ -196,7 +196,7 @@ const Quiz = (() => {
       : '';
     const box = document.getElementById('quizBox');
     box.innerHTML = `
-      <div class="qhd"><span>${current+1} / ${questions.length}</span><span>${t('quiz_score', { n: score })}</span><button class="qclose" style="width:auto;margin:0;padding:2px 10px" onclick="Quiz.close()"><i data-ic="x"></i></button></div>
+      <div class="qhd"><span>${current+1} / ${questions.length}</span><span>${t('quiz_score', { n: score })}</span><button class="qclose" style="width:auto;margin:0;padding:2px 10px" onclick="Quiz.close()"><i data-ic=x></i></button></div>
       <div class="qprompt"><div class="qmain">${main}</div>${posBadge}<div class="qsub">${t('ty_sub')}</div></div>
       ${dunnoBtnHtml()}
       <div class="qf"><input id="tyInput" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="${t('ty_placeholder')}" style="width:100%;box-sizing:border-box;padding:12px 14px;font-size:20px;text-align:center;border:1px solid var(--bd);border-radius:10px;background:var(--bg2);color:var(--tx)"></div>
@@ -214,7 +214,7 @@ const Quiz = (() => {
     // 打了「正確的漢字」但不是假名讀音 → 這題考的是讀音,不算作答、不扣分,提示後讓他重打假名。
     if (typed === q.word.w && typed !== q.word.r) {
       const fbh = document.getElementById('tyFeedback');
-      if (fbh) fbh.innerHTML = `<span style="color:var(--tx2)"><i data-ic="edit"></i> 要輸入「假名讀音」哦:<b style="color:var(--tx)">${q.word.r}</b></span>`;
+      if (fbh) fbh.innerHTML = `<span style="color:var(--tx2)"><i data-ic=edit></i> 要輸入「假名讀音」哦:<b style="color:var(--tx)">${q.word.r}</b></span>`;
       inp.value = '';
       inp.focus();
       return;
@@ -229,10 +229,10 @@ const Quiz = (() => {
     const fb = document.getElementById('tyFeedback');
     if (ok) {
       inp.style.borderColor = 'var(--ac)';
-      if (fb) fb.innerHTML = `<span style="color:var(--ac)"><i data-ic="check"></i> ${q.word.r}</span>`;
+      if (fb) fb.innerHTML = `<span style="color:var(--ac)"><i data-ic=check></i> ${q.word.r}</span>`;
     } else {
       inp.style.borderColor = '#EF4444';
-      if (fb) fb.innerHTML = `<span style="color:#EF4444"><i data-ic="x"></i> ${t('ty_correct_is')}：<b>${q.word.r}</b></span>　<span style="color:var(--tx2)">${typingDiffHint(typed, q.word.r)}</span>`;
+      if (fb) fb.innerHTML = `<span style="color:#EF4444"><i data-ic=x></i> ${t('ty_correct_is')}：<b>${q.word.r}</b></span>　<span style="color:var(--tx2)">${typingDiffHint(typed, q.word.r)}</span>`;
       if (fb) fb.insertAdjacentHTML('afterend', explainCardHtml(q.word));   // 例句詳解卡
     }
     const advance = () => { current++; current >= questions.length ? showResults() : renderQ(); };
@@ -255,7 +255,7 @@ const Quiz = (() => {
   // 「我不會」按鈕：常駐在題目上，就算等一下用猜的猜對了，也能主動把這個字收進單字本。
   // （使用者回饋：很常「我不會但還是猜中」，答對就不會自動進單字本，需要手動標記。）
   function dunnoBtnHtml() {
-    return `<div style="text-align:center;margin:2px 0 10px"><button type="button" id="qDunno" onclick="Quiz.markUnknown()" style="font-size:12px;padding:6px 14px;border:1px solid var(--bd);border-radius:20px;background:var(--bg2);color:var(--tx2);cursor:pointer"><i data-ic="bookmark"></i> 我不會，看答案</button></div>`;
+    return `<div style="text-align:center;margin:2px 0 10px"><button type="button" id="qDunno" onclick="Quiz.markUnknown()" style="font-size:12px;padding:6px 14px;border:1px solid var(--bd);border-radius:20px;background:var(--bg2);color:var(--tx2);cursor:pointer"><i data-ic=bookmark></i> 我不會，看答案</button></div>`;
   }
   // 「我不會」= 直接當作不會：不逼使用者猜 → 加入單字本 + SRS 記為錯 + 顯示正解 + 自動跳下一題。
   function markUnknown() {
@@ -265,7 +265,7 @@ const Quiz = (() => {
     if (typeof Stats !== 'undefined' && Stats.addToNotebook) Stats.addToNotebook(q.word.w, q.word.r, q.word.m, quizLevel, true);
     if (typeof SRS !== 'undefined' && SRS.record) SRS.record(quizLevel, q.word.w, false);   // 不會 → SRS 記錯，會再排複習
     results.push({ word: q.word, correct: false, dunno: true, options: q.options, correctIdx: q.correctIdx, typing: quizType === 'typing' });
-    if (typeof showToast === 'function') showToast('<i data-ic="bookmark"></i> 已加入單字本：' + q.word.w);
+    if (typeof showToast === 'function') showToast('<i data-ic=bookmark></i> 已加入單字本：' + q.word.w);
     const b = document.getElementById('qDunno');
     if (b) { b.disabled = true; b.style.opacity = '.6'; b.style.cursor = 'default'; }
     // 顯示正解 + 例句詳解卡（「我不會」也要能學到東西）
@@ -293,9 +293,9 @@ const Quiz = (() => {
     else if (quizType === 'meaning2word') { main = typeof cvt==='function'?cvt(q.word.m):q.word.m; sub = ''; }
     else { main = q.word.w; sub = t('quiz_reading_sub'); }
     const kanjiToggle = quizType === 'word2meaning' ?
-      `<button onclick="Quiz.toggleKanji()" style="margin-top:8px;font-size:11px;padding:4px 10px;border:1px solid var(--bd);border-radius:6px;background:var(--bg2);color:var(--tx2);cursor:pointer">${showKanji?'🙈 隱藏漢字':'👁 顯示漢字'}</button>` : '';
+      `<button onclick="Quiz.toggleKanji()" style="margin-top:8px;font-size:11px;padding:4px 10px;border:1px solid var(--bd);border-radius:6px;background:var(--bg2);color:var(--tx2);cursor:pointer">${showKanji?'<i data-ic=eye></i> 隱藏漢字':'<i data-ic=eye></i> 顯示漢字'}</button>` : '';
     box.innerHTML = `
-      <div class="qhd"><span>${current+1} / ${questions.length}</span><span>${t('quiz_score', { n: score })}</span><button class="qclose" style="width:auto;margin:0;padding:2px 10px" onclick="Quiz.close()"><i data-ic="x"></i></button></div>
+      <div class="qhd"><span>${current+1} / ${questions.length}</span><span>${t('quiz_score', { n: score })}</span><button class="qclose" style="width:auto;margin:0;padding:2px 10px" onclick="Quiz.close()"><i data-ic=x></i></button></div>
       <div class="qprompt"><div class="qmain">${main}</div>${sub?'<div class="qsub">'+sub+'</div>':''}${kanjiToggle}</div>
       ${dunnoBtnHtml()}
       <div class="qopts">${q.options.map((o,i) => '<button class="qopt" onclick="Quiz.answer('+i+')">'+disp(o)+'</button>').join('')}</div>`;
@@ -338,7 +338,7 @@ const Quiz = (() => {
     const box = document.getElementById('quizBox');
     // 新手前 3 次測驗:講 SRS 價值(為什麼明天要回來)——留存的關鍵一句
     const srsNote = h.length <= 3
-      ? '<div style="background:var(--soft,#C6553B14);border-radius:10px;padding:10px 14px;margin:10px 0;font-size:13.5px;line-height:1.7">' + (typeof enOr==='function' ? enOr('<i data-ic="bulb"></i> 剛剛做過的字,<b>明天會自動回來考你</b>——間隔重複就是背得起來的原因。明天記得回來清「複習」!','<i data-ic="bulb"></i> The words you just practiced <b>will come back to test you tomorrow</b> — spaced repetition is why they stick. Come back tomorrow and clear your reviews!') : '<i data-ic="bulb"></i> 剛剛做過的字,<b>明天會自動回來考你</b>——間隔重複就是背得起來的原因。明天記得回來清「複習」!') + '</div>'
+      ? '<div style="background:var(--soft,#C6553B14);border-radius:10px;padding:10px 14px;margin:10px 0;font-size:13.5px;line-height:1.7">' + (typeof enOr==='function' ? enOr('<i data-ic=bulb></i> 剛剛做過的字,<b>明天會自動回來考你</b>——間隔重複就是背得起來的原因。明天記得回來清「複習」!','<i data-ic=bulb></i> The words you just practiced <b>will come back to test you tomorrow</b> — spaced repetition is why they stick. Come back tomorrow and clear your reviews!') : '<i data-ic=bulb></i> 剛剛做過的字,<b>明天會自動回來考你</b>——間隔重複就是背得起來的原因。明天記得回來清「複習」!') + '</div>'
       : '';
     box.innerHTML = `
       <h3>${t('quiz_result')}</h3>${srsNote}
@@ -348,26 +348,26 @@ const Quiz = (() => {
         const m = typeof cvt==='function' ? cvt(r.word.m) : r.word.m;
         const wFull = r.word.w + (r.word.w !== r.word.r ? '（'+r.word.r+'）' : '');
         const summary = wFull + ' — ' + m;
-        if (r.correct) return '<div class="qr ok"><span class="qrc"><i data-ic="check"></i></span> '+summary+'</div>';
+        if (r.correct) return '<div class="qr ok"><span class="qrc"><i data-ic=check></i></span> '+summary+'</div>';
         // 錯題附例句(現成 vocab ex),讓結算頁不只有對錯
         const exLine = (() => {
           const ex = r.word.ex;
           if (!ex || !ex.j) return '';
           const tr = _uiLang() === 'en' ? (ex.e || '') : (typeof cvt === 'function' ? cvt(ex.z || '') : (ex.z || ''));
-          return `<div style="font-size:12px;color:var(--tx2);margin:4px 0 2px 22px;line-height:1.6"><i data-ic="edit"></i> ${ex.j}${tr ? '<br>' + tr : ''}</div>`;
+          return `<div style="font-size:12px;color:var(--tx2);margin:4px 0 2px 22px;line-height:1.6"><i data-ic=edit></i> ${ex.j}${tr ? '<br>' + tr : ''}</div>`;
         })();
         // 「我不會」：只顯示正解，不顯示「你選了什麼」
         if (r.dunno) {
           const ca = r.typing ? r.word.r : disp(r.word);
-          return `<div class="qr ng"><span class="qrc"><i data-ic="bookmark"></i></span> ${summary}　${t('ty_correct_is')}：${ca}${exLine}</div>`;
+          return `<div class="qr ng"><span class="qrc"><i data-ic=bookmark></i></span> ${summary}　${t('ty_correct_is')}：${ca}${exLine}</div>`;
         }
         // 打字題錯：顯示你打的 + 正解
         if (r.typing) {
-          return `<div class="qr ng"><span class="qrc"><i data-ic="x"></i></span> ${summary}　${t('ty_you_typed')}：${r.typed || '—'} → ${t('ty_correct_is')}：${r.word.r}${exLine}</div>`;
+          return `<div class="qr ng"><span class="qrc"><i data-ic=x></i></span> ${summary}　${t('ty_you_typed')}：${r.typed || '—'} → ${t('ty_correct_is')}：${r.word.r}${exLine}</div>`;
         }
         // 錯題：依題型顯示正確答案（讀音題→讀音、中選日→漢字、看日選中→中譯）
         const correctAnswer = disp(r.word);
-        return `<div class="qr ng"><span class="qrc"><i data-ic="x"></i></span> ${summary}　${t('quiz_you_chose', { chose: disp(r.options[r.chosenIdx]), correct: correctAnswer })}${exLine}</div>`;
+        return `<div class="qr ng"><span class="qrc"><i data-ic=x></i></span> ${summary}　${t('quiz_you_chose', { chose: disp(r.options[r.chosenIdx]), correct: correctAnswer })}${exLine}</div>`;
       }).join('')}</div>
       <div class="qactions"><button class="qstart" onclick="Quiz.begin()">下一輪</button><button class="qstart" style="background:var(--bg3);color:var(--tx)" onclick="Quiz.retrySame()">再測同一批</button><button class="qclose" onclick="Quiz.close()">${t('quiz_back')}</button></div>`;
   }

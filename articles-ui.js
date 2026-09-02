@@ -235,7 +235,7 @@ window.Articles = (function () {
     var newN = arts.filter(function (a) { return !seen[a.id]; }).length;
     var badge = newN > 0 ? '<span class="art-entry-new">' + newN + ' ' + enOr('新', 'new') + '</span>' : '';
     return '<div class="art-entry" onclick="Articles.open()">' +
-      '<div class="art-entry-thumb"><span class="art-entry-emoji"><i data-ic="book"></i></span><img src="' + imgUrl('a-n4-1') + '" alt="" onerror="this.remove()"></div>' +
+      '<div class="art-entry-thumb"><span class="art-entry-emoji"><i data-ic=book></i></span><img src="' + imgUrl('a-n4-1') + '" alt="" onerror="this.remove()"></div>' +
       '<div class="art-entry-b"><div class="art-entry-t">' + enOr('文章閱讀', 'Reading') + badge + '</div>' +
       '<div class="art-entry-d">' + enOr('每天一篇 · 點字查詢 · 真人發音', 'Daily reading · tap to look up · audio') + '</div>' +
       '<div class="art-entry-p">' + enOr('已讀', 'Read') + ' ' + readN + ' / ' + arts.length + ' ' + enOr('篇', '') + '</div></div>' +
@@ -246,9 +246,9 @@ window.Articles = (function () {
   function ttsPath(t) { return window.ttsUrl ? window.ttsUrl(window.__TTS[t]) : 'audio/tts/' + window.__TTS[t] + '.mp3'; }
   function topicEmoji(t) {
     t = t || '';
-    var map = [['電車|交通|通勤', '<i data-ic="train"></i>'], ['京都|旅|観光|旅行', '⛩️'], ['一人|暮|生活|家', '<i data-ic="home"></i>'], ['銭湯|風呂|温泉', '♨️'], ['少子|人口|社会', '👶'], ['飲み|酒|會社|会社|仕事|職場', '🍶'], ['空気|人間関係', '<i data-ic="chat"></i>'], ['報連相|ビジネス', '<i data-ic="clipboard"></i>'], ['AI|学び|勉強|技術', '🤖'], ['観光|公害|環境', '<i data-ic="globe"></i>'], ['食|料理|ご飯', '🍚'], ['天気|季節', '🌤️'], ['一日|朝|日課', '<i data-ic="clock"></i>']];
+    var map = [['電車|交通|通勤', '<i data-ic=train></i>'], ['京都|旅|観光|旅行', '⛩️'], ['一人|暮|生活|家', '<i data-ic=home></i>'], ['銭湯|風呂|温泉', '♨️'], ['少子|人口|社会', '👶'], ['飲み|酒|會社|会社|仕事|職場', '🍶'], ['空気|人間関係', '<i data-ic=chat></i>'], ['報連相|ビジネス', '<i data-ic=clipboard></i>'], ['AI|学び|勉強|技術', '🤖'], ['観光|公害|環境', '<i data-ic=globe></i>'], ['食|料理|ご飯', '🍚'], ['天気|季節', '🌤️'], ['一日|朝|日課', '<i data-ic=clock></i>']];
     for (var i = 0; i < map.length; i++) if (new RegExp(map[i][0]).test(t)) return map[i][1];
-    return '<i data-ic="book"></i>';
+    return '<i data-ic=book></i>';
   }
 
   function ensureCss() {
@@ -413,10 +413,10 @@ window.Articles = (function () {
     list().forEach(function (a) { (byLv[a.level] = byLv[a.level] || []).push(a); });
     var gated = window.ToolQuota && window.ToolQuota.shouldGate && window.ToolQuota.shouldGate();
     var h = '<div class="art-mask" id="artMask"><div class="art-wrap">' +
-      '<div class="art-top"><span class="tt"><i data-ic="book"></i> ' + enOr('文章閱讀', 'Reading') + '</span><button class="art-ic" onclick="Articles.close()"><i data-ic="x"></i></button></div>' +
+      '<div class="art-top"><span class="tt"><i data-ic=book></i> ' + enOr('文章閱讀', 'Reading') + '</span><button class="art-ic" onclick="Articles.close()"><i data-ic=x></i></button></div>' +
       '<div class="art-lwrap">' +
       '<div class="art-sub">' + enOr('讀短文、點單字查意思、聽真人發音,把單字文法放回真正的文章裡記。', 'Read, tap any word to look it up, and listen.') + '</div>';
-    if (gated) h += '<div class="art-trial"><i data-ic="lock"></i> ' + enOr('免費版每天可試讀 1 篇,升級後無限暢讀。', 'Free: 1 article/day. Upgrade for unlimited.') + '</div>';
+    if (gated) h += '<div class="art-trial"><i data-ic=lock></i> ' + enOr('免費版每天可試讀 1 篇,升級後無限暢讀。', 'Free: 1 article/day. Upgrade for unlimited.') + '</div>';
     LEVELS.forEach(function (lv) {
       var arr = byLv[lv] || []; if (!arr.length) return;
       h += '<div class="art-lv">' + LVN[lv] + '　·　' + arr.length + ' ' + enOr('篇', '') + '</div>';
@@ -425,7 +425,7 @@ window.Articles = (function () {
         h += '<div class="art-card" onclick="Articles.read(\'' + a.id + '\')">' +
           '<div class="art-thumb" style="background:linear-gradient(135deg,' + g[0] + ',' + g[1] + ')"><span class="art-th-e">' + topicEmoji(a.topic + a.title) + '</span><img class="art-th-i" src="' + imgUrl(a.id) + '" alt="" loading="lazy" onerror="this.remove()"><span class="art-th-badge">' + LVN[a.level] + '</span></div>' +
           '<div class="art-card-b">' +
-          '<div class="art-card-t">' + esc(a.title) + (read[a.id] ? '<span class="art-done"><i data-ic="check"></i></span>' : '') + '</div>' +
+          '<div class="art-card-t">' + esc(a.title) + (read[a.id] ? '<span class="art-done"><i data-ic=check></i></span>' : '') + '</div>' +
           '<div class="art-card-z">' + esc(Lc(a.title_zh,a.title_en)) + ' · ' + esc(Lc(a.topic,a.topic_en)) + '</div>' +
           '</div></div>';
       });
@@ -444,7 +444,7 @@ window.Articles = (function () {
       if (!window.ToolQuota.canUse('article')) { window.ToolQuota.showPaywall('article'); return; }
       window.ToolQuota.consume('article');
     }
-    markRead(id);   // 進入即標記已讀(<i data-ic="check"></i>);之後重看免計額度
+    markRead(id);   // 進入即標記已讀(<i data-ic=check></i>);之後重看免計額度
     if (window.furiAddEntries) window.furiAddEntries(a.vocab);   // 讓本篇重點單字(含漢字者)在內文也可點查
     close();        // 先移除清單那層 overlay,避免兩層 artMask 疊著(內文被蓋成空白)
     curId = id; curTab = 'read';
@@ -452,7 +452,7 @@ window.Articles = (function () {
     var h = '<div class="art-mask" id="artMask"><div class="art-wrap">' +
       '<div class="art-top"><button class="art-back" onclick="Articles.open()"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>返回</button>' +
       '<span class="tt">' + esc(Lc(a.title_zh,a.title_en)) + '</span>' +
-      '<button class="art-ic" onclick="Articles.close()"><i data-ic="x"></i></button></div>' +
+      '<button class="art-ic" onclick="Articles.close()"><i data-ic=x></i></button></div>' +
       '<div class="art-hero" style="background:linear-gradient(135deg,' + g[0] + ',' + g[1] + ')">' +
       '<img class="art-hero-bg" src="' + imgUrl(a.id) + '" alt="" onerror="this.remove()">' +
       '<div class="art-hero-ov"></div>' +
@@ -470,8 +470,8 @@ window.Articles = (function () {
       '</div>' +
       // tabs
       '<div class="art-tabs">' +
-      tabBtn('read', '<i data-ic="book"></i> ' + enOr('文章·單字·文法', 'Text')) +
-      tabBtn('quiz', '<i data-ic="edit"></i> ' + enOr('測驗', 'Quiz')) +
+      tabBtn('read', '<i data-ic=book></i> ' + enOr('文章·單字·文法', 'Text')) +
+      tabBtn('quiz', '<i data-ic=edit></i> ' + enOr('測驗', 'Quiz')) +
       '</div>' +
       '<div class="art-cnt" id="artContent"></div>' +
       '</div>' +
@@ -569,10 +569,10 @@ window.Articles = (function () {
     }).join('');
     // 讀完往下:重點單字(橘) + 本篇文法(藍),同一頁對照,不用切分頁
     if (a.vocab && a.vocab.length) {
-      body += '<div class="art-inline-v"><div class="art-iv-h"><i data-ic="book"></i> ' + enOr('重點單字', 'Key words') + '</div>' + vocabCardsHtml(a) + '</div>';
+      body += '<div class="art-inline-v"><div class="art-iv-h"><i data-ic=book></i> ' + enOr('重點單字', 'Key words') + '</div>' + vocabCardsHtml(a) + '</div>';
     }
     if (a.grammar && a.grammar.length) {
-      body += '<div class="art-inline-g"><div class="art-ig-h"><i data-ic="tools"></i> ' + enOr('本篇文法', 'Grammar') + '</div>' + grammarCardsHtml(a) + '</div>';
+      body += '<div class="art-inline-g"><div class="art-ig-h"><i data-ic=tools></i> ' + enOr('本篇文法', 'Grammar') + '</div>' + grammarCardsHtml(a) + '</div>';
     }
     c.className = 'art-cnt' + (furiOn ? '' : ' art-nofuri');
     c.innerHTML = body;
@@ -582,7 +582,7 @@ window.Articles = (function () {
   function vocabCardsHtml(a) {
     return (a.vocab || []).map(function (v) {
       var key = v.r || v.w, playable = hasTts(key);
-      var spk = playable ? '<span class="art-v-spk"><i data-ic="volume"></i></span>' : '<span style="width:38px;flex-shrink:0"></span>';
+      var spk = playable ? '<span class="art-v-spk"><i data-ic=volume></i></span>' : '<span style="width:38px;flex-shrink:0"></span>';
       // 整行可點播放(不只喇叭);沒預錄音檔的行不綁 onclick、不上手指游標
       var clk = playable ? ' art-v-click" onclick="Articles.say(\'' + esc(key) + '\')' : '';
       return '<div class="art-v' + clk + '">' + spk + '<div style="min-width:0"><div class="art-v-w">' + esc(v.w) + '</div><div class="art-v-r">' + esc(v.r) + '</div></div><div class="art-v-m">' + esc(Lc(v.m,v.m_en)) + '</div></div>';
@@ -597,7 +597,7 @@ window.Articles = (function () {
   function grammarCardsHtml(a) {
     return (a.grammar || []).map(function (gm) {
       var deep = (gm.id && window.GRAMMAR_DETAIL && window.GRAMMAR_DETAIL[gm.id]) ?
-        '<button class="art-gd-btn" onclick="Articles.gd(this,\'' + gm.id + '\')"><i data-ic="book"></i> ' + enOr('看完整詳解', 'Full explanation') + ' ▾</button><div class="art-gd-body art-hidden"></div>' : '';
+        '<button class="art-gd-btn" onclick="Articles.gd(this,\'' + gm.id + '\')"><i data-ic=book></i> ' + enOr('看完整詳解', 'Full explanation') + ' ▾</button><div class="art-gd-body art-hidden"></div>' : '';
       return '<div class="art-g"><div class="art-g-t"><b>' + esc(Lc(gm.t,gm.t_en)) + '</b></div><div class="art-g-n">' + esc(Lc(gm.note,gm.note_en)) + '</div>' + deep + '</div>';
     }).join('');
   }
@@ -624,9 +624,9 @@ window.Articles = (function () {
       var wrongHtml = '';
       if (quiz.wrongs.length) {
         wrongHtml = '<div style="text-align:left;max-width:420px;margin:18px auto 0;border-top:1px solid var(--bd,#e5e5e5);padding-top:14px">' +
-          '<div style="font-weight:800;font-size:14px;margin-bottom:8px"><i data-ic="book"></i> ' + enOr('這幾個字再看一眼', 'Review these') + '</div>' +
+          '<div style="font-weight:800;font-size:14px;margin-bottom:8px"><i data-ic=book></i> ' + enOr('這幾個字再看一眼', 'Review these') + '</div>' +
           quiz.wrongs.map(function (v) {
-            var spk = hasTts(v.r || v.w) ? ' <button style="border:none;background:none;cursor:pointer;font-size:14px" onclick="Articles.say(\'' + esc(v.r || v.w) + '\')"><i data-ic="volume"></i></button>' : '';
+            var spk = hasTts(v.r || v.w) ? ' <button style="border:none;background:none;cursor:pointer;font-size:14px" onclick="Articles.say(\'' + esc(v.r || v.w) + '\')"><i data-ic=volume></i></button>' : '';
             return '<div style="padding:7px 0;border-bottom:1px dashed var(--bd,#eee);font-size:14.5px"><b>' + esc(v.w) + '</b> <span style="color:var(--ac,#d4654a)">' + esc(v.r || '') + '</span>' + spk + '<br><span style="color:var(--tx2,#888);font-size:13px">' + esc(vm(v)) + '</span></div>';
           }).join('') + '</div>';
       }
@@ -645,7 +645,7 @@ window.Articles = (function () {
     c.innerHTML = '<div class="aq"><div class="aq-prog">' + (quiz.idx + 1) + ' / ' + quiz.list.length + '　·　' + enOr('答對 ', 'Score ') + quiz.score + '</div>' +
       '<div class="aq-q" style="text-align:center">' + enOr('這個字是什麼意思?', 'What does this mean?') + '</div>' +
       '<div class="aq-w" onclick="Articles.say(\'' + esc(v.r || v.w) + '\')">' + esc(v.w) + '</div>' +
-      '<div class="aq-r">' + esc(v.r) + (hasTts(v.r || v.w) ? ' <i data-ic="volume"></i>' : '') + '</div>' +
+      '<div class="aq-r">' + esc(v.r) + (hasTts(v.r || v.w) ? ' <i data-ic=volume></i>' : '') + '</div>' +
       '<div class="aq-opts">' + opts.map(function (o) { return '<button class="aq-opt" onclick="Articles.answer(this,\'' + esc(o).replace(/'/g, "\\'") + '\',\'' + esc(correct).replace(/'/g, "\\'") + '\')">' + esc(o) + '</button>'; }).join('') + '</div></div>';
   }
   function answer(btn, chosen, correct) {
@@ -663,7 +663,7 @@ window.Articles = (function () {
       var aq = btn.closest('.aq');
       if (aq) aq.insertAdjacentHTML('beforeend',
         '<div style="text-align:center;margin-top:14px">' +
-        '<button style="border:none;background:none;cursor:pointer;font-size:14px;color:var(--ac,#d4654a);margin-right:14px" onclick="Articles.say(\'' + esc(v.r || v.w) + '\')"><i data-ic="volume"></i> ' + enOr('再聽一次', 'Replay') + '</button>' +
+        '<button style="border:none;background:none;cursor:pointer;font-size:14px;color:var(--ac,#d4654a);margin-right:14px" onclick="Articles.say(\'' + esc(v.r || v.w) + '\')"><i data-ic=volume></i> ' + enOr('再聽一次', 'Replay') + '</button>' +
         '<button class="art-gd-btn" style="display:inline-block" onclick="Articles.quizNext()">' + enOr('下一題 →', 'Next →') + '</button></div>');
     }
   }

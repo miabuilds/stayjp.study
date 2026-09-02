@@ -396,7 +396,7 @@ const Quiz = (function(){
     opts.sort(()=>Math.random()-.5);
     const box=document.getElementById('quizBox');
     box.innerHTML = `
-      <div class="qhead"><span>第 ${qi+1} / ${queue.length} 題　分數 ${score}</span><button class="x" onclick="Quiz.close()"><i data-ic="x"></i></button></div>
+      <div class="qhead"><span>第 ${qi+1} / ${queue.length} 題　分數 ${score}</span><button class="x" onclick="Quiz.close()"><i data-ic=x></i></button></div>
       <div class="qbar"><i style="width:${qi/queue.length*100}%"></i></div>
       <div class="qq">這個怎麼念?(念念看再選)</div>
       <div class="qform">${esc(item.form)}</div>

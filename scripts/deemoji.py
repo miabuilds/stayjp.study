@@ -14,6 +14,7 @@ ICON = {
 REMOVE = set('🎉✨🙂🙌🙏💪😊🥳🎊👏✊🤝💯🚀🌸🍁💎🏆😄😃🥰😍🤩👍👀🔮🌟💫🎈🧧🫶❤💗💖🆕🈂☁')
 ICON.update({'🗂':'clipboard','🗃':'clipboard','📐':'tools','📏':'tools','🔀':'refresh','🔁':'refresh','🧠':'bulb','🔤':'book','🔠':'book','🔡':'book','✉':'mail','📧':'mail','📤':'mail','📥':'mail','📬':'mail','📭':'mail','📨':'mail'})
 ICON.update({'🎫':'ticket','🧹':'trash','📮':'mail','💵':'coin','💴':'coin','💶':'coin','💷':'coin','📦':'bag','📣':'bell','📢':'bell'})
+ICON.update({'🔍':'search','🔎':'search','☀':'sun','🌞':'sun','🌙':'moon','🌓':'moon','🌗':'moon','🌘':'moon','🌑':'moon','👁':'eye','🙈':'eye','📸':'camera','📷':'camera','🖊':'edit','🖋':'edit','⏻':'power','🖨':'phone'})
 RISKY = re.compile(r'\.textContent|\.innerText|\balert\(|\bconfirm\(|\bprompt\(|title\s*=|aria-label|\.speak\(|placeholder\s*=')
 def is_comment(s):
     st=s.strip()
@@ -34,7 +35,7 @@ def process(fn):
             for v in (e+'️', e):
                 if v in ln:
                     if risky: rk+=ln.count(v); ln=strip_e(ln,v)
-                    else: ic+=ln.count(v); ln=ln.replace(v,'<i data-ic="%s"></i>'%name)
+                    else: ic+=ln.count(v); ln=ln.replace(v,'<i data-ic=%s></i>'%name)
         # 清理移除 emoji 後殘留的空括號對
         for pr in ['（）','「」','【】','〔〕','［］']:
             ln=ln.replace(pr,'')

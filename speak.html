@@ -68,7 +68,7 @@
 <div id="app" class="wrap" style="display:none">
   <div style="margin-bottom:8px"><a href="#" class="backbtn" onclick="if(history.length>1){history.back()}else{location.href='app.html'};return false"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>返回</a></div>
   <h1>口說練習 <span class="muted" style="font-weight:400">Beta</span></h1>
-  <div class="sub">選句子 → 聽範例 → 念一次(或直接打字)→ 送出,看 AI 回饋。　免費體驗 10 次 AI 評分,Premium 每天 30 次。想練「來回對話」試試 <a href="speak-chat.html" style="color:var(--accent);font-weight:600"><i data-ic="speak"></i> 情境對話</a>。</div>
+  <div class="sub">選句子 → 聽範例 → 念一次(或直接打字)→ 送出,看 AI 回饋。　免費體驗 10 次 AI 評分,Premium 每天 30 次。想練「來回對話」試試 <a href="speak-chat.html" style="color:var(--accent);font-weight:600"><i data-ic=speak></i> 情境對話</a>。</div>
 
   <div class="today" id="todayCard" style="display:none">
     <div class="dring" id="dring"></div>
@@ -84,18 +84,18 @@
     <div class="kana" id="kana"></div>
     <div class="zh" id="zh"></div>
     <div class="rowbtns">
-      <button class="btn" onclick="speak()"><i data-ic="volume"></i> 聽範例</button>
+      <button class="btn" onclick="speak()"><i data-ic=volume></i> 聽範例</button>
       <button class="btn" id="favBtn" onclick="favToggle()" title="收藏這句">☆</button>
       <button class="btn" onclick="prev()">← 上一句</button>
       <button class="btn" onclick="next()">下一句 →</button>
-      <button class="btn" onclick="FavSents.open()"><i data-ic="star"></i> 收藏句</button>
+      <button class="btn" onclick="FavSents.open()"><i data-ic=star></i> 收藏句</button>
     </div>
   </div>
 
   <div class="card">
     <div style="font-weight:600;margin-bottom:6px">換你念</div>
     <div class="rowbtns">
-      <button id="recBtn" class="btn rec" onclick="toggleRec()"><i data-ic="mic"></i> 開始錄音</button>
+      <button id="recBtn" class="btn rec" onclick="toggleRec()"><i data-ic=mic></i> 開始錄音</button>
       <button class="btn pri" onclick="submit()">送出評分</button>
     </div>
     <input id="said" class="said" placeholder="辨識結果會出現在這;不準可直接改成你念的內容">
@@ -129,7 +129,7 @@ if(I18n.getLang()==='zh-CN') ensureOpenCC();
     document.title = 'AI Speaking Practice | StayJP';
     var back=document.querySelector('#app a[href="#"]'); if(back) back.textContent='‹ Back';
     var h1=document.querySelector('#app h1'); if(h1) h1.innerHTML='Speaking Practice <span class="muted" style="font-weight:400">Beta</span>';
-    var sub=document.querySelector('#app .sub'); if(sub) sub.innerHTML='Pick a sentence → listen to the example → say it once (or type it) → submit for AI feedback. Free trial: 10 AI reviews, Premium: 30 per day. Want back-and-forth conversation? Try <a href="speak-chat.html" style="color:var(--accent);font-weight:600"><i data-ic="speak"></i> Scenario Chat</a>.';
+    var sub=document.querySelector('#app .sub'); if(sub) sub.innerHTML='Pick a sentence → listen to the example → say it once (or type it) → submit for AI feedback. Free trial: 10 AI reviews, Premium: 30 per day. Want back-and-forth conversation? Try <a href="speak-chat.html" style="color:var(--accent);font-weight:600"><i data-ic=speak></i> Scenario Chat</a>.';
     var cards=document.querySelectorAll('#app .card');
     var btns=cards[0]?cards[0].querySelectorAll('.rowbtns .btn'):[];
     if(btns[0]) btns[0].textContent='Play example';
@@ -157,11 +157,11 @@ const FN_SPEAK = 'https://asia-east1-jpnote-1bdd6.cloudfunctions.net/speakFeedba
 const S = (jp,kana,zh,lv,cat)=>({jp,kana,zh,lv,cat});
 const CATS = [
   { k:'all',    ic:'', name:'全部',       en:'All' },
-  { k:'daily',  ic:'<i data-ic="home"></i>', name:'日常生活',   en:'Daily life' },
-  { k:'travel', ic:'<i data-ic="train"></i>', name:'外出・旅行', en:'Out & travel' },
-  { k:'work',   ic:'<i data-ic="briefcase"></i>', name:'職場・敬語', en:'Work & keigo' },
-  { k:'social', ic:'<i data-ic="speak"></i>', name:'社交',       en:'Social' },
-  { k:'feel',   ic:'<i data-ic="chat"></i>', name:'心情・想法', en:'Feelings' },
+  { k:'daily',  ic:'<i data-ic=home></i>', name:'日常生活',   en:'Daily life' },
+  { k:'travel', ic:'<i data-ic=train></i>', name:'外出・旅行', en:'Out & travel' },
+  { k:'work',   ic:'<i data-ic=briefcase></i>', name:'職場・敬語', en:'Work & keigo' },
+  { k:'social', ic:'<i data-ic=speak></i>', name:'社交',       en:'Social' },
+  { k:'feel',   ic:'<i data-ic=chat></i>', name:'心情・想法', en:'Feelings' },
 ];
 const LV_DESC = {
   N5:'旅遊・生活最基本:問路、點餐、購物,先能開口。',
@@ -505,7 +505,7 @@ function parseFb(text){
     const m=line.match(/^(SCORE|VERDICT|DIFF|POINT|CORRECTED|READING|TIP|ENCOURAGE):\s?(.*)$/);
     if(!m)continue;
     const v=(m[2]||'').trim();
-    if(m[1]==='POINT'){ const p=v.split('|'); o.points.push({ok:/<i data-ic="check"></i>|對|good/i.test(p[0]||''),label:(p[1]||'').trim(),note:(p[2]||'').trim()}); }
+    if(m[1]==='POINT'){ const p=v.split('|'); o.points.push({ok:/<i data-ic=check></i>|對|good/i.test(p[0]||''),label:(p[1]||'').trim(),note:(p[2]||'').trim()}); }
     else o[m[1].toLowerCase()]=v;
   }
   return o;
@@ -518,11 +518,11 @@ function renderStream(text, done){
     ? `<div class="fb-head"><div class="ring" style="background:${col}">${sc}</div>
          <div><div class="verdict" style="color:${col}">${esc(cvt(d.verdict||''))}</div><div class="diff">${esc(cvt(d.diff||''))}</div></div></div>`
     : '<div class="muted">'+enOr('AI 評分中…','AI is scoring…')+'</div>';
-  const pts = (d.points||[]).map(p=>`<div class="pt"><span class="ic">${p.ok?'<i data-ic="check"></i>':'<i data-ic="warning"></i>'}</span><span class="lb">${esc(cvt(p.label||''))}</span><span>${esc(cvt(p.note||''))}</span></div>`).join('');
+  const pts = (d.points||[]).map(p=>`<div class="pt"><span class="ic">${p.ok?'<i data-ic=check></i>':'<i data-ic=warning></i>'}</span><span class="lb">${esc(cvt(p.label||''))}</span><span>${esc(cvt(p.note||''))}</span></div>`).join('');
   document.getElementById('fbCard').innerHTML =
     head + pts
     + (d.corrected?`<div class="corr">${enOr('正確說法:','Correct version: ')}<b>${esc(d.corrected)}</b><div class="r">${esc(d.reading||'')}</div></div>`:'')
-    + (d.tip?`<div class="tip"><i data-ic="bulb"></i> ${esc(cvt(d.tip))}</div>`:'')
+    + (d.tip?`<div class="tip"><i data-ic=bulb></i> ${esc(cvt(d.tip))}</div>`:'')
     + (d.encourage?`<div class="enc">${esc(cvt(d.encourage))}</div>`:'')
     + (!done && d.score!=null?'<div class="muted" style="margin-top:8px">…</div>':'');
 }

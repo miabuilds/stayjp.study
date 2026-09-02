@@ -50,7 +50,7 @@
       tip.innerHTML = '<div class="tt">' + s.t + '</div><div class="td">' + s.d + '</div>' +
         '<div class="tr"><span class="tn">' + (idx + 1) + ' / ' + steps.length + '</span>' +
         '<button class="tskip" onclick="Tour.stop()">' + _en('跳過','Skip') + '</button>' +
-        '<button class="tnext" onclick="Tour.next()">' + (idx === steps.length - 1 ? _en('完成 <i data-ic="check"></i>','Done <i data-ic="check"></i>') : _en('下一步 →','Next →')) + '</button></div>';
+        '<button class="tnext" onclick="Tour.next()">' + (idx === steps.length - 1 ? _en('完成 <i data-ic=check></i>','Done <i data-ic=check></i>') : _en('下一步 →','Next →')) + '</button></div>';
       var th = tip.offsetHeight || 150;
       var top = s.pos === 'above' ? (r.top - th - 14) : (r.bottom + 14);
       top = Math.max(12, Math.min(top, window.innerHeight - th - 12));

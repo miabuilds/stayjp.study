@@ -96,7 +96,7 @@ const KeigoQuiz = (() => {
     const sub = eo(q.meanZh, q.meanEn) + "　" + instr;
     const box = document.getElementById("quizBox");
     box.innerHTML = `
-      <div class="qhd"><span>${current + 1} / ${questions.length}</span><span>${eo("得分", "Score")} ${score}</span><button class="qclose" style="width:auto;margin:0;padding:2px 10px" onclick="KeigoQuiz.close()">✕</button></div>
+      <div class="qhd"><span>${current + 1} / ${questions.length}</span><span>${eo("得分", "Score")} ${score}</span><button class="qclose" style="width:auto;margin:0;padding:2px 10px" onclick="KeigoQuiz.close()"><i data-ic=x></i></button></div>
       <div class="qprompt"><div class="qmain">${q.jp}</div><div class="qsub">${sub}</div></div>
       <div class="qopts">${q.options.map((o, i) => '<button class="qopt" onclick="KeigoQuiz.answer(' + i + ')">' + disp(o) + "</button>").join("")}</div>`;
     // 只轉 .qsub / 標頭那些中文框架(帶假名跳過,日文選項與大字不受影響)
@@ -126,7 +126,7 @@ const KeigoQuiz = (() => {
       <div class="qresults">${results.map(r => {
         const q = r.q;
         const line = q.jp + " → " + disp(q.answer) + " <span style=\"color:var(--tx3);font-size:12px\">" + eo(q.tyZh, q.tyEn) + "</span>";
-        return '<div class="qr ' + (r.correct ? "ok" : "ng") + '"><span class="qrc">' + (r.correct ? "✓" : "✗") + "</span> " + line + "</div>";
+        return '<div class="qr ' + (r.correct ? "ok" : "ng") + '"><span class="qrc">' + (r.correct ? "<i data-ic=check></i>" : "<i data-ic=x></i>") + "</span> " + line + "</div>";
       }).join("")}</div>
       <div class="qactions"><button class="qstart" onclick="KeigoQuiz.begin()">${eo("下一輪", "Again")}</button><button class="qclose" onclick="KeigoQuiz.close()">${eo("返回", "Back")}</button></div>`;
     if (typeof cvtStaticUI === "function") cvtStaticUI(box);
