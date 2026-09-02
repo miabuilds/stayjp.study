@@ -354,7 +354,7 @@ textarea.note:focus{outline:none;border-color:var(--ac)}
  <option value="lifetime">買斷</option>
  </select>
  </label>
- <label style="font-size:13px;color:var(--tx2)">到期日(補開用)
+ <label style="font-size:13px;color:var(--tx2)">到期日(補開用;買斷免填=永久)
  <input id="ssExpiry" type="date" style="width:100%;min-height:44px;padding:8px 10px;margin-top:4px;border:1px solid var(--bd);border-radius:8px;background:var(--bg2);color:var(--tx);font-size:15px">
  </label>
  <label style="font-size:13px;color:var(--tx2)">實付金額(補開用,NT$;留空=用方案定價,填 0=免費贈送不計營收)
@@ -824,11 +824,12 @@ async function setSub(action) {
  if (action === 'set') {
    body.plan = document.getElementById('ssPlan').value;
    const dv = document.getElementById('ssExpiry').value;
-   if (!dv) { msg.textContent = '補開請選到期日'; msg.style.color = '#EF4444'; return; }
-   body.expiresAt = dv;
+   const isLife = body.plan === 'lifetime';
+   if (!dv && !isLife) { msg.textContent = '補開請選到期日(買斷免填,自動永久)'; msg.style.color = '#EF4444'; return; }
+   if (dv) body.expiresAt = dv;   // 買斷留空 → 後端自動設永久(~100 年)
    const amtv = document.getElementById('ssAmount').value;
    if (amtv !== '') body.amount = Number(amtv);   // 留空 → 後端用方案定價
-   if (!confirm(`補開 ${email} 的「${document.getElementById('ssPlan').selectedOptions[0].text}」訂閱,到期 ${dv}${amtv !== '' ? `,實付 NT$${amtv}` : '(用方案定價)'}?`)) return;
+   if (!confirm(`補開 ${email} 的「${document.getElementById('ssPlan').selectedOptions[0].text}」訂閱,到期 ${isLife ? '永久(買斷)' : dv}${amtv !== '' ? `,實付 NT$${amtv}` : '(用方案定價)'}?`)) return;
  } else if (action === 'extend') {
    body.days = Number(document.getElementById('ssDays').value || 0);
    if (!body.days || body.days <= 0) { msg.textContent = '請輸入延長天數'; msg.style.color = '#EF4444'; return; }
