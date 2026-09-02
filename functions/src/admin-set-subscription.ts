@@ -49,7 +49,10 @@ export const adminSetSubscription = functions.onRequest(
         const plan = String(req.body?.plan || "") as PlanKey;
         if (!PLANS[plan]) { res.status(400).json({ error: "invalid_plan", plan }); return; }
         const raw = req.body?.expiresAt;
-        const expiresAt = typeof raw === "number" ? raw : (raw ? new Date(String(raw)).getTime() : 0);
+        let expiresAt = typeof raw === "number" ? raw : (raw ? new Date(String(raw)).getTime() : 0);
+        // 買斷 = 永久:沒填到期日就自動設 ~100 年(與真實買斷一致;isPremium 看 expiresAt,永遠為真)。
+        // 訂閱型(月/年/早鳥)才真的需要到期日。
+        if (plan === "lifetime" && (!expiresAt || isNaN(expiresAt))) expiresAt = nowMs() + 365 * 100 * 86400000;
         if (!expiresAt || isNaN(expiresAt)) { res.status(400).json({ error: "invalid_expiresAt", reason: "需傳到期日(yyyy-mm-dd 或 ms)" }); return; }
         // 實付金額:有給用給的(PayPal 實收),沒給用方案定價。> 0 視為「售出」(計入營收/累計售出);
         // = 0 視為「贈送」(不計營收)。
