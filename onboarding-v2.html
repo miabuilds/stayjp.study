@@ -74,6 +74,7 @@
   .trial.in{opacity:1;transform:none}
   .trial b{color:var(--ac)}
 </style>
+<script src="icons.js"></script>
 </head>
 <body>
 <div class="stage">
@@ -97,37 +98,37 @@ const OB=(()=>{
     { id:'hello', html:`
       <div class="hero">
         <div class="logo">日本再留計劃</div>
-        <div class="art">🎯</div>
+        <div class="art"><i data-ic="target" data-sz="60"></i></div>
         <h1>幾個問題,<br>幫你排好到考前的每一天</h1>
         <div class="sub">30 秒設定。之後每天打開,今天該背什麼、該複習什麼,都已經排好了。</div>
       </div>
       <div class="cta"><button class="btn" onclick="OB.next()">開始 →</button></div>` },
     { id:'goal', kick:'1 / 4・目標', h:'你想考哪一級?', sub:'不確定的話,從你聽過的難度選——之後隨時可以改。',
       opts:[
-        {v:'n5',ic:'🌱',t:'N5',d:'剛起步,五十音之後的第一站'},
-        {v:'n4',ic:'🌿',t:'N4',d:'基礎日常會話'},
-        {v:'n3',ic:'🌳',t:'N3',d:'銜接中級,求職加分的起點'},
-        {v:'n2',ic:'⛰️',t:'N2',d:'工作簽證、日企求職的門檻'},
-        {v:'n1',ic:'🗻',t:'N1',d:'最高級,翻譯、專業職場'},
+        {v:'n5',ic:'',t:'N5',d:'剛起步,五十音之後的第一站'},
+        {v:'n4',ic:'',t:'N4',d:'基礎日常會話'},
+        {v:'n3',ic:'',t:'N3',d:'銜接中級,求職加分的起點'},
+        {v:'n2',ic:'',t:'N2',d:'工作簽證、日企求職的門檻'},
+        {v:'n1',ic:'',t:'N1',d:'最高級,翻譯、專業職場'},
       ], key:'goal' },
     { id:'when', kick:'2 / 4・時間', h:'打算什麼時候考?', sub:'考試日決定每天的進度怎麼排。',
       opts:[
-        {v:'2026-12-06',ic:'🍂',t:'今年 12 月(12/6)',d:'衝刺模式:每天進度會排緊一點'},
-        {v:'2027-07-04',ic:'🌸',t:'明年 7 月',d:'穩紮穩打,基礎打好'},
-        {v:'',ic:'🤔',t:'還沒決定',d:'先開始學,之後再設考試日'},
+        {v:'2026-12-06',ic:'',t:'今年 12 月(12/6)',d:'衝刺模式:每天進度會排緊一點'},
+        {v:'2027-07-04',ic:'',t:'明年 7 月',d:'穩紮穩打,基礎打好'},
+        {v:'',ic:'',t:'還沒決定',d:'先開始學,之後再設考試日'},
       ], key:'exam' },
     { id:'level', kick:'3 / 4・起點', h:'你現在的程度?', sub:'決定從哪裡開始,不浪費時間重學。',
       opts:[
-        {v:'zero',ic:'✨',t:'全新開始',d:'從五十音出發'},
-        {v:'kana',ic:'🈴',t:'會五十音',d:'直接進單字和文法'},
-        {v:'some',ic:'📖',t:'學過一些',d:'N5–N4 程度,撿回來很快'},
-        {v:'restart',ic:'🔁',t:'以前學過,想重新開始',d:'快速複習+補洞'},
+        {v:'zero',ic:'',t:'全新開始',d:'從五十音出發'},
+        {v:'kana',ic:'',t:'會五十音',d:'直接進單字和文法'},
+        {v:'some',ic:'<i data-ic="book"></i>',t:'學過一些',d:'N5–N4 程度,撿回來很快'},
+        {v:'restart',ic:'<i data-ic="refresh"></i>',t:'以前學過,想重新開始',d:'快速複習+補洞'},
       ], key:'level' },
     { id:'time', kick:'4 / 4・節奏', h:'每天能花多少時間?', sub:'誠實選——排得動的計畫才走得遠。',
       opts:[
-        {v:'10',ic:'☕',t:'10 分鐘',d:'每天 10 個字+複習'},
-        {v:'20',ic:'🚃',t:'20 分鐘',d:'單字+文法+一篇短文'},
-        {v:'40',ic:'🔥',t:'40 分鐘以上',d:'完整菜單:含刷題和口說'},
+        {v:'10',ic:'',t:'10 分鐘',d:'每天 10 個字+複習'},
+        {v:'20',ic:'<i data-ic="train"></i>',t:'20 分鐘',d:'單字+文法+一篇短文'},
+        {v:'40',ic:'<i data-ic="fire"></i>',t:'40 分鐘以上',d:'完整菜單:含刷題和口說'},
       ], key:'mins' },
     { id:'calc', html:`
       <div class="calc" id="calcBox">
@@ -150,7 +151,7 @@ const OB=(()=>{
       if(s.opts){
         inner='<div class="kick">'+s.kick+'</div><h1>'+s.h+'</h1><div class="sub">'+s.sub+'</div>'+
           '<div class="opts">'+s.opts.map(o=>
-            '<button class="opt" onclick="OB.pick(this,\''+s.key+'\',\''+o.v+'\')"><span class="ic">'+o.ic+'</span><span><span class="t">'+o.t+'</span><div class="d">'+o.d+'</div></span><span class="chk">✓</span></button>').join('')+'</div>';
+            '<button class="opt" onclick="OB.pick(this,\''+s.key+'\',\''+o.v+'\')"><span class="ic">'+o.ic+'</span><span><span class="t">'+o.t+'</span><div class="d">'+o.d+'</div></span><span class="chk"><i data-ic="check"></i></span></button>').join('')+'</div>';
       }
       return '<div class="slide'+(i===0?' on':'')+'" id="sl'+i+'">'+inner+'</div>';
     }).join('');
@@ -193,7 +194,7 @@ const OB=(()=>{
           <div class="stat" id="st2"><div class="n">${A.exam?days+'天':'自由'}</div><div class="l"><b>${A.exam?'倒數計畫':'無壓力模式'}</b>每天打開就知道今天做什麼</div></div>
           <div class="stat" id="st3"><div class="n">1,668</div><div class="l"><b>JLPT 刷題+模擬考</b>考前實戰,錯的自動進錯題本</div></div>
         </div>
-        <div class="trial" id="tr1">${(window.STAYJP_NATIVE&&window.STAYJP_NATIVE.isNativeApp) ? '🎁 <b>訂閱享 7 天免費試用</b>——SRS 複習、模擬考、AI 口說全開。透過 Apple 帳號訂閱,試用期內可隨時取消、不會扣款。' : '🎁 <b>用 Google 登入即送 3 天全功能試用</b>——不用信用卡、不用任何付款資訊。SRS 複習、模擬考、AI 口說全開。'}</div>
+        <div class="trial" id="tr1">${(window.STAYJP_NATIVE&&window.STAYJP_NATIVE.isNativeApp) ? '<i data-ic="gift"></i> <b>訂閱享 7 天免費試用</b>——SRS 複習、模擬考、AI 口說全開。透過 Apple 帳號訂閱,試用期內可隨時取消、不會扣款。' : '<i data-ic="gift"></i> <b>用 Google 登入即送 3 天全功能試用</b>——不用信用卡、不用任何付款資訊。SRS 複習、模擬考、AI 口說全開。'}</div>
         <div class="cta" style="margin-top:18px">
           <button class="btn" onclick="OB.finish(true)">開始今天的 ${per} 個 →</button>
           <button class="btn ghost" onclick="OB.finish(false)">先逛逛就好</button>
