@@ -324,17 +324,17 @@
     var tags = '';
     if (data.c) tags += '<span class="jtag">' + escapeHtml(data.c) + '</span>';
     if (data.f) tags += '<span class="jtag">' + escapeHtml(data.f) + '</span>';
-    pop.innerHTML = '<span class="jx" role="button" aria-label="關閉">✕</span>'
+    pop.innerHTML = '<span class="jx" role="button" aria-label="關閉"></span>'
       + '<div><span class="jw">' + escapeHtml(data.w) + '</span><span class="jr">' + escapeHtml(data.r) + '</span></div>'
       + (tags ? '<div class="jtags">' + tags + '</div>' : '')
       + '<div class="jm">' + escapeHtml(data.m || '（本站未收錄，可查辭典 ↓）') + '</div>'
       + (data.f ? '<div class="jbase">辭書形（原形）：<b>' + escapeHtml(data.w) + '</b></div>' : '')
-      + (_nudge ? '<div class="jfreq">🔁 你查過這個字 ' + _ln + ' 次，收藏起來複習吧</div>'
+      + (_nudge ? '<div class="jfreq"><i data-ic="refresh"></i> 你查過這個字 ' + _ln + ' 次，收藏起來複習吧</div>'
         : (_ln >= 2 ? '<div class="jfreq jfreq-dim">🔍 查過 ' + _ln + ' 次</div>' : ''))
-      + '<div class="jacts"><button class="jact jact-spk" type="button">🔊 發音</button><button class="jact jact-fav' + (_nudge ? ' jact-pulse' : '') + '" type="button">' + (_nudge ? '⭐ 收藏複習' : '☆ 收藏') + '</button>'
-      + (data.m ? '' : '<a class="jact" href="https://cjjc.weblio.jp/content/' + encodeURIComponent(data.w) + '" target="_blank" rel="noopener" onclick="event.stopPropagation()">📖 中文辭典</a><a class="jact" href="https://jisho.org/search/' + encodeURIComponent(data.w) + '" target="_blank" rel="noopener" onclick="event.stopPropagation()">Jisho</a>')
+      + '<div class="jacts"><button class="jact jact-spk" type="button"><i data-ic="volume"></i> 發音</button><button class="jact jact-fav' + (_nudge ? ' jact-pulse' : '') + '" type="button">' + (_nudge ? '<i data-ic="star"></i> 收藏複習' : '☆ 收藏') + '</button>'
+      + (data.m ? '' : '<a class="jact" href="https://cjjc.weblio.jp/content/' + encodeURIComponent(data.w) + '" target="_blank" rel="noopener" onclick="event.stopPropagation()"><i data-ic="book"></i> 中文辭典</a><a class="jact" href="https://jisho.org/search/' + encodeURIComponent(data.w) + '" target="_blank" rel="noopener" onclick="event.stopPropagation()">Jisho</a>')
       + '</div>'
-      + '<a class="jreport" href="' + reportHref('讀音/內容', data.w, '詞：' + data.w + '\n目前顯示讀音：' + (data.r || '') + '\n意思：' + (data.m || '')) + '" target="_blank" rel="noopener" onclick="event.stopPropagation()">🚩 這個字讀音/意思有誤?回報</a>';
+      + '<a class="jreport" href="' + reportHref('讀音/內容', data.w, '詞：' + data.w + '\n目前顯示讀音：' + (data.r || '') + '\n意思：' + (data.m || '')) + '" target="_blank" rel="noopener" onclick="event.stopPropagation()"><i data-ic="flag"></i> 這個字讀音/意思有誤?回報</a>';
     document.body.appendChild(pop);
     // 定位在被點詞附近,夾在視窗內
     var r = anchor.getBoundingClientRect();
@@ -364,7 +364,7 @@
         if (!window.stayjpAddWord) { showToast('收藏功能未載入'); return; }
         var res = window.stayjpAddWord(data.w, data.r, data.m);
         fav.textContent = '★ 已收藏'; fav.classList.add('on');
-        showToast(res === 'exists' ? '已在生字本 📖' : '已加入生字本 📖');
+        showToast(res === 'exists' ? '已在生字本 <i data-ic="book"></i>' : '已加入生字本 <i data-ic="book"></i>');
       });
     }
     // 整張卡片點擊 = 發音(✕/發音/收藏 已各自 stopPropagation,不會誤觸)

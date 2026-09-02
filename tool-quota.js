@@ -21,7 +21,7 @@
     'stayjpplan@gmail.com',
   ]);
 
-  const LAUNCHED = true;          // ⚠️ 開閘總開關:false=過渡期(不 gate 真實用戶);true=正式開閘(gating 全員非 premium)
+  const LAUNCHED = true;          // <i data-ic="warning"></i> 開閘總開關:false=過渡期(不 gate 真實用戶);true=正式開閘(gating 全員非 premium)
   const PER_TOOL_LIMIT = 1;       // 每個工具每天免費次數
   const GLOBAL_DAILY_LIMIT = 3;   // 每天全站最多免費試用幾個練習工具(收緊「每工具 1 次」的總量)
   const TOOL_NAMES = {
@@ -274,7 +274,7 @@
     } else if (canOfferTrial) {
       // 內文維持單一文字節點(不夾 strong),translate-layer 才能整句 exact-match 翻譯
       body = `${msg}<br>用 Google 登入即送 3 天全功能試用——SRS、模考、跟讀全部無限，不用信用卡。`;
-      primary = { label: '🎁 Google 登入，免費試 3 天', act: 'login' };
+      primary = { label: '<i data-ic="gift"></i> Google 登入，免費試 3 天', act: 'login' };
       secondary = { label: '直接看訂閱方案 →', act: 'plans' };
     } else {
       body = `${msg}<br>你已經比多數人認真——升級 Premium 無限練，衝一次就過。`;
@@ -283,22 +283,22 @@
 
     // 每行維持單一文字節點(不夾 <b>),translate-layer 的 pattern 才能整句翻成英文
     const metaLines = [];
-    if (!isNative && cd) metaLines.push(`⏳ 距離 ${cd.label} JLPT 還有 ${cd.days} 天`);
+    if (!isNative && cd) metaLines.push(`<i data-ic="clock"></i> 距離 ${cd.label} JLPT 還有 ${cd.days} 天`);
     if (!isNative) metaLines.push(`<span id="pwEbLine" style="display:none"></span>`);
-    if (!isNative && !canOfferTrial) metaLines.push('✓ 7 天內無條件全額退費，隨時可取消');
+    if (!isNative && !canOfferTrial) metaLines.push('<i data-ic="check"></i> 7 天內無條件全額退費，隨時可取消');
 
     const wrap = document.createElement('div');
     wrap.className = 'pw-backdrop';
     wrap.id = 'pwBackdrop';
     wrap.innerHTML = `
       <div class="pw-card" role="dialog" aria-modal="true">
-        <div class="pw-ico">${canOfferTrial ? '🎁' : '⭐'}</div>
+        <div class="pw-ico">${canOfferTrial ? '<i data-ic="gift"></i>' : '<i data-ic="star"></i>'}</div>
         <h3 class="pw-title">今天的免費額度用完了</h3>
         <p class="pw-msg">${body}</p>
         ${metaLines.length ? `<p class="pw-meta">${metaLines.join('<br>')}</p>` : ''}
         <button class="pw-btn pw-ok" id="pwOk">${primary.label}</button>
         ${secondary ? `<button class="pw-btn pw-alt" id="pwAlt">${secondary.label}</button>` : ''}
-        ${isIOSWeb ? `<a class="pw-btn pw-alt" style="display:block;text-decoration:none" href="https://apps.apple.com/app/id6778227353" target="_blank" rel="noopener">📱 用 iPhone App 免費試 7 天(網頁只有 3 天)</a>` : ''}
+        ${isIOSWeb ? `<a class="pw-btn pw-alt" style="display:block;text-decoration:none" href="https://apps.apple.com/app/id6778227353" target="_blank" rel="noopener"><i data-ic="phone"></i> 用 iPhone App 免費試 7 天(網頁只有 3 天)</a>` : ''}
         <button class="pw-btn pw-cancel" id="pwCancel">稍後再說</button>
       </div>`;
     document.body.appendChild(wrap);
@@ -327,7 +327,7 @@
         if (!left || left <= 0) return;
         const line = document.getElementById('pwEbLine');
         if (!line) return;
-        line.textContent = `🐦 早鳥年費 NT$990・8/27 中午收官(之後恢復 NT$1,490)`;
+        line.textContent = `早鳥年費 NT$990・8/27 中午收官(之後恢復 NT$1,490)`;
         line.style.display = '';
         if (window.UITranslate && UITranslate.active()) UITranslate.walk(line);
       });
@@ -363,10 +363,10 @@
       // 8/27 12:00 JST 早鳥收官後,橫幅不能再賣 990(買不到了)→ 自動換一般文案
       const ebStillOn = Date.now() < Date.UTC(2026, 7, 27, 3, 0, 0);
       bar.innerHTML = (ebStillOn
-          ? '⏳ 試用明天到期——早鳥年費 NT$990 只到 8/27 中午'
-          : '⏳ 試用明天到期——年費 9/7 起調漲，現在訂閱鎖 NT$1,490')
+          ? '<i data-ic="clock"></i> 試用明天到期——早鳥年費 NT$990 只到 8/27 中午'
+          : '<i data-ic="clock"></i> 試用明天到期——年費 9/7 起調漲，現在訂閱鎖 NT$1,490')
         + ' <a href="pricing.html" style="color:#FDE68A;font-weight:700;text-decoration:underline">看方案 →</a>'
-        + '<button onclick="this.parentElement.remove()" style="position:absolute;right:8px;top:6px;background:none;border:0;color:#fff;font-size:16px;cursor:pointer;padding:4px">✕</button>';
+        + '<button onclick="this.parentElement.remove()" style="position:absolute;right:8px;top:6px;background:none;border:0;color:#fff;font-size:16px;cursor:pointer;padding:4px"><i data-ic="x"></i></button>';
       document.body.appendChild(bar);
     } catch (e) {}
   }
@@ -391,9 +391,9 @@
       badge.title = '免費試用中,全功能無限。點擊查看訂閱方案。';
       // 最後一天 → 換成緊迫感文案吸引升級(badge 本來就可點 → pricing /(App 內)開 paywall)
       badge.innerHTML = daysLeft <= 1
-        ? '<div style="font-weight:700;margin-bottom:2px;color:#FCA5A5">⏰ 試用最後 ' + daysLeft + ' 天</div>'
+        ? '<div style="font-weight:700;margin-bottom:2px;color:#FCA5A5"><i data-ic="clock"></i> 試用最後 ' + daysLeft + ' 天</div>'
           + '<div style="color:#FCD34D">升級 Premium 鎖優惠價,繼續無限使用 →</div>'
-        : '<div style="font-weight:700;margin-bottom:2px">✨ 免費試用中・剩 ' + daysLeft + ' 天</div>'
+        : '<div style="font-weight:700;margin-bottom:2px">免費試用中・剩 ' + daysLeft + ' 天</div>'
           + '<div style="color:#FCD34D">全工具無限使用,試用後升級鎖價 →</div>';
       if (typeof cvtStaticUI === 'function') cvtStaticUI(badge);
       return;
@@ -401,7 +401,7 @@
     // 試用已結束(這個帳號曾開過試用、現已過期、非付費)→ 轉換提示,取代一般免費版 badge
     if (cachedTrialStart != null && !isPremium() && !isNative) {
       badge.title = '3 天試用已結束。點擊升級,解鎖無限練習。';
-      badge.innerHTML = '<div style="font-weight:700;margin-bottom:2px">✨ 3 天試用已結束</div>'
+      badge.innerHTML = '<div style="font-weight:700;margin-bottom:2px">3 天試用已結束</div>'
         + '<div style="color:#FCD34D">升級 Premium 解鎖無限練習 →</div>';
       if (typeof cvtStaticUI === 'function') cvtStaticUI(badge);
       return;
@@ -484,7 +484,7 @@
         subLoaded = true;
         refreshBadge();
         applyGating();
-        rerenderTools();   // 訂閱狀態載完 → 重繪,工具按鈕的 🔒 才會在進頁面當下就正確(免換頁觸發)
+        rerenderTools();   // 訂閱狀態載完 → 重繪,工具按鈕的 <i data-ic="lock"></i> 才會在進頁面當下就正確(免換頁觸發)
       }, err => { console.warn('[ToolQuota] sub watch error:', err); subLoaded = true; refreshBadge(); rerenderTools(); });
     });
   }
@@ -660,12 +660,12 @@
     if (!shouldGate()) return '';
     if (usesPack()) {
       if (packLeft() > 0) return '';
-      return `<a href="pricing.html" class="quota-upsell-line">🔒 免費體驗次數用完了 · 升級無限使用 ↗</a>`;
+      return `<a href="pricing.html" class="quota-upsell-line"><i data-ic="lock"></i> 免費體驗次數用完了 · 升級無限使用 ↗</a>`;
     }
     const c = loadCount();
     const anyUsed = Object.keys(TOOL_NAMES).some(t => (c[t] || 0) >= PER_TOOL_LIMIT);
     if (!anyUsed) return '';
-    return `<a href="pricing.html" class="quota-upsell-line">🔒 今日免費額度用完了 · 升級無限使用 ↗</a>`;
+    return `<a href="pricing.html" class="quota-upsell-line"><i data-ic="lock"></i> 今日免費額度用完了 · 升級無限使用 ↗</a>`;
   }
 
   window.ToolQuota = {

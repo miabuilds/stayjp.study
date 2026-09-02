@@ -94,7 +94,7 @@ window.FavSents = (function () {
     var old = document.getElementById('favPanel'); if (old) old.remove();
     var el = document.createElement('div'); el.id = 'favPanel';
     el.innerHTML = '<div class="fmask" onclick="document.getElementById(\'favPanel\').remove()"></div>'
-      + '<div class="fbox"><div class="fhd">⭐ ' + T('收藏句', 'Saved sentences') + '<button class="fclose" onclick="document.getElementById(\'favPanel\').remove()">✕</button></div>'
+      + '<div class="fbox"><div class="fhd"><i data-ic="star"></i> ' + T('收藏句', 'Saved sentences') + '<button class="fclose" onclick="document.getElementById(\'favPanel\').remove()"><i data-ic="x"></i></button></div>'
       + '<div id="favList" class="muted">' + T('載入中…', 'Loading…') + '</div></div>';
     document.body.appendChild(el);
     var u = user();
@@ -112,8 +112,8 @@ window.FavSents = (function () {
         + (!ruby && s.kana && s.kana !== s.jp ? '<div class="fkana">' + esc(s.kana) + '</div>' : '')
         + (s.zh ? '<div class="fzh">' + esc(CV(s.zh)) + '</div>' : '')
         + '<div class="fops">'
-        + '<button class="fop" onclick="FavSents._play(' + i + ')">🔊 ' + T('發音', 'Play') + '</button>'
-        + '<button class="fop" onclick="FavSents._del(' + i + ')">🗑 ' + T('移除', 'Remove') + '</button>'
+        + '<button class="fop" onclick="FavSents._play(' + i + ')"><i data-ic="volume"></i> ' + T('發音', 'Play') + '</button>'
+        + '<button class="fop" onclick="FavSents._del(' + i + ')"><i data-ic="trash"></i> ' + T('移除', 'Remove') + '</button>'
         + '</div></div>';
     }).join('');
   }
