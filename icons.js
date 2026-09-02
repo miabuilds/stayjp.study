@@ -80,11 +80,12 @@
     var p = PATHS[name];
     if (!p) return '';
     o = o || {};
-    var s = o.size || 18;
+    // 沒指定尺寸 → 用 em,icon 大小自動跟著文字走(小按鈕不會太大);指定才用 px(hero 大圖)。
+    var dim = o.size ? (o.size + 'px') : '1.08em';
     var cls = 'ic ic-' + name + (o.cls ? ' ' + o.cls : '');
-    return '<svg class="' + cls + '" width="' + s + '" height="' + s + '" viewBox="0 0 24 24" fill="none" '
+    return '<svg class="' + cls + '" viewBox="0 0 24 24" fill="none" '
       + 'stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" '
-      + 'style="vertical-align:-0.15em;flex:none" aria-hidden="true">' + p + '</svg>';
+      + 'style="width:' + dim + ';height:' + dim + ';vertical-align:-0.14em;flex:none" aria-hidden="true">' + p + '</svg>';
   }
 
   function hydrate(root) {
@@ -92,10 +93,11 @@
     var list = scope.querySelectorAll('i[data-ic]:not([data-ic-done])');
     for (var i = 0; i < list.length; i++) {
       var el = list[i];
-      el.innerHTML = svg(el.getAttribute('data-ic'), { size: +el.getAttribute('data-sz') || 18 });
+      var sz = el.getAttribute('data-sz');
+      el.innerHTML = svg(el.getAttribute('data-ic'), sz ? { size: +sz } : {});
       el.setAttribute('data-ic-done', '1');
-      el.style.display = 'inline-flex';
-      el.style.alignItems = 'center';
+      // <i> 保持 inline,對齊交給 svg 的 vertical-align(inline-flex 的 baseline 會讓 icon 偏高)
+      el.style.display = 'inline';
     }
   }
 
