@@ -95,12 +95,12 @@
   <div class="hd">
     <b>StayJP 後台</b>
     <div class="ntabs">
-      <button id="ntOverview" class="ntab on" onclick="showTab('overview')">📊 總覽</button>
-      <button id="ntTools" class="ntab" onclick="showTab('tools')">🛠 完整操作</button>
-      <a class="ntab" href="admin-kol.html">🎟 KOL</a>
+      <button id="ntOverview" class="ntab on" onclick="showTab('overview')"><i data-ic="chart"></i> 總覽</button>
+      <button id="ntTools" class="ntab" onclick="showTab('tools')"><i data-ic="tools"></i> 完整操作</button>
+      <a class="ntab" href="admin-kol.html"><i data-ic="ticket"></i> KOL</a>
     </div>
     <span class="sp"></span><span class="chip" id="meInfo"></span>
-    <a href="./">🏠 首頁</a>
+    <a href="./"><i data-ic="home"></i> 首頁</a>
     <a href="#" onclick="logout();return false">登出</a>
   </div>
   <div class="wrap" id="paneOverview">
@@ -123,11 +123,11 @@
       </div></div>
     </div>
 
-    <div class="muted" style="font-size:12px;margin:2px 2px 8px">💡 金額類數字為「透過推薦碼帶進來的首購」口徑(取自 commissions 帳本、金額精準);非推薦的一般銷售不含分潤、不計入此處。「有效訂閱」為全站即時人數。</div>
+    <div class="muted" style="font-size:12px;margin:2px 2px 8px"><i data-ic="bulb"></i> 金額類數字為「透過推薦碼帶進來的首購」口徑(取自 commissions 帳本、金額精準);非推薦的一般銷售不含分潤、不計入此處。「有效訂閱」為全站即時人數。</div>
     <div class="kpis" id="kpis" style="margin-bottom:16px"></div>
 
     <div class="panel">
-      <div class="ph"><h2>💵 全站實收對帳</h2><span class="hint">全站真實金流(依上方期間);Apple 為牌價估算</span></div>
+      <div class="ph"><h2><i data-ic="coin"></i> 全站實收對帳</h2><span class="hint">全站真實金流(依上方期間);Apple 為牌價估算</span></div>
       <div class="scroll" id="reconTable"><div class="pb muted">載入中…</div></div>
       <div class="pb" style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;border-top:1px solid var(--hair)">
         <label class="muted" style="display:flex;align-items:center;gap:6px">綜所稅估算 <input type="number" id="taxPct" value="10" min="0" max="40" step="0.5" style="width:66px" oninput="renderReconcile()">%</label>
@@ -136,23 +136,23 @@
     </div>
 
     <div class="panel">
-      <div class="ph"><h2>📦 各方案訂購中</h2><span class="hint">status = active / trialing(即時)</span></div>
+      <div class="ph"><h2><i data-ic="bag"></i> 各方案訂購中</h2><span class="hint">status = active / trialing(即時)</span></div>
       <div class="pb"><div class="plans" id="plans"></div></div>
       <div class="pb" id="trialsCard" style="display:none">
-        <div style="font-weight:700;margin:6px 0 8px">⏳ 試用中(尚未扣款)<span class="muted" id="trialsSum" style="font-weight:400;margin-left:8px"></span></div>
+        <div style="font-weight:700;margin:6px 0 8px"><i data-ic="clock"></i> 試用中(尚未扣款)<span class="muted" id="trialsSum" style="font-weight:400;margin-left:8px"></span></div>
         <div id="trialsTable"></div>
       </div>
     </div>
 
     <div class="panel">
-      <div class="ph"><h2>💰 分潤付款 · 待付</h2><span class="hint">金額取自 commissions 帳本,非估算</span></div>
+      <div class="ph"><h2><i data-ic="coin"></i> 分潤付款 · 待付</h2><span class="hint">金額取自 commissions 帳本,非估算</span></div>
       <div id="payoutBanner"></div>
       <div class="scroll" id="payoutTable"><div class="pb muted">載入中…</div></div>
-      <div class="pb muted">pending 未滿 30 天不可付 → locked 可付款 → paid 已付。退款自動扣回。滿 NT$1,000(🔔)建議每月匯款。</div>
+      <div class="pb muted">pending 未滿 30 天不可付 → locked 可付款 → paid 已付。退款自動扣回。滿 NT$1,000(<i data-ic="bell"></i>)建議每月匯款。</div>
     </div>
 
     <div class="panel">
-      <div class="ph"><h2>👥 會員明細</h2><span class="hint">點一列看完整詳情</span></div>
+      <div class="ph"><h2><i data-ic="user"></i> 會員明細</h2><span class="hint">點一列看完整詳情</span></div>
       <div class="pb"><input type="search" id="memSearch" placeholder="搜尋 email / 方案 / 碼…" style="width:100%" oninput="renderMembers()"></div>
       <div class="scroll" id="memTable"><div class="pb muted">載入中…</div></div>
     </div>
@@ -163,6 +163,7 @@
 
 <div id="modalHost"></div>
 
+<script src="icons.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
@@ -182,7 +183,7 @@ const FEE_BY_SOURCE = { app:0.15, web:0.0275 };   // 用於缺 profit_twd 時回
 // 全站對帳用:各管道真實手續費(對齊 functions/src/utils/firestore.ts 的 KOL_FEE)
 const RECON_FEE = { ecpay:0.0275, apple_iap:0.15, google:0.15, paypal:0.078, manual:0, gift:0 };
 const RECON_EST = new Set(['apple_iap','google']);   // amount_twd 為台幣牌價估算的管道
-const RECON_LBL = { ecpay:'綠界', apple_iap:'Apple', google:'Google', paypal:'PayPal', manual:'手動', gift:'贈送', unknown:'未知管道⚠️' };
+const RECON_LBL = { ecpay:'綠界', apple_iap:'Apple', google:'Google', paypal:'PayPal', manual:'手動', gift:'贈送', unknown:'未知管道<i data-ic="warning"></i>' };
 const toMs = v => { if(v==null)return 0; if(typeof v==='number')return v; if(typeof v.toMillis==='function')return v.toMillis(); if(v.seconds!=null)return v.seconds*1000; if(v._seconds!=null)return v._seconds*1000; return 0; };
 const fmt = n => 'NT$' + (Math.round(Number(n)||0)).toLocaleString();
 const esc = s => String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
@@ -353,8 +354,8 @@ function renderTrials(){
         const ds=d? (d.getMonth()+1)+'/'+d.getDate() : '?';
         const rm=s.ref_code? (REFMAP[s.ref_code]||{}) : null;
         const attr = !s.ref_code ? '<span style="color:var(--ink3)">直接註冊</span>'
-          : rm && rm.type==='user' ? '👤 用戶碼 <small>'+esc(s.ref_code)+'</small>'
-          : '📣 '+esc((rm&&rm.kol)||'KOL')+' <small>'+esc(s.ref_code)+'</small>';
+          : rm && rm.type==='user' ? '<i data-ic="user"></i> 用戶碼 <small>'+esc(s.ref_code)+'</small>'
+          : '<i data-ic="bell"></i> '+esc((rm&&rm.kol)||'KOL')+' <small>'+esc(s.ref_code)+'</small>';
         return '<tr style="border-top:1px solid var(--line,#eee)"><td style="padding:5px 6px">'+esc(s.email||s.uid.slice(0,10))+'</td>'
           +'<td>'+(PLAN_S[s.plan]||esc(s.plan))+'</td><td>'+ds+'</td>'
           +'<td>'+(s.willRenew?'<span style="color:var(--ok,#15803d)">會扣</span>':'<span style="color:var(--ink3)">已取消</span>')+'</td>'
@@ -368,7 +369,7 @@ function renderPlans(){
   SUBS.forEach(s=>{ if(s.is_sandbox)return; if(s.is_gift){ if(s.status==='active'||s.status==='trialing')gift++; return; } const p=s.plan; if(!g[p])g[p]={a:0,t:0}; if(s.status==='active')g[p].a++; else if(s.status==='trialing')g[p].t++; });
   document.getElementById('plans').innerHTML = PLAN_ORDER.map(p=>{ const x=g[p]||{a:0,t:0};
     return '<div class="plan"><div class="pn">'+(PLAN_NAME[p]||p)+'</div><div class="pc num">'+x.a+' <small>訂閱中'+(x.t?' · '+x.t+' 試用':'')+'</small></div></div>'; }).join('')
-    + (gift?'<div class="plan" style="opacity:.6"><div class="pn">🎁 贈送</div><div class="pc num">'+gift+' <small>非付費</small></div></div>':'');
+    + (gift?'<div class="plan" style="opacity:.6"><div class="pn"><i data-ic="gift"></i> 贈送</div><div class="pc num">'+gift+' <small>非付費</small></div></div>':'');
 }
 
 function renderPayout(){
@@ -380,10 +381,10 @@ function renderPayout(){
   const rows=codes.map(code=>{ const r=g[code]; tP+=r.pending;tL+=r.locked;tPaid+=r.paid;tN+=r.n;tG+=r.gross;tNet+=r.mynet; const rm=REFMAP[code]||{}; return {code,kol:rm.kol||'',payout:rm.payout,...r}; }).sort((a,b)=>b.gross-a.gross);
   const due=rows.filter(r=>r.locked>=1000);
   banner.style.display='block';
-  banner.innerHTML = tL>0 ? ('🔔 可結算(已鎖定)<b>'+fmt(tL)+'</b>,其中滿 NT$1,000 該匯:<b>'+due.length+'</b> 位。待確認 '+fmt(tP)+'、累計已付 '+fmt(tPaid)+'。') : ('待確認 '+fmt(tP)+';尚無可領。累計已付 '+fmt(tPaid)+'。');
+  banner.innerHTML = tL>0 ? ('<i data-ic="bell"></i> 可結算(已鎖定)<b>'+fmt(tL)+'</b>,其中滿 NT$1,000 該匯:<b>'+due.length+'</b> 位。待確認 '+fmt(tP)+'、累計已付 '+fmt(tPaid)+'。') : ('待確認 '+fmt(tP)+';尚無可領。累計已付 '+fmt(tPaid)+'。');
   const payStr=p=>!p?'<span style="color:var(--ink3)">未填收款</span>':('銀行 '+esc(p.account||'(未填帳號)'));
   box.innerHTML='<table><thead><tr><th>KOL</th><th>碼</th><th class="n">成交</th><th>平台</th><th class="n">帶來營收</th><th class="n">妳淨得<br><small style="font-weight:400;color:var(--ink3)">扣手續費+分潤</small></th><th class="n">待確認</th><th class="n">可領</th><th class="n">已付</th><th>收款 / 結算</th></tr></thead><tbody>'
-    + rows.map(r=>'<tr><td class="who">'+esc(r.kol||'—')+'</td><td><code>'+esc(r.code)+'</code></td><td class="n">'+r.n+'</td><td style="font-size:11px;line-height:1.5">'+platCell(r)+'</td><td class="n">'+fmt(r.gross)+'</td><td class="n"><b>'+fmt(r.mynet)+'</b></td><td class="n" style="color:var(--ink3)">'+fmt(r.pending)+'</td><td class="n"><b style="color:'+(r.locked>=1000?'var(--ok)':'var(--ink2)')+'">'+fmt(r.locked)+'</b>'+(r.locked>=1000?' 🔔':'')+'</td><td class="n" style="color:var(--ink3)">'+fmt(r.paid)+'</td><td style="font-size:12px">'+payStr(r.payout)+(r.locked>0?' <button class="btn" style="padding:4px 9px;font-size:11px" onclick="settle(\''+r.code+'\','+r.locked+')">標記已付</button>':'')+'</td></tr>').join('')
+    + rows.map(r=>'<tr><td class="who">'+esc(r.kol||'—')+'</td><td><code>'+esc(r.code)+'</code></td><td class="n">'+r.n+'</td><td style="font-size:11px;line-height:1.5">'+platCell(r)+'</td><td class="n">'+fmt(r.gross)+'</td><td class="n"><b>'+fmt(r.mynet)+'</b></td><td class="n" style="color:var(--ink3)">'+fmt(r.pending)+'</td><td class="n"><b style="color:'+(r.locked>=1000?'var(--ok)':'var(--ink2)')+'">'+fmt(r.locked)+'</b>'+(r.locked>=1000?' <i data-ic="bell"></i>':'')+'</td><td class="n" style="color:var(--ink3)">'+fmt(r.paid)+'</td><td style="font-size:12px">'+payStr(r.payout)+(r.locked>0?' <button class="btn" style="padding:4px 9px;font-size:11px" onclick="settle(\''+r.code+'\','+r.locked+')">標記已付</button>':'')+'</td></tr>').join('')
     + '<tr class="rowtot"><td colspan="2" style="text-align:right">合計</td><td class="n">'+tN+'</td><td></td><td class="n">'+fmt(tG)+'</td><td class="n"><b>'+fmt(tNet)+'</b></td><td class="n">'+fmt(tP)+'</td><td class="n">'+fmt(tL)+'</td><td class="n">'+fmt(tPaid)+'</td><td></td></tr></tbody></table>';
 }
 
@@ -426,7 +427,7 @@ function showMember(i){
   ];
   document.getElementById('modalHost').innerHTML =
     '<div class="mask" onclick="if(event.target===this)closeModal()"><div class="modal">'
-    + '<div class="mh"><b>'+esc(maskEmail(s.email))+'</b><button class="mx" onclick="closeModal()">✕</button></div>'
+    + '<div class="mh"><b>'+esc(maskEmail(s.email))+'</b><button class="mx" onclick="closeModal()"><i data-ic="x"></i></button></div>'
     + rows.map(r=>'<div class="kv"><div class="k">'+r[0]+'</div><div class="v">'+r[1]+'</div></div>').join('')
     + '<div class="pb muted">註:「註冊時間」需後端提供 Auth 建立時間,下一步加入;目前以訂閱開始時間為準。</div>'
     + '</div></div>';
@@ -439,7 +440,7 @@ async function settle(code, locked){
     const r=await fetch(FN_SETTLE,{method:'POST',headers:{Authorization:'Bearer '+t,'Content-Type':'application/json'},body:JSON.stringify({code})});
     const d=await r.json();
     if(!r.ok||!d.ok){ alert('結算失敗:'+(d.error||r.status)); return; }
-    alert(d.nothing?'此碼目前沒有可結算分潤。':('✓ 已結算 '+code+':'+d.count+' 筆,淨額 '+fmt(d.net_twd||0)+(d.clawback_twd?'(扣退款負債 '+fmt(d.clawback_twd)+')':'')));
+    alert(d.nothing?'此碼目前沒有可結算分潤。':('已結算 '+code+':'+d.count+' 筆,淨額 '+fmt(d.net_twd||0)+(d.clawback_twd?'(扣退款負債 '+fmt(d.clawback_twd)+')':'')));
     loadData();
   }catch(e){ alert('結算失敗:'+e.message); }
 }

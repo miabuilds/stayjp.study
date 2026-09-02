@@ -54,30 +54,31 @@ h3.sec{font-family:var(--serif);font-size:15px;color:var(--tx2);margin:8px 0 12p
   <div id="app" style="display:none">
     <div class="updated" id="updated">載入中…</div>
 
-    <h3 class="sec">💰 轉換 / 訂閱</h3>
+    <h3 class="sec"><i data-ic="coin"></i> 轉換 / 訂閱</h3>
     <div class="grid">
-      <div class="kpi hl"><div class="lbl">🐦 早鳥剩餘名額</div><div class="num" id="ebLeft">—</div><div class="bar"><i id="ebBar" style="width:0"></i></div><div class="sub" id="ebSub"></div></div>
-      <div class="kpi"><div class="lbl">📝 註冊會員</div><div class="num" id="members">—</div><div class="sub">users collection 總數</div></div>
-      <div class="kpi hl"><div class="lbl">🔖 衝刺計畫預購</div><div class="num" id="sprint">—</div><div class="sub">sprint_waitlist 登記數</div></div>
+      <div class="kpi hl"><div class="lbl"><i data-ic="bird"></i> 早鳥剩餘名額</div><div class="num" id="ebLeft">—</div><div class="bar"><i id="ebBar" style="width:0"></i></div><div class="sub" id="ebSub"></div></div>
+      <div class="kpi"><div class="lbl"><i data-ic="edit"></i> 註冊會員</div><div class="num" id="members">—</div><div class="sub">users collection 總數</div></div>
+      <div class="kpi hl"><div class="lbl"><i data-ic="bookmark"></i> 衝刺計畫預購</div><div class="num" id="sprint">—</div><div class="sub">sprint_waitlist 登記數</div></div>
     </div>
 
-    <h3 class="sec">📈 流量 / 使用</h3>
+    <h3 class="sec"><i data-ic="chart"></i> 流量 / 使用</h3>
     <div class="grid">
-      <div class="kpi"><div class="lbl">👥 累積學習者</div><div class="num" id="learners">—</div><div class="sub">GA newUsers</div></div>
-      <div class="kpi"><div class="lbl">🟢 此刻在線</div><div class="num" id="active">—</div><div class="sub">過去 30 分鐘</div></div>
+      <div class="kpi"><div class="lbl"><i data-ic="user"></i> 累積學習者</div><div class="num" id="learners">—</div><div class="sub">GA newUsers</div></div>
+      <div class="kpi"><div class="lbl"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#22C55E;vertical-align:middle;margin-right:4px"></span>此刻在線</div><div class="num" id="active">—</div><div class="sub">過去 30 分鐘</div></div>
     </div>
 
-    <h3 class="sec">✉️ Email</h3>
+    <h3 class="sec"><i data-ic="mail"></i> Email</h3>
     <div class="grid">
-      <div class="kpi"><div class="lbl">📤 今日排寄</div><div class="num" id="mailToday">—</div><div class="sub">mail queue（今日）</div></div>
-      <div class="kpi"><div class="lbl">📬 累計寄出</div><div class="num" id="mailTotal">—</div><div class="sub">mail queue 總數</div></div>
+      <div class="kpi"><div class="lbl"><i data-ic="mail"></i> 今日排寄</div><div class="num" id="mailToday">—</div><div class="sub">mail queue（今日）</div></div>
+      <div class="kpi"><div class="lbl"><i data-ic="mail"></i> 累計寄出</div><div class="num" id="mailTotal">—</div><div class="sub">mail queue 總數</div></div>
     </div>
 
     <div class="foot" id="foot"></div>
-    <button class="btn sec" onclick="location.reload()">🔄 重新整理</button>
+    <button class="btn sec" onclick="location.reload()"><i data-ic="refresh"></i> 重新整理</button>
   </div>
 </main>
 
+<script src="icons.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>

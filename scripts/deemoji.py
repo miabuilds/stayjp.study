@@ -12,9 +12,13 @@ ICON = {
  '🏠':'home','🏡':'home','👆':'hand','👇':'hand','🐦':'bird','💰':'coin','🪙':'coin','📋':'clipboard','☰':'menu','🔖':'bookmark','⭐':'star',
 }
 REMOVE = set('🎉✨🙂🙌🙏💪😊🥳🎊👏✊🤝💯🚀🌸🍁💎🏆😄😃🥰😍🤩👍👀🔮🌟💫🎈🧧🫶❤💗💖🆕🈂☁')
+ICON.update({'🗂':'clipboard','🗃':'clipboard','📐':'tools','📏':'tools','🔀':'refresh','🔁':'refresh','🧠':'bulb','🔤':'book','🔠':'book','🔡':'book','✉':'mail','📧':'mail','📤':'mail','📥':'mail','📬':'mail','📭':'mail','📨':'mail'})
+ICON.update({'🎫':'ticket','🧹':'trash','📮':'mail','💵':'coin','💴':'coin','💶':'coin','💷':'coin','📦':'bag','📣':'bell','📢':'bell'})
 RISKY = re.compile(r'\.textContent|\.innerText|\balert\(|\bconfirm\(|\bprompt\(|title\s*=|aria-label|\.speak\(|placeholder\s*=')
 def is_comment(s):
-    s=s.strip(); return s.startswith('//') or s.startswith('/*') or s.startswith('*') or s.startswith('<!--')
+    st=s.strip()
+    if 'content:' in s and ('"' in s or "'" in s): return True  # CSS content pseudo,勿動
+    return st.startswith('//') or s.startswith('/*') or s.startswith('*') or s.startswith('<!--')
 def strip_e(ln, e):
     return ln.replace(e+'️ ','').replace(e+' ','').replace(e+'️','').replace(e,'')
 def process(fn):
