@@ -73,6 +73,7 @@
     menu:     '<path d="M4 6h16"/><path d="M4 12h16"/><path d="M4 18h16"/>',
     bookmark: '<path d="M6 3h12v18l-6-4-6 4z"/>',
     clipboard:'<rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4a3 3 0 0 1 6 0"/><path d="M9 4h6v2H9z"/>',
+    mail:     '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/>',
     coin:     '<circle cx="12" cy="12" r="9"/><path d="M15 9.5A3 3 0 0 0 12 8c-1.7 0-3 1-3 2.3 0 3 6 1.5 6 4.4C15 16 13.7 17 12 17a3 3 0 0 1-3-1.5"/><path d="M12 6.5v11"/>'
   };
 

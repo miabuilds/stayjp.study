@@ -85,6 +85,7 @@ a{color:var(--ac2)}
   <p class="muted">無法登入或有疑問？請來信 <a href="contact.html">聯絡我們</a>，我們會協助你完成刪除。</p>
 </main>
 
+<script src="icons.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script>
@@ -137,7 +138,7 @@ $('btnDelete').onclick = async function () {
       say('刪除失敗：' + (d.message || d.error || res.status) + '，請稍後再試或來信聯絡我們。', '#EF4444');
       return;
     }
-    say('✓ 帳號已刪除。感謝你使用過 StayJP。', '#16A34A');
+    say('<i data-ic="check"></i> 帳號已刪除。感謝你使用過 StayJP。', '#16A34A');
     try { await auth.signOut(); } catch (e) {}
   } catch (e) {
     btn.disabled = false;

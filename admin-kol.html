@@ -41,7 +41,7 @@
 
 <div id="app" style="display:none">
   <div class="hd">
-    <b>🎟 KOL 分潤後台</b>
+    <b><i data-ic="ticket"></i> KOL 分潤後台</b>
     <span class="pill" id="meInfo"></span>
     <span class="sp"></span>
     <a href="admin-dash.html">← 主後台</a>
@@ -51,18 +51,18 @@
 
     <!-- 分潤 / 付款總覽 -->
     <div class="card">
-      <h2>💰 分潤總覽 · 本期待付款</h2>
+      <h2><i data-ic="coin"></i> 分潤總覽 · 本期待付款</h2>
       <div id="payoutBanner"></div>
       <div id="payoutTable">載入中…</div>
       <div class="muted" style="margin-top:10px">
         金額為<b>精算真實紀錄</b>(commissions):被推薦人首筆真付款產生「待確認」→ 過 30 天鎖定期無退費轉「可領」→ 結算匯款後轉「已付款」;退款/退單自動扣回。
-        建議滿 <b>NT$1,000</b>(🔔)每月結算匯款。標記已付款的一鍵結算功能為下一步(P3);目前先依此表手動匯款對帳。
+        建議滿 <b>NT$1,000</b>(<i data-ic="bell"></i>)每月結算匯款。標記已付款的一鍵結算功能為下一步(P3);目前先依此表手動匯款對帳。
       </div>
     </div>
 
     <!-- 期間分潤統計(依 commissions.created_at,重用已載入資料,不額外讀取) -->
     <div class="card">
-      <h2>📅 期間分潤統計</h2>
+      <h2><i data-ic="calendar"></i> 期間分潤統計</h2>
       <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px">
         <input type="date" id="rangeFrom" style="padding:8px 10px;border:1px solid var(--bd);border-radius:8px;background:var(--bg2);color:var(--tx);font-size:14px">
         <span style="color:var(--tx2)">~</span>
@@ -91,6 +91,7 @@
   </div>
 </div>
 
+<script src="icons.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
@@ -205,10 +206,10 @@ async function loadPayout() {
     const due = rows.filter(r => r.locked >= 1000);
     banner.className = 'banner info';
     banner.innerHTML = tL > 0
-      ? `🔔 本期<b>可結算(已鎖定)NT$${tL.toLocaleString()}</b>,其中滿 NT$1,000 該匯款:<b>${due.length}</b> 位。待確認(鎖定期內)NT$${tP.toLocaleString()}、累計已付款 NT$${tPaid.toLocaleString()}。`
+      ? `<i data-ic="bell"></i> 本期<b>可結算(已鎖定)NT$${tL.toLocaleString()}</b>,其中滿 NT$1,000 該匯款:<b>${due.length}</b> 位。待確認(鎖定期內)NT$${tP.toLocaleString()}、累計已付款 NT$${tPaid.toLocaleString()}。`
       : `待確認(鎖定期內)NT$${tP.toLocaleString()};尚無已鎖定可領金額。累計已付款 NT$${tPaid.toLocaleString()}。`;
     box.innerHTML = `<table><thead><tr><th>KOL</th><th>碼</th><th class="num">待確認</th><th class="num">可領(鎖定)</th><th class="num">已付款</th><th>收款 / 結算</th></tr></thead><tbody>`
-      + rows.map(r => `<tr><td>${esc(r.kol||'—')}</td><td><code>${esc(r.code)}</code></td><td class="num" style="color:var(--tx2)">NT$${r.pending.toLocaleString()}</td><td class="num"><b style="color:${r.locked>=1000?'#16A34A':'var(--tx2)'}">NT$${r.locked.toLocaleString()}</b>${r.locked>=1000?' 🔔':''}</td><td class="num" style="color:var(--tx3)">NT$${r.paid.toLocaleString()}</td><td style="font-size:12px">${payStr(payByCode[r.code])}${r.locked>0?` <button class="btn" style="font-size:11px;padding:3px 8px;margin-left:6px" onclick="settleKol('${r.code}',${r.locked})">標記已付款</button>`:''}</td></tr>`).join('')
+      + rows.map(r => `<tr><td>${esc(r.kol||'—')}</td><td><code>${esc(r.code)}</code></td><td class="num" style="color:var(--tx2)">NT$${r.pending.toLocaleString()}</td><td class="num"><b style="color:${r.locked>=1000?'#16A34A':'var(--tx2)'}">NT$${r.locked.toLocaleString()}</b>${r.locked>=1000?' <i data-ic="bell"></i>':''}</td><td class="num" style="color:var(--tx3)">NT$${r.paid.toLocaleString()}</td><td style="font-size:12px">${payStr(payByCode[r.code])}${r.locked>0?` <button class="btn" style="font-size:11px;padding:3px 8px;margin-left:6px" onclick="settleKol('${r.code}',${r.locked})">標記已付款</button>`:''}</td></tr>`).join('')
       + `<tr><td colspan="2" style="text-align:right;font-weight:700">合計</td><td class="num">NT$${tP.toLocaleString()}</td><td class="num"><b>NT$${tL.toLocaleString()}</b></td><td class="num">NT$${tPaid.toLocaleString()}</td><td></td></tr></tbody></table>`;
   } catch(e){ box.textContent='讀取失敗:'+e.message; }
 }
@@ -245,7 +246,7 @@ async function settleKol(code, locked) {
     const d = await r.json();
     if (!r.ok || !d.ok) { alert('結算失敗:' + (d.error || r.status)); return; }
     if (d.nothing) alert('此碼目前沒有可結算的分潤。');
-    else alert('✓ 已結算 ' + code + ':' + d.count + ' 筆,淨額 NT$' + Number(d.net_twd || 0).toLocaleString() + (d.clawback_twd ? '(已扣退款負債 NT$' + Number(d.clawback_twd).toLocaleString() + ')' : ''));
+    else alert('已結算 ' + code + ':' + d.count + ' 筆,淨額 NT$' + Number(d.net_twd || 0).toLocaleString() + (d.clawback_twd ? '(已扣退款負債 NT$' + Number(d.clawback_twd).toLocaleString() + ')' : ''));
     loadPayout();
   } catch (e) { alert('結算失敗:' + e.message); }
 }
@@ -260,7 +261,7 @@ function createRefCode() {
     if (d.exists) { msg.style.color='#EF4444'; msg.textContent='碼已存在:'+code; return; }
     const token = (crypto.randomUUID?crypto.randomUUID().replace(/-/g,''):(Math.random().toString(36).slice(2)+Math.random().toString(36).slice(2))).slice(0,20);
     ref.set({ kol, token, active:true, commission_pct:comm, type:'kol', created_at:Date.now() }).then(()=>{
-      msg.style.color='#16A34A'; msg.textContent='✓ 已建立 '+code;
+      msg.style.color='#16A34A'; msg.textContent='已建立 '+code;
       document.getElementById('refCodeNew').value=''; document.getElementById('refKolNew').value='';
       loadRefCodes(); loadPayout();
     }).catch(e=>{ msg.style.color='#EF4444'; msg.textContent='建立失敗:'+e.message; });
@@ -275,7 +276,7 @@ function setRate(code, cur) {
 }
 function toggleRefCode(code, activate){ db.collection('ref_codes').doc(code).set({ active:!!activate },{merge:true}).then(()=>{loadRefCodes();loadPayout();}); }
 function deleteRefCode(code, paid){
-  const warn = paid>0?`\n\n⚠ 此碼已有 ${paid} 位付費歸因者,刪除後 KOL 統計頁與即時歸因會失效(歷史交易/抽成仍可從帳本查)。`:'';
+  const warn = paid>0?`\n\n<i data-ic="warning"></i> 此碼已有 ${paid} 位付費歸因者,刪除後 KOL 統計頁與即時歸因會失效(歷史交易/抽成仍可從帳本查)。`:'';
   if (!confirm('刪除推薦碼 '+code+'?此動作不可復原。'+warn)) return;
   db.collection('ref_codes').doc(code).delete().then(()=>{loadRefCodes();loadPayout();}).catch(e=>{ const m=document.getElementById('refCodeMsg'); m.style.color='#EF4444'; m.textContent='刪除失敗:'+e.message; });
 }

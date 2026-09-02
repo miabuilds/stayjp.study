@@ -153,8 +153,8 @@ textarea.note:focus{outline:none;border-color:var(--ac)}
  <header class="hd">
  <h1> Admin · StayJP</h1>
  <a class="btn" href="./" style="font-size:11px;padding:4px 10px">← 首頁</a>
- <a class="btn" href="admin-dash.html" style="font-size:11px;padding:4px 10px;border-color:var(--ac);color:var(--ac)">📊 總覽</a>
- <a class="btn" href="admin-kol.html" style="font-size:11px;padding:4px 10px;border-color:var(--ac);color:var(--ac)">🎟 KOL 分潤</a>
+ <a class="btn" href="admin-dash.html" style="font-size:11px;padding:4px 10px;border-color:var(--ac);color:var(--ac)"><i data-ic="chart"></i> 總覽</a>
+ <a class="btn" href="admin-kol.html" style="font-size:11px;padding:4px 10px;border-color:var(--ac);color:var(--ac)"><i data-ic="ticket"></i> KOL 分潤</a>
  <div class="tabs">
  <button id="tabFeedback" class="on"> 回饋</button>
  <button id="tabStats"> 報表</button>
@@ -255,7 +255,7 @@ textarea.note:focus{outline:none;border-color:var(--ac)}
  <div id="wrapSubs" class="stats">
  <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:14px">
  <h2 style="font-size:14px;color:var(--tx2);text-transform:uppercase;letter-spacing:.5px;margin:0">訂閱者</h2>
- <button class="btn" onclick="renderSubs()" style="font-size:11px;padding:4px 10px">↻ 重新整理</button>
+ <button class="btn" onclick="renderSubs()" style="font-size:11px;padding:4px 10px"><i data-ic="refresh"></i> 重新整理</button>
  <span id="subsCount" style="font-size:12px;color:var(--tx2)"></span>
  </div>
  <div id="subAudit" style="font-size:12px;margin-bottom:14px"></div>
@@ -273,20 +273,20 @@ textarea.note:focus{outline:none;border-color:var(--ac)}
  <div id="freeList" style="margin-top:10px;font-size:12px;color:var(--tx2)"></div>
  </div>
  <div style="background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r);padding:12px 16px;margin-bottom:14px;font-size:13px">
- <strong>🎟 推薦碼管理(KOL)</strong>
+ <strong><i data-ic="ticket"></i> 推薦碼管理(KOL)</strong>
  <a href="admin-kol.html" style="margin-left:10px;color:var(--ac);font-size:12px;text-decoration:none">→ 開獨立 KOL 分潤後台(看金額/付款)</a>
  <div style="display:flex;gap:6px;flex-wrap:wrap;margin:8px 0">
  <input id="refCodeNew" placeholder="碼(如 HARRY)" style="padding:6px 10px;border:1px solid var(--bd);border-radius:8px;background:var(--bg);color:var(--tx);font-size:13px;text-transform:uppercase;width:140px">
  <input id="refKolNew" placeholder="KOL 名稱／備註" style="padding:6px 10px;border:1px solid var(--bd);border-radius:8px;background:var(--bg);color:var(--tx);font-size:13px;flex:1;min-width:120px">
  <input id="refCommNew" type="number" min="0" max="100" value="20" title="抽成 %(套用在利潤上;預設 20,特殊再手動改)" style="padding:6px 10px;border:1px solid var(--bd);border-radius:8px;background:var(--bg);color:var(--tx);font-size:13px;width:90px" placeholder="抽成%">
  <button class="btn" onclick="createRefCode()" style="font-size:12px;padding:5px 12px">建立</button>
- <button class="btn" onclick="loadRefCodes()" style="font-size:11px;padding:5px 10px">↻</button>
+ <button class="btn" onclick="loadRefCodes()" style="font-size:11px;padding:5px 10px"><i data-ic="refresh"></i></button>
  </div>
  <div id="refCodeMsg" style="font-size:12px;margin-bottom:6px"></div>
  <div id="refCodeList" style="font-size:12px;color:var(--tx2)">—</div>
  </div>
  <div style="background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r);padding:12px 16px;margin-bottom:14px;font-size:13px">
- <strong>🎁 兌換碼(免費 Premium · 測試者/活動)</strong>
+ <strong><i data-ic="gift"></i> 兌換碼(免費 Premium · 測試者/活動)</strong>
  <span style="color:var(--tx3);margin-left:6px">用戶在帳號頁輸入 → 換一段免費 Premium(金額 0、不計營收、到期自動降回;有付費續扣者只加天數不動帳單)</span>
  <div style="display:flex;gap:6px;flex-wrap:wrap;margin:8px 0">
  <input id="rdCodeNew" placeholder="碼(留空自動產生)" style="padding:6px 10px;border:1px solid var(--bd);border-radius:8px;background:var(--bg);color:var(--tx);font-size:13px;text-transform:uppercase;width:150px">
@@ -297,15 +297,15 @@ textarea.note:focus{outline:none;border-color:var(--ac)}
  <input id="rdMaxNew" type="number" min="0" value="12" title="名額(0=不限)" placeholder="名額" style="padding:6px 10px;border:1px solid var(--bd);border-radius:8px;background:var(--bg);color:var(--tx);font-size:13px;width:80px">
  <input id="rdLabelNew" placeholder="標籤(如 Android beta)" style="padding:6px 10px;border:1px solid var(--bd);border-radius:8px;background:var(--bg);color:var(--tx);font-size:13px;flex:1;min-width:120px">
  <button class="btn" onclick="createRedeemCode()" style="font-size:12px;padding:5px 12px">建立</button>
- <button class="btn" onclick="loadRedeemCodes()" style="font-size:11px;padding:5px 10px">↻</button>
+ <button class="btn" onclick="loadRedeemCodes()" style="font-size:11px;padding:5px 10px"><i data-ic="refresh"></i></button>
  </div>
  <div id="rdCodeMsg" style="font-size:12px;margin-bottom:6px"></div>
  <div id="rdCodeList" style="font-size:12px;color:var(--tx2)">—</div>
  </div>
  <div style="background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r);padding:12px 16px;margin-bottom:14px;font-size:13px">
- <strong>🎫 兌換紀錄</strong>
+ <strong><i data-ic="ticket"></i> 兌換紀錄</strong>
  <span style="color:var(--tx3);margin-left:6px">誰用了兌換碼、什麼時候、目前訂閱狀態</span>
- <button class="btn" onclick="loadRedeemUses()" style="font-size:11px;padding:3px 9px;margin-left:8px">↻</button>
+ <button class="btn" onclick="loadRedeemUses()" style="font-size:11px;padding:3px 9px;margin-left:8px"><i data-ic="refresh"></i></button>
  <div id="redeemUsesList" style="font-size:12px;color:var(--tx2);margin-top:8px;overflow-x:auto">—</div>
  </div>
  <div id="subsList" style="font-size:13px;color:var(--tx2)">載入中…</div>
@@ -314,11 +314,11 @@ textarea.note:focus{outline:none;border-color:var(--ac)}
  <div id="wrapLedger" class="stats">
  <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:14px">
  <h2 style="font-size:14px;color:var(--tx2);text-transform:uppercase;letter-spacing:.5px;margin:0">全交易帳本</h2>
- <button class="btn" onclick="renderLedger()" style="font-size:11px;padding:4px 10px">↻ 重新整理</button>
+ <button class="btn" onclick="renderLedger()" style="font-size:11px;padding:4px 10px"><i data-ic="refresh"></i> 重新整理</button>
  <button class="btn" onclick="exportLedgerCSV()" style="font-size:11px;padding:4px 10px">⤓ 匯出 CSV</button>
  <span id="ledgerCount" style="font-size:12px;color:var(--tx2)"></span>
- <button class="btn danger" onclick="cleanupPending()" style="font-size:11px;padding:4px 10px;margin-left:auto" title="刪掉超過 1 小時的「處理中」棄單(未扣款,不影響營收)">🧹 清掉處理中棄單</button>
- <button class="btn danger" onclick="purgeTest()" style="font-size:11px;padding:4px 10px" title="清除 2 個寫死的測試帳號(knv2dycg8z / yujoulinforwork)的交易+訂閱,並校正早鳥名額。不影響真客人。">🧪 清除測試帳號資料</button>
+ <button class="btn danger" onclick="cleanupPending()" style="font-size:11px;padding:4px 10px;margin-left:auto" title="刪掉超過 1 小時的「處理中」棄單(未扣款,不影響營收)">清掉處理中棄單</button>
+ <button class="btn danger" onclick="purgeTest()" style="font-size:11px;padding:4px 10px" title="清除 2 個寫死的測試帳號(knv2dycg8z / yujoulinforwork)的交易+訂閱,並校正早鳥名額。不影響真客人。">清除測試帳號資料</button>
  <span id="cleanupMsg" style="font-size:12px"></span>
  </div>
  <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:14px;font-size:12px;color:var(--tx2)">
@@ -381,7 +381,7 @@ textarea.note:focus{outline:none;border-color:var(--ac)}
  <div style="margin-top:28px">
  <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
  <h3 style="font-size:14px;color:var(--tx2);margin:0">PayPal 待開通(用戶點了 PayPal 鈕)</h3>
- <button class="btn" onclick="loadPaypalPending()" style="font-size:11px;padding:3px 9px">↻</button>
+ <button class="btn" onclick="loadPaypalPending()" style="font-size:11px;padding:3px 9px"><i data-ic="refresh"></i></button>
  </div>
  <div id="ppPendingList" style="font-size:13px;color:var(--tx2)">載入中…</div>
  </div>
@@ -396,7 +396,7 @@ textarea.note:focus{outline:none;border-color:var(--ac)}
  <option value="48" selected>近 48 小時</option>
  <option value="168">近 7 天</option>
  </select>
- <button class="btn" onclick="renderErrLog()" style="font-size:11px;padding:4px 10px">↻ 重新整理</button>
+ <button class="btn" onclick="renderErrLog()" style="font-size:11px;padding:4px 10px"><i data-ic="refresh"></i> 重新整理</button>
  <span id="elCount" style="font-size:12px;color:var(--tx2)"></span>
  </div>
  <div id="elList" style="font-size:12px;color:var(--tx2)">點「重新整理」載入。</div>
@@ -406,7 +406,7 @@ textarea.note:focus{outline:none;border-color:var(--ac)}
  <div id="wrapRefunds" class="stats">
  <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:14px">
  <h2 style="font-size:14px;color:var(--tx2);text-transform:uppercase;letter-spacing:.5px;margin:0">ATM 退款申請</h2>
- <button class="btn" onclick="renderRefunds()" style="font-size:11px;padding:4px 10px">↻ 重新整理</button>
+ <button class="btn" onclick="renderRefunds()" style="font-size:11px;padding:4px 10px"><i data-ic="refresh"></i> 重新整理</button>
  <label style="font-size:12px;color:var(--tx2)"><input type="checkbox" id="rfShowDone" onchange="renderRefunds()"> 含已處理</label>
  <span id="rfCount" style="font-size:12px;color:var(--tx2)"></span>
  </div>
@@ -417,7 +417,7 @@ textarea.note:focus{outline:none;border-color:var(--ac)}
  <div id="wrapPayouts" class="stats">
  <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:14px">
  <h2 style="font-size:14px;color:var(--tx2);text-transform:uppercase;letter-spacing:.5px;margin:0">KOL 領款申請</h2>
- <button class="btn" onclick="renderPayouts()" style="font-size:11px;padding:4px 10px">↻ 重新整理</button>
+ <button class="btn" onclick="renderPayouts()" style="font-size:11px;padding:4px 10px"><i data-ic="refresh"></i> 重新整理</button>
  <label style="font-size:12px;color:var(--tx2)"><input type="checkbox" id="poShowDone" onchange="renderPayouts()"> 含已處理</label>
  <span id="poCount" style="font-size:12px;color:var(--tx2)"></span>
  </div>
@@ -427,6 +427,7 @@ textarea.note:focus{outline:none;border-color:var(--ac)}
 </div>
 
 <!-- Firebase SDK -->
+<script src="icons.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
@@ -551,7 +552,7 @@ async function renderRefunds() {
   const pend = snap.docs.filter(d => (d.data().status || 'pending') === 'pending').length;
   cnt.innerHTML = `待處理 ${pend} 筆` + (snap.size > pend ? ` · 共 ${snap.size}` : '');
   const docs = snap.docs.filter(d => showDone || (d.data().status || 'pending') === 'pending');
-  if (!docs.length) { box.innerHTML = '<span style="color:var(--tx3)">目前沒有待處理的退款申請 🎉</span>'; return; }
+  if (!docs.length) { box.innerHTML = '<span style="color:var(--tx3)">目前沒有待處理的退款申請 </span>'; return; }
   box.innerHTML = docs.map(d => {
    const x = d.data();
    const t = x.created_at && x.created_at.toDate ? x.created_at.toDate().toLocaleString('zh-TW') : '';
@@ -559,10 +560,10 @@ async function renderRefunds() {
    return `<div style="border-bottom:1px solid var(--bd);padding:10px 0${done ? ';opacity:.5' : ''}">
      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
        <strong style="color:var(--tx)">${esc(x.email || x.uid)}</strong>
-       <span>· ${x.type==='gift'?'🎁 贈送':(SUB_PLAN_TXT[x.plan] || x.plan || '')} · ${esc((x.pay_type || '').toUpperCase())}</span>
+       <span>· ${x.type==='gift'?'<i data-ic="gift"></i> 贈送':(SUB_PLAN_TXT[x.plan] || x.plan || '')} · ${esc((x.pay_type || '').toUpperCase())}</span>
        <span style="color:#16A34A;font-weight:600">實退 NT$${x.net_refund}</span>
        <span style="color:var(--tx3);font-size:11px">(退 ${x.refund_amount} − 手續費 ${x.transfer_fee}) · ${t}</span>
-       ${done ? '<span style="color:var(--tx3);margin-left:auto">✓ 已處理</span>' : `<button class="btn" style="font-size:11px;padding:3px 9px;margin-left:auto" onclick="markRefundDone('${d.id}')">標記已處理</button>`}
+       ${done ? '<span style="color:var(--tx3);margin-left:auto"><i data-ic="check"></i> 已處理</span>' : `<button class="btn" style="font-size:11px;padding:3px 9px;margin-left:auto" onclick="markRefundDone('${d.id}')">標記已處理</button>`}
      </div>
      <div style="margin-top:4px;color:var(--tx2)">原因:${esc(x.reason || '—')}</div>
    </div>`;
@@ -589,12 +590,12 @@ async function renderPayouts() {
   const pend = snap.docs.filter(d => (d.data().status || 'requested') !== 'done').length;
   cnt.innerHTML = `待處理 ${pend} 筆` + (snap.size > pend ? ` · 共 ${snap.size}` : '');
   const docs = snap.docs.filter(d => showDone || (d.data().status || 'requested') !== 'done');
-  if (!docs.length) { box.innerHTML = '<span style="color:var(--tx3)">目前沒有待處理的領款申請 🎉</span>'; return; }
+  if (!docs.length) { box.innerHTML = '<span style="color:var(--tx3)">目前沒有待處理的領款申請 </span>'; return; }
   box.innerHTML = docs.map(d => {
    const x = d.data();
    const t = x.created_at && x.created_at.toDate ? x.created_at.toDate().toLocaleString('zh-TW') : '';
    const done = (x.status || 'requested') === 'done';
-   const mailWarn = x.email_sent === false ? '<span style="color:#EF4444">⚠ 信件未送出(去信箱找不到 PDF 的話,請 KOL 重簽或看 email_error)</span>' : '';
+   const mailWarn = x.email_sent === false ? '<span style="color:#EF4444"><i data-ic="warning"></i> 信件未送出(去信箱找不到 PDF 的話,請 KOL 重簽或看 email_error)</span>' : '';
    return `<div style="border-bottom:1px solid var(--bd);padding:10px 0${done ? ';opacity:.5' : ''}">
      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
        <strong style="color:var(--tx)">${esc(x.kol || x.code)}</strong>
@@ -602,9 +603,9 @@ async function renderPayouts() {
        <span>· 法定姓名 ${esc(x.holder_name || '—')} · 帳戶 ${esc(x.account_masked || '—')}</span>
        <span style="color:#16A34A;font-weight:600">可領 NT$${x.amount_snapshot} (${x.commission_count} 筆)</span>
        <span style="color:var(--tx3);font-size:11px">· ${t}</span>
-       ${done ? '<span style="color:var(--tx3);margin-left:auto">✓ 已處理</span>' : `<button class="btn" style="font-size:11px;padding:3px 9px;margin-left:auto" onclick="markPayoutDone('${d.id}')">標記已處理</button>`}
+       ${done ? '<span style="color:var(--tx3);margin-left:auto"><i data-ic="check"></i> 已處理</span>' : `<button class="btn" style="font-size:11px;padding:3px 9px;margin-left:auto" onclick="markPayoutDone('${d.id}')">標記已處理</button>`}
      </div>
-     <div style="margin-top:4px;color:var(--tx2)">📎 已簽協議 PDF 見 stayjpplan@gmail.com 信箱。${mailWarn}</div>
+     <div style="margin-top:4px;color:var(--tx2)">已簽協議 PDF 見 stayjpplan@gmail.com 信箱。${mailWarn}</div>
    </div>`;
   }).join('');
  } catch (e) { box.innerHTML = '<span style="color:#EF4444">讀取失敗:' + e.message + '</span>'; }
@@ -629,7 +630,7 @@ async function loadPaypalPending() {
    box.innerHTML = snap.docs.map(d => {
      const x = d.data();
      const t = x.created_at && x.created_at.toDate ? x.created_at.toDate().toLocaleString('zh-TW') : '';
-     const plan = x.type==='gift' ? '🎁 贈送' : (SUB_PLAN_TXT[x.plan] || escapeHtml(x.plan||'') || '—');
+     const plan = x.type==='gift' ? '<i data-ic="gift"></i> 贈送' : (SUB_PLAN_TXT[x.plan] || escapeHtml(x.plan||'') || '—');
      return `<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;border-bottom:1px solid var(--bd);padding:6px 0">
        <span style="color:var(--tx)">${escapeHtml(x.email || x.uid)}</span>
        <span>· ${plan}</span>
@@ -695,7 +696,7 @@ function renderList() {
  const status = f.status || 'new';
  const type = f.type || 'other';
  const who = f.email || f.uid?.slice(0, 8) || '匿名';
- const contact = f.contact_email ? ' <span style="color:var(--ok,#15803d);font-weight:700">📮 '+escapeHtml(f.contact_email)+'</span>' : (/@privaterelay\.appleid\.com$/i.test(f.email||'') ? ' <span style="color:var(--bad,#c2410c);font-size:11px">(隱藏信箱,可能回不到)</span>' : '');
+ const contact = f.contact_email ? ' <span style="color:var(--ok,#15803d);font-weight:700"><i data-ic="mail"></i> '+escapeHtml(f.contact_email)+'</span>' : (/@privaterelay\.appleid\.com$/i.test(f.email||'') ? ' <span style="color:var(--bad,#c2410c);font-size:11px">(隱藏信箱,可能回不到)</span>' : '');
  const date = f.createdAt?.toDate ? f.createdAt.toDate().toLocaleString('zh-TW', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }) : '-';
  const msg = (f.message || '').slice(0, 200);
  return `<div class="row ${currentFeedback?.id === f.id ? 'active' : ''}" data-id="${f.id}">
@@ -841,7 +842,7 @@ async function setSub(action) {
  } else if (action === 'refund') {
    body.amount = Number(document.getElementById('ssRefundAmt').value || 0);
    if (!body.amount || body.amount <= 0) { msg.textContent = '請輸入退回金額(NT$)'; msg.style.color = '#EF4444'; return; }
-   if (!confirm(`幫 ${email} 補記一筆退費 NT$${body.amount}?\n(只記帳、報表淨營收下修;不碰權限、不列黑名單)\n⚠ 錢要你自己先在銀行轉回去,這裡只是記帳。`)) return;
+   if (!confirm(`幫 ${email} 補記一筆退費 NT$${body.amount}?\n(只記帳、報表淨營收下修;不碰權限、不列黑名單)\n錢要你自己先在銀行轉回去,這裡只是記帳。`)) return;
  }
  msg.textContent = '處理中…'; msg.style.color = 'var(--tx2)'; result.textContent = '';
  try {
@@ -849,10 +850,10 @@ async function setSub(action) {
    const r = await fetch(FN_SET_SUB, { method:'POST', headers:{ 'Content-Type':'application/json', Authorization:'Bearer '+t }, body: JSON.stringify(body) });
    const d = await r.json();
    if (!r.ok) { msg.textContent = '失敗:' + (d.reason || d.error || r.status); msg.style.color = '#EF4444'; return; }
-   msg.textContent = `✓ 完成(${action})`; msg.style.color = '#16A34A';
+   msg.textContent = `完成(${action})`; msg.style.color = '#16A34A';
    const s = d.subscription;
    result.innerHTML = s
-     ? `最新狀態:<b>${s.is_gift?'🎁 贈送':(SUB_PLAN_TXT[s.plan]||s.plan)}</b> · ${SUB_STATUS_TXT[s.status]||s.status} · 到期 ${s.expiresAt ? new Date(Number(s.expiresAt)).toLocaleDateString('zh-TW') : '—'} · 續扣 ${s.willRenew?'是':'否'}`
+     ? `最新狀態:<b>${s.is_gift?'<i data-ic="gift"></i> 贈送':(SUB_PLAN_TXT[s.plan]||s.plan)}</b> · ${SUB_STATUS_TXT[s.status]||s.status} · 到期 ${s.expiresAt ? new Date(Number(s.expiresAt)).toLocaleDateString('zh-TW') : '—'} · 續扣 ${s.willRenew?'是':'否'}`
      : '(目前無訂閱)';
  } catch (e) { msg.textContent = '錯誤:' + e.message; msg.style.color = '#EF4444'; }
 }
@@ -873,7 +874,7 @@ async function renderErrLog() {
    }
    cnt.textContent = `共 ${d.count} 筆`;
    const items = d.items || [];
-   if (!items.length) { box.innerHTML = '<span style="color:#16A34A">這段期間沒有 ERROR 🎉</span>'; return; }
+   if (!items.length) { box.innerHTML = '<span style="color:#16A34A">這段期間沒有 ERROR </span>'; return; }
    box.innerHTML = items.map(it => `
      <div style="border-bottom:1px solid var(--bd);padding:8px 0">
        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
@@ -894,7 +895,7 @@ async function recomputeEarlyBird() {
     const r = await fetch(FN_RECOMPUTE_EB, { method: 'POST', headers: { Authorization: 'Bearer ' + t } });
     const d = await r.json();
     if (!r.ok) { alert('失敗:' + (d.error || r.status)); return; }
-    alert(`✓ 早鳥計數器 ${d.before} → ${d.after}(剩 ${d.remaining} 名額)`);
+    alert(`早鳥計數器 ${d.before} → ${d.after}(剩 ${d.remaining} 名額)`);
     renderStats();
   } catch (e) { alert('錯誤:' + e.message); }
 }
@@ -909,7 +910,7 @@ async function cleanupPending() {
     const r = await fetch(FN_CLEANUP_PENDING, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + t }, body: JSON.stringify({ olderThanMinutes: 60 }) });
     const d = await r.json();
     if (!r.ok) { msg.textContent = '失敗:' + (d.error || r.status); msg.style.color = '#EF4444'; return; }
-    msg.textContent = `✓ 已刪 ${d.deleted} 筆(保留近 1 小時內 ${d.kept_recent} 筆)`; msg.style.color = '#16A34A';
+    msg.textContent = `已刪 ${d.deleted} 筆(保留近 1 小時內 ${d.kept_recent} 筆)`; msg.style.color = '#16A34A';
     renderLedger();
   } catch (e) { msg.textContent = '錯誤:' + e.message; msg.style.color = '#EF4444'; }
 }
@@ -924,7 +925,7 @@ async function purgeTest() {
     const r = await fetch(FN_PURGE_TEST, { method: 'POST', headers: { Authorization: 'Bearer ' + t } });
     const d = await r.json();
     if (!r.ok) { msg.textContent = '失敗:' + (d.error || r.status); msg.style.color = '#EF4444'; return; }
-    msg.textContent = `✓ 清了 ${d.deletedTxns} 筆交易、早鳥校正為 ${d.earlyBird}`; msg.style.color = '#16A34A';
+    msg.textContent = `清了 ${d.deletedTxns} 筆交易、早鳥校正為 ${d.earlyBird}`; msg.style.color = '#16A34A';
     renderLedger(); renderStats();
   } catch (e) { msg.textContent = '錯誤:' + e.message; msg.style.color = '#EF4444'; }
 }
@@ -943,7 +944,7 @@ async function purgeUid(uid) {
     });
     const d = await r.json();
     if (!r.ok) { alert('清除失敗:' + (d.error || r.status)); return; }
-    alert('✓ 已隱藏(假刪)' + uid + '\n交易 ' + (d.deletedTxns || 0) + ' 筆,早鳥校正為 ' + d.earlyBird + '\n(資料保留,需要可復原)');
+    alert('已隱藏(假刪)' + uid + '\n交易 ' + (d.deletedTxns || 0) + ' 筆,早鳥校正為 ' + d.earlyBird + '\n(資料保留,需要可復原)');
     renderLedger(); renderStats();
   } catch (e) { alert('清除失敗:' + e.message); }
 }
@@ -1053,10 +1054,10 @@ async function renderLedger() {
         : amt !== 0 ? `<span style="color:${amt > 0 ? '#16A34A' : '#EF4444'};font-weight:600">${amt > 0 ? '+' : '-'}${Math.abs(amt).toLocaleString()}</span>` : '—';
       if (_ledgerHideSandbox && x.is_sandbox) return '';   // 預設隱藏沙盒列(營收/CSV 上方已算完,僅不渲染此列)
       return `<tr style="border-bottom:1px solid var(--bd)${(incomplete || x.is_sandbox) ? ';opacity:.5' : ''}">
-        <td style="padding:6px 6px;white-space:nowrap">${x.is_sandbox?'<span style="color:#F59E0B">🧪</span> ':''}${fmt(x.occurred_at)}</td>
+        <td style="padding:6px 6px;white-space:nowrap">${x.is_sandbox?'<span style="color:#F59E0B"></span> ':''}${fmt(x.occurred_at)}</td>
         <td style="padding:6px 6px">${esc(uidEmail[x.uid] || x.uid.slice(0, 10))}</td>
         <td style="padding:6px 6px;white-space:nowrap">${txnTypeLabel(x)}</td>
-        <td style="padding:6px 6px;white-space:nowrap">${x.type==='gift' ? '🎁 贈送' : (SUB_PLAN_TXT[x.plan] || (x.plan && x.plan !== 'n/a' ? x.plan : '—'))}</td>
+        <td style="padding:6px 6px;white-space:nowrap">${x.type==='gift' ? '<i data-ic="gift"></i> 贈送' : (SUB_PLAN_TXT[x.plan] || (x.plan && x.plan !== 'n/a' ? x.plan : '—'))}</td>
         <td style="padding:6px 6px;text-align:right;white-space:nowrap">${amtCell}</td>
         <td style="padding:6px 6px;white-space:nowrap">${PAY_TXT[x.payment_method] || x.payment_method || '—'}</td>
         <td style="padding:6px 6px">${TXN_STATUS_TXT[x.status] || x.status}</td>
@@ -1138,7 +1139,7 @@ function renderRevenueChart(byMonth) {
     <span style="display:inline-flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:2px;background:#16A34A;display:inline-block"></span>綠界(web)</span>
     <span style="display:inline-flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:2px;background:#0EA5E9;display:inline-block"></span>Apple(app)</span>
     <span style="color:var(--tx3);margin-left:auto">最近 ${months.length} 個月・台幣牌價估算</span></div>`;
-  el.innerHTML = `<h3 style="font-size:13px;color:var(--tx2);margin:0 0 8px;font-weight:700">📈 每月營業額</h3>`
+  el.innerHTML = `<h3 style="font-size:13px;color:var(--tx2);margin:0 0 8px;font-weight:700"><i data-ic="chart"></i> 每月營業額</h3>`
     + legend
     + `<div style="overflow-x:auto"><svg viewBox="0 0 ${W} ${H}" width="100%" style="max-width:${W}px;min-width:${Math.min(W, 320)}px;display:block" role="img" aria-label="每月營業額長條圖">${grid}${bars}</svg></div>`;
 }
@@ -1185,7 +1186,7 @@ function renderDailyChart(byDay) {
     <span style="display:inline-flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:2px;background:#16A34A;display:inline-block"></span>綠界</span>
     <span style="display:inline-flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:2px;background:#0EA5E9;display:inline-block"></span>Apple</span>
     <span style="color:var(--tx3);margin-left:auto">${yr}年${mo + 1}月・當月合計 ${money(monthTotal)}</span></div>`;
-  el.innerHTML = `<h3 style="font-size:13px;color:var(--tx2);margin:0 0 8px;font-weight:700">📅 當月每日營業額</h3>`
+  el.innerHTML = `<h3 style="font-size:13px;color:var(--tx2);margin:0 0 8px;font-weight:700"><i data-ic="calendar"></i> 當月每日營業額</h3>`
     + legend
     + `<div style="overflow-x:auto"><svg viewBox="0 0 ${W} ${H}" width="100%" style="max-width:${W}px;min-width:${Math.min(W, 340)}px;display:block" role="img" aria-label="當月每日營業額長條圖">${grid}${bars}</svg></div>`;
 }
@@ -1202,17 +1203,17 @@ async function freeAccess(action, emailArg) {
     const r = await fetch(FN_FREE_ACCESS, { method:'POST', headers:{ 'Content-Type':'application/json', Authorization:'Bearer '+t }, body: JSON.stringify({ action, email }) });
     const d = await r.json();
     if (!r.ok) { msg.textContent = '失敗:' + (d.reason || d.error || r.status); msg.style.color = '#EF4444'; return; }
-    if (action === 'add') { msg.textContent = `✓ 已加 ${email}`; msg.style.color = '#16A34A'; document.getElementById('freeEmail').value = ''; }
-    else if (action === 'remove') { msg.textContent = `✓ 已移除 ${email}`; msg.style.color = '#16A34A'; }
+    if (action === 'add') { msg.textContent = `已加 ${email}`; msg.style.color = '#16A34A'; document.getElementById('freeEmail').value = ''; }
+    else if (action === 'remove') { msg.textContent = `已移除 ${email}`; msg.style.color = '#16A34A'; }
     const list = d.free_users || [];
     document.getElementById('freeList').innerHTML = list.length
-      ? `<b>目前免費(${list.length}):</b> ` + list.map(u => `<span style="display:inline-block;background:var(--bg3);border:1px solid var(--bd);border-radius:999px;padding:2px 8px;margin:4px 4px 0 0">${u.email || u.uid.slice(0,8)} <a href="#" onclick="freeAccess('remove','${u.email}');return false" style="color:#EF4444;text-decoration:none" title="移除">✕</a></span>`).join('')
+      ? `<b>目前免費(${list.length}):</b> ` + list.map(u => `<span style="display:inline-block;background:var(--bg3);border:1px solid var(--bd);border-radius:999px;padding:2px 8px;margin:4px 4px 0 0">${u.email || u.uid.slice(0,8)} <a href="#" onclick="freeAccess('remove','${u.email}');return false" style="color:#EF4444;text-decoration:none" title="移除"></a></span>`).join('')
       : '<span style="color:var(--tx3)">目前沒有免費白名單帳號</span>';
   } catch (e) { msg.textContent = '錯誤:' + e.message; msg.style.color = '#EF4444'; }
 }
 const SUB_PLAN_TXT = { monthly:'月費', yearly:'年費', yearly_early_bird:'早鳥年費', lifetime:'買斷' };
 // cancelled 真正含義是「關閉自動續扣、但到期前仍可用」,不是「已終止」。標籤講清楚避免誤判(看「到期」欄判斷是否還在期內)。
-const SUB_STATUS_TXT = { active:'✓ 已付費', cancelled:'取消續扣（仍可用）', refunded:'已退費', expired:'已過期', trialing:'🎁 試用中' };
+const SUB_STATUS_TXT = { active:'<i data-ic="check"></i> 已付費', cancelled:'取消續扣（仍可用）', refunded:'已退費', expired:'已過期', trialing:'<i data-ic="gift"></i> 試用中' };
 // 交易帳本(transactions)用的標籤 — 與 account.html 對齊
 const TXN_TYPE_TXT = { subscribe:'訂閱', renew:'續訂', refund:'退費', cancel:'關閉續扣', fail:'扣款失敗', chargeback:'信用卡爭議', gift:'贈送', expire:'訂閱到期' };
 // 歷史相容:2026-07 前 EXPIRATION 事件被誤記成 type:'fail' note:'Subscription expired'。
@@ -1284,7 +1285,7 @@ function createRefCode() {
     if (d.exists) { msg.style.color = '#EF4444'; msg.textContent = '碼已存在:' + code; return; }
     const token = (crypto.randomUUID ? crypto.randomUUID().replace(/-/g, '') : (Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2))).slice(0, 20);
     ref.set({ kol, token, active: true, commission_pct: comm, created_at: Date.now() }).then(() => {
-      msg.style.color = '#16A34A'; msg.textContent = '✓ 已建立 ' + code;
+      msg.style.color = '#16A34A'; msg.textContent = '已建立 ' + code;
       document.getElementById('refCodeNew').value = ''; document.getElementById('refKolNew').value = '';
       loadRefCodes();
     }).catch(e => { msg.style.color = '#EF4444'; msg.textContent = '建立失敗:' + e.message; });
@@ -1294,7 +1295,7 @@ function toggleRefCode(code, activate) {
   db.collection('ref_codes').doc(code).set({ active: !!activate }, { merge: true }).then(loadRefCodes);
 }
 function deleteRefCode(code, paid) {
-  const warn = paid > 0 ? `\n\n⚠ 此碼已有 ${paid} 位付費歸因者,刪除後 KOL 統計頁與即時歸因會失效(歷史交易/抽成仍可從帳本查)。` : '';
+  const warn = paid > 0 ? `\n\n<i data-ic="warning"></i> 此碼已有 ${paid} 位付費歸因者,刪除後 KOL 統計頁與即時歸因會失效(歷史交易/抽成仍可從帳本查)。` : '';
   if (!confirm('刪除推薦碼 ' + code + '?此動作不可復原。' + warn)) return;
   db.collection('ref_codes').doc(code).delete().then(loadRefCodes).catch(e => { const m = document.getElementById('refCodeMsg'); m.style.color = '#EF4444'; m.textContent = '刪除失敗:' + e.message; });
 }
@@ -1334,7 +1335,7 @@ function createRedeemCode() {
     const aiChat = Math.max(0, parseInt((document.getElementById('rdAiChatNew')||{}).value, 10) || 0);
     ref.set({ type: rdType, days, ai_eval: aiEval, ai_chat: aiChat, max_uses: max, label, active: true, used_count: 0, plan: 'yearly', created_at: Date.now() }).then(() => {
       msg.style.color = '#16A34A';
-      msg.textContent = '✓ 已建立 ' + code + (rdType==='ai' ? '(AI 包:+' + aiEval + ' 評分/+' + aiChat + ' 對話,名額 ' + (max || '不限') + ')' : '(送 ' + days + ' 天,名額 ' + (max || '不限') + ')');
+      msg.textContent = '已建立 ' + code + (rdType==='ai' ? '(AI 包:+' + aiEval + ' 評分/+' + aiChat + ' 對話,名額 ' + (max || '不限') + ')' : '(送 ' + days + ' 天,名額 ' + (max || '不限') + ')');
       document.getElementById('rdCodeNew').value = ''; document.getElementById('rdLabelNew').value = '';
       loadRedeemCodes();
     }).catch(e => { msg.style.color = '#EF4444'; msg.textContent = '建立失敗:' + e.message; });
@@ -1358,7 +1359,7 @@ async function loadRedeemUses() {
         // 兌換紀錄面板:這裡每列都是「用兌換碼」的人。標記為贈送/兌換取得 + 有效性,
         // 不要用一般訂閱的「年費 · 已付費」(兌換碼開的訂閱 plan 是預設值、金額 0,顯示已付費會誤導)。
         const cur = !s ? '<span style="color:var(--tx3)">查無(未同步/已刪)</span>'
-          : ((s.is_gift ? '🎁 贈送' : (s.willRenew ? '付費訂閱' : '兌換取得'))
+          : ((s.is_gift ? '<i data-ic="gift"></i> 贈送' : (s.willRenew ? '付費訂閱' : '兌換取得'))
              + ' · ' + (s.status === 'refunded' ? '已退費' : (exp > Date.now() ? '有效中' : '已過期'))
              + (exp ? ' · 到期 ' + new Date(exp).toLocaleDateString('zh-TW') : ''));
         return '<tr style="border-top:1px solid var(--bd)"><td style="padding:6px 8px;white-space:nowrap">' + when + '</td><td style="padding:6px 8px">' + escapeHtml(x.email || x.uid || '—') + '</td><td style="padding:6px 8px"><code>' + escapeHtml(x.code || '') + '</code></td><td style="padding:6px 8px">' + cur + '</td></tr>';
@@ -1380,20 +1381,20 @@ async function loadSubAudit() {
     const a = d.data();
     const when = a.checked_at ? new Date(Number(a.checked_at)).toLocaleString('zh-TW', { hour12: false }) : '—';
     if (!a.issue_count) {
-      box.innerHTML = `<div style="padding:8px 11px;background:rgba(22,163,74,.1);border:1px solid #16A34A;border-radius:8px;color:#16A34A">✅ 每日訂閱稽核:${a.total} 筆全部一致,無異常。<span style="color:var(--tx3);font-weight:400">(${when})</span></div>`;
+      box.innerHTML = `<div style="padding:8px 11px;background:rgba(22,163,74,.1);border:1px solid #16A34A;border-radius:8px;color:#16A34A"><i data-ic="check"></i> 每日訂閱稽核:${a.total} 筆全部一致,無異常。<span style="color:var(--tx3);font-weight:400">(${when})</span></div>`;
     } else {
-      const TYPE = { wrongly_expired: '🔴 付費卻被誤標過期', over_granted: '🟡 過期標籤滯後', no_expiry: '⚪ 無到期日' };
+      const TYPE = { wrongly_expired: '<span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:#EF4444;vertical-align:middle;margin-right:4px"></span>付費卻被誤標過期', over_granted: '<span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:#F59E0B;vertical-align:middle;margin-right:4px"></span>過期標籤滯後', no_expiry: '<span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:#9CA3AF;vertical-align:middle;margin-right:4px"></span>無到期日' };
       const issues = a.issues || [];
       // over_granted 自動修 = 只是標籤翻正,不影響權益、無漏財 → 良性;其餘需人工看。
       const benign = issues.filter(i => i.auto_fixed);
       const needAction = issues.filter(i => !i.auto_fixed);
-      const row = i => `<div style="padding:3px 0">${TYPE[i.type] || i.type} · <code>${i.uid}</code> · ${i.status || ''} · ${i.source || ''}${i.auto_fixed ? ' <span style="color:#16A34A">✓ 已自動修正</span>' : ''}</div>`;
+      const row = i => `<div style="padding:3px 0">${TYPE[i.type] || i.type} · <code>${i.uid}</code> · ${i.status || ''} · ${i.source || ''}${i.auto_fixed ? ' <span style="color:#16A34A"><i data-ic="check"></i> 已自動修正</span>' : ''}</div>`;
       if (!needAction.length) {
         // 全部良性(已自動修過期標籤)→ 綠色安心,不用處理
-        box.innerHTML = `<div style="padding:8px 11px;background:rgba(22,163,74,.1);border:1px solid #16A34A;border-radius:8px;color:#16A34A"><b>✅ 每日訂閱稽核:已自動修正 ${benign.length} 筆過期標籤</b>(僅 status 標籤滯後,權益早已依到期日停用、<b>無漏財</b>,無需處理)<span style="color:var(--tx3);font-weight:400"> (${when})</span><div style="margin-top:4px;color:var(--tx2);font-size:12px">${benign.map(row).join('')}</div></div>`;
+        box.innerHTML = `<div style="padding:8px 11px;background:rgba(22,163,74,.1);border:1px solid #16A34A;border-radius:8px;color:#16A34A"><b><i data-ic="check"></i> 每日訂閱稽核:已自動修正 ${benign.length} 筆過期標籤</b>(僅 status 標籤滯後,權益早已依到期日停用、<b>無漏財</b>,無需處理)<span style="color:var(--tx3);font-weight:400"> (${when})</span><div style="margin-top:4px;color:var(--tx2);font-size:12px">${benign.map(row).join('')}</div></div>`;
       } else {
-        // 有需人工處理的(🔴 誤標過期 / ⚪ 無到期日)→ 紅色,良性的收在下面
-        box.innerHTML = `<div style="padding:8px 11px;background:rgba(239,68,68,.1);border:1px solid #EF4444;border-radius:8px;color:#EF4444"><b>⚠️ 每日訂閱稽核:${needAction.length} 筆需處理</b> <span style="color:var(--tx3);font-weight:400">(${when})</span>${needAction.map(row).join('')}${benign.length ? `<div style="margin-top:6px;color:var(--tx2);font-size:12px">另有 ${benign.length} 筆過期標籤已自動修正(無需處理):${benign.map(row).join('')}</div>` : ''}</div>`;
+        // 有需人工處理的(<span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:#EF4444;vertical-align:middle;margin-right:4px"></span>誤標過期 / <span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:#9CA3AF;vertical-align:middle;margin-right:4px"></span>無到期日)→ 紅色,良性的收在下面
+        box.innerHTML = `<div style="padding:8px 11px;background:rgba(239,68,68,.1);border:1px solid #EF4444;border-radius:8px;color:#EF4444"><b><i data-ic="warning"></i> 每日訂閱稽核:${needAction.length} 筆需處理</b> <span style="color:var(--tx3);font-weight:400">(${when})</span>${needAction.map(row).join('')}${benign.length ? `<div style="margin-top:6px;color:var(--tx2);font-size:12px">另有 ${benign.length} 筆過期標籤已自動修正(無需處理):${benign.map(row).join('')}</div>` : ''}</div>`;
       }
     }
   } catch (e) { box.innerHTML = '<span style="color:var(--tx3)">稽核讀取失敗:' + e.message + '</span>'; }
@@ -1427,7 +1428,7 @@ function renderSubsTable() {
     : _allSubs.filter(s => !s.is_sandbox);
   const fmtDate = ms => ms ? new Date(Number(ms)).toLocaleDateString('zh-TW') : '—';
   const fbtn = (f, label) => `<button class="btn" style="font-size:11px;padding:4px 10px;${_subsFilter===f?'background:var(--ac);color:#fff;border-color:var(--ac)':''}" onclick="setSubsFilter('${f}')">${label}</button>`;
-  const filterBar = `<div style="display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap">${fbtn('real','真實 '+realN)}${fbtn('test','🧪 測試 '+testN)}${fbtn('all','全部 '+_allSubs.length)}<span style="font-size:11px;color:var(--tx3);align-self:center;margin-left:4px">(沙盒測試購買=非真實金流;舊測試資料無此旗標,需手動辨識)</span></div>`;
+  const filterBar = `<div style="display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap">${fbtn('real','真實 '+realN)}${fbtn('test','測試 '+testN)}${fbtn('all','全部 '+_allSubs.length)}<span style="font-size:11px;color:var(--tx3);align-self:center;margin-left:4px">(沙盒測試購買=非真實金流;舊測試資料無此旗標,需手動辨識)</span></div>`;
   const srcTxt = s => s.source==='app' ? 'App(IAP)' : (s.ecpay_order?'綠界':'手動/PayPal');
   // 狀態 + 來源彙總 / 漏斗(以目前篩選範圍計):試用中 →(轉化)→ 已付費;Apple vs 網頁
   const sc = {}; let srcApp = 0, srcWeb = 0, srcOther = 0, trialApp = 0, paidApp = 0;
@@ -1443,18 +1444,18 @@ function renderSubsTable() {
   const convRate = convBase ? Math.round(n('active') / convBase * 100) : 0;   // 快照付費佔比(非世代轉化,僅參考)
   const refKeys = Object.keys(refTally).sort((a, b) => refTally[b].total - refTally[a].total);
   const refLine = refKeys.length ? `<div style="font-size:12px;margin-bottom:10px;padding:8px 11px;background:var(--bg);border:1px solid var(--bd);border-radius:8px">
-    <span style="color:var(--tx2)">🎟 推薦碼(KOL):</span> ${refKeys.map(k => `<span style="margin-right:14px"><b>${k}</b> 帶來 <b>${refTally[k].total}</b> 人(付費 <b style="color:#16A34A">${refTally[k].paid}</b>)</span>`).join('')}
+    <span style="color:var(--tx2)"><i data-ic="ticket"></i> 推薦碼(KOL):</span> ${refKeys.map(k => `<span style="margin-right:14px"><b>${k}</b> 帶來 <b>${refTally[k].total}</b> 人(付費 <b style="color:#16A34A">${refTally[k].paid}</b>)</span>`).join('')}
   </div>` : '';
   const summary = `<div style="display:flex;gap:12px;flex-wrap:wrap;font-size:12px;margin-bottom:10px;padding:8px 11px;background:var(--bg);border:1px solid var(--bd);border-radius:8px">
-    <span>🎁 試用中 <b style="color:#D946EF">${n('trialing')}</b></span>
+    <span><i data-ic="gift"></i> 試用中 <b style="color:#D946EF">${n('trialing')}</b></span>
     <span style="color:var(--tx3)">→</span>
-    <span>✓ 已付費 <b style="color:#16A34A">${n('active')}</b></span>
+    <span><i data-ic="check"></i> 已付費 <b style="color:#16A34A">${n('active')}</b></span>
     <span>付費佔比 <b>${convRate}%</b></span>
     <span style="border-left:1px solid var(--bd);padding-left:12px">取消續扣 <b>${n('cancelled')}</b></span>
     <span>退費 <b>${n('refunded')}</b></span>
     <span>過期 <b>${n('expired')}</b></span>
-    <span style="border-left:1px solid var(--bd);padding-left:12px">🍎 Apple <b>${srcApp}</b> <small style="color:var(--tx3)">(試用 ${trialApp}・付費 ${paidApp})</small></span>
-    <span>🌐 網頁 <b>${srcWeb}</b>${srcOther?` ・ 其他 <b>${srcOther}</b>`:''}</span>
+    <span style="border-left:1px solid var(--bd);padding-left:12px">Apple <b>${srcApp}</b> <small style="color:var(--tx3)">(試用 ${trialApp}・付費 ${paidApp})</small></span>
+    <span><i data-ic="globe"></i> 網頁 <b>${srcWeb}</b>${srcOther?` ・ 其他 <b>${srcOther}</b>`:''}</span>
   </div>`;
   // 排序(點欄位標題)+ 分頁(人數變多不塞爆)
   const sval = (s, k) => k === 'email' ? (s.email || '') : k === 'status' ? (s.status || '') : k === 'source' ? (s.source || '') : k === 'plan' ? (s.plan || '') : Number(s.expiresAt || 0);
@@ -1478,8 +1479,8 @@ function renderSubsTable() {
         </tr></thead>
         <tbody>${pageList.map(s => `
           <tr style="border-bottom:1px solid var(--bd)${s.is_sandbox?';opacity:.55':''}">
-            <td style="padding:8px 6px;color:var(--tx)">${s.is_sandbox?'<span style="color:#F59E0B">🧪測試</span> ':''}${s.email || s.uid.slice(0,8)}${s.is_early_bird?' <span style="color:#D946EF">★早鳥</span>':''}${s.ref_code?` <span style="color:#0EA5E9">🎟${s.ref_code}</span>`:''}</td>
-            <td style="padding:8px 6px">${s.is_gift?'🎁 贈送':(SUB_PLAN_TXT[s.plan]||s.plan)}</td>
+            <td style="padding:8px 6px;color:var(--tx)">${s.is_sandbox?'<span style="color:#F59E0B">測試</span> ':''}${s.email || s.uid.slice(0,8)}${s.is_early_bird?' <span style="color:#D946EF">★早鳥</span>':''}${s.ref_code?` <span style="color:#0EA5E9"><i data-ic="ticket"></i>${s.ref_code}</span>`:''}</td>
+            <td style="padding:8px 6px">${s.is_gift?'<i data-ic="gift"></i> 贈送':(SUB_PLAN_TXT[s.plan]||s.plan)}</td>
             <td style="padding:8px 6px">${SUB_STATUS_TXT[s.status]||s.status}</td>
             <td style="padding:8px 6px">${s.plan==='lifetime'?'買斷':fmtDate(s.expiresAt)}</td>
             <td style="padding:8px 6px">${s.willRenew?'開':'關'}</td>
@@ -1504,7 +1505,7 @@ async function showTxns(uid, email) {
   ov.innerHTML = `<div style="background:var(--bg2);border:1px solid var(--bd);border-radius:14px;max-width:780px;width:100%;max-height:86vh;overflow:auto;padding:18px 20px">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
         <strong style="font-size:14px">訂購明細 — ${email || uid.slice(0,8)}</strong>
-        <button class="btn" style="font-size:12px;padding:4px 10px" onclick="closeTxns()">關閉 ✕</button>
+        <button class="btn" style="font-size:12px;padding:4px 10px" onclick="closeTxns()">關閉 <i data-ic="x"></i></button>
       </div>
       <div style="font-size:11px;color:var(--tx3);margin-bottom:12px">同一帳號的所有交易(訂閱／續訂／退費／取消／爭議都各一筆)。商家視角:訂閱／續訂=綠字進帳、退費／爭議=紅字退出。</div>
       <div id="txnModalBody" style="font-size:12px;color:var(--tx2)">載入中…</div>
@@ -1529,7 +1530,7 @@ async function showTxns(uid, email) {
         if (incomplete) amtHTML = `<span style="color:var(--tx3);font-weight:400">NT$${Math.abs(amt).toLocaleString()} <small>未扣款</small></span>`;
         else if (amt !== 0) amtHTML = `<span style="color:${amt > 0 ? '#16A34A' : '#EF4444'}">${amt > 0 ? '+' : '-'}NT$${Math.abs(amt).toLocaleString()}</span>`;
         else amtHTML = '<span style="color:var(--tx3);font-weight:400">—</span>';
-        const plan = x.type==='gift' ? '🎁 贈送' : (SUB_PLAN_TXT[x.plan] || (x.plan && x.plan !== 'n/a' ? x.plan : ''));
+        const plan = x.type==='gift' ? '<i data-ic="gift"></i> 贈送' : (SUB_PLAN_TXT[x.plan] || (x.plan && x.plan !== 'n/a' ? x.plan : ''));
         return `<div class="txn-modal-card"${incomplete ? ' style="opacity:.6"' : ''}>
           <div class="t-top">
             <span class="t-type">${txnTypeLabel(x)}${plan ? ' · ' + plan : ''}</span>
@@ -1559,7 +1560,7 @@ async function unblockUser() {
     });
     const data = await res.json();
     if (!res.ok) { msg.textContent = '失敗:' + (data.error||res.status); msg.style.color='#EF4444'; return; }
-    msg.textContent = data.was_blocked ? `✓ 已解除 ${email} 的限制` : `${email} 本來就沒被限制`;
+    msg.textContent = data.was_blocked ? `已解除 ${email} 的限制` : `${email} 本來就沒被限制`;
     msg.style.color = '#16A34A';
   } catch (e) { msg.textContent = '錯誤:' + e.message; msg.style.color='#EF4444'; }
 }
@@ -1664,7 +1665,7 @@ async function fetchBillingStats() {
  <div class="stat"><div class="lbl">累計售出</div><div class="val">${soldUids.size}<small style="font-size:13px;color:var(--tx2)"> 人</small>${reSold ? ` <small style="font-size:12px;color:var(--tx2)">+${reSold} 重訂</small>` : ''}</div><div class="sub">不重複買家(含手動/PayPal;不含續訂 renew、不受之後取消退費影響)</div></div>
  <div class="stat"><div class="lbl">自動續訂中</div><div class="val">${activeRenew}</div><div class="sub">會自動續扣的綠界訂閱${activeManual ? ` · 另 ${activeManual} 筆手動/PayPal 有效(不續訂)` : ''} · 有效共 ${activeSubs}</div></div>
  <div class="stat"><div class="lbl">取消續扣・已退費</div><div class="val" style="font-size:20px">${cancelledSubs} <small style="font-size:13px;color:var(--tx2)">取消</small> / ${refundedSubs} <small style="font-size:13px;color:var(--tx2)">退費</small></div><div class="sub">取消=期內仍可用 · 過期 ${expiredSubs}</div></div>
- <div class="stat"><div class="lbl">早鳥目前持有 / 100</div><div class="val">${earlyBirdHeld}<small style="font-size:14px;color:var(--tx2)"> / 100</small></div><div class="sub">剩 ${ebLeft} 名額${ebDrift ? ` · <span style="color:#EF4444">⚠ 計數器=${earlyBirdCounter}(pricing 顯示的剩餘用這個)</span> <button class="btn" style="font-size:10px;padding:2px 7px" onclick="recomputeEarlyBird()">校正→${earlyBirdHeld}</button>` : ''}</div></div>
+ <div class="stat"><div class="lbl">早鳥目前持有 / 100</div><div class="val">${earlyBirdHeld}<small style="font-size:14px;color:var(--tx2)"> / 100</small></div><div class="sub">剩 ${ebLeft} 名額${ebDrift ? ` · <span style="color:#EF4444"><i data-ic="warning"></i> 計數器=${earlyBirdCounter}(pricing 顯示的剩餘用這個)</span> <button class="btn" style="font-size:10px;padding:2px 7px" onclick="recomputeEarlyBird()">校正→${earlyBirdHeld}</button>` : ''}</div></div>
  <div class="stat"><div class="lbl">累計營業額(淨)</div><div class="val">NT$${allNet.toLocaleString()}</div><div class="sub">收款 ${allRevenue.toLocaleString()} − 退費 ${allRefund.toLocaleString()}</div></div>
  <div class="stat"><div class="lbl">本月營業額(淨)</div><div class="val">NT$${monthNet.toLocaleString()}</div><div class="sub">本月收款 ${monthRevenue.toLocaleString()} · 退費 ${monthRefund.toLocaleString()}</div></div>
  `;

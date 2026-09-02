@@ -103,6 +103,7 @@
   </footer>
 </div>
 
+<script src="icons.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
@@ -163,15 +164,15 @@ function showLink(d){
   const link=SITE+'/?ref='+d.code;
   const stats=SITE+'/kol.html?code='+d.code+'&t='+encodeURIComponent(d.token||'');
   area.innerHTML=`
-    <div class="ok" style="font-weight:700;font-size:16px">✓ 你已是合作夥伴!</div>
+    <div class="ok" style="font-weight:700;font-size:16px"><i data-ic="check"></i> 你已是合作夥伴!</div>
     <p style="color:var(--tx2);margin-top:6px">分享這條專屬連結,對方註冊並付費後你就賺分潤(抽成 ${d.commission_pct||10}% 首筆利潤):</p>
     <div class="linkbox"><input id="myLink" readonly value="${esc(link)}"><button class="btn" style="padding:11px 18px" onclick="copyLink()">複製</button></div>
     <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap">
-      <a class="btn sec" href="${esc(stats)}" target="_blank" style="padding:11px 20px;font-size:14px">📊 看我的推薦成效</a>
+      <a class="btn sec" href="${esc(stats)}" target="_blank" style="padding:11px 20px;font-size:14px"><i data-ic="chart"></i> 看我的推薦成效</a>
       ${navigator.share?'<button class="btn sec" style="padding:11px 20px;font-size:14px" onclick="shareLink()">分享</button>':''}
     </div>
     <div id="joinMsg" class="muted" style="margin-top:10px">你的推薦碼:<b>${esc(d.code)}</b>(App 受眾可到帳號頁輸入此碼歸因)。</div>
-    <details style="margin-top:10px"><summary style="cursor:pointer;font-size:14px;color:var(--ac)">✏️ 換一個更好記的碼</summary>
+    <details style="margin-top:10px"><summary style="cursor:pointer;font-size:14px;color:var(--ac)"><i data-ic="edit"></i> 換一個更好記的碼</summary>
       <div style="margin-top:8px">
         <input id="chgCode" placeholder="新推薦碼(4–16 碼英數,例:DOUBLEOJ)" maxlength="16" autocapitalize="characters" style="text-transform:uppercase">
         <div class="muted" style="margin-top:4px">只有在你的碼還沒有人使用時才能更改;改了之後舊連結就會失效,記得用新的。</div>
@@ -180,7 +181,7 @@ function showLink(d){
       </div>
     </details>
     <div style="margin-top:18px;padding-top:16px;border-top:1px solid var(--bd)">
-      <div style="font-weight:700;margin-bottom:4px">💰 收款資料</div>
+      <div style="font-weight:700;margin-bottom:4px"><i data-ic="coin"></i> 收款資料</div>
       <p class="muted" style="margin:0 0 10px">累積分潤滿 NT$1,000 於每月結算,款項匯到這裡。結算前補齊即可、可隨時修改。</p>
       <div id="payStatus" style="margin-bottom:10px"></div>
       <select id="uPayM"><option value="">選擇收款方式</option><option value="bank">台灣銀行轉帳</option><option value="paypal">PayPal</option></select>
@@ -193,7 +194,7 @@ function showLink(d){
       <div id="payMsg" class="muted" style="margin-top:8px"></div>
     </div>
     <div style="margin-top:18px;padding-top:16px;border-top:1px solid var(--bd)">
-      <div style="font-weight:700;margin-bottom:4px">🔔 通知請款</div>
+      <div style="font-weight:700;margin-bottom:4px"><i data-ic="bell"></i> 通知請款</div>
       <p class="muted" style="margin:0 0 10px">確認你的成效頁「可領分潤」已達 NT$1,000 後,按這裡通知站方安排結算匯款(每月結算,次月 15 日前入帳)。</p>
       <button class="btn" id="notifyPayBtn" style="padding:11px 18px" onclick="requestPayout()">通知站方我要請款</button>
       <div id="notifyMsg" class="muted" style="margin-top:8px"></div>
@@ -213,8 +214,8 @@ async function requestPayout(){
       uid:u.uid, email:u.email||'', kol_payout_request:true, code:(window.__code||''),
       createdAt:Date.now()
     });
-    msg.style.color='var(--ac)'; msg.textContent='✓ 已通知站方,我們會於下次結算安排匯款。';
-    btn.textContent='已通知 ✓';
+    msg.style.color='var(--ac)'; msg.textContent='已通知站方,我們會於下次結算安排匯款。';
+    btn.textContent='已通知 ';
   }catch(e){ btn.disabled=false; msg.textContent='通知失敗:'+esc(e.message); }
 }
 function setupPayout(p){
@@ -226,10 +227,10 @@ function setupPayout(p){
   const showStatus=pp=>{
     if(pp && pp.method && pp.account){
       status.className='ok'; status.style.fontSize='14px';
-      status.innerHTML='✓ 目前收款方式:<b>'+(pp.method==='paypal'?'PayPal':'銀行轉帳')+'</b> · '+esc(pp.account);
+      status.innerHTML='<i data-ic="check"></i> 目前收款方式:<b>'+(pp.method==='paypal'?'PayPal':'銀行轉帳')+'</b> · '+esc(pp.account);
     }else{
       status.className='err'; status.style.fontSize='14px';
-      status.innerHTML='⚠ 尚未填收款資料 — 結算前請務必補齊,否則無法匯款給你。';
+      status.innerHTML='<i data-ic="warning"></i> 尚未填收款資料 — 結算前請務必補齊,否則無法匯款給你。';
     }
   };
   // 預填既有資料
@@ -245,13 +246,13 @@ function setupPayout(p){
       const body={ payout_method:m.value, payout_account:acc.value, payout_bank:(bank?bank.value:''), payout_name:(name?name.value:'') };
       const r=await fetch(FN_PAYOUT,{method:'POST',headers:{'Authorization':'Bearer '+t,'Content-Type':'application/json'},body:JSON.stringify(body)});
       const d=await r.json();
-      if(d.ok){ msg.className='muted ok'; msg.textContent='✓ 收款資料已儲存。'; showStatus(d.payout); }
+      if(d.ok){ msg.className='muted ok'; msg.textContent='收款資料已儲存。'; showStatus(d.payout); }
       else { msg.className='err'; msg.textContent='儲存失敗:'+esc(d.reason||d.error||'unknown'); }
     }catch(e){ msg.className='err'; msg.textContent='儲存失敗,請稍後再試。'; }
     finally{ btn.disabled=false; }
   };
 }
-function copyLink(){ const el=document.getElementById('myLink'); (navigator.clipboard?navigator.clipboard.writeText(el.value):Promise.reject()).then(()=>{ const m=document.getElementById('joinMsg'); m.className='muted ok'; m.textContent='✓ 已複製,貼給你的觀眾吧!'; }).catch(()=>{ el.removeAttribute('readonly'); el.select(); try{document.execCommand('copy');}catch(e){} }); }
+function copyLink(){ const el=document.getElementById('myLink'); (navigator.clipboard?navigator.clipboard.writeText(el.value):Promise.reject()).then(()=>{ const m=document.getElementById('joinMsg'); m.className='muted ok'; m.textContent='已複製,貼給你的觀眾吧!'; }).catch(()=>{ el.removeAttribute('readonly'); el.select(); try{document.execCommand('copy');}catch(e){} }); }
 function shareLink(){ if(navigator.share) navigator.share({ title:'日本再留計劃 · 免費 JLPT 學習工具', text:'用我的連結註冊 StayJP,還多送你 7 天 Premium!', url:window.__link }).catch(()=>{}); }
 async function changeCode(){
   const inp=document.getElementById('chgCode'), msg=document.getElementById('chgMsg'), btn=document.getElementById('chgBtn');
