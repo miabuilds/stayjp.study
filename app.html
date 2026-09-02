@@ -356,13 +356,13 @@ select.lang-btn {
 @keyframes hubBob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
 @keyframes hubIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
 .hub-mascot2 { animation: hubBob 3.2s ease-in-out infinite; }
-.hub-left, .hub-right > * { animation: hubIn .5s var(--ease) backwards; }
-.hub-right > *:nth-child(1) { animation-delay: .04s; }
-.hub-right > *:nth-child(2) { animation-delay: .10s; }
-.hub-right > *:nth-child(3) { animation-delay: .16s; }
-.hub-right > *:nth-child(4) { animation-delay: .22s; }
-.hub-right > *:nth-child(5) { animation-delay: .28s; }
-.hub-right > *:nth-child(6) { animation-delay: .34s; }
+.hub-anim .hub-left, .hub-anim .hub-right > * { animation: hubIn .5s var(--ease) backwards; }
+.hub-anim .hub-right > *:nth-child(1) { animation-delay: .04s; }
+.hub-anim .hub-right > *:nth-child(2) { animation-delay: .10s; }
+.hub-anim .hub-right > *:nth-child(3) { animation-delay: .16s; }
+.hub-anim .hub-right > *:nth-child(4) { animation-delay: .22s; }
+.hub-anim .hub-right > *:nth-child(5) { animation-delay: .28s; }
+.hub-anim .hub-right > *:nth-child(6) { animation-delay: .34s; }
 .hub-jlpt, .hub-card, .hub-goal, .hub-resume { transition: transform .18s var(--ease), box-shadow .18s var(--ease); }
 @media (hover: hover) {
   .hub-jlpt:hover { transform: translateY(-3px); box-shadow: 0 8px 22px rgba(198,85,59,.34); }
@@ -2281,6 +2281,9 @@ let currentLevel = ['n5','n4','n3','n2','n1','all'].includes(_savedLevel) ? _sav
 let showFavOnly = false;
 let searchTerm = '';
 let inHub = true;   // 進入點是學習面板;點單字/文法或搜尋才進清單
+let _hubAnimated = false;   // 進場動畫每頁只播一次(避免載入時多次 renderHub 讓卡片重播動畫 → 閃一下)
+let _hubRaf = 0;            // 載入時 doRender 會被呼叫多次;面板用 rAF 去重,一幀只渲染一次(免閃)
+let _hubSig = '';          // 面板內容簽章:資料沒變就不重繪(擋掉載入時的重複渲染,保住進場動畫不被打斷)
 
 // Restore saved mode/level UI on load
 (function initSavedState() {
@@ -2322,7 +2325,9 @@ function goHub() {
   searchTerm = '';
   const s = document.getElementById('search'); if (s) s.value = '';
   document.querySelectorAll('.ftb-btn').forEach((b, i) => b.classList.toggle('on', i === 0));
+  if (_hubRaf) { cancelAnimationFrame(_hubRaf); _hubRaf = 0; }
   renderHub();
+  if (typeof fixHeaderHeight === 'function') fixHeaderHeight();   // 面板頭部較矮(無 hd-bar)→ 重算 padding,免得沿用清單頁的大 padding 露出頂部空白
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 window.goHub = goHub;
@@ -2381,6 +2386,7 @@ function renderHub() {
   const done = _hubToday();
   const GOAL = 30;
   const pct = Math.min(100, Math.round(done / GOAL * 100));
+  const firstHub = !_hubAnimated;   // 只有本頁第一次渲染面板才播進場動畫/長條;之後 re-render 直接定位,不閃
   let motto;
   if (done >= GOAL) motto = L('今天達成了，太棒了！', 'Goal smashed today!');
   else if (done > 0) motto = L('再 ' + (GOAL - done) + ' 個就達標，衝！', 'Just ' + (GOAL - done) + ' to go — push!');
@@ -2394,6 +2400,10 @@ function renderHub() {
     const mlabel = lm === 'vocab' ? L('單字', 'Vocab') : L('文法', 'Grammar');
     resume = '<button class="hub-resume" onclick="switchMode(\'' + lm + '\')"><span class="hr-play">▶</span><span class="hr-main">' + L('繼續上次', 'Continue') + '：' + mlabel + ' ' + ll + '</span><span class="hr-sub">' + L('回到上次進度', 'resume') + '</span></button>';
   }
+  // 內容簽章:載入時 doRender 會被叫多次,資料相同就不重繪 → 只渲染一次,進場動畫不被打斷、不閃
+  const _sig = [(typeof I18n !== 'undefined' && I18n.getLang ? I18n.getLang() : ''), streak, done, wod ? wod.w : '', lm || '', ll || ''].join('|');
+  if (_sig === _hubSig && mn.querySelector('.hub')) return;
+  _hubSig = _sig;
   const blossom = c => '<svg class="bl ' + c + '" viewBox="0 0 40 40"><g><ellipse cx="20" cy="11" rx="4.6" ry="7.4"/><ellipse cx="20" cy="11" rx="4.6" ry="7.4" transform="rotate(72 20 20)"/><ellipse cx="20" cy="11" rx="4.6" ry="7.4" transform="rotate(144 20 20)"/><ellipse cx="20" cy="11" rx="4.6" ry="7.4" transform="rotate(216 20 20)"/><ellipse cx="20" cy="11" rx="4.6" ry="7.4" transform="rotate(288 20 20)"/></g><circle cx="20" cy="20" r="2.6" fill="#fff"/></svg>';
   mn.innerHTML =
     '<div class="hub">'
@@ -2409,7 +2419,7 @@ function renderHub() {
         + '</div>'
         + '<button class="hub-goal" onclick="dailyHelp()">'
           + '<div class="hub-goal-top"><b>' + L('今日目標', 'Today’s goal') + '</b><span class="hub-goal-n">' + done + ' / ' + GOAL + '</span></div>'
-          + '<div class="hub-goal-bar"><div class="hub-goal-fill" style="width:0"></div></div>'
+          + '<div class="hub-goal-bar"><div class="hub-goal-fill" style="width:' + (firstHub ? '0' : pct + '%') + '"></div></div>'
           + '<div class="hub-goal-hint">' + (done >= GOAL ? L('今天達成了，太強了！', 'Goal reached — nice!') : L('做滿 30 個學習動作就達標（背卡・答題・複習…混著做都算）', 'Do 30 study actions today — anything counts')) + '</div>'
         + '</button>'
       + '</div>'
@@ -2446,8 +2456,13 @@ function renderHub() {
     + '</div>'
     + '</div>';
   try { if (window.Icons && Icons.hydrate) Icons.hydrate(); } catch (e) {}
-  // 進度條載入時從 0 長到目標值,一點小動感
-  requestAnimationFrame(() => { const f = mn.querySelector('.hub-goal-fill'); if (f) f.style.width = pct + '%'; });
+  const hubEl = mn.querySelector('.hub');
+  if (firstHub) {
+    if (hubEl) hubEl.classList.add('hub-anim');   // 進場動畫只播第一次
+    _hubAnimated = true;
+    // 進度條第一次載入時從 0 長到目標值,一點小動感
+    requestAnimationFrame(() => { const f = mn.querySelector('.hub-goal-fill'); if (f) f.style.width = pct + '%'; });
+  }
   // 達標彩蛋:每天第一次打開面板且已達標時放一次
   if (done >= GOAL) {
     try {
@@ -2505,7 +2520,7 @@ function doRender() {
   // 語言就緒前先不渲染內容:en/zh-CN 要先把英文疊層 / OpenCC 準備好,否則會先閃繁體再跳 → 外國/簡中使用者體驗差。
   // zh-TW 一開始就 ready;en/zh-CN 由 applyContentLang / ensureOpenCC 完成後設 true(有 3s fallback 防卡死)。
   if (!window._langReady) return;
-  if (inHub) { renderHub(); return; }
+  if (inHub) { if (_hubRaf) cancelAnimationFrame(_hubRaf); _hubRaf = requestAnimationFrame(() => { _hubRaf = 0; renderHub(); }); return; }
   document.body.classList.remove('profile-view');   // 回到學習列表 → 還原側邊欄(離開「我的」)
   if (currentMode==='vocab') renderVocab();
   else if (currentMode==='confuse') renderConfuse();
