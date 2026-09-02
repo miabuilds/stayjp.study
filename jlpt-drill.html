@@ -352,7 +352,7 @@ function tyDesc(ty){ return I18n.getLang()==='en' ? (ty.tde||ty.td) : cvt(ty.td)
 function histLabel(s){
   const ty=TYPES.find(x=>x.tt===s); if(ty) return tyName(ty);
   if(s==='錯題本') return enOr('錯題本','Wrong answers');
-  if(s && s.indexOf('<i data-ic=edit></i> 模擬試験')===0) return jaOr('<i data-ic=edit></i> 模擬試験','<i data-ic=edit></i> Mock exam')+(s.indexOf('時間到')>-1?enOr('(時間到)',' (time up)'):'');
+  if(s && s.indexOf('模擬試験')>=0) return jaOr('<i data-ic=edit></i> 模擬試験','<i data-ic=edit></i> Mock exam')+(s.indexOf('時間到')>-1?enOr('(時間到)',' (time up)'):'');
   return cvt(s);
 }
 const LEVELS = ['n5','n4','n3','n2','n1'];
