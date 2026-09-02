@@ -166,7 +166,7 @@
       var photo = user.photoURL || '';
       var img = photo ? '<img src="' + photo + '" alt="" onerror="this.style.display=\'none\'">' : '';
       var ADMIN = ['stayjpplan@gmail.com', 'abc83327@gmail.com'];
-      var adminLink = ADMIN.indexOf((user.email || '').toLowerCase()) > -1 ? '<a class="ahx-item" href="admin-dash.html"><span class="ahx-ic">🛠</span>管理後台</a>' : '';
+      var adminLink = ADMIN.indexOf((user.email || '').toLowerCase()) > -1 ? '<a class="ahx-item" href="admin-dash.html"><span class="ahx-ic"><i data-ic=tools></i></span>管理後台</a>' : '';
       // 白名單(free_users)/有效訂閱 視同 Premium:不顯示升級鈕。結果快取在 localStorage(同步可讀),登入時背景刷新。
       // ⚠️ 這裡不能呼叫 isPremium()——那是 tool-quota.js IIFE 內部的函式,此檔拿不到(2026-08 曾因此
       // ReferenceError 讓所有「非白名單登入用戶」整個 header 渲染失敗、App 內 RC_LOGIN 也被擋)。
@@ -193,11 +193,11 @@
         '<button class="ahx-btn" id="ahxMenuBtn" type="button">' + img + '<span class="ahx-name">' + name + '</span> ▾</button>' +
         '<div class="ahx-menu" id="ahxMenu">' +
           '<div class="ahx-head">' + (user.email || '') + '</div>' +
-          '<a class="ahx-item" href="account.html"><span class="ahx-ic">👤</span>我的帳號</a>' +
-          '<a class="ahx-item" href="pricing.html"><span class="ahx-ic">✨</span>訂閱方案</a>' +
+          '<a class="ahx-item" href="account.html"><span class="ahx-ic"><i data-ic=user></i></span>我的帳號</a>' +
+          '<a class="ahx-item" href="pricing.html"><span class="ahx-ic"></span>訂閱方案</a>' +
           adminLink +
           '<div class="ahx-sep"></div>' +
-          '<button class="ahx-item danger" id="ahxLogout" type="button"><span class="ahx-ic">⏻</span>登出</button>' +
+          '<button class="ahx-item danger" id="ahxLogout" type="button"><span class="ahx-ic"><i data-ic=power></i></span>登出</button>' +
         '</div>';
       area.querySelector('#ahxMenuBtn').onclick = function (e) {
         e.stopPropagation();

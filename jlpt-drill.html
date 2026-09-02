@@ -136,12 +136,12 @@
       <div style="font-size:13px" id="loadingTxt">題庫載入中…</div>
     </div></div>
     <style>@keyframes jdspin{to{transform:rotate(360deg)}}</style>
-    <button class="wrongbtn" id="wrongBtn" onclick="startWrong()"><i data-ic="book"></i> 錯題本 — 重刷答錯的題(<span id="wrongCount">0</span>)</button>
-    <button class="wrongbtn" id="recBtn" onclick="showRecords()" style="display:none"><i data-ic="chart"></i> 刷題紀錄 — 做過哪些題、正答率、場次歷史</button>
-    <button class="exambtn" id="examOpenBtn" onclick="toggleExamSet()"><i data-ic="edit"></i> 模擬試験 — 各題型組一份完整考卷</button>
+    <button class="wrongbtn" id="wrongBtn" onclick="startWrong()"><i data-ic=book></i> 錯題本 — 重刷答錯的題(<span id="wrongCount">0</span>)</button>
+    <button class="wrongbtn" id="recBtn" onclick="showRecords()" style="display:none"><i data-ic=chart></i> 刷題紀錄 — 做過哪些題、正答率、場次歷史</button>
+    <button class="exambtn" id="examOpenBtn" onclick="toggleExamSet()"><i data-ic=edit></i> 模擬試験 — 各題型組一份完整考卷</button>
     <div class="exam-set" id="examSet">
       <div class="row"><span id="timedLabel">計時模式</span>
-        <span class="tgl"><button id="tgOn" class="on" onclick="setTimed(true)"><i data-ic="clock"></i> 計時</button><button id="tgOff" onclick="setTimed(false)">不計時</button></span>
+        <span class="tgl"><button id="tgOn" class="on" onclick="setTimed(true)"><i data-ic=clock></i> 計時</button><button id="tgOff" onclick="setTimed(false)">不計時</button></span>
         <span class="muted" id="examTimeNote"></span>
       </div>
       <div class="row muted" id="examCompNote" style="margin-bottom:12px"></div>
@@ -188,7 +188,7 @@
   <!-- 模擬考成績畫面 -->
   <div id="examResult" style="display:none">
     <div class="qbar">
-      <span class="qt" id="exrTitle"><i data-ic="edit"></i> 模擬試験 結果</span>
+      <span class="qt" id="exrTitle"><i data-ic=edit></i> 模擬試験 結果</span>
       <button id="exrBackBtn" onclick="backHome()">回選單</button>
     </div>
     <div class="rcard" style="margin-bottom:16px">
@@ -203,7 +203,7 @@
   <!-- 刷題紀錄畫面 -->
   <div id="records" style="display:none">
     <div class="qbar">
-      <span class="qt" id="recTitle"><i data-ic="chart"></i> 刷題紀錄</span>
+      <span class="qt" id="recTitle"><i data-ic=chart></i> 刷題紀錄</span>
       <button id="recBackBtn" onclick="backHome()">返回</button>
     </div>
     <div id="recBody"></div>
@@ -317,7 +317,7 @@ function showGateCard(title, body){
   el.id='gateCard';
   el.innerHTML='<div style="position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:900" onclick="document.getElementById(\'gateCard\').remove()"></div>'+
     '<div style="position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:901;background:var(--bg2);border:1px solid var(--bd);border-radius:16px;padding:24px;max-width:340px;width:88%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.3)">'+
-    '<div style="font-size:34px;margin-bottom:8px"><i data-ic="lock"></i></div>'+
+    '<div style="font-size:34px;margin-bottom:8px"><i data-ic=lock></i></div>'+
     '<div style="font-weight:800;font-size:16px;margin-bottom:8px">'+title+'</div>'+
     '<div style="font-size:13.5px;color:var(--tx2);line-height:1.7;margin-bottom:16px">'+body+'</div>'+
     '<a href="pricing.html" style="display:block;background:var(--ac);color:#fff;border-radius:12px;padding:12px;font-weight:700;text-decoration:none">'+enOr('看訂閱方案 →','See plans →')+'</a>'+
@@ -336,10 +336,10 @@ const TYPES = [
 ];
 // JLPT 官方 4 大科目分組(migii 也是這樣分):把 8 個題型收進 4 科,新手一眼看懂「要練哪塊」
 const SKILLS = [
-  { k:'vocab',  ic:'<i data-ic="book"></i>', tt:'文字・語彙', en:'Vocabulary', sub:'漢字・詞彙・語感', sube:'Kanji, words, nuance', types:['kanji','hyoki','context','para'] },
-  { k:'gram',   ic:'<i data-ic="edit"></i>', tt:'文法',       en:'Grammar',    sub:'句型・語順',       sube:'Patterns & word order', types:['grammar','order'] },
-  { k:'read',   ic:'<i data-ic="book"></i>', tt:'読解',       en:'Reading',    sub:'短文閱讀理解',     sube:'Reading comprehension', types:['reading'] },
-  { k:'listen', ic:'<i data-ic="headphones"></i>', tt:'聴解',       en:'Listening',  sub:'聽力理解',         sube:'Listening comprehension', types:['listening'] },
+  { k:'vocab',  ic:'<i data-ic=book></i>', tt:'文字・語彙', en:'Vocabulary', sub:'漢字・詞彙・語感', sube:'Kanji, words, nuance', types:['kanji','hyoki','context','para'] },
+  { k:'gram',   ic:'<i data-ic=edit></i>', tt:'文法',       en:'Grammar',    sub:'句型・語順',       sube:'Patterns & word order', types:['grammar','order'] },
+  { k:'read',   ic:'<i data-ic=book></i>', tt:'読解',       en:'Reading',    sub:'短文閱讀理解',     sube:'Reading comprehension', types:['reading'] },
+  { k:'listen', ic:'<i data-ic=headphones></i>', tt:'聴解',       en:'Listening',  sub:'聽力理解',         sube:'Listening comprehension', types:['listening'] },
 ];
 function skName(sk){ return I18n.getLang()==='en' ? sk.en : sk.tt; }
 function skSub(sk){ return I18n.getLang()==='en' ? sk.sube : sk.sub; }
@@ -352,7 +352,7 @@ function tyDesc(ty){ return I18n.getLang()==='en' ? (ty.tde||ty.td) : cvt(ty.td)
 function histLabel(s){
   const ty=TYPES.find(x=>x.tt===s); if(ty) return tyName(ty);
   if(s==='錯題本') return enOr('錯題本','Wrong answers');
-  if(s && s.indexOf('<i data-ic="edit"></i> 模擬試験')===0) return jaOr('<i data-ic="edit"></i> 模擬試験','<i data-ic="edit"></i> Mock exam')+(s.indexOf('時間到')>-1?enOr('(時間到)',' (time up)'):'');
+  if(s && s.indexOf('<i data-ic=edit></i> 模擬試験')===0) return jaOr('<i data-ic=edit></i> 模擬試験','<i data-ic=edit></i> Mock exam')+(s.indexOf('時間到')>-1?enOr('(時間到)',' (time up)'):'');
   return cvt(s);
 }
 const LEVELS = ['n5','n4','n3','n2','n1'];
@@ -438,7 +438,7 @@ function showRecords(){
   }).join('')+'</div>';
   html += '<h3 style="font-size:15px;margin:18px 0 8px">'+enOr('最近場次','Recent sessions')+'</h3>';
   html += hist.length? hist.slice(0,30).map((h,hi)=>
-    `<div class="hist-row${(h.w&&h.w.length)?' hist-click':''}" ${(h.w&&h.w.length)?'onclick="toggleHistDetail('+hi+')" style="cursor:pointer"':''}><span class="hd2">${h.d}</span><span class="hl">${h.lv==='wrong'?'<i data-ic="book"></i>':h.lv.toUpperCase()}</span><span class="ht">${esc(histLabel(h.t))}</span><span class="hs">${h.s} / ${h.tot}${(h.w&&h.w.length)?' <span style="color:var(--ac);font-size:11px">▾'+enOr('看錯題','review')+'</span>':''}</span></div><div id="histDetail${hi}" style="display:none"></div>`).join('')
+    `<div class="hist-row${(h.w&&h.w.length)?' hist-click':''}" ${(h.w&&h.w.length)?'onclick="toggleHistDetail('+hi+')" style="cursor:pointer"':''}><span class="hd2">${h.d}</span><span class="hl">${h.lv==='wrong'?'<i data-ic=book></i>':h.lv.toUpperCase()}</span><span class="ht">${esc(histLabel(h.t))}</span><span class="hs">${h.s} / ${h.tot}${(h.w&&h.w.length)?' <span style="color:var(--ac);font-size:11px">▾'+enOr('看錯題','review')+'</span>':''}</span></div><div id="histDetail${hi}" style="display:none"></div>`).join('')
     : '<div class="muted">'+enOr('還沒有紀錄,先刷一輪吧!','No records yet — do a round first!')+'</div>';
   document.getElementById('recBody').innerHTML = html;
   show('records');
@@ -556,7 +556,7 @@ function answer(el, ok){
   document.getElementById('xp').innerHTML =
     (q.au ? '<div style="margin-bottom:8px;padding-bottom:8px;border-bottom:1px dashed var(--bd)"><b>スクリプト:</b>'+esc(q.au)+'</div>' : '') + q.x
     + (_tr ? '<div style="margin-top:10px;padding-top:9px;border-top:1px dashed var(--bd)"><button type="button" onclick="var d=this.nextElementSibling;d.hidden=!d.hidden;this.textContent=d.hidden?'+"'"+'▸ '+enOr('顯示整句翻譯','Show translation')+"'"+':'+"'"+'▾ '+enOr('整句翻譯','Translation')+"'"+'" style="background:none;border:0;color:var(--ac);font:inherit;font-size:13px;font-weight:700;cursor:pointer;padding:0">▸ '+enOr('顯示整句翻譯','Show translation')+'</button><div hidden style="color:var(--tx2);font-size:13.5px;line-height:1.75;margin-top:6px">'+esc(_tr)+'</div></div>' : '')
-    + (_rep ? '<a href="'+_rep+'" target="_blank" rel="noopener" style="display:block;text-align:right;margin-top:10px;font-size:12px;color:var(--tx3);text-decoration:none"><i data-ic="flag"></i> '+enOr('這題有誤?回報','Report this question')+'</a>' : '');
+    + (_rep ? '<a href="'+_rep+'" target="_blank" rel="noopener" style="display:block;text-align:right;margin-top:10px;font-size:12px;color:var(--tx3);text-decoration:none"><i data-ic=flag></i> '+enOr('這題有誤?回報','Report this question')+'</a>' : '');
   document.getElementById('explain').style.display='block';
   document.getElementById('nextBtn').style.display='block';
   document.getElementById('nextBtn').textContent = qi<queue.length-1? enOr('下一題 →','Next →'):enOr('看結果','See results');
@@ -618,7 +618,7 @@ function updateExamNotes(){
   document.getElementById('examTimeNote').textContent = examTimed? enOr('時限 '+mins+' 分,時間到自動交卷','Time limit '+mins+' min; auto-submits when time is up'):enOr('不限時','No time limit');
   const usedEx = parseInt(localStorage.getItem('jd_exam_used')||'0',10);
   document.getElementById('examCompNote').innerHTML = enOr('共 '+total+' 題:',total+' questions in total: ')+comp.map(([t,n])=>tyLabel(t)+'×'+n).join(enOr('、',', '))
-    + (jdUnlimited() ? '' : '<br><span style="color:var(--ac);font-weight:700">'+enOr('<i data-ic="ticket"></i> 免費體驗剩 '+Math.max(0,2-usedEx)+' 次','<i data-ic="ticket"></i> '+Math.max(0,2-usedEx)+' free tries left')+'</span>'+enOr('(Premium 無限次)',' (unlimited with Premium)'));
+    + (jdUnlimited() ? '' : '<br><span style="color:var(--ac);font-weight:700">'+enOr('<i data-ic=ticket></i> 免費體驗剩 '+Math.max(0,2-usedEx)+' 次','<i data-ic=ticket></i> '+Math.max(0,2-usedEx)+' free tries left')+'</span>'+enOr('(Premium 無限次)',' (unlimited with Premium)'));
 }
 function startExam(){
   stopExamTimer(); stopAu();
@@ -735,7 +735,7 @@ function finishExam(timeout){
   // 錯題明細(含未作答)→ 場次紀錄可逐題回顧(你選的/正解/詳解)
   const _exWrong = qs.filter(it=>!(it.ans!==null && it.pick[it.ans].ok))
     .map(it=>({ id:it.q.id, ch: it.ans===null ? '(未作答)' : String(it.pick[it.ans].txt||'').slice(0,60) })).slice(0,40);
-  pushHist({ d:today(), lv, t:'<i data-ic="edit"></i> 模擬試験'+(timeout?'(時間到)':''), s:score, tot:qs.length, w:_exWrong });
+  pushHist({ d:today(), lv, t:'<i data-ic=edit></i> 模擬試験'+(timeout?'(時間到)':''), s:score, tot:qs.length, w:_exWrong });
   // ── JLPT 換算分析 ──────────────────────────
   // 依官方計分結構換算 180 分制:N3–N1 三科各 60(言語知識/読解/聴解,科別門檻 19);
   // N5/N4 官方是「言語知識・読解」合併 120(門檻 38)+ 聴解 60(門檻 19)。
@@ -762,7 +762,7 @@ function finishExam(timeout){
   const allSecOk = scaled.every(x=>x.got>=x.min);
   const passed = total>=passLine && allSecOk;
   const verdict = passed? enOr('合格圏!照官方標準這個成績會過','Passing range! By official standards this score would pass')
-    : (total>=passLine? enOr('<i data-ic="warning"></i> 總分過線,但有科目低於最低門檻(官方規定單科不到門檻就不合格)','<i data-ic="warning"></i> Total is above the pass line, but a section is below its minimum (officially that means a fail)')
+    : (total>=passLine? enOr('<i data-ic=warning></i> 總分過線,但有科目低於最低門檻(官方規定單科不到門檻就不合格)','<i data-ic=warning></i> Total is above the pass line, but a section is below its minimum (officially that means a fail)')
     : enOr('還差 '+(passLine-total)+' 分到合格線,看下面的弱點各個擊破',(passLine-total)+' points short of the pass line — pick off the weak spots below one by one'));
   // 弱點題型(正答率最低的前兩個)+ 對應工具建議
   const ADVICE = { kanji:['多刷「漢字讀音」+單字卡','jlpt-drill.html','Drill Kanji Reading + flashcards'], hyoki:['多刷「漢字表記」+單字卡','jlpt-drill.html','Drill Orthography + flashcards'],
@@ -775,7 +775,7 @@ function finishExam(timeout){
   // ── 畫面 ──
   document.getElementById('exScore').textContent = total+' / 180';
   document.getElementById('exSub').innerHTML =
-    (timeout?enOr('<i data-ic="clock"></i> 時間到,自動交卷。',"<i data-ic="clock"></i> Time's up — submitted automatically.")+'<br>':'')+
+    (timeout?enOr('<i data-ic=clock></i> 時間到,自動交卷。',"<i data-ic=clock></i> Time's up — submitted automatically.")+'<br>':'')+
     '<b>'+verdict+'</b><br><span class="muted">'+enOr('答對 '+score+' / '+qs.length+' 題 · '+lv.toUpperCase()+' 合格線 '+passLine+' 分(依官方比例換算,樣本數少僅供參考)',score+' / '+qs.length+' correct · '+lv.toUpperCase()+' pass line '+passLine+' pts (scaled per official weighting; small sample, for reference only)')+'</span>';
   // 免費版:三科分析+弱點打碼(總分照給)——「差幾分、弱哪科」是升級最強理由
   if (!jdUnlimited()) {
@@ -783,7 +783,7 @@ function finishExam(timeout){
       '<div style="position:relative">' +
         '<div style="filter:blur(7px);pointer-events:none;user-select:none">' +
           scaled.map(x=>'<div class="secline"><span class="sn">'+x.name+'</span><span class="ss">'+x.got+' / '+x.max+'</span></div>').join('') +
-          '<div style="padding:10px 0"><b>'+enOr('<i data-ic="pin"></i> 弱點分析','<i data-ic="pin"></i> Weak-Point Analysis')+'</b><div class="secline"><span class="sn">'+enOr('●●●●(正答率 ●●%)','●●●● (accuracy ●●%)')+'</span></div><div class="secline"><span class="sn">'+enOr('●●●●(正答率 ●●%)','●●●● (accuracy ●●%)')+'</span></div></div>' +
+          '<div style="padding:10px 0"><b>'+enOr('<i data-ic=pin></i> 弱點分析','<i data-ic=pin></i> Weak-Point Analysis')+'</b><div class="secline"><span class="sn">'+enOr('●●●●(正答率 ●●%)','●●●● (accuracy ●●%)')+'</span></div><div class="secline"><span class="sn">'+enOr('●●●●(正答率 ●●%)','●●●● (accuracy ●●%)')+'</span></div></div>' +
         '</div>' +
         '<div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center">' +
           '<div style="font-weight:800;font-size:15px">'+enOr('你距離合格線還差幾分、弱在哪一科?','How far are you from passing — and which section is weakest?')+'</div>' +
@@ -798,7 +798,7 @@ function finishExam(timeout){
       return `<div class="rv-q">
         <div class="exam-sec">${i+1}. ${tyLabel(item.q.t)}</div>
         <div class="st">${stem(item.q)}</div>
-        <div class="yours ${ok?'ok':'ng'}">${ok?'<i data-ic="check"></i>':'<i data-ic="x"></i>'} ${enOr('你的答案:','Your answer: ')}${esc(yours)}</div>
+        <div class="yours ${ok?'ok':'ng'}">${ok?'<i data-ic=check></i>':'<i data-ic=x></i>'} ${enOr('你的答案:','Your answer: ')}${esc(yours)}</div>
         ${ok?'':'<div class="yours ok">'+enOr('⭕ 正解:','⭕ Correct: ')+esc(correct)+'</div>'}
         <div class="xp2">${item.q.au?'<b>スクリプト:</b>'+esc(item.q.au)+'<br>':''}${item.q.x}</div>
       </div>`;
@@ -813,7 +813,7 @@ function finishExam(timeout){
       return `<div class="secline"><span class="sn">${x.name} <span class="muted">${enOr('(門檻 '+x.min+')','(min '+x.min+')')}</span></span><span class="ss" style="color:${ok?'var(--ok)':'var(--bad)'}">${x.got} / ${x.max}</span></div>
         <div class="tbar" style="height:6px;margin:2px 0 6px"><i style="width:${pc}%;background:${ok?'var(--ac)':'var(--bad)'}"></i></div>`;
     }).join('')
-    + '<div style="margin-top:12px;border-top:1px solid var(--bd);padding-top:10px"><b style="font-size:14px">'+enOr('<i data-ic="pin"></i> 弱點分析','<i data-ic="pin"></i> Weak-Point Analysis')+'</b>'
+    + '<div style="margin-top:12px;border-top:1px solid var(--bd);padding-top:10px"><b style="font-size:14px">'+enOr('<i data-ic=pin></i> 弱點分析','<i data-ic=pin></i> Weak-Point Analysis')+'</b>'
     + (weak.length? weak.map(x=>{
         const ty=TYPES.find(y=>y.k===x.t); const ad=ADVICE[x.t];
         return `<div class="secline" style="border:0;padding:5px 0"><span class="sn">${ty?tyName(ty):x.t}${enOr('(正答率 '+Math.round(x.r*100)+'%)',' (accuracy '+Math.round(x.r*100)+'%)')}</span><a href="${ad[1]}" style="color:var(--ac);font-size:13px">${adviceTxt(ad)} →</a></div>`;
@@ -829,7 +829,7 @@ function finishExam(timeout){
     return `<div class="rv-q">
       <div class="exam-sec">${i+1}. ${tyLabel(item.q.t)}</div>
       <div class="st">${stem(item.q)}</div>
-      <div class="yours ${ok?'ok':'ng'}">${ok?'<i data-ic="check"></i>':'<i data-ic="x"></i>'} ${enOr('你的答案:','Your answer: ')}${esc(yours)}</div>
+      <div class="yours ${ok?'ok':'ng'}">${ok?'<i data-ic=check></i>':'<i data-ic=x></i>'} ${enOr('你的答案:','Your answer: ')}${esc(yours)}</div>
       ${ok?'':'<div class="yours ok">'+enOr('⭕ 正解:','⭕ Correct: ')+esc(correct)+'</div>'}
       <div class="xp2">${item.q.au?'<b>スクリプト:</b>'+esc(item.q.au)+'<br>':''}${item.q.x}</div>
     </div>`;
@@ -845,23 +845,23 @@ function applyStaticEn(){
   const S=function(sel,txt){ const el=document.querySelector(sel); if(el) el.textContent=txt; };
   S('header .back .bk-t','Back');
   S('header .logo','Japan Stay Plan');
-  S('#home h1','<i data-ic="target"></i> JLPT Drill Zone');
+  S('#home h1','<i data-ic=target></i> JLPT Drill Zone');
   S('#home .lead','Questions modeled on real JLPT formats, each with a full explanation — not just whether you got it right, but why every wrong option is wrong. Missed questions go straight to your wrong-answer notebook.');
   S('#loadingTxt','Loading question bank…');
-  document.getElementById('wrongBtn').innerHTML='<i data-ic="book"></i> Wrong-Answer Notebook — redo the ones you missed (<span id="wrongCount">0</span>)';
-  S('#recBtn','<i data-ic="chart"></i> Drill Records — what you\'ve done, accuracy, session history');
-  S('#examOpenBtn','<i data-ic="edit"></i> Mock Exam — a full test built from every question type');
+  document.getElementById('wrongBtn').innerHTML='<i data-ic=book></i> Wrong-Answer Notebook — redo the ones you missed (<span id="wrongCount">0</span>)';
+  S('#recBtn','<i data-ic=chart></i> Drill Records — what you\'ve done, accuracy, session history');
+  S('#examOpenBtn','<i data-ic=edit></i> Mock Exam — a full test built from every question type');
   S('#timedLabel','Timer');
-  S('#tgOn','<i data-ic="clock"></i> Timed');
+  S('#tgOn','<i data-ic=clock></i> Timed');
   S('#tgOff','No timer');
   document.getElementById('examStartBtn').innerHTML='Start <span id="examLvLabel"></span> Mock Exam';
   document.getElementById('bankNote').innerHTML='The question bank keeps growing. Spot an issue with any question? Tell us via <a href="contact.html" style="color:var(--ac)">feedback</a> — we\'ll verify and fix it right away.';
   S('#drillQuitBtn','End');
   S('#examQuitBtn','Submit');
-  S('#exrTitle','<i data-ic="edit"></i> Mock Exam Results');
+  S('#exrTitle','<i data-ic=edit></i> Mock Exam Results');
   S('#exrBackBtn','Menu');
   S('#exrReviewH','Question-by-question review (with explanations)');
-  S('#recTitle','<i data-ic="chart"></i> Drill Records');
+  S('#recTitle','<i data-ic=chart></i> Drill Records');
   S('#recBackBtn','Back');
   S('#retryBtn','Another round');
   S('#resBackBtn','Back to menu');

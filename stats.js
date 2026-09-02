@@ -45,7 +45,7 @@ const Stats = (() => {
   }
 
   function buildHTML(showCloseBtn) {
-    const closeBtn = showCloseBtn ? `<button class="qclose" style="width:auto;margin:0;padding:2px 10px" onclick="Stats.close()"><i data-ic="x"></i></button>` : '';
+    const closeBtn = showCloseBtn ? `<button class="qclose" style="width:auto;margin:0;padding:2px 10px" onclick="Stats.close()"><i data-ic=x></i></button>` : '';
     let h = `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0">${showCloseBtn ? t('stats_title') : '我的'}</h3>${closeBtn}</div>`;
     // 3 個 sub-tab：學習統計（總覽+考試紀錄）/ 我的詞庫（生詞本+不熟+錯題）/ 設定
     const wqCnt = getWrongQuestions().length;
@@ -61,9 +61,9 @@ const Stats = (() => {
     .stat-tab.on{background:var(--ac);color:#fff;border-color:var(--ac)}
     </style>`;
     h += '<div class="stat-tabs">';
-    h += `<button class="stat-tab on" data-tab="stats" onclick="Stats.switchTab('stats')"><i data-ic="chart"></i> 學習統計</button>`;
-    h += `<button class="stat-tab" data-tab="collection" onclick="Stats.switchTab('collection')"><i data-ic="book"></i> 我的詞庫${nbCnt+wqCnt?` (${nbCnt+wqCnt})`:''}</button>`;
-    h += `<button class="stat-tab" data-tab="settings" onclick="Stats.switchTab('settings')"><i data-ic="settings"></i> 設定</button>`;
+    h += `<button class="stat-tab on" data-tab="stats" onclick="Stats.switchTab('stats')"><i data-ic=chart></i> 學習統計</button>`;
+    h += `<button class="stat-tab" data-tab="collection" onclick="Stats.switchTab('collection')"><i data-ic=book></i> 我的詞庫${nbCnt+wqCnt?` (${nbCnt+wqCnt})`:''}</button>`;
+    h += `<button class="stat-tab" data-tab="settings" onclick="Stats.switchTab('settings')"><i data-ic=settings></i> 設定</button>`;
     h += '</div>';
     h += '<div id="statContent">';
     h += buildStatsCombined();
@@ -92,7 +92,7 @@ const Stats = (() => {
     if (!r || !r.wrong || !r.wrong.length) return;
     box.innerHTML = r.wrong.map(x =>
       '<div style="display:flex;align-items:center;gap:10px;background:var(--bg2);border:1px solid var(--bd);border-radius:10px;padding:9px 12px;margin:5px 0;font-size:13px">'
-      + '<button onclick="event.stopPropagation();if(typeof speak===\'function\')speak(\'' + String(x.w).replace(/'/g,'') + '\')" style="border:0;background:none;cursor:pointer;font-size:15px"><i data-ic="volume"></i></button>'
+      + '<button onclick="event.stopPropagation();if(typeof speak===\'function\')speak(\'' + String(x.w).replace(/'/g,'') + '\')" style="border:0;background:none;cursor:pointer;font-size:15px"><i data-ic=volume></i></button>'
       + '<span><b style="font-size:15px">' + x.w + '</b>' + (x.r && x.r !== x.w ? '<span style="color:var(--ac2);margin-left:6px">' + x.r + '</span>' : '') + '<span style="color:var(--tx2);margin-left:8px">' + (typeof cvt === 'function' ? cvt(x.m || '') : (x.m || '')) + '</span></span>'
       + (x.ch ? '<span style="margin-left:auto;color:var(--wrong,#dc2626);font-size:12px">' + _en2('你答:', 'You: ') + x.ch + '</span>' : '')
       + '</div>').join('');
@@ -112,7 +112,7 @@ const Stats = (() => {
     try {
       const jh = JSON.parse(localStorage.getItem('jd_hist')) || [];
       if (!jh.length) {
-        h += `<div class="st-section"><div class="st-title"><i data-ic="target"></i> ${_en2('JLPT 刷題', 'JLPT Drills')}</div>
+        h += `<div class="st-section"><div class="st-title"><i data-ic=target></i> ${_en2('JLPT 刷題', 'JLPT Drills')}</div>
           <div class="st-empty">${_en2('還沒刷過題——1,668 題等你來', 'No drills yet — 1,668 questions are waiting')} <a href="jlpt-drill.html" style="color:var(--ac);font-weight:700">${_en2('去刷題 →', 'Start →')}</a></div></div>`;
       } else {
         const done = jh.reduce((a, x) => a + (x.tot || 0), 0);
@@ -121,14 +121,14 @@ const Stats = (() => {
         const rows = jh.slice(0, 5).map(x =>
           `<div style="display:flex;justify-content:space-between;font-size:13px;padding:4px 0;border-bottom:1px solid var(--bd)">
             <span>${x.d}・${String(x.lv).toUpperCase()}・${x.t || ''}</span><span style="font-weight:700">${x.s}/${x.tot}</span></div>`).join('');
-        h += `<div class="st-section"><div class="st-title"><i data-ic="target"></i> ${_en2('JLPT 刷題', 'JLPT Drills')}
+        h += `<div class="st-section"><div class="st-title"><i data-ic=target></i> ${_en2('JLPT 刷題', 'JLPT Drills')}
             <a href="jlpt-drill.html" style="float:right;font-size:12.5px;color:var(--ac);font-weight:700">${_en2('繼續刷 →', 'Continue →')}</a></div>
           <div style="font-size:13.5px;margin-bottom:6px">${_en2('累計 ' + done + ' 題・正答率 ' + acc + '%', done + ' questions · ' + acc + '% correct')}</div>
           ${rows}</div>`;
       }
     } catch (e) {}
     // AI 口說(ai_usage 讀自己的;登入才有)
-    h += `<div class="st-section"><div class="st-title"><i data-ic="mic"></i> ${_en2('AI 口說', 'AI Speaking')}</div>
+    h += `<div class="st-section"><div class="st-title"><i data-ic=mic></i> ${_en2('AI 口說', 'AI Speaking')}</div>
       <div id="stAiUsage" class="st-empty">${_en2('載入中…', 'Loading…')}</div></div>`;
     setTimeout(fillAiUsage, 50);
     return h;
@@ -153,7 +153,7 @@ const Stats = (() => {
         }
         el.classList.remove('st-empty');
         el.innerHTML = '<div style="font-size:13.5px;line-height:2">'
-          + '<i data-ic="speak"></i> ' + _en2('對話:累計 ' + chatAll + ' 場・今天 ' + chatToday, 'Chat: ' + chatAll + ' total · ' + chatToday + ' today') + '<br><i data-ic="mic"></i> ' + _en2('評分:累計 ' + evalAll + ' 次・今天 ' + evalToday, 'Scoring: ' + evalAll + ' total · ' + evalToday + ' today')
+          + '<i data-ic=speak></i> ' + _en2('對話:累計 ' + chatAll + ' 場・今天 ' + chatToday, 'Chat: ' + chatAll + ' total · ' + chatToday + ' today') + '<br><i data-ic=mic></i> ' + _en2('評分:累計 ' + evalAll + ' 次・今天 ' + evalToday, 'Scoring: ' + evalAll + ' total · ' + evalToday + ' today')
           + ' <a href="speak-chat.html" style="color:var(--ac);font-weight:700;margin-left:6px">' + _en2('繼續練 →', 'Keep going →') + '</a></div>';
       }).catch(() => { el.textContent = _en2('紀錄載入失敗', 'Could not load records'); });
     } catch (e) {}
@@ -257,7 +257,7 @@ const Stats = (() => {
         h += '<span class="st-weak-reading">' + (w.w !== w.r ? w.r : '') + '</span>';
         h += '<span class="st-weak-meaning">' + (typeof cvt==='function'?cvt(w.m):w.m) + '</span>';
         h += '<span class="st-weak-lv">' + w.lv.toUpperCase() + '</span>';
-        h += '<button style="background:none;border:none;color:var(--wrong,#dc2626);cursor:pointer;font-size:12px;padding:2px 4px" onclick="Stats.removeFromNotebook(\'' + w.w.replace(/'/g, "\\'") + '\',\'' + w.lv + '\')"><i data-ic="x"></i></button>';
+        h += '<button style="background:none;border:none;color:var(--wrong,#dc2626);cursor:pointer;font-size:12px;padding:2px 4px" onclick="Stats.removeFromNotebook(\'' + w.w.replace(/'/g, "\\'") + '\',\'' + w.lv + '\')"><i data-ic=x></i></button>';
         h += '</div>';
       });
       h += '</div>';
@@ -293,7 +293,7 @@ const Stats = (() => {
     function renderCard() {
       const item = nb[cur];
       document.getElementById('quizBox').innerHTML = `
-        <div class="qhd"><span>${t('nb_progress', { cur: cur+1, total: nb.length })}</span><button class="qclose" style="width:auto;margin:0;padding:2px 10px" onclick="Stats.close()"><i data-ic="x"></i></button></div>
+        <div class="qhd"><span>${t('nb_progress', { cur: cur+1, total: nb.length })}</span><button class="qclose" style="width:auto;margin:0;padding:2px 10px" onclick="Stats.close()"><i data-ic=x></i></button></div>
         <div class="srs-card" onclick="this.querySelector('#nbBack').style.display='';this.querySelector('#nbFront').style.display='none'">
           <div id="nbFront"><div class="qmain">${item.w}</div>${item.w!==item.r?'<div class="qsub">'+item.r+'</div>':''}<div class="srs-hint">${t('flip_hint')}</div></div>
           <div id="nbBack" style="display:none"><div class="qmain">${item.w}</div>${item.w!==item.r?'<div class="qsub">'+item.r+'</div>':''}<div class="srs-meaning">${typeof cvt==='function'?cvt(item.m):item.m}</div>
@@ -487,7 +487,7 @@ const Stats = (() => {
     const s = Stats._wqState;
     const q = s.questions[s.cur];
     document.getElementById('quizBox').innerHTML = `
-      <div class="qhd"><span>${t('weak_progress', { cur: s.cur+1, total: s.questions.length })}</span><span>${t('quiz_score', { n: s.score })}</span><button class="qclose" style="width:auto;margin:0;padding:2px 10px" onclick="document.getElementById('quizBg').classList.remove('show')"><i data-ic="x"></i></button></div>
+      <div class="qhd"><span>${t('weak_progress', { cur: s.cur+1, total: s.questions.length })}</span><span>${t('quiz_score', { n: s.score })}</span><button class="qclose" style="width:auto;margin:0;padding:2px 10px" onclick="document.getElementById('quizBg').classList.remove('show')"><i data-ic=x></i></button></div>
       <div class="qprompt"><div class="qmain">${q.word.r || q.word.w}</div></div>
       <div class="qopts">${q.options.map((o, i) => '<button class="qopt" onclick="Stats._answerWeak(' + i + ')">' + (typeof cvt==='function'?cvt(o.m):o.m) + '</button>').join('')}</div>`;
   }
@@ -512,8 +512,8 @@ const Stats = (() => {
           <h3>${t('weak_result')}</h3>
           <div class="qscore ${pct>=80?'good':pct>=60?'ok':'bad'}">${s.score} / ${s.questions.length}（${pct}%）</div>
           <div class="qresults">${s.results.map(r => r.correct
-            ? '<div class="qr ok"><span class="qrc"><i data-ic="check"></i></span> '+r.word.w+' — '+r.word.m+'</div>'
-            : `<div class="qr ng"><span class="qrc"><i data-ic="x"></i></span> ${r.word.w} — ${t('quiz_you_chose', { chose: r.options[r.chosenIdx].m, correct: r.word.m })}</div>`
+            ? '<div class="qr ok"><span class="qrc"><i data-ic=check></i></span> '+r.word.w+' — '+r.word.m+'</div>'
+            : `<div class="qr ng"><span class="qrc"><i data-ic=x></i></span> ${r.word.w} — ${t('quiz_you_chose', { chose: r.options[r.chosenIdx].m, correct: r.word.m })}</div>`
           ).join('')}</div>
           <div class="qactions"><button class="qstart" onclick="Stats.quizWeak()">${t('try_again')}</button><button class="qclose" onclick="Stats.open()">${t('back_to_stats')}</button></div>`;
       } else {
@@ -539,35 +539,35 @@ const Stats = (() => {
     const GLN=['n5','n4','n3','n2','n1'];
     return `
       <div style="${box}">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px"><span style="font-size:16px"><i data-ic="book"></i></span><span style="font-weight:600;color:var(--tx)">文字大小</span></div>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px"><span style="font-size:16px"><i data-ic=book></i></span><span style="font-weight:600;color:var(--tx)">文字大小</span></div>
         <div style="${seg}">
           ${FS_OPTS.map(o=>`<button style="${chip(fs===o.k)}" onclick="Stats._setFont('${o.k}',this)">${o.n}</button>`).join('')}
         </div>
       </div>
       <div style="${box}">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px"><span style="font-size:16px">🌓</span><span style="font-weight:600;color:var(--tx)">主題</span></div>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px"><span style="font-size:16px"><i data-ic=moon></i></span><span style="font-weight:600;color:var(--tx)">主題</span></div>
         <div style="${seg}">
-          <button style="${chip(!isDark)}" onclick="Stats._setTheme('light',this)">☀️ 淺色</button>
-          <button style="${chip(isDark)}" onclick="Stats._setTheme('dark',this)">🌙 深色</button>
+          <button style="${chip(!isDark)}" onclick="Stats._setTheme('light',this)"><i data-ic=sun></i> 淺色</button>
+          <button style="${chip(isDark)}" onclick="Stats._setTheme('dark',this)"><i data-ic=moon></i> 深色</button>
         </div>
       </div>
       <div style="${box}">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
-          <span style="font-size:16px"><i data-ic="volume"></i></span><span style="font-weight:600;color:var(--tx)">語速</span>
+          <span style="font-size:16px"><i data-ic=volume></i></span><span style="font-weight:600;color:var(--tx)">語速</span>
           <span style="margin-left:auto;font-variant-numeric:tabular-nums;color:var(--ac);font-weight:600" id="ttsSpeedLabel">${curSpeed}x</span>
         </div>
         <input type="range" id="ttsSpeedSlider" min="0.5" max="1.5" step="0.05" value="${speedVal}" style="width:100%;display:block" oninput="setTtsSpeed(this.value)">
         <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--tx3);margin-top:4px"><span>0.5x 慢</span><span>1.0x 標準</span><span>1.5x 快</span></div>
       </div>
       <div style="${box}">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><span style="font-size:16px"><i data-ic="target"></i></span><span style="font-weight:600;color:var(--tx)">我的程度</span></div>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><span style="font-size:16px"><i data-ic=target></i></span><span style="font-weight:600;color:var(--tx)">我的程度</span></div>
         <div style="font-size:12px;color:var(--tx2);margin-bottom:10px">背單字會跳過你已學完的級數</div>
         <div style="${seg}">${LVN.map(k=>`<button style="${chip(base===k)}" onclick="Stats._setLevel('base','${k}',this)">${LVL[k]}</button>`).join('')}</div>
         <div style="display:flex;align-items:center;gap:8px;margin:14px 0 10px"><span style="font-size:16px">🏁</span><span style="font-weight:600;color:var(--tx)">目標考級</span></div>
         <div style="${seg}">${GLN.map(k=>`<button style="${chip(goal===k)}" onclick="Stats._setLevel('goal','${k}',this)">${k.toUpperCase()}</button>`).join('')}</div>
       </div>
       ${isApp ? `<div style="${box}">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px"><span style="font-size:16px"><i data-ic="clock"></i></span><span style="font-weight:600;color:var(--tx)">每日提醒</span>${rmOn?`<span style="margin-left:auto;font-size:12px;color:var(--ac);font-weight:600">已開 ${rmOn}</span>`:''}</div>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px"><span style="font-size:16px"><i data-ic=clock></i></span><span style="font-weight:600;color:var(--tx)">每日提醒</span>${rmOn?`<span style="margin-left:auto;font-size:12px;color:var(--ac);font-weight:600">已開 ${rmOn}</span>`:''}</div>
         <div style="display:flex;align-items:center;gap:10px">
           <input type="time" id="setRmTime" value="${rmOn||'20:00'}" style="font-size:17px;padding:7px 10px;border:1px solid var(--bd);border-radius:10px;background:var(--bg);color:var(--tx)">
           <button style="flex:1;padding:9px;border-radius:10px;border:none;background:var(--ac);color:#fff;font-weight:700;cursor:pointer" onclick="Stats._setReminder()">${rmOn?'更新提醒':'開啟提醒'}</button>
@@ -575,14 +575,14 @@ const Stats = (() => {
         </div>
       </div>` : ''}
       <a href="account.html" style="display:flex;align-items:center;gap:12px;padding:14px 16px;background:var(--bg2);border-radius:12px;color:var(--tx);text-decoration:none;margin-bottom:12px">
-        <span style="font-size:20px"><i data-ic="user"></i></span><div style="flex:1"><div style="font-weight:600">我的帳號</div><div style="font-size:12px;color:var(--tx2);margin-top:2px">訂閱・登入・推薦碼</div></div><span style="color:var(--tx3)">›</span>
+        <span style="font-size:20px"><i data-ic=user></i></span><div style="flex:1"><div style="font-weight:600">我的帳號</div><div style="font-size:12px;color:var(--tx2);margin-top:2px">訂閱・登入・推薦碼</div></div><span style="color:var(--tx3)">›</span>
       </a>
       ${_OLD_SETTINGS_TAIL}`;
   }
   const FS_OPTS = [{k:'normal',n:'標準 A'},{k:'large',n:'大 A+'},{k:'xlarge',n:'特大 A++'}];
   const _OLD_SETTINGS_TAIL = `
       <a href="contact.html" style="display:flex;align-items:center;gap:12px;padding:14px 16px;background:var(--bg2);border-radius:12px;color:var(--tx);text-decoration:none">
-        <span style="font-size:20px"><i data-ic="chat"></i></span>
+        <span style="font-size:20px"><i data-ic=chat></i></span>
         <div style="flex:1"><div style="font-weight:600">意見回饋 / 回報錯誤</div><div style="font-size:12px;color:var(--tx2);margin-top:2px">內容有誤或想提建議都歡迎</div></div><span style="color:var(--tx3)">›</span>
       </a>`
   // 設定中心的 setter：呼叫既有全域函數(維持與 header/原位置同一套狀態),改完就地重畫設定 tab
@@ -624,7 +624,7 @@ const Stats = (() => {
     if (!arr.length) {
       h += `<div class="st-empty">還沒有錯題。<br>聽力、閱讀、模考答錯時會自動收進這裡。</div>`;
     } else {
-      const modeLbl = { listening: '<i data-ic="headphones"></i> 聽力', reading: '<i data-ic="book"></i> 閱讀', mock: '<i data-ic="edit"></i> 模考' };
+      const modeLbl = { listening: '<i data-ic=headphones></i> 聽力', reading: '<i data-ic=book></i> 閱讀', mock: '<i data-ic=edit></i> 模考' };
       const modeColor = { listening: '#2563EB', reading: '#16a34a', mock: '#9333EA' };
       h += '<div style="max-height:400px;overflow-y:auto;display:flex;flex-direction:column;gap:8px">';
       arr.forEach(w => {
@@ -638,7 +638,7 @@ const Stats = (() => {
           if (isCorrect) style += 'background:rgba(22,163,74,.15);color:var(--correct,#16a34a);font-weight:600;';
           else if (isUser) style += 'background:rgba(220,38,38,.12);color:var(--wrong,#dc2626);text-decoration:line-through;';
           else style += 'color:var(--tx2);';
-          const mark = isCorrect ? '<i data-ic="check"></i> ' : (isUser ? '<i data-ic="x"></i> ' : '　');
+          const mark = isCorrect ? '<i data-ic=check></i> ' : (isUser ? '<i data-ic=x></i> ' : '　');
           return `<div style="${style}">${mark}${o}</div>`;
         }).join('');
         h += `<div style="border:1px solid var(--bd);border-radius:8px;padding:10px;background:var(--bg2)">
@@ -646,7 +646,7 @@ const Stats = (() => {
             <span style="font-size:11px;font-weight:700;color:${col}">${lbl}</span>
             ${lv?`<span style="font-size:11px;font-weight:600;color:var(--ac2)">${lv}</span>`:''}
             <span style="flex:1"></span>
-            <button style="background:none;border:none;color:var(--wrong,#dc2626);cursor:pointer;font-size:12px;padding:2px 4px" onclick="Stats.removeWrongQuestion('${w.mode}','${(w.id+'').replace(/'/g,"\\'")}')"><i data-ic="x"></i></button>
+            <button style="background:none;border:none;color:var(--wrong,#dc2626);cursor:pointer;font-size:12px;padding:2px 4px" onclick="Stats.removeWrongQuestion('${w.mode}','${(w.id+'').replace(/'/g,"\\'")}')"><i data-ic=x></i></button>
           </div>
           ${w.text ? `<div style="font-size:13px;color:var(--tx2);line-height:1.6;margin-bottom:6px;white-space:pre-wrap;max-height:120px;overflow:auto">${w.text}</div>` : ''}
           <div style="font-size:13px;font-weight:600;color:var(--tx);margin-bottom:4px">${w.q || ''}</div>
@@ -655,7 +655,7 @@ const Stats = (() => {
       });
       h += '</div>';
       h += `<div style="display:flex;gap:8px;margin-top:12px">
-        <button class="qstart" style="flex:1" onclick="Stats.quizWrongQuestions()"><i data-ic="refresh"></i> 重考全部 (${arr.length})</button>
+        <button class="qstart" style="flex:1" onclick="Stats.quizWrongQuestions()"><i data-ic=refresh></i> 重考全部 (${arr.length})</button>
       </div>`;
       h += `<div style="margin-top:10px;font-size:11px;color:var(--tx3)">提示：聽力/閱讀/模考非單字題答錯會自動加入這裡。單字答錯仍會進「生詞本」。</div>`;
     }
@@ -674,11 +674,11 @@ const Stats = (() => {
   }
   function _renderWrongQ() {
     const w = _wq.arr[_wq.cur];
-    const modeLbl = { listening: '<i data-ic="headphones"></i> 聽力', reading: '<i data-ic="book"></i> 閱讀', mock: '<i data-ic="edit"></i> 模考' };
+    const modeLbl = { listening: '<i data-ic=headphones></i> 聽力', reading: '<i data-ic=book></i> 閱讀', mock: '<i data-ic=edit></i> 模考' };
     document.getElementById('quizBox').innerHTML = `
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
         <span style="font-size:12px;color:var(--tx2)">${modeLbl[w.mode]||w.mode} · ${(w.level||'').toUpperCase()} · ${_wq.cur+1}/${_wq.arr.length}</span>
-        <button class="qclose" style="width:auto;margin:0;padding:2px 10px" onclick="Stats.open()"><i data-ic="x"></i></button>
+        <button class="qclose" style="width:auto;margin:0;padding:2px 10px" onclick="Stats.open()"><i data-ic=x></i></button>
       </div>
       ${w.text?`<div style="font-size:13px;color:var(--tx2);line-height:1.6;margin-bottom:10px;white-space:pre-wrap;max-height:180px;overflow:auto;background:var(--bg2);padding:10px;border-radius:8px">${w.text}</div>`:''}
       <div style="font-size:15px;font-weight:600;margin:10px 0">${w.q||''}</div>
@@ -697,7 +697,7 @@ const Stats = (() => {
     });
     const last = _wq.cur >= _wq.arr.length - 1;
     const rmBtn = ok
-      ? `<button class="qclose" style="margin-right:8px" onclick="Stats._wqRemoveAndNext()"><i data-ic="check"></i> 移出錯題本</button>`
+      ? `<button class="qclose" style="margin-right:8px" onclick="Stats._wqRemoveAndNext()"><i data-ic=check></i> 移出錯題本</button>`
       : '';
     document.getElementById('wqNav').innerHTML = rmBtn +
       `<button class="qstart" onclick="Stats._wqNext()">${last?'看結果':'下一題'}</button>`;
@@ -716,7 +716,7 @@ const Stats = (() => {
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-size:14px;font-weight:600">錯題重考結果</span><button class="qclose" style="width:auto;margin:0;padding:2px 10px" onclick="Stats.open()">✕</button></div>
         <div style="text-align:center;padding:24px 0"><div style="font-size:48px;font-weight:700;color:${col}">${pct}%</div><div style="color:var(--tx2);margin-top:4px">${_wq.correct} / ${_wq.arr.length}</div></div>
         <div style="display:flex;gap:8px">
-          <button class="qstart" style="flex:1" onclick="Stats.quizWrongQuestions()"><i data-ic="refresh"></i> 再考一次</button>
+          <button class="qstart" style="flex:1" onclick="Stats.quizWrongQuestions()"><i data-ic=refresh></i> 再考一次</button>
           <button class="qclose" style="flex:1" onclick="Stats.open();Stats.switchTab('collection')">回錯題回顧</button>
         </div>`;
       return;
@@ -761,11 +761,11 @@ const Stats = (() => {
     _fl._opts = opts; _fl._correctIdx = correctIdx;
     document.getElementById('quizBox').innerHTML = `
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-        <span style="font-size:12px;color:var(--tx2)"><i data-ic="headphones"></i> 收藏聽力 ${_fl.cur+1}/${_fl.items.length}</span>
-        <button class="qclose" style="width:auto;margin:0;padding:2px 10px" onclick="Stats.close()"><i data-ic="x"></i></button>
+        <span style="font-size:12px;color:var(--tx2)"><i data-ic=headphones></i> 收藏聽力 ${_fl.cur+1}/${_fl.items.length}</span>
+        <button class="qclose" style="width:auto;margin:0;padding:2px 10px" onclick="Stats.close()"><i data-ic=x></i></button>
       </div>
       <div style="text-align:center;margin:24px 0">
-        <button class="qstart" style="border-radius:50%;width:88px;height:88px;font-size:32px;padding:0;cursor:pointer" onclick="Stats._flReplay()"><i data-ic="volume"></i></button>
+        <button class="qstart" style="border-radius:50%;width:88px;height:88px;font-size:32px;padding:0;cursor:pointer" onclick="Stats._flReplay()"><i data-ic=volume></i></button>
         <div style="font-size:11px;color:var(--tx3);margin-top:8px">點擊重播</div>
       </div>
       <div class="qopts" id="flOpts">${opts.map((o,i)=>`<button class="qopt" onclick="Stats._flAnswer(${i})">${o.z}</button>`).join('')}</div>
@@ -798,7 +798,7 @@ const Stats = (() => {
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-size:14px;font-weight:600">收藏聽力測驗結果</span><button class="qclose" style="width:auto;margin:0;padding:2px 10px" onclick="Stats.close()">✕</button></div>
         <div style="text-align:center;padding:24px 0"><div style="font-size:48px;font-weight:700;color:${col}">${pct}%</div><div style="color:var(--tx2);margin-top:4px">${_fl.correct} / ${_fl.items.length}</div></div>
         <div style="display:flex;gap:8px">
-          <button class="qstart" style="flex:1" onclick="Stats.quizFavListening()"><i data-ic="refresh"></i> 再考一次</button>
+          <button class="qstart" style="flex:1" onclick="Stats.quizFavListening()"><i data-ic=refresh></i> 再考一次</button>
           <button class="qclose" style="flex:1" onclick="Stats.close()">關閉</button>
         </div>`;
       return;

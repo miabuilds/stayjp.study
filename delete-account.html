@@ -138,7 +138,7 @@ $('btnDelete').onclick = async function () {
       say('刪除失敗：' + (d.message || d.error || res.status) + '，請稍後再試或來信聯絡我們。', '#EF4444');
       return;
     }
-    say('<i data-ic="check"></i> 帳號已刪除。感謝你使用過 StayJP。', '#16A34A');
+    say('<i data-ic=check></i> 帳號已刪除。感謝你使用過 StayJP。', '#16A34A');
     try { await auth.signOut(); } catch (e) {}
   } catch (e) {
     btn.disabled = false;

@@ -72,7 +72,7 @@ const Listening = (() => {
         __lsAudio = audio;
       }).catch(() => {
         // 全站政策:絕不退瀏覽器機器音。真載入失敗給提示,不出戲。
-        if (__lsToken === myToken && typeof showToast === 'function') showToast('音檔載入失敗,請檢查網路後再按一次 <i data-ic="volume"></i>');
+        if (__lsToken === myToken && typeof showToast === 'function') showToast('音檔載入失敗,請檢查網路後再按一次 <i data-ic=volume></i>');
       });
       return;
     }
@@ -106,7 +106,7 @@ const Listening = (() => {
     box.innerHTML = `
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
         <h3 style="margin:0">${t('ls_title')}</h3>
-        <button class="qclose" style="width:auto;margin:0;padding:2px 10px" onclick="Listening.close()"><i data-ic="x"></i></button>
+        <button class="qclose" style="width:auto;margin:0;padding:2px 10px" onclick="Listening.close()"><i data-ic=x></i></button>
       </div>
       <p style="font-size:13px;color:var(--tx2);margin-bottom:6px">${t('ls_subtitle')}</p>
       <p style="font-size:11px;color:var(--tx3);margin-bottom:12px">${t('ls_hint')}</p>
@@ -211,7 +211,7 @@ const Listening = (() => {
         </span>
         <span style="display:flex;align-items:center;gap:6px">
           <span style="font-size:12px;color:var(--tx2)">${t('quiz_score', { n: score })}</span>
-          <button class="qclose" style="width:auto;margin:0;padding:2px 10px" onclick="Listening.close()"><i data-ic="x"></i></button>
+          <button class="qclose" style="width:auto;margin:0;padding:2px 10px" onclick="Listening.close()"><i data-ic=x></i></button>
         </span>
       </div>
 
@@ -329,7 +329,7 @@ const Listening = (() => {
       <div class="qscore ${cls}">${score} / ${total} (${pct}%)</div>
       <div style="font-size:13px;color:var(--tx2);margin-bottom:8px">${selectedLevel.toUpperCase()} | ${practiceMode ? t('ls_mode_practice') : t('ls_mode_test')}</div>
       <div class="qresults">${answered.map(a =>
-        '<div class="qr ' + (a.correct ? 'ok' : 'ng') + '"><span class="qrc">' + (a.correct ? '<i data-ic="check"></i>' : '<i data-ic="x"></i>') + '</span><span>' + a.q + '</span><span style="font-size:11px;color:var(--tx3);margin-left:auto">' + a.type + '</span></div>'
+        '<div class="qr ' + (a.correct ? 'ok' : 'ng') + '"><span class="qrc">' + (a.correct ? '<i data-ic=check></i>' : '<i data-ic=x></i>') + '</span><span>' + a.q + '</span><span style="font-size:11px;color:var(--tx3);margin-left:auto">' + a.type + '</span></div>'
       ).join('')}</div>
       <div class="qactions">
         <button class="qstart" onclick="Listening.begin()">下一組</button>

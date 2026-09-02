@@ -66,7 +66,7 @@ const Reading = (() => {
     box.innerHTML = `
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
         <h3 style="margin:0">${t('rd_title')}</h3>
-        <button class="qclose" style="width:auto;margin:0;padding:2px 10px" onclick="Reading.close()"><i data-ic="x"></i></button>
+        <button class="qclose" style="width:auto;margin:0;padding:2px 10px" onclick="Reading.close()"><i data-ic=x></i></button>
       </div>
       <p style="font-size:13px;color:var(--tx2);margin-bottom:12px">${t('rd_subtitle')}</p>
       <div class="qf"><label>${t('quiz_level')}</label><div class="qo" id="rdLevel">
@@ -186,7 +186,7 @@ const Reading = (() => {
         </span>
         <span style="display:flex;align-items:center;gap:8px">
           ${timerEnabled ? '<span id="rdTimer" style="font-variant-numeric:tabular-nums">0:00</span>' : ''}
-          <button class="qclose" style="width:auto;margin:0;padding:2px 10px" onclick="Reading.close()"><i data-ic="x"></i></button>
+          <button class="qclose" style="width:auto;margin:0;padding:2px 10px" onclick="Reading.close()"><i data-ic=x></i></button>
         </span>
       </div>
       <h4 style="margin-bottom:10px;color:var(--tx)">${p.title}</h4>
@@ -234,7 +234,7 @@ const Reading = (() => {
     const qDiv = document.getElementById('rdQuestions');
     const expDiv = document.createElement('div');
     expDiv.style.cssText = 'margin-top:10px;padding:10px;border-radius:8px;font-size:13px;background:var(--note-bg);color:var(--note-tx);border-left:3px solid var(--ac)';
-    expDiv.innerHTML = `<b>${correct ? '<i data-ic="check"></i> 正確' : '<i data-ic="x"></i> 錯誤'}</b>　${q.explanation}`;
+    expDiv.innerHTML = `<b>${correct ? '<i data-ic=check></i> 正確' : '<i data-ic=x></i> 錯誤'}</b>　${q.explanation}`;
     qDiv.appendChild(expDiv);
 
     const navDiv = document.getElementById('rdNav');
@@ -273,7 +273,7 @@ const Reading = (() => {
       ${timerEnabled ? `<div style="text-align:center;font-size:13px;color:var(--tx2);margin-bottom:8px">${t('rd_time_used', { t: formatTime(timerSeconds) })}</div>` : ''}
       <div style="font-size:13px;color:var(--tx2);margin-bottom:8px">${p.title}（${p.level.toUpperCase()}）</div>
       <div class="qresults">${answered.map(a =>
-        '<div class="qr ' + (a.correct ? 'ok' : 'ng') + '"><span class="qrc">' + (a.correct ? '<i data-ic="check"></i>' : '<i data-ic="x"></i>') + '</span><span>' + a.q + '</span></div>'
+        '<div class="qr ' + (a.correct ? 'ok' : 'ng') + '"><span class="qrc">' + (a.correct ? '<i data-ic=check></i>' : '<i data-ic=x></i>') + '</span><span>' + a.q + '</span></div>'
       ).join('')}</div>
       <div class="qactions">
         <button class="qstart" onclick="Reading.begin()">下一篇</button>

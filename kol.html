@@ -87,7 +87,7 @@
           '</div>' +
           '<div class="note">「帶來人數」= 透過你的推薦碼註冊的人;「已付費」= 其中目前付費訂閱中(結算依據);「試用中」= 免費試用尚未轉付費。數字即時更新。</div>' +
           '<div class="range-box">' +
-            '<div class="range-title"><i data-ic="calendar"></i> 期間查詢</div>' +
+            '<div class="range-title"><i data-ic=calendar></i> 期間查詢</div>' +
             '<div class="range-row"><input type="date" id="rFrom" value="' + iso(first) + '"><span>~</span><input type="date" id="rTo" value="' + iso(now) + '"><button id="rBtn">查詢</button></div>' +
             '<div id="rResult" class="range-result">選好日期,查這段期間的<b style="font-size:14px">成交筆數</b>與<b style="font-size:14px">分潤金額</b>。</div>' +
           '</div>';
@@ -95,7 +95,7 @@
         body.insertAdjacentHTML('beforeend',
           '<a href="kol-payout.html?code=' + encodeURIComponent(d.code) + '&t=' + encodeURIComponent(t) + '" ' +
           'style="display:block;text-align:center;margin-top:18px;background:#C6553B;color:#fff;text-decoration:none;' +
-          'padding:15px;border-radius:12px;font-weight:700"><i data-ic="coin"></i> 我要領款（線上簽署佣金協議）</a>' +
+          'padding:15px;border-radius:12px;font-weight:700"><i data-ic=coin></i> 我要領款（線上簽署佣金協議）</a>' +
           '<div class="note" style="margin-top:8px">領款需線上簽署佣金協議並填收款帳戶;送出後主辦方會核對金額轉帳。<b>單次領款建議 NT$20,000 以內</b>;單筆超過 NT$20,000 依法須預扣 10% 所得稅,建議分次跨月領。</div>');
       })
       .catch(() => {
@@ -126,7 +126,7 @@
           var planTxt = r.plan==='adjustment' ? ('額外:'+(r.note||'調整')) : (PLAN[r.plan]||r.plan||'—');
           var srcTxt = SRC[r.source]||r.source;
           var money = 'NT$'+(r.amount||0).toLocaleString();
-          if(r.voided) return '<div class="drow voided"><span class="dp">'+esc(planTxt)+'</span><span class="ds">'+esc(srcTxt)+'</span><span class="dm">'+money+'</span><span class="dx"><i data-ic="x"></i> 已退費</span><span class="dd">'+ds+'</span></div>';
+          if(r.voided) return '<div class="drow voided"><span class="dp">'+esc(planTxt)+'</span><span class="ds">'+esc(srcTxt)+'</span><span class="dm">'+money+'</span><span class="dx"><i data-ic=x></i> 已退費</span><span class="dd">'+ds+'</span></div>';
           var stTxt = r.state==='paid'?'已付款':(r.state==='locked'?'可領':'鎖定中');
           return '<div class="drow"><span class="dp">'+esc(planTxt)+'</span><span class="ds">'+esc(srcTxt)+'</span><span class="dm money">'+money+'</span><span class="dx">'+stTxt+'</span><span class="dd">'+ds+'</span></div>';
         }).join('');
