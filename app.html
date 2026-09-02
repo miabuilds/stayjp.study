@@ -3259,12 +3259,12 @@ const Streak = (() => {
     const s = load();
     const isLoggedIn = typeof currentUser !== 'undefined' && currentUser;
     const lines = [
-      `<i data-ic=fire></i> 連續學習 ${s.days || 0} 天`,
+      `連續學習 ${s.days || 0} 天`,
       `最長紀錄：${s.longest || 0} 天`,
     ];
     if (!isLoggedIn && s.days >= 3) {
       lines.push('');
-      lines.push('<i data-ic=warning></i> 目前紀錄存在這台裝置；清快取或換裝置會丟失。');
+      lines.push('目前紀錄存在這台裝置；清快取或換裝置會丟失。');
       lines.push('登入後自動雲端備份，不會再丟。');
       if (confirm(lines.join('\n') + '\n\n要現在登入備份嗎？')) handleAuth();
     } else {
