@@ -29,7 +29,9 @@
     //    (封測期間為 false 全站隱藏;上架後翻 true,index/about/howto/pricing 四處一起亮。)
     var ANDROID_LIVE = true;
     var ua = navigator.userAgent || '';
-    var isIOS = /iPhone|iPad|iPod/i.test(ua) || (/Macintosh/.test(ua) && typeof document !== 'undefined' && 'ontouchend' in document); // iPadOS 會偽裝成 Mac
+    // iPadOS 13+ 的 Safari UA 會偽裝成 Macintosh;用 maxTouchPoints 才分得出真 Mac(0)與 iPad(>1)。
+    // 不能用 'ontouchend' in document — 桌機版 Chrome/Edge 一律回 true,會把真 Mac 誤判成 iOS。
+    var isIOS = /iPhone|iPad|iPod/i.test(ua) || (/Macintosh/.test(ua) && (navigator.maxTouchPoints || 0) > 1);
     var isAndroid = /Android/i.test(ua);
     var root = document.documentElement;
     root.classList.add(isIOS ? 'stayjp-dev-ios' : isAndroid ? 'stayjp-dev-android' : 'stayjp-dev-desktop');

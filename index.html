@@ -242,6 +242,15 @@ a:hover { text-decoration: underline; }
 }
 .hero-desc strong { color: var(--tx); font-weight: 600; }
 .hero-cta-row { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
+.cta-dl { display: inline-flex; align-items: center; gap: 20px; }
+.hero-dl { display: none; }   /* 桌機隱藏(桌機用 CTA 列的 badge);手機才顯示在浣熊下方 */
+/* 網頁版一律顯示兩顆下載鈕(不分裝置,避免 Mac/桌機被 native-ui 誤判成單一商店);
+   specificity 高於 native-ui 的 html.stayjp-dev-* 規則。只有真正在原生 App 內(stayjp-native)才隱藏。
+   容器層級(.cta-dl / .hero-dl)仍各自控制桌機/手機顯示哪一組,display:none 容器勝過子層 inline-flex。 */
+html:not(.stayjp-native) .cta-dl .app-ios,
+html:not(.stayjp-native) .cta-dl .app-android,
+html:not(.stayjp-native) .hero-dl .app-ios,
+html:not(.stayjp-native) .hero-dl .app-android { display: inline-flex !important; }
 .hero-cta {
   display: inline-flex; align-items: center; gap: 10px;
   background: var(--tx); color: var(--bg);
@@ -304,6 +313,8 @@ a:hover { text-decoration: underline; }
 @media (max-width: 900px) {
   .hero { flex-direction: column; gap: 0; padding-top: calc(var(--hh) + 32px); }
   .hero-mascot { width: 44vw; max-width: 190px; margin: 0 auto 8px; order: -1; }
+  .hero-dl { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; order: -1; margin: 10px auto 22px; }
+  .cta-dl { display: none; }   /* 手機:下載鈕已移到浣熊下方,避免重複(container 隱藏勝過 native-ui 的 !important) */
 }
 
 /* 舊的和式漢字裝飾保留但不再使用 */
@@ -714,14 +725,19 @@ try {
       <a href="app.html" class="hero-cta">免費開始學習
         <svg style="width:16px;height:16px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
       </a>
-      <a href="https://apps.apple.com/app/id6778227353" class="app app-ios store-badge" aria-label="Download on the App Store"><img src="app-store-badge.svg" alt="Download on the App Store"></a>
-      <a href="https://play.google.com/store/apps/details?id=com.stayjp.app" class="app app-android store-badge" aria-label="Get it on Google Play"><img src="google-play-badge.svg" alt="Get it on Google Play"></a>
+      <span class="cta-dl"><a href="https://apps.apple.com/app/id6778227353" class="app app-ios store-badge" aria-label="Download on the App Store"><img src="app-store-badge.svg" alt="Download on the App Store"></a>
+      <a href="https://play.google.com/store/apps/details?id=com.stayjp.app" class="app app-android store-badge" aria-label="Get it on Google Play"><img src="google-play-badge.svg" alt="Get it on Google Play"></a></span>
     </div>
     <p class="hero-badge-note reveal reveal-d4" data-web-only style="margin-top:9px;font-size:12.5px;color:var(--tx3)">下載 App・免費試用 7 天</p>
     <p class="hero-trust reveal reveal-d4" style="margin-top:16px;font-size:14px;color:var(--tx2)"><span>免費・無需信用卡・登入送 3 天全功能試用・<span id="heroLearners">6 萬+</span> 學習者一起備考</span>　<a href="pricing.html" style="color:var(--ac);text-decoration:underline">看付費方案</a></p>
   </div>
   <div class="hero-mascot reveal reveal-d2">
     <img src="images/mascot/tanuki-stand.png" alt="日本再留計劃吉祥物 — 學者狸太郎" loading="eager">
+  </div>
+  <!-- 手機版:下載鈕移到浣熊正下方,一進來第一眼就看到(桌機隱藏,桌機用下方 CTA 列的 badge) -->
+  <div class="hero-dl reveal reveal-d3">
+    <a href="https://apps.apple.com/app/id6778227353" class="app app-ios store-badge" aria-label="Download on the App Store"><img src="app-store-badge.svg" alt="Download on the App Store"></a>
+    <a href="https://play.google.com/store/apps/details?id=com.stayjp.app" class="app app-android store-badge" aria-label="Get it on Google Play"><img src="google-play-badge.svg" alt="Get it on Google Play"></a>
   </div>
 </section>
 
