@@ -68,7 +68,7 @@
 <div id="app" class="wrap" style="display:none">
   <div style="margin-bottom:8px"><a href="#" class="backbtn" onclick="if(history.length>1){history.back()}else{location.href='app.html'};return false"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>返回</a></div>
   <h1>口說練習 <span class="muted" style="font-weight:400">Beta</span></h1>
-  <div class="sub">選句子 → 聽範例 → 念一次(或直接打字)→ 送出,看 AI 回饋。　免費體驗 10 次 AI 評分,Premium 每天 30 次。想練「來回對話」試試 <a href="speak-chat.html" style="color:var(--accent);font-weight:600">🗣 情境對話</a>。</div>
+  <div class="sub">選句子 → 聽範例 → 念一次(或直接打字)→ 送出,看 AI 回饋。　免費體驗 10 次 AI 評分,Premium 每天 30 次。想練「來回對話」試試 <a href="speak-chat.html" style="color:var(--accent);font-weight:600"><i data-ic=speak></i> 情境對話</a>。</div>
 
   <div class="today" id="todayCard" style="display:none">
     <div class="dring" id="dring"></div>
@@ -84,18 +84,18 @@
     <div class="kana" id="kana"></div>
     <div class="zh" id="zh"></div>
     <div class="rowbtns">
-      <button class="btn" onclick="speak()">🔊 聽範例</button>
+      <button class="btn" onclick="speak()"><i data-ic=volume></i> 聽範例</button>
       <button class="btn" id="favBtn" onclick="favToggle()" title="收藏這句">☆</button>
       <button class="btn" onclick="prev()">← 上一句</button>
       <button class="btn" onclick="next()">下一句 →</button>
-      <button class="btn" onclick="FavSents.open()">⭐ 收藏句</button>
+      <button class="btn" onclick="FavSents.open()"><i data-ic=star></i> 收藏句</button>
     </div>
   </div>
 
   <div class="card">
     <div style="font-weight:600;margin-bottom:6px">換你念</div>
     <div class="rowbtns">
-      <button id="recBtn" class="btn rec" onclick="toggleRec()">🎤 開始錄音</button>
+      <button id="recBtn" class="btn rec" onclick="toggleRec()"><i data-ic=mic></i> 開始錄音</button>
       <button class="btn pri" onclick="submit()">送出評分</button>
     </div>
     <input id="said" class="said" placeholder="辨識結果會出現在這;不準可直接改成你念的內容">
@@ -105,6 +105,7 @@
   <div class="card" id="fbCard" style="display:none"></div>
 </div>
 
+<script src="icons.js"></script>
 <script src="i18n.js"></script>
 <script src="audio/tts/manifest.js"></script>
 <script src="speak-ruby.js"></script>
@@ -128,14 +129,14 @@ if(I18n.getLang()==='zh-CN') ensureOpenCC();
     document.title = 'AI Speaking Practice | StayJP';
     var back=document.querySelector('#app a[href="#"]'); if(back) back.textContent='‹ Back';
     var h1=document.querySelector('#app h1'); if(h1) h1.innerHTML='Speaking Practice <span class="muted" style="font-weight:400">Beta</span>';
-    var sub=document.querySelector('#app .sub'); if(sub) sub.innerHTML='Pick a sentence → listen to the example → say it once (or type it) → submit for AI feedback. Free trial: 10 AI reviews, Premium: 30 per day. Want back-and-forth conversation? Try <a href="speak-chat.html" style="color:var(--accent);font-weight:600">🗣 Scenario Chat</a>.';
+    var sub=document.querySelector('#app .sub'); if(sub) sub.innerHTML='Pick a sentence → listen to the example → say it once (or type it) → submit for AI feedback. Free trial: 10 AI reviews, Premium: 30 per day. Want back-and-forth conversation? Try <a href="speak-chat.html" style="color:var(--accent);font-weight:600"><i data-ic=speak></i> Scenario Chat</a>.';
     var cards=document.querySelectorAll('#app .card');
     var btns=cards[0]?cards[0].querySelectorAll('.rowbtns .btn'):[];
-    if(btns[0]) btns[0].textContent='🔊 Play example';
+    if(btns[0]) btns[0].innerHTML='<i data-ic=volume></i> Play example';
     if(btns[1]) btns[1].textContent='← Previous';
     if(btns[2]) btns[2].textContent='Next →';
     var turn=cards[1]?cards[1].querySelector('div'):null; if(turn) turn.textContent='Your turn';
-    var rb=document.getElementById('recBtn'); if(rb) rb.textContent='🎤 Start recording';
+    var rb=document.getElementById('recBtn'); if(rb) rb.innerHTML='<i data-ic=mic></i> Start recording';
     var sb=cards[1]?cards[1].querySelector('.btn.pri'):null; if(sb) sb.textContent='Submit';
     var said=document.getElementById('said'); if(said) said.placeholder="Recognition result appears here — edit it if it's off";
     var rn=document.getElementById('recNote'); if(rn) rn.textContent="Uses your browser's speech recognition (best on mobile/Chrome); if it's unsupported, just type. The app will switch to native recognition later for better accuracy.";
@@ -155,12 +156,12 @@ const FN_SPEAK = 'https://asia-east1-jpnote-1bdd6.cloudfunctions.net/speakFeedba
 // jp=漢字句 / kana=假名讀音 / zh=中文 / lv=JLPT 等級 / cat=分類。內容由淺入深、都是真的用得到的完整句。
 const S = (jp,kana,zh,lv,cat)=>({jp,kana,zh,lv,cat});
 const CATS = [
-  { k:'all',    ic:'✨', name:'全部',       en:'All' },
-  { k:'daily',  ic:'🏠', name:'日常生活',   en:'Daily life' },
-  { k:'travel', ic:'🚉', name:'外出・旅行', en:'Out & travel' },
-  { k:'work',   ic:'💼', name:'職場・敬語', en:'Work & keigo' },
-  { k:'social', ic:'🗣️', name:'社交',       en:'Social' },
-  { k:'feel',   ic:'💭', name:'心情・想法', en:'Feelings' },
+  { k:'all',    ic:'<i data-ic=sparkle></i>', name:'全部',       en:'All' },
+  { k:'daily',  ic:'<i data-ic=home></i>', name:'日常生活',   en:'Daily life' },
+  { k:'travel', ic:'<i data-ic=train></i>', name:'外出・旅行', en:'Out & travel' },
+  { k:'work',   ic:'<i data-ic=briefcase></i>', name:'職場・敬語', en:'Work & keigo' },
+  { k:'social', ic:'<i data-ic=speak></i>', name:'社交',       en:'Social' },
+  { k:'feel',   ic:'<i data-ic=chat></i>', name:'心情・想法', en:'Feelings' },
 ];
 const LV_DESC = {
   N5:'旅遊・生活最基本:問路、點餐、購物,先能開口。',
@@ -353,7 +354,7 @@ function renderRing(){
     `<svg width="52" height="52" viewBox="0 0 52 52"><circle cx="26" cy="26" r="${R}" fill="none" stroke="var(--line)" stroke-width="5"/><circle cx="26" cy="26" r="${R}" fill="none" stroke="var(--accent)" stroke-width="5" stroke-linecap="round" stroke-dasharray="${C.toFixed(1)}" stroke-dashoffset="${off.toFixed(1)}" style="transition:stroke-dashoffset .5s"/></svg><div class="dn">${n}</div>`;
   document.getElementById('todayTt').textContent = enOr('今日口說練習','Today’s speaking');
   document.getElementById('todayTd').textContent = n>=SP_GOAL
-    ? enOr('目標達成!太棒了 🎉','Goal reached! 🎉')
+    ? enOr('目標達成!太棒了','Goal reached!')
     : enOr('已練 '+n+'／'+SP_GOAL+' 句,加油!', n+'/'+SP_GOAL+' done, keep going!');
 }
 function renderLvTabs(){
@@ -429,14 +430,14 @@ const IN_APP = !!(window.STAYJP_NATIVE && window.STAYJP_NATIVE.isNativeApp && wi
 function _postRestore(){ if(IN_APP && !NATIVE_STT) _nPost({type:'AUDIO_RESTORE'}); }
 let rec=null, recording=false;
 function toggleRec(){ recording ? stopRec() : startRec(); }
-function _recBtnUI(on){ const b=document.getElementById('recBtn'); if(!b)return; b.classList.toggle('on',on); b.textContent=on?enOr('⏹ 停止','⏹ Stop'):enOr('🎤 開始錄音','🎤 Start recording'); }
+function _recBtnUI(on){ const b=document.getElementById('recBtn'); if(!b)return; b.classList.toggle('on',on); b.innerHTML=on?enOr('<i data-ic=stop></i> 停止','<i data-ic=stop></i> Stop'):enOr('<i data-ic=mic></i> 開始錄音','<i data-ic=mic></i> Start recording'); }
 function startRec(){
   if(window.STAYJP_NATIVE && window.STAYJP_NATIVE.canPlayB64) _nPost({type:'STOP_PLAY'});   // 開麥前停掉原生播放
   if(NATIVE_STT){
     window.stayjpSpeechResult=function(t,fin){ if(t) document.getElementById('said').value=t; };
     window.stayjpSpeechEnd=function(err){
       recording=false; _recBtnUI(false);
-      if(err==='not-allowed') document.getElementById('recNote').textContent=enOr('🎤 麥克風權限被關了:請到 iPhone 設定 → StayJP 允許麥克風。','🎤 Microphone access is off. Go to iPhone Settings → StayJP and allow the microphone.');
+      if(err==='not-allowed') document.getElementById('recNote').textContent=enOr('麥克風權限被關了:請到 iPhone 設定 → StayJP 允許麥克風。',' Microphone access is off. Go to iPhone Settings → StayJP and allow the microphone.');
       else if(err) document.getElementById('recNote').textContent=enOr('辨識出錯('+err+'),可直接打字。','Recognition error ('+err+') — you can just type instead.');
     };
     recording=true; _recBtnUI(true);
@@ -517,11 +518,11 @@ function renderStream(text, done){
     ? `<div class="fb-head"><div class="ring" style="background:${col}">${sc}</div>
          <div><div class="verdict" style="color:${col}">${esc(cvt(d.verdict||''))}</div><div class="diff">${esc(cvt(d.diff||''))}</div></div></div>`
     : '<div class="muted">'+enOr('AI 評分中…','AI is scoring…')+'</div>';
-  const pts = (d.points||[]).map(p=>`<div class="pt"><span class="ic">${p.ok?'✅':'⚠️'}</span><span class="lb">${esc(cvt(p.label||''))}</span><span>${esc(cvt(p.note||''))}</span></div>`).join('');
+  const pts = (d.points||[]).map(p=>`<div class="pt"><span class="ic">${p.ok?'<i data-ic=check></i>':'<i data-ic=warning></i>'}</span><span class="lb">${esc(cvt(p.label||''))}</span><span>${esc(cvt(p.note||''))}</span></div>`).join('');
   document.getElementById('fbCard').innerHTML =
     head + pts
     + (d.corrected?`<div class="corr">${enOr('正確說法:','Correct version: ')}<b>${esc(d.corrected)}</b><div class="r">${esc(d.reading||'')}</div></div>`:'')
-    + (d.tip?`<div class="tip">💡 ${esc(cvt(d.tip))}</div>`:'')
+    + (d.tip?`<div class="tip"><i data-ic=bulb></i> ${esc(cvt(d.tip))}</div>`:'')
     + (d.encourage?`<div class="enc">${esc(cvt(d.encourage))}</div>`:'')
     + (!done && d.score!=null?'<div class="muted" style="margin-top:8px">…</div>':'');
 }
