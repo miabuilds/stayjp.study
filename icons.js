@@ -63,7 +63,17 @@
     arrowRight:'<path d="M5 12h14"/><path d="M13 6l6 6-6 6"/>',
     arrowLeft: '<path d="M19 12H5"/><path d="M11 6l-6 6 6 6"/>',
     chevronUp: '<path d="M6 15l6-6 6 6"/>',
-    hand:      '<path d="M9 11V5.5a1.5 1.5 0 0 1 3 0V11"/><path d="M12 11V4.5a1.5 1.5 0 0 1 3 0V11"/><path d="M15 11V6.5a1.5 1.5 0 0 1 3 0V15a6 6 0 0 1-6 6h-1a6 6 0 0 1-5-2.7L3 15a1.6 1.6 0 0 1 2.5-2L7 14V7a1.5 1.5 0 0 1 3 0v4"/>'
+    hand:      '<path d="M9 11V5.5a1.5 1.5 0 0 1 3 0V11"/><path d="M12 11V4.5a1.5 1.5 0 0 1 3 0V11"/><path d="M15 11V6.5a1.5 1.5 0 0 1 3 0V15a6 6 0 0 1-6 6h-1a6 6 0 0 1-5-2.7L3 15a1.6 1.6 0 0 1 2.5-2L7 14V7a1.5 1.5 0 0 1 3 0v4"/>',
+    // ── 補充 ──
+    bird:     '<path d="M16 7h.01"/><path d="M3.5 6A2.5 2.5 0 0 1 8 4.5L20 6l-4 4v3a7 7 0 0 1-7 7H4s3-2 3-5c0-2-2-3-2-6a2.5 2.5 0 0 1-1.5-2z"/>',
+    settings: '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.6 1.6 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.6 1.6 0 0 0-2.7 1.1V21a2 2 0 0 1-4 0v-.1A1.6 1.6 0 0 0 7 19.4a1.6 1.6 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1A1.6 1.6 0 0 0 3 15H3a2 2 0 0 1 0-4h.1A1.6 1.6 0 0 0 4.6 7 1.6 1.6 0 0 0 4.3 5.2l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1A1.6 1.6 0 0 0 9 3.6 1.6 1.6 0 0 0 11 2h.1a2 2 0 0 1 4 0V2a1.6 1.6 0 0 0 2.7 1.1l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.6 1.6 0 0 0 1.1 2.7H21a2 2 0 0 1 0 4h-.1a1.6 1.6 0 0 0-1.5 1z"/>',
+    play:     '<path d="M6 4l14 8-14 8z"/>',
+    pause:    '<rect x="7" y="5" width="3.5" height="14" rx="1"/><rect x="14" y="5" width="3.5" height="14" rx="1"/>',
+    stop:     '<rect x="6" y="6" width="12" height="12" rx="2"/>',
+    menu:     '<path d="M4 6h16"/><path d="M4 12h16"/><path d="M4 18h16"/>',
+    bookmark: '<path d="M6 3h12v18l-6-4-6 4z"/>',
+    clipboard:'<rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4a3 3 0 0 1 6 0"/><path d="M9 4h6v2H9z"/>',
+    coin:     '<circle cx="12" cy="12" r="9"/><path d="M15 9.5A3 3 0 0 0 12 8c-1.7 0-3 1-3 2.3 0 3 6 1.5 6 4.4C15 16 13.7 17 12 17a3 3 0 0 1-3-1.5"/><path d="M12 6.5v11"/>'
   };
 
   function svg(name, o) {
@@ -94,4 +104,17 @@
   window.hydrateIcons = hydrate;
   if (document.readyState !== 'loading') hydrate();
   else document.addEventListener('DOMContentLoaded', function () { hydrate(); });
+
+  // JS 動態插入的 <i data-ic> 也自動變 icon（rAF 節流,只掃未 hydrate 的,成本低）。
+  // 這樣靜態 HTML 與 JS 產生的內容都能用同一套 <i data-ic="x"> 寫法。
+  if (window.MutationObserver) {
+    var pending = false;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    function schedule() { if (pending) return; pending = true; raf(function () { pending = false; hydrate(document); }); }
+    try {
+      new MutationObserver(function (muts) {
+        for (var i = 0; i < muts.length; i++) { if (muts[i].addedNodes && muts[i].addedNodes.length) { schedule(); return; } }
+      }).observe(document.documentElement, { childList: true, subtree: true });
+    } catch (e) {}
+  }
 })();
