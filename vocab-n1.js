@@ -19,7 +19,7 @@ const VOCAB_N1 = [
 {w:"原典",r:"げんてん",m:"原典",c:"名",ex:{j:"翻訳を鵜呑みにせず、可能な限り原典に当たって確かめる姿勢が肝要だ。",z:"不要囫圇吞下譯文，盡可能查閱原典加以確認的態度至關重要。",e:"Rather than swallowing translations whole, it is vital to consult the original text and verify wherever possible."}},
 {w:"通説",r:"つうせつ",m:"通說",c:"名",ex:{j:"長らく通説とされてきた見解が、近年の発掘によって根底から揺らいでいる。",z:"長期以來被視為通說的見解，因近年的發掘而從根本上動搖了。",e:"The view long held as the accepted theory is being shaken to its foundations by recent excavations."}},
 {w:"異説",r:"いせつ",m:"異說",c:"名",ex:{j:"学界の主流に真っ向から異を唱える彼の異説は、当初ことごとく黙殺された。",z:"他那正面挑戰學界主流的異說，起初完全遭到漠視。",e:"His dissenting theory, which squarely challenged the academic mainstream, was at first utterly ignored."}},
-{w:"俗説",r:"ぞくせつ",m:"俗說",c:"名",ex:{j:"「爪の白い斑点はカルシウム不足の証」というのは、根拠のない俗説にすぎない。",z:"「指甲上的白點是缺鈣的表徵」不過是毫無根據的俗說罷了。",e:"The idea that white spots on the nails signal calcium deficiency is nothing but a groundless popular myth."}},
+{w:"俗説",r:"ぞくせつ",m:"坊間流傳、多半無根據的說法;俗傳",c:"名",ex:{j:"「爪の白い斑点はカルシウム不足の証」というのは、根拠のない俗説にすぎない。",z:"「指甲上的白點是缺鈣的表徵」不過是毫無根據的俗說罷了。",e:"The idea that white spots on the nails signal calcium deficiency is nothing but a groundless popular myth."}},
 {w:"学識",r:"がくしき",m:"學識",c:"名",ex:{j:"彼女は専門分野にとどまらず、古今東西に通じた深い学識の持ち主だ。",z:"她不僅限於專業領域，更是通曉古今中外、學識淵博之人。",e:"She is a person of deep learning, versed not only in her specialty but in matters ancient and modern, East and West."}},
 {w:"素養",r:"そよう",m:"素養",c:"名",ex:{j:"優れた技術者には、論理的思考に加え、人文的な素養も欠かせない。",z:"優秀的工程師除了邏輯思維，人文方面的素養也不可或缺。",e:"An excellent engineer needs not only logical thinking but also a grounding in the humanities."}},
 {w:"造詣",r:"ぞうけい",m:"造詣",c:"名",ex:{j:"彼は本業の建築のみならず、東洋美術にも並々ならぬ造詣が深い。",z:"他不僅本行建築了得，對東方美術的造詣也非比尋常地深厚。",e:"Beyond his profession of architecture, he has an extraordinarily deep expertise in Oriental art."}},
