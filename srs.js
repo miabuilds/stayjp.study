@@ -164,7 +164,7 @@ const SRS = (() => {
     const st = getStats(itemLv);
     const cfHint = window.sameReadingHint ? window.sameReadingHint(item) : '';
     document.getElementById('quizBox').innerHTML = `
-      <div class="qhd"><span>${t('review')} ${cur+1} / ${queue.length}</span><span>${itemLv.toUpperCase()}・${item.isNew?t('srs_new'):t('srs_review')}</span><button class="qclose" style="width:auto;margin:0;padding:2px 10px" onclick="SRS.close()">✕</button></div>
+      <div class="qhd"><span>${t('review')} ${cur+1} / ${queue.length}</span><span>${itemLv.toUpperCase()}・${item.isNew?t('srs_new'):t('srs_review')}</span><button class="qclose" style="width:auto;margin:0;padding:2px 10px" onclick="SRS.close()"><i data-ic="x"></i></button></div>
       <div class="srs-card" id="srsCard" onclick="SRS.flip()">
         <div class="srs-front" id="srsFront">
           <div class="qmain">${item.w}</div>

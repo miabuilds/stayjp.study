@@ -50,7 +50,7 @@ const GrammarDrill = (() => {
         <button data-v="n3">N3</button><button data-v="n2">N2</button><button data-v="n1">N1</button>
       </div></div>
       <div class="qf"><label>${t('gd_range')}</label><div class="qo" id="gdRange">
-        <button data-v="today" class="on">📚 ${t('gd_range_today')}</button>
+        <button data-v="today" class="on"><i data-ic="book"></i> ${t('gd_range_today')}</button>
         <button data-v="due">${t('gd_range_due')}</button>
         <button data-v="new">${t('gd_range_new')}</button>
         <button data-v="all">${t('gd_range_all')}</button>
@@ -111,7 +111,7 @@ const GrammarDrill = (() => {
     const e = srs[g.id];
     const isNew = !e;
     document.getElementById('quizBox').innerHTML = `
-      <div class="qhd"><span>${t('grammar')} ${cur+1} / ${queue.length}</span><span>${isNew?t('gd_new'):t('gd_review')}</span><button class="qclose" style="width:auto;margin:0;padding:2px 10px" onclick="GrammarDrill.close()">✕</button></div>
+      <div class="qhd"><span>${t('grammar')} ${cur+1} / ${queue.length}</span><span>${isNew?t('gd_new'):t('gd_review')}</span><button class="qclose" style="width:auto;margin:0;padding:2px 10px" onclick="GrammarDrill.close()"><i data-ic="x"></i></button></div>
       <div class="srs-card" onclick="GrammarDrill.flip()">
         <div id="gdFront">
           <div class="qmain" style="font-size:22px">${g.t}</div>
@@ -193,7 +193,7 @@ const GrammarDrill = (() => {
     const pureJ = blanked.replace(/<[^>]+>/g, '').replace(/'/g, "\\'");
     const spk = `<svg class="spk-inline" style="width:18px;height:18px;cursor:pointer;vertical-align:middle;margin-left:6px;stroke:var(--ac2);fill:none;stroke-width:2" onclick="speak('${pureJ}')" viewBox="0 0 24 24"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.54 8.46a5 5 0 010 7.07M19.07 4.93a10 10 0 010 14.14"/></svg>`;
     document.getElementById('quizBox').innerHTML = `
-      <div class="qhd"><span>${t('gd_quiz_mode')} ${cur+1} / ${queue.length}</span><span>${t('quiz_score', { n: gqScore })}</span><button class="qclose" style="width:auto;margin:0;padding:2px 10px" onclick="GrammarDrill.close()">✕</button></div>
+      <div class="qhd"><span>${t('gd_quiz_mode')} ${cur+1} / ${queue.length}</span><span>${t('quiz_score', { n: gqScore })}</span><button class="qclose" style="width:auto;margin:0;padding:2px 10px" onclick="GrammarDrill.close()"><i data-ic="x"></i></button></div>
       <div class="qprompt"><div style="font-size:16px;line-height:1.8;color:var(--tx)">${blanked}${spk}</div><div style="font-size:12px;color:var(--tx2);margin-top:4px">${typeof cvt==='function'?cvt(eg.z):eg.z}</div></div>
       <div class="qopts">${options.map((o, i) => '<button class="qopt" onclick="GrammarDrill.answerQuiz('+i+','+correctIdx+')">'+o+'</button>').join('')}</div>`;
   }

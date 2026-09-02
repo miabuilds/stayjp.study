@@ -27,7 +27,7 @@
     const others = [...set].filter(w => w !== item.w && w !== item.r);
     if (!others.length) return '';
     const list = others.slice(0, 3).map(w => '「' + w + '（' + item.r + '）」').join('、');
-    return '⚠️ 注意：與' + list + '讀音相同，注意漢字區別';
+    return '<i data-ic="warning"></i> 注意：與' + list + '讀音相同，注意漢字區別';
   };
 })();
 
@@ -180,7 +180,7 @@ const FlashCard = (() => {
     if (goal) {
       const scope = scopeLevels(base, goal);
       if (!scope.length) {
-        html += `<div style="color:var(--tx2);font-size:12px;margin-top:6px">目前程度已達目標，無需再背 🎉</div>`;
+        html += `<div style="color:var(--tx2);font-size:12px;margin-top:6px">目前程度已達目標，無需再背 </div>`;
       } else {
         let totalTarget = 0, totalLearned = 0;
         const parts = scope.map(l => {
@@ -210,7 +210,7 @@ const FlashCard = (() => {
       html += `<div><strong>考試倒數：</strong>${days >= 0 ? days + ' 天' : '已過 ' + (-days) + ' 天'}</div>`;
       if (days > 0 && scopeRemaining !== null && scopeRemaining > 0) {
         const perDay = Math.ceil(scopeRemaining / days);
-        html += `<div style="color:var(--ac);font-weight:600;margin-top:4px">💡 建議每天背 ${perDay} 個才背得完</div>`;
+        html += `<div style="color:var(--ac);font-weight:600;margin-top:4px"><i data-ic="bulb"></i> 建議每天背 ${perDay} 個才背得完</div>`;
       }
     } else {
       html += `<div style="color:var(--tx2);font-size:12px;margin-top:4px">選考試日期後可看到每日建議進度</div>`;
@@ -246,8 +246,8 @@ const FlashCard = (() => {
     const selStyle = 'width:100%';
     box.innerHTML = `
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-        <h3 style="margin:0">⚡ 快速背單字</h3>
-        <button class="qclose" style="width:auto;margin:0;padding:2px 10px" onclick="FlashCard.close()">✕</button>
+        <h3 style="margin:0"><i data-ic="bolt"></i> 快速背單字</h3>
+        <button class="qclose" style="width:auto;margin:0;padding:2px 10px" onclick="FlashCard.close()"><i data-ic="x"></i></button>
       </div>
       <div style="font-size:13px;color:var(--tx2);margin-bottom:14px;line-height:1.7">
         每張卡 ${COUNTDOWN_SEC} 秒自動翻面。手機可<strong>左滑（不會）</strong>或<strong>右滑（會）</strong>，桌機按按鈕。答題紀錄會同步到複習系統。
@@ -356,11 +356,11 @@ const FlashCard = (() => {
       <div class="qhd">
         <span>${cur+1} / ${queue.length}</span>
         <span style="font-weight:600">
-          <span style="color:var(--correct-bd)">✓${score.known}</span>
+          <span style="color:var(--correct-bd)"><i data-ic="check"></i>${score.known}</span>
           <span style="color:var(--ac);margin-left:6px">◯${score.soso}</span>
-          <span style="color:var(--wrong-bd);margin-left:6px">✗${score.unknown}</span>
+          <span style="color:var(--wrong-bd);margin-left:6px"><i data-ic="x"></i>${score.unknown}</span>
         </span>
-        <button class="qclose" style="width:auto;margin:0;padding:2px 10px" onclick="FlashCard.close()">✕</button>
+        <button class="qclose" style="width:auto;margin:0;padding:2px 10px" onclick="FlashCard.close()"><i data-ic="x"></i></button>
       </div>
       <div class="fc-bar"><div class="fc-bar-fill" id="fcBarFill"></div></div>
       <div class="fc-card" id="fcCard" onclick="FlashCard.flip()">
@@ -375,16 +375,16 @@ const FlashCard = (() => {
           ${cfHint?`<div class="confuse-hint">${cfHint}</div>`:''}
           ${Array.isArray(item.e)&&item.e.length?`<div class="fc-ex">${item.e.map(ex=>`<div class="fc-ex-row"><div class="fc-ex-j">${window.furiganaHTML?window.furiganaHTML(ex.j):ex.j}<svg class="fc-ex-spk" onclick="event.stopPropagation();speak('${(ex.j||'').replace(/'/g,"\\'")}')" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.54 8.46a5 5 0 010 7.07"/></svg></div><div class="fc-ex-z">${typeof cvt==='function'?cvt(ex.z):ex.z}</div></div>`).join('')}</div>`:''}
           <div class="fc-btns">
-            <button class="fc-btn fc-no" onclick="event.stopPropagation();FlashCard.answer('unknown')">✗ 不會<span class="fc-btn-hint">${gradeLabel('unknown')}</span></button>
+            <button class="fc-btn fc-no" onclick="event.stopPropagation();FlashCard.answer('unknown')"><i data-ic="x"></i> 不會<span class="fc-btn-hint">${gradeLabel('unknown')}</span></button>
             <button class="fc-btn fc-soso" onclick="event.stopPropagation();FlashCard.answer('soso')">◯ 不熟<span class="fc-btn-hint">${gradeLabel('soso')}</span></button>
-            <button class="fc-btn fc-yes" onclick="event.stopPropagation();FlashCard.answer('known')">✓ 記得<span class="fc-btn-hint">${gradeLabel('known')}</span></button>
+            <button class="fc-btn fc-yes" onclick="event.stopPropagation();FlashCard.answer('known')"><i data-ic="check"></i> 記得<span class="fc-btn-hint">${gradeLabel('known')}</span></button>
           </div>
           <div class="fc-hint">手機可左滑（不會）／右滑（記得）</div>
         </div>
       </div>
       <div style="display:flex;justify-content:center;align-items:center;gap:14px;margin-top:10px">
-        <button onclick="event.stopPropagation();speak('${(item.r||item.w).replace(/'/g,"\\'")}')" style="background:var(--bg3);border:1px solid var(--bd);border-radius:20px;padding:6px 16px;cursor:pointer;color:var(--ac2);font-size:13px">🔊 播音</button>
-        <a href="${window.stayjpReportHref?window.stayjpReportHref('單字卡',item.w,'單字：'+item.w+'\n讀音：'+item.r+'\n意思：'+(typeof cvt==='function'?cvt(item.m):item.m)):'#'}" target="_blank" rel="noopener" onclick="event.stopPropagation()" style="color:var(--tx3);font-size:12px;text-decoration:none">🚩 回報錯誤</a>
+        <button onclick="event.stopPropagation();speak('${(item.r||item.w).replace(/'/g,"\\'")}')" style="background:var(--bg3);border:1px solid var(--bd);border-radius:20px;padding:6px 16px;cursor:pointer;color:var(--ac2);font-size:13px"><i data-ic="volume"></i> 播音</button>
+        <a href="${window.stayjpReportHref?window.stayjpReportHref('單字卡',item.w,'單字：'+item.w+'\n讀音：'+item.r+'\n意思：'+(typeof cvt==='function'?cvt(item.m):item.m)):'#'}" target="_blank" rel="noopener" onclick="event.stopPropagation()" style="color:var(--tx3);font-size:12px;text-decoration:none"><i data-ic="flag"></i> 回報錯誤</a>
       </div>`;
     // 不自動播音，使用者要聽點 🔊 按鈕
     // 倒數
@@ -435,7 +435,7 @@ const FlashCard = (() => {
     // 使用者回饋：不會的字要能進單字本，不然常常猜中就漏掉了。
     if (grade === 'unknown' && typeof Stats !== 'undefined' && Stats.addToNotebook) {
       const added = Stats.addToNotebook(item.w, item.r, item.m, level, true);
-      if (added && typeof showToast === 'function') showToast('🔖 已加入單字本：' + item.w);
+      if (added && typeof showToast === 'function') showToast('<i data-ic="bookmark"></i> 已加入單字本：' + item.w);
     }
 
     // 本輪內重現（不熟/不會）→ 排到「本輪佇列尾端」,等這批跑完再回來。
@@ -508,9 +508,9 @@ const FlashCard = (() => {
 
     // 本輪評分明細 + 下次複習時間
     const breakdown = [];
-    if (score.known) breakdown.push(`<div><span style="color:var(--correct-bd);font-weight:600">✓ 記得 ${score.known} 個</span>　<span style="color:var(--tx2)">${gradeLabel('known')}再複習</span></div>`);
+    if (score.known) breakdown.push(`<div><span style="color:var(--correct-bd);font-weight:600"><i data-ic="check"></i> 記得 ${score.known} 個</span>　<span style="color:var(--tx2)">${gradeLabel('known')}再複習</span></div>`);
     if (score.soso) breakdown.push(`<div><span style="color:var(--ac);font-weight:600">◯ 不熟 ${score.soso} 個</span>　<span style="color:var(--tx2)">${gradeLabel('soso')}再複習</span></div>`);
-    if (score.unknown) breakdown.push(`<div><span style="color:var(--wrong-bd);font-weight:600">✗ 不會 ${score.unknown} 個</span>　<span style="color:var(--tx2)">${gradeLabel('unknown')}再複習</span></div>`);
+    if (score.unknown) breakdown.push(`<div><span style="color:var(--wrong-bd);font-weight:600"><i data-ic="x"></i> 不會 ${score.unknown} 個</span>　<span style="color:var(--tx2)">${gradeLabel('unknown')}再複習</span></div>`);
 
     document.getElementById('quizBox').innerHTML = `
       <h3>本輪結束</h3>
@@ -522,7 +522,7 @@ const FlashCard = (() => {
         <div><strong>${level.toUpperCase()} 進度：</strong>${lvLearned} / ${lvTotal}（已學 ${Math.round(lvLearned/lvTotal*100)}%）</div>
         ${scopeHtml}
         ${days !== null ? `<div><strong>考試倒數：</strong>${days >= 0 ? days + ' 天' : '已過 ' + (-days) + ' 天'}</div>` : ''}
-        ${perDaySug ? `<div style="color:var(--ac);font-weight:600;margin-top:4px">💡 建議每天背 ${perDaySug} 個才背得完</div>` : ''}
+        ${perDaySug ? `<div style="color:var(--ac);font-weight:600;margin-top:4px"><i data-ic="bulb"></i> 建議每天背 ${perDaySug} 個才背得完</div>` : ''}
       </div>
       <div class="qactions">
         <button class="qstart" onclick="FlashCard.begin()">下一輪</button>

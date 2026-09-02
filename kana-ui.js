@@ -103,15 +103,15 @@ window.Kana = (function () {
     var soundHint = enOr('點任一格聽發音', 'Tap a kana to hear it');
     var strokeHint = enOr('點任一格看筆順 + 描寫練習', 'Tap a kana for stroke order & tracing');
     var h = '<div id="kanaMask"><div class="kana-wrap">' +
-      '<div class="kana-top"><b>あ ' + enOr('五十音', 'Kana') + '</b><span class="kana-x" onclick="Kana.close()">✕</span></div>' +
+      '<div class="kana-top"><b>あ ' + enOr('五十音', 'Kana') + '</b><span class="kana-x" onclick="Kana.close()"><i data-ic="x"></i></span></div>' +
       '<div class="kana-tabs">' +
       '<button class="kana-tab ' + (script === 'h' ? 'on' : '') + '" onclick="Kana.setScript(\'h\')">ひらがな</button>' +
       '<button class="kana-tab ' + (script === 'k' ? 'on' : '') + '" onclick="Kana.setScript(\'k\')">カタカナ</button>' +
       '</div>' +
       '<div class="kana-modes">' +
-      '<button class="kana-mode-btn ' + (chartMode === 'sound' ? 'on' : '') + '" onclick="Kana.setMode(\'sound\')">🔊 ' + enOr('發音', 'Sound') + '</button>' +
-      '<button class="kana-mode-btn ' + (chartMode === 'stroke' ? 'on' : '') + '" onclick="Kana.setMode(\'stroke\')">✏️ ' + enOr('筆順練習', 'Strokes') + '</button>' +
-      '<button class="kana-quiz-btn" onclick="Kana.quiz(\'read\')">📝 ' + enOr('測驗', 'Quiz') + '</button>' +
+      '<button class="kana-mode-btn ' + (chartMode === 'sound' ? 'on' : '') + '" onclick="Kana.setMode(\'sound\')"><i data-ic="volume"></i> ' + enOr('發音', 'Sound') + '</button>' +
+      '<button class="kana-mode-btn ' + (chartMode === 'stroke' ? 'on' : '') + '" onclick="Kana.setMode(\'stroke\')"><i data-ic="edit"></i> ' + enOr('筆順練習', 'Strokes') + '</button>' +
+      '<button class="kana-quiz-btn" onclick="Kana.quiz(\'read\')"><i data-ic="edit"></i> ' + enOr('測驗', 'Quiz') + '</button>' +
       '</div>' +
       '<div id="kanaHint" class="kana-hint">' + (chartMode === 'stroke' ? strokeHint : soundHint) + '</div>' +
       '<div id="kanaChart">' + chartHtml() + '</div>' +
@@ -139,13 +139,13 @@ window.Kana = (function () {
     var ch = (script === 'k') ? c.k : c.h;
     var hasStroke = [...ch].length === 1; // 拗音(2字)無單一筆順檔
     w.innerHTML =
-      '<div class="kana-top"><button class="kana-back" onclick="Kana.openStroke()">‹ ' + enOr('筆順表', 'Back') + '</button><b style="margin:0 auto 0 0">' + enOr('筆順・描寫', 'Strokes') + '</b><span class="kana-x" onclick="Kana.close()">✕</span></div>' +
+      '<div class="kana-top"><button class="kana-back" onclick="Kana.openStroke()">‹ ' + enOr('筆順表', 'Back') + '</button><b style="margin:0 auto 0 0">' + enOr('筆順・描寫', 'Strokes') + '</b><span class="kana-x" onclick="Kana.close()"><i data-ic="x"></i></span></div>' +
       '<div class="kd-head"><span class="kd-big">' + ch + '</span><span class="kd-rom">' + c.r + '</span>' +
-      '<button class="kd-spk" onclick="Kana.play(\'' + c.h + '\')">🔊</button></div>' +
+      '<button class="kd-spk" onclick="Kana.play(\'' + c.h + '\')"><i data-ic="volume"></i></button></div>' +
       (hasStroke
         ? '<div class="kd-stage" id="kdStage"><div style="color:var(--tx3,#bbb);font-size:13px">' + enOr('載入筆順中…', 'Loading…') + '</div></div>' +
           '<div class="kd-btns">' +
-          '<button id="kdPlay" class="on" onclick="Kana.strokeMode(\'' + h + '\',\'play\')">✏️ ' + enOr('看筆順', 'Stroke order') + '</button>' +
+          '<button id="kdPlay" class="on" onclick="Kana.strokeMode(\'' + h + '\',\'play\')"><i data-ic="edit"></i> ' + enOr('看筆順', 'Stroke order') + '</button>' +
           '<button id="kdTrace" onclick="Kana.strokeMode(\'' + h + '\',\'trace\')">🖊️ ' + enOr('描寫練習', 'Trace') + '</button>' +
           '</div>' +
           '<div class="kd-note">' + enOr('筆順資料', 'Stroke data') + ':<a href="http://kanjivg.tagaini.net" target="_blank" rel="noopener">KanjiVG</a> (CC BY-SA 3.0)</div>'
@@ -219,7 +219,7 @@ window.Kana = (function () {
     // 清除鈕(加到 stage 下方 btns 若尚無)
     var stage = document.getElementById('kdStage');
     if (stage && !document.getElementById('kdClear')) {
-      var b = document.createElement('button'); b.id = 'kdClear'; b.textContent = '🧹 ' + enOr('清除', 'Clear');
+      var b = document.createElement('button'); b.id = 'kdClear'; b.textContent = '' + enOr('清除', 'Clear');
       b.style.cssText = 'display:block;margin:10px auto 0;border:1px solid var(--bd,#ddd);background:var(--bg2,#fff);border-radius:10px;padding:8px 20px;font-size:13px;font-weight:700;cursor:pointer;color:var(--tx,#333)';
       b.onclick = function () { if (cv._clear) cv._clear(); };
       stage.parentNode.insertBefore(b, stage.nextSibling);
@@ -233,9 +233,9 @@ window.Kana = (function () {
   function shuffle(a) { for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(rnd() * (i + 1)); var t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
   function quizMenu() {
     ensureCss(); var w = wrapEl(); if (!w) { open(); w = wrapEl(); }
-    w.innerHTML = '<div class="kana-top"><b>📝 ' + enOr('選擇測驗', 'Choose quiz') + '</b><span class="kana-x" onclick="Kana.open()">✕</span></div>' +
+    w.innerHTML = '<div class="kana-top"><b><i data-ic="edit"></i> ' + enOr('選擇測驗', 'Choose quiz') + '</b><span class="kana-x" onclick="Kana.open()"><i data-ic="x"></i></span></div>' +
       '<div class="kq-box"><div style="display:flex;flex-direction:column;gap:12px;max-width:320px;margin:20px auto">' +
-      '<button class="kana-tab" style="padding:16px" onclick="Kana.quiz(\'read\')">🔤 ' + enOr('認讀測驗', 'Reading') + '<div style="font-size:12px;font-weight:400;color:var(--tx3,#aaa);margin-top:4px">' + enOr('看假名 → 選羅馬拼音', 'Kana → romaji') + '</div></button>' +
+      '<button class="kana-tab" style="padding:16px" onclick="Kana.quiz(\'read\')"><i data-ic="book"></i> ' + enOr('認讀測驗', 'Reading') + '<div style="font-size:12px;font-weight:400;color:var(--tx3,#aaa);margin-top:4px">' + enOr('看假名 → 選羅馬拼音', 'Kana → romaji') + '</div></button>' +
       '</div></div>';
   }
   function quiz(mode) {
@@ -247,15 +247,15 @@ window.Kana = (function () {
   function renderQ() {
     var w = wrapEl(); if (!w) { open(); w = wrapEl(); }
     if (qIdx >= qList.length) {
-      w.innerHTML = '<div class="kana-top"><b>📝 ' + enOr('測驗結果', 'Result') + '</b><span class="kana-x" onclick="Kana.close()">✕</span></div>' +
-        '<div class="kq-box"><div style="font-size:48px;margin:20px 0">' + (qScore >= 8 ? '🎉' : qScore >= 5 ? '👍' : '💪') + '</div>' +
+      w.innerHTML = '<div class="kana-top"><b><i data-ic="edit"></i> ' + enOr('測驗結果', 'Result') + '</b><span class="kana-x" onclick="Kana.close()"><i data-ic="x"></i></span></div>' +
+        '<div class="kq-box"><div style="font-size:48px;margin:20px 0">' + (qScore >= 8 ? '' : qScore >= 5 ? '' : '') + '</div>' +
         '<div style="font-size:22px;font-weight:700">' + qScore + ' / ' + qList.length + '</div>' +
         '<div style="margin-top:24px"><button class="kana-quiz-btn" onclick="Kana.quiz(\'' + qMode + '\')">' + enOr('再測一次', 'Again') + '</button> <button class="kana-tab" style="display:inline-block;width:auto;padding:9px 16px" onclick="Kana.open()">' + enOr('回五十音表', 'Back to chart') + '</button></div></div>';
       return;
     }
     var c = qList[qIdx];
     var showChar = (script === 'k') ? c.k : c.h;
-    var head = '<div class="kana-top"><b>📝 ' + (qMode === 'stroke' ? enOr('筆畫數測驗', 'Stroke count') : enOr('認讀測驗', 'Reading')) + '</b><span class="kq-prog">' + (qIdx + 1) + ' / ' + qList.length + '</span><span class="kana-x" onclick="Kana.open()">✕</span></div>';
+    var head = '<div class="kana-top"><b><i data-ic="edit"></i> ' + (qMode === 'stroke' ? enOr('筆畫數測驗', 'Stroke count') : enOr('認讀測驗', 'Reading')) + '</b><span class="kq-prog">' + (qIdx + 1) + ' / ' + qList.length + '</span><span class="kana-x" onclick="Kana.open()"><i data-ic="x"></i></span></div>';
     var opts, correct, hint;
     if (qMode === 'stroke') {
       var S = window.KANA_STROKES || {}; correct = String(S[showChar] || S[c.h]);

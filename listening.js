@@ -72,12 +72,12 @@ const Listening = (() => {
         __lsAudio = audio;
       }).catch(() => {
         // 全站政策:絕不退瀏覽器機器音。真載入失敗給提示,不出戲。
-        if (__lsToken === myToken && typeof showToast === 'function') showToast('音檔載入失敗,請檢查網路後再按一次 🔊');
+        if (__lsToken === myToken && typeof showToast === 'function') showToast('音檔載入失敗,請檢查網路後再按一次 <i data-ic="volume"></i>');
       });
       return;
     }
     // 沒預錄音檔=資料缺口(收集器已全量覆蓋,理論上不會走到);靜默並提示,不用機器音充數
-    if (typeof showToast === 'function') showToast('這題音檔暫缺,已記錄,近期補上 🙏');
+    if (typeof showToast === 'function') showToast('這題音檔暫缺,已記錄,近期補上 ');
   }
   function speakBrowser(text, rate) {
     if (!window.speechSynthesis) { alert(t('ls_no_tts')); return; }
@@ -106,7 +106,7 @@ const Listening = (() => {
     box.innerHTML = `
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
         <h3 style="margin:0">${t('ls_title')}</h3>
-        <button class="qclose" style="width:auto;margin:0;padding:2px 10px" onclick="Listening.close()">✕</button>
+        <button class="qclose" style="width:auto;margin:0;padding:2px 10px" onclick="Listening.close()"><i data-ic="x"></i></button>
       </div>
       <p style="font-size:13px;color:var(--tx2);margin-bottom:6px">${t('ls_subtitle')}</p>
       <p style="font-size:11px;color:var(--tx3);margin-bottom:12px">${t('ls_hint')}</p>
@@ -160,7 +160,7 @@ const Listening = (() => {
     let exhausted = false;
     if (available.length === 0) {
       // 全部題目都答過了 — 提示使用者並用全 pool（或返回讓使用者重置）
-      if (!confirm('🎉 你已完成這個等級的所有題目！\n按「確定」重置進度從頭再來，按「取消」回到設定頁。')) return;
+      if (!confirm('你已完成這個等級的所有題目！\n按「確定」重置進度從頭再來，按「取消」回到設定頁。')) return;
       resetDone(selectedLevel);
       available = pool.slice();
       exhausted = true;
@@ -211,7 +211,7 @@ const Listening = (() => {
         </span>
         <span style="display:flex;align-items:center;gap:6px">
           <span style="font-size:12px;color:var(--tx2)">${t('quiz_score', { n: score })}</span>
-          <button class="qclose" style="width:auto;margin:0;padding:2px 10px" onclick="Listening.close()">✕</button>
+          <button class="qclose" style="width:auto;margin:0;padding:2px 10px" onclick="Listening.close()"><i data-ic="x"></i></button>
         </span>
       </div>
 
@@ -329,7 +329,7 @@ const Listening = (() => {
       <div class="qscore ${cls}">${score} / ${total} (${pct}%)</div>
       <div style="font-size:13px;color:var(--tx2);margin-bottom:8px">${selectedLevel.toUpperCase()} | ${practiceMode ? t('ls_mode_practice') : t('ls_mode_test')}</div>
       <div class="qresults">${answered.map(a =>
-        '<div class="qr ' + (a.correct ? 'ok' : 'ng') + '"><span class="qrc">' + (a.correct ? '✓' : '✗') + '</span><span>' + a.q + '</span><span style="font-size:11px;color:var(--tx3);margin-left:auto">' + a.type + '</span></div>'
+        '<div class="qr ' + (a.correct ? 'ok' : 'ng') + '"><span class="qrc">' + (a.correct ? '<i data-ic="check"></i>' : '<i data-ic="x"></i>') + '</span><span>' + a.q + '</span><span style="font-size:11px;color:var(--tx3);margin-left:auto">' + a.type + '</span></div>'
       ).join('')}</div>
       <div class="qactions">
         <button class="qstart" onclick="Listening.begin()">下一組</button>
