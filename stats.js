@@ -99,12 +99,12 @@ const Stats = (() => {
     box.style.display = 'block';
   }
 
-  // 學習統計 = 總覽（成績圖 + 學習進度） + 新功能紀錄（刷題/AI 口說） + 考試紀錄
+  // 學習統計 = 總覽（成績圖 + 學習進度） + 新功能紀錄（刷題/AI 跟讀·聊聊） + 考試紀錄
   function buildStatsCombined() {
     return buildScoreChart() + buildProgress() + buildNewFeatures() + buildHistory();
   }
 
-  // ── 新功能紀錄:JLPT 刷題 + AI 口說(之前「我的」完全看不到這些,像沒在用) ──
+  // ── 新功能紀錄:JLPT 刷題 + AI 跟讀·聊聊(之前「我的」完全看不到這些,像沒在用) ──
   function _en2(zh, en) { try { return (typeof enOr === 'function') ? enOr(zh, en) : zh; } catch (e) { return zh; } }
   function buildNewFeatures() {
     let h = '';
@@ -127,8 +127,8 @@ const Stats = (() => {
           ${rows}</div>`;
       }
     } catch (e) {}
-    // AI 口說(ai_usage 讀自己的;登入才有)
-    h += `<div class="st-section"><div class="st-title"><i data-ic=mic></i> ${_en2('AI 口說', 'AI Speaking')}</div>
+    // AI 跟讀·聊聊(ai_usage 讀自己的;登入才有)
+    h += `<div class="st-section"><div class="st-title"><i data-ic=mic></i> ${_en2('AI 跟讀 / 聊聊', 'AI Shadowing / Chat')}</div>
       <div id="stAiUsage" class="st-empty">${_en2('載入中…', 'Loading…')}</div></div>`;
     setTimeout(fillAiUsage, 50);
     return h;
@@ -148,7 +148,7 @@ const Stats = (() => {
         const chatAll = u.chatLife != null ? u.chatLife : ((u.chatTotal || 0) + chatToday);
         const evalAll = u.evalLife != null ? u.evalLife : ((u.evalTotal || 0) + evalToday);
         if (!chatAll && !evalAll) {
-          el.innerHTML = _en2('還沒用過——AI 陪你練口說,每句都給回饋。', 'Not yet — practice speaking with instant AI feedback.') + ' <a href="speak-chat.html" style="color:var(--ac);font-weight:700">' + _en2('去試 AI 對話 →', 'Try AI chat →') + '</a>';
+          el.innerHTML = _en2('還沒用過——AI 陪你練跟讀和對話,每句都給回饋。', 'Not yet — practice speaking with instant AI feedback.') + ' <a href="speak-chat.html" style="color:var(--ac);font-weight:700">' + _en2('去試 AI 對話 →', 'Try AI chat →') + '</a>';
           return;
         }
         el.classList.remove('st-empty');

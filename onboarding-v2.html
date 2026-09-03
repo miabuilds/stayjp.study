@@ -128,7 +128,7 @@ const OB=(()=>{
       opts:[
         {v:'10',ic:'',t:'10 分鐘',d:'每天 10 個字+複習'},
         {v:'20',ic:'<i data-ic=train></i>',t:'20 分鐘',d:'單字+文法+一篇短文'},
-        {v:'40',ic:'<i data-ic=fire></i>',t:'40 分鐘以上',d:'完整菜單:含刷題和口說'},
+        {v:'40',ic:'<i data-ic=fire></i>',t:'40 分鐘以上',d:'完整菜單:含刷題和跟讀'},
       ], key:'mins' },
     { id:'calc', html:`
       <div class="calc" id="calcBox">
@@ -194,7 +194,7 @@ const OB=(()=>{
           <div class="stat" id="st2"><div class="n">${A.exam?days+'天':'自由'}</div><div class="l"><b>${A.exam?'倒數計畫':'無壓力模式'}</b>每天打開就知道今天做什麼</div></div>
           <div class="stat" id="st3"><div class="n">1,668</div><div class="l"><b>JLPT 刷題+模擬考</b>考前實戰,錯的自動進錯題本</div></div>
         </div>
-        <div class="trial" id="tr1">${(window.STAYJP_NATIVE&&window.STAYJP_NATIVE.isNativeApp) ? '<i data-ic=gift></i> <b>訂閱享 7 天免費試用</b>——SRS 複習、模擬考、AI 口說全開。透過 Apple 帳號訂閱,試用期內可隨時取消、不會扣款。' : '<i data-ic=gift></i> <b>用 Google 登入即送 3 天全功能試用</b>——不用信用卡、不用任何付款資訊。SRS 複習、模擬考、AI 口說全開。'}</div>
+        <div class="trial" id="tr1">${(window.STAYJP_NATIVE&&window.STAYJP_NATIVE.isNativeApp) ? '<i data-ic=gift></i> <b>訂閱享 7 天免費試用</b>——SRS 複習、模擬考、AI 跟讀全開。透過 Apple 帳號訂閱,試用期內可隨時取消、不會扣款。' : '<i data-ic=gift></i> <b>用 Google 登入即送 3 天全功能試用</b>——不用信用卡、不用任何付款資訊。SRS 複習、模擬考、AI 跟讀全開。'}</div>
         <div class="cta" style="margin-top:18px">
           <button class="btn" onclick="OB.finish(true)">開始今天的 ${per} 個 →</button>
           <button class="btn ghost" onclick="OB.finish(false)">先逛逛就好</button>

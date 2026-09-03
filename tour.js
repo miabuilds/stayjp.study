@@ -8,7 +8,7 @@
   var DONE_KEY = 'tour_done_v1';
   var steps = [
     { sel: '#hdBar',      t: _en('切級別・切內容','Level & content'), d: _en('這裡選 N5–N1 程度,切換「文法 / 單字」。點 ★ 只看收藏。','Pick your N5–N1 level and switch between Grammar / Vocabulary. Tap ★ to see favorites only.'), pos: 'below' },
-    { sel: '.flag-row',   t: _en('主打功能','Flagship features'), d: _en('JLPT 刷題特區、AI 口說評分、AI 情境對話都在這,點卡片直接進。','JLPT Drills, AI Speaking Score and AI Conversation all live here — tap a card to jump in.'), pos: 'below' },
+    { sel: '.flag-row',   t: _en('主打功能','Flagship features'), d: _en('JLPT 刷題特區、AI 跟讀、AI 聊聊都在這,點卡片直接進。','JLPT Drills, AI Shadowing and AI Chat all live here — tap a card to jump in.'), pos: 'below' },
     { sel: '.art-entry',  t: _en('每天讀一篇','Daily reading'), d: _en('精選日文短文:點字查意思、逐句真人朗讀、讀完有測驗。','Curated short articles: tap any word for its meaning, listen sentence by sentence, then take a quiz.'), pos: 'below' },
     { sel: '#ftb .ftb-btn:nth-child(2)', t: _en('測驗','Quiz'), d: _en('單字測驗在這;寫錯會有詳解卡,答完自動唸給你聽。','Vocabulary quizzes live here; wrong answers get an explanation card and are read aloud.'), pos: 'above' },
     { sel: '#ftb .ftb-btn:nth-child(3)', t: _en('複習(最重要!)','Review (the key!)'), d: _en('每天回來清「複習」:系統照記憶曲線排程,背起來全靠這個。','Come back daily to clear your reviews — spaced repetition is how words actually stick.'), pos: 'above' },

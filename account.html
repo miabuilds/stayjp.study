@@ -557,7 +557,7 @@ async function renderQuotaBox(user, sub) {
     if (premLike) {
       lines.push('<i data-ic=tools></i> ' + T('練習工具:無限次', '练习工具:无限次', 'Practice tools: unlimited'));
       lines.push('<i data-ic=speak></i> ' + T('AI 對話:今天 ' + chatUsed + ' / ' + cfg.premChatDaily + ' 場', 'AI 对话:今天 ' + chatUsed + ' / ' + cfg.premChatDaily + ' 场', 'AI chat: ' + chatUsed + ' / ' + cfg.premChatDaily + ' today'));
-      lines.push('<i data-ic=mic></i> ' + T('AI 口說評分:今天 ' + evalUsed + ' / ' + cfg.premEvalDaily + ' 次', 'AI 口说评分:今天 ' + evalUsed + ' / ' + cfg.premEvalDaily + ' 次', 'AI speaking score: ' + evalUsed + ' / ' + cfg.premEvalDaily + ' today'));
+      lines.push('<i data-ic=mic></i> ' + T('AI 跟讀評分:今天 ' + evalUsed + ' / ' + cfg.premEvalDaily + ' 次', 'AI 跟读评分:今天 ' + evalUsed + ' / ' + cfg.premEvalDaily + ' 次', 'AI shadowing score: ' + evalUsed + ' / ' + cfg.premEvalDaily + ' today'));
     } else {
       // 免費制世代:config/quota.packStartMs 之後註冊 → 總次數包;之前(舊用戶)→ 原每日制(顯示邏輯跟 tool-quota.js 一致)
       let qcfg = { packStartMs: 0, packTotal: 30 };

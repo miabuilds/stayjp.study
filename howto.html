@@ -26,6 +26,9 @@
   .eyebrow{color:var(--ac);font-weight:700;font-size:13px;letter-spacing:.12em;text-transform:uppercase}
   h1{font-family:var(--serif);font-size:clamp(28px,5.5vw,40px);line-height:1.2;margin:12px 0 12px;text-wrap:balance}
   .lead{color:var(--tx2);font-size:17px;max-width:600px}
+  .deco-tanuki{position:absolute;pointer-events:none;z-index:0;height:auto;opacity:.96}
+  @media(max-width:900px){.deco-tanuki{display:none}}
+  .hero{position:relative}
   .steps{list-style:none;counter-reset:s;padding:0;margin:26px 0}
   .steps li{position:relative;background:var(--bg2);border:1px solid var(--bd);border-radius:14px;padding:18px 18px 18px 66px;margin-bottom:12px}
   .steps li::before{counter-increment:s;content:counter(s);position:absolute;left:18px;top:18px;width:32px;height:32px;background:var(--ac);color:#fff;border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:16px}
@@ -63,13 +66,14 @@
 
   <div class="hero">
     <div class="eyebrow" data-t="zh">使用教學</div><div class="eyebrow" data-t="en">How to use</div>
+    <img class="deco-tanuki" src="images/mascot/tanuki-p02.png" alt="" aria-hidden="true" style="right:0;top:2px;width:138px">
     <h1><span data-t="zh">30 秒上手</span><span data-t="en">Get started in 30 seconds</span></h1>
     <p class="lead"><span data-t="zh">不用註冊也能先逛。想存進度就用 Google 登入,還送免費試用。以下是最順的學習流程:</span><span data-t="en">Browse without signing up. To save progress, sign in with Google — a free trial is included. Here's the smoothest way to study:</span></p>
   </div>
 
   <ol class="steps">
     <li><h3><span data-t="zh">選你的程度</span><span data-t="en">Pick your level</span></h3><p><span data-t="zh">第一次進來選 N5–N1,之後隨時可改。不確定就從 N5 開始。</span><span data-t="en">Choose N5–N1 on first visit (changeable anytime). Not sure? Start at N5.</span></p></li>
-    <li><h3><span data-t="zh">從「學習面板」開始</span><span data-t="en">Start from your dashboard</span></h3><p><span data-t="zh">打開就是<b>學習面板</b>:上面是<b>今日目標</b>,下面把所有工具排好——JLPT 刷題、AI 口說/聊聊、單字、文法、文章…。看今天想練什麼,<b>點一下就進去</b>,不用一次面對一堆資料。想回面板,左上角「‹ 面板」或下方「面板」鍵即可。</span><span data-t="en">You land on your <b>dashboard</b>: today's goal up top, then every tool laid out — JLPT drills, AI Speaking/Chat, Vocab, Grammar, Articles… Pick what you feel like and <b>tap to jump in</b>, instead of facing a wall of content. Tap "‹ Panel" (top-left) or "Panel" (bottom) to come back.</span></p></li>
+    <li><h3><span data-t="zh">從「學習面板」開始</span><span data-t="en">Start from your dashboard</span></h3><p><span data-t="zh">打開就是<b>學習面板</b>:上面是<b>今日目標</b>,下面把所有工具排好——JLPT 刷題、AI 跟讀/聊聊、單字、文法、文章…。看今天想練什麼,<b>點一下就進去</b>,不用一次面對一堆資料。想回面板,左上角「‹ 面板」或下方「面板」鍵即可。</span><span data-t="en">You land on your <b>dashboard</b>: today's goal up top, then every tool laid out — JLPT drills, AI Shadowing/Chat, Vocab, Grammar, Articles… Pick what you feel like and <b>tap to jump in</b>, instead of facing a wall of content. Tap "‹ Panel" (top-left) or "Panel" (bottom) to come back.</span></p></li>
     <li><h3><span data-t="zh">背單字卡</span><span data-t="en">Study vocab cards</span></h3><p><span data-t="zh">面板點「<b>單字</b>」進去,一張張看,<b>點卡片就唸出來</b>,每個字都有例句與翻譯。想重點複習就按 ★ 收藏。</span><span data-t="en">Tap <b>Vocab</b> on the dashboard. <b>Tap a card to hear it</b> — every word has an example and translation. Star ★ the ones you want to revisit.</span></p></li>
     <li><h3><span data-t="zh">學文法</span><span data-t="en">Learn grammar</span></h3><p><span data-t="zh">面板點「<b>文法</b>」看接續與語感,<b>點例句方框就唸</b>,幫你抓語感。</span><span data-t="en">Tap <b>Grammar</b> on the dashboard to read usage notes; <b>tap the example box to hear it</b> and build a feel for it.</span></p></li>
     <li><h3><span data-t="zh">模擬考</span><span data-t="en">Take a mock exam</span></h3><p><span data-t="zh">想測實力就做模考,考完看成績、可分享成績卡。</span><span data-t="en">Test yourself with a mock exam, see your score, and share a result card.</span></p></li>
@@ -103,7 +107,8 @@
     </ul>
   </section>
 
-  <section>
+  <section style="position:relative">
+    <img class="deco-tanuki" src="images/mascot/tanuki-p01.png" alt="" aria-hidden="true" style="right:0;bottom:16px;width:92px">
     <div class="cta">
       <a class="btn" href="app.html"><span data-t="zh">現在開始 →</span><span data-t="en">Start now →</span></a>
       <a class="app-ios" href="https://apps.apple.com/app/id6778227353" aria-label="Download on the App Store" style="display:inline-flex;align-items:center;padding:0;border:0;background:none;margin:4px"><img src="app-store-badge.svg" alt="Download on the App Store" style="height:44px;width:auto"></a>
