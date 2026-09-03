@@ -48,14 +48,12 @@ a:hover{text-decoration:underline}
 .main strong{color:var(--tx);font-weight:700}
 
 /* Plan cards */
-.plans{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:32px 0}
+.plans{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:32px 0}
 @media (max-width:1100px){.plans{grid-template-columns:repeat(2,1fr)}}
 @media (max-width:560px){.plans{grid-template-columns:1fr}}
 .plan{background:var(--bg2);border:1px solid var(--bd);border-radius:16px;padding:22px;display:flex;flex-direction:column}
 .plan.featured{border:2px solid var(--ac);position:relative}
 .plan.featured::before{content:"推薦";position:absolute;top:-12px;right:16px;background:var(--ac);color:#fff;font-size:11px;font-weight:700;padding:4px 12px;border-radius:999px}
-.plan.best{border:2px solid #D946EF;position:relative}
-.plan.best::before{content:"<i data-ic=bird></i> 限量 100 名";position:absolute;top:-12px;right:16px;background:#D946EF;color:#fff;font-size:11px;font-weight:700;padding:4px 12px;border-radius:999px}
 .plan.lifetime{border:2px solid #F59E0B;position:relative}
 .plan.lifetime::before{content:"一次解決";position:absolute;top:-12px;right:16px;background:#F59E0B;color:#fff;font-size:11px;font-weight:700;padding:4px 12px;border-radius:999px}
 .save-badge{display:inline-block;background:#EF4444;color:#fff;font-size:11px;font-weight:700;padding:3px 10px;border-radius:999px;margin-left:6px;vertical-align:middle}
@@ -68,7 +66,7 @@ a:hover{text-decoration:underline}
 .plan-cycle{font-size:12px;color:var(--tx2);margin-bottom:20px}
 .plan-features{list-style:none;padding:0;margin:0 0 22px;flex:1}
 .plan-features li{font-size:13px;color:var(--tx);margin-bottom:8px;padding-left:22px;position:relative}
-.plan-features li::before{content:"<i data-ic=check></i>";position:absolute;left:0;color:var(--ac);font-weight:700}
+.plan-features li::before{content:"\2713";position:absolute;left:0;color:var(--ac);font-weight:700}
 .plan-features li.disabled{color:var(--tx3);text-decoration:line-through}
 .plan-features li.disabled::before{content:"—";color:var(--tx3)}
 .plan-cta{display:block;text-align:center;padding:12px;background:var(--bg3);color:var(--tx);border-radius:10px;font-weight:600;font-size:14px;border:1px solid var(--bd)}
@@ -215,21 +213,6 @@ a:hover{text-decoration:underline}
 
   <!-- === 四付費方案 === -->
   <div class="plans">
-
-    <div class="plan best" data-plan="yearly_early_bird">
-      <div class="plan-name"><i data-ic=bird></i> 早鳥年費</div>
-      <div class="plan-tag">限量 100 個有效名額（退費釋出後開放候補）· <strong style="color:#D946EF">早鳥優惠價 NT$990/年，比標準年費省 NT$500</strong></div>
-      <div class="plan-price"><span class="currency">NT$</span>990<span class="unit">/ 年</span></div>
-      <div class="plan-cycle">等於每月 NT$82 · 續訂永遠這個價</div>
-      <ul class="plan-features">
-        <li>跟年費同所有功能</li>
-        <li><strong>NT$990/年 自動續扣，續訂維持此價（標準年費 NT$1,490）</strong></li>
-        <li>適合認同產品想長期支持的鐵粉</li>
-        <li>同時僅 100 個有效名額，額滿即停售</li>
-        <li>7 天內無條件全額退費，隨時可取消</li>
-      </ul>
-      <a class="plan-cta" href="javascript:void(0)" onclick="return startSubscribe(this)">搶下早鳥名額 →</a>
-    </div>
 
     <div class="plan" data-plan="yearly">
       <div class="plan-name">年費訂閱 <span class="save-badge">省 57%</span></div>
@@ -411,44 +394,6 @@ if (!firebase.apps.length) firebase.initializeApp(fbConfig);
   try { firebase.firestore().settings({ experimentalAutoDetectLongPolling: true, useFetchStreams: false }); } catch (e) {}
 const _db = firebase.firestore();
 const _auth = firebase.auth();
-
-// 早鳥剩餘名額顯示
-(async () => {
-  try {
-    // 早鳥收官:2026-08-27 12:00 JST。closed 旗標(cron 寫入)/ 本機時鐘 / 名額歸零,任一成立就收
-    const EB_END = Date.UTC(2026, 7, 27, 3, 0, 0);
-    const snap = await _db.doc('counters/early_bird').get();
-    const data = snap.data() || {};
-    const lim = data.limit || 100;
-    const left = Math.max(0, Math.min(lim, lim - (data.count || 0)));   // 防 count 異常導致顯示爆掉
-    const ended = data.closed === true || Date.now() >= EB_END || left <= 0;
-    const card = document.querySelector('.plan.best');
-    if (!card) return;
-    const name = card.querySelector('.plan-name');
-    if (name && (ended || left < 100)) {
-      const indicator = document.createElement('span');
-      indicator.style.cssText = 'display:inline-block;background:#D946EF;color:#fff;font-size:11px;font-weight:700;padding:3px 10px;border-radius:999px;margin-left:6px';
-      indicator.textContent = ended ? (typeof enOr==='function'?enOr('已結束','Ended'):'已結束') : `剩 ${left} 名`;
-      name.appendChild(indicator);
-    }
-    if (ended) {
-      card.style.opacity = '0.55';
-      const cta = card.querySelector('.plan-cta');
-      if (cta) { cta.textContent = (typeof enOr==='function'?enOr('早鳥已收官','Early bird has ended'):'早鳥已收官'); cta.onclick = function(){return false;}; cta.href = 'javascript:void(0)'; }
-    } else {
-      // 收官倒數:掛在早鳥卡 CTA 上方,天數/小時動態算
-      const cd = document.createElement('div');
-      const hrsAll = Math.max(0, Math.floor((EB_END - Date.now()) / 3600000));
-      const dd = Math.floor(hrsAll / 24), hh = hrsAll % 24;
-      const twTxt = '早鳥 8/27(三)中午 12:00 收官——剩 ' + (dd>0 ? dd+' 天 '+hh+' 小時' : hh+' 小時');
-      const enTxt = 'Early bird ends Aug 27, 12:00 JST — ' + (dd>0 ? dd+'d '+hh+'h' : hh+'h') + ' left';
-      cd.style.cssText = 'font-size:12.5px;font-weight:700;color:#D946EF;margin:8px 0 2px';
-      cd.textContent = (typeof enOr==='function') ? enOr(twTxt, enTxt) : twTxt;
-      const cta = card.querySelector('.plan-cta');
-      if (cta) cta.parentNode.insertBefore(cd, cta);
-    }
-  } catch (e) { console.warn('early bird counter load fail', e); }
-})();
 
 // === 已訂閱會員:pricing 反映訂閱狀態,避免重複下單 ===
 function applySubscriptionState(sub) {
