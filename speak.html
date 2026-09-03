@@ -429,12 +429,26 @@ function _nPost(o){ try{ window.ReactNativeWebView.postMessage(JSON.stringify(o)
 const IN_APP = !!(window.STAYJP_NATIVE && window.STAYJP_NATIVE.isNativeApp && window.ReactNativeWebView);
 function _postRestore(){ if(IN_APP && !NATIVE_STT) _nPost({type:'AUDIO_RESTORE'}); }
 let rec=null, recording=false;
+// 語音辨識常見「整句/整段被辨識兩次」(iOS SFSpeech、Android、瀏覽器都會)。
+// 保守收合重複,但不誤傷日文畳語(色々・時々・どんどん…短疊字):只處理「整串完全念兩次」「結尾長片段(≥6字)重複」「空白分隔的連續重複詞」。
+function dedupeSpeech(s){
+  s=(s||'').replace(/[ \t　]+/g,' ').trim();
+  if(!s) return s;
+  // 1) 空白分隔的連續重複整詞(英文 / 有空白時):"it it"→"it"、"I like it I like it"下方(2)處理
+  s=s.replace(/\b(\w+)(\s+\1\b)+/gi,'$1');
+  // 2) 整串正好被念/辨識兩次:X[分隔]X → X(前半==後半才收,很安全)
+  let m=s.match(/^([\s\S]{3,})[ 、。,.　]?\1$/);
+  if(m) s=m[1].trim();
+  // 3) 結尾長片段(≥6字)緊鄰重複:避免短疊字誤傷
+  s=s.replace(/([\s\S]{6,}?)\1+$/,'$1');
+  return s.trim();
+}
 function toggleRec(){ recording ? stopRec() : startRec(); }
 function _recBtnUI(on){ const b=document.getElementById('recBtn'); if(!b)return; b.classList.toggle('on',on); b.innerHTML=on?enOr('<i data-ic=stop></i> 停止','<i data-ic=stop></i> Stop'):enOr('<i data-ic=mic></i> 開始錄音','<i data-ic=mic></i> Start recording'); }
 function startRec(){
   if(window.STAYJP_NATIVE && window.STAYJP_NATIVE.canPlayB64) _nPost({type:'STOP_PLAY'});   // 開麥前停掉原生播放
   if(NATIVE_STT){
-    window.stayjpSpeechResult=function(t,fin){ if(t) document.getElementById('said').value=t; };
+    window.stayjpSpeechResult=function(t,fin){ if(t) document.getElementById('said').value = fin ? dedupeSpeech(t) : t; };
     window.stayjpSpeechEnd=function(err){
       recording=false; _recBtnUI(false);
       if(err==='not-allowed') document.getElementById('recNote').textContent=enOr('麥克風權限被關了:請到 iPhone 設定 → StayJP 允許麥克風。',' Microphone access is off. Go to iPhone Settings → StayJP and allow the microphone.');
@@ -447,7 +461,7 @@ function startRec(){
   if(!SR){ document.getElementById('recNote').textContent=enOr('這個瀏覽器不支援語音辨識,請直接打字你念的內容。',"This browser doesn't support speech recognition — just type what you said."); document.getElementById('said').focus(); return; }
   rec = new SR(); rec.lang='ja-JP'; rec.interimResults=true; rec.continuous=false;
   let finalTxt='';
-  rec.onresult = e=>{ let t=''; for(let i=0;i<e.results.length;i++) t+=e.results[i][0].transcript; document.getElementById('said').value=t; if(e.results[e.results.length-1].isFinal) finalTxt=t; };
+  rec.onresult = e=>{ let t=''; for(let i=0;i<e.results.length;i++) t+=e.results[i][0].transcript; const fin=e.results[e.results.length-1].isFinal; const out=fin?dedupeSpeech(t):t; document.getElementById('said').value=out; if(fin) finalTxt=out; };
   rec.onerror = e=>{ document.getElementById('recNote').textContent=enOr('辨識出錯('+e.error+'),可直接打字。','Recognition error ('+e.error+') — you can just type instead.'); stopRec(); };
   rec.onend = ()=>{ recording=false; _recBtnUI(false); _postRestore(); };
   try{ rec.start(); recording=true; _recBtnUI(true); }catch(e){}
@@ -481,7 +495,7 @@ function showLoginCard(){
 }
 async function submit(){
   if(!auth.currentUser){ showLoginCard(); return; }
-  const said = (document.getElementById('said').value||'').trim();
+  const said = dedupeSpeech((document.getElementById('said').value||'').trim());
   const fb = document.getElementById('fbCard');
   if(!said){ fb.style.display='block'; fb.innerHTML='<div class="err">'+enOr('先念一次或打字,再送出。','Say it once (or type it), then submit.')+'</div>'; return; }
   fb.style.display='block'; fb.innerHTML='<div class="muted">'+enOr('AI 評分中…','AI is scoring…')+'</div>';
