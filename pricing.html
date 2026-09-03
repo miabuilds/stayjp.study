@@ -247,7 +247,7 @@ a:hover{text-decoration:underline}
       <div class="plan-name">買斷方案</div>
       <div class="plan-tag">一次付清 · 永不續扣 · 買斷現有功能*</div>
       <div class="plan-price"><span class="currency">NT$</span>2,990</div>
-      <div class="plan-cycle">等於 2 年年費，之後免費用</div>
+      <div class="plan-cycle">等於 2 年年費，之後不再扣款*</div>
       <ul class="plan-features">
         <li>跟年費同所有功能，一次買斷、不再續扣</li>
         <li>不再扣款、不會被漲價</li>
@@ -268,7 +268,7 @@ a:hover{text-decoration:underline}
     <strong style="color:var(--tx)">登入即享 3 天全功能免費試用</strong> — 不用綁信用卡、不用先付款;試用後自動回免費版(每日額度),喜歡再升級鎖價。
   </p>
 
-  <p style="font-size:13px;color:var(--tx2);margin-bottom:32px">所有價格為新台幣 (TWD)，含營業稅。境外用戶結帳時依當下匯率以信用卡發卡幣別扣款。<br>* 買斷方案為一次付清、買斷本服務存續期間既有功能之使用權；本站為個人工作室經營，無法保證無限期營運，服務若終止之補償方式詳見<a href="terms.html">服務條款</a>第 8 條。</p>
+  <p style="font-size:13px;color:var(--tx2);margin-bottom:32px">所有價格為新台幣 (TWD)，含營業稅。境外用戶結帳時依當下匯率以信用卡發卡幣別扣款。<br>* 買斷方案為一次付清、買斷本服務<strong>存續期間</strong>既有功能之使用權；本站為個人工作室經營，無法保證無限期營運。服務若終止營運，將提前至少 30 日公告，買斷之使用權至終止日為止、不另退費補償，詳見<a href="terms.html">服務條款</a>第 8 條。</p>
 
   <!-- === 海外用戶 ===
        PayPal 已於 2026-08-31 下架(使用量極低);海外用戶一律導 App 內購買(支援全球卡)。
@@ -584,7 +584,8 @@ function showConsentDialog(plan) {
     const terms = t.recurring
       ? `<li>本方案為<strong>自動續扣</strong>：每期 <strong>${t.price}</strong>，週期 <strong>${t.cycle}</strong>，期滿自動扣款。</li>
          <li>可<strong>隨時</strong>於「帳號 → 訂閱管理」取消自動續扣；取消後用到當期結束、之後不再扣款。</li>`
-      : `<li>本方案為<strong>一次付清 ${t.price}</strong>，<strong>不會</strong>自動續扣。</li>`;
+      : `<li>本方案為<strong>一次付清 ${t.price}</strong>，<strong>不會</strong>自動續扣。</li>
+         <li>買斷取得的是本服務<strong>存續期間內</strong>既有付費功能之使用權；若日後服務終止營運，將提前至少 30 日公告，使用權至終止日為止（詳見<a href="terms.html" target="_blank" rel="noopener">服務條款</a>第 8 條）。</li>`;
     const wrap = document.createElement('div');
     wrap.className = 'cs-backdrop';
     wrap.innerHTML = `
