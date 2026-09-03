@@ -116,7 +116,7 @@ a:hover { text-decoration: underline; }
   position: relative;
 }
 .deco-tanuki{position:absolute;pointer-events:none;z-index:0;height:auto;opacity:.96}
-@media(max-width:900px){.deco-tanuki{display:none}}
+@media(max-width:900px){.deco-tanuki{display:none}.deco-tanuki.keep{display:block;width:66px!important}.main .subtitle{padding-right:76px}}
 .main h2 {
   font-size: 26px; font-weight: 800; letter-spacing: -.3px;
   margin-bottom: 8px;
@@ -256,7 +256,7 @@ a:hover { text-decoration: underline; }
 </header>
 
 <main class="main">
-  <img class="deco-tanuki" src="images/mascot/tanuki-p05.png" alt="" aria-hidden="true" style="right:0;top:calc(var(--hh) + 34px);width:104px">
+  <img class="deco-tanuki keep" src="images/mascot/tanuki-p05.png" alt="" aria-hidden="true" style="right:0;top:calc(var(--hh) + 34px);width:104px">
   <h2>意見回饋</h2>
   <p class="subtitle">遇到 bug、想要什麼功能、或任何想說的都歡迎。</p>
 
