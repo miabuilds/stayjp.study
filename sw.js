@@ -20,7 +20,7 @@
 //   3. 預快取改逐檔 add + catch —— 單一檔案 404 不再讓整個 SW 裝不起來
 //   4. 常用頁面/腳本補進預快取清單
 
-const VERSION = 'v389';
+const VERSION = 'v390';
 const PRECACHE = 'stayjp-' + VERSION;   // 版本化:更新時重新預快取
 const RUNTIME = 'stayjp-runtime';       // 不隨版號刪除:瞬斷/離線時的救命網
 const CACHE_NAME = PRECACHE;            // 舊名稱保留,避免別處有引用
