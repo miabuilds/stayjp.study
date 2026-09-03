@@ -50,6 +50,9 @@
   [data-t]{display:none}
   body[data-lang="zh"] [data-t="zh"]{display:revert}
   body[data-lang="en"] [data-t="en"]{display:revert}
+  .deco-tanuki{position:absolute;pointer-events:none;z-index:0;height:auto;opacity:.96}
+  @media(max-width:900px){.deco-tanuki{display:none}}
+  .hero{position:relative}
   .stat-row{display:flex;gap:22px;flex-wrap:wrap;margin-top:18px}
   .stat b{font-family:var(--serif);font-size:26px;color:var(--ac);display:block}
   .stat span{font-size:13px;color:var(--tx2)}
@@ -73,6 +76,7 @@
       <div class="stat"><b>382</b><span data-t="zh">文法點</span><span data-t="en">grammar points</span></div>
       <div class="stat"><b>N5–N1</b><span data-t="zh">全等級</span><span data-t="en">all levels</span></div>
     </div>
+    <img class="deco-tanuki" src="images/mascot/tanuki-p07.png" alt="" aria-hidden="true" style="right:0;bottom:8px;width:112px">
   </div>
 
   <section>
@@ -112,9 +116,10 @@
     <p style="color:var(--tx2)"><span data-t="zh">那我們怎麼活下去?靠願意支持的人升級 Premium——解鎖無限次練習與進階功能。買的是「更方便」,不是「才能學」。這些支持,讓我們能持續把核心免費開放給每一個還在路上的人,並由獨立小團隊持續更新內容。</span><span data-t="en">So how do we keep going? Through people who choose Premium — unlocking unlimited practice and advanced features. You're paying for convenience, not for the right to learn. That support lets us keep the core free for everyone still on the way, maintained by a small independent team that keeps adding content.</span></p>
   </section>
 
-  <section>
+  <section style="position:relative">
+    <img class="deco-tanuki" src="images/mascot/tanuki-p06.png" alt="" aria-hidden="true" style="right:0;bottom:14px;width:100px">
     <h2><span data-t="zh">怎麼開始</span><span data-t="en">How to start</span></h2>
-    <p style="color:var(--tx2);margin-bottom:14px"><span data-t="zh">網頁打開就能用,或下載手機 App 隨身背。用 Google 帳號登入即可同步進度,還送免費試用。</span><span data-t="en">Use it right in your browser, or get the app to study anywhere. Sign in with Google to sync your progress — with a free trial.</span></p>
+    <p style="color:var(--tx2);margin-bottom:14px;max-width:600px"><span data-t="zh">網頁打開就能用,或下載手機 App 隨身背。用 Google 帳號登入即可同步進度,還送免費試用。</span><span data-t="en">Use it right in your browser, or get the app to study anywhere. Sign in with Google to sync your progress — with a free trial.</span></p>
     <div class="cta">
       <a class="btn" href="app.html"><span data-t="zh">在網頁上使用 →</span><span data-t="en">Use on the web →</span></a>
       <a class="app-ios" href="https://apps.apple.com/app/id6778227353" aria-label="Download on the App Store" style="display:inline-flex;align-items:center;padding:0;border:0;background:none;margin:4px"><img src="app-store-badge.svg" alt="Download on the App Store" style="height:44px;width:auto"></a>
