@@ -200,13 +200,13 @@ a:hover { text-decoration: underline; }
 
 /* == Hero · 日系排版 == */
 .hero {
-  padding: calc(var(--hh) + 96px) 32px 120px;
+  padding: calc(var(--hh) + 52px) 32px 96px;
   position: relative; overflow: hidden;
 }
 .hero-inner { max-width: 1100px; margin: 0 auto; }
 .hero-eyebrow {
   font-size: 11px; letter-spacing: .28em; color: var(--ac);
-  font-weight: 700; margin-bottom: 28px;
+  font-weight: 700; margin-bottom: 18px;
   display: inline-flex; align-items: center; gap: 12px;
 }
 .hero-eyebrow::before {
@@ -214,16 +214,16 @@ a:hover { text-decoration: underline; }
 }
 .hero-kana {
   font-family: var(--serif);
-  font-size: clamp(32px, 5vw, 56px);
+  font-size: clamp(28px, 3.6vw, 42px);
   font-weight: 400; color: var(--tx2);
   letter-spacing: .08em; line-height: 1.2;
-  margin-bottom: 14px;
+  margin-bottom: 10px;
 }
 .hero-title {
   font-family: var(--serif);
-  font-size: clamp(48px, 8.5vw, 96px);
-  font-weight: 700; line-height: 1.1; letter-spacing: -.01em;
-  color: var(--tx); margin-bottom: 32px;
+  font-size: clamp(44px, 6.2vw, 72px);
+  font-weight: 700; line-height: 1.12; letter-spacing: -.01em;
+  color: var(--tx); margin-bottom: 22px;
   max-width: 820px;
 }
 .hero-title em {
@@ -238,7 +238,7 @@ a:hover { text-decoration: underline; }
 @keyframes underlineIn { to { transform: scaleX(1); } }
 .hero-desc {
   max-width: 560px; font-size: 16px;
-  color: var(--tx2); line-height: 2; margin-bottom: 48px;
+  color: var(--tx2); line-height: 1.8; margin-bottom: 26px;
 }
 .hero-desc strong { color: var(--tx); font-weight: 600; }
 .hero-cta-row { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
@@ -355,8 +355,11 @@ html:not(.stayjp-native) .hero-dl .app-android { display: inline-flex !important
 }
 
 /* == Section == */
-.section { padding: 120px 32px; }
-.section-inner { max-width: 1100px; margin: 0 auto; }
+.section { padding: 120px 32px; position: relative; overflow: hidden; }
+.section-inner { max-width: 1100px; margin: 0 auto; position: relative; z-index: 2; }
+/* 角落點綴狸貓:桌機才顯示,手機隱藏(避免擠到文字) */
+.deco-tanuki { position: absolute; pointer-events: none; z-index: 1; height: auto; opacity: .96; }
+@media (max-width: 820px) { .deco-tanuki { display: none; } }
 .eyebrow {
   font-size: 11px; letter-spacing: .28em; color: var(--ac);
   font-weight: 700; text-transform: uppercase;
@@ -513,7 +516,9 @@ html:not(.stayjp-native) .hero-dl .app-android { display: inline-flex !important
   padding: 56px 32px; color: var(--tx3);
   font-size: 12px; border-top: 1px solid var(--line);
   background: var(--bg); line-height: 1.9;
+  position: relative; overflow: hidden;
 }
+.ft .ft-inner { position: relative; z-index: 2; }
 .ft-inner {
   max-width: 1100px; margin: 0 auto;
   display: flex; justify-content: space-between; align-items: center;
@@ -720,7 +725,6 @@ try {
     <h2 class="hero-kana reveal reveal-d1">日々是学習。</h2>
     <h1 class="hero-title reveal reveal-d2">N5 到 N1，<br><em>陪你考過每一關。</em></h1>
     <p class="hero-desc reveal reveal-d3"><strong>7,710 個單字・382 個文法・模擬考・SRS 間隔複習。</strong><br>免費就能用大部分功能，全面備考再升級。</p>
-    <div class="hero-count reveal reveal-d3" id="jlptCountWrap" style="display:none"><i data-ic=clock data-sz=15></i> <span id="jlptCountText"></span></div>
     <div class="hero-cta-row reveal reveal-d4">
       <a href="app.html" class="hero-cta">免費開始學習
         <svg style="width:16px;height:16px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
@@ -730,9 +734,10 @@ try {
     </div>
     <p class="hero-badge-note reveal reveal-d4" data-web-only style="margin-top:9px;font-size:12.5px;color:var(--tx3)">下載 App・免費試用 7 天</p>
     <p class="hero-trust reveal reveal-d4" style="margin-top:16px;font-size:14px;color:var(--tx2)"><span>免費・無需信用卡・登入送 3 天全功能試用・<span id="heroLearners">6 萬+</span> 學習者一起備考</span>　<a href="pricing.html" style="color:var(--ac);text-decoration:underline">看付費方案</a></p>
+    <div class="hero-count reveal reveal-d4" id="jlptCountWrap" style="display:none;margin-top:14px"><i data-ic=clock data-sz=15></i> <span id="jlptCountText"></span></div>
   </div>
   <div class="hero-mascot reveal reveal-d2">
-    <img src="images/mascot/tanuki-stand.png" alt="日本再留計劃吉祥物 — 學者狸太郎" loading="eager">
+    <img src="images/mascot/tanuki-hero.png" alt="日本再留計劃吉祥物 — 學者狸太郎" loading="eager">
   </div>
   <!-- 手機版:下載鈕移到浣熊正下方,一進來第一眼就看到(桌機隱藏,桌機用下方 CTA 列的 badge) -->
   <div class="hero-dl reveal reveal-d3">
@@ -753,6 +758,7 @@ try {
 
 <!-- Features -->
 <section class="section">
+  <img class="deco-tanuki" src="images/mascot/tanuki-p06.png" alt="" aria-hidden="true" style="top:56px;right:3%;width:104px">
   <div class="section-inner">
     <div class="eyebrow reveal">FEATURES · 機能</div>
     <h2 class="section-title reveal">四個工具，<em>串成每日 30 分鐘</em>的備考動線。</h2>
@@ -788,6 +794,7 @@ try {
 
 <!-- Voices 學員回饋（脆網友真實回饋，填入前請先 DM 取得同意，或將帳號打碼） -->
 <section class="section">
+  <img class="deco-tanuki" src="images/mascot/tanuki-p10.png" alt="" aria-hidden="true" style="bottom:30px;left:2%;width:96px">
   <div class="section-inner">
     <div class="eyebrow reveal">VOICES · 學員回饋</div>
     <h2 class="section-title reveal">用過的人，這麼說。</h2>
@@ -805,7 +812,7 @@ try {
   <div class="section-inner">
     <div class="eyebrow reveal">PRICING · 方案</div>
     <h2 class="section-title reveal">內容免費，<em>工具想練到爽再升級</em>。</h2>
-    <div class="pt-mascot reveal" aria-hidden="true"><img src="images/mascot/tanuki-stand.png" alt=""></div>
+    <div class="pt-mascot reveal" aria-hidden="true"><img src="images/mascot/tanuki-p03.png" alt=""></div>
     <div class="pt-grid">
       <div class="pt-card pt-featured reveal">
         <div class="pt-badge pt-badge-best">最划算</div>
@@ -843,6 +850,7 @@ try {
 
 <!-- FAQ -->
 <section class="section" id="faq">
+  <img class="deco-tanuki" src="images/mascot/tanuki-p09.png" alt="" aria-hidden="true" style="bottom:40px;right:3%;width:98px">
   <div class="section-inner">
     <div class="eyebrow reveal">FAQ · 常見問題</div>
     <h2 class="section-title reveal">付費前，<em>你可能想知道</em>。</h2>
@@ -882,6 +890,7 @@ try {
 
 <!-- Footer -->
 <footer class="ft">
+  <img class="deco-tanuki" src="images/mascot/tanuki-p12.png" alt="" aria-hidden="true" style="bottom:0;right:4%;width:110px">
   <div class="ft-inner">
     <div>
       <div class="ft-brand">© 2026 · 日本再留計劃 / StayJP Study</div>
