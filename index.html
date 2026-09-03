@@ -359,7 +359,7 @@ html:not(.stayjp-native) .hero-dl .app-android { display: inline-flex !important
 .section-inner { max-width: 1100px; margin: 0 auto; position: relative; z-index: 2; }
 /* 角落點綴狸貓:桌機才顯示,手機隱藏(避免擠到文字) */
 .deco-tanuki { position: absolute; pointer-events: none; z-index: 1; height: auto; opacity: .96; }
-@media (max-width: 820px) { .deco-tanuki { display: none; } }
+@media (max-width: 820px) { .deco-tanuki { display: none; } .deco-tanuki.keep { display: block; width: 76px !important; } }
 .eyebrow {
   font-size: 11px; letter-spacing: .28em; color: var(--ac);
   font-weight: 700; text-transform: uppercase;
@@ -890,7 +890,7 @@ try {
 
 <!-- Footer -->
 <footer class="ft">
-  <img class="deco-tanuki" src="images/mascot/tanuki-p12.png" alt="" aria-hidden="true" style="bottom:0;right:4%;width:110px">
+  <img class="deco-tanuki keep" src="images/mascot/tanuki-p12.png" alt="" aria-hidden="true" style="bottom:0;right:4%;width:110px">
   <div class="ft-inner">
     <div>
       <div class="ft-brand">© 2026 · 日本再留計劃 / StayJP Study</div>

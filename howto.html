@@ -27,7 +27,7 @@
   h1{font-family:var(--serif);font-size:clamp(28px,5.5vw,40px);line-height:1.2;margin:12px 0 12px;text-wrap:balance}
   .lead{color:var(--tx2);font-size:17px;max-width:600px}
   .deco-tanuki{position:absolute;pointer-events:none;z-index:0;height:auto;opacity:.96}
-  @media(max-width:900px){.deco-tanuki{display:none}}
+  @media(max-width:900px){.deco-tanuki{display:none}.deco-tanuki.keep{display:block;width:88px!important}}
   .hero{position:relative}
   .steps{list-style:none;counter-reset:s;padding:0;margin:26px 0}
   .steps li{position:relative;background:var(--bg2);border:1px solid var(--bd);border-radius:14px;padding:18px 18px 18px 66px;margin-bottom:12px}
@@ -66,7 +66,7 @@
 
   <div class="hero">
     <div class="eyebrow" data-t="zh">使用教學</div><div class="eyebrow" data-t="en">How to use</div>
-    <img class="deco-tanuki" src="images/mascot/tanuki-p02.png" alt="" aria-hidden="true" style="right:0;top:2px;width:138px">
+    <img class="deco-tanuki keep" src="images/mascot/tanuki-p02.png" alt="" aria-hidden="true" style="right:0;top:2px;width:138px">
     <h1><span data-t="zh">30 秒上手</span><span data-t="en">Get started in 30 seconds</span></h1>
     <p class="lead"><span data-t="zh">不用註冊也能先逛。想存進度就用 Google 登入,還送免費試用。以下是最順的學習流程:</span><span data-t="en">Browse without signing up. To save progress, sign in with Google — a free trial is included. Here's the smoothest way to study:</span></p>
   </div>

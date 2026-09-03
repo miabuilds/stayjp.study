@@ -35,7 +35,9 @@
   .scene:hover{border-color:var(--accent)}
   .scene:active{transform:scale(.98)}
   /* JLPT 風格圓形圖示徽章:資料本來就有 ic emoji,原本沒渲染出來 */
-  .scene .sc-ic{width:40px;height:40px;border-radius:50%;background:var(--soft);display:flex;align-items:center;justify-content:center;font-size:21px;margin-bottom:9px}
+  .scene .sc-ic{width:44px;height:44px;border-radius:50%;background:var(--soft);display:flex;align-items:center;justify-content:center;font-size:21px;margin-bottom:9px}
+  .sc-ic img{width:44px;height:44px;display:block;border-radius:50%}
+  .sc-ic:has(img){background:none}
   .scene .sc-done{float:right;font-size:11px;font-weight:700;color:var(--accent);background:var(--soft);border-radius:20px;padding:2px 8px;margin-top:2px}
   .scene .jpw{color:var(--accent);font-weight:800;font-size:20px;line-height:1.3;letter-spacing:.01em;font-family:-apple-system,"Hiragino Sans","PingFang TC",sans-serif}
   .scene .jpw rt{font-size:9px;font-weight:500;color:var(--accent2);letter-spacing:0}
@@ -259,7 +261,7 @@ function renderScenes(){
   const cnt = scCounts();
   document.getElementById('scenes').innerHTML = SCENES.map(s=>{
     const done = cnt[s.k] ? `<span class="sc-done">✓ ${enOr('練過','×')}${cnt[s.k]}${enOr('次','')}</span>` : '';
-    return `<div class="scene" onclick="startChat('${s.k}')">${done}<div class="sc-ic">${esc(s.ic||'💬')}</div><div class="jpw">${s.yomi?`<ruby>${esc(s.jp)}<rt>${esc(s.yomi)}</rt></ruby>`:esc(s.jp)}</div><div class="t">${esc(sceneTitle(s))}</div><div class="d">${esc(s.dE?enOr(s.d,s.dE):s.d)}</div></div>`;
+    return `<div class="scene" onclick="startChat('${s.k}')">${done}<div class="sc-ic"><img src="images/scenes/${s.k}.png" alt="" onerror="this.parentNode.textContent='${esc(s.ic||'💬')}'"></div><div class="jpw">${s.yomi?`<ruby>${esc(s.jp)}<rt>${esc(s.yomi)}</rt></ruby>`:esc(s.jp)}</div><div class="t">${esc(sceneTitle(s))}</div><div class="d">${esc(s.dE?enOr(s.d,s.dE):s.d)}</div></div>`;
   }).join('');
 }
 function backToPick(){ hardStopRec(); try{ if(_turnAbort) _turnAbort.abort(); }catch(e){} busy=false; setBusy(false); scene=null; history=[]; _logSaved=false; _logDocId=null; show('pick'); }
@@ -573,7 +575,7 @@ async function openLogs(){
     box.innerHTML=snap.docs.map(d=>{ const v=d.data(); window.__logs[d.id]=v;
       const dt=new Date(v.ts); const ds=(dt.getMonth()+1)+'/'+dt.getDate()+' '+String(dt.getHours()).padStart(2,'0')+':'+String(dt.getMinutes()).padStart(2,'0');
       return '<div class="hist-row" style="display:flex;gap:10px;align-items:center;padding:12px 4px;border-bottom:1px solid var(--line);cursor:pointer" onclick="viewLog(\''+d.id+'\')">'
-        +'<span style="font-size:20px">'+esc(v.sceneIc||'💬')+'</span>'
+        +(v.sceneK?'<img src="images/scenes/'+esc(v.sceneK)+'.png" alt="" style="width:26px;height:26px;border-radius:50%" onerror="this.style.display=\'none\'">':'<span style="font-size:20px">'+esc(v.sceneIc||'💬')+'</span>')
         +'<span style="flex:1"><b>'+esc(cvt(v.sceneT||''))+'</b> <span class="muted">· '+esc(v.lv||'')+' · '+ds+'</span></span>'
         +(v.score!=null?'<span style="font-weight:700;color:'+(v.score>=85?'var(--ok)':v.score>=60?'var(--warn)':'var(--bad)')+'">'+v.score+'</span>':'')
         +'<span class="muted">›</span></div>'; }).join('');
@@ -582,7 +584,7 @@ async function openLogs(){
 function viewLog(id){
   const v=(window.__logs||{})[id]; if(!v) return;
   show('logview');
-  document.getElementById('lvTtl').textContent=(v.sceneIc||'💬')+' '+cvt(v.sceneT||'')+' · '+(v.lv||'');
+  document.getElementById('lvTtl').innerHTML=(v.sceneK?'<img src="images/scenes/'+esc(v.sceneK)+'.png" alt="" style="width:22px;height:22px;border-radius:50%;vertical-align:-4px" onerror="this.style.display=\'none\'"> ':esc(v.sceneIc||'💬')+' ')+esc(cvt(v.sceneT||''))+' · '+esc(v.lv||'');
   const wrap=document.getElementById('logMsgs');
   wrap.innerHTML=(v.msgs||[]).map(function(m,i){
     if(m.r==='m') return '<div class="msg me"><div class="bubble me"><div class="bjp">'+esc(m.jp)+'</div></div></div>';
