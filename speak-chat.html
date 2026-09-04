@@ -81,7 +81,7 @@
   #chat .inbar{margin-top:auto}   /* 輸入列壓底;msgs 不撐高(撐高會把開場訊息留在視野外,像 bug) */
   #chat .msgs{padding-bottom:12px}
   .wrap.chatting{padding-bottom:0}   /* wrap 的 40px 底 padding 會把 sticky 擋在離底 40px 上(sticky 出不了父容器) */
-  .inbar{position:sticky;bottom:calc(env(safe-area-inset-bottom, 0px) + 8px);z-index:4;background:var(--bg);padding:12px 8px;margin:12px -8px 0;border-top:1px solid var(--line);border-radius:16px}
+  .inbar{position:sticky;bottom:0;z-index:4;background:var(--bg);padding:12px 8px calc(env(safe-area-inset-bottom, 0px) + 16px);margin:12px -8px 0;border-top:1px solid var(--line);border-radius:16px 16px 0 0}
   #chat.has-bg .inbar{background:var(--veil);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-top:0;box-shadow:0 -1px 6px rgba(0,0,0,.06)}
   .msgs{display:flex;flex-direction:column;gap:12px;min-height:40px}
   .msg{display:flex;flex-direction:column;max-width:86%}
@@ -426,11 +426,11 @@ function renderMsgs(streamingAi){
     }
   }
   if(streamingAi!=null) html += aiBubble(streamingAi) + '<div class="typing">相手が入力中…</div>';
+  // 渲染前先量:使用者是否本來就在底部附近(<160px)——是就跟著貼底(對話變長/串流增長不用手動滑);
+  // 往上翻舊訊息時不打擾。開場內容不足一屏時 scrollTo 底=不動,AI 第一句仍在頂部可見。
+  const nearBottom = (window.innerHeight + window.scrollY) >= (document.body.scrollHeight - 160);
   box.innerHTML = html;
-  // 捲到最新一則(nearest:已在視野內就不動)——原本硬捲到頁面最底,
-  // 開場時訊息區被撐高,AI 第一句被留在視野上方(用戶回饋「有聲音沒字,以為壞掉」)
-  const last = box.lastElementChild;
-  if (last) last.scrollIntoView({ block: 'nearest' });
+  if (nearBottom) window.scrollTo(0, document.body.scrollHeight);
 }
 function aiBubble(m){
   const jp = m.jp || m.text || '';
