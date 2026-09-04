@@ -208,6 +208,7 @@
 </div>
 
 <script src="icons.js"></script>
+<script src="ui-modal.js"></script>
 <script src="i18n.js"></script>
 <script src="conjugate.js" defer></script>
 <script src="grammar-kanji-readings.js" defer></script>
@@ -354,8 +355,8 @@ function loginWith(p){
   auth.signInWithPopup(provider).then(function(){ var g=document.getElementById('loginCard'); if(g)g.remove(); })
     .catch(function(e){ var c=e&&e.code;
       if(c==='auth/cancelled-popup-request'||c==='auth/popup-closed-by-user')return;
-      if(c==='auth/operation-not-allowed'){ alert(enOr('Apple 登入還在設定中,請先用 Google 登入。','Apple sign-in is still being set up — please use Google for now.')); return; }
-      alert(enOr('登入失敗:','Sign-in failed: ')+(e&&e.message||e));
+      if(c==='auth/operation-not-allowed'){ AppUI.alert(enOr('Apple 登入還在設定中,請先用 Google 登入。','Apple sign-in is still being set up — please use Google for now.')); return; }
+      AppUI.alert(enOr('登入失敗:','Sign-in failed: ')+(e&&e.message||e));
     }).finally(function(){ _signingIn=false; });
 }
 function showLoginCard(){

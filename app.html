@@ -1783,6 +1783,7 @@ try {
      content-loader.js 載入時若 localStorage 有快取就同步 set window globals；沒有就靠
      ContentLoader.ready() Promise 在 init 時等 Firestore fetch。 -->
 <script src="icons.js"></script>
+<script src="ui-modal.js"></script>
 <script src="content-loader.js"></script>
 <script src="progress-codec.js"></script>
 <script src="grammar-kanji-readings.js"></script>
@@ -1974,10 +1975,10 @@ function loginWith(provider) {
       // 連點被取消 / 用戶自己關彈窗 = 良性,不彈
       if (code === 'auth/cancelled-popup-request' || code === 'auth/popup-closed-by-user') return;
       // 網路不穩 → 友善提示,不丟英文
-      if (code === 'auth/network-request-failed') { alert('網路不穩,登入連線失敗,請稍後再試一次。'); return; }
+      if (code === 'auth/network-request-failed') { AppUI.alert('網路不穩,登入連線失敗,請稍後再試一次。'); return; }
       // Apple 尚未在 Firebase 開通 → 友善提示,別丟英文
-      if (code === 'auth/operation-not-allowed') { alert('此登入方式暫時無法使用,請改用另一種方式登入。'); return; }
-      alert('登入失敗: ' + (e && e.message || e));
+      if (code === 'auth/operation-not-allowed') { AppUI.alert('此登入方式暫時無法使用,請改用另一種方式登入。'); return; }
+      AppUI.alert('登入失敗: ' + (e && e.message || e));
     })
     .finally(() => { _signingIn = false; });
 }
@@ -3100,7 +3101,7 @@ const Shadow = (() => {
   }
 
   function start(items) {
-    if (!items || !items.length) { alert('沒有內容可跟讀'); return; }
+    if (!items || !items.length) { AppUI.alert('沒有內容可跟讀'); return; }
     queue = items;
     idx = 0; stage = 0; paused = false;
     open();
@@ -3261,7 +3262,7 @@ const Shadow = (() => {
         items.push({ j, z, w: x.w, lv: x.lv, m: x.m || '' });
       });
     } catch(e) {}
-    if (!items.length) { alert('還沒有收藏。在單字旁點 ★ 或在跟讀按 / F 加入。'); return; }
+    if (!items.length) { AppUI.alert('還沒有收藏。在單字旁點 ★ 或在跟讀按 / F 加入。'); return; }
     items.sort(() => Math.random() - 0.5);
     start(items);
   }
@@ -3283,7 +3284,7 @@ const Shadow = (() => {
         });
       });
     });
-    if (!items.length) { alert('還沒收藏文法。在文法卡右上點 ★ 收藏,再回來這裡只跟讀你收藏的文法。'); return; }
+    if (!items.length) { AppUI.alert('還沒收藏文法。在文法卡右上點 ★ 收藏,再回來這裡只跟讀你收藏的文法。'); return; }
     items.sort(() => Math.random() - 0.5);
     start(items);
   }
@@ -3417,7 +3418,7 @@ const DailyStory = (() => {
     const id = getStoryId();
     let story = await fetchStory(id);
     if (!story) {
-      alert('這個單元目前沒有對應的故事,換個單元或用「快速背本批」複習吧 ');
+      AppUI.alert('這個單元目前沒有對應的故事,換個單元或用「快速背本批」複習吧 ');
       return;
     }
     showModal(story);
@@ -4129,7 +4130,7 @@ const VOCAB_CATS = [
 ];
 // 動詞變化 modal — 點 vocab 卡 .verb-btn 「変」 觸發
 function openVerbModal(word, reading) {
-  if (!window.Conjugate) { alert('變化引擎還沒載入'); return; }
+  if (!window.Conjugate) { AppUI.alert('變化引擎還沒載入'); return; }
   const r = reading || word;
   const forms = Conjugate.allForms(word, r);
   // 自/他 從 vocab 表抓（若資料有 labeled t 欄）

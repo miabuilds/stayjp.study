@@ -376,6 +376,7 @@ a:hover{text-decoration:underline}
 </footer>
 
 <script src="icons.js"></script>
+<script src="ui-modal.js"></script>
 <script src="counter.js"></script>
 
 <!-- Firebase Auth + Firestore — 訂閱按鈕需要登入身分送 idToken 給 Cloud Function -->
@@ -653,14 +654,14 @@ function ppIsInApp() {
   return /FBAN|FBAV|FB_IAB|Instagram|Line\/|MicroMessenger|Twitter|TikTok|KAKAOTALK|NAVER|Barcelona|BytedanceWebview/i.test(navigator.userAgent || '');
 }
 function ppInAppAlert() {
-  alert('你正在 App 內建瀏覽器(Line／IG／Threads／FB／微信 等)開啟本站,Google 登入會被擋,無法完成訂閱。\n\n請改用 Safari 或 Chrome:點右上／右下的「⋯」或「⋮」→「在預設瀏覽器開啟」,再登入訂閱。');
+  AppUI.alert('你正在 App 內建瀏覽器(Line／IG／Threads／FB／微信 等)開啟本站,Google 登入會被擋,無法完成訂閱。\n\n請改用 Safari 或 Chrome:點右上／右下的「⋯」或「⋮」→「在預設瀏覽器開啟」,再登入訂閱。');
 }
 
 let _subInFlight = false;   // 防連點重複送出(避免重複扣款)
 async function startSubscribe(btn) {
   const card = btn.closest('.plan');
   const plan = card?.dataset.plan;
-  if (!plan) { alert('找不到方案'); return false; }
+  if (!plan) { AppUI.alert('找不到方案'); return false; }
 
   // ── 原生 App 內(iOS/Android）：Apple/Google 規定 app 內的數位訂閱不可走外部金流（綠界），
   //    必須用原生 IAP。偵測到在 App 的 WebView 裡 → 改通知原生端開 paywall，不走綠界。
@@ -714,7 +715,7 @@ async function startSubscribe(btn) {
   const u = curUser;
 
   // ⛔ 綠界維護期間:改走 PayPal 手動付款(不跑綠界、不續扣;保留上面的登入是為了拿到 email 方便開通)
-  if (ECPAY_DOWN) { unlock(); alert('線上刷卡維護中,暫停新訂閱,請稍後再試(手機可用 App 內購買)。'); return false; }
+  if (ECPAY_DOWN) { unlock(); AppUI.alert('線上刷卡維護中,暫停新訂閱,請稍後再試(手機可用 App 內購買)。'); return false; }
 
   // 下單前:明示續扣條款 + 強制勾選同意 + 已滿18歲(消保法)
   const consented = await showConsentDialog(plan);
@@ -734,7 +735,7 @@ async function startSubscribe(btn) {
     });
     const data = await res.json();
     if (!res.ok) {
-      alert(data.reason || data.error || '建立訂單失敗');
+      AppUI.alert(data.reason || data.error || '建立訂單失敗');
       btn.textContent = '訂閱';
       unlock();
       return false;
@@ -756,7 +757,7 @@ async function startSubscribe(btn) {
     form.submit();
   } catch (err) {
     console.error(err);
-    alert('系統錯誤,稍後再試');
+    AppUI.alert('系統錯誤,稍後再試');
     btn.textContent = '訂閱';
     unlock();
   }
