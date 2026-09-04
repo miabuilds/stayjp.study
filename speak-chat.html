@@ -15,7 +15,7 @@
   .backbtn:active{transform:scale(.96)}
   *{box-sizing:border-box;margin:0;padding:0}
   body{background:var(--bg);color:var(--ink);font-family:-apple-system,"PingFang TC","Noto Sans TC",sans-serif;font-size:15px;-webkit-font-smoothing:antialiased}
-  .wrap{max-width:680px;margin:0 auto;padding:16px 14px 40px}
+  .wrap{max-width:680px;margin:0 auto;padding:16px 20px 40px}
   .gate{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px}
   .banner{background:var(--warn);color:#fff;font-size:12px;text-align:center;padding:6px}
   .btn{font:inherit;font-weight:600;border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:10px;padding:9px 15px;cursor:pointer}
@@ -44,8 +44,32 @@
   .scene .t{font-weight:700;margin-top:6px} .scene .d{color:var(--ink2);font-size:12px;margin-top:2px;line-height:1.5}
 
   /* 對話畫面 */
-  .chatbar{position:sticky;top:0;z-index:5;background:var(--bg);display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--line);margin-bottom:12px}
-  .chatbar .ttl{font-weight:700;font-size:15px;flex:1;display:flex;align-items:center;gap:7px}
+  .chatbar{position:sticky;top:0;z-index:5;background:var(--bg);display:flex;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid var(--line);margin:0 -8px 14px;border-radius:0 0 16px 16px}
+  #chat.has-bg .chatbar{background:var(--veil);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-bottom:0;box-shadow:0 1px 6px rgba(0,0,0,.06)}
+  .chatbar .ttl{font-weight:700;font-size:15px;flex:1;display:flex;flex-direction:column;align-items:flex-start;gap:1px;min-width:0}
+  .chatbar .t-jp{font-size:16px;font-weight:800;color:var(--accent);line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+  .chatbar .t-sub{font-size:11.5px;font-weight:500;color:var(--ink3);line-height:1.2}
+  :root{--veil:rgba(246,244,239,.87)}
+  @media(prefers-color-scheme:dark){:root:not([data-theme=light]){--veil:rgba(22,22,21,.91)}}
+  :root[data-theme=dark]{--veil:rgba(22,22,21,.91)}
+  #chat.has-bg::before{content:'';position:fixed;inset:0;z-index:-1;background-image:linear-gradient(var(--veil),var(--veil)),var(--chatbg);background-size:cover;background-position:center top}
+  /* 橫式視窗(桌機):直式插圖不硬撐滿,改原比例等高置中、左右羽化淡出到底色 */
+  @media(min-aspect-ratio:1/1){
+    #chat.has-bg::before{
+      background-size:100% 100%, auto 100%;
+      background-repeat:no-repeat;
+      background-position:center, center top;
+      /* 圖寬 ≈ 100vh × (480/787) ≈ 61vh → 羽化帶貼著圖緣(50% ± ~30vh) */
+      -webkit-mask-image:linear-gradient(90deg,transparent calc(50% - 28vh),#000 calc(50% - 15vh),#000 calc(50% + 15vh),transparent calc(50% + 28vh));
+      mask-image:linear-gradient(90deg,transparent calc(50% - 28vh),#000 calc(50% - 15vh),#000 calc(50% + 15vh),transparent calc(50% + 28vh));
+    }
+  }
+  #chat.has-bg .bubble{box-shadow:0 1px 4px rgba(0,0,0,.07)}
+  /* 輸入區固定畫面底部:訊息少時也壓底、訊息多時捲動黏底 */
+  #chat{display:flex;flex-direction:column;min-height:calc(100dvh - 110px)}
+  #chat .msgs{flex:1}
+  .inbar{position:sticky;bottom:0;z-index:4;background:var(--bg);padding:12px 8px;margin:12px -8px 0;border-top:1px solid var(--line);border-radius:16px 16px 0 0}
+  #chat.has-bg .inbar{background:var(--veil);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-top:0;box-shadow:0 -1px 6px rgba(0,0,0,.06)}
   .msgs{display:flex;flex-direction:column;gap:12px;min-height:40px}
   .msg{display:flex;flex-direction:column;max-width:86%}
   .msg.ai{align-self:flex-start;align-items:flex-start}
@@ -62,7 +86,7 @@
   .bkana{color:var(--accent2);font-size:12.5px;margin-top:3px}
   .bzh{color:var(--ink2);font-size:12.5px;margin-top:3px}
   .msg.me .bkana,.msg.me .bzh{color:#ffffffcc}
-  .coach{align-self:flex-start;max-width:86%;background:var(--soft);border:1px solid var(--accent);border-radius:12px;padding:8px 12px;font-size:13px;color:var(--ink)}
+  .coach{align-self:flex-start;max-width:86%;background:var(--panel);border:1px solid var(--accent);border-radius:12px;padding:8px 12px;font-size:13px;box-shadow:0 1px 4px rgba(0,0,0,.06);color:var(--ink)}
   .coach b{color:var(--accent)}
   .typing{color:var(--ink3);font-size:13px;padding:4px 2px;animation:tpulse 1.2s ease-in-out infinite}
   @keyframes tpulse{0%,100%{opacity:.35}50%{opacity:1}}
@@ -75,9 +99,9 @@
   .muted{color:var(--ink3);font-size:12px;margin-top:6px}
   .err{color:var(--bad);font-size:13px;margin-top:6px}
   .hints{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:10px}
-  .hint-toggle{font:inherit;font-size:13px;color:var(--ink2);background:none;border:1px dashed var(--line);border-radius:14px;padding:7px 14px;cursor:pointer}
+  .hint-toggle{font:inherit;font-size:13px;color:var(--ink2);background:var(--panel);border:1px dashed var(--line);border-radius:14px;padding:7px 14px;cursor:pointer}
   .hint-toggle:hover{color:var(--accent);border-color:var(--accent)}
-  .hints-lb{width:100%;font-size:12px;color:var(--ink3);margin-bottom:-2px}
+  .hints-lb{width:100%;font-size:12px;color:var(--ink2);margin-bottom:-2px}
   .hint-chip{background:var(--soft);border:1px solid var(--accent);color:var(--ink);border-radius:14px;padding:7px 12px;font-size:14px;cursor:pointer;text-align:left;line-height:1.45;font-family:inherit}
   .hint-chip:hover{background:var(--accent);color:#fff}
   .hint-chip .hz{display:block;font-size:11px;opacity:.72;margin-top:1px}
@@ -117,7 +141,7 @@
     <div class="lvtabs" id="lvtabs"></div>
     <div class="scenes" id="scenes"></div>
     <div class="muted" style="margin-top:14px"><i data-ic=bulb></i> AI 回覆與評分由模型自動生成,可能有誤,僅供練習參考。 這是「對話」練習;想練單句跟讀請到 <a href="speak.html" style="color:var(--accent)">跟讀練習</a>。</div>
-    <div style="margin-top:10px"><button class="btn sm" onclick="openLogs()">🕘 對話紀錄</button> <button class="btn sm" onclick="FavSents.open()">⭐ 收藏句</button></div>
+    <div style="margin-top:10px"><button class="btn sm" onclick="openLogs()"><i data-ic=clock></i> 對話紀錄</button> <button class="btn sm" onclick="FavSents.open()">⭐ 收藏句</button></div>
   </div>
 
   <!-- 對話 -->
@@ -125,25 +149,25 @@
     <div class="chatbar">
       <span class="ttl" id="chatTtl"></span>
       <button class="btn sm cnbtn" id="cnBtn" onclick="toggleZh()" title="關掉中文,只靠日文和語音理解,練聽力">中文</button>
-      <button class="btn sm" id="endBtn" onclick="endChat()">結束・看點評</button>
-      <button class="btn sm" id="topicBtn" onclick="backToPick()">換主題</button>
+      <button class="btn sm" id="endBtn" onclick="endChat()">看點評</button>
+      <button class="btn sm" id="topicBtn" onclick="backToPick()">換題</button>
     </div>
     <div class="msgs" id="msgs"></div>
     <div class="inbar">
       <div class="hints" id="hints"></div>
       <div class="inrow">
-        <button id="recBtn" class="btn rec" onclick="toggleRec()">🎤</button>
+        <button id="recBtn" class="btn rec" onclick="toggleRec()"><i data-ic=mic></i></button>
         <textarea id="say" class="say" rows="1" placeholder="用說的或打字…"></textarea>
         <button class="btn pri" id="sendBtn" onclick="sendMine()">送出</button>
       </div>
-      <div class="muted" id="inNote">🎤 用瀏覽器語音辨識(Chrome 較準);不準可直接改字再送。</div>
+      <div class="muted" id="inNote"></div>
     </div>
   </div>
 
   <!-- 對話紀錄清單 -->
   <div id="logs" style="display:none">
     <div class="chatbar">
-      <span class="ttl">🕘 對話紀錄</span>
+      <span class="ttl"><i data-ic=clock></i> 對話紀錄</span>
       <button class="btn sm" onclick="show('pick')">返回</button>
     </div>
     <div id="logList" class="review"></div>
@@ -160,7 +184,7 @@
   <!-- 點評 -->
   <div id="review" style="display:none">
     <div class="chatbar">
-      <span class="ttl" id="rvTtl">📋 對話點評</span>
+      <span class="ttl" id="rvTtl"><i data-ic=clipboard></i> 對話點評</span>
       <button class="btn sm" id="resumeBtn" onclick="resumeChat()">回到對話</button>
       <button class="btn sm" id="topicBtn2" onclick="backToPick()">換主題</button>
     </div>
@@ -246,7 +270,7 @@ let showZh = true;     // 對話中是否顯示中文翻譯;關掉 → 只靠日
 function toggleZh(){ showZh=!showZh; const b=document.getElementById('cnBtn'); if(b) b.classList.toggle('off',!showZh); renderMsgs(); }
 
 // ── 畫面切換 ──
-function show(id){ ['pick','chat','review','logs','logview'].forEach(x=>document.getElementById(x).style.display = x===id?'block':'none'); }
+function show(id){ ['pick','chat','review','logs','logview'].forEach(x=>document.getElementById(x).style.display = x===id?(x==='chat'?'flex':'block'):'none'); }
 function renderLvTabs(){
   const D={N5:enOr('最基本','Basics'),N4:enOr('日常','Daily'),N3:enOr('中級','Intermediate'),N2:enOr('中上','Upper-int'),N1:enOr('高階','Advanced')};
   document.getElementById('lvtabs').innerHTML = LEVELS.map(lv=>
@@ -286,7 +310,7 @@ function showLoginCard(){
   const el=document.createElement('div'); el.id='loginCard';
   el.innerHTML='<div style="position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:900" onclick="document.getElementById(\'loginCard\').remove()"></div>'
     +'<div style="position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:901;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:24px;max-width:320px;width:88%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.3)">'
-    +'<div style="font-size:30px;margin-bottom:6px">🗣</div>'
+    +'<div style="margin-bottom:6px"><i data-ic=speak data-sz=30></i></div>'
     +'<div style="font-weight:800;margin-bottom:4px">'+enOr('登入就能開始對話','Sign in to start chatting')+'</div>'
     +'<div class="muted" style="margin-bottom:16px">'+enOr('免費體驗 1 場,Premium 每天 5 場','1 free session; 5 per day with Premium')+'</div>'
     +'<button class="btn pri" style="width:100%;margin-bottom:8px" onclick="loginWith(\'google\')">'+enOr('用 Google 登入','Sign in with Google')+'</button>'
@@ -322,9 +346,14 @@ function startChat(k){
   }
   history = []; _logSaved=false;
   scBump(k);   // 本地練習次數 +1(情境卡進度徽章用)
-  document.getElementById('chatTtl').innerHTML = `<span style="color:var(--accent);font-weight:800">${esc(scene.jp||'')}</span> ${esc(sceneTitle(scene))} <span class="muted" style="font-weight:400">· ${activeLv}</span>`;
+  document.getElementById('chatTtl').innerHTML = `<span class="t-jp">${esc(scene.jp||'')}</span><span class="t-sub">${esc(sceneTitle(scene))} · ${activeLv}</span>`;
   document.getElementById('msgs').innerHTML = '';
   document.getElementById('say').value = '';
+  // 場景背景圖(有切好的才掛;veil 由 CSS 蓋淡)
+  const chatEl=document.getElementById('chat');
+  const bgOk=['conbini','resto','station','clinic','shop','interview','house','coworker','cityhall','phone','salon','izakaya','delivery','smalltalk','custom'];
+  if(bgOk.includes(scene.k)){ chatEl.style.setProperty('--chatbg','url(images/scenes/bg/'+scene.k+'.jpg)'); chatEl.classList.add('has-bg'); }
+  else { chatEl.classList.remove('has-bg'); }
   show('chat');
   turn();   // AI 先開場
 }
@@ -349,7 +378,7 @@ function renderMsgs(streamingAi){
 function aiBubble(m){
   const jp = m.jp || m.text || '';
   return `<div class="msg ai"><div class="bubble ai">
-    <div class="bjp"><span>${(jp&&window.furiganaHTMLRich)?window.furiganaHTMLRich(jp):(esc(jp)||'…')}</span>${jp?`<button class="spk" title="${enOr('播放','Play')}" onclick="playTTS(${JSON.stringify(jp).replace(/"/g,'&quot;')}, scene&&scene.voice)">🔊</button><button class="spk favstar" title="${enOr('收藏這句','Save this sentence')}" onclick="favFromBubble(this)" data-jp="${esc(jp)}" data-kana="${esc(m.kana||'')}" data-zh="${esc(m.zh||'')}">${(window.FavSents&&FavSents.isFav(jp))?'★':'☆'}</button>`:''}</div>
+    <div class="bjp"><span>${(jp&&window.furiganaHTMLRich)?window.furiganaHTMLRich(jp):(esc(jp)||'…')}</span>${jp?`<button class="spk" title="${enOr('播放','Play')}" onclick="playTTS(${JSON.stringify(jp).replace(/"/g,'&quot;')}, scene&&scene.voice)"><i data-ic=volume></i></button><button class="spk favstar" title="${enOr('收藏這句','Save this sentence')}" onclick="favFromBubble(this)" data-jp="${esc(jp)}" data-kana="${esc(m.kana||'')}" data-zh="${esc(m.zh||'')}">${(window.FavSents&&FavSents.isFav(jp))?'★':'☆'}</button>`:''}</div>
 
     ${(showZh && m.zh)?`<div class="bzh">${esc(cvt(m.zh))}</div>`:''}
     ${(showZh && m.words)?wordChips(m.words):''}
@@ -414,17 +443,17 @@ function renderHints(hints){
   _hints = cleanHints(hints);
   const box=document.getElementById('hints'); if(!box) return;
   if(!_hints.length){ box.innerHTML=''; return; }
-  box.innerHTML = '<button class="hint-toggle" onclick="expandHints()">'+enOr('💡 不知道怎麼接?看提示','💡 Stuck? See hints')+'</button>';
+  box.innerHTML = '<button class="hint-toggle" onclick="expandHints()">'+enOr('<i data-ic=bulb></i> 不知道怎麼接?看提示','<i data-ic=bulb></i> Stuck? See hints')+'</button>';
 }
 function expandHints(){
   const box=document.getElementById('hints'); if(!box || !_hints.length) return;
-  box.innerHTML = '<div class="hints-lb">'+enOr('💬 可以這樣回(點了會填入,可再改):','💬 You could say (tap to fill in, then edit):')+'</div>' +
+  box.innerHTML = '<div class="hints-lb">'+enOr('<i data-ic=speak></i> 可以這樣回(點了會填入,可再改):','<i data-ic=speak></i> You could say (tap to fill in, then edit):')+'</div>' +
     _hints.slice(0,3).map(h=>{
       const parts=String(h).split(/[｜|]/); const jp=(parts[0]||'').trim(); const zh=(parts[1]||'').trim();
       if(!jp) return '';
       const jpHtml = window.furiganaHTMLRich ? window.furiganaHTMLRich(jp) : esc(jp);
       return '<span class="hint-wrap"><button class="hint-chip" onclick="useHint('+JSON.stringify(jp).replace(/"/g,'&quot;')+')">'+jpHtml+(zh?'<span class="hz">'+esc(cvt(zh))+'</span>':'')+'</button>'
-        +'<button class="hint-spk" title="'+enOr('唸給我聽','Hear it')+'" onclick="event.stopPropagation();playTTS('+JSON.stringify(jp).replace(/"/g,'&quot;')+')">🔊</button></span>';
+        +'<button class="hint-spk" title="'+enOr('唸給我聽','Hear it')+'" onclick="event.stopPropagation();playTTS('+JSON.stringify(jp).replace(/"/g,'&quot;')+')"><i data-ic=volume></i></button></span>';
     }).join('');
 }
 // AI 回答的關鍵單字卡:単語|よみ|意思;分號隔開。點卡片唸該單字(雲端 TTS)
@@ -491,7 +520,7 @@ async function sendMine(){
   busy=true;   // 入口即上鎖:toJa 翻譯 await 期間 Enter 連發會把同一句 push 兩次(審查實錘);turn() 內部會接手 busy 狀態
   // 每場 12 輪封頂(成本天花板):到頂自動進點評收尾
   if(history.filter(h=>h.role==='me').length >= 12){
-    appendErr(enOr('這場聊得很充實了!幫你整理點評 🙌','Great session! Putting together your review 🙌')); setTimeout(endChat, 800); return;
+    appendErr(enOr('這場聊得很充實了!幫你整理點評','Great session! Putting together your review')); setTimeout(endChat, 800); return;
   }
   hardStopRec();
   let showTxt=txt, origTxt=null;
@@ -522,7 +551,7 @@ async function endChat(){
   _reviewBusy=true;
   hardStopRec();   // 進點評頁必停麥克風(原本錄音中按結束,mic 一直亮著繼續錄)
   const mine = history.filter(h=>h.role==='me').length;
-  if(mine===0){ _reviewBusy=false; show('review'); document.getElementById('reviewCard').innerHTML='<div class="muted">'+enOr('還沒開始對話,先聊幾句再看點評 🙂','No conversation yet — chat a little first 🙂')+'</div>'; return; }
+  if(mine===0){ _reviewBusy=false; show('review'); document.getElementById('reviewCard').innerHTML='<div class="muted">'+enOr('還沒開始對話,先聊幾句再看點評','No conversation yet — chat a little first')+'</div>'; return; }
   show('review');
   const card=document.getElementById('reviewCard'); card.innerHTML='<div class="muted">'+enOr('整理你的表現中…','Reviewing your performance…')+'</div>';
   try{
@@ -590,16 +619,16 @@ function viewLog(id){
     if(m.r==='m') return '<div class="msg me"><div class="bubble me"><div class="bjp">'+esc(m.jp)+'</div></div></div>';
     // furigana 必須包在單一 <span> 裡:.bubble.ai .bjp 是 flex,裸放會讓每個 ruby 變獨立 flex item 排成直欄(跑版實錘)
     return '<div class="msg ai"><div class="bubble ai">'
-      +'<div class="bjp"><span>'+(window.furiganaHTMLRich?furiganaHTMLRich(m.jp):esc(m.jp))+'</span><button class="spk" onclick="playTTS(window.__logs[\''+id+'\'].msgs['+i+'].jp,\''+(v.voice||'f')+'\')">🔊</button><button class="spk" onclick="favFromBubble(this)" data-jp="'+esc(m.jp)+'" data-kana="'+esc(m.k||'')+'" data-zh="'+esc(m.zh||'')+'">'+((window.FavSents&&FavSents.isFav(m.jp))?'★':'☆')+'</button></div>'
+      +'<div class="bjp"><span>'+(window.furiganaHTMLRich?furiganaHTMLRich(m.jp):esc(m.jp))+'</span><button class="spk" onclick="playTTS(window.__logs[\''+id+'\'].msgs['+i+'].jp,\''+(v.voice||'f')+'\')"><i data-ic=volume></i></button><button class="spk" onclick="favFromBubble(this)" data-jp="'+esc(m.jp)+'" data-kana="'+esc(m.k||'')+'" data-zh="'+esc(m.zh||'')+'">'+((window.FavSents&&FavSents.isFav(m.jp))?'★':'☆')+'</button></div>'
       +(m.zh?'<div class="bzh">'+esc(cvt(m.zh))+'</div>':'')
       +'</div></div>'
       +(m.c?'<div class="coach"><b>'+enOr('教練','Coach')+'</b>:'+esc(cvt(m.c))+'</div>':''); }).join('')
     +((v.score!=null||v.good||v.improve||v.tip)
       ? '<div class="coach" style="margin-top:14px;max-width:100%">'
         +(v.score!=null?'<div style="font-weight:700;margin-bottom:6px">'+enOr('這場得分:','Score: ')+v.score+'</div>':'')
-        +(v.good?'<div>👍 '+esc(cvt(v.good))+'</div>':'')
+        +(v.good?'<div><i data-ic=check></i> '+esc(cvt(v.good))+'</div>':'')
         +(v.improve?'<div style="margin-top:4px">✏️ '+esc(cvt(v.improve))+'</div>':'')
-        +(v.tip?'<div style="margin-top:4px">💡 '+esc(cvt(v.tip))+'</div>':'')
+        +(v.tip?'<div style="margin-top:4px"><i data-ic=bulb></i> '+esc(cvt(v.tip))+'</div>':'')
         +'</div>'
       : '');
 }
@@ -668,12 +697,13 @@ const _IN_APP0 = !!(window.STAYJP_NATIVE && window.STAYJP_NATIVE.isNativeApp && 
 // App 內在提示列尾端帶 OTA 版次前 6 碼(⚙xxxxxx),一眼確認熱更新裝上了沒
 // 改成函式:語言轉換(OpenCC)是非同步載入,取值時才算才能拿到正確語言版本
 function noteIdle(){
-  return (NATIVE_STT ? enOr('🎤 講完按停或直接送出;不準可直接改字再送。','🎤 Tap stop or just send when done; edit the text if it misheard.')
-                     : enOr('🎤 用瀏覽器語音辨識(Chrome 較準);不準可直接改字再送。','🎤 Uses browser speech recognition (Chrome is most accurate); edit the text if it misheard.'))
+  // App 內不提 Chrome(對 App 用戶是雜訊);純瀏覽器才提示 Chrome 較準
+  return (NATIVE_STT ? enOr('講完按停或直接送出;不準可直接改字再送。','Tap stop or just send when done; edit the text if it misheard.')
+                     : enOr('語音不準時,可直接改字再送。','If speech is misheard, just edit the text and send.'))
     + (_IN_APP0 ? ' ⚙'+String(window.STAYJP_NATIVE.updateId||'embedded').slice(-6) : '');   // 取尾 6 碼:updateId 開頭是時間序,尾碼才分得出版本
 }
 function _nPost(o){ try{ window.ReactNativeWebView.postMessage(JSON.stringify(o)); }catch(e){} }
-if(NATIVE_STT){ var _n0=document.getElementById('inNote'); if(_n0) _n0.textContent=noteIdle(); }
+{ var _n0=document.getElementById('inNote'); if(_n0) _n0.textContent=noteIdle(); }   // 全路徑統一由 noteIdle 決定文案(App 內不提 Chrome)
 // 舊版 App(1.0.5,無原生辨識模組)在 App 內走 WKWebView 瀏覽器辨識:錄完 iOS session 卡在錄音模式
 // → 之後 TTS 沒聲音。錄音一結束就通知原生把 session 還原成播放(新版 App 的 OTA 有對應 handler)。
 const IN_APP = _IN_APP0;
@@ -683,8 +713,8 @@ function _nStart(){
   // 原生辨識從按下到真的收音有半秒延遲,太早講開頭會被吃掉。新版 App 會回報 audiostart:
   // 先顯示「準備中」,收到事件才切「開講」;舊版沒事件就照舊直接顯示錄音中。
   if(window.STAYJP_NATIVE.hasSpeechStartEvt){
-    document.getElementById('inNote').textContent=enOr('🎤 準備中…等一下再開口。','🎤 Getting ready… wait a moment before speaking.');
-    window.stayjpSpeechStarted=function(){ if(_wantRec) document.getElementById('inNote').textContent=enOr('🎤 開講!講完按停或直接按送出。','🎤 Go ahead! Tap stop or just send when done.'); };
+    document.getElementById('inNote').textContent=enOr('準備中…等一下再開口。','Getting ready… wait a moment before speaking.');
+    window.stayjpSpeechStarted=function(){ if(_wantRec) document.getElementById('inNote').textContent=enOr('開講!講完按停或直接按送出。','Go ahead! Tap stop or just send when done.'); };
   }
   window.stayjpSpeechResult=function(t,fin){
     if(t==null) return;
@@ -696,8 +726,8 @@ function _nStart(){
   window.stayjpSpeechEnd=function(err){
     recording=false;
     if(_sessFin){ if(!(_sessFin.trim()===_lastFin.trim()&&(Date.now()-_lastFinAt)<1000)) _recBase+=_sessFin; _lastFin=_sessFin; _lastFinAt=Date.now(); _sessFin=''; }   // 防 double-final 疊加(限 1 秒內)
-    if(err==='not-allowed'){ _wantRec=false; updateRecBtn(); document.getElementById('inNote').textContent=enOr('🎤 麥克風權限被關了:請到 iPhone 設定 → StayJP 允許麥克風。','🎤 Microphone access is off: allow it in iPhone Settings → StayJP.'); return; }
-    if(err){ _wantRec=false; updateRecBtn(); document.getElementById('inNote').textContent=enOr('🎤 辨識中斷('+err+'),再按一次麥克風重試。','🎤 Recognition stopped ('+err+') — tap the mic to retry.'); return; }
+    if(err==='not-allowed'){ _wantRec=false; updateRecBtn(); document.getElementById('inNote').textContent=enOr('麥克風權限被關了:請到 iPhone 設定 → StayJP 允許麥克風。','Microphone access is off: allow it in iPhone Settings → StayJP.'); return; }
+    if(err){ _wantRec=false; updateRecBtn(); document.getElementById('inNote').textContent=enOr('辨識中斷('+err+'),再按一次麥克風重試。','Recognition stopped ('+err+') — tap the mic to retry.'); return; }
     if(_wantRec){ setTimeout(function(){ if(_wantRec){ _sessFin=''; recording=true; _nPost({type:'SPEECH_START',lang:'ja-JP',continuous:true}); } },200); return; }   // 停頓自動續錄(舊版 App 無 continuous 時的後備路徑)
     updateRecBtn();
   };
@@ -728,9 +758,9 @@ function _newRec(){
   };
   r.onerror=e=>{
     const c=e&&e.error;
-    if(c==='not-allowed'||c==='service-not-allowed'){ _wantRec=false; document.getElementById('inNote').textContent=enOr('🎤 麥克風權限被擋了:請允許此網站使用麥克風後再試。','🎤 Microphone blocked: allow mic access for this site and try again.'); }
+    if(c==='not-allowed'||c==='service-not-allowed'){ _wantRec=false; document.getElementById('inNote').textContent=enOr('麥克風權限被擋了:請允許此網站使用麥克風後再試。','Microphone blocked: allow mic access for this site and try again.'); }
     else if(c==='no-speech'){ /* 沒聽到聲音:交給 onend 自動續錄 */ }
-    else if(c&&c!=='aborted'){ document.getElementById('inNote').textContent=enOr('🎤 辨識中斷('+c+'),再按一次麥克風重試。','🎤 Recognition stopped ('+c+') — tap the mic to retry.'); _wantRec=false; }
+    else if(c&&c!=='aborted'){ document.getElementById('inNote').textContent=enOr('辨識中斷('+c+'),再按一次麥克風重試。','Recognition stopped ('+c+') — tap the mic to retry.'); _wantRec=false; }
   };
   r.onend=()=>{
     recording=false;
@@ -753,7 +783,7 @@ function startRec(){
   _wantRec=true;
   _recBase=(document.getElementById('say').value||''); _lastFin='';   // 新錄音起點:input 既有文字(含點提示帶入的)不參與去重
   if(_recBase && !/[\s、。]$/.test(_recBase)) _recBase+='';   // 接續原文
-  document.getElementById('inNote').textContent=enOr('🎤 錄音中…講完按停或直接按送出。','🎤 Recording… tap stop or just send when done.');
+  document.getElementById('inNote').textContent=enOr('錄音中…講完按停或直接按送出。','Recording… tap stop or just send when done.');
   if(NATIVE_STT){ _nStart(); return; }
   _startInstance();
 }
@@ -793,13 +823,13 @@ document.addEventListener('keydown',e=>{ if(e.target && e.target.id==='say' && e
   set(q('#pick a'),'‹ Back');
   const h1=q('#pick h1'); if(h1) h1.innerHTML='Scenario Chat <span class="muted" style="font-weight:400">Beta</span>';
   set(q('#pick .sub'),'Pick a scene and level — the AI plays the other person and chats with you turn by turn. Speak (speech recognition) or type. 1 free session; Premium gets 5 per day.');
-  const note=q('#pick > .muted'); if(note) note.innerHTML='💡 This is conversation practice — for single-sentence shadowing, go to <a href="speak.html" style="color:var(--accent)">Speaking practice</a>.';
+  const note=q('#pick > .muted'); if(note) note.innerHTML='<i data-ic=bulb></i> This is conversation practice — for single-sentence shadowing, go to <a href="speak.html" style="color:var(--accent)">Speaking practice</a>.';
   const cn=q('#cnBtn'); if(cn){ cn.textContent='ZH'; cn.title='Hide Chinese translations and rely on Japanese + audio to train listening'; }
   set(q('#endBtn'),'End & review');
   set(q('#topicBtn'),'Change topic');
   set(q('#topicBtn2'),'Change topic');
   set(q('#resumeBtn'),'Back to chat');
-  set(q('#rvTtl'),'📋 Chat review');
+  set(q('#rvTtl'),'Chat review');
   const say=q('#say'); if(say) say.placeholder='Speak or type…';
   set(q('#sendBtn'),'Send');
   set(q('#inNote'),noteIdle());
