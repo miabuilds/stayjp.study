@@ -1607,8 +1607,8 @@ html[data-fs="xlarge"] .gc .ex .j,html[data-fs="xlarge"] .cf-eg .ex .j{font-size
 html[data-fs="xlarge"] .gc .ex .z,html[data-fs="xlarge"] .gc .nt{font-size:17px}
 /* ---- 測驗/模考/讀解/聽力等彈窗:整塊等比放大(zoom 涵蓋所有文字,連 inline 詳解卡也吃得到)。
    zoom 會連框一起放大 → 同步用 calc 縮小框寬高,讓框維持原尺寸、只有內容變大,不溢出螢幕。 ---- */
-html[data-fs="large"] .quiz-box{zoom:1.15;width:calc(92%/1.15);max-width:480px;max-height:calc(85vh/1.15)}
-html[data-fs="xlarge"] .quiz-box{zoom:1.28;width:calc(92%/1.28);max-width:480px;max-height:calc(85vh/1.28)}
+html[data-fs="large"] .quiz-box{zoom:1.15}
+html[data-fs="xlarge"] .quiz-box{zoom:1.28}
 
 /* ── 字級 +1px 後的窄螢幕收斂(2026-08) ─────────────────────────────
    放大字級後兩處變擠:
