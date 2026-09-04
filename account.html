@@ -599,7 +599,15 @@ function renderSubscription(sub) {
  const premiumActions = document.getElementById('premiumActions');
  const appNote = document.getElementById('appPlatformNote');
 
+ // App 內購成功但 Firestore webhook 未落地的空窗:原生已注入 isPremium=true → 顯示同步中,別嚇用戶
+ const nativePrem = !!(window.STAYJP_NATIVE && window.STAYJP_NATIVE.isNativeApp && window.STAYJP_NATIVE.isPremium);
  if (!sub) {
+ if (nativePrem) {
+ planLabel.innerHTML = 'Premium <span class="badge b-active">開通同步中</span>';
+ rowStatus.style.display = 'none'; rowExpiry.style.display = 'none'; rowRenew.style.display = 'none'; rowSource.style.display = 'none';
+ freeActions.style.display = 'none'; premiumActions.style.display = 'none'; appNote.style.display = 'block';
+ return;
+ }
  planLabel.innerHTML = '免費版 <span class="badge b-free">FREE</span>';
  try { db.doc('free_users/' + auth.currentUser.uid).get().then(function(s){ if (s.exists) planLabel.innerHTML = '<i data-ic=ticket></i> 受邀帳號 <span class="badge b-active">全功能</span>'; }).catch(function(){}); } catch (e) {}
  rowStatus.style.display = 'none';
@@ -619,6 +627,12 @@ function renderSubscription(sub) {
  const inPeriod = !!(sub.expiresAt && sub.expiresAt > now);
  const isPrem = (sub.status === 'active' || sub.status === 'trialing' || sub.status === 'cancelled') && inPeriod;
  if (!isPrem) {
+ if (nativePrem) {
+ planLabel.innerHTML = 'Premium <span class="badge b-active">開通同步中</span>';
+ rowStatus.style.display = 'none'; rowExpiry.style.display = 'none'; rowRenew.style.display = 'none'; rowSource.style.display = 'none';
+ freeActions.style.display = 'none'; premiumActions.style.display = 'none'; appNote.style.display = 'block';
+ return;
+ }
  planLabel.innerHTML = '免費版 <span class="badge b-free">FREE</span>';
  try { db.doc('free_users/' + auth.currentUser.uid).get().then(function(s){ if (s.exists) planLabel.innerHTML = '<i data-ic=ticket></i> 受邀帳號 <span class="badge b-active">全功能</span>'; }).catch(function(){}); } catch (e) {}
  rowStatus.style.display = 'none';

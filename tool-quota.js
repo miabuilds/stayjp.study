@@ -668,6 +668,13 @@
     return `<a href="pricing.html" class="quota-upsell-line"><i data-ic=lock></i> 今日免費額度用完了 · 升級無限使用 ↗</a>`;
   }
 
+  // ── 購買後即時反映(App 內購):原生注入的 isPremium 值變化沒有事件,用前景切換+輕量輪詢兜底 ──
+  try {
+    document.addEventListener('visibilitychange', () => { if (!document.hidden) refreshBadge(); });
+    window.addEventListener('pageshow', () => refreshBadge());
+    setInterval(() => { if (document.getElementById('quotaBadge')) refreshBadge(); }, 20000);
+  } catch (e) {}
+
   window.ToolQuota = {
     canUse, consume, usedUp, upsellLine,
     // 這個工具今天的免費額度是否用完(被擋時才 true;trial/premium/未開閘 → false)。給按鈕顯示 🔒 用。
