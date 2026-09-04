@@ -26,7 +26,16 @@
       + 'html[data-fs="large"] header,html[data-fs="xlarge"] header,'
       + 'html[data-fs="large"] .qbar,html[data-fs="xlarge"] .qbar,'
       + 'html[data-fs="large"] .chatbar,html[data-fs="xlarge"] .chatbar,'
-      + 'html[data-fs="large"] footer,html[data-fs="xlarge"] footer{font-size:14px}';
+      + 'html[data-fs="large"] footer,html[data-fs="xlarge"] footer{font-size:14px}'
+      // 彈窗寬度隨字級等比放大(用戶回饋:字調大、盒子不變寬 → 每行塞沒幾個字,全部擠在一起)。
+      // 全站彈窗卡的固定 px 寬 ×1.125 / ×1.25,min(92vw,…) 護手機不超出螢幕。
+      + 'html[data-fs="large"] .aui-card{max-width:min(92vw,450px)}html[data-fs="xlarge"] .aui-card{max-width:min(92vw,500px)}'
+      + 'html[data-fs="large"] .hm-card{max-width:min(92vw,473px)}html[data-fs="xlarge"] .hm-card{max-width:min(92vw,525px)}'
+      + 'html[data-fs="large"] .onb-card{max-width:min(92vw,428px)}html[data-fs="xlarge"] .onb-card{max-width:min(92vw,475px)}'
+      + 'html[data-fs="large"] .modal{max-width:min(92vw,540px)}html[data-fs="xlarge"] .modal{max-width:min(92vw,600px)}'
+      + 'html[data-fs="large"] .shadow-box{max-width:min(94vw,675px)}html[data-fs="xlarge"] .shadow-box{max-width:min(94vw,750px)}'
+      + 'html[data-fs="large"] .party-card{max-width:min(92vw,383px)}html[data-fs="xlarge"] .party-card{max-width:min(92vw,425px)}'
+      + 'html[data-fs="large"] .cs-card{max-width:min(92vw,506px)}html[data-fs="xlarge"] .cs-card{max-width:min(92vw,563px)}';
     (document.head || document.documentElement).appendChild(st);
   }
   try { injectGuard(); } catch (e) {}

@@ -21,6 +21,14 @@
   .aui-btn{flex:1;font:inherit;font-size:.95em;font-weight:700;padding:.7em 1em;border-radius:12px;cursor:pointer;
     border:1px solid var(--line,var(--bd,#e5e0d8));background:none;color:var(--ink,var(--tx,#222))}
   .aui-btn.pri{background:var(--accent,var(--ac,#C6553B));border-color:var(--accent,var(--ac,#C6553B));color:#fff}
+  /* 字級放大 → 彈窗寬度等比放大(固定 px 寬會讓大字擠成一團);涵蓋全站各彈窗卡 */
+  html[data-fs="large"] .aui-card{max-width:min(92vw,450px)}html[data-fs="xlarge"] .aui-card{max-width:min(92vw,500px)}
+  html[data-fs="large"] .hm-card{max-width:min(92vw,473px)}html[data-fs="xlarge"] .hm-card{max-width:min(92vw,525px)}
+  html[data-fs="large"] .onb-card{max-width:min(92vw,428px)}html[data-fs="xlarge"] .onb-card{max-width:min(92vw,475px)}
+  html[data-fs="large"] .modal{max-width:min(92vw,540px)}html[data-fs="xlarge"] .modal{max-width:min(92vw,600px)}
+  html[data-fs="large"] .shadow-box{max-width:min(94vw,675px)}html[data-fs="xlarge"] .shadow-box{max-width:min(94vw,750px)}
+  html[data-fs="large"] .party-card{max-width:min(92vw,383px)}html[data-fs="xlarge"] .party-card{max-width:min(92vw,425px)}
+  html[data-fs="large"] .cs-card{max-width:min(92vw,506px)}html[data-fs="xlarge"] .cs-card{max-width:min(92vw,563px)}
   @media(prefers-color-scheme:dark){
     .aui-card{--aui-fb-bg:#211F1D}
     .aui-card{background:var(--panel,var(--bg2,#211F1D));border-color:var(--line,var(--bd,#3a352f))}
@@ -94,4 +102,5 @@
     alert: (msg, opts) => open(msg, opts, false),
     confirm: (msg, opts) => open(msg, opts, true),
   };
+  try { ensureStyle(); } catch (e) {}   // 立即注入:寬度縮放規則也涵蓋站上其他彈窗卡
 })();
