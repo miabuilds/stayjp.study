@@ -386,6 +386,7 @@ function render(){
   document.getElementById('kana').textContent = cur().kana;
   document.getElementById('zh').textContent = cvt(cur().zh);
   document.getElementById('said').value = '';
+  _recEditBase = ''; _prevRawSpeech = '';   // 換句:清錄音基底與上次辨識快取
   document.getElementById('fbCard').style.display = 'none';
   [...document.querySelectorAll('#chips .chip')].forEach((c,i)=>c.classList.toggle('on', i===idx));
 }
@@ -429,6 +430,18 @@ function _nPost(o){ try{ window.ReactNativeWebView.postMessage(JSON.stringify(o)
 const IN_APP = !!(window.STAYJP_NATIVE && window.STAYJP_NATIVE.isNativeApp && window.ReactNativeWebView);
 function _postRestore(){ if(IN_APP && !NATIVE_STT) _nPost({type:'AUDIO_RESTORE'}); }
 let rec=null, recording=false;
+// 使用者回饋:辨識出錯字 → 手動刪掉 → 重按錄音,被刪掉的字又回來。
+// 原因:辨識結果整串「覆蓋」輸入框,而原生(iOS)累積 transcript 或遲到的 final 會把舊句帶回來。
+// 修法:① 按錄音當下把輸入框現值當「基底」,新辨識接在後面(尊重使用者的手動編輯)
+//       ② 若新 transcript 以上一輪的整串開頭(原生沒重置累積),剝掉舊前綴只取新增
+let _recEditBase='', _prevRawSpeech='';
+function _joinSpeech(base, t){
+  t=(t||'').trim();
+  if(_prevRawSpeech && t.startsWith(_prevRawSpeech)) t=t.slice(_prevRawSpeech.length).trim();
+  if(!base) return t;
+  if(!t) return base;
+  return base + t;
+}
 // 語音辨識常見「整句/整段被辨識兩次」(iOS SFSpeech、Android、瀏覽器都會)。
 // 保守收合重複,但不誤傷日文畳語(色々・時々・どんどん…短疊字):只處理「整串完全念兩次」「結尾長片段(≥6字)重複」「空白分隔的連續重複詞」。
 function dedupeSpeech(s){
@@ -446,9 +459,16 @@ function dedupeSpeech(s){
 function toggleRec(){ recording ? stopRec() : startRec(); }
 function _recBtnUI(on){ const b=document.getElementById('recBtn'); if(!b)return; b.classList.toggle('on',on); b.innerHTML=on?enOr('<i data-ic=stop></i> 停止','<i data-ic=stop></i> Stop'):enOr('<i data-ic=mic></i> 開始錄音','<i data-ic=mic></i> Start recording'); }
 function startRec(){
+  // 基底 = 按錄音當下輸入框的字(尊重手動編輯;刪掉的字不會再回來)
+  _recEditBase = (document.getElementById('said').value||'').trim();
   if(window.STAYJP_NATIVE && window.STAYJP_NATIVE.canPlayB64) _nPost({type:'STOP_PLAY'});   // 開麥前停掉原生播放
   if(NATIVE_STT){
-    window.stayjpSpeechResult=function(t,fin){ if(t) document.getElementById('said').value = fin ? dedupeSpeech(t) : t; };
+    window.stayjpSpeechResult=function(t,fin){
+      if(!t) return;
+      const merged=_joinSpeech(_recEditBase, t);
+      document.getElementById('said').value = fin ? dedupeSpeech(merged) : merged;
+      if(fin){ _prevRawSpeech=(t||'').trim(); _recEditBase=document.getElementById('said').value; }
+    };
     window.stayjpSpeechEnd=function(err){
       recording=false; _recBtnUI(false);
       if(err==='not-allowed') document.getElementById('recNote').textContent=enOr('麥克風權限被關了:請到 iPhone 設定 → StayJP 允許麥克風。',' Microphone access is off. Go to iPhone Settings → StayJP and allow the microphone.');
@@ -461,7 +481,7 @@ function startRec(){
   if(!SR){ document.getElementById('recNote').textContent=enOr('這個瀏覽器不支援語音辨識,請直接打字你念的內容。',"This browser doesn't support speech recognition — just type what you said."); document.getElementById('said').focus(); return; }
   rec = new SR(); rec.lang='ja-JP'; rec.interimResults=true; rec.continuous=false;
   let finalTxt='';
-  rec.onresult = e=>{ let t=''; for(let i=0;i<e.results.length;i++) t+=e.results[i][0].transcript; const fin=e.results[e.results.length-1].isFinal; const out=fin?dedupeSpeech(t):t; document.getElementById('said').value=out; if(fin) finalTxt=out; };
+  rec.onresult = e=>{ let t=''; for(let i=0;i<e.results.length;i++) t+=e.results[i][0].transcript; const fin=e.results[e.results.length-1].isFinal; const merged=_joinSpeech(_recEditBase, t); const out=fin?dedupeSpeech(merged):merged; document.getElementById('said').value=out; if(fin){ finalTxt=out; _prevRawSpeech=(t||'').trim(); _recEditBase=out; } };
   rec.onerror = e=>{ document.getElementById('recNote').textContent=enOr('辨識出錯('+e.error+'),可直接打字。','Recognition error ('+e.error+') — you can just type instead.'); stopRec(); };
   rec.onend = ()=>{ recording=false; _recBtnUI(false); _postRestore(); };
   try{ rec.start(); recording=true; _recBtnUI(true); }catch(e){}

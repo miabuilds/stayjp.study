@@ -106,12 +106,17 @@ const Calendar = (() => {
     const monthLabels = (typeof I18n !== 'undefined' && I18n.getMonths)
       ? I18n.getMonths()
       : ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
+    let lastLabelCol = -9;
     for (let w = 0; w < weeks; w++) {
       const d = new Date(startDate);
       d.setDate(d.getDate() + w * 7);
       const m = d.getMonth();
       if (m !== lastMonth) {
-        months.push({ col: w, label: monthLabels[m] });
+        // 標籤至少隔 3 欄,否則跳過(修:首欄殘月與次月標籤重疊成「5月6月」)
+        if (w - lastLabelCol >= 3) {
+          months.push({ col: w, label: monthLabels[m] });
+          lastLabelCol = w;
+        }
         lastMonth = m;
       }
     }
@@ -242,5 +247,7 @@ const Calendar = (() => {
     panel.innerHTML = getPanelHTML();
   }
 
-  return { logActivity, renderPanel, getStreaks, getTodaySummary };
+  return { logActivity, renderPanel, getStreaks, getTodaySummary, heatmapHTML: buildHeatmap, getLog };
 })();
+// const 不上 window 的坑:讓 window.Calendar 也拿得到(供防衛式判斷)
+try { window.Calendar = Calendar; } catch (e) {}
