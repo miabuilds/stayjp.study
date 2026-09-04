@@ -44,9 +44,69 @@ const Stats = (() => {
     document.getElementById('quizBg').classList.remove('show');
   }
 
+  function buildProfileHero() {
+    const _e = (zh, en) => (typeof enOr === 'function' ? enOr((typeof cvt==='function'?cvt(zh):zh), en) : zh);
+    // 身分:登入顯示名/頭像;未登入給狸貓+登入引導
+    let name = _e('日語學習者', 'Japanese learner'), photo = '', loggedIn = false, email = '';
+    try {
+      const u = (typeof firebase !== 'undefined' && firebase.auth) ? firebase.auth().currentUser : null;
+      if (u) { loggedIn = true; name = u.displayName || (u.email || '').split('@')[0] || name; photo = u.photoURL || ''; email = u.email || ''; }
+    } catch (e) {}
+    // 統計:連續天數(取 streak/日曆較大者)、學習天數、今日動作
+    let days = 0, daysLearned = 0, todayN = 0;
+    try { if (typeof Streak !== 'undefined' && Streak.effectiveDays) days = Streak.effectiveDays(); } catch (e) {}
+    try {
+      if (typeof Calendar !== 'undefined' && Calendar.getLog) {
+        const log = Calendar.getLog();
+        Object.keys(log).forEach(k => { const d = log[k]; if ((d.vocab||0)+(d.grammar||0)+(d.quiz||0) > 0) daysLearned++; });
+      }
+      if (typeof Calendar !== 'undefined' && Calendar.getTodaySummary) todayN = Calendar.getTodaySummary().total || 0;
+    } catch (e) {}
+    // 等級與 Premium
+    let lv = ''; try { lv = (localStorage.getItem('goal_level') || localStorage.getItem('lastLevel') || '').toUpperCase(); } catch (e) {}
+    let prem = false;
+    try { prem = !!((window.ToolQuota && ToolQuota.isPremium && ToolQuota.isPremium()) || (window.STAYJP_NATIVE && STAYJP_NATIVE.isPremium)); } catch (e) {}
+    const avatar = photo
+      ? `<img class="pf-ava" src="${photo}" alt="" referrerpolicy="no-referrer" onerror="this.outerHTML='<img class=\'pf-ava\' src=\'images/mascot/tanuki-p07.png\' alt=\'\'>'">`
+      : `<img class="pf-ava pf-ava-tk" src="images/mascot/tanuki-p07.png" alt="">`;
+    const badges =
+      (lv ? `<span class="pf-badge">${lv}</span>` : '') +
+      (prem ? `<span class="pf-badge pf-prem">Premium</span>` : '') +
+      (!loggedIn ? `<button class="pf-login" onclick="handleAuth&&handleAuth()">${_e('登入同步進度', 'Sign in to sync')}</button>` : '');
+    return `<style>
+    .pf-hero{display:flex;align-items:center;gap:14px;background:linear-gradient(135deg,var(--bg2),var(--bg3,var(--bg2)));border:1px solid var(--bd);border-radius:18px;padding:16px;margin-bottom:14px}
+    .pf-ava{width:64px;height:64px;border-radius:50%;object-fit:cover;flex-shrink:0;border:2px solid var(--bd);background:var(--soft,rgba(198,85,59,.08))}
+    .pf-ava-tk{object-fit:contain;padding:6px}
+    .pf-name{font-size:17px;font-weight:800;line-height:1.3;display:flex;align-items:center;gap:8px;flex-wrap:wrap;min-width:0}
+    .pf-badge{font-size:10.5px;font-weight:800;color:var(--ac);border:1px solid var(--ac);border-radius:999px;padding:1px 8px}
+    .pf-prem{color:#B8860B;border-color:#D4A537;background:rgba(212,165,55,.1)}
+    .pf-login{font:inherit;font-size:12px;font-weight:700;color:#fff;background:var(--ac);border:0;border-radius:999px;padding:4px 12px;cursor:pointer}
+    .pf-sub{font-size:11.5px;color:var(--tx3);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .pf-stats{display:flex;gap:0;margin-top:10px}
+    .pf-stats>div{flex:1;text-align:center;cursor:pointer}
+    .pf-stats>div+div{border-left:1px solid var(--bd)}
+    .pf-stats b{display:block;font-size:20px;font-weight:800;color:var(--ac)}
+    .pf-stats span{font-size:10.5px;color:var(--tx2)}
+    </style>
+    <div class="pf-hero" onclick="if(window.Streak&&Streak.showInfo)Streak.showInfo()" title="${_e('點擊看學習熱力圖','Tap for study heatmap')}">
+      ${avatar}
+      <div style="flex:1;min-width:0">
+        <div class="pf-name"><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${(name||'').replace(/</g,'&lt;')}</span>${badges}</div>
+        ${email ? `<div class="pf-sub">${email.replace(/</g,'&lt;')}</div>` : `<div class="pf-sub">${_e('和狸貓一起,今天也前進一點','One step forward with the tanuki today')}</div>`}
+        <div class="pf-stats">
+          <div><b><i data-ic=fire></i> ${days}</b><span>${_e('連續天數','Streak')}</span></div>
+          <div><b>${daysLearned}</b><span>${_e('學習天數','Days studied')}</span></div>
+          <div><b>${todayN}</b><span>${_e('今日動作','Today')}</span></div>
+        </div>
+      </div>
+    </div>`;
+  }
+
   function buildHTML(showCloseBtn) {
     const closeBtn = showCloseBtn ? `<button class="qclose" style="width:auto;margin:0;padding:2px 10px" onclick="Stats.close()"><i data-ic=x></i></button>` : '';
     let h = `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0">${showCloseBtn ? t('stats_title') : '我的'}</h3>${closeBtn}</div>`;
+    // ── 個人 hero 卡(只在「我的」整頁版):狸貓頭像+名字+等級+Premium 標+三格統計 ──
+    if (!showCloseBtn) h += buildProfileHero();
     // 3 個 sub-tab：學習統計（總覽+考試紀錄）/ 我的詞庫（生詞本+不熟+錯題）/ 設定
     const wqCnt = getWrongQuestions().length;
     const nbCnt = getNotebook().length;
