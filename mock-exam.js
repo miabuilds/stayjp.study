@@ -10,6 +10,7 @@ const MockExam = (() => {
   let examStartTime = 0;
   let timerInterval = null;
   let sectionTimeLimit = 0; // ms
+  let wrongThisExam = [];   // 本場錯題明細(結果頁「錯題回顧」用;重考時清空)
 
   // ── Reading Passage Bank ──
   const PASSAGES = [
@@ -184,6 +185,7 @@ const MockExam = (() => {
 
   // ── Begin exam ──
   function beginExam() {
+    wrongThisExam = [];   // 重考清空本場錯題
     // 從起始面板讀 level；從結果頁呼叫時面板不存在，沿用上次
     const lvEl = document.querySelector('#meLevel .on');
     if (lvEl) examLevel = lvEl.dataset.v;
@@ -573,7 +575,17 @@ const MockExam = (() => {
     const section = sections[currentSection];
     const q = section.questions[currentQ];
     const correct = idx === q.correctIdx;
-    try { if (q.word && q.word.w && typeof speak === 'function') speak(q.word.w); } catch (e) {}   // 答題即唸單字(對錯都唸)
+    // 朗讀統一(用戶回饋:有的題唸有的不唸):一律唸「正確答案」——單字題唸單字,
+    // 其他題唸正確選項(僅當它含日文;讀解的中文選項不唸)
+    try {
+      if (typeof speak === 'function') {
+        if (q.word && q.word.w) speak(q.word.w);
+        else {
+          const ansTxt = String(q.options[q.correctIdx] || '').replace(/<[^>]+>/g, '').trim();
+          if (/[ぁ-ヶ一-龯ァ-ヶー]/.test(ansTxt) && ansTxt.length <= 40) speak(ansTxt);
+        }
+      }
+    } catch (e) {}
     const firstAnswer = answers[currentSection][currentQ] == null || answers[currentSection][currentQ] === -1;
     answers[currentSection][currentQ] = idx;
     if (firstAnswer && typeof Calendar !== 'undefined' && Calendar.logActivity) Calendar.logActivity('quiz');   // 模擬考答題算進今日目標(每題一次)
@@ -592,6 +604,16 @@ const MockExam = (() => {
       SRS.record(examLevel, q.word.w, correct);
     }
 
+    // 本場錯題明細(結果頁回顧)
+    if (!correct) {
+      wrongThisExam.push({
+        typeName: q.typeName,
+        prompt: q.prompt || '',
+        display: (q.display || '').replace(/<[^>]+>/g, '').trim(),
+        options: (q.options || []).map(o => String(o).replace(/<[^>]+>/g, '').trim()),
+        correctIdx: q.correctIdx, userIdx: idx,
+      });
+    }
     // 答錯：單字題進生詞本，其他題（文法/讀解）進錯題回顧
     if (!correct && typeof Stats !== 'undefined') {
       if (q.word && Stats.addToNotebook) {
@@ -616,22 +638,40 @@ const MockExam = (() => {
       }
     }
 
-    setTimeout(() => {
-      currentQ++;
-      if (currentQ >= section.questions.length) {
-        // Section done
-        clearInterval(timerInterval);
-        timerInterval = null;
-        if (currentSection < sections.length - 1) {
-          currentSection++;
-          startSection();
-        } else {
-          showResults();
-        }
+    // 停留看對錯(用戶回饋:答錯直接跳走看不清),按「下一題」才前進
+    const isLastQ = currentQ >= section.questions.length - 1;
+    const isLastSection = currentSection >= sections.length - 1;
+    const nextLabel = isLastQ ? (isLastSection ? (typeof enOr === 'function' ? enOr('看結果 →', 'See results →') : '看結果 →') : (typeof enOr === 'function' ? enOr('下一部分 →', 'Next section →') : '下一部分 →')) : (typeof enOr === 'function' ? enOr('下一題 →', 'Next →') : '下一題 →');
+    const optsBox = document.querySelector('#quizBox .qopts');
+    if (optsBox) {
+      const btn = document.createElement('button');
+      btn.className = 'qstart';
+      btn.style.cssText = 'margin-top:12px';
+      btn.textContent = nextLabel;
+      btn.onclick = () => nextQ();
+      optsBox.insertAdjacentElement('afterend', btn);
+      try { btn.focus(); } catch (e) {}
+    } else {
+      setTimeout(nextQ, correct ? 400 : 900);   // 保險:找不到容器就照舊自動跳
+    }
+  }
+
+  function nextQ() {
+    const section = sections[currentSection];
+    currentQ++;
+    if (currentQ >= section.questions.length) {
+      // Section done
+      clearInterval(timerInterval);
+      timerInterval = null;
+      if (currentSection < sections.length - 1) {
+        currentSection++;
+        startSection();
       } else {
-        renderQuestion();
+        showResults();
       }
-    }, correct ? 400 : 900);
+    } else {
+      renderQuestion();
+    }
   }
 
   // ── Results ──
@@ -761,6 +801,24 @@ const MockExam = (() => {
     });
     html += '</div>';
 
+    // 本場錯題回顧(用戶回饋:考完不知道錯在哪)
+    if (wrongThisExam.length) {
+      const eo = (zh, en) => (typeof enOr === 'function' ? enOr(zh, en) : zh);
+      html += '<details style="margin-bottom:14px;border:1px solid var(--bd);border-radius:8px;padding:10px 14px">' +
+        '<summary style="cursor:pointer;font-size:13px;font-weight:700;color:var(--tx)">' + eo('本場錯題回顧', 'Wrong answers this exam') + '(' + wrongThisExam.length + ')</summary>';
+      wrongThisExam.forEach(w => {
+        html += '<div style="border-top:1px solid var(--bd);padding:10px 0;font-size:13px">' +
+          '<div style="font-size:11px;color:var(--tx2)">' + escapeHTML(w.typeName || '') + '</div>' +
+          (w.prompt ? '<div style="font-weight:600;margin:2px 0">' + escapeHTML(w.prompt) + '</div>' : '') +
+          (w.display ? '<div style="color:var(--tx);margin:2px 0;line-height:1.6">' + escapeHTML(w.display) + '</div>' : '') +
+          '<div style="color:var(--wrong-tx)">✗ ' + eo('你的答案:', 'Your answer: ') + escapeHTML(w.options[w.userIdx] || '-') + '</div>' +
+          '<div style="color:var(--correct-tx)">✓ ' + eo('正解:', 'Correct: ') + escapeHTML(w.options[w.correctIdx] || '-') + '</div>' +
+        '</div>';
+      });
+      html += '<div style="border-top:1px solid var(--bd);padding-top:8px;font-size:11.5px;color:var(--tx2)">' + eo('錯的單字已自動加入生詞本;文法/讀解錯題收在「我的 → 學習統計 → 錯題回顧」。', 'Missed words go to your notebook; grammar/reading mistakes are saved under Me → Stats → Wrong answers.') + '</div>' +
+      '</details>';
+    }
+
     // Actions
     html += '<div class="qactions">' +
       `<button class="qstart" onclick="MockExam.shareCard('${examLevel}',${totalScore},${totalQuestions},${totalPct},${finalPass ? 1 : 0},'${timeStr}')"><i data-ic=camera></i> 分享成績卡</button>` +
@@ -822,7 +880,8 @@ const MockExam = (() => {
     ctx.fillText(pct + '%', 540, 630);
 
     // Pass / fail badge
-    const badgeText = passed ? '<i data-ic=check></i> 達標' : '<i data-ic=x></i> 繼續加油';
+    // canvas fillText 只吃純文字:別放 <i data-ic> 標籤(會原樣印出),用文字符號
+    const badgeText = passed ? '✓ 達標' : '繼續加油!';
     ctx.fillStyle = passed ? '#1C7F3F' : '#B8362A';
     ctx.font = 'bold 48px -apple-system, "Hiragino Sans", "PingFang TC", sans-serif';
     ctx.fillText(badgeText, 540, 740);
