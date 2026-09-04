@@ -78,7 +78,8 @@
   /* 輸入區固定畫面底部:訊息少時也壓底、訊息多時捲動黏底。
      min-height 由 JS 依 #chat 實際頂端量(fitChatHeight);sticky bottom 留 home indicator 間隙 */
   #chat{display:flex;flex-direction:column}
-  #chat .msgs{flex:1}
+  #chat .inbar{margin-top:auto}   /* 輸入列壓底;msgs 不撐高(撐高會把開場訊息留在視野外,像 bug) */
+  #chat .msgs{padding-bottom:12px}
   .wrap.chatting{padding-bottom:0}   /* wrap 的 40px 底 padding 會把 sticky 擋在離底 40px 上(sticky 出不了父容器) */
   .inbar{position:sticky;bottom:calc(env(safe-area-inset-bottom, 0px) + 8px);z-index:4;background:var(--bg);padding:12px 8px;margin:12px -8px 0;border-top:1px solid var(--line);border-radius:16px}
   #chat.has-bg .inbar{background:var(--veil);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-top:0;box-shadow:0 -1px 6px rgba(0,0,0,.06)}
@@ -292,7 +293,7 @@ function show(id){
 function fitChatHeight(){
   const c=document.getElementById('chat'); if(!c||c.style.display==='none')return;
   const vh=(window.visualViewport&&window.visualViewport.height)||window.innerHeight;
-  c.style.minHeight=Math.max(320, vh - c.getBoundingClientRect().top - 2)+'px';
+  c.style.minHeight=Math.max(320, vh - c.getBoundingClientRect().top - 14)+'px';
 }
 try{ (window.visualViewport||window).addEventListener('resize', fitChatHeight); }catch(e){}
 function renderLvTabs(){
@@ -426,8 +427,10 @@ function renderMsgs(streamingAi){
   }
   if(streamingAi!=null) html += aiBubble(streamingAi) + '<div class="typing">相手が入力中…</div>';
   box.innerHTML = html;
-  box.scrollIntoView({block:'end'});
-  window.scrollTo(0, document.body.scrollHeight);
+  // 捲到最新一則(nearest:已在視野內就不動)——原本硬捲到頁面最底,
+  // 開場時訊息區被撐高,AI 第一句被留在視野上方(用戶回饋「有聲音沒字,以為壞掉」)
+  const last = box.lastElementChild;
+  if (last) last.scrollIntoView({ block: 'nearest' });
 }
 function aiBubble(m){
   const jp = m.jp || m.text || '';
