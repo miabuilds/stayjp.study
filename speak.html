@@ -42,6 +42,37 @@
   .rec.on{background:var(--bad);color:#fff;border-color:var(--bad)}
   .muted{color:var(--ink3);font-size:12px}
   .ring{display:inline-flex;align-items:center;justify-content:center;width:64px;height:64px;border-radius:50%;font-size:22px;font-weight:800;color:#fff;flex-shrink:0}
+  /* 評分揭曉:動畫圓環 + 狸貓反應 */
+  .fb-hero{display:flex;align-items:center;gap:14px;margin-bottom:12px}
+  .score-wrap{position:relative;width:76px;height:76px;flex-shrink:0}
+  .score-wrap svg{transform:rotate(-90deg)}
+  .score-wrap .sn{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:23px;font-weight:800}
+  .fb-hero .vx{flex:1;min-width:0}
+  .fb-mascot{width:84px;height:auto;flex-shrink:0;animation:mpop .45s cubic-bezier(.34,1.56,.64,1) both}
+  @keyframes mpop{from{transform:scale(.4) rotate(-8deg);opacity:0}to{transform:scale(1) rotate(0);opacity:1}}
+  @media(max-width:400px){.fb-mascot{width:64px}}
+  /* 錄音中:麥克風脈衝光圈 */
+  .rec.on{animation:recPulse 1.6s ease-out infinite}
+  @keyframes recPulse{0%{box-shadow:0 0 0 0 rgba(251,146,60,.45)}70%{box-shadow:0 0 0 14px rgba(251,146,60,0)}100%{box-shadow:0 0 0 0 rgba(251,146,60,0)}}
+  /* 句子序號:等寬小圓點 */
+  .chip.num{width:30px;height:30px;display:inline-flex;align-items:center;justify-content:center;padding:0;border-radius:50%;font-size:11.5px}
+  .chip.num.s3{background:var(--ok);border-color:var(--ok);color:#fff}
+  .chip.num.s2{background:var(--warn);border-color:var(--warn);color:#fff}
+  .chip.num.s1{border-color:var(--bad);color:var(--bad)}
+  .chip.num.on{outline:2px solid var(--accent);outline-offset:1px}
+  .fb-cta{display:flex;gap:10px;margin-top:16px}
+  .fb-cta .btn{flex:1;padding:12px;font-size:15px}
+  .party-mask{position:fixed;inset:0;z-index:900;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;padding:24px}
+  .party-card{background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:28px 24px;max-width:340px;width:100%;text-align:center;animation:mpop .5s cubic-bezier(.34,1.56,.64,1) both}
+  .party-card img{width:110px;height:auto}
+  .party-card h3{font-size:19px;margin:10px 0 4px}
+  .party-card p{color:var(--ink2);font-size:13.5px;margin-bottom:16px}
+  .party-card .btn{width:100%;padding:12px}
+  .sent-pos{color:var(--ink3);font-size:11.5px;margin-left:auto;align-self:center}
+  /* 句卡:右上分類 icon 水印 */
+  .sent-card{position:relative;overflow:hidden}
+  .sent-wm{position:absolute;right:-6px;top:-4px;font-size:64px;color:var(--accent);opacity:.07;pointer-events:none;line-height:1}
+  .today .tk{width:44px;height:auto;margin-left:auto;flex-shrink:0}
   .fb-head{display:flex;gap:14px;align-items:center;margin-bottom:12px}
   .verdict{font-weight:700} .diff{color:var(--ink2);font-size:13px;margin-top:2px}
   .pt{display:flex;gap:8px;align-items:flex-start;padding:7px 0;border-top:1px solid var(--line);font-size:13.5px}
@@ -73,6 +104,7 @@
   <div class="today" id="todayCard" style="display:none">
     <div class="dring" id="dring"></div>
     <div><div class="tt" id="todayTt"></div><div class="td" id="todayTd"></div></div>
+    <img class="tk" src="images/mascot/tanuki-p06.png" alt="" aria-hidden="true">
   </div>
 
   <div class="card">
@@ -80,15 +112,18 @@
     <div class="lvdesc" id="lvdesc"></div>
     <div class="chips" id="cats"></div>
     <div class="chips" id="chips"></div>
+    <div class="sent-card">
+    <span class="sent-wm" id="catWm"></span>
     <div class="jp" id="jp">—</div>
     <div class="kana" id="kana"></div>
     <div class="zh" id="zh"></div>
+    </div>
     <div class="rowbtns">
       <button class="btn" onclick="speak()"><i data-ic=volume></i> 聽範例</button>
-      <button class="btn" id="favBtn" onclick="favToggle()" title="收藏這句">☆</button>
+      <button class="btn" id="favBtn" onclick="favToggle()" title="收藏這一句,之後到「我的收藏」複習">☆ <span id="favTx">收藏</span></button>
       <button class="btn" onclick="prev()">← 上一句</button>
       <button class="btn" onclick="next()">下一句 →</button>
-      <button class="btn" onclick="FavSents.open()"><i data-ic=star></i> 收藏句</button>
+      <button class="btn" onclick="FavSents.open()"><i data-ic=folder></i> 我的收藏</button>
     </div>
   </div>
 
@@ -375,11 +410,11 @@ function pickCat(k){ activeCat=k; idx=0; stopRec(); renderLvTabs(); renderChips(
 async function favToggle(){
   const c=cur(); if(!c||!window.FavSents) return;
   const r=await FavSents.toggle({jp:c.jp,kana:c.kana,zh:c.zh,src:'speak',v:'f'});
-  const fb=document.getElementById('favBtn'); if(fb&&r!==null) fb.textContent=r?'★':'☆';
+  if(r!==null) _setFavBtn(r);
 }
 function render(){
   // 漢字直接標逐詞假名(離線 kuromoji 生成、與手寫假名核對過才收錄;沒有的句子退回純文字+下方整句假名行)
-  try{ const fb=document.getElementById('favBtn'); if(fb) fb.textContent = (window.FavSents&&FavSents.isFav(cur().jp))?'★':'☆'; }catch(e){}
+  try{ _setFavBtn(!!(window.FavSents&&FavSents.isFav(cur().jp))); }catch(e){}
   const _rb=(window.SPEAK_RUBY||{})[cur().jp];
   if(_rb) document.getElementById('jp').innerHTML=_rb;
   else document.getElementById('jp').textContent = cur().jp;
@@ -389,11 +424,45 @@ function render(){
   _recEditBase = ''; _prevRawSpeech = '';   // 換句:清錄音基底與上次辨識快取
   document.getElementById('fbCard').style.display = 'none';
   [...document.querySelectorAll('#chips .chip')].forEach((c,i)=>c.classList.toggle('on', i===idx));
+  const _cw=document.getElementById('catWm');
+  if(_cw){ const c=CATS.find(x=>x.k===cur().cat); _cw.innerHTML=(c&&c.ic)||''; }
+  const _sp=document.getElementById('sentPos');
+  if(_sp) _sp.textContent=(idx+1)+' / '+list().length;
 }
+// 每句最佳成績(本機):染句號圓點——綠 ≥85 / 黃 60~84 / 橘框 <60,一眼看出哪些還沒練、想全點亮
+function spScores(){ try{ return JSON.parse(localStorage.getItem('sp_scores'))||{}; }catch(e){ return {}; } }
+function spSaveScore(jp,sc){ try{ const m=spScores(); if(!(m[jp]>=sc)) m[jp]=sc; localStorage.setItem('sp_scores',JSON.stringify(m)); }catch(e){} }
+function _scoreCls(sc){ return sc==null?'':sc>=85?' s3':sc>=60?' s2':' s1'; }
+function _setFavBtn(on){ const fb=document.getElementById('favBtn'),tx=document.getElementById('favTx');
+  if(fb) fb.firstChild.nodeValue=(on?'★':'☆')+' '; if(tx) tx.textContent=on?enOr('已收藏','Saved'):enOr('收藏','Save'); }
 function renderChips(){
-  document.getElementById('chips').innerHTML = list().map((s,i)=>`<span class="chip" onclick="go(${i})">${i+1}</span>`).join('');
+  const sc=spScores();
+  document.getElementById('chips').innerHTML = list().map((s,i)=>`<span class="chip num${_scoreCls(sc[s.jp])}" onclick="go(${i})" title="${sc[s.jp]!=null?enOr('最佳 ','best ')+sc[s.jp]:''}">${i+1}</span>`).join('')
+    + `<span class="sent-pos" id="sentPos"></span>`;
+  [...document.querySelectorAll('#chips .chip')].forEach((c,i)=>c.classList.toggle('on', i===idx));
 }
 function go(i){ idx=i; stopRec(); render(); }
+function retrySay(){ document.getElementById('said').value=''; _recEditBase=''; _prevRawSpeech='';
+  document.getElementById('recBtn').scrollIntoView({block:'center',behavior:'smooth'}); }
+function goNextSent(){
+  if(idx<list().length-1){ next(); } else { idx=0; stopRec(); render(); }
+  document.getElementById('jp').scrollIntoView({block:'center',behavior:'smooth'});
+}
+// 今日 10 句達標:狸貓慶祝(一天一次)
+function maybeParty(){
+  if(spToday()!==SP_GOAL) return;
+  const k='sp_party_'+spDayKey().slice(7);
+  try{ if(localStorage.getItem(k)) return; localStorage.setItem(k,'1'); }catch(e){}
+  const m=document.createElement('div'); m.className='party-mask';
+  m.innerHTML=`<div class="party-card">
+    <img src="images/mascot/tanuki-p06.png" alt="">
+    <h3>${enOr(cvt('今日 10 句達成!'),'10 sentences today — done!')}</h3>
+    <p>${enOr(cvt('口說就是這樣練起來的。明天狸貓在這裡等你。'),'This is how speaking gets built. See you tomorrow!')}</p>
+    <button class="btn pri" onclick="this.closest('.party-mask').remove()">${enOr(cvt('繼續練'),'Keep going')}</button>
+  </div>`;
+  m.onclick=e=>{ if(e.target===m) m.remove(); };
+  document.body.appendChild(m);
+}
 function prev(){ if(idx>0){ idx--; stopRec(); render(); } }
 function next(){ if(idx<list().length-1){ idx++; stopRec(); render(); } }
 
@@ -530,6 +599,7 @@ async function submit(){
     while(true){ const {done,value}=await reader.read(); if(done)break; full += dec.decode(value,{stream:true}); renderStream(full,false); }
     renderStream(full,true);
     spBumpToday();   // 評分成功 → 今日練習環 +1
+    maybeParty();    // 剛好達標 → 狸貓慶祝(一天一次)
   }catch(e){ fb.innerHTML='<div class="err">'+enOr('錯誤:','Error: ')+esc(e.message)+'</div>'; }
 }
 // 逐行輕結構 → 物件。串流中最後一行可能不完整,parse 不到就先略過,下一段補齊再顯示。
@@ -548,17 +618,48 @@ function renderStream(text, done){
   const d=parseFb(text);
   const sc=Number(d.score)||0;
   const col=sc>=85?'var(--ok)':sc>=60?'var(--warn)':'var(--bad)';
-  const head = d.score!=null
-    ? `<div class="fb-head"><div class="ring" style="background:${col}">${sc}</div>
-         <div><div class="verdict" style="color:${col}">${esc(cvt(d.verdict||''))}</div><div class="diff">${esc(cvt(d.diff||''))}</div></div></div>`
-    : '<div class="muted">'+enOr('AI 評分中…','AI is scoring…')+'</div>';
+  // 完成時:動畫分數環 + 狸貓反應(高分舉拳/中分讀書/低分趴牆探頭);串流中維持簡潔小環
+  let head;
+  if(done && d.score!=null){
+    const R=32, C=2*Math.PI*R;
+    const tk = sc>=85?'tanuki-p06':sc>=60?'tanuki-p07':'tanuki-p12';
+    head = `<div class="fb-hero">
+      <div class="score-wrap">
+        <svg viewBox="0 0 76 76" width="76" height="76">
+          <circle cx="38" cy="38" r="${R}" fill="none" stroke="var(--line)" stroke-width="7"/>
+          <circle id="scoreArc" cx="38" cy="38" r="${R}" fill="none" stroke="${col}" stroke-width="7" stroke-linecap="round"
+            stroke-dasharray="${C}" stroke-dashoffset="${C}" style="transition:stroke-dashoffset .9s cubic-bezier(.22,1,.36,1)"/>
+        </svg>
+        <span class="sn" style="color:${col}">${sc}</span>
+      </div>
+      <div class="vx"><div class="verdict" style="color:${col};font-size:16px">${esc(cvt(d.verdict||''))}</div><div class="diff">${esc(cvt(d.diff||''))}</div></div>
+      <img class="fb-mascot" src="images/mascot/${tk}.png" alt="">
+    </div>`;
+  } else {
+    head = d.score!=null
+      ? `<div class="fb-head"><div class="ring" style="background:${col}">${sc}</div>
+           <div><div class="verdict" style="color:${col}">${esc(cvt(d.verdict||''))}</div><div class="diff">${esc(cvt(d.diff||''))}</div></div></div>`
+      : '<div class="muted">'+enOr('AI 評分中…','AI is scoring…')+'</div>';
+  }
   const pts = (d.points||[]).map(p=>`<div class="pt"><span class="ic">${p.ok?'<i data-ic=check></i>':'<i data-ic=warning></i>'}</span><span class="lb">${esc(cvt(p.label||''))}</span><span>${esc(cvt(p.note||''))}</span></div>`).join('');
   document.getElementById('fbCard').innerHTML =
     head + pts
     + (d.corrected?`<div class="corr">${enOr('正確說法:','Correct version: ')}<b>${esc(d.corrected)}</b><div class="r">${esc(d.reading||'')}</div></div>`:'')
     + (d.tip?`<div class="tip"><i data-ic=bulb></i> ${esc(cvt(d.tip))}</div>`:'')
     + (d.encourage?`<div class="enc">${esc(cvt(d.encourage))}</div>`:'')
+    + (done && d.score!=null?`<div class="fb-cta">
+        <button class="btn" onclick="retrySay()"><i data-ic=refresh></i> ${enOr('再念一次','Try again')}</button>
+        <button class="btn pri" onclick="goNextSent()">${enOr('下一句 →','Next →')}</button>
+      </div>`:'')
     + (!done && d.score!=null?'<div class="muted" style="margin-top:8px">…</div>':'');
+  if(done && d.score!=null){
+    spSaveScore(cur().jp, sc);
+    renderChips();
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{
+      const arc=document.getElementById('scoreArc');
+      if(arc){ const R=32,C=2*Math.PI*R; arc.style.strokeDashoffset = String(C*(1-Math.min(sc,100)/100)); }
+    }));
+  }
 }
 function esc(s){ return String(s==null?'':s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
 
