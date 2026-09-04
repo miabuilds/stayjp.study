@@ -63,7 +63,7 @@
   .fb-cta{display:flex;gap:10px;margin-top:16px}
   .fb-cta .btn{flex:1;padding:12px;font-size:15px}
   .party-mask{position:fixed;inset:0;z-index:900;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;padding:24px}
-  .party-card{background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:28px 24px;max-width:340px;width:100%;text-align:center;animation:mpop .5s cubic-bezier(.34,1.56,.64,1) both}
+  .party-card{background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:28px 24px;max-width:340px;width:100%;max-height:82vh;overflow:auto;text-align:center;animation:mpop .5s cubic-bezier(.34,1.56,.64,1) both}
   .party-card img{width:110px;height:auto}
   .party-card h3{font-size:19px;margin:10px 0 4px}
   .party-card p{color:var(--ink2);font-size:13.5px;margin-bottom:16px}
@@ -141,6 +141,7 @@
 </div>
 
 <script src="icons.js"></script>
+<script src="ui-modal.js"></script>
 <script src="i18n.js"></script>
 <script src="audio/tts/manifest.js"></script>
 <script src="speak-ruby.js"></script>
@@ -567,8 +568,8 @@ function loginWith(p){
   auth.signInWithPopup(provider).then(function(){ var f=document.getElementById('fbCard'); if(f){f.style.display='none';} })
     .catch(function(e){ var c=e&&e.code;
       if(c==='auth/cancelled-popup-request'||c==='auth/popup-closed-by-user')return;
-      if(c==='auth/operation-not-allowed'){ alert(enOr('Apple 登入還在設定中,請先用 Google 登入。','Apple sign-in is still being set up — please use Google for now.')); return; }
-      alert(enOr('登入失敗:','Sign-in failed: ')+(e&&e.message||e));
+      if(c==='auth/operation-not-allowed'){ AppUI.alert(enOr('Apple 登入還在設定中,請先用 Google 登入。','Apple sign-in is still being set up — please use Google for now.')); return; }
+      AppUI.alert(enOr('登入失敗:','Sign-in failed: ')+(e&&e.message||e));
     }).finally(function(){ _signingIn=false; });
 }
 function showLoginCard(){
