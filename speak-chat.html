@@ -75,10 +75,12 @@
     }
   }
   #chat.has-bg .bubble{box-shadow:0 1px 4px rgba(0,0,0,.07)}
-  /* 輸入區固定畫面底部:訊息少時也壓底、訊息多時捲動黏底 */
-  #chat{display:flex;flex-direction:column;min-height:calc(100dvh - 110px)}
+  /* 輸入區固定畫面底部:訊息少時也壓底、訊息多時捲動黏底。
+     min-height 由 JS 依 #chat 實際頂端量(fitChatHeight);sticky bottom 留 home indicator 間隙 */
+  #chat{display:flex;flex-direction:column}
   #chat .msgs{flex:1}
-  .inbar{position:sticky;bottom:0;z-index:4;background:var(--bg);padding:12px 8px;margin:12px -8px 0;border-top:1px solid var(--line);border-radius:16px 16px 0 0}
+  .wrap.chatting{padding-bottom:0}   /* wrap 的 40px 底 padding 會把 sticky 擋在離底 40px 上(sticky 出不了父容器) */
+  .inbar{position:sticky;bottom:calc(env(safe-area-inset-bottom, 0px) + 8px);z-index:4;background:var(--bg);padding:12px 8px;margin:12px -8px 0;border-top:1px solid var(--line);border-radius:16px}
   #chat.has-bg .inbar{background:var(--veil);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-top:0;box-shadow:0 -1px 6px rgba(0,0,0,.06)}
   .msgs{display:flex;flex-direction:column;gap:12px;min-height:40px}
   .msg{display:flex;flex-direction:column;max-width:86%}
@@ -281,7 +283,18 @@ let showZh = true;     // 對話中是否顯示中文翻譯;關掉 → 只靠日
 function toggleZh(){ showZh=!showZh; const b=document.getElementById('cnBtn'); if(b) b.classList.toggle('off',!showZh); renderMsgs(); }
 
 // ── 畫面切換 ──
-function show(id){ ['pick','chat','review','logs','logview'].forEach(x=>document.getElementById(x).style.display = x===id?(x==='chat'?'flex':'block'):'none'); }
+function show(id){
+  ['pick','chat','review','logs','logview'].forEach(x=>document.getElementById(x).style.display = x===id?(x==='chat'?'flex':'block'):'none');
+  const wrap=document.querySelector('.wrap'); if(wrap) wrap.classList.toggle('chatting', id==='chat');
+  if(id==='chat') requestAnimationFrame(fitChatHeight);
+}
+// #chat 撐到視窗底:輸入列(sticky)訊息少時也貼底。鍵盤開合/轉向重算。
+function fitChatHeight(){
+  const c=document.getElementById('chat'); if(!c||c.style.display==='none')return;
+  const vh=(window.visualViewport&&window.visualViewport.height)||window.innerHeight;
+  c.style.minHeight=Math.max(320, vh - c.getBoundingClientRect().top - 2)+'px';
+}
+try{ (window.visualViewport||window).addEventListener('resize', fitChatHeight); }catch(e){}
 function renderLvTabs(){
   const D={N5:enOr('最基本','Basics'),N4:enOr('日常','Daily'),N3:enOr('中級','Intermediate'),N2:enOr('中上','Upper-int'),N1:enOr('高階','Advanced')};
   document.getElementById('lvtabs').innerHTML = LEVELS.map(lv=>
@@ -388,6 +401,7 @@ function startChat(k){
   document.getElementById('chatTtl').innerHTML = `<span class="t-jp">${esc(scene.jp||'')}</span><span class="t-sub">${esc(sceneTitle(scene))} · ${activeLv}</span>`;
   document.getElementById('msgs').innerHTML = '';
   document.getElementById('say').value = '';
+  _prevRawNative=''; _recBase=''; _sessFin=''; _lastFin='';
   try { if (scene.k!=='custom') localStorage.setItem('sc_last', JSON.stringify({ k: scene.k, lv: activeLv })); } catch(e) {}
   // 場景背景圖(有切好的才掛;veil 由 CSS 蓋淡)
   const chatEl=document.getElementById('chat');
@@ -579,6 +593,7 @@ async function sendMine(){
   busy=false;   // 交棒給 turn()(它自己上鎖);push 前解鎖,確保 turn 不被自己人擋下
   history.push({ role:'me', text:showTxt, orig:origTxt });
   el.value=''; autoGrow();
+  _prevRawNative='';   // 訊息已送出:下一段辨識是全新開始,別再剝上一段前綴
   renderHints([]);   // 你已經回了 → 清掉上一輪建議
   renderMsgs();
   turn();
@@ -728,7 +743,7 @@ async function playTTS(text, voice){
 // 三個舊坑:①舊實例沒 abort 釋放,幾輪後 Chrome 辨識服務卡死 → 每次 start 前先 abort 舊的
 // ②AI 語音還在播就開麥,部分裝置直接中斷 → 開麥前先停播音 ③錯誤靜默 → 顯示原因
 // 加碼補上先前的回饋:辨識「接續不覆蓋」(保留已輸入)、停頓自動續錄(按停或送出才真的停)
-let rec=null, recording=false, _wantRec=false, _recBase='', _sessFin='', _lastFin=''; let _lastFinAt=0;   // _lastFin=上一段已併入的定案文字(double-final 去重專用;不能拿整個 input 比,會吃掉「唸出與輸入框相同字」的正常輸入)
+let rec=null, recording=false, _wantRec=false, _recBase='', _sessFin='', _lastFin=''; let _lastFinAt=0; let _prevRawNative='';   // 上一段原生辨識的原始累積全文(剝跨 session 前綴用)   // _lastFin=上一段已併入的定案文字(double-final 去重專用;不能拿整個 input 比,會吃掉「唸出與輸入框相同字」的正常輸入)
 // App 內改走「原生 SFSpeechRecognizer」橋(app.html 發音檢查同一條):
 // WKWebView 的瀏覽器辨識不可靠(會亮著卻收不到音),而且 WebView 麥克風授權每次開 App 都重問;
 // 原生辨識穩定、權限是系統級只問一次。橋:postMessage SPEECH_START/STOP ← → stayjpSpeechResult/End。
@@ -740,7 +755,7 @@ function noteIdle(){
   // App 內不提 Chrome(對 App 用戶是雜訊);純瀏覽器才提示 Chrome 較準
   return (NATIVE_STT ? enOr('講完按停或直接送出;不準可直接改字再送。','Tap stop or just send when done; edit the text if it misheard.')
                      : enOr('語音不準時,可直接改字再送。','If speech is misheard, just edit the text and send.'))
-    + (_IN_APP0 ? ' ⚙'+String(window.STAYJP_NATIVE.updateId||'embedded').slice(-6) : '');   // 取尾 6 碼:updateId 開頭是時間序,尾碼才分得出版本
+    ;   // (OTA 版次 debug 標記已移除:一般用戶看到「⚙+亂碼」只會困惑)
 }
 function _nPost(o){ try{ window.ReactNativeWebView.postMessage(JSON.stringify(o)); }catch(e){} }
 { var _n0=document.getElementById('inNote'); if(_n0) _n0.textContent=noteIdle(); }   // 全路徑統一由 noteIdle 決定文案(App 內不提 Chrome)
@@ -758,10 +773,14 @@ function _nStart(){
   }
   window.stayjpSpeechResult=function(t,fin){
     if(t==null) return;
+    // 原生(iOS)偶發跨 session 累積:新一段的 transcript 以上一段整串開頭 → 剝掉舊前綴只取新增
+    // (用戶實錘:刪掉辨識文字重講,上一段內容跟著一起回來)
+    const rawT=t;
+    if(_prevRawNative && t.length>_prevRawNative.length && t.startsWith(_prevRawNative)) t=t.slice(_prevRawNative.length);   // 必須更長才剝:等長=用戶真的重講一樣的話,不是累積
     if(t && _lastFin && t.trim()===_lastFin.trim() && (Date.now()-_lastFinAt)<1000) return;   // double-final 重播只發生在結束瞬間;超過 1 秒的同字=使用者真的重講(はい、はい),要收
     const el=document.getElementById('say');
     el.value=_recBase+t; autoGrow();          // 原生 transcript 是這一段的累積全文,直接接在 base 後
-    if(fin && t) _sessFin=t;
+    if(fin && t){ _sessFin=t; _prevRawNative=rawT; }
   };
   window.stayjpSpeechEnd=function(err){
     recording=false;
@@ -848,7 +867,17 @@ function hardStopRec(){
 function updateRecBtn(){ const b=document.getElementById('recBtn'); if(b) b.classList.toggle('on',recording||_wantRec); }
 
 function autoGrow(){ const el=document.getElementById('say'); if(!el)return; el.style.height='auto'; el.style.height=Math.min(120,el.scrollHeight)+'px'; }
-document.addEventListener('input',e=>{ if(e.target && e.target.id==='say') autoGrow(); });
+document.addEventListener('input',e=>{
+  if(!(e.target && e.target.id==='say')) return;
+  autoGrow();
+  // 錄音中手動編輯(通常=刪錯字):立刻停止錄音並以編輯後內容為準——否則原生累積
+  // transcript 下一個 result 就把刪掉的字整段寫回來(用戶實錘「刪了又出現兩次」)
+  if(recording || _wantRec){
+    hardStopRec();
+    _recBase=e.target.value; _sessFin=''; _lastFin=''; _prevRawNative='';
+    const n=document.getElementById('inNote'); if(n) n.textContent=enOr('已停止錄音(你在編輯)。改好可直接送出,或再按麥克風續錄。','Recording stopped while you edit. Send when ready, or tap the mic to continue.');
+  }
+});
 document.addEventListener('keydown',e=>{ if(e.target && e.target.id==='say' && e.key==='Enter' && !e.shiftKey){ e.preventDefault(); sendMine(); } });
 
 // ── 靜態 UI 三語:en 逐項換字、zh-CN 走 OpenCC 整頁轉(非同步,自帶重試)──
