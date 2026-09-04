@@ -104,7 +104,8 @@ const Stats = (() => {
 
   function buildHTML(showCloseBtn) {
     const closeBtn = showCloseBtn ? `<button class="qclose" style="width:auto;margin:0;padding:2px 10px" onclick="Stats.close()"><i data-ic=x></i></button>` : '';
-    let h = `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0">${showCloseBtn ? t('stats_title') : '我的'}</h3>${closeBtn}</div>`;
+    // 「我的」整頁版不放標題(hero 卡已代表頁面,多一行「我的」很多餘——用戶回饋);彈窗版保留標題+關閉鈕
+    let h = showCloseBtn ? `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0">${t('stats_title')}</h3>${closeBtn}</div>` : '';
     // ── 個人 hero 卡(只在「我的」整頁版):狸貓頭像+名字+等級+Premium 標+三格統計 ──
     if (!showCloseBtn) h += buildProfileHero();
     // 3 個 sub-tab：學習統計（總覽+考試紀錄）/ 我的詞庫（生詞本+不熟+錯題）/ 設定
