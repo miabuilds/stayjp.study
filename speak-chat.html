@@ -426,11 +426,22 @@ function renderMsgs(streamingAi){
     }
   }
   if(streamingAi!=null) html += aiBubble(streamingAi) + '<div class="typing">相手が入力中…</div>';
-  // 渲染前先量:使用者是否本來就在底部附近(<160px)——是就跟著貼底(對話變長/串流增長不用手動滑);
-  // 往上翻舊訊息時不打擾。開場內容不足一屏時 scrollTo 底=不動,AI 第一句仍在頂部可見。
-  const nearBottom = (window.innerHeight + window.scrollY) >= (document.body.scrollHeight - 160);
+  // 捲動規則(用戶再三回饋「一定要看到對方說了什麼」):
+  // 錨點=最新一則訊息的「開頭」對齊頂欄下方——不管訊息多長都從頭看,
+  // 不再對齊頁面底(inbar margin-top:auto 的空白會把唯一一則訊息推出視野=「有聲音沒字」)。
+  // 使用者往上翻舊訊息(離底 >240px)時不打擾。
+  const away = (document.body.scrollHeight - window.innerHeight - window.scrollY) > 240;
   box.innerHTML = html;
-  if (nearBottom) window.scrollTo(0, document.body.scrollHeight);
+  if (!away) {
+    const msgs = box.querySelectorAll('.msg');
+    const last = msgs.length ? msgs[msgs.length - 1] : box.lastElementChild;   // 錨訊息泡泡,別錨到教練卡/輸入中指示
+    if (last) {
+      const bar = document.querySelector('#chat .chatbar');
+      const barH = bar ? bar.getBoundingClientRect().height : 56;
+      const top = last.getBoundingClientRect().top + window.scrollY - barH - 10;
+      window.scrollTo(0, Math.max(0, top));
+    }
+  }
 }
 function aiBubble(m){
   const jp = m.jp || m.text || '';
