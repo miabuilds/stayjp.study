@@ -574,6 +574,7 @@ async function sendMine(){
   busy=true;   // 入口即上鎖:toJa 翻譯 await 期間 Enter 連發會把同一句 push 兩次(審查實錘);turn() 內部會接手 busy 狀態
   // 每場 12 輪封頂(成本天花板):到頂自動進點評收尾
   if(history.filter(h=>h.role==='me').length >= 12){
+    busy=false;   // ⚠️ 必須解鎖:endChat 開頭檢查 busy,鎖著會讓「自動點評/手動看點評/再送出」全部沒反應(用戶實錘:聊到最後全卡死)
     appendErr(enOr('這場聊得很充實了!幫你整理點評','Great session! Putting together your review')); setTimeout(endChat, 800); return;
   }
   hardStopRec();
