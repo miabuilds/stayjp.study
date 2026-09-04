@@ -2459,7 +2459,7 @@ function renderHub() {
           + '</div>'
         + '</div>'
         + '<button class="hub-goal" onclick="dailyHelp()">'
-          + '<div class="hub-goal-top"><b>' + L('今日目標', 'Today’s goal') + '</b><span class="hub-goal-n">' + done + ' / ' + GOAL + '</span></div>'
+          + '<div class="hub-goal-top"><b>' + L('今日目標', 'Today’s goal') + '</b><span class="hub-goal-n">' + Math.min(done, GOAL) + ' / ' + GOAL + '</span></div>'
           + '<div class="hub-goal-bar"><div class="hub-goal-fill" style="width:' + (firstHub ? '0' : pct + '%') + '"></div></div>'
           + '<div class="hub-goal-hint">' + (done >= GOAL ? L('今天達成了，太強了！', 'Goal reached — nice!') : L('做滿 30 個學習動作就達標（背卡・答題・複習…混著做都算）', 'Do 30 study actions today — anything counts')) + '</div>'
         + '</button>'
