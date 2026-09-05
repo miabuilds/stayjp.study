@@ -68,6 +68,50 @@
   .party-card h3{font-size:19px;margin:10px 0 4px}
   .party-card p{color:var(--ink2);font-size:13.5px;margin-bottom:16px}
   .party-card .btn{width:100%;padding:12px}
+  /* ── 跟讀課程(Speak 式逐字亮燈) ── */
+  .ls-mask{position:fixed;inset:0;z-index:800;background:var(--bg);display:flex;flex-direction:column;padding:14px 16px calc(env(safe-area-inset-bottom,0px) + 14px)}
+  .ls-top{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+  .ls-x{font:inherit;border:1px solid var(--line);background:var(--panel);color:var(--ink2);border-radius:10px;padding:6px 12px;cursor:pointer}
+  .ls-segs{flex:1;display:flex;gap:5px}
+  .ls-seg{flex:1;height:5px;border-radius:99px;background:var(--line);overflow:hidden}
+  .ls-seg i{display:block;height:100%;width:0;background:var(--accent);border-radius:99px;transition:width .3s}
+  .ls-seg.done i{width:100%;background:var(--ok)}
+  .ls-card{background:var(--panel);border:1px solid var(--line);border-radius:20px;box-shadow:var(--sh);padding:26px 20px;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:14px;overflow:auto}
+  .ls-hint{font-size:12.5px;font-weight:800;color:#fff;background:var(--accent);border-radius:999px;padding:4px 14px;min-height:1em}
+  .ls-hint.listen{background:var(--ok)}
+  .ls-jp{font-size:30px;font-weight:800;line-height:1.8;letter-spacing:.02em;max-width:560px}
+  .ls-jp ruby rt{font-size:10px;font-weight:500;color:var(--ink3)}
+  .ls-jp .lu{color:var(--ink3);transition:color .12s}
+  .ls-jp .lu.hit{color:var(--accent)}
+  .ls-jp .lu.hit ruby rt{color:var(--accent2)}
+  .ls-jp .lu.pn{color:var(--ink3);opacity:.6}
+  .ls-jp .lu.blank{color:transparent;background:var(--soft);border-radius:8px;box-shadow:inset 0 -2px 0 var(--accent)}
+  .ls-jp .lu.blank ruby rt{color:transparent}
+  .ls-jp .lu.blank.hit{color:var(--accent);background:none;box-shadow:none}
+  .ls-jp .lu.blank.hit ruby rt{color:var(--accent2)}
+  .ls-jp.passed .lu,.ls-jp.passed .lu ruby rt{color:var(--ok)}
+  .ls-zh{color:var(--ink2);font-size:15px}
+  .ls-ctl{display:flex;gap:12px;align-items:center;justify-content:center}
+  .ls-ctl button{font:inherit;width:52px;height:52px;border-radius:50%;border:1px solid var(--line);background:var(--panel);color:var(--ink);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:20px}
+  .ls-ctl button.big{width:64px;height:64px;background:var(--accent);border-color:var(--accent);color:#fff}
+  .ls-ctl button.big.on{background:var(--bad);border-color:var(--bad);animation:recPulse 1.6s ease-out infinite}
+  .ls-skip{font:inherit;border:none;background:none;color:var(--ink3);font-size:13px;cursor:pointer;text-decoration:underline}
+  .ls-said{min-height:1.4em;font-size:13px;color:var(--ink3);max-width:520px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .ls-next{font:inherit;font-size:16px;font-weight:800;background:var(--accent);color:#fff;border:0;border-radius:14px;padding:14px 42px;cursor:pointer;animation:mpop .35s cubic-bezier(.34,1.56,.64,1) both}
+  .ls-count{font-size:12px;font-weight:700;color:var(--ink3);white-space:nowrap}
+  .ls-card{position:relative;overflow:hidden}
+  .ls-wm{position:absolute;right:-8px;top:-6px;font-size:88px;color:var(--accent);opacity:.06;pointer-events:none;line-height:1}
+  .ls-tk{width:88px;height:auto;animation:mpop .45s cubic-bezier(.34,1.56,.64,1) both}
+  /* 入口卡 */
+  .ls-entry{display:flex;gap:14px;align-items:center;background:linear-gradient(135deg,var(--soft),var(--panel));border:1.5px solid var(--accent);border-radius:16px;box-shadow:var(--sh);padding:14px 16px;margin-bottom:16px}
+  .ls-entry>img{width:72px;height:auto;flex-shrink:0}
+  .le-t{font-weight:800;font-size:16px;display:flex;align-items:center;gap:8px}
+  .le-new{font-size:9px;font-weight:900;background:var(--accent);color:#fff;border-radius:8px;padding:1px 6px}
+  .le-d{font-size:12.5px;color:var(--ink2);margin-top:2px;line-height:1.5}
+  .le-prog{font-size:11.5px;color:var(--accent);font-weight:700;margin-top:4px;min-height:1em}
+  .le-btns{display:flex;gap:8px;margin-top:8px}
+  .le-btns .btn{font-size:13.5px;padding:8px 14px}
+  @media(max-width:430px){.ls-jp{font-size:24px}}
   .sent-pos{color:var(--ink3);font-size:11.5px;margin-left:auto;align-self:center}
   /* 句卡:右上分類 icon 水印 */
   .sent-card{position:relative;overflow:hidden}
@@ -107,6 +151,20 @@
     <img class="tk" src="images/mascot/tanuki-p06.png" alt="" aria-hidden="true">
   </div>
 
+  <!-- 跟讀課程入口卡(醒目區塊;進度由 updateLessonCard 填) -->
+  <div class="ls-entry" id="lsEntry">
+    <img src="images/mascot/tanuki-p02.png" alt="" aria-hidden="true">
+    <div class="le-body">
+      <div class="le-t">跟讀課程 <span class="le-new">NEW</span></div>
+      <div class="le-d">聽一句、跟著唸,唸到哪字亮到哪——一輪 5 句,全程不用按鍵。</div>
+      <div class="le-prog" id="lsEntryProg"></div>
+      <div class="le-btns">
+        <button class="btn pri" onclick="Lesson.start('shadow')"><i data-ic=bolt></i> 開始跟讀</button>
+        <button class="btn" onclick="Lesson.start('blank')"><i data-ic=edit></i> 填空挑戰</button>
+      </div>
+    </div>
+  </div>
+
   <div class="card">
     <div class="lvtabs" id="lvtabs"></div>
     <div class="lvdesc" id="lvdesc"></div>
@@ -124,6 +182,7 @@
       <button class="btn" onclick="prev()">← 上一句</button>
       <button class="btn" onclick="next()">下一句 →</button>
       <button class="btn" onclick="FavSents.open()"><i data-ic=folder></i> 我的收藏</button>
+
     </div>
   </div>
 
@@ -399,6 +458,7 @@ function renderLvTabs(){
     return `<div class="lvtab${lv===activeLv?' on':''}" onclick="pickLv('${lv}')">${lv}<small>${enOr(n+' 句', n+' sentences')}</small></div>`;
   }).join('');
   document.getElementById('lvdesc').textContent = enOr(LV_DESC[activeLv]||'', LV_DESC_EN[activeLv]||'');
+  try{ updateLessonCard(); }catch(e){}
   // 分類 chips:只顯示該級別有句子的分類(+全部)
   const has = new Set(SENTS.filter(s=>s.lv===activeLv).map(s=>s.cat));
   document.getElementById('cats').innerHTML = CATS.filter(c=>c.k==='all'||has.has(c.k)).map(c=>{
@@ -663,6 +723,258 @@ function renderStream(text, done){
   }
 }
 function esc(s){ return String(s==null?'':s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
+
+// ══ 跟讀課程 / 填空挑戰(Speak 式):逐字即時亮燈,唸完整句自動過關 ══
+const Lesson=(()=>{
+  const N=5, PASS=0.85;
+  let seq=[], li=0, mode='shadow', units=[], saidRaw='', active=false, passed=false;
+  let rec2=null, listening=false, savedNativeHandlers=null, autoTimer=null;
+
+  const PUNCT=/[、。,.!?！？…・「」\s]/;
+  function kata2hira(t){ return t.replace(/[ァ-ヶ]/g,c=>String.fromCharCode(c.charCodeAt(0)-0x60)); }
+  function lnorm(t){ return kata2hira(String(t||'')).replace(/[、。,.!?！？…・「」\s0-9０-９]/g,''); }
+
+  // 句子 → 匹配單元:有 SPEAK_RUBY 用逐段(漢字段帶讀音),否則逐字元
+  function parseUnits(jp){
+    const html=(window.SPEAK_RUBY||{})[jp];
+    const out=[];
+    if(html){
+      const d=document.createElement('div'); d.innerHTML=html;
+      d.childNodes.forEach(n=>{
+        if(n.nodeName==='RUBY'){
+          const rt=n.querySelector('rt'); const r=rt?rt.textContent:'';
+          const t=(n.childNodes[0]&&n.childNodes[0].textContent)||'';
+          out.push({t, r:lnorm(r)});
+        } else {
+          for(const ch of n.textContent){ out.push(PUNCT.test(ch)?{t:ch,pn:true}:{t:ch}); }
+        }
+      });
+    } else {
+      for(const ch of jp){ out.push(PUNCT.test(ch)?{t:ch,pn:true}:{t:ch}); }
+    }
+    return out;
+  }
+
+  // 匹配:每輪對「整串辨識文字」全量重匹配(指針才能正確推進——先前版本已亮的字
+  // 不推指針,句子越長後面越搆不到,用戶實錘「ください 講三次都不亮」)。
+  // UI 只加不減(interim 抖動不閃退);進度取歷史最高。
+  let bestRatio=0;
+  function paint(said, isFinal){
+    const sN=lnorm(said);
+    let p=0, hitChars=0, totChars=0;
+    units.forEach((u,i)=>{
+      if(u.pn) return;
+      const t=lnorm(u.t);
+      totChars+=t.length||1;
+      let found=-1, len=0;
+      const win=sN.slice(p, p+Math.max(10,(t.length||1)+8));
+      if(t && win.indexOf(t)>=0){ found=win.indexOf(t); len=t.length; }
+      else if(u.r && win.indexOf(u.r)>=0){ found=win.indexOf(u.r); len=u.r.length; }
+      if(found>=0){
+        p+=found+len; hitChars+=t.length||1;
+        if(!u._hit){ u._hit=true; const el=document.getElementById('lsu'+i); if(el) el.classList.add('hit'); }
+      } else if(u._hit){
+        hitChars+=t.length||1;   // 曾亮過:計分保留(UI 不回退),指針不動,後面靠加大視窗接回
+      }
+    });
+    const ratio=totChars?hitChars/totChars:0;
+    if(ratio>bestRatio) bestRatio=ratio;
+    const seg=document.querySelector('.ls-seg.cur i'); if(seg) seg.style.width=Math.round(bestRatio*100)+'%';
+    if(passed) return;
+    if(bestRatio>=PASS) return pass();
+    // 寬容過關:一段講完(final)且大致唸到了(≥72%)→ 過。辨識漏一兩個字很常見,
+    // 卡死在 85% 過不了是挫折主因(用戶回饋「不太順」)。
+    if(isFinal && bestRatio>=0.72) return pass();
+  }
+
+  function curIt(){ return seq[li]; }
+  function render(){
+    const it=curIt(); units=parseUnits(it.jp); saidRaw=''; passed=false; bestRatio=0;
+    units.forEach(u=>delete u._hit);
+    let blankIdx=new Set();
+    if(mode==='blank'){
+      const cands=units.map((u,i)=>u.r&&!u.pn?i:-1).filter(i=>i>=0);
+      if(cands.length){
+        blankIdx.add(cands[Math.floor(Math.random()*cands.length)]);
+        if(cands.length>2&&units.length>8){ let j,g=0; do{ j=cands[Math.floor(Math.random()*cands.length)]; }while(blankIdx.has(j)&&++g<9); blankIdx.add(j); }
+      } else {
+        // 全假名句沒有讀音段:挑一段連續 2~3 個非標點字遮住(修:第一題沒空格跟跟讀一樣)
+        const plain=units.map((u,i)=>!u.pn?i:-1).filter(i=>i>=0);
+        if(plain.length>=3){
+          const st=Math.floor(Math.random()*Math.max(1,plain.length-3));
+          for(let k=0;k<Math.min(3,plain.length-st);k++) blankIdx.add(plain[st+k]);
+        }
+      }
+    }
+    const segs=seq.map((_,i)=>'<div class="ls-seg'+(i<li?' done':'')+(i===li?' cur':'')+'"><i></i></div>').join('');
+    const catIc=(typeof CATS!=='undefined'&&(CATS.find(c=>c.k===it.cat)||{}).ic)||'';
+    document.getElementById('lsMask').innerHTML=
+      '<div class="ls-top"><button class="ls-x" onclick="Lesson.exit()"><i data-ic=x></i></button><div class="ls-segs">'+segs+'</div><span class="ls-count">'+(li+1)+' / '+seq.length+'</span></div>'
+      +'<div class="ls-card">'
+      +(catIc?'<span class="ls-wm">'+catIc+'</span>':'')
+      +'<div class="ls-hint" id="lsHint">'+enOr('先聽一次','Listen first')+'</div>'
+      +'<div class="ls-jp" id="lsJp">'+units.map((u,i)=>{
+          const cls='lu'+(u.pn?' pn':'')+(blankIdx.has(i)?' blank':'');
+          const inner=u.r?('<ruby>'+esc(u.t)+'<rt>'+esc(u.r)+'</rt></ruby>'):esc(u.t);
+          return '<span class="'+cls+'" id="lsu'+i+'">'+inner+'</span>';
+        }).join('')+'</div>'
+      +'<div class="ls-zh">'+esc(cvt(it.zh||''))+'</div>'
+      +'<div class="ls-said" id="lsSaid"></div>'
+      +'<div class="ls-ctl">'
+      +'<button onclick="Lesson.demo()" title="'+enOr('再聽一次','Replay')+'"><i data-ic=volume></i></button>'
+      +'<button class="big" id="lsMic" onclick="Lesson.toggleMic()"><i data-ic=mic></i></button>'
+      +'</div>'
+      +'<div id="lsFoot"><button class="ls-skip" onclick="Lesson.next()">'+enOr('跳過這句 →','Skip →')+'</button></div>'
+      +'</div>';
+    try{ if(window.Icons&&Icons.hydrate)Icons.hydrate(); }catch(e){}
+    demo();
+  }
+
+  function setHint(t,listen){ const h=document.getElementById('lsHint'); if(h){ h.textContent=t; h.classList.toggle('listen',!!listen); } }
+  function feed(t, isFinal){ saidRaw=t; const el=document.getElementById('lsSaid'); if(el) el.textContent=t; paint(t, isFinal); }
+
+  function startListen(){
+    if(listening||passed||!active) return;
+    listening=true;
+    const m=document.getElementById('lsMic'); if(m) m.classList.add('on');
+    setHint(enOr('現在請說…','Now you — speak!'), true);
+    if(NATIVE_STT){
+      savedNativeHandlers={ r:window.stayjpSpeechResult, e:window.stayjpSpeechEnd };
+      let base='';
+      window.stayjpSpeechResult=function(t,fin){ if(t==null)return; feed(base+t, !!fin); if(fin&&t) base=base+t; };
+      window.stayjpSpeechEnd=function(){ if(active&&listening&&!passed) _nPost({type:'SPEECH_START',lang:'ja-JP',continuous:true}); };
+      _nPost({type:'SPEECH_START',lang:'ja-JP',continuous:true});
+      return;
+    }
+    if(!SR){ setHint(enOr('此瀏覽器不支援語音辨識','Speech recognition unsupported')); listening=false; return; }
+    let base='';
+    rec2=new SR(); rec2.lang='ja-JP'; rec2.interimResults=true; rec2.continuous=true;
+    rec2.onresult=e=>{ let t=''; for(let i=0;i<e.results.length;i++) t+=e.results[i][0].transcript; feed(base+t, !!e.results[e.results.length-1].isFinal); };
+    rec2.onend=()=>{ if(active&&listening&&!passed){ base=saidRaw; try{rec2.start();}catch(e){} } };
+    rec2.onerror=()=>{};
+    try{ rec2.start(); }catch(e){}
+  }
+  function stopListen(){
+    listening=false;
+    const m=document.getElementById('lsMic'); if(m) m.classList.remove('on');
+    if(NATIVE_STT){ if(savedNativeHandlers){ window.stayjpSpeechResult=savedNativeHandlers.r; window.stayjpSpeechEnd=savedNativeHandlers.e; savedNativeHandlers=null; } _nPost({type:'SPEECH_STOP'}); }
+    if(rec2){ try{ rec2.onend=null; rec2.abort(); }catch(e){} rec2=null; }
+  }
+  function toggleMic(){ if(listening){ stopListen(); setHint(enOr('先聽一次','Listen first')); } else startListen(); }
+
+  function pass(){
+    passed=true; stopListen();
+    const jp=document.getElementById('lsJp'); if(jp) jp.classList.add('passed');
+    const seg=document.querySelector('.ls-seg.cur'); if(seg) seg.classList.add('done');
+    setHint(enOr('太棒了!','Nice!'), true);
+    try{ spBumpToday(); lsMark(curIt().jp); updateLessonCard(); }catch(e){}
+    // 不自動跳(用戶回饋:要能好好看這句、重播再聽);換成「下一句」主鈕+舉拳狸貓
+    const foot=document.getElementById('lsFoot');
+    if(foot){
+      const isLast = li>=seq.length-1;
+      foot.innerHTML='<img class="ls-tk" src="images/mascot/tanuki-p06.png" alt=""><br>'
+        +'<button class="ls-next" onclick="Lesson.next()">'+(isLast?enOr('看結果 →','Results →'):enOr('下一句 →','Next →'))+'</button>';
+      const b=foot.querySelector('.ls-next'); try{ b.focus(); }catch(e){}
+    } else {
+      autoTimer=setTimeout(next, 1100);
+    }
+  }
+  function nextS(){
+    clearTimeout(autoTimer); stopListen();
+    li++;
+    if(li>=seq.length) return finish();
+    render();
+  }
+  let _lastSeq=[];
+  function finish(){
+    stopListen();
+    _lastSeq=seq.slice();
+    const all=list(), done=lsDone();
+    const doneN=all.filter(x=>done[x.jp]).length, tot=all.length, fresh=tot-doneN;
+    const pct=tot?Math.round(doneN/tot*100):0;
+    // 引導閉環:跟讀完 → 用「同一批 5 句」填空考自己(輸入→回想);還有沒練過的 → 下一輪自動換新句
+    let ctas='';
+    if(mode==='shadow') ctas+='<button class="btn pri" style="width:100%;border-radius:12px;height:auto;padding:13px" onclick="Lesson.startBlankSame()">'+enOr(cvt('用填空考剛剛這 5 句 →'),'Quiz these 5 with blanks →')+'</button>';
+    if(fresh>0) ctas+='<button class="btn'+(mode==='shadow'?'':' pri')+'" style="width:100%;border-radius:12px;height:auto;padding:13px" onclick="Lesson.start(\''+mode+'\')">'+enOr(cvt('下一輪(還有 '+fresh+' 句沒練過)'),'Next round ('+fresh+' new left)')+'</button>';
+    else ctas+='<button class="btn" style="width:100%;border-radius:12px;height:auto;padding:13px" onclick="Lesson.start(\''+mode+'\')">'+enOr(cvt('全部練過了!再複習一輪'),'All done — review a round')+'</button>';
+    ctas+='<button class="btn" style="width:100%;border-radius:12px;height:auto;padding:13px" onclick="Lesson.exit()">'+enOr(cvt('回句子列表'),'Back to list')+'</button>';
+    document.getElementById('lsMask').innerHTML=
+      '<div class="ls-top"><button class="ls-x" onclick="Lesson.exit()"><i data-ic=x></i></button><div class="ls-segs">'+seq.map(()=>'<div class="ls-seg done"><i></i></div>').join('')+'</div></div>'
+      +'<div class="ls-card">'
+      +'<img src="images/mascot/tanuki-p06.png" alt="" style="width:120px">'
+      +'<div style="font-size:21px;font-weight:800">'+enOr(cvt('完成 '+seq.length+' 句!'),'Done — '+seq.length+' sentences!')+'</div>'
+      +'<div class="ls-zh">'+enOr(cvt('這個分類已練 '+doneN+' / '+tot+' 句'),'Practiced '+doneN+' / '+tot+' in this set')+'</div>'
+      +'<div style="width:100%;max-width:260px;height:7px;border-radius:99px;background:var(--line);overflow:hidden"><i style="display:block;height:100%;width:'+pct+'%;background:var(--ok);border-radius:99px"></i></div>'
+      +'<div class="ls-ctl" style="flex-direction:column;gap:10px;width:100%;max-width:300px;margin-top:6px">'+ctas+'</div>'
+      +'</div>';
+    try{ if(window.Icons&&Icons.hydrate)Icons.hydrate(); }catch(e){}
+    active=false;
+    try{ updateLessonCard(); }catch(e){}
+  }
+  function startBlankSame(){ start('blank', _lastSeq); }
+  // 已練過的句子(本機):選句「未練優先」輪換,不再每輪同 5 句;入口卡顯示進度
+  function lsDone(){ try{ return JSON.parse(localStorage.getItem('ls_done'))||{}; }catch(e){ return {}; } }
+  function lsMark(jp){ try{ const m=lsDone(); m[jp]=1; localStorage.setItem('ls_done',JSON.stringify(m)); }catch(e){} }
+  function pickSeq(all){
+    const done=lsDone();
+    const fresh=all.filter(s=>!done[s.jp]);
+    const pool=fresh.length?fresh:all;   // 全練過:重頭再來
+    const out=pool.slice(0,N);
+    if(out.length<N) out.push(...all.filter(s=>done[s.jp]).slice(0, N-out.length));
+    return out;
+  }
+  function start(m, seqOverride){
+    mode=m||'shadow';
+    const all=list();
+    if(!all.length){ AppUI.alert(enOr('這個分類沒有句子','No sentences here')); return; }
+    seq=seqOverride&&seqOverride.length?seqOverride.slice():pickSeq(all);
+    li=0; active=true;
+    stopRec();   // 主頁若在錄音先停
+    let mask=document.getElementById('lsMask');
+    if(!mask){ mask=document.createElement('div'); mask.id='lsMask'; mask.className='ls-mask'; document.body.appendChild(mask); }
+    mask.style.display='flex';
+    render();
+  }
+  function exit(){
+    active=false; clearTimeout(autoTimer); stopListen();
+    try{ if(_demo){ _demo.pause(); _demo=null; } }catch(e){}
+    const m=document.getElementById('lsMask'); if(m) m.remove();
+    try{ renderRing(); }catch(e){}
+  }
+  // 範例發音:借用全站 TTS 管線(__TTS 預生 mp3);播完自動開錄
+  function demoPlay(){
+    const it=curIt(); if(!it) return;
+    stopListen();
+    const hash=window.__TTS&&window.__TTS[it.jp];
+    try{ if(_demo){ _demo.pause(); _demo=null; } }catch(e){}
+    const after=()=>{ if(active&&!passed) startListen(); };
+    if(hash){
+      const rel=window.ttsUrl?window.ttsUrl(hash):'audio/tts/'+hash+'.mp3';
+      if(window.STAYJP_NATIVE&&window.STAYJP_NATIVE.canPlayB64){ _nPost({type:'PLAY_URL',url:new URL(rel,location.href).href}); setTimeout(after, Math.max(1600, it.jp.length*160)); return; }
+      _demo=new Audio(rel); _demo.onended=after;
+      setHint(enOr('聽範例中…','Listen…'));
+      _demo.play().catch(()=>{
+        // 自動播放被瀏覽器擋下(常見於剛開頁):別靜默跳過(用戶會以為播放壞了),
+        // 明確引導按喇叭手動播——手動點擊一定播得出來
+        setHint(enOr('按喇叭聽範例','Tap the speaker to hear it'));
+        const sp=document.querySelector('.ls-ctl button'); if(sp) sp.style.animation='recPulse 1.6s ease-out infinite';
+      });
+      _demo.onplaying=()=>{ const sp=document.querySelector('.ls-ctl button'); if(sp) sp.style.animation=''; setHint(enOr('聽範例中…','Listen…')); };
+    } else { browserSpeak(it.jp); setTimeout(after, Math.max(1600, it.jp.length*170)); }
+  }
+  function demo(){ demoPlay(); }
+  return { start, startBlankSame, exit, next:nextS, demo, toggleMic, _feed:feed, _done:lsDone };
+})();
+window.Lesson=Lesson;
+// 入口卡進度:目前等級+分類的已練句數
+function updateLessonCard(){
+  const el=document.getElementById('lsEntryProg'); if(!el) return;
+  try{
+    const all=list(), done=Lesson._done();
+    const n=all.filter(x=>done[x.jp]).length;
+    el.textContent = n ? enOr(cvt('這個分類已練 '+n+' / '+all.length+' 句'), n+' / '+all.length+' practiced') : enOr(cvt(all.length+' 句等你來練'), all.length+' sentences waiting');
+  }catch(e){}
+}
 
 // auth
 auth.onAuthStateChanged(u=>{
