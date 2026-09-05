@@ -950,7 +950,18 @@ const Lesson=(()=>{
     const after=()=>{ if(active&&!passed) startListen(); };
     if(hash){
       const rel=window.ttsUrl?window.ttsUrl(hash):'audio/tts/'+hash+'.mp3';
-      if(window.STAYJP_NATIVE&&window.STAYJP_NATIVE.canPlayB64){ _nPost({type:'PLAY_URL',url:new URL(rel,location.href).href}); setTimeout(after, Math.max(1600, it.jp.length*160)); return; }
+      if(window.STAYJP_NATIVE&&window.STAYJP_NATIVE.canPlayB64){
+        // App 原生播放沒有「播完」回呼:先用 Audio 抓 mp3 真實時長,播完+緩衝才開錄
+        // (用戶實錘:句長估時太短,範例還沒播完就被切去錄音——開錄會搶 audio session 掐掉播放)
+        _nPost({type:'PLAY_URL',url:new URL(rel,location.href).href});
+        setHint(enOr('聽範例中…','Listen…'));
+        const probe=new Audio(); probe.preload='metadata'; probe.src=rel;
+        let fired=false;
+        const go=(ms)=>{ if(fired)return; fired=true; setTimeout(after, ms); };
+        probe.onloadedmetadata=()=>{ if(isFinite(probe.duration)&&probe.duration>0) go(probe.duration*1000+450); };
+        setTimeout(()=>go(Math.max(2200, it.jp.length*220)+500), 900);   // metadata 900ms 內沒到:退回加長估時
+        return;
+      }
       _demo=new Audio(rel); _demo.onended=after;
       setHint(enOr('聽範例中…','Listen…'));
       _demo.play().catch(()=>{
@@ -960,7 +971,7 @@ const Lesson=(()=>{
         const sp=document.querySelector('.ls-ctl button'); if(sp) sp.style.animation='recPulse 1.6s ease-out infinite';
       });
       _demo.onplaying=()=>{ const sp=document.querySelector('.ls-ctl button'); if(sp) sp.style.animation=''; setHint(enOr('聽範例中…','Listen…')); };
-    } else { browserSpeak(it.jp); setTimeout(after, Math.max(1600, it.jp.length*170)); }
+    } else { browserSpeak(it.jp); setTimeout(after, Math.max(2000, it.jp.length*220)+400); }
   }
   function demo(){ demoPlay(); }
   return { start, startBlankSame, exit, next:nextS, demo, toggleMic, _feed:feed, _done:lsDone };
