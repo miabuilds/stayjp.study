@@ -314,6 +314,9 @@ select.lang-btn {
 .hub-goal-bar { height:9px; border-radius:999px; background:var(--bd); overflow:hidden; }
 .hub-goal-fill { height:100%; border-radius:999px; background:var(--ac); transition:width .5s ease; }
 .hub-goal-hint { margin-top:8px; font-size:11.5px; color:var(--tx3); }
+/* 術語「完整說明」跳轉落地高亮:讓人一眼看到跳到哪一條 */
+.g-flash { animation: gFlash 1s ease-in-out 2; }
+@keyframes gFlash { 0%,100% { box-shadow: none; } 50% { box-shadow: 0 0 0 3px var(--ac2), 0 6px 24px rgba(198,85,59,.25); } }
 .hub-resume { display:flex; align-items:center; gap:10px; width:100%; background:var(--ac); color:#fff; border:0; border-radius:14px; padding:14px 16px; font-size:15px; font-weight:800; cursor:pointer; margin:0 0 18px; box-shadow:0 2px 10px rgba(198,85,59,.28); }
 .hub-resume:active { transform: scale(.99); }
 .hub-resume { white-space: nowrap; }
@@ -2531,12 +2534,26 @@ window.gotoGrammar = function (gid) {
   var lv = (String(gid).match(/^(n\d)/) || [])[1];
   if (!lv) return;
   try { if (typeof hideGloss === 'function') hideGloss(); } catch (e) {}
+  // 從面板點進來要先離開 hub 模式,否則 doRender 永遠畫面板、目標卡永遠不出現
+  try { if (typeof inHub !== 'undefined' && inHub) { inHub = false; document.body.classList.remove('hub-view'); } } catch (e) {}
+  // 「今日學習」模式只渲染 10 條,目標卡多半不在裡面 → 先切「顯示全部」
+  try { if (typeof grammarDailyMode !== 'undefined' && grammarDailyMode) grammarDailyMode = false; } catch (e) {}
   if (currentMode !== 'grammar') switchMode('grammar');
-  if (currentLevel !== lv) switchLevel(lv);
-  setTimeout(function () {
+  if (currentLevel !== lv) switchLevel(lv); else doRender();
+  // 輪詢等目標卡渲染出來(App 冷載/資料非同步時 250ms 一次性查找必失敗 → KOL 實錘
+  // 「只跳到 N5 頁,還要自己翻好幾頁找」)。找到:展開+置中+高亮閃爍(一眼看到在哪)。
+  var tries = 0;
+  (function seek() {
     var el = document.getElementById(gid);
-    if (el) { el.classList.add('o'); el.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
-  }, 250);
+    if (el) {
+      el.classList.add('o');
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      el.classList.add('g-flash');
+      setTimeout(function () { el.classList.remove('g-flash'); }, 2000);
+      return;
+    }
+    if (++tries < 40) setTimeout(seek, 150);
+  })();
 };
 function switchLevel(lv) {
   currentLevel = lv;
