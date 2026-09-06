@@ -24,7 +24,16 @@ cd ~/Documents/GitHub/stay-jp-notes && git merge price-day-0914
 # 6. Play:封測中維持不動;Android 上架日翻 ANDROID_LIVE 前先把三價改到位(390/1,990/4,990)
 # 7. 官方折扣碼:Firestore console 建 ref_codes/STAYJP200
 #    { active: true, type: "official", kol: "StayJP 官方" }  ← 不填 owner_uid=不產生分潤(已驗 commission 邏輯)
+# 8. iOS Offer Codes(2026-09-06 決策:App 也要折——訂閱主力在 App,轉換 41% 優先於手續費差):
+#    ASC → 年費訂閱(Yearly)→ 建優惠(Offer):類型 pay up front、時長 1 年、價格 NT$1,790(價格點以選單為準)
+#    → 資格:新訂閱者(+可勾已到期);再建「自訂代碼」:STAYJP200 + 每個 KOL 一個(與 ref_codes 同字串!)
+#    → 分潤歸因靠 RC webhook 讀 event.offer_code(分支已含 db6fece1),碼字串必須存在於 ref_codes 才歸因得到
+#    → KOL 拿到的兌換連結:https://apps.apple.com/redeem?ctx=offercodes&id=6778227353&code=<碼>
+#    → 注意:iOS 兌換=首年 1,790、次年續 1,990(Apple 限制);官網輸碼=年年 1,790。文案統一講「現折 200」,別在 iOS 承諾年年鎖
 ```
+**未來快閃優惠(Mia 2026-09-06 想法,機制已就緒)**:官網限定限時優惠=建一個限期 ref_codes 碼(active:true)、
+檔期結束改 active:false 即失效;現折金額目前固定在 constants.WEB_CODE_DISCOUNT_TWD(yearly:200),
+想要不同折扣額的快閃(如折 300)→ 之後把折扣搬到 ref_codes 文件的 discount_twd 欄位(小改 createPayment),先記著。
 ### 驗收(9/14 部署後)
 1. 無痕:pricing 三卡新價;輸 STAYJP200 → 年費卡出現刪除線 1,990→1,790
 2. 訂年費(套碼)→ 消保視窗「NT$1,790(已套用推薦碼,原價 NT$1,990)」→ 綠界結帳頁金額 **1,790** → 到輸卡頁退出
