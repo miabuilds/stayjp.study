@@ -925,7 +925,7 @@ body.hub-view .mn { margin-left: 0; max-width: none; }
 .daily-bar .dp { flex: 1 1 100%; min-width: 0; }
 /* ── 學習熱力圖彈窗 ── */
 .hm-backdrop { position:fixed; inset:0; z-index:1200; background:rgba(0,0,0,.45); display:flex; align-items:center; justify-content:center; padding:18px; }
-.hm-card { background:var(--bg2); border:1px solid var(--bd); border-radius:20px; padding:22px 20px 16px; width:100%; max-width:420px; max-height:86vh; overflow:auto; text-align:center; }
+.hm-card { background:var(--bg2); border:1px solid var(--bd); border-radius:20px; padding:22px 20px 16px; width:100%; max-width:420px; max-height:86vh; overflow:auto; text-align:center; position:relative}
 .hm-title { font-weight:800; font-size:17px; margin-bottom:14px; }
 .hm-stats { display:flex; justify-content:center; gap:26px; margin-bottom:14px; }
 .hm-stats b { display:block; font-size:24px; font-weight:800; color:var(--ac); }
@@ -2792,7 +2792,7 @@ const Shadow = (() => {
     mask.id = 'shadowMask';
     mask.className = 'cc-mask shadow-mask';
     mask.innerHTML = `<div class="shadow-box">
-      <button class="shadow-close" data-act="exit" title="退出 (Esc)" aria-label="關閉"></button>
+      <button class="shadow-close" data-act="exit" title="退出 (Esc)" aria-label="關閉">✕</button>
       <button class="shadow-fav" id="shadowFav" data-act="fav" title="收藏這句（F）" aria-label="收藏"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></button>
       <div class="shadow-progress"><span id="shadowIdx">1</span> / <span id="shadowTotal">${queue.length}</span></div>
       <div class="shadow-status" id="shadowStatus"><i data-ic=volume></i> 播放中</div>
@@ -3689,6 +3689,7 @@ const Streak = (() => {
     const wrap = document.createElement('div');
     wrap.id = 'heatModal'; wrap.className = 'hm-backdrop';
     wrap.innerHTML = `<div class="hm-card" role="dialog" aria-modal="true">
+      <button onclick="document.getElementById('heatModal').remove()" aria-label="關閉" style="position:absolute;top:10px;right:10px;width:34px;height:34px;border:none;background:transparent;color:var(--tx2);font-size:17px;cursor:pointer;border-radius:50%">✕</button>
       <div class="hm-title"><i data-ic=fire></i> ${enOr(cvt('學習熱力圖'),'Study heatmap')}</div>
       <div class="hm-stats">
         <div><b>${effectiveDays()}</b><span>${enOr(cvt('連續天數'),'Streak')}</span></div>
@@ -3979,7 +3980,7 @@ function dailyHelp() {
   ];
   const m = document.createElement('div');
   m.id = 'onbMask'; m.className = 'onb-mask';
-  m.innerHTML = '<div class="onb-card" role="dialog" aria-modal="true">'
+  m.innerHTML = '<div class="onb-card" role="dialog" aria-modal="true" style="position:relative"><button onclick="_onbRemove()" aria-label="關閉" style="position:absolute;top:10px;right:10px;width:34px;height:34px;border:none;background:transparent;color:var(--tx2);font-size:17px;cursor:pointer">✕</button>'
     + '<div class="onb-title">' + enOr(cvt('每日進度怎麼算？'), 'How daily progress works') + '</div>'
     + '<div class="onb-sub" style="text-align:left;line-height:1.85">' + rows.join('<br>') + '</div>'
     + '<button class="onb-start" onclick="_onbRemove()">' + enOr(cvt('知道了'), 'Got it') + '</button>'

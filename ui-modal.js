@@ -13,6 +13,8 @@
     border-radius:18px;padding:22px 20px 16px;width:100%;max-width:400px;max-height:82vh;overflow:auto;text-align:center;
     box-shadow:0 12px 40px rgba(0,0,0,.18);animation:auiPop .28s cubic-bezier(.34,1.4,.64,1)}
   @keyframes auiPop{from{transform:scale(.9);opacity:0}to{transform:scale(1);opacity:1}}
+  .aui-card{position:relative}
+  .aui-x{position:absolute;top:8px;right:8px;width:34px;height:34px;border:none;background:transparent;color:var(--ink3,var(--tx3,#999));font-size:16px;cursor:pointer;border-radius:50%}
   .aui-card img{width:76px;height:auto;margin-bottom:6px}
   .aui-title{font-size:1.06em;font-weight:800;margin-bottom:6px}
   .aui-msg{font-size:.95em;line-height:1.75;color:var(--ink2,var(--tx2,#666));white-space:pre-wrap;word-break:break-word;text-align:left}
@@ -59,6 +61,10 @@
       mask.className = 'aui-mask'; mask.id = 'auiMask';
       const card = document.createElement('div');
       card.className = 'aui-card'; card.setAttribute('role', 'dialog'); card.setAttribute('aria-modal', 'true');
+      const xbtn = document.createElement('button');
+      xbtn.className = 'aui-x'; xbtn.textContent = '✕'; xbtn.setAttribute('aria-label', '關閉');
+      xbtn.onclick = () => done(withCancel ? false : true);
+      card.appendChild(xbtn);
       const tone = opts.tone || (withCancel ? 'warn' : 'info');
       if (opts.mascot !== false && MASCOT[tone]) {
         const img = document.createElement('img'); img.src = MASCOT[tone]; img.alt = '';
