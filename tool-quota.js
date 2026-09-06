@@ -364,7 +364,7 @@
       const ebStillOn = Date.now() < Date.UTC(2026, 7, 27, 3, 0, 0);
       bar.innerHTML = (ebStillOn
           ? '<i data-ic=clock></i> 試用明天到期——早鳥年費 NT$990 只到 8/27 中午'
-          : '<i data-ic=clock></i> 試用明天到期——年費 9/14 起調漲，現在訂閱鎖 NT$1,490')
+          : '<i data-ic=clock></i> 試用明天到期——升級 Premium 繼續無限用(有推薦碼?年費現折 200)')
         + ' <a href="pricing.html" style="color:#FDE68A;font-weight:700;text-decoration:underline">看方案 →</a>'
         + '<button onclick="this.parentElement.remove()" style="position:absolute;right:8px;top:6px;background:none;border:0;color:#fff;font-size:16px;cursor:pointer;padding:4px"><i data-ic=x></i></button>';
       document.body.appendChild(bar);

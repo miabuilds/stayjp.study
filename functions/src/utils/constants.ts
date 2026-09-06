@@ -38,14 +38,14 @@ export const PLANS: Record<PlanKey, {
   display_name: string;
 }> = {
   monthly: {
-    price_twd: 290,   // 2026-08-31 調漲(原 150;取 Apple 有的價格點 290 三平台對齊;既有月訂戶綠界照舊授權金額續扣,自動凍漲)
+    price_twd: 390,   // 2026-09-14 調漲(290→390,年費 1/5 原則襯托年費;舊訂戶綠界照舊授權金額續扣,自動凍漲)
     period_days: 30,
     ecpay_period_type: "M",
     ecpay_frequency: 1,
     display_name: "月費",
   },
   yearly: {
-    price_twd: 1490,
+    price_twd: 1990,   // 2026-09-14 調漲(1490→1990);官網輸有效推薦碼 → 現折 WEB_CODE_DISCOUNT_TWD
     period_days: 365,
     ecpay_period_type: "Y",
     ecpay_frequency: 1,
@@ -59,7 +59,7 @@ export const PLANS: Record<PlanKey, {
     display_name: "早鳥年費",
   },
   lifetime: {
-    price_twd: 2990,
+    price_twd: 4990,   // 2026-09-14 調漲(2990→4990)
     period_days: 365 * 100,    // 100 年 ~= 終身,實際 willRenew=false
     ecpay_period_type: "M",     // 不續扣
     ecpay_frequency: 1,
@@ -106,6 +106,14 @@ export const PAYPAL_PRICES_USD: Partial<Record<PlanKey, number>> = {
   yearly: 48,                // ≈ NT$1,490
   yearly_early_bird: 32,
   lifetime: 96,
+};
+
+// ── 推薦碼折價(官網/綠界限定;iOS/Play 牌價無碼折,引流至低抽成通路)──
+// createPayment 建單時:users/{uid}.ref_code 存在且該碼有效(ref_codes 存在/active/非停權/非本人)
+// → 建單金額 = price_twd − 折價。定期定額 PeriodAmount 用折後價 → 折後價終身續扣(=「鎖 1,790」承諾)。
+// 年費走折價後,callback 不再另發 +30 天(避免雙重好康;月費 +7 天、買斷 AI 加量照舊)。
+export const WEB_CODE_DISCOUNT_TWD: Partial<Record<PlanKey, number>> = {
+  yearly: 200,
 };
 
 // 退費規則(全自動)
