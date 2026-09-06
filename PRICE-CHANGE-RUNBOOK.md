@@ -10,6 +10,10 @@
 
 **Code 已備好**:分支 **`price-day-0914`**(a3613ef0,含完整 commit message 說明)。已驗:tsc/ui-map/本機截圖(無碼 1,990、套碼刪除線 1,790)/consent+expected_twd 折後價。
 
+⚠️ **2026-09-06 起 ECPAY_DOWN=true**(綠界帳戶審核中,網頁收款暫停、pricing 全數導 App)。
+綠界驗證通過 → pricing.html 的 `ECPAY_DOWN` 改回 false+sw bump+push 即還原。
+**9/14 合併分支時此區會衝突:保留 main 當下的 ECPAY_DOWN 值**(審核沒過就繼續 true)。
+
 ### 9/14 當天(依序)
 ```bash
 # 0. 確認其他 session 沒動 pricing/index/account/tool-quota/ui-map/functions,有衝突先解
