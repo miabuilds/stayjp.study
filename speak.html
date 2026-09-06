@@ -759,23 +759,45 @@ const Lesson=(()=>{
   // 不推指針,句子越長後面越搆不到,用戶實錘「ください 講三次都不亮」)。
   // UI 只加不減(interim 抖動不閃退);進度取歷史最高。
   let bestRatio=0;
-  function paint(said, isFinal){
-    const sN=lnorm(said);
-    let p=0, hitChars=0, totChars=0;
+  // 從指定起點貪婪匹配一輪,回傳命中集合(供多起點嘗試取最優)
+  function greedyFrom(sN, startP){
+    let p=startP, hitChars=0;
+    const hit=new Set();
     units.forEach((u,i)=>{
       if(u.pn) return;
       const t=lnorm(u.t);
-      totChars+=t.length||1;
       let found=-1, len=0;
       const win=sN.slice(p, p+Math.max(10,(t.length||1)+8));
       if(t && win.indexOf(t)>=0){ found=win.indexOf(t); len=t.length; }
       else if(u.r && win.indexOf(u.r)>=0){ found=win.indexOf(u.r); len=u.r.length; }
-      if(found>=0){
-        p+=found+len; hitChars+=t.length||1;
-        if(!u._hit){ u._hit=true; const el=document.getElementById('lsu'+i); if(el) el.classList.add('hit'); }
-      } else if(u._hit){
-        hitChars+=t.length||1;   // 曾亮過:計分保留(UI 不回退),指針不動,後面靠加大視窗接回
-      }
+      if(found>=0){ p+=found+len; hit.add(i); hitChars+=t.length||1; }
+    });
+    return { hit, hitChars };
+  }
+  function paint(said, isFinal){
+    const sN=lnorm(said);
+    // 多起點錨定:用戶第一次講錯再重講時,正確內容在辨識字串「尾部」,從 0 開始的
+    // 窗口搆不到(實錘:有時很準有時一直過不了)。以「句首 unit 在 said 的每個出現位置」
+    // 當候選起點各跑一輪貪婪,取命中最多的結果。
+    const first=units.find(u=>!u.pn&&lnorm(u.t));
+    const starts=[0];
+    if(first){
+      [lnorm(first.t), first.r||''].forEach(k=>{
+        if(!k) return;
+        let ix=sN.indexOf(k);
+        while(ix>=0){ starts.push(ix); ix=sN.indexOf(k, ix+1); }
+      });
+    }
+    let best={hit:new Set(),hitChars:0};
+    [...new Set(starts)].slice(-8).forEach(st=>{ const r=greedyFrom(sN, st); if(r.hitChars>best.hitChars) best=r; });
+    // UI 只加不減;計分=曾亮過的全部字元(單調不回退)
+    let hitChars=0, totChars=0;
+    units.forEach((u,i)=>{
+      if(u.pn) return;
+      const L=lnorm(u.t).length||1;
+      totChars+=L;
+      if(best.hit.has(i) && !u._hit){ u._hit=true; const el=document.getElementById('lsu'+i); if(el) el.classList.add('hit'); }
+      if(u._hit) hitChars+=L;
     });
     const ratio=totChars?hitChars/totChars:0;
     if(ratio>bestRatio) bestRatio=ratio;
@@ -951,15 +973,17 @@ const Lesson=(()=>{
     if(hash){
       const rel=window.ttsUrl?window.ttsUrl(hash):'audio/tts/'+hash+'.mp3';
       if(window.STAYJP_NATIVE&&window.STAYJP_NATIVE.canPlayB64){
-        // App 原生播放沒有「播完」回呼:先用 Audio 抓 mp3 真實時長,播完+緩衝才開錄
-        // (用戶實錘:句長估時太短,範例還沒播完就被切去錄音——開錄會搶 audio session 掐掉播放)
-        _nPost({type:'PLAY_URL',url:new URL(rel,location.href).href});
+        // App 原生播放沒有「播完」回呼:先用 Audio 抓 mp3 真實時長,播完+緩衝才開錄。
+        // 播前先還原 audio session 並緩一拍——上一句的 SPEECH_STOP/session 還原與這次
+        // PLAY 撞在一起會讓範例被切斷或突然變小聲(iOS 錄音模式 duck 播放,用戶實錘)。
+        _postRestore();
         setHint(enOr('聽範例中…','Listen…'));
+        setTimeout(()=>{ if(!active) return; _nPost({type:'PLAY_URL',url:new URL(rel,location.href).href}); }, 280);
         const probe=new Audio(); probe.preload='metadata'; probe.src=rel;
         let fired=false;
-        const go=(ms)=>{ if(fired)return; fired=true; setTimeout(after, ms); };
-        probe.onloadedmetadata=()=>{ if(isFinite(probe.duration)&&probe.duration>0) go(probe.duration*1000+450); };
-        setTimeout(()=>go(Math.max(2200, it.jp.length*220)+500), 900);   // metadata 900ms 內沒到:退回加長估時
+        const go=(ms)=>{ if(fired)return; fired=true; setTimeout(after, ms+280); };
+        probe.onloadedmetadata=()=>{ if(isFinite(probe.duration)&&probe.duration>0) go(probe.duration*1000+700); };
+        setTimeout(()=>go(Math.max(2200, it.jp.length*220)+700), 900);   // metadata 900ms 內沒到:退回加長估時
         return;
       }
       _demo=new Audio(rel); _demo.onended=after;
