@@ -164,10 +164,13 @@ export const ecpayCallback = functions.onRequest(
               newSub.expiresAt = newSub.expiresAt + refBonusDays(plan) * 864e5;   // 依方案:月費+7
             }
             newSub.ref_bonus_at = nowMs();
-          } else if (refCode) {
+          } else if (refCode && amount >= PLANS[plan].price_twd) {
+            // 買斷「未折價」才發 AI 加量包;已折 200(實付<牌價)→ 好康=折價本身(與年費規則一致)
             // 買斷:+7 天對無限期無意義 → 發 AI 加量包(2026-08-27 起,買斷戶的推薦貨幣)
             newSub.ref_bonus_at = nowMs();
             await grantAiBonus(uid, "推薦碼＋購買買斷 → AI 加量包").catch(e => console.error("grantAiBonus(ecpay) 略過:", e));
+          } else if (refCode) {
+            newSub.ref_bonus_at = nowMs();   // 折價買斷:折 200 即好康,不再發 AI 加量包
           }
         }
         try {

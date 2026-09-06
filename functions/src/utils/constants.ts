@@ -59,7 +59,7 @@ export const PLANS: Record<PlanKey, {
     display_name: "早鳥年費",
   },
   lifetime: {
-    price_twd: 4990,   // 2026-09-14 調漲(2990→4990)
+    price_twd: 5990,   // 2026-09-14 調漲(2990→5990,Mia 9/6 定案:3 倍年費,學習週期 1-2 年下買斷>期望LTV)
     period_days: 365 * 100,    // 100 年 ~= 終身,實際 willRenew=false
     ecpay_period_type: "M",     // 不續扣
     ecpay_frequency: 1,
@@ -113,7 +113,8 @@ export const PAYPAL_PRICES_USD: Partial<Record<PlanKey, number>> = {
 // → 建單金額 = price_twd − 折價。定期定額 PeriodAmount 用折後價 → 折後價終身續扣(=「鎖 1,790」承諾)。
 // 年費走折價後,callback 不再另發 +30 天(避免雙重好康;月費 +7 天、買斷 AI 加量照舊)。
 export const WEB_CODE_DISCOUNT_TWD: Partial<Record<PlanKey, number>> = {
-  yearly: 200,
+  yearly: 200,     // 折後 1,790,定期定額終身鎖
+  lifetime: 200,   // 折後 5,790,一次性;App 內碼折要等 1.0.8 雙 SKU(輸碼解鎖 5,790 商品)
 };
 
 // 退費規則(全自動)
