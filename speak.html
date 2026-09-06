@@ -732,7 +732,21 @@ const Lesson=(()=>{
 
   const PUNCT=/[、。,.!?！？…・「」\s]/;
   function kata2hira(t){ return t.replace(/[ァ-ヶ]/g,c=>String.fromCharCode(c.charCodeAt(0)-0x60)); }
-  function lnorm(t){ return kata2hira(String(t||'')).replace(/[、。,.!?！？…・「」\s0-9０-９]/g,''); }
+  // 辨識引擎會把數詞轉阿拉伯數字(ふたつ→「2つ」),但目標句是假名 → 對不上(用戶實錘)。
+  // 比對前把「數字+量詞」還原成假名讀音;蓋不到的量詞退回數字的音讀。
+  const NUM_TSU=['','ひとつ','ふたつ','みっつ','よっつ','いつつ','むっつ','ななつ','やっつ','ここのつ','とお'];
+  const NUM_NIN=['','ひとり','ふたり','さんにん','よにん','ごにん','ろくにん','ななにん','はちにん','きゅうにん','じゅうにん'];
+  const NUM_JI=['','いちじ','にじ','さんじ','よじ','ごじ','ろくじ','しちじ','はちじ','くじ','じゅうじ','じゅういちじ','じゅうにじ'];
+  const NUM_ON=['ゼロ','いち','に','さん','よん','ご','ろく','なな','はち','きゅう','じゅう'];
+  function numNorm(t){
+    return String(t||'')
+      .replace(/[０-９]/g,c=>String.fromCharCode(c.charCodeAt(0)-0xFEE0))
+      .replace(/(10|[0-9])つ/g,(m,n)=>NUM_TSU[+n]||m)
+      .replace(/(10|[0-9])人/g,(m,n)=>NUM_NIN[+n]||m)
+      .replace(/(1[0-2]|[0-9])時/g,(m,n)=>NUM_JI[+n]||m)
+      .replace(/(10|[0-9])/g,(m,n)=>NUM_ON[+n]||'');
+  }
+  function lnorm(t){ return kata2hira(numNorm(t)).replace(/[、。,.!?！？…・「」\s]/g,''); }
 
   // 句子 → 匹配單元:有 SPEAK_RUBY 用逐段(漢字段帶讀音),否則逐字元
   function parseUnits(jp){
@@ -790,6 +804,25 @@ const Lesson=(()=>{
     }
     let best={hit:new Set(),hitChars:0};
     [...new Set(starts)].slice(-8).forEach(st=>{ const r=greedyFrom(sN, st); if(r.hitChars>best.hitChars) best=r; });
+    // final 回撈:辨識輸出常亂序(重講時段落順序顛倒)。一段講完後,把「連續未命中的
+    // unit 串」拼成整段(≥2字)在全文找,找到整段補亮——單字元不獨立撈(假名單字太氾濫會誤亮)
+    if(isFinal){
+      let run=[];
+      const flush=()=>{
+        if(run.length){
+          const seg=run.map(x=>lnorm(units[x].t)).join('');
+          const segR=run.map(x=>units[x].r||lnorm(units[x].t)).join('');
+          if(seg.length>=2 && (sN.indexOf(seg)>=0 || sN.indexOf(segR)>=0)) run.forEach(x=>best.hit.add(x));
+        }
+        run=[];
+      };
+      units.forEach((u,i)=>{
+        if(u.pn){ flush(); return; }
+        if(best.hit.has(i)||u._hit){ flush(); return; }
+        run.push(i);
+      });
+      flush();
+    }
     // UI 只加不減;計分=曾亮過的全部字元(單調不回退)
     let hitChars=0, totChars=0;
     units.forEach((u,i)=>{
