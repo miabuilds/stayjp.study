@@ -161,9 +161,27 @@ export const revenuecatWebhook = functions.onRequest(
           if (existingSub?.ref_bonus_at) {
             newSub.ref_bonus_at = existingSub.ref_bonus_at;   // 延續旗標 → 續訂不重發、不一直 +7
           } else if (newSub.status === "active" && !isSandbox) {
-            const refCode = await getRefCode(uid);
+            // iOS Offer Code 歸因(2026-09-14 起):App Store 兌換碼折價單的買家沒在我們系統輸過碼,
+            // event.offer_code 是唯一歸因來源——碼存在於 ref_codes 且帳上還沒有碼 → 補寫 users.ref_code,
+            // 後面 KOL 分潤/推薦人獎勵沿用既有機制。(限制:匿名購買的兌換單要等登入歸戶,若 TRANSFER
+            // 不帶 offer_code 則歸因不到——可接受,post-purchase 有登入引導。)
+            let refCode = await getRefCode(uid);
+            const offerCode = String((event as { offer_code?: string }).offer_code || "").toUpperCase().replace(/[^A-Z0-9_-]/g, "").slice(0, 32);
+            if (!refCode && offerCode) {
+              try {
+                const oc = await admin.firestore().doc(`ref_codes/${offerCode}`).get();
+                if (oc.exists) {
+                  await admin.firestore().doc(`users/${uid}`).set({ ref_code: offerCode, ref_at: nowMs(), ref_via: "ios_offer_code" }, { merge: true });
+                  refCode = offerCode;
+                }
+              } catch (e) { console.warn("offer_code 歸因略過:", e); }
+            }
             if (refCode && finalPlan !== "lifetime") {
-              newSub.expiresAt = newSub.expiresAt + refBonusDays(finalPlan) * 864e5;   // 依方案:月費+7、年費+30(我們的權益;Apple 計費週期不變)
+              // 年費若已享折價(offer code 首年價,實付<現行牌價)→ 好康=折價本身,不再另發 +30 天(與綠界規則一致)
+              const discountedYearly = finalPlan === "yearly" && (paidTwd ?? planInfo.price_twd) < PLANS.yearly.price_twd;
+              if (!discountedYearly) {
+                newSub.expiresAt = newSub.expiresAt + refBonusDays(finalPlan) * 864e5;   // 依方案:月費+7(我們的權益;Apple 計費週期不變)
+              }
               newSub.ref_bonus_at = nowMs();
             } else if (refCode) {
               newSub.ref_bonus_at = nowMs();   // 買斷:發 AI 加量包(天數對買斷無意義)
