@@ -112,9 +112,10 @@ export const PAYPAL_PRICES_USD: Partial<Record<PlanKey, number>> = {
 // createPayment 建單時:users/{uid}.ref_code 存在且該碼有效(ref_codes 存在/active/非停權/非本人)
 // → 建單金額 = price_twd − 折價。定期定額 PeriodAmount 用折後價 → 折後價終身續扣(=「鎖 1,790」承諾)。
 // 年費走折價後,callback 不再另發 +30 天(避免雙重好康;月費 +7 天、買斷 AI 加量照舊)。
+// 話術=「推薦碼 9 折」,實際取整到十位(1,791→1,790、5,391→5,390,比 9 折再便宜一點)
 export const WEB_CODE_DISCOUNT_TWD: Partial<Record<PlanKey, number>> = {
   yearly: 200,     // 折後 1,790,定期定額終身鎖
-  lifetime: 200,   // 折後 5,790,一次性;App 內碼折要等 1.0.8 雙 SKU(輸碼解鎖 5,790 商品)
+  lifetime: 600,   // 折後 5,390,一次性;App 內碼折要等 1.0.8 雙 SKU(輸碼解鎖 5,390 商品)
 };
 
 // 退費規則(全自動)
