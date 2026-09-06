@@ -1165,5 +1165,22 @@ initTheme();
 <script src="ui-map.js"></script>
 <script src="translate-layer.js"></script>
 <script src="back-to-top.js"></script>
+<script>
+// 9/14 調價公告(可關閉;9/14 後自動消失;App 內不顯示)
+(function(){
+  try{
+    if (window.STAYJP_NATIVE && window.STAYJP_NATIVE.isNativeApp) return;
+    if (Date.now() >= 1789311600000) return;   // 2026-09-14 00:00 JST(UTC 9/13 15:00)
+    if (localStorage.getItem('pd914_dismiss')==='1') return;
+    var b=document.createElement('div'); b.id='pd914Bar';
+    b.style.cssText='position:fixed;left:50%;transform:translateX(-50%);bottom:18px;z-index:9000;background:#2C2C2C;color:#FAF9F6;padding:10px 16px;border-radius:999px;font-size:13px;box-shadow:0 6px 24px rgba(0,0,0,.28);display:flex;gap:10px;align-items:center;max-width:92vw;white-space:nowrap';
+    b.innerHTML='<span>\ud83d\udce2 9/14 \u8d77\u8abf\u6f32\u2014\u2014\u5e74\u8cbb 1,490 \u2192 1,990</span>'
+      +'<a href="pricing.html" style="color:#FDE68A;font-weight:700;text-decoration:underline;white-space:nowrap">\u9396\u4f4f\u820a\u50f9 \u2192</a>'
+      +'<button aria-label="\u95dc\u9589" style="background:none;border:0;color:inherit;font-size:15px;cursor:pointer;padding:0 2px;line-height:1">\u2715</button>';
+    b.querySelector('button').onclick=function(){ try{localStorage.setItem('pd914_dismiss','1');}catch(e){} b.remove(); };
+    document.body.appendChild(b);
+  }catch(e){}
+})();
+</script>
 </body>
 </html>
