@@ -572,6 +572,7 @@ body.hub-view .mn { margin-left: 0; max-width: none; }
 }
 /* Shadowing 跟讀模式 — full-screen overlay with auto-cycle. */
 .shadow-mask { display: flex; align-items: center; justify-content: center; padding: 20px; }
+@media (pointer: coarse) { .shadow-hint.kb-only { display: none; } }
 .shadow-box { background: var(--bg2); border: 1px solid var(--bd); border-radius: 20px; padding: 36px 32px; max-width: 600px; width: 100%; text-align: center; position: relative; }
 .shadow-close { position: absolute; top: 12px; right: 12px; width: 36px; height: 36px; border: none; background: transparent; color: var(--tx2); font-size: 18px; cursor: pointer; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; transition: background .15s, color .15s; }
 .shadow-close:hover { background: var(--bg3); color: var(--tx); }
@@ -2819,7 +2820,7 @@ const Shadow = (() => {
         <label title="念完自己按 ▶ 才換句,不會念到一半被切走"><input type="checkbox" id="shadowManual"> 手動換句</label>
         <label title="錄下自己念的,和原音對比(只存本機,不上傳)"><input type="checkbox" id="shadowRec"> 錄音對比</label>
       </div>
-      <div class="shadow-hint">Space 暫停 · ← → 切換 · R 重播 · Esc 退出</div>
+      <div class="shadow-hint kb-only">Space 暫停 · ← → 切換 · R 重播 · Esc 退出</div>
     </div>`;
     document.body.appendChild(mask);
     // 發音檢查:只在「App 且有原生語音辨識(canSpeech)」時才顯示。
@@ -3008,7 +3009,7 @@ const Shadow = (() => {
 
   function setStatus(s) {
     const el = document.getElementById('shadowStatus');
-    if (el) el.textContent = s;
+    if (el) el.innerHTML = s;   // 僅站內固定字串(含 <i data-ic>);textContent 會印出字面標籤
     const toggleBtn = document.querySelector('#shadowMask [data-act="toggle"]');
     if (toggleBtn) toggleBtn.textContent = paused ? '▶' : '';
   }
