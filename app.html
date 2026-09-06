@@ -2800,7 +2800,7 @@ const Shadow = (() => {
       <div class="shadow-z" id="shadowZ"></div>
       <div class="shadow-controls">
         <button class="shadow-btn" data-act="prev" title="上一句 (←)">◀</button>
-        <button class="shadow-btn" data-act="replay" title="重播 (R)"></button>
+        <button class="shadow-btn" data-act="replay" title="重播 (R)">↻</button>
         <button class="shadow-btn shadow-btn-main" data-act="toggle" title="暫停/繼續 (Space)"></button>
         <button class="shadow-btn" data-act="next" title="下一句 (→)">▶</button>
       </div>
@@ -3011,7 +3011,7 @@ const Shadow = (() => {
     const el = document.getElementById('shadowStatus');
     if (el) el.innerHTML = s;   // 僅站內固定字串(含 <i data-ic>);textContent 會印出字面標籤
     const toggleBtn = document.querySelector('#shadowMask [data-act="toggle"]');
-    if (toggleBtn) toggleBtn.textContent = paused ? '▶' : '';
+    if (toggleBtn) toggleBtn.textContent = paused ? '▶' : '❚❚';   // 播放中顯示暫停符號(de-emoji 時被清成空白,橘鈕看起來壞掉)
   }
 
   function clearTimer() {

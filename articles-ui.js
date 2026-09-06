@@ -830,10 +830,10 @@ window.Articles = (function () {
   }
   function stopPlay() { pl.token++; if (pl.audio) { try { pl.audio.pause(); pl.audio.src = ''; } catch (e) {} pl.audio = null; } pl.playing = false; setBtn(); }
   function setBtn() {
-    var b = document.getElementById('artPlayBtn'); if (b) b.textContent = pl.playing ? '' : '▶';
+    var b = document.getElementById('artPlayBtn'); if (b) b.textContent = pl.playing ? '❚❚' : '▶';
     // 單句 icon 跟主播放鈕同步:正在播的那句顯示 ⏸,其他都是 ▶(使用者回饋:只有下排會切換)
     var sps = document.querySelectorAll('.art-sp');
-    for (var i = 0; i < sps.length; i++) sps[i].textContent = (pl.playing && i === pl.idx) ? '' : '▶';
+    for (var i = 0; i < sps.length; i++) sps[i].textContent = (pl.playing && i === pl.idx) ? '❚❚' : '▶';
   }
   // 點句子旁的播放鈕:同句=暫停/續播;異句=從那句開始播
   function spTap(i) {
