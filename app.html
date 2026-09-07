@@ -1870,7 +1870,7 @@ if (fbConfig) {
   try { firebase.firestore().settings({ experimentalAutoDetectLongPolling: true, useFetchStreams: false }); } catch (e) {}
   auth = firebase.auth();
   db = firebase.firestore();
-  auth.onAuthStateChanged(u => { currentUser = u; _authResolved = true; _writeAuthCache(u); if (u) storeRefCode(); try { localStorage.setItem('stayjp_logged_in', u ? '1' : '0'); } catch (e) {} updateAuthUI(); loadFavorites(); loadCloudData(); if (typeof Streak !== 'undefined') { Streak.syncDown(); Streak.render(); } });
+  auth.onAuthStateChanged(u => { currentUser = u; _authResolved = true; _writeAuthCache(u); if (u) storeRefCode(); try { localStorage.setItem('stayjp_logged_in', u ? '1' : '0'); } catch (e) {} if (!u) { _cloudSynced = false; _pendingSave = false; } updateAuthUI(); loadFavorites(); loadCloudData(); if (typeof Streak !== 'undefined') { Streak.syncDown(); Streak.render(); } });
   // 推薦碼歸因:登入後首次把 localStorage 的 ?ref= 碼寫進 users/{uid}.ref_code(已有就不覆蓋 → 首次點擊歸因)
   function storeRefCode() {
     try {
@@ -2172,12 +2172,12 @@ function loadCloudData() {
       } else {
         const merged = { ...d[k] };
         if (k === 'study_log') {
-          // 學習日曆:按「日期聯集、同日各項取最大」合併——原本同日雲端整筆蓋本機,
-          // 而上傳又是整包覆蓋,兩台裝置輪流用會互吃日期 → 連勝天數兩邊不一致(用戶回報)。
-          let changed = false;
+          // 學習日曆:按「日期聯集、同日各項取最大」合併;本機有雲端缺的日期,
+          // 用 dot-path 逐日補寫(絕不整包 set → 雲端只增不減)。
+          const missing = [];
           Object.entries(local).forEach(([date, val]) => {
             const c = merged[date];
-            if (!c) { merged[date] = val; changed = true; }
+            if (!c) { merged[date] = val; missing.push(date); }
             else {
               const mx = {
                 vocab: Math.max(c.vocab || 0, (val && val.vocab) || 0),
@@ -2185,13 +2185,12 @@ function loadCloudData() {
                 quiz: Math.max(c.quiz || 0, (val && val.quiz) || 0),
                 minutes: Math.max(c.minutes || 0, (val && val.minutes) || 0),
               };
-              if (JSON.stringify(mx) !== JSON.stringify(c)) changed = true;
+              if (JSON.stringify(mx) !== JSON.stringify(c)) missing.push(date);
               merged[date] = mx;
             }
           });
           localStorage.setItem(k, JSON.stringify(merged));
-          // 本機有雲端沒有的資料 → 回寫,讓另一台下次載入就拿到聯集(雙向收斂)
-          if (changed) setTimeout(() => { try { saveAllCloud(); } catch (e) {} }, 1200);
+          if (missing.length) setTimeout(() => { try { _cloudSynced = true; saveStudyDayCloud(missing); } catch (e) {} }, 800);
         } else {
           // Object: cloud values win if newer, local wins otherwise
           Object.entries(local).forEach(([key, val]) => {
@@ -2223,8 +2222,8 @@ function loadCloudData() {
         localStorage.setItem('study_log', JSON.stringify(sl));
       }
     }
-    // 合併後一律把 union 推回雲端:讓「登出時學的 / 只存在本機的學習日」也同步上去,
-    // 其他裝置下次登入就拿得到 → 修「火焰跨裝置連續、但月曆塗滿散落各機」(只有 backfill 時才推會漏掉)。
+    // 合併完成:解除競態鎖 → 之後的上傳才被允許;把合併後的聯集推上雲端
+    _cloudSynced = true; _pendingSave = false;
     if (typeof saveAllCloud === 'function') saveAllCloud();
     if (typeof SRS !== 'undefined') SRS.updateReviewCount();
     // 回訪用戶在這台第一次登入、雲端資料剛載入 → 標記引導完成並關掉(避免對老用戶閃出新手引導)
@@ -2233,7 +2232,7 @@ function loadCloudData() {
       if (typeof _onbRemove === 'function') _onbRemove();
     }
     doRender();
-  }).catch(() => {});
+  }).catch(() => { _cloudSynced = true; if (_pendingSave) { _pendingSave = false; try { saveAllCloud(); } catch (e) {} } });
 }
 function mergeHistory(local, cloud) {
   const all = [...local, ...cloud];
@@ -2276,16 +2275,39 @@ function saveSRSCloud() {
 }
 // ── Sync ALL data ──
 const SYNC_KEYS = ['study_log','word_notebook','grammar_srs','daily_progress','mock_exam_history','exam_date','base_level','goal_level','reading_done','reading_scores','listening_scores','listening_done','shadow_favs','wrong_questions'];
+// 學習日曆逐日上傳:update('study_log.日期', 值) 只動那一天 → 雲端日曆只增不減,
+// 任何裝置的 stale 本機資料都毀不掉歷史(root cause 修:整包 set 會整欄覆蓋)。
+function saveStudyDayCloud(dates) {
+  if (!currentUser || !db || !_cloudSynced) return;
+  try {
+    const log = JSON.parse(localStorage.getItem('study_log') || '{}');
+    // 預設寫「今天」(與 calendar.js today() 同格式);合併補寫時傳入日期陣列
+    const list = dates || [new Date().toISOString().split('T')[0]];
+    const upd = {};
+    list.forEach(d => { if (log[d]) upd['study_log.' + d] = log[d]; });
+    if (!Object.keys(upd).length) return;
+    db.collection('users').doc(currentUser.uid).update(upd).catch(() => {
+      // doc 還不存在(全新用戶):退回 set merge(此時雲端本來就沒歷史,無覆蓋風險)
+      db.collection('users').doc(currentUser.uid).set({ study_log: log }, { merge: true }).catch(() => {});
+    });
+  } catch (e) {}
+}
 const SCALAR_SYNC_KEYS = new Set(['exam_date','base_level','goal_level']);   // 純字串值:不可 JSON.parse/stringify(JSON.parse('n3')會炸→之前這三個永遠沒同步到雲端,用戶回報「程度填過卻不記得」)
+// 競態鎖:登入用戶「首次雲端下載合併」完成前,任何上傳都可能拿 stale/被清空的本機資料
+// 整欄覆蓋雲端(電腦清過快取 → 開頁瞬間學一下 → 27 天日曆被 1 天蓋掉,用戶多次實錘)。
+let _cloudSynced = false, _pendingSave = false;
 function saveAllCloud() {
   if (!currentUser || !db) return;
+  if (!_cloudSynced) { _pendingSave = true; return; }   // 合併完成後由 loadCloudData flush
   const payload = {};
   SYNC_KEYS.forEach(k => {
+    if (k === 'study_log') return;   // 學習日曆改走 saveStudyDayCloud 逐日寫入,永不整欄覆蓋
     try {
       const v = localStorage.getItem(k); if (v == null || v === '') return;
       payload[k] = SCALAR_SYNC_KEYS.has(k) ? v : JSON.parse(v);   // 純字串直接存,別 JSON.parse
     } catch(e) {}
   });
+  saveStudyDayCloud();   // 今天的日曆格照常上傳(dot-path,只動當天)
   if (Object.keys(payload).length) db.collection('users').doc(currentUser.uid).set(payload, { merge: true });
   // 大 key 另壓縮雙寫 user_progress(小純量 exam_date/base_level/goal_level/daily_progress 續留 users)
   if (window.ProgressCodec) {
