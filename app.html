@@ -331,6 +331,44 @@ select.lang-btn {
 .hub-jlpt .hj-d { font-size:12px; opacity:.92; margin-top:2px; }
 .hub-jlpt .hj-new { position:absolute; top:12px; right:14px; font-size:9px; background:#fff; color:var(--ac); border-radius:8px; padding:1px 6px; font-weight:900; }
 .hub-jlpt .hj-arrow { margin-left:auto; font-size:20px; opacity:.85; }
+.unit-quiz-btn { font:inherit; font-size:11.5px; font-weight:700; color:var(--ac); background:var(--soft,rgba(198,85,59,.08)); border:1px solid var(--ac); border-radius:999px; padding:4px 12px; margin-left:10px; cursor:pointer; white-space:nowrap; }
+.unit-quiz-btn:active { transform:scale(.96); }
+/* 0 基礎入口(面板) */
+.hub-zero { display:flex; align-items:center; gap:12px; width:100%; text-align:left; background:linear-gradient(135deg,var(--soft,rgba(198,85,59,.08)),var(--bg2)); border:1.5px dashed var(--ac); border-radius:16px; padding:12px 16px; margin:0 0 14px; cursor:pointer; color:inherit; font:inherit; }
+.hub-zero:active { transform:scale(.99); }
+.hub-zero img { width:52px; height:auto; flex-shrink:0; }
+.hub-zero .hz-tx { flex:1; min-width:0; display:flex; flex-direction:column; gap:1px; }
+.hub-zero b { font-size:15px; font-weight:800; }
+.hub-zero small { font-size:11.5px; color:var(--tx2); }
+.hub-zero .hz-prog { font-size:11px; color:var(--ac); font-weight:800; }
+.hub-zero .hj-arrow { margin-left:auto; font-size:20px; color:var(--ac); }
+/* Journey 課程地圖 */
+.jr-mask { position:fixed; inset:0; z-index:820; background:var(--bg); overflow:auto; }
+.jr-wrap { max-width:640px; margin:0 auto; padding:16px 18px calc(env(safe-area-inset-bottom,0px) + 40px); }
+.jr-top { display:flex; align-items:center; gap:10px; position:sticky; top:0; background:var(--bg); padding:10px 0; z-index:2; }
+.jr-x { font:inherit; border:1px solid var(--bd); background:var(--bg2); color:var(--tx2); border-radius:10px; padding:6px 12px; cursor:pointer; }
+.jr-hero { display:flex; align-items:center; gap:14px; background:var(--bg2); border:1px solid var(--bd); border-radius:18px; padding:16px; margin:6px 0 16px; }
+.jr-hero img { width:76px; height:auto; }
+.jr-hero h2 { font-size:19px; font-weight:800; margin:0 0 2px; }
+.jr-hero p { font-size:12.5px; color:var(--tx2); margin:0 0 8px; line-height:1.5; }
+.jr-bar { height:8px; border-radius:99px; background:var(--bd); overflow:hidden; }
+.jr-bar i { display:block; height:100%; background:var(--ac); border-radius:99px; transition:width .4s; }
+.jr-bar-t { font-size:11px; color:var(--tx3); margin-top:4px; }
+.jr-ch { margin-bottom:14px; }
+.jr-ch-h { display:flex; align-items:center; gap:10px; font-weight:800; font-size:14.5px; margin-bottom:8px; }
+.jr-ch-n { width:26px; height:26px; border-radius:50%; background:var(--ac); color:#fff; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:800; flex-shrink:0; }
+.jr-ch.done .jr-ch-n { background:var(--good,#2E7D57); }
+.jr-step { display:flex; align-items:center; gap:12px; background:var(--bg2); border:1px solid var(--bd); border-radius:14px; padding:12px 14px; margin:0 0 8px 13px; border-left:3px solid var(--bd); }
+.jr-step.done { border-left-color:var(--good,#2E7D57); }
+.jr-dot { width:22px; height:22px; border-radius:50%; border:2px solid var(--bd); flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:12px; color:#fff; }
+.jr-step.done .jr-dot { background:var(--good,#2E7D57); border-color:var(--good,#2E7D57); }
+.jr-st-tx { flex:1; min-width:0; }
+.jr-st-tx b { font-size:14px; font-weight:700; display:block; }
+.jr-st-tx small { font-size:11.5px; color:var(--tx2); line-height:1.45; display:block; }
+.jr-go { font:inherit; font-size:12.5px; font-weight:800; color:#fff; background:var(--ac); border:0; border-radius:999px; padding:7px 14px; cursor:pointer; white-space:nowrap; }
+.jr-step.done .jr-go { background:var(--bg3); color:var(--tx2); }
+.jr-done-card { text-align:center; background:var(--bg2); border:1px solid var(--bd); border-radius:18px; padding:22px; margin-top:6px; }
+.jr-done-card img { width:100px; }
 .hub-grid2 { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:0 0 18px; }
 .hub-card { position:relative; overflow:hidden; display:flex; flex-direction:column; gap:9px; background:var(--bg2); border:1px solid var(--bd); border-radius:16px; padding:16px 16px 15px; text-decoration:none; color:var(--tx); cursor:pointer; text-align:left; box-shadow:0 1px 3px rgba(0,0,0,.04); }
 .hub-card:active { transform: scale(.98); }
@@ -2381,6 +2419,78 @@ function _hubToday() {
     return (d.vocab || 0) + (d.grammar || 0) + (d.quiz || 0);
   } catch (e) { return 0; }
 }
+// ══ 0 基礎引導「日語從頭學」:把站上既有功能串成一條新手路徑(KOL 建議,TalkMe 式) ══
+const Journey = (() => {
+  const L = (zh, en) => (typeof enOr === 'function' ? enOr((typeof cvt === 'function' ? cvt(zh) : zh), en) : zh);
+  // 章節與步驟:全部連到現有功能,零新內容;done 判定=點過「開始」(journey_done)
+  const CHAPTERS = () => [
+    { t: L('第 1 章 · 五十音', 'Ch.1 · Kana'), steps: [
+      { k: 'kana',    t: L('認識五十音', 'Learn the kana'), d: L('平假名・片假名表,點字聽音,還有小測驗', 'Hiragana & katakana chart with audio and quizzes'), go: () => { Journey.close(); Kana.open(); } },
+    ]},
+    { t: L('第 2 章 · 開口說第一句', 'Ch.2 · First words'), steps: [
+      { k: 'essentials', t: L('必學基礎句', 'Essential phrases'), d: L('打招呼、自我介紹這些一定用得到的句子', 'Greetings and self-intro basics'), go: () => { location.href = 'essentials.html'; } },
+      { k: 'phrases', t: L('生活會話', 'Everyday phrases'), d: L('用餐、交通、購物…場景分類,點了就唸', 'Real-life phrases by scene, tap to hear'), go: () => { location.href = 'phrases.html'; } },
+    ]},
+    { t: L('第 3 章 · N5 起步', 'Ch.3 · Start N5'), steps: [
+      { k: 'vocab', t: L('今天的 20 個單字', "Today's 20 words"), d: L('每天一小批,點卡就唸,有例句', 'A small daily batch with audio and examples'), go: () => { Journey.close(); currentLevel='n5'; localStorage.setItem('lastLevel','n5'); dailyMode=true; switchMode('vocab'); } },
+      { k: 'grammar', t: L('今天的 10 個文法', "Today's 10 grammar points"), d: L('接續、語感、例句講清楚', 'Usage, nuance and spoken examples'), go: () => { Journey.close(); currentLevel='n5'; localStorage.setItem('lastLevel','n5'); grammarDailyMode=true; switchMode('grammar'); } },
+    ]},
+    { t: L('第 4 章 · 說出來', 'Ch.4 · Say it out loud'), steps: [
+      { k: 'shadow', t: L('跟讀課程', 'Shadowing lessons'), d: L('聽一句跟著唸,唸到哪字亮到哪', 'Repeat after the audio — words light up as you speak'), go: () => { location.href = 'speak.html'; } },
+      { k: 'chat', t: L('AI 聊聊:便利商店', 'AI chat: convenience store'), d: L('跟 AI 店員來一場真實對話(N5 難度)', 'Role-play with an AI clerk at N5 level'), go: () => { location.href = 'speak-chat.html'; } },
+    ]},
+    { t: L('第 5 章 · 檢驗實力', 'Ch.5 · Check yourself'), steps: [
+      { k: 'mock', t: L('N5 快速小考', 'N5 quick test'), d: L('測一下手感,看看這一路學了多少', 'A quick check-in on what you have learned'), go: () => { Journey.close(); MockExam.start(); } },
+    ]},
+  ];
+  function doneMap(){ try { return JSON.parse(localStorage.getItem('journey_done')) || {}; } catch(e){ return {}; } }
+  function mark(k){ try { const m=doneMap(); m[k]=Date.now(); localStorage.setItem('journey_done', JSON.stringify(m)); } catch(e){} }
+  function stats(){ const m=doneMap(); const chs=CHAPTERS(); let tot=0, done=0; chs.forEach(c=>c.steps.forEach(st=>{ tot++; if(m[st.k]) done++; })); return { tot, done }; }
+  function open(){
+    const m = doneMap();
+    const chs = CHAPTERS();
+    const st = stats();
+    const pct = st.tot ? Math.round(st.done/st.tot*100) : 0;
+    let mask = document.getElementById('jrMask');
+    if (!mask) { mask = document.createElement('div'); mask.id='jrMask'; mask.className='jr-mask'; document.body.appendChild(mask); }
+    let h = '<div class="jr-wrap">'
+      + '<div class="jr-top"><button class="jr-x" onclick="Journey.close()">✕ ' + L('關閉','Close') + '</button></div>'
+      + '<div class="jr-hero"><img src="images/mascot/tanuki-p08.png" alt="">'
+      + '<div style="flex:1;min-width:0"><h2>' + L('日語從頭學','Japanese from zero') + '</h2>'
+      + '<p>' + L('不知道從哪開始?跟著狸貓一步一步走:五十音 → 開口說 → N5。每一步都是站上現成的工具,做完就打勾。','Not sure where to start? Follow the path: kana → speaking → N5.') + '</p>'
+      + '<div class="jr-bar"><i style="width:' + pct + '%"></i></div>'
+      + '<div class="jr-bar-t">' + st.done + ' / ' + st.tot + ' ' + L('步完成','steps done') + (pct>=100 ? ' · ' + L('全部走完了!','All done!') : '') + '</div>'
+      + '</div></div>';
+    chs.forEach((c, ci) => {
+      const allDone = c.steps.every(x=>m[x.k]);
+      h += '<div class="jr-ch' + (allDone?' done':'') + '"><div class="jr-ch-h"><span class="jr-ch-n">' + (allDone?'✓':(ci+1)) + '</span>' + c.t + '</div>';
+      c.steps.forEach(stp => {
+        const dn = !!m[stp.k];
+        h += '<div class="jr-step' + (dn?' done':'') + '"><span class="jr-dot">' + (dn?'✓':'') + '</span>'
+          + '<span class="jr-st-tx"><b>' + stp.t + '</b><small>' + stp.d + '</small></span>'
+          + '<button class="jr-go" data-jk="' + stp.k + '">' + (dn ? L('再做一次','Again') : L('開始','Start')) + '</button></div>';
+      });
+      h += '</div>';
+    });
+    if (pct >= 100) h += '<div class="jr-done-card"><img src="images/mascot/tanuki-p06.png" alt=""><div style="font-size:17px;font-weight:800;margin:8px 0 4px">' + L('新手村畢業!','You made it!') + '</div><div style="font-size:12.5px;color:var(--tx2)">' + L('接下來就交給「今日目標」和 SRS 複習,每天回來一點點。','From here, daily goals and SRS reviews will carry you.') + '</div></div>';
+    h += '</div>';
+    mask.innerHTML = h;
+    mask.style.display = 'block';
+    mask.querySelectorAll('.jr-go').forEach(b => {
+      b.onclick = () => {
+        const k = b.dataset.jk;
+        mark(k);
+        const chs2 = CHAPTERS();
+        for (const c of chs2) { const f = c.steps.find(x=>x.k===k); if (f) { f.go(); break; } }
+      };
+    });
+    try { window.scrollTo(0,0); } catch(e){}
+  }
+  function close(){ const m=document.getElementById('jrMask'); if(m) m.style.display='none'; try{ const el=document.getElementById('hzProg'); if(el){ const st2=stats(); el.textContent = st2.done ? (st2.done+' / '+st2.tot+' '+L('步','steps')) : ''; } }catch(e){} }
+  return { open, close, stats };
+})();
+window.Journey = Journey;
+
 function _hubStreak() {
   try {
     const local = (JSON.parse(localStorage.getItem('streak_v1') || '{}').days) || 0;
@@ -2481,6 +2591,11 @@ function renderHub() {
     + '</aside>'
     + '<div class="hub-right">'
       + '<a class="hub-jlpt" href="jlpt-drill.html"><span class="hj-new">' + L('主打', 'TOP') + '</span><span class="hj-ic"><i data-ic=target></i></span><span><span class="hj-t">' + L('JLPT 刷題特區', 'JLPT Drills') + '</span><div class="hj-d">' + L('2,800+ 題照真題 · 完整模擬試験 · 錯題本', '2,800+ real-format questions · full mock exams') + '</div></span><span class="hj-arrow">›</span></a>'
+      + '<button class="hub-zero" onclick="Journey.open()">'
+        + '<img src="images/mascot/tanuki-p08.png" alt="">'
+        + '<span class="hz-tx"><b>' + L('0 基礎？日語從頭學', 'Zero basics? Start here') + '</b><small>' + L('五十音 → 開口說 → N5,一步一步帶你走', 'Kana → first words → N5, step by step') + '</small><span class="hz-prog" id="hzProg"></span></span>'
+        + '<span class="hj-arrow">›</span>'
+      + '</button>'
       + '<div class="hub-grid2">'
         + '<a class="hub-card" href="speak.html"><i class="hc-wm" data-ic=mic></i><span class="hc-new">NEW</span><span class="hc-ic"><i data-ic=mic></i></span><span class="hc-t">' + L('AI 跟讀', 'AI Shadowing') + '</span><span class="hc-d">' + L('跟著唸 · 即時評分', 'Repeat & get scored') + '</span></a>'
         + '<a class="hub-card" href="speak-chat.html"><i class="hc-wm" data-ic=speak></i><span class="hc-new">NEW</span><span class="hc-ic"><i data-ic=speak></i></span><span class="hc-t">' + L('AI 聊聊', 'AI Chat') + '</span><span class="hc-d">' + L('情境對話', 'Role-play chat') + '</span></a>'
@@ -2502,6 +2617,7 @@ function renderHub() {
     + '</div>'
     + '</div>';
   try { if (window.Icons && Icons.hydrate) Icons.hydrate(); } catch (e) {}
+  try { const el=document.getElementById('hzProg'); if(el && window.Journey){ const st=Journey.stats(); el.textContent = st.done ? (st.done+' / '+st.tot+' '+L('步完成','steps done')) : L('約 15 分鐘走完第一章','~15 min for chapter one'); } } catch (e) {}
   const hubEl = mn.querySelector('.hub');
   if (firstHub) {
     if (hubEl) hubEl.classList.add('hub-anim');   // 進場動畫只播第一次
@@ -4521,7 +4637,7 @@ function render() {
     const items = groups[cat.name];
     if (!items||!items.length) return;
     vc += items.length;
-    h += `<section class="cs" id="cat-${cat.name}"><h2><span class="ci2">${cat.icon}</span>${catLabel(cat.name)}<span style="font-size:12px;color:#999;font-weight:400;margin-left:auto">${t('cat_count_grammar', { n: items.length })}</span></h2>`;
+    h += `<section class="cs" id="cat-${cat.name}"><h2><span class="ci2">${cat.icon}</span>${catLabel(cat.name)}<span style="font-size:12px;color:#999;font-weight:400;margin-left:auto">${t('cat_count_grammar', { n: items.length })}</span>${items.length>=4?`<button class="unit-quiz-btn" onclick="GrammarDrill.startUnit(this.dataset.cat)" data-cat="${cat.name}"><i data-ic=edit></i> ${enOr(cvt('單元測驗'),'Unit quiz')}</button>`:''}</h2>`;
     items.forEach((d,i) => {
       const isFav = favList.includes(d.id);
       const idx = data.indexOf(d) + 1;

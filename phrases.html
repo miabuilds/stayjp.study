@@ -41,7 +41,8 @@
   .scene .ti small{display:block;font-family:-apple-system,sans-serif;font-weight:400;font-size:12px;color:var(--tx2)}
   .row{display:flex;margin:9px 0;gap:8px;align-items:flex-end}
   .row.me{flex-direction:row-reverse}
-  .who{font-size:20px;flex-shrink:0;width:30px;text-align:center;line-height:1.9}
+  .ic-img{width:44px;height:44px;border-radius:50%;flex-shrink:0}
+.ic-line{background:var(--soft,rgba(198,85,59,.1));color:var(--ac);font-size:20px}
   .bubble{max-width:80%;padding:10px 14px;border-radius:18px;position:relative;transition:transform .12s ease}
   .bubble[data-j]{cursor:pointer}
   .bubble:active{transform:scale(.97)}
@@ -71,10 +72,10 @@
   </header>
 
   <div class="hero">
-    <div class="big">🗣️</div>
+    <img src="images/mascot/tanuki-p05.png" alt="" style="width:96px;height:auto;margin:0 auto 6px;display:block">
     <h1><span data-t="zh">去日本,這幾句先學起來</span><span data-t="en">Real phrases you'll actually use in Japan</span></h1>
     <p><span data-t="zh">便利商店、餐廳、問路…真的會用到的自然口語。</span><span data-t="en">Convenience stores, restaurants, directions — natural everyday Japanese.</span></p>
-    <div class="hint">👆 <span data-t="zh">點任何一句日文,就會唸給你聽</span><span data-t="en">Tap any Japanese line to hear it</span></div>
+    <div class="hint"><i data-ic=volume></i> <span data-t="zh">點任何一句日文,就會唸給你聽</span><span data-t="en">Tap any Japanese line to hear it</span></div>
   </div>
 
   <div class="cattabs" id="cattabs"></div>
@@ -316,29 +317,37 @@ const SCENES = [
 const esc = s => String(s||'').replace(/[<>&"]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));
 const SPK = '<svg class="spk" viewBox="0 0 24 24"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.54 8.46a5 5 0 010 7.07M19.07 4.93a10 10 0 010 14.14"/></svg>';
 let activeCat = CATS[0].k;
+// 場景 → 聊聊的場景徽章圖(名稱關鍵字比對;對不上的退分類線條 icon)
+const SCENE_IMG = [['便利','conbini'],['餐廳','resto'],['點餐','resto'],['拉麵','resto'],['居酒屋','izakaya'],['咖啡','coworker'],['車站','station'],['電車','station'],['問路','station'],['計程','station'],['公車','station'],['新幹線','station'],['購物','shop'],['衣','shop'],['試穿','shop'],['藥','clinic'],['醫','clinic'],['診','clinic'],['身體','clinic'],['旅館','house'],['飯店','house'],['住宿','house'],['入住','house'],['溫泉','house'],['市役所','cityhall'],['手續','cityhall'],['銀行','cityhall'],['ATM','cityhall'],['手機','phone'],['門號','phone'],['郵','delivery'],['宅配','delivery'],['寒暄','smalltalk'],['自我介紹','smalltalk'],['鄰居','smalltalk'],['打招呼','smalltalk']];
+function sceneImgFor(zh){ for(const [k,v] of SCENE_IMG){ if(zh.includes(k)) return v; } return null; }
 function sceneHtml(s){
+  const img = sceneImgFor(s.zh);
+  const icHtml = img
+    ? `<img class="ic-img" src="images/scenes/${img}.png" alt="">`
+    : `<div class="ic ic-line">${'<i data-ic='+(CAT_IC[s.cat]||'sparkle')+'></i>'}</div>`;
   return `
     <div class="scene">
       <div class="head">
-        <div class="ic" style="background:${s.bg};color:#fff">${s.ic}</div>
+        ${icHtml}
         <div class="ti"><span data-t="zh">${s.zh}</span><span data-t="en">${s.en}</span><small>${esc(s.en)} · ${esc(s.zh)}</small></div>
       </div>
       ${s.lines.map(l => `
         <div class="row ${l.side}">
-          <div class="who">${l.w}</div>
           <div class="bubble"${(window.__TTS&&window.__TTS[l.jp])?` data-j="${esc(l.jp)}" onclick="speakLine(this)" title="點我發音 / tap to hear"`:''}>
             <div class="jp">${esc(l.jp)}${(window.__TTS&&window.__TTS[l.jp])?SPK:''}</div>
             <div class="rm">${esc(l.rm)}</div>
             <div class="tr"><span data-t="zh">${esc(l.zh)}</span><span data-t="en">${esc(l.en)}</span></div>
           </div>
         </div>`).join('')}
-      ${s.tipZh ? `<div class="tip"><span data-t="zh">💡 ${esc(s.tipZh)}</span><span data-t="en">💡 ${esc(s.tipEn)}</span></div>` : ''}
+      ${s.tipZh ? `<div class="tip"><i data-ic=bulb></i> <span data-t="zh">${esc(s.tipZh)}</span><span data-t="en">${esc(s.tipEn)}</span></div>` : ''}
     </div>`;
 }
+const CAT_IC = { food:'store', trans:'train', shop:'bag', hotel:'home', life:'clipboard', help:'hospital', social:'speak' };
 function renderTabs(){
   document.getElementById('cattabs').innerHTML = CATS.map(c =>
-    `<button class="cattab ${c.k===activeCat?'on':''}" onclick="pickCat('${c.k}')"><span data-t="zh">${c.ic} ${c.zh}</span><span data-t="en">${c.ic} ${c.en}</span></button>`
+    `<button class="cattab ${c.k===activeCat?'on':''}" onclick="pickCat('${c.k}')"><i data-ic=${CAT_IC[c.k]||'sparkle'}></i> <span data-t="zh">${c.zh}</span><span data-t="en">${c.en}</span></button>`
   ).join('');
+  try{ if(window.Icons&&Icons.hydrate)Icons.hydrate(); }catch(e){}
 }
 function renderScenes(){
   document.getElementById('scenes').innerHTML = SCENES.filter(s => s.cat === activeCat).map(sceneHtml).join('');

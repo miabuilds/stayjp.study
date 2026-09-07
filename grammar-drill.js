@@ -67,6 +67,20 @@ const GrammarDrill = (() => {
   }
 
   let quizMode = 'flash';
+  // 單元測驗(用戶回饋:學完一個單元做測試):當前級別該分類的文法,直接出選擇題
+  function startUnit(catName) {
+    const data = getData(typeof currentLevel !== 'undefined' ? currentLevel : lvl);
+    const items = (data || []).filter(d => d.cat === catName);
+    if (items.length < 4) { (window.AppUI ? AppUI.alert : alert)('這個單元題目不夠(至少 4 個文法點)。'); return; }
+    if (window.ToolQuota && ToolQuota.canUse && !ToolQuota.canUse('grammar_drill')) { if (ToolQuota.showPaywall) ToolQuota.showPaywall('grammar_drill'); return; }
+    if (typeof currentLevel !== 'undefined') lvl = currentLevel;
+    quizMode = 'quiz';
+    queue = (typeof shuf === 'function' ? shuf([...items]) : [...items]).slice(0, 15);
+    cur = 0; gqScore = 0; gqResults = [];
+    document.getElementById('quizBg').classList.add('show');
+    renderQuizQ();
+  }
+
   function begin() {
     const modeEl = document.querySelector('#gdMode .on');
     quizMode = modeEl ? modeEl.dataset.v : quizMode;
@@ -75,22 +89,22 @@ const GrammarDrill = (() => {
     const rangeEl = document.querySelector('#gdRange .on');
     const range = rangeEl ? rangeEl.dataset.v : 'all';
     const data = getData(lvl);
-    if (!data || !data.length) { alert(t('gd_no_data')); return; }
+    if (!data || !data.length) { (window.AppUI?AppUI.alert:alert)(t('gd_no_data')); return; }
     const srs = getSRS();
     const todayStr = today();
 
     if (range === 'today') {
       // 「今日學習」= 文法每日批次（offset ~ offset+GRAMMAR_DAILY_NEW），對齊單字測驗的同名範圍
       if (typeof getGrammarDailyProgress !== 'function' || typeof GRAMMAR_DAILY_NEW === 'undefined') {
-        alert(t('gd_today_empty')); return;
+        (window.AppUI?AppUI.alert:alert)(t('gd_today_empty')); return;
       }
       const prog = getGrammarDailyProgress(lvl);
       queue = data.slice(prog.totalOffset, prog.totalOffset + GRAMMAR_DAILY_NEW);
-      if (!queue.length) { alert(t('gd_today_empty')); return; }
+      if (!queue.length) { (window.AppUI?AppUI.alert:alert)(t('gd_today_empty')); return; }
     } else if (range === 'due') {
       // 只出真正到期的複習項；沒有就明確告知（不再偷塞新項，避免和「新的」混淆）
       queue = data.filter(d => { const e = srs[d.id]; return e && e.nextReview <= todayStr; });
-      if (!queue.length) { alert(t('gd_due_empty')); return; }
+      if (!queue.length) { (window.AppUI?AppUI.alert:alert)(t('gd_due_empty')); return; }
     } else if (range === 'new') {
       const learned = new Set(Object.keys(srs));
       queue = data.filter(d => !learned.has(d.id)).slice(0, 15);
@@ -98,7 +112,7 @@ const GrammarDrill = (() => {
       queue = (typeof shuf === 'function' ? shuf(data) : [...data]).slice(0, 20);
     }
 
-    if (!queue.length) { alert(t('gd_no_match')); return; }
+    if (!queue.length) { (window.AppUI?AppUI.alert:alert)(t('gd_no_match')); return; }
     cur = 0;
     gqScore = 0; gqResults = [];
     if (quizMode === 'quiz') { renderQuizQ(); return; }
@@ -217,5 +231,5 @@ const GrammarDrill = (() => {
 
   function close() { document.getElementById('quizBg').classList.remove('show'); }
 
-  return { start, begin, flip, rate, answerQuiz, close };
+  return { start, begin, flip, rate, answerQuiz, close, startUnit };
 })();
