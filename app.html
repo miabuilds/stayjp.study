@@ -2575,6 +2575,12 @@ function hubConfetti() {
   document.body.appendChild(wrap);
   setTimeout(() => wrap.remove(), 3800);
 }
+// 面板重畫防吞點:雲端同步/登入/語言就緒完成時都會 doRender→renderHub 整包 innerHTML 重建,
+// 手指剛按下的卡片被換成新 DOM → click 無聲消失(用戶回報:點第一下沒反應)。
+// 對策:①內容沒變就不動 DOM ②按壓中/剛放開時延後重畫。pointer 事件同時涵蓋觸控與滑鼠。
+let _hubTouchActive = false, _hubTouchEnd = 0, _hubRetryT = 0;
+document.addEventListener('pointerdown', () => { _hubTouchActive = true; }, { passive: true, capture: true });
+['pointerup', 'pointercancel'].forEach(ev => document.addEventListener(ev, () => { _hubTouchActive = false; _hubTouchEnd = Date.now(); }, { passive: true, capture: true }));
 function renderHub() {
   const mn = document.getElementById('mn');
   if (!mn) return;
@@ -2604,7 +2610,7 @@ function renderHub() {
   if (_sig === _hubSig && mn.querySelector('.hub')) return;
   _hubSig = _sig;
   const blossom = c => '<svg class="bl ' + c + '" viewBox="0 0 40 40"><g><ellipse cx="20" cy="11" rx="4.6" ry="7.4"/><ellipse cx="20" cy="11" rx="4.6" ry="7.4" transform="rotate(72 20 20)"/><ellipse cx="20" cy="11" rx="4.6" ry="7.4" transform="rotate(144 20 20)"/><ellipse cx="20" cy="11" rx="4.6" ry="7.4" transform="rotate(216 20 20)"/><ellipse cx="20" cy="11" rx="4.6" ry="7.4" transform="rotate(288 20 20)"/></g><circle cx="20" cy="20" r="2.6" fill="#fff"/></svg>';
-  mn.innerHTML =
+  const hubHtml =
     '<div class="hub">'
     + '<aside class="hub-left">'
       + '<div class="hub-hero">'
@@ -2659,8 +2665,19 @@ function renderHub() {
       + '<div class="hub-foot"><img src="images/mascot/tanuki-p06.png" alt=""><span>' + L('今天也一起加油！', 'Let’s study today!') + '</span></div>'
     + '</div>'
     + '</div>';
+  const _updHzProg = () => { try { const el=document.getElementById('hzProg'); if(el && window.Journey){ const st=Journey.stats(); el.textContent = st.done ? (st.done+' / '+st.tot+' '+L('步完成','steps done')) : L('約 15 分鐘走完第一章','~15 min for chapter one'); } } catch (e) {} };
+  if (mn._hubHtml === hubHtml && mn.querySelector('.hub')) { _updHzProg(); return; }   // 內容沒變:不碰 DOM(手指下的卡片安全)
+  // 只防護「面板已在畫面上」的背景重畫;從其他頁進面板(mn 還不是 hub)要立刻畫,不延遲
+  if ((_hubTouchActive || Date.now() - _hubTouchEnd < 450) && mn.querySelector('.hub')) {
+    _hubSig = null;   // 撤銷開頭的簽名更新,否則延後的重試會被 _sig 檢查擋掉、永遠補不了畫
+    clearTimeout(_hubRetryT);
+    _hubRetryT = setTimeout(() => { if (typeof inHub === 'undefined' || inHub) renderHub(); }, 480);   // 重試前確認還在面板,別蓋掉學習頁
+    return;
+  }
+  mn._hubHtml = hubHtml;
+  mn.innerHTML = hubHtml;
   try { if (window.Icons && Icons.hydrate) Icons.hydrate(); } catch (e) {}
-  try { const el=document.getElementById('hzProg'); if(el && window.Journey){ const st=Journey.stats(); el.textContent = st.done ? (st.done+' / '+st.tot+' '+L('步完成','steps done')) : L('約 15 分鐘走完第一章','~15 min for chapter one'); } } catch (e) {}
+  _updHzProg();
   const hubEl = mn.querySelector('.hub');
   if (firstHub) {
     if (hubEl) hubEl.classList.add('hub-anim');   // 進場動畫只播第一次
