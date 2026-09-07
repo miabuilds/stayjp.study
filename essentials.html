@@ -428,6 +428,7 @@ const Quiz = (function(){
     // 錯題再考一輪
     const box=document.getElementById('quizBox');
     const pct=Math.round(score/queue.length*100);
+    try{localStorage.setItem('jr_essentials','1');}catch(e){}   // Journey 證據:隨堂測驗做完
     const msg = pct>=90?'太強了!這些你很熟 ' : pct>=60?'不錯,錯的再看一下就更穩' : '多測幾次,紅字的地方特別練';
     box.innerHTML=`<div class="qresult">
       <div class="qscore">${score}/${queue.length}</div>

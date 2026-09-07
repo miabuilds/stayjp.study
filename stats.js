@@ -92,7 +92,7 @@ const Stats = (() => {
       ${avatar}
       <div style="flex:1;min-width:0">
         <div class="pf-name"><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${(name||'').replace(/</g,'&lt;')}</span>${badges}</div>
-        ${email ? `<div class="pf-sub">${email.replace(/</g,'&lt;')}</div>` : `<div class="pf-sub">${_e('和狸貓一起,今天也前進一點','One step forward with the tanuki today')}</div>`}
+        ${email ? `<div class="pf-sub">${email.replace(/</g,'&lt;')}</div>` : `<div class="pf-sub">${_e('和狸太郎一起,今天也前進一點','One step forward with Tanutaro today')}</div>`}
         <div class="pf-stats">
           <div><b><i data-ic=fire></i> ${days}</b><span>${_e('連續天數','Streak')}</span></div>
           <div><b>${daysLearned}</b><span>${_e('學習天數','Days studied')}</span></div>

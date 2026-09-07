@@ -362,6 +362,8 @@ function render(){ renderTabs(); renderScenes(); }
 // 發音:優先 VOICEVOX(__TTS 有的話),否則瀏覽器 TTS。與主站一致。
 let _audio = null;
 function speakLine(el){
+  // Journey 證據:點聽滿 5 句
+  try{const n=parseInt(localStorage.getItem('jr_ph_taps')||'0',10)+1;localStorage.setItem('jr_ph_taps',String(n));if(n>=5)localStorage.setItem('jr_phrases','1');}catch(e){}
   const t = el.getAttribute('data-j'); if(!t) return;
   try{ if(window.speechSynthesis) speechSynthesis.cancel(); }catch(e){}
   if(_audio){ try{_audio.pause();}catch(e){} _audio=null; }

@@ -518,7 +518,7 @@ function maybeParty(){
   m.innerHTML=`<div class="party-card" style="position:relative"><button onclick="this.closest('.party-mask').remove()" aria-label="關閉" style="position:absolute;top:10px;right:10px;width:34px;height:34px;border:none;background:transparent;color:var(--ink3);font-size:17px;cursor:pointer">✕</button>
     <img src="images/mascot/tanuki-p06.png" alt="">
     <h3>${enOr(cvt('今日 10 句達成!'),'10 sentences today — done!')}</h3>
-    <p>${enOr(cvt('口說就是這樣練起來的。明天狸貓在這裡等你。'),'This is how speaking gets built. See you tomorrow!')}</p>
+    <p>${enOr(cvt('口說就是這樣練起來的。明天狸太郎在這裡等你。'),'This is how speaking gets built. Tanutaro will be here tomorrow!')}</p>
     <button class="btn pri" onclick="this.closest('.party-mask').remove()">${enOr(cvt('繼續練'),'Keep going')}</button>
   </div>`;
   m.onclick=e=>{ if(e.target===m) m.remove(); };

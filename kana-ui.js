@@ -252,8 +252,9 @@ window.Kana = (function () {
   function renderQ() {
     var w = wrapEl(); if (!w) { open(); w = wrapEl(); }
     if (qIdx >= qList.length) {
+      try{localStorage.setItem('jr_kana','1');}catch(e){}   // Journey 證據:測驗做完
       w.innerHTML = '<div class="kana-top"><b><i data-ic=edit></i> ' + enOr('測驗結果', 'Result') + '</b><span class="kana-x" onclick="Kana.close()"><i data-ic=x></i></span></div>' +
-        '<div class="kq-box"><div style="font-size:48px;margin:20px 0">' + (qScore >= 8 ? '' : qScore >= 5 ? '' : '') + '</div>' +
+        '<div class="kq-box"><div style="margin:16px 0"><img src="images/mascot/' + (qScore >= 8 ? 'tanuki-p06' : qScore >= 5 ? 'tanuki-p08' : 'tanuki-p07') + '.png" alt="" style="width:84px;height:auto"></div>' +
         '<div style="font-size:22px;font-weight:700">' + qScore + ' / ' + qList.length + '</div>' +
         '<div style="margin-top:24px"><button class="kana-quiz-btn" onclick="Kana.quiz(\'' + qMode + '\')">' + enOr('再測一次', 'Again') + '</button> <button class="kana-tab" style="display:inline-block;width:auto;padding:9px 16px" onclick="Kana.open()">' + enOr('回五十音表', 'Back to chart') + '</button></div></div>';
       return;

@@ -365,6 +365,7 @@ select.lang-btn {
 .jr-st-tx { flex:1; min-width:0; }
 .jr-st-tx b { font-size:14px; font-weight:700; display:block; }
 .jr-st-tx small { font-size:11.5px; color:var(--tx2); line-height:1.45; display:block; }
+.jr-st-tx .jr-cond { font-size:11px; color:var(--ac); margin-top:2px; }
 .jr-go { font:inherit; font-size:12.5px; font-weight:800; color:#fff; background:var(--ac); border:0; border-radius:999px; padding:7px 14px; cursor:pointer; white-space:nowrap; }
 .jr-step.done .jr-go { background:var(--bg3); color:var(--tx2); }
 .jr-done-card { text-align:center; background:var(--bg2); border:1px solid var(--bd); border-radius:18px; padding:22px; margin-top:6px; }
@@ -2446,32 +2447,48 @@ function _hubToday() {
 // ══ 0 基礎引導「日語從頭學」:把站上既有功能串成一條新手路徑(KOL 建議,TalkMe 式) ══
 const Journey = (() => {
   const L = (zh, en) => (typeof enOr === 'function' ? enOr((typeof cvt === 'function' ? cvt(zh) : zh), en) : zh);
-  // 章節與步驟:全部連到現有功能,零新內容;done 判定=點過「開始」(journey_done)
+  // 打勾=證據制:每步讀真實學習紀錄,做完才勾(KOL 實測:打開又關掉就完成 → 太鬆)
+  const _ls = k => { try { return localStorage.getItem(k); } catch(e){ return null; } };
+  const _lsj = k => { try { return JSON.parse(localStorage.getItem(k)) || null; } catch(e){ return null; } };
+  const _slSum = f => { const sl = _lsj('study_log') || {}; let n = 0; Object.values(sl).forEach(d => { n += (d && d[f]) || 0; }); return n; };
   const CHAPTERS = () => [
     { t: L('第 1 章 · 五十音', 'Ch.1 · Kana'), steps: [
-      { k: 'kana',    t: L('認識五十音', 'Learn the kana'), d: L('平假名・片假名表,點字聽音,還有小測驗', 'Hiragana & katakana chart with audio and quizzes'), go: () => { Journey.close(); Kana.open(); } },
+      { k: 'kana',    t: L('認識五十音', 'Learn the kana'), d: L('平假名・片假名表,點字聽音,還有小測驗', 'Hiragana & katakana chart with audio and quizzes'),
+        cond: L('做完一次認讀小測驗', 'Finish one reading quiz'), chk: () => !!_ls('jr_kana'),
+        go: () => { Journey.close(); Kana.open(); } },
     ]},
     { t: L('第 2 章 · 開口說第一句', 'Ch.2 · First words'), steps: [
-      { k: 'essentials', t: L('必學基礎句', 'Essential phrases'), d: L('打招呼、自我介紹這些一定用得到的句子', 'Greetings and self-intro basics'), go: () => { location.href = 'essentials.html'; } },
-      { k: 'phrases', t: L('生活會話', 'Everyday phrases'), d: L('用餐、交通、購物…場景分類,點了就唸', 'Real-life phrases by scene, tap to hear'), go: () => { location.href = 'phrases.html'; } },
+      { k: 'essentials', t: L('必學基礎句', 'Essential phrases'), d: L('打招呼、自我介紹這些一定用得到的句子', 'Greetings and self-intro basics'),
+        cond: L('做完一次隨堂測驗', 'Finish the mini quiz'), chk: () => !!_ls('jr_essentials'),
+        go: () => { location.href = 'essentials.html'; } },
+      { k: 'phrases', t: L('生活會話', 'Everyday phrases'), d: L('用餐、交通、購物…場景分類,點了就唸', 'Real-life phrases by scene, tap to hear'),
+        cond: L('點聽 5 句會話', 'Tap-listen to 5 phrases'), chk: () => !!_ls('jr_phrases'),
+        go: () => { location.href = 'phrases.html'; } },
     ]},
     { t: L('第 3 章 · N5 起步', 'Ch.3 · Start N5'), steps: [
-      { k: 'vocab', t: L('今天的 20 個單字', "Today's 20 words"), d: L('每天一小批,點卡就唸,有例句', 'A small daily batch with audio and examples'), go: () => { Journey.close(); currentLevel='n5'; localStorage.setItem('lastLevel','n5'); dailyMode=true; switchMode('vocab'); } },
-      { k: 'grammar', t: L('今天的 10 個文法', "Today's 10 grammar points"), d: L('接續、語感、例句講清楚', 'Usage, nuance and spoken examples'), go: () => { Journey.close(); currentLevel='n5'; localStorage.setItem('lastLevel','n5'); grammarDailyMode=true; switchMode('grammar'); } },
+      { k: 'vocab', t: L('今天的 20 個單字', "Today's 20 words"), d: L('每天一小批,點卡就唸,有例句', 'A small daily batch with audio and examples'),
+        cond: L('翻開 10 張單字卡', 'Open 10 word cards'), chk: () => (parseInt(_ls('jr_vb_seen')||'0',10) >= 10) || _slSum('vocab') >= 10,
+        go: () => { Journey.close(); currentLevel='n5'; localStorage.setItem('lastLevel','n5'); dailyMode=true; switchMode('vocab'); } },
+      { k: 'grammar', t: L('今天的 10 個文法', "Today's 10 grammar points"), d: L('接續、語感、例句講清楚', 'Usage, nuance and spoken examples'),
+        cond: L('展開看 5 條文法', 'Open 5 grammar points'), chk: () => (parseInt(_ls('jr_gr_seen')||'0',10) >= 5) || _slSum('grammar') >= 5,
+        go: () => { Journey.close(); currentLevel='n5'; localStorage.setItem('lastLevel','n5'); grammarDailyMode=true; switchMode('grammar'); } },
     ]},
     { t: L('第 4 章 · 說出來', 'Ch.4 · Say it out loud'), steps: [
-      { k: 'shadow', t: L('跟讀課程', 'Shadowing lessons'), d: L('聽一句跟著唸,唸到哪字亮到哪', 'Repeat after the audio — words light up as you speak'), go: () => { location.href = 'speak.html'; } },
-      { k: 'chat', t: L('AI 聊聊:便利商店', 'AI chat: convenience store'), d: L('跟 AI 店員來一場真實對話(N5 難度)', 'Role-play with an AI clerk at N5 level'), go: () => { location.href = 'speak-chat.html'; } },
+      { k: 'shadow', t: L('跟讀課程', 'Shadowing lessons'), d: L('聽一句跟著唸,唸到哪字亮到哪', 'Repeat after the audio — words light up as you speak'),
+        cond: L('通過 1 課跟讀', 'Pass 1 shadowing lesson'), chk: () => { const m = _lsj('ls_done'); return !!(m && Object.keys(m).length); },
+        go: () => { location.href = 'speak.html'; } },
+      { k: 'chat', t: L('AI 聊聊:便利商店', 'AI chat: convenience store'), d: L('跟 AI 店員來一場真實對話(N5 難度)', 'Role-play with an AI clerk at N5 level'),
+        cond: L('和 AI 對話 3 輪', 'Exchange 3 turns with the AI'), chk: () => !!_ls('jr_chat'),
+        go: () => { location.href = 'speak-chat.html'; } },
     ]},
     { t: L('第 5 章 · 檢驗實力', 'Ch.5 · Check yourself'), steps: [
-      { k: 'mock', t: L('N5 快速小考', 'N5 quick test'), d: L('測一下手感,看看這一路學了多少', 'A quick check-in on what you have learned'), go: () => { Journey.close(); MockExam.start(); } },
+      { k: 'mock', t: L('N5 快速小考', 'N5 quick test'), d: L('測一下手感,看看這一路學了多少', 'A quick check-in on what you have learned'),
+        cond: L('完成 1 次小考', 'Finish one quick test'), chk: () => { const h = _lsj('mock_exam_history'); return !!(h && h.length); },
+        go: () => { Journey.close(); MockExam.start(); } },
     ]},
   ];
-  function doneMap(){ try { return JSON.parse(localStorage.getItem('journey_done')) || {}; } catch(e){ return {}; } }
-  function mark(k){ try { const m=doneMap(); m[k]=Date.now(); localStorage.setItem('journey_done', JSON.stringify(m)); } catch(e){} }
-  function stats(){ const m=doneMap(); const chs=CHAPTERS(); let tot=0, done=0; chs.forEach(c=>c.steps.forEach(st=>{ tot++; if(m[st.k]) done++; })); return { tot, done }; }
+  function stats(){ const chs=CHAPTERS(); let tot=0, done=0; chs.forEach(c=>c.steps.forEach(st=>{ tot++; try{ if(st.chk()) done++; }catch(e){} })); return { tot, done }; }
   function open(){
-    const m = doneMap();
     const chs = CHAPTERS();
     const st = stats();
     const pct = st.tot ? Math.round(st.done/st.tot*100) : 0;
@@ -2481,17 +2498,20 @@ const Journey = (() => {
       + '<div class="jr-top"><button class="jr-x" onclick="Journey.close()">✕ ' + L('關閉','Close') + '</button></div>'
       + '<div class="jr-hero"><img src="images/mascot/tanuki-p08.png" alt="">'
       + '<div style="flex:1;min-width:0"><h2>' + L('日語從頭學','Japanese from zero') + '</h2>'
-      + '<p>' + L('不知道從哪開始?跟著狸貓一步一步走:五十音 → 開口說 → N5。每一步都是站上現成的工具,做完就打勾。','Not sure where to start? Follow the path: kana → speaking → N5.') + '</p>'
+      + '<p>' + L('不知道從哪開始?跟著狸太郎一步一步走:五十音 → 開口說 → N5。每一步都是站上現成的工具,做完就打勾。','Not sure where to start? Follow Tanutaro step by step: kana → speaking → N5.') + '</p>'
       + '<div class="jr-bar"><i style="width:' + pct + '%"></i></div>'
       + '<div class="jr-bar-t">' + st.done + ' / ' + st.tot + ' ' + L('步完成','steps done') + (pct>=100 ? ' · ' + L('全部走完了!','All done!') : '') + '</div>'
       + '</div></div>';
     chs.forEach((c, ci) => {
-      const allDone = c.steps.every(x=>m[x.k]);
+      const dns = c.steps.map(x => { try { return !!x.chk(); } catch(e){ return false; } });
+      const allDone = dns.every(Boolean);
       h += '<div class="jr-ch' + (allDone?' done':'') + '"><div class="jr-ch-h"><span class="jr-ch-n">' + (allDone?'✓':(ci+1)) + '</span>' + c.t + '</div>';
-      c.steps.forEach(stp => {
-        const dn = !!m[stp.k];
+      c.steps.forEach((stp, si) => {
+        const dn = dns[si];
         h += '<div class="jr-step' + (dn?' done':'') + '"><span class="jr-dot">' + (dn?'✓':'') + '</span>'
-          + '<span class="jr-st-tx"><b>' + stp.t + '</b><small>' + stp.d + '</small></span>'
+          + '<span class="jr-st-tx"><b>' + stp.t + '</b><small>' + stp.d + '</small>'
+          + (dn ? '' : '<small class="jr-cond">' + L('打勾條件','To check off') + ':' + stp.cond + '</small>')
+          + '</span>'
           + '<button class="jr-go" data-jk="' + stp.k + '">' + (dn ? L('再做一次','Again') : L('開始','Start')) + '</button></div>';
       });
       h += '</div>';
@@ -2503,7 +2523,6 @@ const Journey = (() => {
     mask.querySelectorAll('.jr-go').forEach(b => {
       b.onclick = () => {
         const k = b.dataset.jk;
-        mark(k);
         const chs2 = CHAPTERS();
         for (const c of chs2) { const f = c.steps.find(x=>x.k===k); if (f) { f.go(); break; } }
       };
@@ -4731,7 +4750,9 @@ function render() {
   sd.innerHTML = sh;
 }
 
-function toggleCard(h,e){if(e&&e.target&&e.target.closest&&e.target.closest('.star'))return;h.parentElement.classList.toggle('o')}
+function toggleCard(h,e){if(e&&e.target&&e.target.closest&&e.target.closest('.star'))return;const opened=h.parentElement.classList.toggle('o');
+  // Journey 證據:真的翻開卡片才計數(打開頁面不算)
+  if(opened){try{const key=(typeof mode!=='undefined'&&mode==='grammar')?'jr_gr_seen':'jr_vb_seen';const n=parseInt(localStorage.getItem(key)||'0',10)+1;if(n<=99)localStorage.setItem(key,String(n));}catch(e2){}}}
 function toggleCat(t){t.classList.toggle('c');t.nextElementSibling.classList.toggle('c')}
 function toggleSd(){
   var open = document.getElementById('sd').classList.toggle('open');
