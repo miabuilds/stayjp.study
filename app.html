@@ -2137,8 +2137,13 @@ function loadCloudData() {
     // Merge all other synced data (study_log, word_notebook, grammar_srs, daily_progress, mock_exam_history)
     SYNC_KEYS.forEach(k => {
       if (d[k] == null || d[k] === '') return;
-      if (SCALAR_SYNC_KEYS.has(k)) {   // 純字串(程度/目標/考試日):直接還原,不進 JSON 合併(否則 JSON.parse 炸掉整段還原)
-        if (typeof d[k] === 'string') localStorage.setItem(k, d[k]);
+      if (SCALAR_SYNC_KEYS.has(k)) {   // 純字串(程度/目標/考試日/引導flag):直接還原,不進 JSON 合併(否則 JSON.parse 炸掉整段還原)
+        if (typeof d[k] === 'string') {
+          if (k === 'jr_vb_seen' || k === 'jr_gr_seen') {   // 翻卡計數:取兩邊較大,雲端舊值不能倒退本機
+            const mx = Math.max(parseInt(localStorage.getItem(k) || '0', 10) || 0, parseInt(d[k], 10) || 0);
+            localStorage.setItem(k, String(mx));
+          } else localStorage.setItem(k, d[k]);
+        }
         return;
       }
       const local = JSON.parse(localStorage.getItem(k) || (Array.isArray(d[k]) ? '[]' : '{}'));
@@ -2277,7 +2282,7 @@ function saveSRSCloud() {
   saveProgressKeys({ srs_data: d });
 }
 // ── Sync ALL data ──
-const SYNC_KEYS = ['study_log','word_notebook','grammar_srs','daily_progress','mock_exam_history','exam_date','base_level','goal_level','reading_done','reading_scores','listening_scores','listening_done','shadow_favs','wrong_questions'];
+const SYNC_KEYS = ['study_log','word_notebook','grammar_srs','daily_progress','mock_exam_history','exam_date','base_level','goal_level','reading_done','reading_scores','listening_scores','listening_done','shadow_favs','wrong_questions','ls_done','jr_kana','jr_essentials','jr_phrases','jr_chat','jr_vb_seen','jr_gr_seen'];
 // 學習日曆逐日上傳:update('study_log.日期', 值) 只動那一天 → 雲端日曆只增不減,
 // 任何裝置的 stale 本機資料都毀不掉歷史(root cause 修:整包 set 會整欄覆蓋)。
 function saveStudyDayCloud(dates) {
@@ -2295,7 +2300,7 @@ function saveStudyDayCloud(dates) {
     });
   } catch (e) {}
 }
-const SCALAR_SYNC_KEYS = new Set(['exam_date','base_level','goal_level']);   // 純字串值:不可 JSON.parse/stringify(JSON.parse('n3')會炸→之前這三個永遠沒同步到雲端,用戶回報「程度填過卻不記得」)
+const SCALAR_SYNC_KEYS = new Set(['exam_date','base_level','goal_level','jr_kana','jr_essentials','jr_phrases','jr_chat','jr_vb_seen','jr_gr_seen']);   // 純字串值:不可 JSON.parse/stringify(JSON.parse('n3')會炸→之前這三個永遠沒同步到雲端,用戶回報「程度填過卻不記得」)
 // 競態鎖:登入用戶「首次雲端下載合併」完成前,任何上傳都可能拿 stale/被清空的本機資料
 // 整欄覆蓋雲端(電腦清過快取 → 開頁瞬間學一下 → 27 天日曆被 1 天蓋掉,用戶多次實錘)。
 let _cloudSynced = false, _pendingSave = false;
@@ -2606,7 +2611,8 @@ function renderHub() {
     resume = '<button class="hub-resume" onclick="switchMode(\'' + lm + '\')"><span class="hr-play">▶</span><span class="hr-main">' + L('繼續上次', 'Continue') + '：' + mlabel + ' ' + ll + '</span><span class="hr-sub">' + L('回到上次進度', 'resume') + '</span></button>';
   }
   // 內容簽章:載入時 doRender 會被叫多次,資料相同就不重繪 → 只渲染一次,進場動畫不被打斷、不閃
-  const _sig = [(typeof I18n !== 'undefined' && I18n.getLang ? I18n.getLang() : ''), streak, done, wod ? wod.w : '', lm || '', ll || ''].join('|');
+  const _jrDone = (() => { try { return window.Journey ? Journey.stats().done : ''; } catch (e) { return ''; } })();
+  const _sig = [(typeof I18n !== 'undefined' && I18n.getLang ? I18n.getLang() : ''), streak, done, wod ? wod.w : '', lm || '', ll || '', _jrDone].join('|');
   if (_sig === _hubSig && mn.querySelector('.hub')) return;
   _hubSig = _sig;
   const blossom = c => '<svg class="bl ' + c + '" viewBox="0 0 40 40"><g><ellipse cx="20" cy="11" rx="4.6" ry="7.4"/><ellipse cx="20" cy="11" rx="4.6" ry="7.4" transform="rotate(72 20 20)"/><ellipse cx="20" cy="11" rx="4.6" ry="7.4" transform="rotate(144 20 20)"/><ellipse cx="20" cy="11" rx="4.6" ry="7.4" transform="rotate(216 20 20)"/><ellipse cx="20" cy="11" rx="4.6" ry="7.4" transform="rotate(288 20 20)"/></g><circle cx="20" cy="20" r="2.6" fill="#fff"/></svg>';

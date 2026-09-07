@@ -138,6 +138,50 @@
 <script src="grammar-kanji-readings.js"></script>
 <script src="vocab-n5.js"></script>
 <script src="audio/tts/manifest.js"></script>
+<script src="i18n.js"></script>
+<script>
+// ── i18n shim(照 speak.html):簡中 OpenCC 即時轉換 + 英文 enOr() ──
+let _tw2cn=null;
+function ensureOpenCC(){ return new Promise(function(res){ if(_tw2cn)return res(_tw2cn); if(window.OpenCC){ _tw2cn=OpenCC.Converter({from:'tw',to:'cn'}); if(I18n.setConverter)I18n.setConverter(_tw2cn); return res(_tw2cn);} var s=document.createElement('script'); s.src='https://cdn.jsdelivr.net/npm/opencc-js@1.0.5/dist/umd/full.js'; s.onload=function(){ _tw2cn=OpenCC.Converter({from:'tw',to:'cn'}); if(I18n.setConverter)I18n.setConverter(_tw2cn); res(_tw2cn); }; s.onerror=function(){res(null)}; document.head.appendChild(s); }); }
+function cvt(x){ return (!x||I18n.getLang()!=='zh-CN'||!_tw2cn)?x:_tw2cn(x); }
+function enOr(zh,en){ return I18n.getLang()==='en'?en:cvt(zh); }
+// 本頁翻譯:T(繁中) → EN 查表 / 簡中 cvt / 繁中原樣。日文字串一律不進 T(查不到表就原樣,cvt 只動中文)。
+const EN_T = {
+  '基本數字':'Basic numbers','0〜億':'0 – 100,000,000','百・千 的變音':'Sound changes in 100s & 1000s','要特別記':'memorize these',
+  '幾點':"o'clock",'幾分':'minutes','星期':'weekdays','月份':'months','日期':'days of the month',
+  '疑問詞':'Question words','問句必備':'question essentials','基本助詞':'Basic particles','句子的關節':'the joints of a sentence',
+  '<b>4・7・9</b> 各有兩種念法(4時よじ、4月しがつ、4個よんこ)。':'<b>4, 7, 9</b> each have two readings (4時 yoji, 4月 shigatsu, 4個 yonko).',
+  '注意 <b>4時よじ・7時しちじ・9時くじ</b>。':'Watch out for <b>4時 yoji · 7時 shichiji · 9時 kuji</b>.',
+  'ぷん / ふん 交替,半 = 30分。':'ぷん / ふん alternate; はん (half) = 30 min.',
+  '<b>4月しがつ・7月しちがつ・9月くがつ</b>(和「時」的念法不同!)。':'<b>4月 shigatsu · 7月 shichigatsu · 9月 kugatsu</b> — different from the hour readings!',
+  '1〜10 日、14/20/24 日 全是<b>不規則</b>和語念法,直接背。':'Days 1–10 and 14/20/24 all use <b>irregular</b> native readings — just memorize them.',
+  '左=<b>講自己家人</b>(謙稱)、右=<b>稱呼別人家人</b>(敬稱)。點任一邊聽發音。':'Left = <b>your own family</b> (humble) · right = <b>someone else’s family</b> (honorific). Tap either side to hear it.',
+  '<b>は</b>讀「わ」、<b>へ</b>讀「え」、<b>を</b>讀「お」——寫法和讀音不同,先記住。':'<b>は</b> is read “wa”, <b>へ</b> “e”, <b>を</b> “o” — spelling ≠ sound. Memorize these first.',
+  '最通用(和語數法,數一般東西、不確定用哪個量詞時)':'Most universal (native counting — general objects, or when unsure which counter fits)',
+  '小東西、蘋果、雞蛋…':'Small things: apples, eggs…','人數':'People',
+  '細長的:筆、瓶、傘、樹':'Long thin things: pens, bottles, umbrellas, trees',
+  '扁平的:紙、盤子、票、T恤':'Flat things: paper, plates, tickets, T-shirts',
+  '小動物:貓、狗、魚、蟲':'Small animals: cats, dogs, fish, bugs',
+  '杯裝、碗裝:一杯咖啡、一碗飯':'Cups & bowls: a cup of coffee, a bowl of rice','年齡':'Age',
+  '其他常用':'Other common ones','台(機器)・冊(書)・回(次數)・階(樓層)':'台 (machines) · 冊 (books) · 回 (times) · 階 (floors)',
+  '什麼':'what','誰':'who','何時':'when','哪裡':'where','哪邊(禮貌)':'which way (polite)','怎麼樣':'how',
+  '為什麼':'why','為何(書面)':'why (formal)','多少錢':'how much','幾個/幾歲':'how many / how old',
+  '哪一個':'which one','哪個+名詞':'which + noun','什麼樣的':'what kind of',
+  '爸爸':'father','媽媽':'mother','哥哥':'older brother','姊姊':'older sister','弟弟':'younger brother','妹妹':'younger sister',
+  '爺爺/外公':'grandfather','奶奶/外婆':'grandmother','丈夫':'husband','妻子':'wife','兒子':'son','女兒':'daughter','父母':'parents','家人':'family',
+  '主題「〜是…」':'Topic marker — “as for…”','主語/新資訊「是…」':'Subject / new information','受詞「把…、〜を」':'Object marker',
+  '時間點/目的地/對象':'Time / destination / target','地點(動作發生)/方法':'Place of action / means','方向「往…」(讀 え)':'Direction “toward” (read “e”)',
+  '「和…、跟…一起」':'“with, and”','「也…」':'“also, too”','「從…開始」':'“from…”','「到…為止」':'“until…”','「比…」(比較)':'“than…” (comparison)','「…的」(所有/修飾)':'Possessive “…’s”',
+  '我是學生。':'I am a student.','誰來了?':'Who came?','吃飯。':'Eat (a meal).','七點起床。':'Get up at seven.','在圖書館唸書。':'Study at the library.',
+  '去日本。':'Go to Japan.','和朋友說話。':'Talk with a friend.','我也去。':'I will go too.','從九點開始工作。':'Work from nine.','等到五點。':'Wait until five.',
+  '比去年熱。':'Hotter than last year.','我的書。':'My book.','讀':'read',
+  '這個怎麼念?(念念看再選)':'How is this read? (say it out loud, then pick)','看結果 →':'Results →','下一題 →':'Next →',
+  '太強了!這些你很熟 ':'Amazing — you know these well!','不錯,錯的再看一下就更穩':'Nice! Review the misses and you’re solid.','多測幾次,紅字的地方特別練':'Keep drilling — the red readings need extra reps.',
+  '只重考錯的':'Retry wrong only','再抽 10 題':'Another 10','關閉':'Close','此級別無單字資料':'No data for this level','返回':'Back',
+};
+function T(zh){ return I18n.getLang()==='en' ? (EN_T[zh]||zh) : cvt(zh); }
+if(I18n.getLang()==='zh-CN') ensureOpenCC();
+</script>
 <script src="ux-extras.js"></script>
 <script>
 // ── 播放:優先 VOICEVOX(__TTS),否則瀏覽器 TTS ──
@@ -308,49 +352,75 @@ const ILLUS = {
   </svg>`,
 };
 function catBanner(c, illus){
-  return `<div class="cat-banner"><div class="cb-txt"><div class="cat-tt">${c.tt}<small>${c.en}</small></div></div><div class="cb-illus">${illus}</div></div>`;
+  const en = I18n.getLang()==='en';
+  return `<div class="cat-banner"><div class="cb-txt"><div class="cat-tt">${en?c.en:cvt(c.tt)}<small>${en?'':c.en}</small></div></div><div class="cb-illus">${illus}</div></div>`;
 }
 
-function grid(rows, cls){ return `<div class="grid ${cls||'g5'}">`+rows.map(r=>cell(r[0], r[1], r[2], r[3])).join('')+`</div>`; }
+function grid(rows, cls){ return `<div class="grid ${cls||'g5'}">`+rows.map(r=>cell(r[0], r[1], r[2], r[3] ? T(r[3]) : r[3])).join('')+`</div>`; }
 
 function render(){
-  document.getElementById('toc').innerHTML = CATS.map(c=>`<a href="#${c.k}">${c.tt}</a>`).join('');
+  document.getElementById('toc').innerHTML = CATS.map(c=>`<a href="#${c.k}">${I18n.getLang()==='en'?c.en:cvt(c.tt)}</a>`).join('');
   let h='';
   // 1) 數字與量詞
   h+=`<section class="cat" id="num">`+catBanner(CATS[0], ILLUS.num);
-  h+=`<div class="sub">基本數字 <small>0〜億</small></div><div class="tip"><b>4・7・9</b> 各有兩種念法(4時よじ、4月しがつ、4個よんこ)。</div>`+grid(NUM);
-  h+=`<div class="sub">百・千 的變音 <small>要特別記</small></div>`+grid(NUM_CH);
-  COUNTERS.forEach(c=>{ h+=`<div class="sub">${esc(c.t)} <small>${esc(c.d)}</small></div>`+grid(c.rows); });
+  h+=`<div class="sub">${T('基本數字')} <small>${T('0〜億')}</small></div><div class="tip">${T('<b>4・7・9</b> 各有兩種念法(4時よじ、4月しがつ、4個よんこ)。')}</div>`+grid(NUM);
+  h+=`<div class="sub">${T('百・千 的變音')} <small>${T('要特別記')}</small></div>`+grid(NUM_CH);
+  COUNTERS.forEach(c=>{ h+=`<div class="sub">${esc(T(c.t))} <small>${esc(T(c.d))}</small></div>`+grid(c.rows); });
   h+=`</section>`;
   // 2) 時間日期曜日
   h+=`<section class="cat" id="time">`+catBanner(CATS[1], ILLUS.time);
-  h+=`<div class="sub">〜時 <small>幾點</small></div><div class="tip">注意 <b>4時よじ・7時しちじ・9時くじ</b>。</div>`+grid(JI);
-  h+=`<div class="sub">〜分 <small>幾分</small></div><div class="tip">ぷん / ふん 交替,半 = 30分。</div>`+grid(FUN);
-  h+=`<div class="sub">曜日 <small>星期</small></div>`+grid(YOUBI);
-  h+=`<div class="sub">〜月 <small>月份</small></div><div class="tip"><b>4月しがつ・7月しちがつ・9月くがつ</b>(和「時」的念法不同!)。</div>`+grid(GATSU);
-  h+=`<div class="sub">〜日 <small>日期</small></div><div class="tip">1〜10 日、14/20/24 日 全是<b>不規則</b>和語念法,直接背。</div>`+grid(NICHI);
+  h+=`<div class="sub">〜時 <small>${T('幾點')}</small></div><div class="tip">${T('注意 <b>4時よじ・7時しちじ・9時くじ</b>。')}</div>`+grid(JI);
+  h+=`<div class="sub">〜分 <small>${T('幾分')}</small></div><div class="tip">${T('ぷん / ふん 交替,半 = 30分。')}</div>`+grid(FUN);
+  h+=`<div class="sub">曜日 <small>${T('星期')}</small></div>`+grid(YOUBI);
+  h+=`<div class="sub">〜月 <small>${T('月份')}</small></div><div class="tip">${T('<b>4月しがつ・7月しちがつ・9月くがつ</b>(和「時」的念法不同!)。')}</div>`+grid(GATSU);
+  h+=`<div class="sub">〜日 <small>${T('日期')}</small></div><div class="tip">${T('1〜10 日、14/20/24 日 全是<b>不規則</b>和語念法,直接背。')}</div>`+grid(NICHI);
   h+=`</section>`;
   // 3) 家族
   h+=`<section class="cat" id="fam">`+catBanner(CATS[2], ILLUS.fam);
-  h+=`<div class="tip">左=<b>講自己家人</b>(謙稱)、右=<b>稱呼別人家人</b>(敬稱)。點任一邊聽發音。</div>`;
+  h+=`<div class="tip">${T('左=<b>講自己家人</b>(謙稱)、右=<b>稱呼別人家人</b>(敬稱)。點任一邊聽發音。')}</div>`;
   h+=`<div class="grid g2">`+KAZOKU.map(k=>`<div class="row2">
       <div class="a" onclick="speak('${esc(k[1])}')"><span class="f">${esc(k[0])}</span><span class="y">${esc(k[1])}</span></div>
       <span class="arrow">→</span>
       <div class="a" onclick="speak('${esc(k[3])}')"><span class="f">${esc(k[2])}</span><span class="y">${esc(k[3])}</span></div>
-      <span class="z">${esc(k[4])}</span></div>`).join('')+`</div>`;
+      <span class="z">${esc(T(k[4]))}</span></div>`).join('')+`</div>`;
   h+=`</section>`;
   // 4) 疑問詞・助詞
   h+=`<section class="cat" id="qp">`+catBanner(CATS[3], ILLUS.qp);
-  h+=`<div class="sub">疑問詞 <small>問句必備</small></div>`+grid(GIMON, 'g3');
-  h+=`<div class="sub">基本助詞 <small>句子的關節</small></div><div class="tip"><b>は</b>讀「わ」、<b>へ</b>讀「え」、<b>を</b>讀「お」——寫法和讀音不同,先記住。</div>`;
+  h+=`<div class="sub">${T('疑問詞')} <small>${T('問句必備')}</small></div>`+grid(GIMON, 'g3');
+  h+=`<div class="sub">${T('基本助詞')} <small>${T('句子的關節')}</small></div><div class="tip">${T('<b>は</b>讀「わ」、<b>へ</b>讀「え」、<b>を</b>讀「お」——寫法和讀音不同,先記住。')}</div>`;
   h+=JOSHI.map(j=>`<div class="ptc" onclick="speak('${esc(j[4])}')">
-      <div class="ph"><span class="p">${esc(j[0])}</span><span class="pu">讀 ${esc(j[1])}</span></div>
-      <div class="pd">${j[2]}</div>
-      <div class="pe">${fr(j[3])}<div class="z">${esc(j[5])}</div></div></div>`).join('');
+      <div class="ph"><span class="p">${esc(j[0])}</span><span class="pu">${T('讀')} ${esc(j[1])}</span></div>
+      <div class="pd">${T(j[2])}</div>
+      <div class="pe">${fr(j[3])}<div class="z">${esc(T(j[5]))}</div></div></div>`).join('');
   h+=`</section>`;
   document.getElementById('list').innerHTML = h;
 }
 render();
+// ── 靜態區塊 i18n:hero/說明/測驗鈕/底部備註(日文/假名節點不動) ──
+function staticI18n(){
+  const lang = I18n.getLang();
+  if (lang === 'en') {
+    const set=(sel,html)=>{ const el=document.querySelector(sel); if(el) el.innerHTML=html; };
+    set('.eyebrow','The must-know basics');
+    set('.hero h1','Essential Basics');
+    set('.lead','The most useful basics from chapter one of any textbook: <b style="color:var(--ac)">numbers & counters, time & dates, family terms, question words & particles</b>. Nail these and drills and conversation get much smoother — tap any word to hear it.');
+    set('.howto','<b>How to use:</b> ① tap through once to hear the readings → ② cover the kana and recall → ③ test yourself with the <b>mini quiz</b> below. <b>Red</b> items (4/7/9, sound changes, dates) are the classic traps.');
+    set('.quizbtn','Mini quiz · random 10');
+    set('.note','<b>Red</b> marks the readings everyone gets wrong: <b>4 (yon/shi) · 7 (nana/shichi) · 9 (kyū/ku)</b>, counter sound changes (<b>hon → bon → pon</b>), and dates like <b>tsuitachi / hatsuka</b>. No rule predicts these — memorizing is fastest.');
+    const bk=document.querySelector('.backbtn'); if(bk){ const w=document.createTreeWalker(bk,NodeFilter.SHOW_TEXT); let n; while((n=w.nextNode())){ if(n.nodeValue.includes('返回')) n.nodeValue=n.nodeValue.replace('返回','Back'); } }
+  } else if (lang === 'zh-CN' && _tw2cn) {
+    // 只轉中文文字節點;含假名的節點(日文說明例)不碰
+    const kana=/[ぁ-ゖァ-ヺー]/;
+    ['.hero','.note','footer','.backbtn'].forEach(sel=>{
+      const el=document.querySelector(sel); if(!el) return;
+      const w=document.createTreeWalker(el,NodeFilter.SHOW_TEXT); const list=[]; let n;
+      while((n=w.nextNode()))list.push(n);
+      list.forEach(node=>{ if(kana.test(node.nodeValue))return; const c=_tw2cn(node.nodeValue); if(c!==node.nodeValue)node.nodeValue=c; });
+    });
+  }
+}
+staticI18n();
+if(I18n.getLang()==='zh-CN') ensureOpenCC().then(()=>{ render(); staticI18n(); });
 
 // ══════════ 隨堂測驗 ══════════
 // 從同一批資料出題:顯示「形」問「讀音」,干擾選項取自同組(較像真的會混淆的)。
@@ -398,12 +468,12 @@ const Quiz = (function(){
     opts.sort(()=>Math.random()-.5);
     const box=document.getElementById('quizBox');
     box.innerHTML = `
-      <div class="qhead"><span>第 ${qi+1} / ${queue.length} 題　分數 ${score}</span><button class="x" onclick="Quiz.close()"><i data-ic=x></i></button></div>
+      <div class="qhead"><span>${I18n.getLang()==='en'?`Q ${qi+1} / ${queue.length} · Score ${score}`:cvt(`第 ${qi+1} / ${queue.length} 題　分數 ${score}`)}</span><button class="x" onclick="Quiz.close()"><i data-ic=x></i></button></div>
       <div class="qbar"><i style="width:${qi/queue.length*100}%"></i></div>
-      <div class="qq">這個怎麼念?(念念看再選)</div>
+      <div class="qq">${T('這個怎麼念?(念念看再選)')}</div>
       <div class="qform">${esc(item.form)}</div>
       <div class="qopts">${opts.map(o=>`<button class="qopt" onclick="Quiz.answer(this,'${esc(o)}')">${esc(o)}</button>`).join('')}</div>
-      <button class="qnext" id="qnext" onclick="Quiz.next()">${qi+1>=queue.length?'看結果 →':'下一題 →'}</button>`;
+      <button class="qnext" id="qnext" onclick="Quiz.next()">${qi+1>=queue.length?T('看結果 →'):T('下一題 →')}</button>`;
   }
   function answer(btn, val){
     if(picked!==null) return;
@@ -429,15 +499,15 @@ const Quiz = (function(){
     const box=document.getElementById('quizBox');
     const pct=Math.round(score/queue.length*100);
     try{localStorage.setItem('jr_essentials','1');}catch(e){}   // Journey 證據:隨堂測驗做完
-    const msg = pct>=90?'太強了!這些你很熟 ' : pct>=60?'不錯,錯的再看一下就更穩' : '多測幾次,紅字的地方特別練';
+    const msg = pct>=90?T('太強了!這些你很熟 ') : pct>=60?T('不錯,錯的再看一下就更穩') : T('多測幾次,紅字的地方特別練');
     box.innerHTML=`<div class="qresult">
       <div class="qscore">${score}/${queue.length}</div>
       <div class="qrsub">${msg}</div>
       <div class="qrbtns">
-        ${wrongs.length?`<button onclick="Quiz.retryWrong()">只重考錯的 (${wrongs.length})</button>`:''}
-        <button class="pri" onclick="Quiz.start()">再抽 10 題</button>
+        ${wrongs.length?`<button onclick="Quiz.retryWrong()">${T('只重考錯的')} (${wrongs.length})</button>`:''}
+        <button class="pri" onclick="Quiz.start()">${T('再抽 10 題')}</button>
       </div>
-      <button style="margin-top:12px;background:none;border:0;color:var(--tx3);font:inherit;font-size:13px;cursor:pointer" onclick="Quiz.close()">關閉</button>
+      <button style="margin-top:12px;background:none;border:0;color:var(--tx3);font:inherit;font-size:13px;cursor:pointer" onclick="Quiz.close()">${T('關閉')}</button>
     </div>`;
   }
   function retryWrong(){ queue=[...wrongs].sort(()=>Math.random()-.5); qi=0; score=0; wrongs=[]; renderQ(); }
