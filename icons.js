@@ -11,6 +11,18 @@
  * 加新 icon:在 PATHS 補一筆 name:'<path .../>'(24×24)即可。
  */
 (function () {
+  // 全站統一返回鍵樣式(用戶回饋:各頁返回鍵不統一,字元「‹/</←」又小又醜)。
+  // 標準 markup:<a class="backbtn" ...><svg chevron>文字</a>;變數 fallback 鏈跨頁通用。
+  try {
+    if (!document.getElementById('backbtnCss')) {
+      var bst = document.createElement('style'); bst.id = 'backbtnCss';
+      bst.textContent = '.backbtn{display:inline-flex;align-items:center;gap:6px;min-height:40px;padding:8px 14px 8px 10px;border-radius:12px;background:var(--panel,var(--bg2,#fff));border:1px solid var(--line,var(--bd,#e5e0d8));color:var(--ink2,var(--tx2,#666));text-decoration:none;font-size:14.5px;font-weight:600;line-height:1;cursor:pointer;font-family:inherit}'
+        + '.backbtn:active{transform:scale(.96)}'
+        + '.backbtn svg{width:16px;height:16px;flex-shrink:0}';
+      (document.head || document.documentElement).appendChild(bst);
+    }
+  } catch (e) {}
+
   'use strict';
   if (window.__stayjpIcons) return;
   window.__stayjpIcons = true;

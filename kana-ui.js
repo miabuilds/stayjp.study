@@ -25,22 +25,27 @@ window.Kana = (function () {
       '#kanaMask{position:fixed;inset:0;z-index:9000;background:var(--bg,#faf9f6);overflow-y:auto;-webkit-overflow-scrolling:touch}',
       '.kana-wrap{max-width:560px;margin:0 auto;padding:14px 16px 90px}',
       '.kana-top{position:sticky;top:0;background:var(--bg,#faf9f6);display:flex;align-items:center;gap:10px;padding:8px 0 10px;border-bottom:1px solid var(--bd,#e8e5e0);z-index:2}',
-      '.kana-top b{font-size:17px}',
-      '.kana-x{margin-left:auto;cursor:pointer;font-size:20px;color:var(--tx2,#888);padding:4px 8px}',
+      '.kana-tk{width:44px;height:auto;flex-shrink:0}',
+      '.kana-ti{display:flex;flex-direction:column;gap:1px;min-width:0}',
+      '.kana-top b{font-size:17px;line-height:1.2}',
+      '.kana-ti small{font-size:11px;color:var(--tx3,#aaa);font-weight:500}',
+      '.kana-x{margin-left:auto;cursor:pointer;font-size:17px;color:var(--tx2,#888);padding:6px 10px;border-radius:50%}',
       '.kana-tabs{display:flex;gap:8px;margin:12px 0;flex-wrap:wrap}',
       '.kana-tab{flex:1;min-width:90px;border:1px solid var(--bd,#ddd);background:var(--bg2,#fff);color:var(--tx2,#666);border-radius:10px;padding:9px;font-size:15px;font-weight:700;cursor:pointer}',
-      '.kana-tab.on{background:var(--ac2,#e8734a);color:#fff;border-color:var(--ac2,#e8734a)}',
+      '.kana-tab.on{background:var(--ac,#c6553b);color:#fff;border-color:var(--ac,#c6553b)}',
       '.kana-quiz-btn{border:none;background:var(--ac,#d4654a);color:#fff;border-radius:10px;padding:9px 16px;font-size:14px;font-weight:700;cursor:pointer}',
       '.kana-modes{display:flex;gap:8px;margin:0 0 8px;flex-wrap:wrap}',
       '.kana-mode-btn{border:1px solid var(--bd,#ddd);background:var(--bg2,#fff);color:var(--tx2,#666);border-radius:10px;padding:9px 15px;font-size:14px;font-weight:700;cursor:pointer;min-height:40px}',
-      '.kana-mode-btn.on{background:var(--ac2,#e8734a);color:#fff;border-color:var(--ac2,#e8734a)}',
+      '.kana-mode-btn.on{background:var(--ac,#c6553b);color:#fff;border-color:var(--ac,#c6553b)}',
       '.kana-hint{font-size:12px;color:var(--tx3,#aaa);margin-bottom:6px}',
       '.kana-cell-on{background:var(--ac2,#e8734a)!important}',
       '.kana-cell-on .kana-c{color:#fff!important}',
       '.kana-cell-on .kana-r{color:rgba(255,255,255,.9)!important}',
       '.kana-back{border:none;background:none;cursor:pointer;color:var(--ac,#d4654a);font-size:15px;font-weight:700;padding:6px 10px 6px 4px;border-radius:10px;font-family:inherit}',
       '.kana-back:active{background:rgba(212,101,74,.1)}',
-      '.kana-sec-h{font-size:14px;font-weight:800;color:var(--ac,#d4654a);margin:20px 0 8px}',
+      '.kana-sec-h{display:flex;align-items:center;gap:10px;font-size:13px;font-weight:800;letter-spacing:.05em;color:var(--tx2,#888);margin:22px 0 10px}',
+      '.kana-sec-h::after{content:"";flex:1;height:1px;background:var(--bd,#e8e5e0)}',
+      '.kana-sec-h em{font-style:normal;color:var(--ac,#c6553b)}',
       '.kana-grid{display:grid;gap:6px}',
       '.kana-grid.c5{grid-template-columns:repeat(5,1fr)}',
       '.kana-grid.c3{grid-template-columns:repeat(3,1fr);max-width:340px}',
@@ -103,7 +108,7 @@ window.Kana = (function () {
     var soundHint = enOr('點任一格聽發音', 'Tap a kana to hear it');
     var strokeHint = enOr('點任一格看筆順 + 描寫練習', 'Tap a kana for stroke order & tracing');
     var h = '<div id="kanaMask"><div class="kana-wrap">' +
-      '<div class="kana-top"><b>あ ' + enOr('五十音', 'Kana') + '</b><span class="kana-x" onclick="Kana.close()"><i data-ic=x></i></span></div>' +
+      '<div class="kana-top"><img class="kana-tk" src="images/mascot/tanuki-p08.png" alt=""><span class="kana-ti"><b>' + enOr('五十音', 'Kana') + '</b><small>' + enOr('日語的第一步:50 個音,全部在這', 'Step one: all 50 sounds in one chart') + '</small></span><span class="kana-x" onclick="Kana.close()">✕</span></div>' +
       '<div class="kana-tabs">' +
       '<button class="kana-tab ' + (script === 'h' ? 'on' : '') + '" onclick="Kana.setScript(\'h\')">ひらがな</button>' +
       '<button class="kana-tab ' + (script === 'k' ? 'on' : '') + '" onclick="Kana.setScript(\'k\')">カタカナ</button>' +
