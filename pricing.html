@@ -630,7 +630,7 @@ function showConsentDialog(plan) {
 
 // 🔧 綠界刷卡 kill-switch(2026-09-06 開啟:金流帳戶更換審核中,網頁暫停收款、全數導 App)。
 // 綠界驗證通過後改回 false 即還原網頁刷卡。App 內(WebView)不受影響:本頁在 native 模式整頁換原生 paywall。
-const ECPAY_DOWN = true;
+const ECPAY_DOWN = false;
 if (ECPAY_DOWN) document.addEventListener('DOMContentLoaded', () => {
   if (window.STAYJP_NATIVE && window.STAYJP_NATIVE.isNativeApp) return;   // App 內走原生 IAP,不動
   const IOS_URL = 'https://apps.apple.com/app/id6778227353';
