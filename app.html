@@ -1649,8 +1649,8 @@ html[data-fs="xlarge"] .gc .ex .j,html[data-fs="xlarge"] .cf-eg .ex .j{font-size
 html[data-fs="xlarge"] .gc .ex .z,html[data-fs="xlarge"] .gc .nt{font-size:17px}
 /* ---- 測驗/模考/讀解/聽力等彈窗:整塊等比放大(zoom 涵蓋所有文字,連 inline 詳解卡也吃得到)。
    zoom 會連框一起放大 → 同步用 calc 縮小框寬高,讓框維持原尺寸、只有內容變大,不溢出螢幕。 ---- */
-html[data-fs="large"] .quiz-box{zoom:1.15}
-html[data-fs="xlarge"] .quiz-box{zoom:1.28}
+html[data-fs="large"] .quiz-box{zoom:1.15;max-height:calc(85vh/1.15)}
+html[data-fs="xlarge"] .quiz-box{zoom:1.28;max-height:calc(85vh/1.28)}
 
 /* ── 字級 +1px 後的窄螢幕收斂(2026-08) ─────────────────────────────
    放大字級後兩處變擠:
@@ -2225,6 +2225,8 @@ function loadCloudData() {
     // 合併完成:解除競態鎖 → 之後的上傳才被允許;把合併後的聯集推上雲端
     _cloudSynced = true; _pendingSave = false;
     if (typeof saveAllCloud === 'function') saveAllCloud();
+    // 連續天數計數器跟雲端對齊(markToday 的 syncUp 常在 auth 完成前就跑掉,雲端會停在舊值)
+    try { if (typeof Streak !== 'undefined' && Streak.syncDown) Streak.syncDown(); } catch (e) {}
     if (typeof SRS !== 'undefined') SRS.updateReviewCount();
     // 回訪用戶在這台第一次登入、雲端資料剛載入 → 標記引導完成並關掉(避免對老用戶閃出新手引導)
     if (typeof _onbHasData === 'function' && _onbHasData()) {
@@ -3789,8 +3791,18 @@ const Streak = (() => {
       const cloud = (doc.exists && doc.data().streak) || null;
       if (!cloud) { syncUp(load()); return; }
       const local = load();
-      const winner = (cloud.last || '') > (local.last || '') ? cloud : (cloud.days || 0) > (local.days || 0) ? cloud : local;
+      // 合併:兩邊 last 相差 ≤1 天 → 同一條連續紀錄,天數取大、日期取新;
+      // 差超過 1 天 → 舊的那條已斷,直接採用較新的紀錄(避免復活早斷掉的連勝)。
+      const lC = cloud.last || '', lL = local.last || '';
+      let winner;
+      if (!lC || !lL || Math.abs(diffDays(lC, lL)) <= 1) {
+        winner = { days: Math.max(cloud.days || 0, local.days || 0), last: lC > lL ? lC : lL,
+                   longest: Math.max(cloud.longest || 0, local.longest || 0) };
+      } else {
+        winner = lC > lL ? cloud : local;
+      }
       save(winner);
+      syncUp(winner);   // 一律回推:讓另一台裝置下次登入拿得到(原本手機的天數永遠上不了雲端)
       render();
     } catch (e) { /* offline — local wins */ }
   }
