@@ -85,12 +85,8 @@ body{margin:0;background:var(--bg);color:var(--tx);font-family:-apple-system,"Pi
 <div class="wrap">
   <div class="top">
     <a href="speak.html" class="backbtn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg> <span id="bkTx">返回</span></a>
-  </div>
-
-  <div class="hero">
-    <img src="images/mascot/tanuki-p05.png" alt="">
-    <div style="flex:1;min-width:0"><h1 id="hTitle">YouTube 跟讀</h1><p id="hSub">貼上任何有日文字幕的影片:逐句循環、開麥跟讀、點字查詞。歌、新聞、Vlog 都是教材。</p></div>
-    <button class="howbtn" id="howBtn" onclick="YTS.tut(true)">怎麼用?</button>
+    <b style="font-size:17px" id="hTitle">YouTube 跟讀</b>
+    <button class="howbtn" id="howBtn" style="margin-left:auto" onclick="YTS.tut(true)">怎麼用?</button>
   </div>
 
   <div class="tut-mask" id="tutMask" onclick="if(event.target===this)YTS.tut(false)">
@@ -107,11 +103,10 @@ body{margin:0;background:var(--bg);color:var(--tx);font-family:-apple-system,"Pi
       <input id="urlIn" placeholder="貼上 YouTube 連結或影片 ID" inputmode="url" autocomplete="off">
       <button class="btn pri" id="loadBtn" onclick="YTS.load()">讀取</button>
     </div>
-    <div class="exrow" id="exRow"></div>
-    <div class="note" id="inNote">影片用 YouTube 官方播放器播放。有日文字幕(含自動字幕)的影片才能逐句練。</div>
+    <div class="note" id="inNote">貼上有日文字幕的影片連結,歌、新聞、Vlog 都行。<a href="javascript:void(0)" style="color:var(--ac)" onclick="YTS.loadExample()">沒有影片?用範例試試(日文歌) →</a></div>
     <div class="err" id="inErr" style="display:none"></div>
     <div class="pastebox" id="pasteBox">
-      <div class="steps" id="pasteSteps"><b>抓不到字幕時,自己複製逐字稿(15 秒):</b><br>① 到 YouTube 打開這支影片 → 說明欄或「⋯」選單點「<b>顯示轉譯稿 / 逐字稿</b>」<br>② 全選複製(含時間) → 貼到下面 → 解析</div>
+      <div class="steps" id="pasteSteps">到 YouTube 開這支影片 → 點「<b>顯示轉譯稿</b>」→ 全選複製貼到下面。<a href="javascript:void(0)" style="color:var(--ac)" onclick="YTS.tut(true)">詳細步驟</a></div>
       <textarea id="pasteTa" placeholder="0:26&#10;派手に色を溶かす夜に&#10;0:32&#10;転がるように風を切って&#10;…"></textarea>
       <div style="display:flex;gap:8px;margin-top:8px"><button class="btn pri" onclick="YTS.parsePaste()" id="parseBtn">解析逐字稿</button></div>
     </div>
@@ -125,6 +120,7 @@ body{margin:0;background:var(--bg);color:var(--tx);font-family:-apple-system,"Pi
       <div class="modes" id="modeRow" style="display:none">
         <button id="mShadow" class="on" onclick="YTS.setMode('shadow')">跟讀</button>
         <button id="mDict" onclick="YTS.setMode('dict')">聽寫</button>
+        <button id="mSwap" style="flex:0 0 auto" onclick="YTS.swap()">換影片</button>
       </div>
       <div class="prog" id="progTx"></div>
       <div id="lines"></div>
@@ -149,9 +145,7 @@ if(I18n.getLang()==='zh-CN') ensureOpenCC().then(function(){ try{ YTS._retext();
 <script>
 const YTS = (() => {
   const FN = 'https://asia-east1-jpnote-1bdd6.cloudfunctions.net/ytCaptions';
-  const EXAMPLES = [
-    { v:'tLQLa6lM3Us', t:'Aimer 残響散歌(歌詞字幕)' },
-  ];
+  const EXAMPLE_V = 'tLQLa6lM3Us';   // Aimer 残響散歌(官方歌詞字幕,開放嵌入)
   let player=null, apiReady=false, vid='', lines=[], cur=-1, mode='shadow', loopOn=false, watchT=0, done={};
 
   // ── i18n 靜態字 ──
@@ -160,12 +154,12 @@ const YTS = (() => {
     const set=(id,zh,e2)=>{ const el=document.getElementById(id); if(el) el.innerHTML = en?e2:cvt(zh); };
     set('bkTx','返回','Back');
     set('hTitle','YouTube 跟讀','YouTube Shadowing');
-    set('hSub','貼上任何有日文字幕的影片:逐句循環、開麥跟讀、點字查詞。歌、新聞、Vlog 都是教材。','Paste any video with Japanese subtitles: loop line by line, shadow with your mic, tap words to look them up.');
-    set('inNote','影片用 YouTube 官方播放器播放。有日文字幕(含自動字幕)的影片才能逐句練。','Videos play in the official YouTube player. Line practice needs Japanese captions (auto captions work too).');
-    set('mShadow','跟讀','Shadow'); set('mDict','聽寫','Dictation');
+    set('inNote','貼上有日文字幕的影片連結,歌、新聞、Vlog 都行。<a href="javascript:void(0)" style="color:var(--ac)" onclick="YTS.loadExample()">沒有影片?用範例試試(日文歌) →</a>',
+      'Paste a link to any video with Japanese subtitles. <a href="javascript:void(0)" style="color:var(--ac)" onclick="YTS.loadExample()">No video in mind? Try the example →</a>');
+    set('mShadow','跟讀','Shadow'); set('mDict','聽寫','Dictation'); set('mSwap','換影片','Change video');
     set('loadBtn','讀取','Load'); set('parseBtn','解析逐字稿','Parse transcript');
-    set('pasteSteps','<b>抓不到字幕時,自己複製逐字稿(15 秒):</b><br>① 到 YouTube 打開這支影片 → 說明欄或「⋯」選單點「<b>顯示轉譯稿 / 逐字稿</b>」<br>② 全選複製(含時間) → 貼到下面 → 解析',
-      '<b>If captions can’t be fetched, copy the transcript yourself (15s):</b><br>① Open the video on YouTube → tap “<b>Show transcript</b>” in the description or “⋯” menu<br>② Select all & copy (with timestamps) → paste below → parse');
+    set('pasteSteps','到 YouTube 開這支影片 → 點「<b>顯示轉譯稿</b>」→ 全選複製貼到下面。<a href="javascript:void(0)" style="color:var(--ac)" onclick="YTS.tut(true)">詳細步驟</a>',
+      'Open the video on YouTube → “<b>Show transcript</b>” → copy everything & paste below. <a href="javascript:void(0)" style="color:var(--ac)" onclick="YTS.tut(true)">Details</a>');
     const u=document.getElementById('urlIn'); if(u) u.placeholder = en?'Paste a YouTube link or video ID':cvt('貼上 YouTube 連結或影片 ID');
   }
 
@@ -206,7 +200,20 @@ const YTS = (() => {
     await ensureApi();
     if(player){ try{player.destroy();}catch(e){} player=null; }
     document.getElementById('playerWrap').style.display='block';
-    player=new YT.Player('playerBox',{ videoId:v, playerVars:{ playsinline:1, rel:0, controls:1 }, events:{} });
+    player=new YT.Player('playerBox',{ videoId:v, playerVars:{ playsinline:1, rel:0, controls:1 }, events:{
+      onError: (e)=>{   // 101/150=版權方禁止站外嵌入、100=影片不存在
+        const code=e&&e.data;
+        document.getElementById('playerWrap').style.display='none';
+        document.getElementById('inputCard').style.display='block';
+        document.getElementById('pasteBox').style.display='none';
+        document.getElementById('inNote').textContent='';
+        const errEl=document.getElementById('inErr');
+        errEl.textContent = (code===101||code===150)
+          ? enOr('這支影片的版權方不開放站外播放(YouTube 的限制),換一支吧——大部分官方 MV、新聞、Vlog 都可以。','The rights holder disabled embedding for this video. Try another — most official MVs, news and vlogs work.')
+          : enOr('影片載入失敗(代碼 '+code+'),確認連結沒錯或換一支。','Video failed to load (code '+code+') — check the link or try another.');
+        errEl.style.display='block';
+      }
+    } });
     // 字幕:先試自動抓,失敗開貼上模式
     try{
       const r=await fetch(FN,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({v})});
@@ -253,6 +260,8 @@ const YTS = (() => {
   function doneKey(){ return 'yts_done_'+vid; }
   function setLines(ls,title){
     lines=ls; cur=-1;
+    document.getElementById('inputCard').style.display='none';   // 開練後畫面只留播放器+句子,乾淨
+    document.getElementById('inErr').style.display='none';
     try{ done=JSON.parse(localStorage.getItem(doneKey()))||{}; }catch(e){ done={}; }
     if(title) document.getElementById('vTitle').textContent=title;
     document.getElementById('modeRow').style.display='flex';
@@ -400,9 +409,14 @@ const YTS = (() => {
     const ln=document.getElementById('ln'+i); if(ln){ ln.classList.remove('dict-blur'); if(pass)ln.classList.add('done'); }
   }
 
-  // ── 範例 ──
-  function renderEx(){
-    document.getElementById('exRow').innerHTML = EXAMPLES.map(e=>`<button onclick="document.getElementById('urlIn').value='${e.v}';YTS.load()">${esc(e.t)}</button>`).join('');
+  // ── 範例 / 換影片 ──
+  function loadExample(){ document.getElementById('urlIn').value=EXAMPLE_V; load(); }
+  function swap(){
+    stopRec(); clearInterval(watchT);
+    try{ player&&player.pauseVideo(); }catch(e){}
+    document.getElementById('inputCard').style.display='block';
+    document.getElementById('urlIn').value=''; document.getElementById('urlIn').focus();
+    window.scrollTo({top:0,behavior:'smooth'});
   }
   // ── 教學 ──
   function tutHtml(){
@@ -424,11 +438,11 @@ const YTS = (() => {
     } else { m.classList.remove('show'); try{ localStorage.setItem('yts_tut_seen','1'); }catch(e){} }
   }
   document.addEventListener('DOMContentLoaded',()=>{
-    renderEx(); _retext();
+    _retext();
     try{ const el=document.getElementById('howBtn'); if(el) el.textContent=enOr('怎麼用?','How?'); }catch(e){}
     try{ if(!localStorage.getItem('yts_tut_seen')) tut(true); }catch(e){}
   });
-  return { load, parsePaste, pick, playSeg, toggleLoop, setMode, toggleRec, checkDict, tut, _retext };
+  return { load, parsePaste, pick, playSeg, toggleLoop, setMode, toggleRec, checkDict, tut, loadExample, swap, _retext };
 })();
 </script>
 <script src="font-scale.js"></script>
