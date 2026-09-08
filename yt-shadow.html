@@ -121,7 +121,7 @@ body{margin:0;background:var(--bg);color:var(--tx);font-family:-apple-system,"Pi
 <body>
 <div class="wrap">
   <div class="top">
-    <a href="speak.html" class="backbtn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg> <span id="bkTx">返回</span></a>
+    <a href="app.html" class="backbtn" onclick="try{if(history.length>1){history.back();return false}}catch(e){}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg> <span id="bkTx">返回</span></a>
     <b style="font-size:17px" id="hTitle">YouTube 跟讀</b>
     <button class="howbtn" id="howBtn" style="margin-left:auto" onclick="YTS.tut(true)">怎麼用?</button>
   </div>
