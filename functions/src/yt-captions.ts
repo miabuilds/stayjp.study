@@ -5,6 +5,9 @@
 //   斷了前端會 fallback「無字幕模式」;修這支即可,不影響站上其他功能。
 // - 免登入(此功能依 YouTube 條款必須留在免費區),用 videoId 白名單格式 + 迷你記憶體快取擋濫用。
 import * as functions from "firebase-functions/v2/https";
+import * as admin from "firebase-admin";
+
+if (admin.apps.length === 0) admin.initializeApp();
 
 const INNERTUBE_KEY = "AIzaSyA8eiZmM1FaDVjRy-df2KTyQ_vz_yYM39w";   // YouTube 網頁版公開 key(非機密,寫死在 youtube.com 前端)
 const CACHE = new Map<string, { at: number; data: unknown }>();     // instance 內快取,15 分鐘
@@ -71,6 +74,18 @@ export const ytCaptions = functions.onRequest(
       const hit = CACHE.get(v);
       if (hit && Date.now() - hit.at < CACHE_MS) { res.json(hit.data); return; }
 
+      // Firestore 快取:GCP 機房 IP 常被 YouTube 擋,任何一次成功抓取(或本機種入)都全站共用
+      try {
+        const doc = await admin.firestore().collection("yt_captions_cache").doc(v).get();
+        if (doc.exists) {
+          const c = doc.data() as any;
+          if (c && Array.isArray(c.lines) && c.lines.length) {
+            CACHE.set(v, { at: Date.now(), data: c });
+            res.json(c); return;
+          }
+        }
+      } catch (e) { /* 快取失敗照走即時抓 */ }
+
       const p = await innertubePlayer(v);
       const status = p?.playabilityStatus?.status;
       if (status && status !== "OK") { res.json({ error: "unplayable", reason: p?.playabilityStatus?.reason || status }); return; }
@@ -100,6 +115,7 @@ export const ytCaptions = functions.onRequest(
         lines: lines.slice(0, 600).map(l => ({ t: l.t, d: l.d, ja: l.text, zh: zhByT.get(l.t) || "" })),
       };
       CACHE.set(v, { at: Date.now(), data });
+      try { await admin.firestore().collection("yt_captions_cache").doc(v).set(data); } catch (e) { /* 寫不進快取不影響回應 */ }
       res.json(data);
     } catch (e: any) {
       res.status(500).json({ error: "fetch_failed", message: String(e?.message || e) });
