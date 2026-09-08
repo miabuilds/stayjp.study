@@ -295,11 +295,15 @@ const YTS = (() => {
     errEl.style.display='none';
     const rows=raw.split(/\n+/).map(s=>s.trim()).filter(Boolean);
     const out=[]; const TS=/^(\d{1,2}):(\d{2})(?::(\d{2}))?$/;
+    // YouTube 複製常黏進無障礙朗讀標籤:「6:23」變「6:236 分鐘 23 秒句子」——把這層剝掉
+    const ARIA=/^\s*(?:\d+\s*小?時[,，]?\s*)?\d+\s*分鐘?[,，]?\s*(?:\d+\s*秒)?\s*|^\s*(?:\d+\s*hours?[,，]?\s*)?\d+\s*minutes?[,，]?\s*(?:\d+\s*seconds?)?\s*/i;
     for(let i=0;i<rows.length;i++){
-      let m=rows[i].match(TS);
-      if(m && rows[i+1] && !TS.test(rows[i+1])){ out.push({ t:toMs(m), ja:rows[++i], zh:'' }); continue; }
-      m=rows[i].match(/^(\d{1,2}):(\d{2})(?::(\d{2}))?\s+(.+)$/);
-      if(m) out.push({ t:toMs(m), ja:m[4], zh:'' });
+      const head=rows[i].match(/^(\d{1,2}):(\d{2})(?::(\d{2}))?(.*)$/);
+      if(!head) continue;
+      let rest=(head[4]||'').trim();
+      if(rest && /^\d/.test(rest)){ const stripped=rest.replace(ARIA,''); if(stripped!==rest) rest=stripped.trim(); }   // 只有「數字開頭+分/秒字樣」才當標籤剝
+      if(rest){ out.push({ t:toMs(head), ja:rest, zh:'' }); continue; }
+      if(rows[i+1] && !TS.test(rows[i+1]) && !/^\d{1,2}:\d{2}/.test(rows[i+1])){ out.push({ t:toMs(head), ja:rows[++i], zh:'' }); }
     }
     function toMs(m){ return m[3]!=null ? ((+m[1]*3600)+(+m[2]*60)+(+m[3]))*1000 : ((+m[1]*60)+(+m[2]))*1000; }
     if(!out.length){ errEl.textContent=enOr('解析不出時間軸——確認有把「時間+句子」一起複製(像 0:26 這樣的行要在)。','Could not parse timestamps — make sure times like 0:26 were copied along with the lines.'); errEl.style.display='block'; document.getElementById('parseBtn').style.display='inline-block'; return; }
