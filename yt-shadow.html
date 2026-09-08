@@ -323,6 +323,8 @@ const YTS = (() => {
     { v:'4Q9DWZLaY2U', cat:'歌', t:'LiSA「炎」THE FIRST TAKE', tag:'鬼滅 · 中日字幕' },
     { v:'tLQLa6lM3Us', cat:'歌', t:'Aimer「残響散歌」MV', tag:'鬼滅 · 中日字幕' },
     { v:'h1L_fLJX7Gk', cat:'歌', t:'松原みき「真夜中のドア〜Stay With Me」', tag:'昭和 City Pop · 歌詞字幕' },
+    { v:'yXZd7xVdpJ0', cat:'歌', t:'優里「ドライフラワー」THE FIRST TAKE', tag:'抒情 · 歌詞字幕' },
+    { v:'Lz24PqZkF2s', cat:'歌', t:'T.M.Revolution「HOT LIMIT」THE FIRST TAKE', tag:'經典動漫歌 · 歌詞字幕' },
     { v:'Ifux-aLb4RQ', cat:'新聞', t:'関東の天気:週明け大雨の恐れ', tag:'真實語速' },
     { v:'iQn2LbktWN0', cat:'新聞', t:'水中の「ガイコツパンダ」新種!', tag:'趣聞 · 中日字幕' },
   ];
@@ -1056,16 +1058,19 @@ const YTS = (() => {
   const THUMB_STEPS=['sddefault','hqdefault','mqdefault'];
   function thumbFallback(img){
     const n=parseInt(img.dataset.step||'0',10);
-    if(n>=THUMB_STEPS.length){ img.onerror=null; return; }
+    if(n>=THUMB_STEPS.length){ img.onerror=null; img.onload=null; return; }
     img.dataset.step=String(n+1);
     img.src='https://i.ytimg.com/vi/'+img.dataset.v+'/'+THUMB_STEPS[n]+'.jpg';
   }
+  // 沒有高解析版時 YouTube 不回 404,而是回一張 120x90 灰色佔位圖(所以 onerror 不會觸發)
+  // → 載入後檢查尺寸,太小就換下一級。
+  function thumbCheck(img){ if(img.naturalWidth && img.naturalWidth<=120) thumbFallback(img); }
   function renderGallery(){
     const g=document.getElementById('gal'); if(!g) return;
     const cats=['全部',...new Set(SAMPLES.map(x=>x.cat))];
     document.getElementById('galCats').innerHTML=cats.map(c=>`<button class="${c===galCat?'on':''}" onclick="YTS.setCat('${c}')">${esc(c)}</button>`).join('');
     g.innerHTML=SAMPLES.filter(x=>galCat==='全部'||x.cat===galCat).map(x=>`<button class="gal-c" onclick="YTS.loadSample('${x.v}')">
-      <img src="https://i.ytimg.com/vi/${x.v}/maxresdefault.jpg" alt="" loading="lazy" data-v="${x.v}" data-step="0" onerror="YTS.thumbFallback(this)">
+      <img src="https://i.ytimg.com/vi/${x.v}/maxresdefault.jpg" alt="" loading="lazy" data-v="${x.v}" data-step="0" onerror="YTS.thumbFallback(this)" onload="YTS.thumbCheck(this)">
       <div class="gt">${esc(x.t)}</div><span class="gtag">${esc(x.tag)}</span>
     </button>`).join('');
   }
@@ -1122,7 +1127,7 @@ const YTS = (() => {
     if(ta) ta.addEventListener('paste',()=>{ setTimeout(()=>{ if((ta.value||'').trim()) parsePaste(); },80); });   // 貼上即解析
     try{ if(!localStorage.getItem('yts_tut_seen')) tut(true); }catch(e){}
   });
-  return { load, parsePaste, nav, jump, replay, cycleSpeed, toggleLoop, setMode, toggleRec, checkDict, toggleList, toggleZh, tut, loadSample, setCat, backToPractice, openTranscript, swap, theater, startQuiz, qzBegin, qzPlay, qzAnswer, qzNext, jumpPlay, openLearn, learnTab, saveWord, speakWord, thumbFallback, _retext };
+  return { load, parsePaste, nav, jump, replay, cycleSpeed, toggleLoop, setMode, toggleRec, checkDict, toggleList, toggleZh, tut, loadSample, setCat, backToPractice, openTranscript, swap, theater, startQuiz, qzBegin, qzPlay, qzAnswer, qzNext, jumpPlay, openLearn, learnTab, saveWord, speakWord, thumbFallback, thumbCheck, _retext };
 })();
 </script>
 <script src="font-scale.js"></script>
