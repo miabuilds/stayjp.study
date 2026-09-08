@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>YouTube 跟讀 — 用任何日文影片練口說｜StayJP 日本再留計劃</title>
+<meta name="description" content="貼上任何有日文字幕的 YouTube 影片,逐句循環播放、開麥跟讀、即時比對,還能點字查詞。歌、新聞、Vlog 都是你的教材。">
+<script>try{var _th=localStorage.getItem('theme');if(_th)document.documentElement.setAttribute('data-theme',_th);}catch(e){}</script>
+<style>
+:root{--bg:#faf8f4;--bg2:#fff;--bg3:#f4f0e8;--bd:#e8e2d6;--tx:#2d2a26;--tx2:#6f6a61;--tx3:#a39d92;--ac:#c6553b;--soft:rgba(198,85,59,.09);--good:#2E7D57;--goodbg:rgba(46,125,87,.1);--bad:#b3402a}
+[data-theme="dark"]{--bg:#191715;--bg2:#221f1c;--bg3:#2a2622;--bd:#3a352f;--tx:#ece7df;--tx2:#a89f92;--tx3:#6f685e;--soft:rgba(198,85,59,.16);--goodbg:rgba(46,125,87,.2)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font-family:-apple-system,"PingFang TC","Hiragino Sans","Noto Sans TC",sans-serif;font-size:15px;line-height:1.6}
+.wrap{max-width:760px;margin:0 auto;padding:14px 16px 80px}
+.top{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.hero{display:flex;gap:14px;align-items:center;background:var(--bg2);border:1px solid var(--bd);border-radius:16px;padding:16px;margin-bottom:14px}
+.hero img{width:74px;height:auto;flex-shrink:0}
+.hero h1{margin:0;font-size:19px}
+.hero p{margin:4px 0 0;font-size:12.5px;color:var(--tx2)}
+.card{background:var(--bg2);border:1px solid var(--bd);border-radius:16px;padding:14px;margin-bottom:14px}
+.urlrow{display:flex;gap:8px}
+.urlrow input{flex:1;min-width:0;padding:11px 12px;border:1px solid var(--bd);border-radius:12px;background:var(--bg);color:var(--tx);font:inherit;font-size:14px}
+.btn{border:none;border-radius:12px;padding:11px 16px;font:inherit;font-weight:700;cursor:pointer;background:var(--bg3);color:var(--tx)}
+.btn.pri{background:var(--ac);color:#fff}
+.btn:active{transform:scale(.97)}
+.exrow{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.exrow button{border:1px solid var(--bd);background:var(--bg);color:var(--tx2);border-radius:99px;padding:6px 12px;font:inherit;font-size:12.5px;cursor:pointer}
+.note{font-size:12px;color:var(--tx3);margin-top:8px;line-height:1.6}
+#playerWrap{position:sticky;top:0;z-index:20;background:var(--bg);padding:6px 0;display:none}
+#playerBox{position:relative;width:100%;aspect-ratio:16/9;border-radius:14px;overflow:hidden;background:#000;box-shadow:0 4px 18px rgba(0,0,0,.18)}
+#playerBox iframe{position:absolute;inset:0;width:100%;height:100%}
+.vtitle{font-size:13px;font-weight:700;margin:8px 2px 0;color:var(--tx2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.modes{display:flex;gap:8px;margin:12px 0}
+.modes button{flex:1;border:1px solid var(--bd);background:var(--bg2);color:var(--tx2);border-radius:12px;padding:9px;font:inherit;font-weight:700;cursor:pointer}
+.modes button.on{background:var(--ac);color:#fff;border-color:var(--ac)}
+.line{background:var(--bg2);border:1px solid var(--bd);border-left:3px solid transparent;border-radius:14px;padding:12px 14px;margin-bottom:10px;cursor:pointer}
+.line.on{border-left-color:var(--ac);box-shadow:0 2px 12px rgba(0,0,0,.07)}
+.line.done{border-left-color:var(--good)}
+.lhead{display:flex;align-items:center;gap:8px;font-size:11.5px;color:var(--tx3);margin-bottom:4px}
+.lhead .tstamp{background:var(--bg3);border-radius:6px;padding:1px 7px;font-variant-numeric:tabular-nums}
+.lhead .okmark{color:var(--good);font-weight:800;margin-left:auto}
+.ljp{font-size:17px;line-height:2;word-break:break-word}
+.ljp rt{font-size:10px;color:var(--tx3)}
+.ljp .hit{color:var(--good);font-weight:700}
+.lzh{font-size:12.5px;color:var(--tx2);margin-top:2px}
+.dict-blur .ljp{filter:blur(6px);user-select:none}
+.line.on.dict-blur .ljp.revealed{filter:none;user-select:auto}
+.ltools{display:none;gap:8px;margin-top:10px;flex-wrap:wrap;align-items:center}
+.line.on .ltools{display:flex}
+.ltools .btn{padding:8px 13px;font-size:13.5px}
+.ltools .btn.rec-on{background:var(--bad);color:#fff;animation:pulse 1.2s infinite}
+@keyframes pulse{50%{opacity:.75}}
+.score{font-size:13px;font-weight:800}
+.score.pass{color:var(--good)} .score.fail{color:var(--ac)}
+.saidbox{width:100%;margin-top:8px;padding:9px 11px;border:1px solid var(--bd);border-radius:10px;background:var(--bg);color:var(--tx);font:inherit;font-size:14px}
+.dictarea{width:100%;margin-top:8px;padding:9px 11px;border:1px solid var(--bd);border-radius:10px;background:var(--bg);color:var(--tx);font:inherit;font-size:15px;min-height:56px;resize:vertical}
+.diffbox{margin-top:8px;font-size:15px;line-height:1.9;background:var(--bg3);border-radius:10px;padding:9px 11px;display:none}
+.diffbox .dok{color:var(--good)} .diffbox .dng{color:var(--bad);text-decoration:line-through}
+.pastebox{display:none;margin-top:12px}
+.pastebox textarea{width:100%;min-height:130px;padding:10px;border:1px solid var(--bd);border-radius:12px;background:var(--bg);color:var(--tx);font:inherit;font-size:13px;resize:vertical}
+.steps{font-size:12.5px;color:var(--tx2);line-height:1.8;margin:6px 0}
+.steps b{color:var(--ac)}
+.err{color:var(--bad);font-size:13px;margin-top:8px}
+.prog{font-size:12.5px;color:var(--tx2);margin:4px 2px 10px}
+.recnote{font-size:12px;color:var(--tx3);width:100%}
+@media(min-width:820px){ #playerWrap{position:static} .cols{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start} .colL{position:sticky;top:12px} }
+.tut-mask{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:99;padding:20px;overflow-y:auto}
+.tut-mask.show{display:flex;align-items:flex-start;justify-content:center}
+.tut-card{background:var(--bg2);border-radius:18px;max-width:480px;width:100%;padding:20px;margin:4vh 0;position:relative}
+.tut-x{position:absolute;top:12px;right:12px;width:34px;height:34px;border:none;background:transparent;color:var(--tx2);font-size:17px;cursor:pointer;border-radius:50%}
+.tut-hd{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.tut-hd img{width:56px;height:auto}
+.tut-hd b{font-size:17px}
+.tut-step{display:flex;gap:12px;margin-bottom:14px}
+.tut-n{flex-shrink:0;width:26px;height:26px;border-radius:50%;background:var(--ac);color:#fff;font-size:13.5px;font-weight:800;display:flex;align-items:center;justify-content:center;margin-top:2px}
+.tut-step b{display:block;font-size:14.5px;margin-bottom:2px}
+.tut-step p{margin:0;font-size:13px;color:var(--tx2);line-height:1.7}
+.tut-sub{background:var(--bg3);border-radius:10px;padding:8px 11px;font-size:12.5px;color:var(--tx2);line-height:1.7;margin-top:6px}
+.tut-sub b{display:inline;font-size:12.5px;color:var(--tx)}
+.tut-go{width:100%;margin-top:4px}
+.howbtn{border:1px solid var(--bd);background:var(--bg2);color:var(--tx2);border-radius:99px;padding:6px 13px;font:inherit;font-size:12.5px;cursor:pointer;flex-shrink:0}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <a href="speak.html" class="backbtn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg> <span id="bkTx">返回</span></a>
+  </div>
+
+  <div class="hero">
+    <img src="images/mascot/tanuki-p05.png" alt="">
+    <div style="flex:1;min-width:0"><h1 id="hTitle">YouTube 跟讀</h1><p id="hSub">貼上任何有日文字幕的影片:逐句循環、開麥跟讀、點字查詞。歌、新聞、Vlog 都是教材。</p></div>
+    <button class="howbtn" id="howBtn" onclick="YTS.tut(true)">怎麼用?</button>
+  </div>
+
+  <div class="tut-mask" id="tutMask" onclick="if(event.target===this)YTS.tut(false)">
+    <div class="tut-card">
+      <button class="tut-x" onclick="YTS.tut(false)">✕</button>
+      <div class="tut-hd"><img src="images/mascot/tanuki-p08.png" alt=""><b id="tutT">30 秒學會 YouTube 跟讀</b></div>
+      <div id="tutBody"></div>
+      <button class="btn pri tut-go" id="tutGo" onclick="YTS.tut(false)">開始用</button>
+    </div>
+  </div>
+
+  <div class="card" id="inputCard">
+    <div class="urlrow">
+      <input id="urlIn" placeholder="貼上 YouTube 連結或影片 ID" inputmode="url" autocomplete="off">
+      <button class="btn pri" id="loadBtn" onclick="YTS.load()">讀取</button>
+    </div>
+    <div class="exrow" id="exRow"></div>
+    <div class="note" id="inNote">影片用 YouTube 官方播放器播放。有日文字幕(含自動字幕)的影片才能逐句練。</div>
+    <div class="err" id="inErr" style="display:none"></div>
+    <div class="pastebox" id="pasteBox">
+      <div class="steps" id="pasteSteps"><b>抓不到字幕時,自己複製逐字稿(15 秒):</b><br>① 到 YouTube 打開這支影片 → 說明欄或「⋯」選單點「<b>顯示轉譯稿 / 逐字稿</b>」<br>② 全選複製(含時間) → 貼到下面 → 解析</div>
+      <textarea id="pasteTa" placeholder="0:26&#10;派手に色を溶かす夜に&#10;0:32&#10;転がるように風を切って&#10;…"></textarea>
+      <div style="display:flex;gap:8px;margin-top:8px"><button class="btn pri" onclick="YTS.parsePaste()" id="parseBtn">解析逐字稿</button></div>
+    </div>
+  </div>
+
+  <div class="cols">
+    <div class="colL">
+      <div id="playerWrap"><div id="playerBox"></div><div class="vtitle" id="vTitle"></div></div>
+    </div>
+    <div class="colR">
+      <div class="modes" id="modeRow" style="display:none">
+        <button id="mShadow" class="on" onclick="YTS.setMode('shadow')">跟讀</button>
+        <button id="mDict" onclick="YTS.setMode('dict')">聽寫</button>
+      </div>
+      <div class="prog" id="progTx"></div>
+      <div id="lines"></div>
+    </div>
+  </div>
+</div>
+
+<script src="icons.js"></script>
+<script src="i18n.js"></script>
+<script>
+// i18n shim(照 speak.html)
+let _tw2cn=null;
+function ensureOpenCC(){ return new Promise(function(res){ if(_tw2cn)return res(_tw2cn); if(window.OpenCC){ _tw2cn=OpenCC.Converter({from:'tw',to:'cn'}); return res(_tw2cn);} var s=document.createElement('script'); s.src='https://cdn.jsdelivr.net/npm/opencc-js@1.0.5/dist/umd/full.js'; s.onload=function(){ _tw2cn=OpenCC.Converter({from:'tw',to:'cn'}); res(_tw2cn); }; s.onerror=function(){res(null)}; document.head.appendChild(s); }); }
+function cvt(x){ return (!x||I18n.getLang()!=='zh-CN'||!_tw2cn)?x:_tw2cn(x); }
+function enOr(zh,en){ return I18n.getLang()==='en'?en:cvt(zh); }
+if(I18n.getLang()==='zh-CN') ensureOpenCC().then(function(){ try{ YTS._retext(); }catch(e){} });
+</script>
+<script src="grammar-kanji-readings.js"></script>
+<script src="vocab-n5.js"></script>
+<script src="vocab-n4.js"></script>
+<script src="ux-extras.js"></script>
+<script>
+const YTS = (() => {
+  const FN = 'https://asia-east1-jpnote-1bdd6.cloudfunctions.net/ytCaptions';
+  const EXAMPLES = [
+    { v:'tLQLa6lM3Us', t:'Aimer 残響散歌(歌詞字幕)' },
+  ];
+  let player=null, apiReady=false, vid='', lines=[], cur=-1, mode='shadow', loopOn=false, watchT=0, done={};
+
+  // ── i18n 靜態字 ──
+  function _retext(){
+    const en = I18n.getLang()==='en';
+    const set=(id,zh,e2)=>{ const el=document.getElementById(id); if(el) el.innerHTML = en?e2:cvt(zh); };
+    set('bkTx','返回','Back');
+    set('hTitle','YouTube 跟讀','YouTube Shadowing');
+    set('hSub','貼上任何有日文字幕的影片:逐句循環、開麥跟讀、點字查詞。歌、新聞、Vlog 都是教材。','Paste any video with Japanese subtitles: loop line by line, shadow with your mic, tap words to look them up.');
+    set('inNote','影片用 YouTube 官方播放器播放。有日文字幕(含自動字幕)的影片才能逐句練。','Videos play in the official YouTube player. Line practice needs Japanese captions (auto captions work too).');
+    set('mShadow','跟讀','Shadow'); set('mDict','聽寫','Dictation');
+    set('loadBtn','讀取','Load'); set('parseBtn','解析逐字稿','Parse transcript');
+    set('pasteSteps','<b>抓不到字幕時,自己複製逐字稿(15 秒):</b><br>① 到 YouTube 打開這支影片 → 說明欄或「⋯」選單點「<b>顯示轉譯稿 / 逐字稿</b>」<br>② 全選複製(含時間) → 貼到下面 → 解析',
+      '<b>If captions can’t be fetched, copy the transcript yourself (15s):</b><br>① Open the video on YouTube → tap “<b>Show transcript</b>” in the description or “⋯” menu<br>② Select all & copy (with timestamps) → paste below → parse');
+    const u=document.getElementById('urlIn'); if(u) u.placeholder = en?'Paste a YouTube link or video ID':cvt('貼上 YouTube 連結或影片 ID');
+  }
+
+  // ── 工具 ──
+  const esc=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  function parseVid(input){
+    input=(input||'').trim();
+    if(/^[A-Za-z0-9_-]{11}$/.test(input)) return input;
+    const m=input.match(/(?:v=|youtu\.be\/|shorts\/|embed\/|live\/)([A-Za-z0-9_-]{11})/);
+    return m?m[1]:'';
+  }
+  const fmtT=ms=>{ const s=Math.floor(ms/1000); return Math.floor(s/60)+':'+String(s%60).padStart(2,'0'); };
+  const norm=s=>(s||'').replace(/[\s、。,．.!！?？「」『』()（）・〜~♪…––—-]/g,'');
+  // 貪婪順序比對:target 每字在 said 中依序找,回 [每字是否命中]
+  function matchChars(target,said){
+    const t=norm(target), s=norm(said);
+    const hits=new Array(t.length).fill(false);
+    let p=0;
+    for(let i=0;i<t.length;i++){ const idx=s.indexOf(t[i],p); if(idx>=0){ hits[i]=true; p=idx+1; } }
+    return { hits, ratio: t.length? hits.filter(Boolean).length/t.length : 0, t };
+  }
+
+  // ── 載入影片 ──
+  function ensureApi(){
+    return new Promise(res=>{
+      if(apiReady) return res();
+      window.onYouTubeIframeAPIReady=()=>{ apiReady=true; res(); };
+      const s=document.createElement('script'); s.src='https://www.youtube.com/iframe_api'; document.head.appendChild(s);
+    });
+  }
+  async function load(){
+    const v=parseVid(document.getElementById('urlIn').value);
+    const errEl=document.getElementById('inErr'); errEl.style.display='none';
+    if(!v){ errEl.textContent=enOr('看不懂這個連結,貼 YouTube 影片網址或 11 碼影片 ID。','Could not parse that link — paste a YouTube URL or 11-char video ID.'); errEl.style.display='block'; return; }
+    vid=v;
+    document.getElementById('loadBtn').disabled=true;
+    document.getElementById('inNote').textContent=enOr('讀取中…','Loading…');
+    await ensureApi();
+    if(player){ try{player.destroy();}catch(e){} player=null; }
+    document.getElementById('playerWrap').style.display='block';
+    player=new YT.Player('playerBox',{ videoId:v, playerVars:{ playsinline:1, rel:0, controls:1 }, events:{} });
+    // 字幕:先試自動抓,失敗開貼上模式
+    try{
+      const r=await fetch(FN,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({v})});
+      const d=await r.json();
+      if(d && Array.isArray(d.lines) && d.lines.length){
+        setLines(d.lines, d.title||'');
+        if(d.track==='asr') document.getElementById('inNote').textContent=enOr('這支只有自動字幕,分句和文字可能不完美。','Auto captions only — segmentation may be imperfect.');
+        else document.getElementById('inNote').textContent=enOr('字幕讀取完成,點任一句開始。','Captions loaded — tap any line to start.');
+        document.getElementById('pasteBox').style.display='none';
+        return;
+      }
+      throw new Error(d && d.error || 'no_captions');
+    }catch(e){
+      document.getElementById('inNote').textContent=enOr('自動抓字幕沒成功(YouTube 擋了或這支沒字幕)。用下面的方法貼逐字稿,一樣能練:','Auto caption fetch failed (blocked by YouTube or no captions). Paste the transcript below instead:');
+      document.getElementById('pasteBox').style.display='block';
+    }finally{
+      document.getElementById('loadBtn').disabled=false;
+    }
+  }
+
+  // ── 貼上逐字稿解析:支援「0:26↵文字」與「0:26 文字」兩種格式 ──
+  function parsePaste(){
+    const raw=(document.getElementById('pasteTa').value||'').trim();
+    if(!raw) return;
+    const rows=raw.split(/\n+/).map(s=>s.trim()).filter(Boolean);
+    const out=[]; const TS=/^(\d{1,2}):(\d{2})(?::(\d{2}))?$/;
+    for(let i=0;i<rows.length;i++){
+      let m=rows[i].match(TS);
+      if(m && rows[i+1] && !TS.test(rows[i+1])){           // 時間獨立一行,下一行是字幕
+        out.push({ t:toMs(m), ja:rows[++i], zh:'' }); continue;
+      }
+      m=rows[i].match(/^(\d{1,2}):(\d{2})(?::(\d{2}))?\s+(.+)$/);  // 同一行「0:26 文字」
+      if(m) out.push({ t:toMs(m), ja:m[4], zh:'' });
+    }
+    function toMs(m){ return m[3]!=null ? ((+m[1]*3600)+(+m[2]*60)+(+m[3]))*1000 : ((+m[1]*60)+(+m[2]))*1000; }
+    if(!out.length){ document.getElementById('inNote').textContent=enOr('解析不出時間軸,確認有把「時間+句子」一起複製。','Could not parse timestamps — make sure you copied times together with the lines.'); return; }
+    out.forEach((l,i)=>{ l.d = (i+1<out.length ? out[i+1].t-l.t : 5000); });
+    setLines(out,'');
+    document.getElementById('pasteBox').style.display='none';
+    document.getElementById('inNote').textContent=enOr('逐字稿解析完成,點任一句開始。','Transcript parsed — tap any line to start.');
+  }
+
+  // ── 句子列表 ──
+  function doneKey(){ return 'yts_done_'+vid; }
+  function setLines(ls,title){
+    lines=ls; cur=-1;
+    try{ done=JSON.parse(localStorage.getItem(doneKey()))||{}; }catch(e){ done={}; }
+    if(title) document.getElementById('vTitle').textContent=title;
+    document.getElementById('modeRow').style.display='flex';
+    renderLines();
+  }
+  function fr(t){ try{ return (window.furiganaHTML? furiganaHTML(t) : esc(t)); }catch(e){ return esc(t); } }
+  function renderLines(){
+    const box=document.getElementById('lines');
+    box.innerHTML = lines.map((l,i)=>`
+      <div class="line ${i===cur?'on':''} ${done[i]?'done':''} ${mode==='dict'&&!l._rev?'dict-blur':''}" id="ln${i}" onclick="YTS.pick(${i},event)">
+        <div class="lhead"><span class="tstamp">${fmtT(l.t)}</span>${done[i]?'<span class="okmark">✓</span>':''}</div>
+        <div class="ljp ${l._rev?'revealed':''}" id="jp${i}">${fr(l.ja)}</div>
+        ${l.zh?`<div class="lzh">${esc(l.zh)}</div>`:''}
+        <div class="ltools" id="tools${i}"></div>
+      </div>`).join('');
+    updProg();
+    try{ if(window.Icons&&Icons.hydrate)Icons.hydrate(); }catch(e){}
+  }
+  function updProg(){
+    const n=Object.keys(done).length;
+    document.getElementById('progTx').textContent = lines.length? (enOr('已完成 ','Done ')+n+' / '+lines.length+enOr(' 句',' lines')) : '';
+  }
+
+  // ── 播放控制 ──
+  function playSeg(i,loop){
+    if(!player||!lines[i]) return;
+    const l=lines[i];
+    clearInterval(watchT);
+    player.seekTo(l.t/1000,true); player.playVideo();
+    const end=(l.t+(l.d||4000))/1000;
+    watchT=setInterval(()=>{
+      try{
+        const c=player.getCurrentTime();
+        if(c>=end-0.05){
+          if(loop&&loopOn){ player.seekTo(l.t/1000,true); }
+          else { player.pauseVideo(); clearInterval(watchT); }
+        }
+      }catch(e){}
+    },120);
+  }
+  function pick(i,ev){
+    if(ev&&ev.target&&ev.target.closest&&(ev.target.closest('.ltools')||ev.target.closest('.jlk'))) return;   // 工具鈕/查詞不觸發選句
+    stopRec();
+    cur=i; renderLines(); buildTools(i); playSeg(i,true);
+    const el=document.getElementById('ln'+i); if(el) el.scrollIntoView({behavior:'smooth',block:'center'});
+  }
+  function buildTools(i){
+    const t=document.getElementById('tools'+i); if(!t) return;
+    if(mode==='shadow'){
+      t.innerHTML=`
+        <button class="btn" onclick="YTS.playSeg(${i},false)"><i data-ic=volume></i> ${enOr('再聽','Replay')}</button>
+        <button class="btn" onclick="YTS.toggleLoop(this)">${loopOn?enOr('循環:開','Loop: on'):enOr('循環:關','Loop: off')}</button>
+        <button class="btn pri" id="recB${i}" onclick="YTS.toggleRec(${i})"><i data-ic=mic></i> ${enOr('跟讀','Shadow')}</button>
+        <span class="score" id="sc${i}"></span>
+        <input class="saidbox" id="said${i}" placeholder="${enOr('辨識結果會出現在這(也可直接打字)','Recognized speech appears here (or type)')}" style="display:none">
+        <div class="recnote" id="rn${i}"></div>`;
+    } else {
+      t.innerHTML=`
+        <button class="btn" onclick="YTS.playSeg(${i},false)"><i data-ic=volume></i> ${enOr('播放這句','Play line')}</button>
+        <textarea class="dictarea" id="dt${i}" placeholder="${enOr('聽完把句子打出來','Type what you heard')}"></textarea>
+        <button class="btn pri" onclick="YTS.checkDict(${i})">${enOr('對答案','Check')}</button>
+        <span class="score" id="sc${i}"></span>
+        <div class="diffbox" id="df${i}"></div>`;
+    }
+    try{ if(window.Icons&&Icons.hydrate)Icons.hydrate(); }catch(e){}
+  }
+  function toggleLoop(btn){ loopOn=!loopOn; btn.textContent=loopOn?enOr('循環:開','Loop: on'):enOr('循環:關','Loop: off'); if(loopOn&&cur>=0) playSeg(cur,true); }
+  function setMode(m){
+    stopRec(); mode=m; cur=-1;
+    document.getElementById('mShadow').classList.toggle('on',m==='shadow');
+    document.getElementById('mDict').classList.toggle('on',m==='dict');
+    lines.forEach(l=>{ l._rev=false; });
+    renderLines();
+  }
+
+  // ── 跟讀:瀏覽器 STT / App 原生 STT 雙路(照 speak.html) ──
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  const NATIVE_STT=!!(window.STAYJP_NATIVE&&window.STAYJP_NATIVE.canSpeech&&window.ReactNativeWebView);
+  function _nPost(o){ try{ window.ReactNativeWebView.postMessage(JSON.stringify(o)); }catch(e){} }
+  let rec=null, recording=false, recIdx=-1;
+  function toggleRec(i){ recording?stopRec():startRec(i); }
+  function _recUI(i,on){ const b=document.getElementById('recB'+i); if(b){ b.classList.toggle('rec-on',on); b.innerHTML=on?('<i data-ic=stop></i> '+enOr('停止','Stop')):('<i data-ic=mic></i> '+enOr('跟讀','Shadow')); try{ if(window.Icons&&Icons.hydrate)Icons.hydrate(); }catch(e){} } }
+  function onSaid(i,text,fin){
+    const inp=document.getElementById('said'+i); if(inp){ inp.style.display='block'; inp.value=text; }
+    const m=matchChars(lines[i].ja,text);
+    // 逐字亮綠:重繪該句(不含 ruby 命中著色的複雜度:對 norm 後字元順序著色,ruby 內文字逐一對應)
+    paintHits(i,m.hits);
+    const sc=document.getElementById('sc'+i);
+    if(fin){
+      const pct=Math.round(m.ratio*100);
+      const pass=m.ratio>=0.7;
+      if(sc){ sc.textContent=pct+'%'+(pass?' ✓':''); sc.className='score '+(pass?'pass':'fail'); }
+      if(pass){ done[i]=1; try{ localStorage.setItem(doneKey(),JSON.stringify(done)); }catch(e){} const ln=document.getElementById('ln'+i); if(ln)ln.classList.add('done'); updProg(); }
+    } else if(sc){ sc.textContent=Math.round(m.ratio*100)+'%'; sc.className='score'; }
+  }
+  function paintHits(i,hits){
+    const el=document.getElementById('jp'+i); if(!el) return;
+    // 走原始字串:略過標點(未參與比對),與 hits 索引對齊
+    const raw=lines[i].ja; let hIdx=0; let html='';
+    for(const ch of raw){
+      if(norm(ch)===''){ html+=esc(ch); continue; }
+      html += hits[hIdx] ? '<span class="hit">'+esc(ch)+'</span>' : esc(ch);
+      hIdx++;
+    }
+    el.innerHTML=html;   // 著色時暫時捨棄 ruby(結束後點其他句會重繪回 ruby 版)
+  }
+  function startRec(i){
+    recIdx=i;
+    try{ player&&player.pauseVideo(); }catch(e){}
+    clearInterval(watchT);
+    if(NATIVE_STT){
+      window.stayjpSpeechResult=(t,fin)=>{ if(t) onSaid(recIdx,t,!!fin); };
+      window.stayjpSpeechEnd=(err)=>{ recording=false; _recUI(recIdx,false); const rn=document.getElementById('rn'+recIdx); if(err&&rn) rn.textContent=enOr('辨識出錯('+err+'),可直接打字。','Recognition error ('+err+') — you can type instead.'); };
+      recording=true; _recUI(i,true); _nPost({type:'SPEECH_START',lang:'ja-JP'});
+      return;
+    }
+    if(!SR){ const rn=document.getElementById('rn'+i); if(rn) rn.textContent=enOr('這個瀏覽器不支援語音辨識,可直接打字後看著色。','This browser has no speech recognition — type instead.'); const inp=document.getElementById('said'+i); if(inp){ inp.style.display='block'; inp.oninput=()=>onSaid(i,inp.value,false); } return; }
+    rec=new SR(); rec.lang='ja-JP'; rec.interimResults=true; rec.continuous=false;
+    rec.onresult=e=>{ let t=''; for(let k=0;k<e.results.length;k++) t+=e.results[k][0].transcript; onSaid(recIdx,t,e.results[e.results.length-1].isFinal); };
+    rec.onerror=e=>{ const rn=document.getElementById('rn'+recIdx); if(rn) rn.textContent=enOr('辨識出錯('+e.error+'),可直接打字。','Recognition error ('+e.error+') — type instead.'); stopRec(); };
+    rec.onend=()=>{ recording=false; _recUI(recIdx,false); };
+    try{ rec.start(); recording=true; _recUI(i,true); }catch(e){}
+  }
+  function stopRec(){ if(NATIVE_STT&&recording){ _nPost({type:'SPEECH_STOP'}); } else if(rec&&recording){ try{rec.stop();}catch(e){} } recording=false; if(recIdx>=0)_recUI(recIdx,false); }
+
+  // ── 聽寫 ──
+  function checkDict(i){
+    const ta=document.getElementById('dt'+i); const said=(ta&&ta.value||'').trim();
+    if(!said) return;
+    const l=lines[i]; l._rev=true;
+    const t=norm(l.ja), s=norm(said);
+    // LCS 對答案:答對字綠、多打/錯字紅線
+    const dp=Array.from({length:s.length+1},()=>new Array(t.length+1).fill(0));
+    for(let a=1;a<=s.length;a++)for(let b=1;b<=t.length;b++) dp[a][b]=s[a-1]===t[b-1]?dp[a-1][b-1]+1:Math.max(dp[a-1][b],dp[a][b-1]);
+    let a=s.length,b=t.length; const keepS=new Set();
+    while(a>0&&b>0){ if(s[a-1]===t[b-1]){keepS.add(a-1);a--;b--;} else if(dp[a-1][b]>=dp[a][b-1])a--; else b--; }
+    let html='';
+    for(let k=0;k<s.length;k++) html+=keepS.has(k)?'<span class="dok">'+esc(s[k])+'</span>':'<span class="dng">'+esc(s[k])+'</span>';
+    const df=document.getElementById('df'+i); if(df){ df.innerHTML=html+'<div style="margin-top:6px;color:var(--tx2);font-size:12.5px">'+enOr('正解:','Answer: ')+esc(l.ja)+'</div>'; df.style.display='block'; }
+    const ratio=t.length?dp[s.length][t.length]/t.length:0;
+    const pct=Math.round(ratio*100), pass=ratio>=0.7;
+    const sc=document.getElementById('sc'+i); if(sc){ sc.textContent=pct+'%'+(pass?' ✓':''); sc.className='score '+(pass?'pass':'fail'); }
+    if(pass){ done[i]=1; try{ localStorage.setItem(doneKey(),JSON.stringify(done)); }catch(e){} updProg(); }
+    const jp=document.getElementById('jp'+i); if(jp) jp.classList.add('revealed');
+    const ln=document.getElementById('ln'+i); if(ln){ ln.classList.remove('dict-blur'); if(pass)ln.classList.add('done'); }
+  }
+
+  // ── 範例 ──
+  function renderEx(){
+    document.getElementById('exRow').innerHTML = EXAMPLES.map(e=>`<button onclick="document.getElementById('urlIn').value='${e.v}';YTS.load()">${esc(e.t)}</button>`).join('');
+  }
+  // ── 教學 ──
+  function tutHtml(){
+    const en=I18n.getLang()==='en';
+    const S=(n,zhT,enT,zhP,enP,sub)=>`<div class="tut-step"><span class="tut-n">${n}</span><div><b>${en?enT:cvt(zhT)}</b><p>${en?enP:cvt(zhP)}</p>${sub||''}</div></div>`;
+    const sub2 = `<div class="tut-sub">${en
+      ? '<b>Desktop:</b> below the video → “Show transcript” → select all & copy (keep timestamps on).<br><b>Phone:</b> open the video in a <b>browser</b> (not the YouTube app) → tap “Show transcript” in the description → long-press to select & copy.'
+      : cvt('<b>電腦:</b>影片下方「<b>顯示轉譯稿 / 逐字稿</b>」→ 全選複製(時間戳記保持顯示)。<br><b>手機:</b>用<b>瀏覽器</b>開那支影片(不是 YouTube App)→ 說明欄點「顯示轉譯稿」→ 長按選取全部複製。')}</div>`;
+    return S(1,'選一支影片','Pick a video','任何有日文字幕的都行:喜歡的歌、新聞、動漫歌 MV、Vlog。複製它的連結,貼進輸入框按「讀取」。','Any video with Japanese subtitles works: songs, news, anime MVs, vlogs. Copy its link, paste it, hit Load.')
+      + S(2,'字幕抓不到?貼逐字稿','No captions? Paste the transcript','大部分影片會自動載入字幕。抓不到的話,到 YouTube 複製「逐字稿」貼過來,一樣能練:','Captions usually load automatically. If not, copy the video’s transcript from YouTube and paste it here:',sub2)
+      + S(3,'開始練','Start practicing','點任一句 → 那句循環播放。「跟讀」開麥跟著唸,唸到的字會亮綠、給分數;「聽寫」先聽再打字對答案。看不懂的漢字,點一下就查。','Tap any line to loop it. In Shadow mode, speak along — matched words light up green with a score. In Dictation, listen first then type. Tap any word to look it up.');
+  }
+  function tut(show){
+    const m=document.getElementById('tutMask');
+    if(show){ document.getElementById('tutBody').innerHTML=tutHtml();
+      document.getElementById('tutT').textContent=enOr('30 秒學會 YouTube 跟讀','YouTube shadowing in 30 seconds');
+      document.getElementById('tutGo').textContent=enOr('開始用','Got it');
+      m.classList.add('show');
+    } else { m.classList.remove('show'); try{ localStorage.setItem('yts_tut_seen','1'); }catch(e){} }
+  }
+  document.addEventListener('DOMContentLoaded',()=>{
+    renderEx(); _retext();
+    try{ const el=document.getElementById('howBtn'); if(el) el.textContent=enOr('怎麼用?','How?'); }catch(e){}
+    try{ if(!localStorage.getItem('yts_tut_seen')) tut(true); }catch(e){}
+  });
+  return { load, parsePaste, pick, playSeg, toggleLoop, setMode, toggleRec, checkDict, tut, _retext };
+})();
+</script>
+<script src="font-scale.js"></script>
+</body>
+</html>
