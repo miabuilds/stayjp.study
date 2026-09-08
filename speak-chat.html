@@ -593,6 +593,8 @@ async function sendMine(){
     appendErr(enOr('這場聊得很充實了!幫你整理點評','Great session! Putting together your review')); setTimeout(endChat, 800); return;
   }
   hardStopRec();
+  // Journey 證據:真的對話滿 3 輪(只數自己送出的)
+  try{if(history.filter(h=>h.role==='me').length>=2)localStorage.setItem('jr_chat','1');}catch(e){}
   let showTxt=txt, origTxt=null;
   if(needsJa(txt) && auth.currentUser){
     setBusy(true);

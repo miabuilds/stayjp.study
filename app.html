@@ -331,9 +331,49 @@ select.lang-btn {
 .hub-jlpt .hj-d { font-size:12px; opacity:.92; margin-top:2px; }
 .hub-jlpt .hj-new { position:absolute; top:12px; right:14px; font-size:9px; background:#fff; color:var(--ac); border-radius:8px; padding:1px 6px; font-weight:900; }
 .hub-jlpt .hj-arrow { margin-left:auto; font-size:20px; opacity:.85; }
+.unit-quiz-btn { font:inherit; font-size:11.5px; font-weight:700; color:var(--ac); background:var(--soft,rgba(198,85,59,.08)); border:1px solid var(--ac); border-radius:999px; padding:4px 12px; margin-left:10px; cursor:pointer; white-space:nowrap; }
+.unit-quiz-btn:active { transform:scale(.96); }
+/* 0 基礎入口(面板) */
+.hub-zero { display:flex; align-items:center; gap:12px; width:100%; text-align:left; background:linear-gradient(135deg,var(--soft,rgba(198,85,59,.08)),var(--bg2)); border:1.5px dashed var(--ac); border-radius:16px; padding:12px 16px; margin:0 0 14px; cursor:pointer; color:inherit; font:inherit; }
+.hub-zero:active { transform:scale(.99); }
+.hub-zero img { width:52px; height:auto; flex-shrink:0; }
+.hub-zero .hz-tx { flex:1; min-width:0; display:flex; flex-direction:column; gap:1px; }
+.hub-zero b { font-size:15px; font-weight:800; }
+.hub-zero small { font-size:11.5px; color:var(--tx2); }
+.hub-zero .hz-prog { font-size:11px; color:var(--ac); font-weight:800; }
+.hub-zero .hj-arrow { margin-left:auto; font-size:20px; color:var(--ac); }
+/* Journey 課程地圖 */
+.jr-mask { position:fixed; inset:0; z-index:820; background:var(--bg); overflow:auto; }
+.jr-wrap { max-width:640px; margin:0 auto; padding:16px 18px calc(env(safe-area-inset-bottom,0px) + 40px); }
+.jr-top { display:flex; align-items:center; gap:10px; position:sticky; top:0; background:var(--bg); padding:10px 0; z-index:2; }
+.jr-x { font:inherit; border:1px solid var(--bd); background:var(--bg2); color:var(--tx2); border-radius:10px; padding:6px 12px; cursor:pointer; }
+.jr-hero { display:flex; align-items:center; gap:14px; background:var(--bg2); border:1px solid var(--bd); border-radius:18px; padding:16px; margin:6px 0 16px; }
+.jr-hero img { width:76px; height:auto; }
+.jr-hero h2 { font-size:19px; font-weight:800; margin:0 0 2px; }
+.jr-hero p { font-size:12.5px; color:var(--tx2); margin:0 0 8px; line-height:1.5; }
+.jr-bar { height:8px; border-radius:99px; background:var(--bd); overflow:hidden; }
+.jr-bar i { display:block; height:100%; background:var(--ac); border-radius:99px; transition:width .4s; }
+.jr-bar-t { font-size:11px; color:var(--tx3); margin-top:4px; }
+.jr-ch { margin-bottom:14px; }
+.jr-ch-h { display:flex; align-items:center; gap:10px; font-weight:800; font-size:14.5px; margin-bottom:8px; }
+.jr-ch-n { width:26px; height:26px; border-radius:50%; background:var(--ac); color:#fff; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:800; flex-shrink:0; }
+.jr-ch.done .jr-ch-n { background:var(--good,#2E7D57); }
+.jr-step { display:flex; align-items:center; gap:12px; background:var(--bg2); border:1px solid var(--bd); border-radius:14px; padding:12px 14px; margin:0 0 8px 13px; border-left:3px solid var(--bd); }
+.jr-step.done { border-left-color:var(--good,#2E7D57); }
+.jr-dot { width:22px; height:22px; border-radius:50%; border:2px solid var(--bd); flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:12px; color:#fff; }
+.jr-step.done .jr-dot { background:var(--good,#2E7D57); border-color:var(--good,#2E7D57); }
+.jr-st-tx { flex:1; min-width:0; }
+.jr-st-tx b { font-size:14px; font-weight:700; display:block; }
+.jr-st-tx small { font-size:11.5px; color:var(--tx2); line-height:1.45; display:block; }
+.jr-st-tx .jr-cond { font-size:11px; color:var(--ac); margin-top:2px; }
+.jr-go { font:inherit; font-size:12.5px; font-weight:800; color:#fff; background:var(--ac); border:0; border-radius:999px; padding:7px 14px; cursor:pointer; white-space:nowrap; }
+.jr-step.done .jr-go { background:var(--bg3); color:var(--tx2); }
+.jr-done-card { text-align:center; background:var(--bg2); border:1px solid var(--bd); border-radius:18px; padding:22px; margin-top:6px; }
+.jr-done-card img { width:100px; }
 .hub-grid2 { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:0 0 18px; }
 .hub-card { position:relative; overflow:hidden; display:flex; flex-direction:column; gap:9px; background:var(--bg2); border:1px solid var(--bd); border-radius:16px; padding:16px 16px 15px; text-decoration:none; color:var(--tx); cursor:pointer; text-align:left; box-shadow:0 1px 3px rgba(0,0,0,.04); }
 .hub-card:active { transform: scale(.98); }
+
 .hub-card .hc-ic { width:46px; height:46px; border-radius:13px; background:var(--soft,rgba(198,85,59,.10)); display:flex; align-items:center; justify-content:center; color:var(--ac); font-size:23px; line-height:1; }
 .hub-card .hc-t { font-size:16px; font-weight:800; margin-top:1px; }
 .hub-card .hc-d { font-size:11.5px; color:var(--tx2); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%; }
@@ -572,6 +612,7 @@ body.hub-view .mn { margin-left: 0; max-width: none; }
 }
 /* Shadowing 跟讀模式 — full-screen overlay with auto-cycle. */
 .shadow-mask { display: flex; align-items: center; justify-content: center; padding: 20px; }
+@media (pointer: coarse) { .shadow-hint.kb-only { display: none; } }
 .shadow-box { background: var(--bg2); border: 1px solid var(--bd); border-radius: 20px; padding: 36px 32px; max-width: 600px; width: 100%; text-align: center; position: relative; }
 .shadow-close { position: absolute; top: 12px; right: 12px; width: 36px; height: 36px; border: none; background: transparent; color: var(--tx2); font-size: 18px; cursor: pointer; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; transition: background .15s, color .15s; }
 .shadow-close:hover { background: var(--bg3); color: var(--tx); }
@@ -924,7 +965,7 @@ body.hub-view .mn { margin-left: 0; max-width: none; }
 .daily-bar .dp { flex: 1 1 100%; min-width: 0; }
 /* ── 學習熱力圖彈窗 ── */
 .hm-backdrop { position:fixed; inset:0; z-index:1200; background:rgba(0,0,0,.45); display:flex; align-items:center; justify-content:center; padding:18px; }
-.hm-card { background:var(--bg2); border:1px solid var(--bd); border-radius:20px; padding:22px 20px 16px; width:100%; max-width:420px; max-height:86vh; overflow:auto; text-align:center; }
+.hm-card { background:var(--bg2); border:1px solid var(--bd); border-radius:20px; padding:22px 20px 16px; width:100%; max-width:420px; max-height:86vh; overflow:auto; text-align:center; position:relative}
 .hm-title { font-weight:800; font-size:17px; margin-bottom:14px; }
 .hm-stats { display:flex; justify-content:center; gap:26px; margin-bottom:14px; }
 .hm-stats b { display:block; font-size:24px; font-weight:800; color:var(--ac); }
@@ -1610,8 +1651,8 @@ html[data-fs="xlarge"] .gc .ex .j,html[data-fs="xlarge"] .cf-eg .ex .j{font-size
 html[data-fs="xlarge"] .gc .ex .z,html[data-fs="xlarge"] .gc .nt{font-size:17px}
 /* ---- 測驗/模考/讀解/聽力等彈窗:整塊等比放大(zoom 涵蓋所有文字,連 inline 詳解卡也吃得到)。
    zoom 會連框一起放大 → 同步用 calc 縮小框寬高,讓框維持原尺寸、只有內容變大,不溢出螢幕。 ---- */
-html[data-fs="large"] .quiz-box{zoom:1.15}
-html[data-fs="xlarge"] .quiz-box{zoom:1.28}
+html[data-fs="large"] .quiz-box{zoom:1.15;max-height:calc(85vh/1.15)}
+html[data-fs="xlarge"] .quiz-box{zoom:1.28;max-height:calc(85vh/1.28)}
 
 /* ── 字級 +1px 後的窄螢幕收斂(2026-08) ─────────────────────────────
    放大字級後兩處變擠:
@@ -1683,7 +1724,7 @@ try {
     </div>
   </div>
   <div class="hd-bar" id="hdBar">
-    <button class="hub-back" onclick="goHub()" aria-label="返回面板">‹ <span data-i18n="hub_panel">面板</span></button>
+    <button class="hub-back" onclick="goHub()" aria-label="返回面板"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="vertical-align:-2px"><path d="M15 18l-6-6 6-6"/></svg> <span data-i18n="hub_panel">面板</span></button>
     <button class="mode-pill on" onclick="switchMode('grammar')" data-i18n="grammar">文法</button>
     <button class="mode-pill" onclick="switchMode('vocab')" data-i18n="vocab">單字</button>
     <div class="hd-sep"></div>
@@ -1727,6 +1768,7 @@ try {
   <a class="more-item" href="jlpt-drill.html"><svg class="mi-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3.2"/></svg><span>JLPT 刷題特區</span><span class="mi-new">NEW</span></a>
   <a class="more-item" href="speak.html"><svg class="mi-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M6 11a6 6 0 0 0 12 0"/><path d="M12 17v4M9 21h6"/></svg><span>AI 跟讀練習</span><span class="mi-new">NEW</span></a>
   <a class="more-item" href="speak-chat.html"><svg class="mi-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-11.4 7.2L4 21l1.8-5.2A8 8 0 1 1 21 12z"/></svg><span>AI 情境對話</span><span class="mi-new">NEW</span></a>
+  <a class="more-item" href="yt-shadow.html"><svg class="mi-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="6 4 20 12 6 20 6 4"/></svg><span>YouTube 跟讀</span><span class="mi-new">NEW</span></a>
   </div>
   <div class="more-sec">練習</div>
   <a class="more-item" href="essentials.html"><svg class="mi-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6.5C10.5 5 7.5 4.5 4 5v13c3.5-.5 6.5 0 8 1.5M12 6.5C13.5 5 16.5 4.5 20 5v13c-3.5-.5-6.5 0-8 1.5M12 6.5V20"/></svg><span>必學基礎</span></a>
@@ -1831,7 +1873,7 @@ if (fbConfig) {
   try { firebase.firestore().settings({ experimentalAutoDetectLongPolling: true, useFetchStreams: false }); } catch (e) {}
   auth = firebase.auth();
   db = firebase.firestore();
-  auth.onAuthStateChanged(u => { currentUser = u; _authResolved = true; _writeAuthCache(u); if (u) storeRefCode(); try { localStorage.setItem('stayjp_logged_in', u ? '1' : '0'); } catch (e) {} updateAuthUI(); loadFavorites(); loadCloudData(); if (typeof Streak !== 'undefined') { Streak.syncDown(); Streak.render(); } });
+  auth.onAuthStateChanged(u => { currentUser = u; _authResolved = true; _writeAuthCache(u); if (u) storeRefCode(); try { localStorage.setItem('stayjp_logged_in', u ? '1' : '0'); } catch (e) {} if (!u) { _cloudSynced = false; _pendingSave = false; } updateAuthUI(); loadFavorites(); loadCloudData(); if (typeof Streak !== 'undefined') { Streak.syncDown(); Streak.render(); } });
   // 推薦碼歸因:登入後首次把 localStorage 的 ?ref= 碼寫進 users/{uid}.ref_code(已有就不覆蓋 → 首次點擊歸因)
   function storeRefCode() {
     try {
@@ -2097,8 +2139,13 @@ function loadCloudData() {
     // Merge all other synced data (study_log, word_notebook, grammar_srs, daily_progress, mock_exam_history)
     SYNC_KEYS.forEach(k => {
       if (d[k] == null || d[k] === '') return;
-      if (SCALAR_SYNC_KEYS.has(k)) {   // 純字串(程度/目標/考試日):直接還原,不進 JSON 合併(否則 JSON.parse 炸掉整段還原)
-        if (typeof d[k] === 'string') localStorage.setItem(k, d[k]);
+      if (SCALAR_SYNC_KEYS.has(k)) {   // 純字串(程度/目標/考試日/引導flag):直接還原,不進 JSON 合併(否則 JSON.parse 炸掉整段還原)
+        if (typeof d[k] === 'string') {
+          if (k === 'jr_vb_seen' || k === 'jr_gr_seen') {   // 翻卡計數:取兩邊較大,雲端舊值不能倒退本機
+            const mx = Math.max(parseInt(localStorage.getItem(k) || '0', 10) || 0, parseInt(d[k], 10) || 0);
+            localStorage.setItem(k, String(mx));
+          } else localStorage.setItem(k, d[k]);
+        }
         return;
       }
       const local = JSON.parse(localStorage.getItem(k) || (Array.isArray(d[k]) ? '[]' : '{}'));
@@ -2133,12 +2180,12 @@ function loadCloudData() {
       } else {
         const merged = { ...d[k] };
         if (k === 'study_log') {
-          // 學習日曆:按「日期聯集、同日各項取最大」合併——原本同日雲端整筆蓋本機,
-          // 而上傳又是整包覆蓋,兩台裝置輪流用會互吃日期 → 連勝天數兩邊不一致(用戶回報)。
-          let changed = false;
+          // 學習日曆:按「日期聯集、同日各項取最大」合併;本機有雲端缺的日期,
+          // 用 dot-path 逐日補寫(絕不整包 set → 雲端只增不減)。
+          const missing = [];
           Object.entries(local).forEach(([date, val]) => {
             const c = merged[date];
-            if (!c) { merged[date] = val; changed = true; }
+            if (!c) { merged[date] = val; missing.push(date); }
             else {
               const mx = {
                 vocab: Math.max(c.vocab || 0, (val && val.vocab) || 0),
@@ -2146,13 +2193,12 @@ function loadCloudData() {
                 quiz: Math.max(c.quiz || 0, (val && val.quiz) || 0),
                 minutes: Math.max(c.minutes || 0, (val && val.minutes) || 0),
               };
-              if (JSON.stringify(mx) !== JSON.stringify(c)) changed = true;
+              if (JSON.stringify(mx) !== JSON.stringify(c)) missing.push(date);
               merged[date] = mx;
             }
           });
           localStorage.setItem(k, JSON.stringify(merged));
-          // 本機有雲端沒有的資料 → 回寫,讓另一台下次載入就拿到聯集(雙向收斂)
-          if (changed) setTimeout(() => { try { saveAllCloud(); } catch (e) {} }, 1200);
+          if (missing.length) setTimeout(() => { try { _cloudSynced = true; saveStudyDayCloud(missing); } catch (e) {} }, 800);
         } else {
           // Object: cloud values win if newer, local wins otherwise
           Object.entries(local).forEach(([key, val]) => {
@@ -2184,9 +2230,11 @@ function loadCloudData() {
         localStorage.setItem('study_log', JSON.stringify(sl));
       }
     }
-    // 合併後一律把 union 推回雲端:讓「登出時學的 / 只存在本機的學習日」也同步上去,
-    // 其他裝置下次登入就拿得到 → 修「火焰跨裝置連續、但月曆塗滿散落各機」(只有 backfill 時才推會漏掉)。
+    // 合併完成:解除競態鎖 → 之後的上傳才被允許;把合併後的聯集推上雲端
+    _cloudSynced = true; _pendingSave = false;
     if (typeof saveAllCloud === 'function') saveAllCloud();
+    // 連續天數計數器跟雲端對齊(markToday 的 syncUp 常在 auth 完成前就跑掉,雲端會停在舊值)
+    try { if (typeof Streak !== 'undefined' && Streak.syncDown) Streak.syncDown(); } catch (e) {}
     if (typeof SRS !== 'undefined') SRS.updateReviewCount();
     // 回訪用戶在這台第一次登入、雲端資料剛載入 → 標記引導完成並關掉(避免對老用戶閃出新手引導)
     if (typeof _onbHasData === 'function' && _onbHasData()) {
@@ -2194,7 +2242,7 @@ function loadCloudData() {
       if (typeof _onbRemove === 'function') _onbRemove();
     }
     doRender();
-  }).catch(() => {});
+  }).catch(() => { _cloudSynced = true; if (_pendingSave) { _pendingSave = false; try { saveAllCloud(); } catch (e) {} } });
 }
 function mergeHistory(local, cloud) {
   const all = [...local, ...cloud];
@@ -2236,17 +2284,40 @@ function saveSRSCloud() {
   saveProgressKeys({ srs_data: d });
 }
 // ── Sync ALL data ──
-const SYNC_KEYS = ['study_log','word_notebook','grammar_srs','daily_progress','mock_exam_history','exam_date','base_level','goal_level','reading_done','reading_scores','listening_scores','listening_done','shadow_favs','wrong_questions'];
-const SCALAR_SYNC_KEYS = new Set(['exam_date','base_level','goal_level']);   // 純字串值:不可 JSON.parse/stringify(JSON.parse('n3')會炸→之前這三個永遠沒同步到雲端,用戶回報「程度填過卻不記得」)
+const SYNC_KEYS = ['study_log','word_notebook','grammar_srs','daily_progress','mock_exam_history','exam_date','base_level','goal_level','reading_done','reading_scores','listening_scores','listening_done','shadow_favs','wrong_questions','ls_done','jr_kana','jr_essentials','jr_phrases','jr_chat','jr_vb_seen','jr_gr_seen'];
+// 學習日曆逐日上傳:update('study_log.日期', 值) 只動那一天 → 雲端日曆只增不減,
+// 任何裝置的 stale 本機資料都毀不掉歷史(root cause 修:整包 set 會整欄覆蓋)。
+function saveStudyDayCloud(dates) {
+  if (!currentUser || !db || !_cloudSynced) return;
+  try {
+    const log = JSON.parse(localStorage.getItem('study_log') || '{}');
+    // 預設寫「今天」(與 calendar.js today() 同格式);合併補寫時傳入日期陣列
+    const list = dates || [new Date().toISOString().split('T')[0]];
+    const upd = {};
+    list.forEach(d => { if (log[d]) upd['study_log.' + d] = log[d]; });
+    if (!Object.keys(upd).length) return;
+    db.collection('users').doc(currentUser.uid).update(upd).catch(() => {
+      // doc 還不存在(全新用戶):退回 set merge(此時雲端本來就沒歷史,無覆蓋風險)
+      db.collection('users').doc(currentUser.uid).set({ study_log: log }, { merge: true }).catch(() => {});
+    });
+  } catch (e) {}
+}
+const SCALAR_SYNC_KEYS = new Set(['exam_date','base_level','goal_level','jr_kana','jr_essentials','jr_phrases','jr_chat','jr_vb_seen','jr_gr_seen']);   // 純字串值:不可 JSON.parse/stringify(JSON.parse('n3')會炸→之前這三個永遠沒同步到雲端,用戶回報「程度填過卻不記得」)
+// 競態鎖:登入用戶「首次雲端下載合併」完成前,任何上傳都可能拿 stale/被清空的本機資料
+// 整欄覆蓋雲端(電腦清過快取 → 開頁瞬間學一下 → 27 天日曆被 1 天蓋掉,用戶多次實錘)。
+let _cloudSynced = false, _pendingSave = false;
 function saveAllCloud() {
   if (!currentUser || !db) return;
+  if (!_cloudSynced) { _pendingSave = true; return; }   // 合併完成後由 loadCloudData flush
   const payload = {};
   SYNC_KEYS.forEach(k => {
+    if (k === 'study_log') return;   // 學習日曆改走 saveStudyDayCloud 逐日寫入,永不整欄覆蓋
     try {
       const v = localStorage.getItem(k); if (v == null || v === '') return;
       payload[k] = SCALAR_SYNC_KEYS.has(k) ? v : JSON.parse(v);   // 純字串直接存,別 JSON.parse
     } catch(e) {}
   });
+  saveStudyDayCloud();   // 今天的日曆格照常上傳(dot-path,只動當天)
   if (Object.keys(payload).length) db.collection('users').doc(currentUser.uid).set(payload, { merge: true });
   // 大 key 另壓縮雙寫 user_progress(小純量 exam_date/base_level/goal_level/daily_progress 續留 users)
   if (window.ProgressCodec) {
@@ -2380,6 +2451,96 @@ function _hubToday() {
     return (d.vocab || 0) + (d.grammar || 0) + (d.quiz || 0);
   } catch (e) { return 0; }
 }
+// ══ 0 基礎引導「日語從頭學」:把站上既有功能串成一條新手路徑(KOL 建議,TalkMe 式) ══
+const Journey = (() => {
+  const L = (zh, en) => (typeof enOr === 'function' ? enOr((typeof cvt === 'function' ? cvt(zh) : zh), en) : zh);
+  // 打勾=證據制:每步讀真實學習紀錄,做完才勾(KOL 實測:打開又關掉就完成 → 太鬆)
+  const _ls = k => { try { return localStorage.getItem(k); } catch(e){ return null; } };
+  const _lsj = k => { try { return JSON.parse(localStorage.getItem(k)) || null; } catch(e){ return null; } };
+  const _slSum = f => { const sl = _lsj('study_log') || {}; let n = 0; Object.values(sl).forEach(d => { n += (d && d[f]) || 0; }); return n; };
+  const CHAPTERS = () => [
+    { t: L('第 1 章 · 五十音', 'Ch.1 · Kana'), steps: [
+      { k: 'kana',    t: L('認識五十音', 'Learn the kana'), d: L('平假名・片假名表,點字聽音,還有小測驗', 'Hiragana & katakana chart with audio and quizzes'),
+        cond: L('做完一次認讀小測驗', 'Finish one reading quiz'), chk: () => !!_ls('jr_kana'),
+        go: () => { Journey.close(); Kana.open(); } },
+    ]},
+    { t: L('第 2 章 · 開口說第一句', 'Ch.2 · First words'), steps: [
+      { k: 'essentials', t: L('必學基礎句', 'Essential phrases'), d: L('打招呼、自我介紹這些一定用得到的句子', 'Greetings and self-intro basics'),
+        cond: L('做完一次隨堂測驗', 'Finish the mini quiz'), chk: () => !!_ls('jr_essentials'),
+        go: () => { location.href = 'essentials.html'; } },
+      { k: 'phrases', t: L('生活會話', 'Everyday phrases'), d: L('用餐、交通、購物…場景分類,點了就唸', 'Real-life phrases by scene, tap to hear'),
+        cond: L('點聽 5 句會話', 'Tap-listen to 5 phrases'), chk: () => !!_ls('jr_phrases'),
+        go: () => { location.href = 'phrases.html'; } },
+    ]},
+    { t: L('第 3 章 · N5 起步', 'Ch.3 · Start N5'), steps: [
+      { k: 'vocab', t: L('今天的 20 個單字', "Today's 20 words"), d: L('每天一小批,點卡就唸,有例句', 'A small daily batch with audio and examples'),
+        cond: L('翻開 10 張單字卡', 'Open 10 word cards'), chk: () => (parseInt(_ls('jr_vb_seen')||'0',10) >= 10) || _slSum('vocab') >= 10,
+        go: () => { Journey.close(); currentLevel='n5'; localStorage.setItem('lastLevel','n5'); dailyMode=true; switchMode('vocab'); } },
+      { k: 'grammar', t: L('今天的 10 個文法', "Today's 10 grammar points"), d: L('接續、語感、例句講清楚', 'Usage, nuance and spoken examples'),
+        cond: L('展開看 5 條文法', 'Open 5 grammar points'), chk: () => (parseInt(_ls('jr_gr_seen')||'0',10) >= 5) || _slSum('grammar') >= 5,
+        go: () => { Journey.close(); currentLevel='n5'; localStorage.setItem('lastLevel','n5'); grammarDailyMode=true; switchMode('grammar'); } },
+    ]},
+    { t: L('第 4 章 · 說出來', 'Ch.4 · Say it out loud'), steps: [
+      { k: 'shadow', t: L('跟讀課程', 'Shadowing lessons'), d: L('聽一句跟著唸,唸到哪字亮到哪', 'Repeat after the audio — words light up as you speak'),
+        cond: L('通過 1 課跟讀', 'Pass 1 shadowing lesson'), chk: () => { const m = _lsj('ls_done'); return !!(m && Object.keys(m).length); },
+        go: () => { location.href = 'speak.html'; } },
+      { k: 'chat', t: L('AI 聊聊:便利商店', 'AI chat: convenience store'), d: L('跟 AI 店員來一場真實對話(N5 難度)', 'Role-play with an AI clerk at N5 level'),
+        cond: L('和 AI 對話 3 輪', 'Exchange 3 turns with the AI'), chk: () => !!_ls('jr_chat'),
+        go: () => { location.href = 'speak-chat.html'; } },
+    ]},
+    { t: L('第 5 章 · 檢驗實力', 'Ch.5 · Check yourself'), steps: [
+      { k: 'mock', t: L('N5 快速小考', 'N5 quick test'), d: L('測一下手感,看看這一路學了多少', 'A quick check-in on what you have learned'),
+        cond: L('完成 1 次小考', 'Finish one quick test'), chk: () => { const h = _lsj('mock_exam_history'); return !!(h && h.length); },
+        go: () => { Journey.close(); MockExam.start(); } },
+    ]},
+  ];
+  function stats(){ const chs=CHAPTERS(); let tot=0, done=0; chs.forEach(c=>c.steps.forEach(st=>{ tot++; try{ if(st.chk()) done++; }catch(e){} })); return { tot, done }; }
+  function open(){
+    const chs = CHAPTERS();
+    const st = stats();
+    const pct = st.tot ? Math.round(st.done/st.tot*100) : 0;
+    let mask = document.getElementById('jrMask');
+    if (!mask) { mask = document.createElement('div'); mask.id='jrMask'; mask.className='jr-mask'; document.body.appendChild(mask); }
+    let h = '<div class="jr-wrap">'
+      + '<div class="jr-top"><button class="jr-x" onclick="Journey.close()">✕ ' + L('關閉','Close') + '</button></div>'
+      + '<div class="jr-hero"><img src="images/mascot/tanuki-p08.png" alt="">'
+      + '<div style="flex:1;min-width:0"><h2>' + L('日語從頭學','Japanese from zero') + '</h2>'
+      + '<p>' + L('不知道從哪開始?跟著狸太郎一步一步走:五十音 → 開口說 → N5。每一步都是站上現成的工具,做完就打勾。','Not sure where to start? Follow Tanutaro step by step: kana → speaking → N5.') + '</p>'
+      + '<div class="jr-bar"><i style="width:' + pct + '%"></i></div>'
+      + '<div class="jr-bar-t">' + st.done + ' / ' + st.tot + ' ' + L('步完成','steps done') + (pct>=100 ? ' · ' + L('全部走完了!','All done!') : '') + '</div>'
+      + '</div></div>';
+    chs.forEach((c, ci) => {
+      const dns = c.steps.map(x => { try { return !!x.chk(); } catch(e){ return false; } });
+      const allDone = dns.every(Boolean);
+      h += '<div class="jr-ch' + (allDone?' done':'') + '"><div class="jr-ch-h"><span class="jr-ch-n">' + (allDone?'✓':(ci+1)) + '</span>' + c.t + '</div>';
+      c.steps.forEach((stp, si) => {
+        const dn = dns[si];
+        h += '<div class="jr-step' + (dn?' done':'') + '"><span class="jr-dot">' + (dn?'✓':'') + '</span>'
+          + '<span class="jr-st-tx"><b>' + stp.t + '</b><small>' + stp.d + '</small>'
+          + (dn ? '' : '<small class="jr-cond">' + L('打勾條件','To check off') + ':' + stp.cond + '</small>')
+          + '</span>'
+          + '<button class="jr-go" data-jk="' + stp.k + '">' + (dn ? L('再做一次','Again') : L('開始','Start')) + '</button></div>';
+      });
+      h += '</div>';
+    });
+    if (pct >= 100) h += '<div class="jr-done-card"><img src="images/mascot/tanuki-p06.png" alt=""><div style="font-size:17px;font-weight:800;margin:8px 0 4px">' + L('新手村畢業!','You made it!') + '</div><div style="font-size:12.5px;color:var(--tx2)">' + L('接下來就交給「今日目標」和 SRS 複習,每天回來一點點。','From here, daily goals and SRS reviews will carry you.') + '</div></div>';
+    h += '</div>';
+    mask.innerHTML = h;
+    mask.style.display = 'block';
+    mask.querySelectorAll('.jr-go').forEach(b => {
+      b.onclick = () => {
+        const k = b.dataset.jk;
+        const chs2 = CHAPTERS();
+        for (const c of chs2) { const f = c.steps.find(x=>x.k===k); if (f) { f.go(); break; } }
+      };
+    });
+    try { window.scrollTo(0,0); } catch(e){}
+  }
+  function close(){ const m=document.getElementById('jrMask'); if(m) m.style.display='none'; try{ const el=document.getElementById('hzProg'); if(el){ const st2=stats(); el.textContent = st2.done ? (st2.done+' / '+st2.tot+' '+L('步','steps')) : ''; } }catch(e){} }
+  return { open, close, stats };
+})();
+window.Journey = Journey;
+
 function _hubStreak() {
   try {
     const local = (JSON.parse(localStorage.getItem('streak_v1') || '{}').days) || 0;
@@ -2421,6 +2582,12 @@ function hubConfetti() {
   document.body.appendChild(wrap);
   setTimeout(() => wrap.remove(), 3800);
 }
+// 面板重畫防吞點:雲端同步/登入/語言就緒完成時都會 doRender→renderHub 整包 innerHTML 重建,
+// 手指剛按下的卡片被換成新 DOM → click 無聲消失(用戶回報:點第一下沒反應)。
+// 對策:①內容沒變就不動 DOM ②按壓中/剛放開時延後重畫。pointer 事件同時涵蓋觸控與滑鼠。
+let _hubTouchActive = false, _hubTouchEnd = 0, _hubRetryT = 0;
+document.addEventListener('pointerdown', () => { _hubTouchActive = true; }, { passive: true, capture: true });
+['pointerup', 'pointercancel'].forEach(ev => document.addEventListener(ev, () => { _hubTouchActive = false; _hubTouchEnd = Date.now(); }, { passive: true, capture: true }));
 function renderHub() {
   const mn = document.getElementById('mn');
   if (!mn) return;
@@ -2446,11 +2613,12 @@ function renderHub() {
     resume = '<button class="hub-resume" onclick="switchMode(\'' + lm + '\')"><span class="hr-play">▶</span><span class="hr-main">' + L('繼續上次', 'Continue') + '：' + mlabel + ' ' + ll + '</span><span class="hr-sub">' + L('回到上次進度', 'resume') + '</span></button>';
   }
   // 內容簽章:載入時 doRender 會被叫多次,資料相同就不重繪 → 只渲染一次,進場動畫不被打斷、不閃
-  const _sig = [(typeof I18n !== 'undefined' && I18n.getLang ? I18n.getLang() : ''), streak, done, wod ? wod.w : '', lm || '', ll || ''].join('|');
+  const _jrDone = (() => { try { return window.Journey ? Journey.stats().done : ''; } catch (e) { return ''; } })();
+  const _sig = [(typeof I18n !== 'undefined' && I18n.getLang ? I18n.getLang() : ''), streak, done, wod ? wod.w : '', lm || '', ll || '', _jrDone].join('|');
   if (_sig === _hubSig && mn.querySelector('.hub')) return;
   _hubSig = _sig;
   const blossom = c => '<svg class="bl ' + c + '" viewBox="0 0 40 40"><g><ellipse cx="20" cy="11" rx="4.6" ry="7.4"/><ellipse cx="20" cy="11" rx="4.6" ry="7.4" transform="rotate(72 20 20)"/><ellipse cx="20" cy="11" rx="4.6" ry="7.4" transform="rotate(144 20 20)"/><ellipse cx="20" cy="11" rx="4.6" ry="7.4" transform="rotate(216 20 20)"/><ellipse cx="20" cy="11" rx="4.6" ry="7.4" transform="rotate(288 20 20)"/></g><circle cx="20" cy="20" r="2.6" fill="#fff"/></svg>';
-  mn.innerHTML =
+  const hubHtml =
     '<div class="hub">'
     + '<aside class="hub-left">'
       + '<div class="hub-hero">'
@@ -2480,9 +2648,15 @@ function renderHub() {
     + '</aside>'
     + '<div class="hub-right">'
       + '<a class="hub-jlpt" href="jlpt-drill.html"><span class="hj-new">' + L('主打', 'TOP') + '</span><span class="hj-ic"><i data-ic=target></i></span><span><span class="hj-t">' + L('JLPT 刷題特區', 'JLPT Drills') + '</span><div class="hj-d">' + L('2,800+ 題照真題 · 完整模擬試験 · 錯題本', '2,800+ real-format questions · full mock exams') + '</div></span><span class="hj-arrow">›</span></a>'
+      + '<button class="hub-zero" onclick="Journey.open()">'
+        + '<img src="images/mascot/tanuki-p08.png" alt="">'
+        + '<span class="hz-tx"><b>' + L('0 基礎？日語從頭學', 'Zero basics? Start here') + '</b><small>' + L('五十音 → 開口說 → N5,一步一步帶你走', 'Kana → first words → N5, step by step') + '</small><span class="hz-prog" id="hzProg"></span></span>'
+        + '<span class="hj-arrow">›</span>'
+      + '</button>'
       + '<div class="hub-grid2">'
         + '<a class="hub-card" href="speak.html"><i class="hc-wm" data-ic=mic></i><span class="hc-new">NEW</span><span class="hc-ic"><i data-ic=mic></i></span><span class="hc-t">' + L('AI 跟讀', 'AI Shadowing') + '</span><span class="hc-d">' + L('跟著唸 · 即時評分', 'Repeat & get scored') + '</span></a>'
         + '<a class="hub-card" href="speak-chat.html"><i class="hc-wm" data-ic=speak></i><span class="hc-new">NEW</span><span class="hc-ic"><i data-ic=speak></i></span><span class="hc-t">' + L('AI 聊聊', 'AI Chat') + '</span><span class="hc-d">' + L('情境對話', 'Role-play chat') + '</span></a>'
+        + '<a class="hub-card" href="yt-shadow.html"><i class="hc-wm" data-ic=play></i><span class="hc-new">NEW</span><span class="hc-ic"><i data-ic=play></i></span><span class="hc-t">' + L('YouTube 跟讀', 'YouTube Shadowing') + '</span><span class="hc-d">' + L('影片跟讀 · 每天一支推薦', 'Shadow real videos · daily pick') + '</span></a>'
       + '</div>'
       + ((window.Articles && Articles.entryCardHtml) ? '<div class="hub-art">' + Articles.entryCardHtml() + '</div>' : '')
       + '<div class="hub-sec">' + L('背 · 記', 'Study') + '</div>'
@@ -2500,7 +2674,19 @@ function renderHub() {
       + '<div class="hub-foot"><img src="images/mascot/tanuki-p06.png" alt=""><span>' + L('今天也一起加油！', 'Let’s study today!') + '</span></div>'
     + '</div>'
     + '</div>';
+  const _updHzProg = () => { try { const el=document.getElementById('hzProg'); if(el && window.Journey){ const st=Journey.stats(); el.textContent = st.done ? (st.done+' / '+st.tot+' '+L('步完成','steps done')) : L('約 15 分鐘走完第一章','~15 min for chapter one'); } } catch (e) {} };
+  if (mn._hubHtml === hubHtml && mn.querySelector('.hub')) { _updHzProg(); return; }   // 內容沒變:不碰 DOM(手指下的卡片安全)
+  // 只防護「面板已在畫面上」的背景重畫;從其他頁進面板(mn 還不是 hub)要立刻畫,不延遲
+  if ((_hubTouchActive || Date.now() - _hubTouchEnd < 450) && mn.querySelector('.hub')) {
+    _hubSig = null;   // 撤銷開頭的簽名更新,否則延後的重試會被 _sig 檢查擋掉、永遠補不了畫
+    clearTimeout(_hubRetryT);
+    _hubRetryT = setTimeout(() => { if (typeof inHub === 'undefined' || inHub) renderHub(); }, 480);   // 重試前確認還在面板,別蓋掉學習頁
+    return;
+  }
+  mn._hubHtml = hubHtml;
+  mn.innerHTML = hubHtml;
   try { if (window.Icons && Icons.hydrate) Icons.hydrate(); } catch (e) {}
+  _updHzProg();
   const hubEl = mn.querySelector('.hub');
   if (firstHub) {
     if (hubEl) hubEl.classList.add('hub-anim');   // 進場動畫只播第一次
@@ -2791,7 +2977,7 @@ const Shadow = (() => {
     mask.id = 'shadowMask';
     mask.className = 'cc-mask shadow-mask';
     mask.innerHTML = `<div class="shadow-box">
-      <button class="shadow-close" data-act="exit" title="退出 (Esc)" aria-label="關閉"></button>
+      <button class="shadow-close" data-act="exit" title="退出 (Esc)" aria-label="關閉">✕</button>
       <button class="shadow-fav" id="shadowFav" data-act="fav" title="收藏這句（F）" aria-label="收藏"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></button>
       <div class="shadow-progress"><span id="shadowIdx">1</span> / <span id="shadowTotal">${queue.length}</span></div>
       <div class="shadow-status" id="shadowStatus"><i data-ic=volume></i> 播放中</div>
@@ -2799,7 +2985,7 @@ const Shadow = (() => {
       <div class="shadow-z" id="shadowZ"></div>
       <div class="shadow-controls">
         <button class="shadow-btn" data-act="prev" title="上一句 (←)">◀</button>
-        <button class="shadow-btn" data-act="replay" title="重播 (R)"></button>
+        <button class="shadow-btn" data-act="replay" title="重播 (R)">↻</button>
         <button class="shadow-btn shadow-btn-main" data-act="toggle" title="暫停/繼續 (Space)"></button>
         <button class="shadow-btn" data-act="next" title="下一句 (→)">▶</button>
       </div>
@@ -2819,7 +3005,7 @@ const Shadow = (() => {
         <label title="念完自己按 ▶ 才換句,不會念到一半被切走"><input type="checkbox" id="shadowManual"> 手動換句</label>
         <label title="錄下自己念的,和原音對比(只存本機,不上傳)"><input type="checkbox" id="shadowRec"> 錄音對比</label>
       </div>
-      <div class="shadow-hint">Space 暫停 · ← → 切換 · R 重播 · Esc 退出</div>
+      <div class="shadow-hint kb-only">Space 暫停 · ← → 切換 · R 重播 · Esc 退出</div>
     </div>`;
     document.body.appendChild(mask);
     // 發音檢查:只在「App 且有原生語音辨識(canSpeech)」時才顯示。
@@ -3008,9 +3194,9 @@ const Shadow = (() => {
 
   function setStatus(s) {
     const el = document.getElementById('shadowStatus');
-    if (el) el.textContent = s;
+    if (el) el.innerHTML = s;   // 僅站內固定字串(含 <i data-ic>);textContent 會印出字面標籤
     const toggleBtn = document.querySelector('#shadowMask [data-act="toggle"]');
-    if (toggleBtn) toggleBtn.textContent = paused ? '▶' : '';
+    if (toggleBtn) toggleBtn.textContent = paused ? '▶' : '❚❚';   // 播放中顯示暫停符號(de-emoji 時被清成空白,橘鈕看起來壞掉)
   }
 
   function clearTimer() {
@@ -3650,8 +3836,18 @@ const Streak = (() => {
       const cloud = (doc.exists && doc.data().streak) || null;
       if (!cloud) { syncUp(load()); return; }
       const local = load();
-      const winner = (cloud.last || '') > (local.last || '') ? cloud : (cloud.days || 0) > (local.days || 0) ? cloud : local;
+      // 合併:兩邊 last 相差 ≤1 天 → 同一條連續紀錄,天數取大、日期取新;
+      // 差超過 1 天 → 舊的那條已斷,直接採用較新的紀錄(避免復活早斷掉的連勝)。
+      const lC = cloud.last || '', lL = local.last || '';
+      let winner;
+      if (!lC || !lL || Math.abs(diffDays(lC, lL)) <= 1) {
+        winner = { days: Math.max(cloud.days || 0, local.days || 0), last: lC > lL ? lC : lL,
+                   longest: Math.max(cloud.longest || 0, local.longest || 0) };
+      } else {
+        winner = lC > lL ? cloud : local;
+      }
       save(winner);
+      syncUp(winner);   // 一律回推:讓另一台裝置下次登入拿得到(原本手機的天數永遠上不了雲端)
       render();
     } catch (e) { /* offline — local wins */ }
   }
@@ -3688,6 +3884,7 @@ const Streak = (() => {
     const wrap = document.createElement('div');
     wrap.id = 'heatModal'; wrap.className = 'hm-backdrop';
     wrap.innerHTML = `<div class="hm-card" role="dialog" aria-modal="true">
+      <button onclick="document.getElementById('heatModal').remove()" aria-label="關閉" style="position:absolute;top:10px;right:10px;width:34px;height:34px;border:none;background:transparent;color:var(--tx2);font-size:17px;cursor:pointer;border-radius:50%">✕</button>
       <div class="hm-title"><i data-ic=fire></i> ${enOr(cvt('學習熱力圖'),'Study heatmap')}</div>
       <div class="hm-stats">
         <div><b>${effectiveDays()}</b><span>${enOr(cvt('連續天數'),'Streak')}</span></div>
@@ -3978,7 +4175,7 @@ function dailyHelp() {
   ];
   const m = document.createElement('div');
   m.id = 'onbMask'; m.className = 'onb-mask';
-  m.innerHTML = '<div class="onb-card" role="dialog" aria-modal="true">'
+  m.innerHTML = '<div class="onb-card" role="dialog" aria-modal="true" style="position:relative"><button onclick="_onbRemove()" aria-label="關閉" style="position:absolute;top:10px;right:10px;width:34px;height:34px;border:none;background:transparent;color:var(--tx2);font-size:17px;cursor:pointer">✕</button>'
     + '<div class="onb-title">' + enOr(cvt('每日進度怎麼算？'), 'How daily progress works') + '</div>'
     + '<div class="onb-sub" style="text-align:left;line-height:1.85">' + rows.join('<br>') + '</div>'
     + '<button class="onb-start" onclick="_onbRemove()">' + enOr(cvt('知道了'), 'Got it') + '</button>'
@@ -4519,7 +4716,7 @@ function render() {
     const items = groups[cat.name];
     if (!items||!items.length) return;
     vc += items.length;
-    h += `<section class="cs" id="cat-${cat.name}"><h2><span class="ci2">${cat.icon}</span>${catLabel(cat.name)}<span style="font-size:12px;color:#999;font-weight:400;margin-left:auto">${t('cat_count_grammar', { n: items.length })}</span></h2>`;
+    h += `<section class="cs" id="cat-${cat.name}"><h2><span class="ci2">${cat.icon}</span>${catLabel(cat.name)}<span style="font-size:12px;color:#999;font-weight:400;margin-left:auto">${t('cat_count_grammar', { n: items.length })}</span>${items.length>=4?`<button class="unit-quiz-btn" onclick="GrammarDrill.startUnit(this.dataset.cat)" data-cat="${cat.name}"><i data-ic=edit></i> ${enOr(cvt('單元測驗'),'Unit quiz')}</button>`:''}</h2>`;
     items.forEach((d,i) => {
       const isFav = favList.includes(d.id);
       const idx = data.indexOf(d) + 1;
@@ -4579,7 +4776,9 @@ function render() {
   sd.innerHTML = sh;
 }
 
-function toggleCard(h,e){if(e&&e.target&&e.target.closest&&e.target.closest('.star'))return;h.parentElement.classList.toggle('o')}
+function toggleCard(h,e){if(e&&e.target&&e.target.closest&&e.target.closest('.star'))return;const opened=h.parentElement.classList.toggle('o');
+  // Journey 證據:真的翻開卡片才計數(打開頁面不算)
+  if(opened){try{const key=(typeof mode!=='undefined'&&mode==='grammar')?'jr_gr_seen':'jr_vb_seen';const n=parseInt(localStorage.getItem(key)||'0',10)+1;if(n<=99)localStorage.setItem(key,String(n));}catch(e2){}}}
 function toggleCat(t){t.classList.toggle('c');t.nextElementSibling.classList.toggle('c')}
 function toggleSd(){
   var open = document.getElementById('sd').classList.toggle('open');

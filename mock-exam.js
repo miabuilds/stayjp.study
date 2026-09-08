@@ -566,6 +566,34 @@ const MockExam = (() => {
     updateTimer();
   }
 
+  // 詳解生成:單字題→讀音/意思/例句;文法題→接續/語感/例句;讀解題→回到原文找依據。
+  // 資料(vocab 的 ex、grammar 的 p/ex/eg)本來就在,組起來就是完整解說,不需另外寫題庫。
+  function buildExplain(q) {
+    const E = s => escapeHTML(String(s == null ? '' : s));
+    const eo = (zh, en) => (typeof enOr === 'function' ? enOr(zh, en) : zh);
+    const w = q.word, g = q.grammar;
+    let h = '';
+    if (w) {
+      h += '<b>' + E(w.w) + '</b>';
+      if (w.r && w.r !== w.w) h += '（' + E(w.r) + '）';
+      if (w.m) h += ' ' + E(typeof cvt === 'function' ? cvt(w.m) : w.m);
+      if (w.c) h += ' <span style="color:var(--tx2)">[' + E(w.c) + ']</span>';
+      const ex = w.ex || (Array.isArray(w.e) ? w.e[0] : null);
+      if (ex && ex.j) h += '<br>' + eo('例:', 'e.g. ') + E(ex.j) + (ex.z ? '　' + E(typeof cvt === 'function' ? cvt(ex.z) : ex.z) : '');
+      return h;
+    }
+    if (g) {
+      h += '<b>' + E(g.t) + '</b>';
+      if (g.p) h += '<br>' + eo('接續:', 'Form: ') + E(g.p);
+      if (g.ex) h += '<br>' + E(typeof cvt === 'function' ? cvt(g.ex) : g.ex);
+      const eg = Array.isArray(g.eg) ? g.eg[0] : null;
+      if (eg && eg.j) h += '<br>' + eo('例:', 'e.g. ') + E(String(eg.j).replace(/<[^>]+>/g, '')) + (eg.z ? '　' + E(typeof cvt === 'function' ? cvt(eg.z) : eg.z) : '');
+      return h;
+    }
+    if (q.type === 7) return eo('讀解題:答案的線索就在短文裡,回頭找出對應那句再比對選項。', 'Reading: the clue is in the passage — find the matching line and compare the options.');
+    return '';
+  }
+
   function escapeHTML(s) {
     return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   }
@@ -599,12 +627,17 @@ const MockExam = (() => {
       if (i === idx && !correct) b.classList.add('qwrong');
     });
 
+    // 詳解:單字題用「讀音+意思+例句」,文法題用「接續+語感+例句」——資料本來就有,組起來就是解說
+    // (放在計分後、供錯題回顧與逐題檢討共用)
+    // eslint-disable-next-line no-inner-declarations
+    // (函式宣告在模組底部)
+
     // SRS record for vocab questions
     if (q.word && typeof SRS !== 'undefined' && SRS.record) {
       SRS.record(examLevel, q.word.w, correct);
     }
 
-    // 本場錯題明細(結果頁回顧)
+    // 本場錯題明細(結果頁回顧;附詳解——用戶回饋:考完要知道為什麼)
     if (!correct) {
       wrongThisExam.push({
         typeName: q.typeName,
@@ -612,6 +645,7 @@ const MockExam = (() => {
         display: (q.display || '').replace(/<[^>]+>/g, '').trim(),
         options: (q.options || []).map(o => String(o).replace(/<[^>]+>/g, '').trim()),
         correctIdx: q.correctIdx, userIdx: idx,
+        explain: buildExplain(q),
       });
     }
     // 答錯：單字題進生詞本，其他題（文法/讀解）進錯題回顧
@@ -802,6 +836,7 @@ const MockExam = (() => {
     html += '</div>';
 
     // 本場錯題回顧(用戶回饋:考完不知道錯在哪)
+    // ※ 詳解由 buildExplain() 生成,見檔案下方
     if (wrongThisExam.length) {
       const eo = (zh, en) => (typeof enOr === 'function' ? enOr(zh, en) : zh);
       html += '<details style="margin-bottom:14px;border:1px solid var(--bd);border-radius:8px;padding:10px 14px">' +
@@ -813,6 +848,7 @@ const MockExam = (() => {
           (w.display ? '<div style="color:var(--tx);margin:2px 0;line-height:1.6">' + escapeHTML(w.display) + '</div>' : '') +
           '<div style="color:var(--wrong-tx)">✗ ' + eo('你的答案:', 'Your answer: ') + escapeHTML(w.options[w.userIdx] || '-') + '</div>' +
           '<div style="color:var(--correct-tx)">✓ ' + eo('正解:', 'Correct: ') + escapeHTML(w.options[w.correctIdx] || '-') + '</div>' +
+          (w.explain ? '<div style="margin-top:6px;padding:8px 10px;background:var(--bg3);border-radius:8px;font-size:12.5px;line-height:1.75;color:var(--tx)">' + w.explain + '</div>' : '') +
         '</div>';
       });
       html += '<div style="border-top:1px solid var(--bd);padding-top:8px;font-size:11.5px;color:var(--tx2)">' + eo('錯的單字已自動加入生詞本;文法/讀解錯題收在「我的 → 學習統計 → 錯題回顧」。', 'Missed words go to your notebook; grammar/reading mistakes are saved under Me → Stats → Wrong answers.') + '</div>' +

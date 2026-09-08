@@ -41,10 +41,18 @@
   .scene .ti small{display:block;font-family:-apple-system,sans-serif;font-weight:400;font-size:12px;color:var(--tx2)}
   .row{display:flex;margin:9px 0;gap:8px;align-items:flex-end}
   .row.me{flex-direction:row-reverse}
-  .who{font-size:20px;flex-shrink:0;width:30px;text-align:center;line-height:1.9}
+  .ic-img{width:44px;height:44px;border-radius:50%;flex-shrink:0}
+.ic-line{background:var(--soft,rgba(198,85,59,.1));color:var(--ac);font-size:20px}
   .bubble{max-width:80%;padding:10px 14px;border-radius:18px;position:relative;transition:transform .12s ease}
   .bubble[data-j]{cursor:pointer}
   .bubble:active{transform:scale(.97)}
+  .shx{display:flex;align-items:center;gap:8px;margin-top:7px}
+  .shx-mic{display:inline-flex;align-items:center;gap:5px;border:1px solid var(--bd,#e5e0d8);background:var(--bg2,#fff);color:var(--tx2,#777);border-radius:99px;padding:4px 11px;font:inherit;font-size:12px;font-weight:700;cursor:pointer}
+  .shx-mic.on{background:#b3402a;border-color:#b3402a;color:#fff;animation:shxp 1.2s infinite}
+  @keyframes shxp{50%{opacity:.75}}
+  .shx-sc{font-size:12px;font-weight:800}
+  .shx-sc[data-done="1"]{color:#2E7D57}
+  .jp .hit{color:#2E7D57;font-weight:700}
   .row.you .bubble{background:var(--you);border-bottom-left-radius:6px}
   .row.me .bubble{background:var(--me);border-bottom-right-radius:6px}
   .bubble .jp{font-size:17px;font-weight:600;color:var(--tx);display:flex;align-items:center;gap:7px}
@@ -63,7 +71,7 @@
 <body data-lang="zh">
 <div class="wrap">
   <header>
-    <a href="app.html" class="backbtn" onclick="try{if(history.length>1){history.back();return false}}catch(e){}" aria-label="返回 / Back" style="font-weight:600;margin-right:4px">‹ <span data-t="zh">返回</span><span data-t="en">Back</span></a>
+    <a href="app.html" class="backbtn" onclick="try{if(history.length>1){history.back();return false}}catch(e){}" aria-label="返回 / Back" style="margin-right:4px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg> <span data-t="zh">返回</span><span data-t="en">Back</span></a>
     <span class="logo" data-t="zh">日本再留計劃</span><span class="logo" data-t="en">StayJP</span>
     <span class="sp"></span>
     <a href="about.html" data-t="zh">關於</a><a href="about.html" data-t="en">About</a>
@@ -71,10 +79,10 @@
   </header>
 
   <div class="hero">
-    <div class="big">🗣️</div>
+    <img src="images/mascot/tanuki-p05.png" alt="" style="width:96px;height:auto;margin:0 auto 6px;display:block">
     <h1><span data-t="zh">去日本,這幾句先學起來</span><span data-t="en">Real phrases you'll actually use in Japan</span></h1>
     <p><span data-t="zh">便利商店、餐廳、問路…真的會用到的自然口語。</span><span data-t="en">Convenience stores, restaurants, directions — natural everyday Japanese.</span></p>
-    <div class="hint">👆 <span data-t="zh">點任何一句日文,就會唸給你聽</span><span data-t="en">Tap any Japanese line to hear it</span></div>
+    <div class="hint"><i data-ic=volume></i> <span data-t="zh">點任何一句日文,就會唸給你聽</span><span data-t="en">Tap any Japanese line to hear it</span></div>
   </div>
 
   <div class="cattabs" id="cattabs"></div>
@@ -316,29 +324,41 @@ const SCENES = [
 const esc = s => String(s||'').replace(/[<>&"]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));
 const SPK = '<svg class="spk" viewBox="0 0 24 24"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.54 8.46a5 5 0 010 7.07M19.07 4.93a10 10 0 010 14.14"/></svg>';
 let activeCat = CATS[0].k;
+// 場景 → 聊聊的場景徽章圖(名稱關鍵字比對;對不上的退分類線條 icon)
+const SCENE_IMG = [['便利','conbini'],['餐廳','resto'],['點餐','resto'],['拉麵','resto'],['居酒屋','izakaya'],['咖啡','coworker'],['車站','station'],['電車','station'],['問路','station'],['計程','station'],['公車','station'],['新幹線','station'],['購物','shop'],['衣','shop'],['試穿','shop'],['藥','clinic'],['醫','clinic'],['診','clinic'],['身體','clinic'],['旅館','house'],['飯店','house'],['住宿','house'],['入住','house'],['溫泉','house'],['市役所','cityhall'],['手續','cityhall'],['銀行','cityhall'],['ATM','cityhall'],['手機','phone'],['門號','phone'],['郵','delivery'],['宅配','delivery'],['寒暄','smalltalk'],['自我介紹','smalltalk'],['鄰居','smalltalk'],['打招呼','smalltalk']];
+function sceneImgFor(zh){ for(const [k,v] of SCENE_IMG){ if(zh.includes(k)) return v; } return null; }
 function sceneHtml(s){
+  const img = sceneImgFor(s.zh);
+  const icHtml = img
+    ? `<img class="ic-img" src="images/scenes/${img}.png" alt="">`
+    : `<div class="ic ic-line">${'<i data-ic='+(CAT_IC[s.cat]||'sparkle')+'></i>'}</div>`;
   return `
     <div class="scene">
       <div class="head">
-        <div class="ic" style="background:${s.bg};color:#fff">${s.ic}</div>
+        ${icHtml}
         <div class="ti"><span data-t="zh">${s.zh}</span><span data-t="en">${s.en}</span><small>${esc(s.en)} · ${esc(s.zh)}</small></div>
       </div>
       ${s.lines.map(l => `
         <div class="row ${l.side}">
-          <div class="who">${l.w}</div>
           <div class="bubble"${(window.__TTS&&window.__TTS[l.jp])?` data-j="${esc(l.jp)}" onclick="speakLine(this)" title="點我發音 / tap to hear"`:''}>
-            <div class="jp">${esc(l.jp)}${(window.__TTS&&window.__TTS[l.jp])?SPK:''}</div>
+            <div class="jp" data-raw="${esc(l.jp)}">${esc(l.jp)}${(window.__TTS&&window.__TTS[l.jp])?SPK:''}</div>
             <div class="rm">${esc(l.rm)}</div>
             <div class="tr"><span data-t="zh">${esc(l.zh)}</span><span data-t="en">${esc(l.en)}</span></div>
+            <div class="shx">
+              <button class="shx-mic" onclick="PShadow.toggle(event,this)"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/></svg><span data-t="zh">跟讀</span><span data-t="en">Say it</span></button>
+              <span class="shx-sc" data-done="${PShadow.isDone(l.jp)?'1':''}">${PShadow.isDone(l.jp)?'✓':''}</span>
+            </div>
           </div>
         </div>`).join('')}
-      ${s.tipZh ? `<div class="tip"><span data-t="zh">💡 ${esc(s.tipZh)}</span><span data-t="en">💡 ${esc(s.tipEn)}</span></div>` : ''}
+      ${s.tipZh ? `<div class="tip"><i data-ic=bulb></i> <span data-t="zh">${esc(s.tipZh)}</span><span data-t="en">${esc(s.tipEn)}</span></div>` : ''}
     </div>`;
 }
+const CAT_IC = { food:'store', trans:'train', shop:'bag', hotel:'home', life:'clipboard', help:'hospital', social:'speak' };
 function renderTabs(){
   document.getElementById('cattabs').innerHTML = CATS.map(c =>
-    `<button class="cattab ${c.k===activeCat?'on':''}" onclick="pickCat('${c.k}')"><span data-t="zh">${c.ic} ${c.zh}</span><span data-t="en">${c.ic} ${c.en}</span></button>`
+    `<button class="cattab ${c.k===activeCat?'on':''}" onclick="pickCat('${c.k}')"><i data-ic=${CAT_IC[c.k]||'sparkle'}></i> <span data-t="zh">${c.zh}</span><span data-t="en">${c.en}</span></button>`
   ).join('');
+  try{ if(window.Icons&&Icons.hydrate)Icons.hydrate(); }catch(e){}
 }
 function renderScenes(){
   document.getElementById('scenes').innerHTML = SCENES.filter(s => s.cat === activeCat).map(sceneHtml).join('');
@@ -352,7 +372,71 @@ function pickCat(k){
 function render(){ renderTabs(); renderScenes(); }
 // 發音:優先 VOICEVOX(__TTS 有的話),否則瀏覽器 TTS。與主站一致。
 let _audio = null;
+const PShadow = (() => {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const NATIVE = !!(window.STAYJP_NATIVE && window.STAYJP_NATIVE.canSpeech && window.ReactNativeWebView);
+  const nPost = o => { try{ window.ReactNativeWebView.postMessage(JSON.stringify(o)); }catch(e){} };
+  const norm = t => (t||'').replace(/[\s、。,．.!！?？「」『』()（）・〜~♪…–—-]/g,'');
+  let rec=null, on=false, acc='', btn=null, jpEl=null, target='', prevRawN='', nBase='';
+  const doneMap = () => { try{ return JSON.parse(localStorage.getItem('ph_shadow_done'))||{}; }catch(e){ return {}; } };
+  const isDone = jp => !!doneMap()[jp];
+  function match(t,said){
+    const T=norm(t), S=norm(said);
+    const hits=new Array(T.length).fill(false); let p=0;
+    for(let i=0;i<T.length;i++){ const x=S.indexOf(T[i],p); if(x>=0){hits[i]=true;p=x+1;} }
+    return { hits, ratio: T.length? hits.filter(Boolean).length/T.length : 0 };
+  }
+  function paint(hits){
+    if(!jpEl) return;
+    let h='', k=0;
+    for(const ch of target){ if(norm(ch)===''){h+=ch;continue;} h += hits[k]?'<span class="hit">'+ch+'</span>':ch; k++; }
+    // 保留喇叭 icon
+    jpEl.innerHTML = h + (jpEl.querySelector('.spk')? '' : '');
+  }
+  function feed(text,fin){
+    const m=match(target,text);
+    paint(m.hits);
+    if(m.ratio>=0.99){ stop(true); return; }
+    if(fin) settle(m.ratio);
+  }
+  function settle(ratio){
+    const sc=btn && btn.parentElement.querySelector('.shx-sc');
+    const pct=Math.round(ratio*100), pass=ratio>=0.7;
+    if(sc){ sc.textContent=pct+'%'+(pass?' ✓':''); sc.style.color=pass?'#2E7D57':'var(--ac,#c6553b)'; }
+    if(pass){ try{ const m=doneMap(); m[target]=1; localStorage.setItem('ph_shadow_done',JSON.stringify(m)); }catch(e){} }
+  }
+  function start(b){
+    btn=b; const bub=b.closest('.bubble'); jpEl=bub.querySelector('.jp'); target=jpEl.getAttribute('data-raw')||jpEl.textContent;
+    acc=''; prevRawN=''; nBase='';
+    try{ if(window.speechSynthesis) speechSynthesis.cancel(); }catch(e){}
+    if(typeof _audio!=='undefined' && _audio){ try{_audio.pause();}catch(e){} }
+    if(NATIVE){
+      window.stayjpSpeechResult=(t,fin)=>{ if(!t)return; let nt=t.trim(); if(prevRawN&&nt.startsWith(prevRawN))nt=nt.slice(prevRawN.length).trim(); const merged=nBase+nt; if(fin){acc=merged;prevRawN=t.trim();} feed(merged,false); };
+      window.stayjpSpeechEnd=()=>{ on=false; ui(false); };
+      on=true; ui(true); nPost({type:'SPEECH_START',lang:'ja-JP'});
+      return;
+    }
+    if(!SR){ alert('這個瀏覽器不支援語音辨識'); return; }
+    rec=new SR(); rec.lang='ja-JP'; rec.interimResults=true; rec.continuous=true;
+    rec.onresult=e=>{ let it=''; for(let k=e.resultIndex;k<e.results.length;k++){ const t=e.results[k][0].transcript; if(e.results[k].isFinal) acc+=t; else it+=t; } feed(acc+it,false); };
+    rec.onerror=e=>{ if(e.error==='no-speech'||e.error==='aborted')return; stop(false); };
+    rec.onend=()=>{ if(on){ try{rec.start();return;}catch(e){} } on=false; ui(false); };
+    try{ rec.start(); on=true; ui(true); }catch(e){}
+  }
+  function stop(settleIt){
+    const was=on; on=false;
+    if(NATIVE&&was) nPost({type:'SPEECH_STOP'});
+    else if(rec&&was){ try{rec.stop();}catch(e){} }
+    ui(false);
+    if(settleIt&&was) settle(match(target,acc||'').ratio>=0? match(target,acc||'').ratio : 0);
+  }
+  function ui(rec_on){ if(btn) btn.classList.toggle('on',rec_on); }
+  function toggle(ev,b){ ev.stopPropagation(); on ? stop(true) : start(b); }
+  return { toggle, isDone };
+})();
 function speakLine(el){
+  // Journey 證據:點聽滿 5 句
+  try{const n=parseInt(localStorage.getItem('jr_ph_taps')||'0',10)+1;localStorage.setItem('jr_ph_taps',String(n));if(n>=5)localStorage.setItem('jr_phrases','1');}catch(e){}
   const t = el.getAttribute('data-j'); if(!t) return;
   try{ if(window.speechSynthesis) speechSynthesis.cancel(); }catch(e){}
   if(_audio){ try{_audio.pause();}catch(e){} _audio=null; }

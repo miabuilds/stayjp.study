@@ -34,7 +34,7 @@ const Stats = (() => {
     document.querySelectorAll('.ftb-btn').forEach(b => b.classList.remove('on'));
     const btns = document.querySelectorAll('.ftb-btn');
     if (btns[3]) btns[3].classList.add('on'); // 「我的」 is index 3
-    mn.innerHTML = '<div style="padding:16px;max-width:880px;margin:0 auto">' + buildHTML(false) + '</div>';
+    mn.innerHTML = '<div style="padding:10px 10px 24px;max-width:880px;margin:0 auto">' + buildHTML(false) + '</div>';
     document.getElementById('quizBg').classList.remove('show');
     // 回頂部:從捲到下面的「學習」頁切過來時,舊 scrollY 會被夾到這頁的底 → 看起來像「跳到頁尾」
     try { window.scrollTo(0, 0); } catch (e) {}
@@ -92,7 +92,7 @@ const Stats = (() => {
       ${avatar}
       <div style="flex:1;min-width:0">
         <div class="pf-name"><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${(name||'').replace(/</g,'&lt;')}</span>${badges}</div>
-        ${email ? `<div class="pf-sub">${email.replace(/</g,'&lt;')}</div>` : `<div class="pf-sub">${_e('和狸貓一起,今天也前進一點','One step forward with the tanuki today')}</div>`}
+        ${email ? `<div class="pf-sub">${email.replace(/</g,'&lt;')}</div>` : `<div class="pf-sub">${_e('和狸太郎一起,今天也前進一點','One step forward with Tanutaro today')}</div>`}
         <div class="pf-stats">
           <div><b><i data-ic=fire></i> ${days}</b><span>${_e('連續天數','Streak')}</span></div>
           <div><b>${daysLearned}</b><span>${_e('學習天數','Days studied')}</span></div>
@@ -232,9 +232,14 @@ const Stats = (() => {
   function buildHistory() {
     const hist = getHistory();
     if (!hist.length) return `<div class="st-section"><div class="st-title">${t('tab_history')}</div><div class="st-empty">${t('history_empty')}</div></div>`;
-    let h = `<div class="st-section"><div class="st-title">${t('history_title')}</div>`;
-    h += '<div style="max-height:400px;overflow-y:auto">';
-    const recent = hist.slice(-50).reverse();
+    // 精簡(用戶回饋:紀錄一大串沒意義):只列最近 8 筆,上方一行彙總(總次數/平均/最佳)
+    const pctsAll = hist.map(x => Math.round(x.score / x.total * 100));
+    const avgAll = Math.round(pctsAll.reduce((a,b)=>a+b,0) / pctsAll.length);
+    const bestAll = Math.max(...pctsAll);
+    let h = `<div class="st-section"><div class="st-title">${t('history_title').replace(/\s*[（(].*[）)]\s*/,'')}</div>`;
+    h += `<div style="font-size:12.5px;color:var(--tx2);margin-bottom:8px">${_en2('共 '+hist.length+' 次 · 平均 '+avgAll+'% · 最佳 '+bestAll+'%','Total '+hist.length+' · avg '+avgAll+'% · best '+bestAll+'%')} <span style="color:var(--tx3)">${_en2('(只顯示最近 8 筆)','(latest 8 shown)')}</span></div>`;
+    h += '<div>';
+    const recent = hist.slice(-8).reverse();
     recent.forEach((r, i) => {
       const pct = Math.round(r.score / r.total * 100);
       const color = pct >= 80 ? 'var(--correct,#16a34a)' : pct >= 60 ? 'var(--ok-tx,#ca8a04)' : 'var(--wrong,#dc2626)';
@@ -243,8 +248,8 @@ const Stats = (() => {
       const hasW = r.wrong && r.wrong.length;
       h += '<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--bd);font-size:13px'+(hasW?';cursor:pointer':'')+'"'+(hasW?' onclick="Stats._toggleQh('+i+')"':'')+'>';
       h += '<span style="min-width:35px;font-weight:700;color:'+color+'">'+pct+'%</span>';
-      h += '<span style="min-width:28px;font-size:11px;color:var(--ac2);font-weight:600">'+r.level.toUpperCase()+'</span>';
-      h += '<span style="flex:1;color:var(--tx2);font-size:12px">'+(typeMap[r.type]||r.type)+'</span>';
+      h += '<span style="min-width:28px;font-size:11px;color:var(--ac2);font-weight:600">'+String(r.level||'').toUpperCase()+'</span>';
+      h += '<span style="flex:1;color:var(--tx2);font-size:12px">'+(typeMap[r.type]||r.type||'')+'</span>';
       h += '<span style="font-size:11px;color:var(--tx3)">'+r.score+'/'+r.total+'</span>';
       h += '<span style="font-size:10px;color:var(--tx3)">'+date+'</span>';
       if (hasW) h += '<span style="font-size:11px;color:var(--ac)">▾'+_en2('看錯題','review')+'</span>';
@@ -370,8 +375,17 @@ const Stats = (() => {
   }
 
   // ── 測驗成績走勢 ──
+  // 綜合成績:單字測驗 + JLPT 刷題 + 快速小考 三源合併(用戶回饋:舊圖只吃單字測驗,新功能沒進來)
+  function getAllScores() {
+    const out = [];
+    try { (getHistory()||[]).forEach(x => { if (x.total) out.push({ date: x.date, score: x.score, total: x.total, kind: _en2('單字測驗','Vocab quiz') }); }); } catch(e){}
+    try { (JSON.parse(localStorage.getItem('jd_hist'))||[]).forEach(x => { if (x.tot) out.push({ date: x.d, score: x.s, total: x.tot, kind: _en2('JLPT 刷題','Drills') + (x.lv ? ' '+String(x.lv).toUpperCase() : '') }); }); } catch(e){}
+    try { (JSON.parse(localStorage.getItem('mock_exam_history'))||[]).forEach(x => { if (x.totalQuestions) out.push({ date: x.date, score: x.totalScore, total: x.totalQuestions, kind: _en2('快速小考','Quick test') + (x.level ? ' '+String(x.level).toUpperCase() : '') }); }); } catch(e){}
+    out.sort((a,b) => new Date(a.date||0) - new Date(b.date||0));
+    return out;
+  }
   function buildScoreChart() {
-    const hist = getHistory();
+    const hist = getAllScores();
     if (!hist.length) return `<div class="st-section"><div class="st-title">${t('score_title')}</div><div class="st-empty">${t('score_empty')}</div></div>`;
 
     const last20 = hist.slice(-20);
@@ -404,7 +418,7 @@ const Stats = (() => {
     const dotsHtml = pts.map(o => {
       const color = o.p >= 80 ? '#16a34a' : o.p >= 60 ? '#ca8a04' : '#dc2626';
       const date = new Date(o.item.date).toLocaleDateString('zh-TW', {month:'numeric',day:'numeric'});
-      return `<div style="position:absolute;left:${o.x}%;top:${o.y}%;width:8px;height:8px;margin:-4px 0 0 -4px;border-radius:50%;background:#fff;border:1.5px solid ${color};box-sizing:border-box" title="${date} ${o.item.level.toUpperCase()} ${o.p}%"></div>`;
+      return `<div style="position:absolute;left:${o.x}%;top:${o.y}%;width:8px;height:8px;margin:-4px 0 0 -4px;border-radius:50%;background:#fff;border:1.5px solid ${color};box-sizing:border-box" title="${date} ${o.item.kind||''} ${o.p}%"></div>`;
     }).join('');
     const bars = `
       <div style="position:relative;height:130px;margin:8px 0 4px;padding-right:36px">

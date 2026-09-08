@@ -652,23 +652,36 @@ function showConsentDialog(plan) {
   });
 }
 
-// 🔧 綠界刷卡維護期間的 kill-switch(PayPal 已下架,維護期=全面暫停新訂閱)。修好改回 false 即可還原。
+// 🔧 綠界刷卡 kill-switch(2026-09-06 開啟:金流帳戶更換審核中,網頁暫停收款、全數導 App)。
+// 綠界驗證通過後改回 false 即還原網頁刷卡。App 內(WebView)不受影響:本頁在 native 模式整頁換原生 paywall。
 const ECPAY_DOWN = false;
 if (ECPAY_DOWN) document.addEventListener('DOMContentLoaded', () => {
+  if (window.STAYJP_NATIVE && window.STAYJP_NATIVE.isNativeApp) return;   // App 內走原生 IAP,不動
+  const IOS_URL = 'https://apps.apple.com/app/id6778227353';
+  const AND_URL = 'https://play.google.com/store/apps/details?id=com.stayjp.app';
+  const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent) || (/Macintosh/.test(navigator.userAgent) && 'ontouchend' in document);
+  const isAndroid = /Android/i.test(navigator.userAgent);
+  const storeUrl = isIOS ? IOS_URL : (isAndroid ? AND_URL : '');
   const anchor = document.querySelector('.main .lead') || document.querySelector('.plans');
   if (anchor && !document.getElementById('ecpayDownBanner')) {
     const b = document.createElement('div');
     b.id = 'ecpayDownBanner'; b.className = 'box';
-    b.style.cssText = 'max-width:560px;margin:18px auto 14px;border-color:var(--ac);text-align:center;font-size:14px';
-    b.innerHTML = '<i data-ic=tools></i> 線上刷卡維護中,暫停新訂閱——手機用戶可改用 App 內購買,不便之處請見諒。';
+    b.style.cssText = 'max-width:560px;margin:18px auto 14px;border:2px solid var(--ac);text-align:center;font-size:14px;line-height:1.8;color:var(--tx2)';
+    b.innerHTML = '<div style="font-weight:700;color:var(--tx);font-size:15px"><i data-ic=tools></i> 網頁刷卡暫停服務中</div>'
+      + '<div style="margin-top:4px">金流帳戶更換作業中,網頁暫時無法刷卡。請改用手機 App 訂閱——功能、價格完全相同,同一帳號登入即通用。</div>'
+      + '<div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:12px">'
+      + '<a href="' + IOS_URL + '" target="_blank" rel="noopener" style="background:#000;color:#fff;padding:10px 22px;border-radius:10px;font-weight:600;font-size:14px;text-decoration:none">iOS App 訂閱</a>'
+      + '<a href="' + AND_URL + '" target="_blank" rel="noopener" style="background:#000;color:#fff;padding:10px 22px;border-radius:10px;font-weight:600;font-size:14px;text-decoration:none">Android App 訂閱</a></div>';
     anchor.insertAdjacentElement('afterend', b);
   }
   document.querySelectorAll('.plan .plan-cta').forEach(cta => {
-    cta.textContent = '暫不開放';
+    cta.textContent = '用 App 訂閱 →';
     cta.onclick = null;
-    cta.style.pointerEvents = 'none';
-    cta.style.opacity = '.5';
-    cta.style.cursor = 'default';
+    if (storeUrl) { cta.href = storeUrl; cta.target = '_blank'; cta.rel = 'noopener'; }
+    else {
+      cta.href = 'javascript:void(0)';
+      cta.onclick = function () { var b = document.getElementById('ecpayDownBanner'); if (b) b.scrollIntoView({ behavior: 'smooth', block: 'center' }); return false; };
+    }
   });
 });
 
@@ -739,7 +752,7 @@ async function startSubscribe(btn) {
   const u = curUser;
 
   // ⛔ 綠界維護期間:改走 PayPal 手動付款(不跑綠界、不續扣;保留上面的登入是為了拿到 email 方便開通)
-  if (ECPAY_DOWN) { unlock(); AppUI.alert('線上刷卡維護中,暫停新訂閱,請稍後再試(手機可用 App 內購買)。'); return false; }
+  if (ECPAY_DOWN) { unlock(); AppUI.alert('網頁刷卡暫停服務中(金流帳戶更換作業),請改用手機 App 訂閱——功能與價格相同。'); return false; }
 
   // 下單前:明示續扣條款 + 強制勾選同意 + 已滿18歲(消保法)
   const consented = await showConsentDialog(plan);

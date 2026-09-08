@@ -165,6 +165,16 @@
     </div>
   </div>
 
+  <!-- YouTube 跟讀入口:用任何 YouTube 影片練(官方嵌入播放,合法) -->
+  <a class="ls-entry yt-entry" href="yt-shadow.html" style="text-decoration:none;color:inherit;border-style:dashed">
+    <img src="images/mascot/tanuki-p05.png" alt="" aria-hidden="true">
+    <div class="le-body">
+      <div class="le-t"><span data-cvt>YouTube 跟讀</span> <span class="le-new">NEW</span></div>
+      <div class="le-d"><span data-cvt>喜歡的歌、新聞、Vlog——貼上連結逐句循環跟讀,點字查詞。</span></div>
+    </div>
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="flex-shrink:0;color:var(--tx3)"><path d="M9 18l6-6-6-6"/></svg>
+  </a>
+
   <div class="card">
     <div class="lvtabs" id="lvtabs"></div>
     <div class="lvdesc" id="lvdesc"></div>
@@ -515,10 +525,10 @@ function maybeParty(){
   const k='sp_party_'+spDayKey().slice(7);
   try{ if(localStorage.getItem(k)) return; localStorage.setItem(k,'1'); }catch(e){}
   const m=document.createElement('div'); m.className='party-mask';
-  m.innerHTML=`<div class="party-card">
+  m.innerHTML=`<div class="party-card" style="position:relative"><button onclick="this.closest('.party-mask').remove()" aria-label="關閉" style="position:absolute;top:10px;right:10px;width:34px;height:34px;border:none;background:transparent;color:var(--ink3);font-size:17px;cursor:pointer">✕</button>
     <img src="images/mascot/tanuki-p06.png" alt="">
     <h3>${enOr(cvt('今日 10 句達成!'),'10 sentences today — done!')}</h3>
-    <p>${enOr(cvt('口說就是這樣練起來的。明天狸貓在這裡等你。'),'This is how speaking gets built. See you tomorrow!')}</p>
+    <p>${enOr(cvt('口說就是這樣練起來的。明天狸太郎在這裡等你。'),'This is how speaking gets built. Tanutaro will be here tomorrow!')}</p>
     <button class="btn pri" onclick="this.closest('.party-mask').remove()">${enOr(cvt('繼續練'),'Keep going')}</button>
   </div>`;
   m.onclick=e=>{ if(e.target===m) m.remove(); };
@@ -732,7 +742,21 @@ const Lesson=(()=>{
 
   const PUNCT=/[、。,.!?！？…・「」\s]/;
   function kata2hira(t){ return t.replace(/[ァ-ヶ]/g,c=>String.fromCharCode(c.charCodeAt(0)-0x60)); }
-  function lnorm(t){ return kata2hira(String(t||'')).replace(/[、。,.!?！？…・「」\s0-9０-９]/g,''); }
+  // 辨識引擎會把數詞轉阿拉伯數字(ふたつ→「2つ」),但目標句是假名 → 對不上(用戶實錘)。
+  // 比對前把「數字+量詞」還原成假名讀音;蓋不到的量詞退回數字的音讀。
+  const NUM_TSU=['','ひとつ','ふたつ','みっつ','よっつ','いつつ','むっつ','ななつ','やっつ','ここのつ','とお'];
+  const NUM_NIN=['','ひとり','ふたり','さんにん','よにん','ごにん','ろくにん','ななにん','はちにん','きゅうにん','じゅうにん'];
+  const NUM_JI=['','いちじ','にじ','さんじ','よじ','ごじ','ろくじ','しちじ','はちじ','くじ','じゅうじ','じゅういちじ','じゅうにじ'];
+  const NUM_ON=['ゼロ','いち','に','さん','よん','ご','ろく','なな','はち','きゅう','じゅう'];
+  function numNorm(t){
+    return String(t||'')
+      .replace(/[０-９]/g,c=>String.fromCharCode(c.charCodeAt(0)-0xFEE0))
+      .replace(/(10|[0-9])つ/g,(m,n)=>NUM_TSU[+n]||m)
+      .replace(/(10|[0-9])人/g,(m,n)=>NUM_NIN[+n]||m)
+      .replace(/(1[0-2]|[0-9])時/g,(m,n)=>NUM_JI[+n]||m)
+      .replace(/(10|[0-9])/g,(m,n)=>NUM_ON[+n]||'');
+  }
+  function lnorm(t){ return kata2hira(numNorm(t)).replace(/[、。,.!?！？…・「」\s]/g,''); }
 
   // 句子 → 匹配單元:有 SPEAK_RUBY 用逐段(漢字段帶讀音),否則逐字元
   function parseUnits(jp){
@@ -759,23 +783,64 @@ const Lesson=(()=>{
   // 不推指針,句子越長後面越搆不到,用戶實錘「ください 講三次都不亮」)。
   // UI 只加不減(interim 抖動不閃退);進度取歷史最高。
   let bestRatio=0;
-  function paint(said, isFinal){
-    const sN=lnorm(said);
-    let p=0, hitChars=0, totChars=0;
+  // 從指定起點貪婪匹配一輪,回傳命中集合(供多起點嘗試取最優)
+  function greedyFrom(sN, startP){
+    let p=startP, hitChars=0;
+    const hit=new Set();
     units.forEach((u,i)=>{
       if(u.pn) return;
       const t=lnorm(u.t);
-      totChars+=t.length||1;
       let found=-1, len=0;
       const win=sN.slice(p, p+Math.max(10,(t.length||1)+8));
       if(t && win.indexOf(t)>=0){ found=win.indexOf(t); len=t.length; }
       else if(u.r && win.indexOf(u.r)>=0){ found=win.indexOf(u.r); len=u.r.length; }
-      if(found>=0){
-        p+=found+len; hitChars+=t.length||1;
-        if(!u._hit){ u._hit=true; const el=document.getElementById('lsu'+i); if(el) el.classList.add('hit'); }
-      } else if(u._hit){
-        hitChars+=t.length||1;   // 曾亮過:計分保留(UI 不回退),指針不動,後面靠加大視窗接回
-      }
+      if(found>=0){ p+=found+len; hit.add(i); hitChars+=t.length||1; }
+    });
+    return { hit, hitChars };
+  }
+  function paint(said, isFinal){
+    const sN=lnorm(said);
+    // 多起點錨定:用戶第一次講錯再重講時,正確內容在辨識字串「尾部」,從 0 開始的
+    // 窗口搆不到(實錘:有時很準有時一直過不了)。以「句首 unit 在 said 的每個出現位置」
+    // 當候選起點各跑一輪貪婪,取命中最多的結果。
+    const first=units.find(u=>!u.pn&&lnorm(u.t));
+    const starts=[0];
+    if(first){
+      [lnorm(first.t), first.r||''].forEach(k=>{
+        if(!k) return;
+        let ix=sN.indexOf(k);
+        while(ix>=0){ starts.push(ix); ix=sN.indexOf(k, ix+1); }
+      });
+    }
+    let best={hit:new Set(),hitChars:0};
+    [...new Set(starts)].slice(-8).forEach(st=>{ const r=greedyFrom(sN, st); if(r.hitChars>best.hitChars) best=r; });
+    // final 回撈:辨識輸出常亂序(重講時段落順序顛倒)。一段講完後,把「連續未命中的
+    // unit 串」拼成整段(≥2字)在全文找,找到整段補亮——單字元不獨立撈(假名單字太氾濫會誤亮)
+    if(isFinal){
+      let run=[];
+      const flush=()=>{
+        if(run.length){
+          const seg=run.map(x=>lnorm(units[x].t)).join('');
+          const segR=run.map(x=>units[x].r||lnorm(units[x].t)).join('');
+          if(seg.length>=2 && (sN.indexOf(seg)>=0 || sN.indexOf(segR)>=0)) run.forEach(x=>best.hit.add(x));
+        }
+        run=[];
+      };
+      units.forEach((u,i)=>{
+        if(u.pn){ flush(); return; }
+        if(best.hit.has(i)||u._hit){ flush(); return; }
+        run.push(i);
+      });
+      flush();
+    }
+    // UI 只加不減;計分=曾亮過的全部字元(單調不回退)
+    let hitChars=0, totChars=0;
+    units.forEach((u,i)=>{
+      if(u.pn) return;
+      const L=lnorm(u.t).length||1;
+      totChars+=L;
+      if(best.hit.has(i) && !u._hit){ u._hit=true; const el=document.getElementById('lsu'+i); if(el) el.classList.add('hit'); }
+      if(u._hit) hitChars+=L;
     });
     const ratio=totChars?hitChars/totChars:0;
     if(ratio>bestRatio) bestRatio=ratio;
@@ -951,15 +1016,17 @@ const Lesson=(()=>{
     if(hash){
       const rel=window.ttsUrl?window.ttsUrl(hash):'audio/tts/'+hash+'.mp3';
       if(window.STAYJP_NATIVE&&window.STAYJP_NATIVE.canPlayB64){
-        // App 原生播放沒有「播完」回呼:先用 Audio 抓 mp3 真實時長,播完+緩衝才開錄
-        // (用戶實錘:句長估時太短,範例還沒播完就被切去錄音——開錄會搶 audio session 掐掉播放)
-        _nPost({type:'PLAY_URL',url:new URL(rel,location.href).href});
+        // App 原生播放沒有「播完」回呼:先用 Audio 抓 mp3 真實時長,播完+緩衝才開錄。
+        // 播前先還原 audio session 並緩一拍——上一句的 SPEECH_STOP/session 還原與這次
+        // PLAY 撞在一起會讓範例被切斷或突然變小聲(iOS 錄音模式 duck 播放,用戶實錘)。
+        _postRestore();
         setHint(enOr('聽範例中…','Listen…'));
+        setTimeout(()=>{ if(!active) return; _nPost({type:'PLAY_URL',url:new URL(rel,location.href).href}); }, 280);
         const probe=new Audio(); probe.preload='metadata'; probe.src=rel;
         let fired=false;
-        const go=(ms)=>{ if(fired)return; fired=true; setTimeout(after, ms); };
-        probe.onloadedmetadata=()=>{ if(isFinite(probe.duration)&&probe.duration>0) go(probe.duration*1000+450); };
-        setTimeout(()=>go(Math.max(2200, it.jp.length*220)+500), 900);   // metadata 900ms 內沒到:退回加長估時
+        const go=(ms)=>{ if(fired)return; fired=true; setTimeout(after, ms+280); };
+        probe.onloadedmetadata=()=>{ if(isFinite(probe.duration)&&probe.duration>0) go(probe.duration*1000+700); };
+        setTimeout(()=>go(Math.max(2200, it.jp.length*220)+700), 900);   // metadata 900ms 內沒到:退回加長估時
         return;
       }
       _demo=new Audio(rel); _demo.onended=after;

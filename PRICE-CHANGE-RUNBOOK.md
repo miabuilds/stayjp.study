@@ -1,4 +1,69 @@
-# 2026-09 調價日 Runbook（漲價當天照這份做）
+# 2026-09 調價日 Runbook
+
+## 🔴 最終定案(2026-09-06)＋ 9/14(一)執行清單 —— 以本節為準,下方舊章節僅供背景
+
+**新價(9/14 起,三平台牌價統一)**:月費 290→**390**、年費 1,490→**1,990**、買斷 2,990→**5,990**(9/6 定案)。
+**推薦碼=打 9 折(9/6 終版):年費+買斷**(月費不折,維持+7天)。金額取整到十位:年費 1,790(定期定額終身鎖)、買斷 **5,390**(折600);iOS 年費走 Offer Codes(首年 1,790);**App 內買斷碼折=1.0.8 雙 SKU**(paywall 輸碼→解鎖 5,390 商品,iOS+Android 同版;上版前買斷碼折為官網限定)。
+所有既有 KOL 碼/個人碼自動獲得折價功能;無主官方碼可用。**iOS 走 ASC Offer Codes 同步折(見步驟 8;9/6 改決策:訂閱主力在 App)**;Play 上架後再議。
+月費碼好康維持 +7 天、買斷維持 AI 加量;**年費改折價後不再 +30 天**(callback 已改,防雙重發放)。
+舊訂戶全部凍漲(綠界舊單不動、ASC 選保留、Play 不動)。
+
+**Code 已備好**:分支 **`price-day-0914`**(a3613ef0,含完整 commit message 說明)。已驗:tsc/ui-map/本機截圖(無碼 1,990、套碼刪除線 1,790)/consent+expected_twd 折後價。
+
+⚠️ **2026-09-06 起 ECPAY_DOWN=true**(綠界帳戶審核中,網頁收款暫停、pricing 全數導 App)。
+綠界驗證通過 → pricing.html 的 `ECPAY_DOWN` 改回 false+sw bump+push 即還原。
+**9/14 合併分支時此區會衝突:保留 main 當下的 ECPAY_DOWN 值**(審核沒過就繼續 true)。
+
+### 9/14 當天(依序)
+```bash
+# 0. 確認其他 session 沒動 pricing/index/account/tool-quota/ui-map/functions,有衝突先解
+cd ~/Documents/GitHub/stay-jp-notes && git merge price-day-0914
+#    衝突大概率在 pricing.html/index.html(其他 session 常改) → 以分支的價格區塊為準
+# 1. bump sw.js VERSION(+1,先 grep 現值,多 session 會撞)
+# 2. cd functions && npm run build   (functions/lib 是 committed build output)
+# 3. git push → curl -s https://stayjp.study/pricing.html | grep -c 'twd: 1990'  應 >0
+# 4. firebase deploy --only functions:createPayment,functions:ecpayCallback,functions:trialEmailCron
+# 5. ASC(手動):monthly 排 390、yearly 排 1,990——兩個都必選「為現有訂閱者保留價格」;
+#    lifetime(非消耗型)直接改 5,990。價格點以 ASC 選單有的為準(X90 系列應該都有)。
+# 6. Play(⚠️ Android 已於 9/1 上架!):D-day 當天 Play Console 三價改 390/1,990/5,990(預設只影響新購=凍漲);
+#    ⚠️ 9/6 發現上架時可能沒改價——Mia 待確認 Play 現行三價,若 monthly 仍 150 要「立刻」先改 290 止血
+# 7. 官方折扣碼:Firestore console 建 ref_codes/STAYJP200
+#    { active: true, type: "official", kol: "StayJP 官方" }  ← 不填 owner_uid=不產生分潤(已驗 commission 邏輯)
+# 8. iOS Offer Codes(2026-09-06 決策:App 也要折——訂閱主力在 App,轉換 41% 優先於手續費差):
+#    ASC → 年費訂閱(Yearly)→ 建優惠(Offer):類型 pay up front、時長 1 年、價格 NT$1,790(價格點以選單為準)
+#    → 資格:新訂閱者(+可勾已到期);再建「自訂代碼」:STAYJP200 + 每個 KOL 一個(與 ref_codes 同字串!)
+#    → 分潤歸因靠 RC webhook 讀 event.offer_code(分支已含 db6fece1),碼字串必須存在於 ref_codes 才歸因得到
+#    → KOL 拿到的兌換連結:https://apps.apple.com/redeem?ctx=offercodes&id=6778227353&code=<碼>
+#    → 注意:iOS 兌換=首年 1,790、次年續 1,990(Apple 限制);官網輸碼=年年 1,790。文案統一講「現折 200」,別在 iOS 承諾年年鎖
+```
+**未來快閃優惠(Mia 2026-09-06 想法,機制已就緒)**:官網限定限時優惠=建一個限期 ref_codes 碼(active:true)、
+檔期結束改 active:false 即失效;現折金額目前固定在 constants.WEB_CODE_DISCOUNT_TWD(yearly:200),
+想要不同折扣額的快閃(如折 300)→ 之後把折扣搬到 ref_codes 文件的 discount_twd 欄位(小改 createPayment),先記著。
+
+### 1.0.8 App 版(9/14 後盡快,iOS+Android 同版):App 內買斷碼折
+- ASC/Play 各建一次性商品 `com.stayjp.app.lifetime_ref` / `stayjp_lifetime_ref` @**5,390**
+- Paywall 加「輸入推薦碼」:打 validateRefCode → 有效即切換顯示 5,790 買斷商品(RC offering/product 切換)
+- 歸因:app 輸碼時寫 RC subscriber attribute `ref_code`(匿名購買也帶得到)→ webhook 讀 attributes 歸因+分潤
+- rc-sync-subscription.ts + revenuecat-webhook.ts 的 product→plan map 補 lifetime_ref → lifetime
+- **評分彈窗(Mia 指定必做)**:升級現有 maybeAskForReview(9/1 已有 STUDY_DONE→計次→expo-store-review 管線)為兩段式:
+  先跳自家「用得還好嗎?」小視窗 → 「喜歡」→ 呼叫原生評分(iOS SKStoreReview/Play In-App Review);
+  「還好」→ 導意見回饋頁。節流:累計 N 天使用+距上次 ≥60 天;不可提供獎勵(商店規範)
+- **App Store/Play 商店截圖全套換新**(Mia 指定):主打功能排前面——AI 情境對話、AI 跟讀評分、單字卡/SRS、JLPT 刷題;
+  砍掉無聊介面圖。截圖只能隨新版本更新 → 與 1.0.8 同一次送審上
+- 排程:9/8-9/11 開發+截圖set、9/11-12 送審(選「手動發佈」)、9/14 改完商店價後按發佈(審核若延遲則審過即發)
+**分潤制度(9/6 定案):維持「只分潤首筆」,續訂不分潤,不再改**(學習週期1-2年,續訂單少;KOL 無後續支付義務)。
+### 驗收(9/14 部署後)
+1. 無痕:pricing 三卡新價;輸 STAYJP200 → 年費卡出現刪除線 1,990→1,790
+2. 訂年費(套碼)→ 消保 1,790 → 綠界 **1,790**;訂買斷(套碼)→ 消保 5,390 → 綠界 **5,390**(各到輸卡頁退出)
+3. 無碼帳號訂年費 → 消保 1,990、綠界 1,990
+4. admin 抽 2-3 個舊訂戶:訂閱/金額不變;隔天 transactions 抽查新單=新價、續扣=舊價
+5. App paywall = 商店新價(iOS 截圖)
+### 公告排程(文案另出)
+9/8(二)晚 首發(信件+Threads/IG+站內) → 9/11(五)「最後一個週末」 → 9/13(日)晚 最後 24 小時 → 9/14 上午部署。
+主話術:「9/14 起調漲(年 1,990/月 390/買斷 5,990)。9/13 前訂年費 1,490 終身鎖價;9/14 後輸推薦碼一律 9 折。」
+廣告圖帶官方碼 STAYJP200。⚠️ App 內文案不得提官網價/碼折(Apple 3.1.1),只說「即將調漲」。
+
+---
 
 > 決策（2026-08-23 拍板，**2026-08-31 更新**）：**舊用戶全部凍漲，只有新購走新價**。
 > 新價：月訂 150→**290（Apple 價格點無 299 → 取 290 三平台一致；2026-08-31 已執行完畢：網頁 live、iOS 排 9/1 生效並保留舊訂戶、Play 待上架日）**、

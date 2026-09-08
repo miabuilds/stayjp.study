@@ -164,56 +164,34 @@ const FlashCard = (() => {
     const srs = JSON.parse(localStorage.getItem('srs_data') || '{}');
 
     let html = '';
-    // 本輪級別的進度（已學 = 至少一次記得）
+    // 精簡摘要:程度/目標/考試日期在 JLPT 卡設定過,這裡只顯示、不重複填(用戶回饋)
     if (data && data.length) {
       const pf = lv + ':';
       const learned = countLearned(srs, lv);
       const now = Date.now();
       const due = Object.keys(srs).filter(k => k.startsWith(pf) && SRS.isDue(srs[k], now)).length;
-      html += `<div><strong>${lv.toUpperCase()} 進度：</strong>${learned} / ${data.length}（已學 ${Math.round(learned/data.length*100)}%）${due>0?`　<span style="color:var(--ac)">・今日待複習 ${due}</span>`:''}</div>`;
+      html += `<div><strong>${lv.toUpperCase()}</strong>　已學 ${learned} / ${data.length}（${Math.round(learned/data.length*100)}%）${due>0?`<span style="color:var(--ac)">　待複習 ${due}</span>`:''}</div>`;
     } else {
       html += `<div style="color:var(--tx2)">此級別無單字資料</div>`;
     }
-
-    // 目標：累計從 base+1 到 goal 的所有級別
-    let scopeRemaining = null;
     if (goal) {
       const scope = scopeLevels(base, goal);
-      if (!scope.length) {
-        html += `<div style="color:var(--tx2);font-size:12px;margin-top:6px">目前程度已達目標，無需再背 </div>`;
-      } else {
+      if (scope.length) {
         let totalTarget = 0, totalLearned = 0;
-        const parts = scope.map(l => {
-          const d = getData(l);
-          const cnt = d ? d.length : 0;
-          const lrn = countLearned(srs, l);
-          totalTarget += cnt;
-          totalLearned += lrn;
-          return `${l.toUpperCase()} ${lrn}/${cnt}`;
-        });
-        scopeRemaining = totalTarget - totalLearned;
+        scope.forEach(l => { const d = getData(l); totalTarget += d ? d.length : 0; totalLearned += countLearned(srs, l); });
+        const remaining = totalTarget - totalLearned;
+        let extra = '';
+        const examIso = getExamDate();
+        if (examIso) {
+          const d = new Date(examIso); d.setHours(0,0,0,0);
+          const t = new Date(); t.setHours(0,0,0,0);
+          const days = Math.ceil((d - t) / 86400000);
+          if (days > 0 && remaining > 0) extra = `　倒數 ${days} 天・每天 ${Math.ceil(remaining/days)} 個`;
+          else if (days > 0) extra = `　倒數 ${days} 天`;
+        }
         const baseLabel = (!base || base === 'none') ? '零基礎' : base.toUpperCase();
-        html += `<div style="margin-top:6px"><strong>${baseLabel} → ${goal.toUpperCase()} 目標：</strong>${totalLearned} / ${totalTarget}</div>`;
-        html += `<div style="color:var(--tx2);font-size:12px">${parts.join('　')}</div>`;
-        html += `<div><strong>還要背：</strong>${scopeRemaining} 個</div>`;
+        html += `<div style="color:var(--tx2);font-size:12px;margin-top:5px">${baseLabel} → ${goal.toUpperCase()}　還要背 ${remaining} 個${extra}</div>`;
       }
-    } else {
-      html += `<div style="color:var(--tx2);font-size:12px;margin-top:6px">選「目前程度」和「目標級別」後會顯示累計還要背多少</div>`;
-    }
-
-    // 考試倒數 + 建議
-    const examIso = examEl && examEl.value ? examEl.value : '';
-    if (examIso) {
-      const d = new Date(examIso); d.setHours(0,0,0,0);
-      const t = new Date(); t.setHours(0,0,0,0);
-      const days = Math.ceil((d - t) / 86400000);
-      html += `<div><strong>考試倒數：</strong>${days >= 0 ? days + ' 天' : '已過 ' + (-days) + ' 天'}</div>`;
-      if (days > 0 && scopeRemaining !== null && scopeRemaining > 0) {
-        const perDay = Math.ceil(scopeRemaining / days);
-        html += `<div style="color:var(--ac);font-weight:600;margin-top:4px"><i data-ic=bulb></i> 建議每天背 ${perDay} 個才背得完</div>`;
-      }
-    } else {
-      html += `<div style="color:var(--tx2);font-size:12px;margin-top:4px">選考試日期後可看到每日建議進度</div>`;
     }
     infoEl.innerHTML = html;
   }
@@ -226,31 +204,13 @@ const FlashCard = (() => {
     const exam = getExamDate();
     const base = getBaseLevel();
     const goal = getGoalLevel();
-    const upcoming = getUpcomingJlptDates(6);
-    // 如果已存 exam 不在列表（舊資料 / 自訂），保留它
-    const inList = upcoming.some(x => x.iso === exam);
-    const customOpt = exam && !inList ? `<option value="${exam}" selected>${exam}（自訂）</option>` : '';
-    const examOptions = [
-      `<option value="" ${!exam?'selected':''}>不設定</option>`,
-      customOpt,
-      ...upcoming.map(x => `<option value="${x.iso}" ${x.iso===exam?'selected':''}>${x.label}</option>`)
-    ].join('');
-    const baseOptions = [
-      `<option value="none" ${base==='none'?'selected':''}>零基礎</option>`,
-      ...LEVELS.slice(0, 4).map(l => `<option value="${l}" ${base===l?'selected':''}>${l.toUpperCase()} 已學完</option>`)
-    ].join('');
-    const goalOptions = [
-      `<option value="" ${!goal?'selected':''}>未設定</option>`,
-      ...LEVELS.map(l => `<option value="${l}" ${goal===l?'selected':''}>${l.toUpperCase()}</option>`)
-    ].join('');
-    const selStyle = 'width:100%';
     box.innerHTML = `
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
         <h3 style="margin:0"><i data-ic=bolt></i> 快速背單字</h3>
         <button class="qclose" style="width:auto;margin:0;padding:2px 10px" onclick="FlashCard.close()"><i data-ic=x></i></button>
       </div>
-      <div style="font-size:13px;color:var(--tx2);margin-bottom:14px;line-height:1.7">
-        每張卡 ${COUNTDOWN_SEC} 秒自動翻面。手機可<strong>左滑（不會）</strong>或<strong>右滑（會）</strong>，桌機按按鈕。答題紀錄會同步到複習系統。
+      <div style="font-size:12.5px;color:var(--tx2);margin-bottom:12px;line-height:1.6">
+        ${COUNTDOWN_SEC} 秒自動翻面・左滑不會、右滑記得・紀錄自動進複習系統
       </div>
       <div class="qf"><label>級別</label><div class="qo" id="fcLevel">
         <button data-v="n5" class="${curLv==='n5'?'on':''}">N5</button>
@@ -267,20 +227,7 @@ const FlashCard = (() => {
         <button data-v="due">待複習</button>
         <button data-v="random">全部隨機</button>
       </div></div>
-      <div class="qf" style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-        <div><label style="display:block;font-size:13px;color:var(--tx2);margin-bottom:5px;font-weight:600">目前程度</label>
-          <select id="fcBase" style="${selStyle}">${baseOptions}</select>
-        </div>
-        <div><label style="display:block;font-size:13px;color:var(--tx2);margin-bottom:5px;font-weight:600">目標級別</label>
-          <select id="fcGoal" style="${selStyle}">${goalOptions}</select>
-        </div>
-      </div>
-      <div class="qf"><label>考試日期</label>
-        <select id="fcExam" style="${selStyle}">
-          ${examOptions}
-        </select>
-      </div>
-      <div id="fcInfo" style="background:var(--bg3);border:1px solid var(--bd);border-radius:10px;padding:12px;margin:14px 0;font-size:13px;line-height:1.9;color:var(--tx)"></div>
+      <div id="fcInfo" style="background:var(--bg3);border:1px solid var(--bd);border-radius:10px;padding:10px 12px;margin:12px 0;font-size:13px;line-height:1.8;color:var(--tx)"></div>
       <button class="qstart" onclick="FlashCard.begin()">開始</button>
       <button class="qclose" onclick="FlashCard.close()">取消</button>`;
     box.querySelectorAll('.qo').forEach(g => {
@@ -292,15 +239,6 @@ const FlashCard = (() => {
         };
       });
     });
-    const sel = document.getElementById('fcExam');
-    sel.addEventListener('change', () => {
-      setExamDate(sel.value);
-      renderStartInfo();
-    });
-    const baseSel = document.getElementById('fcBase');
-    baseSel.addEventListener('change', () => { setBaseLevel(baseSel.value); renderStartInfo(); });
-    const goalSel = document.getElementById('fcGoal');
-    goalSel.addEventListener('change', () => { setGoalLevel(goalSel.value); renderStartInfo(); });
     renderStartInfo();
     if (typeof cvtStaticUI === 'function') cvtStaticUI(document.getElementById('quizBox'));   // 簡中:轉設定框寫死的繁體字(如「範圍」,無日文,安全)
     document.getElementById('quizBg').classList.add('show');
