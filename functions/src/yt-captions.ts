@@ -63,6 +63,38 @@ async function fetchTrack(baseUrl: string, tlang?: string): Promise<Line[]> {
   return parseTrack(await r.text());
 }
 
+// 眾包快取:使用者貼逐字稿解析成功後回傳,存進共用快取 → 同影片下一個人免貼。
+// 只補空位(不覆蓋官方抓到的字幕);基本驗形防亂灌。
+export const ytCaptionsSeed = functions.onRequest(
+  { cors: true, region: "asia-east1", memory: "256MiB", timeoutSeconds: 15 },
+  async (req, res) => {
+    try {
+      if (req.method !== "POST") { res.status(405).json({ error: "method_not_allowed" }); return; }
+      const b = req.body || {};
+      const v = String(b.v || "");
+      if (!/^[A-Za-z0-9_-]{11}$/.test(v)) { res.status(400).json({ error: "bad_video_id" }); return; }
+      const lines = Array.isArray(b.lines) ? b.lines : [];
+      if (lines.length < 5 || lines.length > 600) { res.status(400).json({ error: "bad_lines" }); return; }
+      let prevT = -1;
+      const clean: { t: number; d: number; ja: string; zh: string }[] = [];
+      for (const l of lines) {
+        const t = Math.floor(Number(l?.t)); const d = Math.floor(Number(l?.d)) || 4000;
+        const ja = String(l?.ja || "").slice(0, 300).trim();
+        if (!Number.isFinite(t) || t < 0 || t < prevT || !ja) { res.status(400).json({ error: "bad_line" }); return; }
+        prevT = t;
+        clean.push({ t, d: Math.min(Math.max(d, 300), 120000), ja, zh: "" });
+      }
+      const ref = admin.firestore().collection("yt_captions_cache").doc(v);
+      const doc = await ref.get();
+      if (doc.exists && (doc.data() as any)?.track !== "user") { res.json({ ok: true, kept: "existing" }); return; }   // 官方字幕優先,不覆蓋
+      await ref.set({ title: String(b.title || "").slice(0, 120), author: "", seconds: 0, track: "user", lang: "ja", lines: clean });
+      res.json({ ok: true });
+    } catch (e: any) {
+      res.status(500).json({ error: "seed_failed", message: String(e?.message || e) });
+    }
+  }
+);
+
 export const ytCaptions = functions.onRequest(
   { cors: true, region: "asia-east1", memory: "256MiB", timeoutSeconds: 30 },
   async (req, res) => {
