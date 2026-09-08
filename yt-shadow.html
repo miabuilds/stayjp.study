@@ -11,59 +11,67 @@
 [data-theme="dark"]{--bg:#191715;--bg2:#221f1c;--bg3:#2a2622;--bd:#3a352f;--tx:#ece7df;--tx2:#a89f92;--tx3:#6f685e;--soft:rgba(198,85,59,.16);--goodbg:rgba(46,125,87,.2)}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--tx);font-family:-apple-system,"PingFang TC","Hiragino Sans","Noto Sans TC",sans-serif;font-size:15px;line-height:1.6}
-.wrap{max-width:760px;margin:0 auto;padding:14px 16px 80px}
+.wrap{max-width:680px;margin:0 auto;padding:14px 16px 90px}
 .top{display:flex;align-items:center;gap:10px;margin-bottom:14px}
-.hero{display:flex;gap:14px;align-items:center;background:var(--bg2);border:1px solid var(--bd);border-radius:16px;padding:16px;margin-bottom:14px}
-.hero img{width:74px;height:auto;flex-shrink:0}
-.hero h1{margin:0;font-size:19px}
-.hero p{margin:4px 0 0;font-size:12.5px;color:var(--tx2)}
 .card{background:var(--bg2);border:1px solid var(--bd);border-radius:16px;padding:14px;margin-bottom:14px}
 .urlrow{display:flex;gap:8px}
 .urlrow input{flex:1;min-width:0;padding:11px 12px;border:1px solid var(--bd);border-radius:12px;background:var(--bg);color:var(--tx);font:inherit;font-size:14px}
 .btn{border:none;border-radius:12px;padding:11px 16px;font:inherit;font-weight:700;cursor:pointer;background:var(--bg3);color:var(--tx)}
 .btn.pri{background:var(--ac);color:#fff}
 .btn:active{transform:scale(.97)}
-.exrow{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
-.exrow button{border:1px solid var(--bd);background:var(--bg);color:var(--tx2);border-radius:99px;padding:6px 12px;font:inherit;font-size:12.5px;cursor:pointer}
-.note{font-size:12px;color:var(--tx3);margin-top:8px;line-height:1.6}
-#playerWrap{position:sticky;top:0;z-index:20;background:var(--bg);padding:6px 0;display:none}
-#playerBox{position:relative;width:100%;aspect-ratio:16/9;border-radius:14px;overflow:hidden;background:#000;box-shadow:0 4px 18px rgba(0,0,0,.18)}
+.note{font-size:12.5px;color:var(--tx3);margin-top:8px;line-height:1.7}
+.err{color:var(--bad);font-size:13px;margin-top:8px}
+#playerWrap{display:none;margin-bottom:10px}
+#playerBox{position:relative;width:100%;aspect-ratio:16/9;border-radius:14px;overflow:hidden;background:#000;box-shadow:0 4px 18px rgba(0,0,0,.16)}
 #playerBox iframe{position:absolute;inset:0;width:100%;height:100%}
-.vtitle{font-size:13px;font-weight:700;margin:8px 2px 0;color:var(--tx2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.modes{display:flex;gap:8px;margin:12px 0}
+/* ── 練習卡(一次一句) ── */
+#practice{display:none}
+.pc{background:var(--bg2);border:1.5px solid var(--bd);border-radius:18px;padding:16px;box-shadow:0 3px 14px rgba(0,0,0,.06)}
+.pc-ctr{display:flex;gap:8px;justify-content:center;align-items:center;margin-bottom:4px}
+.pc-ctr button{border:1px solid var(--bd);background:var(--bg3);color:var(--tx);border-radius:12px;min-width:46px;height:42px;font:inherit;font-weight:800;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:4px}
+.pc-ctr button:active{transform:scale(.94)}
+.pc-ctr button.on{background:var(--ac);color:#fff;border-color:var(--ac)}
+.pc-ctr .nav{font-size:20px;line-height:1}
+.pc-idx{text-align:center;font-size:12px;color:var(--tx3);margin:6px 0 10px;font-variant-numeric:tabular-nums}
+.pc-jp{font-size:21px;line-height:2.1;text-align:center;min-height:56px;word-break:break-word;margin-bottom:2px}
+.pc-jp rt{font-size:10.5px;color:var(--tx3)}
+.pc-jp .hit{color:var(--good);font-weight:700}
+.pc-jp.blur{filter:blur(7px);user-select:none;pointer-events:none}
+.pc-zh{text-align:center;font-size:13px;color:var(--tx2);margin-bottom:10px;min-height:18px}
+.pc-act{display:flex;flex-direction:column;gap:10px;align-items:center;margin-top:6px}
+.micbtn{width:100%;max-width:340px;padding:14px;font-size:16px;border-radius:14px}
+.micbtn.rec-on{background:var(--bad)!important;color:#fff;animation:pulse 1.2s infinite}
+@keyframes pulse{50%{opacity:.75}}
+.saidbox{width:100%;padding:10px 12px;border:1px solid var(--bd);border-radius:12px;background:var(--bg);color:var(--tx);font:inherit;font-size:14.5px}
+.dictarea{width:100%;padding:10px 12px;border:1px solid var(--bd);border-radius:12px;background:var(--bg);color:var(--tx);font:inherit;font-size:16px;min-height:64px;resize:vertical}
+.recnote{font-size:12px;color:var(--tx3);text-align:center;min-height:16px}
+/* 結果區 */
+.pc-result{display:none;width:100%;border-radius:14px;padding:12px 14px;margin-top:2px}
+.pc-result.pass{display:block;background:var(--goodbg);border:1px solid var(--good)}
+.pc-result.fail{display:block;background:var(--soft);border:1px solid var(--ac)}
+.pc-result .rt1{font-weight:800;font-size:15px}
+.pc-result.pass .rt1{color:var(--good)} .pc-result.fail .rt1{color:var(--ac)}
+.pc-result .rt2{font-size:13px;color:var(--tx2);margin-top:2px;line-height:1.8}
+.pc-result .dok{color:var(--good)} .pc-result .dng{color:var(--bad);text-decoration:line-through}
+.nextbtn{width:100%;max-width:340px;padding:14px;font-size:16px;border-radius:14px;background:var(--good);color:#fff}
+.modes{display:flex;gap:8px;margin:0 0 12px}
 .modes button{flex:1;border:1px solid var(--bd);background:var(--bg2);color:var(--tx2);border-radius:12px;padding:9px;font:inherit;font-weight:700;cursor:pointer}
 .modes button.on{background:var(--ac);color:#fff;border-color:var(--ac)}
-.line{background:var(--bg2);border:1px solid var(--bd);border-left:3px solid transparent;border-radius:14px;padding:12px 14px;margin-bottom:10px;cursor:pointer}
-.line.on{border-left-color:var(--ac);box-shadow:0 2px 12px rgba(0,0,0,.07)}
-.line.done{border-left-color:var(--good)}
-.lhead{display:flex;align-items:center;gap:8px;font-size:11.5px;color:var(--tx3);margin-bottom:4px}
-.lhead .tstamp{background:var(--bg3);border-radius:6px;padding:1px 7px;font-variant-numeric:tabular-nums}
-.lhead .okmark{color:var(--good);font-weight:800;margin-left:auto}
-.ljp{font-size:17px;line-height:2;word-break:break-word}
-.ljp rt{font-size:10px;color:var(--tx3)}
-.ljp .hit{color:var(--good);font-weight:700}
-.lzh{font-size:12.5px;color:var(--tx2);margin-top:2px}
-.dict-blur .ljp{filter:blur(6px);user-select:none}
-.line.on.dict-blur .ljp.revealed{filter:none;user-select:auto}
-.ltools{display:none;gap:8px;margin-top:10px;flex-wrap:wrap;align-items:center}
-.line.on .ltools{display:flex}
-.ltools .btn{padding:8px 13px;font-size:13.5px}
-.ltools .btn.rec-on{background:var(--bad);color:#fff;animation:pulse 1.2s infinite}
-@keyframes pulse{50%{opacity:.75}}
-.score{font-size:13px;font-weight:800}
-.score.pass{color:var(--good)} .score.fail{color:var(--ac)}
-.saidbox{width:100%;margin-top:8px;padding:9px 11px;border:1px solid var(--bd);border-radius:10px;background:var(--bg);color:var(--tx);font:inherit;font-size:14px}
-.dictarea{width:100%;margin-top:8px;padding:9px 11px;border:1px solid var(--bd);border-radius:10px;background:var(--bg);color:var(--tx);font:inherit;font-size:15px;min-height:56px;resize:vertical}
-.diffbox{margin-top:8px;font-size:15px;line-height:1.9;background:var(--bg3);border-radius:10px;padding:9px 11px;display:none}
-.diffbox .dok{color:var(--good)} .diffbox .dng{color:var(--bad);text-decoration:line-through}
+/* 句子總覽(跳句用) */
+.pc-more{display:flex;justify-content:space-between;align-items:center;margin-top:12px}
+.pc-more button{border:none;background:none;color:var(--tx3);font:inherit;font-size:12.5px;cursor:pointer;text-decoration:underline}
+#allLines{display:none;margin-top:10px;max-height:300px;overflow-y:auto}
+.jl{display:flex;gap:8px;align-items:baseline;padding:8px 10px;border-radius:10px;cursor:pointer;font-size:13.5px}
+.jl:nth-child(odd){background:var(--bg3)}
+.jl .t{color:var(--tx3);font-size:11.5px;font-variant-numeric:tabular-nums;flex-shrink:0}
+.jl .ok{color:var(--good);font-weight:800;margin-left:auto}
+.jl.cur{outline:2px solid var(--ac)}
+/* 貼逐字稿 */
 .pastebox{display:none;margin-top:12px}
 .pastebox textarea{width:100%;min-height:130px;padding:10px;border:1px solid var(--bd);border-radius:12px;background:var(--bg);color:var(--tx);font:inherit;font-size:13px;resize:vertical}
 .steps{font-size:12.5px;color:var(--tx2);line-height:1.8;margin:6px 0}
 .steps b{color:var(--ac)}
-.err{color:var(--bad);font-size:13px;margin-top:8px}
-.prog{font-size:12.5px;color:var(--tx2);margin:4px 2px 10px}
-.recnote{font-size:12px;color:var(--tx3);width:100%}
-@media(min-width:820px){ #playerWrap{position:static} .cols{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start} .colL{position:sticky;top:12px} }
+/* 教學 */
 .tut-mask{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:99;padding:20px;overflow-y:auto}
 .tut-mask.show{display:flex;align-items:flex-start;justify-content:center}
 .tut-card{background:var(--bg2);border-radius:18px;max-width:480px;width:100%;padding:20px;margin:4vh 0;position:relative}
@@ -79,6 +87,11 @@ body{margin:0;background:var(--bg);color:var(--tx);font-family:-apple-system,"Pi
 .tut-sub b{display:inline;font-size:12.5px;color:var(--tx)}
 .tut-go{width:100%;margin-top:4px}
 .howbtn{border:1px solid var(--bd);background:var(--bg2);color:var(--tx2);border-radius:99px;padding:6px 13px;font:inherit;font-size:12.5px;cursor:pointer;flex-shrink:0}
+@media(min-width:860px){
+  .wrap{max-width:1080px}
+  .cols{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start}
+  .colL{position:sticky;top:12px}
+}
 </style>
 </head>
 <body>
@@ -113,17 +126,35 @@ body{margin:0;background:var(--bg);color:var(--tx);font-family:-apple-system,"Pi
   </div>
 
   <div class="cols">
-    <div class="colL">
-      <div id="playerWrap"><div id="playerBox"></div><div class="vtitle" id="vTitle"></div></div>
-    </div>
+    <div class="colL"><div id="playerWrap"><div id="playerBox"></div></div></div>
     <div class="colR">
-      <div class="modes" id="modeRow" style="display:none">
-        <button id="mShadow" class="on" onclick="YTS.setMode('shadow')">跟讀</button>
-        <button id="mDict" onclick="YTS.setMode('dict')">聽寫</button>
-        <button id="mSwap" style="flex:0 0 auto" onclick="YTS.swap()">換影片</button>
+      <div id="practice">
+        <div class="modes" id="modeRow">
+          <button id="mShadow" class="on" onclick="YTS.setMode('shadow')">跟讀</button>
+          <button id="mDict" onclick="YTS.setMode('dict')">聽寫</button>
+          <button id="mSwap" style="flex:0 0 auto" onclick="YTS.swap()">換影片</button>
+        </div>
+        <div class="pc">
+          <div class="pc-ctr">
+            <button class="nav" onclick="YTS.nav(-1)" aria-label="上一句">‹</button>
+            <button onclick="YTS.replay()" aria-label="重播"><i data-ic=volume></i></button>
+            <button id="spdBtn" onclick="YTS.cycleSpeed()">1x</button>
+            <button id="loopBtn" onclick="YTS.toggleLoop()">循環</button>
+            <button class="nav" onclick="YTS.nav(1)" aria-label="下一句">›</button>
+          </div>
+          <div class="pc-idx" id="pcIdx"></div>
+          <div class="pc-jp" id="pcJp"></div>
+          <div class="pc-zh" id="pcZh"></div>
+          <div class="pc-act" id="pcAct"></div>
+          <div class="pc-result" id="pcRes"></div>
+          <div class="pc-act" id="pcNext" style="display:none"><button class="btn nextbtn" onclick="YTS.nav(1)" id="nextBtn">下一句 →</button></div>
+          <div class="pc-more">
+            <button onclick="YTS.toggleList()" id="listBtn">全部句子</button>
+            <span style="font-size:12px;color:var(--tx3)" id="progTx"></span>
+          </div>
+          <div id="allLines"></div>
+        </div>
       </div>
-      <div class="prog" id="progTx"></div>
-      <div id="lines"></div>
     </div>
   </div>
 </div>
@@ -146,7 +177,8 @@ if(I18n.getLang()==='zh-CN') ensureOpenCC().then(function(){ try{ YTS._retext();
 const YTS = (() => {
   const FN = 'https://asia-east1-jpnote-1bdd6.cloudfunctions.net/ytCaptions';
   const EXAMPLE_V = 'tLQLa6lM3Us';   // Aimer 残響散歌(官方歌詞字幕,開放嵌入)
-  let player=null, apiReady=false, vid='', lines=[], cur=-1, mode='shadow', loopOn=false, watchT=0, done={};
+  const SPEEDS = [1, 0.75, 0.5];
+  let player=null, apiReady=false, vid='', lines=[], cur=0, mode='shadow', loopOn=false, watchT=0, done={}, spdIdx=0, listOpen=false;
 
   // ── i18n 靜態字 ──
   function _retext(){
@@ -158,10 +190,12 @@ const YTS = (() => {
       'Paste a link to any video with Japanese subtitles. <a href="javascript:void(0)" style="color:var(--ac)" onclick="YTS.loadExample()">No video in mind? Try the example →</a>');
     set('mShadow','跟讀','Shadow'); set('mDict','聽寫','Dictation'); set('mSwap','換影片','Change video');
     set('loadBtn','讀取','Load'); set('parseBtn','解析逐字稿','Parse transcript');
+    set('loopBtn','循環','Loop'); set('listBtn','全部句子','All lines'); set('nextBtn','下一句 →','Next →');
     set('pasteSteps','到 YouTube 開這支影片 → 點「<b>顯示轉譯稿</b>」→ 全選複製貼到下面。<a href="javascript:void(0)" style="color:var(--ac)" onclick="YTS.tut(true)">詳細步驟</a>',
       'Open the video on YouTube → “<b>Show transcript</b>” → copy everything & paste below. <a href="javascript:void(0)" style="color:var(--ac)" onclick="YTS.tut(true)">Details</a>');
     const u=document.getElementById('urlIn'); if(u) u.placeholder = en?'Paste a YouTube link or video ID':cvt('貼上 YouTube 連結或影片 ID');
     const pt=document.getElementById('pasteTa'); if(pt) pt.placeholder = en?'← Copy the transcript on YouTube first, then paste it here (with timestamps like 0:26)':cvt('← 先去 YouTube 複製逐字稿,回來貼在這裡(要含 0:26 這種時間)');
+    const hb=document.getElementById('howBtn'); if(hb) hb.textContent = en?'How?':cvt('怎麼用?');
   }
 
   // ── 工具 ──
@@ -174,14 +208,14 @@ const YTS = (() => {
   }
   const fmtT=ms=>{ const s=Math.floor(ms/1000); return Math.floor(s/60)+':'+String(s%60).padStart(2,'0'); };
   const norm=s=>(s||'').replace(/[\s、。,．.!！?？「」『』()（）・〜~♪…––—-]/g,'');
-  // 貪婪順序比對:target 每字在 said 中依序找,回 [每字是否命中]
   function matchChars(target,said){
     const t=norm(target), s=norm(said);
     const hits=new Array(t.length).fill(false);
     let p=0;
     for(let i=0;i<t.length;i++){ const idx=s.indexOf(t[i],p); if(idx>=0){ hits[i]=true; p=idx+1; } }
-    return { hits, ratio: t.length? hits.filter(Boolean).length/t.length : 0, t };
+    return { hits, ratio: t.length? hits.filter(Boolean).length/t.length : 0 };
   }
+  function fr(t){ try{ return (window.furiganaHTML? furiganaHTML(t) : esc(t)); }catch(e){ return esc(t); } }
 
   // ── 載入影片 ──
   function ensureApi(){
@@ -205,24 +239,22 @@ const YTS = (() => {
       onError: (e)=>{   // 101/150=版權方禁止站外嵌入、100=影片不存在
         const code=e&&e.data;
         document.getElementById('playerWrap').style.display='none';
+        document.getElementById('practice').style.display='none';
         document.getElementById('inputCard').style.display='block';
         document.getElementById('pasteBox').style.display='none';
         document.getElementById('inNote').textContent='';
-        const errEl=document.getElementById('inErr');
-        errEl.textContent = (code===101||code===150)
+        const er=document.getElementById('inErr');
+        er.textContent = (code===101||code===150)
           ? enOr('這支影片的版權方不開放站外播放(YouTube 的限制),換一支吧——大部分官方 MV、新聞、Vlog 都可以。','The rights holder disabled embedding for this video. Try another — most official MVs, news and vlogs work.')
           : enOr('影片載入失敗(代碼 '+code+'),確認連結沒錯或換一支。','Video failed to load (code '+code+') — check the link or try another.');
-        errEl.style.display='block';
+        er.style.display='block';
       }
     } });
-    // 字幕:先試自動抓,失敗開貼上模式
     try{
       const r=await fetch(FN,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({v})});
       const d=await r.json();
       if(d && Array.isArray(d.lines) && d.lines.length){
-        setLines(d.lines, d.title||'');
-        if(d.track==='asr') document.getElementById('inNote').textContent=enOr('這支只有自動字幕,分句和文字可能不完美。','Auto captions only — segmentation may be imperfect.');
-        else document.getElementById('inNote').textContent=enOr('字幕讀取完成,點任一句開始。','Captions loaded — tap any line to start.');
+        setLines(d.lines);
         document.getElementById('pasteBox').style.display='none';
         return;
       }
@@ -245,182 +277,199 @@ const YTS = (() => {
     const out=[]; const TS=/^(\d{1,2}):(\d{2})(?::(\d{2}))?$/;
     for(let i=0;i<rows.length;i++){
       let m=rows[i].match(TS);
-      if(m && rows[i+1] && !TS.test(rows[i+1])){           // 時間獨立一行,下一行是字幕
-        out.push({ t:toMs(m), ja:rows[++i], zh:'' }); continue;
-      }
-      m=rows[i].match(/^(\d{1,2}):(\d{2})(?::(\d{2}))?\s+(.+)$/);  // 同一行「0:26 文字」
+      if(m && rows[i+1] && !TS.test(rows[i+1])){ out.push({ t:toMs(m), ja:rows[++i], zh:'' }); continue; }
+      m=rows[i].match(/^(\d{1,2}):(\d{2})(?::(\d{2}))?\s+(.+)$/);
       if(m) out.push({ t:toMs(m), ja:m[4], zh:'' });
     }
     function toMs(m){ return m[3]!=null ? ((+m[1]*3600)+(+m[2]*60)+(+m[3]))*1000 : ((+m[1]*60)+(+m[2]))*1000; }
-    if(!out.length){ document.getElementById('inNote').textContent=enOr('解析不出時間軸,確認有把「時間+句子」一起複製。','Could not parse timestamps — make sure you copied times together with the lines.'); return; }
+    if(!out.length){ errEl.textContent=enOr('解析不出時間軸——確認有把「時間+句子」一起複製(像 0:26 這樣的行要在)。','Could not parse timestamps — make sure times like 0:26 were copied along with the lines.'); errEl.style.display='block'; return; }
     out.forEach((l,i)=>{ l.d = (i+1<out.length ? out[i+1].t-l.t : 5000); });
-    setLines(out,'');
+    setLines(out);
     document.getElementById('pasteBox').style.display='none';
-    document.getElementById('inNote').textContent=enOr('逐字稿解析完成,點任一句開始。','Transcript parsed — tap any line to start.');
   }
 
-  // ── 句子列表 ──
+  // ── 進入練習 ──
   function doneKey(){ return 'yts_done_'+vid; }
-  function setLines(ls,title){
-    lines=ls; cur=-1;
-    document.getElementById('inputCard').style.display='none';   // 開練後畫面只留播放器+句子,乾淨
-    document.getElementById('inErr').style.display='none';
+  function setLines(ls){
+    lines=ls;
     try{ done=JSON.parse(localStorage.getItem(doneKey()))||{}; }catch(e){ done={}; }
-    if(title) document.getElementById('vTitle').textContent=title;
-    document.getElementById('modeRow').style.display='flex';
-    renderLines();
+    document.getElementById('inputCard').style.display='none';
+    document.getElementById('inErr').style.display='none';
+    document.getElementById('practice').style.display='block';
+    listOpen=false; document.getElementById('allLines').style.display='none';
+    // 從第一個沒完成的句子開始
+    cur=0; while(cur<lines.length-1 && done[cur]) cur++;
+    renderCard(false);
   }
-  function fr(t){ try{ return (window.furiganaHTML? furiganaHTML(t) : esc(t)); }catch(e){ return esc(t); } }
-  function renderLines(){
-    const box=document.getElementById('lines');
-    box.innerHTML = lines.map((l,i)=>`
-      <div class="line ${i===cur?'on':''} ${done[i]?'done':''} ${mode==='dict'&&!l._rev?'dict-blur':''}" id="ln${i}" onclick="YTS.pick(${i},event)">
-        <div class="lhead"><span class="tstamp">${fmtT(l.t)}</span>${done[i]?'<span class="okmark">✓</span>':''}</div>
-        <div class="ljp ${l._rev?'revealed':''}" id="jp${i}">${fr(l.ja)}</div>
-        ${l.zh?`<div class="lzh">${esc(l.zh)}</div>`:''}
-        <div class="ltools" id="tools${i}"></div>
-      </div>`).join('');
-    updProg();
+
+  // ── 練習卡(一次一句) ──
+  function renderCard(autoplay=true){
+    stopRec();
+    const l=lines[cur]; if(!l) return;
+    document.getElementById('pcIdx').textContent=(cur+1)+' / '+lines.length+'　'+fmtT(l.t);
+    const jp=document.getElementById('pcJp');
+    jp.innerHTML=fr(l.ja);
+    jp.classList.toggle('blur', mode==='dict' && !l._rev);
+    document.getElementById('pcZh').textContent=l.zh||'';
+    const res=document.getElementById('pcRes'); res.className='pc-result'; res.innerHTML='';
+    document.getElementById('pcNext').style.display='none';
+    const act=document.getElementById('pcAct');
+    if(mode==='shadow'){
+      act.innerHTML=`
+        <button class="btn pri micbtn" id="micBtn" onclick="YTS.toggleRec()"><i data-ic=mic></i> ${enOr('開麥跟讀','Shadow with mic')}</button>
+        <input class="saidbox" id="saidIn" placeholder="${enOr('辨識結果會出現在這(也可直接打字)','Recognized speech appears here (or type)')}" style="display:none">
+        <div class="recnote" id="recNote"></div>`;
+    } else {
+      act.innerHTML=`
+        <textarea class="dictarea" id="dictIn" placeholder="${enOr('聽完把句子打出來','Type what you heard')}"></textarea>
+        <button class="btn pri micbtn" onclick="YTS.checkDict()">${enOr('對答案','Check')}</button>`;
+    }
     try{ if(window.Icons&&Icons.hydrate)Icons.hydrate(); }catch(e){}
+    updProg(); renderList();
+    if(autoplay) playSeg();
   }
   function updProg(){
     const n=Object.keys(done).length;
-    document.getElementById('progTx').textContent = lines.length? (enOr('已完成 ','Done ')+n+' / '+lines.length+enOr(' 句',' lines')) : '';
+    document.getElementById('progTx').textContent=enOr('已完成 ','Done ')+n+' / '+lines.length;
   }
+  function nav(d){ cur=Math.min(lines.length-1,Math.max(0,cur+d)); renderCard(); }
+  function jump(i){ cur=i; listOpen=false; document.getElementById('allLines').style.display='none'; renderCard(); }
 
   // ── 播放控制 ──
-  function playSeg(i,loop){
-    if(!player||!lines[i]) return;
-    const l=lines[i];
+  function playSeg(){
+    if(!player||!lines[cur]) return;
+    const l=lines[cur];
     clearInterval(watchT);
-    player.seekTo(l.t/1000,true); player.playVideo();
+    try{
+      player.setPlaybackRate(SPEEDS[spdIdx]);
+      player.seekTo(l.t/1000,true); player.playVideo();
+    }catch(e){ return; }
     const end=(l.t+(l.d||4000))/1000;
     watchT=setInterval(()=>{
       try{
         const c=player.getCurrentTime();
         if(c>=end-0.05){
-          if(loop&&loopOn){ player.seekTo(l.t/1000,true); }
+          if(loopOn){ player.seekTo(l.t/1000,true); }
           else { player.pauseVideo(); clearInterval(watchT); }
         }
       }catch(e){}
     },120);
   }
-  function pick(i,ev){
-    if(ev&&ev.target&&ev.target.closest&&(ev.target.closest('.ltools')||ev.target.closest('.jlk'))) return;   // 工具鈕/查詞不觸發選句
-    stopRec();
-    cur=i; renderLines(); buildTools(i); playSeg(i,true);
-    const el=document.getElementById('ln'+i); if(el) el.scrollIntoView({behavior:'smooth',block:'center'});
+  function replay(){ playSeg(); }
+  function cycleSpeed(){
+    spdIdx=(spdIdx+1)%SPEEDS.length;
+    document.getElementById('spdBtn').textContent=SPEEDS[spdIdx]+'x';
+    try{ player&&player.setPlaybackRate(SPEEDS[spdIdx]); }catch(e){}
   }
-  function buildTools(i){
-    const t=document.getElementById('tools'+i); if(!t) return;
-    if(mode==='shadow'){
-      t.innerHTML=`
-        <button class="btn" onclick="YTS.playSeg(${i},false)"><i data-ic=volume></i> ${enOr('再聽','Replay')}</button>
-        <button class="btn" onclick="YTS.toggleLoop(this)">${loopOn?enOr('循環:開','Loop: on'):enOr('循環:關','Loop: off')}</button>
-        <button class="btn pri" id="recB${i}" onclick="YTS.toggleRec(${i})"><i data-ic=mic></i> ${enOr('跟讀','Shadow')}</button>
-        <span class="score" id="sc${i}"></span>
-        <input class="saidbox" id="said${i}" placeholder="${enOr('辨識結果會出現在這(也可直接打字)','Recognized speech appears here (or type)')}" style="display:none">
-        <div class="recnote" id="rn${i}"></div>`;
-    } else {
-      t.innerHTML=`
-        <button class="btn" onclick="YTS.playSeg(${i},false)"><i data-ic=volume></i> ${enOr('播放這句','Play line')}</button>
-        <textarea class="dictarea" id="dt${i}" placeholder="${enOr('聽完把句子打出來','Type what you heard')}"></textarea>
-        <button class="btn pri" onclick="YTS.checkDict(${i})">${enOr('對答案','Check')}</button>
-        <span class="score" id="sc${i}"></span>
-        <div class="diffbox" id="df${i}"></div>`;
-    }
-    try{ if(window.Icons&&Icons.hydrate)Icons.hydrate(); }catch(e){}
-  }
-  function toggleLoop(btn){ loopOn=!loopOn; btn.textContent=loopOn?enOr('循環:開','Loop: on'):enOr('循環:關','Loop: off'); if(loopOn&&cur>=0) playSeg(cur,true); }
-  function setMode(m){
-    stopRec(); mode=m; cur=-1;
-    document.getElementById('mShadow').classList.toggle('on',m==='shadow');
-    document.getElementById('mDict').classList.toggle('on',m==='dict');
-    lines.forEach(l=>{ l._rev=false; });
-    renderLines();
+  function toggleLoop(){
+    loopOn=!loopOn;
+    document.getElementById('loopBtn').classList.toggle('on',loopOn);
+    if(loopOn) playSeg();
   }
 
   // ── 跟讀:瀏覽器 STT / App 原生 STT 雙路(照 speak.html) ──
   const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
   const NATIVE_STT=!!(window.STAYJP_NATIVE&&window.STAYJP_NATIVE.canSpeech&&window.ReactNativeWebView);
   function _nPost(o){ try{ window.ReactNativeWebView.postMessage(JSON.stringify(o)); }catch(e){} }
-  let rec=null, recording=false, recIdx=-1;
-  function toggleRec(i){ recording?stopRec():startRec(i); }
-  function _recUI(i,on){ const b=document.getElementById('recB'+i); if(b){ b.classList.toggle('rec-on',on); b.innerHTML=on?('<i data-ic=stop></i> '+enOr('停止','Stop')):('<i data-ic=mic></i> '+enOr('跟讀','Shadow')); try{ if(window.Icons&&Icons.hydrate)Icons.hydrate(); }catch(e){} } }
-  function onSaid(i,text,fin){
-    const inp=document.getElementById('said'+i); if(inp){ inp.style.display='block'; inp.value=text; }
-    const m=matchChars(lines[i].ja,text);
-    // 逐字亮綠:重繪該句(不含 ruby 命中著色的複雜度:對 norm 後字元順序著色,ruby 內文字逐一對應)
-    paintHits(i,m.hits);
-    const sc=document.getElementById('sc'+i);
-    if(fin){
-      const pct=Math.round(m.ratio*100);
-      const pass=m.ratio>=0.7;
-      if(sc){ sc.textContent=pct+'%'+(pass?' ✓':''); sc.className='score '+(pass?'pass':'fail'); }
-      if(pass){ done[i]=1; try{ localStorage.setItem(doneKey(),JSON.stringify(done)); }catch(e){} const ln=document.getElementById('ln'+i); if(ln)ln.classList.add('done'); updProg(); }
-    } else if(sc){ sc.textContent=Math.round(m.ratio*100)+'%'; sc.className='score'; }
+  let rec=null, recording=false;
+  function toggleRec(){ recording?stopRec():startRec(); }
+  function _recUI(on){ const b=document.getElementById('micBtn'); if(b){ b.classList.toggle('rec-on',on); b.innerHTML=on?('<i data-ic=stop></i> '+enOr('停止','Stop')):('<i data-ic=mic></i> '+enOr('開麥跟讀','Shadow with mic')); try{ if(window.Icons&&Icons.hydrate)Icons.hydrate(); }catch(e){} } }
+  function onSaid(text,fin){
+    const inp=document.getElementById('saidIn'); if(inp){ inp.style.display='block'; inp.value=text; }
+    const m=matchChars(lines[cur].ja,text);
+    paintHits(m.hits);
+    if(fin) showResult(m.ratio, null);
   }
-  function paintHits(i,hits){
-    const el=document.getElementById('jp'+i); if(!el) return;
-    // 走原始字串:略過標點(未參與比對),與 hits 索引對齊
-    const raw=lines[i].ja; let hIdx=0; let html='';
+  function paintHits(hits){
+    const el=document.getElementById('pcJp'); if(!el) return;
+    const raw=lines[cur].ja; let hIdx=0; let html='';
     for(const ch of raw){
       if(norm(ch)===''){ html+=esc(ch); continue; }
       html += hits[hIdx] ? '<span class="hit">'+esc(ch)+'</span>' : esc(ch);
       hIdx++;
     }
-    el.innerHTML=html;   // 著色時暫時捨棄 ruby(結束後點其他句會重繪回 ruby 版)
+    el.innerHTML=html;
   }
-  function startRec(i){
-    recIdx=i;
+  function showResult(ratio, diffHtml){
+    const pct=Math.round(ratio*100), pass=ratio>=0.7;
+    const res=document.getElementById('pcRes');
+    res.className='pc-result '+(pass?'pass':'fail');
+    res.innerHTML=`<div class="rt1">${pass?enOr('太棒了!','Nice!'):enOr('再試一次會更好','Almost — try again')} ${pct}%${pass?' ✓':''}</div>`
+      + (diffHtml?`<div class="rt2">${diffHtml}</div>`:'');
+    if(pass){
+      done[cur]=1; try{ localStorage.setItem(doneKey(),JSON.stringify(done)); }catch(e){}
+      document.getElementById('pcNext').style.display='flex';
+      updProg(); renderList();
+    }
+  }
+  function startRec(){
     try{ player&&player.pauseVideo(); }catch(e){}
     clearInterval(watchT);
     if(NATIVE_STT){
-      window.stayjpSpeechResult=(t,fin)=>{ if(t) onSaid(recIdx,t,!!fin); };
-      window.stayjpSpeechEnd=(err)=>{ recording=false; _recUI(recIdx,false); const rn=document.getElementById('rn'+recIdx); if(err&&rn) rn.textContent=enOr('辨識出錯('+err+'),可直接打字。','Recognition error ('+err+') — you can type instead.'); };
-      recording=true; _recUI(i,true); _nPost({type:'SPEECH_START',lang:'ja-JP'});
+      window.stayjpSpeechResult=(t,fin)=>{ if(t) onSaid(t,!!fin); };
+      window.stayjpSpeechEnd=(err)=>{ recording=false; _recUI(false); const rn=document.getElementById('recNote'); if(err&&rn) rn.textContent=enOr('辨識出錯('+err+'),可直接打字。','Recognition error ('+err+') — you can type instead.'); };
+      recording=true; _recUI(true); _nPost({type:'SPEECH_START',lang:'ja-JP'});
       return;
     }
-    if(!SR){ const rn=document.getElementById('rn'+i); if(rn) rn.textContent=enOr('這個瀏覽器不支援語音辨識,可直接打字後看著色。','This browser has no speech recognition — type instead.'); const inp=document.getElementById('said'+i); if(inp){ inp.style.display='block'; inp.oninput=()=>onSaid(i,inp.value,false); } return; }
+    if(!SR){
+      const rn=document.getElementById('recNote'); if(rn) rn.textContent=enOr('這個瀏覽器不支援語音辨識,可直接打字後看著色。','This browser has no speech recognition — type instead.');
+      const inp=document.getElementById('saidIn'); if(inp){ inp.style.display='block'; inp.oninput=()=>onSaid(inp.value,false); inp.onchange=()=>onSaid(inp.value,true); }
+      return;
+    }
     rec=new SR(); rec.lang='ja-JP'; rec.interimResults=true; rec.continuous=false;
-    rec.onresult=e=>{ let t=''; for(let k=0;k<e.results.length;k++) t+=e.results[k][0].transcript; onSaid(recIdx,t,e.results[e.results.length-1].isFinal); };
-    rec.onerror=e=>{ const rn=document.getElementById('rn'+recIdx); if(rn) rn.textContent=enOr('辨識出錯('+e.error+'),可直接打字。','Recognition error ('+e.error+') — type instead.'); stopRec(); };
-    rec.onend=()=>{ recording=false; _recUI(recIdx,false); };
-    try{ rec.start(); recording=true; _recUI(i,true); }catch(e){}
+    rec.onresult=e=>{ let t=''; for(let k=0;k<e.results.length;k++) t+=e.results[k][0].transcript; onSaid(t,e.results[e.results.length-1].isFinal); };
+    rec.onerror=e=>{ const rn=document.getElementById('recNote'); if(rn) rn.textContent=enOr('辨識出錯('+e.error+'),可直接打字。','Recognition error ('+e.error+') — type instead.'); stopRec(); };
+    rec.onend=()=>{ recording=false; _recUI(false); };
+    try{ rec.start(); recording=true; _recUI(true); }catch(e){}
   }
-  function stopRec(){ if(NATIVE_STT&&recording){ _nPost({type:'SPEECH_STOP'}); } else if(rec&&recording){ try{rec.stop();}catch(e){} } recording=false; if(recIdx>=0)_recUI(recIdx,false); }
+  function stopRec(){ if(NATIVE_STT&&recording){ _nPost({type:'SPEECH_STOP'}); } else if(rec&&recording){ try{rec.stop();}catch(e){} } recording=false; _recUI(false); }
 
   // ── 聽寫 ──
-  function checkDict(i){
-    const ta=document.getElementById('dt'+i); const said=(ta&&ta.value||'').trim();
+  function checkDict(){
+    const ta=document.getElementById('dictIn'); const said=(ta&&ta.value||'').trim();
     if(!said) return;
-    const l=lines[i]; l._rev=true;
+    const l=lines[cur]; l._rev=true;
     const t=norm(l.ja), s=norm(said);
-    // LCS 對答案:答對字綠、多打/錯字紅線
     const dp=Array.from({length:s.length+1},()=>new Array(t.length+1).fill(0));
     for(let a=1;a<=s.length;a++)for(let b=1;b<=t.length;b++) dp[a][b]=s[a-1]===t[b-1]?dp[a-1][b-1]+1:Math.max(dp[a-1][b],dp[a][b-1]);
     let a=s.length,b=t.length; const keepS=new Set();
     while(a>0&&b>0){ if(s[a-1]===t[b-1]){keepS.add(a-1);a--;b--;} else if(dp[a-1][b]>=dp[a][b-1])a--; else b--; }
     let html='';
     for(let k=0;k<s.length;k++) html+=keepS.has(k)?'<span class="dok">'+esc(s[k])+'</span>':'<span class="dng">'+esc(s[k])+'</span>';
-    const df=document.getElementById('df'+i); if(df){ df.innerHTML=html+'<div style="margin-top:6px;color:var(--tx2);font-size:12.5px">'+enOr('正解:','Answer: ')+esc(l.ja)+'</div>'; df.style.display='block'; }
-    const ratio=t.length?dp[s.length][t.length]/t.length:0;
-    const pct=Math.round(ratio*100), pass=ratio>=0.7;
-    const sc=document.getElementById('sc'+i); if(sc){ sc.textContent=pct+'%'+(pass?' ✓':''); sc.className='score '+(pass?'pass':'fail'); }
-    if(pass){ done[i]=1; try{ localStorage.setItem(doneKey(),JSON.stringify(done)); }catch(e){} updProg(); }
-    const jp=document.getElementById('jp'+i); if(jp) jp.classList.add('revealed');
-    const ln=document.getElementById('ln'+i); if(ln){ ln.classList.remove('dict-blur'); if(pass)ln.classList.add('done'); }
+    document.getElementById('pcJp').classList.remove('blur');
+    showResult(t.length?dp[s.length][t.length]/t.length:0, html);
   }
 
-  // ── 範例 / 換影片 ──
+  // ── 句子總覽(跳句) ──
+  function toggleList(){
+    listOpen=!listOpen;
+    document.getElementById('allLines').style.display=listOpen?'block':'none';
+    if(listOpen) renderList();
+  }
+  function renderList(){
+    if(!listOpen) return;
+    document.getElementById('allLines').innerHTML=lines.map((l,i)=>
+      `<div class="jl ${i===cur?'cur':''}" onclick="YTS.jump(${i})"><span class="t">${fmtT(l.t)}</span><span>${esc(l.ja.slice(0,22))}${l.ja.length>22?'…':''}</span>${done[i]?'<span class="ok">✓</span>':''}</div>`).join('');
+  }
+
+  // ── 模式/換影片/範例 ──
+  function setMode(m){
+    stopRec(); mode=m;
+    document.getElementById('mShadow').classList.toggle('on',m==='shadow');
+    document.getElementById('mDict').classList.toggle('on',m==='dict');
+    lines.forEach(l=>{ l._rev=false; });
+    renderCard(false);
+  }
   function loadExample(){ document.getElementById('urlIn').value=EXAMPLE_V; load(); }
   function swap(){
     stopRec(); clearInterval(watchT);
     try{ player&&player.pauseVideo(); }catch(e){}
+    document.getElementById('practice').style.display='none';
     document.getElementById('inputCard').style.display='block';
     document.getElementById('urlIn').value=''; document.getElementById('urlIn').focus();
     window.scrollTo({top:0,behavior:'smooth'});
   }
+
   // ── 教學 ──
   function tutHtml(){
     const en=I18n.getLang()==='en';
@@ -430,7 +479,7 @@ const YTS = (() => {
       : cvt('<b>電腦:</b>影片下方「<b>顯示轉譯稿 / 逐字稿</b>」→ 全選複製(時間戳記保持顯示)。<br><b>手機:</b>用<b>瀏覽器</b>開那支影片(不是 YouTube App)→ 說明欄點「顯示轉譯稿」→ 長按選取全部複製。')}</div>`;
     return S(1,'選一支影片','Pick a video','任何有日文字幕的都行:喜歡的歌、新聞、動漫歌 MV、Vlog。複製它的連結,貼進輸入框按「讀取」。','Any video with Japanese subtitles works: songs, news, anime MVs, vlogs. Copy its link, paste it, hit Load.')
       + S(2,'字幕抓不到?貼逐字稿','No captions? Paste the transcript','大部分影片會自動載入字幕。抓不到的話,到 YouTube 複製「逐字稿」貼過來,一樣能練:','Captions usually load automatically. If not, copy the video’s transcript from YouTube and paste it here:',sub2)
-      + S(3,'開始練','Start practicing','點任一句 → 那句循環播放。「跟讀」開麥跟著唸,唸到的字會亮綠、給分數;「聽寫」先聽再打字對答案。看不懂的漢字,點一下就查。','Tap any line to loop it. In Shadow mode, speak along — matched words light up green with a score. In Dictation, listen first then type. Tap any word to look it up.');
+      + S(3,'一次一句開練','Practice line by line','影片下面就是當前句:唸完亮綠給分,70% 以上打勾、跳下一句。「‹ ›」換句、「1x」調速度、「循環」重複聽、看不懂的漢字點一下就查。','Your current line sits under the video: speak it and matched words light up green. Use ‹ › to move, 1x to slow down, Loop to repeat, and tap any word to look it up.');
   }
   function tut(show){
     const m=document.getElementById('tutMask');
@@ -442,10 +491,9 @@ const YTS = (() => {
   }
   document.addEventListener('DOMContentLoaded',()=>{
     _retext();
-    try{ const el=document.getElementById('howBtn'); if(el) el.textContent=enOr('怎麼用?','How?'); }catch(e){}
     try{ if(!localStorage.getItem('yts_tut_seen')) tut(true); }catch(e){}
   });
-  return { load, parsePaste, pick, playSeg, toggleLoop, setMode, toggleRec, checkDict, tut, loadExample, swap, _retext };
+  return { load, parsePaste, nav, jump, replay, cycleSpeed, toggleLoop, setMode, toggleRec, checkDict, toggleList, tut, loadExample, swap, _retext };
 })();
 </script>
 <script src="font-scale.js"></script>
