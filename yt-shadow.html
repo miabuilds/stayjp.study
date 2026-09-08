@@ -107,7 +107,7 @@ body{margin:0;background:var(--bg);color:var(--tx);font-family:-apple-system,"Pi
     <div class="err" id="inErr" style="display:none"></div>
     <div class="pastebox" id="pasteBox">
       <div class="steps" id="pasteSteps">到 YouTube 開這支影片 → 點「<b>顯示轉譯稿</b>」→ 全選複製貼到下面。<a href="javascript:void(0)" style="color:var(--ac)" onclick="YTS.tut(true)">詳細步驟</a></div>
-      <textarea id="pasteTa" placeholder="0:26&#10;派手に色を溶かす夜に&#10;0:32&#10;転がるように風を切って&#10;…"></textarea>
+      <textarea id="pasteTa" placeholder="← 先去 YouTube 複製逐字稿,回來貼在這裡(要含 0:26 這種時間)"></textarea>
       <div style="display:flex;gap:8px;margin-top:8px"><button class="btn pri" onclick="YTS.parsePaste()" id="parseBtn">解析逐字稿</button></div>
     </div>
   </div>
@@ -161,6 +161,7 @@ const YTS = (() => {
     set('pasteSteps','到 YouTube 開這支影片 → 點「<b>顯示轉譯稿</b>」→ 全選複製貼到下面。<a href="javascript:void(0)" style="color:var(--ac)" onclick="YTS.tut(true)">詳細步驟</a>',
       'Open the video on YouTube → “<b>Show transcript</b>” → copy everything & paste below. <a href="javascript:void(0)" style="color:var(--ac)" onclick="YTS.tut(true)">Details</a>');
     const u=document.getElementById('urlIn'); if(u) u.placeholder = en?'Paste a YouTube link or video ID':cvt('貼上 YouTube 連結或影片 ID');
+    const pt=document.getElementById('pasteTa'); if(pt) pt.placeholder = en?'← Copy the transcript on YouTube first, then paste it here (with timestamps like 0:26)':cvt('← 先去 YouTube 複製逐字稿,回來貼在這裡(要含 0:26 這種時間)');
   }
 
   // ── 工具 ──
@@ -237,7 +238,9 @@ const YTS = (() => {
   // ── 貼上逐字稿解析:支援「0:26↵文字」與「0:26 文字」兩種格式 ──
   function parsePaste(){
     const raw=(document.getElementById('pasteTa').value||'').trim();
-    if(!raw) return;
+    const errEl=document.getElementById('inErr');
+    if(!raw){ errEl.textContent=enOr('這裡還是空的——先到 YouTube 複製這支影片的逐字稿,貼進來再按解析。','The box is empty — copy the video’s transcript from YouTube first, paste it, then parse.'); errEl.style.display='block'; return; }
+    errEl.style.display='none';
     const rows=raw.split(/\n+/).map(s=>s.trim()).filter(Boolean);
     const out=[]; const TS=/^(\d{1,2}):(\d{2})(?::(\d{2}))?$/;
     for(let i=0;i<rows.length;i++){
