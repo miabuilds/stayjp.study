@@ -11,7 +11,7 @@ if (admin.apps.length === 0) admin.initializeApp();
 
 const INNERTUBE_KEY = "AIzaSyA8eiZmM1FaDVjRy-df2KTyQ_vz_yYM39w";   // YouTube 網頁版公開 key(非機密,寫死在 youtube.com 前端)
 const CACHE = new Map<string, { at: number; data: unknown }>();     // instance 內快取,15 分鐘
-const CACHE_MS = 15 * 60 * 1000;
+const CACHE_MS = 60 * 1000;   // 記憶體快取只擋瞬間重複請求;Firestore 才是主快取(更新字幕/翻譯後要馬上看得到)
 
 type CapTrack = { baseUrl: string; languageCode: string; kind?: string; name?: { runs?: { text: string }[] } };
 
