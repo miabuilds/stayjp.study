@@ -368,12 +368,33 @@ const YTS = (() => {
   }
   const fmtT=ms=>{ const s=Math.floor(ms/1000); return Math.floor(s/60)+':'+String(s%60).padStart(2,'0'); };
   const norm=s=>(s||'').replace(/[\s、。,．.!！?？「」『』()（）・〜~♪…––—-]/g,'');
+  // 判定用的假名正規化:片假名→平假名,漢字→讀音(站上注音字典)。
+  // 目的:打漢字、平假名、片假名都算對(用戶回饋)。
+  const kata2hira = t => (t||'').replace(/[\u30a1-\u30f6]/g, c => String.fromCharCode(c.charCodeAt(0)-0x60));
+  function kanaOf(t){
+    try{
+      if(!window.furiganaHTML) return '';
+      return furiganaHTML(t).replace(/<ruby>(.*?)<rt>(.*?)<\/rt><\/ruby>/g,'$2').replace(/<[^>]+>/g,'');
+    }catch(e){ return ''; }
+  }
+  const normK = t => kata2hira(norm(t));
+  function lcsRatio(said,target){          // target 被命中的比例(假名等價)
+    const a=normK(said), b=normK(target);
+    if(!b) return 0;
+    const dp=Array.from({length:a.length+1},()=>new Array(b.length+1).fill(0));
+    for(let i=1;i<=a.length;i++)for(let j=1;j<=b.length;j++)
+      dp[i][j]= a[i-1]===b[j-1] ? dp[i-1][j-1]+1 : Math.max(dp[i-1][j],dp[i][j-1]);
+    return dp[a.length][b.length]/Math.max(a.length,b.length);
+  }
   function matchChars(target,said){
-    const t=norm(target), s=norm(said);
+    const t=norm(target), s=normK(said);
     const hits=new Array(t.length).fill(false);
     let p=0;
-    for(let i=0;i<t.length;i++){ const idx=s.indexOf(t[i],p); if(idx>=0){ hits[i]=true; p=idx+1; } }
-    return { hits, ratio: t.length? hits.filter(Boolean).length/t.length : 0 };
+    for(let i=0;i<t.length;i++){ const c=normK(t[i]); const idx=c?s.indexOf(c,p):-1; if(idx>=0){ hits[i]=true; p=idx+1; } }
+    const hitN = hits.filter(Boolean).length;
+    const rawRatio = t.length ? hitN/Math.max(normK(target).length, s.length||1) : 0;
+    const kanaRatio = lcsRatio(said, kanaOf(target) || target);   // 整句用假名唸/打也算對
+    return { hits, ratio: Math.max(rawRatio, kanaRatio) };
   }
   function fr(t){ try{ return (window.furiganaHTML? furiganaHTML(t) : esc(t)); }catch(e){ return esc(t); } }
   // 有效句長(ms):ASR 字幕的 d 常延伸蓋過下一句 → 截到下一句開始,KTV 刷色才對得上
@@ -675,7 +696,7 @@ const YTS = (() => {
     const pct=Math.round(ratio*100), pass=ratio>=0.7;
     const res=document.getElementById('pcRes');
     res.className='pc-result '+(pass?'pass':'fail');
-    res.innerHTML=`<div class="rt1">${pass?enOr('太棒了!','Nice!'):enOr('再試一次會更好','Almost — try again')} ${pct}%${pass?' ✓':''}</div>`
+    res.innerHTML=`<div class="rt1">${pass?enOr('答對了!','Correct!'):enOr('再試一次會更好','Almost — try again')} ${pct}%${pass?' ✓':''}</div>`
       + (diffHtml?`<div class="rt2">${diffHtml}</div>`:'');
     if(pass){
       done[cur]=1; try{ localStorage.setItem(doneKey(),JSON.stringify(done)); }catch(e){}
@@ -743,7 +764,8 @@ const YTS = (() => {
     const ta=document.getElementById('dictIn'); const said=(ta&&ta.value||'').trim();
     if(!said) return;
     const l=lines[cur]; l._rev=true;
-    const t=norm(l.ja), s=norm(said);
+    // 漢字寫法與假名寫法都算對:兩種比對取高分
+    const t=normK(l.ja), s=normK(said);
     const dp=Array.from({length:s.length+1},()=>new Array(t.length+1).fill(0));
     for(let a=1;a<=s.length;a++)for(let b=1;b<=t.length;b++) dp[a][b]=s[a-1]===t[b-1]?dp[a-1][b-1]+1:Math.max(dp[a-1][b],dp[a][b-1]);
     let a=s.length,b=t.length; const keepS=new Set();
@@ -752,7 +774,7 @@ const YTS = (() => {
     for(let k=0;k<s.length;k++) html+=keepS.has(k)?'<span class="dok">'+esc(s[k])+'</span>':'<span class="dng">'+esc(s[k])+'</span>';
     document.getElementById('pcJp').classList.remove('blur');
     document.getElementById('pcZh').style.filter='';
-    showResult(t.length?dp[s.length][t.length]/t.length:0, html);
+    showResult(Math.max(t.length?dp[s.length][t.length]/Math.max(t.length,s.length):0, lcsRatio(said, kanaOf(l.ja)||l.ja)), html);
   }
 
   // ── 這支影片的單字・文法:掃字幕比對站上題庫,點開才載入大檔(vocab 每級 600KB) ──
@@ -886,10 +908,17 @@ const YTS = (() => {
   }
   function startQuiz(){
     qz = { list:buildQuiz(), i:0, picked:null, score:0, log:[] };
-    document.getElementById('quizBox').style.display='block';
-    if(!qz.list.length){ document.getElementById('quizBox').innerHTML='<div class="qz-sub">'+enOr('這支影片句子太少,出不了題——換一支再試。','Not enough lines in this video for a quiz — try another.')+'</div>'; return; }
-    renderQuiz();
+    const box=document.getElementById('quizBox');
+    box.style.display='block';
+    if(!qz.list.length){ box.innerHTML='<div class="qz-sub">'+enOr('這支影片句子太少,出不了題——換一支再試。','Not enough lines in this video for a quiz — try another.')+'</div>'; return; }
+    // 先給開始畫面:不要一點開就冒出聲音(用戶回饋)
+    box.innerHTML='<div class="qz-res" style="padding:18px 0">'
+      + '<div style="font-size:15px;font-weight:800;margin-bottom:4px">'+enOr('影片測驗','Video quiz')+'</div>'
+      + '<div style="font-size:13px;color:var(--tx2);line-height:1.9">'+enOr('共 '+qz.list.length+' 題:聽句選句 + 克漏字。<br>每題會播放那一段影片,記得開聲音。', qz.list.length+' questions: listening and cloze.<br>Each one plays a clip — turn your sound on.')+'</div>'
+      + '<button class="btn pri" style="margin-top:14px;padding:13px 28px;font-size:15px" onclick="YTS.qzBegin()"><i data-ic=volume></i> '+enOr('開始測驗','Start quiz')+'</button></div>';
+    try{ if(window.Icons&&Icons.hydrate)Icons.hydrate(); }catch(e){}
   }
+  function qzBegin(){ renderQuiz(); }
   function renderQuiz(){
     const q=qz.list[qz.i], box=document.getElementById('quizBox');
     const l=lines[q.idx];
@@ -1023,12 +1052,20 @@ const YTS = (() => {
     else { stopKtv(); try{ player&&player.pauseVideo(); }catch(e){} renderCard(false); }
   }
   function loadSample(v){ document.getElementById('urlIn').value=v; load(); }
+  // 縮圖後備:部分影片沒有 maxresdefault(404) → 依序退 sddefault、hqdefault
+  const THUMB_STEPS=['sddefault','hqdefault','mqdefault'];
+  function thumbFallback(img){
+    const n=parseInt(img.dataset.step||'0',10);
+    if(n>=THUMB_STEPS.length){ img.onerror=null; return; }
+    img.dataset.step=String(n+1);
+    img.src='https://i.ytimg.com/vi/'+img.dataset.v+'/'+THUMB_STEPS[n]+'.jpg';
+  }
   function renderGallery(){
     const g=document.getElementById('gal'); if(!g) return;
     const cats=['全部',...new Set(SAMPLES.map(x=>x.cat))];
     document.getElementById('galCats').innerHTML=cats.map(c=>`<button class="${c===galCat?'on':''}" onclick="YTS.setCat('${c}')">${esc(c)}</button>`).join('');
     g.innerHTML=SAMPLES.filter(x=>galCat==='全部'||x.cat===galCat).map(x=>`<button class="gal-c" onclick="YTS.loadSample('${x.v}')">
-      <img src="https://i.ytimg.com/vi/${x.v}/maxresdefault.jpg" alt="" loading="lazy" onerror="this.onerror=null;this.src='https://i.ytimg.com/vi/${x.v}/hqdefault.jpg'">
+      <img src="https://i.ytimg.com/vi/${x.v}/maxresdefault.jpg" alt="" loading="lazy" data-v="${x.v}" data-step="0" onerror="YTS.thumbFallback(this)">
       <div class="gt">${esc(x.t)}</div><span class="gtag">${esc(x.tag)}</span>
     </button>`).join('');
   }
@@ -1085,7 +1122,7 @@ const YTS = (() => {
     if(ta) ta.addEventListener('paste',()=>{ setTimeout(()=>{ if((ta.value||'').trim()) parsePaste(); },80); });   // 貼上即解析
     try{ if(!localStorage.getItem('yts_tut_seen')) tut(true); }catch(e){}
   });
-  return { load, parsePaste, nav, jump, replay, cycleSpeed, toggleLoop, setMode, toggleRec, checkDict, toggleList, toggleZh, tut, loadSample, setCat, backToPractice, openTranscript, swap, theater, startQuiz, qzPlay, qzAnswer, qzNext, jumpPlay, openLearn, learnTab, saveWord, speakWord, _retext };
+  return { load, parsePaste, nav, jump, replay, cycleSpeed, toggleLoop, setMode, toggleRec, checkDict, toggleList, toggleZh, tut, loadSample, setCat, backToPractice, openTranscript, swap, theater, startQuiz, qzBegin, qzPlay, qzAnswer, qzNext, jumpPlay, openLearn, learnTab, saveWord, speakWord, thumbFallback, _retext };
 })();
 </script>
 <script src="font-scale.js"></script>
