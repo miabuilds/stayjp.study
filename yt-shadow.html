@@ -211,11 +211,15 @@ if(I18n.getLang()==='zh-CN') ensureOpenCC().then(function(){ try{ YTS._retext();
 const YTS = (() => {
   const FN = 'https://asia-east1-jpnote-1bdd6.cloudfunctions.net/ytCaptions';
   // 範例牆:全部「開放嵌入+日文字幕」且字幕已種進快取(即點即練)
-  const SAMPLES = [
-    { v:'Bwe7zLSPtXA', t:'日本語散歩Vlog:最近よく眠れていますか?', tag:'Vlog · 生活日語 · 中日字幕' },
+  const SAMPLES = [   // 由易到難排;全部已種字幕(即點即練)
+    { v:'rjmKQ-fjnyQ', t:'慢速日語會話(Comprehensible Japanese)', tag:'入門 · 慢速 · 中日字幕' },
+    { v:'JYEutL_zQQc', t:'昨日、何をしましたか?(5分鐘簡單對話)', tag:'入門 · 日常會話' },
+    { v:'3k75rkB61Bk', t:'桃太郎(日本昔話動畫)', tag:'N5-N4 · 童話朗讀' },
+    { v:'Bwe7zLSPtXA', t:'日本語散歩Vlog:最近よく眠れていますか?', tag:'N4-N3 · Vlog · 中日字幕' },
+    { v:'Xw3NjBuXMLY', t:'日本語散歩Vlog:東京駅から新橋まで', tag:'N4-N3 · Vlog' },
+    { v:'NyUTYwZe_l4', t:'YOASOBI「群青」THE FIRST TAKE', tag:'歌 · 歌詞字幕 · 中文對照' },
     { v:'tLQLa6lM3Us', t:'Aimer「残響散歌」(鬼滅の刃)', tag:'歌 · 歌詞字幕' },
-    { v:'Xw3NjBuXMLY', t:'日本語散歩Vlog:東京駅から新橋まで', tag:'Vlog · 生活日語' },
-    { v:'Ifux-aLb4RQ', t:'関東の天気:週明け大雨の恐れ', tag:'新聞 · 真實語速' },
+    { v:'Ifux-aLb4RQ', t:'関東の天気:週明け大雨の恐れ', tag:'新聞 · 真實語速 · 挑戰' },
   ];
   const SPEEDS = [1, 0.75, 0.5];
   let player=null, apiReady=false, vid='', lines=[], cur=0, mode='ktv', loopOn=false, watchT=0, done={}, spdIdx=0, listOpen=false, ktvT=0;
