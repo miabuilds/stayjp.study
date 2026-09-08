@@ -162,6 +162,7 @@ body{margin:0;background:var(--bg);color:var(--tx);font-family:-apple-system,"Pi
 .tut-step{display:flex;gap:12px;margin-bottom:14px}
 .tut-n{flex-shrink:0;width:26px;height:26px;border-radius:50%;background:var(--ac);color:#fff;font-size:13.5px;font-weight:800;display:flex;align-items:center;justify-content:center;margin-top:2px}
 .tut-step b{display:block;font-size:14.5px;margin-bottom:2px}
+.tut-step p em{font-style:normal;font-weight:700;color:var(--ac)}
 .tut-step p{margin:0;font-size:13px;color:var(--tx2);line-height:1.7}
 .tut-sub{background:var(--bg3);border-radius:10px;padding:8px 11px;font-size:12.5px;color:var(--tx2);line-height:1.7;margin-top:6px}
 .tut-sub b{display:inline;font-size:12.5px;color:var(--tx)}
@@ -1057,13 +1058,16 @@ const YTS = (() => {
   // ── 教學 ──
   function tutHtml(){
     const en=I18n.getLang()==='en';
-    const S=(n,zhT,enT,zhP,enP,sub)=>`<div class="tut-step"><span class="tut-n">${n}</span><div><b>${en?enT:cvt(zhT)}</b><p>${en?enP:cvt(zhP)}</p>${sub||''}</div></div>`;
-    const sub2 = `<div class="tut-sub">${en
-      ? '<b>Desktop:</b> below the video → “Show transcript” → select all & copy (keep timestamps on).<br><b>Phone:</b> open the video in a <b>browser</b> (not the YouTube app) → tap “Show transcript” in the description → long-press to select & copy.'
-      : cvt('<b>電腦:</b>影片下方「<b>顯示轉譯稿 / 逐字稿</b>」→ 全選複製(時間戳記保持顯示)。<br><b>手機:</b>用<b>瀏覽器</b>開那支影片(不是 YouTube App)→ 說明欄點「顯示轉譯稿」→ 長按選取全部複製。')}</div>`;
-    return S(1,'選一支影片','Pick a video','任何有日文字幕的都行:喜歡的歌、新聞、動漫歌 MV、Vlog。複製它的連結,貼進輸入框按「讀取」。','Any video with Japanese subtitles works: songs, news, anime MVs, vlogs. Copy its link, paste it, hit Load.')
-      + S(2,'字幕抓不到?貼逐字稿','No captions? Paste the transcript','大部分影片會自動載入字幕。抓不到的話,到 YouTube 複製「逐字稿」貼過來,一樣能練:','Captions usually load automatically. If not, copy the video’s transcript from YouTube and paste it here:',sub2)
-      + S(3,'一次一句開練','Practice line by line','影片下面就是當前句:唸完亮綠給分,70% 以上打勾、跳下一句。「‹ ›」換句、「1x」調速度、「循環」重複聽、看不懂的漢字點一下就查。','Your current line sits under the video: speak it and matched words light up green. Use ‹ › to move, 1x to slow down, Loop to repeat, and tap any word to look it up.');
+    const S=(n,zhT,enT,zhP,enP)=>`<div class="tut-step"><span class="tut-n">${n}</span><div><b>${en?enT:cvt(zhT)}</b><p>${en?enP:cvt(zhP)}</p></div></div>`;
+    return S(1,'挑一支影片','Pick a video',
+        '首頁的片庫全部可以直接練——用上面的分類挑(入門、會話、故事、Vlog、動漫、歌、新聞),點縮圖就開始,不用設定任何東西。',
+        'Every video in the gallery is ready to go — filter by category (Beginner, Conversation, Stories, Vlog, Anime, Songs, News) and just tap a thumbnail.')
+      + S(2,'四種練法,由淺入深','Four ways to practice',
+        '<em>跟播</em>=影片一直播,字幕自動跳、當前句像 KTV 一樣刷色;<em>跟讀</em>=開麥跟著唸,唸到的字亮綠給分;<em>聽寫</em>=句子先遮住,聽完打出來對答案;<em>測驗</em>=聽句選句和克漏字,每題都有詳解。',
+        '<em>Follow</em>: captions auto-advance with a karaoke highlight. <em>Shadow</em>: speak along and matched words light up with a score. <em>Dictation</em>: the line is hidden until you type it. <em>Quiz</em>: listening and cloze questions, each with an explanation.')
+      + S(3,'邊看邊查、順手收單字','Look things up as you go',
+        '句子裡的漢字點一下就查(有讀音和意思);「<em>這支影片的單字・文法</em>」會列出這支片用到的 JLPT 單字和句型,標級數、可跳去那一句聽,☆ 收進生詞本就會進複習系統。速度可切 0.5x、循環單句、中文翻譯也能開關。',
+        'Tap any kanji in a line to look it up. The <em>Words &amp; grammar in this video</em> panel lists the JLPT vocabulary and patterns it uses — with levels, jump-to-line playback, and ☆ to save into your review deck. You can also slow to 0.5x, loop a line, and toggle the Chinese translation.');
   }
   function tut(show){
     const m=document.getElementById('tutMask');
