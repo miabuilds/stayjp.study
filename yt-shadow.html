@@ -407,10 +407,26 @@ const YTS = (() => {
 
   // ── 進入練習 ──
   function doneKey(){ return 'yts_done_'+vid; }
+  // 有些頻道的「中文字幕軌」其實是雙語(日文+中文同一行)→ 翻譯欄會把日文再抄一次。
+  // 剝掉開頭與日文重複的部分,只留真正的中文。
+  function dedupeZh(ja,zh){
+    ja=(ja||'').trim(); zh=(zh||'').trim();
+    if(!zh||!ja) return zh;
+    if(zh.startsWith(ja)) return zh.slice(ja.length).replace(/^[\s　:：,，、。.-]+/,'').trim();
+    const norm=t=>t.replace(/[\s　、。,．.!！?？「」『』()（）・〜~…–—-]/g,'');
+    const nj=norm(ja), nz=norm(zh);
+    if(nj && nz.startsWith(nj)){   // 標點不同也算重複:逐字對掉前綴
+      let k=0,hit=0;
+      while(k<zh.length && hit<nj.length){ if(norm(zh[k])!=='') hit++; k++; }
+      return zh.slice(k).replace(/^[\s　:：,，、。.-]+/,'').trim();
+    }
+    return zh;
+  }
   function setLines(ls){
     // 過濾音效標籤句([音楽]/[拍手]/(笑) 這類整句都是括號標記的,不能拿來練)
     lines=ls.filter(l=>!/^[\[（(【][^\]）)】]*[\]）)】]$/.test((l.ja||'').trim()));
     if(!lines.length) lines=ls;
+    lines.forEach(l=>{ l.zh=dedupeZh(l.ja,l.zh); });
     try{ done=JSON.parse(localStorage.getItem(doneKey()))||{}; }catch(e){ done={}; }
     document.getElementById('inputCard').style.display='none';
     document.getElementById('inErr').style.display='none';
