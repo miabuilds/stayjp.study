@@ -1131,6 +1131,11 @@ const YTS = (() => {
   }
   document.addEventListener('DOMContentLoaded',()=>{
     _retext(); renderGallery();
+    // 從面板「今日推薦」點進來:?v=<id> 直接開那支影片
+    try{
+      const q=new URLSearchParams(location.search).get('v');
+      if(q && /^[A-Za-z0-9_-]{11}$/.test(q)){ document.getElementById('urlIn').value=q; setTimeout(load,80); }
+    }catch(e){}
     // 點字查詢時把影片暫停:查詢彈窗的發音才不會跟影片疊音
     document.addEventListener('click',e=>{ if(e.target&&e.target.closest&&e.target.closest('.jlk')){ try{ player&&player.pauseVideo(); }catch(e2){} clearInterval(watchT); } },true);
     const ta=document.getElementById('pasteTa');
