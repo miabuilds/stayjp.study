@@ -1299,7 +1299,7 @@ window.ARTICLES = [
       "Precisely because we live in an age when AI gives instant answers, the attitude of continuing to ask \"why\" becomes all the more important.",
       "Rather than hoarding knowledge, how you use it and how you judge will become the core of learning from now on."
     ]
-    },
+  },
   {
     "id": "a-n5-3",
     "level": "n5",
@@ -2143,785 +2143,1634 @@ window.ARTICLES = [
       }
     ]
   },
-{
-  "id": "a-n1-3",
-  "level": "n1",
-  "topic": "社会",
-  "topic_en": "Society",
-  "title": "少子高齢化という難題",
-  "title_zh": "少子高齡化這道難題",
-  "title_en": "The Challenge of an Aging, Shrinking Society",
-  "body": "日本は 世界でも 類を見ない 速さで 少子高齢化が 進んでいる。総人口に 占める 高齢者の 割合は 年々 上昇し、その 一方で 生まれる 子どもの 数は 減り続けている。\nこの 傾向が もたらす 影響は、社会保障制度の 根幹を 揺るがしかねない。年金や 医療、介護に かかる 費用は 増える 一方で、それを 支える 現役世代は 減っていくからだ。\n対策として、育児と 仕事の 両立を 支援する 制度の 充実や、外国人労働者の 受け入れ 拡大などが 議論されている。しかし、いずれも 一朝一夕に 解決できる 問題では ない。\n出生率が 下がる 背景には、経済的な 不安や 価値観の 多様化といった、複雑な 要因が 絡み合っている。単に 補助金を 配れば 済むという 話では ないのだ。\n少子高齢化は、もはや 避けて 通れない 現実で ある。社会全体で どう 向き合い、次の 世代に どのような 国を 残すのか。今こそ 真剣な 議論が 求められている。",
-  "trans": [
-    "日本正以世界上前所未見的速度邁向少子高齡化。高齡者在總人口中所占的比例逐年上升,另一方面,出生的孩子數量卻持續減少。",
-    "這股趨勢帶來的影響,恐怕會動搖社會保障制度的根基。因為年金、醫療、照護所需的費用不斷增加,而支撐這些的青壯世代卻愈來愈少。",
-    "作為對策,支援育兒與工作兼顧的制度該如何充實、是否擴大接納外籍勞工等等,都正在被討論。然而,這些都不是一朝一夕就能解決的問題。",
-    "出生率下降的背後,經濟上的不安、價值觀的多元化等等複雜的因素相互交織。並不是單靠發放補助金就能了事的。",
-    "少子高齡化已是無可迴避的現實。整個社會該如何面對、要留給下一代什麼樣的國家?此刻正需要一場認真的討論。"
-  ],
-  "trans_en": [
-    "Japan is aging and shrinking at a speed the world has never seen. The share of the elderly in the total population rises year by year, while the number of children being born keeps falling.",
-    "The impact of this trend could shake the very foundation of the social security system, because the costs of pensions, healthcare and nursing care keep rising while the working generation that supports them keeps shrinking.",
-    "Proposed measures — enriching systems that help people balance childcare and work, or widening the acceptance of foreign workers — are all being debated. Yet none can be solved overnight.",
-    "Behind the falling birth rate lie tangled, complex factors: economic anxiety, the diversification of values, and more. It is not something handouts alone can fix.",
-    "An aging, shrinking society is now an unavoidable reality. How should society as a whole face it, and what kind of country should we leave the next generation? A serious debate is needed now more than ever."
-  ],
-  "vocab": [
-    {
-      "w": "割合",
-      "r": "わりあい",
-      "m": "比例、比率",
-      "m_en": "proportion / ratio"
-    },
-    {
-      "w": "傾向",
-      "r": "けいこう",
-      "m": "傾向、趨勢",
-      "m_en": "tendency / trend"
-    },
-    {
-      "w": "根幹",
-      "r": "こんかん",
-      "m": "根基、核心",
-      "m_en": "foundation / core"
-    },
-    {
-      "w": "介護",
-      "r": "かいご",
-      "m": "照護、看護",
-      "m_en": "nursing care"
-    },
-    {
-      "w": "両立",
-      "r": "りょうりつ",
-      "m": "兼顧、並存",
-      "m_en": "balancing two things"
-    },
-    {
-      "w": "一朝一夕",
-      "r": "いっちょういっせき",
-      "m": "一朝一夕、短時間",
-      "m_en": "in a short time / overnight"
-    },
-    {
-      "w": "出生率",
-      "r": "しゅっしょうりつ",
-      "m": "出生率",
-      "m_en": "birth rate"
-    },
-    {
-      "w": "要因",
-      "r": "よういん",
-      "m": "因素、要因",
-      "m_en": "factor"
-    }
-  ],
-  "grammar": [
-    {
-      "t": "~かねない",
-      "note": "「有可能~(壞結果)」:根幹を揺るがしかねない=可能動搖根基。",
-      "t_en": "〜かねない",
-      "note_en": "\"could well (do something bad)\": 根幹を揺るがしかねない."
-    },
-    {
-      "t": "~一方で",
-      "note": "對比兩面:費用は増える一方で、現役世代は減る。",
-      "t_en": "〜一方で",
-      "note_en": "contrasting two sides: costs rise on one hand, the working generation shrinks on the other."
-    },
-    {
-      "t": "~ではないのだ",
-      "note": "強調否定、下結論:済むという話ではないのだ。",
-      "t_en": "〜ではないのだ",
-      "note_en": "emphatic negation / conclusion: it is not something that will simply do."
-    }
-  ]
-},
-{
-  "id": "a-n1-4",
-  "level": "n1",
-  "topic": "メディア",
-  "topic_en": "Media",
-  "title": "情報の海を泳ぐために",
-  "title_zh": "為了在資訊之海中泅泳",
-  "title_en": "Swimming Through a Sea of Information",
-  "body": "スマートフォンの 普及に よって、私たちは いつでも どこでも 膨大な 情報に 触れられる ように なった。だが、その 便利さの 裏には 見過ごせない 落とし穴が 潜んでいる。\nインターネット上には、真偽の 定かでない 情報が あふれている。中には、悪意を もって 拡散される デマも 少なくない。事実と 意見を 見分ける 力が、かつてないほど 求められている。\nさらに 厄介なのは、自分の 好みに 合う 情報ばかりが 表示される 仕組みだ。知らず知らずの うちに 視野が 狭まり、偏った 考えに 陥りやすくなる。\n大切なのは、一つの 情報を 鵜呑みに せず、複数の 情報源に あたって 確かめる 姿勢である。発信する 際にも、その 内容に 責任を 持たなければ ならない。\n情報を 正しく 読み解く 力は、もはや 一部の 専門家だけの ものでは ない。誰もが 身につけるべき、現代を 生き抜く ための 必須の 教養なのだ。",
-  "trans": [
-    "隨著智慧型手機的普及,我們變得隨時隨地都能接觸到龐大的資訊。但在那份便利的背後,潛藏著不可忽視的陷阱。",
-    "網路上充斥著真偽難辨的資訊。其中,懷著惡意被散播的假消息也不在少數。分辨事實與意見的能力,前所未有地被需要著。",
-    "更棘手的是,只顯示符合自己喜好資訊的機制。在不知不覺間視野變窄,容易陷入偏頗的想法。",
-    "重要的是,不囫圇吞棗地接受單一資訊,而是查閱多個資訊來源加以確認的態度。在發布時,也必須對其內容負起責任。",
-    "正確解讀資訊的能力,已不再是少數專家的專利。而是每個人都該具備、在現代生存下去所必需的素養。"
-  ],
-  "trans_en": [
-    "With the spread of smartphones, we can now reach vast amounts of information anytime, anywhere. But behind that convenience lurks a pitfall we cannot overlook.",
-    "The internet overflows with information of uncertain truth. Not a few are rumors spread with malice. The ability to tell fact from opinion is demanded as never before.",
-    "More troublesome still is the mechanism that shows only information matching your own tastes. Before you know it, your view narrows and you easily fall into biased thinking.",
-    "What matters is the attitude of not swallowing a single piece of information whole, but checking it against multiple sources. When you post, too, you must take responsibility for the content.",
-    "The power to read information correctly is no longer the preserve of a few experts. It is essential literacy that everyone should acquire to survive the modern age."
-  ],
-  "vocab": [
-    {
-      "w": "普及",
-      "r": "ふきゅう",
-      "m": "普及",
-      "m_en": "spread / diffusion"
-    },
-    {
-      "w": "膨大",
-      "r": "ぼうだい",
-      "m": "龐大",
-      "m_en": "enormous"
-    },
-    {
-      "w": "真偽",
-      "r": "しんぎ",
-      "m": "真偽",
-      "m_en": "truth or falsehood"
-    },
-    {
-      "w": "拡散",
-      "r": "かくさん",
-      "m": "擴散、散播",
-      "m_en": "to spread / diffuse"
-    },
-    {
-      "w": "厄介",
-      "r": "やっかい",
-      "m": "棘手、麻煩",
-      "m_en": "troublesome"
-    },
-    {
-      "w": "視野",
-      "r": "しや",
-      "m": "視野",
-      "m_en": "field of view / perspective"
-    },
-    {
-      "w": "鵜呑み",
-      "r": "うのみ",
-      "m": "囫圇吞棗、盲信",
-      "m_en": "swallowing whole / taking uncritically"
-    },
-    {
-      "w": "教養",
-      "r": "きょうよう",
-      "m": "素養、涵養",
-      "m_en": "cultivation / literacy"
-    }
-  ],
-  "grammar": [
-    {
-      "t": "~ずにはいられない/~ないうちに",
-      "note": "「知らず知らずのうちに」=在不知不覺間。",
-      "t_en": "〜ないうちに",
-      "note_en": "\"before you know it\": 知らず知らずのうちに."
-    },
-    {
-      "t": "~ばかり",
-      "note": "限定、偏重:好みに合う情報ばかりが表示される。",
-      "t_en": "〜ばかり",
-      "note_en": "only / nothing but: only information matching your tastes is shown."
-    },
-    {
-      "t": "もはや~ない",
-      "note": "「已不再~」:もはや専門家だけのものではない。",
-      "t_en": "もはや〜ない",
-      "note_en": "\"no longer\": no longer the preserve of experts alone."
-    }
-  ]
-},
-{
-  "id": "a-n1-5",
-  "level": "n1",
-  "topic": "社会",
-  "topic_en": "Society",
-  "title": "捨てられる食べ物",
-  "title_zh": "被丟棄的食物",
-  "title_en": "The Food We Throw Away",
-  "body": "まだ 食べられるのに 捨てられて しまう 食品、いわゆる 食品ロスが 世界的な 問題と なっている。日本でも 年間 数百万トンもの 食料が、無駄に 廃棄されている という。\nその 一方で、世界には 十分な 食事を とれない 人々が 大勢いる。豊かさの 象徴の ように 見える 飽食の 裏で、深刻な 不均衡が 生じているのだ。\n食品ロスは、家庭や 飲食店で 出る 食べ残しだけが 原因では ない。まだ 売れる はずの 商品が、賞味期限を 理由に 大量に 処分される 現状も 見逃せない。\nこの 問題の 解決には、企業の 取り組みは もちろん、一人ひとりの 意識の 変化が 欠かせない。買いすぎない、作りすぎない といった 心がけが、大きな 一歩と なる。\n限りある 資源を 大切に する ことは、次の 世代への 責任でも ある。食べ物を 無駄にしない 暮らしが、今 改めて 問われている。",
-  "trans": [
-    "明明還能吃卻被丟掉的食品,也就是所謂的食物浪費,已成為全球性的問題。據說在日本,每年也有數百萬噸的食物被白白廢棄。",
-    "另一方面,世界上有許多人無法獲得足夠的三餐。在看似富足象徵的飽食背後,正產生著嚴重的不均衡。",
-    "食物浪費的原因,並不只是家庭或餐廳產生的剩菜。原本應該還賣得出去的商品,卻以賞味期限為由被大量處理掉的現況,也不容忽視。",
-    "要解決這個問題,企業的努力自不待言,每一個人意識的轉變更是不可或缺。不買過量、不做過量這樣的用心,就會成為重要的一步。",
-    "珍惜有限的資源,也是對下一代的責任。不浪費食物的生活方式,如今再次被重新檢視。"
-  ],
-  "trans_en": [
-    "Food thrown away though still edible — so-called food loss — has become a worldwide problem. In Japan too, millions of tons of food are said to be wastefully discarded each year.",
-    "On the other hand, many people in the world cannot get enough to eat. Behind an abundance that looks like a symbol of wealth, a serious imbalance is arising.",
-    "Food loss is not caused only by leftovers from homes and restaurants. We cannot overlook the reality that products that should still sell are discarded in bulk on the grounds of best-before dates.",
-    "Solving this problem requires not only corporate efforts but also a change in each person's awareness. Small resolves — not overbuying, not overcooking — become a big step.",
-    "Cherishing limited resources is also a responsibility to the next generation. A way of life that does not waste food is now being questioned anew."
-  ],
-  "vocab": [
-    {
-      "w": "廃棄",
-      "r": "はいき",
-      "m": "廢棄、丟棄",
-      "m_en": "disposal / scrapping"
-    },
-    {
-      "w": "大勢",
-      "r": "おおぜい",
-      "m": "許多人",
-      "m_en": "a large number of people"
-    },
-    {
-      "w": "飽食",
-      "r": "ほうしょく",
-      "m": "飽食、豐衣足食",
-      "m_en": "gluttony / satiety"
-    },
-    {
-      "w": "不均衡",
-      "r": "ふきんこう",
-      "m": "不均衡",
-      "m_en": "imbalance"
-    },
-    {
-      "w": "賞味期限",
-      "r": "しょうみきげん",
-      "m": "賞味期限",
-      "m_en": "best-before date"
-    },
-    {
-      "w": "処分",
-      "r": "しょぶん",
-      "m": "處理、處分",
-      "m_en": "disposal"
-    },
-    {
-      "w": "欠かせない",
-      "r": "かかせない",
-      "m": "不可或缺",
-      "m_en": "indispensable"
-    },
-    {
-      "w": "資源",
-      "r": "しげん",
-      "m": "資源",
-      "m_en": "resources"
-    }
-  ],
-  "grammar": [
-    {
-      "t": "~のに",
-      "note": "逆接:まだ食べられるのに捨てられる。",
-      "t_en": "〜のに",
-      "note_en": "although: thrown away although still edible."
-    },
-    {
-      "t": "~はもちろん",
-      "note": "「~自不待言、更別提」:企業の取り組みはもちろん。",
-      "t_en": "〜はもちろん",
-      "note_en": "\"not only ... but also\": corporate efforts, of course, but also ..."
-    },
-    {
-      "t": "~ずにはいられない/見逃せない",
-      "note": "「不容忽視」:現状も見逃せない。",
-      "t_en": "〜見逃せない",
-      "note_en": "\"cannot overlook\": we cannot overlook this reality."
-    }
-  ]
-},
-{
-  "id": "a-n1-6",
-  "level": "n1",
-  "topic": "文化",
-  "topic_en": "Culture",
-  "title": "受け継がれるもの",
-  "title_zh": "被傳承下來的東西",
-  "title_en": "What Gets Passed Down",
-  "body": "各地に 伝わる 伝統文化や 職人の 技は、長い 年月を かけて 磨かれ、受け継がれて きた かけがえのない 財産で ある。しかし 今、その 多くが 存続の 危機に 瀕している。\n最大の 要因は、後継者の 不足だ。担い手の 高齢化が 進む 一方で、若者は 都市へと 流出し、技を 学ぼうとする 者は 年々 減っている。\n伝統を 守ると 言っても、ただ 昔の ままを 保てば よい という わけでは ない。時代の 変化に 応じて 新しい 価値を 生み出してこそ、文化は 生き続けられる。\n近年では、伝統工芸に 現代的な デザインを 取り入れたり、海外へ 発信したり する 試みも 広がりつつある。古いものと 新しいものの 融合が、活路を 開く 鍵と なる。\n先人が 築いてきた ものを 次の 世代へ どう つなぐか。それは、私たち 一人ひとりに 課された、重い 宿題なのかもしれない。",
-  "trans": [
-    "各地流傳的傳統文化與工匠的技藝,是歷經漫長歲月琢磨、傳承下來的無可取代的資產。然而如今,其中許多正瀕臨存續的危機。",
-    "最大的原因是後繼者的不足。在承擔者高齡化不斷加劇的同時,年輕人往都市外流,想學習技藝的人也逐年減少。",
-    "雖說要守護傳統,但並不是只要一味保持昔日原貌就好。唯有順應時代的變化、創造出新的價值,文化才能繼續存活。",
-    "近年來,將現代設計融入傳統工藝、或向海外發信這樣的嘗試也正逐漸擴展。舊事物與新事物的融合,成為開拓生路的關鍵。",
-    "如何將先人所建立的東西連接給下一個世代?那或許是加諸在我們每一個人身上的、沉重的功課。"
-  ],
-  "trans_en": [
-    "Traditional cultures and craftsmen's skills handed down across the land are irreplaceable treasures, honed and passed on over long years. Yet now, many of them face a crisis of survival.",
-    "The biggest factor is a shortage of successors. As those who carry the skills grow old, young people flow out to the cities, and those who would learn the crafts dwindle year by year.",
-    "Even if we speak of protecting tradition, it does not mean simply keeping things as they were. Only by creating new value in response to the changing times can a culture keep living.",
-    "In recent years, attempts to bring modern design into traditional crafts, or to send them out overseas, are spreading. A fusion of old and new becomes the key that opens a way forward.",
-    "How do we connect what our forebears built to the next generation? That may be a heavy piece of homework imposed on each and every one of us."
-  ],
-  "vocab": [
-    {
-      "w": "職人",
-      "r": "しょくにん",
-      "m": "工匠、職人",
-      "m_en": "craftsman"
-    },
-    {
-      "w": "存続",
-      "r": "そんぞく",
-      "m": "存續",
-      "m_en": "survival / continuation"
-    },
-    {
-      "w": "瀕して",
-      "r": "ひんして",
-      "m": "瀕臨",
-      "m_en": "to be on the verge of"
-    },
-    {
-      "w": "後継者",
-      "r": "こうけいしゃ",
-      "m": "後繼者、接班人",
-      "m_en": "successor"
-    },
-    {
-      "w": "担い手",
-      "r": "にないて",
-      "m": "承擔者、中堅",
-      "m_en": "bearer / one who carries on"
-    },
-    {
-      "w": "融合",
-      "r": "ゆうごう",
-      "m": "融合",
-      "m_en": "fusion"
-    },
-    {
-      "w": "活路",
-      "r": "かつろ",
-      "m": "生路、出路",
-      "m_en": "way out / lifeline"
-    },
-    {
-      "w": "先人",
-      "r": "せんじん",
-      "m": "先人、前人",
-      "m_en": "predecessors / forebears"
-    }
-  ],
-  "grammar": [
-    {
-      "t": "~てこそ",
-      "note": "「唯有~才」:新しい価値を生み出してこそ生き続けられる。",
-      "t_en": "〜てこそ",
-      "note_en": "\"only by doing\": only by creating new value can it survive."
-    },
-    {
-      "t": "~わけではない",
-      "note": "部分否定:昔のままを保てばよいというわけではない。",
-      "t_en": "〜わけではない",
-      "note_en": "\"it doesn't mean that\": it doesn't mean just keeping the old ways is fine."
-    },
-    {
-      "t": "~つつある",
-      "note": "「正逐漸~」:試みも広がりつつある。",
-      "t_en": "〜つつある",
-      "note_en": "\"is gradually ...\": such attempts are gradually spreading."
-    }
-  ]
-},
-{
-  "id": "a-n2-6",
-  "level": "n2",
-  "topic": "健康",
-  "topic_en": "Health",
-  "title": "眠りを大切に",
-  "title_zh": "重視睡眠",
-  "title_en": "Take Sleep Seriously",
-  "body": "忙しい 毎日の 中で、つい 削って しまいがちなのが 睡眠の 時間です。しかし、質の よい 睡眠は、健康な 生活を 送る うえで 欠かせない ものです。\n睡眠が 足りないと、集中力が 落ちたり、体調を 崩したり します。日中の 眠気で 仕事や 勉強が うまく いかない 人も 多いでしょう。\nよく 眠る ためには、まず 生活の リズムを 整える ことが 大切です。毎日 同じ 時間に 寝て、同じ 時間に 起きる 習慣を つけましょう。\nまた、寝る 前に スマートフォンを 見るのは できるだけ 避けた ほうが よいです。画面の 明るい 光は、脳を 目覚めさせて しまうからです。\nたった 数時間の 違いでも、毎日の 積み重ねは 大きな 差に なります。まずは 早めに 布団に 入る ことから 始めて みませんか。",
-  "trans": [
-    "在忙碌的每一天中,總是不知不覺就會被犧牲掉的,就是睡眠時間。然而,優質的睡眠,是過健康生活所不可或缺的。",
-    "睡眠不足的話,會導致注意力下降、身體狀況變差。想必也有很多人因為白天的睡意,使得工作或讀書都不順利。",
-    "為了睡得好,首先調整生活的節奏很重要。養成每天在同一時間睡、同一時間起床的習慣吧。",
-    "另外,睡前最好盡量避免看智慧型手機。因為螢幕明亮的光線,會使大腦清醒過來。",
-    "即使只是短短幾小時的差別,每天的累積也會變成很大的差距。要不要先從早點鑽進被窩開始試試看呢?"
-  ],
-  "trans_en": [
-    "In our busy days, the thing we tend to cut without thinking is sleep. Yet good-quality sleep is indispensable for living a healthy life.",
-    "When you don't get enough sleep, your concentration drops and your health suffers. Many people find work or study going badly because of daytime drowsiness.",
-    "To sleep well, the first important thing is to get your daily rhythm in order. Make a habit of going to bed and getting up at the same time every day.",
-    "Also, it is best to avoid looking at your smartphone before bed as much as possible, because the bright light of the screen wakes the brain up.",
-    "Even a difference of just a few hours adds up daily into a big gap. Why not start by getting into bed a little earlier?"
-  ],
-  "vocab": [
-    {
-      "w": "削って",
-      "r": "けずって",
-      "m": "削減、犧牲",
-      "m_en": "to cut down / shave off"
-    },
-    {
-      "w": "睡眠",
-      "r": "すいみん",
-      "m": "睡眠",
-      "m_en": "sleep"
-    },
-    {
-      "w": "欠かせない",
-      "r": "かかせない",
-      "m": "不可或缺",
-      "m_en": "indispensable"
-    },
-    {
-      "w": "集中力",
-      "r": "しゅうちゅうりょく",
-      "m": "注意力、專注力",
-      "m_en": "concentration"
-    },
-    {
-      "w": "眠気",
-      "r": "ねむけ",
-      "m": "睡意",
-      "m_en": "drowsiness"
-    },
-    {
-      "w": "整える",
-      "r": "ととのえる",
-      "m": "調整、整頓",
-      "m_en": "to arrange / put in order"
-    },
-    {
-      "w": "避けた",
-      "r": "さけた",
-      "m": "避開",
-      "m_en": "avoided"
-    },
-    {
-      "w": "積み重ね",
-      "r": "つみかさね",
-      "m": "累積",
-      "m_en": "accumulation"
-    }
-  ],
-  "grammar": [
-    {
-      "t": "~がち",
-      "note": "「容易、往往~」:つい削ってしまいがち。",
-      "t_en": "〜がち",
-      "note_en": "\"tend to\": we tend to cut sleep."
-    },
-    {
-      "t": "~うえで",
-      "note": "「在~方面」:健康な生活を送るうえで欠かせない。",
-      "t_en": "〜うえで",
-      "note_en": "\"in doing / for\": indispensable for living healthily."
-    },
-    {
-      "t": "~たほうがよい",
-      "note": "建議:スマホを見るのは避けたほうがよい。",
-      "t_en": "〜たほうがよい",
-      "note_en": "\"had better\": you had better avoid your phone."
-    }
-  ]
-},
-{
-  "id": "a-n2-7",
-  "level": "n2",
-  "topic": "生活",
-  "topic_en": "Daily life",
-  "title": "そなえあれば",
-  "title_zh": "有備無患",
-  "title_en": "Better Safe Than Sorry",
-  "body": "日本は 地震や 台風などの 自然災害が 多い 国です。いつ 起こるか 分からない 災害に、日ごろから 備えて おく ことが とても 大切です。\nまず、家庭で できる ことから 始めましょう。水や 食料、懐中電灯などを 用意して、すぐに 持ち出せる 場所に 置いて おくと 安心です。\n家族と 話し合って おく ことも 忘れては いけません。もし はぐれて しまった とき、どこで 集まるかを 決めて おけば、あわてずに 行動できます。\nまた、住んでいる 地域の 危険な 場所を 知って おく ことも 役に 立ちます。市役所などが 配る 地図を 見て、避難所までの 道を 確認して おきましょう。\n災害は 防げなくても、被害を 減らす ことは できます。ふだんの ちょっとした 心がけが、いざという ときに 自分や 家族を 守るのです。",
-  "trans": [
-    "日本是地震、颱風等自然災害多的國家。對於不知何時會發生的災害,平時就先做好準備非常重要。",
-    "首先,從家庭做得到的事情開始吧。準備好水、食物、手電筒等,放在能立刻帶出去的地方就令人安心。",
-    "和家人事先討論好也不能忘記。萬一走散的時候,只要事先決定好在哪裡集合,就能不慌張地行動。",
-    "另外,先了解自己居住地區的危險場所也很有幫助。看看市公所等發放的地圖,先確認到避難所的路吧。",
-    "就算災害無法防止,也能減少損害。平時一點點的用心,在緊要關頭就能守護自己和家人。"
-  ],
-  "trans_en": [
-    "Japan is a country with many natural disasters such as earthquakes and typhoons. It is very important to prepare in ordinary times for disasters that may strike at any moment.",
-    "First, let's start with what you can do at home. It is reassuring to prepare water, food, a flashlight and so on, and keep them where you can grab them at once.",
-    "Don't forget to talk things over with your family in advance. If you get separated, deciding where to gather beforehand lets you act without panicking.",
-    "It also helps to know the dangerous spots in the area where you live. Look at the map handed out by the city office and check the route to the evacuation site.",
-    "Even if disasters can't be prevented, damage can be reduced. A little everyday care is what protects you and your family when the moment comes."
-  ],
-  "vocab": [
-    {
-      "w": "災害",
-      "r": "さいがい",
-      "m": "災害",
-      "m_en": "disaster"
-    },
-    {
-      "w": "備えて",
-      "r": "そなえて",
-      "m": "防備、準備",
-      "m_en": "to prepare / guard against"
-    },
-    {
-      "w": "懐中電灯",
-      "r": "かいちゅうでんとう",
-      "m": "手電筒",
-      "m_en": "flashlight"
-    },
-    {
-      "w": "持ち出せる",
-      "r": "もちだせる",
-      "m": "能帶出、能取出",
-      "m_en": "can carry out"
-    },
-    {
-      "w": "避難所",
-      "r": "ひなんじょ",
-      "m": "避難所",
-      "m_en": "evacuation shelter"
-    },
-    {
-      "w": "被害",
-      "r": "ひがい",
-      "m": "損害、災情",
-      "m_en": "damage"
-    },
-    {
-      "w": "心がけ",
-      "r": "こころがけ",
-      "m": "用心、留意",
-      "m_en": "mindfulness / care"
-    },
-    {
-      "w": "守る",
-      "r": "まもる",
-      "m": "守護、保護",
-      "m_en": "to protect"
-    }
-  ],
-  "grammar": [
-    {
-      "t": "~ておく",
-      "note": "事先做好:備えておく、決めておく。",
-      "t_en": "〜ておく",
-      "note_en": "do in advance: prepare / decide beforehand."
-    },
-    {
-      "t": "~てはいけない",
-      "note": "禁止/不可:話し合っておくことも忘れてはいけない。",
-      "t_en": "〜てはいけない",
-      "note_en": "must not: you must not forget to talk it over."
-    },
-    {
-      "t": "いざというとき",
-      "note": "「緊要關頭、萬一時」慣用:いざというときに守る。",
-      "t_en": "いざというとき",
-      "note_en": "\"when it really matters / in an emergency.\""
-    }
-  ]
-},
-{
-  "id": "a-n5-6",
-  "level": "n5",
-  "topic": "趣味",
-  "topic_en": "Hobby",
-  "title": "わたしの しゅみ",
-  "title_zh": "我的興趣",
-  "title_en": "My Hobby",
-  "body": "わたしの しゅみは しゃしんを とる ことです。\nやすみの 日は カメラを もって、まちを あるきます。\nはなや とりの しゃしんを とります。\nきれいな しゃしんが とれた とき、とても うれしいです。\nときどき ともだちに しゃしんを おくります。\nともだちは 「じょうずですね」と いいます。\nあたらしい カメラが ほしいですが、たかいですから、いまは おかねを ためて います。",
-  "trans": [
-    "我的興趣是拍照。",
-    "假日會帶著相機,在街上走走。",
-    "拍花和鳥的照片。",
-    "拍到漂亮的照片時,非常開心。",
-    "有時候會把照片傳給朋友。",
-    "朋友會說:「拍得真好呢。」",
-    "雖然想要新相機,但因為很貴,現在正在存錢。"
-  ],
-  "trans_en": [
-    "My hobby is taking photos.",
-    "On my days off, I take my camera and walk around town.",
-    "I take pictures of flowers and birds.",
-    "When I get a beautiful shot, I feel really happy.",
-    "Sometimes I send photos to my friends.",
-    "My friends say, \"You're really good!\"",
-    "I want a new camera, but it's expensive, so for now I'm saving money."
-  ],
-  "vocab": [
-    { "w": "趣味", "r": "しゅみ", "m": "興趣、嗜好", "m_en": "hobby" },
-    { "w": "写真", "r": "しゃしん", "m": "照片", "m_en": "photo" },
-    { "w": "撮る", "r": "とる", "m": "拍(照)", "m_en": "to take (a photo)" },
-    { "w": "歩く", "r": "あるく", "m": "走路、步行", "m_en": "to walk" },
-    { "w": "送る", "r": "おくる", "m": "寄送、傳送", "m_en": "to send" },
-    { "w": "貯める", "r": "ためる", "m": "存(錢)", "m_en": "to save (money)" }
-  ],
-  "grammar": [
-    { "t": "しゅみは~ことです", "note": "「我的興趣是做~」:名詞化的こと收尾。しゅみは しゃしんを とる ことです。", "t_en": "しゅみは〜ことです", "note_en": "\"My hobby is (doing) ~\": nominalize the verb with こと." },
-    { "t": "~とき", "note": "「~的時候」:とれた とき(拍到的時候)。", "id": "n5-59", "t_en": "〜とき", "note_en": "\"when ~\": とれた とき = when I managed to take (a good photo)." },
-    { "t": "~が ほしい", "note": "「想要~(東西)」:カメラが ほしいです。想要的對象用が。", "t_en": "〜が ほしい", "note_en": "\"I want ~ (a thing)\": the desired object takes が." }
-  ]
-},
-{
-  "id": "a-n4-7",
-  "level": "n4",
-  "topic": "生活",
-  "topic_en": "Life",
-  "title": "ごみの出し方",
-  "title_zh": "垃圾的丟法",
-  "title_en": "How to Take Out the Trash",
-  "body": "日本に住み始めて、一番驚いたのはごみの出し方です。\nごみは「燃えるごみ」「燃えないごみ」「資源ごみ」などに分けなければなりません。\n出す曜日も決まっていて、私の町では燃えるごみは月曜日と木曜日です。\n朝八時までに、決められた場所に出します。\n間違えると、ごみを持って行ってもらえないこともあります。\n最初は面倒だと思いましたが、慣れると難しくありません。\n分別のおかげで、町はいつもきれいです。",
-  "trans": [
-    "開始住在日本之後,最讓我驚訝的就是垃圾的丟法。",
-    "垃圾必須分成「可燃垃圾」「不可燃垃圾」「資源垃圾」等等。",
-    "丟垃圾的星期幾也是固定的,在我住的城鎮,可燃垃圾是星期一和星期四。",
-    "要在早上八點之前,拿到指定的地點丟。",
-    "如果分錯了,垃圾有時候會不被收走。",
-    "一開始覺得很麻煩,但習慣之後就不難了。",
-    "多虧了垃圾分類,城鎮總是很乾淨。"
-  ],
-  "trans_en": [
-    "After I started living in Japan, what surprised me most was how to take out the trash.",
-    "Trash must be separated into \"burnable,\" \"non-burnable,\" \"recyclable,\" and so on.",
-    "The collection days are fixed, too — in my town, burnable trash goes out on Mondays and Thursdays.",
-    "You take it to the designated spot by eight in the morning.",
-    "If you sort it wrong, sometimes they won't take it away.",
-    "At first I thought it was a hassle, but once you get used to it, it isn't hard.",
-    "Thanks to the sorting system, the town is always clean."
-  ],
-  "vocab": [
-    { "w": "驚く", "r": "おどろく", "m": "驚訝、吃驚", "m_en": "to be surprised" },
-    { "w": "分ける", "r": "わける", "m": "分開、分類", "m_en": "to separate, to sort" },
-    { "w": "決まる", "r": "きまる", "m": "被決定、固定", "m_en": "to be decided, to be fixed" },
-    { "w": "間違える", "r": "まちがえる", "m": "弄錯", "m_en": "to make a mistake" },
-    { "w": "面倒", "r": "めんどう", "m": "麻煩", "m_en": "troublesome, a hassle" },
-    { "w": "慣れる", "r": "なれる", "m": "習慣", "m_en": "to get used to" },
-    { "w": "分別", "r": "ぶんべつ", "m": "(垃圾)分類", "m_en": "sorting (trash)" }
-  ],
-  "grammar": [
-    { "t": "~なければなりません", "note": "「必須~」:分けなければなりません(必須分類)。", "id": "n4-16", "t_en": "〜なければなりません", "note_en": "\"must ~\": 分けなければなりません = must sort." },
-    { "t": "~までに", "note": "「在~之前(期限)」:朝八時までに出します。までに是期限,まで是持續。", "t_en": "〜までに", "note_en": "\"by ~ (deadline)\": までに marks a deadline; まで marks duration." },
-    { "t": "~てもらえない", "note": "「無法讓對方為自己做~」:持って行ってもらえない(不被收走)。てもらう的可能否定形。", "id": "n3-69", "t_en": "〜てもらえない", "note_en": "\"can't get someone to do ~ for you\": potential-negative of てもらう." },
-    { "t": "~おかげで", "note": "「多虧~、託~的福」:分別のおかげで、町はきれいです。", "id": "n3-6", "t_en": "〜おかげで", "note_en": "\"thanks to ~\": used for positive results." }
-  ]
-},
-{
-  "id": "a-n3-8",
-  "level": "n3",
-  "topic": "生活",
-  "topic_en": "Life",
-  "title": "日本で病院に行く",
-  "title_zh": "在日本看醫生",
-  "title_en": "Going to the Doctor in Japan",
-  "body": "日本で初めて熱を出したとき、どうすればいいか分からなくて、とても不安だった。\n友達に相談すると、「まず近くの内科に行ったほうがいいよ」と教えてくれた。\n病院では、最初に保険証を出して、問診票に症状を書く。\n「いつから痛いですか」「アレルギーはありますか」など、聞かれることは大体決まっている。\n診察が終わると、処方箋をもらって、薬局で薬を受け取る。\n料金は思ったより安かった。保険に入っていれば、自分で払うのは三割だけだからだ。\n言葉が心配な人は、症状を紙に書いて見せるといい。伝える方法はいくらでもある。",
-  "trans": [
-    "在日本第一次發燒的時候,我不知道該怎麼辦,非常不安。",
-    "找朋友商量,朋友告訴我:「先去附近的內科比較好喔。」",
-    "在醫院,首先出示健保卡,然後在問診表上寫下症狀。",
-    "「從什麼時候開始痛?」「有過敏嗎?」等等,會被問的問題大致上是固定的。",
-    "看診結束後,拿到處方箋,再到藥局領藥。",
-    "費用比想像中便宜。因為只要有加入健保,自己付的就只有三成。",
-    "擔心語言不通的人,可以把症狀寫在紙上給醫生看。要把意思傳達出去,方法要多少有多少。"
-  ],
-  "trans_en": [
-    "The first time I ran a fever in Japan, I had no idea what to do and felt really anxious.",
-    "When I asked a friend, they told me, \"You should go to a nearby internal medicine clinic first.\"",
-    "At the clinic, you first show your health insurance card, then write your symptoms on a questionnaire.",
-    "\"Since when has it hurt?\" \"Do you have any allergies?\" — the questions they ask are mostly the same.",
-    "After the examination, you get a prescription and pick up your medicine at a pharmacy.",
-    "It cost less than I expected — if you're enrolled in health insurance, you only pay thirty percent yourself.",
-    "If you're worried about the language, write your symptoms on paper and show them. There are plenty of ways to get your meaning across."
-  ],
-  "vocab": [
-    { "w": "不安", "r": "ふあん", "m": "不安", "m_en": "anxious, uneasy" },
-    { "w": "相談", "r": "そうだん", "m": "商量、諮詢", "m_en": "consultation" },
-    { "w": "保険証", "r": "ほけんしょう", "m": "健保卡", "m_en": "health insurance card" },
-    { "w": "症状", "r": "しょうじょう", "m": "症狀", "m_en": "symptom" },
-    { "w": "診察", "r": "しんさつ", "m": "看診、診察", "m_en": "medical examination" },
-    { "w": "処方箋", "r": "しょほうせん", "m": "處方箋", "m_en": "prescription" },
-    { "w": "薬局", "r": "やっきょく", "m": "藥局", "m_en": "pharmacy" },
-    { "w": "受け取る", "r": "うけとる", "m": "領取、收下", "m_en": "to receive, to pick up" }
-  ],
-  "grammar": [
-    { "t": "~たほうがいい", "note": "「~比較好(建議)」:行ったほうがいい。", "id": "n4-11", "t_en": "〜たほうがいい", "note_en": "\"you should ~ / it's better to ~\": advice." },
-    { "t": "~と(條件)", "note": "「一~就…」:相談すると、教えてくれた/診察が終わると。前句成立,後句自然接著發生。", "t_en": "〜と (conditional)", "note_en": "\"when/once ~\": the second clause follows naturally from the first." },
-    { "t": "~より", "note": "「比~」:思ったより安かった(比想像中便宜)。", "t_en": "〜より", "note_en": "\"than ~\": 思ったより = than I expected." },
-    { "t": "~といい", "note": "「~就好、建議~」:書いて見せるといい。", "t_en": "〜といい", "note_en": "\"it's a good idea to ~\": gentle suggestion." }
-  ]
-},
-{
-  "id": "a-n2-8",
-  "level": "n2",
-  "topic": "社会",
-  "topic_en": "Society",
-  "title": "地方移住という選択",
-  "title_zh": "移居鄉間這個選項",
-  "title_en": "Moving to the Countryside",
-  "body": "最近、都会を離れて地方に移住する人が増えているという。\nリモートワークの普及によって、どこに住んでいても仕事ができるようになったことが大きい。\n家賃は都会の半分以下、通勤ラッシュとも無縁で、自然に囲まれた暮らしは魅力的に見える。\nしかし、移住は決して簡単なものではない。\n車がなければ生活できない地域も多く、医療や教育の面で不便を感じることもある。\n地域の人間関係に溶け込めるかどうかも、大きな課題だと言われている。\n大切なのは、理想だけで決めるのではなく、実際に何度か足を運んで、その土地の暮らしを確かめることだろう。",
-  "trans": [
-    "據說最近離開都市、移居鄉間的人越來越多。",
-    "很大的原因是,隨著遠距工作的普及,不管住在哪裡都能工作了。",
-    "房租不到都市的一半,又與通勤尖峰無緣,被大自然環繞的生活看起來很有魅力。",
-    "但是,移居絕對不是件簡單的事。",
-    "沒有車就無法生活的地區很多,在醫療和教育方面有時也會感到不便。",
-    "能不能融入當地的人際關係,據說也是一大課題。",
-    "重要的應該是:不要只憑理想做決定,而是實際多跑幾趟,親自確認那塊土地上的生活。"
-  ],
-  "trans_en": [
-    "These days, more and more people are said to be leaving the city and moving to the countryside.",
-    "A big reason is that with the spread of remote work, you can now work wherever you live.",
-    "Rent is less than half of what it is in the city, there's no commuter rush, and a life surrounded by nature looks appealing.",
-    "However, relocating is by no means easy.",
-    "In many areas you can't get by without a car, and you may find healthcare and education inconvenient.",
-    "Whether you can blend into the local community is also said to be a major challenge.",
-    "What matters is not deciding on ideals alone, but actually visiting several times and seeing for yourself what life there is like."
-  ],
-  "vocab": [
-    { "w": "移住", "r": "いじゅう", "m": "移居", "m_en": "migration, relocation" },
-    { "w": "普及", "r": "ふきゅう", "m": "普及", "m_en": "spread, diffusion" },
-    { "w": "家賃", "r": "やちん", "m": "房租", "m_en": "rent" },
-    { "w": "無縁", "r": "むえん", "m": "無緣、不相干", "m_en": "unrelated, free from" },
-    { "w": "溶け込む", "r": "とけこむ", "m": "融入", "m_en": "to blend in, to fit in" },
-    { "w": "課題", "r": "かだい", "m": "課題、待解決的問題", "m_en": "challenge, issue" },
-    { "w": "足を運ぶ", "r": "あしをはこぶ", "m": "親自前往、跑一趟", "m_en": "to go in person, to visit" },
-    { "w": "確かめる", "r": "たしかめる", "m": "確認", "m_en": "to confirm, to make sure" }
-  ],
-  "grammar": [
-    { "t": "~という(傳聞)", "note": "「據說~」:増えているという。句尾的という表示傳聞、引述。", "id": "n5-68", "t_en": "〜という (hearsay)", "note_en": "sentence-final という reports hearsay: \"it is said that ~.\"" },
-    { "t": "~によって", "note": "「由於~、隨著~」:普及によって~ようになった。表原因/手段。", "id": "n3-4", "t_en": "〜によって", "note_en": "\"due to / by means of ~\": cause or means." },
-    { "t": "決して~ない", "note": "「絕對不~」:決して簡単なものではない。與否定呼應的副詞。", "t_en": "決して〜ない", "note_en": "\"by no means ~\": adverb that pairs with a negative." },
-    { "t": "~かどうか", "note": "「是否~」:溶け込めるかどうか。", "id": "n4-43", "t_en": "〜かどうか", "note_en": "\"whether or not ~.\"" },
-    { "t": "~のではなく", "note": "「不是~而是…」:理想だけで決めるのではなく、実際に確かめる。", "t_en": "〜のではなく", "note_en": "\"not ~ but rather ...\"" }
-  ]
-},
-{
-  "id": "a-n1-7",
-  "level": "n1",
-  "topic": "言語",
-  "topic_en": "Language",
-  "title": "変わりゆく日本語",
-  "title_zh": "持續改變的日語",
-  "title_en": "The Ever-Changing Japanese Language",
-  "body": "「ら抜き言葉」という言葉を聞いたことがあるだろうか。\n「食べられる」を「食べれる」と言うような言い方で、正しくない日本語だと批判されることが多い。\nだが、言語学の立場から見れば、これは単なる「乱れ」ではなく、合理的な変化だという見方もある。\n「見られる」には受身・尊敬・可能という複数の意味があるが、「見れる」なら可能の意味だと一目で分かるからだ。\nそもそも、言葉は常に変化し続けてきた。\n今、私たちが「正しい」と信じている日本語も、百年前の人々から見れば乱れた言葉にほかならない。\n変化を嘆くより、なぜそう変わるのかを考えるほうが、言葉の本質に近づけるのではないだろうか。",
-  "trans": [
-    "你聽過「ら抜き言葉(去ら詞)」這個詞嗎?",
-    "就是把「食べられる」說成「食べれる」這類說法,常被批評是不正確的日語。",
-    "但從語言學的立場來看,也有一種觀點認為:這不是單純的「語言混亂」,而是一種合理的變化。",
-    "因為「見られる」同時有被動、尊敬、可能等多種意思,而「見れる」的話,一眼就能看出是「能看」的意思。",
-    "說到底,語言本來就一直在變化。",
-    "如今我們深信「正確」的日語,在一百年前的人看來,也不外乎就是一種走樣的語言。",
-    "與其感嘆變化,不如去思考「為什麼會這樣變」——這樣或許才更能接近語言的本質,不是嗎?"
-  ],
-  "trans_en": [
-    "Have you ever heard of \"ra-nuki kotoba\" (ra-dropped words)?",
-    "It refers to saying 食べれる instead of 食べられる — a usage often criticized as incorrect Japanese.",
-    "From a linguistics standpoint, however, some see it not as mere \"corruption\" but as a rational change.",
-    "見られる carries multiple meanings — passive, honorific, and potential — while 見れる can only mean \"can see,\" clear at a glance.",
-    "Language, after all, has never stopped changing.",
-    "Even the Japanese we now believe to be \"correct\" would be nothing other than corrupted speech in the eyes of people a hundred years ago.",
-    "Rather than lamenting change, perhaps asking why it happens brings us closer to the true nature of language."
-  ],
-  "vocab": [
-    { "w": "批判", "r": "ひはん", "m": "批評、批判", "m_en": "criticism" },
-    { "w": "乱れ", "r": "みだれ", "m": "混亂、走樣", "m_en": "disorder, corruption (of language)" },
-    { "w": "合理的", "r": "ごうりてき", "m": "合理的", "m_en": "rational" },
-    { "w": "受身", "r": "うけみ", "m": "被動(語態)", "m_en": "passive (voice)" },
-    { "w": "尊敬", "r": "そんけい", "m": "尊敬", "m_en": "respect, honorific" },
-    { "w": "嘆く", "r": "なげく", "m": "感嘆、悲嘆", "m_en": "to lament" },
-    { "w": "本質", "r": "ほんしつ", "m": "本質", "m_en": "essence, true nature" },
-    { "w": "近づく", "r": "ちかづく", "m": "接近", "m_en": "to approach, to get closer" }
-  ],
-  "grammar": [
-    { "t": "~にほかならない", "note": "「不外乎是~、正是~」:乱れた言葉にほかならない。斷定的書面語。", "id": "n2-56", "t_en": "〜にほかならない", "note_en": "\"is nothing other than ~\": emphatic, written style." },
-    { "t": "~ゆく", "note": "「逐漸~(書面語)」:変わりゆく日本語。ていく的文語形,表持續變化。", "t_en": "〜ゆく", "note_en": "literary form of ていく: gradual, ongoing change." },
-    { "t": "単なる~ではなく", "note": "「不是單純的~」:単なる「乱れ」ではなく、合理的な変化。", "t_en": "単なる〜ではなく", "note_en": "\"not merely ~ (but ...).\"" },
-    { "t": "~のではないだろうか", "note": "「不是~嗎(委婉主張)」:近づけるのではないだろうか。以反問委婉表達意見。", "t_en": "〜のではないだろうか", "note_en": "\"isn't it that ~?\": soft assertion via rhetorical question." }
-  ]
-}
+  {
+    "id": "a-n1-3",
+    "level": "n1",
+    "topic": "社会",
+    "topic_en": "Society",
+    "title": "少子高齢化という難題",
+    "title_zh": "少子高齡化這道難題",
+    "title_en": "The Challenge of an Aging, Shrinking Society",
+    "body": "日本は 世界でも 類を見ない 速さで 少子高齢化が 進んでいる。総人口に 占める 高齢者の 割合は 年々 上昇し、その 一方で 生まれる 子どもの 数は 減り続けている。\nこの 傾向が もたらす 影響は、社会保障制度の 根幹を 揺るがしかねない。年金や 医療、介護に かかる 費用は 増える 一方で、それを 支える 現役世代は 減っていくからだ。\n対策として、育児と 仕事の 両立を 支援する 制度の 充実や、外国人労働者の 受け入れ 拡大などが 議論されている。しかし、いずれも 一朝一夕に 解決できる 問題では ない。\n出生率が 下がる 背景には、経済的な 不安や 価値観の 多様化といった、複雑な 要因が 絡み合っている。単に 補助金を 配れば 済むという 話では ないのだ。\n少子高齢化は、もはや 避けて 通れない 現実で ある。社会全体で どう 向き合い、次の 世代に どのような 国を 残すのか。今こそ 真剣な 議論が 求められている。",
+    "trans": [
+      "日本正以世界上前所未見的速度邁向少子高齡化。高齡者在總人口中所占的比例逐年上升,另一方面,出生的孩子數量卻持續減少。",
+      "這股趨勢帶來的影響,恐怕會動搖社會保障制度的根基。因為年金、醫療、照護所需的費用不斷增加,而支撐這些的青壯世代卻愈來愈少。",
+      "作為對策,支援育兒與工作兼顧的制度該如何充實、是否擴大接納外籍勞工等等,都正在被討論。然而,這些都不是一朝一夕就能解決的問題。",
+      "出生率下降的背後,經濟上的不安、價值觀的多元化等等複雜的因素相互交織。並不是單靠發放補助金就能了事的。",
+      "少子高齡化已是無可迴避的現實。整個社會該如何面對、要留給下一代什麼樣的國家?此刻正需要一場認真的討論。"
+    ],
+    "trans_en": [
+      "Japan is aging and shrinking at a speed the world has never seen. The share of the elderly in the total population rises year by year, while the number of children being born keeps falling.",
+      "The impact of this trend could shake the very foundation of the social security system, because the costs of pensions, healthcare and nursing care keep rising while the working generation that supports them keeps shrinking.",
+      "Proposed measures — enriching systems that help people balance childcare and work, or widening the acceptance of foreign workers — are all being debated. Yet none can be solved overnight.",
+      "Behind the falling birth rate lie tangled, complex factors: economic anxiety, the diversification of values, and more. It is not something handouts alone can fix.",
+      "An aging, shrinking society is now an unavoidable reality. How should society as a whole face it, and what kind of country should we leave the next generation? A serious debate is needed now more than ever."
+    ],
+    "vocab": [
+      {
+        "w": "割合",
+        "r": "わりあい",
+        "m": "比例、比率",
+        "m_en": "proportion / ratio"
+      },
+      {
+        "w": "傾向",
+        "r": "けいこう",
+        "m": "傾向、趨勢",
+        "m_en": "tendency / trend"
+      },
+      {
+        "w": "根幹",
+        "r": "こんかん",
+        "m": "根基、核心",
+        "m_en": "foundation / core"
+      },
+      {
+        "w": "介護",
+        "r": "かいご",
+        "m": "照護、看護",
+        "m_en": "nursing care"
+      },
+      {
+        "w": "両立",
+        "r": "りょうりつ",
+        "m": "兼顧、並存",
+        "m_en": "balancing two things"
+      },
+      {
+        "w": "一朝一夕",
+        "r": "いっちょういっせき",
+        "m": "一朝一夕、短時間",
+        "m_en": "in a short time / overnight"
+      },
+      {
+        "w": "出生率",
+        "r": "しゅっしょうりつ",
+        "m": "出生率",
+        "m_en": "birth rate"
+      },
+      {
+        "w": "要因",
+        "r": "よういん",
+        "m": "因素、要因",
+        "m_en": "factor"
+      }
+    ],
+    "grammar": [
+      {
+        "t": "~かねない",
+        "note": "「有可能~(壞結果)」:根幹を揺るがしかねない=可能動搖根基。",
+        "t_en": "〜かねない",
+        "note_en": "\"could well (do something bad)\": 根幹を揺るがしかねない."
+      },
+      {
+        "t": "~一方で",
+        "note": "對比兩面:費用は増える一方で、現役世代は減る。",
+        "t_en": "〜一方で",
+        "note_en": "contrasting two sides: costs rise on one hand, the working generation shrinks on the other."
+      },
+      {
+        "t": "~ではないのだ",
+        "note": "強調否定、下結論:済むという話ではないのだ。",
+        "t_en": "〜ではないのだ",
+        "note_en": "emphatic negation / conclusion: it is not something that will simply do."
+      }
+    ]
+  },
+  {
+    "id": "a-n1-4",
+    "level": "n1",
+    "topic": "メディア",
+    "topic_en": "Media",
+    "title": "情報の海を泳ぐために",
+    "title_zh": "為了在資訊之海中泅泳",
+    "title_en": "Swimming Through a Sea of Information",
+    "body": "スマートフォンの 普及に よって、私たちは いつでも どこでも 膨大な 情報に 触れられる ように なった。だが、その 便利さの 裏には 見過ごせない 落とし穴が 潜んでいる。\nインターネット上には、真偽の 定かでない 情報が あふれている。中には、悪意を もって 拡散される デマも 少なくない。事実と 意見を 見分ける 力が、かつてないほど 求められている。\nさらに 厄介なのは、自分の 好みに 合う 情報ばかりが 表示される 仕組みだ。知らず知らずの うちに 視野が 狭まり、偏った 考えに 陥りやすくなる。\n大切なのは、一つの 情報を 鵜呑みに せず、複数の 情報源に あたって 確かめる 姿勢である。発信する 際にも、その 内容に 責任を 持たなければ ならない。\n情報を 正しく 読み解く 力は、もはや 一部の 専門家だけの ものでは ない。誰もが 身につけるべき、現代を 生き抜く ための 必須の 教養なのだ。",
+    "trans": [
+      "隨著智慧型手機的普及,我們變得隨時隨地都能接觸到龐大的資訊。但在那份便利的背後,潛藏著不可忽視的陷阱。",
+      "網路上充斥著真偽難辨的資訊。其中,懷著惡意被散播的假消息也不在少數。分辨事實與意見的能力,前所未有地被需要著。",
+      "更棘手的是,只顯示符合自己喜好資訊的機制。在不知不覺間視野變窄,容易陷入偏頗的想法。",
+      "重要的是,不囫圇吞棗地接受單一資訊,而是查閱多個資訊來源加以確認的態度。在發布時,也必須對其內容負起責任。",
+      "正確解讀資訊的能力,已不再是少數專家的專利。而是每個人都該具備、在現代生存下去所必需的素養。"
+    ],
+    "trans_en": [
+      "With the spread of smartphones, we can now reach vast amounts of information anytime, anywhere. But behind that convenience lurks a pitfall we cannot overlook.",
+      "The internet overflows with information of uncertain truth. Not a few are rumors spread with malice. The ability to tell fact from opinion is demanded as never before.",
+      "More troublesome still is the mechanism that shows only information matching your own tastes. Before you know it, your view narrows and you easily fall into biased thinking.",
+      "What matters is the attitude of not swallowing a single piece of information whole, but checking it against multiple sources. When you post, too, you must take responsibility for the content.",
+      "The power to read information correctly is no longer the preserve of a few experts. It is essential literacy that everyone should acquire to survive the modern age."
+    ],
+    "vocab": [
+      {
+        "w": "普及",
+        "r": "ふきゅう",
+        "m": "普及",
+        "m_en": "spread / diffusion"
+      },
+      {
+        "w": "膨大",
+        "r": "ぼうだい",
+        "m": "龐大",
+        "m_en": "enormous"
+      },
+      {
+        "w": "真偽",
+        "r": "しんぎ",
+        "m": "真偽",
+        "m_en": "truth or falsehood"
+      },
+      {
+        "w": "拡散",
+        "r": "かくさん",
+        "m": "擴散、散播",
+        "m_en": "to spread / diffuse"
+      },
+      {
+        "w": "厄介",
+        "r": "やっかい",
+        "m": "棘手、麻煩",
+        "m_en": "troublesome"
+      },
+      {
+        "w": "視野",
+        "r": "しや",
+        "m": "視野",
+        "m_en": "field of view / perspective"
+      },
+      {
+        "w": "鵜呑み",
+        "r": "うのみ",
+        "m": "囫圇吞棗、盲信",
+        "m_en": "swallowing whole / taking uncritically"
+      },
+      {
+        "w": "教養",
+        "r": "きょうよう",
+        "m": "素養、涵養",
+        "m_en": "cultivation / literacy"
+      }
+    ],
+    "grammar": [
+      {
+        "t": "~ずにはいられない/~ないうちに",
+        "note": "「知らず知らずのうちに」=在不知不覺間。",
+        "t_en": "〜ないうちに",
+        "note_en": "\"before you know it\": 知らず知らずのうちに."
+      },
+      {
+        "t": "~ばかり",
+        "note": "限定、偏重:好みに合う情報ばかりが表示される。",
+        "t_en": "〜ばかり",
+        "note_en": "only / nothing but: only information matching your tastes is shown."
+      },
+      {
+        "t": "もはや~ない",
+        "note": "「已不再~」:もはや専門家だけのものではない。",
+        "t_en": "もはや〜ない",
+        "note_en": "\"no longer\": no longer the preserve of experts alone."
+      }
+    ]
+  },
+  {
+    "id": "a-n1-5",
+    "level": "n1",
+    "topic": "社会",
+    "topic_en": "Society",
+    "title": "捨てられる食べ物",
+    "title_zh": "被丟棄的食物",
+    "title_en": "The Food We Throw Away",
+    "body": "まだ 食べられるのに 捨てられて しまう 食品、いわゆる 食品ロスが 世界的な 問題と なっている。日本でも 年間 数百万トンもの 食料が、無駄に 廃棄されている という。\nその 一方で、世界には 十分な 食事を とれない 人々が 大勢いる。豊かさの 象徴の ように 見える 飽食の 裏で、深刻な 不均衡が 生じているのだ。\n食品ロスは、家庭や 飲食店で 出る 食べ残しだけが 原因では ない。まだ 売れる はずの 商品が、賞味期限を 理由に 大量に 処分される 現状も 見逃せない。\nこの 問題の 解決には、企業の 取り組みは もちろん、一人ひとりの 意識の 変化が 欠かせない。買いすぎない、作りすぎない といった 心がけが、大きな 一歩と なる。\n限りある 資源を 大切に する ことは、次の 世代への 責任でも ある。食べ物を 無駄にしない 暮らしが、今 改めて 問われている。",
+    "trans": [
+      "明明還能吃卻被丟掉的食品,也就是所謂的食物浪費,已成為全球性的問題。據說在日本,每年也有數百萬噸的食物被白白廢棄。",
+      "另一方面,世界上有許多人無法獲得足夠的三餐。在看似富足象徵的飽食背後,正產生著嚴重的不均衡。",
+      "食物浪費的原因,並不只是家庭或餐廳產生的剩菜。原本應該還賣得出去的商品,卻以賞味期限為由被大量處理掉的現況,也不容忽視。",
+      "要解決這個問題,企業的努力自不待言,每一個人意識的轉變更是不可或缺。不買過量、不做過量這樣的用心,就會成為重要的一步。",
+      "珍惜有限的資源,也是對下一代的責任。不浪費食物的生活方式,如今再次被重新檢視。"
+    ],
+    "trans_en": [
+      "Food thrown away though still edible — so-called food loss — has become a worldwide problem. In Japan too, millions of tons of food are said to be wastefully discarded each year.",
+      "On the other hand, many people in the world cannot get enough to eat. Behind an abundance that looks like a symbol of wealth, a serious imbalance is arising.",
+      "Food loss is not caused only by leftovers from homes and restaurants. We cannot overlook the reality that products that should still sell are discarded in bulk on the grounds of best-before dates.",
+      "Solving this problem requires not only corporate efforts but also a change in each person's awareness. Small resolves — not overbuying, not overcooking — become a big step.",
+      "Cherishing limited resources is also a responsibility to the next generation. A way of life that does not waste food is now being questioned anew."
+    ],
+    "vocab": [
+      {
+        "w": "廃棄",
+        "r": "はいき",
+        "m": "廢棄、丟棄",
+        "m_en": "disposal / scrapping"
+      },
+      {
+        "w": "大勢",
+        "r": "おおぜい",
+        "m": "許多人",
+        "m_en": "a large number of people"
+      },
+      {
+        "w": "飽食",
+        "r": "ほうしょく",
+        "m": "飽食、豐衣足食",
+        "m_en": "gluttony / satiety"
+      },
+      {
+        "w": "不均衡",
+        "r": "ふきんこう",
+        "m": "不均衡",
+        "m_en": "imbalance"
+      },
+      {
+        "w": "賞味期限",
+        "r": "しょうみきげん",
+        "m": "賞味期限",
+        "m_en": "best-before date"
+      },
+      {
+        "w": "処分",
+        "r": "しょぶん",
+        "m": "處理、處分",
+        "m_en": "disposal"
+      },
+      {
+        "w": "欠かせない",
+        "r": "かかせない",
+        "m": "不可或缺",
+        "m_en": "indispensable"
+      },
+      {
+        "w": "資源",
+        "r": "しげん",
+        "m": "資源",
+        "m_en": "resources"
+      }
+    ],
+    "grammar": [
+      {
+        "t": "~のに",
+        "note": "逆接:まだ食べられるのに捨てられる。",
+        "t_en": "〜のに",
+        "note_en": "although: thrown away although still edible."
+      },
+      {
+        "t": "~はもちろん",
+        "note": "「~自不待言、更別提」:企業の取り組みはもちろん。",
+        "t_en": "〜はもちろん",
+        "note_en": "\"not only ... but also\": corporate efforts, of course, but also ..."
+      },
+      {
+        "t": "~ずにはいられない/見逃せない",
+        "note": "「不容忽視」:現状も見逃せない。",
+        "t_en": "〜見逃せない",
+        "note_en": "\"cannot overlook\": we cannot overlook this reality."
+      }
+    ]
+  },
+  {
+    "id": "a-n1-6",
+    "level": "n1",
+    "topic": "文化",
+    "topic_en": "Culture",
+    "title": "受け継がれるもの",
+    "title_zh": "被傳承下來的東西",
+    "title_en": "What Gets Passed Down",
+    "body": "各地に 伝わる 伝統文化や 職人の 技は、長い 年月を かけて 磨かれ、受け継がれて きた かけがえのない 財産で ある。しかし 今、その 多くが 存続の 危機に 瀕している。\n最大の 要因は、後継者の 不足だ。担い手の 高齢化が 進む 一方で、若者は 都市へと 流出し、技を 学ぼうとする 者は 年々 減っている。\n伝統を 守ると 言っても、ただ 昔の ままを 保てば よい という わけでは ない。時代の 変化に 応じて 新しい 価値を 生み出してこそ、文化は 生き続けられる。\n近年では、伝統工芸に 現代的な デザインを 取り入れたり、海外へ 発信したり する 試みも 広がりつつある。古いものと 新しいものの 融合が、活路を 開く 鍵と なる。\n先人が 築いてきた ものを 次の 世代へ どう つなぐか。それは、私たち 一人ひとりに 課された、重い 宿題なのかもしれない。",
+    "trans": [
+      "各地流傳的傳統文化與工匠的技藝,是歷經漫長歲月琢磨、傳承下來的無可取代的資產。然而如今,其中許多正瀕臨存續的危機。",
+      "最大的原因是後繼者的不足。在承擔者高齡化不斷加劇的同時,年輕人往都市外流,想學習技藝的人也逐年減少。",
+      "雖說要守護傳統,但並不是只要一味保持昔日原貌就好。唯有順應時代的變化、創造出新的價值,文化才能繼續存活。",
+      "近年來,將現代設計融入傳統工藝、或向海外發信這樣的嘗試也正逐漸擴展。舊事物與新事物的融合,成為開拓生路的關鍵。",
+      "如何將先人所建立的東西連接給下一個世代?那或許是加諸在我們每一個人身上的、沉重的功課。"
+    ],
+    "trans_en": [
+      "Traditional cultures and craftsmen's skills handed down across the land are irreplaceable treasures, honed and passed on over long years. Yet now, many of them face a crisis of survival.",
+      "The biggest factor is a shortage of successors. As those who carry the skills grow old, young people flow out to the cities, and those who would learn the crafts dwindle year by year.",
+      "Even if we speak of protecting tradition, it does not mean simply keeping things as they were. Only by creating new value in response to the changing times can a culture keep living.",
+      "In recent years, attempts to bring modern design into traditional crafts, or to send them out overseas, are spreading. A fusion of old and new becomes the key that opens a way forward.",
+      "How do we connect what our forebears built to the next generation? That may be a heavy piece of homework imposed on each and every one of us."
+    ],
+    "vocab": [
+      {
+        "w": "職人",
+        "r": "しょくにん",
+        "m": "工匠、職人",
+        "m_en": "craftsman"
+      },
+      {
+        "w": "存続",
+        "r": "そんぞく",
+        "m": "存續",
+        "m_en": "survival / continuation"
+      },
+      {
+        "w": "瀕して",
+        "r": "ひんして",
+        "m": "瀕臨",
+        "m_en": "to be on the verge of"
+      },
+      {
+        "w": "後継者",
+        "r": "こうけいしゃ",
+        "m": "後繼者、接班人",
+        "m_en": "successor"
+      },
+      {
+        "w": "担い手",
+        "r": "にないて",
+        "m": "承擔者、中堅",
+        "m_en": "bearer / one who carries on"
+      },
+      {
+        "w": "融合",
+        "r": "ゆうごう",
+        "m": "融合",
+        "m_en": "fusion"
+      },
+      {
+        "w": "活路",
+        "r": "かつろ",
+        "m": "生路、出路",
+        "m_en": "way out / lifeline"
+      },
+      {
+        "w": "先人",
+        "r": "せんじん",
+        "m": "先人、前人",
+        "m_en": "predecessors / forebears"
+      }
+    ],
+    "grammar": [
+      {
+        "t": "~てこそ",
+        "note": "「唯有~才」:新しい価値を生み出してこそ生き続けられる。",
+        "t_en": "〜てこそ",
+        "note_en": "\"only by doing\": only by creating new value can it survive."
+      },
+      {
+        "t": "~わけではない",
+        "note": "部分否定:昔のままを保てばよいというわけではない。",
+        "t_en": "〜わけではない",
+        "note_en": "\"it doesn't mean that\": it doesn't mean just keeping the old ways is fine."
+      },
+      {
+        "t": "~つつある",
+        "note": "「正逐漸~」:試みも広がりつつある。",
+        "t_en": "〜つつある",
+        "note_en": "\"is gradually ...\": such attempts are gradually spreading."
+      }
+    ]
+  },
+  {
+    "id": "a-n2-6",
+    "level": "n2",
+    "topic": "健康",
+    "topic_en": "Health",
+    "title": "眠りを大切に",
+    "title_zh": "重視睡眠",
+    "title_en": "Take Sleep Seriously",
+    "body": "忙しい 毎日の 中で、つい 削って しまいがちなのが 睡眠の 時間です。しかし、質の よい 睡眠は、健康な 生活を 送る うえで 欠かせない ものです。\n睡眠が 足りないと、集中力が 落ちたり、体調を 崩したり します。日中の 眠気で 仕事や 勉強が うまく いかない 人も 多いでしょう。\nよく 眠る ためには、まず 生活の リズムを 整える ことが 大切です。毎日 同じ 時間に 寝て、同じ 時間に 起きる 習慣を つけましょう。\nまた、寝る 前に スマートフォンを 見るのは できるだけ 避けた ほうが よいです。画面の 明るい 光は、脳を 目覚めさせて しまうからです。\nたった 数時間の 違いでも、毎日の 積み重ねは 大きな 差に なります。まずは 早めに 布団に 入る ことから 始めて みませんか。",
+    "trans": [
+      "在忙碌的每一天中,總是不知不覺就會被犧牲掉的,就是睡眠時間。然而,優質的睡眠,是過健康生活所不可或缺的。",
+      "睡眠不足的話,會導致注意力下降、身體狀況變差。想必也有很多人因為白天的睡意,使得工作或讀書都不順利。",
+      "為了睡得好,首先調整生活的節奏很重要。養成每天在同一時間睡、同一時間起床的習慣吧。",
+      "另外,睡前最好盡量避免看智慧型手機。因為螢幕明亮的光線,會使大腦清醒過來。",
+      "即使只是短短幾小時的差別,每天的累積也會變成很大的差距。要不要先從早點鑽進被窩開始試試看呢?"
+    ],
+    "trans_en": [
+      "In our busy days, the thing we tend to cut without thinking is sleep. Yet good-quality sleep is indispensable for living a healthy life.",
+      "When you don't get enough sleep, your concentration drops and your health suffers. Many people find work or study going badly because of daytime drowsiness.",
+      "To sleep well, the first important thing is to get your daily rhythm in order. Make a habit of going to bed and getting up at the same time every day.",
+      "Also, it is best to avoid looking at your smartphone before bed as much as possible, because the bright light of the screen wakes the brain up.",
+      "Even a difference of just a few hours adds up daily into a big gap. Why not start by getting into bed a little earlier?"
+    ],
+    "vocab": [
+      {
+        "w": "削って",
+        "r": "けずって",
+        "m": "削減、犧牲",
+        "m_en": "to cut down / shave off"
+      },
+      {
+        "w": "睡眠",
+        "r": "すいみん",
+        "m": "睡眠",
+        "m_en": "sleep"
+      },
+      {
+        "w": "欠かせない",
+        "r": "かかせない",
+        "m": "不可或缺",
+        "m_en": "indispensable"
+      },
+      {
+        "w": "集中力",
+        "r": "しゅうちゅうりょく",
+        "m": "注意力、專注力",
+        "m_en": "concentration"
+      },
+      {
+        "w": "眠気",
+        "r": "ねむけ",
+        "m": "睡意",
+        "m_en": "drowsiness"
+      },
+      {
+        "w": "整える",
+        "r": "ととのえる",
+        "m": "調整、整頓",
+        "m_en": "to arrange / put in order"
+      },
+      {
+        "w": "避けた",
+        "r": "さけた",
+        "m": "避開",
+        "m_en": "avoided"
+      },
+      {
+        "w": "積み重ね",
+        "r": "つみかさね",
+        "m": "累積",
+        "m_en": "accumulation"
+      }
+    ],
+    "grammar": [
+      {
+        "t": "~がち",
+        "note": "「容易、往往~」:つい削ってしまいがち。",
+        "t_en": "〜がち",
+        "note_en": "\"tend to\": we tend to cut sleep."
+      },
+      {
+        "t": "~うえで",
+        "note": "「在~方面」:健康な生活を送るうえで欠かせない。",
+        "t_en": "〜うえで",
+        "note_en": "\"in doing / for\": indispensable for living healthily."
+      },
+      {
+        "t": "~たほうがよい",
+        "note": "建議:スマホを見るのは避けたほうがよい。",
+        "t_en": "〜たほうがよい",
+        "note_en": "\"had better\": you had better avoid your phone."
+      }
+    ]
+  },
+  {
+    "id": "a-n2-7",
+    "level": "n2",
+    "topic": "生活",
+    "topic_en": "Daily life",
+    "title": "そなえあれば",
+    "title_zh": "有備無患",
+    "title_en": "Better Safe Than Sorry",
+    "body": "日本は 地震や 台風などの 自然災害が 多い 国です。いつ 起こるか 分からない 災害に、日ごろから 備えて おく ことが とても 大切です。\nまず、家庭で できる ことから 始めましょう。水や 食料、懐中電灯などを 用意して、すぐに 持ち出せる 場所に 置いて おくと 安心です。\n家族と 話し合って おく ことも 忘れては いけません。もし はぐれて しまった とき、どこで 集まるかを 決めて おけば、あわてずに 行動できます。\nまた、住んでいる 地域の 危険な 場所を 知って おく ことも 役に 立ちます。市役所などが 配る 地図を 見て、避難所までの 道を 確認して おきましょう。\n災害は 防げなくても、被害を 減らす ことは できます。ふだんの ちょっとした 心がけが、いざという ときに 自分や 家族を 守るのです。",
+    "trans": [
+      "日本是地震、颱風等自然災害多的國家。對於不知何時會發生的災害,平時就先做好準備非常重要。",
+      "首先,從家庭做得到的事情開始吧。準備好水、食物、手電筒等,放在能立刻帶出去的地方就令人安心。",
+      "和家人事先討論好也不能忘記。萬一走散的時候,只要事先決定好在哪裡集合,就能不慌張地行動。",
+      "另外,先了解自己居住地區的危險場所也很有幫助。看看市公所等發放的地圖,先確認到避難所的路吧。",
+      "就算災害無法防止,也能減少損害。平時一點點的用心,在緊要關頭就能守護自己和家人。"
+    ],
+    "trans_en": [
+      "Japan is a country with many natural disasters such as earthquakes and typhoons. It is very important to prepare in ordinary times for disasters that may strike at any moment.",
+      "First, let's start with what you can do at home. It is reassuring to prepare water, food, a flashlight and so on, and keep them where you can grab them at once.",
+      "Don't forget to talk things over with your family in advance. If you get separated, deciding where to gather beforehand lets you act without panicking.",
+      "It also helps to know the dangerous spots in the area where you live. Look at the map handed out by the city office and check the route to the evacuation site.",
+      "Even if disasters can't be prevented, damage can be reduced. A little everyday care is what protects you and your family when the moment comes."
+    ],
+    "vocab": [
+      {
+        "w": "災害",
+        "r": "さいがい",
+        "m": "災害",
+        "m_en": "disaster"
+      },
+      {
+        "w": "備えて",
+        "r": "そなえて",
+        "m": "防備、準備",
+        "m_en": "to prepare / guard against"
+      },
+      {
+        "w": "懐中電灯",
+        "r": "かいちゅうでんとう",
+        "m": "手電筒",
+        "m_en": "flashlight"
+      },
+      {
+        "w": "持ち出せる",
+        "r": "もちだせる",
+        "m": "能帶出、能取出",
+        "m_en": "can carry out"
+      },
+      {
+        "w": "避難所",
+        "r": "ひなんじょ",
+        "m": "避難所",
+        "m_en": "evacuation shelter"
+      },
+      {
+        "w": "被害",
+        "r": "ひがい",
+        "m": "損害、災情",
+        "m_en": "damage"
+      },
+      {
+        "w": "心がけ",
+        "r": "こころがけ",
+        "m": "用心、留意",
+        "m_en": "mindfulness / care"
+      },
+      {
+        "w": "守る",
+        "r": "まもる",
+        "m": "守護、保護",
+        "m_en": "to protect"
+      }
+    ],
+    "grammar": [
+      {
+        "t": "~ておく",
+        "note": "事先做好:備えておく、決めておく。",
+        "t_en": "〜ておく",
+        "note_en": "do in advance: prepare / decide beforehand."
+      },
+      {
+        "t": "~てはいけない",
+        "note": "禁止/不可:話し合っておくことも忘れてはいけない。",
+        "t_en": "〜てはいけない",
+        "note_en": "must not: you must not forget to talk it over."
+      },
+      {
+        "t": "いざというとき",
+        "note": "「緊要關頭、萬一時」慣用:いざというときに守る。",
+        "t_en": "いざというとき",
+        "note_en": "\"when it really matters / in an emergency.\""
+      }
+    ]
+  },
+  {
+    "id": "a-n5-6",
+    "level": "n5",
+    "topic": "趣味",
+    "topic_en": "Hobby",
+    "title": "わたしの しゅみ",
+    "title_zh": "我的興趣",
+    "title_en": "My Hobby",
+    "body": "わたしの しゅみは しゃしんを とる ことです。\nやすみの 日は カメラを もって、まちを あるきます。\nはなや とりの しゃしんを とります。\nきれいな しゃしんが とれた とき、とても うれしいです。\nときどき ともだちに しゃしんを おくります。\nともだちは 「じょうずですね」と いいます。\nあたらしい カメラが ほしいですが、たかいですから、いまは おかねを ためて います。",
+    "trans": [
+      "我的興趣是拍照。",
+      "假日會帶著相機,在街上走走。",
+      "拍花和鳥的照片。",
+      "拍到漂亮的照片時,非常開心。",
+      "有時候會把照片傳給朋友。",
+      "朋友會說:「拍得真好呢。」",
+      "雖然想要新相機,但因為很貴,現在正在存錢。"
+    ],
+    "trans_en": [
+      "My hobby is taking photos.",
+      "On my days off, I take my camera and walk around town.",
+      "I take pictures of flowers and birds.",
+      "When I get a beautiful shot, I feel really happy.",
+      "Sometimes I send photos to my friends.",
+      "My friends say, \"You're really good!\"",
+      "I want a new camera, but it's expensive, so for now I'm saving money."
+    ],
+    "vocab": [
+      {
+        "w": "趣味",
+        "r": "しゅみ",
+        "m": "興趣、嗜好",
+        "m_en": "hobby"
+      },
+      {
+        "w": "写真",
+        "r": "しゃしん",
+        "m": "照片",
+        "m_en": "photo"
+      },
+      {
+        "w": "撮る",
+        "r": "とる",
+        "m": "拍(照)",
+        "m_en": "to take (a photo)"
+      },
+      {
+        "w": "歩く",
+        "r": "あるく",
+        "m": "走路、步行",
+        "m_en": "to walk"
+      },
+      {
+        "w": "送る",
+        "r": "おくる",
+        "m": "寄送、傳送",
+        "m_en": "to send"
+      },
+      {
+        "w": "貯める",
+        "r": "ためる",
+        "m": "存(錢)",
+        "m_en": "to save (money)"
+      }
+    ],
+    "grammar": [
+      {
+        "t": "しゅみは~ことです",
+        "note": "「我的興趣是做~」:名詞化的こと收尾。しゅみは しゃしんを とる ことです。",
+        "t_en": "しゅみは〜ことです",
+        "note_en": "\"My hobby is (doing) ~\": nominalize the verb with こと."
+      },
+      {
+        "t": "~とき",
+        "note": "「~的時候」:とれた とき(拍到的時候)。",
+        "id": "n5-59",
+        "t_en": "〜とき",
+        "note_en": "\"when ~\": とれた とき = when I managed to take (a good photo)."
+      },
+      {
+        "t": "~が ほしい",
+        "note": "「想要~(東西)」:カメラが ほしいです。想要的對象用が。",
+        "t_en": "〜が ほしい",
+        "note_en": "\"I want ~ (a thing)\": the desired object takes が."
+      }
+    ]
+  },
+  {
+    "id": "a-n4-7",
+    "level": "n4",
+    "topic": "生活",
+    "topic_en": "Life",
+    "title": "ごみの出し方",
+    "title_zh": "垃圾的丟法",
+    "title_en": "How to Take Out the Trash",
+    "body": "日本に住み始めて、一番驚いたのはごみの出し方です。\nごみは「燃えるごみ」「燃えないごみ」「資源ごみ」などに分けなければなりません。\n出す曜日も決まっていて、私の町では燃えるごみは月曜日と木曜日です。\n朝八時までに、決められた場所に出します。\n間違えると、ごみを持って行ってもらえないこともあります。\n最初は面倒だと思いましたが、慣れると難しくありません。\n分別のおかげで、町はいつもきれいです。",
+    "trans": [
+      "開始住在日本之後,最讓我驚訝的就是垃圾的丟法。",
+      "垃圾必須分成「可燃垃圾」「不可燃垃圾」「資源垃圾」等等。",
+      "丟垃圾的星期幾也是固定的,在我住的城鎮,可燃垃圾是星期一和星期四。",
+      "要在早上八點之前,拿到指定的地點丟。",
+      "如果分錯了,垃圾有時候會不被收走。",
+      "一開始覺得很麻煩,但習慣之後就不難了。",
+      "多虧了垃圾分類,城鎮總是很乾淨。"
+    ],
+    "trans_en": [
+      "After I started living in Japan, what surprised me most was how to take out the trash.",
+      "Trash must be separated into \"burnable,\" \"non-burnable,\" \"recyclable,\" and so on.",
+      "The collection days are fixed, too — in my town, burnable trash goes out on Mondays and Thursdays.",
+      "You take it to the designated spot by eight in the morning.",
+      "If you sort it wrong, sometimes they won't take it away.",
+      "At first I thought it was a hassle, but once you get used to it, it isn't hard.",
+      "Thanks to the sorting system, the town is always clean."
+    ],
+    "vocab": [
+      {
+        "w": "驚く",
+        "r": "おどろく",
+        "m": "驚訝、吃驚",
+        "m_en": "to be surprised"
+      },
+      {
+        "w": "分ける",
+        "r": "わける",
+        "m": "分開、分類",
+        "m_en": "to separate, to sort"
+      },
+      {
+        "w": "決まる",
+        "r": "きまる",
+        "m": "被決定、固定",
+        "m_en": "to be decided, to be fixed"
+      },
+      {
+        "w": "間違える",
+        "r": "まちがえる",
+        "m": "弄錯",
+        "m_en": "to make a mistake"
+      },
+      {
+        "w": "面倒",
+        "r": "めんどう",
+        "m": "麻煩",
+        "m_en": "troublesome, a hassle"
+      },
+      {
+        "w": "慣れる",
+        "r": "なれる",
+        "m": "習慣",
+        "m_en": "to get used to"
+      },
+      {
+        "w": "分別",
+        "r": "ぶんべつ",
+        "m": "(垃圾)分類",
+        "m_en": "sorting (trash)"
+      }
+    ],
+    "grammar": [
+      {
+        "t": "~なければなりません",
+        "note": "「必須~」:分けなければなりません(必須分類)。",
+        "id": "n4-16",
+        "t_en": "〜なければなりません",
+        "note_en": "\"must ~\": 分けなければなりません = must sort."
+      },
+      {
+        "t": "~までに",
+        "note": "「在~之前(期限)」:朝八時までに出します。までに是期限,まで是持續。",
+        "t_en": "〜までに",
+        "note_en": "\"by ~ (deadline)\": までに marks a deadline; まで marks duration."
+      },
+      {
+        "t": "~てもらえない",
+        "note": "「無法讓對方為自己做~」:持って行ってもらえない(不被收走)。てもらう的可能否定形。",
+        "id": "n3-69",
+        "t_en": "〜てもらえない",
+        "note_en": "\"can't get someone to do ~ for you\": potential-negative of てもらう."
+      },
+      {
+        "t": "~おかげで",
+        "note": "「多虧~、託~的福」:分別のおかげで、町はきれいです。",
+        "id": "n3-6",
+        "t_en": "〜おかげで",
+        "note_en": "\"thanks to ~\": used for positive results."
+      }
+    ]
+  },
+  {
+    "id": "a-n3-8",
+    "level": "n3",
+    "topic": "生活",
+    "topic_en": "Life",
+    "title": "日本で病院に行く",
+    "title_zh": "在日本看醫生",
+    "title_en": "Going to the Doctor in Japan",
+    "body": "日本で初めて熱を出したとき、どうすればいいか分からなくて、とても不安だった。\n友達に相談すると、「まず近くの内科に行ったほうがいいよ」と教えてくれた。\n病院では、最初に保険証を出して、問診票に症状を書く。\n「いつから痛いですか」「アレルギーはありますか」など、聞かれることは大体決まっている。\n診察が終わると、処方箋をもらって、薬局で薬を受け取る。\n料金は思ったより安かった。保険に入っていれば、自分で払うのは三割だけだからだ。\n言葉が心配な人は、症状を紙に書いて見せるといい。伝える方法はいくらでもある。",
+    "trans": [
+      "在日本第一次發燒的時候,我不知道該怎麼辦,非常不安。",
+      "找朋友商量,朋友告訴我:「先去附近的內科比較好喔。」",
+      "在醫院,首先出示健保卡,然後在問診表上寫下症狀。",
+      "「從什麼時候開始痛?」「有過敏嗎?」等等,會被問的問題大致上是固定的。",
+      "看診結束後,拿到處方箋,再到藥局領藥。",
+      "費用比想像中便宜。因為只要有加入健保,自己付的就只有三成。",
+      "擔心語言不通的人,可以把症狀寫在紙上給醫生看。要把意思傳達出去,方法要多少有多少。"
+    ],
+    "trans_en": [
+      "The first time I ran a fever in Japan, I had no idea what to do and felt really anxious.",
+      "When I asked a friend, they told me, \"You should go to a nearby internal medicine clinic first.\"",
+      "At the clinic, you first show your health insurance card, then write your symptoms on a questionnaire.",
+      "\"Since when has it hurt?\" \"Do you have any allergies?\" — the questions they ask are mostly the same.",
+      "After the examination, you get a prescription and pick up your medicine at a pharmacy.",
+      "It cost less than I expected — if you're enrolled in health insurance, you only pay thirty percent yourself.",
+      "If you're worried about the language, write your symptoms on paper and show them. There are plenty of ways to get your meaning across."
+    ],
+    "vocab": [
+      {
+        "w": "不安",
+        "r": "ふあん",
+        "m": "不安",
+        "m_en": "anxious, uneasy"
+      },
+      {
+        "w": "相談",
+        "r": "そうだん",
+        "m": "商量、諮詢",
+        "m_en": "consultation"
+      },
+      {
+        "w": "保険証",
+        "r": "ほけんしょう",
+        "m": "健保卡",
+        "m_en": "health insurance card"
+      },
+      {
+        "w": "症状",
+        "r": "しょうじょう",
+        "m": "症狀",
+        "m_en": "symptom"
+      },
+      {
+        "w": "診察",
+        "r": "しんさつ",
+        "m": "看診、診察",
+        "m_en": "medical examination"
+      },
+      {
+        "w": "処方箋",
+        "r": "しょほうせん",
+        "m": "處方箋",
+        "m_en": "prescription"
+      },
+      {
+        "w": "薬局",
+        "r": "やっきょく",
+        "m": "藥局",
+        "m_en": "pharmacy"
+      },
+      {
+        "w": "受け取る",
+        "r": "うけとる",
+        "m": "領取、收下",
+        "m_en": "to receive, to pick up"
+      }
+    ],
+    "grammar": [
+      {
+        "t": "~たほうがいい",
+        "note": "「~比較好(建議)」:行ったほうがいい。",
+        "id": "n4-11",
+        "t_en": "〜たほうがいい",
+        "note_en": "\"you should ~ / it's better to ~\": advice."
+      },
+      {
+        "t": "~と(條件)",
+        "note": "「一~就…」:相談すると、教えてくれた/診察が終わると。前句成立,後句自然接著發生。",
+        "t_en": "〜と (conditional)",
+        "note_en": "\"when/once ~\": the second clause follows naturally from the first."
+      },
+      {
+        "t": "~より",
+        "note": "「比~」:思ったより安かった(比想像中便宜)。",
+        "t_en": "〜より",
+        "note_en": "\"than ~\": 思ったより = than I expected."
+      },
+      {
+        "t": "~といい",
+        "note": "「~就好、建議~」:書いて見せるといい。",
+        "t_en": "〜といい",
+        "note_en": "\"it's a good idea to ~\": gentle suggestion."
+      }
+    ]
+  },
+  {
+    "id": "a-n2-8",
+    "level": "n2",
+    "topic": "社会",
+    "topic_en": "Society",
+    "title": "地方移住という選択",
+    "title_zh": "移居鄉間這個選項",
+    "title_en": "Moving to the Countryside",
+    "body": "最近、都会を離れて地方に移住する人が増えているという。\nリモートワークの普及によって、どこに住んでいても仕事ができるようになったことが大きい。\n家賃は都会の半分以下、通勤ラッシュとも無縁で、自然に囲まれた暮らしは魅力的に見える。\nしかし、移住は決して簡単なものではない。\n車がなければ生活できない地域も多く、医療や教育の面で不便を感じることもある。\n地域の人間関係に溶け込めるかどうかも、大きな課題だと言われている。\n大切なのは、理想だけで決めるのではなく、実際に何度か足を運んで、その土地の暮らしを確かめることだろう。",
+    "trans": [
+      "據說最近離開都市、移居鄉間的人越來越多。",
+      "很大的原因是,隨著遠距工作的普及,不管住在哪裡都能工作了。",
+      "房租不到都市的一半,又與通勤尖峰無緣,被大自然環繞的生活看起來很有魅力。",
+      "但是,移居絕對不是件簡單的事。",
+      "沒有車就無法生活的地區很多,在醫療和教育方面有時也會感到不便。",
+      "能不能融入當地的人際關係,據說也是一大課題。",
+      "重要的應該是:不要只憑理想做決定,而是實際多跑幾趟,親自確認那塊土地上的生活。"
+    ],
+    "trans_en": [
+      "These days, more and more people are said to be leaving the city and moving to the countryside.",
+      "A big reason is that with the spread of remote work, you can now work wherever you live.",
+      "Rent is less than half of what it is in the city, there's no commuter rush, and a life surrounded by nature looks appealing.",
+      "However, relocating is by no means easy.",
+      "In many areas you can't get by without a car, and you may find healthcare and education inconvenient.",
+      "Whether you can blend into the local community is also said to be a major challenge.",
+      "What matters is not deciding on ideals alone, but actually visiting several times and seeing for yourself what life there is like."
+    ],
+    "vocab": [
+      {
+        "w": "移住",
+        "r": "いじゅう",
+        "m": "移居",
+        "m_en": "migration, relocation"
+      },
+      {
+        "w": "普及",
+        "r": "ふきゅう",
+        "m": "普及",
+        "m_en": "spread, diffusion"
+      },
+      {
+        "w": "家賃",
+        "r": "やちん",
+        "m": "房租",
+        "m_en": "rent"
+      },
+      {
+        "w": "無縁",
+        "r": "むえん",
+        "m": "無緣、不相干",
+        "m_en": "unrelated, free from"
+      },
+      {
+        "w": "溶け込む",
+        "r": "とけこむ",
+        "m": "融入",
+        "m_en": "to blend in, to fit in"
+      },
+      {
+        "w": "課題",
+        "r": "かだい",
+        "m": "課題、待解決的問題",
+        "m_en": "challenge, issue"
+      },
+      {
+        "w": "足を運ぶ",
+        "r": "あしをはこぶ",
+        "m": "親自前往、跑一趟",
+        "m_en": "to go in person, to visit"
+      },
+      {
+        "w": "確かめる",
+        "r": "たしかめる",
+        "m": "確認",
+        "m_en": "to confirm, to make sure"
+      }
+    ],
+    "grammar": [
+      {
+        "t": "~という(傳聞)",
+        "note": "「據說~」:増えているという。句尾的という表示傳聞、引述。",
+        "id": "n5-68",
+        "t_en": "〜という (hearsay)",
+        "note_en": "sentence-final という reports hearsay: \"it is said that ~.\""
+      },
+      {
+        "t": "~によって",
+        "note": "「由於~、隨著~」:普及によって~ようになった。表原因/手段。",
+        "id": "n3-4",
+        "t_en": "〜によって",
+        "note_en": "\"due to / by means of ~\": cause or means."
+      },
+      {
+        "t": "決して~ない",
+        "note": "「絕對不~」:決して簡単なものではない。與否定呼應的副詞。",
+        "t_en": "決して〜ない",
+        "note_en": "\"by no means ~\": adverb that pairs with a negative."
+      },
+      {
+        "t": "~かどうか",
+        "note": "「是否~」:溶け込めるかどうか。",
+        "id": "n4-43",
+        "t_en": "〜かどうか",
+        "note_en": "\"whether or not ~.\""
+      },
+      {
+        "t": "~のではなく",
+        "note": "「不是~而是…」:理想だけで決めるのではなく、実際に確かめる。",
+        "t_en": "〜のではなく",
+        "note_en": "\"not ~ but rather ...\""
+      }
+    ]
+  },
+  {
+    "id": "a-n1-7",
+    "level": "n1",
+    "topic": "言語",
+    "topic_en": "Language",
+    "title": "変わりゆく日本語",
+    "title_zh": "持續改變的日語",
+    "title_en": "The Ever-Changing Japanese Language",
+    "body": "「ら抜き言葉」という言葉を聞いたことがあるだろうか。\n「食べられる」を「食べれる」と言うような言い方で、正しくない日本語だと批判されることが多い。\nだが、言語学の立場から見れば、これは単なる「乱れ」ではなく、合理的な変化だという見方もある。\n「見られる」には受身・尊敬・可能という複数の意味があるが、「見れる」なら可能の意味だと一目で分かるからだ。\nそもそも、言葉は常に変化し続けてきた。\n今、私たちが「正しい」と信じている日本語も、百年前の人々から見れば乱れた言葉にほかならない。\n変化を嘆くより、なぜそう変わるのかを考えるほうが、言葉の本質に近づけるのではないだろうか。",
+    "trans": [
+      "你聽過「ら抜き言葉(去ら詞)」這個詞嗎?",
+      "就是把「食べられる」說成「食べれる」這類說法,常被批評是不正確的日語。",
+      "但從語言學的立場來看,也有一種觀點認為:這不是單純的「語言混亂」,而是一種合理的變化。",
+      "因為「見られる」同時有被動、尊敬、可能等多種意思,而「見れる」的話,一眼就能看出是「能看」的意思。",
+      "說到底,語言本來就一直在變化。",
+      "如今我們深信「正確」的日語,在一百年前的人看來,也不外乎就是一種走樣的語言。",
+      "與其感嘆變化,不如去思考「為什麼會這樣變」——這樣或許才更能接近語言的本質,不是嗎?"
+    ],
+    "trans_en": [
+      "Have you ever heard of \"ra-nuki kotoba\" (ra-dropped words)?",
+      "It refers to saying 食べれる instead of 食べられる — a usage often criticized as incorrect Japanese.",
+      "From a linguistics standpoint, however, some see it not as mere \"corruption\" but as a rational change.",
+      "見られる carries multiple meanings — passive, honorific, and potential — while 見れる can only mean \"can see,\" clear at a glance.",
+      "Language, after all, has never stopped changing.",
+      "Even the Japanese we now believe to be \"correct\" would be nothing other than corrupted speech in the eyes of people a hundred years ago.",
+      "Rather than lamenting change, perhaps asking why it happens brings us closer to the true nature of language."
+    ],
+    "vocab": [
+      {
+        "w": "批判",
+        "r": "ひはん",
+        "m": "批評、批判",
+        "m_en": "criticism"
+      },
+      {
+        "w": "乱れ",
+        "r": "みだれ",
+        "m": "混亂、走樣",
+        "m_en": "disorder, corruption (of language)"
+      },
+      {
+        "w": "合理的",
+        "r": "ごうりてき",
+        "m": "合理的",
+        "m_en": "rational"
+      },
+      {
+        "w": "受身",
+        "r": "うけみ",
+        "m": "被動(語態)",
+        "m_en": "passive (voice)"
+      },
+      {
+        "w": "尊敬",
+        "r": "そんけい",
+        "m": "尊敬",
+        "m_en": "respect, honorific"
+      },
+      {
+        "w": "嘆く",
+        "r": "なげく",
+        "m": "感嘆、悲嘆",
+        "m_en": "to lament"
+      },
+      {
+        "w": "本質",
+        "r": "ほんしつ",
+        "m": "本質",
+        "m_en": "essence, true nature"
+      },
+      {
+        "w": "近づく",
+        "r": "ちかづく",
+        "m": "接近",
+        "m_en": "to approach, to get closer"
+      }
+    ],
+    "grammar": [
+      {
+        "t": "~にほかならない",
+        "note": "「不外乎是~、正是~」:乱れた言葉にほかならない。斷定的書面語。",
+        "id": "n2-56",
+        "t_en": "〜にほかならない",
+        "note_en": "\"is nothing other than ~\": emphatic, written style."
+      },
+      {
+        "t": "~ゆく",
+        "note": "「逐漸~(書面語)」:変わりゆく日本語。ていく的文語形,表持續變化。",
+        "t_en": "〜ゆく",
+        "note_en": "literary form of ていく: gradual, ongoing change."
+      },
+      {
+        "t": "単なる~ではなく",
+        "note": "「不是單純的~」:単なる「乱れ」ではなく、合理的な変化。",
+        "t_en": "単なる〜ではなく",
+        "note_en": "\"not merely ~ (but ...).\""
+      },
+      {
+        "t": "~のではないだろうか",
+        "note": "「不是~嗎(委婉主張)」:近づけるのではないだろうか。以反問委婉表達意見。",
+        "t_en": "〜のではないだろうか",
+        "note_en": "\"isn't it that ~?\": soft assertion via rhetorical question."
+      }
+    ]
+  },
+  {
+    "id": "a-n5-7",
+    "level": "n5",
+    "topic": "生活",
+    "title": "ゆうびんきょくで にもつを おくる",
+    "title_zh": "在郵局寄包裹",
+    "body": "きょうは ゆうびんきょくへ にもつを おくりに いきます。\nまど口で 「これを 台湾へ おねがいします」と いいます。\n係の人が 「船便ですか、航空便ですか」と ききました。\n船便は やすいですが、一か月ぐらい かかります。航空便は 早いですが、たかいです。\nわたしは 航空便を えらびました。用紙に 名前と じゅうしょを 書いてから、お金を はらいます。\n「いつ とどきますか」と きくと、「一週間ぐらいです」と おしえて くれました。\nかえりに コンビニで きってを 買って、はがきも 出しました。",
+    "trans": [
+      "今天我要去郵局寄包裹。",
+      "在櫃台說「這個要寄到台灣,麻煩你」。",
+      "櫃台人員問我「要船運還是空運?」。",
+      "船運便宜,但要花一個月左右。空運快,但比較貴。",
+      "我選了空運。在表格上寫完名字和地址後,再付錢。",
+      "我問「什麼時候會到?」,對方告訴我「大概一個星期」。",
+      "回程在便利商店買了郵票,也寄了明信片。"
+    ],
+    "vocab": [
+      {
+        "w": "郵便局",
+        "r": "ゆうびんきょく",
+        "m": "郵局",
+        "m_en": "post office"
+      },
+      {
+        "w": "荷物",
+        "r": "にもつ",
+        "m": "行李、包裹",
+        "m_en": "package, luggage"
+      },
+      {
+        "w": "窓口",
+        "r": "まどぐち",
+        "m": "櫃台",
+        "m_en": "service counter"
+      },
+      {
+        "w": "船便",
+        "r": "ふなびん",
+        "m": "船運",
+        "m_en": "sea mail"
+      },
+      {
+        "w": "航空便",
+        "r": "こうくうびん",
+        "m": "空運",
+        "m_en": "air mail"
+      },
+      {
+        "w": "用紙",
+        "r": "ようし",
+        "m": "表格、紙張",
+        "m_en": "form"
+      },
+      {
+        "w": "住所",
+        "r": "じゅうしょ",
+        "m": "地址",
+        "m_en": "address"
+      },
+      {
+        "w": "切手",
+        "r": "きって",
+        "m": "郵票",
+        "m_en": "stamp"
+      },
+      {
+        "w": "届く",
+        "r": "とどく",
+        "m": "送達",
+        "m_en": "to arrive, be delivered"
+      }
+    ],
+    "grammar": [
+      {
+        "t": "～てから",
+        "note": "先做完前項再做後項。「書いてから はらいます」=寫完才付錢,順序很清楚。",
+        "id": "n5-54",
+        "t_en": "～てから",
+        "note_en": "Do the second action after finishing the first: 書いてから はらいます = pay after filling it in."
+      },
+      {
+        "t": "～と いいます／ききます",
+        "note": "引用說過或問過的話,把整句放在「と」前面:「これを おねがいします」と いいます。",
+        "id": "n5-38",
+        "t_en": "～と いいます / ききます",
+        "note_en": "Quote what was said or asked by putting the whole sentence before と."
+      },
+      {
+        "t": "～に いきます(目的)",
+        "note": "動詞ます形去ます+に いきます=去做某事。「おくりに いきます」=去寄(東西)。",
+        "id": "n5-31",
+        "t_en": "～に いきます (purpose)",
+        "note_en": "Verb stem + に いきます = go somewhere to do something: おくりに いきます = go to send it."
+      }
+    ],
+    "title_en": "Sending a Package at the Post Office",
+    "topic_en": "Daily life",
+    "trans_en": [
+      "Today I'm going to the post office to send a package.",
+      "At the counter I say, “This one to Taiwan, please.”",
+      "The clerk asked, “Sea mail or air mail?”",
+      "Sea mail is cheap but takes about a month. Air mail is fast but expensive.",
+      "I chose air mail. After writing my name and address on the form, I pay.",
+      "When I asked “When will it arrive?”, they told me “About a week.”",
+      "On the way home I bought stamps at the convenience store and mailed a postcard too."
+    ]
+  },
+  {
+    "id": "a-n4-8",
+    "level": "n4",
+    "topic": "生活",
+    "title": "区役所での手続き",
+    "title_zh": "在區公所辦手續",
+    "body": "引っ越しをしたら、十四日以内に 区役所へ 行かなければなりません。\n窓口で「転入届を出したいんですが」と言うと、番号札をもらいました。\n名前を呼ばれるまで、椅子に座って待ちます。待っている間に、書類に住所と生年月日を書いておきました。\n係の人は在留カードを見てから、裏に新しい住所を書いてくれました。\n同じ日に国民健康保険の手続きもできます。窓口が違うので、一階から二階へ移動しました。\n全部終わるまで一時間ぐらいかかりましたが、日本語だけで手続きができて、少し自信がつきました。\n分からないことがあれば、遠慮しないで聞いたほうがいいです。係の人はゆっくり話してくれます。",
+    "trans": [
+      "搬家之後,十四天內必須去區公所。",
+      "在櫃台說「我想辦遷入登記」,就拿到了號碼牌。",
+      "在被叫到名字之前,坐在椅子上等。等待的期間,我先在文件上寫好住址和出生年月日。",
+      "承辦人員看過在留卡後,幫我在背面寫上新住址。",
+      "同一天也可以辦國民健康保險的手續。因為窗口不同,我從一樓移動到二樓。",
+      "全部辦完花了大約一小時,不過能只用日文辦好手續,讓我稍微有了自信。",
+      "如果有不懂的地方,不要客氣直接問比較好。承辦人員會放慢速度說話。"
+    ],
+    "vocab": [
+      {
+        "w": "区役所",
+        "r": "くやくしょ",
+        "m": "區公所",
+        "m_en": "ward office"
+      },
+      {
+        "w": "手続き",
+        "r": "てつづき",
+        "m": "手續",
+        "m_en": "procedure, paperwork"
+      },
+      {
+        "w": "転入届",
+        "r": "てんにゅうとどけ",
+        "m": "遷入登記",
+        "m_en": "move-in notification"
+      },
+      {
+        "w": "番号札",
+        "r": "ばんごうふだ",
+        "m": "號碼牌",
+        "m_en": "number ticket"
+      },
+      {
+        "w": "書類",
+        "r": "しょるい",
+        "m": "文件",
+        "m_en": "documents"
+      },
+      {
+        "w": "生年月日",
+        "r": "せいねんがっぴ",
+        "m": "出生年月日",
+        "m_en": "date of birth"
+      },
+      {
+        "w": "在留カード",
+        "r": "ざいりゅうカード",
+        "m": "在留卡",
+        "m_en": "residence card"
+      },
+      {
+        "w": "国民健康保険",
+        "r": "こくみんけんこうほけん",
+        "m": "國民健康保險",
+        "m_en": "national health insurance"
+      },
+      {
+        "w": "遠慮する",
+        "r": "えんりょする",
+        "m": "客氣、顧慮",
+        "m_en": "to hold back, be reserved"
+      }
+    ],
+    "grammar": [
+      {
+        "t": "～なければなりません",
+        "note": "表示義務、非做不可。「十四日以内に行かなければなりません」=十四天內非去不可,是規定。",
+        "id": "n4-16",
+        "t_en": "～なければなりません",
+        "note_en": "Expresses obligation: you must do it. Used here for a legal deadline."
+      },
+      {
+        "t": "～ておく",
+        "note": "事先做好準備。「書いておきました」=趁等待時先寫好,等一下就不用慌。",
+        "id": "n4-30",
+        "t_en": "～ておく",
+        "note_en": "Do something in advance in preparation: 書いておきました = filled it in beforehand."
+      },
+      {
+        "t": "～てくれる",
+        "note": "別人為我做某事,帶有感謝的語感。「書いてくれました」=(對方)幫我寫。",
+        "id": "n5-51",
+        "t_en": "～てくれる",
+        "note_en": "Someone does something for me — carries a sense of gratitude."
+      }
+    ],
+    "title_en": "Paperwork at the Ward Office",
+    "topic_en": "Daily life",
+    "trans_en": [
+      "After moving, you must go to the ward office within fourteen days.",
+      "When I said at the counter, “I'd like to submit a move-in notification,” I was given a number ticket.",
+      "I sit and wait until my name is called. While waiting, I filled in my address and date of birth on the form in advance.",
+      "After checking my residence card, the clerk wrote my new address on the back for me.",
+      "You can also enroll in national health insurance the same day. The counter is different, so I moved from the first floor to the second.",
+      "It took about an hour in total, but being able to do it all in Japanese gave me a bit of confidence.",
+      "If there's anything you don't understand, it's better to just ask. The staff will speak slowly for you."
+    ]
+  },
+  {
+    "id": "a-n3-9",
+    "level": "n3",
+    "topic": "生活",
+    "title": "日本で部屋を探す",
+    "title_zh": "在日本找房子",
+    "body": "日本で部屋を借りるのは、思っていたより手間がかかる。\nまず不動産屋に行き、家賃の予算と希望の場所を伝える。駅から徒歩十分以内、という条件をつけると、家賃は一気に上がる。\n気に入った部屋が見つかっても、すぐには決められない。敷金・礼金・仲介手数料など、最初にまとまったお金が必要になるからだ。\n外国人の場合、保証人を求められることが多い。最近は保証会社を使うほうが一般的で、家賃の半分ほどを払って契約する。\n審査に通るように、勤務先や収入がわかる書類をそろえておいたほうがいい。\n内見のときは、日当たりや騒音だけでなく、洗濯機を置く場所やコンセントの数も確認するといい。写真ではわからない部分こそ、実際に見る意味がある。\n面倒に思えるが、この手順を知っているだけで、次の引っ越しはずっと楽になるはずだ。",
+    "trans": [
+      "在日本租房子,比想像中還要費工夫。",
+      "首先去房仲,告訴對方房租預算和希望的地點。一加上「離車站步行十分鐘以內」這種條件,房租就會一口氣往上跳。",
+      "就算找到喜歡的房間,也沒辦法馬上決定。因為押金、禮金、仲介手續費等等,一開始就需要一筆錢。",
+      "外國人的話,常常會被要求提供保證人。最近使用保證公司比較普遍,付大約半個月房租來簽約。",
+      "為了順利通過審查,最好事先備齊能證明工作單位和收入的文件。",
+      "看房的時候,不只採光和噪音,連洗衣機的擺放位置和插座數量也一起確認會比較好。正因為有照片看不出來的部分,才有實際去看的意義。",
+      "雖然覺得麻煩,但光是知道這套流程,下次搬家就會輕鬆很多。"
+    ],
+    "vocab": [
+      {
+        "w": "不動産屋",
+        "r": "ふどうさんや",
+        "m": "房仲",
+        "m_en": "real estate agency"
+      },
+      {
+        "w": "家賃",
+        "r": "やちん",
+        "m": "房租",
+        "m_en": "rent"
+      },
+      {
+        "w": "敷金",
+        "r": "しききん",
+        "m": "押金",
+        "m_en": "security deposit"
+      },
+      {
+        "w": "礼金",
+        "r": "れいきん",
+        "m": "禮金(不退還)",
+        "m_en": "key money (non-refundable)"
+      },
+      {
+        "w": "仲介手数料",
+        "r": "ちゅうかいてすうりょう",
+        "m": "仲介手續費",
+        "m_en": "agency fee"
+      },
+      {
+        "w": "保証人",
+        "r": "ほしょうにん",
+        "m": "保證人",
+        "m_en": "guarantor"
+      },
+      {
+        "w": "審査",
+        "r": "しんさ",
+        "m": "審查",
+        "m_en": "screening, review"
+      },
+      {
+        "w": "内見",
+        "r": "ないけん",
+        "m": "看房",
+        "m_en": "viewing a property"
+      },
+      {
+        "w": "日当たり",
+        "r": "ひあたり",
+        "m": "採光",
+        "m_en": "sunlight exposure"
+      },
+      {
+        "w": "手間がかかる",
+        "r": "てまがかかる",
+        "m": "費工夫",
+        "m_en": "to take effort"
+      }
+    ],
+    "grammar": [
+      {
+        "t": "～ように(目的)",
+        "note": "表示希望達成的狀態,前面多接可能形或無意志動詞。「審査に通るように」=為了(能)通過審查。",
+        "id": "n3-39",
+        "t_en": "～ように (purpose)",
+        "note_en": "States a desired outcome; often follows a potential or non-volitional verb: 通るように = so that it passes."
+      },
+      {
+        "t": "～ほうがいい",
+        "note": "建議。「そろえておいたほうがいい」=最好事先備齊,語氣比命令柔和但很明確。",
+        "id": "n4-17",
+        "t_en": "～ほうがいい",
+        "note_en": "Advice: 〜たほうがいい suggests the better course of action."
+      },
+      {
+        "t": "～こそ",
+        "note": "強調正是這個。「わからない部分こそ」=正因為是看不出來的部分(才重要)。",
+        "id": "n3-41",
+        "t_en": "～こそ",
+        "note_en": "Emphasis: “it is precisely this” — わからない部分こそ = precisely the parts you can't tell."
+      }
+    ],
+    "title_en": "Finding an Apartment in Japan",
+    "topic_en": "Daily life",
+    "trans_en": [
+      "Renting a place in Japan takes more effort than I expected.",
+      "First you go to a real estate agency and tell them your rent budget and preferred area. Add the condition “within a ten-minute walk of a station” and the rent jumps immediately.",
+      "Even when you find a place you like, you can't decide right away — because deposits, key money and agency fees mean you need a lump sum up front.",
+      "Foreign residents are often asked for a guarantor. These days it's more common to use a guarantor company, paying about half a month's rent to sign.",
+      "So that you pass the screening, it's best to prepare documents showing your employer and income in advance.",
+      "At a viewing, check not only sunlight and noise but also where the washing machine goes and how many outlets there are. It's exactly the parts photos can't show that make visiting worthwhile.",
+      "It sounds like a hassle, but just knowing this process makes your next move far easier."
+    ]
+  },
+  {
+    "id": "a-n2-9",
+    "level": "n2",
+    "topic": "社会",
+    "title": "在留資格の更新という関門",
+    "title_zh": "在留資格更新這道關卡",
+    "body": "日本で暮らす外国人にとって、在留資格の更新は避けて通れない関門である。\n期限の三か月前から申請できるが、書類の準備に時間がかかるため、早めに動くに越したことはない。\n必要なのは、申請書のほかに、住民税の課税証明書と納税証明書、在職証明書など。転職したばかりの人は、雇用契約書も求められることがある。\n審査では、収入が安定しているか、税金や年金をきちんと納めているかが見られる。\nつまり、日々の手続きを後回しにしてきたつけが、この時期にまとめて回ってくるというわけだ。\n入管の窓口は混み合うので、オンライン申請を利用する人も増えている。それに伴い、手続きの流れも少しずつ変わりつつある。\n結果が出るまでの数週間は落ち着かないが、必要な書類をそろえ、正直に申告していれば、過度に恐れることはない。",
+    "trans": [
+      "對在日本生活的外國人來說,在留資格的更新是一道避不開的關卡。",
+      "雖然期限前三個月就能申請,但因為準備文件很花時間,早點行動絕對沒有壞處。",
+      "需要的除了申請書之外,還有住民稅的課稅證明、納稅證明、在職證明等等。剛換工作的人,有時還會被要求提供僱用契約書。",
+      "審查時會看收入是否穩定、稅金和年金是否確實繳納。",
+      "也就是說,平時把手續一直往後拖的代價,會在這個時期一次算總帳。",
+      "入管的窗口很擁擠,因此使用線上申請的人也在增加。隨之而來,手續的流程也正一點一點地改變。",
+      "在結果出來前的幾個星期會靜不下心,但只要備齊必要文件、誠實申報,就不需要過度害怕。"
+    ],
+    "vocab": [
+      {
+        "w": "在留資格",
+        "r": "ざいりゅうしかく",
+        "m": "在留資格(簽證)",
+        "m_en": "residence status"
+      },
+      {
+        "w": "更新",
+        "r": "こうしん",
+        "m": "更新",
+        "m_en": "renewal"
+      },
+      {
+        "w": "関門",
+        "r": "かんもん",
+        "m": "關卡、難關",
+        "m_en": "hurdle, barrier"
+      },
+      {
+        "w": "課税証明書",
+        "r": "かぜいしょうめいしょ",
+        "m": "課稅證明",
+        "m_en": "tax assessment certificate"
+      },
+      {
+        "w": "納税証明書",
+        "r": "のうぜいしょうめいしょ",
+        "m": "納稅證明",
+        "m_en": "tax payment certificate"
+      },
+      {
+        "w": "在職証明書",
+        "r": "ざいしょくしょうめいしょ",
+        "m": "在職證明",
+        "m_en": "certificate of employment"
+      },
+      {
+        "w": "入管",
+        "r": "にゅうかん",
+        "m": "入國管理局",
+        "m_en": "immigration bureau"
+      },
+      {
+        "w": "申告",
+        "r": "しんこく",
+        "m": "申報",
+        "m_en": "declaration, filing"
+      },
+      {
+        "w": "つけが回る",
+        "r": "つけがまわる",
+        "m": "付出代價、算總帳",
+        "m_en": "to pay the price later"
+      }
+    ],
+    "grammar": [
+      {
+        "t": "～に越したことはない",
+        "note": "「沒有比…更好的了」,表示某做法最保險。「早めに動くに越したことはない」=越早行動越好。",
+        "id": "n2-18",
+        "t_en": "～に越したことはない",
+        "note_en": "“Nothing beats doing X” — the safest course of action."
+      },
+      {
+        "t": "～というわけだ",
+        "note": "從前面推導出結論。「回ってくるというわけだ」=也就是說,結果會這樣。",
+        "id": "n3-41",
+        "t_en": "～というわけだ",
+        "note_en": "Draws a conclusion from what precedes: “that is to say…”"
+      },
+      {
+        "t": "～に伴って／それに伴い",
+        "note": "隨著某變化,另一件事也跟著變。「それに伴い、流れも変わりつつある」=隨之流程也在改變。",
+        "id": "n2-50",
+        "t_en": "～に伴って / それに伴い",
+        "note_en": "As one thing changes, another follows along with it."
+      },
+      {
+        "t": "～つつある",
+        "note": "正在持續變化中,比「ている」更書面。「変わりつつある」=正逐漸改變。",
+        "id": "n2-33",
+        "t_en": "～つつある",
+        "note_en": "Indicates a gradual, ongoing change; more formal than ～ている."
+      }
+    ],
+    "title_en": "Renewing Your Residence Status",
+    "topic_en": "Society",
+    "trans_en": [
+      "For foreigners living in Japan, renewing your residence status is a hurdle you cannot avoid.",
+      "You can apply from three months before it expires, and since gathering documents takes time, moving early is always better.",
+      "Besides the application form you need a tax assessment certificate, a tax payment certificate, a certificate of employment and so on. Those who just changed jobs may also be asked for their employment contract.",
+      "The screening looks at whether your income is stable and whether you have properly paid your taxes and pension.",
+      "In other words, the price of putting off everyday paperwork comes due all at once at this moment.",
+      "Immigration counters are crowded, so more people are using online applications — and with that, the procedure itself is gradually changing.",
+      "The few weeks until the result arrives are unsettling, but if you have the documents and declare honestly, there is no need to be overly afraid."
+    ]
+  },
+  {
+    "id": "a-n1-8",
+    "level": "n1",
+    "topic": "社会",
+    "title": "外国人材と日本社会のこれから",
+    "title_zh": "外國人才與日本社會的未來",
+    "body": "人手不足が構造的な問題となった今、外国人材の受け入れは、もはや一時しのぎの策とは言えない段階に入っている。\n特定技能や高度人材といった制度が整えられ、在留者数は過去最多を更新し続けている。しかし数の増加が、そのまま定着を意味するわけではない。\n言葉の壁、住まいの確保、子どもの教育——生活の基盤が整わなければ、どれほど待遇を改善したところで、人は根を下ろさない。\n企業ともなると、採用した後の日本語教育や、地域社会とのつながりづくりまで担う必要が出てくる。\n受け入れる側の意識もまた問われている。「労働力」としてではなく、同じ地域に暮らす隣人として向き合えるかどうか。\n制度のいかんによらず、最後に定着を左右するのは、日々の関係の積み重ねなのだろう。\n外国人材の議論は、実のところ、日本社会がどのような共同体でありたいかという問いと表裏一体なのである。",
+    "trans": [
+      "在人手不足已成為結構性問題的現在,接納外國人才,已經進入不能再說是權宜之計的階段。",
+      "特定技能、高度人才等制度陸續建立,在留人數也持續刷新歷史新高。然而數量的增加,並不直接等於留得下來。",
+      "語言的隔閡、住處的確保、孩子的教育——生活的根基若沒打好,無論待遇改善到什麼程度,人都不會扎根。",
+      "若是企業,錄用之後還必須承擔日語教育、以及與地方社群建立連結等責任。",
+      "接納一方的意識同樣受到檢視。能不能不把對方當成「勞動力」,而是當作住在同一個地區的鄰居來面對。",
+      "無論制度如何,最後左右能否留下的,恐怕還是日常關係的一點一滴累積。",
+      "關於外國人才的討論,其實與「日本社會想成為什麼樣的共同體」這個提問,是一體兩面的。"
+    ],
+    "vocab": [
+      {
+        "w": "人手不足",
+        "r": "ひとでぶそく",
+        "m": "人手不足",
+        "m_en": "labor shortage"
+      },
+      {
+        "w": "受け入れ",
+        "r": "うけいれ",
+        "m": "接納",
+        "m_en": "acceptance, taking in"
+      },
+      {
+        "w": "一時しのぎ",
+        "r": "いちじしのぎ",
+        "m": "權宜之計",
+        "m_en": "stopgap measure"
+      },
+      {
+        "w": "特定技能",
+        "r": "とくていぎのう",
+        "m": "特定技能(簽證類別)",
+        "m_en": "Specified Skilled Worker visa"
+      },
+      {
+        "w": "定着",
+        "r": "ていちゃく",
+        "m": "扎根、留下",
+        "m_en": "settling, taking root"
+      },
+      {
+        "w": "待遇",
+        "r": "たいぐう",
+        "m": "待遇",
+        "m_en": "treatment, working conditions"
+      },
+      {
+        "w": "根を下ろす",
+        "r": "ねをおろす",
+        "m": "扎根",
+        "m_en": "to put down roots"
+      },
+      {
+        "w": "表裏一体",
+        "r": "ひょうりいったい",
+        "m": "一體兩面",
+        "m_en": "two sides of the same coin"
+      },
+      {
+        "w": "問われる",
+        "r": "とわれる",
+        "m": "被檢視、被追問",
+        "m_en": "to be called into question"
+      }
+    ],
+    "grammar": [
+      {
+        "t": "～ともなると",
+        "note": "到了某個層級就會不一樣。「企業ともなると」=若是到了企業這個層級,責任就更多。",
+        "id": "n1-47",
+        "t_en": "～ともなると",
+        "note_en": "Once you reach a certain level or status, things change accordingly."
+      },
+      {
+        "t": "～いかんによらず",
+        "note": "不管前項如何都不影響結果。「制度のいかんによらず」=無論制度怎樣。",
+        "id": "n1-66",
+        "t_en": "～いかんによらず",
+        "note_en": "Regardless of how X turns out; the result is unaffected."
+      },
+      {
+        "t": "～たところで",
+        "note": "就算做了也沒用,後接否定結果。「改善したところで、根を下ろさない」=就算改善也不會扎根。",
+        "id": "n1-30",
+        "t_en": "～たところで",
+        "note_en": "Even if you do X, the result won't change (followed by a negative outcome)."
+      },
+      {
+        "t": "～わけではない",
+        "note": "部分否定。「定着を意味するわけではない」=並不等於就會留下來。",
+        "id": "n3-41",
+        "t_en": "～わけではない",
+        "note_en": "Partial negation: it doesn't necessarily mean that…"
+      }
+    ],
+    "title_en": "Foreign Workers and the Future of Japanese Society",
+    "topic_en": "Society",
+    "trans_en": [
+      "Now that the labor shortage has become a structural problem, accepting foreign workers has entered a stage where it can no longer be called a stopgap.",
+      "Systems such as the Specified Skilled Worker and Highly Skilled Professional visas have been put in place, and the resident population keeps hitting record highs. Yet an increase in numbers does not in itself mean people stay.",
+      "The language barrier, securing housing, schooling for children — if the foundations of daily life are not in place, people will not put down roots no matter how much conditions improve.",
+      "For companies, responsibility extends beyond hiring to Japanese-language education and building ties with the local community.",
+      "The mindset of the receiving side is being questioned too: can we face these people not as “labor” but as neighbors living in the same community?",
+      "Regardless of the system, what ultimately determines whether people stay is probably the accumulation of everyday relationships.",
+      "The debate over foreign workers is, in truth, two sides of the same coin as the question of what kind of community Japanese society wants to be."
+    ]
+  }
 ];

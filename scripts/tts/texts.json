@@ -49,6 +49,13 @@
     ]
   },
   {
+    "text": "「いつとどきますか」ときくと、「一週間ぐらいです」とおしえてくれました。",
+    "hash": "76499e70e283",
+    "sources": [
+      "article#a-n5-7"
+    ]
+  },
+  {
     "text": "「ここはリビング、そこはキッチン、あそこはお風呂です。」",
     "hash": "bf1349f165ff",
     "sources": [
@@ -354,6 +361,13 @@
     "hash": "cab2c2568829",
     "sources": [
       "daily-story#n5_35"
+    ]
+  },
+  {
+    "text": "「労働力」としてではなく、同じ地域に暮らす隣人として向き合えるかどうか。",
+    "hash": "9cc756c2576e",
+    "sources": [
+      "article#a-n1-8"
     ]
   },
   {
@@ -5767,6 +5781,13 @@
     ]
   },
   {
+    "text": "いちじしのぎ",
+    "hash": "e5442deacc14",
+    "sources": [
+      "article-vocab#a-n1-8"
+    ]
+  },
+  {
     "text": "いちじるしい",
     "hash": "fbaed673d1a1",
     "sources": [
@@ -7049,6 +7070,13 @@
     "hash": "390ea6676f89",
     "sources": [
       "vocab-n3"
+    ]
+  },
+  {
+    "text": "うけいれ",
+    "hash": "be631fea6926",
+    "sources": [
+      "article-vocab#a-n1-8"
     ]
   },
   {
@@ -8397,7 +8425,8 @@
     "hash": "46a8c0c8ddb3",
     "sources": [
       "vocab-n4",
-      "vocab-n3"
+      "vocab-n3",
+      "article-vocab#a-n4-8"
     ]
   },
   {
@@ -11621,6 +11650,13 @@
     ]
   },
   {
+    "text": "かえりにコンビニできってを買って、はがきも出しました。",
+    "hash": "98d017cd8426",
+    "sources": [
+      "article#a-n5-7"
+    ]
+  },
+  {
     "text": "かえりみる",
     "hash": "3f108751b25b",
     "sources": [
@@ -12428,6 +12464,13 @@
     "sources": [
       "vocab-n5",
       "vocab-n4"
+    ]
+  },
+  {
+    "text": "かぜいしょうめいしょ",
+    "hash": "e103328d756e",
+    "sources": [
+      "article-vocab#a-n2-9"
     ]
   },
   {
@@ -14230,6 +14273,13 @@
     ]
   },
   {
+    "text": "かんもん",
+    "hash": "2d9ef1494702",
+    "sources": [
+      "article-vocab#a-n2-9"
+    ]
+  },
+  {
     "text": "かんよう",
     "hash": "2d6a1f411dfa",
     "sources": [
@@ -14973,7 +15023,8 @@
     "hash": "e72b7d7266eb",
     "sources": [
       "vocab-n5",
-      "vocab-n4"
+      "vocab-n4",
+      "article-vocab#a-n5-7"
     ]
   },
   {
@@ -16190,6 +16241,13 @@
     ]
   },
   {
+    "text": "きょうはゆうびんきょくへにもつをおくりにいきます。",
+    "hash": "adbe80f691dc",
+    "sources": [
+      "article#a-n5-7"
+    ]
+  },
+  {
     "text": "きょうは水だけ飲みました。",
     "hash": "2d423cad01ff",
     "sources": [
@@ -17276,6 +17334,13 @@
     "hash": "118f5b0b620f",
     "sources": [
       "vocab-n4"
+    ]
+  },
+  {
+    "text": "くやくしょ",
+    "hash": "8cac49648cc9",
+    "sources": [
+      "article-vocab#a-n4-8"
     ]
   },
   {
@@ -19396,6 +19461,13 @@
     ]
   },
   {
+    "text": "こうくうびん",
+    "hash": "337b7a3e9f3d",
+    "sources": [
+      "article-vocab#a-n5-7"
+    ]
+  },
+  {
     "text": "ごうけい",
     "hash": "1eafa0bed754",
     "sources": [
@@ -19660,7 +19732,8 @@
     "text": "こうしん",
     "hash": "5fd316913bd4",
     "sources": [
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n2-9"
     ]
   },
   {
@@ -20397,6 +20470,13 @@
       "vocab-n4",
       "vocab-n3",
       "vocab-n2"
+    ]
+  },
+  {
+    "text": "こくみんけんこうほけん",
+    "hash": "d6fe203da8f9",
+    "sources": [
+      "article-vocab#a-n4-8"
     ]
   },
   {
@@ -28036,6 +28116,13 @@
     ]
   },
   {
+    "text": "ざいしょくしょうめいしょ",
+    "hash": "27754f709ecf",
+    "sources": [
+      "article-vocab#a-n2-9"
+    ]
+  },
+  {
     "text": "さいしん",
     "hash": "955e812936c1",
     "sources": [
@@ -28191,6 +28278,20 @@
     "hash": "f1af3f9dd828",
     "sources": [
       "vocab-n3"
+    ]
+  },
+  {
+    "text": "ざいりゅうカード",
+    "hash": "c91f9174845f",
+    "sources": [
+      "article-vocab#a-n4-8"
+    ]
+  },
+  {
+    "text": "ざいりゅうしかく",
+    "hash": "c5611ed7a31f",
+    "sources": [
+      "article-vocab#a-n2-9"
     ]
   },
   {
@@ -29723,6 +29824,13 @@
     ]
   },
   {
+    "text": "しかし数の増加が、そのまま定着を意味するわけではない。",
+    "hash": "a28624590429",
+    "sources": [
+      "article#a-n1-8"
+    ]
+  },
+  {
     "text": "しかたがない",
     "hash": "cca2b2346c75",
     "sources": [
@@ -29814,6 +29922,13 @@
     "hash": "c3437b8e7d82",
     "sources": [
       "vocab-n3"
+    ]
+  },
+  {
+    "text": "しききん",
+    "hash": "4ce4e4315884",
+    "sources": [
+      "article-vocab#a-n3-9"
     ]
   },
   {
@@ -31643,7 +31758,8 @@
     "hash": "61623cb55ca7",
     "sources": [
       "vocab-n5",
-      "vocab-n4"
+      "vocab-n4",
+      "article-vocab#a-n5-7"
     ]
   },
   {
@@ -33536,7 +33652,8 @@
     "text": "しょるい",
     "hash": "a2996497f650",
     "sources": [
-      "vocab-n3"
+      "vocab-n3",
+      "article-vocab#a-n4-8"
     ]
   },
   {
@@ -33804,7 +33921,8 @@
     "sources": [
       "vocab-n3",
       "vocab-n2",
-      "article-vocab#a-n1-1"
+      "article-vocab#a-n1-1",
+      "article-vocab#a-n2-9"
     ]
   },
   {
@@ -33818,7 +33936,8 @@
     "text": "しんさ",
     "hash": "6f78fecd5d92",
     "sources": [
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n3-9"
     ]
   },
   {
@@ -35908,6 +36027,13 @@
     "hash": "fe3c4c3236cb",
     "sources": [
       "vocab-n1"
+    ]
+  },
+  {
+    "text": "せいねんがっぴ",
+    "hash": "2835e93f154d",
+    "sources": [
+      "article-vocab#a-n4-8"
     ]
   },
   {
@@ -38957,6 +39083,13 @@
     ]
   },
   {
+    "text": "それに伴い、手続きの流れも少しずつ変わりつつある。",
+    "hash": "f85666a0cc89",
+    "sources": [
+      "article#a-n2-9"
+    ]
+  },
+  {
     "text": "それは、私たち一人ひとりに課された、重い宿題なのかもしれない。",
     "hash": "3e0747ff6cdc",
     "sources": [
@@ -39483,6 +39616,13 @@
     "hash": "4def2001314c",
     "sources": [
       "vocab-n5"
+    ]
+  },
+  {
+    "text": "たいぐう",
+    "hash": "53cd9ba91fc9",
+    "sources": [
+      "article-vocab#a-n1-8"
     ]
   },
   {
@@ -42089,6 +42229,13 @@
     ]
   },
   {
+    "text": "ちゅうかいてすうりょう",
+    "hash": "664591c33744",
+    "sources": [
+      "article-vocab#a-n3-9"
+    ]
+  },
+  {
     "text": "ちゅうがっこう",
     "hash": "7a726a6b02b4",
     "sources": [
@@ -43139,6 +43286,13 @@
     ]
   },
   {
+    "text": "つけがまわる",
+    "hash": "a9a3bdf5fc4a",
+    "sources": [
+      "article-vocab#a-n2-9"
+    ]
+  },
+  {
     "text": "つけもの",
     "hash": "12b138943ca5",
     "sources": [
@@ -43374,6 +43528,13 @@
       "vocab-n3",
       "vocab-n2",
       "confusables-word"
+    ]
+  },
+  {
+    "text": "つまり、日々の手続きを後回しにしてきたつけが、この時期にまとめて回ってくるというわけだ。",
+    "hash": "883a1aac4f0a",
+    "sources": [
+      "article#a-n2-9"
     ]
   },
   {
@@ -43681,6 +43842,13 @@
     "hash": "db602876f5f9",
     "sources": [
       "vocab-n1"
+    ]
+  },
+  {
+    "text": "ていちゃく",
+    "hash": "90a7a4f7b4e5",
+    "sources": [
+      "article-vocab#a-n1-8"
     ]
   },
   {
@@ -44214,7 +44382,8 @@
     "sources": [
       "vocab-n4",
       "vocab-n3",
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n4-8"
     ]
   },
   {
@@ -44399,6 +44568,13 @@
     "hash": "242efbec9c84",
     "sources": [
       "vocab-n1"
+    ]
+  },
+  {
+    "text": "てまがかかる",
+    "hash": "aa975d646e82",
+    "sources": [
+      "article-vocab#a-n3-9"
     ]
   },
   {
@@ -44794,6 +44970,13 @@
       "vocab-n3",
       "vocab-n2",
       "article-vocab#a-n5-2"
+    ]
+  },
+  {
+    "text": "てんにゅうとどけ",
+    "hash": "2b7173123c65",
+    "sources": [
+      "article-vocab#a-n4-8"
     ]
   },
   {
@@ -45894,6 +46077,13 @@
     ]
   },
   {
+    "text": "とくていぎのう",
+    "hash": "6dcd1dae8383",
+    "sources": [
+      "article-vocab#a-n1-8"
+    ]
+  },
+  {
     "text": "どくとく",
     "hash": "715ef3f47534",
     "sources": [
@@ -46319,7 +46509,8 @@
       "vocab-n5",
       "vocab-n4",
       "vocab-n3",
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n5-7"
     ]
   },
   {
@@ -46945,6 +47136,13 @@
     ]
   },
   {
+    "text": "とわれる",
+    "hash": "bc7d867312f5",
+    "sources": [
+      "article-vocab#a-n1-8"
+    ]
+  },
+  {
     "text": "どん",
     "hash": "3f52bafa9f95",
     "sources": [
@@ -47511,6 +47709,13 @@
     "hash": "a714d86131b0",
     "sources": [
       "vocab-n1"
+    ]
+  },
+  {
+    "text": "ないけん",
+    "hash": "69247896996a",
+    "sources": [
+      "article-vocab#a-n3-9"
     ]
   },
   {
@@ -48687,7 +48892,8 @@
     "hash": "ff4f9f849a81",
     "sources": [
       "vocab-n5",
-      "vocab-n4"
+      "vocab-n4",
+      "article-vocab#a-n5-7"
     ]
   },
   {
@@ -48742,6 +48948,13 @@
     "sources": [
       "vocab-n4",
       "vocab-n3"
+    ]
+  },
+  {
+    "text": "にゅうかん",
+    "hash": "34e7686d7445",
+    "sources": [
+      "article-vocab#a-n2-9"
     ]
   },
   {
@@ -49245,6 +49458,13 @@
     ]
   },
   {
+    "text": "ねをおろす",
+    "hash": "6069bf9bd4c6",
+    "sources": [
+      "article-vocab#a-n1-8"
+    ]
+  },
+  {
     "text": "ねんかん",
     "hash": "c202c9663838",
     "sources": [
@@ -49372,6 +49592,13 @@
     "hash": "e0c0d9005ae1",
     "sources": [
       "vocab-n2"
+    ]
+  },
+  {
+    "text": "のうぜいしょうめいしょ",
+    "hash": "451f609f1cfe",
+    "sources": [
+      "article-vocab#a-n2-9"
     ]
   },
   {
@@ -51490,6 +51717,13 @@
     ]
   },
   {
+    "text": "ばんごうふだ",
+    "hash": "264c485580cf",
+    "sources": [
+      "article-vocab#a-n4-8"
+    ]
+  },
+  {
     "text": "ばんごはん",
     "hash": "4486b10e4fb7",
     "sources": [
@@ -51781,6 +52015,13 @@
     "hash": "be13496536d8",
     "sources": [
       "vocab-n1"
+    ]
+  },
+  {
+    "text": "ひあたり",
+    "hash": "fadaed3fd0b7",
+    "sources": [
+      "article-vocab#a-n3-9"
     ]
   },
   {
@@ -52383,6 +52624,13 @@
     ]
   },
   {
+    "text": "ひとでぶそく",
+    "hash": "882f5a0075f3",
+    "sources": [
+      "article-vocab#a-n1-8"
+    ]
+  },
+  {
     "text": "ヒトの細胞には、通常四十六本の染色体が含まれている。",
     "hash": "461f96a0329a",
     "sources": [
@@ -52844,7 +53092,8 @@
     "text": "ひょうりいったい",
     "hash": "fb10c22a1554",
     "sources": [
-      "vocab-n1"
+      "vocab-n1",
+      "article-vocab#a-n1-8"
     ]
   },
   {
@@ -53995,6 +54244,13 @@
     ]
   },
   {
+    "text": "ふどうさんや",
+    "hash": "f97db8117ef8",
+    "sources": [
+      "article-vocab#a-n3-9"
+    ]
+  },
+  {
     "text": "ふとうめい",
     "hash": "1fad4fdf64d7",
     "sources": [
@@ -54013,6 +54269,13 @@
     "hash": "ea80af814281",
     "sources": [
       "vocab-n4"
+    ]
+  },
+  {
+    "text": "ふなびん",
+    "hash": "0d3e3aa8dcd2",
+    "sources": [
+      "article-vocab#a-n5-7"
     ]
   },
   {
@@ -55925,6 +56188,13 @@
     ]
   },
   {
+    "text": "ほしょうにん",
+    "hash": "90aae07504fe",
+    "sources": [
+      "article-vocab#a-n3-9"
+    ]
+  },
+  {
     "text": "ほす",
     "hash": "cfca202cf898",
     "sources": [
@@ -56744,6 +57014,13 @@
     ]
   },
   {
+    "text": "まず不動産屋に行き、家賃の予算と希望の場所を伝える。",
+    "hash": "a41f0a5cda88",
+    "sources": [
+      "article#a-n3-9"
+    ]
+  },
+  {
     "text": "まず有名な庭園を見に行きました。",
     "hash": "535e16d33e28",
     "sources": [
@@ -56983,7 +57260,8 @@
     "text": "まどぐち",
     "hash": "f9b6eb58970d",
     "sources": [
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n5-7"
     ]
   },
   {
@@ -56999,6 +57277,13 @@
     "sources": [
       "vocab-n3",
       "vocab-n2"
+    ]
+  },
+  {
+    "text": "まど口で「これを台湾へおねがいします」といいます。",
+    "hash": "de400042b455",
+    "sources": [
+      "article#a-n5-7"
     ]
   },
   {
@@ -60012,7 +60297,8 @@
     "hash": "aff5f2a3f824",
     "sources": [
       "vocab-n3",
-      "article-vocab#a-n2-8"
+      "article-vocab#a-n2-8",
+      "article-vocab#a-n3-9"
     ]
   },
   {
@@ -60517,7 +60803,8 @@
     "text": "ゆうびんきょく",
     "hash": "022b7bdd1855",
     "sources": [
-      "vocab-n5"
+      "vocab-n5",
+      "article-vocab#a-n5-7"
     ]
   },
   {
@@ -60950,7 +61237,8 @@
     "text": "ようし",
     "hash": "8740d217ac91",
     "sources": [
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n5-7"
     ]
   },
   {
@@ -62546,6 +62834,13 @@
     ]
   },
   {
+    "text": "れいきん",
+    "hash": "866fc097b033",
+    "sources": [
+      "article-vocab#a-n3-9"
+    ]
+  },
+  {
     "text": "れいせい",
     "hash": "1b284cf563f2",
     "sources": [
@@ -63771,6 +64066,13 @@
     "hash": "9c8edb5acd90",
     "sources": [
       "vocab-n5#韓国"
+    ]
+  },
+  {
+    "text": "わたしは航空便をえらびました。",
+    "hash": "45316fccebd9",
+    "sources": [
+      "article#a-n5-7"
     ]
   },
   {
@@ -65451,6 +65753,13 @@
     ]
   },
   {
+    "text": "引っ越しをしたら、十四日以内に区役所へ行かなければなりません。",
+    "hash": "46fd68c5e9af",
+    "sources": [
+      "article#a-n4-8"
+    ]
+  },
+  {
     "text": "引っ越しを機に、駅からもっと近いアパートを探しているところです。",
     "hash": "6d79ef1c6894",
     "sources": [
@@ -66113,6 +66422,13 @@
     "hash": "872ed57b2ef6",
     "sources": [
       "vocab-n3#およそ"
+    ]
+  },
+  {
+    "text": "駅から徒歩十分以内、という条件をつけると、家賃は一気に上がる。",
+    "hash": "c3b3de037e53",
+    "sources": [
+      "article#a-n3-9"
     ]
   },
   {
@@ -69940,6 +70256,13 @@
     ]
   },
   {
+    "text": "外国人の場合、保証人を求められることが多い。",
+    "hash": "39ef59cb51a0",
+    "sources": [
+      "article#a-n3-9"
+    ]
+  },
+  {
     "text": "外国人の友達に、茶道の作法を丁寧に教えてあげました。",
     "hash": "ec6f1252a357",
     "sources": [
@@ -69958,6 +70281,13 @@
     "hash": "fa2c3077b58b",
     "sources": [
       "confusables-eg"
+    ]
+  },
+  {
+    "text": "外国人材の議論は、実のところ、日本社会がどのような共同体でありたいかという問いと表裏一体なのである。",
+    "hash": "e59ee2962cf1",
+    "sources": [
+      "article#a-n1-8"
     ]
   },
   {
@@ -71368,6 +71698,13 @@
     ]
   },
   {
+    "text": "企業ともなると、採用した後の日本語教育や、地域社会とのつながりづくりまで担う必要が出てくる。",
+    "hash": "708b4de68848",
+    "sources": [
+      "article#a-n1-8"
+    ]
+  },
+  {
     "text": "企業は事故の原因を速やかに公表し、社会的な責任を果たすべきだ。",
     "hash": "ad134ca9c23a",
     "sources": [
@@ -71545,6 +71882,13 @@
     ]
   },
   {
+    "text": "期限の三か月前から申請できるが、書類の準備に時間がかかるため、早めに動くに越したことはない。",
+    "hash": "385ec80d29b6",
+    "sources": [
+      "article#a-n2-9"
+    ]
+  },
+  {
     "text": "期限までに税金を納めなければ、延滞金が発生します。",
     "hash": "70a903e4b4de",
     "sources": [
@@ -71661,6 +72005,13 @@
     "hash": "c5325ce25b5f",
     "sources": [
       "vocab-n3#応募する"
+    ]
+  },
+  {
+    "text": "気に入った部屋が見つかっても、すぐには決められない。",
+    "hash": "8bb06d106a83",
+    "sources": [
+      "article#a-n3-9"
     ]
   },
   {
@@ -74059,6 +74410,27 @@
     ]
   },
   {
+    "text": "係の人が「船便ですか、航空便ですか」とききました。",
+    "hash": "46a47e9d37f7",
+    "sources": [
+      "article#a-n5-7"
+    ]
+  },
+  {
+    "text": "係の人はゆっくり話してくれます。",
+    "hash": "1ecaadeb1e40",
+    "sources": [
+      "article#a-n4-8"
+    ]
+  },
+  {
+    "text": "係の人は在留カードを見てから、裏に新しい住所を書いてくれました。",
+    "hash": "288345a46ca0",
+    "sources": [
+      "article#a-n4-8"
+    ]
+  },
+  {
     "text": "兄の几帳面さにひきかえ、弟はいつも部屋が散らかっている。",
     "hash": "71b59310e597",
     "sources": [
@@ -75008,6 +75380,13 @@
     "hash": "77db1efb4347",
     "sources": [
       "confusables-eg"
+    ]
+  },
+  {
+    "text": "結果が出るまでの数週間は落ち着かないが、必要な書類をそろえ、正直に申告していれば、過度に恐れることはない。",
+    "hash": "933d22f823c9",
+    "sources": [
+      "article#a-n2-9"
     ]
   },
   {
@@ -76301,6 +76680,13 @@
     ]
   },
   {
+    "text": "言葉の壁、住まいの確保、子どもの教育——生活の基盤が整わなければ、どれほど待遇を改善したところで、人は根を下ろさない。",
+    "hash": "5f184eae753c",
+    "sources": [
+      "article#a-n1-8"
+    ]
+  },
+  {
     "text": "言葉の壁を乗り越えるには、地道な努力が欠かせない。",
     "hash": "bde14c16ec9e",
     "sources": [
@@ -77544,6 +77930,13 @@
     "hash": "c16af05d5699",
     "sources": [
       "phrases"
+    ]
+  },
+  {
+    "text": "航空便は早いですが、たかいです。",
+    "hash": "6d78d9242057",
+    "sources": [
+      "article#a-n5-7"
     ]
   },
   {
@@ -80136,6 +80529,13 @@
     "hash": "d743ff8b3d8f",
     "sources": [
       "vocab-n3#物価"
+    ]
+  },
+  {
+    "text": "最近は保証会社を使うほうが一般的で、家賃の半分ほどを払って契約する。",
+    "hash": "7fb10159485f",
+    "sources": [
+      "article#a-n3-9"
     ]
   },
   {
@@ -85228,6 +85628,13 @@
     ]
   },
   {
+    "text": "写真ではわからない部分こそ、実際に見る意味がある。",
+    "hash": "c59935896fea",
+    "sources": [
+      "article#a-n3-9"
+    ]
+  },
+  {
     "text": "写真を撮っていただけませんか。",
     "hash": "ce66e7ed2275",
     "sources": [
@@ -86555,6 +86962,13 @@
     "hash": "754196c4630a",
     "sources": [
       "confusables-word"
+    ]
+  },
+  {
+    "text": "受け入れる側の意識もまた問われている。",
+    "hash": "d00606dff704",
+    "sources": [
+      "article#a-n1-8"
     ]
   },
   {
@@ -90306,10 +90720,24 @@
     ]
   },
   {
+    "text": "審査では、収入が安定しているか、税金や年金をきちんと納めているかが見られる。",
+    "hash": "a323e11d6114",
+    "sources": [
+      "article#a-n2-9"
+    ]
+  },
+  {
     "text": "審査には三日ないし五日ほどを要しますので、あらかじめご了承ください。",
     "hash": "a17432f3f1ca",
     "sources": [
       "vocab-n1#ないし"
+    ]
+  },
+  {
+    "text": "審査に通るように、勤務先や収入がわかる書類をそろえておいたほうがいい。",
+    "hash": "2ecdb2112700",
+    "sources": [
+      "article#a-n3-9"
     ]
   },
   {
@@ -92343,6 +92771,13 @@
     ]
   },
   {
+    "text": "人手不足が構造的な問題となった今、外国人材の受け入れは、もはや一時しのぎの策とは言えない段階に入っている。",
+    "hash": "04923b35171a",
+    "sources": [
+      "article#a-n1-8"
+    ]
+  },
+  {
     "text": "人生では、自分で道を選択しなければならない場面が何度もある。",
     "hash": "ab22674ff339",
     "sources": [
@@ -92880,6 +93315,13 @@
     "hash": "bcac140e3ec6",
     "sources": [
       "vocab-n2#違反"
+    ]
+  },
+  {
+    "text": "制度のいかんによらず、最後に定着を左右するのは、日々の関係の積み重ねなのだろう。",
+    "hash": "5cb228888dfa",
+    "sources": [
+      "article#a-n1-8"
     ]
   },
   {
@@ -94773,6 +95215,13 @@
     ]
   },
   {
+    "text": "船便はやすいですが、一か月ぐらいかかります。",
+    "hash": "daff18b30edb",
+    "sources": [
+      "article#a-n5-7"
+    ]
+  },
+  {
     "text": "選挙結果を都合よく解釈するのではなく、政治家は真摯に民意を汲み取るべきだ。",
     "hash": "0198c3614277",
     "sources": [
@@ -94980,6 +95429,13 @@
     "hash": "1a7a5202da5c",
     "sources": [
       "daily-story#n5_17"
+    ]
+  },
+  {
+    "text": "全部終わるまで一時間ぐらいかかりましたが、日本語だけで手続きができて、少し自信がつきました。",
+    "hash": "6c77cb82ca69",
+    "sources": [
+      "article#a-n4-8"
     ]
   },
   {
@@ -95907,6 +96363,20 @@
     ]
   },
   {
+    "text": "窓口が違うので、一階から二階へ移動しました。",
+    "hash": "30e0bbca6c47",
+    "sources": [
+      "article#a-n4-8"
+    ]
+  },
+  {
+    "text": "窓口で「転入届を出したいんですが」と言うと、番号札をもらいました。",
+    "hash": "6c33baa7b149",
+    "sources": [
+      "article#a-n4-8"
+    ]
+  },
+  {
     "text": "窓口に問い合わせたところ、すぐに回答を得た。",
     "hash": "c1f090617d77",
     "sources": [
@@ -96597,6 +97067,13 @@
     "hash": "64df5a06852b",
     "sources": [
       "verbs"
+    ]
+  },
+  {
+    "text": "待っている間に、書類に住所と生年月日を書いておきました。",
+    "hash": "5154e81c267b",
+    "sources": [
+      "article#a-n4-8"
     ]
   },
   {
@@ -100940,6 +101417,13 @@
     ]
   },
   {
+    "text": "転職したばかりの人は、雇用契約書も求められることがある。",
+    "hash": "3e068cd261dc",
+    "sources": [
+      "article#a-n2-9"
+    ]
+  },
+  {
     "text": "転職してから収入が安定したので、やっと安心して暮らせるようになった。",
     "hash": "8830a336c4f0",
     "sources": [
@@ -102621,6 +103105,13 @@
     ]
   },
   {
+    "text": "同じ日に国民健康保険の手続きもできます。",
+    "hash": "5033401238b6",
+    "sources": [
+      "article#a-n4-8"
+    ]
+  },
+  {
     "text": "同じ目標に向かって努力する仲間がいると、苦労も乗り越えられる。",
     "hash": "405ff789a9db",
     "sources": [
@@ -102887,6 +103378,13 @@
     ]
   },
   {
+    "text": "特定技能や高度人材といった制度が整えられ、在留者数は過去最多を更新し続けている。",
+    "hash": "73e08c45efc2",
+    "sources": [
+      "article#a-n1-8"
+    ]
+  },
+  {
     "text": "独り身で迎える年の瀬は、どうしようもなく侘しいものがある。",
     "hash": "c91c92043870",
     "sources": [
@@ -103038,6 +103536,13 @@
     "hash": "d5d18a63c829",
     "sources": [
       "vocab-n1#否決"
+    ]
+  },
+  {
+    "text": "内見のときは、日当たりや騒音だけでなく、洗濯機を置く場所やコンセントの数も確認するといい。",
+    "hash": "5a5d1a49d899",
+    "sources": [
+      "article#a-n3-9"
     ]
   },
   {
@@ -103528,6 +104033,20 @@
     "hash": "4f33db5f7aea",
     "sources": [
       "vocab-n4#ビザ"
+    ]
+  },
+  {
+    "text": "日本で部屋を借りるのは、思っていたより手間がかかる。",
+    "hash": "c90163a7da23",
+    "sources": [
+      "article#a-n3-9"
+    ]
+  },
+  {
+    "text": "日本で暮らす外国人にとって、在留資格の更新は避けて通れない関門である。",
+    "hash": "ac4acae7796b",
+    "sources": [
+      "article#a-n2-9"
     ]
   },
   {
@@ -104207,6 +104726,13 @@
     "hash": "cf8d176d641c",
     "sources": [
       "vocab-n1#規約"
+    ]
+  },
+  {
+    "text": "入管の窓口は混み合うので、オンライン申請を利用する人も増えている。",
+    "hash": "07aae75a0bf4",
+    "sources": [
+      "article#a-n2-9"
     ]
   },
   {
@@ -109378,6 +109904,13 @@
     ]
   },
   {
+    "text": "必要なのは、申請書のほかに、住民税の課税証明書と納税証明書、在職証明書など。",
+    "hash": "900308ced0d7",
+    "sources": [
+      "article#a-n2-9"
+    ]
+  },
+  {
     "text": "必要な書類がすべて揃ってから、改めて申請を行ってください。",
     "hash": "7b25d27bd2fe",
     "sources": [
@@ -109746,6 +110279,13 @@
     "hash": "7fe72c99cef5",
     "sources": [
       "confusables-word"
+    ]
+  },
+  {
+    "text": "敷金・礼金・仲介手数料など、最初にまとまったお金が必要になるからだ。",
+    "hash": "508aa6a867b3",
+    "sources": [
+      "article#a-n3-9"
     ]
   },
   {
@@ -110866,6 +111406,13 @@
     "hash": "73954c0836d5",
     "sources": [
       "vocab-n3#気軽"
+    ]
+  },
+  {
+    "text": "分からないことがあれば、遠慮しないで聞いたほうがいいです。",
+    "hash": "7e070e5e50b8",
+    "sources": [
+      "article#a-n4-8"
     ]
   },
   {
@@ -113327,6 +113874,13 @@
     ]
   },
   {
+    "text": "名前を呼ばれるまで、椅子に座って待ちます。",
+    "hash": "1ce29582b23a",
+    "sources": [
+      "article#a-n4-8"
+    ]
+  },
+  {
     "text": "明るいうちに、山から下山しましょう。",
     "hash": "400e1a90ec32",
     "sources": [
@@ -113919,6 +114473,13 @@
     "hash": "6ba89004db05",
     "sources": [
       "vocab-n2#引き受ける"
+    ]
+  },
+  {
+    "text": "面倒に思えるが、この手順を知っているだけで、次の引っ越しはずっと楽になるはずだ。",
+    "hash": "7a8856159628",
+    "sources": [
+      "article#a-n3-9"
     ]
   },
   {
@@ -115907,6 +116468,13 @@
     "hash": "23c3e70821b3",
     "sources": [
       "daily-story#n5_11"
+    ]
+  },
+  {
+    "text": "用紙に名前とじゅうしょを書いてから、お金をはらいます。",
+    "hash": "9d7088932772",
+    "sources": [
+      "article#a-n5-7"
     ]
   },
   {

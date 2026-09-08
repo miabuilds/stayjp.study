@@ -19,3 +19,10 @@
 ## 文章封面圖 — Openverse（CC0 / 公共領域）
 
 `images/articles/*.jpg` 為文章閱讀清單與 hero 的封面圖，透過 [Openverse](https://openverse.org) 搜尋、僅取 **CC0（公眾領域貢獻）與 Public Domain Mark（PDM）** 授權之圖片。此類授權**可自由商用、無需標註**；此處仍記錄來源以示尊重。已縮為 400×400 JPG。
+
+2026-09 新增（皆為 CC0 / PDM）：
+- `a-n5-7.jpg` Postman's delight — flickr.com/photos/88123769@N02/23143602121（CC0）
+- `a-n4-8.jpg` Steel structure of State Government Building — flickr.com/photos/60455048@N02/37011602081（PDM）
+- `a-n3-9.jpg` Apartment window with plants on sill — flickr.com/photos/29507259@N02/3885995757（CC0）
+- `a-n2-9.jpg` Vaccine Passport 2.0 — flickr.com/photos/148598741@N02/51631732550（CC0）
+- `a-n1-8.jpg` Ceremony for Olympic team（No Known Restrictions）— flickr.com/photos/39735679@N00/489346436（PDM）

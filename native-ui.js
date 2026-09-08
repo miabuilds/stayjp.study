@@ -118,6 +118,9 @@
       fetch('/app-version.json?t=' + Date.now(), { cache: 'no-store' })
         .then(function (r) { return r.json(); })
         .then(function (cfg) {
+          // force:低於此版一律擋畫面(重大修正才設,例如 1.0.7 前的 WebView 影片會強制全螢幕)
+          var force = cfg && cfg.force;
+          if (force && cmpVer(cur, force) < 0) { showForceUpdate(platform, force); return; }
           var latest = cfg && cfg.latest && cfg.latest[platform];
           if (!latest || cmpVer(cur, latest) >= 0) return;   // 沒設定 / 已是最新
           if (localStorage.getItem('stayjp_update_dismissed') === latest) return; // 這個新版已被關過
@@ -126,6 +129,41 @@
         .catch(function () {});
     } catch (e) {}
   }
+  // 強制更新:全畫面擋住,只留「前往更新」(舊版有無法從網頁修的原生問題時使用)
+  function showForceUpdate(platform, ver) {
+    if (document.getElementById('stayjpForceUpd')) return;
+    var storeUrl = platform === 'ios'
+      ? 'https://apps.apple.com/app/id6778227353'
+      : 'https://play.google.com/store/apps/details?id=com.stayjp.app';
+    var en = /^en/.test(localStorage.getItem('ui_lang') || '');
+    var m = document.createElement('div');
+    m.id = 'stayjpForceUpd';
+    m.style.cssText = 'position:fixed;inset:0;z-index:2147483600;background:rgba(24,20,17,.94);display:flex;align-items:center;justify-content:center;padding:24px;font:500 15px/1.7 -apple-system,BlinkMacSystemFont,"Noto Sans TC","PingFang TC",sans-serif';
+    var card = document.createElement('div');
+    card.style.cssText = 'background:#fff;color:#2d2a26;border-radius:18px;max-width:340px;width:100%;padding:24px 22px;text-align:center';
+    var img = document.createElement('img');
+    img.src = 'images/mascot/tanuki-p08.png'; img.alt = '';
+    img.style.cssText = 'width:84px;height:auto;margin-bottom:10px';
+    var h = document.createElement('div');
+    h.style.cssText = 'font-size:17px;font-weight:800;margin-bottom:6px';
+    h.textContent = en ? 'Update required' : '請更新到最新版';
+    var p = document.createElement('div');
+    p.style.cssText = 'font-size:13.5px;color:#6f6a61;margin-bottom:16px';
+    p.textContent = en
+      ? 'This version has a playback issue that can only be fixed by updating (videos force fullscreen). It takes about 30 seconds.'
+      : '這個版本有影片會強制全螢幕的問題,更新後才能修好,大約 30 秒就好。';
+    var b = document.createElement('button');
+    b.textContent = en ? 'Update now' : '前往更新';
+    b.style.cssText = 'width:100%;background:#C6553B;color:#fff;border:0;padding:13px;border-radius:12px;font-weight:800;font-size:15px;cursor:pointer';
+    b.onclick = function () {
+      try { if (window.ReactNativeWebView) { window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'OPEN_STORE', url: storeUrl })); return; } } catch (e) {}
+      try { window.location.href = storeUrl; } catch (e) {}
+    };
+    card.appendChild(img); card.appendChild(h); card.appendChild(p); card.appendChild(b);
+    m.appendChild(card);
+    (document.body || document.documentElement).appendChild(m);
+  }
+
   function showUpdateBar(platform, latest) {
     var storeUrl = platform === 'ios'
       ? 'https://apps.apple.com/app/id6778227353'
