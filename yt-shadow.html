@@ -127,7 +127,8 @@ body{margin:0;background:var(--bg);color:var(--tx);font-family:-apple-system,"Pi
 .jl .ok{color:var(--good);font-weight:800;margin-left:auto}
 .jl.cur{outline:2px solid var(--ac)}
 /* 範例影片牆 */
-.gal{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.gal{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-top:12px}
+@media(min-width:560px){ .gal{grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px} }
 .gal-c{position:relative;border:1px solid var(--bd);border-radius:14px;overflow:hidden;cursor:pointer;background:var(--bg);text-align:left}
 .gal-c{transition:box-shadow .15s ease,transform .12s ease}
 .gal-c:hover{box-shadow:0 4px 16px rgba(0,0,0,.1)}
@@ -1026,7 +1027,7 @@ const YTS = (() => {
     const cats=['全部',...new Set(SAMPLES.map(x=>x.cat))];
     document.getElementById('galCats').innerHTML=cats.map(c=>`<button class="${c===galCat?'on':''}" onclick="YTS.setCat('${c}')">${esc(c)}</button>`).join('');
     g.innerHTML=SAMPLES.filter(x=>galCat==='全部'||x.cat===galCat).map(x=>`<button class="gal-c" onclick="YTS.loadSample('${x.v}')">
-      <img src="https://i.ytimg.com/vi/${x.v}/mqdefault.jpg" alt="" loading="lazy">
+      <img src="https://i.ytimg.com/vi/${x.v}/maxresdefault.jpg" alt="" loading="lazy" onerror="this.onerror=null;this.src='https://i.ytimg.com/vi/${x.v}/hqdefault.jpg'">
       <div class="gt">${esc(x.t)}</div><span class="gtag">${esc(x.tag)}</span>
     </button>`).join('');
   }
