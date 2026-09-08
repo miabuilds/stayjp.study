@@ -437,6 +437,11 @@ const YTS = (() => {
     if(player){ try{player.destroy();}catch(e){} player=null; }
     document.getElementById('playerWrap').style.display='block';
     player=new YT.Player('playerBox',{ videoId:v, playerVars:{ playsinline:1, rel:0, controls:1, vq:'hd1080' }, events:{
+      onStateChange: (e)=>{
+        // 使用者直接按影片的播放鍵時,我們的邊界監看沒被啟動 → 聽寫/跟讀/測驗會一路播下去。
+        // 這裡在「開始播放」時重新掛上當前句的結束點。(跟播模式本來就是連續播,不攔)
+        if(e && e.data===1 && (mode==='dict'||mode==='shadow'||mode==='quiz') && lines[cur]) armSegEnd();
+      },
       onError: (e)=>{   // 101/150=版權方禁止站外嵌入、100=影片不存在
         const code=e&&e.data;
         document.getElementById('playerWrap').style.display='none';
@@ -590,7 +595,11 @@ const YTS = (() => {
     if(mode==='shadow'){
       act.innerHTML=`
         <button class="btn pri micbtn" id="micBtn" onclick="YTS.toggleRec()"><i data-ic=mic></i> ${enOr('開麥跟讀','Shadow with mic')}</button>
-        <input class="saidbox" id="saidIn" placeholder="${enOr('辨識結果會出現在這(也可直接打字)','Recognized speech appears here (or type)')}" style="display:none">
+        <input class="saidbox" id="saidIn" placeholder="${enOr('辨識結果會出現在這(也可直接打字)','Recognized speech appears here (or type)')}">
+        <div style="display:flex;gap:8px;width:100%;max-width:340px">
+          <button class="btn" style="flex:1" onclick="YTS.submitSaid()">${enOr('送出評分','Score it')}</button>
+          <button class="btn" style="flex:1" onclick="YTS.revealAnswer()">${enOr('看答案','Show answer')}</button>
+        </div>
         <div class="recnote" id="recNote"></div>`;
     } else {
       act.innerHTML=`
@@ -657,6 +666,19 @@ const YTS = (() => {
   }
   function stopKtv(){ ktvT=0; cancelAnimationFrame(ktvRaf); ktvRaf=0; }
 
+  // 播到當前句結尾就停(不論播放是誰觸發的)
+  function armSegEnd(){
+    if(!player||!lines[cur]) return;
+    clearInterval(watchT);
+    const end=(lines[cur].t+effD(cur))/1000;
+    watchT=setInterval(()=>{
+      try{
+        const c=player.getCurrentTime();
+        if(c>=end-0.05 || c<lines[cur].t/1000-1){ player.pauseVideo(); clearInterval(watchT); }
+      }catch(e){}
+    },100);
+  }
+
   // ── 播放控制 ──
   function playSeg(){
     if(!player||!lines[cur]) return;
@@ -675,7 +697,7 @@ const YTS = (() => {
           else { player.pauseVideo(); clearInterval(watchT); }
         }
       }catch(e){}
-    },120);
+    },100);
   }
   function replay(){ if(mode==='ktv'){ try{ player.seekTo(lines[cur].t/1000,true); player.playVideo(); }catch(e){} return; } playSeg(); }
   function cycleSpeed(){
@@ -719,8 +741,11 @@ const YTS = (() => {
     const pct=Math.round(ratio*100), pass=ratio>=0.7;
     const res=document.getElementById('pcRes');
     res.className='pc-result '+(pass?'pass':'fail');
+    const l=lines[cur];
+    const answerHtml = pass ? '' : `<div class="rt2">${enOr('正解:','Answer: ')}${esc(l?l.ja:'')}${(l&&l.zh&&hasZh)?'　'+esc(l.zh):''}</div>`;
     res.innerHTML=`<div class="rt1">${pass?enOr('答對了!','Correct!'):enOr('再試一次會更好','Almost — try again')} ${pct}%${pass?' ✓':''}</div>`
-      + (diffHtml?`<div class="rt2">${diffHtml}</div>`:'');
+      + (diffHtml?`<div class="rt2">${diffHtml}</div>`:'') + answerHtml;
+    if(!pass) document.getElementById('pcNext').style.display='flex';   // 沒過也能往下一句,不卡住
     if(pass){
       done[cur]=1; try{ localStorage.setItem(doneKey(),JSON.stringify(done)); }catch(e){}
       document.getElementById('pcNext').style.display='flex';
@@ -778,8 +803,37 @@ const YTS = (() => {
     if(NATIVE_STT&&was){ _nPost({type:'SPEECH_STOP'}); }
     else if(rec&&was){ try{rec.stop();}catch(e){} }
     _recUI(false);
-    // 只有使用者自己按「停止」才結算;換句/換模式時的 stopRec 不能拿舊累積評新句
-    if(settle && was && mode==='shadow' && _acc){ const m=matchChars(lines[cur].ja,_acc); paintHits(m.hits); showResult(m.ratio,null); }
+    if(!settle || !was || mode!=='shadow') return;
+    const inp=document.getElementById('saidIn');
+    const text=(_acc || (inp&&inp.value) || '').trim();
+    if(!text){   // 沒收到聲音:給明確出口,不要讓人卡住
+      const rn=document.getElementById('recNote');
+      if(rn) rn.textContent=enOr('沒聽到聲音——再按一次麥克風,或直接把句子打在上面再按「送出評分」。','No speech detected — tap the mic again, or type the line above and press “Score it”.');
+      return;
+    }
+    const m=matchChars(lines[cur].ja,text); paintHits(m.hits); showResult(m.ratio,null);
+  }
+  // 手動送出:打字或辨識結果都能評分(不再只能靠麥克風)
+  function submitSaid(){
+    const inp=document.getElementById('saidIn');
+    const text=((inp&&inp.value)||_acc||'').trim();
+    if(!text){ const rn=document.getElementById('recNote'); if(rn) rn.textContent=enOr('先唸一次或把句子打上去,再按送出。','Say it once or type the line first, then submit.'); return; }
+    if(recording) stopRec(false);
+    _acc=text;
+    const m=matchChars(lines[cur].ja,text); paintHits(m.hits); showResult(m.ratio,null);
+  }
+  // 完全唸不出來時的出口:直接看答案並前進
+  function revealAnswer(){
+    if(recording) stopRec(false);
+    const l=lines[cur]; if(!l) return;
+    const jp=document.getElementById('pcJp'); if(jp){ jp.classList.remove('blur'); jp.innerHTML=fr(l.ja); }
+    document.getElementById('pcZh').style.filter='';
+    const res=document.getElementById('pcRes');
+    res.className='pc-result fail';
+    res.innerHTML='<div class="rt1">'+enOr('這句先看過就好','Here’s the line')+'</div>'
+      + '<div class="rt2">'+esc(l.ja)+((l.zh&&hasZh)?'<br>'+esc(l.zh):'')+'</div>';
+    document.getElementById('pcNext').style.display='flex';
+    _settled=true;
   }
 
   // ── 聽寫 ──
@@ -1167,7 +1221,7 @@ const YTS = (() => {
     if(ta) ta.addEventListener('paste',()=>{ setTimeout(()=>{ if((ta.value||'').trim()) parsePaste(); },80); });   // 貼上即解析
     try{ if(!localStorage.getItem('yts_tut_seen')) tut(true); }catch(e){}
   });
-  return { load, parsePaste, nav, jump, replay, cycleSpeed, toggleLoop, setMode, toggleRec, checkDict, toggleList, toggleZh, tut, loadSample, setCat, backToPractice, openTranscript, swap, theater, startQuiz, qzBegin, qzPlay, qzAnswer, qzNext, jumpPlay, openLearn, learnTab, saveWord, speakWord, thumbFallback, thumbCheck, renderToday, _retext };
+  return { load, parsePaste, nav, jump, replay, cycleSpeed, toggleLoop, setMode, toggleRec, submitSaid, revealAnswer, checkDict, toggleList, toggleZh, tut, loadSample, setCat, backToPractice, openTranscript, swap, theater, startQuiz, qzBegin, qzPlay, qzAnswer, qzNext, jumpPlay, openLearn, learnTab, saveWord, speakWord, thumbFallback, thumbCheck, renderToday, _retext };
 })();
 </script>
 <script src="font-scale.js"></script>
