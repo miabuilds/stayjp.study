@@ -82,6 +82,12 @@ body{margin:0;background:var(--bg);color:var(--tx);font-family:-apple-system,"Pi
 .gal-c .gt{font-size:12.5px;font-weight:700;padding:8px 10px 3px;line-height:1.45;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .gal-c .gtag{display:inline-block;font-size:10.5px;color:var(--ac);background:var(--soft);border-radius:6px;padding:1px 7px;margin:0 10px 9px}
 .gal-hd{font-size:13px;font-weight:800;color:var(--tx2);margin:16px 0 0}
+.gal-cats{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}
+.gal-cats button{border:1px solid var(--bd);background:var(--bg);color:var(--tx2);border-radius:99px;padding:5px 13px;font:inherit;font-size:12.5px;font-weight:700;cursor:pointer}
+.gal-cats button.on{background:var(--ac);border-color:var(--ac);color:#fff}
+.own{margin-top:14px;border-top:1px dashed var(--bd);padding-top:10px}
+.own summary{font-size:13px;color:var(--tx2);cursor:pointer;font-weight:700;list-style:none}
+.own summary::-webkit-details-marker{display:none}
 .backpr{display:none;width:100%;margin-bottom:10px;background:var(--goodbg);color:var(--good);border:1px solid var(--good)}
 /* 貼逐字稿 */
 .pastebox{display:none;margin-top:12px}
@@ -137,13 +143,17 @@ body{margin:0;background:var(--bg);color:var(--tx);font-family:-apple-system,"Pi
 
   <div class="card" id="inputCard">
     <button class="btn backpr" id="backPr" onclick="YTS.backToPractice()">← 回到練習(影片還在)</button>
-    <div class="urlrow">
-      <input id="urlIn" placeholder="貼上 YouTube 連結或影片 ID" inputmode="url" autocomplete="off">
-      <button class="btn pri" id="loadBtn" onclick="YTS.load()">讀取</button>
-    </div>
-    <div class="note" id="inNote">貼上有日文字幕的影片連結,歌、新聞、Vlog 都行。</div>
-    <div class="gal-hd" id="galHd">或者直接從這裡開始(點了就能練):</div>
+    <div class="gal-hd" id="galHd" style="margin-top:0">挑一支影片開始練(全部即點即用):</div>
+    <div class="gal-cats" id="galCats"></div>
     <div class="gal" id="gal"></div>
+    <details class="own" id="ownVid">
+      <summary id="ownSum">用自己的 YouTube 影片練 ▾</summary>
+      <div class="urlrow" style="margin-top:10px">
+        <input id="urlIn" placeholder="貼上 YouTube 連結或影片 ID" inputmode="url" autocomplete="off">
+        <button class="btn pri" id="loadBtn" onclick="YTS.load()">讀取</button>
+      </div>
+      <div class="note" id="inNote">貼上有日文字幕的影片連結,歌、新聞、Vlog 都行。</div>
+    </details>
     <div class="err" id="inErr" style="display:none"></div>
     <div class="pastebox" id="pasteBox">
       <div class="pb-step"><span class="pb-n">1</span><button class="btn" onclick="YTS.openTranscript()" id="openTsBtn">在 YouTube 開這支影片 ↗</button><span class="pb-hint" id="pbHint1">點「顯示轉譯稿」→ 全選複製</span></div>
@@ -212,16 +222,24 @@ if(I18n.getLang()==='zh-CN') ensureOpenCC().then(function(){ try{ YTS._retext();
 const YTS = (() => {
   const FN = 'https://asia-east1-jpnote-1bdd6.cloudfunctions.net/ytCaptions';
   // 範例牆:全部「開放嵌入+日文字幕」且字幕已種進快取(即點即練)
-  const SAMPLES = [   // 由易到難排;全部已種字幕(即點即練)
-    { v:'rjmKQ-fjnyQ', t:'慢速日語會話(Comprehensible Japanese)', tag:'入門 · 慢速 · 中日字幕' },
-    { v:'JYEutL_zQQc', t:'昨日、何をしましたか?(5分鐘簡單對話)', tag:'入門 · 日常會話' },
-    { v:'3k75rkB61Bk', t:'桃太郎(日本昔話動畫)', tag:'N5-N4 · 童話朗讀' },
-    { v:'Bwe7zLSPtXA', t:'日本語散歩Vlog:最近よく眠れていますか?', tag:'N4-N3 · Vlog · 中日字幕' },
-    { v:'Xw3NjBuXMLY', t:'日本語散歩Vlog:東京駅から新橋まで', tag:'N4-N3 · Vlog' },
-    { v:'NyUTYwZe_l4', t:'YOASOBI「群青」THE FIRST TAKE', tag:'歌 · 歌詞字幕 · 中文對照' },
-    { v:'tLQLa6lM3Us', t:'Aimer「残響散歌」(鬼滅の刃)', tag:'歌 · 歌詞字幕' },
-    { v:'Ifux-aLb4RQ', t:'関東の天気:週明け大雨の恐れ', tag:'新聞 · 真實語速 · 挑戰' },
+  // 範例庫:全部「開放嵌入+日文字幕」且已種進快取(即點即練);cat=分類 chips
+  const SAMPLES = [
+    { v:'rjmKQ-fjnyQ', cat:'入門', t:'慢速日語會話 #1(Comprehensible Japanese)', tag:'入門 · 慢速 · 中日字幕' },
+    { v:'aRS80OfBJ9o', cat:'入門', t:'慢速日語會話 #2(Comprehensible Japanese)', tag:'入門 · 慢速' },
+    { v:'JYEutL_zQQc', cat:'入門', t:'昨日、何をしましたか?(5分鐘簡單對話)', tag:'入門 · 25個基本動詞' },
+    { v:'63yInL0Vm_o', cat:'會話', t:'買い物する時の会話(あかね)', tag:'會話 · 購物實戰' },
+    { v:'C3oPjuudXas', cat:'會話', t:'スーパーの日本語(聽力練習)', tag:'會話 · 超市場景' },
+    { v:'3k75rkB61Bk', cat:'故事', t:'桃太郎(日本昔話動畫)', tag:'N5-N4 · 童話朗讀' },
+    { v:'hlm-RqVknfE', cat:'故事', t:'浦島太郎(日本昔話動畫)', tag:'N5-N4 · 童話朗讀' },
+    { v:'Bwe7zLSPtXA', cat:'Vlog', t:'日本語散歩Vlog:最近よく眠れていますか?', tag:'N4-N3 · 中日字幕' },
+    { v:'Xw3NjBuXMLY', cat:'Vlog', t:'日本語散歩Vlog:東京駅から新橋まで', tag:'N4-N3' },
+    { v:'NyUTYwZe_l4', cat:'歌', t:'YOASOBI「群青」THE FIRST TAKE', tag:'歌詞字幕 · 中文對照' },
+    { v:'MpYy6wwqxoo', cat:'歌', t:'LiSA「紅蓮華」THE FIRST TAKE(鬼滅の刃)', tag:'歌詞字幕' },
+    { v:'tLQLa6lM3Us', cat:'歌', t:'Aimer「残響散歌」MV(鬼滅の刃)', tag:'歌詞字幕' },
+    { v:'Ifux-aLb4RQ', cat:'新聞', t:'関東の天気:週明け大雨の恐れ', tag:'真實語速 · 挑戰' },
+    { v:'iQn2LbktWN0', cat:'新聞', t:'水中の「ガイコツパンダ」実は新種!', tag:'趣聞 · 真實語速' },
   ];
+  let galCat='全部';
   const SPEEDS = [1, 0.75, 0.5];
   let player=null, apiReady=false, vid='', lines=[], cur=0, mode='ktv', loopOn=false, watchT=0, done={}, spdIdx=0, listOpen=false, ktvT=0;
 
@@ -232,7 +250,8 @@ const YTS = (() => {
     set('bkTx','返回','Back');
     set('hTitle','YouTube 跟讀','YouTube Shadowing');
     set('inNote','貼上有日文字幕的影片連結,歌、新聞、Vlog 都行。','Paste a link to any video with Japanese subtitles.');
-    set('galHd','或者直接從這裡開始(點了就能練):','Or start right here (tap to practice):');
+    set('galHd','挑一支影片開始練(全部即點即用):','Pick a video to start (all ready to practice):');
+    set('ownSum','用自己的 YouTube 影片練 ▾','Use your own YouTube video ▾');
     set('backPr','← 回到練習(影片還在)','← Back to practice (your video is still here)');
     set('mKtv','跟播','Follow'); set('mShadow','跟讀','Shadow'); set('mDict','聽寫','Dictation'); set('mSwap','換影片','Change video');
     set('loadBtn','讀取','Load'); set('parseBtn','解析','Parse');
@@ -318,6 +337,7 @@ const YTS = (() => {
     }catch(e){
       document.getElementById('inNote').textContent=enOr('這支還沒有現成字幕——花 15 秒把逐字稿帶過來就能練:','No ready captions for this one — grab the transcript in 15 seconds:');
       document.getElementById('pasteBox').style.display='block';
+      try{ document.getElementById('ownVid').open=true; }catch(e2){}
       setTimeout(()=>{ try{ document.getElementById('pasteTa').focus(); }catch(e2){} },100);
     }finally{
       document.getElementById('loadBtn').disabled=false;
@@ -626,11 +646,14 @@ const YTS = (() => {
   function loadSample(v){ document.getElementById('urlIn').value=v; load(); }
   function renderGallery(){
     const g=document.getElementById('gal'); if(!g) return;
-    g.innerHTML=SAMPLES.map(x=>`<button class="gal-c" onclick="YTS.loadSample('${x.v}')">
+    const cats=['全部',...new Set(SAMPLES.map(x=>x.cat))];
+    document.getElementById('galCats').innerHTML=cats.map(c=>`<button class="${c===galCat?'on':''}" onclick="YTS.setCat('${c}')">${esc(c)}</button>`).join('');
+    g.innerHTML=SAMPLES.filter(x=>galCat==='全部'||x.cat===galCat).map(x=>`<button class="gal-c" onclick="YTS.loadSample('${x.v}')">
       <img src="https://i.ytimg.com/vi/${x.v}/mqdefault.jpg" alt="" loading="lazy">
       <div class="gt">${esc(x.t)}</div><span class="gtag">${esc(x.tag)}</span>
     </button>`).join('');
   }
+  function setCat(c){ galCat=c; renderGallery(); }
   function theater(){
     const c=document.querySelector('.cols'); if(!c) return;
     const on=c.classList.toggle('theater');
@@ -678,7 +701,7 @@ const YTS = (() => {
     if(ta) ta.addEventListener('paste',()=>{ setTimeout(()=>{ if((ta.value||'').trim()) parsePaste(); },80); });   // 貼上即解析
     try{ if(!localStorage.getItem('yts_tut_seen')) tut(true); }catch(e){}
   });
-  return { load, parsePaste, nav, jump, replay, cycleSpeed, toggleLoop, setMode, toggleRec, checkDict, toggleList, tut, loadSample, backToPractice, openTranscript, swap, theater, _retext };
+  return { load, parsePaste, nav, jump, replay, cycleSpeed, toggleLoop, setMode, toggleRec, checkDict, toggleList, tut, loadSample, setCat, backToPractice, openTranscript, swap, theater, _retext };
 })();
 </script>
 <script src="font-scale.js"></script>
