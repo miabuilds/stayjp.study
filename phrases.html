@@ -46,6 +46,13 @@
   .bubble{max-width:80%;padding:10px 14px;border-radius:18px;position:relative;transition:transform .12s ease}
   .bubble[data-j]{cursor:pointer}
   .bubble:active{transform:scale(.97)}
+  .shx{display:flex;align-items:center;gap:8px;margin-top:7px}
+  .shx-mic{display:inline-flex;align-items:center;gap:5px;border:1px solid var(--bd,#e5e0d8);background:var(--bg2,#fff);color:var(--tx2,#777);border-radius:99px;padding:4px 11px;font:inherit;font-size:12px;font-weight:700;cursor:pointer}
+  .shx-mic.on{background:#b3402a;border-color:#b3402a;color:#fff;animation:shxp 1.2s infinite}
+  @keyframes shxp{50%{opacity:.75}}
+  .shx-sc{font-size:12px;font-weight:800}
+  .shx-sc[data-done="1"]{color:#2E7D57}
+  .jp .hit{color:#2E7D57;font-weight:700}
   .row.you .bubble{background:var(--you);border-bottom-left-radius:6px}
   .row.me .bubble{background:var(--me);border-bottom-right-radius:6px}
   .bubble .jp{font-size:17px;font-weight:600;color:var(--tx);display:flex;align-items:center;gap:7px}
@@ -334,9 +341,13 @@ function sceneHtml(s){
       ${s.lines.map(l => `
         <div class="row ${l.side}">
           <div class="bubble"${(window.__TTS&&window.__TTS[l.jp])?` data-j="${esc(l.jp)}" onclick="speakLine(this)" title="點我發音 / tap to hear"`:''}>
-            <div class="jp">${esc(l.jp)}${(window.__TTS&&window.__TTS[l.jp])?SPK:''}</div>
+            <div class="jp" data-raw="${esc(l.jp)}">${esc(l.jp)}${(window.__TTS&&window.__TTS[l.jp])?SPK:''}</div>
             <div class="rm">${esc(l.rm)}</div>
             <div class="tr"><span data-t="zh">${esc(l.zh)}</span><span data-t="en">${esc(l.en)}</span></div>
+            <div class="shx">
+              <button class="shx-mic" onclick="PShadow.toggle(event,this)"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/></svg><span data-t="zh">跟讀</span><span data-t="en">Say it</span></button>
+              <span class="shx-sc" data-done="${PShadow.isDone(l.jp)?'1':''}">${PShadow.isDone(l.jp)?'✓':''}</span>
+            </div>
           </div>
         </div>`).join('')}
       ${s.tipZh ? `<div class="tip"><i data-ic=bulb></i> <span data-t="zh">${esc(s.tipZh)}</span><span data-t="en">${esc(s.tipEn)}</span></div>` : ''}
@@ -361,6 +372,68 @@ function pickCat(k){
 function render(){ renderTabs(); renderScenes(); }
 // 發音:優先 VOICEVOX(__TTS 有的話),否則瀏覽器 TTS。與主站一致。
 let _audio = null;
+const PShadow = (() => {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const NATIVE = !!(window.STAYJP_NATIVE && window.STAYJP_NATIVE.canSpeech && window.ReactNativeWebView);
+  const nPost = o => { try{ window.ReactNativeWebView.postMessage(JSON.stringify(o)); }catch(e){} };
+  const norm = t => (t||'').replace(/[\s、。,．.!！?？「」『』()（）・〜~♪…–—-]/g,'');
+  let rec=null, on=false, acc='', btn=null, jpEl=null, target='', prevRawN='', nBase='';
+  const doneMap = () => { try{ return JSON.parse(localStorage.getItem('ph_shadow_done'))||{}; }catch(e){ return {}; } };
+  const isDone = jp => !!doneMap()[jp];
+  function match(t,said){
+    const T=norm(t), S=norm(said);
+    const hits=new Array(T.length).fill(false); let p=0;
+    for(let i=0;i<T.length;i++){ const x=S.indexOf(T[i],p); if(x>=0){hits[i]=true;p=x+1;} }
+    return { hits, ratio: T.length? hits.filter(Boolean).length/T.length : 0 };
+  }
+  function paint(hits){
+    if(!jpEl) return;
+    let h='', k=0;
+    for(const ch of target){ if(norm(ch)===''){h+=ch;continue;} h += hits[k]?'<span class="hit">'+ch+'</span>':ch; k++; }
+    // 保留喇叭 icon
+    jpEl.innerHTML = h + (jpEl.querySelector('.spk')? '' : '');
+  }
+  function feed(text,fin){
+    const m=match(target,text);
+    paint(m.hits);
+    if(m.ratio>=0.99){ stop(true); return; }
+    if(fin) settle(m.ratio);
+  }
+  function settle(ratio){
+    const sc=btn && btn.parentElement.querySelector('.shx-sc');
+    const pct=Math.round(ratio*100), pass=ratio>=0.7;
+    if(sc){ sc.textContent=pct+'%'+(pass?' ✓':''); sc.style.color=pass?'#2E7D57':'var(--ac,#c6553b)'; }
+    if(pass){ try{ const m=doneMap(); m[target]=1; localStorage.setItem('ph_shadow_done',JSON.stringify(m)); }catch(e){} }
+  }
+  function start(b){
+    btn=b; const bub=b.closest('.bubble'); jpEl=bub.querySelector('.jp'); target=jpEl.getAttribute('data-raw')||jpEl.textContent;
+    acc=''; prevRawN=''; nBase='';
+    try{ if(window.speechSynthesis) speechSynthesis.cancel(); }catch(e){}
+    if(typeof _audio!=='undefined' && _audio){ try{_audio.pause();}catch(e){} }
+    if(NATIVE){
+      window.stayjpSpeechResult=(t,fin)=>{ if(!t)return; let nt=t.trim(); if(prevRawN&&nt.startsWith(prevRawN))nt=nt.slice(prevRawN.length).trim(); const merged=nBase+nt; if(fin){acc=merged;prevRawN=t.trim();} feed(merged,false); };
+      window.stayjpSpeechEnd=()=>{ on=false; ui(false); };
+      on=true; ui(true); nPost({type:'SPEECH_START',lang:'ja-JP'});
+      return;
+    }
+    if(!SR){ alert('這個瀏覽器不支援語音辨識'); return; }
+    rec=new SR(); rec.lang='ja-JP'; rec.interimResults=true; rec.continuous=true;
+    rec.onresult=e=>{ let it=''; for(let k=e.resultIndex;k<e.results.length;k++){ const t=e.results[k][0].transcript; if(e.results[k].isFinal) acc+=t; else it+=t; } feed(acc+it,false); };
+    rec.onerror=e=>{ if(e.error==='no-speech'||e.error==='aborted')return; stop(false); };
+    rec.onend=()=>{ if(on){ try{rec.start();return;}catch(e){} } on=false; ui(false); };
+    try{ rec.start(); on=true; ui(true); }catch(e){}
+  }
+  function stop(settleIt){
+    const was=on; on=false;
+    if(NATIVE&&was) nPost({type:'SPEECH_STOP'});
+    else if(rec&&was){ try{rec.stop();}catch(e){} }
+    ui(false);
+    if(settleIt&&was) settle(match(target,acc||'').ratio>=0? match(target,acc||'').ratio : 0);
+  }
+  function ui(rec_on){ if(btn) btn.classList.toggle('on',rec_on); }
+  function toggle(ev,b){ ev.stopPropagation(); on ? stop(true) : start(b); }
+  return { toggle, isDone };
+})();
 function speakLine(el){
   // Journey 證據:點聽滿 5 句
   try{const n=parseInt(localStorage.getItem('jr_ph_taps')||'0',10)+1;localStorage.setItem('jr_ph_taps',String(n));if(n>=5)localStorage.setItem('jr_phrases','1');}catch(e){}
