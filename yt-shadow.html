@@ -54,6 +54,14 @@ body{margin:0;background:var(--bg);color:var(--tx);font-family:-apple-system,"Pi
 .pc-result .rt2{font-size:13px;color:var(--tx2);margin-top:2px;line-height:1.8}
 .pc-result .dok{color:var(--good)} .pc-result .dng{color:var(--bad);text-decoration:line-through}
 .nextbtn{width:100%;max-width:340px;padding:14px;font-size:16px;border-radius:14px;background:var(--good);color:#fff}
+/* KTV 跟播面板:深色襯底,當前句隨播放進度刷色 */
+.ktv-wrap{display:none;background:linear-gradient(165deg,#262019,#332a20 60%,#2b2118);border-radius:16px;padding:20px 14px 16px;text-align:center;color:#efe9df;margin:4px 0 8px;position:relative;overflow:hidden}
+.ktv-wrap::before{content:"";position:absolute;inset:0;background:radial-gradient(120% 60% at 50% 0%,rgba(255,176,84,.12),transparent 60%);pointer-events:none}
+.ktv-prev,.ktv-next{font-size:13px;color:rgba(255,255,255,.32);min-height:22px;line-height:1.7;cursor:pointer;position:relative}
+.ktv-cur{font-size:23px;line-height:1.9;margin:10px 0 6px;font-weight:700;position:relative;word-break:break-word}
+.ktv-cur .kt{background-image:linear-gradient(90deg,#ffb054 var(--p,0%),#efe9df var(--p,0%));-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent}
+.ktv-cur rt{font-size:10px}
+.ktv-zh{font-size:13px;color:rgba(255,255,255,.5);min-height:18px;position:relative}
 .modes{display:flex;gap:8px;margin:0 0 12px}
 .modes button{flex:1;border:1px solid var(--bd);background:var(--bg2);color:var(--tx2);border-radius:12px;padding:9px;font:inherit;font-weight:700;cursor:pointer}
 .modes button.on{background:var(--ac);color:#fff;border-color:var(--ac)}
@@ -132,7 +140,8 @@ body{margin:0;background:var(--bg);color:var(--tx);font-family:-apple-system,"Pi
     <div class="colR">
       <div id="practice">
         <div class="modes" id="modeRow">
-          <button id="mShadow" class="on" onclick="YTS.setMode('shadow')">跟讀</button>
+          <button id="mKtv" class="on" onclick="YTS.setMode('ktv')">跟播</button>
+          <button id="mShadow" onclick="YTS.setMode('shadow')">跟讀</button>
           <button id="mDict" onclick="YTS.setMode('dict')">聽寫</button>
           <button id="mSwap" style="flex:0 0 auto" onclick="YTS.swap()">換影片</button>
         </div>
@@ -145,6 +154,12 @@ body{margin:0;background:var(--bg);color:var(--tx);font-family:-apple-system,"Pi
             <button class="nav" onclick="YTS.nav(1)" aria-label="下一句">›</button>
           </div>
           <div class="pc-idx" id="pcIdx"></div>
+          <div class="ktv-wrap" id="ktvBox">
+            <div class="ktv-prev" id="ktvPrev" onclick="YTS.nav(-1)"></div>
+            <div class="ktv-cur" id="ktvCur"></div>
+            <div class="ktv-zh" id="ktvZh"></div>
+            <div class="ktv-next" id="ktvNext" onclick="YTS.nav(1)"></div>
+          </div>
           <div class="pc-jp" id="pcJp"></div>
           <div class="pc-zh" id="pcZh"></div>
           <div class="pc-act" id="pcAct"></div>
@@ -180,7 +195,7 @@ const YTS = (() => {
   const FN = 'https://asia-east1-jpnote-1bdd6.cloudfunctions.net/ytCaptions';
   const EXAMPLE_V = 'tLQLa6lM3Us';   // Aimer 残響散歌(官方歌詞字幕,開放嵌入)
   const SPEEDS = [1, 0.75, 0.5];
-  let player=null, apiReady=false, vid='', lines=[], cur=0, mode='shadow', loopOn=false, watchT=0, done={}, spdIdx=0, listOpen=false;
+  let player=null, apiReady=false, vid='', lines=[], cur=0, mode='ktv', loopOn=false, watchT=0, done={}, spdIdx=0, listOpen=false, ktvT=0;
 
   // ── i18n 靜態字 ──
   function _retext(){
@@ -190,7 +205,7 @@ const YTS = (() => {
     set('hTitle','YouTube 跟讀','YouTube Shadowing');
     set('inNote','貼上有日文字幕的影片連結,歌、新聞、Vlog 都行。<a href="javascript:void(0)" style="color:var(--ac)" onclick="YTS.loadExample()">沒有影片?用範例試試(日文歌) →</a>',
       'Paste a link to any video with Japanese subtitles. <a href="javascript:void(0)" style="color:var(--ac)" onclick="YTS.loadExample()">No video in mind? Try the example →</a>');
-    set('mShadow','跟讀','Shadow'); set('mDict','聽寫','Dictation'); set('mSwap','換影片','Change video');
+    set('mKtv','跟播','Follow'); set('mShadow','跟讀','Shadow'); set('mDict','聽寫','Dictation'); set('mSwap','換影片','Change video');
     set('loadBtn','讀取','Load'); set('parseBtn','解析','Parse');
     set('openTsBtn','在 YouTube 開這支影片 ↗','Open this video on YouTube ↗');
     set('pbHint1','點「顯示轉譯稿」→ 全選複製','Tap “Show transcript” → select all & copy');
@@ -296,7 +311,9 @@ const YTS = (() => {
   // ── 進入練習 ──
   function doneKey(){ return 'yts_done_'+vid; }
   function setLines(ls){
-    lines=ls;
+    // 過濾音效標籤句([音楽]/[拍手]/(笑) 這類整句都是括號標記的,不能拿來練)
+    lines=ls.filter(l=>!/^[\[（(【][^\]）)】]*[\]）)】]$/.test((l.ja||'').trim()));
+    if(!lines.length) lines=ls;
     try{ done=JSON.parse(localStorage.getItem(doneKey()))||{}; }catch(e){ done={}; }
     document.getElementById('inputCard').style.display='none';
     document.getElementById('inErr').style.display='none';
@@ -307,18 +324,32 @@ const YTS = (() => {
     renderCard(false);
   }
 
-  // ── 練習卡(一次一句) ──
+  // ── 練習卡 ──
   function renderCard(autoplay=true){
     stopRec();
     const l=lines[cur]; if(!l) return;
     document.getElementById('pcIdx').textContent=(cur+1)+' / '+lines.length+'　'+fmtT(l.t);
+    const isKtv = mode==='ktv';
+    document.getElementById('ktvBox').style.display=isKtv?'block':'none';
+    document.getElementById('loopBtn').style.display=isKtv?'none':'flex';   // 跟播=連續播放,循環無意義
     const jp=document.getElementById('pcJp');
-    jp.innerHTML=fr(l.ja);
-    jp.classList.toggle('blur', mode==='dict' && !l._rev);
-    document.getElementById('pcZh').textContent=l.zh||'';
+    jp.style.display=isKtv?'none':'block';
+    document.getElementById('pcZh').style.display=isKtv?'none':'block';
     const res=document.getElementById('pcRes'); res.className='pc-result'; res.innerHTML='';
     document.getElementById('pcNext').style.display='none';
     const act=document.getElementById('pcAct');
+    if(isKtv){
+      act.innerHTML='';
+      renderKtv();
+      updProg(); renderList();
+      ktvWatch();                 // 監看永遠開:就算使用者自己按影片的播放鍵,句子也要跟
+      if(autoplay) startKtv();
+      return;
+    }
+    stopKtv();
+    jp.innerHTML=fr(l.ja);
+    jp.classList.toggle('blur', mode==='dict' && !l._rev);
+    document.getElementById('pcZh').textContent=l.zh||'';
     if(mode==='shadow'){
       act.innerHTML=`
         <button class="btn pri micbtn" id="micBtn" onclick="YTS.toggleRec()"><i data-ic=mic></i> ${enOr('開麥跟讀','Shadow with mic')}</button>
@@ -337,8 +368,51 @@ const YTS = (() => {
     const n=Object.keys(done).length;
     document.getElementById('progTx').textContent=enOr('已完成 ','Done ')+n+' / '+lines.length;
   }
-  function nav(d){ cur=Math.min(lines.length-1,Math.max(0,cur+d)); renderCard(); }
-  function jump(i){ cur=i; listOpen=false; document.getElementById('allLines').style.display='none'; renderCard(); }
+  function nav(d){
+    cur=Math.min(lines.length-1,Math.max(0,cur+d));
+    if(mode==='ktv'){ renderKtv(); try{ player.seekTo(lines[cur].t/1000,true); player.playVideo(); }catch(e){} return; }
+    renderCard();
+  }
+  function jump(i){
+    cur=i; listOpen=false; document.getElementById('allLines').style.display='none';
+    if(mode==='ktv'){ renderKtv(); try{ player.seekTo(lines[cur].t/1000,true); player.playVideo(); }catch(e){} return; }
+    renderCard();
+  }
+
+  // ── KTV 跟播:影片連續播,句子隨時間自動跳轉+當前句刷色 ──
+  function renderKtv(){
+    const l=lines[cur]; if(!l) return;
+    document.getElementById('ktvPrev').innerHTML = cur>0 ? esc(lines[cur-1].ja) : '';
+    document.getElementById('ktvCur').innerHTML = '<span class="kt" id="ktSpan">'+fr(l.ja)+'</span>';
+    document.getElementById('ktvZh').textContent = l.zh||'';
+    document.getElementById('ktvNext').innerHTML = cur<lines.length-1 ? esc(lines[cur+1].ja) : '';
+    document.getElementById('pcIdx').textContent=(cur+1)+' / '+lines.length+'　'+fmtT(l.t);
+  }
+  function startKtv(){
+    if(!player) return;
+    try{ player.setPlaybackRate(SPEEDS[spdIdx]); player.seekTo(lines[cur].t/1000,true); player.playVideo(); }catch(e){}
+    ktvWatch();
+  }
+  function ktvWatch(){
+    if(!player) return;
+    clearInterval(watchT);   // 關掉逐句暫停監看
+    clearInterval(ktvT);
+    ktvT=setInterval(()=>{
+      try{
+        const ms=player.getCurrentTime()*1000;
+        // 找目前時間落在哪一句(取最後一個 t<=ms 的句子)
+        let idx=cur;
+        if(ms<lines[cur].t || ms>=lines[cur].t+(lines[cur].d||4000)+2000){ idx=0; }
+        while(idx<lines.length-1 && lines[idx+1].t<=ms) idx++;
+        while(idx>0 && lines[idx].t>ms) idx--;
+        if(idx!==cur){ cur=idx; renderKtv(); }
+        const l=lines[cur];
+        const p=Math.max(0,Math.min(100,(ms-l.t)/(l.d||4000)*100));
+        const sp=document.getElementById('ktSpan'); if(sp) sp.style.setProperty('--p',p+'%');
+      }catch(e){}
+    },100);
+  }
+  function stopKtv(){ clearInterval(ktvT); ktvT=0; }
 
   // ── 播放控制 ──
   function playSeg(){
@@ -360,7 +434,7 @@ const YTS = (() => {
       }catch(e){}
     },120);
   }
-  function replay(){ playSeg(); }
+  function replay(){ if(mode==='ktv'){ try{ player.seekTo(lines[cur].t/1000,true); player.playVideo(); }catch(e){} return; } playSeg(); }
   function cycleSpeed(){
     spdIdx=(spdIdx+1)%SPEEDS.length;
     document.getElementById('spdBtn').textContent=SPEEDS[spdIdx]+'x';
@@ -460,15 +534,17 @@ const YTS = (() => {
   // ── 模式/換影片/範例 ──
   function setMode(m){
     stopRec(); mode=m;
+    document.getElementById('mKtv').classList.toggle('on',m==='ktv');
     document.getElementById('mShadow').classList.toggle('on',m==='shadow');
     document.getElementById('mDict').classList.toggle('on',m==='dict');
     lines.forEach(l=>{ l._rev=false; });
-    renderCard(false);
+    if(m==='ktv'){ renderCard(true); }
+    else { stopKtv(); try{ player&&player.pauseVideo(); }catch(e){} renderCard(false); }
   }
   function loadExample(){ document.getElementById('urlIn').value=EXAMPLE_V; load(); }
   function openTranscript(){ try{ window.open('https://www.youtube.com/watch?v='+vid,'_blank'); }catch(e){} }
   function swap(){
-    stopRec(); clearInterval(watchT);
+    stopRec(); clearInterval(watchT); stopKtv();
     try{ player&&player.pauseVideo(); }catch(e){}
     document.getElementById('practice').style.display='none';
     document.getElementById('inputCard').style.display='block';
