@@ -65,6 +65,34 @@ body{margin:0;background:var(--bg);color:var(--tx);font-family:-apple-system,"Pi
 .modes{display:flex;gap:8px;margin:0 0 12px}
 .modes button{flex:1;border:1px solid var(--bd);background:var(--bg2);color:var(--tx2);border-radius:12px;padding:9px;font:inherit;font-weight:700;cursor:pointer}
 .modes button.on{background:var(--ac);color:#fff;border-color:var(--ac)}
+/* 影片測驗 */
+.qz-head{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--tx3);margin-bottom:8px}
+.qz-bar{height:4px;background:var(--bg3);border-radius:99px;overflow:hidden;margin-bottom:14px}
+.qz-bar i{display:block;height:100%;background:var(--ac);transition:width .3s ease}
+.qz-q{font-size:15px;font-weight:700;text-align:center;margin-bottom:6px}
+.qz-sub{font-size:12.5px;color:var(--tx2);text-align:center;margin-bottom:12px}
+.qz-blank{font-size:20px;line-height:2;text-align:center;margin:10px 0 14px;word-break:break-word}
+.qz-blank .bk{display:inline-block;min-width:70px;border-bottom:2.5px solid var(--ac);color:var(--ac);font-weight:800}
+.qz-opts{display:flex;flex-direction:column;gap:9px}
+.qz-opt{border:1.5px solid var(--bd);background:var(--bg2);color:var(--tx);border-radius:12px;padding:12px 14px;font:inherit;font-size:15px;text-align:left;cursor:pointer;line-height:1.7}
+.qz-opt:active{transform:scale(.99)}
+.qz-opt.ok{border-color:var(--good);background:var(--goodbg);color:var(--good);font-weight:700}
+.qz-opt.ng{border-color:var(--bad);background:var(--soft);color:var(--bad);text-decoration:line-through}
+.qz-opt:disabled{cursor:default}
+.qz-ex{margin-top:12px;background:var(--bg3);border-radius:12px;padding:12px 14px;font-size:13.5px;line-height:1.9}
+.qz-ex b{color:var(--ac)}
+.qz-ex .exj{font-size:16px;line-height:2.1;margin:2px 0}
+.qz-ex .exz{color:var(--tx2);font-size:13px}
+.qz-ex rt{font-size:10px;color:var(--tx3)}
+.qz-actions{display:flex;gap:8px;margin-top:12px}
+.qz-actions .btn{flex:1;padding:12px}
+.qz-res{text-align:center;padding:8px 0}
+.qz-score{font-size:40px;font-weight:800;color:var(--ac)}
+.qz-rv{margin-top:14px;text-align:left}
+.qz-rv-item{border-top:1px solid var(--bd);padding:11px 0;font-size:13.5px}
+.qz-rv-item .rq{font-weight:700;margin-bottom:3px}
+.qz-rv-item .mine{color:var(--bad);font-size:12.5px}
+.qz-rv-item .corr{color:var(--good);font-size:12.5px}
 /* 句子總覽(跳句用) */
 .pc-more{display:flex;justify-content:space-between;align-items:center;margin-top:12px}
 .pc-more button{border:none;background:none;color:var(--tx3);font:inherit;font-size:12.5px;cursor:pointer;text-decoration:underline}
@@ -173,6 +201,7 @@ body{margin:0;background:var(--bg);color:var(--tx);font-family:-apple-system,"Pi
           <button id="mKtv" class="on" onclick="YTS.setMode('ktv')">跟播</button>
           <button id="mShadow" onclick="YTS.setMode('shadow')">跟讀</button>
           <button id="mDict" onclick="YTS.setMode('dict')">聽寫</button>
+          <button id="mQuiz" onclick="YTS.setMode('quiz')">測驗</button>
           <button id="mSwap" style="flex:0 0 auto" onclick="YTS.swap()">換影片</button>
         </div>
         <div class="pc">
@@ -195,6 +224,7 @@ body{margin:0;background:var(--bg);color:var(--tx);font-family:-apple-system,"Pi
           <div class="pc-act" id="pcAct"></div>
           <div class="pc-result" id="pcRes"></div>
           <div class="pc-act" id="pcNext" style="display:none"><button class="btn nextbtn" onclick="YTS.nav(1)" id="nextBtn">下一句 →</button></div>
+          <div id="quizBox" style="display:none"></div>
           <div class="pc-more">
             <button onclick="YTS.toggleList()" id="listBtn">全部句子</button>
             <button onclick="YTS.toggleZh(this)" id="zhBtn">中文:開</button>
@@ -279,7 +309,7 @@ const YTS = (() => {
     set('galHd','挑一支影片開始練(全部即點即用):','Pick a video to start (all ready to practice):');
     set('ownSum','用自己的 YouTube 影片練 ▾','Use your own YouTube video ▾');
     set('backPr','← 回到練習(影片還在)','← Back to practice (your video is still here)');
-    set('mKtv','跟播','Follow'); set('mShadow','跟讀','Shadow'); set('mDict','聽寫','Dictation'); set('mSwap','換影片','Change video');
+    set('mKtv','跟播','Follow'); set('mShadow','跟讀','Shadow'); set('mDict','聽寫','Dictation'); set('mQuiz','測驗','Quiz'); set('mSwap','換影片','Change video');
     set('loadBtn','讀取','Load'); set('parseBtn','解析','Parse');
     set('openTsBtn','在 YouTube 開這支影片 ↗','Open this video on YouTube ↗');
     set('pbHint1','點「顯示轉譯稿」→ 全選複製','Tap “Show transcript” → select all & copy');
@@ -680,6 +710,131 @@ const YTS = (() => {
     showResult(t.length?dp[s.length][t.length]/t.length:0, html);
   }
 
+  // ── 影片測驗:從字幕自動出題(聽句選句 / 克漏字),每題附詳解 ──
+  let qz = { list:[], i:0, picked:null, score:0, log:[] };
+  const shuf = a => a.map(x=>[Math.random(),x]).sort((p,q)=>p[0]-q[0]).map(p=>p[1]);
+  // 從句子挑一個「詞」當空格:優先含漢字的詞塊,其次片假名詞,再其次連續假名
+  function pickChunk(t){
+    const cands = [];
+    (t.match(/[一-龥々]{1,4}[ぁ-ん]{0,3}/g)||[]).forEach(x=>{ if(x.length>=2) cands.push(x); });
+    if(!cands.length) (t.match(/[ァ-ヴー]{2,8}/g)||[]).forEach(x=>cands.push(x));
+    if(!cands.length) { const k=t.replace(/[\s、。,．.!！?？「」『』()（）・〜~…–—-]/g,''); if(k.length>=4) cands.push(k.slice(1,4)); }
+    return cands.length ? cands[Math.floor(Math.random()*cands.length)] : '';
+  }
+  function buildQuiz(){
+    const pool = lines.map((l,i)=>({l,i})).filter(x=>norm(x.l.ja).length>=6);
+    if(pool.length<4) return [];
+    const picks = shuf(pool).slice(0, Math.min(8, pool.length));
+    const out=[];
+    picks.forEach((p,n)=>{
+      const others = shuf(pool.filter(x=>x.i!==p.i));
+      if(n%2===0 || !pickChunk(p.l.ja)){
+        // A. 聽句選句:播那一段,從四句裡選出聽到的
+        const opts = shuf([p.l.ja, ...others.slice(0,3).map(x=>x.l.ja)]);
+        out.push({ kind:'listen', idx:p.i, ans:p.l.ja, opts });
+      } else {
+        // B. 克漏字:挖掉一個詞,從四個詞裡選
+        const chunk = pickChunk(p.l.ja);
+        const distract = [];
+        for(const o of others){ const c=pickChunk(o.l.ja); if(c && c!==chunk && !distract.includes(c)) distract.push(c); if(distract.length>=3) break; }
+        if(distract.length<3){ const opts=shuf([p.l.ja, ...others.slice(0,3).map(x=>x.l.ja)]); out.push({ kind:'listen', idx:p.i, ans:p.l.ja, opts }); return; }
+        out.push({ kind:'blank', idx:p.i, ans:chunk, opts:shuf([chunk,...distract]) });
+      }
+    });
+    return out;
+  }
+  function startQuiz(){
+    qz = { list:buildQuiz(), i:0, picked:null, score:0, log:[] };
+    document.getElementById('quizBox').style.display='block';
+    if(!qz.list.length){ document.getElementById('quizBox').innerHTML='<div class="qz-sub">'+enOr('這支影片句子太少,出不了題——換一支再試。','Not enough lines in this video for a quiz — try another.')+'</div>'; return; }
+    renderQuiz();
+  }
+  function renderQuiz(){
+    const q=qz.list[qz.i], box=document.getElementById('quizBox');
+    const l=lines[q.idx];
+    const head='<div class="qz-head"><span>'+enOr('第 ','Q')+(qz.i+1)+' / '+qz.list.length+enOr(' 題','')+'</span><span>'+enOr('答對 ','Correct ')+qz.score+'</span></div>'
+      + '<div class="qz-bar"><i style="width:'+(qz.i/qz.list.length*100)+'%"></i></div>';
+    let body='';
+    if(q.kind==='listen'){
+      body = '<div class="qz-q">'+enOr('聽聽看,這句是哪一句?','Which line did you hear?')+'</div>'
+        + '<div class="qz-sub">'+fmtT(l.t)+'　<button class="btn" style="padding:5px 12px;font-size:13px" onclick="YTS.qzPlay()"><i data-ic=volume></i> '+enOr('播放','Play')+'</button></div>';
+    } else {
+      const masked = esc(l.ja).replace(esc(q.ans), '<span class="bk">?</span>');
+      body = '<div class="qz-q">'+enOr('空格該填哪個詞?','Which word fills the blank?')+'</div>'
+        + '<div class="qz-blank">'+masked+'</div>'
+        + '<div class="qz-sub">'+fmtT(l.t)+'　<button class="btn" style="padding:5px 12px;font-size:13px" onclick="YTS.qzPlay()"><i data-ic=volume></i> '+enOr('播放這句','Play line')+'</button></div>';
+    }
+    body += '<div class="qz-opts">'+q.opts.map((o,k)=>'<button class="qz-opt" data-k="'+k+'" onclick="YTS.qzAnswer(this,'+k+')">'+esc(o)+'</button>').join('')+'</div>';
+    box.innerHTML = head+body+'<div id="qzEx"></div>';
+    try{ if(window.Icons&&Icons.hydrate)Icons.hydrate(); }catch(e){}
+    qz.picked=null;
+    qzPlay();
+  }
+  function qzPlay(){
+    const q=qz.list[qz.i]; if(!q||!player) return;
+    const l=lines[q.idx];
+    clearInterval(watchT); stopKtv();
+    try{ player.seekTo(l.t/1000,true); player.playVideo(); }catch(e){}
+    const end=(l.t+effD(q.idx))/1000;
+    watchT=setInterval(()=>{ try{ if(player.getCurrentTime()>=end-0.05){ player.pauseVideo(); clearInterval(watchT); } }catch(e){} },100);
+  }
+  function qzAnswer(btn,k){
+    if(qz.picked!==null) return;
+    const q=qz.list[qz.i], l=lines[q.idx];
+    qz.picked=k;
+    const okIdx=q.opts.indexOf(q.ans);
+    document.querySelectorAll('#quizBox .qz-opt').forEach((b,n)=>{
+      b.disabled=true;
+      if(n===okIdx) b.classList.add('ok');
+      else if(n===k) b.classList.add('ng');
+    });
+    const correct = k===okIdx;
+    if(correct) qz.score++;
+    qz.log.push({ kind:q.kind, idx:q.idx, mine:q.opts[k], ans:q.ans, correct });
+    // 詳解:整句(注音)+中文+這句的時間點,附重播
+    const zhLine = (l.zh&&hasZh) ? '<div class="exz">'+esc(l.zh)+'</div>' : '';
+    const why = q.kind==='listen'
+      ? enOr('其他選項都是這支影片裡的其他句子,回頭聽會發現音節長度和語尾不一樣。','The other options are different lines from this video — listen again and compare the rhythm and endings.')
+      : enOr('把整句唸一次,注意這個詞在句中的位置和前後接續。','Read the whole line aloud and note how this word connects to what comes before and after.');
+    document.getElementById('qzEx').innerHTML =
+      '<div class="qz-ex"><b>'+(correct?enOr('答對了!','Correct!'):enOr('正解:','Answer: '))+'</b>'+esc(q.ans)
+      + '<div class="exj">'+fr(l.ja)+'</div>'+zhLine
+      + '<div style="color:var(--tx2);font-size:12.5px;margin-top:4px">'+why+'</div>'
+      + '<div class="qz-actions"><button class="btn" onclick="YTS.qzPlay()"><i data-ic=volume></i> '+enOr('再聽一次','Replay')+'</button>'
+      + '<button class="btn pri" onclick="YTS.qzNext()">'+(qz.i+1>=qz.list.length?enOr('看結果 →','Results →'):enOr('下一題 →','Next →'))+'</button></div></div>';
+    try{ if(window.Icons&&Icons.hydrate)Icons.hydrate(); }catch(e){}
+  }
+  function qzNext(){
+    if(qz.i+1>=qz.list.length){ qzResult(); return; }
+    qz.i++; renderQuiz();
+  }
+  function qzResult(){
+    const pct=Math.round(qz.score/qz.list.length*100);
+    let h='<div class="qz-res"><div class="qz-score">'+qz.score+' / '+qz.list.length+'</div>'
+      + '<div style="color:var(--tx2);font-size:13px">'+(pct>=80?enOr('聽力很穩!','Sharp ears!'):pct>=50?enOr('抓到一半,再聽一輪會更好','Halfway there — one more round helps'):enOr('先用跟播多聽幾次再回來','Try Follow mode a few times first'))+'</div></div>'
+      + '<div class="qz-rv">';
+    qz.log.forEach((r,n)=>{
+      const l=lines[r.idx];
+      h += '<div class="qz-rv-item"><div class="rq">'+(n+1)+'. '+(r.kind==='listen'?enOr('聽句','Listening'):enOr('克漏字','Cloze'))+'　'+fmtT(l.t)+'</div>'
+        + (r.correct?'':'<div class="mine">✗ '+esc(r.mine)+'</div>')
+        + '<div class="corr">✓ '+esc(r.ans)+'</div>'
+        + '<div style="margin-top:4px;line-height:2">'+fr(l.ja)+'</div>'
+        + ((l.zh&&hasZh)?'<div class="exz" style="color:var(--tx2);font-size:12.5px">'+esc(l.zh)+'</div>':'')
+        + '<button class="btn" style="margin-top:6px;padding:5px 12px;font-size:12.5px" onclick="YTS.jumpPlay('+r.idx+')"><i data-ic=volume></i> '+enOr('聽這句','Play')+'</button></div>';
+    });
+    h += '</div><div class="qz-actions"><button class="btn pri" onclick="YTS.startQuiz()">'+enOr('再測一次','Again')+'</button>'
+      + '<button class="btn" onclick="YTS.setMode(\'ktv\')">'+enOr('回跟播','Back to Follow')+'</button></div>';
+    document.getElementById('quizBox').innerHTML=h;
+    try{ if(window.Icons&&Icons.hydrate)Icons.hydrate(); }catch(e){}
+  }
+  function jumpPlay(i){
+    const l=lines[i]; if(!l||!player) return;
+    clearInterval(watchT);
+    try{ player.seekTo(l.t/1000,true); player.playVideo(); }catch(e){}
+    const end=(l.t+effD(i))/1000;
+    watchT=setInterval(()=>{ try{ if(player.getCurrentTime()>=end-0.05){ player.pauseVideo(); clearInterval(watchT); } }catch(e){} },100);
+  }
+
   // ── 句子總覽(跳句) ──
   function toggleZh(btn){
     zhOn=!zhOn;
@@ -708,10 +863,21 @@ const YTS = (() => {
   // ── 模式/換影片/範例 ──
   function setMode(m){
     stopRec(); mode=m;
-    document.getElementById('mKtv').classList.toggle('on',m==='ktv');
-    document.getElementById('mShadow').classList.toggle('on',m==='shadow');
-    document.getElementById('mDict').classList.toggle('on',m==='dict');
+    ['ktv','shadow','dict','quiz'].forEach(x=>{ const b=document.getElementById('m'+x.charAt(0).toUpperCase()+x.slice(1)); if(b) b.classList.toggle('on',m===x); });
     lines.forEach(l=>{ l._rev=false; });
+    const qb=document.getElementById('quizBox');
+    if(m==='quiz'){
+      stopKtv();
+      // 測驗:只留題目卡(藏掉跟播/跟讀那組元件)
+      ['ktvBox','pcJp','pcZh','pcAct','pcRes','pcNext'].forEach(id=>{ const el=document.getElementById(id); if(el) el.style.display='none'; });
+      document.getElementById('pcIdx').textContent='';
+      document.querySelector('.pc-ctr').style.display='none';
+      startQuiz();
+      return;
+    }
+    if(qb){ qb.style.display='none'; qb.innerHTML=''; }
+    ['pcJp','pcAct'].forEach(id=>{ const el=document.getElementById(id); if(el) el.style.display=''; });
+    document.querySelector('.pc-ctr').style.display='';
     if(m==='ktv'){ renderCard(true); }
     else { stopKtv(); try{ player&&player.pauseVideo(); }catch(e){} renderCard(false); }
   }
@@ -775,7 +941,7 @@ const YTS = (() => {
     if(ta) ta.addEventListener('paste',()=>{ setTimeout(()=>{ if((ta.value||'').trim()) parsePaste(); },80); });   // 貼上即解析
     try{ if(!localStorage.getItem('yts_tut_seen')) tut(true); }catch(e){}
   });
-  return { load, parsePaste, nav, jump, replay, cycleSpeed, toggleLoop, setMode, toggleRec, checkDict, toggleList, toggleZh, tut, loadSample, setCat, backToPractice, openTranscript, swap, theater, _retext };
+  return { load, parsePaste, nav, jump, replay, cycleSpeed, toggleLoop, setMode, toggleRec, checkDict, toggleList, toggleZh, tut, loadSample, setCat, backToPractice, openTranscript, swap, theater, startQuiz, qzPlay, qzAnswer, qzNext, jumpPlay, _retext };
 })();
 </script>
 <script src="font-scale.js"></script>
