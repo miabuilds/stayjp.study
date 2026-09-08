@@ -94,10 +94,11 @@ export const ytCaptions = functions.onRequest(
       const tracks: CapTrack[] = p?.captions?.playerCaptionsTracklistRenderer?.captionTracks || [];
       if (!tracks.length) { res.json({ error: "no_captions", title: vd.title || "", author: vd.author || "" }); return; }
 
-      // 選字幕軌:日文人工 > 日文自動(asr) > 第一軌
+      // 選字幕軌:日文人工 > 日文自動(asr)。沒有日文軌就回 no_captions——
+      // 別退到第一軌(曾把只有英文字幕的影片端出英文,跟讀日文變雞同鴨講)。
       const ja = tracks.find(t => t.languageCode === "ja" && t.kind !== "asr")
-        || tracks.find(t => t.languageCode === "ja")
-        || tracks[0];
+        || tracks.find(t => (t.languageCode || "").startsWith("ja"));
+      if (!ja) { res.json({ error: "no_captions", reason: "no_ja_track", title: vd.title || "", author: vd.author || "" }); return; }
       const lines = await fetchTrack(ja.baseUrl);
       if (!lines.length) { res.json({ error: "no_captions", title: vd.title || "", author: vd.author || "" }); return; }
 
