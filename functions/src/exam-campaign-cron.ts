@@ -13,6 +13,7 @@
 
 import * as functions from "firebase-functions/v2/scheduler";
 import * as admin from "firebase-admin";
+import { PLANS } from "./utils/constants";
 import { db, nowMs } from "./utils/firestore";
 
 if (admin.apps.length === 0) admin.initializeApp();
@@ -55,7 +56,7 @@ function mailD90(name: string, examLabel: string, days: number) {
 function mailD30(name: string, days: number, isPaid: boolean) {
   const pitch = isPaid
     ? `<p style="margin:24px 0"><a href="${SITE}/?utm_source=email&utm_campaign=exam_d30" style="display:inline-block;background:#B8362A;color:#fff;font-weight:700;padding:12px 28px;border-radius:999px;text-decoration:none">🎯 開始今天的模考 →</a></p>`
-    : `<p style="margin:0 0 16px">模考和 SRS 無限次練習,現在有<strong>月費 NT$150</strong>——就是為考前衝刺的人準備的,考完隨時取消,一杯手搖的錢換 ${days} 天不限量。</p>
+    : `<p style="margin:0 0 16px">模考和 SRS 無限次練習,現在有<strong>月費 NT$${PLANS.monthly.price_twd.toLocaleString("en-US")}</strong>——就是為考前衝刺的人準備的,考完隨時取消,${days} 天不限量。</p>
   <p style="margin:24px 0"><a href="${SITE}/pricing.html?utm_source=email&utm_campaign=exam_d30" style="display:inline-block;background:#B8362A;color:#fff;font-weight:700;padding:12px 28px;border-radius:999px;text-decoration:none">🎯 開始今天的模考 →</a></p>`;
   return {
     subject: `最後 ${days} 天,別再背新單字了`,

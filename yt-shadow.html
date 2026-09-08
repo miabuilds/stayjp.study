@@ -126,6 +126,16 @@ body{margin:0;background:var(--bg);color:var(--tx);font-family:-apple-system,"Pi
 .jl .t{color:var(--tx3);font-size:11.5px;font-variant-numeric:tabular-nums;flex-shrink:0}
 .jl .ok{color:var(--good);font-weight:800;margin-left:auto}
 .jl.cur{outline:2px solid var(--ac);outline-offset:-2px}
+/* 今日推薦(片庫頁最上方,大點擊區) */
+.tp{display:flex;gap:14px;align-items:center;width:100%;text-align:left;border:1.5px solid var(--ac);background:linear-gradient(135deg,var(--soft),var(--bg2));border-radius:16px;padding:12px;cursor:pointer;font:inherit;color:inherit}
+.tp:active{transform:scale(.99)}
+.tp img{width:132px;aspect-ratio:16/9;object-fit:cover;border-radius:11px;flex-shrink:0}
+.tp .tpx{flex:1;min-width:0}
+.tp .tpl{font-size:11px;font-weight:800;color:var(--ac);letter-spacing:.04em}
+.tp .tpt{font-size:15px;font-weight:700;margin:2px 0 3px;line-height:1.4}
+.tp .tpd{font-size:12px;color:var(--tx2)}
+.tp .tpg{margin-left:auto;flex-shrink:0;color:var(--ac)}
+@media(max-width:480px){ .tp img{width:104px} .tp .tpt{font-size:14px} }
 /* 範例影片牆 */
 .gal{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-top:12px}
 @media(min-width:560px){ .gal{grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px} }
@@ -199,7 +209,8 @@ body{margin:0;background:var(--bg);color:var(--tx);font-family:-apple-system,"Pi
 
   <div class="card" id="inputCard">
     <button class="btn backpr" id="backPr" onclick="YTS.backToPractice()">← 回到練習(影片還在)</button>
-    <div class="gal-hd" id="galHd" style="margin-top:0">挑一支影片開始練(全部即點即用):</div>
+    <div id="todayPick"></div>
+    <div class="gal-hd" id="galHd">挑一支影片開始練(全部即點即用):</div>
     <div class="gal-cats" id="galCats"></div>
     <div class="gal" id="gal"></div>
     <details class="own" id="ownVid" style="display:none"><!-- 自貼影片先隱藏(用戶:太陽春),流程優化好再放出來 -->
@@ -1075,6 +1086,19 @@ const YTS = (() => {
   // 沒有高解析版時 YouTube 不回 404,而是回一張 120x90 灰色佔位圖(所以 onerror 不會觸發)
   // → 載入後檢查尺寸,太小就換下一級。
   function thumbCheck(img){ if(img.naturalWidth && img.naturalWidth<=120) thumbFallback(img); }
+  // 今日推薦:每天依日期輪播一支(點整張卡進那支影片,單一點擊區不會誤觸)
+  function renderToday(){
+    const el=document.getElementById('todayPick'); if(!el||!SAMPLES.length) return;
+    const d=new Date(); const key=d.getFullYear()+'-'+d.getMonth()+'-'+d.getDate();
+    let h=0; for(let i=0;i<key.length;i++) h=(h*31+key.charCodeAt(i))>>>0;
+    const p=SAMPLES[h%SAMPLES.length];
+    el.innerHTML='<button class="tp" onclick="YTS.loadSample(\''+p.v+'\')">'
+      + '<img src="https://i.ytimg.com/vi/'+p.v+'/mqdefault.jpg" alt="" data-v="'+p.v+'" data-step="0" onerror="YTS.thumbFallback(this)" onload="YTS.thumbCheck(this)">'
+      + '<span class="tpx"><span class="tpl">'+enOr('今天練這支','TODAY’S PICK')+'</span>'
+      + '<span class="tpt" style="display:block">'+esc(p.t)+'</span>'
+      + '<span class="tpd">'+esc(p.tag)+'</span></span>'
+      + '<svg class="tpg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg></button>';
+  }
   function renderGallery(){
     const g=document.getElementById('gal'); if(!g) return;
     const cats=['全部',...new Set(SAMPLES.map(x=>x.cat))];
@@ -1102,6 +1126,7 @@ const YTS = (() => {
     try{ player&&player.pauseVideo(); }catch(e){}
     document.getElementById('practice').style.display='none';
     document.getElementById('inputCard').style.display='block';
+    renderToday();
     document.getElementById('backPr').style.display=lines.length?'block':'none';   // 只是點點看?一鍵回去,不會弄丟
     document.getElementById('urlIn').value='';
     window.scrollTo({top:0,behavior:'smooth'});
@@ -1130,7 +1155,7 @@ const YTS = (() => {
     } else { m.classList.remove('show'); try{ localStorage.setItem('yts_tut_seen','1'); }catch(e){} }
   }
   document.addEventListener('DOMContentLoaded',()=>{
-    _retext(); renderGallery();
+    _retext(); renderToday(); renderGallery();
     // 從面板「今日推薦」點進來:?v=<id> 直接開那支影片
     try{
       const q=new URLSearchParams(location.search).get('v');
@@ -1142,7 +1167,7 @@ const YTS = (() => {
     if(ta) ta.addEventListener('paste',()=>{ setTimeout(()=>{ if((ta.value||'').trim()) parsePaste(); },80); });   // 貼上即解析
     try{ if(!localStorage.getItem('yts_tut_seen')) tut(true); }catch(e){}
   });
-  return { load, parsePaste, nav, jump, replay, cycleSpeed, toggleLoop, setMode, toggleRec, checkDict, toggleList, toggleZh, tut, loadSample, setCat, backToPractice, openTranscript, swap, theater, startQuiz, qzBegin, qzPlay, qzAnswer, qzNext, jumpPlay, openLearn, learnTab, saveWord, speakWord, thumbFallback, thumbCheck, _retext };
+  return { load, parsePaste, nav, jump, replay, cycleSpeed, toggleLoop, setMode, toggleRec, checkDict, toggleList, toggleZh, tut, loadSample, setCat, backToPractice, openTranscript, swap, theater, startQuiz, qzBegin, qzPlay, qzAnswer, qzNext, jumpPlay, openLearn, learnTab, saveWord, speakWord, thumbFallback, thumbCheck, renderToday, _retext };
 })();
 </script>
 <script src="font-scale.js"></script>

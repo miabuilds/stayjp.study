@@ -373,11 +373,7 @@ select.lang-btn {
 .hub-grid2 { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:0 0 18px; }
 .hub-card { position:relative; overflow:hidden; display:flex; flex-direction:column; gap:9px; background:var(--bg2); border:1px solid var(--bd); border-radius:16px; padding:16px 16px 15px; text-decoration:none; color:var(--tx); cursor:pointer; text-align:left; box-shadow:0 1px 3px rgba(0,0,0,.04); }
 .hub-card:active { transform: scale(.98); }
-.hub-card .hc-thumb { background-size:cover; background-position:center; color:#fff; position:relative; }
-.hub-card .hc-thumb::after { content:''; position:absolute; inset:0; border-radius:inherit; background:rgba(0,0,0,.28); }
-.hub-card .hc-thumb i { position:relative; z-index:1; filter:drop-shadow(0 1px 3px rgba(0,0,0,.5)); }
-.hub-card .hc-thumb { cursor:pointer; }
-.hub-card .hc-today { color:var(--ac); font-weight:600; cursor:pointer; text-decoration:underline; text-underline-offset:2px; text-decoration-color:rgba(198,85,59,.35); }
+
 .hub-card .hc-ic { width:46px; height:46px; border-radius:13px; background:var(--soft,rgba(198,85,59,.10)); display:flex; align-items:center; justify-content:center; color:var(--ac); font-size:23px; line-height:1; }
 .hub-card .hc-t { font-size:16px; font-weight:800; margin-top:1px; }
 .hub-card .hc-d { font-size:11.5px; color:var(--tx2); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%; }
@@ -2660,23 +2656,7 @@ function renderHub() {
       + '<div class="hub-grid2">'
         + '<a class="hub-card" href="speak.html"><i class="hc-wm" data-ic=mic></i><span class="hc-new">NEW</span><span class="hc-ic"><i data-ic=mic></i></span><span class="hc-t">' + L('AI 跟讀', 'AI Shadowing') + '</span><span class="hc-d">' + L('跟著唸 · 即時評分', 'Repeat & get scored') + '</span></a>'
         + '<a class="hub-card" href="speak-chat.html"><i class="hc-wm" data-ic=speak></i><span class="hc-new">NEW</span><span class="hc-ic"><i data-ic=speak></i></span><span class="hc-t">' + L('AI 聊聊', 'AI Chat') + '</span><span class="hc-d">' + L('情境對話', 'Role-play chat') + '</span></a>'
-        + (function(){
-            // 每日輪播一支片庫影片:縮圖連進該影片(與片庫相同用法);點了直接開練
-            const PICKS = [
-              { v:'rjmKQ-fjnyQ', t:'慢速日語會話' }, { v:'3k75rkB61Bk', t:'桃太郎' },
-              { v:'Bwe7zLSPtXA', t:'日本語散歩 Vlog' }, { v:'MpYy6wwqxoo', t:'LiSA 紅蓮華' },
-              { v:'63yInL0Vm_o', t:'買い物の会話' }, { v:'yXZd7xVdpJ0', t:'優里 ドライフラワー' },
-              { v:'8zGz4z3bdzg', t:'すずめの戸締まり' }, { v:'h1L_fLJX7Gk', t:'Stay With Me' },
-            ];
-            const d = new Date(); let h = 0; const key = d.getFullYear()+'-'+d.getMonth()+'-'+d.getDate();
-            for (let i=0;i<key.length;i++) h = (h*31 + key.charCodeAt(i)) >>> 0;
-            const p = PICKS[h % PICKS.length];
-            const go = 'event.preventDefault();event.stopPropagation();location.href=\'yt-shadow.html?v=' + p.v + '\'';
-            return '<a class="hub-card hub-yt" href="yt-shadow.html"><i class="hc-wm" data-ic=play></i><span class="hc-new">NEW</span>'
-              + '<span class="hc-ic hc-thumb" title="' + L('直接練這支','Practice this one') + '" onclick="' + go + '" style="background-image:url(https://i.ytimg.com/vi/' + p.v + '/mqdefault.jpg)"><i data-ic=play></i></span>'
-              + '<span class="hc-t">' + L('YouTube 跟讀','YouTube Shadowing') + '</span>'
-              + '<span class="hc-d hc-today" onclick="' + go + '">' + L('今天練:','Today: ') + _hubEsc(p.t) + ' ›</span></a>';
-          })()
+        + '<a class="hub-card" href="yt-shadow.html"><i class="hc-wm" data-ic=play></i><span class="hc-new">NEW</span><span class="hc-ic"><i data-ic=play></i></span><span class="hc-t">' + L('YouTube 跟讀', 'YouTube Shadowing') + '</span><span class="hc-d">' + L('影片跟讀 · 每天一支推薦', 'Shadow real videos · daily pick') + '</span></a>'
       + '</div>'
       + ((window.Articles && Articles.entryCardHtml) ? '<div class="hub-art">' + Articles.entryCardHtml() + '</div>' : '')
       + '<div class="hub-sec">' + L('背 · 記', 'Study') + '</div>'

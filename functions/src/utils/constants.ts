@@ -30,6 +30,16 @@ export type PlanKey = "monthly" | "yearly" | "yearly_early_bird" | "lifetime";
 export type Source = "web" | "app";
 export type SubStatus = "trialing" | "active" | "cancelled" | "expired" | "refunded" | "voided";
 
+// ───── 2026-09-14 00:00 (台北) 調漲 ─────────────────────────────────
+// PLANS.price_twd 做成 getter,時間到自動回新價 → 後端 14 處呼叫端(綠界扣款金額、
+// 金額驗證、分潤計算、退費、信件文案)全部自動跟上,不用當天手動改、也不會漏改。
+//
+// 既有訂戶不受影響:綠界定期定額是照「授權當時的金額」續扣,所以老客自動凍漲。
+// ⚠️ 網頁(pricing.html 等)的價格是寫死的,必須同一時間一起換 ——
+//    因為 create-payment.ts 會驗證前端送來的金額,對不上會直接擋掉付款。
+export const PRICE_HIKE_AT = Date.UTC(2026, 8, 13, 16, 0, 0);   // 2026-09-14 00:00 +08
+export const priceHiked = (now: number = Date.now()) => now >= PRICE_HIKE_AT;
+
 export const PLANS: Record<PlanKey, {
   price_twd: number;
   period_days: number;
@@ -38,14 +48,14 @@ export const PLANS: Record<PlanKey, {
   display_name: string;
 }> = {
   monthly: {
-    price_twd: 290,   // 2026-08-31 調漲(原 150;取 Apple 有的價格點 290 三平台對齊;既有月訂戶綠界照舊授權金額續扣,自動凍漲)
+    get price_twd() { return priceHiked() ? 390 : 290; },   // 2026-08-31: 150→290、2026-09-14: 290→390
     period_days: 30,
     ecpay_period_type: "M",
     ecpay_frequency: 1,
     display_name: "月費",
   },
   yearly: {
-    price_twd: 1490,
+    get price_twd() { return priceHiked() ? 1990 : 1490; },   // 2026-09-14 起 1490 → 1990
     period_days: 365,
     ecpay_period_type: "Y",
     ecpay_frequency: 1,
@@ -59,7 +69,7 @@ export const PLANS: Record<PlanKey, {
     display_name: "早鳥年費",
   },
   lifetime: {
-    price_twd: 2990,
+    get price_twd() { return priceHiked() ? 5990 : 2990; },   // 2026-09-14 起 2990 → 5990
     period_days: 365 * 100,    // 100 年 ~= 終身,實際 willRenew=false
     ecpay_period_type: "M",     // 不續扣
     ecpay_frequency: 1,
