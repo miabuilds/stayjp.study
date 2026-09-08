@@ -235,6 +235,13 @@ const YTS = (() => {
     return { hits, ratio: t.length? hits.filter(Boolean).length/t.length : 0 };
   }
   function fr(t){ try{ return (window.furiganaHTML? furiganaHTML(t) : esc(t)); }catch(e){ return esc(t); } }
+  // 有效句長(ms):ASR 字幕的 d 常延伸蓋過下一句 → 截到下一句開始,KTV 刷色才對得上
+  function effD(i){
+    const l=lines[i]; if(!l) return 4000;
+    let d=l.d||4000;
+    if(i+1<lines.length) d=Math.min(d, Math.max(400, lines[i+1].t-l.t));
+    return d;
+  }
 
   // ── 載入影片 ──
   function ensureApi(){
@@ -397,26 +404,30 @@ const YTS = (() => {
     try{ player.setPlaybackRate(SPEEDS[spdIdx]); player.seekTo(lines[cur].t/1000,true); player.playVideo(); }catch(e){}
     ktvWatch();
   }
+  let ktvRaf=0;
   function ktvWatch(){
     if(!player) return;
     clearInterval(watchT);   // 關掉逐句暫停監看
-    clearInterval(ktvT);
-    ktvT=setInterval(()=>{
+    clearInterval(ktvT); cancelAnimationFrame(ktvRaf);
+    ktvT=1;
+    const tick=()=>{
+      if(!ktvT) return;
       try{
         const ms=player.getCurrentTime()*1000;
-        // 找目前時間落在哪一句(取最後一個 t<=ms 的句子)
         let idx=cur;
-        if(ms<lines[cur].t || ms>=lines[cur].t+(lines[cur].d||4000)+2000){ idx=0; }
+        if(ms<lines[cur].t || ms>=lines[cur].t+effD(cur)+4000){ idx=0; }   // 使用者亂拉進度條:重找
         while(idx<lines.length-1 && lines[idx+1].t<=ms) idx++;
         while(idx>0 && lines[idx].t>ms) idx--;
         if(idx!==cur){ cur=idx; renderKtv(); }
         const l=lines[cur];
-        const p=Math.max(0,Math.min(100,(ms-l.t)/(l.d||4000)*100));
-        const sp=document.getElementById('ktSpan'); if(sp) sp.style.setProperty('--p',p+'%');
+        const p=Math.max(0,Math.min(100,(ms-l.t)/effD(cur)*100));
+        const sp=document.getElementById('ktSpan'); if(sp) sp.style.setProperty('--p',p.toFixed(1)+'%');
       }catch(e){}
-    },100);
+      ktvRaf=requestAnimationFrame(tick);
+    };
+    ktvRaf=requestAnimationFrame(tick);
   }
-  function stopKtv(){ clearInterval(ktvT); ktvT=0; }
+  function stopKtv(){ ktvT=0; cancelAnimationFrame(ktvRaf); ktvRaf=0; }
 
   // ── 播放控制 ──
   function playSeg(){
@@ -427,7 +438,7 @@ const YTS = (() => {
       player.setPlaybackRate(SPEEDS[spdIdx]);
       player.seekTo(l.t/1000,true); player.playVideo();
     }catch(e){ return; }
-    const end=(l.t+(l.d||4000))/1000;
+    const end=(l.t+effD(cur))/1000;
     watchT=setInterval(()=>{
       try{
         const c=player.getCurrentTime();
