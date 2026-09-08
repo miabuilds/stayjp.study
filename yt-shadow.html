@@ -356,7 +356,7 @@ const YTS = (() => {
 
   // ── 練習卡 ──
   function renderCard(autoplay=true){
-    stopRec();
+    stopRec(); resetAcc();
     const l=lines[cur]; if(!l) return;
     document.getElementById('pcIdx').textContent=(cur+1)+' / '+lines.length+'　'+fmtT(l.t);
     const isKtv = mode==='ktv';
@@ -484,13 +484,15 @@ const YTS = (() => {
   const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
   const NATIVE_STT=!!(window.STAYJP_NATIVE&&window.STAYJP_NATIVE.canSpeech&&window.ReactNativeWebView);
   function _nPost(o){ try{ window.ReactNativeWebView.postMessage(JSON.stringify(o)); }catch(e){} }
-  let rec=null, recording=false;
-  function toggleRec(){ recording?stopRec():startRec(); }
+  let rec=null, recording=false, _acc='', _nBase='', _prevRawN='';
+  function toggleRec(){ recording?stopRec(true):startRec(); }
+  function resetAcc(){ _acc=''; _nBase=''; _prevRawN=''; }
   function _recUI(on){ const b=document.getElementById('micBtn'); if(b){ b.classList.toggle('rec-on',on); b.innerHTML=on?('<i data-ic=stop></i> '+enOr('停止','Stop')):('<i data-ic=mic></i> '+enOr('開麥跟讀','Shadow with mic')); try{ if(window.Icons&&Icons.hydrate)Icons.hydrate(); }catch(e){} } }
   function onSaid(text,fin){
     const inp=document.getElementById('saidIn'); if(inp){ inp.style.display='block'; inp.value=text; }
     const m=matchChars(lines[cur].ja,text);
     paintHits(m.hits);
+    if(!fin && m.ratio>=0.99){ stopRec(); showResult(m.ratio,null); return; }   // 唸到全對:自動收麥給分
     if(fin) showResult(m.ratio, null);
   }
   function paintHits(hits){
@@ -519,7 +521,15 @@ const YTS = (() => {
     try{ player&&player.pauseVideo(); }catch(e){}
     clearInterval(watchT);
     if(NATIVE_STT){
-      window.stayjpSpeechResult=(t,fin)=>{ if(t) onSaid(t,!!fin); };
+      _nBase=_acc;   // 這輪之前累積的先當基底
+      window.stayjpSpeechResult=(t,fin)=>{
+        if(!t) return;
+        let nt=(t||'').trim();
+        if(_prevRawN && nt.startsWith(_prevRawN)) nt=nt.slice(_prevRawN.length).trim();   // 原生累積 transcript:剝掉上一輪前綴
+        const merged=_nBase+nt;
+        if(fin){ _acc=merged; _prevRawN=(t||'').trim(); }
+        onSaid(merged,false);
+      };
       window.stayjpSpeechEnd=(err)=>{ recording=false; _recUI(false); const rn=document.getElementById('recNote'); if(err&&rn) rn.textContent=enOr('辨識出錯('+err+'),可直接打字。','Recognition error ('+err+') — you can type instead.'); };
       recording=true; _recUI(true); _nPost({type:'SPEECH_START',lang:'ja-JP'});
       return;
@@ -529,13 +539,33 @@ const YTS = (() => {
       const inp=document.getElementById('saidIn'); if(inp){ inp.style.display='block'; inp.oninput=()=>onSaid(inp.value,false); inp.onchange=()=>onSaid(inp.value,true); }
       return;
     }
-    rec=new SR(); rec.lang='ja-JP'; rec.interimResults=true; rec.continuous=false;
-    rec.onresult=e=>{ let t=''; for(let k=0;k<e.results.length;k++) t+=e.results[k][0].transcript; onSaid(t,e.results[e.results.length-1].isFinal); };
-    rec.onerror=e=>{ const rn=document.getElementById('recNote'); if(rn) rn.textContent=enOr('辨識出錯('+e.error+'),可直接打字。','Recognition error ('+e.error+') — type instead.'); stopRec(); };
-    rec.onend=()=>{ recording=false; _recUI(false); };
+    // 連續聆聽:講慢/停頓不切;瀏覽器自己收工就自動重啟;每段 final 累積進 _acc,前面講的不會被清掉
+    rec=new SR(); rec.lang='ja-JP'; rec.interimResults=true; rec.continuous=true;
+    rec.onresult=e=>{
+      let interim='';
+      for(let k=e.resultIndex;k<e.results.length;k++){
+        const t=e.results[k][0].transcript;
+        if(e.results[k].isFinal) _acc+=t; else interim+=t;
+      }
+      onSaid(_acc+interim,false);
+    };
+    rec.onerror=e=>{ if(e.error==='no-speech'||e.error==='aborted') return;   // 靜音/中止:交給 onend 重啟,不報錯
+      const rn=document.getElementById('recNote'); if(rn) rn.textContent=enOr('辨識出錯('+e.error+'),可直接打字。','Recognition error ('+e.error+') — type instead.'); stopRec(); };
+    rec.onend=()=>{
+      if(recording){ try{ rec.start(); return; }catch(e){} }   // 使用者沒按停:瀏覽器超時自動續錄
+      recording=false; _recUI(false);
+    };
     try{ rec.start(); recording=true; _recUI(true); }catch(e){}
   }
-  function stopRec(){ if(NATIVE_STT&&recording){ _nPost({type:'SPEECH_STOP'}); } else if(rec&&recording){ try{rec.stop();}catch(e){} } recording=false; _recUI(false); }
+  function stopRec(settle){
+    const was=recording;
+    recording=false;   // 先降旗:onend 才不會自動重啟
+    if(NATIVE_STT&&was){ _nPost({type:'SPEECH_STOP'}); }
+    else if(rec&&was){ try{rec.stop();}catch(e){} }
+    _recUI(false);
+    // 只有使用者自己按「停止」才結算;換句/換模式時的 stopRec 不能拿舊累積評新句
+    if(settle && was && mode==='shadow' && _acc){ const m=matchChars(lines[cur].ja,_acc); paintHits(m.hits); showResult(m.ratio,null); }
+  }
 
   // ── 聽寫 ──
   function checkDict(){
