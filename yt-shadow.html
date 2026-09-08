@@ -65,6 +65,30 @@ body{margin:0;background:var(--bg);color:var(--tx);font-family:-apple-system,"Pi
 .modes{display:flex;gap:8px;margin:0 0 12px}
 .modes button{flex:1;border:1px solid var(--bd);background:var(--bg2);color:var(--tx2);border-radius:12px;padding:9px;font:inherit;font-weight:700;cursor:pointer}
 .modes button.on{background:var(--ac);color:#fff;border-color:var(--ac)}
+/* 這支影片的單字・文法 */
+.lp{margin-top:12px;border-top:1px dashed var(--bd);padding-top:10px}
+.lp summary{font-size:13px;font-weight:700;color:var(--tx2);cursor:pointer;list-style:none}
+.lp summary::-webkit-details-marker{display:none}
+.lp-tabs{display:flex;gap:8px;margin:10px 0}
+.lp-tabs button{flex:1;border:1px solid var(--bd);background:var(--bg2);color:var(--tx2);border-radius:10px;padding:7px;font:inherit;font-size:13px;font-weight:700;cursor:pointer}
+.lp-tabs button.on{background:var(--ac);border-color:var(--ac);color:#fff}
+.lp-body{max-height:360px;overflow-y:auto}
+.lw{display:flex;align-items:flex-start;gap:10px;padding:9px 4px;border-bottom:1px solid var(--bd)}
+.lw .lvb{flex-shrink:0;font-size:10px;font-weight:800;color:var(--ac);background:var(--soft);border-radius:5px;padding:2px 6px;margin-top:3px}
+.lw .lwx{flex:1;min-width:0}
+.lw .lww{font-size:15.5px;font-weight:700}
+.lw .lwr{font-size:12px;color:var(--tx3);margin-left:5px;font-weight:400}
+.lw .lwm{font-size:12.5px;color:var(--tx2)}
+.lw .lwl{font-size:12px;color:var(--tx3);margin-top:3px;line-height:1.7}
+.lw .lwa{display:flex;gap:5px;flex-shrink:0}
+.lw .lwa button{border:1px solid var(--bd);background:var(--bg2);color:var(--tx2);border-radius:8px;padding:5px 8px;font:inherit;font-size:12px;cursor:pointer}
+.lw .lwa button.saved{color:var(--good);border-color:var(--good)}
+.lg{padding:10px 4px;border-bottom:1px solid var(--bd)}
+.lg .lgt{font-size:14.5px;font-weight:700}
+.lg .lgp{font-size:12px;color:var(--ac);margin-top:2px}
+.lg .lgx{font-size:12.5px;color:var(--tx2);margin-top:3px;line-height:1.7}
+.lg .lgl{font-size:12px;color:var(--tx3);margin-top:4px;line-height:1.7}
+.lp-empty{font-size:12.5px;color:var(--tx3);padding:14px 4px;text-align:center}
 /* 影片測驗 */
 .qz-head{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--tx3);margin-bottom:8px}
 .qz-bar{height:4px;background:var(--bg3);border-radius:99px;overflow:hidden;margin-bottom:14px}
@@ -231,6 +255,14 @@ body{margin:0;background:var(--bg);color:var(--tx);font-family:-apple-system,"Pi
             <span style="font-size:12px;color:var(--tx3);margin-left:auto" id="progTx"></span>
           </div>
           <div id="allLines"></div>
+          <details class="lp" id="learnPanel" ontoggle="YTS.openLearn(this)">
+            <summary id="lpSum">這支影片的單字・文法 ▾</summary>
+            <div class="lp-tabs" id="lpTabs" style="display:none">
+              <button class="on" id="lpTabW" onclick="YTS.learnTab('w')">單字</button>
+              <button id="lpTabG" onclick="YTS.learnTab('g')">文法</button>
+            </div>
+            <div id="lpBody" class="lp-body"></div>
+          </details>
         </div>
       </div>
     </div>
@@ -310,6 +342,8 @@ const YTS = (() => {
     set('ownSum','用自己的 YouTube 影片練 ▾','Use your own YouTube video ▾');
     set('backPr','← 回到練習(影片還在)','← Back to practice (your video is still here)');
     set('mKtv','跟播','Follow'); set('mShadow','跟讀','Shadow'); set('mDict','聽寫','Dictation'); set('mQuiz','測驗','Quiz'); set('mSwap','換影片','Change video');
+    set('lpSum','這支影片的單字・文法 ▾','Words & grammar in this video ▾');
+    set('lpTabW','單字','Words'); set('lpTabG','文法','Grammar');
     set('loadBtn','讀取','Load'); set('parseBtn','解析','Parse');
     set('openTsBtn','在 YouTube 開這支影片 ↗','Open this video on YouTube ↗');
     set('pbHint1','點「顯示轉譯稿」→ 全選複製','Tap “Show transcript” → select all & copy');
@@ -454,11 +488,20 @@ const YTS = (() => {
     }
     return zh;
   }
+  // 有些歌詞字幕把「日文 + 羅馬拼音」寫在同一行(例:相変らずなのね Aikawarazu nanone)
+  // → 日文後面的連續拉丁字母段剝掉,只留日文。整行都是英文的(歌名等)不動。
+  function stripRomaji(t){
+    t=(t||'').trim();
+    if(!/[ぁ-んァ-ヴ一-龥]/.test(t)) return t;
+    return t.replace(/([ぁ-んァ-ヴ一-龥ー、。！？」』\s])([A-Za-z][A-Za-z'’\- ]{2,})\s*$/,'$1').trim();
+  }
   function setLines(ls){
+    learnData=null; learnLoading=false;
+    try{ const d=document.getElementById('learnPanel'); if(d){ d.open=false; document.getElementById('lpTabs').style.display='none'; document.getElementById('lpBody').innerHTML=''; } }catch(e){}
     // 過濾音效標籤句([音楽]/[拍手]/(笑) 這類整句都是括號標記的,不能拿來練)
     lines=ls.filter(l=>!/^[\[（(【][^\]）)】]*[\]）)】]$/.test((l.ja||'').trim()));
     if(!lines.length) lines=ls;
-    lines.forEach(l=>{ l.zh=dedupeZh(l.ja,l.zh); });
+    lines.forEach(l=>{ l.ja=stripRomaji(l.ja); l.zh=dedupeZh(l.ja,l.zh); });
     hasZh = lines.some(l=>(l.zh||'').trim());
     try{ done=JSON.parse(localStorage.getItem(doneKey()))||{}; }catch(e){ done={}; }
     document.getElementById('inputCard').style.display='none';
@@ -710,6 +753,102 @@ const YTS = (() => {
     showResult(t.length?dp[s.length][t.length]/t.length:0, html);
   }
 
+  // ── 這支影片的單字・文法:掃字幕比對站上題庫,點開才載入大檔(vocab 每級 600KB) ──
+  let learnTabCur='w', learnData=null, learnLoading=false;
+  function loadScript(src){
+    return new Promise(res=>{
+      if(document.querySelector('script[data-lp="'+src+'"]')) return res();
+      const el=document.createElement('script'); el.src=src; el.dataset.lp=src;
+      el.onload=()=>res(); el.onerror=()=>res();
+      document.head.appendChild(el);
+    });
+  }
+  async function openLearn(det){
+    if(!det.open || learnData || learnLoading) return;
+    learnLoading=true;
+    const body=document.getElementById('lpBody');
+    body.innerHTML='<div class="lp-empty">'+enOr('載入中…','Loading…')+'</div>';
+    await Promise.all(['vocab-n3.js','vocab-n2.js','vocab-n1.js','grammar-n5.js','grammar-n4.js','grammar-n3.js','grammar-n2.js','grammar-n1.js'].map(loadScript));
+    learnData=extractLearn();
+    learnLoading=false;
+    document.getElementById('lpTabs').style.display='flex';
+    renderLearn();
+  }
+  function extractLearn(){
+    const big=lines.map(l=>l.ja).join('\n');
+    const lineOf=(t)=>{ for(let i=0;i<lines.length;i++){ if(lines[i].ja.includes(t)) return i; } return -1; };
+    // 單字:站上字庫裡有、且出現在字幕的詞(2 字以上;低級數優先)
+    const words=[], seen=new Set();
+    ['N5','N4','N3','N2','N1'].forEach(lv=>{
+      const arr=window['VOCAB_'+lv]||[];
+      arr.forEach(w=>{
+        if(!w||!w.w||w.w.length<2||seen.has(w.w)) return;
+        if(!big.includes(w.w)) return;
+        seen.add(w.w);
+        words.push({ w:w.w, r:w.r||'', m:w.m||'', c:w.c||'', lv, li:lineOf(w.w) });
+      });
+    });
+    // 文法:把「～ています（進行）」這種標題拆出可比對的表面形
+    const grams=[], gseen=new Set();
+    [['N5',window.N5||(typeof N5!=='undefined'?N5:[])],['N4',window.N4||(typeof N4!=='undefined'?N4:[])],
+     ['N3',typeof N3!=='undefined'?N3:[]],['N2',typeof N2!=='undefined'?N2:[]],['N1',typeof N1!=='undefined'?N1:[]]].forEach(([lv,arr])=>{
+      (arr||[]).forEach(g=>{
+        if(!g||!g.t||gseen.has(g.t)) return;
+        const forms=String(g.t).split(/[・／\/]/).map(x=>x.replace(/[（(].*?[）)]/g,'').replace(/[～〜]/g,'').trim()).filter(x=>x.length>=2);
+        const hit=forms.find(f=>big.includes(f));
+        if(!hit) return;
+        gseen.add(g.t);
+        grams.push({ t:g.t, p:g.p||'', ex:g.ex||'', lv, li:lineOf(hit) });
+      });
+    });
+    words.sort((a,b)=>b.w.length-a.w.length);
+    return { words:words.slice(0,60), grams:grams.slice(0,30) };
+  }
+  function learnTab(k){
+    learnTabCur=k;
+    document.getElementById('lpTabW').classList.toggle('on',k==='w');
+    document.getElementById('lpTabG').classList.toggle('on',k==='g');
+    renderLearn();
+  }
+  function inNotebook(w){
+    try{ return (JSON.parse(localStorage.getItem('word_notebook'))||[]).some(x=>x.w===w); }catch(e){ return false; }
+  }
+  function saveWord(btn,w,r,m,lv){
+    try{
+      const nb=JSON.parse(localStorage.getItem('word_notebook'))||[];
+      if(!nb.some(x=>x.w===w)){ nb.push({ w, r, m, lv:lv.toLowerCase(), added:new Date().toISOString() }); localStorage.setItem('word_notebook',JSON.stringify(nb)); }
+      btn.classList.add('saved'); btn.textContent='✓';
+    }catch(e){}
+  }
+  function renderLearn(){
+    const body=document.getElementById('lpBody'); if(!body||!learnData) return;
+    if(learnTabCur==='w'){
+      if(!learnData.words.length){ body.innerHTML='<div class="lp-empty">'+enOr('這支影片沒對到站上字庫的單字。','No words from our dictionary appear in this video.')+'</div>'; return; }
+      body.innerHTML=learnData.words.map(w=>{
+        const saved=inNotebook(w.w);
+        const line=w.li>=0?('<div class="lwl">'+fmtT(lines[w.li].t)+'　'+esc(lines[w.li].ja)+'</div>'):'';
+        return '<div class="lw"><span class="lvb">'+w.lv+'</span><div class="lwx">'
+          + '<div class="lww">'+esc(w.w)+(w.r&&w.r!==w.w?'<span class="lwr">'+esc(w.r)+'</span>':'')+'</div>'
+          + '<div class="lwm">'+esc(typeof cvt==='function'?cvt(w.m):w.m)+(w.c?' ['+esc(w.c)+']':'')+'</div>'+line
+          + '</div><div class="lwa">'
+          + '<button onclick="YTS.speakWord(\''+esc(w.r||w.w).replace(/'/g,"\\'")+'\')"><i data-ic=volume></i></button>'
+          + (w.li>=0?'<button onclick="YTS.jumpPlay('+w.li+')">▶</button>':'')
+          + '<button class="'+(saved?'saved':'')+'" onclick="YTS.saveWord(this,\''+esc(w.w).replace(/'/g,"\\'")+'\',\''+esc(w.r).replace(/'/g,"\\'")+'\',\''+esc(w.m).replace(/'/g,"\\'")+'\',\''+w.lv+'\')">'+(saved?'✓':'☆')+'</button>'
+          + '</div></div>';
+      }).join('');
+    } else {
+      if(!learnData.grams.length){ body.innerHTML='<div class="lp-empty">'+enOr('這支影片沒對到站上的文法句型。','No grammar patterns from our library appear in this video.')+'</div>'; return; }
+      body.innerHTML=learnData.grams.map(g=>
+        '<div class="lg"><div class="lgt"><span class="lvb">'+g.lv+'</span> '+esc(g.t)+'</div>'
+        + (g.p?'<div class="lgp">'+esc(g.p)+'</div>':'')
+        + (g.ex?'<div class="lgx">'+esc(typeof cvt==='function'?cvt(g.ex):g.ex)+'</div>':'')
+        + (g.li>=0?'<div class="lgl">'+fmtT(lines[g.li].t)+'　'+esc(lines[g.li].ja)+' <button style="border:1px solid var(--bd);background:var(--bg2);color:var(--tx2);border-radius:8px;padding:3px 8px;font:inherit;font-size:11.5px;cursor:pointer" onclick="YTS.jumpPlay('+g.li+')">▶</button></div>':'')
+        + '</div>').join('');
+    }
+    try{ if(window.Icons&&Icons.hydrate)Icons.hydrate(); }catch(e){}
+  }
+  function speakWord(t){ try{ window.speak&&window.speak(t); }catch(e){} }
+
   // ── 影片測驗:從字幕自動出題(聽句選句 / 克漏字),每題附詳解 ──
   let qz = { list:[], i:0, picked:null, score:0, log:[] };
   const shuf = a => a.map(x=>[Math.random(),x]).sort((p,q)=>p[0]-q[0]).map(p=>p[1]);
@@ -941,7 +1080,7 @@ const YTS = (() => {
     if(ta) ta.addEventListener('paste',()=>{ setTimeout(()=>{ if((ta.value||'').trim()) parsePaste(); },80); });   // 貼上即解析
     try{ if(!localStorage.getItem('yts_tut_seen')) tut(true); }catch(e){}
   });
-  return { load, parsePaste, nav, jump, replay, cycleSpeed, toggleLoop, setMode, toggleRec, checkDict, toggleList, toggleZh, tut, loadSample, setCat, backToPractice, openTranscript, swap, theater, startQuiz, qzPlay, qzAnswer, qzNext, jumpPlay, _retext };
+  return { load, parsePaste, nav, jump, replay, cycleSpeed, toggleLoop, setMode, toggleRec, checkDict, toggleList, toggleZh, tut, loadSample, setCat, backToPractice, openTranscript, swap, theater, startQuiz, qzPlay, qzAnswer, qzNext, jumpPlay, openLearn, learnTab, saveWord, speakWord, _retext };
 })();
 </script>
 <script src="font-scale.js"></script>
