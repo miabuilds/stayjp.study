@@ -16,25 +16,17 @@
 import * as functions from "firebase-functions/v2/scheduler";
 import * as admin from "firebase-admin";
 import { db, nowMs } from "./utils/firestore";
-import { EARLY_BIRD_END_MS, PRICE_HIKE_AT, PLANS } from "./utils/constants";
+import { EARLY_BIRD_END_MS } from "./utils/constants";
 
 if (admin.apps.length === 0) admin.initializeApp();
 
 const TRIAL_DAYS = 3;
 const SITE = "https://stayjp.study";
 
-const nt = (n: number) => "NT$" + n.toLocaleString("en-US");
-
-function buildHtml(name: string, ebLeft: number | null, now: number): { subject: string; html: string } {
-  // 價格一律從 PLANS 讀,不要寫死 —— 之前寫死害得月費漲到 290 之後信裡還在講 150。
-  const yr = PLANS.yearly.price_twd;
-  const eb = PLANS.yearly_early_bird.price_twd;
-  const hikeSoon = now < PRICE_HIKE_AT;
+function buildHtml(name: string, ebLeft: number | null): { subject: string; html: string } {
   const ebLine = ebLeft && ebLeft > 0
-    ? `<p style="margin:0 0 16px"><strong style="color:#B8362A">早鳥年費 ${nt(eb)}/年</strong>(月均 ${Math.round(eb / 12)} 元,限量 100 名,目前只剩 <strong>${ebLeft}</strong> 名)<br>續訂永遠鎖這個價,之後恢復標準價 ${nt(yr)}。</p>`
-    : hikeSoon
-    ? `<p style="margin:0 0 16px"><strong style="color:#B8362A">年費 ${nt(yr)}/年</strong>(月均 ${Math.round(yr / 12)} 元),整個備考週期完整覆蓋。<br>⏰ <strong>9/14 起調漲</strong>——現在訂閱,往後每年續扣都鎖 ${nt(yr)}。</p>`
-    : `<p style="margin:0 0 16px"><strong style="color:#B8362A">年費 ${nt(yr)}/年</strong>(月均 ${Math.round(yr / 12)} 元),整個備考週期完整覆蓋。<br>訂閱後往後每年續扣都鎖這個價。</p>`;
+    ? `<p style="margin:0 0 16px"><strong style="color:#B8362A">早鳥年費 NT$990/年</strong>(月均 82 元,限量 100 名,目前只剩 <strong>${ebLeft}</strong> 名)<br>續訂永遠鎖這個價,之後恢復標準價 NT$1,490。</p>`
+    : `<p style="margin:0 0 16px"><strong style="color:#B8362A">年費 NT$1,490/年</strong>(月均 124 元),整個備考週期完整覆蓋。<br>⏰ <strong>9/14 起調漲</strong>——現在訂閱,往後每年續扣都鎖 NT$1,490。</p>`;
   return {
     subject: "你的全功能試用,明天就到期了",
     html: `
@@ -101,7 +93,7 @@ export const trialEmailCron = functions.onSchedule(
       } catch { /* 帳號已刪 */ }
       if (!email) { skipped++; continue; }
 
-      const { subject, html } = buildHtml(name, ebLeft, now);
+      const { subject, html } = buildHtml(name, ebLeft);
       await db.collection("mail").add({
         to: email,
         message: { subject, html },
