@@ -20,6 +20,7 @@
   header{display:flex;align-items:center;gap:12px;padding:16px 0}
   .logo{font-family:var(--serif);font-weight:700;font-size:17px;color:var(--tx)}
   header .sp{margin-left:auto;display:flex;gap:8px}
+  @media(max-width:520px){ header{flex-wrap:wrap;gap:8px} header .logo{font-size:15px} header .sp{gap:6px} header a.nav,header button.nav{padding:5px 10px;font-size:12px} }
   header a.nav,header button.nav{border:1px solid var(--bd);background:var(--bg2);color:var(--tx2);border-radius:99px;padding:6px 13px;font:inherit;font-size:13px;text-decoration:none;cursor:pointer}
   [data-t]{display:none}
   body[data-lang="zh"] [data-t="zh"]{display:revert}
@@ -70,9 +71,10 @@
 <body data-lang="zh">
 <div class="wrap">
   <header>
-    <span class="logo" data-t="zh">日本再留計劃</span><span class="logo" data-t="en">StayJP</span>
+    <a class="backbtn" href="index.html" onclick="try{if(history.length>1){history.back();return false}}catch(e){}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg> <span data-t="zh">返回</span><span data-t="en">Back</span></a>
+    <a class="logo" href="index.html" style="text-decoration:none"><span data-t="zh">日本再留計劃</span><span data-t="en">StayJP</span></a>
     <span class="sp">
-      <a class="nav" href="pricing.html" data-t="zh">方案</a><a class="nav" href="pricing.html" data-t="en">Pricing</a>
+      <a class="nav" href="app.html" data-t="zh">學習工具</a><a class="nav" href="app.html" data-t="en">App</a>
       <button class="nav" onclick="toggleLang()">中 / EN</button>
     </span>
   </header>
@@ -234,7 +236,8 @@
     <span data-t="zh">日本再留計劃 (StayJP)</span><span data-t="en">StayJP</span> ·
     <a href="about.html" data-t="zh">關於</a><a href="about.html" data-t="en">About</a> ·
     <a href="terms.html" data-t="zh">服務條款</a><a href="terms.html" data-t="en">Terms</a> ·
-    <a href="pricing.html" data-t="zh">方案</a><a href="pricing.html" data-t="en">Pricing</a>
+    <a href="pricing.html" data-t="zh">方案</a><a href="pricing.html" data-t="en">Pricing</a> ·
+    <a href="index.html" data-t="zh">回首頁</a><a href="index.html" data-t="en">Home</a>
   </footer>
 </div>
 
