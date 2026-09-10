@@ -407,7 +407,28 @@ window.Articles = (function () {
   function close() { stopPlay(); var m = document.getElementById('artMask'); if (m) m.remove(); }
 
   // ─────────── 清單 ───────────
+  // 資料檔(articles.js)還在下載時開清單會是空的 → 顯示載入中並自動重試,
+  // 不要讓使用者看到「一片空白」(用戶回報:文章沒出現/很晚出現)。
+  var _waitTries = 0;
   function open() {
+    if (!list().length && _waitTries < 40) {
+      _waitTries++;
+      ensureCss();
+      var m = document.getElementById('artMask');
+      if (!m) {
+        var d0 = document.createElement('div');
+        d0.innerHTML = '<div class="art-mask" id="artMask"><div class="art-wrap">'
+          + '<div class="art-top"><span class="tt"><i data-ic=book></i> ' + enOr('文章閱讀', 'Reading') + '</span>'
+          + '<button class="art-ic" onclick="Articles.close()"><i data-ic=x></i></button></div>'
+          + '<div class="art-lwrap"><div style="text-align:center;color:var(--tx3,#aaa);padding:60px 0;font-size:14px">'
+          + enOr('文章載入中…', 'Loading articles…') + '</div></div></div></div>';
+        document.body.appendChild(d0.firstChild);
+        try { if (window.hydrateIcons) hydrateIcons(document.getElementById('artMask')); } catch (e) {}
+      }
+      setTimeout(open, 250);
+      return;
+    }
+    _waitTries = 0;
     ensureCss(); close();
     var read = readSet(), byLv = {};
     list().forEach(function (a) { (byLv[a.level] = byLv[a.level] || []).push(a); });
