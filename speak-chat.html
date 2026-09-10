@@ -274,6 +274,26 @@ const SCENES = [
     desc:'你是宅配公司或網購客服人員,對方要處理包裹問題(改配送時間、不在配達、退貨換貨)。你會確認單號、說明手續。' },
   { k:'smalltalk', ur:'鄰居', jp:'ご近所', yomi:'ごきんじょ', ic:'🌸', t:'鄰居寒暄', d:'垃圾日、天氣、近況', tE:'Neighbor chat', dE:'Trash day, weather, life', voice:'f',
     desc:'你是對方的日本鄰居,在公寓門口或垃圾集中處碰到面。你會寒暄天氣、聊垃圾分類日、社區的事、隨意近況,親切自然。' },
+  { k:'bank', ur:'顧客', jp:'銀行', yomi:'ぎんこう', ic:'🏦', t:'銀行開戶', d:'開戶、匯款、補摺', tE:'At the bank', dE:'Opening an account, transfers', voice:'f',
+    desc:'你是日本銀行的行員,客人要開戶或辦理匯款。你會確認在留卡與印章、說明需要填的表格、詢問用途,並一步步引導完成手續。' },
+  { k:'post', ur:'寄件人', jp:'郵便局', yomi:'ゆうびんきょく', ic:'📮', t:'郵局寄件', d:'寄包裹、國際郵件', tE:'Post office', dE:'Sending parcels abroad', voice:'m',
+    desc:'你是郵局櫃檯人員,客人要寄包裹或信件(常是寄回台灣)。你會問船運還是空運、內容物是什麼、要不要保價,並說明天數與費用。' },
+  { k:'moving', ur:'租客', jp:'引っ越し', yomi:'ひっこし', ic:'📦', t:'搬家與退租', d:'退租、搬家公司、水電', tE:'Moving out', dE:'Ending a lease, movers, utilities', voice:'m',
+    desc:'你是房仲或搬家公司的窗口,客人要退租或安排搬家。你會確認解約通知期限、搬出日期、原狀恢復與清潔費用,並協調日程。' },
+  { k:'dentist', ur:'患者', jp:'歯医者', yomi:'はいしゃ', ic:'🦷', t:'看牙醫', d:'預約、說症狀、療程', tE:'At the dentist', dE:'Booking, symptoms, treatment', voice:'f',
+    desc:'你是牙科診所的櫃檯與牙醫,患者牙痛或要洗牙。你會問哪顆牙、痛多久、冷熱會不會敏感,說明療程與回診次數。' },
+  { k:'gym', ur:'見學者', jp:'ジム見学', yomi:'けんがく', ic:'🏋️', t:'健身房入會', d:'參觀、方案、解約', tE:'Gym sign-up', dE:'Tour, plans, cancelling', voice:'m',
+    desc:'你是健身房的接待人員,客人來參觀想入會。你介紹方案與月費、說明入會手續與解約規定,並帶對方看設施。' },
+  { k:'school', ur:'保護者', jp:'学校', yomi:'がっこう', ic:'🎒', t:'學校面談', d:'家長會、聯絡簿、活動', tE:'School meeting', dE:'Parent-teacher talk', voice:'f',
+    desc:'你是日本小學的老師,正在和外國籍家長面談。你會說明孩子在校狀況、需要準備的物品與活動日程,用字盡量好懂。' },
+  { k:'trouble', ur:'住戶', jp:'トラブル相談', yomi:'そうだん', ic:'🔧', t:'生活狀況排除', d:'漏水、故障、噪音', tE:'Household trouble', dE:'Leaks, repairs, noise', voice:'m',
+    desc:'你是管理公司的窗口,住戶來反映漏水、機器故障或鄰居噪音。你會問狀況多久了、什麼時候方便派人,並安排處理。' },
+  { k:'ticket', ur:'旅客', jp:'切符・予約', yomi:'きっぷ', ic:'🎫', t:'訂票與劃位', d:'新幹線、指定席、退改', tE:'Booking tickets', dE:'Shinkansen, seats, changes', voice:'f',
+    desc:'你是綠色窗口(みどりの窓口)的站務員,旅客要買新幹線車票或改期。你會確認日期時段、指定席或自由席、單程來回,並說明手續費。' },
+  { k:'meeting', ur:'發表者', jp:'会議', yomi:'かいぎ', ic:'📊', t:'開會報告', d:'進度報告、提問、結論', tE:'Team meeting', dE:'Status updates, Q&A', voice:'m',
+    desc:'你是主持會議的上司,部下正在報告專案進度。你會追問時程、風險與對策,並要求下一步的具體行動,語氣專業但不刁難。' },
+  { k:'friend', ur:'朋友', jp:'週末の予定', yomi:'よてい', ic:'☕', t:'約朋友出門', d:'邀約、喬時間、改期', tE:'Making plans', dE:'Inviting, scheduling', voice:'f',
+    desc:'你是對方的日本朋友,正在用 LINE 般的口吻約週末見面。你會提議地點、喬時間、也可能臨時要改期,語氣輕鬆用常體。' },
   { k:'custom', ur:'對話的另一方', jp:'自由トーク', yomi:'', ic:'✏️', t:'自訂主題', d:'想聊什麼自己定', tE:'Custom topic', dE:'You decide what to chat about', voice:'f', custom:true },
 ];
 const LEVELS = ['N5','N4','N3','N2','N1'];
@@ -309,9 +329,9 @@ function scCounts(){ try{ return JSON.parse(localStorage.getItem('sc_cnt')||'{}'
 function scBump(k){ try{ const m=scCounts(); m[k]=(m[k]||0)+1; localStorage.setItem('sc_cnt',JSON.stringify(m)); }catch(e){} }
 // 場景分組:一眼掃到想練的類型(平鋪 15 張要捲很久)
 const SCENE_GROUPS = [
-  { t:'日常生活', tE:'Daily life',        ks:['conbini','resto','shop','salon','station','delivery'] },
-  { t:'辦事・正式場合', tE:'Errands & formal', ks:['clinic','cityhall','phone','house','interview'] },
-  { t:'社交・閒聊', tE:'Social',           ks:['coworker','izakaya','smalltalk','custom'] },
+  { t:'日常生活', tE:'Daily life',        ks:['conbini','resto','shop','salon','station','delivery','ticket','friend'] },
+  { t:'辦事・正式場合', tE:'Errands & formal', ks:['clinic','dentist','cityhall','bank','post','phone','house','moving','trouble','gym','school','interview'] },
+  { t:'社交・閒聊', tE:'Social',           ks:['coworker','izakaya','meeting','smalltalk','custom'] },
 ];
 function renderScenes(){
   const cnt = scCounts();

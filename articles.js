@@ -3772,5 +3772,554 @@ window.ARTICLES = [
       "Regardless of the system, what ultimately determines whether people stay is probably the accumulation of everyday relationships.",
       "The debate over foreign workers is, in truth, two sides of the same coin as the question of what kind of community Japanese society wants to be."
     ]
+  },
+  {
+    "id": "a-n5-8",
+    "level": "n5",
+    "topic": "生活",
+    "title": "ぎんこうで こうざを つくる",
+    "title_zh": "在銀行開戶",
+    "body": "きょうは ぎんこうへ こうざを つくりに いきます。\nまど口の 人が「ざいりゅうカードと いんかんを おねがいします」と いいました。\nわたしは かばんから カードと いんかんを 出しました。\n用紙に なまえと じゅうしょと でんわばんごうを 書きます。かんじが むずかしいので、ゆっくり 書きました。\n「キャッシュカードは 二週間ぐらいで うちに とどきます」と おしえて くれました。\nつうちょうは その日に もらえました。はじめての 日本の つうちょうです。\nすこし きんちょうしましたが、日本語だけで できて うれしかったです。",
+    "trans": [
+      "今天我要去銀行開戶。",
+      "櫃台的人說「請給我在留卡和印章」。",
+      "我從包包裡拿出卡片和印章。",
+      "在表格上寫名字、地址和電話號碼。因為漢字很難,我慢慢地寫。",
+      "對方告訴我「提款卡大概兩個星期會寄到家裡」。",
+      "存摺當天就拿到了。這是我第一本日本的存摺。",
+      "雖然有點緊張,但能只用日文辦好,很開心。"
+    ],
+    "vocab": [
+      {
+        "w": "銀行",
+        "r": "ぎんこう",
+        "m": "銀行",
+        "m_en": "bank"
+      },
+      {
+        "w": "口座",
+        "r": "こうざ",
+        "m": "帳戶",
+        "m_en": "bank account"
+      },
+      {
+        "w": "印鑑",
+        "r": "いんかん",
+        "m": "印章",
+        "m_en": "personal seal"
+      },
+      {
+        "w": "用紙",
+        "r": "ようし",
+        "m": "表格",
+        "m_en": "form"
+      },
+      {
+        "w": "電話番号",
+        "r": "でんわばんごう",
+        "m": "電話號碼",
+        "m_en": "phone number"
+      },
+      {
+        "w": "通帳",
+        "r": "つうちょう",
+        "m": "存摺",
+        "m_en": "bankbook"
+      },
+      {
+        "w": "届く",
+        "r": "とどく",
+        "m": "送達",
+        "m_en": "to arrive"
+      },
+      {
+        "w": "緊張する",
+        "r": "きんちょうする",
+        "m": "緊張",
+        "m_en": "to be nervous"
+      }
+    ],
+    "grammar": [
+      {
+        "t": "～に いきます(目的)",
+        "note": "動詞ます形去ます+に いきます=去做某事。「こうざを つくりに いきます」=去開戶。",
+        "id": "n5-31",
+        "t_en": "～に いきます (purpose)",
+        "note_en": "Verb stem + に いきます = go somewhere to do something."
+      },
+      {
+        "t": "～と いいました",
+        "note": "引用別人說的話,整句放在「と」前面。",
+        "id": "n5-38",
+        "t_en": "～と いいました",
+        "note_en": "Quotes what someone said; the quoted sentence goes before と."
+      },
+      {
+        "t": "～てくれる",
+        "note": "別人為我做某事,含感謝語感。「おしえて くれました」=(對方)告訴了我。",
+        "id": "n5-51",
+        "t_en": "～てくれる",
+        "note_en": "Someone does something for me — implies gratitude."
+      }
+    ],
+    "title_en": "Opening a Bank Account",
+    "topic_en": "Daily life",
+    "trans_en": [
+      "Today I'm going to the bank to open an account.",
+      "The person at the counter said, “Your residence card and seal, please.”",
+      "I took the card and seal out of my bag.",
+      "I write my name, address and phone number on the form. The kanji are hard, so I wrote slowly.",
+      "They told me, “Your cash card will arrive at your home in about two weeks.”",
+      "I received the bankbook the same day — my first Japanese bankbook.",
+      "I was a little nervous, but managing it all in Japanese felt great."
+    ]
+  },
+  {
+    "id": "a-n4-9",
+    "level": "n4",
+    "topic": "生活",
+    "title": "歯医者へ行く",
+    "title_zh": "去看牙醫",
+    "body": "三日前から歯が痛くなったので、近くの歯医者に予約をしました。\n受付で保険証を出すと、問診票を書くように言われました。いつから痛いか、冷たい物がしみるかなどを書きます。\n先生は「虫歯が一本ありますね」と言って、レントゲンを見せてくれました。\n今日は削って薬を入れるだけで、来週もう一度来てくださいと言われました。\n治療のあと、歯みがきの仕方も教えてもらいました。強く磨きすぎると、歯ぐきを傷めてしまうそうです。\n日本の歯医者は何回も通わなければなりませんが、そのぶん丁寧に治してくれます。\n痛くなる前に、半年に一度は検診に行ったほうがいいと思いました。",
+    "trans": [
+      "因為三天前開始牙痛,我跟附近的牙醫預約了。",
+      "在櫃台出示健保卡後,被要求填問診表。要寫從什麼時候開始痛、碰到冷的會不會敏感等等。",
+      "醫生說「有一顆蛀牙呢」,還讓我看了 X 光片。",
+      "今天只有磨掉並填藥,他說下週請再來一次。",
+      "治療之後,他也教了我刷牙的方法。聽說刷得太用力,會傷到牙齦。",
+      "日本的牙醫必須跑好幾趟,但相對地會很仔細地幫你治好。",
+      "我覺得在痛起來之前,最好半年去檢查一次。"
+    ],
+    "vocab": [
+      {
+        "w": "歯医者",
+        "r": "はいしゃ",
+        "m": "牙醫",
+        "m_en": "dentist"
+      },
+      {
+        "w": "予約",
+        "r": "よやく",
+        "m": "預約",
+        "m_en": "appointment"
+      },
+      {
+        "w": "保険証",
+        "r": "ほけんしょう",
+        "m": "健保卡",
+        "m_en": "insurance card"
+      },
+      {
+        "w": "問診票",
+        "r": "もんしんひょう",
+        "m": "問診表",
+        "m_en": "medical questionnaire"
+      },
+      {
+        "w": "しみる",
+        "r": "しみる",
+        "m": "(冷熱)刺痛、敏感",
+        "m_en": "to sting, feel sensitive"
+      },
+      {
+        "w": "虫歯",
+        "r": "むしば",
+        "m": "蛀牙",
+        "m_en": "cavity"
+      },
+      {
+        "w": "治療",
+        "r": "ちりょう",
+        "m": "治療",
+        "m_en": "treatment"
+      },
+      {
+        "w": "歯ぐき",
+        "r": "はぐき",
+        "m": "牙齦",
+        "m_en": "gums"
+      },
+      {
+        "w": "検診",
+        "r": "けんしん",
+        "m": "健康檢查",
+        "m_en": "check-up"
+      }
+    ],
+    "grammar": [
+      {
+        "t": "～ように言われる",
+        "note": "被要求做某事(間接指示)。「書くように言われました」=被要求填寫。",
+        "id": "n4-30",
+        "t_en": "～ように言われる",
+        "note_en": "To be told/asked to do something (indirect instruction)."
+      },
+      {
+        "t": "～そうです(傳聞)",
+        "note": "聽說。「傷めてしまうそうです」=聽說會傷到,消息來自別人。",
+        "id": "n4-3",
+        "t_en": "～そうです (hearsay)",
+        "note_en": "“I hear that…” — reports information from another source."
+      },
+      {
+        "t": "～なければなりません",
+        "note": "必須。「通わなければなりません」=非跑好幾趟不可。",
+        "id": "n4-16",
+        "t_en": "～なければなりません",
+        "note_en": "Expresses obligation: must do it."
+      }
+    ],
+    "title_en": "A Trip to the Dentist",
+    "topic_en": "Daily life",
+    "trans_en": [
+      "My tooth started hurting three days ago, so I booked an appointment at a nearby dental clinic.",
+      "When I handed over my insurance card at reception, they asked me to fill in a questionnaire: when the pain started, whether cold things sting, and so on.",
+      "The dentist said, “You have one cavity,” and showed me the X-ray.",
+      "Today they only drilled it and put in medicine, and asked me to come again next week.",
+      "After the treatment they also taught me how to brush properly — apparently brushing too hard damages your gums.",
+      "Dentists in Japan require several visits, but in exchange they treat you thoroughly.",
+      "I decided it is better to go for a check-up every six months, before anything starts to hurt."
+    ]
+  },
+  {
+    "id": "a-n3-10",
+    "level": "n3",
+    "topic": "生活",
+    "title": "ゴミ出しのルール",
+    "title_zh": "丟垃圾的規矩",
+    "body": "日本で暮らし始めて、最初に戸惑ったのがゴミの分け方だった。\n燃えるゴミ、燃えないゴミ、資源ゴミ——区によって分類も回収日も違う。引っ越したら、まず市役所でもらえる一覧表を確認したほうがいい。\nペットボトルは、ラベルとキャップを外し、中を軽くすすいでから出す。面倒に思えるが、そのひと手間で再利用できるかどうかが決まるらしい。\n出す時間にも決まりがあり、多くの地域では当日の朝八時までとされている。前の晩に出すと、カラスに荒らされることがあるからだ。\n粗大ゴミは事前に電話やネットで申し込み、コンビニでシールを買って貼っておく。これを知らずに置いてしまい、注意された人も少なくない。\n最初は細かすぎると感じたが、住んでいるうちに慣れてきた。\nゴミの出し方は、その地域で暮らすための最初の「共通ルール」なのかもしれない。",
+    "trans": [
+      "開始在日本生活後,最先讓我困惑的就是垃圾的分法。",
+      "可燃垃圾、不可燃垃圾、資源回收——分類方式和回收日各區都不同。搬家後,最好先確認市役所發的分類表。",
+      "寶特瓶要拆掉標籤和瓶蓋,裡面稍微沖一下再丟。雖然覺得麻煩,但據說就是這道小工序決定了能不能再利用。",
+      "丟的時間也有規定,多數地區是當天早上八點以前。因為前一天晚上丟出去,可能會被烏鴉翻。",
+      "大型垃圾要事先用電話或網路申請,再到便利商店買貼紙貼上。不知道這件事就直接放出去而被提醒的人也不少。",
+      "一開始覺得太瑣碎,但住著住著就習慣了。",
+      "丟垃圾的方式,或許就是在那個地區生活的第一條「共同規則」。"
+    ],
+    "vocab": [
+      {
+        "w": "戸惑う",
+        "r": "とまどう",
+        "m": "困惑、不知所措",
+        "m_en": "to be at a loss"
+      },
+      {
+        "w": "分類",
+        "r": "ぶんるい",
+        "m": "分類",
+        "m_en": "sorting, classification"
+      },
+      {
+        "w": "資源ゴミ",
+        "r": "しげんゴミ",
+        "m": "資源回收",
+        "m_en": "recyclables"
+      },
+      {
+        "w": "一覧表",
+        "r": "いちらんひょう",
+        "m": "一覽表",
+        "m_en": "reference chart"
+      },
+      {
+        "w": "すすぐ",
+        "r": "すすぐ",
+        "m": "沖洗",
+        "m_en": "to rinse"
+      },
+      {
+        "w": "ひと手間",
+        "r": "ひとてま",
+        "m": "一道工序",
+        "m_en": "a bit of extra effort"
+      },
+      {
+        "w": "荒らす",
+        "r": "あらす",
+        "m": "翻亂、破壞",
+        "m_en": "to ransack, tear apart"
+      },
+      {
+        "w": "粗大ゴミ",
+        "r": "そだいゴミ",
+        "m": "大型垃圾",
+        "m_en": "oversized trash"
+      },
+      {
+        "w": "申し込む",
+        "r": "もうしこむ",
+        "m": "申請",
+        "m_en": "to apply, request"
+      }
+    ],
+    "grammar": [
+      {
+        "t": "～によって(依…而異)",
+        "note": "依前項不同而有差別。「区によって分類も違う」=依區別不同,分類也不同。",
+        "id": "n3-53",
+        "t_en": "～によって (varies by)",
+        "note_en": "Indicates something differs depending on the preceding noun."
+      },
+      {
+        "t": "～らしい(傳聞)",
+        "note": "根據聽來的資訊推斷。「決まるらしい」=據說是這樣決定的。",
+        "id": "n3-41",
+        "t_en": "～らしい (hearsay)",
+        "note_en": "Expresses information heard from elsewhere."
+      },
+      {
+        "t": "～ているうちに",
+        "note": "在持續的過程中不知不覺產生變化。「住んでいるうちに慣れてきた」=住著住著就習慣了。",
+        "id": "n3-11",
+        "t_en": "～ているうちに",
+        "note_en": "While doing something, a change gradually happens."
+      }
+    ],
+    "title_en": "The Rules of Taking Out the Trash",
+    "topic_en": "Daily life",
+    "trans_en": [
+      "The first thing that confused me after moving to Japan was how to sort the garbage.",
+      "Burnable, non-burnable, recyclable — both the categories and the collection days differ by ward. After moving, it is best to check the chart the city office hands out.",
+      "Plastic bottles need the label and cap removed and a quick rinse inside. It feels like a hassle, but apparently that small step decides whether they can be recycled.",
+      "There are rules about timing too: in most areas, before 8 a.m. on collection day. Put it out the night before and crows may tear it open.",
+      "Oversized trash must be booked by phone or online, with a sticker bought at a convenience store. Plenty of people have been reprimanded for not knowing this.",
+      "At first it felt excessively fussy, but living here I got used to it.",
+      "How you take out the trash may be the first “shared rule” of living in a neighbourhood."
+    ]
+  },
+  {
+    "id": "a-n2-10",
+    "level": "n2",
+    "topic": "職場",
+    "title": "報告・連絡・相談の実践",
+    "title_zh": "報連相的實戰",
+    "body": "日本の職場でよく言われる「報・連・相」は、覚えるのは簡単だが、実践となると難しい。\nとりわけ外国人社員がつまずきやすいのは、「まだ結論が出ていない段階で報告してよいのか」という判断である。\n結論から言えば、出ていなくてよい。むしろ、進捗が思わしくないときこそ早めに共有することが求められる。\n上司が知りたいのは完璧な報告ではなく、リスクが手遅れになる前の一言だからだ。\n「〇〇の件、今のところ半分ほど進んでいますが、資料待ちで少し遅れそうです」——この程度で十分機能する。\n相談も同様で、答えを持たずに行っても構わない。「どこで迷っているか」を言語化できていれば、それ自体が相談として成立する。\n報・連・相は上下関係の作法というより、チームで事故を防ぐための仕組みだと考えれば、負担はずいぶん軽くなるはずだ。",
+    "trans": [
+      "日本職場常說的「報・連・相」,記起來簡單,真要實踐卻很難。",
+      "其中外國員工最容易卡住的,是「結論還沒出來的階段可以報告嗎」這個判斷。",
+      "結論先講:沒出來也沒關係。反而是進度不順的時候,更被期待要早點分享。",
+      "因為上司想知道的不是完美的報告,而是在風險來不及之前的那一句話。",
+      "「關於某某案,目前進行到一半左右,但在等資料,可能會稍微延遲」——這種程度就完全夠用了。",
+      "商量也一樣,沒有答案就去也無妨。只要能把「卡在哪裡」講清楚,那本身就成立為一次商量。",
+      "與其把報連相想成上下關係的禮節,不如當成團隊防止事故的機制,負擔就會輕很多。"
+    ],
+    "vocab": [
+      {
+        "w": "実践",
+        "r": "じっせん",
+        "m": "實踐",
+        "m_en": "practice, putting into action"
+      },
+      {
+        "w": "とりわけ",
+        "r": "とりわけ",
+        "m": "尤其",
+        "m_en": "especially"
+      },
+      {
+        "w": "つまずく",
+        "r": "つまずく",
+        "m": "絆倒、受挫",
+        "m_en": "to stumble"
+      },
+      {
+        "w": "進捗",
+        "r": "しんちょく",
+        "m": "進度",
+        "m_en": "progress"
+      },
+      {
+        "w": "思わしくない",
+        "r": "おもわしくない",
+        "m": "不理想",
+        "m_en": "not going well"
+      },
+      {
+        "w": "手遅れ",
+        "r": "ておくれ",
+        "m": "為時已晚",
+        "m_en": "too late"
+      },
+      {
+        "w": "言語化",
+        "r": "げんごか",
+        "m": "用語言表達",
+        "m_en": "putting into words"
+      },
+      {
+        "w": "作法",
+        "r": "さほう",
+        "m": "禮節、規矩",
+        "m_en": "etiquette"
+      },
+      {
+        "w": "仕組み",
+        "r": "しくみ",
+        "m": "機制",
+        "m_en": "system, mechanism"
+      }
+    ],
+    "grammar": [
+      {
+        "t": "～となると",
+        "note": "一旦到了某情況就不同。「実践となると難しい」=真要實踐就難了。",
+        "id": "n2-18",
+        "t_en": "～となると",
+        "note_en": "“When it comes to…” — the situation changes once you reach that point."
+      },
+      {
+        "t": "～こそ",
+        "note": "強調正是這時候。「思わしくないときこそ」=正是不順的時候(才更該)。",
+        "id": "n3-41",
+        "t_en": "～こそ",
+        "note_en": "Emphasis: “it is precisely then/that.”"
+      },
+      {
+        "t": "～ても構わない",
+        "note": "即使…也沒關係。「行っても構わない」=去了也無妨。",
+        "id": "n4-16",
+        "t_en": "～ても構わない",
+        "note_en": "“It is fine even if…” — grants permission."
+      },
+      {
+        "t": "～というより",
+        "note": "與其說是A不如說是B。「作法というより仕組み」=與其說是禮節,不如說是機制。",
+        "id": "n2-33",
+        "t_en": "～というより",
+        "note_en": "“Rather than A, it is B.”"
+      }
+    ],
+    "title_en": "Putting “Report, Contact, Consult” into Practice",
+    "topic_en": "Work",
+    "trans_en": [
+      "“Hō-Ren-Sō” — report, contact, consult — is easy to memorise but hard to practise.",
+      "What trips up foreign employees most is judging whether it is acceptable to report before a conclusion has been reached.",
+      "The short answer: it is. In fact, sharing early matters most when progress is not going well.",
+      "What a manager wants is not a perfect report but a heads-up before a risk becomes irreversible.",
+      "“On that project, we're about halfway, but we're waiting on materials so it may slip slightly” — that level is entirely sufficient.",
+      "The same goes for consulting: you may go without an answer in hand. If you can articulate where you are stuck, that alone counts as consulting.",
+      "Think of it less as hierarchical etiquette and more as a system for preventing accidents as a team, and the burden gets much lighter."
+    ]
+  },
+  {
+    "id": "a-n1-9",
+    "level": "n1",
+    "topic": "文化",
+    "title": "住まいに宿る距離感",
+    "title_zh": "居住空間裡的距離感",
+    "body": "日本の住まいには、言葉にされない距離の取り方が随所に埋め込まれている。\n玄関で靴を脱ぐという習慣ひとつをとっても、そこには「外」と「内」を隔てる明確な線が引かれている。上がり框をまたぐ動作は、単なる移動ではなく、いわば切り替えの儀式なのである。\n襖や障子といった仕切りは、閉ざしきらないという点で示唆に富む。音も気配も通す薄い一枚が、それでも空間を分けたことにする——この曖昧さこそが、狭い住居で他者と暮らす知恵だったのだろう。\n集合住宅が主流となった現在も、その感覚は形を変えて残っている。生活音への神経質なまでの配慮は、壁の薄さゆえというより、互いの領域を侵さないという作法の延長線上にある。\nもっとも、こうした距離感は外から来た者には読み取りにくい。挨拶をすべきか否か、どこまで踏み込んでよいのか——明文化されていないだけに、迷うことも多い。\nだが裏を返せば、それは各自が加減を委ねられているということでもある。\n住まいとは、他者との距離をどう測るかという問いが、日々静かに繰り返される場所なのかもしれない。",
+    "trans": [
+      "日本的居住空間裡,到處都埋著沒有被說出口的距離拿捏。",
+      "光是在玄關脫鞋這個習慣,就在那裡劃下了區隔「外」與「內」的明確界線。跨過門檻的動作,不只是移動,可說是一種切換的儀式。",
+      "紙門與障子這類隔間,在「不完全關死」這點上很耐人尋味。聲音和氣息都能穿透的薄薄一片,卻仍然算是把空間分開了——正是這份曖昧,才是在狹小住居裡與他人共處的智慧吧。",
+      "即使在集合住宅成為主流的現在,那種感覺仍以不同形式留存。對生活噪音近乎神經質的顧慮,與其說是因為牆薄,不如說是「不侵犯彼此領域」這套禮節的延長線。",
+      "不過,這樣的距離感對外來者而言並不好讀。該不該打招呼、可以踏進到什麼程度——正因為沒有明文規定,迷惘的時候也多。",
+      "但反過來說,那也意味著分寸被交給了每個人自己拿捏。",
+      "所謂居住空間,或許就是「該如何測量與他人的距離」這個提問,每天靜靜重複的場所。"
+    ],
+    "vocab": [
+      {
+        "w": "随所",
+        "r": "ずいしょ",
+        "m": "到處",
+        "m_en": "everywhere, in many places"
+      },
+      {
+        "w": "隔てる",
+        "r": "へだてる",
+        "m": "隔開",
+        "m_en": "to separate, divide"
+      },
+      {
+        "w": "上がり框",
+        "r": "あがりかまち",
+        "m": "玄關的高低界(門檻)",
+        "m_en": "step-up ledge at the entrance"
+      },
+      {
+        "w": "儀式",
+        "r": "ぎしき",
+        "m": "儀式",
+        "m_en": "ritual"
+      },
+      {
+        "w": "仕切り",
+        "r": "しきり",
+        "m": "隔間",
+        "m_en": "partition"
+      },
+      {
+        "w": "示唆に富む",
+        "r": "しさにとむ",
+        "m": "耐人尋味、富啟發",
+        "m_en": "suggestive, thought-provoking"
+      },
+      {
+        "w": "気配",
+        "r": "けはい",
+        "m": "氣息、動靜",
+        "m_en": "presence, sign"
+      },
+      {
+        "w": "配慮",
+        "r": "はいりょ",
+        "m": "顧慮、體貼",
+        "m_en": "consideration"
+      },
+      {
+        "w": "侵す",
+        "r": "おかす",
+        "m": "侵犯",
+        "m_en": "to intrude upon"
+      },
+      {
+        "w": "委ねる",
+        "r": "ゆだねる",
+        "m": "交託、交由",
+        "m_en": "to entrust, leave to"
+      }
+    ],
+    "grammar": [
+      {
+        "t": "～をとっても",
+        "note": "舉一例來看。「習慣ひとつをとっても」=光舉一個習慣來看。",
+        "id": "n1-47",
+        "t_en": "～をとっても",
+        "note_en": "“Take even just one example of…”"
+      },
+      {
+        "t": "～ゆえに／～ゆえ",
+        "note": "書面的原因表現。「壁の薄さゆえ」=因為牆薄。",
+        "id": "n1-30",
+        "t_en": "～ゆえ(に)",
+        "note_en": "A formal, written way to state a cause."
+      },
+      {
+        "t": "～というより",
+        "note": "與其說A不如說B。用來修正說法、把重點導向後項。",
+        "id": "n2-33",
+        "t_en": "～というより",
+        "note_en": "“Rather than A, it is B.”"
+      },
+      {
+        "t": "裏を返せば",
+        "note": "反過來說。用於把同一件事翻到另一面解讀。",
+        "id": "n1-66",
+        "t_en": "裏を返せば",
+        "note_en": "“Looked at the other way round…”"
+      }
+    ],
+    "title_en": "The Sense of Distance Built into a Japanese Home",
+    "topic_en": "Culture",
+    "trans_en": [
+      "Japanese homes have unspoken ways of managing distance embedded throughout them.",
+      "Take the single habit of removing your shoes at the entrance: it draws a clear line between “outside” and “inside.” Stepping over the raised ledge is not mere movement but something closer to a ritual of switching modes.",
+      "Partitions such as fusuma and shoji are telling precisely because they never fully close. A thin sheet that lets both sound and presence through still counts as dividing the space — and that ambiguity was surely the wisdom of living with others in a small home.",
+      "Even now that apartment blocks are the norm, that sensibility survives in altered form. The almost nervous consideration given to household noise is less about thin walls than an extension of the etiquette of not intruding on one another's territory.",
+      "This sense of distance is, however, hard for newcomers to read. Whether to greet someone, how far one may step in — precisely because none of it is written down, there is plenty of hesitation.",
+      "Yet seen from the other side, it also means the calibration is entrusted to each person.",
+      "A home may be the place where the question of how to measure the distance to others is quietly repeated, day after day."
+    ]
   }
 ];
