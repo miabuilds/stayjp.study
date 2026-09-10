@@ -26,3 +26,8 @@
 - `a-n3-9.jpg` Apartment window with plants on sill — flickr.com/photos/29507259@N02/3885995757（CC0）
 - `a-n2-9.jpg` Vaccine Passport 2.0 — flickr.com/photos/148598741@N02/51631732550（CC0）
 - `a-n1-8.jpg` Ceremony for Olympic team（No Known Restrictions）— flickr.com/photos/39735679@N00/489346436（PDM）
+- `a-n5-8.jpg` Illustration: Imperial Bank of Canada — flickr.com/photos/45379817@N08/7088057639（PDM）
+- `a-n4-9.jpg` View of surgery, Department of Public Health — flickr.com/photos/60455048@N02/42194949712（PDM）
+- `a-n3-10.jpg` Recycle Logo From Recycling Bin — flickr.com/photos/34331948@N06/3566044905（CC0）
+- `a-n2-10.jpg` Chaos / Order — flickr.com/photos/37996646802@N01/2373867187（CC0）
+- `a-n1-9.jpg` Pte pause 'tatami' — flickr.com/photos/192395121@N02/52149671008（PDM）
