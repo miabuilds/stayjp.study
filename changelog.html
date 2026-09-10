@@ -1,0 +1,256 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>更新紀錄 — StayJP 一直在長大｜日本再留計劃</title>
+<script src="icons.js"></script>
+<script src="native-ui.js"></script>
+<meta name="description" content="StayJP 的公開更新紀錄:內容規模、每次改版做了什麼、以及「小工作室會不會做不下去」的誠實回答。2,968 題題庫、41 篇文章、210 句跟讀、32 支影片教材。">
+<link rel="canonical" href="https://stayjp.study/changelog.html">
+<meta property="og:title" content="StayJP 更新紀錄 — 我們一直在長大">
+<meta property="og:description" content="公開的更新節奏與內容規模,還有對「小工作室能撐多久」的誠實回答。">
+<meta property="og:type" content="article">
+<style>
+  :root{ --bg:#F6F4EF;--bg2:#FFFFFF;--tx:#2C2C2C;--tx2:#6B6B6B;--tx3:#9A9A9A;--ac:#C6553B;--ac2:#D4654A;--bd:#E7E3DC;--soft:rgba(198,85,59,.08);--good:#2E7D57;--serif:"Noto Serif TC","Songti TC",serif; }
+  @media (prefers-color-scheme:dark){ :root{ --bg:#161615;--bg2:#211F1D;--tx:#EDEBE7;--tx2:#A7A29B;--tx3:#6E6A64;--ac:#E8734A;--ac2:#E8734A;--bd:#332F2B;--soft:rgba(232,115,74,.14); }}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--tx);font-family:-apple-system,"PingFang TC","Noto Sans TC",sans-serif;line-height:1.75;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:760px;margin:0 auto;padding:0 22px}
+  header{display:flex;align-items:center;gap:12px;padding:16px 0}
+  .logo{font-family:var(--serif);font-weight:700;font-size:17px;color:var(--tx)}
+  header .sp{margin-left:auto;display:flex;gap:8px}
+  header a.nav,header button.nav{border:1px solid var(--bd);background:var(--bg2);color:var(--tx2);border-radius:99px;padding:6px 13px;font:inherit;font-size:13px;text-decoration:none;cursor:pointer}
+  [data-t]{display:none}
+  body[data-lang="zh"] [data-t="zh"]{display:revert}
+  body[data-lang="en"] [data-t="en"]{display:revert}
+  /* hero */
+  .hero{display:flex;gap:18px;align-items:center;background:var(--bg2);border:1px solid var(--bd);border-radius:20px;padding:22px;margin:8px 0 20px}
+  .hero img{width:96px;height:auto;flex-shrink:0}
+  .hero h1{font-family:var(--serif);font-size:26px;line-height:1.35;margin-bottom:6px}
+  .hero p{font-size:14px;color:var(--tx2)}
+  @media(max-width:520px){ .hero{flex-direction:column;text-align:center;gap:10px} .hero h1{font-size:22px} }
+  /* 數字卡 */
+  h2{font-family:var(--serif);font-size:19px;margin:30px 0 4px}
+  .sub{font-size:13.5px;color:var(--tx2);margin-bottom:14px}
+  .stats{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+  .stat{background:var(--bg2);border:1px solid var(--bd);border-radius:14px;padding:14px 15px}
+  .stat b{display:block;font-family:var(--serif);font-size:24px;color:var(--ac);line-height:1.2}
+  .stat span{font-size:12.5px;color:var(--tx2)}
+  .asof{font-size:12px;color:var(--tx3);margin-top:10px}
+  /* 時間軸 */
+  .tl{margin-top:6px;border-left:2px solid var(--bd);padding-left:18px}
+  .tl-item{position:relative;padding:14px 0}
+  .tl-item::before{content:"";position:absolute;left:-25px;top:20px;width:11px;height:11px;border-radius:50%;background:var(--ac);border:2.5px solid var(--bg)}
+  .tl-d{font-size:12px;color:var(--tx3);font-variant-numeric:tabular-nums}
+  .tl-t{font-size:15.5px;font-weight:700;margin:1px 0 4px}
+  .tl-x{font-size:13.5px;color:var(--tx2);line-height:1.85}
+  .tag{display:inline-block;font-size:11px;font-weight:700;border-radius:6px;padding:1px 8px;margin-right:6px;vertical-align:1.5px}
+  .tag.new{background:var(--soft);color:var(--ac)}
+  .tag.fix{background:rgba(46,125,87,.12);color:var(--good)}
+  /* FAQ */
+  .faq{background:var(--bg2);border:1px solid var(--bd);border-radius:16px;padding:6px 18px;margin-top:8px}
+  .faq details{border-bottom:1px solid var(--bd)}
+  .faq details:last-child{border-bottom:none}
+  .faq summary{cursor:pointer;list-style:none;padding:15px 0;font-weight:700;font-size:15px;display:flex;gap:10px;align-items:flex-start}
+  .faq summary::-webkit-details-marker{display:none}
+  .faq summary::after{content:"＋";margin-left:auto;color:var(--tx3);font-weight:400;flex-shrink:0}
+  .faq details[open] summary::after{content:"−"}
+  .faq .a{padding:0 0 15px;font-size:14px;color:var(--tx2);line-height:1.9}
+  .faq .a b{color:var(--tx)}
+  /* CTA */
+  .cta{display:flex;gap:10px;flex-wrap:wrap;margin:24px 0 8px}
+  .cta a{flex:1;min-width:180px;text-align:center;border-radius:14px;padding:14px;font-weight:700;text-decoration:none;font-size:15px}
+  .cta .p{background:var(--ac);color:#fff}
+  .cta .s{background:var(--bg2);border:1px solid var(--bd);color:var(--tx)}
+  footer{border-top:1px solid var(--bd);margin-top:36px;padding:20px 0 40px;font-size:13px;color:var(--tx3);text-align:center}
+  footer a{color:var(--tx2);text-decoration:none;margin:0 4px}
+</style>
+</head>
+<body data-lang="zh">
+<div class="wrap">
+  <header>
+    <span class="logo" data-t="zh">日本再留計劃</span><span class="logo" data-t="en">StayJP</span>
+    <span class="sp">
+      <a class="nav" href="pricing.html" data-t="zh">方案</a><a class="nav" href="pricing.html" data-t="en">Pricing</a>
+      <button class="nav" onclick="toggleLang()">中 / EN</button>
+    </span>
+  </header>
+
+  <div class="hero">
+    <img src="images/mascot/tanuki-p02.png" alt="">
+    <div>
+      <h1 data-t="zh">更新紀錄:StayJP 一直在長大</h1>
+      <h1 data-t="en">Changelog: StayJP keeps growing</h1>
+      <p data-t="zh">很多人問「這個小工作室會不會做一做就不做了?」——與其保證,不如把更新節奏攤開給你看。這頁會持續更新。</p>
+      <p data-t="en">People ask whether a one-person studio will keep going. Rather than promise, here is the actual pace — updated as we ship.</p>
+    </div>
+  </div>
+
+  <h2 data-t="zh">目前的內容規模</h2>
+  <h2 data-t="en">What's inside right now</h2>
+  <div class="sub" data-t="zh">全部含在同一個帳號裡,網頁與 App 通用。</div>
+  <div class="sub" data-t="en">All included in one account, on web and in the app.</div>
+  <div class="stats">
+    <div class="stat"><b>2,968</b><span data-t="zh">JLPT 題庫(附詳解)</span><span data-t="en">JLPT questions with explanations</span></div>
+    <div class="stat"><b>7,730</b><span data-t="zh">單字(例句＋朗讀)</span><span data-t="en">words with examples &amp; audio</span></div>
+    <div class="stat"><b>41</b><span data-t="zh">篇分級文章</span><span data-t="en">graded reading articles</span></div>
+    <div class="stat"><b>210</b><span data-t="zh">句跟讀練習</span><span data-t="en">shadowing lines</span></div>
+    <div class="stat"><b>32</b><span data-t="zh">支影片教材</span><span data-t="en">video lessons</span></div>
+    <div class="stat"><b>115</b><span data-t="zh">句生活會話</span><span data-t="en">everyday phrases</span></div>
+    <div class="stat"><b>18,161</b><span data-t="zh">段真人語速朗讀</span><span data-t="en">audio clips</span></div>
+    <div class="stat"><b>44</b><span data-t="zh">天有更新(近兩個月)</span><span data-t="en">days shipped (last 2 months)</span></div>
+  </div>
+  <div class="asof" id="asof"></div>
+
+  <h2 data-t="zh">最近做了什麼</h2>
+  <h2 data-t="en">Recent updates</h2>
+  <div class="sub" data-t="zh">只列使用者看得到的改動,修 bug 的細節省略。</div>
+  <div class="sub" data-t="en">User-facing changes only; bug-fix details omitted.</div>
+
+  <div class="tl">
+    <div class="tl-item">
+      <div class="tl-d">2026.09.10</div>
+      <div class="tl-t" data-t="zh">文章朗讀可以整篇循環了</div>
+      <div class="tl-t" data-t="en">Whole-article loop for reading audio</div>
+      <div class="tl-x"><span class="tag new" data-t="zh">新功能</span><span class="tag new" data-t="en">NEW</span>
+        <span data-t="zh">使用者許願:上班想一直重聽。循環鈕現在有三段——關 / 單句循環 / 整篇循環,選過會記住。</span>
+        <span data-t="en">A user asked for background listening at work. The loop button now cycles: off / repeat line / loop whole article, and remembers your choice.</span></div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-d">2026.09.10</div>
+      <div class="tl-t" data-t="zh">影片教材加到 32 支</div>
+      <div class="tl-t" data-t="en">Video library grew to 32</div>
+      <div class="tl-x"><span class="tag new" data-t="zh">新內容</span><span class="tag new" data-t="en">CONTENT</span>
+        <span data-t="zh">新增 unravel、First Love、Ado「うっせぇわ」、鬼滅無限城編預告,以及兩支日語學習法影片。每支都附中日字幕。</span>
+        <span data-t="en">Added unravel, First Love, Ado, the new Demon Slayer trailer, and two study-method videos — all with Japanese and Chinese subtitles.</span></div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-d">2026.09.09</div>
+      <div class="tl-t" data-t="zh">跟讀句庫 150 → 210 句,新增 5 篇文章</div>
+      <div class="tl-t" data-t="en">Shadowing 150 → 210 lines, 5 new articles</div>
+      <div class="tl-x"><span class="tag new" data-t="zh">新內容</span><span class="tag new" data-t="en">CONTENT</span>
+        <span data-t="zh">主題貼著在日生活:郵局寄件、區公所手續、租屋看房、在留資格更新、職場敬語。文章每篇都配逐句朗讀。</span>
+        <span data-t="en">Focused on real life in Japan: post office, ward office paperwork, apartment hunting, visa renewal, workplace keigo. Every article has sentence-level audio.</span></div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-d">2026.09.08</div>
+      <div class="tl-t" data-t="zh">YouTube 跟讀上線</div>
+      <div class="tl-t" data-t="en">YouTube Shadowing launched</div>
+      <div class="tl-x"><span class="tag new" data-t="zh">新功能</span><span class="tag new" data-t="en">NEW</span>
+        <span data-t="zh">用喜歡的歌、動漫預告、新聞練日文:跟播(KTV 式字幕)、跟讀(開麥即時評分)、聽寫、測驗四種模式,還會列出該影片用到的單字與文法。</span>
+        <span data-t="en">Practice with songs, anime trailers and news: karaoke-style follow-along, mic shadowing with scoring, dictation and quizzes — plus the vocabulary and grammar each video uses.</span></div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-d">2026.09.08</div>
+      <div class="tl-t" data-t="zh">四個測驗系統全部補上詳解</div>
+      <div class="tl-t" data-t="en">Explanations across all four quiz systems</div>
+      <div class="tl-x"><span class="tag fix" data-t="zh">改善</span><span class="tag fix" data-t="en">IMPROVED</span>
+        <span data-t="zh">快速小考、JLPT 題庫、文法測驗、影片測驗——考完都看得到「為什麼是這個答案、其他選項錯在哪」。</span>
+        <span data-t="en">Quick tests, the JLPT bank, grammar drills and video quizzes now all explain why an answer is right and where the others go wrong.</span></div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-d">2026.09.07</div>
+      <div class="tl-t" data-t="zh">「日語從頭學」改成證據制</div>
+      <div class="tl-t" data-t="en">Zero-beginner path now evidence-based</div>
+      <div class="tl-x"><span class="tag fix" data-t="zh">改善</span><span class="tag fix" data-t="en">IMPROVED</span>
+        <span data-t="zh">以前點開就算完成,現在要真的做完才打勾(做完測驗、唸滿幾句…),每一步都寫明條件。</span>
+        <span data-t="en">Steps used to count as done just for opening them; now each step lists what actually completes it.</span></div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-d">2026.09.05</div>
+      <div class="tl-t" data-t="zh">跟讀課程 + 填空挑戰</div>
+      <div class="tl-t" data-t="en">Shadowing lessons + fill-in-the-blank</div>
+      <div class="tl-x"><span class="tag new" data-t="zh">新功能</span><span class="tag new" data-t="en">NEW</span>
+        <span data-t="zh">聽一句、跟著唸,唸到哪個字就亮到哪,全程不用按鍵。</span>
+        <span data-t="en">Listen, repeat, and watch each word light up as you say it — no button pressing.</span></div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-d">2026.09.04</div>
+      <div class="tl-t" data-t="zh">生活會話每句都能跟讀</div>
+      <div class="tl-t" data-t="en">Mic practice on every phrase</div>
+      <div class="tl-x"><span class="tag new" data-t="zh">新功能</span><span class="tag new" data-t="en">NEW</span>
+        <span data-t="zh">115 句情境會話,每一句都可以開麥跟著唸並即時評分。</span>
+        <span data-t="en">All 115 situational phrases can now be practiced with the mic and scored instantly.</span></div>
+    </div>
+  </div>
+
+  <h2 data-t="zh">關於「小工作室能撐多久」</h2>
+  <h2 data-t="en">About “how long will a small studio last?”</h2>
+  <div class="sub" data-t="zh">這是最多人問、也最該講清楚的事。以下都寫在服務條款裡,不是口頭承諾。</div>
+  <div class="sub" data-t="en">The most common question — and all of it is in the terms, not just talk.</div>
+
+  <div class="faq">
+    <details open>
+      <summary><span data-t="zh">買斷是「永久」嗎?</span><span data-t="en">Is “lifetime” really forever?</span></summary>
+      <div class="a">
+        <span data-t="zh">誠實說:<b>不是</b>。買斷是「買到服務終止日為止」的使用權。StayJP 是個人工作室,我不能保證無限期營運,所以我把這件事寫進條款,而不是等你買了才發現。</span>
+        <span data-t="en">Honestly: <b>no</b>. It is a licence that runs until the service ends. StayJP is a one-person studio and cannot promise to run forever, so this is written into the terms rather than discovered after purchase.</span>
+      </div>
+    </details>
+    <details>
+      <summary><span data-t="zh">那買斷划算嗎?</span><span data-t="en">Is the lifetime plan worth it?</span></summary>
+      <div class="a">
+        <span data-t="zh">買斷定價大約等於<b>兩年年費</b>。也就是說用滿兩年就回本,之後都是多的。如果你不確定自己會用多久,先訂月費或年費完全合理,之後想換買斷也可以。</span>
+        <span data-t="en">It costs roughly <b>two years of the annual plan</b>. Break even at two years; everything after that is upside. If you are unsure how long you will use it, starting monthly or annually is perfectly reasonable.</span>
+      </div>
+    </details>
+    <details>
+      <summary><span data-t="zh">如果哪天真的收攤呢?</span><span data-t="en">What if the service does shut down?</span></summary>
+      <div class="a">
+        <span data-t="zh">條款寫明:會<b>至少提前 30 天</b>公告並寄信通知,讓你有時間把想學的學完、把資料匯出帶走。如果服務轉手給別人經營,買斷權益會一起移轉繼續有效。</span>
+        <span data-t="en">The terms require <b>at least 30 days' notice</b> by announcement and email, so you can finish what you are studying and export your data. If the service is transferred to another operator, lifetime access transfers with it.</span>
+      </div>
+    </details>
+    <details>
+      <summary><span data-t="zh">內容還會繼續加嗎?</span><span data-t="en">Will content keep growing?</span></summary>
+      <div class="a">
+        <span data-t="zh">會,而且這頁就是給你檢查用的。近兩個月有 <b>44 天</b>推出更新;上面的時間軸會持續往下長。我不會給「每週幾篇」這種硬承諾,但更新節奏你可以自己看。</span>
+        <span data-t="en">Yes — and this page exists so you can check. We shipped on <b>44 days</b> over the past two months, and the timeline above keeps growing. No fixed weekly quota is promised; the pace is simply visible.</span>
+      </div>
+    </details>
+    <details>
+      <summary><span data-t="zh">為什麼相信你會一直做?</span><span data-t="en">Why keep building it?</span></summary>
+      <div class="a">
+        <span data-t="zh">因為<b>我自己就是使用者</b>。我人在日本、也在準備日檢,StayJP 是我每天在用的工具——功能都是我自己卡關才做出來的。我停止更新的那天,大概也是我自己不需要它的那天。</span>
+        <span data-t="en">Because <b>I use it myself</b>. I live in Japan and study for the JLPT; StayJP is the tool I open every day, and most features exist because I hit that wall first.</span>
+      </div>
+    </details>
+    <details>
+      <summary><span data-t="zh">我的學習紀錄帶得走嗎?</span><span data-t="en">Can I take my data with me?</span></summary>
+      <div class="a">
+        <span data-t="zh">可以。學習紀錄、生詞本、錯題本都能匯出。帳號資料也可以隨時要求刪除。</span>
+        <span data-t="en">Yes. Study history, your word notebook and wrong-answer notes can all be exported, and account data can be deleted on request.</span>
+      </div>
+    </details>
+  </div>
+
+  <div class="cta">
+    <a class="p" href="pricing.html" data-t="zh">看方案與價格 →</a><a class="p" href="pricing.html" data-t="en">See plans →</a>
+    <a class="s" href="app.html" data-t="zh">先免費試用</a><a class="s" href="app.html" data-t="en">Try it free</a>
+  </div>
+
+  <footer>
+    <span data-t="zh">日本再留計劃 (StayJP)</span><span data-t="en">StayJP</span> ·
+    <a href="about.html" data-t="zh">關於</a><a href="about.html" data-t="en">About</a> ·
+    <a href="terms.html" data-t="zh">服務條款</a><a href="terms.html" data-t="en">Terms</a> ·
+    <a href="pricing.html" data-t="zh">方案</a><a href="pricing.html" data-t="en">Pricing</a>
+  </footer>
+</div>
+
+<script>
+  function setLang(l){ document.body.setAttribute('data-lang', l); document.documentElement.lang = l==='en'?'en':'zh-Hant'; try{ localStorage.setItem('stayjp_about_lang', l); }catch(e){} }
+  function toggleLang(){ setLang(document.body.getAttribute('data-lang')==='zh'?'en':'zh'); }
+  (function(){ var s; try{ s=localStorage.getItem('stayjp_about_lang'); }catch(e){} setLang(s || ((navigator.language||'').toLowerCase().indexOf('zh')===0?'zh':'en')); })();
+  // 統計基準日:自動顯示,不用手改
+  (function(){
+    var d=new Date(), z=n=>String(n).padStart(2,'0');
+    var el=document.getElementById('asof');
+    var zh='數字統計至 '+d.getFullYear()+'.'+z(d.getMonth()+1)+'.'+z(d.getDate())+',每次改版後更新。';
+    var en='Figures as of '+d.getFullYear()+'.'+z(d.getMonth()+1)+'.'+z(d.getDate())+', updated with each release.';
+    el.textContent = document.body.getAttribute('data-lang')==='en' ? en : zh;
+  })();
+</script>
+<script src="i18n.js"></script>
+</body>
+</html>
