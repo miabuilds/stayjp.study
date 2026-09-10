@@ -483,7 +483,7 @@ window.Articles = (function () {
       '<button class="art-pb art-rstep" onclick="Articles.stepRate(-1)" title="' + enOr('慢一點', 'Slower') + '" aria-label="' + enOr('慢一點', 'Slower') + '">−</button>' +
       '<span class="art-prate" id="artRate">' + (pl.rate.toFixed(2).replace(/0$/, '')) + '×</span>' +
       '<button class="art-pb art-rstep" onclick="Articles.stepRate(1)" title="' + enOr('快一點', 'Faster') + '" aria-label="' + enOr('快一點', 'Faster') + '">＋</button>' +
-      '<button class="art-pb art-mode" id="artRepBtn" onclick="Articles.toggleRepeat()" title="' + enOr('重複播放這一句', 'Repeat sentence') + '"></button>' +
+      '<button class="art-pb art-mode" id="artRepBtn" onclick="Articles.toggleRepeat()" title="' + enOr('循環播放:這一句 → 整篇', 'Loop: one line → whole article') + '">↻</button>' +
       '<button class="art-pb art-mode" id="artSingleBtn" onclick="Articles.toggleSingle()" title="' + enOr('只播這一句就停', 'Play one sentence') + '">' + enOr('單句', '1 sent.') + '</button>' +
       '</div></div>' +
       '</div>';
@@ -764,7 +764,8 @@ window.Articles = (function () {
   // ─────────── 底部連播播放器(自建 Audio 佇列,只播預錄 mp3)───────────
   // 朗讀速度:預設 0.85(使用者回饋 1.0 偏快、跟不上);記住上次選的。
   var _savedRate = parseFloat(typeof localStorage !== 'undefined' && localStorage.getItem('art_rate'));
-  var pl = { audio: null, idx: -1, playing: false, rate: (_savedRate > 0 ? _savedRate : 0.85), token: 0, pre: {} };
+  var _savedRep = (function () { try { return localStorage.getItem('art_repeat') || false; } catch (e) { return false; } })();
+  var pl = { audio: null, idx: -1, playing: false, rate: (_savedRate > 0 ? _savedRate : 0.85), token: 0, pre: {}, repeat: (_savedRep === 'one' || _savedRep === 'all') ? _savedRep : false };
   // 預載句子 mp3:按播放才 new Audio 會先等下載(使用者回饋「按了好幾秒才播」)。
   // 開文章先載前兩句;播放中滾動預載 n+1/n+2 → 按下即播、句間無縫。
   function preloadSent(n) {
@@ -785,7 +786,10 @@ window.Articles = (function () {
     stopPlay();
     var myToken = ++pl.token;
     function step(n) {
-      if (n >= sentSeq.length) { pl.playing = false; pl.idx = -1; setBtn(); highlight(-1); setPText(); return; }
+      if (n >= sentSeq.length) {
+        if (pl.repeat === 'all') { step(0); return; }   // 整篇循環:播完自動從頭
+        pl.playing = false; pl.idx = -1; setBtn(); highlight(-1); setPText(); return;
+      }
       pl.idx = n; highlight(n); setPText(); setBtn();
       var _key = sentSeq[n].text;
       var au = pl.pre[_key] || new Audio(ttsPath(_key));
@@ -814,7 +818,7 @@ window.Articles = (function () {
         if (pl.token !== myToken) return;
         if (aws[lastWi]) aws[lastWi].classList.remove('cur');
         // 播放模式(測試者回饋:像 Readle 的單句/重複):🔁=同句循環;單句=播完當句就停(再按▶重播當句)
-        if (pl.repeat) { step(n); return; }
+        if (pl.repeat === 'one') { step(n); return; }   // 同句循環
         if (pl.single) { pl.playing = false; pl.audio = null; setBtn(); return; }
         step(n + 1);
       };
@@ -851,17 +855,29 @@ window.Articles = (function () {
     if (pl.audio) pl.audio.playbackRate = pl.rate;
   }
   // 播放模式切換:🔁 重複當句 / 單句播完即停(互斥:開一個關另一個)
+  // 循環模式三段切換:關 → 這一句循環 → 整篇循環(使用者要求:工作時一直重聽整篇)
   function toggleRepeat() {
-    pl.repeat = !pl.repeat; if (pl.repeat) pl.single = false;
+    pl.repeat = pl.repeat === 'one' ? 'all' : (pl.repeat === 'all' ? false : 'one');
+    if (pl.repeat) pl.single = false;
+    try { localStorage.setItem('art_repeat', pl.repeat || ''); } catch (e) {}
     setModeBtns();
   }
   function toggleSingle() {
     pl.single = !pl.single; if (pl.single) pl.repeat = false;
+    try { localStorage.setItem('art_repeat', ''); } catch (e) {}
     setModeBtns();
   }
   function setModeBtns() {
     var r = document.getElementById('artRepBtn'), s = document.getElementById('artSingleBtn');
-    if (r) r.classList.toggle('on', !!pl.repeat);
+    if (r) {
+      r.classList.toggle('on', !!pl.repeat);
+      r.innerHTML = pl.repeat === 'all'
+        ? '<span style="font-size:12px;font-weight:800">↻ ' + enOr('全篇', 'All') + '</span>'
+        : (pl.repeat === 'one' ? '<span style="font-size:12px;font-weight:800">↻ 1</span>' : '↻');
+      r.title = pl.repeat === 'all' ? enOr('整篇循環播放中(再按關閉)', 'Looping whole article — tap to turn off')
+        : (pl.repeat === 'one' ? enOr('這一句循環中(再按改成整篇循環)', 'Repeating this line — tap for whole-article loop')
+        : enOr('循環播放:這一句 → 整篇', 'Loop: one line → whole article'));
+    }
     if (s) s.classList.toggle('on', !!pl.single);
   }
   // 單字/測驗單點發音(用預錄)
