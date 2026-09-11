@@ -40,6 +40,18 @@ cd ~/Documents/GitHub/stay-jp-notes && git merge price-day-0914
 檔期結束改 active:false 即失效;現折金額目前固定在 constants.WEB_CODE_DISCOUNT_TWD(yearly:200),
 想要不同折扣額的快閃(如折 300)→ 之後把折扣搬到 ref_codes 文件的 discount_twd 欄位(小改 createPayment),先記著。
 
+### 1.0.8 App 版 — **9/11 code 已完成(stayjp-app commit 3582071 + 後端分支 e3c24ca3),Mia 決定跟 9/14 一起衝**
+**內容**:①推薦碼 9 折雙 SKU(App 內輸碼 → 年費改賣 `yearly_ref` 1,790、買斷改賣 `lifetime_ref` 5,390;商店沒建優惠版時自動退回原價)
+②評分彈窗(9/1 已寫好首次出貨)③新價 fallback 390/1,990/5,990 ④商店截圖 5 張 ×2 尺寸已產出:`~/Downloads/StayJP_商店截圖_1.0.8/`
+⑤ASO:標題/副標/關鍵字加「日文 JLPT」(提案見對話;ASC 隨版本送、Play 商店資訊可先改)
+**Mia 要建的商品(三處都要,id 一字不差)**:
+| | ASC | Play | RevenueCat |
+|---|---|---|---|
+| 年費優惠版 | `com.stayjp.app.yearly_ref` 自動續訂・同群組 StayJP Premium・NT$1,790 | 訂閱 `stayjp_yearly_ref` base plan 年 1,790 | 掛 entitlement `StayJP Plan Premium` + current offering |
+| 買斷優惠版 | `com.stayjp.app.lifetime_ref` 非消耗型・NT$5,390 | 一次性 `stayjp_lifetime_ref` 5,390 | 同上 |
+**流程**:商品建好 → EAS build(ios+android)→ TestFlight/內測沙盒測「輸碼→顯示刪除線→買優惠版→權益解鎖→Firestore plan=yearly/lifetime」→ 送審選**手動發佈** → **9/14 商店改價後才按發佈**(否則 1,790 > 舊牌價 1,490)
+**歸因**:App 端套碼寫 RC subscriber attribute `ref_code`;webhook 讀 `offer_code ∪ subscriber_attributes.ref_code` 補 users.ref_code → KOL 分潤照算;折價單不再發 +30 天/AI 包
+(以下為 9/6 原規劃,保留備查)
 ### 1.0.8 App 版(9/14 後盡快,iOS+Android 同版):App 內買斷碼折
 - ASC/Play 各建一次性商品 `com.stayjp.app.lifetime_ref` / `stayjp_lifetime_ref` @**5,390**
 - Paywall 加「輸入推薦碼」:打 validateRefCode → 有效即切換顯示 5,790 買斷商品(RC offering/product 切換)
