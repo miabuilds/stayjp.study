@@ -381,6 +381,15 @@ function today(){ const d=new Date(); return d.getFullYear()+'/'+(d.getMonth()+1
 function esc(s){ return String(s==null?'':s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
 // 題幹裡用【】標的目標詞 → 底線強調
 function stem(q){ return esc(q.q).replace(/【(.+?)】/g,'<u>$1</u>').replace(/\(\s*\)/g,'(　　)').replace(/\n/g,'<br>'); }
+// 詳解裡的「答案①〜④」指的是資料原序,但選項在畫面上是亂序 → 換成正解文字,才不會對不上。
+// 編號與 q.a 不符時原樣保留(那代表該題資料有誤,不該被蓋掉)。
+function xText(q){
+  if(!q || !q.x) return '';
+  return q.x.replace(/答案([\u2460-\u2463])(\s*[:\uff1a])?/g, function(m, n, colon){
+    if('\u2460\u2461\u2462\u2463'.indexOf(n) !== q.a) return m;
+    return colon ? '\u7b54\u6848:' : '\u7b54\u6848\u300c' + esc(q.o[q.a]) + '\u300d';
+  });
+}
 function shuffle(a){ const x=a.slice(); for(let i=x.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [x[i],x[j]]=[x[j],x[i]]; } return x; }
 
 function show(id){ ['home','drill','result','records','exam','examResult'].forEach(x=>document.getElementById(x).style.display=x===id?'block':'none'); window.scrollTo(0,0); }
@@ -455,7 +464,7 @@ function toggleHistDetail(hi){
       + '<div style="font-size:15px;margin-bottom:6px">'+stem(q)+'</div>'
       + (wr.ch?('<div style="font-size:13px;color:var(--bad,#c2410c)">'+enOr('你選:','You picked: ')+esc(wr.ch)+'</div>'):'')
       + '<div style="font-size:13px;color:var(--ok,#15803d);margin:2px 0 6px">'+enOr('正解:','Answer: ')+esc(q.o[q.a])+'</div>'
-      + '<div style="font-size:13px;color:var(--tx2);line-height:1.7">'+q.x+'</div>'
+      + '<div style="font-size:13px;color:var(--tx2);line-height:1.7">'+xText(q)+'</div>'
       + '</div>';
   }).join('') || '<div class="muted">'+enOr('這場的題目已更新,無法回顧','These questions have since been updated')+'</div>';
   box.style.display='block';
@@ -554,7 +563,7 @@ function answer(el, ok){
   const _rep = window.stayjpReportHref ? window.stayjpReportHref('刷題 '+(q.id||''), q.id||'', '題目 ID：'+(q.id||'')+'\n題幹：'+((q.q||q.at||'').slice(0,80))+'\n正解：'+esc(q.o[q.a]||'')) : '';
   const _tr = (window.JLPT_Q_TRANS && JLPT_Q_TRANS[q.id]) ? JLPT_Q_TRANS[q.id] : '';
   document.getElementById('xp').innerHTML =
-    (q.au ? '<div style="margin-bottom:8px;padding-bottom:8px;border-bottom:1px dashed var(--bd)"><b>スクリプト:</b>'+esc(q.au)+'</div>' : '') + q.x
+    (q.au ? '<div style="margin-bottom:8px;padding-bottom:8px;border-bottom:1px dashed var(--bd)"><b>スクリプト:</b>'+esc(q.au)+'</div>' : '') + xText(q)
     + (_tr ? '<div style="margin-top:10px;padding-top:9px;border-top:1px dashed var(--bd)"><button type="button" onclick="var d=this.nextElementSibling;d.hidden=!d.hidden;this.textContent=d.hidden?'+"'"+'▸ '+enOr('顯示整句翻譯','Show translation')+"'"+':'+"'"+'▾ '+enOr('整句翻譯','Translation')+"'"+'" style="background:none;border:0;color:var(--ac);font:inherit;font-size:13px;font-weight:700;cursor:pointer;padding:0">▸ '+enOr('顯示整句翻譯','Show translation')+'</button><div hidden style="color:var(--tx2);font-size:13.5px;line-height:1.75;margin-top:6px">'+esc(_tr)+'</div></div>' : '')
     + (_rep ? '<a href="'+_rep+'" target="_blank" rel="noopener" style="display:block;text-align:right;margin-top:10px;font-size:12px;color:var(--tx3);text-decoration:none"><i data-ic=flag></i> '+enOr('這題有誤?回報','Report this question')+'</a>' : '');
   document.getElementById('explain').style.display='block';
@@ -800,7 +809,7 @@ function finishExam(timeout){
         <div class="st">${stem(item.q)}</div>
         <div class="yours ${ok?'ok':'ng'}">${ok?'<i data-ic=check></i>':'<i data-ic=x></i>'} ${enOr('你的答案:','Your answer: ')}${esc(yours)}</div>
         ${ok?'':'<div class="yours ok">'+enOr('⭕ 正解:','⭕ Correct: ')+esc(correct)+'</div>'}
-        <div class="xp2">${item.q.au?'<b>スクリプト:</b>'+esc(item.q.au)+'<br>':''}${item.q.x}</div>
+        <div class="xp2">${item.q.au?'<b>スクリプト:</b>'+esc(item.q.au)+'<br>':''}${xText(item.q)}</div>
       </div>`;
     }).join('');
     show('examResult');
@@ -831,7 +840,7 @@ function finishExam(timeout){
       <div class="st">${stem(item.q)}</div>
       <div class="yours ${ok?'ok':'ng'}">${ok?'<i data-ic=check></i>':'<i data-ic=x></i>'} ${enOr('你的答案:','Your answer: ')}${esc(yours)}</div>
       ${ok?'':'<div class="yours ok">'+enOr('⭕ 正解:','⭕ Correct: ')+esc(correct)+'</div>'}
-      <div class="xp2">${item.q.au?'<b>スクリプト:</b>'+esc(item.q.au)+'<br>':''}${item.q.x}</div>
+      <div class="xp2">${item.q.au?'<b>スクリプト:</b>'+esc(item.q.au)+'<br>':''}${xText(item.q)}</div>
     </div>`;
   }).join('');
   show('examResult');
