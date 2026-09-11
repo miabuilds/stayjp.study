@@ -52,7 +52,7 @@ cd ~/Documents/GitHub/stay-jp-notes && git merge price-day-0914
 **進度(9/11 晚)**:✅ Play 兩商品已用 API 建好並啟用(`stayjp_yearly_ref` base plan yearly TW 1,790、`stayjp_lifetime_ref` TW 5,390,其他地區 USD/EUR 自動換算)。
 ✅ ASC 兩商品已建好(9/11 晚,Mia 執行腳本):yearly_ref `6810977330`(TWD 1,790、175 地區等價價、7 天試用×175、審核截圖)、lifetime_ref `6810977244`(TWD 5,390 價格表、175 地區、審核截圖),兩者 READY_TO_SUBMIT → 隨 1.0.8 版本一起送審。ASC API 腳本(冪等) `stayjp-app/scripts/asc-create-ref-products.py`(冪等),**Claude 執行被 auto-mode 擋,Mia 自己跑一行即可**:`cd ~/Documents/GitHub/stayjp-app && python3 scripts/asc-create-ref-products.py`(需 `pip install --user pyjwt cryptography`,已裝)。
 ✅ Play 商店資訊(9/11):標題改「日本再留計劃 — 學日文 JLPT 日檢」、簡短/完整說明加「學日文」、手機截圖換新 5 張(舊 8 張已刪;原文備份 scratchpad/play-listing-backup.json)。
-✅ iOS build 34 已處理完並掛到 ASC 1.0.8(手動發佈)、TestFlight 內部群組「自己測」可裝。待 Mia 沙盒測完 → ASC 提交審查(Claude 可用 API 送:appStoreVersionSubmissions)。Android build 進行中→ `eas submit -p android`(production+draft)。
+✅ iOS build 34 已處理完並掛到 ASC 1.0.8(手動發佈)、TestFlight 內部群組「自己測」可裝。待 Mia 沙盒測完 → ASC 提交審查(Claude 可用 API 送:appStoreVersionSubmissions)。✅ Android build(versionCode 9)9/11 17:3x 已 `eas submit` 到 Play production **draft**(不會自動上線;9/14 在 Play Console 把草稿版本「發布」即可)。
 ✅ EAS build 1.0.8 已於 9/11 晚啟動:iOS 9ac47f42、Android 434006bd(production profile)。
 ⏳ ASC 1.0.8 版本/名稱副標/更新說明/iPhone 截圖:腳本 `scripts/asc-metadata-1.0.8.py`(Mia 執行;名稱擬改「日本再留計劃 - 學日文 JLPT」、副標「日文單字文法・JLPT 刷題・AI 跟讀」;ASC 關鍵字欄本來就有 日文/日語/日檢,不用動)。
 ✅ RevenueCat(9/11 晚,API):project proj361acca2、四商品已建(iOS yearly_ref/lifetime_ref、Play stayjp_yearly_ref:yearly/stayjp_lifetime_ref)、掛 entitlement `StayJP Plan Premium`、default offering 新增 package `yearly_ref`/`lifetime_ref`。v2 key 存 `~/Documents/secrets/stayjp-app/rc-v2.key`(600),腳本 `scripts/rc-attach-ref-products.py`。
