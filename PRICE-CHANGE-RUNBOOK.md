@@ -54,7 +54,8 @@ cd ~/Documents/GitHub/stay-jp-notes && git merge price-day-0914
 ✅ Play 商店資訊(9/11):標題改「日本再留計劃 — 學日文 JLPT 日檢」、簡短/完整說明加「學日文」、手機截圖換新 5 張(舊 8 張已刪;原文備份 scratchpad/play-listing-backup.json)。
 ✅ EAS build 1.0.8 已於 9/11 晚啟動:iOS 9ac47f42、Android 434006bd(production profile)。
 ⏳ ASC 1.0.8 版本/名稱副標/更新說明/iPhone 截圖:腳本 `scripts/asc-metadata-1.0.8.py`(Mia 執行;名稱擬改「日本再留計劃 - 學日文 JLPT」、副標「日文單字文法・JLPT 刷題・AI 跟讀」;ASC 關鍵字欄本來就有 日文/日語/日檢,不用動)。
-⏳ RevenueCat:需 **v2 secret API key**(RC 後台 → Project settings → API keys → New → Secret v2,勾 products/entitlements/offerings 讀寫)給 Claude 才能用 API 掛 entitlement+offering;否則 Mia 手動:Products 新增 4 個 store product id → Entitlement `StayJP Plan Premium` attach → Offering current 加兩個 package。
+✅ RevenueCat(9/11 晚,API):project proj361acca2、四商品已建(iOS yearly_ref/lifetime_ref、Play stayjp_yearly_ref:yearly/stayjp_lifetime_ref)、掛 entitlement `StayJP Plan Premium`、default offering 新增 package `yearly_ref`/`lifetime_ref`。v2 key 存 `~/Documents/secrets/stayjp-app/rc-v2.key`(600),腳本 `scripts/rc-attach-ref-products.py`。
+(原)RevenueCat:需 **v2 secret API key**(RC 後台 → Project settings → API keys → New → Secret v2,勾 products/entitlements/offerings 讀寫)給 Claude 才能用 API 掛 entitlement+offering;否則 Mia 手動:Products 新增 4 個 store product id → Entitlement `StayJP Plan Premium` attach → Offering current 加兩個 package。
 **流程**:商品建好 → EAS build(ios+android)→ TestFlight/內測沙盒測「輸碼→顯示刪除線→買優惠版→權益解鎖→Firestore plan=yearly/lifetime」→ 送審選**手動發佈** → **9/14 商店改價後才按發佈**(否則 1,790 > 舊牌價 1,490)
 **歸因**:App 端套碼寫 RC subscriber attribute `ref_code`;webhook 讀 `offer_code ∪ subscriber_attributes.ref_code` 補 users.ref_code → KOL 分潤照算;折價單不再發 +30 天/AI 包
 (以下為 9/6 原規劃,保留備查)
