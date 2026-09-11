@@ -27,6 +27,11 @@ function mapProductIdToPlan(productId: string): PlanKey | null {
     "stayjp_yearly_early_bird": "yearly_early_bird",
     "com.stayjp.app.lifetime": "lifetime",
     "stayjp_lifetime": "lifetime",
+    // 推薦碼優惠版(9 折,2026-09-14 起 App 內輸碼解鎖):權益/方案同原商品
+    "com.stayjp.app.yearly_ref": "yearly",
+    "stayjp_yearly_ref": "yearly",
+    "com.stayjp.app.lifetime_ref": "lifetime",
+    "stayjp_lifetime_ref": "lifetime",
   };
   return map[productId] ?? null;
 }

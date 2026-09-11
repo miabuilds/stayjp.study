@@ -166,12 +166,16 @@ export const revenuecatWebhook = functions.onRequest(
             // 後面 KOL 分潤/推薦人獎勵沿用既有機制。(限制:匿名購買的兌換單要等登入歸戶,若 TRANSFER
             // 不帶 offer_code 則歸因不到——可接受,post-purchase 有登入引導。)
             let refCode = await getRefCode(uid);
-            const offerCode = String((event as { offer_code?: string }).offer_code || "").toUpperCase().replace(/[^A-Z0-9_-]/g, "").slice(0, 32);
+            const norm = (v: unknown) => String(v || "").toUpperCase().replace(/[^A-Z0-9_-]/g, "").slice(0, 32);
+            const attrs = (event as { subscriber_attributes?: Record<string, { value?: string }> }).subscriber_attributes || {};
+            // 兩個來源:① ASC Offer Code 兌換(event.offer_code)② App 內輸碼(RC subscriber attribute ref_code,匿名購買也帶得到)
+            const offerCode = norm((event as { offer_code?: string }).offer_code) || norm(attrs.ref_code?.value);
+            const refVia = (event as { offer_code?: string }).offer_code ? "ios_offer_code" : "app_ref_attribute";
             if (!refCode && offerCode) {
               try {
                 const oc = await admin.firestore().doc(`ref_codes/${offerCode}`).get();
                 if (oc.exists) {
-                  await admin.firestore().doc(`users/${uid}`).set({ ref_code: offerCode, ref_at: nowMs(), ref_via: "ios_offer_code" }, { merge: true });
+                  await admin.firestore().doc(`users/${uid}`).set({ ref_code: offerCode, ref_at: nowMs(), ref_via: refVia }, { merge: true });
                   refCode = offerCode;
                 }
               } catch (e) { console.warn("offer_code 歸因略過:", e); }
@@ -185,7 +189,11 @@ export const revenuecatWebhook = functions.onRequest(
               newSub.ref_bonus_at = nowMs();
             } else if (refCode) {
               newSub.ref_bonus_at = nowMs();   // 買斷:發 AI 加量包(天數對買斷無意義)
-              await grantAiBonus(uid, "推薦碼＋購買買斷(App)→ AI 加量包").catch(e => console.error("grantAiBonus(rc) 略過:", e));
+              // 買斷若已享折價(lifetime_ref 5,390,實付<牌價)→ 好康=折價本身,不再發 AI 加量包(與綠界規則一致)
+              const discountedLifetime = (paidTwd ?? planInfo.price_twd) < PLANS.lifetime.price_twd;
+              if (!discountedLifetime) {
+                await grantAiBonus(uid, "推薦碼＋購買買斷(App)→ AI 加量包").catch(e => console.error("grantAiBonus(rc) 略過:", e));
+              }
             }
           }
           // 匿名購買(未登入)→ 不寫 users/{$RCAnonymousID} 訂閱 doc(否則污染訂閱者清單、變假使用者)。
@@ -334,6 +342,11 @@ function mapProductIdToPlan(productId: string): PlanKey | null {
     "stayjp_yearly_early_bird": "yearly_early_bird",
     "com.stayjp.app.lifetime": "lifetime",   // 原本漏了 → app 買斷版會寫不進(unknown product)
     "stayjp_lifetime": "lifetime",
+    // 推薦碼優惠版(9 折,App 內輸碼解鎖的雙 SKU):方案同原商品,實付由 price_in_purchased_currency 記
+    "com.stayjp.app.yearly_ref": "yearly",
+    "stayjp_yearly_ref": "yearly",
+    "com.stayjp.app.lifetime_ref": "lifetime",
+    "stayjp_lifetime_ref": "lifetime",
   };
   return map[productId] ?? null;
 }
