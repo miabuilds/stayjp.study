@@ -49,6 +49,7 @@ cd ~/Documents/GitHub/stay-jp-notes && git merge price-day-0914
 |---|---|---|---|
 | 年費優惠版 | `com.stayjp.app.yearly_ref` 自動續訂・同群組 StayJP Premium・NT$1,790 | 訂閱 `stayjp_yearly_ref` base plan 年 1,790 | 掛 entitlement `StayJP Plan Premium` + current offering |
 | 買斷優惠版 | `com.stayjp.app.lifetime_ref` 非消耗型・NT$5,390 | 一次性 `stayjp_lifetime_ref` 5,390 | 同上 |
+**進度(9/11 深夜・商店截圖)**:✅ 5 張新截圖(AI 跟讀／YouTube 跟讀／單字＋閃卡／文法／JLPT 刷題;拿掉聊聊、動詞、基礎專區)已換上——Play zh-TW 手機截圖用 edits API 刪舊傳新並 commit(production 1.0.8 draft vc9 不受影響);ASC 1.0.8 zh-Hant iPhone 6.7" 5 張 COMPLETE(iPad 4 張沿用)。原檔 `~/Downloads/StayJP_商店截圖_1.0.8/`(舊版移到 `_old/`);版型 `scratchpad/ads914/store/slide.html`+`jobs.json` 可重渲染。
 **進度(9/11 晚)**:✅ Play 兩商品已用 API 建好並啟用(`stayjp_yearly_ref` base plan yearly TW 1,790、`stayjp_lifetime_ref` TW 5,390,其他地區 USD/EUR 自動換算)。
 ✅ ASC 兩商品已建好(9/11 晚,Mia 執行腳本):yearly_ref `6810977330`(TWD 1,790、175 地區等價價、7 天試用×175、審核截圖)、lifetime_ref `6810977244`(TWD 5,390 價格表、175 地區、審核截圖),兩者 READY_TO_SUBMIT → 隨 1.0.8 版本一起送審。ASC API 腳本(冪等) `stayjp-app/scripts/asc-create-ref-products.py`(冪等),**Claude 執行被 auto-mode 擋,Mia 自己跑一行即可**:`cd ~/Documents/GitHub/stayjp-app && python3 scripts/asc-create-ref-products.py`(需 `pip install --user pyjwt cryptography`,已裝)。
 ✅ Play 商店資訊(9/11):標題改「日本再留計劃 — 學日文 JLPT 日檢」、簡短/完整說明加「學日文」、手機截圖換新 5 張(舊 8 張已刪;原文備份 scratchpad/play-listing-backup.json)。

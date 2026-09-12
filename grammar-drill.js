@@ -71,11 +71,20 @@ const GrammarDrill = (() => {
   function startUnit(catName) {
     const data = getData(typeof currentLevel !== 'undefined' ? currentLevel : lvl);
     const items = (data || []).filter(d => d.cat === catName);
-    if (items.length < 4) { (window.AppUI ? AppUI.alert : alert)('這個單元題目不夠(至少 4 個文法點)。'); return; }
+    if (!items.length) { (window.AppUI ? AppUI.alert : alert)(t('gd_no_match')); return; }
     if (window.ToolQuota && ToolQuota.canUse && !ToolQuota.canUse('grammar_drill')) { if (ToolQuota.showPaywall) ToolQuota.showPaywall('grammar_drill'); return; }
     if (typeof currentLevel !== 'undefined') lvl = currentLevel;
     quizMode = 'quiz';
-    queue = (typeof shuf === 'function' ? shuf([...items]) : [...items]).slice(0, 15);
+    // 使用者回饋:單元測驗做過好幾輪,總進度條還是灌不滿——以前每輪從單元裡「隨機抽 15 題」,
+    // 大單元(N5 助詞 26 個)總有幾個一直抽不到,而進度條算的是「每個文法點有沒有練過」。
+    // 改成:沒練過的先出 → 到期該複習的 → 其他(最久沒碰的優先);每輪仍最多 15 題,多做幾輪必掃完整個單元。
+    // 誤答選項本來就取自整級文法,所以只有 2–3 個文法點的小單元也能考(原本 <4 直接擋掉,那幾個永遠算不到)。
+    const srs = getSRS(), td = today(), S = a => (typeof shuf === 'function' ? shuf(a) : a);
+    const fresh = S(items.filter(d => !srs[d.id]));
+    const due   = S(items.filter(d => srs[d.id] && srs[d.id].nextReview <= td));
+    const rest  = items.filter(d => srs[d.id] && srs[d.id].nextReview > td)
+                       .sort((a, b) => ((srs[a.id].lastReview || '') < (srs[b.id].lastReview || '')) ? -1 : 1);
+    queue = fresh.concat(due, rest).slice(0, 15);
     cur = 0; gqScore = 0; gqResults = [];
     document.getElementById('quizBg').classList.add('show');
     renderQuizQ();
@@ -183,14 +192,11 @@ const GrammarDrill = (() => {
   }
   function renderQuizQ() {
     const g = queue[cur];
-    const eg = g.eg && g.eg[0];
-    const answer = eg ? extractEm(eg.j) : null;
-    // Fallback：若無 <em> 標記，退回用文法名稱當答案（少見）
-    if (!answer) {
-      cur++;
-      if (cur >= queue.length) return showQuizResults();
-      return renderQuizQ();
-    }
+    // 挑第一個有 <em> 標記的例句;都沒有(目前只有 n4-75)就改考「這句用了哪個文法」——
+    // 以前直接跳過不出題,那個文法點就永遠記不到 SRS、進度條差一格灌不滿。
+    const eg = (g.eg || []).find(e => e && /<em>/.test(e.j)) || (g.eg && g.eg[0]);
+    const answer = eg && /<em>/.test(eg.j) ? extractEm(eg.j) : null;
+    if (!answer) return renderTitleQ(g, eg);
     const allGrammar = getData(lvl);
     // 蒐集同級別其他文法的 <em> 片段，當誤答候選
     const distractPool = [];
@@ -210,6 +216,22 @@ const GrammarDrill = (() => {
     document.getElementById('quizBox').innerHTML = `
       <div class="qhd"><span>${t('gd_quiz_mode')} ${cur+1} / ${queue.length}</span><span>${t('quiz_score', { n: gqScore })}</span><button class="qclose" style="width:auto;margin:0;padding:2px 10px" onclick="GrammarDrill.close()"><i data-ic=x></i></button></div>
       <div class="qprompt"><div style="font-size:16px;line-height:1.8;color:var(--tx)">${blanked}${spk}</div><div style="font-size:12px;color:var(--tx2);margin-top:4px">${typeof cvt==='function'?cvt(eg.z):eg.z}</div></div>
+      <div class="qopts">${options.map((o, i) => '<button class="qopt" onclick="GrammarDrill.answerQuiz('+i+','+correctIdx+')">'+o+'</button>').join('')}</div>`;
+  }
+  // 備援題型:例句沒有 <em> 可挖空時,改問「這句用了哪個文法」,選項是同級其他文法名
+  function renderTitleQ(g, eg) {
+    const others = getData(lvl).filter(x => x.id !== g.id && x.t && x.t !== g.t).map(x => x.t);
+    const wrong = others.sort(() => Math.random() - 0.5).slice(0, 3);
+    const options = (typeof shuf === 'function' ? shuf([g.t, ...wrong]) : [g.t, ...wrong]);
+    const correctIdx = options.indexOf(g.t);
+    const sent = eg ? String(eg.j).replace(/<[^>]+>/g, '') : '';
+    const C = x => (typeof cvt === 'function' ? cvt(x) : x);
+    document.getElementById('quizBox').innerHTML = `
+      <div class="qhd"><span>${t('gd_quiz_mode')} ${cur+1} / ${queue.length}</span><span>${t('quiz_score', { n: gqScore })}</span><button class="qclose" style="width:auto;margin:0;padding:2px 10px" onclick="GrammarDrill.close()"><i data-ic=x></i></button></div>
+      <div class="qprompt"><div style="font-size:13px;color:var(--tx2);margin-bottom:6px">${typeof enOr === 'function' ? enOr(C('這句用了哪個文法?'), 'Which grammar point does this sentence use?') : '這句用了哪個文法?'}</div>
+        ${sent ? '<div style="font-size:16px;line-height:1.8;color:var(--tx)">' + sent + '</div>' : ''}
+        ${eg && eg.z ? '<div style="font-size:12px;color:var(--tx2);margin-top:4px">' + C(eg.z) + '</div>' : ''}
+        ${!sent && g.ex ? '<div style="font-size:14px;color:var(--tx)">' + C(g.ex) + '</div>' : ''}</div>
       <div class="qopts">${options.map((o, i) => '<button class="qopt" onclick="GrammarDrill.answerQuiz('+i+','+correctIdx+')">'+o+'</button>').join('')}</div>`;
   }
   // 詳解卡:答完顯示「為什麼是這個答案」(文法名+接續+語感+完整例句),不自動跳題——
