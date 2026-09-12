@@ -1695,6 +1695,15 @@ html[data-fs="xlarge"] .quiz-box{zoom:1.28;max-height:calc(85vh/1.28)}
   .hd-bar .fav-pill { padding-left: 6px; padding-right: 6px; }
   .hd-bar .hd-sep { margin-left: 1px; margin-right: 1px; }
 }
+
+/* 單字複習・打字模式(使用者回饋) */
+.srs-type-in{width:100%;box-sizing:border-box;padding:12px 14px;font-size:20px;text-align:center;border:2px solid var(--bd);border-radius:12px;background:var(--bg2);color:var(--tx);margin:12px 0 4px;font-family:inherit}
+.srs-type-in:focus{outline:none;border-color:var(--ac2)}
+.srs-type-in.ok{border-color:var(--correct-bd);background:var(--correct-bg);color:var(--correct-tx)}
+.srs-type-in.ng{border-color:var(--wrong-bd);background:var(--wrong-bg);color:var(--wrong-tx)}
+.srs-type-toggle{border:1px solid var(--bd);background:var(--bg2);color:var(--tx2);border-radius:999px;padding:3px 10px;font-size:12px;cursor:pointer;margin-left:auto;margin-right:8px;white-space:nowrap}
+.srs-type-toggle.on{background:var(--ac2);color:#fff;border-color:var(--ac2)}
+.srs-type-res{margin-top:10px;font-size:14px;line-height:1.8;text-align:left;background:var(--bg3);border-radius:12px;padding:10px 14px}
 </style>
 <script>
 // 推薦碼歸因落地:分享連結是 /?ref=CODE(account 頁邀請卡產生)。先存 localStorage,
@@ -4172,7 +4181,8 @@ function dailyHelp() {
     enOr(cvt('・湊滿 30 個（可以混著做）就達成今天目標；連續達成會累積連勝 <i data-ic=fire></i>'), '· Reach 30 (mix them freely) to complete today’s goal; keep it up to build your streak <i data-ic=fire></i>'),
     '<br>' + '<b>' + enOr(cvt('【總進度】下面那條是你「真的學會多少」'), '[Total progress] The lower bar is how much you\'ve actually learned') + '</b>',
     enOr(cvt('・背過、測驗過的字會進「已學」；複習到夠熟就升級「熟練」。把整級學完就是 100%。'), '· Words you\'ve studied or quizzed count as “Learned”; reviewed until solid become “Mastered”. Finishing the level = 100%.'),
-    enOr(cvt('・「下一批 ▶」只是換今天顯示哪一批，不會灌水進度條 '), '· “Next batch ▶” just changes which set you see today — it doesn\'t inflate the bar ')
+    enOr(cvt('・「下一批 ▶」只是換今天顯示哪一批，不會灌水進度條 '), '· “Next batch ▶” just changes which set you see today — it doesn\'t inflate the bar '),
+    enOr(cvt('・文法那條：做過「單元測驗」或文法練習的文法點才算已學。單元測驗每輪最多 15 題、優先出還沒練過的，多做幾輪就會補滿。'), '· Grammar bar: a point counts as learned once it appears in a unit quiz or grammar drill. Each quiz round has up to 15 questions and puts unpractised points first, so a few rounds fill the bar.')
   ];
   const m = document.createElement('div');
   m.id = 'onbMask'; m.className = 'onb-mask';
@@ -4717,7 +4727,7 @@ function render() {
     const items = groups[cat.name];
     if (!items||!items.length) return;
     vc += items.length;
-    h += `<section class="cs" id="cat-${cat.name}"><h2><span class="ci2">${cat.icon}</span>${catLabel(cat.name)}<span style="font-size:12px;color:#999;font-weight:400;margin-left:auto">${t('cat_count_grammar', { n: items.length })}</span>${items.length>=4?`<button class="unit-quiz-btn" onclick="GrammarDrill.startUnit(this.dataset.cat)" data-cat="${cat.name}"><i data-ic=edit></i> ${enOr(cvt('單元測驗'),'Unit quiz')}</button>`:''}</h2>`;
+    h += `<section class="cs" id="cat-${cat.name}"><h2><span class="ci2">${cat.icon}</span>${catLabel(cat.name)}<span style="font-size:12px;color:#999;font-weight:400;margin-left:auto">${t('cat_count_grammar', { n: items.length })}</span>${items.length?`<button class="unit-quiz-btn" onclick="GrammarDrill.startUnit(this.dataset.cat)" data-cat="${cat.name}"><i data-ic=edit></i> ${enOr(cvt('單元測驗'),'Unit quiz')}</button>`:''}</h2>`;
     items.forEach((d,i) => {
       const isFav = favList.includes(d.id);
       const idx = data.indexOf(d) + 1;

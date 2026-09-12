@@ -802,6 +802,27 @@ window.Articles = (function () {
     var el = document.getElementById('artS' + i);
     if (el) { el.classList.add('on'); el.scrollIntoView({ block: 'center', behavior: 'smooth' }); }
   }
+  // 背景/鎖屏播放(使用者回饋:想關螢幕聽):把朗讀登記成系統媒體(Media Session),
+  // 鎖屏與耳機鍵可播放/暫停/上下句;句子在 onended 裡接著播,螢幕關掉也會繼續。
+  // App 端另需 iOS UIBackgroundModes=audio(stayjp-app app.json 已加,下次 build 生效)。
+  var _msBound = false;
+  function setMediaSession(n) {
+    try {
+      if (!('mediaSession' in navigator) || typeof MediaMetadata === 'undefined') return;
+      var ttlEl = document.querySelector('#artMask .ht') || document.querySelector('.ht');
+      var ttl = (ttlEl && ttlEl.textContent.trim()) || 'StayJP';
+      navigator.mediaSession.metadata = new MediaMetadata({ title: sentSeq[n] ? sentSeq[n].text : ttl, artist: ttl, album: 'StayJP · ' + (n + 1) + ' / ' + sentSeq.length });
+      navigator.mediaSession.playbackState = 'playing';
+      if (_msBound) return; _msBound = true;
+      var H = function (k, f) { try { navigator.mediaSession.setActionHandler(k, f); } catch (e) {} };
+      H('play', function () { if (!pl.playing) togglePlay(); });
+      H('pause', function () { if (pl.playing) togglePlay(); });
+      H('stop', function () { stopPlay(); });
+      H('nexttrack', function () { if (pl.idx + 1 < sentSeq.length) playFrom(pl.idx + 1); });
+      H('previoustrack', function () { playFrom(Math.max(0, pl.idx - 1)); });
+    } catch (e) {}
+  }
+  function msState(st) { try { if ('mediaSession' in navigator) navigator.mediaSession.playbackState = st; } catch (e) {} }
   function playFrom(i) {
     if (!sentSeq.length) return;
     stopPlay();
@@ -817,6 +838,7 @@ window.Articles = (function () {
       delete pl.pre[_key];
       try { au.currentTime = 0; } catch (e) {}
       au.playbackRate = pl.rate; pl.audio = au;
+      setMediaSession(n);
       preloadSent(n + 1); preloadSent(n + 2);
       // 逐詞高亮:依 VOICEVOX 時間軸,把 .cur 框移到目前唸到的詞(對齊實際發音);無時間軸則整句淡底即可
       var el = document.getElementById('artS' + n);
@@ -849,11 +871,11 @@ window.Articles = (function () {
   }
   function togglePlay() {
     if (!sentSeq.length) return;
-    if (pl.playing && pl.audio) { pl.audio.pause(); pl.playing = false; setBtn(); return; }
-    if (!pl.playing && pl.audio && pl.idx >= 0) { pl.audio.play(); pl.playing = true; setBtn(); return; }
+    if (pl.playing && pl.audio) { pl.audio.pause(); pl.playing = false; setBtn(); msState('paused'); return; }
+    if (!pl.playing && pl.audio && pl.idx >= 0) { pl.audio.play(); pl.playing = true; setBtn(); msState('playing'); return; }
     playFrom(pl.idx >= 0 ? pl.idx : 0);
   }
-  function stopPlay() { pl.token++; if (pl.audio) { try { pl.audio.pause(); pl.audio.src = ''; } catch (e) {} pl.audio = null; } pl.playing = false; setBtn(); }
+  function stopPlay() { pl.token++; if (pl.audio) { try { pl.audio.pause(); pl.audio.src = ''; } catch (e) {} pl.audio = null; } pl.playing = false; setBtn(); msState('none'); }
   function setBtn() {
     var b = document.getElementById('artPlayBtn'); if (b) b.textContent = pl.playing ? '❚❚' : '▶';
     // 單句 icon 跟主播放鈕同步:正在播的那句顯示 ⏸,其他都是 ▶(使用者回饋:只有下排會切換)
