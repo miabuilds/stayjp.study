@@ -407,7 +407,28 @@ window.Articles = (function () {
   function close() { stopPlay(); var m = document.getElementById('artMask'); if (m) m.remove(); }
 
   // ─────────── 清單 ───────────
+  // 資料檔(articles.js)還在下載時開清單會是空的 → 顯示載入中並自動重試,
+  // 不要讓使用者看到「一片空白」(用戶回報:文章沒出現/很晚出現)。
+  var _waitTries = 0;
   function open() {
+    if (!list().length && _waitTries < 40) {
+      _waitTries++;
+      ensureCss();
+      var m = document.getElementById('artMask');
+      if (!m) {
+        var d0 = document.createElement('div');
+        d0.innerHTML = '<div class="art-mask" id="artMask"><div class="art-wrap">'
+          + '<div class="art-top"><span class="tt"><i data-ic=book></i> ' + enOr('文章閱讀', 'Reading') + '</span>'
+          + '<button class="art-ic" onclick="Articles.close()"><i data-ic=x></i></button></div>'
+          + '<div class="art-lwrap"><div style="text-align:center;color:var(--tx3,#aaa);padding:60px 0;font-size:14px">'
+          + enOr('文章載入中…', 'Loading articles…') + '</div></div></div></div>';
+        document.body.appendChild(d0.firstChild);
+        try { if (window.hydrateIcons) hydrateIcons(document.getElementById('artMask')); } catch (e) {}
+      }
+      setTimeout(open, 250);
+      return;
+    }
+    _waitTries = 0;
     ensureCss(); close();
     var read = readSet(), byLv = {};
     list().forEach(function (a) { (byLv[a.level] = byLv[a.level] || []).push(a); });
@@ -483,7 +504,7 @@ window.Articles = (function () {
       '<button class="art-pb art-rstep" onclick="Articles.stepRate(-1)" title="' + enOr('慢一點', 'Slower') + '" aria-label="' + enOr('慢一點', 'Slower') + '">−</button>' +
       '<span class="art-prate" id="artRate">' + (pl.rate.toFixed(2).replace(/0$/, '')) + '×</span>' +
       '<button class="art-pb art-rstep" onclick="Articles.stepRate(1)" title="' + enOr('快一點', 'Faster') + '" aria-label="' + enOr('快一點', 'Faster') + '">＋</button>' +
-      '<button class="art-pb art-mode" id="artRepBtn" onclick="Articles.toggleRepeat()" title="' + enOr('重複播放這一句', 'Repeat sentence') + '"></button>' +
+      '<button class="art-pb art-mode" id="artRepBtn" onclick="Articles.toggleRepeat()" title="' + enOr('循環播放:這一句 → 整篇', 'Loop: one line → whole article') + '">↻</button>' +
       '<button class="art-pb art-mode" id="artSingleBtn" onclick="Articles.toggleSingle()" title="' + enOr('只播這一句就停', 'Play one sentence') + '">' + enOr('單句', '1 sent.') + '</button>' +
       '</div></div>' +
       '</div>';
@@ -764,7 +785,8 @@ window.Articles = (function () {
   // ─────────── 底部連播播放器(自建 Audio 佇列,只播預錄 mp3)───────────
   // 朗讀速度:預設 0.85(使用者回饋 1.0 偏快、跟不上);記住上次選的。
   var _savedRate = parseFloat(typeof localStorage !== 'undefined' && localStorage.getItem('art_rate'));
-  var pl = { audio: null, idx: -1, playing: false, rate: (_savedRate > 0 ? _savedRate : 0.85), token: 0, pre: {} };
+  var _savedRep = (function () { try { return localStorage.getItem('art_repeat') || false; } catch (e) { return false; } })();
+  var pl = { audio: null, idx: -1, playing: false, rate: (_savedRate > 0 ? _savedRate : 0.85), token: 0, pre: {}, repeat: (_savedRep === 'one' || _savedRep === 'all') ? _savedRep : false };
   // 預載句子 mp3:按播放才 new Audio 會先等下載(使用者回饋「按了好幾秒才播」)。
   // 開文章先載前兩句;播放中滾動預載 n+1/n+2 → 按下即播、句間無縫。
   function preloadSent(n) {
@@ -780,18 +802,43 @@ window.Articles = (function () {
     var el = document.getElementById('artS' + i);
     if (el) { el.classList.add('on'); el.scrollIntoView({ block: 'center', behavior: 'smooth' }); }
   }
+  // 背景/鎖屏播放(使用者回饋:想關螢幕聽):把朗讀登記成系統媒體(Media Session),
+  // 鎖屏與耳機鍵可播放/暫停/上下句;句子在 onended 裡接著播,螢幕關掉也會繼續。
+  // App 端另需 iOS UIBackgroundModes=audio(stayjp-app app.json 已加,下次 build 生效)。
+  var _msBound = false;
+  function setMediaSession(n) {
+    try {
+      if (!('mediaSession' in navigator) || typeof MediaMetadata === 'undefined') return;
+      var ttlEl = document.querySelector('#artMask .ht') || document.querySelector('.ht');
+      var ttl = (ttlEl && ttlEl.textContent.trim()) || 'StayJP';
+      navigator.mediaSession.metadata = new MediaMetadata({ title: sentSeq[n] ? sentSeq[n].text : ttl, artist: ttl, album: 'StayJP · ' + (n + 1) + ' / ' + sentSeq.length });
+      navigator.mediaSession.playbackState = 'playing';
+      if (_msBound) return; _msBound = true;
+      var H = function (k, f) { try { navigator.mediaSession.setActionHandler(k, f); } catch (e) {} };
+      H('play', function () { if (!pl.playing) togglePlay(); });
+      H('pause', function () { if (pl.playing) togglePlay(); });
+      H('stop', function () { stopPlay(); });
+      H('nexttrack', function () { if (pl.idx + 1 < sentSeq.length) playFrom(pl.idx + 1); });
+      H('previoustrack', function () { playFrom(Math.max(0, pl.idx - 1)); });
+    } catch (e) {}
+  }
+  function msState(st) { try { if ('mediaSession' in navigator) navigator.mediaSession.playbackState = st; } catch (e) {} }
   function playFrom(i) {
     if (!sentSeq.length) return;
     stopPlay();
     var myToken = ++pl.token;
     function step(n) {
-      if (n >= sentSeq.length) { pl.playing = false; pl.idx = -1; setBtn(); highlight(-1); setPText(); return; }
+      if (n >= sentSeq.length) {
+        if (pl.repeat === 'all') { step(0); return; }   // 整篇循環:播完自動從頭
+        pl.playing = false; pl.idx = -1; setBtn(); highlight(-1); setPText(); return;
+      }
       pl.idx = n; highlight(n); setPText(); setBtn();
       var _key = sentSeq[n].text;
       var au = pl.pre[_key] || new Audio(ttsPath(_key));
       delete pl.pre[_key];
       try { au.currentTime = 0; } catch (e) {}
       au.playbackRate = pl.rate; pl.audio = au;
+      setMediaSession(n);
       preloadSent(n + 1); preloadSent(n + 2);
       // 逐詞高亮:依 VOICEVOX 時間軸,把 .cur 框移到目前唸到的詞(對齊實際發音);無時間軸則整句淡底即可
       var el = document.getElementById('artS' + n);
@@ -814,7 +861,7 @@ window.Articles = (function () {
         if (pl.token !== myToken) return;
         if (aws[lastWi]) aws[lastWi].classList.remove('cur');
         // 播放模式(測試者回饋:像 Readle 的單句/重複):🔁=同句循環;單句=播完當句就停(再按▶重播當句)
-        if (pl.repeat) { step(n); return; }
+        if (pl.repeat === 'one') { step(n); return; }   // 同句循環
         if (pl.single) { pl.playing = false; pl.audio = null; setBtn(); return; }
         step(n + 1);
       };
@@ -824,11 +871,11 @@ window.Articles = (function () {
   }
   function togglePlay() {
     if (!sentSeq.length) return;
-    if (pl.playing && pl.audio) { pl.audio.pause(); pl.playing = false; setBtn(); return; }
-    if (!pl.playing && pl.audio && pl.idx >= 0) { pl.audio.play(); pl.playing = true; setBtn(); return; }
+    if (pl.playing && pl.audio) { pl.audio.pause(); pl.playing = false; setBtn(); msState('paused'); return; }
+    if (!pl.playing && pl.audio && pl.idx >= 0) { pl.audio.play(); pl.playing = true; setBtn(); msState('playing'); return; }
     playFrom(pl.idx >= 0 ? pl.idx : 0);
   }
-  function stopPlay() { pl.token++; if (pl.audio) { try { pl.audio.pause(); pl.audio.src = ''; } catch (e) {} pl.audio = null; } pl.playing = false; setBtn(); }
+  function stopPlay() { pl.token++; if (pl.audio) { try { pl.audio.pause(); pl.audio.src = ''; } catch (e) {} pl.audio = null; } pl.playing = false; setBtn(); msState('none'); }
   function setBtn() {
     var b = document.getElementById('artPlayBtn'); if (b) b.textContent = pl.playing ? '❚❚' : '▶';
     // 單句 icon 跟主播放鈕同步:正在播的那句顯示 ⏸,其他都是 ▶(使用者回饋:只有下排會切換)
@@ -851,17 +898,29 @@ window.Articles = (function () {
     if (pl.audio) pl.audio.playbackRate = pl.rate;
   }
   // 播放模式切換:🔁 重複當句 / 單句播完即停(互斥:開一個關另一個)
+  // 循環模式三段切換:關 → 這一句循環 → 整篇循環(使用者要求:工作時一直重聽整篇)
   function toggleRepeat() {
-    pl.repeat = !pl.repeat; if (pl.repeat) pl.single = false;
+    pl.repeat = pl.repeat === 'one' ? 'all' : (pl.repeat === 'all' ? false : 'one');
+    if (pl.repeat) pl.single = false;
+    try { localStorage.setItem('art_repeat', pl.repeat || ''); } catch (e) {}
     setModeBtns();
   }
   function toggleSingle() {
     pl.single = !pl.single; if (pl.single) pl.repeat = false;
+    try { localStorage.setItem('art_repeat', ''); } catch (e) {}
     setModeBtns();
   }
   function setModeBtns() {
     var r = document.getElementById('artRepBtn'), s = document.getElementById('artSingleBtn');
-    if (r) r.classList.toggle('on', !!pl.repeat);
+    if (r) {
+      r.classList.toggle('on', !!pl.repeat);
+      r.innerHTML = pl.repeat === 'all'
+        ? '<span style="font-size:12px;font-weight:800">↻ ' + enOr('全篇', 'All') + '</span>'
+        : (pl.repeat === 'one' ? '<span style="font-size:12px;font-weight:800">↻ 1</span>' : '↻');
+      r.title = pl.repeat === 'all' ? enOr('整篇循環播放中(再按關閉)', 'Looping whole article — tap to turn off')
+        : (pl.repeat === 'one' ? enOr('這一句循環中(再按改成整篇循環)', 'Repeating this line — tap for whole-article loop')
+        : enOr('循環播放:這一句 → 整篇', 'Loop: one line → whole article'));
+    }
     if (s) s.classList.toggle('on', !!pl.single);
   }
   // 單字/測驗單點發音(用預錄)
