@@ -138,6 +138,12 @@ const FlashCard = (() => {
       #quizBox .fc-card { animation: fcCardIn .24s cubic-bezier(.2,.8,.2,1); }
       #quizBox .fc-bar-fill { transition: width .1s linear; }
       #quizBox .fc-face { animation: fcFaceIn .22s ease; }
+      #quizBox .fc-ex { margin:10px auto 4px; max-width:420px; text-align:left; background:var(--bg3); border:1px solid var(--bd); border-radius:10px; padding:8px 12px; }
+      #quizBox .fc-ex-row + .fc-ex-row { margin-top:6px; border-top:1px dashed var(--bd); padding-top:6px; }
+      #quizBox .fc-ex-j { font-size:15px; line-height:1.9; color:var(--tx); display:flex; align-items:flex-start; gap:6px; }
+      #quizBox .fc-ex-j rt { font-size:.55em; color:var(--tx2); }
+      #quizBox .fc-ex-spk { flex:0 0 auto; margin-top:6px; color:var(--ac2); cursor:pointer; }
+      #quizBox .fc-ex-z { font-size:12.5px; color:var(--tx2); line-height:1.5; margin-top:2px; }
       @keyframes fcCardIn { from { opacity: 0; transform: translateY(8px) scale(.98); } to { opacity: 1; transform: none; } }
       @keyframes fcFaceIn { from { opacity: 0; transform: scale(.96); } to { opacity: 1; transform: scale(1); } }
       #quizBox .fc-btn, #quizBox .qstart, #quizBox .qclose, #quizBox .qo button { transition: transform .12s ease, background .15s ease, border-color .15s ease; }
@@ -311,7 +317,7 @@ const FlashCard = (() => {
           ${item.w!==item.r?`<div class="fc-reading">${item.r}</div>`:''}
           <div class="fc-meaning">${typeof cvt==='function'?cvt(item.m):item.m}</div>
           ${cfHint?`<div class="confuse-hint">${cfHint}</div>`:''}
-          ${Array.isArray(item.e)&&item.e.length?`<div class="fc-ex">${item.e.map(ex=>`<div class="fc-ex-row"><div class="fc-ex-j">${window.furiganaHTML?window.furiganaHTML(ex.j):ex.j}<svg class="fc-ex-spk" onclick="event.stopPropagation();speak('${(ex.j||'').replace(/'/g,"\\'")}')" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.54 8.46a5 5 0 010 7.07"/></svg></div><div class="fc-ex-z">${typeof cvt==='function'?cvt(ex.z):ex.z}</div></div>`).join('')}</div>`:''}
+          ${(exList=>exList.length?`<div class="fc-ex">${exList.map(ex=>`<div class="fc-ex-row"><div class="fc-ex-j">${window.furiganaHTML?window.furiganaHTML(ex.j):ex.j}<svg class="fc-ex-spk" onclick="event.stopPropagation();speak('${(ex.j||'').replace(/'/g,"\\'")}')" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.54 8.46a5 5 0 010 7.07"/></svg></div><div class="fc-ex-z">${(function(){try{if(localStorage.getItem('ui_lang')==='en'&&ex.e)return ex.e;}catch(e){}return typeof cvt==='function'?cvt(ex.z):ex.z;})()}</div></div>`).join('')}</div>`:'')(Array.isArray(item.e)&&item.e.length?item.e:(item.ex&&item.ex.j?[item.ex]:[]))}
           <div class="fc-btns">
             <button class="fc-btn fc-no" onclick="event.stopPropagation();FlashCard.answer('unknown')"><i data-ic=x></i> 不會<span class="fc-btn-hint">${gradeLabel('unknown')}</span></button>
             <button class="fc-btn fc-soso" onclick="event.stopPropagation();FlashCard.answer('soso')">◯ 不熟<span class="fc-btn-hint">${gradeLabel('soso')}</span></button>

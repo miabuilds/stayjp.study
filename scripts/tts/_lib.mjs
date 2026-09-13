@@ -7,6 +7,7 @@
 //   speak(text) checks __TTS first, falls back to browser SpeechSynthesis.
 
 import fs from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import { execFileSync } from 'node:child_process';
@@ -65,11 +66,11 @@ async function fetchT(url, opts = {}, ms = 30000) {
   finally { clearTimeout(t); }
 }
 
-export async function audioQuery(text) {
+export async function audioQuery(text, speaker = SPEAKER) {
   // 支援 kana 強制重音模式：override 寫成 "kana:ハ'ガキ" 之類，跳過 VOICEVOX 自動分析
   if (text.startsWith('kana:')) {
     const kana = text.slice(5);
-    const apUrl = `${ENGINE}/accent_phrases?text=${encodeURIComponent(kana)}&speaker=${SPEAKER}&is_kana=true`;
+    const apUrl = `${ENGINE}/accent_phrases?text=${encodeURIComponent(kana)}&speaker=${speaker}&is_kana=true`;
     const apRes = await fetchT(apUrl, { method: 'POST' });
     if (!apRes.ok) throw new Error(`accent_phrases ${apRes.status}: ${await apRes.text()}`);
     const accent_phrases = await apRes.json();
@@ -92,14 +93,14 @@ export async function audioQuery(text) {
       kana,
     };
   }
-  const url = `${ENGINE}/audio_query?text=${encodeURIComponent(text)}&speaker=${SPEAKER}`;
+  const url = `${ENGINE}/audio_query?text=${encodeURIComponent(text)}&speaker=${speaker}`;
   const res = await fetchT(url, { method: 'POST' });
   if (!res.ok) throw new Error(`audio_query ${res.status}: ${await res.text()}`);
   return res.json();
 }
 
-export async function synthesis(query) {
-  const url = `${ENGINE}/synthesis?speaker=${SPEAKER}`;
+export async function synthesis(query, speaker = SPEAKER) {
+  const url = `${ENGINE}/synthesis?speaker=${speaker}`;
   const res = await fetchT(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -130,4 +131,27 @@ export function wavToMp3(wavBuf, outPath) {
       '-ac', '1', '-ar', '24000', '-b:a', '64k', outPath],
     { input: wavBuf, timeout: 15000, killSignal: 'SIGKILL' }
   );
+}
+
+// ── 對話多聲線(2026-09-14 用戶回饋:聽力 A/B 對話同一個聲音分不出來)──
+// 文字長「A：…。B：…」(listening-items 的 script 經 \n→。)→ 逐輪用不同 speaker 合成,再用 ffmpeg 串成一支 mp3,
+// 檔名 hash 不變(仍以整段文字為 key),前端 speakText 完全不用改。
+export const DIALOG_SPEAKERS = { A: parseInt(process.env.VOICEVOX_SPEAKER_A || '2', 10), B: parseInt(process.env.VOICEVOX_SPEAKER_B || '13', 10) }; // A=四国めたん(女) B=青山龍星(男)
+export function splitDialogue(text) {
+  // 只在「開頭或句號後接 A：/B：」才視為對話;回傳 [{who,line}],不是對話回 null
+  if (!/^[AB]：/.test(text) || !/。[AB]：/.test(text)) return null;
+  const parts = text.split(/(?:^|(?<=。))(?=[AB]：)/).filter(Boolean);
+  const turns = parts.map(p => ({ who: p[0], line: p.slice(2).replace(/^。+/, '').replace(/。{2,}$/, '。').trim() })).filter(t => t.line);
+  return turns.length >= 2 ? turns : null;
+}
+export function concatWavsToMp3(wavBufs, outPath) {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'stayjp-dlg-'));
+  try {
+    const files = wavBufs.map((b, i) => { const f = path.join(tmpDir, `${i}.wav`); fs.writeFileSync(f, b); return f; });
+    const args = ['-loglevel', 'error', '-y'];
+    files.forEach(f => args.push('-i', f));
+    const filter = files.map((_, i) => `[${i}:a]`).join('') + `concat=n=${files.length}:v=0:a=1[out]`;
+    args.push('-filter_complex', filter, '-map', '[out]', '-ac', '1', '-ar', '24000', '-b:a', '64k', outPath);
+    execFileSync('ffmpeg', args, { timeout: 30000, killSignal: 'SIGKILL' });
+  } finally { fs.rmSync(tmpDir, { recursive: true, force: true }); }
 }
