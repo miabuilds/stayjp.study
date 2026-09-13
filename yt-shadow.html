@@ -432,6 +432,28 @@ const YTS = (() => {
     if(i+1<lines.length) d=Math.min(d, Math.max(400, lines[i+1].t-l.t));
     return d;
   }
+  // 句段實際播放範圍(秒):字幕 cue 常比人聲晚一點開始、早一點結束 → 前面多留 0.15s、尾巴多 0.3s(但不吃進下一句超過 0.25s)。
+  // 用戶回饋「題目沒到正確音軌、聽不清楚」多半是頭尾被切掉。
+  function segRange(i){
+    const l=lines[i]; const s=Math.max(0, l.t/1000-0.15);
+    let e=(l.t+effD(i))/1000+0.3;
+    if(i+1<lines.length) e=Math.min(e, lines[i+1].t/1000+0.25);
+    return { s, e };
+  }
+  // 邊界監看:seekTo 之後 getCurrentTime 會先回「舊位置」幾百毫秒;舊位置若已在新句結尾之後(往回跳)或之前太多(往前跳),
+  // 舊寫法會立刻 pause → 播不出來/播一下就停(用戶回饋「卡卡的」)。這裡先等 seek 真的落在句段附近才開始判斷。
+  function clearWatch(){ clearInterval(watchT); watchT=0; }
+  function watchSeg(s, e, onEnd){
+    clearWatch();
+    let landed=false, tries=0;
+    watchT=setInterval(()=>{
+      try{
+        const c=player.getCurrentTime();
+        if(!landed){ if(c>=s-0.6 && c<e+0.5) landed=true; else if(++tries>40) landed=true; else return; }   // 最多等 4 秒
+        if(c>=e-0.05 || c<s-1.5) onEnd(c);
+      }catch(e2){}
+    },100);
+  }
 
   // ── 載入影片 ──
   function ensureApi(){
@@ -451,11 +473,12 @@ const YTS = (() => {
     await ensureApi();
     if(player){ try{player.destroy();}catch(e){} player=null; }
     document.getElementById('playerWrap').style.display='block';
-    player=new YT.Player('playerBox',{ videoId:v, playerVars:{ playsinline:1, rel:0, controls:1, vq:'hd1080' }, events:{
+    player=new YT.Player('playerBox',{ videoId:v, playerVars:{ playsinline:1, rel:0, controls:1 }, events:{
       onStateChange: (e)=>{
         // 使用者直接按影片的播放鍵時,我們的邊界監看沒被啟動 → 聽寫/跟讀/測驗會一路播下去。
         // 這裡在「開始播放」時重新掛上當前句的結束點。(跟播模式本來就是連續播,不攔)
         if(e && e.data===1 && (mode==='dict'||mode==='shadow'||mode==='quiz') && lines[cur]) armSegEnd();
+        if(e && e.data===2 && mode!=='ktv') clearWatch();   // 使用者自己按暫停 → 監看收掉,免得下次 PLAYING 掛不上
       },
       onError: (e)=>{   // 101/150=版權方禁止站外嵌入、100=影片不存在
         const code=e&&e.data;
@@ -659,8 +682,8 @@ const YTS = (() => {
   let ktvRaf=0;
   function ktvWatch(){
     if(!player) return;
-    clearInterval(watchT);   // 關掉逐句暫停監看
-    clearInterval(ktvT); cancelAnimationFrame(ktvRaf);
+    clearWatch();   // 關掉逐句暫停監看
+    clearInterval(ktvT); clearInterval(ktvRaf);
     ktvT=1;
     const tick=()=>{
       if(!ktvT) return;
@@ -675,44 +698,33 @@ const YTS = (() => {
         const p=Math.max(0,Math.min(100,(ms-l.t)/effD(cur)*100));
         const sp=document.getElementById('ktSpan'); if(sp) sp.style.setProperty('--p',p.toFixed(1)+'%');
       }catch(e){}
-      ktvRaf=requestAnimationFrame(tick);
     };
-    ktvRaf=requestAnimationFrame(tick);
+    ktvRaf=setInterval(tick,120);   // 原本 requestAnimationFrame 每幀 postMessage 問時間,低階手機會頓
   }
-  function stopKtv(){ ktvT=0; cancelAnimationFrame(ktvRaf); ktvRaf=0; }
+  function stopKtv(){ ktvT=0; clearInterval(ktvRaf); ktvRaf=0; }
 
   // 播到當前句結尾就停(不論播放是誰觸發的)
   function armSegEnd(){
     if(!player||!lines[cur]) return;
-    clearInterval(watchT);
-    const end=(lines[cur].t+effD(cur))/1000;
-    watchT=setInterval(()=>{
-      try{
-        const c=player.getCurrentTime();
-        if(c>=end-0.05 || c<lines[cur].t/1000-1){ player.pauseVideo(); clearInterval(watchT); }
-      }catch(e){}
-    },100);
+    if(watchT) return;   // playSeg/qzPlay/jumpPlay 已掛自己的監看(含循環邏輯),別蓋掉
+    const r=segRange(cur);
+    watchSeg(r.s, r.e, ()=>{ player.pauseVideo(); clearWatch(); });
   }
 
   // ── 播放控制 ──
   function playSeg(){
     if(!player||!lines[cur]) return;
-    const l=lines[cur];
-    clearInterval(watchT);
+    const r=segRange(cur);
+    clearWatch();
     try{
       player.setPlaybackRate(SPEEDS[spdIdx]);
-      player.seekTo(l.t/1000,true); player.playVideo();
+      player.seekTo(r.s,true); player.playVideo();
     }catch(e){ return; }
-    const end=(l.t+effD(cur))/1000;
-    watchT=setInterval(()=>{
-      try{
-        const c=player.getCurrentTime();
-        if(c>=end-0.05){
-          if(loopOn){ player.seekTo(l.t/1000,true); }
-          else { player.pauseVideo(); clearInterval(watchT); }
-        }
-      }catch(e){}
-    },100);
+    const arm=()=>watchSeg(r.s, r.e, ()=>{
+      if(loopOn){ player.seekTo(r.s,true); arm(); }   // 重掛:讓 seek 落地守門重新生效
+      else { player.pauseVideo(); clearWatch(); }
+    });
+    arm();
   }
   function replay(){ if(mode==='ktv'){ try{ player.seekTo(lines[cur].t/1000,true); player.playVideo(); }catch(e){} return; } playSeg(); }
   function cycleSpeed(){
@@ -774,7 +786,7 @@ const YTS = (() => {
       const jp=document.getElementById('pcJp'); if(jp&&lines[cur]) jp.innerHTML=fr(lines[cur].ja);
     }
     try{ player&&player.pauseVideo(); }catch(e){}
-    clearInterval(watchT);
+    clearWatch();
     if(NATIVE_STT){
       _nBase=_acc;   // 這輪之前累積的先當基底
       window.stayjpSpeechResult=(t,fin)=>{
@@ -1034,11 +1046,10 @@ const YTS = (() => {
   }
   function qzPlay(){
     const q=qz.list[qz.i]; if(!q||!player) return;
-    const l=lines[q.idx];
-    clearInterval(watchT); stopKtv();
-    try{ player.seekTo(l.t/1000,true); player.playVideo(); }catch(e){}
-    const end=(l.t+effD(q.idx))/1000;
-    watchT=setInterval(()=>{ try{ if(player.getCurrentTime()>=end-0.05){ player.pauseVideo(); clearInterval(watchT); } }catch(e){} },100);
+    const r=segRange(q.idx);
+    clearWatch(); stopKtv();
+    try{ player.seekTo(r.s,true); player.playVideo(); }catch(e){}
+    watchSeg(r.s, r.e, ()=>{ player.pauseVideo(); clearWatch(); });
   }
   function qzAnswer(btn,k){
     if(qz.picked!==null) return;
@@ -1091,10 +1102,10 @@ const YTS = (() => {
   }
   function jumpPlay(i){
     const l=lines[i]; if(!l||!player) return;
-    clearInterval(watchT);
-    try{ player.seekTo(l.t/1000,true); player.playVideo(); }catch(e){}
-    const end=(l.t+effD(i))/1000;
-    watchT=setInterval(()=>{ try{ if(player.getCurrentTime()>=end-0.05){ player.pauseVideo(); clearInterval(watchT); } }catch(e){} },100);
+    const r=segRange(i);
+    clearWatch();
+    try{ player.seekTo(r.s,true); player.playVideo(); }catch(e){}
+    watchSeg(r.s, r.e, ()=>{ player.pauseVideo(); clearWatch(); });
   }
 
   // ── 句子總覽(跳句) ──
@@ -1191,7 +1202,7 @@ const YTS = (() => {
   }
   function openTranscript(){ try{ window.open('https://www.youtube.com/watch?v='+vid,'_blank'); }catch(e){} }
   function swap(){
-    stopRec(); clearInterval(watchT); stopKtv();
+    stopRec(); clearWatch(); stopKtv();
     try{ player&&player.pauseVideo(); }catch(e){}
     document.getElementById('practice').style.display='none';
     document.getElementById('inputCard').style.display='block';
@@ -1231,7 +1242,7 @@ const YTS = (() => {
       if(q && /^[A-Za-z0-9_-]{11}$/.test(q)){ document.getElementById('urlIn').value=q; setTimeout(load,80); }
     }catch(e){}
     // 點字查詢時把影片暫停:查詢彈窗的發音才不會跟影片疊音
-    document.addEventListener('click',e=>{ if(e.target&&e.target.closest&&e.target.closest('.jlk')){ try{ player&&player.pauseVideo(); }catch(e2){} clearInterval(watchT); } },true);
+    document.addEventListener('click',e=>{ if(e.target&&e.target.closest&&e.target.closest('.jlk')){ try{ player&&player.pauseVideo(); }catch(e2){} clearWatch(); } },true);
     const ta=document.getElementById('pasteTa');
     if(ta) ta.addEventListener('paste',()=>{ setTimeout(()=>{ if((ta.value||'').trim()) parsePaste(); },80); });   // 貼上即解析
     try{ if(!localStorage.getItem('yts_tut_seen')) tut(true); }catch(e){}
