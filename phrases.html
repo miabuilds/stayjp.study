@@ -319,6 +319,95 @@ const SCENES = [
     { w:'🙋', side:'me', jp:'エンジニアをしています。', rm:'Enjinia o shite imasu.', zh:'我是工程師。', en:'I work as an engineer.' },
     { w:'🙋', side:'me', jp:'また今度、ぜひ。', rm:'Mata kondo, zehi.', zh:'下次再一起吧。', en:"Let's do it again sometime." },
   ], tipZh:'附和用「〜ですね」最自然;天氣是日本人最常見的破冰話題。', tipEn:'Agree with "~desu ne"; weather is the classic Japanese ice-breaker.' },
+  // ── 2026-09 新增:在日生活剛需場景 ──────────────
+  { cat:'life', ic:'🏠', bg:'var(--green)', zh:'租屋看房', en:'Apartment viewing', lines:[
+    { w:'🧑‍💼', side:'you', jp:'ご予算はどのくらいですか。', rm:'Go-yosan wa dono kurai desu ka.', zh:'您的預算大概多少？', en:'What is your budget?' },
+    { w:'🙋', side:'me', jp:'家賃は八万円くらいまでです。', rm:'Yachin wa hachiman-en kurai made desu.', zh:'房租大概到八萬日圓。', en:'Up to about 80,000 yen.' },
+    { w:'🙋', side:'me', jp:'この部屋、内見できますか。', rm:'Kono heya, naiken dekimasu ka.', zh:'這間房可以看房嗎？', en:'Can I view this apartment?' },
+    { w:'🧑‍💼', side:'you', jp:'敷金と礼金がそれぞれ一か月分かかります。', rm:'Shikikin to reikin ga sorezore ikkagetsu-bun kakarimasu.', zh:'押金和禮金各要一個月房租。', en:'Deposit and key money are one month each.' },
+    { w:'🙋', side:'me', jp:'保証人がいないのですが、大丈夫ですか。', rm:'Hoshōnin ga inai no desu ga, daijōbu desu ka.', zh:'我沒有保證人，這樣可以嗎？', en:'I do not have a guarantor — is that all right?' },
+  ], tipZh:'沒有保證人可以問「保証会社(ほしょうがいしゃ)」——付約半個月房租代替保證人，外國人常用。', tipEn:'No guarantor? Ask about a guarantor company — about half a month’s rent, commonly used by foreign residents.' },
+
+  { cat:'life', ic:'🏦', bg:'var(--blue)', zh:'銀行開戶', en:'Opening a bank account', lines:[
+    { w:'🙋', side:'me', jp:'口座を作りたいのですが。', rm:'Kōza o tsukuritai no desu ga.', zh:'我想開戶。', en:'I would like to open an account.' },
+    { w:'🧑‍💼', side:'you', jp:'在留カードと印鑑はお持ちですか。', rm:'Zairyū kādo to inkan wa o-mochi desu ka.', zh:'請問有帶在留卡和印章嗎？', en:'Do you have your residence card and personal seal?' },
+    { w:'🙋', side:'me', jp:'はい、持っています。', rm:'Hai, motte imasu.', zh:'有，我有帶。', en:'Yes, I have them.' },
+    { w:'🧑‍💼', side:'you', jp:'こちらの用紙にご記入ください。', rm:'Kochira no yōshi ni go-kinyū kudasai.', zh:'請填寫這份表格。', en:'Please fill in this form.' },
+    { w:'🙋', side:'me', jp:'キャッシュカードはいつ届きますか。', rm:'Kyasshu kādo wa itsu todokimasu ka.', zh:'提款卡什麼時候會寄到？', en:'When will the cash card arrive?' },
+  ], tipZh:'銀行幾乎都要「印鑑(いんかん)」，開戶前先去刻一個。提款卡通常一到兩週寄到家。', tipEn:'Most banks still require a personal seal (inkan). The cash card usually arrives by mail in one to two weeks.' },
+
+  { cat:'life', ic:'🗑️', bg:'var(--green)', zh:'垃圾分類', en:'Sorting the trash', lines:[
+    { w:'🙋', side:'me', jp:'すみません、ゴミの出し方を教えてください。', rm:'Sumimasen, gomi no dashikata o oshiete kudasai.', zh:'不好意思，請教我垃圾怎麼丟。', en:'Excuse me, could you tell me how to sort the trash?' },
+    { w:'🧑‍💼', side:'you', jp:'燃えるゴミは月曜と木曜です。', rm:'Moeru gomi wa getsuyō to mokuyō desu.', zh:'可燃垃圾是星期一和星期四。', en:'Burnable trash goes out Monday and Thursday.' },
+    { w:'🙋', side:'me', jp:'ペットボトルはどうすればいいですか。', rm:'Petto botoru wa dō sureba ii desu ka.', zh:'寶特瓶要怎麼處理？', en:'What should I do with plastic bottles?' },
+    { w:'🧑‍💼', side:'you', jp:'ラベルとキャップを外して、資源ゴミに出してください。', rm:'Raberu to kyappu o hazushite, shigen gomi ni dashite kudasai.', zh:'請把標籤和瓶蓋拆掉，丟資源回收。', en:'Remove the label and cap, then put it out as recyclables.' },
+    { w:'🙋', side:'me', jp:'朝は何時までに出せばいいですか。', rm:'Asa wa nan-ji made ni daseba ii desu ka.', zh:'早上要幾點前拿出去？', en:'By what time in the morning should I put it out?' },
+  ], tipZh:'多數地區規定當天早上八點前丟；分類規則各區不同，市役所會給一張分類表。', tipEn:'Most areas require trash out before 8 a.m. Rules differ by ward — the city office provides a sorting chart.' },
+
+  { cat:'help', ic:'🦷', bg:'var(--pink)', zh:'看牙醫', en:'At the dentist', lines:[
+    { w:'🙋', side:'me', jp:'歯が痛いので、予約したいのですが。', rm:'Ha ga itai node, yoyaku shitai no desu ga.', zh:'我牙痛，想預約。', en:'My tooth hurts — I would like to make an appointment.' },
+    { w:'🧑‍💼', side:'you', jp:'いつごろから痛みますか。', rm:'Itsu goro kara itamimasu ka.', zh:'大概從什麼時候開始痛的？', en:'Since when has it been hurting?' },
+    { w:'🙋', side:'me', jp:'三日前からです。冷たい物がしみます。', rm:'Mikka mae kara desu. Tsumetai mono ga shimimasu.', zh:'從三天前開始。碰到冷的會敏感。', en:'Three days ago. Cold things make it sting.' },
+    { w:'🧑‍💼', side:'you', jp:'今日はレントゲンを撮りますね。', rm:'Kyō wa rentogen o torimasu ne.', zh:'今天先照個 X 光喔。', en:'We will take an X-ray today.' },
+    { w:'🙋', side:'me', jp:'何回くらい通うことになりますか。', rm:'Nankai kurai kayou koto ni narimasu ka.', zh:'大概需要回診幾次？', en:'About how many visits will I need?' },
+  ], tipZh:'「しみる」是牙齒遇冷熱的酸軟感，看牙醫最常用；痛則用「痛(いた)い」。', tipEn:'"Shimiru" describes that sharp twinge from hot or cold — the go-to word at the dentist.' },
+
+  { cat:'help', ic:'🚨', bg:'var(--ac)', zh:'東西掉了', en:'Lost something', lines:[
+    { w:'🙋', side:'me', jp:'電車に財布を忘れてしまいました。', rm:'Densha ni saifu o wasurete shimaimashita.', zh:'我把錢包忘在電車上了。', en:'I left my wallet on the train.' },
+    { w:'🧑‍💼', side:'you', jp:'何時ごろの電車ですか。', rm:'Nanji goro no densha desu ka.', zh:'大概幾點的電車？', en:'About what time was the train?' },
+    { w:'🙋', side:'me', jp:'午後三時ごろ、上りの電車です。', rm:'Gogo sanji goro, nobori no densha desu.', zh:'下午三點左右，上行的電車。', en:'Around 3 p.m., on the inbound train.' },
+    { w:'🧑‍💼', side:'you', jp:'こちらの用紙にご記入をお願いします。', rm:'Kochira no yōshi ni go-kinyū o onegai shimasu.', zh:'麻煩填一下這張表。', en:'Please fill in this form.' },
+    { w:'🙋', side:'me', jp:'見つかったら連絡してもらえますか。', rm:'Mitsukattara renraku shite moraemasu ka.', zh:'找到的話可以聯絡我嗎？', en:'Could you contact me if it turns up?' },
+  ], tipZh:'車站的「忘れ物センター(遺失物中心)」通常隔天才彙整，隔天再問一次比較有機會。', tipEn:'Station lost-and-found centers usually collate items the next day, so it is worth asking again then.' },
+
+  { cat:'social', ic:'💼', bg:'var(--purple, var(--ac))', zh:'職場報告', en:'Reporting at work', lines:[
+    { w:'🙋', side:'me', jp:'今、少しお時間よろしいでしょうか。', rm:'Ima, sukoshi o-jikan yoroshii deshō ka.', zh:'現在方便打擾一下嗎？', en:'Do you have a moment?' },
+    { w:'🧑‍💼', side:'you', jp:'はい、どうぞ。', rm:'Hai, dōzo.', zh:'好，請說。', en:'Sure, go ahead.' },
+    { w:'🙋', side:'me', jp:'資料の件ですが、明日までにお送りします。', rm:'Shiryō no ken desu ga, ashita made ni o-okuri shimasu.', zh:'關於資料的事，我明天前寄給您。', en:'About the documents — I will send them by tomorrow.' },
+    { w:'🧑‍💼', side:'you', jp:'助かります。よろしくお願いします。', rm:'Tasukarimasu. Yoroshiku onegai shimasu.', zh:'幫大忙了，麻煩你了。', en:'That helps — thank you.' },
+    { w:'🙋', side:'me', jp:'不明な点があれば、いつでもご連絡ください。', rm:'Fumei na ten ga areba, itsudemo go-renraku kudasai.', zh:'有不清楚的地方隨時聯絡我。', en:'Please contact me any time if anything is unclear.' },
+  ], tipZh:'找上司講話先問「今、少しお時間よろしいでしょうか」，比直接開口有禮貌很多。', tipEn:'Open with "Do you have a moment?" before launching into a topic — far more polite than diving straight in.' },
+
+  { cat:'social', ic:'🙇', bg:'var(--ac)', zh:'請假・遲到', en:'Calling in late or sick', lines:[
+    { w:'🙋', side:'me', jp:'おはようございます。田中です。', rm:'Ohayō gozaimasu. Tanaka desu.', zh:'早安，我是田中。', en:'Good morning, this is Tanaka.' },
+    { w:'🙋', side:'me', jp:'電車が遅れていて、十分ほど遅刻しそうです。', rm:'Densha ga okurete ite, juppun hodo chikoku shisō desu.', zh:'電車誤點，我可能會遲到十分鐘左右。', en:'The train is delayed — I will be about ten minutes late.' },
+    { w:'🧑‍💼', side:'you', jp:'了解しました。気をつけて来てください。', rm:'Ryōkai shimashita. Ki o tsukete kite kudasai.', zh:'了解，路上小心。', en:'Understood — take care on your way.' },
+    { w:'🙋', side:'me', jp:'熱があるので、今日はお休みをいただけますか。', rm:'Netsu ga aru node, kyō wa o-yasumi o itadakemasu ka.', zh:'我發燒了，今天可以請假嗎？', en:'I have a fever — may I take today off?' },
+    { w:'🧑‍💼', side:'you', jp:'お大事に。ゆっくり休んでください。', rm:'O-daiji ni. Yukkuri yasunde kudasai.', zh:'保重，好好休息。', en:'Get well soon — rest up.' },
+  ], tipZh:'遲到先報「電車遅延」再說預估時間；日本公司通常接受電車誤點證明(遅延証明書)。', tipEn:'Report the train delay first, then your ETA. Japanese companies accept a delay certificate from the station.' },
+
+  { cat:'shop', ic:'💇', bg:'var(--pink)', zh:'剪頭髮', en:'At the hair salon', lines:[
+    { w:'🧑‍💼', side:'you', jp:'今日はどうなさいますか。', rm:'Kyō wa dō nasaimasu ka.', zh:'今天想怎麼剪呢？', en:'What would you like today?' },
+    { w:'🙋', side:'me', jp:'全体的に少し短くしてください。', rm:'Zentai-teki ni sukoshi mijikaku shite kudasai.', zh:'整體麻煩剪短一點。', en:'A little shorter overall, please.' },
+    { w:'🙋', side:'me', jp:'前髪は眉毛が見えるくらいでお願いします。', rm:'Maegami wa mayuge ga mieru kurai de onegai shimasu.', zh:'瀏海麻煩剪到看得到眉毛。', en:'Bangs just above the eyebrows, please.' },
+    { w:'🧑‍💼', side:'you', jp:'シャンプーもなさいますか。', rm:'Shanpū mo nasaimasu ka.', zh:'要洗頭嗎？', en:'Would you like a shampoo as well?' },
+    { w:'🙋', side:'me', jp:'はい、お願いします。', rm:'Hai, onegai shimasu.', zh:'好，麻煩你。', en:'Yes, please.' },
+  ], tipZh:'講不清楚就帶照片說「こんな感じで」，比形容詞管用；「すいてください」是打薄。', tipEn:'Bring a photo and say "like this" — far easier than describing. "Suite kudasai" means thin it out.' },
+
+  { cat:'shop', ic:'📦', bg:'var(--yellow)', zh:'宅配收件', en:'Receiving a delivery', lines:[
+    { w:'🧑‍💼', side:'you', jp:'お荷物のお届けに参りました。', rm:'O-nimotsu no o-todoke ni mairimashita.', zh:'我來送包裹。', en:'I am here to deliver your package.' },
+    { w:'🙋', side:'me', jp:'ここにサインすればいいですか。', rm:'Koko ni sain sureba ii desu ka.', zh:'簽在這裡就好嗎？', en:'Should I sign here?' },
+    { w:'🙋', side:'me', jp:'不在だったので、再配達をお願いしたいです。', rm:'Fuzai datta node, saihaitatsu o onegai shitai desu.', zh:'我剛好不在，想申請重新配送。', en:'I was out — could I request redelivery?' },
+    { w:'🧑‍💼', side:'you', jp:'ご希望の時間帯はございますか。', rm:'Go-kibō no jikantai wa gozaimasu ka.', zh:'有希望的時段嗎？', en:'Is there a time slot you prefer?' },
+    { w:'🙋', side:'me', jp:'夜の七時から九時でお願いします。', rm:'Yoru no shichiji kara kuji de onegai shimasu.', zh:'麻煩晚上七點到九點。', en:'Between 7 and 9 p.m., please.' },
+  ], tipZh:'不在票(不在票)上有 QR 碼，用手機掃就能重約，比打電話快。', tipEn:'The missed-delivery slip has a QR code — rescheduling online is faster than calling.' },
+
+  { cat:'trans', ic:'🎫', bg:'var(--blue)', zh:'買新幹線車票', en:'Buying a Shinkansen ticket', lines:[
+    { w:'🙋', side:'me', jp:'来週の金曜、東京から大阪までお願いします。', rm:'Raishū no kinyō, Tōkyō kara Ōsaka made onegai shimasu.', zh:'下週五，東京到大阪，麻煩了。', en:'Next Friday, Tokyo to Osaka, please.' },
+    { w:'🧑‍💼', side:'you', jp:'指定席と自由席、どちらになさいますか。', rm:'Shiteiseki to jiyūseki, dochira ni nasaimasu ka.', zh:'要對號座還是自由座？', en:'Reserved or non-reserved seat?' },
+    { w:'🙋', side:'me', jp:'指定席で、窓側をお願いします。', rm:'Shiteiseki de, madogawa o onegai shimasu.', zh:'對號座，麻煩靠窗。', en:'Reserved, window seat please.' },
+    { w:'🧑‍💼', side:'you', jp:'片道でよろしいですか。', rm:'Katamichi de yoroshii desu ka.', zh:'單程可以嗎？', en:'One way is fine?' },
+    { w:'🙋', side:'me', jp:'往復でお願いします。', rm:'Ōfuku de onegai shimasu.', zh:'麻煩來回票。', en:'Round trip, please.' },
+  ], tipZh:'綠色窗口叫「みどりの窓口」；改期在發車前免手續費一次，記得先問。', tipEn:'The ticket office is the "Midori no Madoguchi"; one free change before departure is usually allowed.' },
+
+  { cat:'life', ic:'🎒', bg:'var(--green)', zh:'學校聯絡', en:'Talking to the school', lines:[
+    { w:'🙋', side:'me', jp:'子どもが熱を出したので、今日は休ませます。', rm:'Kodomo ga netsu o dashita node, kyō wa yasumasemasu.', zh:'孩子發燒了，今天請假。', en:'My child has a fever, so they will stay home today.' },
+    { w:'🧑‍💼', side:'you', jp:'お大事に。連絡帳に書いておいてください。', rm:'O-daiji ni. Renrakuchō ni kaite oite kudasai.', zh:'請保重。麻煩寫在聯絡簿上。', en:'Take care — please note it in the contact book.' },
+    { w:'🙋', side:'me', jp:'明日の持ち物を教えていただけますか。', rm:'Ashita no mochimono o oshiete itadakemasu ka.', zh:'可以告訴我明天要帶什麼嗎？', en:'Could you tell me what to bring tomorrow?' },
+    { w:'🧑‍💼', side:'you', jp:'体操着と水筒をお願いします。', rm:'Taisōgi to suitō o onegai shimasu.', zh:'麻煩帶體育服和水壺。', en:'Gym clothes and a water bottle, please.' },
+    { w:'🙋', side:'me', jp:'日本語がまだ苦手なので、ゆっくりお願いします。', rm:'Nihongo ga mada nigate na node, yukkuri onegai shimasu.', zh:'我日文還不太好，麻煩講慢一點。', en:'My Japanese is still weak — could you speak slowly?' },
+  ], tipZh:'學校聯絡多靠「連絡帳(れんらくちょう)」，請假、疑問寫上去老師會回。', tipEn:'Japanese schools rely on the renrakuchō (contact book) — write absences or questions and the teacher replies.' },
+
 ];
 
 const esc = s => String(s||'').replace(/[<>&"]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));

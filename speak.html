@@ -56,6 +56,30 @@
   @keyframes recPulse{0%{box-shadow:0 0 0 0 rgba(251,146,60,.45)}70%{box-shadow:0 0 0 14px rgba(251,146,60,0)}100%{box-shadow:0 0 0 0 rgba(251,146,60,0)}}
   /* 句子序號:等寬小圓點 */
   .chip.num{width:30px;height:30px;display:inline-flex;align-items:center;justify-content:center;padding:0;border-radius:50%;font-size:11.5px}
+  /* 句子進度條 + 清單(取代 40+ 顆數字鈕) */
+  .sent-bar{margin-bottom:10px}
+  .sb-track{position:relative;height:6px;border-radius:99px;background:var(--soft);overflow:hidden}
+  .sb-track i{position:absolute;left:0;top:0;height:100%;background:var(--accent);opacity:.35;border-radius:99px}
+  .sb-track b{position:absolute;left:0;top:0;height:100%;background:var(--accent);border-radius:99px}
+  .sb-meta{display:flex;align-items:center;gap:10px;margin-top:6px;font-size:12px;color:var(--ink2);flex-wrap:wrap}
+  .sb-done{color:var(--ink2)}
+  .sb-toggle{margin-left:auto;border:none;background:none;color:var(--accent);font:inherit;font-size:12px;font-weight:700;cursor:pointer;padding:2px 0}
+  .sent-list{width:100%;max-height:260px;overflow-y:auto;margin:8px 0 12px;border:1px solid var(--line);border-radius:12px;padding:3px;box-sizing:border-box}
+  .sent-list.hide{display:none}
+  .sl-row{display:flex;align-items:center;gap:9px;width:100%;text-align:left;border:none;background:none;font:inherit;font-size:13.5px;color:var(--ink);padding:8px 9px;border-radius:9px;cursor:pointer}
+  .sl-row:nth-child(odd){background:var(--soft)}
+  .sl-row.on{outline:2px solid var(--accent);outline-offset:-2px}
+  .sl-n{flex-shrink:0;width:22px;font-size:11px;color:var(--ink3,#a39d92);font-variant-numeric:tabular-nums}
+  .sl-jp{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .sl-sc{flex-shrink:0;font-size:11px;font-weight:800;border-radius:6px;padding:1px 6px;background:var(--soft);color:var(--ink2)}
+  .sl-sc.s3{background:rgba(46,125,87,.14);color:#2E7D57}
+  .sl-sc.s2{background:rgba(245,184,65,.18);color:#a3781f}
+  .sl-sc.s1{background:rgba(198,85,59,.13);color:var(--accent)}
+  /* 句卡動作列:主鈕 + 圖示鈕 */
+  .sent-acts{display:flex;gap:8px;align-items:center;flex-wrap:nowrap}
+  .sent-acts .btn.ico{flex:0 0 auto;width:42px;padding:9px 0;text-align:center;font-size:17px;line-height:1}
+  .sent-acts .btn.wide{flex:1;min-width:0}
+  .sent-acts .btn.fav-on{color:var(--accent);border-color:var(--accent)}
   .chip.num.s3{background:var(--ok);border-color:var(--ok);color:#fff}
   .chip.num.s2{background:var(--warn);border-color:var(--warn);color:#fff}
   .chip.num.s1{border-color:var(--bad);color:var(--bad)}
@@ -186,13 +210,12 @@
     <div class="kana" id="kana"></div>
     <div class="zh" id="zh"></div>
     </div>
-    <div class="rowbtns">
-      <button class="btn" onclick="speak()"><i data-ic=volume></i> 聽範例</button>
-      <button class="btn" id="favBtn" onclick="favToggle()" title="收藏這一句,之後到「我的收藏」複習">☆ <span id="favTx">收藏</span></button>
-      <button class="btn" onclick="prev()">← 上一句</button>
-      <button class="btn" onclick="next()">下一句 →</button>
-      <button class="btn" onclick="FavSents.open()"><i data-ic=folder></i> 我的收藏</button>
-
+    <div class="rowbtns sent-acts">
+      <button class="btn ico" onclick="prev()" aria-label="上一句" title="上一句">‹</button>
+      <button class="btn pri wide" onclick="speak()"><i data-ic=volume></i> 聽範例</button>
+      <button class="btn ico" onclick="next()" aria-label="下一句" title="下一句">›</button>
+      <button class="btn ico" id="favBtn" onclick="favToggle()" title="收藏這一句"><span id="favTx">☆</span></button>
+      <button class="btn ico" onclick="FavSents.open()" title="我的收藏"><i data-ic=folder></i></button>
     </div>
   </div>
 
@@ -438,6 +461,71 @@ const SENTS = [
   S('あの映画は期待を裏切らない出来栄えでした。','あのえいがはきたいをうらぎらないできばえでした。','那部電影的完成度不負期待。','N1','feel'),
   S('先方の意向を踏まえた上で、改めてご提案いたします。','せんぽうのいこうをふまえたうえで、あらためてごていあんいたします。','將參酌對方意向後,再次向您提案。','N1','work'),
   S('ささいなことでも、お気軽にご相談ください。','ささいなことでも、おきがるにごそうだんください。','再小的事也請隨時找我商量。','N1','social'),
+  // ══ N5 追加 ══
+  S('郵便局はどこですか。','ゆうびんきょくはどこですか。','郵局在哪裡?','N5','travel'),
+  S('これ、台湾まで送りたいです。','これ、たいわんまでおくりたいです。','這個我想寄到台灣。','N5','travel'),
+  S('カードを作りたいんですが。','カードをつくりたいんですが。','我想辦卡。','N5','daily'),
+  S('名前はここに書きますか。','なまえはここにかきますか。','名字寫在這裡嗎?','N5','daily'),
+  S('お湯をください。','おゆをください。','請給我熱水。','N5','travel'),
+  S('この薬は一日何回ですか。','このくすりはいちにちなんかいですか。','這個藥一天幾次?','N5','daily'),
+  S('ゆっくり話してもらえますか。','ゆっくりはなしてもらえますか。','可以講慢一點嗎?','N5','social'),
+  S('もう一度お願いします。','もういちどおねがいします。','麻煩再說一次。','N5','social'),
+  S('今日はありがとうございました。','きょうはありがとうございました。','今天謝謝你。','N5','social'),
+  S('あしたは休みです。','あしたはやすみです。','明天休假。','N5','daily'),
+  S('これ、いくらですか。','これ、いくらですか。','這個多少錢?','N5','travel'),
+  S('ちょっと寒いですね。','ちょっとさむいですね。','有點冷呢。','N5','feel'),
+  // ══ N4 追加 ══
+  S('転入届を出したいんですが。','てんにゅうとどけをだしたいんですが。','我想辦遷入登記。','N4','daily'),
+  S('この書類の書き方がわかりません。','このしょるいのかきかたがわかりません。','我不知道這份文件怎麼填。','N4','daily'),
+  S('いつまでに出せばいいですか。','いつまでにだせばいいですか。','要在什麼時候之前交?','N4','daily'),
+  S('ここに印鑑が必要ですか。','ここにいんかんがひつようですか。','這裡需要印章嗎?','N4','daily'),
+  S('お湯が出ないんですが、見てもらえますか。','おゆがでないんですが、みてもらえますか。','熱水出不來,可以幫我看一下嗎?','N4','daily'),
+  S('ゴミはいつ出せばいいですか。','ゴミはいつだせばいいですか。','垃圾什麼時候可以丟?','N4','daily'),
+  S('すみません、電波が悪いみたいです。','すみません、でんぱがわるいみたいです。','不好意思,收訊好像不好。','N4','work'),
+  S('もう少し考えさせてください。','もうすこしかんがえさせてください。','請讓我再想一下。','N4','work'),
+  S('お昼、一緒に行きませんか。','おひる、いっしょにいきませんか。','中午要不要一起去?','N4','social'),
+  S('手伝ってくれてありがとう。','てつだってくれてありがとう。','謝謝你幫我。','N4','social'),
+  S('ちょっと緊張しています。','ちょっときんちょうしています。','我有點緊張。','N4','feel'),
+  S('日本の生活にだいぶ慣れました。','にほんのせいかつにだいぶなれました。','我已經蠻習慣日本的生活了。','N4','feel'),
+  // ══ N3 追加 ══
+  S('この物件、内見できますか。','このぶっけん、ないけんできますか。','這個房子可以看房嗎?','N3','daily'),
+  S('家賃のほかに、何がかかりますか。','やちんのほかに、なにがかかりますか。','除了房租之外還要花什麼?','N3','daily'),
+  S('保証人がいないんですが、大丈夫でしょうか。','ほしょうにんがいないんですが、だいじょうぶでしょうか。','我沒有保證人,這樣可以嗎?','N3','daily'),
+  S('来月から入居したいと思っています。','らいげつからにゅうきょしたいとおもっています。','我想從下個月開始入住。','N3','daily'),
+  S('症状はいつからですか、と聞かれました。','しょうじょうはいつからですか、ときかれました。','被問到症狀是從什麼時候開始的。','N3','daily'),
+  S('アレルギーはとくにありません。','アレルギーはとくにありません。','我沒有特別的過敏。','N3','daily'),
+  S('今日中に確認して、折り返します。','きょうじゅうにかくにんして、おりかえします。','我今天內確認後回覆你。','N3','work'),
+  S('こちらの手違いで、ご迷惑をおかけしました。','こちらのてちがいで、ごめいわくをおかけしました。','是我們這邊的疏失,造成您的困擾。','N3','work'),
+  S('先に失礼してもよろしいでしょうか。','さきにしつれいしてもよろしいでしょうか。','我可以先離開嗎?','N3','work'),
+  S('思ったより時間がかかりそうです。','おもったよりじかんがかかりそうです。','看起來會比想像中花時間。','N3','feel'),
+  S('おかげさまで、無事に終わりました。','おかげさまで、ぶじにおわりました。','託您的福,順利結束了。','N3','social'),
+  S('また機会があれば、ぜひ誘ってください。','またきかいがあれば、ぜひさそってください。','下次有機會的話,請一定要找我。','N3','social'),
+  // ══ N2 追加 ══
+  S('在留カードの更新について伺いたいのですが。','ざいりゅうカードのこうしんについてうかがいたいのですが。','我想請問在留卡更新的事。','N2','daily'),
+  S('必要な書類を教えていただけますか。','ひつようなしょるいをおしえていただけますか。','可以告訴我需要哪些文件嗎?','N2','daily'),
+  S('課税証明書はどこで取れますか。','かぜいしょうめいしょはどこでとれますか。','課稅證明在哪裡可以拿到?','N2','daily'),
+  S('転職したばかりなのですが、問題ありませんか。','てんしょくしたばかりなのですが、もんだいありませんか。','我剛換工作,這樣沒問題嗎?','N2','daily'),
+  S('結果が出るまで、どのくらいかかりますか。','けっかがでるまで、どのくらいかかりますか。','到結果出來大概要多久?','N2','daily'),
+  S('ご提案いただいた件、社内で検討いたします。','ごていあんいただいたけん、しゃないでけんとういたします。','您提案的事,我們會在公司內部討論。','N2','work'),
+  S('認識に相違がないか、確認させてください。','にんしきにそういがないか、かくにんさせてください。','讓我確認一下我們的認知有沒有落差。','N2','work'),
+  S('スケジュールを前倒しできないか検討中です。','スケジュールをまえだおしできないかけんとうちゅうです。','正在研究能不能把時程提前。','N2','work'),
+  S('恐れ入りますが、期限を延ばしていただけないでしょうか。','おそれいりますが、きげんをのばしていただけないでしょうか。','不好意思,期限可以延一下嗎?','N2','work'),
+  S('お互いにとって良い形になればと思います。','おたがいにとってよいかたちになればとおもいます。','希望能變成對彼此都好的形式。','N2','social'),
+  S('言葉の壁は感じますが、少しずつ慣れてきました。','ことばのかべはかんじますが、すこしずつなれてきました。','雖然感受到語言的隔閡,但正一點一點習慣。','N2','feel'),
+  S('この経験は今後にも活かせると思います。','このけいけんはこんごにもいかせるとおもいます。','我想這個經驗今後也能派上用場。','N2','feel'),
+  // ══ N1 追加 ══
+  S('在留資格の要件について、詳細をご教示いただけますでしょうか。','ざいりゅうしかくのようけんについて、しょうさいをごきょうじいただけますでしょうか。','關於在留資格的要件,可以請您指教詳情嗎?','N1','daily'),
+  S('書類に不備がある場合は、ご連絡いただけますと幸いです。','しょるいにふびがあるばあいは、ごれんらくいただけますとさいわいです。','文件如有缺漏,還請與我聯繫。','N1','daily'),
+  S('制度の変更に伴い、手続きも見直される見込みです。','せいどのへんこうにともない、てつづきもみなおされるみこみです。','隨著制度變更,手續預計也會重新檢討。','N1','daily'),
+  S('当該案件につきましては、追ってご報告申し上げます。','とうがいあんけんにつきましては、おってごほうこくもうしあげます。','關於該案件,容後向您報告。','N1','work'),
+  S('ご指摘の点を踏まえ、方針を再検討いたします。','ごしてきのてんをふまえ、ほうしんをさいけんとういたします。','根據您指出的點,我們會重新檢討方針。','N1','work'),
+  S('現状を鑑みるに、早急な対応が求められます。','げんじょうをかんがみるに、そうきゅうなたいおうがもとめられます。','有鑑於現狀,需要儘速因應。','N1','work'),
+  S('いずれにせよ、関係各所との調整が不可欠です。','いずれにせよ、かんけいかくしょとのちょうせいがふかけつです。','無論如何,與各相關單位的協調都不可或缺。','N1','work'),
+  S('私見ではございますが、一言申し添えます。','しけんではございますが、ひとこともうしそえます。','雖然只是我個人淺見,容我補充一句。','N1','work'),
+  S('ご厚意に甘えるようで恐縮です。','ごこういにあまえるようできょうしゅくです。','像是承蒙您的好意,實在不好意思。','N1','social'),
+  S('これまでのご尽力に、深く感謝申し上げます。','これまでのごじんりょくに、ふかくかんしゃもうしあげます。','對您至今的付出,致上深深的謝意。','N1','social'),
+  S('異国で暮らすことの難しさを、身をもって知りました。','いこくでくらすことのむずかしさを、みをもってしりました。','我親身體會到在異國生活的難處。','N1','feel'),
+  S('慣れない環境でも、自分なりに前に進んでいます。','なれないかんきょうでも、じぶんなりにまえにすすんでいます。','即使在不熟悉的環境,我也用自己的方式往前走。','N1','feel'),
 ];
 const LEVELS = ['N5','N4','N3','N2','N1'];
 let activeLv = (function(){ try{ return localStorage.getItem('sp_lv')||'N5'; }catch(e){ return 'N5'; } })();
@@ -494,7 +582,7 @@ function render(){
   document.getElementById('said').value = '';
   _recEditBase = ''; _prevRawSpeech = '';   // 換句:清錄音基底與上次辨識快取
   document.getElementById('fbCard').style.display = 'none';
-  [...document.querySelectorAll('#chips .chip')].forEach((c,i)=>c.classList.toggle('on', i===idx));
+  renderSentList();
   const _cw=document.getElementById('catWm');
   if(_cw){ const c=CATS.find(x=>x.k===cur().cat); _cw.innerHTML=(c&&c.ic)||''; }
   const _sp=document.getElementById('sentPos');
@@ -505,13 +593,43 @@ function spScores(){ try{ return JSON.parse(localStorage.getItem('sp_scores'))||
 function spSaveScore(jp,sc){ try{ const m=spScores(); if(!(m[jp]>=sc)) m[jp]=sc; localStorage.setItem('sp_scores',JSON.stringify(m)); }catch(e){} }
 function _scoreCls(sc){ return sc==null?'':sc>=85?' s3':sc>=60?' s2':' s1'; }
 function _setFavBtn(on){ const fb=document.getElementById('favBtn'),tx=document.getElementById('favTx');
-  if(fb) fb.firstChild.nodeValue=(on?'★':'☆')+' '; if(tx) tx.textContent=on?enOr('已收藏','Saved'):enOr('收藏','Save'); }
+  if(tx) tx.textContent=on?'★':'☆';
+  if(fb){ fb.classList.toggle('fav-on',!!on); fb.title=on?enOr('已收藏','Saved'):enOr('收藏這一句','Save this line'); } }
+// 句子選擇:原本一排 40+ 個數字鈕太雜(用戶回饋)→ 改「進度條 + 可展開的句子清單」
+let _listOpen=false;
 function renderChips(){
-  const sc=spScores();
-  document.getElementById('chips').innerHTML = list().map((s,i)=>`<span class="chip num${_scoreCls(sc[s.jp])}" onclick="go(${i})" title="${sc[s.jp]!=null?enOr('最佳 ','best ')+sc[s.jp]:''}">${i+1}</span>`).join('')
-    + `<span class="sent-pos" id="sentPos"></span>`;
-  [...document.querySelectorAll('#chips .chip')].forEach((c,i)=>c.classList.toggle('on', i===idx));
+  const sc=spScores(), L=list();
+  const done=L.filter(s=>sc[s.jp]!=null).length;
+  const good=L.filter(s=>sc[s.jp]>=85).length;
+  document.getElementById('chips').innerHTML =
+      '<div class="sent-bar">'
+    +   '<div class="sb-track"><i style="width:'+(L.length?done/L.length*100:0)+'%"></i>'
+    +     '<b style="width:'+(L.length?good/L.length*100:0)+'%"></b></div>'
+    +   '<div class="sb-meta"><span id="sentPos"></span>'
+    +     '<span class="sb-done">'+enOr('練過 ','Practiced ')+done+' / '+L.length+(good?' · '+enOr('熟練 ','Mastered ')+good:'')+'</span>'
+    +     '<button class="sb-toggle" onclick="toggleSentList()" id="sentListBtn">'+(_listOpen?enOr('收起 ▴','Hide ▴'):enOr('全部句子 ▾','All lines ▾'))+'</button>'
+    +   '</div>'
+    + '</div><div class="sent-list' + (_listOpen?'':' hide') + '" id="sentList"></div>';
+  renderSentList();
 }
+function renderSentList(){
+  const el=document.getElementById('sentList'); if(!el||!_listOpen) return;
+  const sc=spScores();
+  el.innerHTML=list().map((s,i)=>{
+    const v=sc[s.jp];
+    const badge = v==null ? '' : '<span class="sl-sc'+_scoreCls(v)+'">'+v+'</span>';
+    return '<button class="sl-row'+(i===idx?' on':'')+'" onclick="go('+i+')">'
+      + '<span class="sl-n">'+(i+1)+'</span><span class="sl-jp">'+esc(s.jp)+'</span>'+badge+'</button>';
+  }).join('');
+}
+function toggleSentList(){
+  _listOpen=!_listOpen;
+  const el=document.getElementById('sentList'), b=document.getElementById('sentListBtn');
+  if(el) el.classList.toggle('hide',!_listOpen);
+  if(b) b.textContent=_listOpen?enOr('收起 ▴','Hide ▴'):enOr('全部句子 ▾','All lines ▾');
+  renderSentList();
+}
+function esc(t){ return String(t==null?'':t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 function go(i){ idx=i; stopRec(); render(); }
 function retrySay(){ document.getElementById('said').value=''; _recEditBase=''; _prevRawSpeech='';
   document.getElementById('recBtn').scrollIntoView({block:'center',behavior:'smooth'}); }
