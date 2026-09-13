@@ -113,6 +113,14 @@
   <div class="tl">
     <div class="tl-item">
       <div class="tl-d">2026.09.14</div>
+      <div class="tl-t" data-t="zh">YouTube 跟讀:播放不再卡頓、句子頭尾不再被切</div>
+      <div class="tl-t" data-t="en">YouTube shadowing: smoother playback, lines no longer clipped</div>
+      <div class="tl-x"><span class="tag fix" data-t="zh">修正</span><span class="tag fix" data-t="en">FIX</span>
+        <span data-t="zh">有人回饋「影片卡卡的、題目沒播到正確位置聽不清楚」。查出兩個原因:①跳句之後播放器要幾百毫秒才真的跳過去,舊程式在這段空窗就判定「已經播到結尾」把影片按停,所以往回跳常常沒聲音、往前跳播一下就停,看起來就像卡頓;②字幕時間軸比人聲晚一點開、早一點收,句子頭尾會被切掉。現在會等真的跳到位才開始盯結尾,每句前面多留 0.15 秒、後面多 0.3 秒;同時不再強制 1080p(弱網一直緩衝),跟播模式的進度輪詢也減量。循環播放順便修好(之前會被播放事件打斷)。</span>
+        <span data-t="en">A user reported choppy video and lines that didn’t play from the right spot. Two causes: ① after a jump the player takes a few hundred ms to actually seek, and the old code judged “already at the end” during that gap and paused — so jumping back often played nothing and jumping forward stopped after a moment; ② caption timestamps start a little late and end early, clipping the line. Playback now waits for the seek to land before watching for the end, pads each line by 0.15s before and 0.3s after, no longer forces 1080p, and polls less in follow mode. Loop mode is fixed too.</span></div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-d">2026.09.14</div>
       <div class="tl-t" data-t="zh">刷題進度跨裝置同步;聽力對話男女雙聲＋逐字稿振假名;快速背單字翻面有例句</div>
       <div class="tl-t" data-t="en">JLPT drill progress syncs across devices; two voices in listening dialogues + furigana; flashcards show example sentences</div>
       <div class="tl-x"><span class="tag new" data-t="zh">用戶回饋</span><span class="tag new" data-t="en">FEEDBACK</span>
