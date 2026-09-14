@@ -282,6 +282,7 @@ body{margin:0;background:var(--bg);color:var(--tx);font-family:-apple-system,"Pi
   </div>
 </div>
 
+<script src="daily-log.js"></script>
 <script src="icons.js"></script>
 <script src="i18n.js"></script>
 <script>
@@ -775,6 +776,7 @@ const YTS = (() => {
     if(!pass) document.getElementById('pcNext').style.display='flex';   // 沒過也能往下一句,不卡住
     if(pass){
       done[cur]=1; try{ localStorage.setItem(doneKey(),JSON.stringify(done)); }catch(e){}
+      try{ StayDaily.log('quiz'); }catch(e2){}   // 跟讀過關一句=今日目標一個動作
       document.getElementById('pcNext').style.display='flex';
       updProg(); renderList();
     }
@@ -868,6 +870,7 @@ const YTS = (() => {
     const ta=document.getElementById('dictIn'); const said=(ta&&ta.value||'').trim();
     if(!said) return;
     const l=lines[cur]; l._rev=true;
+    try{ StayDaily.log('quiz'); }catch(e2){}   // 聽寫送出一句=今日目標一個動作
     // 漢字寫法與假名寫法都算對:兩種比對取高分
     const t=normK(l.ja), s=normK(said);
     const dp=Array.from({length:s.length+1},()=>new Array(t.length+1).fill(0));
@@ -1055,6 +1058,7 @@ const YTS = (() => {
     if(qz.picked!==null) return;
     const q=qz.list[qz.i], l=lines[q.idx];
     qz.picked=k;
+    try{ StayDaily.log('quiz'); }catch(e2){}   // 影片測驗答一題=今日目標一個動作
     const okIdx=q.opts.indexOf(q.ans);
     document.querySelectorAll('#quizBox .qz-opt').forEach((b,n)=>{
       b.disabled=true;

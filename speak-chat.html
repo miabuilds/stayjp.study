@@ -207,6 +207,7 @@
 
 </div>
 
+<script src="daily-log.js"></script>
 <script src="icons.js"></script>
 <script src="ui-modal.js"></script>
 <script src="i18n.js"></script>
@@ -630,6 +631,7 @@ async function sendMine(){
   }
   busy=false;   // 交棒給 turn()(它自己上鎖);push 前解鎖,確保 turn 不被自己人擋下
   history.push({ role:'me', text:showTxt, orig:origTxt });
+  try{ StayDaily.log('quiz'); }catch(e2){}   // 情境對話每回一句=今日目標一個動作
   el.value=''; autoGrow();
   _prevRawNative='';   // 訊息已送出:下一段辨識是全新開始,別再剝上一段前綴
   renderHints([]);   // 你已經回了 → 清掉上一輪建議

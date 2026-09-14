@@ -224,6 +224,7 @@
   <footer>日本再留計劃 (StayJP) · <a href="jlpt.html" style="color:var(--tx2)">JLPT 指南</a> · <a href="app.html" style="color:var(--tx2)">學習工具</a></footer>
 </div>
 
+<script src="daily-log.js"></script>
 <script src="icons.js"></script>
 <script src="jlpt-questions.js"></script>
 <script src="jlpt-q-trans.js"></script>
@@ -588,6 +589,7 @@ function answer(el, ok){
   // 每題紀錄:做過幾次 n、對幾次 c、最後日期
   const rec = getRec(); const e = rec[q.id]||{n:0,c:0};
   e.n++; if(ok) e.c++; e.last=today(); rec[q.id]=e; saveRec(rec);
+  try{ StayDaily.log('quiz'); }catch(e2){}   // 刷一題=今日目標一個動作(用戶回饋:做了沒得分)
   const v = document.getElementById('verdict');
   v.textContent = ok? enOr('答對了!','Correct!'):enOr('答錯了','Incorrect');
   v.className = 'verdict '+(ok?'ok':'ng');
@@ -769,7 +771,8 @@ function finishExam(timeout){
     if(ok) score++;
     const t = item.q.t;
     secStat[t] = secStat[t]||{c:0,n:0}; secStat[t].n++; if(ok) secStat[t].c++;
-    if(item.ans===null) continue;   // 沒作答(時間到自動交卷)的題:計入本場分數,但不寫刷題紀錄、不進錯題本——沒看過的題不該灌水統計
+    if(item.ans===null) continue;   // 沒作答(時間到自動交卷)的題:計入本場分數,但不寫刷題紀錄、不進錯題本
+    try{ StayDaily.log('quiz'); }catch(e2){}   // 模擬試験每答一題也算今日目標——沒看過的題不該灌水統計
     const e = rec[item.q.id]||{n:0,c:0}; e.n++; if(ok)e.c++; e.last=today(); rec[item.q.id]=e;
     if(!ok) w[item.q.id]=true; else if(w[item.q.id]) { /* 模擬考答對不移出錯題本,留給錯題本模式清 */ }
   }

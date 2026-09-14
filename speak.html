@@ -232,6 +232,7 @@
   <div class="card" id="fbCard" style="display:none"></div>
 </div>
 
+<script src="daily-log.js"></script>
 <script src="icons.js"></script>
 <script src="ui-modal.js"></script>
 <script src="i18n.js"></script>
@@ -843,6 +844,7 @@ function renderStream(text, done){
     + (!done && d.score!=null?'<div class="muted" style="margin-top:8px">…</div>':'');
   if(done && d.score!=null){
     spSaveScore(cur().jp, sc);
+    try{ StayDaily.log('quiz'); }catch(e2){}   // AI 跟讀評完一句=今日目標一個動作
     renderChips();
     requestAnimationFrame(()=>requestAnimationFrame(()=>{
       const arc=document.getElementById('scoreArc');

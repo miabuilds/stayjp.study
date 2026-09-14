@@ -3530,6 +3530,7 @@ const Shadow = (() => {
   }
   function showSpkResult(heard) {
     const it = queue[idx] || {}; const score = spkScore(it.j || '', heard);
+    try { if (typeof Calendar !== 'undefined' && Calendar.logActivity) Calendar.logActivity('quiz'); } catch (e) {}   // 跟讀評完一句=今日目標一個動作
     const verdict = score >= 85 ? '完美!發音很清楚 ' : score >= 60 ? '不錯!再順一點就更好 ' : '再念一次試試 ';
     const color = score >= 60 ? 'var(--ok,#16A34A)' : 'var(--ac,#e0563f)';
     const res = document.getElementById('spkResult'); if (!res) return;
