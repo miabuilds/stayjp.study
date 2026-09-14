@@ -14,7 +14,7 @@ import { PLANS, PlanKey } from "./utils/constants";
 import {
   writeSubscription, writeTransaction, getSubscription, getRefCode,
   rewardReferrerOnPayment, recordKolCommission, voidKolCommission, grantAiBonus, refBonusDays,
-  patchSubscription, nowMs, plusDays, tryReserveEarlyBird, SubscriptionDoc,
+  patchSubscription, nowMs, plusDays, tryReserveEarlyBird, SubscriptionDoc, getLatestSuccessChargeTwd,
 } from "./utils/firestore";
 
 if (admin.apps.length === 0) admin.initializeApp();
@@ -116,6 +116,11 @@ export const revenuecatWebhook = functions.onRequest(
       const paidTwd = rcMoney.currency === "TWD"
         && typeof rcMoney.amount_paid === "number" && rcMoney.amount_paid > 0
         ? Math.round(rcMoney.amount_paid) : null;
+      // 這位買家「之前有沒有真的付過錢」(交易表最近一筆成功的 subscribe/renew 金額>0)。
+      // 用來判定 RENEWAL 是不是「試用→轉正」的首筆真付款:原本只看 existingSub.status==='trialing',
+      // 但 App 購買後前端 rcSyncSubscription 會把 status 覆寫成 active(RC period_type 沒帶 trial)→ 首筆分潤被漏(9/13 探長J 一筆實錘)。
+      // 一定要在下面 writeTransaction 之前算,否則會把這筆 RENEWAL 自己算成「之前付過」。
+      const paidBefore = ((await getLatestSuccessChargeTwd(uid).catch(() => null)) || 0) > 0;
 
       switch (type) {
         case "INITIAL_PURCHASE":
@@ -233,7 +238,7 @@ export const revenuecatWebhook = functions.onRequest(
             // 分潤永遠記不到(INITIAL 時 gross=0 略過、RENEWAL 又被 isFirstPayment=false 擋——兩頭踢皮球,2026-08-27 抓到)。
             // 冪等仍由 commissions/{code_buyer} doc id 保證,重送/誤判都不會重複入帳。
             isFirstPayment: type === "INITIAL_PURCHASE" || type === "NON_RENEWING_PURCHASE"
-              || (type === "RENEWAL" && existingSub?.status === "trialing"),
+              || (type === "RENEWAL" && (existingSub?.status === "trialing" || !paidBefore)),
           }).catch(e => console.error("recordKolCommission(rc) 略過:", e));
           break;
         }
