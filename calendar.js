@@ -17,6 +17,8 @@ const Calendar = (() => {
     else if (type === 'grammar') log[d].grammar++;
     else if (type === 'quiz') log[d].quiz++;
     saveLog(log);
+    // 雲端加總(user_daily/{uid} increment):跨裝置今日目標才會相加、其他裝置即時看到(daily-log.js)
+    try { if (window.StayDaily && StayDaily.cloudBump) StayDaily.cloudBump(type); } catch (e) {}
     if (typeof saveAllCloud === 'function') saveAllCloud();
     // 留存:學完一次後(App)邀請開每日提醒。startReminderPrompt 會重試到離開測驗/引導畫面才彈。
     if (typeof startReminderPrompt === 'function') startReminderPrompt();
