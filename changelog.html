@@ -113,6 +113,14 @@
   <div class="tl">
     <div class="tl-item">
       <div class="tl-d">2026.09.14</div>
+      <div class="tl-t" data-t="zh">App 內未登入先購買、之後才登入的帳號,AI 額度現在會自動補上 Premium</div>
+      <div class="tl-t" data-t="en">Purchases made before signing in now unlock Premium AI quota automatically after sign-in</div>
+      <div class="tl-x"><span class="tag fix" data-t="zh">修正</span><span class="tag fix" data-t="en">FIX</span>
+        <span data-t="zh">有人回報「已經是 Premium,AI 聊聊卻只能用一次」。原因:在 App 裡還沒登入就先買,之後登入時只做了歸戶、沒把訂閱寫進帳號,App 介面看得到 Premium 但 AI 額度是伺服器算的、以為你是免費。現在只要 App 說你有購買、帳號卻沒訂閱,會自動補同步,重開 App 即修好。</span>
+        <span data-t="en">Reported: “I’m Premium but AI Chat only allows one use.” Cause: buying inside the app before signing in linked the purchase to the account but never wrote the subscription to it, so the app UI showed Premium while the server-side AI quota treated you as free. The app now re-syncs automatically whenever it sees a purchase without a matching account subscription — reopening the app fixes it.</span></div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-d">2026.09.14</div>
       <div class="tl-t" data-t="zh">AI 功能第一次使用前會先說明資料傳送並徵求同意</div>
       <div class="tl-t" data-t="en">AI features now ask for consent before the first use</div>
       <div class="tl-x"><span class="tag new" data-t="zh">隱私</span><span class="tag new" data-t="en">PRIVACY</span>
