@@ -4,41 +4,126 @@
       "collectionGroup": "transactions",
       "queryScope": "COLLECTION",
       "fields": [
-        { "fieldPath": "uid", "order": "ASCENDING" },
-        { "fieldPath": "occurred_at", "order": "DESCENDING" }
+        {
+          "fieldPath": "uid",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "occurred_at",
+          "order": "DESCENDING"
+        }
       ]
     },
     {
       "collectionGroup": "transactions",
       "queryScope": "COLLECTION",
       "fields": [
-        { "fieldPath": "uid", "order": "ASCENDING" },
-        { "fieldPath": "external_id", "order": "ASCENDING" },
-        { "fieldPath": "status", "order": "ASCENDING" }
+        {
+          "fieldPath": "uid",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "external_id",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        }
       ]
     },
     {
       "collectionGroup": "transactions",
       "queryScope": "COLLECTION",
       "fields": [
-        { "fieldPath": "uid", "order": "ASCENDING" },
-        { "fieldPath": "status", "order": "ASCENDING" },
-        { "fieldPath": "type", "order": "ASCENDING" },
-        { "fieldPath": "occurred_at", "order": "DESCENDING" }
+        {
+          "fieldPath": "uid",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "type",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "occurred_at",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "transactions",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "uid",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "occurred_at",
+          "order": "ASCENDING"
+        }
       ]
     }
   ],
   "fieldOverrides": [
-    { "collectionGroup": "users", "fieldPath": "srs_data", "indexes": [] },
-    { "collectionGroup": "users", "fieldPath": "grammar_srs", "indexes": [] },
-    { "collectionGroup": "users", "fieldPath": "grammar_weak", "indexes": [] },
-    { "collectionGroup": "users", "fieldPath": "word_notebook", "indexes": [] },
-    { "collectionGroup": "users", "fieldPath": "quiz_history", "indexes": [] },
-    { "collectionGroup": "users", "fieldPath": "mock_exam_history", "indexes": [] },
-    { "collectionGroup": "users", "fieldPath": "study_log", "indexes": [] },
-    { "collectionGroup": "users", "fieldPath": "daily_progress", "indexes": [] },
-    { "collectionGroup": "users", "fieldPath": "reading_done", "indexes": [] },
-    { "collectionGroup": "users", "fieldPath": "listening_done", "indexes": [] },
-    { "collectionGroup": "users", "fieldPath": "listening_scores", "indexes": [] }
+    {
+      "collectionGroup": "users",
+      "fieldPath": "srs_data",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "users",
+      "fieldPath": "grammar_srs",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "users",
+      "fieldPath": "grammar_weak",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "users",
+      "fieldPath": "word_notebook",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "users",
+      "fieldPath": "quiz_history",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "users",
+      "fieldPath": "mock_exam_history",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "users",
+      "fieldPath": "study_log",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "users",
+      "fieldPath": "daily_progress",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "users",
+      "fieldPath": "reading_done",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "users",
+      "fieldPath": "listening_done",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "users",
+      "fieldPath": "listening_scores",
+      "indexes": []
+    }
   ]
 }
