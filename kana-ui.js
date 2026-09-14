@@ -284,6 +284,7 @@ window.Kana = (function () {
     var opts = btn.parentElement.querySelectorAll('.kq-opt');
     opts.forEach(function (o) { o.onclick = null; if (o.getAttribute('data-v') === correct || o.textContent.trim().split(' ')[0] === correct) o.classList.add('ok'); });
     if (String(chosen) === String(correct)) { qScore++; } else { btn.classList.add('ng'); }
+    try { if (window.Calendar && Calendar.logActivity) Calendar.logActivity('vocab'); else if (window.StayDaily) StayDaily.log('vocab'); } catch (e) {}   // 假名測驗答一題=今日目標
     setTimeout(function () { qIdx++; renderQ(); }, 800);
   }
 
