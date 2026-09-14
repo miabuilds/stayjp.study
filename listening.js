@@ -237,7 +237,7 @@ const Listening = (() => {
       </div>
       <div id="lsScript" style="display:none;margin-top:12px;padding:12px;background:var(--bg3);border-radius:8px;border:1px solid var(--bd)">
         <div style="font-size:11px;color:var(--tx2);margin-bottom:4px;font-weight:600">${t('ls_script')}</div>
-        <div style="font-size:14px;line-height:1.8;color:var(--tx)">${currentItem.script.replace(/\n/g, '<br>')}</div>
+        <div style="font-size:14px;line-height:2;color:var(--tx)">${currentItem.script.split('\n').map(l => { const f = window.furiganaHTMLRich || window.furiganaHTML; return f ? f(l) : l; }).join('<br>')}</div>
       </div>
       <div id="lsNav" style="margin-top:12px"></div>`;
 

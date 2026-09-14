@@ -25,7 +25,7 @@ cd ~/Documents/GitHub/stay-jp-notes && git merge price-day-0914
 # 4. firebase deploy --only functions:createPayment,functions:ecpayCallback,functions:trialEmailCron
 # 5. ASC(手動):monthly 排 390、yearly 排 1,990——兩個都必選「為現有訂閱者保留價格」;
 #    lifetime(非消耗型)直接改 5,990。價格點以 ASC 選單有的為準(X90 系列應該都有)。
-# 6. Play(⚠️ Android 已於 9/1 上架!):D-day 當天 Play Console 三價改 390/1,990/5,990(預設只影響新購=凍漲);
+# 6. Play(⚠️ Android 已於 9/1 上架!):D-day 當天改三價 390/1,990/5,990 → 用腳本 `cd ~/Documents/GitHub/stayjp-app && node scripts/play-price-0914.cjs`(先 dry-run 看對照表)再 `--apply`;其他 173 區同比例取整、不遷移舊訂戶=凍漲(9/13 dry-run 已驗:US 月 11.99/年 60.99/買斷 189.99);
 #    ⚠️ 9/6 發現上架時可能沒改價——Mia 待確認 Play 現行三價,若 monthly 仍 150 要「立刻」先改 290 止血
 # 7. 官方折扣碼:Firestore console 建 ref_codes/STAYJP200
 #    { active: true, type: "official", kol: "StayJP 官方" }  ← 不填 owner_uid=不產生分潤(已驗 commission 邏輯)
@@ -49,6 +49,10 @@ cd ~/Documents/GitHub/stay-jp-notes && git merge price-day-0914
 |---|---|---|---|
 | 年費優惠版 | `com.stayjp.app.yearly_ref` 自動續訂・同群組 StayJP Premium・NT$1,790 | 訂閱 `stayjp_yearly_ref` base plan 年 1,790 | 掛 entitlement `StayJP Plan Premium` + current offering |
 | 買斷優惠版 | `com.stayjp.app.lifetime_ref` 非消耗型・NT$5,390 | 一次性 `stayjp_lifetime_ref` 5,390 | 同上 |
+**進度(9/14 00:50・分支同步)**:main 今晚多了三個 commit(橫幅改 22:00、單字打字重打 v481/v482);已把 main 合進 `price-day-0914`(ee723bd3,index.html 橫幅段採分支版=移除),再測合併 CLEAN。明晚 merge 只剩把分支合回 main。
+**進度(9/13 23:25)**:✅ iOS build 35 上 ASC(VALID)並掛到 1.0.8;✅ Android vc10 已 submit 進 Play production draft(取代 vc9);✅ yearly_ref/lifetime_ref WAITING_FOR_REVIEW(Mia 跑腳本送的)。✅ 1.0.8 已送 App 審核(9/13 23:40 Mia 跑腳本,reviewSubmission fec66da9,WAITING_FOR_REVIEW,釋出手動)。9/14 晚若已 APPROVED/PENDING_DEVELOPER_RELEASE → 22:00 流程尾端釋出;未過審則照常改價,App 內 9 折等過審再釋出。
+**⏰ 正式時刻定案(9/13 深夜):9/14(一) 台灣時間 22:00(JST 23:00)**。官網橫幅已改「晚上 10 點調漲」、22:00 台灣才自動消失(commit 181f6b73,sw v480)。對外口徑:「晚上 10 點官網正式調漲,App 商店同晚跟進」(Apple 同步有時差,不承諾整點)。當晚流程:21:30 開機 → 21:50 merge+推 Pages → 22:00 確認線上新價 → deploy functions → Play `--apply` → Mia 在 ASC 改三價 → 建 `ref_codes/STAYJP200` → 釋出 iOS 1.0.8(若已過審)+ Play draft 轉正式。
+**進度(9/13 晚・沙盒實測修正)**:Mia TestFlight(USD 沙盒帳號)輸碼後年費 $49.99→$49.99、買斷 $99.99→$149.99 卻掛「9 折」——原商品 9/14 前還是舊價、優惠版已是新價 9 折,非台幣區分級換算也可能同價。已修 Paywall:`ref.price < base.price`(同幣別)才切優惠版、否則退回原價不掛標(commit 661ec67)。已 OTA 到 production(runtime 1.0.8,只有 build 34 測試機吃到;線上 1.0.7 不受影響)並重 build **iOS 35 / Android vc10**(含另一 session 的 UIBackgroundModes=audio)。⚠️ 9/14 送審/發佈改用 build 35、Play draft 要換 vc10(舊 34/vc9 作廢)。優惠商品 yearly_ref/lifetime_ref 送審:Claude 跑被 classifier 擋,**Mia 自己跑** `cd ~/Documents/GitHub/stayjp-app && python3 scripts/asc-submit-ref-products.py`(冪等)。9/13 最終複核:price-day-0914 與 main 試合併乾淨、functions tsc 過、pricing.html 390/1,990/5,990 + CODE_DISCOUNT 200/600、ECPAY_DOWN=false;Play 優惠商品 ACTIVE、RC offering 齊。
 **進度(9/11 深夜・商店截圖)**:✅ 5 張新截圖(AI 跟讀／YouTube 跟讀／單字＋閃卡／文法／JLPT 刷題;拿掉聊聊、動詞、基礎專區)已換上——Play zh-TW 手機截圖用 edits API 刪舊傳新並 commit(production 1.0.8 draft vc9 不受影響);ASC 1.0.8 zh-Hant iPhone 6.7" 5 張 COMPLETE(iPad 4 張沿用)。原檔 `~/Downloads/StayJP_商店截圖_1.0.8/`(舊版移到 `_old/`);版型 `scratchpad/ads914/store/slide.html`+`jobs.json` 可重渲染。
 **進度(9/11 晚)**:✅ Play 兩商品已用 API 建好並啟用(`stayjp_yearly_ref` base plan yearly TW 1,790、`stayjp_lifetime_ref` TW 5,390,其他地區 USD/EUR 自動換算)。
 ✅ ASC 兩商品已建好(9/11 晚,Mia 執行腳本):yearly_ref `6810977330`(TWD 1,790、175 地區等價價、7 天試用×175、審核截圖)、lifetime_ref `6810977244`(TWD 5,390 價格表、175 地區、審核截圖),兩者 READY_TO_SUBMIT → 隨 1.0.8 版本一起送審。ASC API 腳本(冪等) `stayjp-app/scripts/asc-create-ref-products.py`(冪等),**Claude 執行被 auto-mode 擋,Mia 自己跑一行即可**:`cd ~/Documents/GitHub/stayjp-app && python3 scripts/asc-create-ref-products.py`(需 `pip install --user pyjwt cryptography`,已裝)。

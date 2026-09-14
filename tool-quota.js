@@ -84,6 +84,7 @@
 
   // 訂閱快取 — 由 Firestore listener 更新
   let cachedSub = null;
+  let rcSyncTried = false;   // App 內 RC→Firestore 訂閱補同步,每個登入 session 只打一次
   let cachedUserEmail = null;
   let cachedFreeAccess = false;   // free_users/{uid} 存在 = 管理員授予免費(在 admin 後台加白名單)
   let authReady = false;
@@ -438,7 +439,7 @@
     firebase.auth().onAuthStateChanged(user => {
       authReady = true;
       cachedTrialStart = null; trialWriteDone = false; trialResolved = false;   // 換帳號/登出 → 重置試用狀態,重新依該 user 的 doc 評估
-      cachedUserCreatedMs = null;
+      cachedUserCreatedMs = null; rcSyncTried = false;
       if (!user) { cachedUserEmail = null; cachedSub = null; cachedFreeAccess = false; subLoaded = true; refreshBadge(); rerenderTools(); return; }
       cachedUserEmail = user.email || null;
       // 註冊時間(判斷免費制世代:packStartMs 之後註冊 → 總次數包;之前 → 原每日制)
@@ -456,6 +457,15 @@
       firebase.firestore().doc('users/' + user.uid).onSnapshot(snap => {
         const data = snap.data() || {};
         cachedSub = data.subscription || null;
+        // App 內:原生說已購買(RevenueCat 裝置權益)但帳號 doc 沒訂閱 → 多半是「未登入先買、之後才登入」,
+        // 匿名購買歸戶時沒把訂閱寫進 Firestore(用戶回報:App 顯示 Premium,AI 額度卻只算免費)。
+        // 打 rcSyncSubscription 讓後端用 RC secret 驗證後補寫 users/{uid}.subscription,這個 onSnapshot 會再回來解鎖。
+        if (window.STAYJP_NATIVE && window.STAYJP_NATIVE.isNativeApp && window.STAYJP_NATIVE.isPremium && !isPremium() && !rcSyncTried) {
+          rcSyncTried = true;
+          user.getIdToken().then(function (tok) {
+            return fetch('https://asia-east1-jpnote-1bdd6.cloudfunctions.net/rcSyncSubscription', { method: 'POST', headers: { Authorization: 'Bearer ' + tok } });
+          }).catch(function () {});
+        }
         // 免費試用:讀 trial_started_at(server 時戳);沒有 + 非付費 → 第一次登入即開啟 3 天試用(只設一次)
         const ts = data.trial_started_at;
         if (ts && typeof ts.toMillis === 'function') { cachedTrialStart = ts.toMillis(); trialResolved = true; }

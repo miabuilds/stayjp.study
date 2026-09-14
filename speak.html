@@ -190,7 +190,7 @@
   </div>
 
   <!-- YouTube 跟讀入口:用任何 YouTube 影片練(官方嵌入播放,合法) -->
-  <a class="ls-entry yt-entry" href="yt-shadow.html" style="text-decoration:none;color:inherit;border-style:dashed">
+  <a class="ls-entry yt-entry yt-web-only" href="yt-shadow.html" style="text-decoration:none;color:inherit;border-style:dashed">
     <img src="images/mascot/tanuki-p05.png" alt="" aria-hidden="true">
     <div class="le-body">
       <div class="le-t"><span data-cvt>YouTube 跟讀</span> <span class="le-new">NEW</span></div>
@@ -232,6 +232,10 @@
   <div class="card" id="fbCard" style="display:none"></div>
 </div>
 
+<style>html.no-yt .yt-web-only{display:none!important}</style>
+<script>try{if(window.STAYJP_NATIVE&&STAYJP_NATIVE.isNativeApp&&STAYJP_NATIVE.platform==='ios')document.documentElement.classList.add('no-yt');}catch(e){}</script>
+<script src="ai-consent.js"></script>
+<script src="daily-log.js"></script>
 <script src="icons.js"></script>
 <script src="ui-modal.js"></script>
 <script src="i18n.js"></script>
@@ -773,6 +777,7 @@ function showLoginCard(){
 }
 async function submit(){
   if(!auth.currentUser){ showLoginCard(); return; }
+  if(window.AIConsent && !(await AIConsent.ensure())) return;   // Apple 5.1.1/5.1.2:第一次送 AI 前說明送什麼給誰、取得同意
   const said = dedupeSpeech((document.getElementById('said').value||'').trim());
   const fb = document.getElementById('fbCard');
   if(!said){ fb.style.display='block'; fb.innerHTML='<div class="err">'+enOr('先念一次或打字,再送出。','Say it once (or type it), then submit.')+'</div>'; return; }
@@ -843,6 +848,7 @@ function renderStream(text, done){
     + (!done && d.score!=null?'<div class="muted" style="margin-top:8px">…</div>':'');
   if(done && d.score!=null){
     spSaveScore(cur().jp, sc);
+    try{ StayDaily.log('quiz'); }catch(e2){}   // AI 跟讀評完一句=今日目標一個動作
     renderChips();
     requestAnimationFrame(()=>requestAnimationFrame(()=>{
       const arc=document.getElementById('scoreArc');

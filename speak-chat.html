@@ -207,6 +207,8 @@
 
 </div>
 
+<script src="ai-consent.js"></script>
+<script src="daily-log.js"></script>
 <script src="icons.js"></script>
 <script src="ui-modal.js"></script>
 <script src="i18n.js"></script>
@@ -406,6 +408,7 @@ function ensureDictLv(lv){
   document.head.appendChild(sc);
 }
 function startChat(k){
+  if(window.AIConsent && !AIConsent.has()){ AIConsent.ensure().then(function(ok){ if(ok) startChat(k); }); return; }   // 第一次用 AI 聊聊先取得資料傳送同意
   ensureDictLv(activeLv);
   if(!auth.currentUser){ showLoginCard(); return; }
   const s0 = SCENES.find(s=>s.k===k); if(!s0) return;
@@ -604,6 +607,7 @@ function needsJa(t){
   return false;
 }
 async function sendMine(){
+  if(window.AIConsent && !(await AIConsent.ensure())) return;
   const el=document.getElementById('say'); const txt=(el.value||'').trim();
   if(!txt || busy) return;
   busy=true;   // 入口即上鎖:toJa 翻譯 await 期間 Enter 連發會把同一句 push 兩次(審查實錘);turn() 內部會接手 busy 狀態
@@ -630,6 +634,7 @@ async function sendMine(){
   }
   busy=false;   // 交棒給 turn()(它自己上鎖);push 前解鎖,確保 turn 不被自己人擋下
   history.push({ role:'me', text:showTxt, orig:origTxt });
+  try{ StayDaily.log('quiz'); }catch(e2){}   // 情境對話每回一句=今日目標一個動作
   el.value=''; autoGrow();
   _prevRawNative='';   // 訊息已送出:下一段辨識是全新開始,別再剝上一段前綴
   renderHints([]);   // 你已經回了 → 清掉上一輪建議

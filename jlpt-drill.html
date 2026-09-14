@@ -224,6 +224,7 @@
   <footer>日本再留計劃 (StayJP) · <a href="jlpt.html" style="color:var(--tx2)">JLPT 指南</a> · <a href="app.html" style="color:var(--tx2)">學習工具</a></footer>
 </div>
 
+<script src="daily-log.js"></script>
 <script src="icons.js"></script>
 <script src="jlpt-questions.js"></script>
 <script src="jlpt-q-trans.js"></script>
@@ -260,7 +261,7 @@ let jdPremium = false, jdAdmin = false, jdTrialStart = null;   // jdTrialStart:3
     if(!firebase.apps.length) firebase.initializeApp(cfg);
     firebase.auth().onAuthStateChanged(u=>{
       jdAdmin = !!(u && JD_ADMIN.includes((u.email||'').toLowerCase()));
-      if(!u){ jdPremium=false; return; }
+      if(!u){ jdPremium=false; jdUid=null; jdCloudReady=false; return; }
       // 白名單(free_users)= Premium 等級。⚠️ 兩個讀取並行,訂閱檢查「只能往 true 推,不能覆寫」
       // (2026-08-23 修:原本無條件覆寫,白名單被訂閱檢查蓋回 false → 還是被當免費擋)
       try{ if(localStorage.getItem('jd_prem_'+u.uid)==='1') jdPremium=true; }catch(e){}   // 上次結果快取,秒判(樂觀先亮,下面權威覆核)
@@ -276,6 +277,8 @@ let jdPremium = false, jdAdmin = false, jdTrialStart = null;   // jdTrialStart:3
       firebase.firestore().doc('free_users/'+u.uid).get().then(fs2=>{ _wl=fs2.exists; _sync(); }).catch(()=>{});
       firebase.firestore().doc('users/'+u.uid).get().then(s=>{
         const d=s.data()||{};
+        // 刷題進度:雲端→本機合併後才開放上傳;本機有雲端缺的就補傳一次
+        try{ jdUid=u.uid; const need=jdMergeCloud(d); jdCloudReady=true; if(need) jdSaveCloud(); }catch(e){}
         const sub=d.subscription;
         _sub=!!(sub && (sub.status==='active'||sub.status==='trialing'||sub.status==='cancelled') && (sub.expiresAt||0)>Date.now());
         // 3 天網頁試用(同 tool-quota.js):讀 trial_started_at。之前這頁漏認 → 試用者仍被當免費、每天只能刷 1 輪(用戶回報)
@@ -368,14 +371,45 @@ window.stayjpReportHref = window.stayjpReportHref || function(kind,id,detail){
 };
 function bank(){ return (window.JLPT_Q||[]).concat(window.JLPT_Q_GEN||[]); }
 function getWrong(){ try{ return JSON.parse(localStorage.getItem(WKEY))||{}; }catch(e){ return {}; } }
-function saveWrong(w){ localStorage.setItem(WKEY, JSON.stringify(w)); }
+function saveWrong(w){ localStorage.setItem(WKEY, JSON.stringify(w)); jdSaveCloud(); }
 // ── 刷題紀錄:每題做過幾次/對幾次 + 場次歷史 ──
 const RKEY='jd_rec', HKEY='jd_hist';
 let roundWrong=[];   // 本輪錯題明細 [{id, ch:你選的}],finish 時寫入場次紀錄供回顧
 function getRec(){ try{ return JSON.parse(localStorage.getItem(RKEY))||{}; }catch(e){ return {}; } }
-function saveRec(r){ localStorage.setItem(RKEY, JSON.stringify(r)); }
+function saveRec(r){ localStorage.setItem(RKEY, JSON.stringify(r)); jdSaveCloud(); }
 function getHist(){ try{ return JSON.parse(localStorage.getItem(HKEY))||[]; }catch(e){ return []; } }
-function pushHist(h){ const a=getHist(); a.unshift(h); localStorage.setItem(HKEY, JSON.stringify(a.slice(0,100))); }
+function pushHist(h){ const a=getHist(); a.unshift(h); localStorage.setItem(HKEY, JSON.stringify(a.slice(0,100))); jdSaveCloud(); }
+// ── 刷題進度雲端同步(2026-09-14 用戶回饋:電腦與平板同帳號,刷題數字沒同步)──
+// jd_rec / jd_wrong / jd_hist 原本只在本機。現在存 users/{uid} 三個欄位;登入後先「雲端→本機合併」,合併完才開放上傳
+// (競態鎖,同 app.html:避免清過快取的裝置用空資料整欄蓋掉雲端)。合併規則:rec 逐題取做過次數多的、wrong 聯集、hist 去重取近 100 場。
+let jdUid=null, jdCloudReady=false, _jdSaveT=null;
+function jdHistTime(h){ try{ const m=String(h&&h.d||'').match(/^(\d{4})\/(\d{1,2})\/(\d{1,2})$/); return m?new Date(+m[1],+m[2]-1,+m[3]).getTime():0; }catch(e){ return 0; } }
+function jdMergeCloud(d){
+  let changed=false;
+  if(d.jd_rec && typeof d.jd_rec==='object'){
+    const loc=getRec(); const out={...d.jd_rec};
+    Object.keys(loc).forEach(id=>{ const a=loc[id], b=out[id]; if(!b || (a.n||0)>(b.n||0) || ((a.n||0)===(b.n||0) && (a.c||0)>(b.c||0))) { out[id]=a; if(!b || JSON.stringify(a)!==JSON.stringify(b)) changed=true; } });
+    if(JSON.stringify(out)!==JSON.stringify(loc)) localStorage.setItem(RKEY, JSON.stringify(out));
+  } else if(Object.keys(getRec()).length) changed=true;
+  if(d.jd_wrong && typeof d.jd_wrong==='object'){
+    const loc=getWrong(); const out={...d.jd_wrong, ...loc};
+    if(Object.keys(loc).some(k=>!d.jd_wrong[k])) changed=true;
+    if(JSON.stringify(out)!==JSON.stringify(loc)) localStorage.setItem(WKEY, JSON.stringify(out));
+  } else if(Object.keys(getWrong()).length) changed=true;
+  if(Array.isArray(d.jd_hist)){
+    const loc=getHist(); const seen=new Set(); const all=[...loc, ...d.jd_hist].filter(x=>{ if(!x) return false; const k=JSON.stringify(x); if(seen.has(k)) return false; seen.add(k); return true; });
+    all.sort((a,b)=>jdHistTime(b)-jdHistTime(a));
+    const out=all.slice(0,100);
+    if(loc.some(x=>!d.jd_hist.some(y=>JSON.stringify(x)===JSON.stringify(y)))) changed=true;
+    if(JSON.stringify(out)!==JSON.stringify(loc)) localStorage.setItem(HKEY, JSON.stringify(out));
+  } else if(getHist().length) changed=true;
+  return changed;   // 本機有雲端沒有的 → 呼叫端補上傳一次
+}
+function jdSaveCloud(){
+  if(!jdUid || !jdCloudReady) return;
+  clearTimeout(_jdSaveT);
+  _jdSaveT=setTimeout(()=>{ try{ firebase.firestore().doc('users/'+jdUid).set({ jd_rec:getRec(), jd_wrong:getWrong(), jd_hist:getHist() }, { merge:true }).catch(()=>{}); }catch(e){} }, 800);
+}
 function today(){ const d=new Date(); return d.getFullYear()+'/'+(d.getMonth()+1)+'/'+d.getDate(); }
 
 function esc(s){ return String(s==null?'':s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
@@ -555,6 +589,7 @@ function answer(el, ok){
   // 每題紀錄:做過幾次 n、對幾次 c、最後日期
   const rec = getRec(); const e = rec[q.id]||{n:0,c:0};
   e.n++; if(ok) e.c++; e.last=today(); rec[q.id]=e; saveRec(rec);
+  try{ StayDaily.log('quiz'); }catch(e2){}   // 刷一題=今日目標一個動作(用戶回饋:做了沒得分)
   const v = document.getElementById('verdict');
   v.textContent = ok? enOr('答對了!','Correct!'):enOr('答錯了','Incorrect');
   v.className = 'verdict '+(ok?'ok':'ng');
@@ -736,7 +771,8 @@ function finishExam(timeout){
     if(ok) score++;
     const t = item.q.t;
     secStat[t] = secStat[t]||{c:0,n:0}; secStat[t].n++; if(ok) secStat[t].c++;
-    if(item.ans===null) continue;   // 沒作答(時間到自動交卷)的題:計入本場分數,但不寫刷題紀錄、不進錯題本——沒看過的題不該灌水統計
+    if(item.ans===null) continue;   // 沒作答(時間到自動交卷)的題:計入本場分數,但不寫刷題紀錄、不進錯題本
+    try{ StayDaily.log('quiz'); }catch(e2){}   // 模擬試験每答一題也算今日目標——沒看過的題不該灌水統計
     const e = rec[item.q.id]||{n:0,c:0}; e.n++; if(ok)e.c++; e.last=today(); rec[item.q.id]=e;
     if(!ok) w[item.q.id]=true; else if(w[item.q.id]) { /* 模擬考答對不移出錯題本,留給錯題本模式清 */ }
   }

@@ -13,7 +13,7 @@ import { spawnSync } from 'node:child_process';
 import {
   ROOT, OUT_DIR, MANIFEST_JS, TEXTS_JSON,
   loadOverrides, applyOverrides,
-  audioQuery, synthesis, checkEngine, wavToMp3,
+  audioQuery, synthesis, checkEngine, wavToMp3, splitDialogue, concatWavsToMp3, DIALOG_SPEAKERS,
 } from './_lib.mjs';
 
 const args = process.argv.slice(2);
@@ -59,9 +59,22 @@ for (let i = 0; i < work.length; i++) {
   const fed = applyOverrides(text, overrides);
   if (fed === '__SKIP__') { skipped++; continue; }  // 跳過預生成 → fallback 瀏覽器 TTS
   try {
-    const q = await audioQuery(fed);
-    const wav = await synthesis(q);
-    wavToMp3(wav, mp3);
+    const turns = splitDialogue(fed);
+    if (turns) {
+      // 對話:A/B 各自聲線,每輪尾巴多留 0.35s 當換人停頓
+      const wavs = [];
+      for (const t of turns) {
+        const sp = DIALOG_SPEAKERS[t.who];
+        const q = await audioQuery(t.line, sp);
+        q.postPhonemeLength = 0.35;
+        wavs.push(await synthesis(q, sp));
+      }
+      concatWavsToMp3(wavs, mp3);
+    } else {
+      const q = await audioQuery(fed);
+      const wav = await synthesis(q);
+      wavToMp3(wav, mp3);
+    }
     made++;
     consecutiveFailures = 0;
     if (made % 25 === 0) {
