@@ -9,7 +9,7 @@
 
 import * as functions from "firebase-functions/v2/https";
 import * as admin from "firebase-admin";
-import { PLANS, PlanKey, ecpayConfig, ecpayEndpoint, ECPAY_SECRETS } from "./utils/constants";
+import { PLANS, PlanKey, WEB_CODE_DISCOUNT_TWD, ecpayConfig, ecpayEndpoint, ECPAY_SECRETS } from "./utils/constants";
 import { checkMacValue, ecpayDateTimeTW, generateMerchantTradeNo } from "./utils/ecpay";
 import {
   precheckSubscribe, writeTransaction, emailHash,
@@ -47,13 +47,33 @@ export const createPayment = functions.onRequest(
       const plan = (req.body?.plan || "") as PlanKey;
       if (!PLANS[plan]) { res.status(400).json({ error: "invalid_plan", plan }); return; }
 
+      // ── 2.4 推薦碼折價(官網限定):resolve 實際建單金額 ──
+      // 帳上推薦碼有效(存在/active/非停權/非本人的碼)→ 現折 WEB_CODE_DISCOUNT_TWD[plan]。
+      // 解析失敗一律以牌價續行(fail-closed 到「不折」,錢不會少收)。
+      let priceTwd = PLANS[plan].price_twd;
+      let codeApplied = "";
+      const discount = WEB_CODE_DISCOUNT_TWD[plan] || 0;
+      if (discount > 0) {
+        try {
+          const uSnap = await admin.firestore().doc(`users/${uid}`).get();
+          const code = String(uSnap.data()?.ref_code || "").toUpperCase().replace(/[^A-Z0-9_-]/g, "").slice(0, 32);
+          if (code) {
+            const cSnap = await admin.firestore().doc(`ref_codes/${code}`).get();
+            const c = cSnap.data();
+            const valid = cSnap.exists && !!c && c.active !== false && c.status !== "suspended" && c.owner_uid !== uid;
+            if (valid) { priceTwd = PLANS[plan].price_twd - discount; codeApplied = code; }
+          }
+        } catch (e) { console.warn("推薦碼折價解析失敗,以牌價續行:", e); }
+      }
+
       // ── 2.5 核對前端顯示的金額(防 service worker 舊快取頁:畫面寫舊價、實際扣新價,
-      //        違反消保法「下單前明示金額」。前端從 PLAN_TERMS 帶 expected_twd,不一致就擋)──
+      //        違反消保法「下單前明示金額」。前端從 resolvedTerms 帶 expected_twd,不一致就擋)──
       const expectedTwd = Number(req.body?.expected_twd);
-      if (!Number.isFinite(expectedTwd) || expectedTwd !== PLANS[plan].price_twd) {
+      if (!Number.isFinite(expectedTwd) || expectedTwd !== priceTwd) {
         res.status(409).json({
           error: "price_mismatch",
-          reason: "方案價格已更新,請重新整理頁面後再訂閱(未扣款)。",
+          current_twd: priceTwd,
+          reason: "方案價格已更新(或推薦碼狀態變動),頁面將重新整理,請再訂閱一次(未扣款)。",
         });
         return;
       }
@@ -79,12 +99,12 @@ export const createPayment = functions.onRequest(
         type: "subscribe",
         source: "web",
         plan,
-        amount_twd: planInfo.price_twd,
+        amount_twd: priceTwd,
         payment_method: "ecpay",
         external_id: merchantTradeNo,
         status: "pending",
         email_hash: emailHash(email),
-        note: "等待 ECPay 扣款 callback",
+        note: "等待 ECPay 扣款 callback" + (codeApplied ? `(推薦碼 ${codeApplied} 折 ${discount})` : ""),
       });
 
       // ── 4. 組綠界表單 ──
@@ -94,7 +114,7 @@ export const createPayment = functions.onRequest(
         MerchantTradeNo: merchantTradeNo,
         MerchantTradeDate: ecpayDateTimeTW(),
         PaymentType: "aio",
-        TotalAmount: planInfo.price_twd,
+        TotalAmount: priceTwd,
         TradeDesc: encodeURIComponent("StayJP Premium 訂閱"),
         ItemName: `StayJP Premium ${planInfo.display_name}`,
         ChoosePayment: "ALL",
@@ -112,13 +132,13 @@ export const createPayment = functions.onRequest(
 
       // 定期定額(訂閱制)— lifetime 不設,單次付款
       if (plan === "monthly") {
-        params.PeriodAmount = planInfo.price_twd;
+        params.PeriodAmount = priceTwd;
         params.PeriodType = "M";
         params.Frequency = 1;
         params.ExecTimes = 99;     // 上限 99 期月費(綠界限制)
         params.PeriodReturnURL = cfg.callbackUrl;
       } else if (plan === "yearly" || plan === "yearly_early_bird") {
-        params.PeriodAmount = planInfo.price_twd;
+        params.PeriodAmount = priceTwd;   // 折後價 → 定期定額終身鎖折後價
         params.PeriodType = "Y";
         params.Frequency = 1;
         params.ExecTimes = 99;

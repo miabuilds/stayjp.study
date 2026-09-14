@@ -223,17 +223,6 @@ a:hover{text-decoration:underline}
  <div class="txn-list" id="txnList">載入中…</div>
  </div>
 
- <!-- 價格調整預告(早鳥 2026-08-27 已收官) -->
- <div class="card">
- <h2><i data-ic=clock></i> 價格調整預告</h2>
- <p style="font-size:13px;color:var(--tx2);margin-top:14px">
- 年費將於 9/14(一)調漲。9/14 前訂閱 NT$1,490,往後每年續扣都鎖這個價。
- 已訂閱的用戶(含早鳥)完全不受影響,續扣永遠維持你當初的價格。
- </p>
- <div class="actions">
- <a href="pricing.html" class="btn primary">查看方案</a>
- </div>
- </div>
 
  <!-- 邀請好友(雙向獎勵)-->
  <div class="card" id="inviteCard" style="display:none">
@@ -890,8 +879,8 @@ async function requestRefund() {
  const isPaypal = !!(_sub && _sub.paypal_capture);
  const _en = (function(){ try { return localStorage.getItem('ui_lang') === 'en'; } catch(e){ return false; } })();
  const ebWarn = (_sub && _sub.is_early_bird)
-   ? (_en ? '\n• Early-bird is a one-time limited offer: after a refund you can no longer subscribe at the early-bird price; future subscriptions are at the regular price (NT$1,490/yr).'
-          : '\n• 早鳥為限量一次性優惠:退費後無法再以早鳥價訂閱,日後重新訂閱僅能用一般價(年費 NT$1,490)。')
+   ? (_en ? '\n• Early-bird is a one-time limited offer: after a refund you can no longer subscribe at the early-bird price; future subscriptions are at the current regular price.'
+          : '\n• 早鳥為限量一次性優惠:退費後無法再以早鳥價訂閱,日後重新訂閱僅能用現行一般價。')
    : '';
  const refundDesc = isPaypal
    ? (_en ? '• Funds are returned to your original payment method; timing depends on the payment provider / card issuer\n• First purchase only, within 7 days; contact support if past due'
