@@ -473,7 +473,7 @@ function applyRefCode() {
     }).catch(() => { msg.style.color = '#EF4444'; msg.textContent = '讀取失敗,請稍後再試。'; });
   };
   fetch(VALIDATE_URL + '?code=' + encodeURIComponent(raw)).then(r => r.json()).then(v => {
-    if (v && v.valid) writeFor('<i data-ic=check></i> 已套用 ' + raw + (v.kol ? '(' + v.kol + ')' : '') + ':年費現折 NT$200/月費+7天/買斷送 AI 加量!');
+    if (v && v.valid) writeFor('✓ 已套用 ' + raw + (v.kol ? '(' + v.kol + ')' : '') + ':年費現折 NT$200、買斷現折 NT$600(9 折)、月費 +7 天!');
     else if (v && v.error) writeFor('已套用 ' + raw + '(暫時無法即時驗證)');
     else { msg.style.color = '#EF4444'; msg.textContent = '查無此推薦碼,請確認後再輸入。'; }
   }).catch(() => writeFor('已套用 ' + raw + '(暫時無法驗證)'));
@@ -500,7 +500,7 @@ function syncRefCode(data) {
       const rewarded = !!data.ref_bonus_at;   // 已發放 → 鎖定;否則可改/可清
       if (inp) { inp.value = data.ref_code; inp.disabled = rewarded; }
       const clr = document.getElementById('refClear'); if (clr) clr.style.display = rewarded ? 'none' : 'inline-block';
-      if (m) { m.style.color = 'var(--tx3)'; m.textContent = rewarded ? ('已套用推薦碼:' + data.ref_code + '(好康已發放,不可更改)') : ('目前推薦碼:' + data.ref_code + '(年費現折200/月費+7天/買斷送AI加量;發放前可更改或清除)'); }
+      if (m) { m.style.color = 'var(--tx3)'; m.textContent = rewarded ? ('已套用推薦碼:' + data.ref_code + '(好康已發放,不可更改)') : ('目前推薦碼:' + data.ref_code + '(年費現折 200、買斷現折 600、月費 +7 天;發放前可更改或清除)'); }
       if (!rewarded) setRefActive(true);
       return;
     }
@@ -514,7 +514,7 @@ function syncRefCode(data) {
     if (pending && _auth.currentUser) {
       _db.doc('users/' + _auth.currentUser.uid).set({ ref_code: pending, ref_at: Date.now() }, { merge: true }).catch(() => {});
       if (inp && !inp.value) inp.value = pending;
-      if (m) { m.style.color = '#16A34A'; m.textContent = '推薦碼 ' + pending + ' 已套用:年費現折200/月費+7天/買斷送AI加量!'; }
+      if (m) { m.style.color = '#16A34A'; m.textContent = '推薦碼 ' + pending + ' 已套用:年費現折 200、買斷現折 600、月費 +7 天!'; }
       setRefActive(true);
     }
   } catch (e) {}
