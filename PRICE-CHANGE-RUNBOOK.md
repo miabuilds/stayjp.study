@@ -49,6 +49,12 @@ cd ~/Documents/GitHub/stay-jp-notes && git merge price-day-0914
 |---|---|---|---|
 | 年費優惠版 | `com.stayjp.app.yearly_ref` 自動續訂・同群組 StayJP Premium・NT$1,790 | 訂閱 `stayjp_yearly_ref` base plan 年 1,790 | 掛 entitlement `StayJP Plan Premium` + current offering |
 | 買斷優惠版 | `com.stayjp.app.lifetime_ref` 非消耗型・NT$5,390 | 一次性 `stayjp_lifetime_ref` 5,390 | 同上 |
+**✅ 9/14 D-DAY 完成(JST 23:00–23:20)**:
+- 22:57 push main(merge ef4c8caa + sw v493)→ 23:0x Pages 上線,pricing 顯示 390/1,990/5,990、無 1,490、橫幅消失(DOM 驗)。
+- functions 5 支部署成功(createPayment/ecpayCallback/trialEmailCron/revenuecatWebhook/rcSyncSubscription;functions/lib 是 gitignore,不用 commit)。
+- ASC(API `stayjp-app/scripts/asc-price-0914.py`):買斷 5,990 **即時**生效(基準 TWN 自動換算);月費 390、年費 1,990 **排程 2026-09-15 各地 00:00**,全 175 區、preserveCurrentPrice=true(現有訂閱者留 150/290、1,490)——Apple 對已核准訂閱不接受即時改價,只能排程。
+- Play(API `scripts/play-price-0914.cjs`,regionsVersion **2025/03**+官方 convertRegionPrices):月 390/年 1,990/買斷 5,990 ACTIVE,舊訂戶未遷移。
+- `ref_codes/STAYJP200` 已建(Firestore REST,owner token)。Play 1.0.8(vc10)已從 draft 轉 completed 發佈。iOS 1.0.8(36) 在 Apple 審核中。
 **進度(9/14 20:40)**:用戶回報「Premium 但 AI 只能用一次」→ 根因:App 內未登入先買→登入歸戶不走 webhook,users.subscription 沒寫、推薦碼好康/推薦人獎勵/KOL 分潤也全漏。已修:網頁 tool-quota 兜底自動打 rcSyncSubscription(已上線 v492);`rc-sync-subscription.ts` 帳號首次拿到訂閱時補做好康/獎勵/分潤(**今晚 functions 部署一起上**,rcSyncSubscription 本來就在部署清單);App rcLogIn 後同步(下次 build)。main 已合進 price-day-0914(clean)。
 **⚠️ 9/14 19:36 Apple 退件 1.0.8(35)**:3.1.2(c) 描述缺 EULA 連結、2.1(a) Apple 登入後白頁(iOS/iPadOS 27)、4.0 權限字串語言、5.2.3 YouTube 第三方影音、5.1.1/5.1.2 AI 第三方資料需先同意。**不影響今晚改價**(改價不經審核;只延後 App 內推薦碼 9 折)。已做:網頁側 AI 同意視窗+iOS App 內隱藏 YouTube 跟讀(sw v491 已上線)、權限字串三語 locales、WebView 白頁防護(onContentProcessDidTerminate+登入後偵測)、ASC 描述 EULA+審核備註腳本 `stayjp-app/scripts/asc-fix-1.0.8-rejection.py`(Mia 跑)。✅ iOS build 36 已上 TestFlight 並掛到 1.0.8(20:5x);✅ 三語描述已補 EULA、審核備註已改寫(API 直接跑成功)。⏳ 剩 Mia 在 ASC 回覆審核訊息(草稿在對話)+「重新提交至 App 審查」。Play vc10 不受影響。
 **進度(9/14 01:40・回饋修完)**:main 又推了聽力 171 題+內容包重發、閃卡例句、聽力振假名、對話雙聲線音檔、刷題進度雲端同步(jd_* 存 users/{uid})。⚠️ 晚上 merge 前再跑一次 `git merge --no-commit main` 試合併(sw.js 版號分支未動,應乾淨)。
