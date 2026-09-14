@@ -140,9 +140,10 @@ const FlashCard = (() => {
       #quizBox .fc-face { animation: fcFaceIn .22s ease; }
       #quizBox .fc-ex { margin:10px auto 4px; max-width:420px; text-align:left; background:var(--bg3); border:1px solid var(--bd); border-radius:10px; padding:8px 12px; }
       #quizBox .fc-ex-row + .fc-ex-row { margin-top:6px; border-top:1px dashed var(--bd); padding-top:6px; }
-      #quizBox .fc-ex-j { font-size:15px; line-height:1.9; color:var(--tx); display:flex; align-items:flex-start; gap:6px; }
+      #quizBox .fc-ex-j { font-size:15px; line-height:2; color:var(--tx); display:block; word-break:keep-all; overflow-wrap:anywhere; }
+      #quizBox .fc-ex-j ruby { ruby-align:center; }
       #quizBox .fc-ex-j rt { font-size:.55em; color:var(--tx2); }
-      #quizBox .fc-ex-spk { flex:0 0 auto; margin-top:6px; color:var(--ac2); cursor:pointer; }
+      #quizBox .fc-ex-spk { display:inline-block; vertical-align:middle; margin-left:6px; color:var(--ac2); cursor:pointer; }
       #quizBox .fc-ex-z { font-size:12.5px; color:var(--tx2); line-height:1.5; margin-top:2px; }
       @keyframes fcCardIn { from { opacity: 0; transform: translateY(8px) scale(.98); } to { opacity: 1; transform: none; } }
       @keyframes fcFaceIn { from { opacity: 0; transform: scale(.96); } to { opacity: 1; transform: scale(1); } }
