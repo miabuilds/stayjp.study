@@ -11,7 +11,8 @@
 import * as functions from "firebase-functions/v2/https";
 import * as admin from "firebase-admin";
 import { PlanKey } from "./utils/constants";
-import { writeSubscription, getSubscription, nowMs, SubscriptionDoc } from "./utils/firestore";
+import { writeSubscription, getSubscription, getRefCode, grantAiBonus, rewardReferrerOnPayment, recordKolCommission, refBonusDays, nowMs, SubscriptionDoc } from "./utils/firestore";
+import { PLANS } from "./utils/constants";
 
 if (admin.apps.length === 0) admin.initializeApp();
 
@@ -61,7 +62,9 @@ export const rcSyncSubscription = functions.onRequest(
         entitlements?: Record<string, {
           expires_date?: string | null; product_identifier?: string; unsubscribe_detected_at?: string | null;
         }>;
-        subscriptions?: Record<string, { period_type?: string }>;   // period_type: "trial"|"intro"|"normal"
+        subscriptions?: Record<string, { period_type?: string; is_sandbox?: boolean; store_transaction_id?: string; price?: { amount?: number; currency?: string } }>;   // period_type: "trial"|"intro"|"normal"
+        non_subscriptions?: Record<string, Array<{ is_sandbox?: boolean; store_transaction_id?: string; price?: { amount?: number; currency?: string } }>>;
+        subscriber_attributes?: Record<string, { value?: string }>;
       } };
 
       const ent = data?.subscriber?.entitlements?.[ENTITLEMENT_ID];
@@ -84,8 +87,43 @@ export const rcSyncSubscription = functions.onRequest(
         is_early_bird: existing?.is_early_bird === true,
         failed_retries: 0,
       };
-      await writeSubscription(uid, sub);
-      res.json({ ok: true, premium: true, plan, expiresAt });
+      // ── 「未登入先買、之後才登入」補課(2026-09-14 用戶回報):匿名購買歸戶不會觸發 webhook,
+      //    這支是唯一會經過的地方 → 推薦碼好康(月/年 +天數、買斷 AI 加量)、推薦人 +7 天、KOL 分潤
+      //    全部在這裡補做一次。只在「帳號第一次拿到訂閱」時跑;所有 helper 本身冪等(ref_bonus_at / referrer_paid_at / commissions doc id)。
+      if (!existing && sub.status === "active") {
+        const subEntry = data?.subscriber?.subscriptions?.[prodId];
+        const nonSub = (data?.subscriber?.non_subscriptions?.[prodId] || [])[0];
+        const entry = subEntry || nonSub;
+        const isSandbox = !!entry?.is_sandbox;
+        const listTwd = (PLANS as Record<string, { price_twd: number }>)[plan]?.price_twd ?? 0;
+        const paidTwd = entry?.price?.currency === "TWD" && typeof entry?.price?.amount === "number" ? Math.round(entry.price.amount) : listTwd;
+        const txnId = entry?.store_transaction_id || "";
+        const norm = (v: unknown) => String(v || "").toUpperCase().replace(/[^A-Z0-9_-]/g, "").slice(0, 32);
+        let refCode = await getRefCode(uid);
+        const attrCode = norm(data?.subscriber?.subscriber_attributes?.ref_code?.value);
+        if (!refCode && attrCode) {
+          try {
+            const oc = await admin.firestore().doc(`ref_codes/${attrCode}`).get();
+            if (oc.exists) { await admin.firestore().doc(`users/${uid}`).set({ ref_code: attrCode, ref_at: nowMs(), ref_via: "app_ref_attribute" }, { merge: true }); refCode = attrCode; }
+          } catch (e) { console.warn("rcSync ref attr 歸因略過:", e); }
+        }
+        if (refCode && !isSandbox) {
+          if (plan !== "lifetime") {
+            const discountedYearly = plan === "yearly" && paidTwd < PLANS.yearly.price_twd;
+            if (!discountedYearly) sub.expiresAt = sub.expiresAt + refBonusDays(plan) * 864e5;
+          } else if (paidTwd >= PLANS.lifetime.price_twd) {
+            await grantAiBonus(uid, "推薦碼＋購買買斷(App,登入歸戶補發)→ AI 加量包").catch(e => console.error("grantAiBonus(rcSync) 略過:", e));
+          }
+          sub.ref_bonus_at = nowMs();
+        }
+        await writeSubscription(uid, sub);
+        await rewardReferrerOnPayment(uid, isSandbox).catch(e => console.error("rewardReferrer(rcSync) 略過:", e));
+        await recordKolCommission(uid, { plan, gross_twd: paidTwd, source: "app", txnId, isSandbox, isFirstPayment: true })
+          .catch(e => console.error("recordKolCommission(rcSync) 略過:", e));
+      } else {
+        await writeSubscription(uid, sub);
+      }
+      res.json({ ok: true, premium: true, plan, expiresAt: sub.expiresAt });
     } catch (err) {
       console.error("rcSyncSubscription error:", err);
       res.status(500).json({ error: "internal", message: String(err) });
