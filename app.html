@@ -2949,7 +2949,14 @@ function speak(text) {
   window._ttsNow = au;
   au.play().then(() => {
     if (seq !== _spkSeq) { try { au.pause(); } catch (e) {} }   // 播出來時已被更新的點擊取代 → 收回
-  }).catch(() => { if (seq === _spkSeq) track('audio_play_fail', { text: t.slice(0, 40) }); });
+  }).catch(() => {
+    if (seq !== _spkSeq) return;
+    // 快取的 Audio 元素偶爾會壞掉(iOS WebView 切過麥克風/背景後 play() 一直 reject,用戶回饋「前幾張有聲音後面沒有」)
+    // → 丟掉快取、新建一顆再試一次;還是不行才記 log。
+    try { delete _ttsCache[hash]; const i = _ttsOrder.indexOf(hash); if (i >= 0) _ttsOrder.splice(i, 1); } catch (e) {}
+    const au2 = _ttsAudioFor(hash); au2.playbackRate = getTtsSpeed(); window._ttsNow = au2;
+    au2.play().catch(() => { if (seq === _spkSeq) track('audio_play_fail', { text: t.slice(0, 40) }); });
+  });
 }
 if (window.speechSynthesis) speechSynthesis.getVoices();
 

@@ -225,7 +225,7 @@
       <button id="recBtn" class="btn rec" onclick="toggleRec()"><i data-ic=mic></i> 開始錄音</button>
       <button class="btn pri" onclick="submit()">送出評分</button>
     </div>
-    <input id="said" class="said" placeholder="辨識結果會出現在這;不準可直接改成你念的內容">
+    <div style="display:flex;gap:8px;align-items:center"><input id="said" class="said" style="flex:1" placeholder="辨識結果會出現在這;不準可直接改成你念的內容"><button class="btn" type="button" id="saidClear" onclick="clearSaid()" style="flex:0 0 auto;padding:8px 12px;font-size:13px" title="清空辨識結果">清空</button></div>
     <div class="muted" style="margin-top:6px" id="recNote">語音辨識不準時,可直接改字再送;不支援語音就直接打字。</div>
   </div>
 
@@ -720,9 +720,12 @@ function dedupeSpeech(s){
 }
 function toggleRec(){ recording ? stopRec() : startRec(); }
 function _recBtnUI(on){ const b=document.getElementById('recBtn'); if(!b)return; b.classList.toggle('on',on); b.innerHTML=on?enOr('<i data-ic=stop></i> 停止','<i data-ic=stop></i> Stop'):enOr('<i data-ic=mic></i> 開始錄音','<i data-ic=mic></i> Start recording'); }
+function clearSaid(){ const el=document.getElementById('said'); if(el){ el.value=''; } _recEditBase=''; _prevRawSpeech=''; }
 function startRec(){
-  // 基底 = 按錄音當下輸入框的字(尊重手動編輯;刪掉的字不會再回來)
-  _recEditBase = (document.getElementById('said').value||'').trim();
+  // 每次錄音都從空白開始(用戶回饋:想重錄時會接在前一句後面,很怪)。想接續打字的人可以錄完再手動改。
+  clearSaid();
+  _recEditBase = '';
+  try{ document.getElementById('said').readOnly = true; }catch(e){}   // 錄音中唯讀,避免辨識結果與手打互相覆蓋
   if(window.STAYJP_NATIVE && window.STAYJP_NATIVE.canPlayB64) _nPost({type:'STOP_PLAY'});   // 開麥前停掉原生播放
   if(NATIVE_STT){
     window.stayjpSpeechResult=function(t,fin){
@@ -732,7 +735,7 @@ function startRec(){
       if(fin){ _prevRawSpeech=(t||'').trim(); _recEditBase=document.getElementById('said').value; }
     };
     window.stayjpSpeechEnd=function(err){
-      recording=false; _recBtnUI(false);
+      recording=false; _recBtnUI(false); try{ document.getElementById('said').readOnly=false; }catch(e){}
       if(err==='not-allowed') document.getElementById('recNote').textContent=enOr('麥克風權限被關了:請到 iPhone 設定 → StayJP 允許麥克風。',' Microphone access is off. Go to iPhone Settings → StayJP and allow the microphone.');
       else if(err) document.getElementById('recNote').textContent=enOr('辨識出錯('+err+'),可直接打字。','Recognition error ('+err+') — you can just type instead.');
     };
@@ -745,10 +748,10 @@ function startRec(){
   let finalTxt='';
   rec.onresult = e=>{ let t=''; for(let i=0;i<e.results.length;i++) t+=e.results[i][0].transcript; const fin=e.results[e.results.length-1].isFinal; const merged=_joinSpeech(_recEditBase, t); const out=fin?dedupeSpeech(merged):merged; document.getElementById('said').value=out; if(fin){ finalTxt=out; _prevRawSpeech=(t||'').trim(); _recEditBase=out; } };
   rec.onerror = e=>{ document.getElementById('recNote').textContent=enOr('辨識出錯('+e.error+'),可直接打字。','Recognition error ('+e.error+') — you can just type instead.'); stopRec(); };
-  rec.onend = ()=>{ recording=false; _recBtnUI(false); _postRestore(); };
+  rec.onend = ()=>{ recording=false; _recBtnUI(false); try{ document.getElementById('said').readOnly=false; }catch(e){} _postRestore(); };
   try{ rec.start(); recording=true; _recBtnUI(true); }catch(e){}
 }
-function stopRec(){ if(NATIVE_STT){ _nPost({type:'SPEECH_STOP'}); } else if(rec&&recording){ try{rec.stop();}catch(e){} } recording=false; _recBtnUI(false); }
+function stopRec(){ if(NATIVE_STT){ _nPost({type:'SPEECH_STOP'}); } else if(rec&&recording){ try{rec.stop();}catch(e){} } recording=false; _recBtnUI(false); try{ document.getElementById('said').readOnly = false; }catch(e){} }
 
 // 站上標準雙登入(照 auth-header.js):Google / Apple
 let _signingIn=false;
