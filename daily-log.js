@@ -37,6 +37,7 @@
       var cur = getPend();   // 期間可能又多了新動作,只扣掉這次送出的量
       Object.keys(snapshot).forEach(function (d) { Object.keys(snapshot[d]).forEach(function (k) { if (cur[d]) { cur[d][k] = Math.max(0, (cur[d][k] || 0) - snapshot[d][k]); if (!cur[d][k]) delete cur[d][k]; if (!Object.keys(cur[d]).length) delete cur[d]; } }); });
       setPend(cur); flushing = false;
+      if (Object.keys(cur).length) setTimeout(flush, 300);   // 送出期間又有新動作 → 接著補送,不用等下一個事件
     }).catch(function () { flushing = false; });
   }
 
