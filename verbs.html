@@ -1280,6 +1280,7 @@ const PTQuiz = (function(){
     if (answered) return; answered = true;
     const q = curr(); const ok = (kind === q.s.kind);
     total++; if (ok) { correct++; streak++; } else streak = 0;
+    try{ StayDaily.log('grammar'); }catch(e2){}   // 動詞種類判斷答一題=今日目標
     document.querySelectorAll('#ptqWrap .ptq-opt').forEach(b => {
       const k = b.dataset.kind;
       if (k === q.s.kind) b.style.background = '#10B98122', b.style.borderColor = '#10B981';
@@ -1309,6 +1310,7 @@ document.addEventListener('DOMContentLoaded', () => PTQuiz.render());
   <div style="margin-top:4px;font-size:12px;opacity:.7">語音：VOICEVOX:四国めたん</div>
 </footer>
 
+<script src="daily-log.js"></script>
 <script src="icons.js"></script>
 <script src="i18n.js"></script>
 <!-- TTS manifest: text -> pre-rendered VOICEVOX mp3 hash. -->
@@ -1700,6 +1702,7 @@ function checkTypedAnswer(correct) {
   if (quizState.answered) return;
   quizState.answered = true;
   quizState.total++;
+  try{ StayDaily.log('grammar'); }catch(e2){}   // 動詞變化答一題(打字/選擇)=今日目標
 
   const input = document.getElementById('quizInput');
   const answerEl = document.getElementById('quizAnswer');
@@ -1726,6 +1729,7 @@ function checkSelectedAnswer(btn, correct) {
   if (quizState.answered) return;
   quizState.answered = true;
   quizState.total++;
+  try{ StayDaily.log('grammar'); }catch(e2){}   // 動詞變化答一題(打字/選擇)=今日目標
 
   const answerEl = document.getElementById('quizAnswer');
   const nextBtn = document.getElementById('quizNext');
