@@ -33,7 +33,7 @@ function evalArrayFromFile(file, varName) {
 // Scan a chunk of source for {id:"<level>-N",...,eg:[{j:"...",z:"..."}, ...]} and emit each j.
 function harvestInlineGrammar(src, levelPrefix, sourceLabel) {
   const entryRe = new RegExp(`\\{id:"(${levelPrefix}-\\d+)",.*?eg:\\[(.*?)\\](?:,n:"(?:\\\\.|[^"\\\\])*")?\\}`, 'g');
-  const egRe = /\{j:"((?:\\.|[^"\\])*)",z:"(?:\\.|[^"\\])*"\}/g;
+  const egRe = /\{j:"((?:\\.|[^"\\])*)",z:"(?:\\.|[^"\\])*"(?:,g:"(?:\\.|[^"\\])*")?\}/g;   // g=動詞類別小標(2026-09-15 起,可有可無)
   let m;
   while ((m = entryRe.exec(src))) {
     const block = m[2];

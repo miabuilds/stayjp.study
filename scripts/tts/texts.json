@@ -21888,6 +21888,13 @@
     ]
   },
   {
+    "text": "こっちへ来い！",
+    "hash": "fdefbad728b9",
+    "sources": [
+      "grammar-n4#n4-53"
+    ]
+  },
+  {
     "text": "こづつみ",
     "hash": "65ba54234577",
     "sources": [
@@ -36617,6 +36624,13 @@
     ]
   },
   {
+    "text": "する：します/して/できる/される/させる",
+    "hash": "b230f3867847",
+    "sources": [
+      "grammar-n4#n4-75"
+    ]
+  },
+  {
     "text": "すると",
     "hash": "a6f6e6ab347b",
     "sources": [
@@ -41527,6 +41541,13 @@
     ]
   },
   {
+    "text": "たくさん歩かされました。",
+    "hash": "2fd69463cd06",
+    "sources": [
+      "grammar-n4#n4-61"
+    ]
+  },
+  {
     "text": "たくしー",
     "hash": "c9dcdf62e1d5",
     "sources": [
@@ -45943,6 +45964,13 @@
     "hash": "62d65db05561",
     "sources": [
       "grammar-n3#n3-36"
+    ]
+  },
+  {
+    "text": "テレビを見て、笑いました。",
+    "hash": "744a403f42e1",
+    "sources": [
+      "grammar-n5#n5-42"
     ]
   },
   {
@@ -68385,6 +68413,13 @@
     ]
   },
   {
+    "text": "駅まで来て、待ちます。",
+    "hash": "391c9faded65",
+    "sources": [
+      "grammar-n5#n5-42"
+    ]
+  },
+  {
     "text": "駅を出たとたん、激しい夕立に遭った。",
     "hash": "ced5e11a5583",
     "sources": [
@@ -74873,6 +74908,13 @@
     "hash": "52429604b27a",
     "sources": [
       "confusables-eg"
+    ]
+  },
+  {
+    "text": "急に会社に来させられました。",
+    "hash": "25d73b6df48c",
+    "sources": [
+      "grammar-n4#n4-61"
     ]
   },
   {
@@ -90311,6 +90353,13 @@
     ]
   },
   {
+    "text": "宿題をして、寝ます。",
+    "hash": "559ecf5bdbc0",
+    "sources": [
+      "grammar-n5#n5-42"
+    ]
+  },
+  {
     "text": "宿題を先にやりなさい。",
     "hash": "9b8ed4e1aa4a",
     "sources": [
@@ -92765,6 +92814,13 @@
     "hash": "21dac0842106",
     "sources": [
       "verbs"
+    ]
+  },
+  {
+    "text": "食べる/食べない/食べた/食べなかった",
+    "hash": "62e9f784bdda",
+    "sources": [
+      "grammar-n5#n5-45"
     ]
   },
   {
@@ -97103,6 +97159,13 @@
     ]
   },
   {
+    "text": "先生に注意されました。",
+    "hash": "f3e32fd4e609",
+    "sources": [
+      "grammar-n4#n4-59"
+    ]
+  },
+  {
     "text": "先生に渡された分厚い資料を、一晩で読まされて本当に大変だった。",
     "hash": "28d9b945c73c",
     "sources": [
@@ -97236,6 +97299,13 @@
     ]
   },
   {
+    "text": "先生はもうすぐ来られます。",
+    "hash": "d86ae3f44d0a",
+    "sources": [
+      "grammar-n4#n4-74"
+    ]
+  },
+  {
     "text": "先生は何とおっしゃっていましたか。",
     "hash": "c5febe954377",
     "sources": [
@@ -97243,10 +97313,24 @@
     ]
   },
   {
+    "text": "先生は学生に単語を暗記させます。",
+    "hash": "b826ccbd5c2d",
+    "sources": [
+      "grammar-n4#n4-60"
+    ]
+  },
+  {
     "text": "先生は時間を守るようにと何度も注意した。",
     "hash": "4759622b7d67",
     "sources": [
       "grammar-n3#n3-55"
+    ]
+  },
+  {
+    "text": "先生は写真を見られますか。",
+    "hash": "110dfede6344",
+    "sources": [
+      "grammar-n4#n4-74"
     ]
   },
   {
@@ -97282,6 +97366,13 @@
     "hash": "77b0b95dfcf4",
     "sources": [
       "vocab-n4#丁寧に"
+    ]
+  },
+  {
+    "text": "先生は毎朝新聞を読まれます。",
+    "hash": "6f165682479f",
+    "sources": [
+      "grammar-n4#n4-74"
     ]
   },
   {
@@ -98699,6 +98790,20 @@
     ]
   },
   {
+    "text": "早く起きれば間に合います。",
+    "hash": "3a0ebeeccadf",
+    "sources": [
+      "grammar-n4#n4-54"
+    ]
+  },
+  {
+    "text": "早く起きろ！",
+    "hash": "da2201ecad60",
+    "sources": [
+      "grammar-n4#n4-53"
+    ]
+  },
+  {
     "text": "早く申し込むと、どんないいことがありますか。",
     "hash": "9af5b36bd793",
     "sources": [
@@ -98708,6 +98813,13 @@
   {
     "text": "早く走れ！",
     "hash": "d5a45345e037",
+    "sources": [
+      "grammar-n4#n4-53"
+    ]
+  },
+  {
+    "text": "早く返事しろ！",
+    "hash": "9fa2349eb546",
     "sources": [
       "grammar-n4#n4-53"
     ]
@@ -104831,6 +104943,13 @@
     ]
   },
   {
+    "text": "電話します→電話する／電話しない",
+    "hash": "6842f8bf0ce5",
+    "sources": [
+      "grammar-n5#n5-43"
+    ]
+  },
+  {
     "text": "電話に出ているうちに、フライパンの魚を焦がしてしまった。",
     "hash": "65ea14445ce4",
     "sources": [
@@ -107513,6 +107632,13 @@
     ]
   },
   {
+    "text": "日本語で説明できます。",
+    "hash": "c4636e7e2362",
+    "sources": [
+      "grammar-n4#n4-52"
+    ]
+  },
+  {
     "text": "日本語には、感情を遠回しに伝える表現が数多くある。",
     "hash": "973b682a3ceb",
     "sources": [
@@ -108991,6 +109117,13 @@
     ]
   },
   {
+    "text": "彼が来れば始めましょう。",
+    "hash": "d28fc9848bf6",
+    "sources": [
+      "grammar-n4#n4-54"
+    ]
+  },
+  {
     "text": "彼とはもう三年も付き合っているので、来年結婚する予定です。",
     "hash": "fcf3f6830370",
     "sources": [
@@ -110109,6 +110242,13 @@
     "hash": "fdbe6d74e264",
     "sources": [
       "vocab-n3#認める"
+    ]
+  },
+  {
+    "text": "彼はパーティーに来られますか。",
+    "hash": "2746d774dfe1",
+    "sources": [
+      "grammar-n4#n4-52"
     ]
   },
   {
@@ -111677,6 +111817,13 @@
     "hash": "431f74e4e0cb",
     "sources": [
       "vocab-n1#制覇"
+    ]
+  },
+  {
+    "text": "彼を会議に来させました。",
+    "hash": "377e7d8ad5ee",
+    "sources": [
+      "grammar-n4#n4-60"
     ]
   },
   {
@@ -115005,6 +115152,27 @@
     ]
   },
   {
+    "text": "勉強する/勉強しない/勉強した/勉強しなかった",
+    "hash": "b3783fa1334e",
+    "sources": [
+      "grammar-n5#n5-45"
+    ]
+  },
+  {
+    "text": "勉強する→勉強した",
+    "hash": "f642f0affb01",
+    "sources": [
+      "grammar-n5#n5-44"
+    ]
+  },
+  {
+    "text": "勉強すれば合格できます。",
+    "hash": "f152fab96ac8",
+    "sources": [
+      "grammar-n4#n4-54"
+    ]
+  },
+  {
     "text": "勉強との両立は簡単ではありませんが、社会に出る前のいい経験になっていると思います。",
     "hash": "c530897e0dbe",
     "sources": [
@@ -115233,6 +115401,13 @@
     "hash": "7aa0788dce86",
     "sources": [
       "grammar-n3#n3-70"
+    ]
+  },
+  {
+    "text": "母は子供に野菜を食べさせます。",
+    "hash": "7583374e5bcf",
+    "sources": [
+      "grammar-n4#n4-60"
     ]
   },
   {
@@ -116276,6 +116451,7 @@
     "text": "毎日、日本語を勉強します。",
     "hash": "a468e17fb3c2",
     "sources": [
+      "grammar-n5#n5-41",
       "vocab-n5#毎日"
     ]
   },
@@ -117446,6 +117622,13 @@
     "hash": "31b73d7bf939",
     "sources": [
       "vocab-n5#思う"
+    ]
+  },
+  {
+    "text": "明日は早く起きよう。",
+    "hash": "37ee76dbd6a1",
+    "sources": [
+      "grammar-n4#n4-51"
     ]
   },
   {
@@ -118968,6 +119151,13 @@
     ]
   },
   {
+    "text": "友達が明日、家に来ます。",
+    "hash": "dae7adb32dbd",
+    "sources": [
+      "grammar-n5#n5-41"
+    ]
+  },
+  {
     "text": "友達が来ました。「この家、初めて見るね」と言いました。",
     "hash": "aa7bfd0610dc",
     "sources": [
@@ -119035,6 +119225,13 @@
     "hash": "71e5acdb056e",
     "sources": [
       "daily-story#n5_33"
+    ]
+  },
+  {
+    "text": "友達に急に来られて困りました。",
+    "hash": "6a5edde173e5",
+    "sources": [
+      "grammar-n4#n4-59"
     ]
   },
   {
@@ -119126,6 +119323,13 @@
     "hash": "64912b42633b",
     "sources": [
       "daily-story#n4_31"
+    ]
+  },
+  {
+    "text": "友達もパーティーに来よう。",
+    "hash": "ecd0fc9be000",
+    "sources": [
+      "grammar-n4#n4-51"
     ]
   },
   {
@@ -119885,6 +120089,20 @@
     ]
   },
   {
+    "text": "来ない→来なかった",
+    "hash": "eaaa49ba866b",
+    "sources": [
+      "grammar-n5#n5-44"
+    ]
+  },
+  {
+    "text": "来ます→来る／来ない",
+    "hash": "b7441a1fa500",
+    "sources": [
+      "grammar-n5#n5-43"
+    ]
+  },
+  {
     "text": "来られなかったおばあちゃんには、お見舞いの代わりにお礼の手紙を後で送りました。",
     "hash": "afd0eb44af75",
     "sources": [
@@ -119896,6 +120114,20 @@
     "hash": "71400c113af9",
     "sources": [
       "verbs"
+    ]
+  },
+  {
+    "text": "来る：来ます/来て/来られる/来られる/来させる",
+    "hash": "aa5c296efc87",
+    "sources": [
+      "grammar-n4#n4-75"
+    ]
+  },
+  {
+    "text": "来る/来ない/来た/来なかった",
+    "hash": "9919df988dab",
+    "sources": [
+      "grammar-n5#n5-45"
     ]
   },
   {
