@@ -90,6 +90,8 @@ export async function patchSubscription(
 // 改發 AI 加量包(對話 +5 場、評分 +15 次,一次性,寫進 ai_usage 的 bonus 池,額度系統優先扣 bonus)。
 // 2026-08-27 Mia 拍板(數量取小)。成本 ~US$1/份,只在真實付款時發。
 export const REF_AI_BONUS = { chat: 5, eval: 30 };
+export const REFERRER_REWARD_DAYS = 30;          // 碼主每帶來一位付費朋友 +30 天(2026-09-15)
+export const REFERRER_REWARD_CAP_PER_YEAR = 6;   // 滾動一年最多 6 位(=半年免費)
 // 推薦獎勵天數(依方案分級,2026-09):月費 +7 天、年費/早鳥 +30 天(一個月)。
 // 買斷不走天數(對永久會員無感)→ 呼叫端改發 AI 加量包。雙邊(推薦人 + 被推薦買家)共用同一套。
 export function refBonusDays(plan: string | undefined): number {
@@ -128,12 +130,24 @@ export async function rewardReferrerOnPayment(friendUid: string, isSandbox: bool
   if (!c || c.type !== "user") return;                 // 只有用戶個人碼獎碼主;KOL 碼不走這
   const ownerUid = c.owner_uid as string | undefined;
   if (!ownerUid || ownerUid === friendUid) return;      // 防自我推薦
-  // 獎推薦人:訂閱戶 +7 天;買斷戶(天數無意義)改發 AI 加量包(2026-08-27 起)
+  // 獎推薦人(2026-09-15 Mia 定案「你朋友省 200,你多一個月」):每帶來一位付費朋友 +30 天,不分月費/年費;
+  // 一年(滾動 365 天)最多 6 位=半年免費;買斷戶(天數無意義)改發 AI 加量包,同樣受 6 位上限。
+  // 超過上限:朋友那邊的好康照發(在 callback 端),只有碼主這半不再加,並記 log。
+  const ownerRef = db.doc(`users/${ownerUid}`);
+  const ownerDoc = (await ownerRef.get()).data() || {};
+  const yearAgo = nowMs() - 365 * 864e5;
+  const log: number[] = Array.isArray(ownerDoc.referral_reward_log) ? ownerDoc.referral_reward_log.filter((t: unknown) => typeof t === "number" && t > yearAgo) : [];
+  if (log.length >= REFERRER_REWARD_CAP_PER_YEAR) {
+    console.log(`referrer ${ownerUid} 已達一年 ${REFERRER_REWARD_CAP_PER_YEAR} 位上限,略過獎勵(friend ${friendUid})`);
+    await db.doc(`users/${friendUid}`).set({ referrer_paid_at: nowMs(), referrer_reward_skipped: "cap" }, { merge: true });
+    return;
+  }
+  await ownerRef.set({ referral_reward_log: [...log, nowMs()] }, { merge: true });
   const ownerSub = await getSubscription(ownerUid);
   if (ownerSub?.plan === "lifetime") {
     await grantAiBonus(ownerUid, `推薦好友(${friendUid})付費 → 推薦人為買斷戶,發 AI 加量包(對話+${REF_AI_BONUS.chat}/評分+${REF_AI_BONUS.eval})`);
   } else {
-    const bonusDays = refBonusDays(ownerSub?.plan);   // 依推薦人自己的方案:月費 7 天、年費 30 天
+    const bonusDays = REFERRER_REWARD_DAYS;   // 一律 +30 天(原本月費 7/年費 30)
     const base = Math.max(nowMs(), ownerSub?.expiresAt || 0);
     const patch: Partial<SubscriptionDoc> = { status: "active", expiresAt: base + bonusDays * 864e5, willRenew: ownerSub?.willRenew ?? false };
     if (!ownerSub) { patch.plan = "monthly"; patch.source = "web"; patch.startedAt = nowMs(); }
