@@ -31,6 +31,21 @@ const CONTENT = new Set(['名詞', '動詞', '形容詞', '副詞', '連体詞',
 // kuromoji 同音字誤讀修正(furigana 顯示用;表層完全相符才套)。每輪對全表套用=冪等。
 // 「正しく」kuromoji 常誤判成 まさしく(誠然),文中幾乎都是 ただしく(正確地)。
 const READING_FIX = { '正しく': 'ただしく', '一目': 'ひとめ' };
+// 複合詞修正:kuromoji 會把這些詞切碎且末字注錯音(報/連/相→しょう)→ 合併成一個 token 並給正確讀音(冪等,修到新舊句)
+const COMPOUND_FIX = { '報連相': 'ほうれんそう' };
+function mergeCompounds(arr) {
+  const out = [];
+  for (let i = 0; i < arr.length; i++) {
+    let hit = null;
+    for (const [word, r] of Object.entries(COMPOUND_FIX)) {
+      let acc = '', j = i;
+      while (j < arr.length && acc.length < word.length) { acc += arr[j].s; j++; }
+      if (acc === word) { hit = { s: word, r, k: 1, span: j - i }; break; }
+    }
+    if (hit) { out.push({ s: hit.s, r: hit.r, k: 1 }); i += hit.span - 1; } else out.push(arr[i]);
+  }
+  return out;
+}
 
 const ARTICLES = (new Function('window', fs.readFileSync(path.join(ROOT, 'articles.js'), 'utf8') + ';return window.ARTICLES;'))({}) || [];
 let TOKENS = {};
@@ -77,6 +92,9 @@ for (const arr of Object.values(TOKENS)) for (const t of arr) {
   if (t.r && READING_FIX[t.s] && t.r !== READING_FIX[t.s]) { t.r = READING_FIX[t.s]; fixed++; }
 }
 if (fixed) console.log(`同音字修正套用 ${fixed} 處`);
+let merged = 0;
+for (const k of Object.keys(TOKENS)) { const before = TOKENS[k].length; TOKENS[k] = mergeCompounds(TOKENS[k]); if (TOKENS[k].length !== before) merged++; }
+if (merged) console.log(`複合詞合併 ${merged} 句`);
 
 // 保留既有插入順序(既有句在前、新句附後)→ 最小 diff
 const out = '// 由 scripts kuromoji 離線斷詞產生 — 勿手改。key=去空白句子,值=詞陣列{s:表層,r:讀音,b:原形,k:可點}\n'
