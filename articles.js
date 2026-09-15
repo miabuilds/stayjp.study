@@ -4321,5 +4321,359 @@ window.ARTICLES = [
       "Yet seen from the other side, it also means the calibration is entrusted to each person.",
       "A home may be the place where the question of how to measure the distance to others is quietly repeated, day after day."
     ]
+  },
+  {
+    "id": "a-n5-9",
+    "level": "n5",
+    "topic": "生活",
+    "topic_en": "Everyday life",
+    "title": "こうえんで あそぶ 一日",
+    "title_zh": "在公園玩耍的一天",
+    "title_en": "A Day Playing at the Park",
+    "body": "どようびは いい てんきでした。わたしは ともだちと こうえんへ 行く やくそくを しました。あさ 九時に えきで あいました。\nまえの ばんに おべんとうを つくりました。たまごやきと おにぎりと やさいを いれました。ともだちの ぶんも すこし つくりました。\nこうえんまで じてんしゃで 行きました。みちには さくらの きが たくさん ありました。かぜが きもち よかったです。\nこうえんの ベンチで おべんとうを たべました。とても おいしかったです。ともだちも おいしいと いいました。\nたべた あと、ともだちと バドミントンを したり、しゃしんを とったり しました。みんな たのしそうでした。\nゆうがた いえに かえりました。すこし つかれましたが、とても たのしい 一日でした。らいしゅうも また こうえんへ 行きたいです。",
+    "trans": [
+      "星期六天氣很好。我和朋友約好要去公園。早上九點在車站見面。",
+      "前一天晚上做了便當。放了煎蛋、飯糰和蔬菜。也幫朋友做了一點。",
+      "騎腳踏車去公園。路上有很多櫻花樹。風吹起來很舒服。",
+      "在公園的長椅上吃便當。非常好吃。朋友也說很好吃。",
+      "吃完之後,和朋友一起打羽毛球、拍照。大家看起來都很開心。",
+      "傍晚回到家。雖然有點累,但是非常開心的一天。下星期也想再去公園。"
+    ],
+    "trans_en": [
+      "It was nice weather on Saturday. I promised my friend to go to the park. We met at the station at nine in the morning.",
+      "I made a bento the night before. I put in rolled egg, rice balls, and vegetables. I also made a little for my friend.",
+      "We went to the park by bicycle. There were many cherry trees along the way. The wind felt nice.",
+      "We ate the bento on a bench in the park. It was very delicious. My friend also said it was delicious.",
+      "After eating, we did things like play badminton and take photos with my friend. Everyone looked happy.",
+      "I went home in the evening. I was a little tired, but it was a very fun day. I want to go to the park again next week."
+    ],
+    "vocab": [
+      {
+        "w": "土曜日",
+        "r": "どようび",
+        "m": "星期六",
+        "m_en": "Saturday"
+      },
+      {
+        "w": "天気",
+        "r": "てんき",
+        "m": "天氣",
+        "m_en": "weather"
+      },
+      {
+        "w": "友だち",
+        "r": "ともだち",
+        "m": "朋友",
+        "m_en": "friend"
+      },
+      {
+        "w": "公園",
+        "r": "こうえん",
+        "m": "公園",
+        "m_en": "park"
+      },
+      {
+        "w": "約束",
+        "r": "やくそく",
+        "m": "約定",
+        "m_en": "promise"
+      },
+      {
+        "w": "弁当",
+        "r": "べんとう",
+        "m": "便當",
+        "m_en": "boxed lunch"
+      },
+      {
+        "w": "卵焼き",
+        "r": "たまごやき",
+        "m": "煎蛋捲",
+        "m_en": "rolled omelette"
+      },
+      {
+        "w": "おにぎり",
+        "r": "おにぎり",
+        "m": "飯糰",
+        "m_en": "rice ball"
+      },
+      {
+        "w": "自転車",
+        "r": "じてんしゃ",
+        "m": "腳踏車",
+        "m_en": "bicycle"
+      },
+      {
+        "w": "写真",
+        "r": "しゃしん",
+        "m": "照片",
+        "m_en": "photo"
+      }
+    ],
+    "grammar": [
+      {
+        "t": "へ(方向)",
+        "note": "表示移動的方向,常接「行く」等動詞:「こうえんへ 行く」。",
+        "id": "n5-22",
+        "t_en": "へ (direction)",
+        "note_en": "Marks the direction of movement, often used with verbs like 行く: 「こうえんへ 行く」."
+      },
+      {
+        "t": "た形+あと",
+        "note": "動詞た形加「あと」表示「~之後」:「たべた あと、あそびました」。",
+        "id": "n5-23",
+        "t_en": "た-form + あと",
+        "note_en": "Adding あと to the plain past (た-form) means \"after doing ~\": 「たべた あと、あそびました」."
+      },
+      {
+        "t": "~たり~たりする",
+        "note": "列舉幾個動作或狀態:「バドミントンを したり、しゃしんを とったり しました」。",
+        "id": "n5-24",
+        "t_en": "~たり~たりする",
+        "note_en": "Used to list a few representative actions or states: 「バドミントンを したり、しゃしんを とったり しました」."
+      },
+      {
+        "t": "も(也)",
+        "note": "表示「也一樣」,接在名詞後面:「ともだちも おいしいと いいました」。",
+        "id": "n5-25",
+        "t_en": "も (also)",
+        "note_en": "Attached after a noun to mean \"also/too\": 「ともだちも おいしいと いいました」."
+      }
+    ]
+  },
+  {
+    "id": "a-n4-10",
+    "level": "n4",
+    "topic": "生活",
+    "topic_en": "Everyday life",
+    "title": "セルフレジ",
+    "title_zh": "自助結帳機",
+    "title_en": "Self-Checkout Machine",
+    "body": "先週、近くのスーパーで初めてセルフレジを使いました。店員さんがいなくても、自分で商品を精算できます。\nまず、かごから商品を一つずつ取り出して、バーコードを機械にかざします。音が鳴ったら、精算が正しくできたしるしです。\n次に、画面を見ながら、現金かカードか、支払い方を選びます。現金の場合は、お金を入れるところに入れます。\n私は初めてだったので、どこを押せばいいかわからず、少し迷いました。でも、困ったときは近くの店員さんがすぐに手伝ってくれました。\nセルフレジはレジに並ばなくてもいいので、時間のないときにとても便利です。ただ、慣れない人には少し難しいかもしれません。\n使い方に慣れれば、誰でも簡単に使えるようになります。これから利用する人は、まずゆっくり画面を見ながら試してみてください。",
+    "trans": [
+      "上週,我第一次在附近的超市使用了自助結帳機。即使沒有店員,也可以自己完成商品的結帳。",
+      "首先,把籃子裡的商品一件一件拿出來,對著機器讀取條碼。如果發出聲音,就是表示結帳成功的訊號。",
+      "接著,一邊看畫面,一邊選擇要用現金還是刷卡付款。如果是付現金,就把錢放進投錢口。",
+      "因為是第一次,不知道該按哪裡,有點不知所措。不過,遇到困難時,附近的店員馬上就來幫忙了。",
+      "自助結帳機不用排隊等收銀台,所以在沒有時間的時候非常方便。不過,對不習慣的人來說可能有點難。",
+      "只要習慣了使用方法,任何人都能簡單地使用。今後要使用的人,請先一邊慢慢看畫面一邊試試看。"
+    ],
+    "trans_en": [
+      "Last week, I used a self-checkout machine at a nearby supermarket for the first time. Even without a store clerk, you can check out your items yourself.",
+      "First, take the items out of the basket one by one and scan the barcode with the machine. If a sound is made, it's a sign that the scan was successful.",
+      "Next, while looking at the screen, choose whether to pay by cash or card. If paying with cash, put the money into the cash slot.",
+      "Since it was my first time, I didn't know what to press and felt a bit confused. But when I had trouble, a nearby clerk quickly helped me.",
+      "Self-checkout is very convenient when you're short on time since you don't have to line up at the register. However, it might be a bit difficult for those who aren't used to it.",
+      "Once you get used to how to use it, anyone can use it easily. For those who will use it from now on, please try it while slowly looking at the screen first."
+    ],
+    "vocab": [
+      {
+        "w": "店員",
+        "r": "てんいん",
+        "m": "店員",
+        "m_en": "store clerk"
+      },
+      {
+        "w": "商品",
+        "r": "しょうひん",
+        "m": "商品",
+        "m_en": "product"
+      },
+      {
+        "w": "機械",
+        "r": "きかい",
+        "m": "機器",
+        "m_en": "machine"
+      },
+      {
+        "w": "画面",
+        "r": "がめん",
+        "m": "畫面、螢幕",
+        "m_en": "screen"
+      },
+      {
+        "w": "現金",
+        "r": "げんきん",
+        "m": "現金",
+        "m_en": "cash"
+      },
+      {
+        "w": "支払う",
+        "r": "しはらう",
+        "m": "支付",
+        "m_en": "to pay"
+      },
+      {
+        "w": "選ぶ",
+        "r": "えらぶ",
+        "m": "選擇",
+        "m_en": "to choose"
+      },
+      {
+        "w": "迷う",
+        "r": "まよう",
+        "m": "猶豫、迷惑",
+        "m_en": "to hesitate"
+      },
+      {
+        "w": "手伝う",
+        "r": "てつだう",
+        "m": "幫忙",
+        "m_en": "to help"
+      },
+      {
+        "w": "慣れる",
+        "r": "なれる",
+        "m": "習慣",
+        "m_en": "to get used to"
+      }
+    ],
+    "grammar": [
+      {
+        "t": "~てくれる",
+        "note": "別人為自己做某事:「店員さんが 手伝って くれました」(店員幫了我)。",
+        "id": "n4-58",
+        "t_en": "〜てくれる",
+        "note_en": "Someone does something for you: 「店員さんが 手伝って くれました」(The clerk helped me)."
+      },
+      {
+        "t": "~なくてもいい",
+        "note": "表示不必做某事:「レジに ならばなくても いいです」(不用排隊也可以)。",
+        "id": "n4-59",
+        "t_en": "〜なくてもいい",
+        "note_en": "Expresses that something is not necessary: 「レジに ならばなくても いいです」(You don't have to line up)."
+      },
+      {
+        "t": "~ずつ",
+        "note": "表示「每~」平均分配的量:「一つずつ とりだす」(一件一件拿出來)。",
+        "id": "n4-60",
+        "t_en": "〜ずつ",
+        "note_en": "Indicates an equal amount \"each\": 「一つずつ とりだす」(take out one at a time)."
+      },
+      {
+        "t": "~か~か",
+        "note": "表示在兩者中選擇:「げんきんか カードか」(現金還是刷卡)。",
+        "id": "n4-61",
+        "t_en": "〜か〜か",
+        "note_en": "Indicates a choice between two options: 「げんきんか カードか」(cash or card)."
+      }
+    ]
+  },
+  {
+    "id": "a-n3-11",
+    "level": "n3",
+    "topic": "職場",
+    "topic_en": "Work",
+    "title": "報連相の大切さ",
+    "title_zh": "報連相的重要性",
+    "title_en": "The Importance of Hourensou",
+    "body": "日本の会社では、「報連相」がとても大切だと言われています。これは報告、連絡、相談の三つをまとめた言葉です。\n仕事の進み具合を上司に伝えることを報告と言います。何か問題が起きたら、すぐに報告することが求められます。\n連絡は、必要な情報を関係する人に伝えることです。予定が変わったときなど、早めの連絡が大切にされます。\n相談は、一人で決められないことを上司や同僚に聞くことです。小さなことでも相談すれば、大きな失敗を防げます。\n外国人の社員にとって、この報連相の習慣は最初は難しく感じられるかもしれません。自分の国では、自分で判断して進めることが評価される場合もあるからです。\nしかし、報連相をきちんと行えば、チームの中で信頼を得やすくなります。日本の会社で働くなら、この考え方を理解しておくことが役に立つでしょう。",
+    "trans": [
+      "在日本的公司裡,常說『報連相』非常重要。這是把報告、聯絡、商量這三個詞彙合起來的說法。",
+      "向上司傳達工作進度稱為報告。發生問題時,被要求要立刻報告。",
+      "聯絡是指把必要的資訊傳達給相關人員。像是行程有變動時,及早聯絡被視為很重要。",
+      "商量是指詢問上司或同事那些自己一個人無法決定的事。就算是小事,只要商量,就能避免大的失敗。",
+      "對外國員工來說,這種報連相的習慣一開始或許會覺得困難。因為在自己的國家,有時候自行判斷、推進工作反而會受到肯定。",
+      "不過,若能確實做好報連相,就更容易在團隊中獲得信賴。若要在日本公司工作,理解這種想法應該會很有幫助。"
+    ],
+    "trans_en": [
+      "In Japanese companies, it is said that 'hourensou' is very important. This is a word combining the three: reporting, contacting, and consulting.",
+      "Reporting means telling your supervisor about the progress of your work. If a problem occurs, you are expected to report it immediately.",
+      "Contacting means conveying necessary information to the people involved. For example, when a schedule changes, contacting early is considered important.",
+      "Consulting means asking your boss or colleagues about things you cannot decide alone. Even for small matters, consulting can prevent big failures.",
+      "For foreign employees, this habit of hourensou may feel difficult at first. This is because, in their own countries, deciding and proceeding on one's own is sometimes valued.",
+      "However, if you properly practice hourensou, you can more easily gain trust within the team. If you work at a Japanese company, understanding this way of thinking will likely be helpful."
+    ],
+    "vocab": [
+      {
+        "w": "報連相",
+        "r": "ほうれんそう",
+        "m": "報告、聯絡、商量的合稱",
+        "m_en": "abbreviation for report-contact-consult"
+      },
+      {
+        "w": "報告",
+        "r": "ほうこく",
+        "m": "報告",
+        "m_en": "report"
+      },
+      {
+        "w": "連絡",
+        "r": "れんらく",
+        "m": "聯絡",
+        "m_en": "contact"
+      },
+      {
+        "w": "相談",
+        "r": "そうだん",
+        "m": "商量",
+        "m_en": "consultation"
+      },
+      {
+        "w": "進み具合",
+        "r": "すすみぐあい",
+        "m": "進度",
+        "m_en": "progress"
+      },
+      {
+        "w": "上司",
+        "r": "じょうし",
+        "m": "上司",
+        "m_en": "boss / supervisor"
+      },
+      {
+        "w": "同僚",
+        "r": "どうりょう",
+        "m": "同事",
+        "m_en": "colleague"
+      },
+      {
+        "w": "信頼",
+        "r": "しんらい",
+        "m": "信賴",
+        "m_en": "trust"
+      },
+      {
+        "w": "判断",
+        "r": "はんだん",
+        "m": "判斷",
+        "m_en": "judgment"
+      },
+      {
+        "w": "評価",
+        "r": "ひょうか",
+        "m": "評價",
+        "m_en": "evaluation"
+      }
+    ],
+    "grammar": [
+      {
+        "t": "~と言われています",
+        "note": "表示「大家都說~、據說~」,例:「報連相が大切だと言われています」(大家都說報連相很重要)。",
+        "id": "n3-01",
+        "t_en": "〜と言われています",
+        "note_en": "Expresses \"it is said that 〜,\" e.g. 「報連相が大切だと言われています」(\"It is said that hourensou is important.\")"
+      },
+      {
+        "t": "~ことです",
+        "note": "把動詞句名詞化,表示「就是~這件事」,例:「情報を伝えることです」(就是傳達資訊這件事)。",
+        "id": "n3-02",
+        "t_en": "〜ことです",
+        "note_en": "Turns a verb phrase into a noun phrase meaning \"it is the act of 〜,\" e.g. 「情報を伝えることです」(\"It is conveying information.\")"
+      },
+      {
+        "t": "~ば",
+        "note": "表示條件「如果~的話」,例:「相談すれば、失敗を防げます」(如果商量的話,就能防止失敗)。",
+        "id": "n4-15",
+        "t_en": "〜ば",
+        "note_en": "Conditional meaning \"if 〜,\" e.g. 「相談すれば、失敗を防げます」(\"If you consult, you can prevent failure.\")"
+      },
+      {
+        "t": "~かもしれません",
+        "note": "表示「或許~、也許~」的推測,例:「難しく感じられるかもしれません」(或許會覺得困難)。",
+        "id": "n4-20",
+        "t_en": "〜かもしれません",
+        "note_en": "Expresses the guess \"maybe 〜,\" e.g. 「難しく感じられるかもしれません」(\"It might feel difficult.\")"
+      }
+    ]
   }
 ];

@@ -2058,6 +2058,13 @@
     ]
   },
   {
+    "text": "JR東日本からお知らせします。ただいま、強風の影響で中央線は運転を見合わせております。振替輸送として、地下鉄丸の内線をご利用いただけます。",
+    "hash": "53c45af56d51",
+    "sources": [
+      "jlpt-listening"
+    ]
+  },
+  {
     "text": "SNSの普及によってどんな新しい問題が生まれましたか。",
     "hash": "9aaa32246e05",
     "sources": [
@@ -2533,6 +2540,13 @@
     ]
   },
   {
+    "text": "あさ九時にえきであいました。",
+    "hash": "212cd1618380",
+    "sources": [
+      "article#a-n5-9"
+    ]
+  },
+  {
     "text": "あし",
     "hash": "07edf881b7d9",
     "sources": [
@@ -2600,6 +2614,13 @@
     "hash": "cefd0089771b",
     "sources": [
       "vocab-n5#準備する"
+    ]
+  },
+  {
+    "text": "あしたの花火大会ですが、台風のため中止になりました。次の週末に延期します。",
+    "hash": "aef061d5da5d",
+    "sources": [
+      "jlpt-listening"
     ]
   },
   {
@@ -8541,7 +8562,8 @@
     "text": "えらぶ",
     "hash": "20ffd578608e",
     "sources": [
-      "vocab-n4"
+      "vocab-n4",
+      "article-vocab#a-n4-10"
     ]
   },
   {
@@ -9888,6 +9910,13 @@
     ]
   },
   {
+    "text": "おにぎり",
+    "hash": "634befb62a51",
+    "sources": [
+      "article-vocab#a-n5-9"
+    ]
+  },
+  {
     "text": "おににかなぼう",
     "hash": "c4f8882a6e7d",
     "sources": [
@@ -10983,6 +11012,13 @@
     "hash": "0d388d8faec2",
     "sources": [
       "vocab-n4#醤油"
+    ]
+  },
+  {
+    "text": "お住まいの地域のごみ収集ですが、来週は祝日の関係で、月曜日ではなく火曜日に変更になります。再来週からは、また元の月曜日に戻ります。",
+    "hash": "78e6569f621d",
+    "sources": [
+      "jlpt-listening"
     ]
   },
   {
@@ -12952,6 +12988,13 @@
     ]
   },
   {
+    "text": "かぜがきもちよかったです。",
+    "hash": "80514291c33a",
+    "sources": [
+      "article#a-n5-9"
+    ]
+  },
+  {
     "text": "かせぐ",
     "hash": "fbe355e040fd",
     "sources": [
@@ -13910,6 +13953,13 @@
     "hash": "8e4dbe98d066",
     "sources": [
       "vocab-n5"
+    ]
+  },
+  {
+    "text": "がめん",
+    "hash": "4f2db071cb64",
+    "sources": [
+      "article-vocab#a-n4-10"
     ]
   },
   {
@@ -14959,7 +15009,8 @@
       "vocab-n4",
       "vocab-n3",
       "vocab-n1",
-      "article-vocab#a-n4-6"
+      "article-vocab#a-n4-6",
+      "article-vocab#a-n4-10"
     ]
   },
   {
@@ -19257,7 +19308,8 @@
     "hash": "65746967ebdc",
     "sources": [
       "vocab-n4",
-      "article-vocab#a-n2-5"
+      "article-vocab#a-n2-5",
+      "article-vocab#a-n4-10"
     ]
   },
   {
@@ -19877,7 +19929,22 @@
     "sources": [
       "vocab-n5",
       "vocab-n3",
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n5-9"
+    ]
+  },
+  {
+    "text": "こうえんのベンチでおべんとうをたべました。",
+    "hash": "68a48599c087",
+    "sources": [
+      "article#a-n5-9"
+    ]
+  },
+  {
+    "text": "こうえんまでじてんしゃで行きました。",
+    "hash": "bc36a4480be3",
+    "sources": [
+      "article#a-n5-9"
     ]
   },
   {
@@ -21694,6 +21761,13 @@
     ]
   },
   {
+    "text": "こちらのセールは本日までですが、会員のお客様に限り、あしたまで同じ価格でご購入いただけます。",
+    "hash": "2b6e4657bf76",
+    "sources": [
+      "jlpt-listening"
+    ]
+  },
+  {
     "text": "こちらの手違いで、ご迷惑をおかけしました。",
     "hash": "0bf169928331",
     "sources": [
@@ -21703,6 +21777,13 @@
   {
     "text": "こちらの商品は、ただいまセール中で、表示価格から3割引きとなっております。",
     "hash": "8346e89d1fae",
+    "sources": [
+      "jlpt-listening"
+    ]
+  },
+  {
+    "text": "こちらの商品は生産終了ではなく、人気により一時的に品切れとなっておりまして、来月には入荷の予定です。",
+    "hash": "99b6aac3e0ed",
     "sources": [
       "jlpt-listening"
     ]
@@ -22368,6 +22449,13 @@
     "hash": "c6e2ebb978f1",
     "sources": [
       "vocab-n3#缶"
+    ]
+  },
+  {
+    "text": "このスーパーは、いつも夜9時に閉まりますが、今日はセールのため、夜11時まで開いています。",
+    "hash": "750c06199251",
+    "sources": [
+      "jlpt-listening"
     ]
   },
   {
@@ -28088,6 +28176,13 @@
     ]
   },
   {
+    "text": "これから利用する人は、まずゆっくり画面を見ながら試してみてください。",
+    "hash": "5dd98182424e",
+    "sources": [
+      "article#a-n4-10"
+    ]
+  },
+  {
     "text": "これだけの仕事をしたのだから、それに見合う報酬がほしいです。",
     "hash": "17fc24fa9b15",
     "sources": [
@@ -28197,6 +28292,13 @@
     "hash": "d232303906d1",
     "sources": [
       "vocab-n5#珍しい"
+    ]
+  },
+  {
+    "text": "これは報告、連絡、相談の三つをまとめた言葉です。",
+    "hash": "e15eb2d1eacc",
+    "sources": [
+      "article#a-n3-11"
     ]
   },
   {
@@ -30677,6 +30779,13 @@
     ]
   },
   {
+    "text": "しかし、報連相をきちんと行えば、チームの中で信頼を得やすくなります。",
+    "hash": "37c02157abfd",
+    "sources": [
+      "article#a-n3-11"
+    ]
+  },
+  {
     "text": "しかしさいきんのわかい人の中には、しごととプライベートをきちんと分けたいと考える人もふえている。",
     "hash": "3ca2faa0a7a3",
     "sources": [
@@ -31844,7 +31953,8 @@
     "text": "じてんしゃ",
     "hash": "211dddf921a2",
     "sources": [
-      "vocab-n5"
+      "vocab-n5",
+      "article-vocab#a-n5-9"
     ]
   },
   {
@@ -32003,7 +32113,8 @@
     "text": "しはらう",
     "hash": "b6eb39a06255",
     "sources": [
-      "article-vocab#a-n2-5"
+      "article-vocab#a-n2-5",
+      "article-vocab#a-n4-10"
     ]
   },
   {
@@ -32365,7 +32476,8 @@
     "sources": [
       "vocab-n5",
       "vocab-n4",
-      "article-vocab#a-n5-6"
+      "article-vocab#a-n5-6",
+      "article-vocab#a-n5-9"
     ]
   },
   {
@@ -33783,7 +33895,8 @@
     "hash": "a676950b85d5",
     "sources": [
       "vocab-n4",
-      "vocab-n3"
+      "vocab-n3",
+      "article-vocab#a-n3-11"
     ]
   },
   {
@@ -34118,7 +34231,8 @@
     "hash": "ed13cfa39039",
     "sources": [
       "vocab-n3",
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n4-10"
     ]
   },
   {
@@ -35285,7 +35399,8 @@
     "sources": [
       "vocab-n3",
       "vocab-n2",
-      "article-vocab#a-n2-3"
+      "article-vocab#a-n2-3",
+      "article-vocab#a-n3-11"
     ]
   },
   {
@@ -35806,6 +35921,13 @@
     ]
   },
   {
+    "text": "すこしつかれましたが、とてもたのしい一日でした。",
+    "hash": "2ea3e6820a2f",
+    "sources": [
+      "article#a-n5-9"
+    ]
+  },
+  {
     "text": "すこしも",
     "hash": "d3aaf6902fcf",
     "sources": [
@@ -35854,6 +35976,13 @@
     "sources": [
       "vocab-n5",
       "vocab-n2"
+    ]
+  },
+  {
+    "text": "すすみぐあい",
+    "hash": "3d2e31b0d628",
+    "sources": [
+      "article-vocab#a-n3-11"
     ]
   },
   {
@@ -36209,6 +36338,13 @@
     ]
   },
   {
+    "text": "すみません、このシャツは1000円ですが、今日は20%引きです。",
+    "hash": "55169ee1ff7f",
+    "sources": [
+      "jlpt-listening"
+    ]
+  },
+  {
     "text": "すみません、この近くにゆうびんきょくはありますか。ぎんこうのとなりにありますよ。",
     "hash": "bf6df53e33da",
     "sources": [
@@ -36395,6 +36531,13 @@
     "hash": "d4668a980c45",
     "sources": [
       "phrases"
+    ]
+  },
+  {
+    "text": "すみません、予約していた3時の診察ですが、急用ができてしまいました。4時に変更していただくことはできますか。",
+    "hash": "60cf3c180a75",
+    "sources": [
+      "jlpt-listening"
     ]
   },
   {
@@ -37730,6 +37873,13 @@
     ]
   },
   {
+    "text": "セルフレジはレジに並ばなくてもいいので、時間のないときにとても便利です。",
+    "hash": "acb932ce8bb2",
+    "sources": [
+      "article#a-n4-10"
+    ]
+  },
+  {
     "text": "ゼロ",
     "hash": "d3a4ab7b3e1d",
     "sources": [
@@ -38551,7 +38701,8 @@
     "sources": [
       "vocab-n4",
       "vocab-n3",
-      "article-vocab#a-n3-8"
+      "article-vocab#a-n3-8",
+      "article-vocab#a-n3-11"
     ]
   },
   {
@@ -41618,6 +41769,13 @@
     ]
   },
   {
+    "text": "ただ、慣れない人には少し難しいかもしれません。",
+    "hash": "18d64af588f5",
+    "sources": [
+      "article#a-n4-10"
+    ]
+  },
+  {
     "text": "ただい",
     "hash": "d91ee0f5a00c",
     "sources": [
@@ -42185,6 +42343,13 @@
     ]
   },
   {
+    "text": "たべたあと、ともだちとバドミントンをしたり、しゃしんをとったりしました。",
+    "hash": "b0009fc392ad",
+    "sources": [
+      "article#a-n5-9"
+    ]
+  },
+  {
     "text": "たべもの",
     "hash": "791c549738ea",
     "sources": [
@@ -42210,6 +42375,20 @@
     "hash": "7446c97eeae7",
     "sources": [
       "vocab-n5"
+    ]
+  },
+  {
+    "text": "たまごやき",
+    "hash": "fdcb2e97d0ff",
+    "sources": [
+      "article-vocab#a-n5-9"
+    ]
+  },
+  {
+    "text": "たまごやきとおにぎりとやさいをいれました。",
+    "hash": "581c502aa923",
+    "sources": [
+      "article#a-n5-9"
     ]
   },
   {
@@ -45453,6 +45632,13 @@
     ]
   },
   {
+    "text": "てつだう",
+    "hash": "eaa7a0d64122",
+    "sources": [
+      "article-vocab#a-n4-10"
+    ]
+  },
+  {
     "text": "てつづき",
     "hash": "af6980db6832",
     "sources": [
@@ -45682,6 +45868,13 @@
     ]
   },
   {
+    "text": "でも、困ったときは近くの店員さんがすぐに手伝ってくれました。",
+    "hash": "7b063fa5f5df",
+    "sources": [
+      "article#a-n4-10"
+    ]
+  },
+  {
     "text": "でも、少しずつできることが増えてきました。",
     "hash": "a6baec6132c0",
     "sources": [
@@ -45792,7 +45985,8 @@
     "text": "てんいん",
     "hash": "cc9caa983496",
     "sources": [
-      "vocab-n5"
+      "vocab-n5",
+      "article-vocab#a-n4-10"
     ]
   },
   {
@@ -45836,7 +46030,8 @@
     "text": "てんき",
     "hash": "8171cbe9a4f1",
     "sources": [
-      "vocab-n5"
+      "vocab-n5",
+      "article-vocab#a-n5-9"
     ]
   },
   {
@@ -46874,7 +47069,8 @@
       "vocab-n4",
       "vocab-n3",
       "vocab-n2",
-      "article-vocab#a-n3-5"
+      "article-vocab#a-n3-5",
+      "article-vocab#a-n3-11"
     ]
   },
   {
@@ -47560,6 +47756,13 @@
     ]
   },
   {
+    "text": "とてもおいしかったです。",
+    "hash": "6c6dd3ec0102",
+    "sources": [
+      "article#a-n5-9"
+    ]
+  },
+  {
     "text": "とてもおいしかったです。ご馳走様でした。",
     "hash": "8de544cf5031",
     "sources": [
@@ -47913,7 +48116,8 @@
     "text": "ともだち",
     "hash": "fa04cb341f01",
     "sources": [
-      "vocab-n5"
+      "vocab-n5",
+      "article-vocab#a-n5-9"
     ]
   },
   {
@@ -47931,10 +48135,24 @@
     ]
   },
   {
+    "text": "ともだちのぶんもすこしつくりました。",
+    "hash": "9f169f47cf40",
+    "sources": [
+      "article#a-n5-9"
+    ]
+  },
+  {
     "text": "ともだちは「じょうずですね」といいます。",
     "hash": "95ae3d555c4b",
     "sources": [
       "article#a-n5-6"
+    ]
+  },
+  {
+    "text": "ともだちもおいしいといいました。",
+    "hash": "5e9ed59207fd",
+    "sources": [
+      "article#a-n5-9"
     ]
   },
   {
@@ -47956,7 +48174,15 @@
     "hash": "d9ccde3f8f77",
     "sources": [
       "vocab-n5",
+      "article-vocab#a-n5-9",
       "essentials"
+    ]
+  },
+  {
+    "text": "どようびはいいてんきでした。",
+    "hash": "62dedae6f861",
+    "sources": [
+      "article#a-n5-9"
     ]
   },
   {
@@ -49550,7 +49776,8 @@
       "vocab-n4",
       "vocab-n3",
       "vocab-n2",
-      "article-vocab#a-n4-7"
+      "article-vocab#a-n4-7",
+      "article-vocab#a-n4-10"
     ]
   },
   {
@@ -52995,7 +53222,8 @@
     "sources": [
       "vocab-n3",
       "vocab-n2",
-      "article-vocab#a-n3-2"
+      "article-vocab#a-n3-2",
+      "article-vocab#a-n3-11"
     ]
   },
   {
@@ -54117,7 +54345,8 @@
     "hash": "a9671c7d5c2b",
     "sources": [
       "vocab-n3",
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n3-11"
     ]
   },
   {
@@ -56645,6 +56874,13 @@
     ]
   },
   {
+    "text": "べんとう",
+    "hash": "67bd15ca3a1c",
+    "sources": [
+      "article-vocab#a-n5-9"
+    ]
+  },
+  {
     "text": "へんどうする",
     "hash": "fec43ea37af8",
     "sources": [
@@ -56881,7 +57117,8 @@
     "hash": "6eefdd673ac4",
     "sources": [
       "vocab-n3",
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n3-11"
     ]
   },
   {
@@ -57214,6 +57451,13 @@
     "hash": "c987a0af200b",
     "sources": [
       "vocab-n2"
+    ]
+  },
+  {
+    "text": "ほうれんそう",
+    "hash": "f56bb3b75e36",
+    "sources": [
+      "article-vocab#a-n3-11"
     ]
   },
   {
@@ -57970,6 +58214,13 @@
     ]
   },
   {
+    "text": "まえのばんにおべんとうをつくりました。",
+    "hash": "d196f836f355",
+    "sources": [
+      "article#a-n5-9"
+    ]
+  },
+  {
     "text": "まかなう",
     "hash": "fcac050be0e5",
     "sources": [
@@ -58167,6 +58418,13 @@
     "hash": "c909e2368d1b",
     "sources": [
       "conjunctions"
+    ]
+  },
+  {
+    "text": "まず、かごから商品を一つずつ取り出して、バーコードを機械にかざします。",
+    "hash": "dc2036aa79a0",
+    "sources": [
+      "article#a-n4-10"
     ]
   },
   {
@@ -58619,7 +58877,8 @@
       "vocab-n4",
       "vocab-n3",
       "vocab-n2",
-      "article-vocab#a-n2-3"
+      "article-vocab#a-n2-3",
+      "article-vocab#a-n4-10"
     ]
   },
   {
@@ -59075,6 +59334,13 @@
     ]
   },
   {
+    "text": "みちにはさくらのきがたくさんありました。",
+    "hash": "7933a13b04fb",
+    "sources": [
+      "article#a-n5-9"
+    ]
+  },
+  {
     "text": "みちびきだす",
     "hash": "fb953c1aa599",
     "sources": [
@@ -59488,6 +59754,13 @@
     "hash": "a44aeb23943e",
     "sources": [
       "vocab-n1#ことさらに"
+    ]
+  },
+  {
+    "text": "みんなたのしそうでした。",
+    "hash": "62887c8833ba",
+    "sources": [
+      "article#a-n5-9"
     ]
   },
   {
@@ -61448,7 +61721,8 @@
       "vocab-n5",
       "vocab-n4",
       "vocab-n3",
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n5-9"
     ]
   },
   {
@@ -61948,6 +62222,13 @@
     "hash": "81feba2dc169",
     "sources": [
       "vocab-n5"
+    ]
+  },
+  {
+    "text": "ゆうがたいえにかえりました。",
+    "hash": "0beaa5b3833f",
+    "sources": [
+      "article#a-n5-9"
     ]
   },
   {
@@ -63248,6 +63529,13 @@
     ]
   },
   {
+    "text": "らいしゅうもまたこうえんへ行きたいです。",
+    "hash": "11dd88cc7823",
+    "sources": [
+      "article#a-n5-9"
+    ]
+  },
+  {
     "text": "らいねん",
     "hash": "1ecc559ba6b9",
     "sources": [
@@ -64402,7 +64690,8 @@
     "sources": [
       "vocab-n4",
       "vocab-n3",
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n3-11"
     ]
   },
   {
@@ -65392,6 +65681,13 @@
     "hash": "acc1678ea031",
     "sources": [
       "vocab-n5#スポーツ"
+    ]
+  },
+  {
+    "text": "わたしはともだちとこうえんへ行くやくそくをしました。",
+    "hash": "aa614962257a",
+    "sources": [
+      "article#a-n5-9"
     ]
   },
   {
@@ -68754,6 +69050,13 @@
     ]
   },
   {
+    "text": "音が鳴ったら、精算が正しくできたしるしです。",
+    "hash": "bd2c557b1669",
+    "sources": [
+      "article#a-n4-10"
+    ]
+  },
+  {
     "text": "音も気配も通す薄い一枚が、それでも空間を分けたことにする——この曖昧さこそが、狭い住居で他者と暮らす知恵だったのだろう。",
     "hash": "172a51483d0b",
     "sources": [
@@ -68905,6 +69208,13 @@
     "hash": "6d8b7d7728e9",
     "sources": [
       "grammar-n2#n2-47"
+    ]
+  },
+  {
+    "text": "何か問題が起きたら、すぐに報告することが求められます。",
+    "hash": "aa9d25f3f166",
+    "sources": [
+      "article#a-n3-11"
     ]
   },
   {
@@ -71750,6 +72060,13 @@
     ]
   },
   {
+    "text": "外国人の社員にとって、この報連相の習慣は最初は難しく感じられるかもしれません。",
+    "hash": "b807cdcf3315",
+    "sources": [
+      "article#a-n3-11"
+    ]
+  },
+  {
     "text": "外国人の場合、保証人を求められることが多い。",
     "hash": "39ef59cb51a0",
     "sources": [
@@ -73590,6 +73907,13 @@
     "hash": "7036a99b6317",
     "sources": [
       "daily-story#n5_16"
+    ]
+  },
+  {
+    "text": "気持ちは分かりますが、提出期限の延長は、他の学生との公平性を考えますと、難しいかと存じます。",
+    "hash": "157c10e064c0",
+    "sources": [
+      "jlpt-listening"
     ]
   },
   {
@@ -77332,6 +77656,13 @@
     ]
   },
   {
+    "text": "健康診断の結果、異常値が見られたわけではなく、念のため再検査をお願いする形となっております。",
+    "hash": "53e8c6b197f3",
+    "sources": [
+      "jlpt-listening"
+    ]
+  },
+  {
     "text": "券売機で食券を買ってください。",
     "hash": "080c721dcd57",
     "sources": [
@@ -78052,6 +78383,13 @@
     "hash": "602a0be72980",
     "sources": [
       "article#a-n2-5"
+    ]
+  },
+  {
+    "text": "現金の場合は、お金を入れるところに入れます。",
+    "hash": "d7b3965f9ee3",
+    "sources": [
+      "article#a-n4-10"
     ]
   },
   {
@@ -80799,6 +81137,13 @@
     ]
   },
   {
+    "text": "今週の土曜日に行われる予定だった夏祭りは、雨のため、来週の土曜日に変更になりました。",
+    "hash": "f6f661a26a7a",
+    "sources": [
+      "jlpt-listening"
+    ]
+  },
+  {
     "text": "今週は、テストがあります。",
     "hash": "2ddd825dcf7a",
     "sources": [
@@ -80943,6 +81288,13 @@
     "hash": "bfe7141d494f",
     "sources": [
       "vocab-n3#議事録"
+    ]
+  },
+  {
+    "text": "今日の会議は2階の会議室です。会議の前に、資料をコピーしておいてください。",
+    "hash": "aaf9f5140a76",
+    "sources": [
+      "jlpt-listening"
     ]
   },
   {
@@ -81280,6 +81632,13 @@
     "hash": "60793a26f94e",
     "sources": [
       "vocab-n3#それに"
+    ]
+  },
+  {
+    "text": "今日は部屋を掃除します。まず、ゴミを出して、それから、そうじきをかけます。",
+    "hash": "1f487294eb06",
+    "sources": [
+      "jlpt-listening"
     ]
   },
   {
@@ -84077,6 +84436,13 @@
     ]
   },
   {
+    "text": "仕事の進み具合を上司に伝えることを報告と言います。",
+    "hash": "dbf6b613b0c4",
+    "sources": [
+      "article#a-n3-11"
+    ]
+  },
+  {
     "text": "仕事の内容は、注文を取ったり、コーヒーを作ったり、テーブルをかたづけたりすることです。",
     "hash": "f758773ae498",
     "sources": [
@@ -84186,6 +84552,13 @@
     "hash": "b788c27168fb",
     "sources": [
       "vocab-n3#説明する"
+    ]
+  },
+  {
+    "text": "使い方に慣れれば、誰でも簡単に使えるようになります。",
+    "hash": "4e8bcad3be19",
+    "sources": [
+      "article#a-n4-10"
     ]
   },
   {
@@ -84917,6 +85290,13 @@
     ]
   },
   {
+    "text": "市民センターからのご案内です。健康講座の参加者を募集しておりますが、今回は定員に達したため、受付を終了させていただきました。次回の講座は来月開催予定です。",
+    "hash": "9ba3eb5b9ed8",
+    "sources": [
+      "jlpt-listening"
+    ]
+  },
+  {
     "text": "市民のみなさんに、駅前の工事についてお知らせいたします。",
     "hash": "5a162ef6d625",
     "sources": [
@@ -85460,6 +85840,13 @@
     "hash": "81334c026a39",
     "sources": [
       "daily-story#n4_24"
+    ]
+  },
+  {
+    "text": "私は初めてだったので、どこを押せばいいかわからず、少し迷いました。",
+    "hash": "f23139552200",
+    "sources": [
+      "article#a-n4-10"
     ]
   },
   {
@@ -86730,6 +87117,13 @@
     ]
   },
   {
+    "text": "次に、画面を見ながら、現金かカードか、支払い方を選びます。",
+    "hash": "9e3a9b4c5995",
+    "sources": [
+      "article#a-n4-10"
+    ]
+  },
+  {
     "text": "次に、野菜を切ります。",
     "hash": "1375bd518d51",
     "sources": [
@@ -86790,6 +87184,13 @@
     "hash": "4982f2abbb4d",
     "sources": [
       "vocab-n3#交差点"
+    ]
+  },
+  {
+    "text": "次の電車は、事故のため、15分遅れて来ます。急いでいる方は、バスをご利用ください。",
+    "hash": "07d4fbb302ca",
+    "sources": [
+      "jlpt-listening"
     ]
   },
   {
@@ -87021,6 +87422,13 @@
     "hash": "6fc9d9d72f9d",
     "sources": [
       "vocab-n1#謙譲語"
+    ]
+  },
+  {
+    "text": "自分の国では、自分で判断して進めることが評価される場合もあるからです。",
+    "hash": "cca0effa1bdc",
+    "sources": [
+      "article#a-n3-11"
     ]
   },
   {
@@ -91079,6 +91487,13 @@
     ]
   },
   {
+    "text": "小さなことでも相談すれば、大きな失敗を防げます。",
+    "hash": "0c6d19d2cfaa",
+    "sources": [
+      "article#a-n3-11"
+    ]
+  },
+  {
     "text": "小さなことに感謝できる人は幸福だと思います。",
     "hash": "a124484f2f88",
     "sources": [
@@ -94888,6 +95303,20 @@
     ]
   },
   {
+    "text": "図書館からのお知らせです。今月は蔵書点検のため、15日から17日まで休館いたします。なお、休館中もインターネットでの予約受付は通常通り行っております。",
+    "hash": "5997b529498a",
+    "sources": [
+      "jlpt-listening"
+    ]
+  },
+  {
+    "text": "図書館からのお知らせです。本日借りた本の返却期限は今週の火曜日ですが、月曜日は祝日で休館のため、水曜日までに返却してください。",
+    "hash": "384f8995d9c0",
+    "sources": [
+      "jlpt-listening"
+    ]
+  },
+  {
     "text": "図書館では周囲の迷惑にならないよう、声を出さず黙読するのがマナーだ。",
     "hash": "cbc4fb5790e3",
     "sources": [
@@ -96422,6 +96851,13 @@
     ]
   },
   {
+    "text": "先週、近くのスーパーで初めてセルフレジを使いました。",
+    "hash": "4b3bb4bdacd6",
+    "sources": [
+      "article#a-n4-10"
+    ]
+  },
+  {
     "text": "先週、珍しい人に会いました。",
     "hash": "d7fef3a0ba9f",
     "sources": [
@@ -96531,6 +96967,13 @@
     "hash": "72fd92b387b5",
     "sources": [
       "vocab-n4#おっしゃる"
+    ]
+  },
+  {
+    "text": "先生からのお知らせです。「文化祭の準備のため、来週の水曜日と木曜日の部活動は中止とします。ただし、金曜日は通常通り活動を行いますので、忘れずに来てください。」",
+    "hash": "e845557d8c1a",
+    "sources": [
+      "jlpt-listening"
     ]
   },
   {
@@ -98417,6 +98860,13 @@
     ]
   },
   {
+    "text": "相談は、一人で決められないことを上司や同僚に聞くことです。",
+    "hash": "e7b02edd8f48",
+    "sources": [
+      "article#a-n3-11"
+    ]
+  },
+  {
     "text": "相談も同様で、答えを持たずに行っても構わない。",
     "hash": "f597570ece55",
     "sources": [
@@ -99551,6 +100001,13 @@
     ]
   },
   {
+    "text": "台風の接近により、あしたの野外コンサートは中止となりました。なお、雨天の場合に予定していた体育館での代替公演は、予定通り行います。",
+    "hash": "409a55826787",
+    "sources": [
+      "jlpt-listening"
+    ]
+  },
+  {
     "text": "台風の接近により、本日の出発は見合わせることになりました。",
     "hash": "20fec81cc5ec",
     "sources": [
@@ -99567,6 +100024,13 @@
   {
     "text": "台風の接近に伴い、本日午後の便は、欠航となる可能性がございます。最新の運航状況は、ウェブサイトでご確認ください。",
     "hash": "abf92c7758ca",
+    "sources": [
+      "jlpt-listening"
+    ]
+  },
+  {
+    "text": "台風の接近に伴い、明日の便は欠航ではなく、出発時刻を大幅に繰り上げての運航となります。",
+    "hash": "e3cbab635fd8",
     "sources": [
       "jlpt-listening"
     ]
@@ -100386,6 +100850,13 @@
   {
     "text": "男の人が言います。「引っ越し、来月だったよね。手伝いに行こうか。」女の人が答えます。「ありがとう。でも、荷物は業者に頼んだから大丈夫。気持ちだけもらっておくね。」",
     "hash": "955adcd4d8ee",
+    "sources": [
+      "jlpt-listening"
+    ]
+  },
+  {
+    "text": "男の人が言います。「明日の会議、3時からでしたよね。」女の人が答えます。「あ、それが、部長の予定が変わって、2時からになったんです。」男の人が言います。「じゃ、資料は今日中に準備しないと。」",
+    "hash": "4b5a722da808",
     "sources": [
       "jlpt-listening"
     ]
@@ -103625,6 +104096,13 @@
     ]
   },
   {
+    "text": "店員さんがいなくても、自分で商品を精算できます。",
+    "hash": "91b934f848f3",
+    "sources": [
+      "article#a-n4-10"
+    ]
+  },
+  {
     "text": "店員さんがはっきり、ちゃんと説明してくれて、本当に親切でした。",
     "hash": "ac9f5ec87552",
     "sources": [
@@ -103958,6 +104436,13 @@
     "hash": "1f812d32fbde",
     "sources": [
       "listening-q"
+    ]
+  },
+  {
+    "text": "田中さんは朝から頭が痛いです。薬を飲みましたが、まだ痛いので、これから病院に行きます。",
+    "hash": "96d1c27f35cd",
+    "sources": [
+      "jlpt-listening"
     ]
   },
   {
@@ -105155,6 +105640,13 @@
     "hash": "1905742d5f4c",
     "sources": [
       "vocab-n2#膨らむ"
+    ]
+  },
+  {
+    "text": "当初は積雪が予想されていましたが、現時点の予測では、気温は下がるものの、積もるほどの降雪にはならない見込みです。",
+    "hash": "dee4d2429f55",
+    "sources": [
+      "jlpt-listening"
     ]
   },
   {
@@ -106706,10 +107198,24 @@
     ]
   },
   {
+    "text": "日本の会社では、「報連相」がとても大切だと言われています。",
+    "hash": "8275fca48f5d",
+    "sources": [
+      "article#a-n3-11"
+    ]
+  },
+  {
     "text": "日本の会社では、仕事のあとに同僚や上司とお酒を飲みに行くことがよくある。",
     "hash": "80aac44c5432",
     "sources": [
       "article#a-n3-5"
+    ]
+  },
+  {
+    "text": "日本の会社で働くなら、この考え方を理解しておくことが役に立つでしょう。",
+    "hash": "9ede7bc8508a",
+    "sources": [
+      "article#a-n3-11"
     ]
   },
   {
@@ -112728,6 +113234,20 @@
     ]
   },
   {
+    "text": "病院の受付です。「本日は予約された田中様の担当医が急用のため、診察開始が1時間遅れることになりました。お待ちいただくか、明日にご予約を変更することも可能です。」",
+    "hash": "60f7676a5d5a",
+    "sources": [
+      "jlpt-listening"
+    ]
+  },
+  {
+    "text": "病院の予約ですが、午前10時ではなく、午後2時に変更になりました。",
+    "hash": "f0514ae3806c",
+    "sources": [
+      "jlpt-listening"
+    ]
+  },
+  {
     "text": "病気の進行を食い止めるため、早期の治療が何よりも重要だ。",
     "hash": "26ffbabfa920",
     "sources": [
@@ -113500,6 +114020,13 @@
   {
     "text": "部長からの指示ですが、来週の出張は延期ではなく中止となりました。先方との契約自体が白紙にもどったためです。関係者に至急連絡してください。",
     "hash": "ac25807b07fd",
+    "sources": [
+      "jlpt-listening"
+    ]
+  },
+  {
+    "text": "部長が言います。「この資料、あしたの朝までに5部コピーしておいて。あ、やっぱり6部お願い。」",
+    "hash": "551049be932f",
     "sources": [
       "jlpt-listening"
     ]
@@ -114884,6 +115411,13 @@
     ]
   },
   {
+    "text": "方向性自体は悪くないのですが、根本から練り直していただいたほうがよろしいかと。",
+    "hash": "be6588bb52ed",
+    "sources": [
+      "jlpt-listening"
+    ]
+  },
+  {
     "text": "方針の対立が原因で、彼は長年在籍した組合を脱退した。",
     "hash": "fa1d70d3aed0",
     "sources": [
@@ -115476,6 +116010,13 @@
     "hash": "743f82640edf",
     "sources": [
       "listening"
+    ]
+  },
+  {
+    "text": "本日は当店にご来店いただき、ありがとうございます。現在、レジにて2000円以上のお買い物をされた方に、次回使える500円分のクーポンをお渡ししております。",
+    "hash": "aacf18197a71",
+    "sources": [
+      "jlpt-listening"
     ]
   },
   {
@@ -116674,6 +117215,13 @@
     "hash": "e64c0b7149ab",
     "sources": [
       "vocab-n4#試合"
+    ]
+  },
+  {
+    "text": "明日のテストは、9時から10時までです。教室は3階の301教室ではなく、5階の501教室に変わりました。",
+    "hash": "bdb566c9efce",
+    "sources": [
+      "jlpt-listening"
     ]
   },
   {
@@ -118959,6 +119507,13 @@
     ]
   },
   {
+    "text": "予定が変わったときなど、早めの連絡が大切にされます。",
+    "hash": "51917e95a126",
+    "sources": [
+      "article#a-n3-11"
+    ]
+  },
+  {
     "text": "予定が変わったので、ホテルの予約を取消することにしました。",
     "hash": "fd709575fcf5",
     "sources": [
@@ -119880,6 +120435,13 @@
     "hash": "d0f13ddd0e4a",
     "sources": [
       "vocab-n2#作成"
+    ]
+  },
+  {
+    "text": "来週の漢字テストですが、月曜日ではなく、水曜日に行います。",
+    "hash": "2ad83c1a7589",
+    "sources": [
+      "jlpt-listening"
     ]
   },
   {
@@ -121700,6 +122262,13 @@
     "hash": "dbf647c27629",
     "sources": [
       "vocab-n2#ずっと"
+    ]
+  },
+  {
+    "text": "連絡は、必要な情報を関係する人に伝えることです。",
+    "hash": "1d11236d3d46",
+    "sources": [
+      "article#a-n3-11"
     ]
   },
   {
