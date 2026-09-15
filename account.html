@@ -228,7 +228,7 @@ a:hover{text-decoration:underline}
  <div class="card" id="inviteCard" style="display:none">
  <h2><i data-ic=gift></i> 邀請好友,雙方都有獎</h2>
  <p style="font-size:13px;color:var(--tx2);margin-top:6px;line-height:1.7">
- 把你的專屬連結分享給朋友。朋友用連結註冊並<strong>首次付費成功</strong>後,雙方都有獎:<strong>月費 +7 天</strong>、<strong>年費 +1 個月</strong>、<strong>買斷送 AI 加量包</strong>(對話 +5 場、評分 +30 次)。每推薦一位付費朋友發一次,<strong>無上限</strong>。
+ 把你的專屬連結或推薦碼分享給朋友。<strong>你朋友省 200,你多一個月</strong>:朋友用你的碼,年費、買斷直接打 <strong>9 折</strong>(1,790／5,390;月費多 7 天);朋友<strong>首次付費成功</strong>後,你 <strong>+30 天 Premium</strong>,一年最多 6 位(=半年免費)。你是買斷戶的話改送 <strong>AI 加量包</strong>(對話 +5 場、評分 +30 次)。
  </p>
  <div style="margin-top:14px;padding:12px;background:var(--bg3);border-radius:10px">
  <div style="font-size:12px;color:var(--tx3);margin-bottom:6px">你的專屬推薦碼</div>
@@ -425,7 +425,7 @@ function applyRefCode() {
      headers: { 'Authorization': 'Bearer ' + idToken },
    })).then(r => r.json()).then(v => {
      if (v && v.self) { msg.style.color = '#EF4444'; msg.textContent = '這是你自己的推薦碼,請把它分享給朋友 '; return; }
-     if (v && v.valid) store('<i data-ic=check></i> 已套用 ' + raw + (v.kol ? '(' + v.kol + ')' : '') + ',付費後好康:月費多 7 天・年費多 1 個月・買斷送 AI 加量包!');
+     if (v && v.valid) store('✓ 已套用 ' + raw + (v.kol ? '(' + v.kol + ')' : '') + ':年費、買斷打 9 折(1,790／5,390),月費多 7 天!');
      else if (v && v.error) store('已套用 ' + raw + '(暫時無法即時驗證)');
      else { msg.style.color = '#EF4444'; msg.textContent = '查無此推薦碼,請確認後再輸入。'; }
    }).catch(() => store('已套用 ' + raw + '(暫時無法驗證)'));
@@ -471,7 +471,7 @@ function shareInvite() {
  if (navigator.share) {
    navigator.share({
      title: '日本再留計劃 · 免費 JLPT 學習工具',
-     text: '用我的連結註冊 StayJP,付費後我們各有好康(月費多 7 天、年費多 1 個月)!',
+     text: '用我的推薦碼註冊 StayJP,年費、買斷直接打 9 折(省 200 起)!',
      url: link,
    }).catch(() => {});
  }
