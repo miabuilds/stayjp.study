@@ -4800,7 +4800,7 @@ function render() {
 
 function toggleCard(h,e){if(e&&e.target&&e.target.closest&&e.target.closest('.star'))return;const opened=h.parentElement.classList.toggle('o');
   // Journey 證據:真的翻開卡片才計數(打開頁面不算)
-  if(opened){try{const key=(typeof mode!=='undefined'&&mode==='grammar')?'jr_gr_seen':'jr_vb_seen';const n=parseInt(localStorage.getItem(key)||'0',10)+1;if(n<=99)localStorage.setItem(key,String(n));}catch(e2){}}}
+  if(opened){try{if(window.Tutor)Tutor.ctxFromCard(h.parentElement);}catch(e3){}try{const key=(typeof mode!=='undefined'&&mode==='grammar')?'jr_gr_seen':'jr_vb_seen';const n=parseInt(localStorage.getItem(key)||'0',10)+1;if(n<=99)localStorage.setItem(key,String(n));}catch(e2){}}}
 function toggleCat(t){t.classList.toggle('c');t.nextElementSibling.classList.toggle('c')}
 function toggleSd(){
   var open = document.getElementById('sd').classList.toggle('open');
@@ -5314,6 +5314,8 @@ function toggleDetail(btn) {
 </script>
 <script src="tour.js"></script>
 <script src="tool-quota.js"></script>
+<script src="ai-consent.js"></script>
+<script src="tutor.js"></script>
 <!-- Cloudflare Web Analytics --><script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon="{&quot;token&quot;: &quot;0a94a20c2737440a86f55c4241011f68&quot;}"></script><!-- End Cloudflare Web Analytics -->
 <script src="back-to-top.js"></script>
 </body>

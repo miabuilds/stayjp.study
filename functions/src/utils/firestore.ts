@@ -89,7 +89,7 @@ export async function patchSubscription(
 // 買斷戶不缺天數:被推薦人買買斷、或推薦人自己是買斷戶時,+7 天是空氣 →
 // 改發 AI 加量包(對話 +5 場、評分 +15 次,一次性,寫進 ai_usage 的 bonus 池,額度系統優先扣 bonus)。
 // 2026-08-27 Mia 拍板(數量取小)。成本 ~US$1/份,只在真實付款時發。
-export const REF_AI_BONUS = { chat: 5, eval: 30 };
+export const REF_AI_BONUS = { chat: 5, eval: 30, ask: 30 };   // ask=小狸助教問數(2026-09 新增)
 export const REFERRER_REWARD_DAYS = 30;          // 碼主每帶來一位付費朋友 +30 天(2026-09-15)
 export const REFERRER_REWARD_CAP_PER_YEAR = 6;   // 滾動一年最多 6 位(=半年免費)
 // 推薦獎勵天數(依方案分級,2026-09):月費 +7 天、年費/早鳥 +30 天(一個月)。
@@ -101,6 +101,7 @@ export async function grantAiBonus(uid: string, note: string): Promise<void> {
   await db.doc(`ai_usage/${uid}`).set({
     bonusChat: FieldValue.increment(REF_AI_BONUS.chat),
     bonusEval: FieldValue.increment(REF_AI_BONUS.eval),
+    bonusAsk: FieldValue.increment(REF_AI_BONUS.ask),
   }, { merge: true });
   await writeTransaction({
     uid, type: "gift", source: "web", plan: "lifetime",
