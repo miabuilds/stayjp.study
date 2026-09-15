@@ -185,6 +185,9 @@ a:hover{text-decoration:underline}
   </div>
 
   <!-- === 推薦碼(KOL)=== -->
+  <!-- Apple 3.1.1(2026-09-15 退件):iOS App 內輸碼只走原生 Paywall(切換到推薦價 IAP 商品),網頁這塊在 iOS App 裡藏掉,避免「promo code」字面再被審核員抓 -->
+  <style>html.ios-app #refBox{display:none!important}</style>
+  <script>try{if(window.STAYJP_NATIVE&&STAYJP_NATIVE.isNativeApp&&STAYJP_NATIVE.platform==='ios')document.documentElement.classList.add('ios-app');}catch(e){}</script>
   <div id="refBox" style="max-width:440px;margin:8px auto 0;padding:13px 15px;background:var(--bg3);border:1px solid var(--bd);border-radius:var(--r)">
     <div style="font-size:13px;color:var(--tx2);margin-bottom:8px"><i data-ic=ticket></i> 有推薦碼?輸入立刻享:年費、買斷<b style="color:var(--tx)">打 9 折</b>(年費 1,790 續扣終身鎖、買斷 5,390)、月費多 <b style="color:var(--tx)">7 天</b>(選填):</div>
     <div style="display:flex;gap:8px;flex-wrap:wrap">
