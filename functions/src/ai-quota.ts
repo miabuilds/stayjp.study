@@ -16,6 +16,9 @@ const DEFAULTS = {
   freeChatTotal: 1,       // 免費:對話總場數
   premEvalDaily: 30,      // Premium/買斷:評分每日
   premChatDaily: 3,       // Premium/買斷:對話每日場數
+  freeAskDaily: 2,        // 免費:小狸助教每日問數(2026-09 與 Mia 定案:免費每天 2 問、Premium 30 問;成本低所以免費走每日)
+  premAskDaily: 30,       // Premium/買斷:小狸助教每日問數
+  tutorModel: "claude-sonnet-5",   // 小狸助教模型:文法解釋要準,預設 Sonnet;config/ai 可熱切
   maxTurns: 12,           // 每場對話輪數封頂(成本天花板)
   historyKeep: 12,        // 送給模型的歷史訊息數上限(6輪),input 不隨對話無限長
   ttsDaily: 150,          // 雲端 TTS 每人每日粗上限(防拿 token 單獨刷合成;正常對話一天用不到)
@@ -56,7 +59,7 @@ function dayKey(): string {
 
 // 檢查並消耗一次額度。kind: 'eval'(評分一次)| 'chat'(對話開新一場)| 'tts'(合成一次,粗防線)
 // 回傳 null=放行;否則回傳給前端的擋下訊息。
-export async function consumeQuota(uid: string, kind: "eval" | "chat" | "tts", cfg: AiConfig): Promise<string | null> {
+export async function consumeQuota(uid: string, kind: "eval" | "chat" | "ask" | "tts", cfg: AiConfig): Promise<string | null> {
   const prem = await isPremium(uid);
   const ref = admin.firestore().doc("ai_usage/" + uid);
   const today = dayKey();
@@ -68,6 +71,21 @@ export async function consumeQuota(uid: string, kind: "eval" | "chat" | "tts", c
       if (day.n >= cfg.ttsDaily) return "今天的語音合成額度用完了,明天再來!";
       day.n++;
       tx.set(ref, { ttsDay: day }, { merge: true });
+      return null;
+    }
+    if (kind === "ask") {
+      // 小狸助教:免費/Premium 都走「每日」上限(免費 2、Premium 30),超過先扣 bonusAsk(AI 加量包)
+      const day = (u.askDay && u.askDay.d === today) ? u.askDay : { d: today, n: 0 };
+      const limit = prem ? cfg.premAskDaily : cfg.freeAskDaily;
+      const bonusA = Number(u.bonusAsk || 0);
+      if (day.n >= limit) {
+        if (bonusA > 0) { day.n++; tx.set(ref, { askDay: day, bonusAsk: bonusA - 1, askLife: admin.firestore.FieldValue.increment(1) }, { merge: true }); return null; }
+        return prem
+          ? `今天問小狸的額度(${limit} 次)用完了,明天再來!`
+          : `免費每天可以問小狸 ${limit} 次,今天用完了。升級 Premium 每天 ${cfg.premAskDaily} 次!`;
+      }
+      day.n++;
+      tx.set(ref, { askDay: day, askLife: admin.firestore.FieldValue.increment(1) }, { merge: true });
       return null;
     }
     // 累計使用(「我的」頁顯示用;與額度無關,只進不出)
@@ -113,17 +131,17 @@ export async function consumeQuota(uid: string, kind: "eval" | "chat" | "tts", c
 }
 
 // 純記錄(不檢查額度):admin 不計量但「我的」頁也要看得到紀錄(累計+今天都記)
-export async function recordAiUse(uid: string, kind: "eval" | "chat"): Promise<void> {
+export async function recordAiUse(uid: string, kind: "eval" | "chat" | "ask"): Promise<void> {
   try {
     const ref = admin.firestore().doc("ai_usage/" + uid);
     const today = dayKey();
-    const dayField = kind === "eval" ? "evalDay" : "chatDay";
+    const dayField = kind === "eval" ? "evalDay" : kind === "ask" ? "askDay" : "chatDay";
     await admin.firestore().runTransaction(async (tx) => {
       const snap = await tx.get(ref);
       const u: any = snap.exists ? snap.data() : {};
       const day = (u[dayField] && u[dayField].d === today) ? u[dayField] : { d: today, n: 0 };
       day.n++;
-      tx.set(ref, { [dayField]: day, [kind === "eval" ? "evalLife" : "chatLife"]: admin.firestore.FieldValue.increment(1) }, { merge: true });
+      tx.set(ref, { [dayField]: day, [kind === "eval" ? "evalLife" : kind === "ask" ? "askLife" : "chatLife"]: admin.firestore.FieldValue.increment(1) }, { merge: true });
     });
   } catch { /* 統計失敗不影響功能 */ }
 }

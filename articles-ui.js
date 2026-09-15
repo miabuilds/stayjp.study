@@ -551,6 +551,11 @@ window.Articles = (function () {
       }
     } catch (e) {}
   }
+  // 句尾小狸鈕:點了把這句丟給小狸助教逐詞拆解(tutor.js 沒載的頁面不顯示)
+  function askBtn(sentence, a) {
+    if (!window.Tutor) return '';
+    return '<button type="button" class="art-sq" title="' + enOr('問小狸:拆解這句', 'Ask tutor: break down this sentence') + '" onclick="event.stopPropagation();Tutor.askSentence(this.getAttribute(\'data-s\'),this.getAttribute(\'data-t\'),this.getAttribute(\'data-l\'))" data-s="' + esc(sentence) + '" data-t="' + esc(a.title) + '" data-l="' + esc(a.level) + '"><img src="images/mascot/tanuki-think.png" alt=""></button>';
+  }
   function renderRead(a, c) {
     logArticleReadActivity(a.id);
     var paras = String(a.body).split('\n').filter(function (p) { return p.trim(); });
@@ -576,9 +581,9 @@ window.Articles = (function () {
           // 句首 ▶:明確的「播這一句」目標(單字都被字典點擊佔用,句子本身難點到)
           sp = '<span class="art-s" id="artS' + idx + '" onclick="Articles.playFrom(' + idx + ')">' +
             '<button class="art-sp" title="' + enOr('播放/暫停這句', 'Play / pause sentence') + '" onclick="event.stopPropagation();Articles.spTap(' + idx + ')">▶</button>' +
-            frFn(s) + '</span>';
+            frFn(s) + askBtn(clean, a) + '</span>';
         } else {
-          sp = '<span class="art-s" style="padding-left:6px">' + frFn(s) + '</span>';
+          sp = '<span class="art-s" style="padding-left:6px">' + frFn(s) + askBtn(clean, a) + '</span>';
         }
         var rj = romajiForSentence(clean);
         var rjS = rj ? '<span class="art-romaji" style="display:' + (romaOn ? 'block' : 'none') + '">' + esc(rj) + '</span>' : '';

@@ -23,6 +23,7 @@ export { adminListSubscribers } from "./admin-list-subscribers";
 export { adminGaStats } from "./admin-ga-stats";
 export { speakFeedback } from "./speak-feedback";
 export { speakChat } from "./speak-chat";
+export { askTutor } from "./ask-tutor";
 export { ytCaptions, ytCaptionsSeed } from "./yt-captions";
 export { ttsSpeak } from "./tts-speak";
 export { redeemCode } from "./redeem-code";
