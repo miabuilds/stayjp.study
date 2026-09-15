@@ -63,6 +63,13 @@
     ]
   },
   {
+    "text": "「お年玉」はいつ渡しますか。",
+    "hash": "f5d50f5c3719",
+    "sources": [
+      "listening-q"
+    ]
+  },
+  {
     "text": "「キャッシュカードは二週間ぐらいでうちにとどきます」とおしえてくれました。",
     "hash": "01358d2c6591",
     "sources": [
@@ -2009,6 +2016,13 @@
     ]
   },
   {
+    "text": "AIの発展には何が必要ですか。",
+    "hash": "22ede5fe6565",
+    "sources": [
+      "listening-q"
+    ]
+  },
+  {
     "text": "AI技術の発展に伴い、倫理的な課題も深刻化している。アルゴリズムの偏見、プライバシーの侵害、雇用の喪失など、社会全体で取り組むべき問題が山積している。技術の進歩を享受するためには、それに見合った制度設計と社会的合意の形成が不可欠である。",
     "hash": "68f7724897ed",
     "sources": [
@@ -2030,6 +2044,230 @@
     ]
   },
   {
+    "text": "Aさんはどの電車に乗ればいいですか。",
+    "hash": "44f858a82e0f",
+    "sources": [
+      "listening-q"
+    ]
+  },
+  {
+    "text": "Aさんはりんごをいくつかいますか。",
+    "hash": "d56dac0cf15e",
+    "sources": [
+      "listening-q"
+    ]
+  },
+  {
+    "text": "Aさんは何をするように言いましたか。",
+    "hash": "dc8d57b004a2",
+    "sources": [
+      "listening-q"
+    ]
+  },
+  {
+    "text": "Aさんは何を持っていきますか。",
+    "hash": "174c995de318",
+    "sources": [
+      "listening-q"
+    ]
+  },
+  {
+    "text": "Aさんは何を借りましたか。",
+    "hash": "d9d7eb9da00c",
+    "sources": [
+      "listening-q"
+    ]
+  },
+  {
+    "text": "Aはどうすることになりましたか。",
+    "hash": "624a4daf0bc9",
+    "sources": [
+      "listening-q"
+    ]
+  },
+  {
+    "text": "Bさんの かぞくは なんにんですか。",
+    "hash": "d44f9149260a",
+    "sources": [
+      "listening-q"
+    ]
+  },
+  {
+    "text": "Bさんの旅行は何日間ですか。",
+    "hash": "8f993e02df31",
+    "sources": [
+      "listening-q"
+    ]
+  },
+  {
+    "text": "Bさんは テストは どうでしたか。",
+    "hash": "7c9fdda47ed6",
+    "sources": [
+      "listening-q"
+    ]
+  },
+  {
+    "text": "Bさんはいつ手伝えますか。",
+    "hash": "79485dd493d0",
+    "sources": [
+      "listening-q"
+    ]
+  },
+  {
+    "text": "Bさんはエアコンを何度にしてほしいと言っていますか。",
+    "hash": "249b8b36e1f5",
+    "sources": [
+      "listening-q"
+    ]
+  },
+  {
+    "text": "Bさんはきのう何をしましたか。",
+    "hash": "05da8b70ea7c",
+    "sources": [
+      "listening-q"
+    ]
+  },
+  {
+    "text": "Bさんはどこでホテルを探しますか。",
+    "hash": "2e3cc27fa398",
+    "sources": [
+      "listening-q"
+    ]
+  },
+  {
+    "text": "Bさんはなにをのみますか。",
+    "hash": "0a6f6548a439",
+    "sources": [
+      "listening-q"
+    ]
+  },
+  {
+    "text": "Bさんはまいにちなんじにおきますか。",
+    "hash": "0073ab376850",
+    "sources": [
+      "listening-q"
+    ]
+  },
+  {
+    "text": "Bさんは映画についてどう思いましたか。",
+    "hash": "e4f0a54faefc",
+    "sources": [
+      "listening-q"
+    ]
+  },
+  {
+    "text": "Bさんは何を飲みますか。",
+    "hash": "3e6109d8c750",
+    "sources": [
+      "listening-q"
+    ]
+  },
+  {
+    "text": "Bさんは何時ごろ帰りますか。",
+    "hash": "49f153cca351",
+    "sources": [
+      "listening-q"
+    ]
+  },
+  {
+    "text": "Bさんは最近どうですか。",
+    "hash": "4994998997d2",
+    "sources": [
+      "listening-q"
+    ]
+  },
+  {
+    "text": "Bさんは週末、本当は何をしましたか。",
+    "hash": "82086fb97f44",
+    "sources": [
+      "listening-q"
+    ]
+  },
+  {
+    "text": "Bさんは出張にどうやって行きますか。",
+    "hash": "c20700876525",
+    "sources": [
+      "listening-q"
+    ]
+  },
+  {
+    "text": "Bさんは日本語の何が一番好きですか。",
+    "hash": "44b8ac1058c2",
+    "sources": [
+      "listening-q"
+    ]
+  },
+  {
+    "text": "Bさんは平日、どのくらい勉強していますか。",
+    "hash": "10d4d8b4fa5e",
+    "sources": [
+      "listening-q"
+    ]
+  },
+  {
+    "text": "Bはいつ資料を送りますか。",
+    "hash": "44a87d8ee8d6",
+    "sources": [
+      "listening-q"
+    ]
+  },
+  {
+    "text": "Bはこれからどんな仕事をしますか。",
+    "hash": "af51fe1ba82a",
+    "sources": [
+      "listening-q"
+    ]
+  },
+  {
+    "text": "Bはこれからどんな役職になりますか。",
+    "hash": "6442c02d68d3",
+    "sources": [
+      "listening-q"
+    ]
+  },
+  {
+    "text": "Bはこれから何をしますか。",
+    "hash": "8aadae890e13",
+    "sources": [
+      "listening-q"
+    ]
+  },
+  {
+    "text": "Bはなぜ前の仕事を辞めましたか。",
+    "hash": "03745fb1d53c",
+    "sources": [
+      "listening-q"
+    ]
+  },
+  {
+    "text": "Bは何の本を勧めていますか。",
+    "hash": "13433a6d35ad",
+    "sources": [
+      "listening-q"
+    ]
+  },
+  {
+    "text": "Bは漢字をどうやって覚えるといいと言っていますか。",
+    "hash": "31051bf0c57c",
+    "sources": [
+      "listening-q"
+    ]
+  },
+  {
+    "text": "Bは最後に何と答えましたか。",
+    "hash": "f698370d408d",
+    "sources": [
+      "listening-q"
+    ]
+  },
+  {
+    "text": "Bは田中さんの何を心配していますか。",
+    "hash": "5f22f7ce0803",
+    "sources": [
+      "listening-q"
+    ]
+  },
+  {
     "text": "ICカードにチャージしたいです。",
     "hash": "5a54c3035246",
     "sources": [
@@ -2041,6 +2279,13 @@
     "hash": "bef68bc2a75b",
     "sources": [
       "vocab-n2#目まぐるしい"
+    ]
+  },
+  {
+    "text": "SNSの普及によってどんな新しい問題が生まれましたか。",
+    "hash": "9aaa32246e05",
+    "sources": [
+      "listening-q"
     ]
   },
   {
@@ -2568,6 +2813,13 @@
     ]
   },
   {
+    "text": "あしたともだちとどこへいきますか。",
+    "hash": "264c97de9231",
+    "sources": [
+      "listening-q"
+    ]
+  },
+  {
     "text": "あしたの テストの じゅんびを しています。",
     "hash": "cefd0089771b",
     "sources": [
@@ -2617,6 +2869,13 @@
     ]
   },
   {
+    "text": "あしたは何曜日ですか。",
+    "hash": "9b46d707215f",
+    "sources": [
+      "listening-q"
+    ]
+  },
+  {
     "text": "あしたは寒いかもしれない。",
     "hash": "31b12737607a",
     "sources": [
@@ -2635,6 +2894,13 @@
     "hash": "10a74734b04d",
     "sources": [
       "vocab-n5#なければならない"
+    ]
+  },
+  {
+    "text": "あした何を着ますか。",
+    "hash": "7ad55e85b2e9",
+    "sources": [
+      "listening-q"
     ]
   },
   {
@@ -6184,6 +6450,13 @@
     ]
   },
   {
+    "text": "いつカフェに行きますか。",
+    "hash": "532b7c6f2d8e",
+    "sources": [
+      "listening-q"
+    ]
+  },
+  {
     "text": "いつから痛いか、冷たい物がしみるかなどを書きます。",
     "hash": "25bff7b35e1a",
     "sources": [
@@ -6634,6 +6907,13 @@
     ]
   },
   {
+    "text": "いつ散歩するのがいいと言っていますか。",
+    "hash": "8bdd99293105",
+    "sources": [
+      "listening-q"
+    ]
+  },
+  {
     "text": "いでん",
     "hash": "daafbd96bf38",
     "sources": [
@@ -6825,6 +7105,13 @@
     ]
   },
   {
+    "text": "いま なんじですか。",
+    "hash": "6f7368f398b5",
+    "sources": [
+      "listening-q"
+    ]
+  },
+  {
     "text": "いまいましい",
     "hash": "1469235344c5",
     "sources": [
@@ -6851,6 +7138,13 @@
     "sources": [
       "vocab-n3",
       "vocab-n2"
+    ]
+  },
+  {
+    "text": "いまなんじですか。",
+    "hash": "7def87b51bcc",
+    "sources": [
+      "listening-q"
     ]
   },
   {
@@ -9665,6 +9959,13 @@
     ]
   },
   {
+    "text": "おとうさんの しごとは なんですか。",
+    "hash": "91ba4826561f",
+    "sources": [
+      "listening-q"
+    ]
+  },
+  {
     "text": "おとうと",
     "hash": "f4b1936b0927",
     "sources": [
@@ -9698,6 +9999,20 @@
     "hash": "e06d5c5fd1ce",
     "sources": [
       "vocab-n5"
+    ]
+  },
+  {
+    "text": "おとこの人は なにを したいですか。",
+    "hash": "7451f6984555",
+    "sources": [
+      "listening-q"
+    ]
+  },
+  {
+    "text": "おとこの人は にちようびに なにを しますか。",
+    "hash": "e6052775fdac",
+    "sources": [
+      "listening-q"
     ]
   },
   {
@@ -10432,6 +10747,27 @@
     ]
   },
   {
+    "text": "おんなの人は えきまで どうやって いきますか。",
+    "hash": "6a1508a16592",
+    "sources": [
+      "listening-q"
+    ]
+  },
+  {
+    "text": "おんなの人は どちらが すきですか。",
+    "hash": "611b1df56454",
+    "sources": [
+      "listening-q"
+    ]
+  },
+  {
+    "text": "おんなの人は どんな シャツが ほしいですか。",
+    "hash": "ff002a68bd00",
+    "sources": [
+      "listening-q"
+    ]
+  },
+  {
     "text": "おんびん",
     "hash": "5b0994c6a0ae",
     "sources": [
@@ -10450,6 +10786,13 @@
     "hash": "5afe7aacd5b6",
     "sources": [
       "listening"
+    ]
+  },
+  {
+    "text": "オンライン教育はどんなことに貢献していますか。",
+    "hash": "3af18d338ca0",
+    "sources": [
+      "listening-q"
     ]
   },
   {
@@ -12909,6 +13252,13 @@
     ]
   },
   {
+    "text": "かぞくはなんにんですか。",
+    "hash": "f6a4124d65dc",
+    "sources": [
+      "listening-q"
+    ]
+  },
+  {
     "text": "かぞくはわたしのたからものです。",
     "hash": "a65fd7d865b6",
     "sources": [
@@ -13169,6 +13519,13 @@
     "hash": "64126ecae3ee",
     "sources": [
       "listening"
+    ]
+  },
+  {
+    "text": "がっこうは なんじから ですか。",
+    "hash": "f5b50beac5d7",
+    "sources": [
+      "listening-q"
     ]
   },
   {
@@ -16436,6 +16793,13 @@
     ]
   },
   {
+    "text": "きょうしつに がくせいは なんにん いますか。",
+    "hash": "244c07726c30",
+    "sources": [
+      "listening-q"
+    ]
+  },
+  {
     "text": "きょうじゅ",
     "hash": "bbb05f33a697",
     "sources": [
@@ -16608,6 +16972,20 @@
     ]
   },
   {
+    "text": "きょうの てんきは どうですか。",
+    "hash": "e5c43cec1cf7",
+    "sources": [
+      "listening-q"
+    ]
+  },
+  {
+    "text": "きょうのてんきはどうですか。",
+    "hash": "0d0cf960e8d7",
+    "sources": [
+      "listening-q"
+    ]
+  },
+  {
     "text": "きょうは かようびです。あしたは すいようびです。",
     "hash": "67a5ad0fcdda",
     "sources": [
@@ -16654,6 +17032,13 @@
     "hash": "adbe80f691dc",
     "sources": [
       "article#a-n5-7"
+    ]
+  },
+  {
+    "text": "きょうは何月何日ですか。",
+    "hash": "ee6113e11196",
+    "sources": [
+      "listening-q"
     ]
   },
   {
@@ -19615,6 +20000,13 @@
     ]
   },
   {
+    "text": "コアタイムは何時から何時までですか。",
+    "hash": "9ae3e02bd624",
+    "sources": [
+      "listening-q"
+    ]
+  },
+  {
     "text": "こい",
     "hash": "06ead5fe45fa",
     "sources": [
@@ -20704,6 +21096,13 @@
     ]
   },
   {
+    "text": "コーヒーは一杯いくらですか。",
+    "hash": "5cf9deab9514",
+    "sources": [
+      "listening-q"
+    ]
+  },
+  {
     "text": "コーヒーは苦いです。",
     "hash": "9ca04e7ae369",
     "sources": [
@@ -20987,6 +21386,13 @@
     "hash": "2e65033e7d7c",
     "sources": [
       "confusables-eg"
+    ]
+  },
+  {
+    "text": "ここで してはいけないことは なんですか。",
+    "hash": "c6f1e113e0c9",
+    "sources": [
+      "listening-q"
     ]
   },
   {
@@ -21386,6 +21792,13 @@
     "hash": "48dd8d8141f2",
     "sources": [
       "vocab-n1"
+    ]
+  },
+  {
+    "text": "コスト超過の主な原因は何ですか。",
+    "hash": "7c509ee9935c",
+    "sources": [
+      "listening-q"
     ]
   },
   {
@@ -21888,6 +22301,13 @@
     ]
   },
   {
+    "text": "このアプリの特徴は何ですか。",
+    "hash": "a2fbd4aae712",
+    "sources": [
+      "listening-q"
+    ]
+  },
+  {
     "text": "このアプリは、無料で使えるので便利です。",
     "hash": "e43d90958cb0",
     "sources": [
@@ -21997,6 +22417,13 @@
     "hash": "913b34dd5015",
     "sources": [
       "vocab-n4#カード"
+    ]
+  },
+  {
+    "text": "このかさは だれの ですか。",
+    "hash": "bb0eb99acfe9",
+    "sources": [
+      "listening-q"
     ]
   },
   {
@@ -22420,6 +22847,13 @@
     ]
   },
   {
+    "text": "このひとはまいにちなにをべんきょうしますか。",
+    "hash": "85cf05784d10",
+    "sources": [
+      "listening-q"
+    ]
+  },
+  {
     "text": "このプロジェクトが高く評価される理由は、理解に難くない。",
     "hash": "f3c3422b2f87",
     "sources": [
@@ -22572,6 +23006,13 @@
     "hash": "1e79dd64ed38",
     "sources": [
       "vocab-n3#責任"
+    ]
+  },
+  {
+    "text": "このみせはなんじまでですか。",
+    "hash": "7e7a7c2a46fa",
+    "sources": [
+      "listening-q"
     ]
   },
   {
@@ -24990,6 +25431,48 @@
     ]
   },
   {
+    "text": "この人の趣味は何ですか。",
+    "hash": "ebb8f77698fa",
+    "sources": [
+      "listening-q"
+    ]
+  },
+  {
+    "text": "この人は あさ なにを たべますか。",
+    "hash": "59150c003027",
+    "sources": [
+      "listening-q"
+    ]
+  },
+  {
+    "text": "この人はどこへ行きたいですか。",
+    "hash": "b01a947e1522",
+    "sources": [
+      "listening-q"
+    ]
+  },
+  {
+    "text": "この人は何を読むのが好きですか。",
+    "hash": "00a03d6a8c95",
+    "sources": [
+      "listening-q"
+    ]
+  },
+  {
+    "text": "この人は火曜日に何をしますか。",
+    "hash": "1f132f296cab",
+    "sources": [
+      "listening-q"
+    ]
+  },
+  {
+    "text": "この人は週末に何をしますか。",
+    "hash": "bbcf7cb02b8d",
+    "sources": [
+      "listening-q"
+    ]
+  },
+  {
     "text": "この図書館で Wi-Fi を使うことができます。",
     "hash": "06eee23e2781",
     "sources": [
@@ -25001,6 +25484,13 @@
     "hash": "8543a1e19d05",
     "sources": [
       "listening"
+    ]
+  },
+  {
+    "text": "この図書館で一人が借りられる本は何冊ですか。",
+    "hash": "23a365beefb7",
+    "sources": [
+      "listening-q"
     ]
   },
   {
@@ -32180,6 +32670,13 @@
     ]
   },
   {
+    "text": "シャツを二枚買うと、割引はどうなりますか。",
+    "hash": "80aee2104f21",
+    "sources": [
+      "listening-q"
+    ]
+  },
+  {
     "text": "じゃどう",
     "hash": "f5ad2172c4aa",
     "sources": [
@@ -35395,10 +35892,24 @@
     ]
   },
   {
+    "text": "スーパーは なんじに しまりますか。",
+    "hash": "4c2073835cdf",
+    "sources": [
+      "listening-q"
+    ]
+  },
+  {
     "text": "すうはい",
     "hash": "81b0f37c8c4c",
     "sources": [
       "vocab-n1"
+    ]
+  },
+  {
+    "text": "スープは何時間煮込みますか。",
+    "hash": "d9f7c7b83588",
+    "sources": [
+      "listening-q"
     ]
   },
   {
@@ -38908,6 +39419,13 @@
     ]
   },
   {
+    "text": "そのラーメン屋はどんな店ですか。",
+    "hash": "ac5da9b57ecb",
+    "sources": [
+      "listening-q"
+    ]
+  },
+  {
     "text": "その一言は、忘れようとしていた過去の傷を容赦なく抉るものだった。",
     "hash": "a0ef785c0b80",
     "sources": [
@@ -41153,6 +41671,13 @@
     ]
   },
   {
+    "text": "たこ焼きの形はどんな形ですか。",
+    "hash": "486d99815915",
+    "sources": [
+      "listening-q"
+    ]
+  },
+  {
     "text": "たこ焼きは大阪の有名な食べ物です。小麦粉の中にたこを入れて、丸く焼きます。ソースとマヨネーズをかけて食べます。",
     "hash": "8be46072ac7d",
     "sources": [
@@ -41761,6 +42286,13 @@
     "hash": "9037c56b7a34",
     "sources": [
       "vocab-n1"
+    ]
+  },
+  {
+    "text": "たなかさんはどこからきましたか。",
+    "hash": "c3e81ec8746f",
+    "sources": [
+      "listening-q"
     ]
   },
   {
@@ -43986,6 +44518,13 @@
     ]
   },
   {
+    "text": "つぎの えきは どこですか。",
+    "hash": "dd80357e3f1b",
+    "sources": [
+      "listening-q"
+    ]
+  },
+  {
     "text": "つく",
     "hash": "d7321d4ea417",
     "sources": [
@@ -45974,7 +46513,8 @@
     "hash": "e498528b8ec3",
     "sources": [
       "vocab-n5#トイレ",
-      "vocab-n5#どこ"
+      "vocab-n5#どこ",
+      "listening-q"
     ]
   },
   {
@@ -47421,6 +47961,13 @@
     ]
   },
   {
+    "text": "どのサイズが売り切れですか。",
+    "hash": "8aa3f48d9b6b",
+    "sources": [
+      "listening-q"
+    ]
+  },
+  {
     "text": "どのような理由であれ、暴力は正当化できない。",
     "hash": "c1777794b82f",
     "sources": [
@@ -47439,6 +47986,13 @@
     "hash": "6c0763f4efb6",
     "sources": [
       "vocab-n5#どの"
+    ]
+  },
+  {
+    "text": "どの年代の地方への移住が最も多いですか。",
+    "hash": "563a0c84eac2",
+    "sources": [
+      "listening-q"
     ]
   },
   {
@@ -48389,6 +48943,13 @@
     "hash": "e999d0456798",
     "sources": [
       "vocab-n3#基本"
+    ]
+  },
+  {
+    "text": "どんな仕事の価値が見直されていますか。",
+    "hash": "fc6cbc838745",
+    "sources": [
+      "listening-q"
     ]
   },
   {
@@ -50745,6 +51306,13 @@
     ]
   },
   {
+    "text": "パーティーはどこで行われますか。",
+    "hash": "dd5632d174f0",
+    "sources": [
+      "listening-q"
+    ]
+  },
+  {
     "text": "パーティーはとても楽しいです。",
     "hash": "654ad21cf261",
     "sources": [
@@ -51029,6 +51597,13 @@
     "hash": "a784c08fff8d",
     "sources": [
       "listening"
+    ]
+  },
+  {
+    "text": "ハイデガー哲学の中心的な問いは何ですか。",
+    "hash": "a92911e7ea89",
+    "sources": [
+      "listening-q"
     ]
   },
   {
@@ -52440,6 +53015,13 @@
     "hash": "3f2dd2588db6",
     "sources": [
       "vocab-n3"
+    ]
+  },
+  {
+    "text": "はるとあきのてんきはどうですか。",
+    "hash": "634e2d927346",
+    "sources": [
+      "listening-q"
     ]
   },
   {
@@ -54852,6 +55434,20 @@
     ]
   },
   {
+    "text": "ふたりともなにがすきですか。",
+    "hash": "a30f8b01da1d",
+    "sources": [
+      "listening-q"
+    ]
+  },
+  {
+    "text": "ふたりはなんじにどこであいますか。",
+    "hash": "c3870180807b",
+    "sources": [
+      "listening-q"
+    ]
+  },
+  {
     "text": "ふたん",
     "hash": "9a99fcdab969",
     "sources": [
@@ -55304,6 +55900,13 @@
     ]
   },
   {
+    "text": "プラスチックのごみは何曜日に出しますか。",
+    "hash": "04952460e96e",
+    "sources": [
+      "listening-q"
+    ]
+  },
+  {
     "text": "ふらふら",
     "hash": "75c556019884",
     "sources": [
@@ -55496,6 +56099,13 @@
     "sources": [
       "vocab-n3",
       "vocab-n2"
+    ]
+  },
+  {
+    "text": "プロジェクトが遅れている原因は何ですか。",
+    "hash": "4b7995eac048",
+    "sources": [
+      "listening-q"
     ]
   },
   {
@@ -61364,6 +61974,13 @@
     ]
   },
   {
+    "text": "やまださんの たんじょうびは いつですか。",
+    "hash": "12ab33d38685",
+    "sources": [
+      "listening-q"
+    ]
+  },
+  {
     "text": "やむをえず",
     "hash": "0f939d8ff415",
     "sources": [
@@ -63870,6 +64487,13 @@
     ]
   },
   {
+    "text": "レジ袋は一枚いくらぐらいですか。",
+    "hash": "16e40efc46bd",
+    "sources": [
+      "listening-q"
+    ]
+  },
+  {
     "text": "れすとらん",
     "hash": "490f8f383501",
     "sources": [
@@ -63923,6 +64547,13 @@
     "hash": "c9935a4b9e33",
     "sources": [
       "vocab-n2#要旨"
+    ]
+  },
+  {
+    "text": "レポートはいつまでに出しますか。",
+    "hash": "af09cd3c32b5",
+    "sources": [
+      "listening-q"
     ]
   },
   {
@@ -64771,6 +65402,13 @@
     ]
   },
   {
+    "text": "わたしの かばんは なにいろですか。",
+    "hash": "6a8a733ed328",
+    "sources": [
+      "listening-q"
+    ]
+  },
+  {
     "text": "わたしの くるまは あかいです。あおい くるまも すきです。",
     "hash": "a4d56c92b8b2",
     "sources": [
@@ -64831,6 +65469,13 @@
     "hash": "64387029fc74",
     "sources": [
       "vocab-n5#黒"
+    ]
+  },
+  {
+    "text": "わたしのくるまはなにいろですか。",
+    "hash": "1fdfe172ba18",
+    "sources": [
+      "listening-q"
     ]
   },
   {
@@ -65020,6 +65665,13 @@
     "hash": "caea900679a2",
     "sources": [
       "vocab-n5#自転車"
+    ]
+  },
+  {
+    "text": "わたしは七時に何をしますか。",
+    "hash": "c7f1b93dc7ed",
+    "sources": [
+      "listening-q"
     ]
   },
   {
@@ -65752,6 +66404,13 @@
     "hash": "89275bfeaeaf",
     "sources": [
       "vocab-n2#勧める"
+    ]
+  },
+  {
+    "text": "医者は頭痛の原因は何だと言っていますか。",
+    "hash": "11cec971e98b",
+    "sources": [
+      "listening-q"
     ]
   },
   {
@@ -67005,6 +67664,13 @@
     "hash": "e13965276ce7",
     "sources": [
       "vocab-n3#乾かす"
+    ]
+  },
+  {
+    "text": "雨の場合、どうやって確認しますか。",
+    "hash": "53079018801d",
+    "sources": [
+      "listening-q"
     ]
   },
   {
@@ -68624,6 +69290,13 @@
     "hash": "bd8b1fac12bd",
     "sources": [
       "phrases"
+    ]
+  },
+  {
+    "text": "何時に教室に来なければなりませんか。",
+    "hash": "0629fc845084",
+    "sources": [
+      "listening-q"
     ]
   },
   {
@@ -70503,10 +71176,31 @@
     ]
   },
   {
+    "text": "会議はどのくらいの時間を予定していますか。",
+    "hash": "25b4fad3e83c",
+    "sources": [
+      "listening-q"
+    ]
+  },
+  {
     "text": "会議は何時から始まりますか。",
     "hash": "780c07937d74",
     "sources": [
       "speak-test"
+    ]
+  },
+  {
+    "text": "会議は何時に変わりましたか。",
+    "hash": "8fa358deae2d",
+    "sources": [
+      "listening-q"
+    ]
+  },
+  {
+    "text": "会議は何時に変更されましたか。",
+    "hash": "b978da73aeb2",
+    "sources": [
+      "listening-q"
     ]
   },
   {
@@ -72729,6 +73423,13 @@
     ]
   },
   {
+    "text": "企画書のどの部分を修正しますか。",
+    "hash": "7e039c42eed5",
+    "sources": [
+      "listening-q"
+    ]
+  },
+  {
     "text": "企業ともなると、採用した後の日本語教育や、地域社会とのつながりづくりまで担う必要が出てくる。",
     "hash": "708b4de68848",
     "sources": [
@@ -73081,6 +73782,13 @@
     ]
   },
   {
+    "text": "気候変動への対応には何が必要ですか。",
+    "hash": "62f71ed7a436",
+    "sources": [
+      "listening-q"
+    ]
+  },
+  {
     "text": "気候変動への対応は、もはや一国の問題ではなく、地球規模での協調が求められている。先進国と発展途上国の間の利害調整、技術移転、資金援助など、解決すべき課題は多岐にわたる。次世代に持続可能な地球を引き継ぐためには、今こそ国際社会の結束が試されている。",
     "hash": "2c6525520a5c",
     "sources": [
@@ -73106,6 +73814,13 @@
     "hash": "7036a99b6317",
     "sources": [
       "daily-story#n5_16"
+    ]
+  },
+  {
+    "text": "気象庁は何を呼びかけていますか。",
+    "hash": "d27e14b3bff2",
+    "sources": [
+      "listening-q"
     ]
   },
   {
@@ -73624,6 +74339,27 @@
     "hash": "d9b8b54717cc",
     "sources": [
       "vocab-n2#結論"
+    ]
+  },
+  {
+    "text": "客はこの後、どうすることになりましたか。",
+    "hash": "05e8c9f4776d",
+    "sources": [
+      "listening-q"
+    ]
+  },
+  {
+    "text": "客は最後に何を買いましたか。",
+    "hash": "1770f6c4348a",
+    "sources": [
+      "listening-q"
+    ]
+  },
+  {
+    "text": "客への対応はどうすることにしましたか。",
+    "hash": "11de99e1b943",
+    "sources": [
+      "listening-q"
     ]
   },
   {
@@ -74376,6 +75112,13 @@
     ]
   },
   {
+    "text": "京都の春には何がありますか。",
+    "hash": "b348f7d71e1b",
+    "sources": [
+      "listening-q"
+    ]
+  },
+  {
     "text": "京都は、千年以上むかしに日本の首都だった町です。",
     "hash": "c64603f1b9e4",
     "sources": [
@@ -75062,6 +75805,13 @@
     ]
   },
   {
+    "text": "金融政策正常化の良い面は何ですか。",
+    "hash": "72b74fb5e098",
+    "sources": [
+      "listening-q"
+    ]
+  },
+  {
     "text": "金曜日に歓迎会があります。",
     "hash": "2daf7101586f",
     "sources": [
@@ -75389,6 +76139,13 @@
     "hash": "1c446b29fada",
     "sources": [
       "grammar-n1#n1-37"
+    ]
+  },
+  {
+    "text": "空飛ぶクルマの課題は何ですか。",
+    "hash": "95e65020c3a5",
+    "sources": [
+      "listening-q"
     ]
   },
   {
@@ -76638,6 +77395,13 @@
     ]
   },
   {
+    "text": "月曜日の図書館はどうですか。",
+    "hash": "c01896c3e1e6",
+    "sources": [
+      "listening-q"
+    ]
+  },
+  {
     "text": "健康あっての挑戦だ。体を壊しては元も子もない。",
     "hash": "960911de980d",
     "sources": [
@@ -77529,6 +78293,13 @@
     ]
   },
   {
+    "text": "現在、男性の育児休業取得率はどのくらいですか。",
+    "hash": "e17d495afee3",
+    "sources": [
+      "listening-q"
+    ]
+  },
+  {
     "text": "現在の状況を説明していただけますか。",
     "hash": "97c8754ac22b",
     "sources": [
@@ -78261,6 +79032,13 @@
     "hash": "004e4762bcfc",
     "sources": [
       "phrases"
+    ]
+  },
+  {
+    "text": "午前中は何が予定されていますか。",
+    "hash": "947884f9be17",
+    "sources": [
+      "listening-q"
     ]
   },
   {
@@ -79300,6 +80078,13 @@
     ]
   },
   {
+    "text": "高齢化社会によってどんな問題が起きていますか。",
+    "hash": "e084a3f85496",
+    "sources": [
+      "listening-q"
+    ]
+  },
+  {
     "text": "高齢化社会の進展に伴い、認知症患者の数は増加の一途を辿っています。地域包括ケアシステムの構築が急務であり、医療と介護の連携強化が求められています。",
     "hash": "95789d7ee5a3",
     "sources": [
@@ -79741,6 +80526,13 @@
     ]
   },
   {
+    "text": "今のところ何人来る予定ですか。",
+    "hash": "79aa6dea9a46",
+    "sources": [
+      "listening-q"
+    ]
+  },
+  {
     "text": "今のは冗談だから、そんなに真剣に受け取らないでください。",
     "hash": "6b00098cd494",
     "sources": [
@@ -80119,10 +80911,24 @@
     ]
   },
   {
+    "text": "今回の旅行は何日間ですか。",
+    "hash": "e5085500e276",
+    "sources": [
+      "listening-q"
+    ]
+  },
+  {
     "text": "今回の旅行は予算が限られているので、安い宿を探しています。",
     "hash": "a339f43e8e0a",
     "sources": [
       "vocab-n3#予算"
+    ]
+  },
+  {
+    "text": "今期の業績についての見方はどれですか。",
+    "hash": "04c2617fb0af",
+    "sources": [
+      "listening-q"
     ]
   },
   {
@@ -81182,6 +81988,13 @@
     "hash": "2efb6490abb3",
     "sources": [
       "vocab-n1#こじれる"
+    ]
+  },
+  {
+    "text": "佐藤さんは卒業後、何をしたいと言っていますか。",
+    "hash": "ae7efab280f6",
+    "sources": [
+      "listening-q"
     ]
   },
   {
@@ -82284,6 +83097,13 @@
     ]
   },
   {
+    "text": "在宅勤務を希望する若い人はどのくらいですか。",
+    "hash": "d914a7122578",
+    "sources": [
+      "listening-q"
+    ]
+  },
+  {
     "text": "在宅勤務を申請しようと思っています。",
     "hash": "abfd40917a99",
     "sources": [
@@ -82463,6 +83283,13 @@
     "hash": "03e6afa4fea6",
     "sources": [
       "vocab-n1#財務"
+    ]
+  },
+  {
+    "text": "阪神線に乗り換える場合、どの駅で降りますか。",
+    "hash": "f2fccec27adb",
+    "sources": [
+      "listening-q"
     ]
   },
   {
@@ -82757,6 +83584,13 @@
     "hash": "5999ffe4738d",
     "sources": [
       "vocab-n2#散る"
+    ]
+  },
+  {
+    "text": "桜はなぜ新しい始まりの象徴なのですか。",
+    "hash": "d6fe603befb9",
+    "sources": [
+      "listening-q"
     ]
   },
   {
@@ -83198,6 +84032,13 @@
     "hash": "88ca7634dec1",
     "sources": [
       "vocab-n1#朝焼け"
+    ]
+  },
+  {
+    "text": "山田さんは今どうしていますか。",
+    "hash": "1e7381c8490a",
+    "sources": [
+      "listening-q"
     ]
   },
   {
@@ -86141,6 +86982,13 @@
     ]
   },
   {
+    "text": "次の駅はどこですか。",
+    "hash": "6208985a1c0f",
+    "sources": [
+      "listening-q"
+    ]
+  },
+  {
     "text": "次の角を右に曲がってください。",
     "hash": "3e6f91429eeb",
     "sources": [
@@ -86967,6 +87815,13 @@
     ]
   },
   {
+    "text": "社員旅行の行き先はどこになりそうですか。",
+    "hash": "2a9f5d3f62a4",
+    "sources": [
+      "listening-q"
+    ]
+  },
+  {
     "text": "社運を賭けたこの計画に、全社員の英知を結集して臨むほかない。",
     "hash": "13df635d9156",
     "sources": [
@@ -87562,10 +88417,24 @@
     ]
   },
   {
+    "text": "若い世代の主な支払い方法は何ですか。",
+    "hash": "23225df35ffc",
+    "sources": [
+      "listening-q"
+    ]
+  },
+  {
     "text": "若い世代の政治への無関心が、近年ますます深刻になっている。",
     "hash": "ec68eef2239f",
     "sources": [
       "vocab-n2#政治"
+    ]
+  },
+  {
+    "text": "若い世代は一日何時間以上スマートフォンを使いますか。",
+    "hash": "93a0df610040",
+    "sources": [
+      "listening-q"
     ]
   },
   {
@@ -90238,6 +91107,13 @@
     ]
   },
   {
+    "text": "女の人が頼んだコーヒーはいくらですか。",
+    "hash": "aba35f586b18",
+    "sources": [
+      "listening-q"
+    ]
+  },
+  {
     "text": "女三人寄れば姦しいとはよく言ったもので、控室はずっと笑い声で満ちていた。",
     "hash": "a8a9d5de8ec3",
     "sources": [
@@ -91449,6 +92325,13 @@
     ]
   },
   {
+    "text": "情報漏洩について最も急ぐべき対応は何ですか。",
+    "hash": "31ef8fc2d25f",
+    "sources": [
+      "listening-q"
+    ]
+  },
+  {
     "text": "条件が合えば、引き受けないものでもない。",
     "hash": "0ef5658ed992",
     "sources": [
@@ -92644,6 +93527,13 @@
     "hash": "295036f7bbf4",
     "sources": [
       "conjunctions"
+    ]
+  },
+  {
+    "text": "新しく加わった案内言語は何ですか。",
+    "hash": "223e624ede83",
+    "sources": [
+      "listening-q"
     ]
   },
   {
@@ -96253,6 +97143,13 @@
     ]
   },
   {
+    "text": "先方は何を追加してほしいと言っていますか。",
+    "hash": "25a82d943bed",
+    "sources": [
+      "listening-q"
+    ]
+  },
+  {
     "text": "千円を出したので、お釣りをもらいました。",
     "hash": "d539556525fc",
     "sources": [
@@ -96789,6 +97686,13 @@
     "hash": "778fc8f99453",
     "sources": [
       "confusables-word"
+    ]
+  },
+  {
+    "text": "全部でいくらですか。",
+    "hash": "5e1c69215146",
+    "sources": [
+      "listening-q"
     ]
   },
   {
@@ -97534,6 +98438,13 @@
     ]
   },
   {
+    "text": "早く申し込むと、どんないいことがありますか。",
+    "hash": "9af5b36bd793",
+    "sources": [
+      "listening-q"
+    ]
+  },
+  {
     "text": "早く走れ！",
     "hash": "d5a45345e037",
     "sources": [
@@ -98021,6 +98932,13 @@
     "hash": "84fda28a3abc",
     "sources": [
       "listening"
+    ]
+  },
+  {
+    "text": "村上春樹の作品はなぜ世界中で愛されていますか。",
+    "hash": "e8285742e8ca",
+    "sources": [
+      "listening-q"
     ]
   },
   {
@@ -99123,10 +100041,24 @@
     ]
   },
   {
+    "text": "大阪から有馬温泉まで電車でどのくらいかかりますか。",
+    "hash": "dab976de4f8c",
+    "sources": [
+      "listening-q"
+    ]
+  },
+  {
     "text": "大阪市からのお知らせです。明日は台風の影響で、大雨と強風が予想されます。不要な外出は控えてください。最新情報はウェブサイトで確認できます。",
     "hash": "9f81dca3b1eb",
     "sources": [
       "listening"
+    ]
+  },
+  {
+    "text": "大阪城まで歩いて何分ぐらいですか。",
+    "hash": "fbac1d7ec76c",
+    "sources": [
+      "listening-q"
     ]
   },
   {
@@ -100051,6 +100983,13 @@
     "hash": "5f4bc9e585de",
     "sources": [
       "vocab-n2#黒字"
+    ]
+  },
+  {
+    "text": "地方の観光地では何が進められていますか。",
+    "hash": "b64b7d4d2d7d",
+    "sources": [
+      "listening-q"
     ]
   },
   {
@@ -102994,6 +103933,13 @@
     ]
   },
   {
+    "text": "田中さんはどこにいますか。",
+    "hash": "7cc8ea2d952b",
+    "sources": [
+      "listening-q"
+    ]
+  },
+  {
     "text": "田中さんはとても優しい人です。",
     "hash": "a58fdab4b877",
     "sources": [
@@ -103008,10 +103954,24 @@
     ]
   },
   {
+    "text": "田中さんは今何をしていますか。",
+    "hash": "1f812d32fbde",
+    "sources": [
+      "listening-q"
+    ]
+  },
+  {
     "text": "田中さんは風邪をひいたようだ。",
     "hash": "fa5f560b5f6c",
     "sources": [
       "vocab-n5#ようだ"
+    ]
+  },
+  {
+    "text": "田中さんは毎朝どのくらいジョギングをしますか。",
+    "hash": "2e8d41bad10e",
+    "sources": [
+      "listening-q"
     ]
   },
   {
@@ -103764,6 +104724,13 @@
     ]
   },
   {
+    "text": "土曜日、郵便局はいつ開いていますか。",
+    "hash": "44a39ecc6a31",
+    "sources": [
+      "listening-q"
+    ]
+  },
+  {
     "text": "土曜日は、家で本を読みます。",
     "hash": "9daad61d65eb",
     "sources": [
@@ -103999,6 +104966,13 @@
     "hash": "4442a59c33c3",
     "sources": [
       "grammar-n1#n1-69"
+    ]
+  },
+  {
+    "text": "東南アジア市場についての見方はどれですか。",
+    "hash": "bd52e8c5e599",
+    "sources": [
+      "listening-q"
     ]
   },
   {
@@ -104458,6 +105432,13 @@
     ]
   },
   {
+    "text": "動物を何匹飼っていますか。",
+    "hash": "1bdff71dd905",
+    "sources": [
+      "listening-q"
+    ]
+  },
+  {
     "text": "動物園と遊園地も、子供連れには人気のスポットです。",
     "hash": "06b87525f6bc",
     "sources": [
@@ -104787,6 +105768,13 @@
     ]
   },
   {
+    "text": "道頓堀は何の看板で有名ですか。",
+    "hash": "5788b503f20a",
+    "sources": [
+      "listening-q"
+    ]
+  },
+  {
     "text": "道頓堀は大阪を代表する繁華街で、グリコの看板が有名です。通りにはたこ焼きやお好み焼きなど、大阪名物の店がたくさん並んでいます。外国人観光客にも人気のスポットです。",
     "hash": "c4be4afcdc33",
     "sources": [
@@ -104833,6 +105821,13 @@
     "hash": "0602235e44e6",
     "sources": [
       "article#a-n3-7"
+    ]
+  },
+  {
+    "text": "特に人手不足が深刻な分野はどこですか。",
+    "hash": "4eae70d1c2a6",
+    "sources": [
+      "listening-q"
     ]
   },
   {
@@ -105249,6 +106244,27 @@
     ]
   },
   {
+    "text": "二人はいつ花見に行きますか。",
+    "hash": "191beacc7d7c",
+    "sources": [
+      "listening-q"
+    ]
+  },
+  {
+    "text": "二人はこれから何をしますか。",
+    "hash": "dbb17a4ff178",
+    "sources": [
+      "listening-q"
+    ]
+  },
+  {
+    "text": "二人はどこで食べることにしましたか。",
+    "hash": "c75083a3ca8d",
+    "sources": [
+      "listening-q"
+    ]
+  },
+  {
     "text": "二人はまるで運命に導かれるかのように出会い、結ばれた。",
     "hash": "2955da86a1f4",
     "sources": [
@@ -105256,10 +106272,66 @@
     ]
   },
   {
+    "text": "二人は何を食べましたか。",
+    "hash": "fa072aa2fb81",
+    "sources": [
+      "listening-q"
+    ]
+  },
+  {
+    "text": "二人は何時に会いますか。",
+    "hash": "a7753f636339",
+    "sources": [
+      "listening-q"
+    ]
+  },
+  {
+    "text": "二人は新システムの導入について、どう考えていますか。",
+    "hash": "c25423ba9323",
+    "sources": [
+      "listening-q"
+    ]
+  },
+  {
     "text": "二人は人目を忍ぶように、木陰で何やら甘い囁きを交わしていた。",
     "hash": "95ef5b2dba44",
     "sources": [
       "vocab-n1#囁き"
+    ]
+  },
+  {
+    "text": "二人は通商交渉についてどうすべきだと考えていますか。",
+    "hash": "e07d82c23666",
+    "sources": [
+      "listening-q"
+    ]
+  },
+  {
+    "text": "二人は田中さんをどう評価していますか。",
+    "hash": "0740701a8ace",
+    "sources": [
+      "listening-q"
+    ]
+  },
+  {
+    "text": "二人は買収案件についてどうすることにしましたか。",
+    "hash": "7c151638b729",
+    "sources": [
+      "listening-q"
+    ]
+  },
+  {
+    "text": "二人は報道への対応をどうすると決めましたか。",
+    "hash": "defe0f855de8",
+    "sources": [
+      "listening-q"
+    ]
+  },
+  {
+    "text": "二人は目標の数値をどうすることにしましたか。",
+    "hash": "e3c02eea4e67",
+    "sources": [
+      "listening-q"
     ]
   },
   {
@@ -106899,6 +107971,13 @@
     "hash": "20e9b09b4d9e",
     "sources": [
       "vocab-n1#気だるい"
+    ]
+  },
+  {
+    "text": "梅田から難波までどのぐらいかかりますか。",
+    "hash": "a576fff42ae9",
+    "sources": [
+      "listening-q"
     ]
   },
   {
@@ -112286,6 +113365,13 @@
     ]
   },
   {
+    "text": "部屋に何がありませんか。",
+    "hash": "781cb1041c4c",
+    "sources": [
+      "listening-q"
+    ]
+  },
+  {
     "text": "部屋に入るとき、彼は丁寧に帽子を外して挨拶した。",
     "hash": "f9b8067f652b",
     "sources": [
@@ -112451,6 +113537,13 @@
     "hash": "189c7ed82e68",
     "sources": [
       "grammar-n4#n4-40"
+    ]
+  },
+  {
+    "text": "部長はいつ修正点を伝えますか。",
+    "hash": "684790e6bde2",
+    "sources": [
+      "listening-q"
     ]
   },
   {
@@ -112885,6 +113978,13 @@
     "hash": "e918c8106180",
     "sources": [
       "vocab-n2#賃金"
+    ]
+  },
+  {
+    "text": "物価の上昇は主に何に影響していますか。",
+    "hash": "3832537ca99e",
+    "sources": [
+      "listening-q"
     ]
   },
   {
@@ -114842,6 +115942,13 @@
     ]
   },
   {
+    "text": "毎年どのくらいのプラスチックが海に流れ込んでいますか。",
+    "hash": "6010b995eccc",
+    "sources": [
+      "listening-q"
+    ]
+  },
+  {
     "text": "毎晩、その日にあったことを日記に書きます。",
     "hash": "7570d6411868",
     "sources": [
@@ -115000,6 +116107,13 @@
     "hash": "0c2b829f36a4",
     "sources": [
       "vocab-n1#副腎"
+    ]
+  },
+  {
+    "text": "慢性的な孤独の健康リスクは何にたとえられていますか。",
+    "hash": "80380a92238a",
+    "sources": [
+      "listening-q"
     ]
   },
   {
@@ -115661,10 +116775,24 @@
     ]
   },
   {
+    "text": "明日の授業はどうなりますか。",
+    "hash": "3b2f783923f1",
+    "sources": [
+      "listening-q"
+    ]
+  },
+  {
     "text": "明日の朝、7時に起こしてください。",
     "hash": "0b95f8145b19",
     "sources": [
       "speak-test"
+    ]
+  },
+  {
+    "text": "明日の天気はどうなると予想されていますか。",
+    "hash": "d0df0b091214",
+    "sources": [
+      "listening-q"
     ]
   },
   {
@@ -116141,6 +117269,13 @@
     "hash": "7552709d4c20",
     "sources": [
       "vocab-n3#猛烈"
+    ]
+  },
+  {
+    "text": "木村さんは今日、どうして定時に帰りますか。",
+    "hash": "7ebdaddaa8e1",
+    "sources": [
+      "listening-q"
     ]
   },
   {
@@ -116956,6 +118091,13 @@
     ]
   },
   {
+    "text": "薬を飲んだ後、してはいけないことは何ですか。",
+    "hash": "9f494c9116cf",
+    "sources": [
+      "listening-q"
+    ]
+  },
+  {
     "text": "薬を飲んでいるのに、症状は一向によくならない。",
     "hash": "3c9674d2ddc9",
     "sources": [
@@ -117520,6 +118662,13 @@
     "hash": "a5a6b290f620",
     "sources": [
       "speak-test"
+    ]
+  },
+  {
+    "text": "郵便局はどこにありますか。",
+    "hash": "f2e5dd83eff2",
+    "sources": [
+      "listening-q"
     ]
   },
   {
@@ -120092,6 +121241,13 @@
     ]
   },
   {
+    "text": "量子コンピュータと従来のコンピュータの主な違いは何ですか。",
+    "hash": "dfa4f38d1c2b",
+    "sources": [
+      "listening-q"
+    ]
+  },
+  {
     "text": "量子コンピュータの研究開発が世界各国で加速しています。従来のコンピュータが零と一の二進法で計算するのに対し、量子コンピュータは量子ビットを用いることで、膨大な計算を同時に処理できる可能性を秘めています。医薬品開発や気候シミュレーションなど、応用分野は多岐にわたりますが、実用化にはまだ技術的な課題が残されています。",
     "hash": "a1e0b1aeab97",
     "sources": [
@@ -120733,6 +121889,13 @@
     "hash": "f028edd0ad1a",
     "sources": [
       "vocab-n2#例えば"
+    ]
+  },
+  {
+    "text": "和食は何として登録されましたか。",
+    "hash": "76cecbf52d18",
+    "sources": [
+      "listening-q"
     ]
   },
   {

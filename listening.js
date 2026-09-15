@@ -9,6 +9,8 @@ const Listening = (() => {
   let queue = [];
   let answered = [];
   let practiceMode = false;
+  // 日檢模式(2026-09-15 用戶回饋:題目選項中文會看關鍵字選答案):題目與選項用日文(qj/oj),答完才顯示中文。
+  let jpMode = true; try { jpMode = localStorage.getItem('ls_jp') !== '0'; } catch (e) {}
   let speedOverride = null;
   let selectedLevel = 'n5';
 
@@ -57,7 +59,14 @@ const Listening = (() => {
       __lsAudio = null;
     }
   }
-  function speakText(text, rate) {
+  function _en(zh, en) { try { return (typeof enOr === 'function') ? enOr(zh, en) : zh; } catch (e) { return zh; } }
+  function _useJp(item) { return jpMode && !_rlEn() && item && item.qj && Array.isArray(item.oj) && item.oj.length === 4; }
+  function _fr(t) { try { return (window.furiganaHTMLRich || window.furiganaHTML) ? (window.furiganaHTMLRich || window.furiganaHTML)(t) : t; } catch (e) { return t; } }
+  function _qText(item) { return _useJp(item) ? _fr(item.qj) : item.q; }
+  function _optList(item) { return _useJp(item) ? item.oj.map(_fr) : item.options; }
+  function _hasAudio(t) { try { return !!(window.__TTS && window.__TTS[String(t || '').trim()]); } catch (e) { return false; } }
+  function sayQuestion() { if (currentItem && currentItem.qj && _hasAudio(currentItem.qj)) speakText(currentItem.qj, speedOverride || currentItem.speed); }
+  function speakText(text, rate, onEnd) {
     const t2 = (text || '').trim();
     if (!t2) return;
     stopAudio();
@@ -66,6 +75,7 @@ const Listening = (() => {
     if (hash) {
       const audio = new Audio(window.ttsUrl ? window.ttsUrl(hash) : 'audio/tts/' + hash + '.mp3');
       audio.playbackRate = rate || 0.85;
+      if (onEnd) audio.onended = () => { if (__lsToken === myToken) { try { onEnd(); } catch (e) {} } };
       audio.play().then(() => {
         // 在 play() Promise resolve 之前若有更新的呼叫進來，這份音檔要作廢
         if (__lsToken !== myToken) { try { audio.pause(); audio.src=''; } catch(e){} return; }
@@ -122,6 +132,10 @@ const Listening = (() => {
         <button class="on" data-v="test">${t('ls_mode_test')}</button>
         <button data-v="practice">${t('ls_mode_practice')}</button>
       </div></div>
+      <div class="qf"><label>${_en('題目・選項', 'Question & options')}</label><div class="qo" id="lsLang">
+        <button class="${jpMode ? 'on' : ''}" data-v="jp">${_en('日文(日檢模式)', 'Japanese (JLPT style)')}</button>
+        <button class="${jpMode ? '' : 'on'}" data-v="zh">${_en('中文', 'Chinese/English')}</button>
+      </div></div>
       <div style="margin:10px 0;display:flex;flex-direction:column;gap:3px">${levelStats}</div>
       <button class="qstart" onclick="Listening.begin()">${t('ls_start')}</button>
       <div style="display:flex;gap:8px;margin-top:8px">
@@ -150,6 +164,8 @@ const Listening = (() => {
     if (lvEl) { if (selectedLevel !== lvEl.dataset.v) lastBatchIds = []; selectedLevel = lvEl.dataset.v; }
     if (ctEl) lastCountVal = ctEl.dataset.v;
     if (mdEl) practiceMode = mdEl.dataset.v === 'practice';
+    const lgEl = document.querySelector('#lsLang .on');
+    if (lgEl) { jpMode = lgEl.dataset.v === 'jp'; try { localStorage.setItem('ls_jp', jpMode ? '1' : '0'); } catch (e) {} }
 
     const pool = items.filter(i => i.level === selectedLevel);
     if (!pool.length) { alert(t('ls_no_data')); return; }
@@ -231,10 +247,11 @@ const Listening = (() => {
         <button onclick="Listening.setSpeed(1.2)" class="ls-speed-btn" style="font-size:11px;padding:4px 10px;border:1px solid var(--bd);border-radius:6px;background:${rateDisplay===1.2?'var(--ac2)':'var(--bg2)'};color:${rateDisplay===1.2?'#fff':'var(--tx2)'};cursor:pointer">1.2x</button>
       </div>` : ''}
 
-      <div style="font-size:15px;font-weight:600;margin-bottom:10px;color:var(--tx)">${currentItem.q}</div>
+      <div style="font-size:15px;font-weight:600;margin-bottom:10px;color:var(--tx);display:flex;gap:8px;align-items:flex-start"><span style="flex:1">${_qText(currentItem)}</span>${(_useJp(currentItem) && _hasAudio(currentItem.qj)) ? '<button onclick="Listening.sayQuestion()" title="播放題目" style="flex:0 0 auto;background:var(--bg3);border:1px solid var(--bd);border-radius:8px;padding:2px 8px;cursor:pointer;color:var(--ac2)"><i data-ic=volume></i></button>' : ''}</div>
       <div class="qopts" id="lsOpts">
-        ${currentItem.options.map((o, i) => '<button class="qopt" onclick="Listening.answer(' + idx + ',' + i + ')">' + o + '</button>').join('')}
+        ${_optList(currentItem).map((o, i) => '<button class="qopt" onclick="Listening.answer(' + idx + ',' + i + ')">' + o + '</button>').join('')}
       </div>
+      <div id="lsZh" style="display:none;margin-top:10px;font-size:13px;color:var(--tx2);line-height:1.7"></div>
       <div id="lsScript" style="display:none;margin-top:12px;padding:12px;background:var(--bg3);border-radius:8px;border:1px solid var(--bd)">
         <div style="font-size:11px;color:var(--tx2);margin-bottom:4px;font-weight:600">${t('ls_script')}</div>
         <div style="font-size:14px;line-height:2;color:var(--tx)">${currentItem.script.split('\n').map(l => { const f = window.furiganaHTMLRich || window.furiganaHTML; return f ? f(l) : l; }).join('<br>')}</div>
@@ -248,7 +265,8 @@ const Listening = (() => {
   function play() {
     if (replaysLeft <= 0 && !practiceMode) return;
     const rate = speedOverride || currentItem.speed;
-    speakText(currentItem.script.replace(/\n/g, '。'), rate);
+    // 日檢模式:原文播完接著唸日文題目(像真的聽解:先聽對話再聽問題)
+    speakText(currentItem.script.replace(/\n/g, '。'), rate, (_useJp(currentItem) && _hasAudio(currentItem.qj)) ? () => setTimeout(() => { if (currentItem && currentItem.qj) speakText(currentItem.qj, rate); }, 500) : null);   // 題目音檔還沒生成時安靜略過
     if (!practiceMode) {
       replaysLeft--;
       const info = document.getElementById('lsReplayInfo');
@@ -299,6 +317,9 @@ const Listening = (() => {
     // Show script
     const scriptEl = document.getElementById('lsScript');
     if (scriptEl) scriptEl.style.display = 'block';
+    // 日檢模式:答完才給中文題目與正解(學習用),不影響作答時的純日文
+    const zhEl = document.getElementById('lsZh');
+    if (zhEl && _useJp(item)) { zhEl.style.display = 'block'; zhEl.innerHTML = '<b>' + _en('中文：', 'Meaning: ') + '</b>' + item.q + '　→　' + item.options[item.correct]; }
 
     // Show nav
     const navDiv = document.getElementById('lsNav');
@@ -352,5 +373,5 @@ const Listening = (() => {
     resetDone(lv);
     start();  // 重新渲染 start 畫面，更新計數
   }
-  return { start, begin, retrySame, play, setSpeed, answer, renderItem, showResults, close, resetCurrent, setItems };
+  return { start, begin, retrySame, play, setSpeed, answer, renderItem, showResults, close, resetCurrent, setItems, sayQuestion };
 })();
