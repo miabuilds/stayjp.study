@@ -244,7 +244,8 @@ body{margin:0;background:var(--bg);color:var(--tx);font-family:-apple-system,"Pi
         <div class="pc">
           <div class="pc-ctr">
             <button class="nav" onclick="YTS.nav(-1)" aria-label="上一句">‹</button>
-            <button onclick="YTS.replay()" aria-label="重播"><i data-ic=volume></i></button>
+            <button onclick="YTS.replay()" aria-label="重播這句" title="重播這句"><i data-ic=refresh></i></button>
+            <button id="ppBtn" onclick="YTS.togglePlayPause()" aria-label="播放/暫停" title="播放／暫停" style="min-width:56px"><i data-ic=play></i></button>
             <button id="spdBtn" onclick="YTS.cycleSpeed()">1x</button>
             <button id="loopBtn" onclick="YTS.toggleLoop()">循環</button>
             <button class="nav" onclick="YTS.nav(1)" aria-label="下一句">›</button>
@@ -477,6 +478,8 @@ const YTS = (() => {
     document.getElementById('playerWrap').style.display='block';
     player=new YT.Player('playerBox',{ videoId:v, playerVars:{ playsinline:1, rel:0, controls:1 }, events:{
       onStateChange: (e)=>{
+        // 播放/暫停鍵圖示跟著播放器狀態走(1=播放中 → 顯示暫停)
+        try{ const pp=document.getElementById('ppBtn'); if(pp&&e){ pp.innerHTML = e.data===1 ? '<i data-ic=pause></i>' : '<i data-ic=play></i>'; if(window.Icons&&Icons.hydrate)Icons.hydrate(); } }catch(_){}
         // 使用者直接按影片的播放鍵時,我們的邊界監看沒被啟動 → 聽寫/跟讀/測驗會一路播下去。
         // 這裡在「開始播放」時重新掛上當前句的結束點。(跟播模式本來就是連續播,不攔)
         if(e && e.data===1 && (mode==='dict'||mode==='shadow'||mode==='quiz') && lines[cur]) armSegEnd();
@@ -727,6 +730,17 @@ const YTS = (() => {
       else { player.pauseVideo(); clearWatch(); }
     });
     arm();
+  }
+  function togglePlayPause(){
+    if(!player) return;
+    let st=-1; try{ st=player.getPlayerState(); }catch(e){}
+    if(st===1){ try{ player.pauseVideo(); }catch(e){} return; }
+    if(mode==='ktv'){ try{ player.playVideo(); }catch(e){} ktvWatch(); return; }
+    // 逐句模式:若已停在句子中間就續播並重掛結尾監看,否則從這句開頭播
+    let c=0; try{ c=player.getCurrentTime(); }catch(e){}
+    const r=segRange(cur);
+    if(c>r.s && c<r.e-0.1){ try{ player.playVideo(); }catch(e){} clearWatch(); watchSeg(r.s, r.e, ()=>{ player.pauseVideo(); clearWatch(); }); }
+    else playSeg();
   }
   function replay(){ if(mode==='ktv'){ try{ player.seekTo(lines[cur].t/1000,true); player.playVideo(); }catch(e){} return; } playSeg(); }
   function cycleSpeed(){
@@ -1252,7 +1266,7 @@ const YTS = (() => {
     if(ta) ta.addEventListener('paste',()=>{ setTimeout(()=>{ if((ta.value||'').trim()) parsePaste(); },80); });   // 貼上即解析
     try{ if(!localStorage.getItem('yts_tut_seen')) tut(true); }catch(e){}
   });
-  return { load, parsePaste, nav, jump, replay, cycleSpeed, toggleLoop, setMode, toggleRec, submitSaid, revealAnswer, checkDict, toggleList, toggleZh, tut, loadSample, setCat, backToPractice, openTranscript, swap, theater, startQuiz, qzBegin, qzPlay, qzAnswer, qzNext, jumpPlay, openLearn, learnTab, saveWord, speakWord, thumbFallback, thumbCheck, renderToday, _retext };
+  return { load, parsePaste, nav, jump, replay, togglePlayPause, cycleSpeed, toggleLoop, setMode, toggleRec, submitSaid, revealAnswer, checkDict, toggleList, toggleZh, tut, loadSample, setCat, backToPractice, openTranscript, swap, theater, startQuiz, qzBegin, qzPlay, qzAnswer, qzNext, jumpPlay, openLearn, learnTab, saveWord, speakWord, thumbFallback, thumbCheck, renderToday, _retext };
 })();
 </script>
 <script src="font-scale.js"></script>
