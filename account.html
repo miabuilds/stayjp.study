@@ -162,6 +162,9 @@ a:hover{text-decoration:underline}
  <div id="quotaRows" style="font-size:13px;line-height:2;color:var(--tx2)"></div>
  </div>
 
+<!-- Apple 3.1.1(2026-09-15 退件):iOS App 內不得用兌換碼解鎖 Premium → iOS 原生 App 裡整塊藏掉(Web/Android 照常) -->
+<style>html.ios-app #redeemBox{display:none!important}</style>
+<script>try{if(window.STAYJP_NATIVE&&STAYJP_NATIVE.isNativeApp&&STAYJP_NATIVE.platform==='ios')document.documentElement.classList.add('ios-app');}catch(e){}</script>
  <div id="redeemBox" style="margin-top:14px;padding:12px;background:var(--bg3);border-radius:10px">
  <div style="font-size:13px;color:var(--tx2);margin-bottom:8px"><i data-ic=gift></i> 有兌換碼?輸入換取免費 Premium(測試者 / 活動):</div>
  <div style="display:flex;gap:8px;flex-wrap:wrap">
