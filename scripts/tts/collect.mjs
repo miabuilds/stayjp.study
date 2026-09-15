@@ -111,6 +111,10 @@ while ((ls = scriptRe.exec(listenSrc))) {
   const raw = ls[1].replace(/\\n/g, '\n').replace(/\\"/g, '"').replace(/\\\\/g, '\\');
   add(raw.replace(/\n/g, '。'), 'listening');
 }
+// 日檢模式的日文題目(qj)也要有音檔(原文播完接著唸題目)
+for (const m of listenSrc.matchAll(/qj:\s*"((?:\\.|[^"\\])*)"/g)) {
+  add(m[1].replace(/\\"/g, '"'), 'listening-q');
+}
 
 // Articles — 文章閱讀:每篇 body 拆句,去空白(前端 speak 的 key 是去空白的句子)
 const artCode = fs.readFileSync(path.join(ROOT, 'articles.js'), 'utf8');
