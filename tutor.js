@@ -110,7 +110,7 @@
 
   function renderCtx() {
     var box = $('tutorCtx'); if (!box) return;
-    if (!ctx || !(ctx.title || ctx.body)) { box.style.display = 'none'; return; }
+    if (!ctx || !(ctx.title || ctx.body)) { box.style.display = 'none'; renderChips(); return; }
     box.style.display = 'flex';
     var tag = ctx.type === 'grammar' ? L('文法', 'Grammar') : ctx.type === 'vocab' ? L('單字', 'Word') : ctx.type === 'article' ? L('文章', 'Article') : ctx.type === 'sentence' ? L('句子', 'Sentence') : '';
     $('tutorCtxT').textContent = (tag ? tag + '・' : '') + (ctx.title || ctx.body || '').slice(0, 60);

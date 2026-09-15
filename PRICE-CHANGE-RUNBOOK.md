@@ -233,3 +233,7 @@ Firestore console 建立文件 `config/quota`：
 - 舊用戶扣款失敗/卡過期斷訂後回來重訂＝走新價 → 想給舊價用兌換碼或 admin 手動（redeem-code 現成）
 - 非台幣 IAP 的 `amount_twd` 仍是牌價估計（真數字要 ASC 財報＋vendor number，對帳 memo 已記）
 - `ecpay-callback.ts:65` 信任綠界回報金額不對牌價驗證——**這是刻意的**（凍漲舊單靠它記實付），別「順手修」它
+
+## 2026-09-16 iOS 進度
+- 1.0.8(build 36)第二次被退。沒另開版本:把被退的 1.0.8 版本直接 PATCH versionString→1.0.9、掛 build 37(RC AdServices 歸因、三語截圖/文案、ASO、更新提醒),舊 submission 取消、新開一個送出 → WAITING_FOR_REVIEW(09:2x JST)。退件理由 API 看不到,要 Mia 貼 Resolution Center 訊息才能回覆審核員。
+- Android 1.0.9 vc12 已在 Play 草稿,等 iOS 過審一起發;過審後 app-version.json latest 兩邊同時改 1.0.9。
