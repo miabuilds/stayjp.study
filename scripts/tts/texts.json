@@ -259,6 +259,13 @@
     ]
   },
   {
+    "text": "「会議の件」だけではなく、「来週の会議の日程について」のように具体的に書くとよいでしょう。",
+    "hash": "f622a0ec9e37",
+    "sources": [
+      "article#a-n3-12"
+    ]
+  },
+  {
     "text": "「学生ですか。」「はい、そうです。」",
     "hash": "8cd739099ea3",
     "sources": [
@@ -270,6 +277,13 @@
     "hash": "19643db5d821",
     "sources": [
       "article#a-n1-7"
+    ]
+  },
+  {
+    "text": "「黒くて、柄が少し曲がっている傘です」と話しました。",
+    "hash": "325a15c8cd0d",
+    "sources": [
+      "article#a-n4-11"
     ]
   },
   {
@@ -361,6 +375,13 @@
     "hash": "a339f6d46ca4",
     "sources": [
       "grammar-n5#n5-68"
+    ]
+  },
+  {
+    "text": "「特徴を教えてください」と言われたので、色と形を伝えました。",
+    "hash": "a0038886ab8e",
+    "sources": [
+      "article#a-n4-11"
     ]
   },
   {
@@ -4932,6 +4953,13 @@
     ]
   },
   {
+    "text": "あんしん",
+    "hash": "23f85837b56a",
+    "sources": [
+      "article-vocab#a-n3-12"
+    ]
+  },
+  {
     "text": "あんしんする",
     "hash": "9ea3c45530d8",
     "sources": [
@@ -7508,7 +7536,8 @@
     "sources": [
       "vocab-n4",
       "vocab-n3",
-      "article-vocab#a-n3-8"
+      "article-vocab#a-n3-8",
+      "article-vocab#a-n4-11"
     ]
   },
   {
@@ -11541,6 +11570,13 @@
     ]
   },
   {
+    "text": "カードもつかえて、べんりでした。",
+    "hash": "e92b4dd4674f",
+    "sources": [
+      "article#a-n5-10"
+    ]
+  },
+  {
     "text": "カードを作りたいんですが。",
     "hash": "3f908a0851ab",
     "sources": [
@@ -12625,7 +12661,8 @@
     "hash": "45237f446291",
     "sources": [
       "vocab-n4",
-      "vocab-n3"
+      "vocab-n3",
+      "article-vocab#a-n4-11"
     ]
   },
   {
@@ -14395,7 +14432,8 @@
     "text": "かんけつ",
     "hash": "399a098f2ca9",
     "sources": [
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n3-12"
     ]
   },
   {
@@ -15053,7 +15091,8 @@
     "text": "きがつく",
     "hash": "7a13bda9f63c",
     "sources": [
-      "vocab-n4"
+      "vocab-n4",
+      "article-vocab#a-n4-11"
     ]
   },
   {
@@ -16869,6 +16908,13 @@
     ]
   },
   {
+    "text": "きょうはともだちとレストランへ行きました。",
+    "hash": "6fb12fcef15d",
+    "sources": [
+      "article#a-n5-10"
+    ]
+  },
+  {
     "text": "きょうはゆうびんきょくへにもつをおくりにいきます。",
     "hash": "adbe80f691dc",
     "sources": [
@@ -17750,7 +17796,8 @@
     "hash": "a184481db298",
     "sources": [
       "vocab-n3",
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n3-12"
     ]
   },
   {
@@ -19773,6 +19820,13 @@
     "hash": "0a9350bea906",
     "sources": [
       "vocab-n1"
+    ]
+  },
+  {
+    "text": "けんめい",
+    "hash": "6bcd54ba980c",
+    "sources": [
+      "article-vocab#a-n3-12"
     ]
   },
   {
@@ -24112,6 +24166,13 @@
     ]
   },
   {
+    "text": "この言葉があることで、文章全体が丁寧な印象になり、相手も気持ちよく読むことができます。",
+    "hash": "fd828b05efc4",
+    "sources": [
+      "article#a-n3-12"
+    ]
+  },
+  {
     "text": "この言葉にはいくつかの意味があるので、文脈で判断する必要があります。",
     "hash": "40e9fa0e4261",
     "sources": [
@@ -27926,7 +27987,8 @@
     "hash": "3ab79418a353",
     "sources": [
       "vocab-n5",
-      "vocab-n4"
+      "vocab-n4",
+      "article-vocab#a-n4-11"
     ]
   },
   {
@@ -28155,6 +28217,13 @@
     ]
   },
   {
+    "text": "これからは、電車を降りるとき忘れ物がないか確認しようと思います。",
+    "hash": "4c8e7650b2dd",
+    "sources": [
+      "article#a-n4-11"
+    ]
+  },
+  {
     "text": "これからもっと難しくなっていくだろう。",
     "hash": "b58677c0ab26",
     "sources": [
@@ -28222,6 +28291,13 @@
     "hash": "b3d38ed1ce1a",
     "sources": [
       "grammar-n2#n2-41"
+    ]
+  },
+  {
+    "text": "これは、相手との関係に感謝を示す挨拶で、社外の人にも社内の人にも使われる表現です。",
+    "hash": "421493c7ecd9",
+    "sources": [
+      "article#a-n3-12"
     ]
   },
   {
@@ -32153,6 +32229,13 @@
     ]
   },
   {
+    "text": "しばらく待っていると、同じような傘が見つかりそうだと言われました。",
+    "hash": "b5640cf26b71",
+    "sources": [
+      "article#a-n4-11"
+    ]
+  },
+  {
     "text": "しばる",
     "hash": "7c9b41e0c16d",
     "sources": [
@@ -35292,6 +35375,13 @@
     ]
   },
   {
+    "text": "しんにゅうしゃいん",
+    "hash": "2c57e53dc82b",
+    "sources": [
+      "article-vocab#a-n3-12"
+    ]
+  },
+  {
     "text": "しんにゅうする",
     "hash": "ac839b8883ca",
     "sources": [
@@ -35902,6 +35992,20 @@
     "hash": "8aa86aa295b6",
     "sources": [
       "vocab-n4"
+    ]
+  },
+  {
+    "text": "すぐに受け取れて、本当にほっとしました。",
+    "hash": "ce9bd2f0dd62",
+    "sources": [
+      "article#a-n4-11"
+    ]
+  },
+  {
+    "text": "すぐに答えが出せない場合でも、「確認して後日ご連絡します」と一言送っておくと安心されます。",
+    "hash": "2ddf608e2b8a",
+    "sources": [
+      "article#a-n3-12"
     ]
   },
   {
@@ -41872,6 +41976,13 @@
     ]
   },
   {
+    "text": "ただし、件名を長くしすぎればよいというわけではなく、短くまとめる工夫も必要です。",
+    "hash": "eb896ae29c7d",
+    "sources": [
+      "article#a-n3-12"
+    ]
+  },
+  {
     "text": "ただしい",
     "hash": "404f9ddf84c0",
     "sources": [
@@ -42382,6 +42493,13 @@
     "hash": "b0009fc392ad",
     "sources": [
       "article#a-n5-9"
+    ]
+  },
+  {
+    "text": "たべたあと、レジでおかねをはらいました。",
+    "hash": "42c805e9f067",
+    "sources": [
+      "article#a-n5-10"
     ]
   },
   {
@@ -43618,6 +43736,13 @@
     "sources": [
       "vocab-n4",
       "vocab-n3"
+    ]
+  },
+  {
+    "text": "ちゅうもんします",
+    "hash": "43f6460f70d6",
+    "sources": [
+      "article-vocab#a-n5-10"
     ]
   },
   {
@@ -45081,7 +45206,8 @@
     "text": "ていしょく",
     "hash": "a63458c6e63c",
     "sources": [
-      "vocab-n4"
+      "vocab-n4",
+      "article-vocab#a-n5-10"
     ]
   },
   {
@@ -45089,6 +45215,13 @@
     "hash": "68bea0680851",
     "sources": [
       "vocab-n1"
+    ]
+  },
+  {
+    "text": "ていしょくとおちゃをちゅうもんしました。",
+    "hash": "8def27780561",
+    "sources": [
+      "article#a-n5-10"
     ]
   },
   {
@@ -45162,7 +45295,8 @@
     "sources": [
       "vocab-n5",
       "vocab-n4",
-      "vocab-n3"
+      "vocab-n3",
+      "article-vocab#a-n3-12"
     ]
   },
   {
@@ -46029,6 +46163,20 @@
     "sources": [
       "vocab-n5",
       "article-vocab#a-n4-10"
+    ]
+  },
+  {
+    "text": "てんいんさん",
+    "hash": "9088acf1da63",
+    "sources": [
+      "article-vocab#a-n5-10"
+    ]
+  },
+  {
+    "text": "てんいんさんをよびました。",
+    "hash": "289ec411bfb7",
+    "sources": [
+      "article#a-n5-10"
     ]
   },
   {
@@ -47389,7 +47537,8 @@
     "sources": [
       "vocab-n3",
       "vocab-n2",
-      "article-vocab#a-n2-2"
+      "article-vocab#a-n2-2",
+      "article-vocab#a-n4-11"
     ]
   },
   {
@@ -47801,7 +47950,8 @@
     "text": "とてもおいしかったです。",
     "hash": "6c6dd3ec0102",
     "sources": [
-      "article#a-n5-9"
+      "article#a-n5-9",
+      "article#a-n5-10"
     ]
   },
   {
@@ -47816,6 +47966,13 @@
     "hash": "be92ec0c5f8e",
     "sources": [
       "grammar-n5#n5-66"
+    ]
+  },
+  {
+    "text": "とても困ったので、駅の忘れ物センターへ行くことにしました。",
+    "hash": "f92ff701b11f",
+    "sources": [
+      "article#a-n4-11"
     ]
   },
   {
@@ -52992,6 +53149,13 @@
     ]
   },
   {
+    "text": "はらいます",
+    "hash": "44548b21d2a3",
+    "sources": [
+      "article-vocab#a-n5-10"
+    ]
+  },
+  {
     "text": "はらう",
     "hash": "30a0f08a89c3",
     "sources": [
@@ -56895,6 +57059,13 @@
     ]
   },
   {
+    "text": "へんしん",
+    "hash": "8d298362c744",
+    "sources": [
+      "article-vocab#a-n3-12"
+    ]
+  },
+  {
     "text": "へんすう",
     "hash": "334709560bca",
     "sources": [
@@ -56993,7 +57164,8 @@
       "vocab-n3",
       "vocab-n2",
       "article-vocab#a-n3-1",
-      "article-vocab#a-n5-4"
+      "article-vocab#a-n5-4",
+      "article-vocab#a-n5-10"
     ]
   },
   {
@@ -57846,6 +58018,13 @@
     ]
   },
   {
+    "text": "ほっとする",
+    "hash": "7bb53e9e478c",
+    "sources": [
+      "article-vocab#a-n4-11"
+    ]
+  },
+  {
     "text": "ぼつぼつ",
     "hash": "49acfd4138ac",
     "sources": [
@@ -58282,7 +58461,8 @@
     "sources": [
       "vocab-n5",
       "vocab-n3",
-      "article-vocab#a-n4-3"
+      "article-vocab#a-n4-3",
+      "article-vocab#a-n4-11"
     ]
   },
   {
@@ -58484,6 +58664,13 @@
     ]
   },
   {
+    "text": "まず、件名は一目で内容がわかるように、簡潔に書くことが大切です。",
+    "hash": "d98c01c64d09",
+    "sources": [
+      "article#a-n3-12"
+    ]
+  },
+  {
     "text": "ますい",
     "hash": "f240dce4dc9e",
     "sources": [
@@ -58585,6 +58772,13 @@
     "sources": [
       "vocab-n5",
       "confusables-word"
+    ]
+  },
+  {
+    "text": "また、メールを受け取ったら、できるだけ早く返信することも大切なマナーの一つです。",
+    "hash": "8ef76625365f",
+    "sources": [
+      "article#a-n3-12"
     ]
   },
   {
@@ -58835,6 +59029,13 @@
     "hash": "8a4d7a4595b8",
     "sources": [
       "article#a-n5-8"
+    ]
+  },
+  {
+    "text": "マナー",
+    "hash": "9a459cea045e",
+    "sources": [
+      "article-vocab#a-n3-12"
     ]
   },
   {
@@ -59116,7 +59317,8 @@
     "hash": "8b71130d71ef",
     "sources": [
       "vocab-n3",
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n3-12"
     ]
   },
   {
@@ -59422,7 +59624,8 @@
     "hash": "54c723d30073",
     "sources": [
       "vocab-n4",
-      "vocab-n3"
+      "vocab-n3",
+      "article-vocab#a-n4-11"
     ]
   },
   {
@@ -60486,10 +60689,31 @@
     ]
   },
   {
+    "text": "メールの最後には、「よろしくお願いいたします」という言葉で締めることにしている人が多いです。",
+    "hash": "4f7061dba856",
+    "sources": [
+      "article#a-n3-12"
+    ]
+  },
+  {
+    "text": "メールの書き出しには、「お世話になっております」という言葉がよく使われます。",
+    "hash": "8280eb104d3e",
+    "sources": [
+      "article#a-n3-12"
+    ]
+  },
+  {
     "text": "メールの内容がよく分からなかったので、もう一度確認させていただけますか。",
     "hash": "b8d599ae1304",
     "sources": [
       "vocab-n3#内容"
+    ]
+  },
+  {
+    "text": "メールは電話と違って、相手の都合のよい時間に読んでもらえるという利点があります。",
+    "hash": "d85d1bc2dc52",
+    "sources": [
+      "article#a-n3-12"
     ]
   },
   {
@@ -60661,6 +60885,20 @@
     "hash": "20c616d534ed",
     "sources": [
       "vocab-n4"
+    ]
+  },
+  {
+    "text": "メニュー",
+    "hash": "8f99b5f7c588",
+    "sources": [
+      "article-vocab#a-n5-10"
+    ]
+  },
+  {
+    "text": "メニューをみて、りょうりをえらびました。",
+    "hash": "523e5f01debc",
+    "sources": [
+      "article#a-n5-10"
     ]
   },
   {
@@ -63286,6 +63524,13 @@
     ]
   },
   {
+    "text": "よびます",
+    "hash": "12813a7c9cc7",
+    "sources": [
+      "article-vocab#a-n5-10"
+    ]
+  },
+  {
     "text": "よぶ",
     "hash": "3bfaa7c076de",
     "sources": [
@@ -63943,7 +64188,8 @@
     "hash": "39467a869cd8",
     "sources": [
       "vocab-n3",
-      "article-vocab#a-n2-5"
+      "article-vocab#a-n2-5",
+      "article-vocab#a-n3-12"
     ]
   },
   {
@@ -64241,7 +64487,8 @@
     "text": "りょうり",
     "hash": "e437be4fbe8f",
     "sources": [
-      "vocab-n5"
+      "vocab-n5",
+      "article-vocab#a-n5-10"
     ]
   },
   {
@@ -64258,6 +64505,13 @@
     "sources": [
       "article-vocab#a-n3-4",
       "article-vocab#a-n1-3"
+    ]
+  },
+  {
+    "text": "りょうりははやくきました。",
+    "hash": "34b67ee2ba41",
+    "sources": [
+      "article#a-n5-10"
     ]
   },
   {
@@ -64537,6 +64791,13 @@
     ]
   },
   {
+    "text": "レジ",
+    "hash": "77654f51d590",
+    "sources": [
+      "article-vocab#a-n5-10"
+    ]
+  },
+  {
     "text": "れしーと",
     "hash": "aa86e673d5f9",
     "sources": [
@@ -64611,6 +64872,13 @@
     "hash": "490f8f383501",
     "sources": [
       "vocab-n5"
+    ]
+  },
+  {
+    "text": "レストラン",
+    "hash": "a4e764301cf7",
+    "sources": [
+      "article-vocab#a-n5-10"
     ]
   },
   {
@@ -65490,6 +65758,13 @@
     "sources": [
       "vocab-n3",
       "vocab-n2"
+    ]
+  },
+  {
+    "text": "わすれもの",
+    "hash": "c71c58df70f3",
+    "sources": [
+      "article-vocab#a-n4-11"
     ]
   },
   {
@@ -68844,6 +69119,13 @@
     "hash": "f5a037ce0e6c",
     "sources": [
       "vocab-n2#摂取"
+    ]
+  },
+  {
+    "text": "奥から傘を持ってきてもらったら、それは確かに私の傘でした。",
+    "hash": "92303ddd7d37",
+    "sources": [
+      "article#a-n4-11"
     ]
   },
   {
@@ -73903,6 +74185,13 @@
     ]
   },
   {
+    "text": "気がついたら、もう電車は次の駅に着いていました。",
+    "hash": "3b9e75ca1337",
+    "sources": [
+      "article#a-n4-11"
+    ]
+  },
+  {
     "text": "気がつくと、観客が静かになっていました。",
     "hash": "669f7b04be8c",
     "sources": [
@@ -76431,6 +76720,20 @@
     ]
   },
   {
+    "text": "係の人に、傘をなくしたことを説明しました。",
+    "hash": "7edf73ab57bc",
+    "sources": [
+      "article#a-n4-11"
+    ]
+  },
+  {
+    "text": "係の人は「少し待ってください、探してみます」と言ってくれました。",
+    "hash": "6abe5423121c",
+    "sources": [
+      "article#a-n4-11"
+    ]
+  },
+  {
     "text": "係の人はゆっくり話してくれます。",
     "hash": "1ecaadeb1e40",
     "sources": [
@@ -77611,6 +77914,13 @@
     "hash": "c01896c3e1e6",
     "sources": [
       "listening-q"
+    ]
+  },
+  {
+    "text": "件名が分かりにくいと、相手が忙しいときにメールを見落としてしまうかもしれません。",
+    "hash": "9c0ecc4b19c9",
+    "sources": [
+      "article#a-n3-12"
     ]
   },
   {
@@ -81393,6 +81703,13 @@
     "hash": "1a4065ba363b",
     "sources": [
       "vocab-n1#寒波"
+    ]
+  },
+  {
+    "text": "今日、電車の中に傘を忘れてしまいました。",
+    "hash": "31d5604570e3",
+    "sources": [
+      "article#a-n4-11"
     ]
   },
   {
@@ -90983,6 +91300,13 @@
     ]
   },
   {
+    "text": "初めて連絡する相手には、「はじめてご連絡いたします」のような表現を使うこともあります。",
+    "hash": "724c77b41c39",
+    "sources": [
+      "article#a-n3-12"
+    ]
+  },
+  {
     "text": "初めまして、田中と申します。",
     "hash": "71368942c0a4",
     "sources": [
@@ -91246,6 +91570,13 @@
     "hash": "5dd390c5741e",
     "sources": [
       "vocab-n1#請願"
+    ]
+  },
+  {
+    "text": "書き方を間違えると失礼な印象を与えてしまうこともあるので、新入社員は先輩からよく学びます。",
+    "hash": "1ee4e467f9fb",
+    "sources": [
+      "article#a-n3-12"
     ]
   },
   {
@@ -107534,6 +107865,13 @@
     ]
   },
   {
+    "text": "日本の会社で働くとき、メールの書き方にはいくつかの基本的なルールがあります。",
+    "hash": "c3c9e2a9b7f8",
+    "sources": [
+      "article#a-n3-12"
+    ]
+  },
+  {
     "text": "日本の会社で働くなら、この考え方を理解しておくことが役に立つでしょう。",
     "hash": "9ede7bc8508a",
     "sources": [
@@ -116423,6 +116761,13 @@
     "hash": "5666232f848b",
     "sources": [
       "vocab-n1#入念"
+    ]
+  },
+  {
+    "text": "本文では、用件を分かりやすく伝えるように、短い文で丁寧に書くことが求められます。",
+    "hash": "4bfc0ad85615",
+    "sources": [
+      "article#a-n3-12"
     ]
   },
   {
