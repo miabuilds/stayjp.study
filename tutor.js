@@ -67,6 +67,9 @@
       '#tutorPanel .tt-welcome{font-size:13.5px;color:var(--tx2,#7A7A7A);line-height:1.6;padding:6px 4px}',
       '.art-sq{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;margin-left:4px;border-radius:50%;border:1.5px solid rgba(74,127,212,.4);background:none;cursor:pointer;vertical-align:middle;padding:0;font-size:12px;line-height:1;color:#4A7FD4}',
       '.art-sq img{width:16px;height:16px;object-fit:contain;pointer-events:none}',
+      // app.html 有「↑ 回頂部」鈕(.bt,bottom:72px right:16px)→ 小狸往上疊,不要壓到它(Mia 2026-09-16 回饋)
+      'body.tutor-has-bt #tutorFab{bottom:calc(72px + 50px + env(safe-area-inset-bottom,0px));right:16px}',
+      'body.tutor-has-bt #tutorHint{bottom:calc(72px + 62px + env(safe-area-inset-bottom,0px));right:82px}',
       'body.tutor-open #tutorFab,body.tutor-open #tutorHint,body.tutor-open #quotaBadge{display:none!important}'   // 面板開著時左下角免費額度小牌也收起,手機上會壓到對話
     ].join('\n');
     document.head.appendChild(s);
@@ -74,6 +77,7 @@
 
   function build() {
     if (built) return; built = true; css();
+    try { if (document.getElementById('bt')) document.body.classList.add('tutor-has-bt'); } catch (e) {}
     var fab = document.createElement('button'); fab.id = 'tutorFab'; fab.type = 'button';
     fab.setAttribute('aria-label', L('問小狸助教', 'Ask Tanuki tutor'));
     fab.innerHTML = '<img src="' + IMG + '" alt=""><span class="tt-dot">AI</span>';
