@@ -1784,6 +1784,7 @@ try {
   <div class="more-sec">練習</div>
   <a class="more-item" href="essentials.html"><svg class="mi-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6.5C10.5 5 7.5 4.5 4 5v13c3.5-.5 6.5 0 8 1.5M12 6.5C13.5 5 16.5 4.5 20 5v13c-3.5-.5-6.5 0-8 1.5M12 6.5V20"/></svg><span>必學基礎</span></a>
   <button class="more-item" onclick="closeMore();FlashCard.start()"><svg class="mi-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="6.5" width="12" height="14" rx="2"/><path d="M8 3.5h10a2 2 0 0 1 2 2v11"/></svg><span>快速背單字</span></button>
+  <button class="more-item" onclick="closeMore();VocabListen.open()"><svg class="mi-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="6.5" width="12" height="14" rx="2"/><path d="M8 3.5h10a2 2 0 0 1 2 2v11"/></svg><span>用聽的背單字</span></button>
   <button class="more-item" onclick="closeMore();MockExam.start()"><svg class="mi-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="12" height="17" rx="2"/><path d="M9.5 4V3h5v1"/><path d="M9 10h6M9 14h4"/></svg><span data-i18n="mock_exam">模擬考</span></button>
   <button class="more-item" onclick="closeMore();GrammarDrill.start()"><svg class="mi-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4.5h8a3 3 0 0 1 3 3V20a2.5 2.5 0 0 0-2.5-2H5z"/><path d="M5 4.5V18"/></svg><span data-i18n="grammar_drill">文法練習</span></button>
   <button class="more-item" onclick="closeMore();KeigoQuiz.start()"><svg class="mi-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="9" r="5"/><path d="M8.5 13l-1.5 8 5-3 5 3-1.5-8"/></svg><span data-i18n="keigo_practice">敬語練習</span></button>
@@ -2685,6 +2686,7 @@ function renderHub() {
         + '<button onclick="Kana.open()"><span class="hq-ic"><i data-ic=grid></i></span>' + L('五十音', 'Kana') + '</button>'
         + '<button onclick="MockExam.start()"><span class="hq-ic"><i data-ic=clipboard></i></span>' + L('快速小考', 'Quick test') + '</button>'
         + '<button onclick="FlashCard.start()"><span class="hq-ic"><i data-ic=bolt></i></span>' + L('快速背單字', 'Flashcards') + '</button>'
+        + '<button onclick="VocabListen.open()"><span class="hq-ic"><i data-ic=headphones></i></span>' + L('用聽的背', 'Listen') + '</button>'
       + '</div>'
       + '<div class="hub-foot"><img src="images/mascot/tanuki-p06.png" alt=""><span>' + L('今天也一起加油！', 'Let’s study today!') + '</span></div>'
     + '</div>'
@@ -5254,6 +5256,7 @@ function toggleDetail(btn) {
 <script src="quiz.js"></script>
 <script src="srs.js"></script>
 <script src="study-plan.js"></script>
+<script src="vocab-listen.js"></script>
 <script src="stats.js"></script>
 <script src="grammar-glossary.js"></script>
 <script src="grammar-drill.js"></script>

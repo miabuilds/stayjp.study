@@ -26,7 +26,7 @@
   const GLOBAL_DAILY_LIMIT = 3;   // 每天全站最多免費試用幾個練習工具(收緊「每工具 1 次」的總量)
   const TOOL_NAMES = {
     srs: 'SRS 記憶卡', flashcard: '快速背單字', shadow: '跟讀', grammar: '文法練習',
-    quiz: '單字測驗', reading: '讀解', listening: '聽力', story: '今日故事',
+    quiz: '單字測驗', reading: '讀解', listening: '聽力', story: '今日故事', listen: '用聽的背單字',
   };
 
   // ── 免費制世代切換(2026-09 調價配套):每日配額 → 總次數包 ──
