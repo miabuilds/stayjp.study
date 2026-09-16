@@ -333,6 +333,7 @@
         : (_ln >= 2 ? '<div class="jfreq jfreq-dim"><i data-ic=search></i> 查過 ' + _ln + ' 次</div>' : ''))
       + '<div class="jacts"><button class="jact jact-spk" type="button"><i data-ic=volume></i> 發音</button><button class="jact jact-fav' + (_nudge ? ' jact-pulse' : '') + '" type="button">' + (_nudge ? '<i data-ic=star></i> 收藏複習' : '☆ 收藏') + '</button>'
       + (data.m ? '' : '<a class="jact" href="https://cjjc.weblio.jp/content/' + encodeURIComponent(data.w) + '" target="_blank" rel="noopener" onclick="event.stopPropagation()"><i data-ic=book></i> 中文辭典</a><a class="jact" href="https://jisho.org/search/' + encodeURIComponent(data.w) + '" target="_blank" rel="noopener" onclick="event.stopPropagation()">Jisho</a>')
+      + (window.Tutor ? '<button class="jact jact-ask" type="button" title="用法、例句、相似字差別">🦝 問小狸</button>' : '')
       + '</div>'
       + '<a class="jreport" href="' + reportHref('讀音/內容', data.w, '詞：' + data.w + '\n目前顯示讀音：' + (data.r || '') + '\n意思：' + (data.m || '')) + '" target="_blank" rel="noopener" onclick="event.stopPropagation()"><i data-ic=flag></i> 這個字讀音/意思有誤?回報</a>';
     document.body.appendChild(pop);
@@ -354,6 +355,19 @@
       var key = T[data.r] ? data.r : (T[data.w] ? data.w : null);
       if (key) { if (typeof speak === 'function') speak(key); return; }
       cloudSay(data.r || data.w);
+    });
+    // 🦝 問小狸:帶著這個詞(讀音/詞性/釋義)開助教,直接問用法(回饋:點單字後想看更多用法介紹)
+    var ask = pop.querySelector('.jact-ask');
+    if (ask) ask.addEventListener('click', function (e) {
+      e.stopPropagation(); closePop();
+      try {
+        var ctxType = /助詞|助動詞|語尾|接続/.test(data.c || '') ? 'grammar' : 'vocab';
+        var isEn = (typeof I18n !== 'undefined' && I18n.getLang && I18n.getLang() === 'en');
+        window.Tutor.open({ type: ctxType, title: data.w + (data.r && data.r !== data.w ? '(' + data.r + ')' : ''), body: [data.c, data.m].filter(Boolean).join(' / '), level: window.currentLevel || '' });
+        window.Tutor.ask(isEn
+          ? 'How is 「' + data.w + '」 used? Give 3 example sentences from everyday life, and note any similar words and how they differ.'
+          : '「' + data.w + '」怎麼用?給我 3 個生活例句,並說明跟相似的字差在哪。', 'ask');
+      } catch (err) {}
     });
     // ☆ 收藏 → 生字本
     var fav = pop.querySelector('.jact-fav');

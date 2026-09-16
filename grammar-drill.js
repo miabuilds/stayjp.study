@@ -9,6 +9,7 @@ const GrammarDrill = (() => {
     if (lv === 'n4') return typeof N4 !== 'undefined' ? N4 : [];
     if (lv === 'n3') return typeof N3 !== 'undefined' ? N3 : [];
     if (lv === 'n2') return typeof N2 !== 'undefined' ? N2 : [];
+    if (lv === 'n1') return typeof N1 !== 'undefined' ? N1 : [];   // 2026-09-16 用戶回饋:N1 單元測驗「沒有符合條件的文法點」= 這裡漏了 N1
     return [];
   }
 
