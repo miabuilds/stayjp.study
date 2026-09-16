@@ -238,3 +238,4 @@ Firestore console 建立文件 `config/quota`：
 - 1.0.8(build 36)第二次被退。沒另開版本:把被退的 1.0.8 版本直接 PATCH versionString→1.0.9、掛 build 37(RC AdServices 歸因、三語截圖/文案、ASO、更新提醒),舊 submission 取消、新開一個送出 → WAITING_FOR_REVIEW(09:2x JST)。退件理由 API 看不到,要 Mia 貼 Resolution Center 訊息才能回覆審核員。
 - Android 1.0.9 vc12 已在 Play 草稿,等 iOS 過審一起發;過審後 app-version.json latest 兩邊同時改 1.0.9。
 - 09-16 14:3x JST:1.0.8 第二次退件理由=3.1.1(兌換碼/推薦碼字面)。處理:iOS App 內藏 #redeemBox/#refBox(web 已上線)、原生 Paywall 改版+文案只講 IAP 推薦價方案、換新小狸圖、EN 補齊 → 1.0.9 送審撤回、版本改名 1.0.10、build 38 掛上、WAITING_FOR_REVIEW。Android vc13 在 Play 草稿等一起發。YouTube 跟讀 iOS 入口依 Mia 要求復原。
+- 09-17:1.0.10(build 39)三退 3.1.1(iPad 審,Paywall 推薦碼欄)。1.0.11 = iOS Paywall 完全移除輸碼欄 + 推薦深連結 stayjp://ref/CODE、?ref= 自動套推薦價 + 提醒語氣(溫柔/教練/情勒)。build 41 掛上、WAITING_FOR_REVIEW;Android vc16 進 Play 草稿。網頁:iPhone Safari 點推薦連結顯示「在 App 開啟」、partner 頁改連結優先。
