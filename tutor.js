@@ -68,6 +68,8 @@
       '.art-sq{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;margin-left:4px;border-radius:50%;border:1.5px solid rgba(74,127,212,.4);background:none;cursor:pointer;vertical-align:middle;padding:0;font-size:12px;line-height:1;color:#4A7FD4}',
       '.art-sq img{width:16px;height:16px;object-fit:contain;pointer-events:none}',
       // app.html 有「↑ 回頂部」鈕(.bt,bottom:72px right:16px)→ 小狸往上疊,不要壓到它(Mia 2026-09-16 回饋)
+      // 測驗/字卡/設定 overlay(#quizBg.show)開著時收起小狸鈕,不壓到卡片(Mia 2026-09-17 截圖)
+      'body:has(#quizBg.show) #tutorFab,body:has(#quizBg.show) #tutorHint{display:none!important}',
       'body.tutor-has-bt #tutorFab{bottom:calc(72px + 50px + env(safe-area-inset-bottom,0px));right:16px}',
       'body.tutor-has-bt #tutorHint{bottom:calc(72px + 62px + env(safe-area-inset-bottom,0px));right:82px}',
       'body.tutor-open #tutorFab,body.tutor-open #tutorHint,body.tutor-open #quotaBadge{display:none!important}'   // 面板開著時左下角免費額度小牌也收起,手機上會壓到對話
