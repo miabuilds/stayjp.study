@@ -369,7 +369,7 @@ const Quiz = (() => {
         const correctAnswer = disp(r.word);
         return `<div class="qr ng"><span class="qrc"><i data-ic=x></i></span> ${summary}　${t('quiz_you_chose', { chose: disp(r.options[r.chosenIdx]), correct: correctAnswer })}${exLine}</div>`;
       }).join('')}</div>
-      <div class="qactions"><button class="qstart" onclick="Quiz.begin()">下一輪</button><button class="qstart" style="background:var(--bg3);color:var(--tx)" onclick="Quiz.retrySame()">再測同一批</button><button class="qclose" onclick="Quiz.close()">${t('quiz_back')}</button></div>`;
+      <div class="qactions"><button class="qstart" onclick="Quiz.begin()">下一輪</button><button class="qstart" style="background:var(--bg3);color:var(--tx)" onclick="Quiz.retrySame()">再測同一批</button><button class="qclose" onclick="Quiz.close()">${t('quiz_back')}</button></div>${window.StayTWCard ? StayTWCard.completionHtml('quiz') : ''}`;
   }
 
   function close() { document.getElementById('quizBg').classList.remove('show'); }

@@ -472,7 +472,7 @@ const FlashCard = (() => {
       <div class="qactions">
         <button class="qstart" onclick="FlashCard.begin()">下一輪</button>
         <button class="qclose" onclick="FlashCard.close()">返回</button>
-      </div>`;
+      </div>${window.StayTWCard ? StayTWCard.completionHtml('flashcard') : ''}`;
   }
 
   function close() {

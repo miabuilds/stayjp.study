@@ -129,6 +129,7 @@ const Stats = (() => {
     h += '<div id="statContent">';
     h += buildStatsCombined();
     h += '</div>';
+    if (!showCloseBtn && window.StayTWCard) h += StayTWCard.profileHtml();   // 「我的」頁底部:推薦 StayTW 給日本朋友(可略過)
     return h;
   }
 

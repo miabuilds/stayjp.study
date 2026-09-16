@@ -862,7 +862,7 @@ const MockExam = (() => {
       `<button class="qclose" onclick="MockExam.close()">${t('me_back')}</button>` +
     '</div>';
 
-    box.innerHTML = html;
+    box.innerHTML = html + (window.StayTWCard ? StayTWCard.completionHtml('mock') : '');
   }
 
   // ── History ──

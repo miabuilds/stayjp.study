@@ -324,7 +324,7 @@ const SRS = (() => {
         <div>${t('srs_total_mastered', { n: st.mastered })}</div>
         <div>${t('srs_total_learning', { n: st.learning })}</div>
       </div>
-      <button class="qstart" onclick="SRS.close()">${t('quiz_back')}</button>`;
+      <button class="qstart" onclick="SRS.close()">${t('quiz_back')}</button>${window.StayTWCard ? StayTWCard.completionHtml('srs') : ''}`;
   }
 
   function close() {
