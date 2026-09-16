@@ -20,15 +20,22 @@
       try { await navigator.share({ text: SHARE_TEXT }); return; }
       catch (e) { if (e && e.name === 'AbortError') return; /* 不支援或失敗 → 退回複製 */ }
     }
+    // 桌機/WebView 退回複製:先用同步的 execCommand(在點擊手勢內最穩,Safari 也吃),再試 clipboard API
     let ok = false;
-    try { if (navigator.clipboard && navigator.clipboard.writeText) { await navigator.clipboard.writeText(SHARE_TEXT); ok = true; } } catch (e) {}
-    if (!ok) {
-      try {
-        const ta = document.createElement('textarea'); ta.value = SHARE_TEXT; ta.setAttribute('readonly', ''); ta.style.cssText = 'position:fixed;left:-9999px;top:0';
-        document.body.appendChild(ta); ta.select(); ok = document.execCommand('copy'); ta.remove();
-      } catch (e) {}
-    }
-    toast(ok ? L('已複製，貼給朋友就好', 'Copied — just paste it to your friend') : L('複製失敗，請手動複製連結', 'Copy failed — please copy the link manually'));
+    try {
+      const ta = document.createElement('textarea'); ta.value = SHARE_TEXT; ta.setAttribute('readonly', ''); ta.style.cssText = 'position:fixed;left:-9999px;top:0';
+      document.body.appendChild(ta); ta.focus(); ta.select(); ta.setSelectionRange(0, SHARE_TEXT.length); ok = document.execCommand('copy'); ta.remove();
+    } catch (e) {}
+    if (!ok) { try { if (navigator.clipboard && navigator.clipboard.writeText) { await navigator.clipboard.writeText(SHARE_TEXT); ok = true; } } catch (e) {} }
+    if (ok) { toast(L('已複製，貼給朋友就好', 'Copied — just paste it to your friend')); return; }
+    // 兩種都不行(權限被擋)→ 把文字直接攤在卡片裡讓人長按複製,不彈窗
+    document.querySelectorAll('.stw-card[data-where="' + where + '"] .stw-b').forEach(b => {
+      if (b.querySelector('.stw-copy')) return;
+      const box = document.createElement('textarea'); box.className = 'stw-copy'; box.readOnly = true; box.value = SHARE_TEXT; box.rows = 4;
+      box.onclick = function () { try { this.select(); } catch (e) {} };
+      b.appendChild(box); try { box.select(); } catch (e) {}
+    });
+    toast(L('請長按選取複製', 'Long-press to copy'));
   }
   let _t = null, _tm = null;
   function toast(msg) {
@@ -47,6 +54,7 @@
       '.stw-card .stw-b{flex:1;min-width:0}.stw-card .stw-t{font-size:14px;font-weight:700;color:var(--tx);margin:0 0 4px}.stw-card .stw-d{font-size:12.5px;line-height:1.6;color:var(--tx2);margin:0 0 10px}',
       '.stw-card .stw-acts{display:flex;gap:8px;flex-wrap:wrap}.stw-card .stw-acts button{border:1px solid var(--bd);background:var(--bg2);color:var(--tx);border-radius:999px;padding:7px 14px;font-size:13px;font-weight:600;cursor:pointer;width:auto;margin:0}',
       '.stw-card .stw-acts .pri{background:var(--tx);color:var(--bg2);border-color:var(--tx)}',
+      '.stw-card .stw-copy{display:block;width:100%;margin-top:10px;padding:8px 10px;border:1px solid var(--bd);border-radius:10px;background:var(--bg3);color:var(--tx);font-size:12.5px;line-height:1.5;resize:none;font-family:inherit}',
       '.stw-toast{position:fixed;left:50%;bottom:calc(var(--btm-h,56px) + 24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%) translateY(8px);background:rgba(30,30,30,.94);color:#fff;padding:10px 16px;border-radius:999px;font-size:13.5px;z-index:10050;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;max-width:86vw;text-align:center}.stw-toast.show{opacity:1;transform:translateX(-50%)}'
     ].join('\n');
     document.head.appendChild(st);
