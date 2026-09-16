@@ -130,7 +130,7 @@ def steps(name, link, pending_note):
 
 coupon('official-1.png', '拿到推薦碼或連結的人', '', 'https://stayjp.study/pricing.html', '年費往後每年續扣都鎖 1,790 · 買斷一次付清永久使用')
 steps('official-2.png', 'https://stayjp.study/?ref=推薦碼', '年費 1,790 · 買斷 5,390 · 月費 +7 天,三種都算推薦')
-coupon('captain-1.png', '英文艦長 的專屬推薦', '666666', 'https://stayjp.study/?ref=666666', '年費往後每年續扣都鎖 1,790 · 買斷一次付清永久使用')
+coupon('captain-1.png', '英文探長J 的專屬推薦', '666666', 'https://stayjp.study/?ref=666666', '年費往後每年續扣都鎖 1,790 · 買斷一次付清永久使用')
 steps('captain-2.png', 'https://stayjp.study/?ref=666666', '推薦碼 666666 · 網頁與 Android 可直接輸入')
 coupon('kol-template-1.png', 'KOL 的專屬推薦', '你的推薦碼', 'https://stayjp.study/?ref=你的碼', '把「你的推薦碼」換成自己的碼、連結換成 partner 頁那條')
 steps('kol-template-2.png', 'https://stayjp.study/?ref=你的碼', '連結在 partner 頁一鍵複製,碼與連結都是你專屬的')
