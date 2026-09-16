@@ -172,7 +172,7 @@ const SRS = (() => {
   const TYPE_KEY = 'srs_type_mode';
   const _E = (zh, en) => (typeof enOr === 'function' ? enOr(zh, en) : zh);
   function typeMode() { try { return localStorage.getItem(TYPE_KEY) === '1'; } catch (e) { return false; } }
-  function setTypeMode(on) { try { localStorage.setItem(TYPE_KEY, on ? '1' : ''); } catch (e) {} renderCard(); }
+  function setTypeMode(on) { try { localStorage.setItem(TYPE_KEY, on ? '1' : ''); } catch (e) {} if (queue[cur]) renderCard(); }
   function normJa(x) {
     return String(x || '').normalize('NFKC').trim().replace(/[\s・･]/g, '')
       .replace(/[\u30a1-\u30f6]/g, ch => String.fromCharCode(ch.charCodeAt(0) - 0x60));
@@ -187,8 +187,8 @@ const SRS = (() => {
   let typedDone = false;
   function headerHtml(item, itemLv) {
     const on = typeMode();
-    return `<div class="qhd"><span>${t('review')} ${cur+1} / ${queue.length}</span><span>${itemLv.toUpperCase()}・${item.again?_E('錯題重考','Retry'):item.isNew?t('srs_new'):t('srs_review')}</span>` +
-      `<button class="srs-type-toggle ${on?'on':''}" onclick="event.stopPropagation();SRS.setTypeMode(${on?'false':'true'})" title="${_E('打字模式','Typing mode')}"><i data-ic=edit></i> ${_E('打字','Type')}</button>` +
+    return `<div class="qhd"><span>${cur+1} / ${queue.length}<span style="color:var(--tx3);margin:0 6px">·</span>${itemLv.toUpperCase()} ${item.again?_E('錯題重考','Retry'):item.isNew?t('srs_new'):t('srs_review')}</span>` +
+      `<span class="srs-seg" role="tablist"><button type="button" class="${on?'':'on'}" onclick="event.stopPropagation();SRS.setTypeMode(false)"><i data-ic=refresh></i>${_E('翻卡','Flip')}</button><button type="button" class="${on?'on':''}" onclick="event.stopPropagation();SRS.setTypeMode(true)"><i data-ic=edit></i>${_E('打字','Type')}</button></span>` +
       `<button class="qclose" style="width:auto;margin:0;padding:2px 10px" onclick="SRS.close()"><i data-ic=x></i></button></div>`;
   }
   function renderTyped(item, itemLv, st) {
@@ -250,7 +250,15 @@ const SRS = (() => {
   function checkRetype(live) {
     const ri = document.getElementById('srsRetypeIn'); if (!ri || !retypePending) return;
     const ok = isTypedRight(queue[cur], ri.value);
-    if (ok) { ri.classList.remove('ng'); ri.classList.add('ok'); ri.disabled = true; retypePending = false; setTimeout(() => rate(false), 450); return; }
+    if (ok) {
+      // 使用者回饋:重打對了直接跳下一題很突然 → 先亮綠、說「打對了」,按「下一題」才走
+      ri.classList.remove('ng'); ri.classList.add('ok'); ri.disabled = true; retypePending = false;
+      const wrap = ri.parentElement;
+      const btns = wrap && wrap.querySelector('div[style*="display:flex"]');
+      if (btns) btns.innerHTML = '<div style="flex:1;align-self:center;font-weight:800;color:var(--correct-tx,#2E7D57)">✓ ' + _E('打對了!','Correct!') + '</div><button class="qstart" style="margin:0;width:auto;flex:0 0 120px" onclick="SRS.nextTyped(false)">' + (cur + 1 >= queue.length ? _E('看結果 →','Results →') : _E('下一題 →','Next →')) + '</button>';
+      try { if (typeof speak === 'function') speak(queue[cur].r || queue[cur].w); } catch (e) {}
+      return;
+    }
     if (!live) { ri.classList.add('ng'); ri.select && ri.select(); }
     else ri.classList.remove('ng');
   }
@@ -272,7 +280,7 @@ const SRS = (() => {
           <div class="srs-hint">${t('srs_flip')}</div>`}
         </div>
         <div class="srs-back" id="srsBack" style="display:none">
-          <div class="qmain">${item.w}</div>
+          <div class="qmain">${item.w}${(window.StudyPlan&&StudyPlan.pitchMark)?StudyPlan.pitchMark(item):''}</div>
           ${item.w!==item.r?'<div class="qsub">'+item.r+'</div>':''}
           ${item.m && item.m!==item.w ? '<div class="srs-meaning">'+(typeof cvt==='function'?cvt(item.m):item.m)+'</div>' : ''}
           ${cfHint?'<div class="confuse-hint">'+cfHint+'</div>':''}

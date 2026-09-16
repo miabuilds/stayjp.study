@@ -8,7 +8,7 @@
 (function (root) {
   const KEY = 'sp_settings', SETS_KEY = 'sp_sets';
   const LEVELS = ['n5', 'n4', 'n3', 'n2', 'n1'];
-  const DEF = { newPerDay: 20, reviewPerDay: 200, order: 'mix', front: 'jp', again: true };
+  const DEF = { newPerDay: 20, reviewPerDay: 200, order: 'mix', front: 'jp', again: true, pitch: false };
 
   const L = (zh, en) => { try { return (typeof enOr === 'function') ? enOr(zh, en) : zh; } catch (e) { return zh; } };
   const esc = s => String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -28,6 +28,7 @@
     if (o.order !== 'reviewFirst') o.order = 'mix';
     if (o.front !== 'zh') o.front = 'jp';
     o.again = o.again !== false;
+    o.pitch = o.pitch === true;
     return o;
   }
   function set(patch) {
@@ -133,15 +134,18 @@
   }
 
   // ── 面板卡 ──
-  function hubCardHtml() {
+  function hubCardHtml(g) {
     const p = plan();
     const n = p.fresh.length, d = p.due.length;
     const doneAll = n === 0 && d === 0;
+    // 今日目標濃縮成卡底一條:「今日目標 5 / 30」+ 細進度條(點了看說明)
+    const goalLine = g ? '<button type="button" class="sp-goal" onclick="dailyHelp&&dailyHelp()"><span>' + L('今日目標', 'Today’s goal') + '</span><span class="sp-goal-n">' + Math.min(g.done, g.goal) + ' / ' + g.goal + '</span><i class="sp-goal-bar"><b style="width:' + Math.min(100, Math.round(g.done / g.goal * 100)) + '%"></b></i></button>' : '';
     if (doneAll) {
       return '<div class="sp-card sp-done">'
         + '<div class="sp-top"><b>' + L('今天的份完成了 🎉', 'Today\'s share is done 🎉') + '</b><button type="button" class="sp-gear" onclick="StudyPlan.openSettings()" aria-label="settings"><i data-ic=settings></i></button></div>'
         + '<div class="sp-sub">' + L('已學 ' + newToday() + ' 個新字・沒有到期的複習。想多學一點？', newToday() + ' new words learned · nothing due. Want more?') + '</div>'
         + '<button type="button" class="sp-cta sp-cta-sub" onclick="SRS.start(null,{extraNew:10})">' + L('再學 10 個新單字', 'Learn 10 more') + '</button>'
+        + goalLine
         + '</div>';
     }
     const parts = [];
@@ -150,8 +154,9 @@
     return '<div class="sp-card">'
       + '<div class="sp-top"><b>' + L('準備好了', 'Ready for you') + '</b><button type="button" class="sp-gear" onclick="StudyPlan.openSettings()" aria-label="settings"><i data-ic=settings></i></button></div>'
       + '<div class="sp-main">' + parts.join('<span class="sp-dot">・</span>') + '</div>'
-      + '<div class="sp-sub">' + L('從第一張開始，大約 ' + p.minutes + ' 分鐘', 'Start with the first card — about ' + p.minutes + ' min') + (p.dueTotal > d ? L('（到期 ' + p.dueTotal + ' 張，今天先排 ' + d + '）', ' (' + p.dueTotal + ' due, ' + d + ' scheduled today)') : '') + '</div>'
+      + '<div class="sp-sub">' + L('大約 ' + p.minutes + ' 分鐘', 'About ' + p.minutes + ' min') + (p.dueTotal > d ? '・' + L('到期共 ' + p.dueTotal + ' 張', p.dueTotal + ' due in total') : '') + '</div>'
       + '<button type="button" class="sp-cta" onclick="SRS.start()">' + L('開始今天的學習', 'Start today\'s session') + ' →</button>'
+      + goalLine
       + '</div>';
   }
 
@@ -190,6 +195,10 @@
         '<select onchange="StudyPlan.set({front:this.value})"><option value="jp"' + (cfg.front === 'jp' ? ' selected' : '') + '>' + L('單字（預設）', 'Word (default)') + '</option><option value="zh"' + (cfg.front === 'zh' ? ' selected' : '') + '>' + L('中文意思', 'Meaning') + '</option></select>')
       + row(L('錯題重考', 'Retry misses'), L('這一輪答錯的卡，結尾自動再考一次', 'Cards you miss come back at the end of the session'),
         '<label class="sp-switch"><input type="checkbox" ' + (cfg.again ? 'checked' : '') + ' onchange="StudyPlan.set({again:this.checked})"><span></span></label>')
+      + row(L('單字顯示音高', 'Show pitch accent'), L('翻面後在單字後加 ⓪①②③ 標示東京標準語的音調（目前 N5・N4）', 'Adds ⓪①②③ after the word on the back (N5・N4 for now)'),
+        '<label class="sp-switch"><input type="checkbox" ' + (cfg.pitch ? 'checked' : '') + ' onchange="StudyPlan.set({pitch:this.checked})"><span></span></label>')
+      + row(L('語音', 'Voice'), L('單字發音的聲音（N5・N4 單字可切換；例句與其他等級為標準聲）', 'Voice for word audio (N5・N4 words; sentences and other levels use the standard voice)'),
+        '<select onchange="StudyPlan.setVoice(this.value)">' + VOICES.map(v => '<option value="' + v[0] + '"' + (voice() === v[0] ? ' selected' : '') + '>' + L(v[1], v[2]) + '</option>').join('') + '</select>')
       + '<div class="sp-sec">' + L('單字集', 'Word sets') + '</div>'
       + '<div class="sp-hint">' + L('勾選想背的等級、用 ↑↓ 排序：靠前的先抽新字。點 ▾ 可關掉某級裡不想背的主題。', 'Tick the levels to study and order them with ↑↓ — new words come from the top first. Tap ▾ to switch off themes within a level.') + '</div>'
       + lvRows
@@ -222,18 +231,33 @@
     if (btn) btn.classList.toggle('off', !!s.themeOff[k]);
   }
 
+  // B8 音高:pitch-accent.js(window.PITCH,"字|讀音"→核位置;0=平板)→ ⓪①②③ 標在單字後(設定開才顯示)
+  const CIRC = ['⓪','①','②','③','④','⑤','⑥','⑦','⑧','⑨','⑩','⑪','⑫'];
+  function pitchOf(item) { try { const P = root.PITCH; if (!P || !item) return null; const v = P[item.w + '|' + (item.r || '')]; return (typeof v === 'number') ? v : null; } catch (e) { return null; } }
+  function pitchMark(item) {
+    if (!get().pitch) return '';
+    const n = pitchOf(item); if (n == null) return '';
+    return '<span class="sp-pitch" title="' + L('音高:アクセント核位置(0=平板型)', 'Pitch accent: nucleus position (0 = flat)') + '">' + (CIRC[n] || n) + '</span>';
+  }
+  // B9 多人聲:tts_voice(2 めたん預設 / 8 つむぎ / 13 龍星),目前只有 N5・N4 單字有替代聲,其餘自動退回預設
+  const VOICES = [['2', '四国めたん（女・標準）', 'Metan (female, standard)'], ['8', '春日部つむぎ（女・柔）', 'Tsumugi (female, soft)'], ['13', '青山龍星（男）', 'Ryusei (male)']];
+  function voice() { try { return localStorage.getItem('tts_voice') || '2'; } catch (e) { return '2'; } }
+  function setVoice(v) { try { localStorage.setItem('tts_voice', String(v)); } catch (e) {} cloud(); try { if (root.__ttsCacheClear) root.__ttsCacheClear(); } catch (e) {} try { if (typeof speak === 'function') speak('こんにちは'); } catch (e) {} }
+
   function ensureCss() {
     if (document.getElementById('spCss')) return;
     const st = document.createElement('style'); st.id = 'spCss';
     st.textContent = [
-      '.sp-card{background:var(--bg2);border:1px solid var(--bd);border-radius:16px;padding:14px 16px;margin:0 0 14px}',
+      '.sp-card{background:var(--bg2);border:1px solid var(--bd);border-radius:20px;padding:20px 20px 16px;margin:0 0 14px;box-shadow:var(--sh2)}',
+      '.sp-goal{display:grid;grid-template-columns:auto auto;align-items:center;justify-content:space-between;gap:6px 8px;width:100%;margin-top:16px;padding:12px 0 0;border:0;border-top:1px solid var(--bd);background:none;color:var(--tx2);font-size:12.5px;cursor:pointer;text-align:left}',
+      '.sp-goal .sp-goal-n{font-weight:700;color:var(--tx);font-variant-numeric:tabular-nums;text-align:right}.sp-goal-bar{grid-column:1/-1;display:block;height:6px;border-radius:999px;background:var(--bd);overflow:hidden}.sp-goal-bar b{display:block;height:100%;background:var(--ac);border-radius:999px;transition:width .5s ease}',
       '.sp-card.sp-done{background:linear-gradient(160deg,var(--correct-bg,#dcfce7),var(--bg2))}',
       '.sp-top{display:flex;align-items:center;justify-content:space-between}.sp-top b{font-size:13px;color:var(--tx2);font-weight:700;letter-spacing:.02em}',
       '.sp-gear{border:none;background:none;color:var(--tx3);cursor:pointer;padding:2px 4px;font-size:15px;line-height:1}.sp-gear i{width:16px;height:16px}',
-      '.sp-main{margin-top:6px;font-size:16px;font-weight:700;color:var(--tx);display:flex;align-items:baseline;flex-wrap:wrap;gap:2px 4px}',
-      '.sp-num{font-size:34px;font-weight:900;letter-spacing:-1px;color:var(--tx);line-height:1;margin-right:2px}.sp-dot{color:var(--tx3);font-weight:400;margin:0 4px}',
-      '.sp-sub{margin-top:6px;font-size:12.5px;color:var(--tx2)}',
-      '.sp-cta{display:block;width:100%;margin-top:12px;background:var(--ac);color:#fff;border:0;border-radius:12px;padding:13px 14px;font-size:15px;font-weight:800;cursor:pointer}.sp-cta:active{transform:scale(.99)}',
+      '.sp-main{margin-top:10px;font-size:15px;font-weight:700;color:var(--tx);display:flex;align-items:baseline;flex-wrap:wrap;gap:2px 6px}',
+      '.sp-num{font-size:38px;font-weight:900;letter-spacing:-1px;color:var(--tx);line-height:1;margin-right:3px}.sp-dot{color:var(--tx3);font-weight:400;margin:0 8px}',
+      '.sp-sub{margin-top:8px;font-size:12.5px;color:var(--tx3)}',
+      '.sp-cta{display:block;width:100%;margin-top:16px;background:var(--ac);color:#fff;border:0;border-radius:12px;padding:13px 14px;font-size:15px;font-weight:800;cursor:pointer}.sp-cta:active{transform:scale(.99)}',
       '.sp-cta-sub{background:var(--bg3);color:var(--tx);border:1px solid var(--bd)}',
       '.sp-set{text-align:left}.sp-sec{font-size:12px;font-weight:800;color:var(--tx2);letter-spacing:.06em;margin:16px 0 6px}.sp-hint{font-size:12px;color:var(--tx3);margin-bottom:8px;line-height:1.5}',
       '.sp-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid var(--bd)}.sp-row-t b{display:block;font-size:14px}.sp-row-t small{display:block;font-size:11.5px;color:var(--tx3);margin-top:2px;line-height:1.4}',
@@ -243,11 +267,12 @@
       '.sp-check{display:flex;align-items:center;gap:8px;font-size:15px}.sp-check input{width:18px;height:18px;accent-color:var(--ac)}.sp-lv-n{flex:1;font-size:12px;color:var(--tx3)}',
       '.sp-lv-btns{display:flex;gap:4px}.sp-lv-btns button{width:30px;height:30px;border:1px solid var(--bd);background:var(--bg);color:var(--tx);border-radius:8px;cursor:pointer;font-size:13px}.sp-lv-btns button:disabled{opacity:.3}',
       '.sp-themes{display:none;flex-wrap:wrap;gap:6px;margin-top:8px}.sp-lv.open .sp-themes{display:flex}.sp-lv.open .sp-exp{transform:rotate(180deg)}',
+      '.sp-pitch{font-size:.55em;color:var(--ac2);vertical-align:super;margin-left:3px;font-weight:600}',
       '.sp-chip{border:1px solid var(--ac);background:var(--bg2);color:var(--ac);border-radius:999px;padding:4px 10px;font-size:12px;cursor:pointer}.sp-chip small{opacity:.7}.sp-chip.off{border-color:var(--bd);color:var(--tx3);text-decoration:line-through}'
     ].join('\n');
     document.head.appendChild(st);
   }
   if (document.head) ensureCss();
 
-  root.StudyPlan = { get, set, sets, plan, buildQueue, sig, greeting, hubCardHtml, openSettings, closeSettings, toggleLevel, moveLevel, toggleTheme, newToday, enabledLevels, LEVELS };
+  root.StudyPlan = { get, set, sets, plan, buildQueue, sig, greeting, hubCardHtml, openSettings, closeSettings, toggleLevel, moveLevel, toggleTheme, newToday, enabledLevels, LEVELS, pitchOf, pitchMark, voice, setVoice, VOICES };
 })(window);

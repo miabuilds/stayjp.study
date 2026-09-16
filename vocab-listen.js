@@ -132,7 +132,7 @@
       + '<div class="vl-top"><button class="vl-x" onclick="VocabListen.back()" aria-label="back">‹</button><span class="tt">🎧 ' + L('用聽的背單字', 'Listen & learn') + '</span><button class="vl-x" onclick="VocabListen.close()">×</button></div>'
       + '<div class="vl-card" onclick="VocabListen.toggleMeaning()">'
       + '<div class="vl-lv">' + v.level.toUpperCase() + (v.c ? '・' + esc(v.c) : '') + '</div>'
-      + '<div class="vl-w">' + esc(v.w) + '</div>' + (v.r && v.r !== v.w ? '<div class="vl-r">' + esc(v.r) + '</div>' : '')
+      + '<div class="vl-w">' + esc(v.w) + ((root.StudyPlan && StudyPlan.pitchMark) ? StudyPlan.pitchMark(v) : '') + '</div>' + (v.r && v.r !== v.w ? '<div class="vl-r">' + esc(v.r) + '</div>' : '')
       + '<div class="vl-m' + (opts.showMeaning ? '' : ' hid') + '" id="vlM">' + esc(C(v.m || '')) + '</div>'
       + (ex ? '<div class="vl-ex" id="vlEx"><div>' + esc(ex.j) + '</div><div class="z' + (opts.showMeaning ? '' : ' hid') + '">' + esc(C(ex.z || '')) + '</div></div>' : '')
       + '</div>'
