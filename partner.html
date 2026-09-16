@@ -171,7 +171,7 @@ function showLink(d){
       <a class="btn sec" href="${esc(stats)}" target="_blank" style="padding:11px 20px;font-size:14px"><i data-ic=chart></i> 看我的推薦成效</a>
       ${navigator.share?'<button class="btn sec" style="padding:11px 20px;font-size:14px" onclick="shareLink()">分享</button>':''}
     </div>
-    <div id="joinMsg" class="muted" style="margin-top:10px">你的推薦碼:<b>${esc(d.code)}</b>(App 受眾可到帳號頁輸入此碼歸因)。</div>
+    <div id="joinMsg" class="muted" style="margin-top:10px">你的推薦碼:<b>${esc(d.code)}</b>。<b>請優先分享上面的連結</b>:對方點了就自動套用推薦價,iPhone 有裝 App 會直接在 App 裡套用;推薦碼本身在網頁與 Android App 也可以手動輸入(iPhone App 內依 Apple 規定沒有輸碼欄)。</div>
     <details style="margin-top:10px"><summary style="cursor:pointer;font-size:14px;color:var(--ac)"><i data-ic=edit></i> 換一個更好記的碼</summary>
       <div style="margin-top:8px">
         <input id="chgCode" placeholder="新推薦碼(4–16 碼英數,例:DOUBLEOJ)" maxlength="16" autocapitalize="characters" style="text-transform:uppercase">
