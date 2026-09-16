@@ -195,8 +195,8 @@
         '<select onchange="StudyPlan.set({front:this.value})"><option value="jp"' + (cfg.front === 'jp' ? ' selected' : '') + '>' + L('單字（預設）', 'Word (default)') + '</option><option value="zh"' + (cfg.front === 'zh' ? ' selected' : '') + '>' + L('中文意思', 'Meaning') + '</option></select>')
       + row(L('錯題重考', 'Retry misses'), L('這一輪答錯的卡，結尾自動再考一次', 'Cards you miss come back at the end of the session'),
         '<label class="sp-switch"><input type="checkbox" ' + (cfg.again ? 'checked' : '') + ' onchange="StudyPlan.set({again:this.checked})"><span></span></label>')
-      + row(L('單字顯示音高', 'Show pitch accent'), L('翻面後在單字後加 ⓪①②③ 標示東京標準語的音調（目前 N5・N4）', 'Adds ⓪①②③ after the word on the back (N5・N4 for now)'),
-        '<label class="sp-switch"><input type="checkbox" ' + (cfg.pitch ? 'checked' : '') + ' onchange="StudyPlan.set({pitch:this.checked})"><span></span></label>')
+      + (root.PITCH_VERIFIED ? row(L('單字顯示音高', 'Show pitch accent'), L('翻面後在單字後加 ⓪①②③ 標示東京標準語的音調（目前 N5・N4）', 'Adds ⓪①②③ after the word on the back (N5・N4 for now)'),
+        '<label class="sp-switch"><input type="checkbox" ' + (cfg.pitch ? 'checked' : '') + ' onchange="StudyPlan.set({pitch:this.checked})"><span></span></label>') : '')   // 音高資料(LLM 產)NHK 抽查只有 ~80%,資料換成 UniDic 驗證過再開(PITCH_VERIFIED)
       + row(L('語音', 'Voice'), L('單字發音的聲音（N5・N4 單字可切換；例句與其他等級為標準聲）', 'Voice for word audio (N5・N4 words; sentences and other levels use the standard voice)'),
         '<select onchange="StudyPlan.setVoice(this.value)">' + VOICES.map(v => '<option value="' + v[0] + '"' + (voice() === v[0] ? ' selected' : '') + '>' + L(v[1], v[2]) + '</option>').join('') + '</select>')
       + '<div class="sp-sec">' + L('單字集', 'Word sets') + '</div>'
