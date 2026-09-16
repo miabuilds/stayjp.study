@@ -46,7 +46,8 @@
     // iPhone Safari 點推薦連結:順手給「在 App 開啟」(stayjp://ref/CODE 深連結 → App 內自動套推薦價;Apple 3.1.1 後 iOS App 無輸碼欄,連結就是唯一入口)
     if (_refm && /iPhone|iPad/.test(navigator.userAgent) && !(window.STAYJP_NATIVE && STAYJP_NATIVE.isNativeApp) && !sessionStorage.getItem('ref_app_bar')) {
       var _code = _refm[1].toUpperCase();
-      document.addEventListener('DOMContentLoaded', function () {
+      // 深連結要 iOS 1.0.11 以上才會吃(1.0.7 開了也不會套碼)→ 看 app-version.json 的 latest.ios,沒到就不顯示這條,改由文案引導網頁購買
+      var _showBar = function () {
         var bar = document.createElement('div');
         bar.style.cssText = 'position:fixed;left:12px;right:12px;bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:10040;background:#2C2C2C;color:#fff;border-radius:14px;padding:12px 14px;display:flex;align-items:center;gap:10px;font-size:13.5px;box-shadow:0 8px 24px rgba(0,0,0,.25)';
         bar.innerHTML = '<span style="flex:1;line-height:1.4">推薦價已套用(登入後生效)。有裝 StayJP App?</span>' +
@@ -54,7 +55,11 @@
           '<button type="button" aria-label="close" style="background:none;border:0;color:#bbb;font-size:20px;line-height:1;padding:0 2px">×</button>';
         bar.querySelector('button').onclick = function () { bar.remove(); try { sessionStorage.setItem('ref_app_bar', '1'); } catch (e) {} };
         document.body.appendChild(bar);
-      });
+      };
+      var _vOk = function (v) { var a = String(v || '0').split('.').map(Number); return (a[0] > 1) || (a[0] === 1 && a[1] > 0) || (a[0] === 1 && a[1] === 0 && (a[2] || 0) >= 11); };
+      fetch('app-version.json?x=' + Math.floor(Date.now() / 3600000)).then(function (r) { return r.json(); }).then(function (j) {
+        if (j && j.latest && _vOk(j.latest.ios)) { if (document.body) _showBar(); else document.addEventListener('DOMContentLoaded', _showBar); }
+      }).catch(function () {});
     }
   } catch (e) {}
 
