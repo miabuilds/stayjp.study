@@ -184,7 +184,15 @@ const SRS = (() => {
       return n === v || n.replace(/[〜~()（）]/g, '') === v;   // 「〜する」「（お）金」這類註記去掉再比
     });
   }
-  let typedDone = false;
+  let typedDone = false, typedRight = false;
+  // 打字模式結果畫面:按 Enter = 下一題(不用伸手點按鈕);組字中的 Enter 不算
+  document.addEventListener('keydown', function (e) {
+    if (e.key !== 'Enter' || e.isComposing || e.keyCode === 229) return;
+    if (!typedDone || retypePending) return;
+    const box = document.getElementById('quizBox'); if (!box || !box.querySelector('#srsTypeRes')) return;
+    if (e.target && e.target.id === 'srsRetypeIn') return;   // 重打框自己的 handler 處理
+    e.preventDefault(); nextTyped(typedRight);
+  });
   function headerHtml(item, itemLv) {
     const on = typeMode();
     return `<div class="qhd"><span>${cur+1} / ${queue.length}<span style="color:var(--tx3);margin:0 6px">·</span>${itemLv.toUpperCase()} ${item.again?_E('錯題重考','Retry'):item.isNew?t('srs_new'):t('srs_review')}</span>` +
@@ -198,7 +206,7 @@ const SRS = (() => {
       <div class="srs-card" id="srsCard" style="cursor:default">
         <div class="srs-meaning" style="font-size:22px;font-weight:800;margin-top:6px">${C(item.m)}</div>
         <div style="font-size:12px;color:var(--tx2);margin-top:4px">${item.c ? '［' + item.c + '］ ' : ''}${_E('打出日文，漢字或假名都可以 → Enter','Type the Japanese — kanji or kana → Enter')}</div>
-        <input id="srsTypeIn" class="srs-type-in" lang="ja" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="done" placeholder="…" onkeydown="if(event.key==='Enter'){event.preventDefault();SRS.checkTyped();}">
+        <input id="srsTypeIn" class="srs-type-in" lang="ja" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="done" placeholder="…" onkeydown="if(event.key==='Enter'&&!event.isComposing&&event.keyCode!==229){event.preventDefault();SRS.checkTyped();}" oncompositionstart="this.dataset.c=1" oncompositionend="this.dataset.c=''">
         <div class="srs-btns" id="srsTypeBtns">
           <button class="srs-btn srs-hard" onclick="SRS.giveUp()">${_E('不會','Don\'t know')}</button>
           <button class="srs-btn srs-ok" onclick="SRS.checkTyped()">${_E('送出','Check')}</button>
@@ -210,7 +218,7 @@ const SRS = (() => {
     if (inp) setTimeout(() => { try { inp.focus(); } catch (e) {} }, 50);
   }
   function revealTyped(right, val) {
-    if (typedDone) return; typedDone = true;
+    if (typedDone) return; typedDone = true; typedRight = !!right;
     const item = queue[cur];
     const C = x => (typeof cvt === 'function' ? cvt(x) : x);
     const E = x => String(x == null ? '' : x).replace(/&/g, '&amp;').replace(/</g, '&lt;');
@@ -231,7 +239,7 @@ const SRS = (() => {
       (right
         ? '<button class="qstart" style="margin-top:10px" onclick="SRS.nextTyped(true)">' + (cur + 1 >= queue.length ? _E('看結果 →','Results →') : _E('下一題 →','Next →')) + '</button>'
         : '<div style="margin-top:10px;font-size:13px;font-weight:700;color:var(--ac)">' + _E('照著再打一次 ✍️','Type it once more ✍️') + '</div>' +
-          '<input id="srsRetypeIn" class="srs-type-in" lang="ja" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="done" placeholder="' + E(item.w) + '" onkeydown="if(event.key===\'Enter\'){event.preventDefault();SRS.checkRetype();}" oninput="SRS.checkRetype(true)">' +
+          '<input id="srsRetypeIn" class="srs-type-in" lang="ja" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="done" placeholder="' + E(item.w) + '" onkeydown="if(event.key===\'Enter\'&&!event.isComposing&&event.keyCode!==229){event.preventDefault();SRS.checkRetype();}" oncompositionstart="this.dataset.c=1" oncompositionend="this.dataset.c=\'\';SRS.checkRetype(true)" oninput="SRS.checkRetype(true)">' +
           '<div style="display:flex;gap:8px;margin-top:8px"><button class="qstart" style="margin:0;width:auto;flex:1 1 0" onclick="SRS.checkRetype()">' + _E('送出','Check') + '</button>' +
           '<button class="qstart" style="margin:0;width:auto;flex:0 0 92px;background:none;color:var(--tx2);border:1px solid var(--bd,#ddd)" onclick="SRS.nextTyped(false)">' + _E('跳過','Skip') + '</button></div>');
     if (!right) { const ri = document.getElementById('srsRetypeIn'); if (ri) setTimeout(() => { try { ri.focus(); } catch (e) {} }, 80); }
@@ -249,10 +257,12 @@ const SRS = (() => {
   // 重打:打對(邊打邊比對,對了就綁綠框 + 自動進下一題;仍算「答錯」進 SRS)。live=true 是 oninput 觸發,打錯不提示。
   function checkRetype(live) {
     const ri = document.getElementById('srsRetypeIn'); if (!ri || !retypePending) return;
+    if (live && ri.dataset.c) return;   // IME 組字中:等 compositionend 再比
     const ok = isTypedRight(queue[cur], ri.value);
     if (ok) {
       // 使用者回饋:重打對了直接跳下一題很突然 → 先亮綠、說「打對了」,按「下一題」才走
-      ri.classList.remove('ng'); ri.classList.add('ok'); ri.disabled = true; retypePending = false;
+      ri.classList.remove('ng'); ri.classList.add('ok'); ri.readOnly = true; retypePending = false; typedRight = false;
+      ri.onkeydown = function (e) { if (e.key === 'Enter' && !e.isComposing && e.keyCode !== 229) { e.preventDefault(); nextTyped(false); } };
       const wrap = ri.parentElement;
       const btns = wrap && wrap.querySelector('div[style*="display:flex"]');
       if (btns) btns.innerHTML = '<div style="flex:1;align-self:center;font-weight:800;color:var(--correct-tx,#2E7D57)">✓ ' + _E('打對了!','Correct!') + '</div><button class="qstart" style="margin:0;width:auto;flex:0 0 120px" onclick="SRS.nextTyped(false)">' + (cur + 1 >= queue.length ? _E('看結果 →','Results →') : _E('下一題 →','Next →')) + '</button>';
