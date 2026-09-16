@@ -282,6 +282,14 @@ window.Articles = (function () {
       '.art-card-b{min-width:0;flex:1}',
       '.art-card-t{font-size:17px;font-weight:700;color:var(--tx,#2c2c2c);font-family:"Hiragino Mincho ProN","Noto Serif JP",serif;line-height:1.35;display:flex;align-items:center;gap:6px}',
       '.art-done{color:#16a34a;font-size:15px;flex-shrink:0}',
+      '.art-top-n{margin-left:auto;margin-right:8px;font-size:12.5px;color:var(--tx3,#aaa);font-variant-numeric:tabular-nums}',
+      '.art-next{display:flex;gap:14px;align-items:center;background:var(--bg2,#fff);border:2px solid var(--ac,#D4654A);border-radius:18px;padding:12px 14px;margin:6px 0 14px;cursor:pointer;position:relative}',
+      '.art-next .art-next-l{font-size:11.5px;font-weight:800;color:var(--ac,#D4654A);letter-spacing:.06em;margin-bottom:2px}.art-next-go{margin-left:auto;font-size:22px;color:var(--tx3,#aaa)}',
+      '.art-chips{display:flex;gap:6px;flex-wrap:wrap;margin:2px 0 6px;position:sticky;top:0;background:var(--bg,#faf9f6);padding:8px 0;z-index:2}',
+      '.art-chip{border:1px solid var(--bd,#e5e5e5);background:var(--bg2,#fff);color:var(--tx,#333);border-radius:999px;padding:6px 12px;font-size:13px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:5px}.art-chip.on{background:var(--tx,#2C2C2C);color:var(--bg2,#fff);border-color:var(--tx,#2C2C2C)}',
+      '.art-chip small{font-size:11px;background:var(--ac,#D4654A);color:#fff;border-radius:999px;padding:1px 6px;font-weight:700}.art-chip.on small{background:var(--bg2,#fff);color:var(--tx,#2C2C2C)}.art-chip i{width:12px;height:12px;color:#16a34a}',
+      '.art-card.is-read{opacity:.72}',
+      '.art-readfold{margin:4px 0 6px}.art-readfold summary{cursor:pointer;list-style:none;display:inline-flex;align-items:center;gap:6px;font-size:12.5px;color:var(--tx3,#aaa);padding:6px 10px;border:1px dashed var(--bd,#ddd);border-radius:999px;margin-bottom:10px}.art-readfold summary::-webkit-details-marker{display:none}.art-readfold summary i{width:12px;height:12px;color:#16a34a}',
       '.art-card-z{font-size:13px;color:var(--tx2,#888);margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
       '.art-lwrap{padding:16px 16px 4px}',
       '.art-lv{font-size:12px;font-weight:800;color:var(--tx3,#aaa);letter-spacing:.12em;margin:22px 2px 12px}',
@@ -433,23 +441,48 @@ window.Articles = (function () {
     var read = readSet(), byLv = {};
     list().forEach(function (a) { (byLv[a.level] = byLv[a.level] || []).push(a); });
     var gated = window.ToolQuota && window.ToolQuota.shouldGate && window.ToolQuota.shouldGate();
+    // 2026-09-17 清單改版(Mia:文章越多越要一直滑):等級篩選 chips(記住)+ 未讀排前面 + 已讀收進「已讀 N 篇」可展開 + 頂端「接著讀」
+    var filt = ''; try { filt = localStorage.getItem('art_filter') || ''; } catch (e) {}
+    if (filt && !byLv[filt]) filt = '';
+    var all = list(), total = all.length, readN = all.filter(function (a) { return read[a.id]; }).length;
     var h = '<div class="art-mask" id="artMask"><div class="art-wrap">' +
-      '<div class="art-top"><span class="tt"><i data-ic=book></i> ' + enOr('文章閱讀', 'Reading') + '</span><button class="art-ic" onclick="Articles.close()"><i data-ic=x></i></button></div>' +
-      '<div class="art-lwrap">' +
-      '<div class="art-sub">' + enOr('讀短文、點單字查意思、聽真人發音,把單字文法放回真正的文章裡記。', 'Read, tap any word to look it up, and listen.') + '</div>';
+      '<div class="art-top"><span class="tt"><i data-ic=book></i> ' + enOr('文章閱讀', 'Reading') + '</span><span class="art-top-n">' + readN + ' / ' + total + '</span><button class="art-ic" onclick="Articles.close()"><i data-ic=x></i></button></div>' +
+      '<div class="art-lwrap">';
     if (gated) h += '<div class="art-trial"><i data-ic=lock></i> ' + enOr('免費版每天可試讀 1 篇,升級後無限暢讀。', 'Free: 1 article/day. Upgrade for unlimited.') + '</div>';
+    // 接著讀:最近讀的那篇之後、同級第一篇未讀;全都讀過就不顯示
+    var lastId = null, lastTs = 0; Object.keys(read).forEach(function (id) { if (read[id] > lastTs) { lastTs = read[id]; lastId = id; } });
+    var lastA = lastId ? all.find(function (a) { return a.id === lastId; }) : null;
+    var nextA = null;
+    if (lastA) { var same = (byLv[lastA.level] || []); var i0 = same.indexOf(lastA); nextA = same.slice(i0 + 1).concat(same.slice(0, i0)).find(function (a) { return !read[a.id]; }) || null; }
+    if (!nextA) nextA = all.find(function (a) { return !read[a.id] && (!filt || a.level === filt); }) || null;
+    if (nextA) {
+      var gN = LVC[nextA.level] || LVC.n5;
+      h += '<div class="art-next" onclick="Articles.read(\'' + nextA.id + '\')">' +
+        '<div class="art-thumb" style="background:linear-gradient(135deg,' + gN[0] + ',' + gN[1] + ')"><span class="art-th-e">' + topicEmoji(nextA.topic + nextA.title) + '</span><img class="art-th-i" src="' + imgUrl(nextA.id) + '" alt="" onerror="this.remove()"></div>' +
+        '<div class="art-card-b"><div class="art-next-l">' + (lastA ? enOr('接著讀', 'Up next') : enOr('從這篇開始', 'Start here')) + ' · ' + LVN[nextA.level] + '</div>' +
+        '<div class="art-card-t">' + esc(nextA.title) + '</div><div class="art-card-z">' + esc(Lc(nextA.title_zh, nextA.title_en)) + '</div></div><span class="art-next-go">›</span></div>';
+    }
+    h += '<div class="art-chips"><button class="art-chip' + (filt ? '' : ' on') + '" onclick="Articles.filter(\'\')">' + enOr('全部', 'All') + '</button>';
+    LEVELS.forEach(function (lv) { var arr = byLv[lv] || []; if (!arr.length) return; var un = arr.filter(function (a) { return !read[a.id]; }).length;
+      h += '<button class="art-chip' + (filt === lv ? ' on' : '') + '" onclick="Articles.filter(\'' + lv + '\')">' + LVN[lv] + (un ? '<small>' + un + '</small>' : '<i data-ic=check></i>') + '</button>'; });
+    h += '</div>';
+    function cardHtml(a) {
+      var g = LVC[a.level] || LVC.n5;
+      return '<div class="art-card' + (read[a.id] ? ' is-read' : '') + '" onclick="Articles.read(\'' + a.id + '\')">' +
+        '<div class="art-thumb" style="background:linear-gradient(135deg,' + g[0] + ',' + g[1] + ')"><span class="art-th-e">' + topicEmoji(a.topic + a.title) + '</span><img class="art-th-i" src="' + imgUrl(a.id) + '" alt="" onerror="this.remove()"></div>' +
+        '<div class="art-card-b">' +
+        '<div class="art-card-t">' + esc(a.title) + (read[a.id] ? '<span class="art-done"><i data-ic=check></i></span>' : '') + '</div>' +
+        '<div class="art-card-z">' + esc(Lc(a.title_zh, a.title_en)) + ' · ' + esc(Lc(a.topic, a.topic_en)) + '</div>' +
+        '</div></div>';
+    }
     LEVELS.forEach(function (lv) {
-      var arr = byLv[lv] || []; if (!arr.length) return;
-      h += '<div class="art-lv">' + LVN[lv] + '　·　' + arr.length + ' ' + enOr('篇', '') + '</div>';
-      arr.forEach(function (a) {
-        var g = LVC[a.level] || LVC.n5;
-        h += '<div class="art-card" onclick="Articles.read(\'' + a.id + '\')">' +
-          '<div class="art-thumb" style="background:linear-gradient(135deg,' + g[0] + ',' + g[1] + ')"><span class="art-th-e">' + topicEmoji(a.topic + a.title) + '</span><img class="art-th-i" src="' + imgUrl(a.id) + '" alt="" loading="lazy" onerror="this.remove()"><span class="art-th-badge">' + LVN[a.level] + '</span></div>' +
-          '<div class="art-card-b">' +
-          '<div class="art-card-t">' + esc(a.title) + (read[a.id] ? '<span class="art-done"><i data-ic=check></i></span>' : '') + '</div>' +
-          '<div class="art-card-z">' + esc(Lc(a.title_zh,a.title_en)) + ' · ' + esc(Lc(a.topic,a.topic_en)) + '</div>' +
-          '</div></div>';
-      });
+      var arr = byLv[lv] || []; if (!arr.length || (filt && filt !== lv)) return;
+      var unread = arr.filter(function (a) { return !read[a.id]; }), done = arr.filter(function (a) { return read[a.id]; });
+      h += '<div class="art-lv">' + LVN[lv] + '　·　' + (unread.length ? unread.length + ' ' + enOr('篇未讀', 'unread') : enOr('全部讀完 ✓', 'all read ✓')) + '</div>';
+      unread.forEach(function (a) { h += cardHtml(a); });
+      if (done.length) {
+        h += '<details class="art-readfold"' + (unread.length ? '' : ' open') + '><summary>' + enOr('已讀 ' + done.length + ' 篇', done.length + ' read') + ' <i data-ic=check></i></summary>' + done.map(cardHtml).join('') + '</details>';
+      }
     });
     h += '</div></div></div>';
     var d = document.createElement('div'); d.innerHTML = h; document.body.appendChild(d.firstChild);
@@ -515,6 +548,7 @@ window.Articles = (function () {
     preloadSent(0); preloadSent(1);   // 開文章先載前兩句,按播放零等待
     var _mk=document.querySelector('.art-mask'); if(_mk) _mk.classList.toggle('pos-off', !posOn());
   }
+  function filter(lv) { try { if (lv) localStorage.setItem('art_filter', lv); else localStorage.removeItem('art_filter'); } catch (e) {} open(); }
   function tabBtn(k, label) { return '<button class="art-tab' + (curTab === k ? ' on' : '') + '" data-tab="' + k + '" onclick="Articles.tab(\'' + k + '\')">' + label + '</button>'; }
 
   function tab(k) {
@@ -942,6 +976,7 @@ window.Articles = (function () {
   function done() { if (curId) markRead(curId); }
 
   return {
+    filter,
     open: open, close: close, read: read, tab: tab, entryCardHtml: entryCardHtml,
     toggleFuri: toggleFuri, toggleZh: toggleZh, toggleRomaji: toggleRomaji, cycleFs: cycleFs,
     playFrom: playFrom, togglePlay: togglePlay, stepRate: stepRate, say: say, spTap: spTap, togglePos: togglePos,
