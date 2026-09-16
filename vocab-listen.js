@@ -66,7 +66,8 @@
       '.vl-prog{display:flex;justify-content:space-between;font-size:12.5px;color:var(--tx2);margin:14px 2px 6px;font-variant-numeric:tabular-nums}.vl-bar{height:6px;border-radius:999px;background:var(--bd);overflow:hidden}.vl-bar i{display:block;height:100%;background:var(--ac);transition:width .3s}',
       '.vl-ctl{display:flex;align-items:center;justify-content:center;gap:18px;margin-top:18px}.vl-ctl button{border:1px solid var(--bd);background:var(--bg2);color:var(--tx);width:52px;height:52px;border-radius:50%;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center}.vl-ctl .main{width:72px;height:72px;background:var(--ac);border-color:var(--ac);color:#fff;font-size:28px}',
       '.vl-mini{display:flex;justify-content:center;gap:8px;margin-top:14px;flex-wrap:wrap}.vl-mini button{border:1px solid var(--bd);background:var(--bg2);color:var(--tx2);border-radius:999px;padding:6px 12px;font-size:12.5px;cursor:pointer}.vl-mini button.on{color:var(--ac);border-color:var(--ac)}',
-      '.vl-done{text-align:center;padding:40px 10px}.vl-done img{width:110px}.vl-done h3{margin:10px 0 4px}'
+      '.vl-done{text-align:center;padding:40px 10px}.vl-done img{width:110px}.vl-done h3{margin:10px 0 4px}',
+      'body.vl-open #tutorFab,body.vl-open #tutorHint,body.vl-open #quotaBadge,body.vl-open .bt{display:none!important}'   // 播放頁全螢幕:把小狸鈕/額度小牌/回頂部收起
     ].join('\n');
     document.head.appendChild(st);
   }
@@ -108,10 +109,11 @@
   function open() {
     css(); opts = load();
     if (!mask()) { const d = document.createElement('div'); d.className = 'vl-mask'; d.id = 'vlMask'; document.body.appendChild(d); }
+    document.body.classList.add('vl-open');
     render();
     try { if (typeof track === 'function') track('listen_open'); } catch (e) {}
   }
-  function close() { stop(); const m = mask(); if (m) m.remove(); releaseWake(); }
+  function close() { stop(); const m = mask(); if (m) m.remove(); releaseWake(); document.body.classList.remove('vl-open'); }
 
   // ── 播放 ──
   function start() {
