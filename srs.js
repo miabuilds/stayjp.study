@@ -25,7 +25,8 @@ const SRS = (() => {
     const d = getData();
     const key = k(level, word);
     const now = Date.now();
-    const e = d[key] || { interval: 0, ease: 2.5, nextReview: today(), nextReviewTs: now, reviews: 0, correct: 0 };
+    const e = d[key] || { interval: 0, ease: 2.5, nextReview: today(), nextReviewTs: now, reviews: 0, correct: 0, created: now };
+    if (!e.created) e.created = e.lastReviewTs || now;   // 舊資料補 created(每日新字上限用;舊字不算今天新學)
     e.reviews++;
     if (correct) {
       e.correct++;
@@ -54,7 +55,8 @@ const SRS = (() => {
     const d = getData();
     const key = k(level, word);
     const now = Date.now();
-    const e = d[key] || { interval: 0, ease: 2.5, nextReview: today(), nextReviewTs: now, reviews: 0, correct: 0 };
+    const e = d[key] || { interval: 0, ease: 2.5, nextReview: today(), nextReviewTs: now, reviews: 0, correct: 0, created: now };
+    if (!e.created) e.created = e.lastReviewTs || now;
     e.reviews = (e.reviews || 0) + 1;
     e.lastReview = today();
     e.lastReviewTs = now;
@@ -141,18 +143,25 @@ const SRS = (() => {
     return out.sort((a, b) => (a.nextReviewTs || 0) - (b.nextReviewTs || 0));
   }
 
-  function start(level) {
+  let againQueue = [], inAgain = false;   // B7 錯題重考:本輪答錯的卡,結尾再考一次
+  function start(level, opts) {
     lvl = level || (typeof currentLevel !== 'undefined' ? currentLevel : 'n5');
-    // 複習跨級別：底部「複習(195)」是全級別計數，start 也要對齊
-    const allDue = getAllDue();
-    const nw = getNew(lvl, 10);
-    queue = [];
-    allDue.forEach(x => {
-      const v = getVocabData(x.level).find(w => w.w === x.word);
-      if (v) queue.push({ ...v, level: x.level, isNew: false });
-    });
-    nw.forEach(v => queue.push({ ...v, level: lvl, isNew: true }));
-    if (!queue.length) { alert(t('srs_no_review')); return; }
+    againQueue = []; inAgain = false;
+    if (window.StudyPlan) {
+      // 每日計畫(study-plan.js):複習上限、新字上限(扣掉今天已學)、交錯/先複習、單字集排序與主題開關
+      queue = StudyPlan.buildQueue(opts && opts.extraNew ? opts.extraNew : 0);
+    } else {
+      // 複習跨級別：底部「複習(195)」是全級別計數，start 也要對齊
+      const allDue = getAllDue();
+      const nw = getNew(lvl, 10);
+      queue = [];
+      allDue.forEach(x => {
+        const v = getVocabData(x.level).find(w => w.w === x.word);
+        if (v) queue.push({ ...v, level: x.level, isNew: false });
+      });
+      nw.forEach(v => queue.push({ ...v, level: lvl, isNew: true }));
+    }
+    if (!queue.length) { (window.AppUI ? AppUI.alert : alert)(t('srs_no_review')); return; }
     cur = 0;
     renderCard();
     document.getElementById('quizBg').classList.add('show');
@@ -178,7 +187,7 @@ const SRS = (() => {
   let typedDone = false;
   function headerHtml(item, itemLv) {
     const on = typeMode();
-    return `<div class="qhd"><span>${t('review')} ${cur+1} / ${queue.length}</span><span>${itemLv.toUpperCase()}・${item.isNew?t('srs_new'):t('srs_review')}</span>` +
+    return `<div class="qhd"><span>${t('review')} ${cur+1} / ${queue.length}</span><span>${itemLv.toUpperCase()}・${item.again?_E('錯題重考','Retry'):item.isNew?t('srs_new'):t('srs_review')}</span>` +
       `<button class="srs-type-toggle ${on?'on':''}" onclick="event.stopPropagation();SRS.setTypeMode(${on?'false':'true'})" title="${_E('打字模式','Typing mode')}"><i data-ic=edit></i> ${_E('打字','Type')}</button>` +
       `<button class="qclose" style="width:auto;margin:0;padding:2px 10px" onclick="SRS.close()"><i data-ic=x></i></button></div>`;
   }
@@ -255,10 +264,12 @@ const SRS = (() => {
     document.getElementById('quizBox').innerHTML = headerHtml(item, itemLv) + `
       <div class="srs-card" id="srsCard" onclick="SRS.flip()">
         <div class="srs-front" id="srsFront">
-          <div class="qmain">${item.w}</div>
+          ${(window.StudyPlan && StudyPlan.get().front === 'zh' && item.m && item.m !== item.w)
+            ? `<div class="srs-meaning" style="font-size:24px;font-weight:800;margin-top:10px">${typeof cvt==='function'?cvt(item.m):item.m}</div>${item.c?'<div class="qsub">［'+item.c+'］</div>':''}<div class="srs-hint" style="margin-top:10px">${_E('回想日文怎麼說 → 點卡翻面','Recall the Japanese → tap to flip')}</div>`
+            : `<div class="qmain">${item.w}</div>
           ${item.w!==item.r?'<div class="qsub">'+item.r+'</div>':''}
           <div style="margin:8px 0"><svg class="spk" style="width:24px;height:24px;opacity:.6" onclick="event.stopPropagation();speak('${(item.r || item.w).replace(/'/g,"\\'")}')" viewBox="0 0 24 24"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.54 8.46a5 5 0 010 7.07M19.07 4.93a10 10 0 010 14.14"/></svg></div>
-          <div class="srs-hint">${t('srs_flip')}</div>
+          <div class="srs-hint">${t('srs_flip')}</div>`}
         </div>
         <div class="srs-back" id="srsBack" style="display:none">
           <div class="qmain">${item.w}</div>
@@ -281,10 +292,18 @@ const SRS = (() => {
 
   function rate(correct) {
     const item = queue[cur];
-    record(item.level || lvl, item.w, correct);
+    // 重考回合:答對不再寫 SRS(第一次答錯已排明天複習,再寫會變「答對→間隔跳長」);答錯再記一次
+    if (!item.again || !correct) record(item.level || lvl, item.w, correct);
     if (typeof Calendar !== 'undefined') Calendar.logActivity('vocab');
+    if (!correct && !item.again && window.StudyPlan && StudyPlan.get().again) againQueue.push({ ...item, again: true });
     cur++;
-    if (cur >= queue.length) showDone(); else renderCard();
+    if (cur >= queue.length) {
+      if (againQueue.length && !inAgain) {   // 本輪結尾:把答錯的卡接上去再考一次
+        inAgain = true; queue = queue.concat(againQueue); againQueue = [];
+        renderCard(); return;
+      }
+      showDone();
+    } else renderCard();
   }
 
   function showDone() {

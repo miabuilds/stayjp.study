@@ -1,0 +1,253 @@
+// 每日學習計畫(2026-09-16,參考 Kotonoha 抄過來再優化):
+//   A1 每日新單字上限 / 複習上限 / 複習順序(交錯・先複習) → 面板「準備好了 N 個新單字」卡 + 一顆開始鈕
+//   A2 字卡正面可選「日文」或「中文→回想日文」
+//   A3 依時段問候 + 一句話輪播(給 renderHub 用)
+//   A4 單字集:可同時開多個等級、排序決定新字先從哪級抽、每級可關掉不想背的生活主題
+//   B7 答錯的卡在本輪結尾自動再考一次(SRS.rate 會呼叫 againQueue)
+// 設定存 localStorage sp_settings / sp_sets(加進 SYNC_KEYS 跨裝置同步)。純前端。
+(function (root) {
+  const KEY = 'sp_settings', SETS_KEY = 'sp_sets';
+  const LEVELS = ['n5', 'n4', 'n3', 'n2', 'n1'];
+  const DEF = { newPerDay: 20, reviewPerDay: 200, order: 'mix', front: 'jp', again: true };
+
+  const L = (zh, en) => { try { return (typeof enOr === 'function') ? enOr(zh, en) : zh; } catch (e) { return zh; } };
+  const esc = s => String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  function today() { return new Date().toISOString().split('T')[0]; }
+  function dayOf(ts) { return new Date(ts).toISOString().split('T')[0]; }
+  function curLevel() { try { return (typeof currentLevel !== 'undefined' && LEVELS.includes(currentLevel)) ? currentLevel : (localStorage.getItem('lastLevel') || 'n5'); } catch (e) { return 'n5'; } }
+  function vocab(lv) { try { return (typeof getVocabData === 'function') ? (getVocabData(lv) || []) : []; } catch (e) { return []; } }
+  function srsData() { try { return JSON.parse(localStorage.getItem('srs_data')) || {}; } catch (e) { return {}; } }
+  function cloud() { try { if (typeof saveAllCloud === 'function') saveAllCloud(); } catch (e) {} }
+
+  // ── 設定 ──
+  function get() {
+    let s = {}; try { s = JSON.parse(localStorage.getItem(KEY)) || {}; } catch (e) {}
+    const o = { ...DEF, ...s };
+    o.newPerDay = Math.max(0, Math.min(200, parseInt(o.newPerDay, 10) || 0));
+    o.reviewPerDay = Math.max(10, Math.min(1000, parseInt(o.reviewPerDay, 10) || DEF.reviewPerDay));
+    if (o.order !== 'reviewFirst') o.order = 'mix';
+    if (o.front !== 'zh') o.front = 'jp';
+    o.again = o.again !== false;
+    return o;
+  }
+  function set(patch) {
+    const o = { ...get(), ...(patch || {}) };
+    try { localStorage.setItem(KEY, JSON.stringify(o)); } catch (e) {}
+    cloud();
+    try { if (typeof doRender === 'function') { root._hubSig = ''; doRender(); } } catch (e) {}
+    return o;
+  }
+
+  // ── 單字集(等級開關 + 排序 + 主題關閉)──
+  function sets() {
+    let s = {}; try { s = JSON.parse(localStorage.getItem(SETS_KEY)) || {}; } catch (e) {}
+    const order = Array.isArray(s.order) ? s.order.filter(l => LEVELS.includes(l)) : [];
+    LEVELS.forEach(l => { if (!order.includes(l)) order.push(l); });
+    let on = (s.on && typeof s.on === 'object') ? s.on : null;
+    if (!on) { on = {}; on[curLevel()] = true; }   // 預設:只開目前在看的等級(跟舊行為一致,不會突然抽到 N1)
+    return { order, on, themeOff: (s.themeOff && typeof s.themeOff === 'object') ? s.themeOff : {} };
+  }
+  function saveSets(s) { try { localStorage.setItem(SETS_KEY, JSON.stringify(s)); } catch (e) {} cloud(); }
+  function enabledLevels() { const s = sets(); const on = s.order.filter(l => s.on[l]); return on.length ? on : [curLevel()]; }
+  function themeOf(v) { try { return (root.VOCAB_THEMES && root.VOCAB_THEMES[v.w + '|' + (v.r || '')]) || ''; } catch (e) { return ''; } }
+  function levelPool(lv, s) {
+    const off = s.themeOff;
+    return vocab(lv).filter(v => { const th = themeOf(v); return !(th && off[lv + '|' + th]); });
+  }
+
+  // ── 今日統計 ──
+  function newToday(d) {
+    d = d || srsData(); const t = today(); let n = 0;
+    Object.values(d).forEach(e => { if (e && e.created && dayOf(e.created) === t) n++; });
+    return n;
+  }
+  function allDue(d) {
+    d = d || srsData(); const now = Date.now(), out = [];
+    Object.entries(d).forEach(([key, e]) => {
+      if (!e) return;
+      const due = (typeof e.nextReviewTs === 'number') ? e.nextReviewTs <= now : (e.nextReview <= dayOf(now));
+      if (!due) return;
+      const ci = key.indexOf(':'); if (ci < 0) return;
+      out.push({ level: key.slice(0, ci), word: key.slice(ci + 1), ts: e.nextReviewTs || 0 });
+    });
+    return out.sort((a, b) => a.ts - b.ts);
+  }
+  // 新字:依單字集排序、跳過已學與關掉的主題
+  function pickNew(count, d) {
+    if (count <= 0) return [];
+    d = d || srsData(); const s = sets(); const out = [];
+    for (const lv of enabledLevels()) {
+      const pf = lv + ':';
+      for (const v of levelPool(lv, s)) {
+        if (d[pf + v.w]) continue;
+        out.push({ ...v, level: lv, isNew: true });
+        if (out.length >= count) return out;
+      }
+    }
+    return out;
+  }
+  function plan(extraNew) {
+    const cfg = get(); const d = srsData();
+    const due = allDue(d);
+    const dueItems = [];
+    for (const x of due) {
+      if (dueItems.length >= cfg.reviewPerDay) break;
+      const v = vocab(x.level).find(w => w.w === x.word);
+      if (v) dueItems.push({ ...v, level: x.level, isNew: false });
+    }
+    const left = Math.max(0, cfg.newPerDay - newToday(d)) + (extraNew || 0);
+    const newItems = pickNew(left, d);
+    const minutes = Math.max(1, Math.round(dueItems.length * 0.15 + newItems.length * 0.3));
+    return { due: dueItems, fresh: newItems, dueTotal: due.length, minutes, cfg };
+  }
+  // 出題順序:交錯(每 2 張複習插 1 張新字,比例不夠就照剩的排)或先複習
+  function buildQueue(extraNew) {
+    const p = plan(extraNew);
+    if (p.cfg.order === 'reviewFirst' || !p.due.length || !p.fresh.length) return p.due.concat(p.fresh);
+    const q = []; let di = 0, ni = 0;
+    const ratio = Math.max(1, Math.round(p.due.length / p.fresh.length));
+    while (di < p.due.length || ni < p.fresh.length) {
+      for (let k = 0; k < ratio && di < p.due.length; k++) q.push(p.due[di++]);
+      if (ni < p.fresh.length) q.push(p.fresh[ni++]);
+    }
+    return q;
+  }
+  function sig() { try { const p = plan(); return p.due.length + '/' + p.fresh.length + '/' + newToday(); } catch (e) { return ''; } }
+
+  // ── A3 時段問候 ──
+  function greeting() {
+    const h = new Date().getHours();
+    const slot = h < 5 ? 'night' : h < 11 ? 'morning' : h < 14 ? 'noon' : h < 18 ? 'afternoon' : h < 23 ? 'evening' : 'night';
+    const greet = slot === 'morning' ? 'おはよう' : (slot === 'noon' || slot === 'afternoon') ? 'こんにちは' : slot === 'evening' ? 'こんばんは' : 'おやすみ前に';
+    const POOL = {
+      morning: [['早安！出門前先背 5 個字，一天都順', 'Morning! Five words before you head out.'], ['早上記的字最牢，先來一輪吧', 'Words stick best in the morning — one round?'], ['今天也一起加油！', 'Let\'s go again today!']],
+      noon: [['午休 5 分鐘，剛好背幾個字', 'Five minutes at lunch is all it takes.'], ['吃飽了？來翻幾張卡消化一下', 'Full? Flip a few cards to digest.']],
+      afternoon: [['下午容易放空，翻幾張卡醒一醒', 'Afternoon slump? A few cards will wake you up.'], ['離下班還有一段，先把今天的份做掉', 'Knock out today\'s share before the day ends.']],
+      evening: [['今天辛苦了，複習一下再休息', 'Long day. A quick review, then rest.'], ['晚上複習一輪，白天學的才會留下來', 'Review tonight and today\'s words will stay.'], ['一天一點，記憶就會穩穩堆起來', 'A little every day, and it all adds up.']],
+      night: [['睡前複習一下吧 — 睡眠會幫你把記憶存好', 'A quick review before bed — sleep files it away.'], ['很晚了，翻 5 張就好，然後早點睡', 'It\'s late. Five cards, then sleep.']],
+    };
+    const pool = POOL[slot];
+    const dayN = Math.floor(Date.now() / 86400000);
+    const pick = pool[dayN % pool.length];
+    return { slot, greet, motto: L(pick[0], pick[1]) };
+  }
+
+  // ── 面板卡 ──
+  function hubCardHtml() {
+    const p = plan();
+    const n = p.fresh.length, d = p.due.length;
+    const doneAll = n === 0 && d === 0;
+    if (doneAll) {
+      return '<div class="sp-card sp-done">'
+        + '<div class="sp-top"><b>' + L('今天的份完成了 🎉', 'Today\'s share is done 🎉') + '</b><button type="button" class="sp-gear" onclick="StudyPlan.openSettings()" aria-label="settings"><i data-ic=settings></i></button></div>'
+        + '<div class="sp-sub">' + L('已學 ' + newToday() + ' 個新字・沒有到期的複習。想多學一點？', newToday() + ' new words learned · nothing due. Want more?') + '</div>'
+        + '<button type="button" class="sp-cta sp-cta-sub" onclick="SRS.start(null,{extraNew:10})">' + L('再學 10 個新單字', 'Learn 10 more') + '</button>'
+        + '</div>';
+    }
+    const parts = [];
+    if (n) parts.push('<span class="sp-num">' + n + '</span> ' + L('個新單字', 'new words'));
+    if (d) parts.push('<span class="sp-num">' + d + '</span> ' + L('張待複習', 'to review'));
+    return '<div class="sp-card">'
+      + '<div class="sp-top"><b>' + L('準備好了', 'Ready for you') + '</b><button type="button" class="sp-gear" onclick="StudyPlan.openSettings()" aria-label="settings"><i data-ic=settings></i></button></div>'
+      + '<div class="sp-main">' + parts.join('<span class="sp-dot">・</span>') + '</div>'
+      + '<div class="sp-sub">' + L('從第一張開始，大約 ' + p.minutes + ' 分鐘', 'Start with the first card — about ' + p.minutes + ' min') + (p.dueTotal > d ? L('（到期 ' + p.dueTotal + ' 張，今天先排 ' + d + '）', ' (' + p.dueTotal + ' due, ' + d + ' scheduled today)') : '') + '</div>'
+      + '<button type="button" class="sp-cta" onclick="SRS.start()">' + L('開始今天的學習', 'Start today\'s session') + ' →</button>'
+      + '</div>';
+  }
+
+  // ── 設定面板(用 quiz overlay)──
+  function openSettings() {
+    ensureCss();
+    const box = document.getElementById('quizBox'), bg = document.getElementById('quizBg');
+    if (!box || !bg) return;
+    const cfg = get(), s = sets();
+    const lvRows = s.order.map((lv, i) => {
+      const total = vocab(lv).length;
+      const themes = {}; vocab(lv).forEach(v => { const th = themeOf(v); if (th) themes[th] = (themes[th] || 0) + 1; });
+      const offN = Object.keys(themes).filter(th => s.themeOff[lv + '|' + th]).length;
+      const chips = Object.keys(themes).sort((a, b) => themes[b] - themes[a]).map(th =>
+        '<button type="button" class="sp-chip' + (s.themeOff[lv + '|' + th] ? ' off' : '') + '" onclick="StudyPlan.toggleTheme(\'' + lv + '\',\'' + esc(th) + '\')">' + esc(th) + ' <small>' + themes[th] + '</small></button>').join('');
+      return '<div class="sp-lv' + (s.on[lv] ? '' : ' dim') + '">'
+        + '<div class="sp-lv-row">'
+        + '<label class="sp-check"><input type="checkbox" ' + (s.on[lv] ? 'checked' : '') + ' onchange="StudyPlan.toggleLevel(\'' + lv + '\',this.checked)"><b>' + lv.toUpperCase() + '</b></label>'
+        + '<span class="sp-lv-n">' + (offN ? L('已關 ' + offN + ' 個主題・', offN + ' themes off · ') : L('全開・', 'all · ')) + total + L(' 詞', ' words') + '</span>'
+        + '<span class="sp-lv-btns"><button type="button" ' + (i === 0 ? 'disabled' : '') + ' onclick="StudyPlan.moveLevel(\'' + lv + '\',-1)" aria-label="up">↑</button><button type="button" ' + (i === s.order.length - 1 ? 'disabled' : '') + ' onclick="StudyPlan.moveLevel(\'' + lv + '\',1)" aria-label="down">↓</button>'
+        + '<button type="button" class="sp-exp" onclick="this.closest(\'.sp-lv\').classList.toggle(\'open\')" aria-label="themes">▾</button></span>'
+        + '</div>'
+        + '<div class="sp-themes">' + (chips || '<span class="sp-lv-n">' + L('此級別尚無主題標記', 'No theme tags yet') + '</span>') + '</div>'
+        + '</div>';
+    }).join('');
+    box.innerHTML = '<div class="sp-set">'
+      + '<div class="qhd"><h3 style="margin:0">' + L('學習計畫', 'Study plan') + '</h3><button class="qclose" style="width:auto;margin:0;padding:2px 10px" onclick="StudyPlan.closeSettings()"><i data-ic=x></i></button></div>'
+      + '<div class="sp-sec">' + L('學習目標', 'Daily goals') + '</div>'
+      + row(L('每日新單字上限', 'New words per day'), L('每天最多抽幾個沒學過的新字（建議 10–30）', 'Max new words drawn each day (10–30 recommended)'),
+        '<input type="number" min="0" max="200" inputmode="numeric" value="' + cfg.newPerDay + '" onchange="StudyPlan.set({newPerDay:this.value})">')
+      + row(L('每次複習上限', 'Reviews per session'), L('一次最多排幾張到期的舊字（建議 100–300）', 'Max due cards per session (100–300 recommended)'),
+        '<input type="number" min="10" max="1000" inputmode="numeric" value="' + cfg.reviewPerDay + '" onchange="StudyPlan.set({reviewPerDay:this.value})">')
+      + row(L('複習順序', 'Order'), L('交錯＝待複習與新字穿插；先複習＝清完到期的舊字才學新字', 'Mixed = reviews and new words interleaved; Reviews first = clear due cards before new ones'),
+        '<select onchange="StudyPlan.set({order:this.value})"><option value="mix"' + (cfg.order === 'mix' ? ' selected' : '') + '>' + L('交錯（預設）', 'Mixed (default)') + '</option><option value="reviewFirst"' + (cfg.order === 'reviewFirst' ? ' selected' : '') + '>' + L('先複習', 'Reviews first') + '</option></select>')
+      + row(L('字卡正面', 'Card front'), L('中文→回想日文：先看意思，練主動說出來；翻面才看單字與讀音', 'Meaning first: recall the Japanese yourself; flip to see the word and reading'),
+        '<select onchange="StudyPlan.set({front:this.value})"><option value="jp"' + (cfg.front === 'jp' ? ' selected' : '') + '>' + L('單字（預設）', 'Word (default)') + '</option><option value="zh"' + (cfg.front === 'zh' ? ' selected' : '') + '>' + L('中文意思', 'Meaning') + '</option></select>')
+      + row(L('錯題重考', 'Retry misses'), L('這一輪答錯的卡，結尾自動再考一次', 'Cards you miss come back at the end of the session'),
+        '<label class="sp-switch"><input type="checkbox" ' + (cfg.again ? 'checked' : '') + ' onchange="StudyPlan.set({again:this.checked})"><span></span></label>')
+      + '<div class="sp-sec">' + L('單字集', 'Word sets') + '</div>'
+      + '<div class="sp-hint">' + L('勾選想背的等級、用 ↑↓ 排序：靠前的先抽新字。點 ▾ 可關掉某級裡不想背的主題。', 'Tick the levels to study and order them with ↑↓ — new words come from the top first. Tap ▾ to switch off themes within a level.') + '</div>'
+      + lvRows
+      + '<button class="qstart" style="margin-top:14px" onclick="StudyPlan.closeSettings()">' + L('完成', 'Done') + '</button>'
+      + '</div>';
+    try { if (typeof cvtStaticUI === 'function') cvtStaticUI(box); } catch (e) {}
+    bg.classList.add('show');
+    function row(title, desc, ctrl) {
+      return '<div class="sp-row"><div class="sp-row-t"><b>' + title + '</b><small>' + desc + '</small></div><div class="sp-row-c">' + ctrl + '</div></div>';
+    }
+  }
+  function closeSettings() {
+    const bg = document.getElementById('quizBg'); if (bg) bg.classList.remove('show');
+    try { root._hubSig = ''; if (typeof doRender === 'function') doRender(); } catch (e) {}
+    try { if (root.SRS && SRS.updateReviewCount) SRS.updateReviewCount(); } catch (e) {}
+  }
+  function toggleLevel(lv, on) { const s = sets(); s.on[lv] = !!on; saveSets(s); openSettings(); }
+  function moveLevel(lv, dir) {
+    const s = sets(); const i = s.order.indexOf(lv); const j = i + dir;
+    if (i < 0 || j < 0 || j >= s.order.length) return;
+    s.order.splice(i, 1); s.order.splice(j, 0, lv); saveSets(s); openSettings();
+  }
+  function toggleTheme(lv, th) {
+    const s = sets(); const k = lv + '|' + th;
+    if (s.themeOff[k]) delete s.themeOff[k]; else s.themeOff[k] = true;
+    saveSets(s);
+    // 只更新 chip,不整個重畫(保持展開狀態)
+    const box = document.getElementById('quizBox');
+    const btn = box && [].find.call(box.querySelectorAll('.sp-chip'), b => b.getAttribute('onclick').includes('\'' + lv + '\',\'' + th.replace(/'/g, "\\'") + '\''));
+    if (btn) btn.classList.toggle('off', !!s.themeOff[k]);
+  }
+
+  function ensureCss() {
+    if (document.getElementById('spCss')) return;
+    const st = document.createElement('style'); st.id = 'spCss';
+    st.textContent = [
+      '.sp-card{background:var(--bg2);border:1px solid var(--bd);border-radius:16px;padding:14px 16px;margin:0 0 14px}',
+      '.sp-card.sp-done{background:linear-gradient(160deg,var(--correct-bg,#dcfce7),var(--bg2))}',
+      '.sp-top{display:flex;align-items:center;justify-content:space-between}.sp-top b{font-size:13px;color:var(--tx2);font-weight:700;letter-spacing:.02em}',
+      '.sp-gear{border:none;background:none;color:var(--tx3);cursor:pointer;padding:2px 4px;font-size:15px;line-height:1}.sp-gear i{width:16px;height:16px}',
+      '.sp-main{margin-top:6px;font-size:16px;font-weight:700;color:var(--tx);display:flex;align-items:baseline;flex-wrap:wrap;gap:2px 4px}',
+      '.sp-num{font-size:34px;font-weight:900;letter-spacing:-1px;color:var(--tx);line-height:1;margin-right:2px}.sp-dot{color:var(--tx3);font-weight:400;margin:0 4px}',
+      '.sp-sub{margin-top:6px;font-size:12.5px;color:var(--tx2)}',
+      '.sp-cta{display:block;width:100%;margin-top:12px;background:var(--ac);color:#fff;border:0;border-radius:12px;padding:13px 14px;font-size:15px;font-weight:800;cursor:pointer}.sp-cta:active{transform:scale(.99)}',
+      '.sp-cta-sub{background:var(--bg3);color:var(--tx);border:1px solid var(--bd)}',
+      '.sp-set{text-align:left}.sp-sec{font-size:12px;font-weight:800;color:var(--tx2);letter-spacing:.06em;margin:16px 0 6px}.sp-hint{font-size:12px;color:var(--tx3);margin-bottom:8px;line-height:1.5}',
+      '.sp-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid var(--bd)}.sp-row-t b{display:block;font-size:14px}.sp-row-t small{display:block;font-size:11.5px;color:var(--tx3);margin-top:2px;line-height:1.4}',
+      '.sp-row-c input,.sp-row-c select{width:88px;padding:8px 10px;border:1px solid var(--bd);border-radius:10px;background:var(--bg);color:var(--tx);font-size:15px;font-weight:700;text-align:center}.sp-row-c select{width:auto;text-align:left;font-weight:600;font-size:13.5px}',
+      '.sp-switch{position:relative;display:inline-block;width:44px;height:26px}.sp-switch input{opacity:0;width:0;height:0}.sp-switch span{position:absolute;inset:0;background:var(--bd);border-radius:999px;transition:.2s}.sp-switch span:before{content:"";position:absolute;width:20px;height:20px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}.sp-switch input:checked+span{background:var(--ac)}.sp-switch input:checked+span:before{transform:translateX(18px)}',
+      '.sp-lv{border:1px solid var(--bd);border-radius:12px;padding:8px 10px;margin-top:8px;background:var(--bg2)}.sp-lv.dim{opacity:.55}.sp-lv-row{display:flex;align-items:center;gap:8px}',
+      '.sp-check{display:flex;align-items:center;gap:8px;font-size:15px}.sp-check input{width:18px;height:18px;accent-color:var(--ac)}.sp-lv-n{flex:1;font-size:12px;color:var(--tx3)}',
+      '.sp-lv-btns{display:flex;gap:4px}.sp-lv-btns button{width:30px;height:30px;border:1px solid var(--bd);background:var(--bg);color:var(--tx);border-radius:8px;cursor:pointer;font-size:13px}.sp-lv-btns button:disabled{opacity:.3}',
+      '.sp-themes{display:none;flex-wrap:wrap;gap:6px;margin-top:8px}.sp-lv.open .sp-themes{display:flex}.sp-lv.open .sp-exp{transform:rotate(180deg)}',
+      '.sp-chip{border:1px solid var(--ac);background:var(--bg2);color:var(--ac);border-radius:999px;padding:4px 10px;font-size:12px;cursor:pointer}.sp-chip small{opacity:.7}.sp-chip.off{border-color:var(--bd);color:var(--tx3);text-decoration:line-through}'
+    ].join('\n');
+    document.head.appendChild(st);
+  }
+  if (document.head) ensureCss();
+
+  root.StudyPlan = { get, set, sets, plan, buildQueue, sig, greeting, hubCardHtml, openSettings, closeSettings, toggleLevel, moveLevel, toggleTheme, newToday, enabledLevels, LEVELS };
+})(window);
