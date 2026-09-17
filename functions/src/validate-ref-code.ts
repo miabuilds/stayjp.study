@@ -26,7 +26,9 @@ export const validateRefCode = functions.onRequest(
       const d = await db.doc(`ref_codes/${code}`).get();
       const c = d.data();
       // 停權(suspended)或停用(active:false)一律視為無效 → 不歸因、不外洩(預防投機:停權後失效)
-      const valid = d.exists && !!c && c.active !== false && c.status !== "suspended";
+      // expires_at(ms):官方活動碼(如中秋 TSUKIMI)到期即無效(2026-09-17)
+      const notExpired = !c || typeof c.expires_at !== "number" || c.expires_at > Date.now();
+      const valid = d.exists && !!c && c.active !== false && c.status !== "suspended" && notExpired;
       // 若帶了登入 token,檢查是不是「填自己的碼」(任何 owner_uid 碼:user 個人碼 + kol 分潤碼)
       // → 回 self 讓前端擋掉,防自我推薦刷分潤/刷 7 天
       let self = false;

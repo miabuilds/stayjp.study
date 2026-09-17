@@ -60,7 +60,8 @@ export const createPayment = functions.onRequest(
           if (code) {
             const cSnap = await admin.firestore().doc(`ref_codes/${code}`).get();
             const c = cSnap.data();
-            const valid = cSnap.exists && !!c && c.active !== false && c.status !== "suspended" && c.owner_uid !== uid;
+            const notExpired = typeof c?.expires_at !== "number" || c.expires_at > Date.now();   // 活動碼到期不再折價
+            const valid = cSnap.exists && !!c && c.active !== false && c.status !== "suspended" && c.owner_uid !== uid && notExpired;
             if (valid) { priceTwd = PLANS[plan].price_twd - discount; codeApplied = code; }
           }
         } catch (e) { console.warn("推薦碼折價解析失敗,以牌價續行:", e); }

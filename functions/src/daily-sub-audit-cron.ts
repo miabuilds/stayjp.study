@@ -23,6 +23,24 @@ export const dailySubAuditCron = functions.onSchedule(
     memory: "256MiB",
   },
   async () => {
+    // ── 活動碼到期掃除(2026-09-17,官方中秋碼 TSUKIMI 這類):expires_at 過了 → active:false,
+    //    並把還沒付費(無 ref_bonus_at)的帳號上掛著的這個碼清掉,避免 App Paywall 過期後仍顯示推薦價。
+    try {
+      const nowMs = Date.now();
+      const expired = await db.collection("ref_codes").where("expires_at", "<", nowMs).get();
+      for (const doc of expired.docs) {
+        const c = doc.data();
+        if (c.active === false) continue;
+        await doc.ref.set({ active: false, expired_swept_at: nowMs }, { merge: true });
+        const holders = await db.collection("users").where("ref_code", "==", doc.id).limit(500).get();
+        let cleared = 0;
+        for (const u of holders.docs) {
+          if (u.data().ref_bonus_at) continue;   // 已付費拿過好康的不動
+          await u.ref.set({ ref_code: admin.firestore.FieldValue.delete(), ref_expired_code: doc.id }, { merge: true }); cleared++;
+        }
+        console.log(`[sub-audit] 活動碼 ${doc.id} 到期 → 停用,清掉 ${cleared} 個未付費帳號上的碼`);
+      }
+    } catch (e) { console.error("[sub-audit] 活動碼到期掃除失敗(不影響其餘稽核):", e); }
     const snap = await db.collection("users")
       .where("subscription.status", "in", ["active", "trialing", "cancelled", "expired", "refunded"])
       .get();
