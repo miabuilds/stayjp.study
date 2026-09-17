@@ -20,7 +20,7 @@
 //   3. 預快取改逐檔 add + catch —— 單一檔案 404 不再讓整個 SW 裝不起來
 //   4. 常用頁面/腳本補進預快取清單
 
-const VERSION = 'v535';
+const VERSION = 'v536';
 const PRECACHE = 'stayjp-' + VERSION;   // 版本化:更新時重新預快取
 const RUNTIME = 'stayjp-runtime';       // 不隨版號刪除:瞬斷/離線時的救命網
 const CACHE_NAME = PRECACHE;            // 舊名稱保留,避免別處有引用
@@ -199,6 +199,23 @@ self.addEventListener('fetch', (e) => {
   const isCode = e.request.mode === 'navigate'
     || url.pathname === '/'
     || /\.(?:html|js|css)$/i.test(url.pathname);
+
+  // 大型資料檔 / 第三方版本化 SDK → 「每個 SW 版號抓一次」:先看本版預快取,沒有才下載並存進本版快取。
+  // 這些檔改動時一定伴隨 sw VERSION bump(部署慣例),所以不會吃到舊資料;
+  // 之前一律 network-first + cache:'reload',刷題頁一開就重抓 ~1MB(gz)的題庫+語音索引+Firebase SDK,登入/切類別都拖慢。
+  const isVersionedData = url.origin !== self.location.origin
+    ? /^https:\/\/(www\.gstatic\.com\/firebasejs\/|cdn\.jsdelivr\.net\/npm\/[^/]+@\d)/.test(url.href)
+    : /\/(?:audio\/tts(?:-v)?\/manifest|jlpt-questions(?:-gen)?|jlpt-q-trans|pitch-accent|articles|article-tokens|article-timings|article-dict|vocab-themes|grammar-detail|grammar-kanji-readings|reading-listening-en|vocab-n\d|grammar-n\d|ui-map|i18n)\.js$/.test(url.pathname);
+  if (isVersionedData && !url.search) {
+    e.respondWith(
+      caches.open(PRECACHE).then((cache) => cache.match(e.request).then((hit) => hit || fetch(e.request).then((response) => {
+        if (response && response.status === 200 && !response.redirected) cache.put(e.request, response.clone());
+        return response;
+      })))
+        .catch(() => fallback(e.request)),
+    );
+    return;
+  }
 
   if (isCode) {
     // cache:'reload' → 強制走網路、繞過瀏覽器自身的 HTTP 快取,避免抓到舊的(甚至是頁面還沒上線前的 404)版本。

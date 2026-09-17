@@ -229,7 +229,15 @@
 <script src="jlpt-questions.js"></script>
 <script src="jlpt-q-trans.js"></script>
 <script src="jlpt-questions-gen.js"></script>
-<script src="audio/tts/manifest.js" async></script>
+<script>
+// 語音索引(audio/tts/manifest.js,1.2MB)不在開頁時抓:先讓類別畫面出來,頁面載完 1 秒後背景載;
+// 播放/唸讀音時若還沒到,等它載好再播一次。
+var __ttsP=null;
+function ensureTTS(){ if(window.__TTS) return Promise.resolve(); if(__ttsP) return __ttsP;
+  __ttsP=new Promise(function(res){ var s=document.createElement('script'); s.src='audio/tts/manifest.js'; s.onload=function(){res();}; s.onerror=function(){__ttsP=null;res();}; document.head.appendChild(s); });
+  return __ttsP; }
+window.addEventListener('load',function(){ setTimeout(ensureTTS,1000); });
+</script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
@@ -541,6 +549,7 @@ function startWrong(){ _clearRound();
 let _au=null;
 function playAu(){
   const q = queue[qi]; if(!q || !q.at) return;
+  if(!window.__TTS){ ensureTTS().then(function(){ if(window.__TTS && queue[qi]===q) playAu(); }); return; }
   try{ if(_au){ _au.pause(); _au=null; } }catch(e){}
   const hash = window.__TTS && window.__TTS[q.at];
   if(hash){ _au = new Audio('audio/tts/'+hash+'.mp3'); _au.play().catch(()=>{}); }
@@ -569,6 +578,7 @@ function sayWordAudio(q){
   if(q.t==='kanji') kana = q.o[q.a];
   else if(q.t==='hyoki'){ const m = q.q.match(/【(.+?)】/); kana = m && m[1]; }
   if(!kana) return;
+  if(!window.__TTS){ ensureTTS().then(function(){ if(window.__TTS) sayWordAudio(q); }); return; }
   const hash = window.__TTS && window.__TTS[kana];
   if(!hash) return;
   try{ if(_au){ _au.pause(); _au=null; } }catch(e){}
@@ -742,6 +752,7 @@ function examNext(){
 function playExamAu(){
   if(!EX) return;
   const node = EX.flow[EX.idx]; if(node.part || !node.q.at) return;
+  if(!window.__TTS){ ensureTTS().then(function(){ if(window.__TTS && EX && EX.flow[EX.idx]===node) playExamAu(); }); return; }
   try{ if(_au){ _au.pause(); _au=null; } }catch(e){}
   const hash = window.__TTS && window.__TTS[node.q.at];
   if(hash){ _au = new Audio('audio/tts/'+hash+'.mp3'); _au.play().catch(()=>{}); }
