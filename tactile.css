@@ -1,0 +1,40 @@
+/* 按壓手感(2026-09-18 原型):html.tactile 才生效。借競品「日檢手帖」的配方——粗一點的邊框 + 不模糊的右下硬陰影 + 按下位移,
+   讓「可以按的東西」跟純顯示區塊分層;深色模式硬陰影改用亮邊色,不然看不見。 */
+html.tactile { --tac-bd: #2C2C2C; --tac-sh: #2C2C2C; }
+html.tactile[data-theme="dark"] { --tac-bd: #6E6E73; --tac-sh: #8E8E93; }
+
+/* 卡片:首頁功能卡 */
+html.tactile .hub-card { border: 1.5px solid var(--tac-bd); box-shadow: 4px 4px 0 var(--tac-sh); transition: transform .08s, box-shadow .08s; }
+html.tactile .hub-card:hover { transform: translate(-1px,-1px); box-shadow: 5px 5px 0 var(--tac-sh); }
+html.tactile .hub-card:active { transform: translate(3px,3px); box-shadow: 0 0 0 var(--tac-sh); }
+
+/* 膠囊快捷鈕、選項鈕、一般次要按鈕 */
+html.tactile .hub-quick a, html.tactile .hub-quick button,
+html.tactile .qo button, html.tactile .daily-btn, html.tactile .cc-btn,
+html.tactile .opt, html.tactile .playbtn, html.tactile .wrongbtn {
+  border: 1.5px solid var(--tac-bd); box-shadow: 2.5px 2.5px 0 var(--tac-sh); transition: transform .08s, box-shadow .08s, background .15s;
+}
+html.tactile .hub-quick a:active, html.tactile .hub-quick button:active,
+html.tactile .qo button:active, html.tactile .daily-btn:active, html.tactile .cc-btn:active,
+html.tactile .opt:active, html.tactile .playbtn:active, html.tactile .wrongbtn:active { transform: translate(2px,2px); box-shadow: 0 0 0 var(--tac-sh); }
+html.tactile .opt { background: var(--bg2); }
+html.tactile .qo button.on { background: var(--ac2); color: #fff; border-color: var(--tac-bd); }
+
+/* 主要行動鈕:開始 / 下一題 / 送出 */
+html.tactile .qstart, html.tactile .onb-start, html.tactile .srs-btn, html.tactile .fc-btns button, html.tactile #nextBtn, html.tactile .cc-btn.primary {
+  border: 1.5px solid var(--tac-bd); box-shadow: 3px 3px 0 var(--tac-sh); transition: transform .08s, box-shadow .08s, opacity .15s;
+}
+html.tactile .qstart:hover, html.tactile .onb-start:hover { opacity: 1; transform: translate(-1px,-1px); box-shadow: 4px 4px 0 var(--tac-sh); }
+html.tactile .qstart:active, html.tactile .onb-start:active, html.tactile .srs-btn:active, html.tactile .fc-btns button:active, html.tactile #nextBtn:active, html.tactile .cc-btn.primary:active { transform: translate(3px,3px); box-shadow: 0 0 0 var(--tac-sh); }
+html.tactile .onb-start { border-radius: 14px; }
+
+/* 已答對/答錯的選項不要再有陰影(視覺上「已按下」) */
+html.tactile .opt.ok, html.tactile .opt.ng, html.tactile .opt[disabled] { box-shadow: none; transform: none; }
+
+/* 首頁上半:學習計畫卡、今日一字、刷題特區橫幅、從頭學卡 —— 卡片本體立體、主 CTA 更立體 */
+html.tactile .sp-card, html.tactile .hub-wod, html.tactile .hub-goal, html.tactile .hub-resume { border: 1.5px solid var(--tac-bd); box-shadow: 4px 4px 0 var(--tac-sh); }
+html.tactile .sp-cta { border: 1.5px solid var(--tac-bd); box-shadow: 3px 3px 0 var(--tac-sh); transition: transform .08s, box-shadow .08s; }
+html.tactile .sp-cta:active { transform: translate(3px,3px); box-shadow: 0 0 0 var(--tac-sh); }
+html.tactile .hub-jlpt { border: 1.5px solid var(--tac-bd); box-shadow: 4px 4px 0 var(--tac-sh); transition: transform .08s, box-shadow .08s; }
+html.tactile .hub-jlpt:active { transform: translate(3px,3px); box-shadow: 0 0 0 var(--tac-sh); }
+html.tactile .hub-zero { border-width: 1.5px; border-color: var(--tac-bd); box-shadow: 4px 4px 0 var(--tac-sh); }

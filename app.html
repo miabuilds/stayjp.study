@@ -1718,6 +1718,7 @@ try {
   if (_rm) localStorage.setItem('stayjp_ref', _rm[1].toUpperCase());
 } catch (e) {}
 </script>
+<link rel="stylesheet" href="tactile.css">
 </head>
 <body>
 
@@ -5059,6 +5060,8 @@ if ('requestIdleCallback' in window) {
 
 // ========== THEME ==========
 function initTheme() {
+  // 按壓手感原型(tactile.css):?tactile=1 開 / ?tactile=0 關,記在 localStorage ui_tactile
+  try { var _tq = /[?&]tactile=([01])/.exec(location.search); if (_tq) localStorage.setItem('ui_tactile', _tq[1]); if (localStorage.getItem('ui_tactile') === '1') document.documentElement.classList.add('tactile'); } catch (e) {}
   const saved = localStorage.getItem('theme');
   if (saved) {
     document.documentElement.setAttribute('data-theme', saved);
