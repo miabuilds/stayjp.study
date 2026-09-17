@@ -32,6 +32,12 @@
 })();
 
 const FlashCard = (() => {
+  const _E = (zh, en) => (typeof enOr === 'function' ? enOr(zh, en) : zh);   // EN 介面(用戶回饋 2026-09-17)
+  // 打字模式(用戶回饋:背單字也想打字):看中文打日文;漢字/假名皆可;IME 組字中的 Enter 不送出
+  const FC_TYPE_KEY = 'fc_type_mode';
+  function typeMode() { try { return localStorage.getItem(FC_TYPE_KEY) === '1'; } catch (e) { return false; } }
+  function normJa(x) { return String(x || '').normalize('NFKC').trim().replace(/[\s・･]/g, '').replace(/[\u30a1-\u30f6]/g, ch => String.fromCharCode(ch.charCodeAt(0) - 0x60)); }
+  function typedRight(item, val) { const v = normJa(val); if (!v) return false; return [item.w, item.r].filter(Boolean).some(c => { const n = normJa(c); return n === v || n.replace(/[〜~()（）]/g, '') === v; }); }
   const EXAM_KEY = 'exam_date';
   const BASE_KEY = 'base_level';    // 目前程度（這級以下視為已懂）'none'|'n5'|'n4'|'n3'|'n2'
   const GOAL_KEY = 'goal_level';    // 目標考級 'n5'|'n4'|'n3'|'n2'|'n1'
@@ -177,9 +183,9 @@ const FlashCard = (() => {
       const learned = countLearned(srs, lv);
       const now = Date.now();
       const due = Object.keys(srs).filter(k => k.startsWith(pf) && SRS.isDue(srs[k], now)).length;
-      html += `<div><strong>${lv.toUpperCase()}</strong>　已學 ${learned} / ${data.length}（${Math.round(learned/data.length*100)}%）${due>0?`<span style="color:var(--ac)">　待複習 ${due}</span>`:''}</div>`;
+      html += `<div><strong>${lv.toUpperCase()}</strong>　${_E('已學','Learned')} ${learned} / ${data.length}（${Math.round(learned/data.length*100)}%）${due>0?`<span style="color:var(--ac)">　${_E('待複習','Due')} ${due}</span>`:''}</div>`;
     } else {
-      html += `<div style="color:var(--tx2)">此級別無單字資料</div>`;
+      html += `<div style="color:var(--tx2)">${_E('此級別無單字資料','No vocabulary for this level')}</div>`;
     }
     if (goal) {
       const scope = scopeLevels(base, goal);
@@ -193,11 +199,11 @@ const FlashCard = (() => {
           const d = new Date(examIso); d.setHours(0,0,0,0);
           const t = new Date(); t.setHours(0,0,0,0);
           const days = Math.ceil((d - t) / 86400000);
-          if (days > 0 && remaining > 0) extra = `　倒數 ${days} 天・每天 ${Math.ceil(remaining/days)} 個`;
-          else if (days > 0) extra = `　倒數 ${days} 天`;
+          if (days > 0 && remaining > 0) extra = _E(`　倒數 ${days} 天・每天 ${Math.ceil(remaining/days)} 個`, ` · ${days} days left · ${Math.ceil(remaining/days)} words/day`);
+          else if (days > 0) extra = _E(`　倒數 ${days} 天`, ` · ${days} days left`);
         }
-        const baseLabel = (!base || base === 'none') ? '零基礎' : base.toUpperCase();
-        html += `<div style="color:var(--tx2);font-size:12px;margin-top:5px">${baseLabel} → ${goal.toUpperCase()}　還要背 ${remaining} 個${extra}</div>`;
+        const baseLabel = (!base || base === 'none') ? _E('零基礎','Beginner') : base.toUpperCase();
+        html += `<div style="color:var(--tx2);font-size:12px;margin-top:5px">${baseLabel} → ${goal.toUpperCase()}　${_E('還要背','to go:')} ${remaining} ${_E('個','words')}${extra}</div>`;
       }
     }
     infoEl.innerHTML = html;
@@ -217,7 +223,7 @@ const FlashCard = (() => {
         <button class="qclose" style="width:auto;margin:0;padding:2px 10px" onclick="FlashCard.close()"><i data-ic=x></i></button>
       </div>
       <div style="font-size:12.5px;color:var(--tx2);margin-bottom:12px;line-height:1.6">
-        ${COUNTDOWN_SEC} 秒自動翻面・左滑不會、右滑記得・紀錄自動進複習系統
+        ${_E(COUNTDOWN_SEC + ' 秒自動翻面・左滑不會、右滑記得・紀錄自動進複習系統', 'Auto-flips after ' + COUNTDOWN_SEC + 's · swipe left = don\'t know, right = got it · results feed the review system')}
       </div>
       <div class="qf"><label>級別</label><div class="qo" id="fcLevel">
         <button data-v="n5" class="${curLv==='n5'?'on':''}">N5</button>
@@ -226,17 +232,17 @@ const FlashCard = (() => {
         <button data-v="n2" class="${curLv==='n2'?'on':''}">N2</button>
         <button data-v="n1" class="${curLv==='n1'?'on':''}">N1</button>
       </div></div>
-      <div class="qf"><label>張數</label><div class="qo" id="fcCount">
+      <div class="qf"><label>${_E('張數','Cards')}</label><div class="qo" id="fcCount">
         <button data-v="10">10</button><button data-v="20" class="on">20</button><button data-v="50">50</button>
       </div></div>
-      <div class="qf"><label>範圍</label><div class="qo" id="fcRange">
-        <button data-v="new" class="on">新詞為主</button>
-        <button data-v="due">待複習</button>
-        <button data-v="random">全部隨機</button>
+      <div class="qf"><label>${_E('範圍','Range')}</label><div class="qo" id="fcRange">
+        <button data-v="new" class="on">${_E('新詞為主','Mostly new')}</button>
+        <button data-v="due">${_E('待複習','Due')}</button>
+        <button data-v="random">${_E('全部隨機','Random')}</button>
       </div></div>
       <div id="fcInfo" style="background:var(--bg3);border:1px solid var(--bd);border-radius:10px;padding:10px 12px;margin:12px 0;font-size:13px;line-height:1.8;color:var(--tx)"></div>
-      <button class="qstart" onclick="FlashCard.begin()">開始</button>
-      <button class="qclose" onclick="FlashCard.close()">取消</button>`;
+      <button class="qstart" onclick="FlashCard.begin()">${_E('開始','Start')}</button>
+      <button class="qclose" onclick="FlashCard.close()">${_E('取消','Cancel')}</button>`;
     box.querySelectorAll('.qo').forEach(g => {
       g.querySelectorAll('button').forEach(b => {
         b.onclick = () => {
@@ -259,7 +265,7 @@ const FlashCard = (() => {
     const count = ctEl ? parseInt(ctEl.dataset.v) : 20;
     const range = rgEl ? rgEl.dataset.v : 'new';
     const data = getData(level);
-    if (!data || !data.length) { alert('此級別無單字資料'); return; }
+    if (!data || !data.length) { alert(_E('此級別無單字資料','No vocabulary for this level')); return; }
     const srs = typeof SRS !== 'undefined' ? JSON.parse(localStorage.getItem('srs_data') || '{}') : {};
     const pf = level + ':';
     // 「已學」= 至少一次記得；只打過不熟/不會的不算，新詞模式仍會出現
@@ -292,14 +298,16 @@ const FlashCard = (() => {
       if (ToolQuota.showPaywall) ToolQuota.showPaywall('flashcard');
       return;
     }
-    flipped = false;
+    flipped = false; typedDone = false;
     timeLeft = COUNTDOWN_SEC;
     const item = queue[cur];
     const cfHint = window.sameReadingHint ? window.sameReadingHint(item) : '';
     const box = document.getElementById('quizBox');
+    const tm = typeMode();
     box.innerHTML = `
       <div class="qhd">
         <span>${cur+1} / ${queue.length}</span>
+        <span class="srs-seg" role="tablist"><button type="button" class="${tm?'':'on'}" onclick="event.stopPropagation();FlashCard.setTypeMode(false)"><i data-ic=refresh></i>${_E('翻卡','Flip')}</button><button type="button" class="${tm?'on':''}" onclick="event.stopPropagation();FlashCard.setTypeMode(true)"><i data-ic=edit></i>${_E('打字','Type')}</button></span>
         <span style="font-weight:600">
           <span style="color:var(--correct-bd)"><i data-ic=check></i>${score.known}</span>
           <span style="color:var(--ac);margin-left:6px">◯${score.soso}</span>
@@ -309,9 +317,15 @@ const FlashCard = (() => {
       </div>
       <div class="fc-bar"><div class="fc-bar-fill" id="fcBarFill"></div></div>
       <div class="fc-card" id="fcCard" onclick="FlashCard.flip()">
-        <div class="fc-face" id="fcFront">
-          <div class="fc-word">${item.w}</div>
-          <div class="fc-hint">點卡翻面，或等 ${COUNTDOWN_SEC} 秒自動翻</div>
+        <div class="fc-face" id="fcFront" ${tm ? 'onclick="event.stopPropagation()" style="cursor:default"' : ''}>
+          ${tm
+            ? `<div class="fc-meaning" style="font-size:24px;font-weight:800">${typeof cvt==='function'?cvt(item.m):item.m}</div>
+          <div class="fc-hint" style="animation:none">${item.c ? '［' + item.c + '］ ' : ''}${_E('打出日文，漢字或假名都可以 → Enter','Type the Japanese — kanji or kana → Enter')}</div>
+          <input id="fcTypeIn" class="srs-type-in" lang="ja" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="done" placeholder="…" onclick="event.stopPropagation()" onkeydown="if(event.key==='Enter'&&!event.isComposing&&event.keyCode!==229){event.preventDefault();FlashCard.checkTyped();}">
+          <div class="srs-btns"><button class="srs-btn srs-hard" onclick="event.stopPropagation();FlashCard.giveUp()">${_E('不會','Don\'t know')}</button><button class="srs-btn srs-ok" onclick="event.stopPropagation();FlashCard.checkTyped()">${_E('送出','Check')}</button></div>
+          <div id="fcTypeRes"></div>`
+            : `<div class="fc-word">${item.w}</div>
+          <div class="fc-hint">${_E('點卡翻面，或等 ' + COUNTDOWN_SEC + ' 秒自動翻', 'Tap to flip, or wait ' + COUNTDOWN_SEC + 's')}</div>`}
         </div>
         <div class="fc-face" id="fcBack" style="display:none">
           <div class="fc-word" style="font-size:28px">${item.w}</div>
@@ -320,23 +334,57 @@ const FlashCard = (() => {
           ${cfHint?`<div class="confuse-hint">${cfHint}</div>`:''}
           ${(exList=>exList.length?`<div class="fc-ex">${exList.map(ex=>`<div class="fc-ex-row"><div class="fc-ex-j">${window.furiganaHTML?window.furiganaHTML(ex.j):ex.j}<svg class="fc-ex-spk" onclick="event.stopPropagation();speak('${(ex.j||'').replace(/'/g,"\\'")}')" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.54 8.46a5 5 0 010 7.07"/></svg></div><div class="fc-ex-z">${(function(){try{if(localStorage.getItem('ui_lang')==='en'&&ex.e)return ex.e;}catch(e){}return typeof cvt==='function'?cvt(ex.z):ex.z;})()}</div></div>`).join('')}</div>`:'')(Array.isArray(item.e)&&item.e.length?item.e:(item.ex&&item.ex.j?[item.ex]:[]))}
           <div class="fc-btns">
-            <button class="fc-btn fc-no" onclick="event.stopPropagation();FlashCard.answer('unknown')"><i data-ic=x></i> 不會<span class="fc-btn-hint">${gradeLabel('unknown')}</span></button>
-            <button class="fc-btn fc-soso" onclick="event.stopPropagation();FlashCard.answer('soso')">◯ 不熟<span class="fc-btn-hint">${gradeLabel('soso')}</span></button>
-            <button class="fc-btn fc-yes" onclick="event.stopPropagation();FlashCard.answer('known')"><i data-ic=check></i> 記得<span class="fc-btn-hint">${gradeLabel('known')}</span></button>
+            <button class="fc-btn fc-no" onclick="event.stopPropagation();FlashCard.answer('unknown')"><i data-ic=x></i> ${_E('不會','Don\'t know')}<span class="fc-btn-hint">${gradeLabel('unknown')}</span></button>
+            <button class="fc-btn fc-soso" onclick="event.stopPropagation();FlashCard.answer('soso')">◯ ${_E('不熟','Fuzzy')}<span class="fc-btn-hint">${gradeLabel('soso')}</span></button>
+            <button class="fc-btn fc-yes" onclick="event.stopPropagation();FlashCard.answer('known')"><i data-ic=check></i> ${_E('記得','Got it')}<span class="fc-btn-hint">${gradeLabel('known')}</span></button>
           </div>
-          <div class="fc-hint">手機可左滑（不會）／右滑（記得）</div>
+          <div class="fc-hint">${tm ? '' : _E('手機可左滑（不會）／右滑（記得）','Swipe left = don\'t know, right = got it')}</div>
         </div>
       </div>
       <div style="display:flex;justify-content:center;align-items:center;gap:14px;margin-top:10px">
-        <button onclick="event.stopPropagation();speak('${(item.r||item.w).replace(/'/g,"\\'")}')" style="background:var(--bg3);border:1px solid var(--bd);border-radius:20px;padding:6px 16px;cursor:pointer;color:var(--ac2);font-size:13px"><i data-ic=volume></i> 播音</button>
-        <a href="${window.stayjpReportHref?window.stayjpReportHref('單字卡',item.w,'單字：'+item.w+'\n讀音：'+item.r+'\n意思：'+(typeof cvt==='function'?cvt(item.m):item.m)):'#'}" target="_blank" rel="noopener" onclick="event.stopPropagation()" style="color:var(--tx3);font-size:12px;text-decoration:none"><i data-ic=flag></i> 回報錯誤</a>
+        <button onclick="event.stopPropagation();speak('${(item.r||item.w).replace(/'/g,"\\'")}')" style="background:var(--bg3);border:1px solid var(--bd);border-radius:20px;padding:6px 16px;cursor:pointer;color:var(--ac2);font-size:13px"><i data-ic=volume></i> ${_E('播音','Play')}</button>
+        <a href="${window.stayjpReportHref?window.stayjpReportHref('單字卡',item.w,'單字：'+item.w+'\n讀音：'+item.r+'\n意思：'+(typeof cvt==='function'?cvt(item.m):item.m)):'#'}" target="_blank" rel="noopener" onclick="event.stopPropagation()" style="color:var(--tx3);font-size:12px;text-decoration:none"><i data-ic=flag></i> ${_E('回報錯誤','Report')}</a>
       </div>`;
     // 不自動播音，使用者要聽點 🔊 按鈕
+    if (tm) {
+      // 打字模式:不倒數、不綁滑動,直接聚焦輸入框
+      clearInterval(timerId); const fill = document.getElementById('fcBarFill'); if (fill) fill.style.width = '100%';
+      const inp = document.getElementById('fcTypeIn'); if (inp) setTimeout(() => { try { inp.focus(); } catch (e) {} }, 50);
+      return;
+    }
     // 倒數
     startTimer();
     // 綁手勢
     bindSwipe();
   }
+  function setTypeMode(on) { try { localStorage.setItem(FC_TYPE_KEY, on ? '1' : ''); } catch (e) {} if (queue[cur]) renderCard(); }
+  // 打字模式:對了 → 直接算「記得」進 SRS 並顯示正解與例句,按下一題;錯了 → 顯示正解,讓使用者選不熟/不會
+  let typedDone = false;
+  function revealTyped(right, val) {
+    if (typedDone) return; typedDone = true;
+    const item = queue[cur];
+    const E = x => String(x == null ? '' : x).replace(/&/g, '&amp;').replace(/</g, '&lt;');
+    const inp = document.getElementById('fcTypeIn'); if (inp) { inp.readOnly = true; inp.classList.add(right ? 'ok' : 'ng'); }
+    const btns = document.querySelector('#fcFront .srs-btns'); if (btns) btns.style.display = 'none';
+    const res = document.getElementById('fcTypeRes'); if (!res) return;
+    const ex = (item.ex && item.ex.j) ? '<div style="margin-top:6px">' + E(item.ex.j) + '</div><div style="font-size:12.5px;color:var(--tx2)">' + (typeof cvt === 'function' ? cvt(E(item.ex.z || '')) : E(item.ex.z || '')) + '</div>' : '';
+    res.innerHTML = '<div style="font-weight:800;font-size:15px;margin-top:10px;color:' + (right ? 'var(--correct-tx,#2E7D57)' : 'var(--ac)') + '">' + (right ? _E('答對了!', 'Correct!') : _E('正解:', 'Answer: ') + E(item.w) + (item.r && item.r !== item.w ? '（' + E(item.r) + '）' : '')) + '</div>'
+      + (!right && val ? '<div style="font-size:12.5px;color:var(--tx2)">' + _E('你打的:', 'You typed: ') + E(val) + '</div>' : '')
+      + '<div class="srs-type-res"><div style="font-size:18px;font-weight:700">' + E(item.w) + (item.r && item.r !== item.w ? ' <span style="font-size:13px;color:var(--tx2)">' + E(item.r) + '</span>' : '') + '</div>' + ex + '</div>'
+      + (right
+        ? '<button class="qstart" style="margin-top:10px" id="fcTypeNext" onclick="event.stopPropagation();FlashCard.answer(\'known\')">' + _E('下一題 →', 'Next →') + '</button>'
+        : '<div class="fc-btns" style="margin-top:10px"><button class="fc-btn fc-no" onclick="event.stopPropagation();FlashCard.answer(\'unknown\')"><i data-ic=x></i> ' + _E('不會', 'Don\'t know') + '</button><button class="fc-btn fc-soso" onclick="event.stopPropagation();FlashCard.answer(\'soso\')">◯ ' + _E('有點難', 'Almost') + '</button></div>');
+    try { if (window.hydrateIcons) hydrateIcons(res); } catch (e) {}
+    try { if (typeof speak === 'function') speak(item.r || item.w); } catch (e) {}
+    if (right) { const b = document.getElementById('fcTypeNext'); if (b) setTimeout(() => { try { b.focus(); } catch (e) {} }, 30); }
+  }
+  function checkTyped() { const inp = document.getElementById('fcTypeIn'); const val = inp ? inp.value : ''; if (!normJa(val)) { if (inp) inp.focus(); return; } revealTyped(typedRight(queue[cur], val), val); }
+  function giveUp() { revealTyped(false, ''); }
+  // 結果畫面按 Enter = 下一題(打字模式)
+  document.addEventListener('keydown', function (e) {
+    if (e.key !== 'Enter' || e.isComposing || e.keyCode === 229 || !typedDone) return;
+    const b = document.getElementById('fcTypeNext'); if (b) { e.preventDefault(); b.click(); }
+  });
 
   function startTimer() {
     clearInterval(timerId);
@@ -443,8 +491,8 @@ const FlashCard = (() => {
           totalLearned += countLearned(srs, l);
         });
         scopeRemaining = totalTarget - totalLearned;
-        const baseLabel = (!base || base === 'none') ? '零基礎' : base.toUpperCase();
-        scopeHtml = `<div style="margin-top:4px"><strong>${baseLabel} → ${goal.toUpperCase()} 目標：</strong>${totalLearned} / ${totalTarget}（還要背 ${scopeRemaining} 個）</div>`;
+        const baseLabel = (!base || base === 'none') ? _E('零基礎','Beginner') : base.toUpperCase();
+        scopeHtml = `<div style="margin-top:4px"><strong>${baseLabel} → ${goal.toUpperCase()} ${_E('目標：','goal: ')}</strong>${totalLearned} / ${totalTarget}（${_E('還要背','to go')} ${scopeRemaining} ${_E('個','')}）</div>`;
       }
     }
     const perDaySug = days && days > 0 && scopeRemaining !== null && scopeRemaining > 0
@@ -470,8 +518,8 @@ const FlashCard = (() => {
         ${perDaySug ? `<div style="color:var(--ac);font-weight:600;margin-top:4px"><i data-ic=bulb></i> 建議每天背 ${perDaySug} 個才背得完</div>` : ''}
       </div>
       <div class="qactions">
-        <button class="qstart" onclick="FlashCard.begin()">下一輪</button>
-        <button class="qclose" onclick="FlashCard.close()">返回</button>
+        <button class="qstart" onclick="FlashCard.begin()">${_E('下一輪','Next round')}</button>
+        <button class="qclose" onclick="FlashCard.close()">${_E('返回','Back')}</button>
       </div>${window.StayTWCard ? StayTWCard.completionHtml('flashcard') : ''}`;
   }
 
@@ -485,7 +533,7 @@ const FlashCard = (() => {
     ensureStyles();
     const lv = typeof currentLevel !== 'undefined' ? currentLevel : 'n5';
     const data = getData(lv);
-    if (!data || !data.length) { alert('此級別無單字資料'); return; }
+    if (!data || !data.length) { alert(_E('此級別無單字資料','No vocabulary for this level')); return; }
     if (typeof getDailyProgress !== 'function' || typeof DAILY_NEW === 'undefined') {
       alert('今日批次功能未就緒'); return;
     }
@@ -503,5 +551,5 @@ const FlashCard = (() => {
     renderCard();
   }
 
-  return { start, begin, beginToday, flip, answer, close, getExamDate, setExamDate, daysUntilExam };
+  return { start, begin, beginToday, flip, answer, close, getExamDate, setExamDate, daysUntilExam, setTypeMode, checkTyped, giveUp };
 })();

@@ -1,6 +1,7 @@
 // ========== GRAMMAR DRILL ==========
 // Flashcard-style grammar review with spaced repetition
 const GrammarDrill = (() => {
+  const _E = (zh, en) => (typeof enOr === 'function' ? enOr(zh, en) : zh);   // EN 介面用(用戶回饋:英文模式測驗頁跳回中文)
   const GKEY = 'grammar_srs';
   let queue = [], cur = 0, lvl = 'n5';
 
@@ -250,7 +251,7 @@ const GrammarDrill = (() => {
     if (eg && eg.z) h += '<div style="color:var(--tx2);font-size:12.5px">' + C(E(eg.z)) + '</div>';
     if (myAnswer != null && myAnswer !== correctAns) {
       h += '<div style="color:var(--tx2);font-size:12.5px;margin-top:8px;padding-top:8px;border-top:1px solid var(--bd)">'
-        + '你選的「' + E(myAnswer) + '」是別的文法的用法,套在這句接不上。</div>';
+        + _E('你選的「', 'You picked 「') + E(myAnswer) + _E('」是別的文法的用法,套在這句接不上。', '」, which is a different grammar point and does not fit this sentence.') + '</div>';
     }
     h += '</div>';
     return h;
@@ -271,10 +272,10 @@ const GrammarDrill = (() => {
     const wrap = document.createElement('div');
     const last = cur + 1 >= queue.length;
     wrap.innerHTML = '<div style="font-weight:800;color:' + (correct ? 'var(--correct-tx,#2E7D57)' : 'var(--ac)') + ';margin-top:12px">'
-      + (correct ? '答對了!' : '正解:' + String(okAns == null ? '' : okAns)) + '</div>'
+      + (correct ? _E('答對了!', 'Correct!') : _E('正解:', 'Answer: ') + String(okAns == null ? '' : okAns)) + '</div>'
       + explainHtml(g, myAns, okAns)
       + '<button class="qstart" style="margin-top:12px" onclick="GrammarDrill.nextQuiz()">'
-      + (last ? '看結果 →' : (typeof t === 'function' ? t('rd_next') : '下一題') + ' →') + '</button>';
+      + (last ? _E('看結果 →', 'Results →') : (typeof t === 'function' ? t('rd_next') : _E('下一題', 'Next')) + ' →') + '</button>';
     box.appendChild(wrap);
     wrap.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
   }
@@ -284,7 +285,7 @@ const GrammarDrill = (() => {
     let review = '';
     if (gqWrong.length) {
       review = '<details style="margin:14px 0;border:1px solid var(--bd);border-radius:10px;padding:10px 14px;text-align:left">'
-        + '<summary style="cursor:pointer;font-size:13.5px;font-weight:700">錯題回顧(' + gqWrong.length + ')</summary>'
+        + '<summary style="cursor:pointer;font-size:13.5px;font-weight:700">' + _E('錯題回顧(', 'Missed questions (') + gqWrong.length + ')</summary>'
         + gqWrong.map(w => explainHtml(w.g, w.mine, w.ans)).join('')
         + '</details>';
     }
