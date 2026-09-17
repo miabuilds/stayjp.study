@@ -3966,6 +3966,7 @@ function onbFinish() { localStorage.setItem('onboarding_done_v1', '1'); _onbRemo
 (function(){
   try{
     if (localStorage.getItem('onboarding_done_v1') || localStorage.getItem('ob_v2_done')) return;
+    if (/[?&](open|ref)=/.test(location.search)) return;   // 活動/推薦連結進來的人直接看功能,不先導去引導(2026-09-17)
     if (localStorage.getItem('base_level') || localStorage.getItem('goal_level')) return;
     if (Object.keys(JSON.parse(localStorage.getItem('study_log')||'{}')).length) return;
     location.replace('onboarding-v2.html');
@@ -5329,5 +5330,11 @@ function toggleDetail(btn) {
 <script src="tutor.js"></script>
 <!-- Cloudflare Web Analytics --><script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon="{&quot;token&quot;: &quot;0a94a20c2737440a86f55c4241011f68&quot;}"></script><!-- End Cloudflare Web Analytics -->
 <script src="back-to-top.js"></script>
+<!-- 活動/深連結直開功能:?open=tutor | listen | article:<id>(tsukimi.html 等活動頁用;等模組與內容載好再開,最多等 12 秒) -->
+<script>(function(){try{var o=new URLSearchParams(location.search).get('open');if(!o)return;var tries=0;(function go(){tries++;
+  if(o==='tutor'&&window.Tutor){Tutor.open();return}
+  if(o==='listen'&&window.VocabListen){VocabListen.open();return}
+  if(o.indexOf('article:')===0&&window.Articles&&window.ARTICLES&&ARTICLES.length){Articles.read(o.slice(8));return}
+  if(tries<40)setTimeout(go,300)})();}catch(e){}})();</script>
 </body>
 </html>

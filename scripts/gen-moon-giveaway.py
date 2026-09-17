@@ -37,12 +37,12 @@ T(d, (80, 400), '3 名 · 價值 NT$1,990 · 不用買任何東西', F(30), (220
 # 步驹卡
 cy0 = 500
 d.rounded_rectangle([80, cy0, W - 80, cy0 + 440], radius=30, fill=WHITE)
-T(d, (116, cy0 + 28), '怎麼參加(3 步都要)', F(30), MUTED)
-steps = [('追蹤 @stayjp.study', '沒追蹤抽到也聯絡不到你'), ('轉發這篇貼文', '直接按轉發就好,不用改字'), ('留言:你想考 N 幾 + 一個想學好日文的原因', '一句就好,講真的最好')]
+T(d, (116, cy0 + 28), '怎麼參加(3 步都要;有截圖 3 倍機會)', F(28), MUTED)
+steps = [('追蹤 @stayjp.study', '沒追蹤抽到也聯絡不到你'), ('轉發這篇貼文', '直接按轉發就好,不用改字'), ('留言:你想考 N 幾', '＋貼一張你在 StayJP 的截圖 → 抽獎機會 ×3')]
 sy = cy0 + 86
 for i, (a, b) in enumerate(steps):
     d.ellipse([116, sy, 176, sy + 60], fill=ORANGE); T(d, (146, sy + 30), str(i + 1), N(34), WHITE, anchor='mm')
-    T(d, (200, sy - 2), a, F(34 if len(a) < 16 else 28), INK, 1); T(d, (200, sy + 46), b, F(23, False), MUTED)
+    T(d, (200, sy - 2), a, F(34 if len(a) < 16 else 28), INK, 1); T(d, (200, sy + 46), b, F(23, False), ORANGE if '×3' in b else MUTED)
     sy += 112
 # 截止 / 開獎
 d.rounded_rectangle([80, cy0 + 462, W - 80, cy0 + 462 + 90], radius=22, fill=(255, 214, 102))
