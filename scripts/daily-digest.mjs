@@ -34,7 +34,9 @@ const planStr = (p) => Object.entries(p).map(([k, v]) => `${k.replace('yearly_ea
 
 // ── 回報
 const newReports = (await db.collection('reports').where('status', '==', 'new').get()).size;
-const handledY = (await db.collection('reports').where('status', 'in', ['handled', 'replied']).get()).docs.filter((d) => dayTW(toMs(d.data().handled_at)) === yday).length;
+const handledY = (await db.collection('reports').where('status', 'in', ['handled', 'replied', 'needs_publish']).get()).docs.filter((d) => dayTW(toMs(d.data().handled_at)) === yday).length;
+// 要 Mia 親自處理的:escalate(金流/帳號)、triaged(自動流程修不了的 bug)、needs_publish(改了但要重發內容包)
+const pend = (await db.collection('reports').where('status', 'in', ['escalate', 'triaged', 'needs_publish']).get()).docs.map((d) => ({ _id: d.id, ...d.data() }));
 
 // ── GA(昨天):使用者、新使用者、工作階段、Threads 來源、前 5 頁
 let ga = null;
@@ -62,7 +64,8 @@ lines.push(`StayJP 每日 digest ${yday}(台灣)`);
 lines.push('');
 lines.push(`💰 付款 ${y.n} 筆 NT$${y.amt.toLocaleString()}(前 7 天日均 ${avg('n')} 筆 / NT$${Math.round(prev7.reduce((a, x) => a + x.amt, 0) / 7).toLocaleString()})  ${planStr(y.plans)}`);
 lines.push(`🧪 站內試用開啟 ${y.trials}(前 7 天日均 ${avg('trials')})`);
-lines.push(`📨 使用者回報:待處理 ${newReports}、昨天處理 ${handledY}`);
+lines.push(`📨 使用者回報:待自動處理 ${newReports}、昨天處理 ${handledY}、等你 ${pend.length}`);
+for (const r of pend.slice(0, 8)) lines.push(`   [${r.status}] ${r.kind || ''} ${r.id || ''} — ${(r.desc || '').replace(/\s+/g, ' ').slice(0, 60)}${r.email ? ' (' + r.email + ')' : ''}${r.note ? ' → ' + String(r.note).slice(0, 60) : ''}`);
 if (ga) lines.push(ga.err ? `📈 GA 抓失敗:${ga.err}` : `📈 網站 ${ga.users} 人(新 ${ga.newUsers})、${ga.sessions} 次;來源:${ga.sources}\n   熱門頁:${ga.pages}`);
 if (th) for (const acct of Object.keys(th)) { const a = th[acct]; lines.push(`🧵 ${acct}:近 24h ${a.n24 || 0} 篇 / ${a.v24 || 0} 次觀看;7 天日均 ${a.avg7 || 0} 次/篇${a.top ? `\n   最佳:${a.top}` : ''}`); }
 lines.push('');
