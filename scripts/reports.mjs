@@ -23,7 +23,14 @@ if (cmd === 'list') {
   const status = args[0] || 'new';
   const snap = await db.collection('reports').where('status', '==', status).get();
   const rows = snap.docs.map((d) => ({ ...d.data(), _id: d.id })).sort((a, b) => toMs(a.created_at) - toMs(b.created_at));
-  for (const r of rows) console.log(JSON.stringify({ ...r, created_at: new Date(toMs(r.created_at)).toISOString() }));
+  // 同一個人(同 email 或同 uid)之前回過的:第二封常是接著上一封講(Mia 提醒),附上讓處理者先看脈絡
+  const all = (await db.collection('reports').get()).docs.map((d) => ({ ...d.data(), _id: d.id }));
+  for (const r of rows) {
+    const prior = all.filter((x) => x._id !== r._id && ((r.email && x.email === r.email) || (r.uid && x.uid === r.uid)))
+      .sort((a, b) => toMs(b.created_at) - toMs(a.created_at)).slice(0, 5)
+      .map((x) => ({ _id: x._id, at: new Date(toMs(x.created_at)).toISOString().slice(0, 16), status: x.status, kind: x.kind, id: x.id, desc: String(x.desc || '').slice(0, 200), note: x.note || '', replied_subject: x.replied_subject || '' }));
+    console.log(JSON.stringify({ ...r, created_at: new Date(toMs(r.created_at)).toISOString(), prior }));
+  }
   console.error(`${rows.length} 筆 status=${status}`);
 } else if (cmd === 'set') {
   const [id, status, ...note] = args; if (!id || !status) throw new Error('usage: set <id> <status> [note]');
