@@ -234,6 +234,25 @@ service cloud.firestore {
       allow write: if false;
     }
 
+    // 使用者回報(題目錯誤/bug/其他)— 前端表單直接建(不必登入,回報不該有門檻);只准 create、欄位白名單+長度上限;
+    // 讀/改/刪只給 Admin SDK(自動處理流程 + 後台),前端一律不行。
+    match /reports/{docId} {
+      allow create: if request.resource.data.keys().hasOnly(['kind','id','detail','desc','email','uid','page','ua','lang','platform','status','created_at'])
+        && request.resource.data.status == 'new'
+        && request.resource.data.created_at == request.time
+        && request.resource.data.kind is string && request.resource.data.kind.size() <= 40
+        && request.resource.data.desc is string && request.resource.data.desc.size() >= 2 && request.resource.data.desc.size() <= 3000
+        && (!('id' in request.resource.data) || (request.resource.data.id is string && request.resource.data.id.size() <= 80))
+        && (!('detail' in request.resource.data) || (request.resource.data.detail is string && request.resource.data.detail.size() <= 2000))
+        && (!('email' in request.resource.data) || (request.resource.data.email is string && request.resource.data.email.size() <= 120))
+        && (!('uid' in request.resource.data) || (request.resource.data.uid is string && request.resource.data.uid.size() <= 128))
+        && (!('page' in request.resource.data) || (request.resource.data.page is string && request.resource.data.page.size() <= 500))
+        && (!('ua' in request.resource.data) || (request.resource.data.ua is string && request.resource.data.ua.size() <= 300))
+        && (!('lang' in request.resource.data) || (request.resource.data.lang is string && request.resource.data.lang.size() <= 10))
+        && (!('platform' in request.resource.data) || (request.resource.data.platform is string && request.resource.data.platform.size() <= 20));
+      allow read, update, delete: if false;
+    }
+
     // 寄信 queue(Trigger Email 擴充套件用)— cron/擴充套件寫,admin 讀(看板統計今日寄信量)
     match /mail/{docId} {
       allow read: if request.auth != null &&
