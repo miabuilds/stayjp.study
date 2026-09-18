@@ -55,6 +55,7 @@ try {
 
 // ── Threads(由 autopost 傳入)
 let th = null; try { if (process.env.THREADS_SUMMARY) th = JSON.parse(process.env.THREADS_SUMMARY); } catch {}
+if (!th) { try { const d = await db.doc(`threads_insights/${new Date().toISOString().slice(0, 10)}`).get(); if (d.exists) th = JSON.parse(d.data().summary); } catch (e) { console.error('threads_insights 讀取失敗', e.message); } }   // autopost 每天 00:50 UTC 寫進來
 
 const lines = [];
 lines.push(`StayJP 每日 digest ${yday}(台灣)`);
