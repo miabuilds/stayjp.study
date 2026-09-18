@@ -197,7 +197,7 @@
         '<label class="sp-switch"><input type="checkbox" ' + (cfg.again ? 'checked' : '') + ' onchange="StudyPlan.set({again:this.checked})"><span></span></label>')
       + (root.PITCH_VERIFIED ? row(L('單字顯示音高', 'Show pitch accent'), L('翻面後在單字後加 ⓪①②③ 標示東京標準語的音調（目前 N5・N4）', 'Adds ⓪①②③ after the word on the back (N5・N4 for now)'),
         '<label class="sp-switch"><input type="checkbox" ' + (cfg.pitch ? 'checked' : '') + ' onchange="StudyPlan.set({pitch:this.checked})"><span></span></label>') : '')   // 音高資料(LLM 產)NHK 抽查只有 ~80%,資料換成 UniDic 驗證過再開(PITCH_VERIFIED)
-      + row(L('語音', 'Voice'), L('單字發音的聲音（N5・N4 單字可切換；例句與其他等級為標準聲）', 'Voice for word audio (N5・N4 words; sentences and other levels use the standard voice)'),
+      + row(L('語音', 'Voice'), L('單字與例句的聲音（N5・N4 單字＋例句、N3～N1 單字可切換；N3 以上例句與文章為標準聲）', 'Voice for words and sentences (N5・N4 words + sentences, N3–N1 words; N3+ sentences and articles use the standard voice)'),
         '<select onchange="StudyPlan.setVoice(this.value)">' + VOICES.map(v => '<option value="' + v[0] + '"' + (voice() === v[0] ? ' selected' : '') + '>' + L(v[1], v[2]) + '</option>').join('') + '</select>')
       + '<div class="sp-sec">' + L('單字集', 'Word sets') + '</div>'
       + '<div class="sp-hint">' + L('勾選想背的等級、用 ↑↓ 排序：靠前的先抽新字。點 ▾ 可關掉某級裡不想背的主題。', 'Tick the levels to study and order them with ↑↓ — new words come from the top first. Tap ▾ to switch off themes within a level.') + '</div>'
@@ -239,7 +239,7 @@
     const n = pitchOf(item); if (n == null) return '';
     return '<span class="sp-pitch" title="' + L('音高:アクセント核位置(0=平板型)', 'Pitch accent: nucleus position (0 = flat)') + '">' + (CIRC[n] || n) + '</span>';
   }
-  // B9 多人聲:tts_voice(2 めたん預設 / 8 つむぎ / 13 龍星),目前只有 N5・N4 單字有替代聲,其餘自動退回預設
+  // B9 多人聲:tts_voice(2 めたん預設 / 8 つむぎ / 13 龍星)。2026-09-18 起 N5・N4 單字+例句、N3~N1 單字有替代聲(audio/tts-v),其餘(N3+ 例句/文章)自動退回預設
   const VOICES = [['2', '四国めたん（女・標準）', 'Metan (female, standard)'], ['8', '春日部つむぎ（女・柔）', 'Tsumugi (female, soft)'], ['13', '青山龍星（男）', 'Ryusei (male)']];
   function voice() { try { return localStorage.getItem('tts_voice') || '2'; } catch (e) { return '2'; } }
   function setVoice(v) { try { localStorage.setItem('tts_voice', String(v)); } catch (e) {} cloud(); try { if (root.__ttsCacheClear) root.__ttsCacheClear(); } catch (e) {} try { if (typeof speak === 'function') speak('こんにちは'); } catch (e) {} }
