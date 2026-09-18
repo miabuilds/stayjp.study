@@ -1,0 +1,37 @@
+name: Daily digest
+
+# 每天早上寄一封 5 行 digest 給 Mia:昨天付款/試用/回報 + GA 流量 + Threads 成效。
+# 主要由 stayjp-autopost 的 digest-threads workflow 在 00:50 UTC(台灣 08:50)算完 Threads 成效後 repository_dispatch 觸發;
+# 01:30 UTC 的 cron 是保險(autopost 那邊掛了也會寄,只是少 Threads 那段);同一天不會寄兩次(digests/{date} 判重)。
+on:
+  repository_dispatch:
+    types: [threads-insights]
+  schedule:
+    - cron: '30 1 * * *'
+  workflow_dispatch:
+    inputs:
+      force: { description: '1=同日重寄', default: '' }
+
+jobs:
+  digest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '22' }
+      - name: Install functions deps (firebase-admin)
+        run: npm ci --prefix functions --omit=dev --no-audit --no-fund
+      - name: Build digest & queue mail
+        env:
+          GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
+          OAUTH_CLIENT_ID: ${{ secrets.OAUTH_CLIENT_ID }}
+          OAUTH_CLIENT_SECRET: ${{ secrets.OAUTH_CLIENT_SECRET }}
+          OAUTH_REFRESH_TOKEN: ${{ secrets.OAUTH_REFRESH_TOKEN }}
+          GA4_PROPERTY_ID: ${{ secrets.GA4_PROPERTY_ID }}
+          THREADS_SUMMARY: ${{ toJson(github.event.client_payload.threads) }}
+          FORCE: ${{ github.event.inputs.force }}
+        run: |
+          if [ "$THREADS_SUMMARY" = "null" ]; then THREADS_SUMMARY=""; fi
+          export THREADS_SUMMARY
+          node scripts/daily-digest.mjs
