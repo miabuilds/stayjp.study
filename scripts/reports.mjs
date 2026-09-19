@@ -3,20 +3,8 @@
 //   node scripts/reports.mjs set <id> <status> [note] → 標記 handled / replied / wontfix / spam(+處理備註)
 //   node scripts/reports.mjs reply <id> <subject> <bodyfile> → 寫 mail 集合寄信給回報者(Trigger Email),並標 replied
 //   node scripts/reports.mjs delete <id>               → 刪(只給測試資料用)
-import fs from 'node:fs'; import os from 'node:os'; import path from 'node:path';
-import { createRequire } from 'node:module';
-const require = createRequire(new URL('../functions/', import.meta.url));
-const admin = require('firebase-admin');
-let adcTmp = null;
-function credential() {
-  if (process.env.GCP_SA_KEY) return admin.credential.cert(JSON.parse(process.env.GCP_SA_KEY));
-  const cfg = JSON.parse(fs.readFileSync(os.homedir() + '/.config/configstore/firebase-tools.json', 'utf8'));
-  adcTmp = path.join(os.tmpdir(), `stayjp-adc-${process.pid}.json`);
-  fs.writeFileSync(adcTmp, JSON.stringify({ type: 'authorized_user', client_id: '563584335869-fgrhgmd47bqnekij5i8b5pr03ho849e6.apps.googleusercontent.com', client_secret: 'REDACTED_LOCAL_ONLY', refresh_token: cfg.tokens.refresh_token }), { mode: 0o600 });
-  process.env.GOOGLE_APPLICATION_CREDENTIALS = adcTmp; return admin.credential.applicationDefault();
-}
-process.on('exit', () => { try { if (adcTmp) fs.unlinkSync(adcTmp); } catch {} });
-admin.initializeApp({ credential: credential(), projectId: 'jpnote-1bdd6' }); const db = admin.firestore();
+import fs from 'node:fs';
+import { db, admin } from './lib/fire-admin.mjs';   // 認證集中在 helper(repo 是 public,不寫死任何憑證)
 const [cmd, ...args] = process.argv.slice(2);
 const toMs = (v) => (v == null ? 0 : typeof v.toMillis === 'function' ? v.toMillis() : Number(v) || 0);
 if (cmd === 'list') {

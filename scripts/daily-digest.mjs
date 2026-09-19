@@ -1,20 +1,8 @@
 // 每日 digest(唯讀彙整 + 寄一封信給 Mia):昨天付款/試用/回報、GA 流量、Threads 成效(由 stayjp-autopost 以 repository_dispatch 傳來)。
 // 跑在 GitHub Actions(GCP_SA_KEY);本機也能跑(firebase login 憑證)。
 //   THREADS_SUMMARY(JSON 字串,可空)  DIGEST_TO(預設 stayjpplan@gmail.com)  DRY=1 只印不寄  FORCE=1 同日重寄
-import fs from 'node:fs'; import os from 'node:os'; import path from 'node:path';
-import { createRequire } from 'node:module';
-const require = createRequire(new URL('../functions/', import.meta.url));
-const admin = require('firebase-admin');
-let adcTmp = null;
-function credential() {
-  if (process.env.GCP_SA_KEY) return admin.credential.cert(JSON.parse(process.env.GCP_SA_KEY));
-  const cfg = JSON.parse(fs.readFileSync(os.homedir() + '/.config/configstore/firebase-tools.json', 'utf8'));
-  adcTmp = path.join(os.tmpdir(), `stayjp-adc-${process.pid}.json`);
-  fs.writeFileSync(adcTmp, JSON.stringify({ type: 'authorized_user', client_id: '563584335869-fgrhgmd47bqnekij5i8b5pr03ho849e6.apps.googleusercontent.com', client_secret: 'REDACTED_LOCAL_ONLY', refresh_token: cfg.tokens.refresh_token }), { mode: 0o600 });
-  process.env.GOOGLE_APPLICATION_CREDENTIALS = adcTmp; return admin.credential.applicationDefault();
-}
-process.on('exit', () => { try { if (adcTmp) fs.unlinkSync(adcTmp); } catch {} });
-admin.initializeApp({ credential: credential(), projectId: 'jpnote-1bdd6' }); const db = admin.firestore();
+import fs from 'node:fs';
+import { db, admin } from './lib/fire-admin.mjs';   // 認證集中在 helper(repo 是 public,不寫死任何憑證)
 
 const TW = 8 * 3600e3; const now = Date.now();
 const dayTW = (ms) => new Date(ms + TW).toISOString().slice(0, 10);

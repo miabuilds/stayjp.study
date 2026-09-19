@@ -1,21 +1,6 @@
 // 抽驗回填正確性:取前 N 個有 legacy srs_data 的用戶,讀 user_progress 解壓後與 legacy deepEqual。
 import fs from 'node:fs';
-import os from 'node:os';
-import assert from 'node:assert';
-import { createRequire } from 'node:module';
-const require = createRequire(import.meta.url);
-const admin = require('firebase-admin');
-const codec = require('../progress-codec.js');
-
-function credential() {
-  if (process.env.GCP_SA_KEY) return admin.credential.cert(JSON.parse(process.env.GCP_SA_KEY));
-  const cfg = JSON.parse(fs.readFileSync(os.homedir() + '/.config/configstore/firebase-tools.json', 'utf8'));
-  const rt = cfg.tokens && cfg.tokens.refresh_token;
-  if (!rt) throw new Error('無認證');
-  return admin.credential.refreshToken({ type: 'authorized_user', client_id: '563584335869-fgrhgmd47bqnekij5i8b5pr03ho849e6.apps.googleusercontent.com', client_secret: 'REDACTED_LOCAL_ONLY', refresh_token: rt });
-}
-admin.initializeApp({ credential: credential(), projectId: 'jpnote-1bdd6' });
-const db = admin.firestore();
+import { db, admin } from './lib/fire-admin.mjs';   // 認證集中在 helper(repo 是 public,不寫死任何憑證)
 const N = Number(process.env.N || 20);
 
 let checked = 0, ok = 0, mismatch = 0;

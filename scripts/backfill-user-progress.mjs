@@ -9,34 +9,7 @@
 //            或本機 firebase CLI 登入(讀 ~/.config/configstore/firebase-tools.json 的 refresh_token)。
 // DRY_RUN=1:只統計「要回填幾個用戶 / 幾個 key」,不寫。先跑這個。
 import fs from 'node:fs';
-import os from 'node:os';
-import { createRequire } from 'node:module';
-
-const require = createRequire(import.meta.url);
-const admin = require('firebase-admin');           // require 才吃 NODE_PATH(借主倉 functions/node_modules)
-const codec = require('../progress-codec.js');
-const BIG = codec.PROGRESS_BIG_KEYS;
-const isDry = !!process.env.DRY_RUN;
-const PROJECT = process.env.FIRE_PROJECT || 'jpnote-1bdd6';
-const PAGE = Number(process.env.PAGE || 50);
-
-function credential() {
-  if (process.env.GCP_SA_KEY) return admin.credential.cert(JSON.parse(process.env.GCP_SA_KEY));
-  // fallback:借 firebase CLI 的 refresh token(client_id/secret 是 firebase-tools 公開值)
-  const cfg = JSON.parse(fs.readFileSync(os.homedir() + '/.config/configstore/firebase-tools.json', 'utf8'));
-  const rt = cfg.tokens && cfg.tokens.refresh_token;
-  if (!rt) throw new Error('無 GCP_SA_KEY 也無 firebase CLI refresh_token,請先 firebase login');
-  return admin.credential.refreshToken({
-    type: 'authorized_user',
-    client_id: '563584335869-fgrhgmd47bqnekij5i8b5pr03ho849e6.apps.googleusercontent.com',
-    client_secret: 'REDACTED_LOCAL_ONLY',
-    refresh_token: rt,
-  });
-}
-
-admin.initializeApp({ credential: credential(), projectId: PROJECT });
-const db = admin.firestore();
-
+import { db, admin } from './lib/fire-admin.mjs';   // 認證集中在 helper(repo 是 public,不寫死任何憑證)
 let scanned = 0, migrated = 0, skipped = 0, keysWritten = 0, errors = 0, anon = 0;
 let last = null;
 

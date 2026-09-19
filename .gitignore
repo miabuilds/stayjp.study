@@ -51,3 +51,10 @@ scripts/tts/pron-audit.log
 ai_e2e.png
 scripts/pricing-metrics.mjs
 scripts/tts/grammar-kana-audit.tsv
+
+# 本機認證(firebase CLI OAuth client)— repo 是 public,絕不 push
+scripts/.fireauth.json
+
+# 營運分析腳本(會吐營收/分潤數字)— 同 funnel-cohort/revenue-reconcile,只留本機
+scripts/daily-sales.mjs
+scripts/kol-commission-audit.mjs

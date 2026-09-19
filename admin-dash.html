@@ -127,7 +127,7 @@
     <div class="kpis" id="kpis" style="margin-bottom:16px"></div>
 
     <div class="panel">
-      <div class="ph"><h2><i data-ic=coin></i> 全站實收對帳</h2><span class="hint">全站真實金流(依上方期間);Apple 為牌價估算</span></div>
+      <div class="ph"><h2><i data-ic=coin></i> 全站實收對帳</h2><span class="hint">全站真實金流(依上方期間);iOS/Android 商店為牌價估算</span></div>
       <div class="scroll" id="reconTable"><div class="pb muted">載入中…</div></div>
       <div class="pb" style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;border-top:1px solid var(--hair)">
         <label class="muted" style="display:flex;align-items:center;gap:6px">綜所稅估算 <input type="number" id="taxPct" value="10" min="0" max="40" step="0.5" style="width:66px" oninput="renderReconcile()">%</label>
@@ -181,15 +181,17 @@ const PLAN_NAME = { monthly:'月費', yearly:'年費', yearly_early_bird:'早鳥
 const PLAN_ORDER = ['monthly','yearly','yearly_early_bird','lifetime'];
 const FEE_BY_SOURCE = { app:0.15, web:0.0275 };   // 用於缺 profit_twd 時回推(舊資料)
 // 全站對帳用:各管道真實手續費(對齊 functions/src/utils/firestore.ts 的 KOL_FEE)
-const RECON_FEE = { ecpay:0.0275, apple_iap:0.15, google:0.15, paypal:0.078, manual:0, gift:0 };
-const RECON_EST = new Set(['apple_iap','google']);   // amount_twd 為台幣牌價估算的管道
-const RECON_LBL = { ecpay:'綠界', apple_iap:'Apple', google:'Google', paypal:'PayPal', manual:'手動', gift:'贈送', unknown:'未知管道<i data-ic=warning></i>' };
+// key 要對上 transactions.payment_method:Android 是 google_billing(舊寫 google → Android 整批落未知管道、費率算 0%)
+const RECON_FEE = { ecpay:0.0275, apple_iap:0.15, google_billing:0.15, google:0.15, paypal:0.078, manual:0, gift:0 };
+const RECON_EST = new Set(['apple_iap','google_billing','google']);   // amount_twd 為台幣牌價估算的管道
+const RECON_LBL = { ecpay:'綠界', apple_iap:'Apple(iOS)', google_billing:'Google Play(Android)', google:'Google Play(Android)', paypal:'PayPal', manual:'手動', gift:'贈送', unknown:'未知管道<i data-ic=warning></i>' };
 const toMs = v => { if(v==null)return 0; if(typeof v==='number')return v; if(typeof v.toMillis==='function')return v.toMillis(); if(v.seconds!=null)return v.seconds*1000; if(v._seconds!=null)return v._seconds*1000; return 0; };
 const fmt = n => 'NT$' + (Math.round(Number(n)||0)).toLocaleString();
 const esc = s => String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 const dt = ms => { if(!ms) return '—'; const d=new Date(Number(ms)); if(isNaN(d)) return '—'; const p=n=>(n<10?'0':'')+n; return (''+d.getFullYear()).slice(2)+'/'+p(d.getMonth()+1)+'/'+p(d.getDate()); };
 
 let SUBS=[], COMMS=[], REFMAP={}, TXNS=[];   // 全域資料
+let DASH_UID_STORE={};   // uid → 'ios'|'and'(訂閱文件沒記商店 → 從交易 payment_method 回推)
 let FROM=0, TO=0;
 
 auth.onAuthStateChanged(user => {
@@ -232,7 +234,10 @@ async function loadData(){
     TXNS=[]; tsnap.forEach(d=>{ const t=d.data();
       if(t.is_sandbox===true) return;
       if(t.status!=='success' && t.status!=='refunded') return;
-      TXNS.push({ pm:t.payment_method||'unknown', amt:Number(t.amount_twd)||0, type:t.type||'', ms:toMs(t.occurred_at) });
+      TXNS.push({ pm:t.payment_method||'unknown', amt:Number(t.amount_twd)||0, type:t.type||'', ms:toMs(t.occurred_at), uid:t.uid||'' });
+      // 訂閱文件只記 source:'app',沒記商店 → 用交易的 payment_method 回推該 uid 是 iOS 還是 Android
+      if(t.uid && t.payment_method==='google_billing') DASH_UID_STORE[t.uid]='and';
+      else if(t.uid && t.payment_method==='apple_iap' && !DASH_UID_STORE[t.uid]) DASH_UID_STORE[t.uid]='ios';
     });
     SUBS = (subsRes && subsRes.subscribers) ? subsRes.subscribers : [];
     COMMS = []; csnap.forEach(d=>{ const c=d.data(); COMMS.push({
@@ -389,7 +394,7 @@ function renderPayout(){
 }
 
 function platCell(r){ var a=[]; if(r.web)a.push('綠界 '+r.web); if(r.paypal)a.push('PayPal '+r.paypal); if(r.app)a.push('App '+r.app); return a.length?a.join('<br>'):'<span style="color:var(--ink3)">—</span>'; }
-function payMethod(s){ if(s.source==='app')return 'App 內購'; if(s.ecpay_order)return '綠界(卡/ATM/超商)'; return 'PayPal / 其他'; }
+function payMethod(s){ if(s.source==='app'){ const st=DASH_UID_STORE[s.uid]; return st==='and'?'Android 內購':st==='ios'?'iOS 內購':'App 內購'; } if(s.ecpay_order)return '綠界(卡/ATM/超商)'; return 'PayPal / 其他'; }
 function statusPill(st){ const m={active:['p-ok','active'],trialing:['p-ok','trialing'],cancelled:['p-warn','cancelled'],expired:['p-mute','expired'],refunded:['p-bad','refunded'],voided:['p-bad','voided']}; const x=m[st]||['p-mute',st||'—']; return '<span class="pill '+x[0]+'">'+x[1]+'</span>'; }
 
 function renderMembers(){
