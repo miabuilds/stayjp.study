@@ -494,6 +494,9 @@ window.Articles = (function () {
   function read(id) {
     ensureCss();
     var a = list().find(function (x) { return x.id === id; }); if (!a) return;
+    // 逐詞/時間軸/字典是延後載入的(見 app.html 的大型資料檔載入器):還沒到就先等,
+    // 不然這篇會變成沒有點字查詢、朗讀也對不齊。已載入時 Promise 立即 resolve,感覺不到延遲。
+    if (window.ensureArticleData && !window.ARTICLE_TOKENS) { window.ensureArticleData().then(function () { read(id); }); return; }
     if (!readSet()[id] && window.ToolQuota && window.ToolQuota.shouldGate && window.ToolQuota.shouldGate()) {
       if (!window.ToolQuota.canUse('article')) { window.ToolQuota.showPaywall('article'); return; }
       window.ToolQuota.consume('article');
@@ -967,6 +970,16 @@ window.Articles = (function () {
 
   function gd(btn, id) {
     var body = btn.nextElementSibling; var hidden = body.classList.toggle('art-hidden');
+    // 詳解檔是延後載入的(app.html 大型資料檔載入器):還沒到就先載,載完再把內容填進已展開的區塊
+    if (!hidden && !body.innerHTML && !window.GRAMMAR_DETAIL && window.ensureGrammarDetail) {
+      window.ensureGrammarDetail().then(function () {
+        if (body.classList.contains('art-hidden') || body.innerHTML) return;   // 使用者已收合/內容已填 → 不動
+        var d = window.GRAMMAR_DETAIL && window.GRAMMAR_DETAIL[id];
+        if (!d) return;
+        var inner2 = (typeof grammarDetailHTML === 'function') ? grammarDetailHTML(d) : d;
+        body.innerHTML = '<div class="gd-body" style="display:block;margin-top:10px">' + inner2 + '</div>';
+      });
+    }
     if (!hidden && !body.innerHTML && window.GRAMMAR_DETAIL && window.GRAMMAR_DETAIL[id]) {
       var inner = (typeof grammarDetailHTML === 'function') ? grammarDetailHTML(window.GRAMMAR_DETAIL[id]) : window.GRAMMAR_DETAIL[id];
       body.innerHTML = '<div class="gd-body" style="display:block;margin-top:10px">' + inner + '</div>';
