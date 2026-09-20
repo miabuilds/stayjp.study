@@ -56,7 +56,22 @@
     p[lv].placed = { at, n: Object.keys(skip).length, dismissed: false };
     save(p);
   }
-  function resetLevel(lv) { const p = prog(); p[lv] = { done: {}, days: {}, skip: {}, placed: { at: 0, n: 0, dismissed: true } }; save(p); try { if (root.hubInvalidate) root.hubInvalidate(); if (typeof doRender === 'function') doRender(); } catch (e) {} }
+  // 從第 k 關開始:把前面全部當作「已學過」(和自動定位同一套標記),之後從這裡接下去
+  function startFrom(k) {
+    var lv = level(), us = units(lv);
+    if (!(k >= 0 && k < us.length)) return;
+    var p = prog(); p[lv] = Object.assign({ done: {}, days: {}, skip: {} }, p[lv] || {});
+    p[lv].done = Object.assign({}, p[lv].done); p[lv].skip = Object.assign({}, p[lv].skip);
+    for (var i = 0; i < k; i++) { if (p[lv].done[i] == null) { p[lv].done[i] = 0; p[lv].skip[i] = 1; } }
+    for (var j = k; j < us.length; j++) { delete p[lv].done[j]; delete p[lv].skip[j]; }   // 這關以後一律清掉,真的從這裡開始
+    p[lv].placed = { at: k, n: k, dismissed: true };
+    save(p); openMap(); startUnit(k);
+  }
+  function resetLevel(lv) {
+    const p = prog(); p[lv] = { done: {}, days: {}, skip: {}, placed: { at: 0, n: 0, dismissed: true } }; save(p);
+    try { if (root.hubInvalidate) root.hubInvalidate(); if (typeof doRender === 'function') doRender(); } catch (e) {}
+    if (document.getElementById('pathMask')) openMap();
+  }
   function dismissPlaced(lv) { const p = prog(); if (p[lv] && p[lv].placed) { p[lv].placed.dismissed = true; save(p); } try { if (root.hubInvalidate) root.hubInvalidate(); if (typeof doRender === 'function') doRender(); } catch (e) {} }
   function placedInfo(lv) { const p = prog()[lv]; return (p && p.placed && p.placed.n > 0 && !p.placed.dismissed) ? p.placed : null; }
   function isSkipped(lv, k) { const p = prog()[lv]; return !!(p && p.skip && p.skip[k]); }
@@ -170,32 +185,83 @@
       + '</div>';
   }
 
-  // ── 全地圖 ──
+  // ── 全地圖(整頁,不是彈窗:清單很長,彈窗要滑回最上面才關得掉)──
   function openMap() {
     ensureCss();
-    const lv = level(); autoPlace(lv);
-    const us = units(lv), d = lvProg(lv).done, cur = currentIndex(lv);
-    const chips = LEVELS.map(l => '<button type="button" class="pt-chip' + (l === lv ? ' on' : '') + '" onclick="Path.setLevel(\'' + l + '\');Path.openMap()">' + l.toUpperCase() + '</button>').join('');
-    let h = '<div class="pt-map"><div class="qhd"><h3 style="margin:0">' + L('闖關地圖', 'Path') + '</h3><button class="qclose" style="width:auto;margin:0;padding:2px 10px" onclick="Path.close()"><i data-ic=x></i></button></div>'
-      + '<div class="pt-chips">' + chips + '</div>'
-      + '<div class="pt-map-sub">' + L('每關:10 個單字 → 1 個文法 → 5 題;每 5 關一次小考。做完的關可以重做。', 'Each level: 10 words → 1 grammar point → 5 questions; a checkpoint every 5 levels.') + '</div>';
-    let chapter = 0;
-    us.forEach((u, k) => {
-      if (k % (LESSONS_PER_BOSS + 1) === 0) { chapter++; h += '<div class="pt-ch">' + L('第 ' + chapter + ' 章', 'Chapter ' + chapter) + '</div>'; }
-      const st = (d[k] != null) ? 'done' : (k === cur ? 'cur' : 'lock');
-      const stars = isSkipped(lv, k) ? L('已學過', 'Already known') : d[k] ? '★'.repeat(d[k]) + '<span class="dim">' + '★'.repeat(3 - d[k]) + '</span>' : '';
-      h += '<button type="button" class="pt-row ' + st + (u.boss ? ' boss' : '') + '" ' + (st === 'lock' ? 'disabled' : 'onclick="Path.startUnit(' + k + ')"') + '>'
-        + '<span class="pt-node' + (u.boss ? ' boss' : '') + '">' + (st === 'done' ? '<i data-ic=check></i>' : st === 'lock' ? '<i data-ic=lock></i>' : (u.boss ? '<i data-ic=target></i>' : (k + 1))) + '</span>'
-        + '<span class="pt-tx"><b>' + L('第 ' + (k + 1) + ' 關', 'Level ' + (k + 1)) + (u.boss ? ' · ' + L('小考', 'Checkpoint') : ' · ' + esc(u.title)) + '</b>'
-        + '<small>' + (stars || (u.boss ? L(BOSS_N + ' 題', BOSS_N + ' questions') : L(u.words.slice(0, 4).map(w => w.w).join('、') + '…', u.words.slice(0, 4).map(w => w.w).join(', ') + '…'))) + '</small></span>'
+    var lv = level(); autoPlace(lv);
+    var us = units(lv), d = lvProg(lv).done, cur = currentIndex(lv);
+    var chips = LEVELS.map(function (l) { return '<button type="button" class="pt-chip' + (l === lv ? ' on' : '') + '" onclick="Path.setLevel(\'' + l + '\');Path.openMap()">' + l.toUpperCase() + '</button>'; }).join('');
+    var doneN = Object.keys(d).length;
+    var body = '';
+    var chapter = 0;
+    us.forEach(function (u, k) {
+      if (k % (LESSONS_PER_BOSS + 1) === 0) { chapter++; body += '<div class="pt-ch">' + L('第 ' + chapter + ' 章', 'Chapter ' + chapter) + '</div>'; }
+      var st = (d[k] != null) ? 'done' : (k === cur ? 'cur' : 'lock');
+      var sub = isSkipped(lv, k) ? L('已學過', 'Already known')
+        : (d[k] != null) ? '★'.repeat(d[k]) + '<span class="dim">' + '★'.repeat(3 - d[k]) + '</span>'
+        : u.boss ? L(BOSS_N + ' 題', BOSS_N + ' questions')
+        : esc(u.words.slice(0, 4).map(function (w) { return w.w; }).join('、')) + '…';
+      body += '<div class="pt-rw">'
+        + '<button type="button" class="pt-row ' + st + (u.boss ? ' boss' : '') + '" onclick="' + (st === 'lock' ? 'Path.askStartFrom(' + k + ')' : 'Path.startUnit(' + k + ')') + '">'
+        + '<span class="pt-node' + (u.boss ? ' boss' : '') + '">' + (st === 'done' ? '<i data-ic=check></i>' : st === 'lock' ? (k + 1) : (u.boss ? '<i data-ic=target></i>' : (k + 1))) + '</span>'
+        + '<span class="pt-tx"><b>' + L('第 ' + (k + 1) + ' 關', 'Level ' + (k + 1)) + (u.boss ? ' · ' + L('小考', 'Checkpoint') : ' · ' + esc(u.title)) + '</b><small>' + sub + '</small></span>'
         + (st === 'cur' ? '<span class="pt-go">' + L('開始', 'Start') + '</span>' : '')
-        + '</button>';
+        + '</button>'
+        + '</div>';
     });
-    h += '</div>';
-    box().innerHTML = h; show(); hydrate();
-    try { const c = box().querySelector('.pt-row.cur'); if (c) c.scrollIntoView({ block: 'center' }); } catch (e) {}
+    var mask = document.getElementById('pathMask');
+    if (!mask) { mask = document.createElement('div'); mask.id = 'pathMask'; mask.className = 'pt-mask'; document.body.appendChild(mask); }
+    mask.innerHTML = '<div class="pt-hdr">'
+      + '<button type="button" class="pt-hdr-x" onclick="Path.close()" aria-label="close"><i data-ic=x></i></button>'
+      + '<div class="pt-hdr-t"><b>' + L('闖關地圖', 'Path') + '</b><small>' + L('已完成 ' + doneN + ' / ' + us.length + ' 關', doneN + ' / ' + us.length + ' done') + '</small></div>'
+      + '<button type="button" class="pt-hdr-m" onclick="Path.menu()" aria-label="menu">⋯</button>'
+      + '<div class="pt-chips">' + chips + '</div>'
+      + '</div>'
+      + '<div class="pt-mapbody">'
+      + '<div class="pt-map-sub">' + L('每關:10 個單字 → 1 個文法 → 5 題,每 5 關一次小考。<b>點還沒解鎖的關</b>可以直接從那裡開始;右上角 ⋯ 可以清空重刷。', 'Each level: 10 words → 1 grammar → 5 questions; checkpoint every 5. <b>Tap a locked level</b> to start there; ⋯ to reset.') + '</div>'
+      + body + '</div>';
+    document.body.classList.add('pt-open');
+    hydrate();
+    // ⚠️ 不能用 scrollIntoView:它會連外層一起捲,把 position:sticky 的頂列推出畫面(實測頂列被切掉)
+    try {
+      var body = mask.querySelector('.pt-mapbody'), c = mask.querySelector('.pt-row.cur');
+      if (body && c) body.scrollTop = Math.max(0, c.offsetTop - body.clientHeight / 2);
+    } catch (e) {}
   }
-  function close() { hide(); }
+  function menu() {
+    var lv = level();
+    var m = document.getElementById('pathMenu');
+    if (m) { m.remove(); return; }
+    m = document.createElement('div'); m.id = 'pathMenu'; m.className = 'pt-menu';
+    m.innerHTML = '<button type="button" onclick="Path.confirmReset()"><b>' + L('清空 ' + lv.toUpperCase() + ' 進度', 'Reset ' + lv.toUpperCase()) + '</b><small>' + L('全部關卡回到未完成,從第 1 關重刷(單字複習紀錄不受影響)', 'All levels back to not-done; your SRS reviews are untouched') + '</small></button>'
+      + '<button type="button" onclick="Path.menu()"><b>' + L('取消', 'Cancel') + '</b></button>';
+    document.getElementById('pathMask').appendChild(m);
+  }
+  function confirmReset() {
+    var lv = level();
+    var go = function () { var m = document.getElementById('pathMenu'); if (m) m.remove(); resetLevel(lv); };
+    ask(L('確定把 ' + lv.toUpperCase() + ' 的闖關進度全部清空、從第 1 關重刷嗎?', 'Reset all ' + lv.toUpperCase() + ' path progress and start from level 1?'), go);
+  }
+  function askStartFrom(k) {
+    ask(L('把第 ' + (k + 1) + ' 關之前都當作已學過,從這一關開始?', 'Mark everything before level ' + (k + 1) + ' as known and start there?'), function () { startFrom(k); });
+  }
+  // 小確認框:自己畫,掛在 #pathMask 裡面。
+  // ⚠️ 不要用 AppUI.confirm:它的遮罩掛在 body 且 z-index 比整頁地圖低 → 會被地圖蓋住,看起來像沒反應(實測)。
+  // 也不用 window.confirm(App 內 WebView 會擋)。
+  function ask(msg, onYes) {
+    var d = document.createElement('div'); d.className = 'pt-ask';
+    d.innerHTML = '<div class="pt-ask-box"><p>' + esc(msg) + '</p><div class="pt-ask-btns">'
+      + '<button type="button" class="no">' + L('取消', 'Cancel') + '</button>'
+      + '<button type="button" class="yes">' + L('確定', 'OK') + '</button></div></div>';
+    (document.getElementById('pathMask') || document.body).appendChild(d);
+    d.querySelector('.no').onclick = function () { d.remove(); };
+    d.querySelector('.yes').onclick = function () { d.remove(); onYes(); };
+  }
+  function close() {
+    var m = document.getElementById('pathMask'); if (m) m.remove();
+    document.body.classList.remove('pt-open');
+    hide();
+  }
 
   // ── 單元流程:單字(SRS)→ 文法卡 → 小測 → 結算 ──
   let run = null;
@@ -298,11 +364,26 @@
       '.pt-cta{display:block;width:100%;margin-top:14px;background:var(--ac);color:#fff;border:0;border-radius:12px;padding:13px 14px;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit}',
       '.pt-cta-sub{background:var(--bg3);color:var(--tx);margin-top:8px}',
       '.pt-sub{font-size:13px;color:var(--tx2)}',
-      '.pt-map{max-height:78vh;overflow:auto;padding-bottom:6px}.pt-chips{display:flex;gap:6px;margin:10px 0 8px}.pt-chip{font:inherit;font-weight:800;font-size:12.5px;border:1.5px solid var(--bd);background:var(--bg);color:var(--tx2);border-radius:999px;padding:5px 12px;cursor:pointer}.pt-chip.on{border-color:var(--ac);color:var(--ac);background:var(--soft,rgba(212,101,74,.08))}',
+      // 整頁地圖(2026-09-20 Mia:關閉鈕不要讓使用者滑到最上面;彈窗改整頁)
+      '.pt-mask{position:fixed;inset:0;z-index:9200;background:var(--bg,#FAF9F6);display:flex;flex-direction:column}',
+      'body.pt-open{overflow:hidden}body.pt-open #tutorFab,body.pt-open .bt,body.pt-open #quotaBadge{display:none!important}',
+      '.pt-hdr{flex:none;position:sticky;top:0;background:var(--bg,#FAF9F6);border-bottom:1px solid var(--bd);padding:calc(8px + env(safe-area-inset-top)) 12px 8px;display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:8px}',
+      '.pt-hdr-x,.pt-hdr-m{font:inherit;background:none;border:0;color:var(--tx2);font-size:20px;line-height:1;cursor:pointer;padding:6px 8px;border-radius:10px}',
+      '.pt-hdr-t{text-align:center;min-width:0}.pt-hdr-t b{display:block;font-size:15px}.pt-hdr-t small{display:block;font-size:11.5px;color:var(--tx2)}',
+      '.pt-hdr .pt-chips{grid-column:1/-1;margin:6px 0 0;justify-content:center}',
+      '.pt-mapbody{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:12px 16px calc(28px + env(safe-area-inset-bottom))}',
+      '.pt-rw{display:flex;align-items:center;gap:6px}.pt-rw .pt-row{flex:1}',
+      '.pt-here{flex:none;font:inherit;background:none;border:0;color:var(--tx3);font-size:15px;cursor:pointer;padding:8px 6px;border-radius:10px}.pt-here:active{background:var(--bg3)}',
+      '.pt-menu{position:absolute;right:12px;top:calc(50px + env(safe-area-inset-top));background:var(--bg2);border:1px solid var(--bd);border-radius:14px;box-shadow:0 8px 24px rgba(0,0,0,.16);overflow:hidden;min-width:250px;z-index:2}',
+      '.pt-menu button{display:block;width:100%;text-align:left;font:inherit;background:none;border:0;border-bottom:1px solid var(--bd);padding:11px 14px;cursor:pointer;color:var(--tx)}.pt-menu button:last-child{border-bottom:0}.pt-menu b{display:block;font-size:14px}.pt-menu small{display:block;font-size:11.5px;color:var(--tx2);line-height:1.45;margin-top:2px}',
+      '.pt-ask{position:fixed;inset:0;z-index:9300;background:rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;padding:24px}',
+      '.pt-ask-box{background:var(--bg2);border-radius:16px;padding:18px;max-width:340px;width:100%}.pt-ask-box p{margin:0 0 14px;font-size:14.5px;line-height:1.6}',
+      '.pt-ask-btns{display:flex;gap:8px}.pt-ask-btns button{flex:1;font:inherit;font-size:14px;font-weight:800;border-radius:10px;padding:10px;cursor:pointer;border:1px solid var(--bd);background:var(--bg3);color:var(--tx)}.pt-ask-btns .yes{background:var(--ac);color:#fff;border-color:var(--ac)}',
+      '.pt-chips{display:flex;gap:6px;margin:10px 0 8px}.pt-chip{font:inherit;font-weight:800;font-size:12.5px;border:1.5px solid var(--bd);background:var(--bg);color:var(--tx2);border-radius:999px;padding:5px 12px;cursor:pointer}.pt-chip.on{border-color:var(--ac);color:var(--ac);background:var(--soft,rgba(212,101,74,.08))}',
       '.pt-map-sub{font-size:12px;color:var(--tx2);margin-bottom:8px;line-height:1.5}',
       '.pt-ch{font-size:11.5px;font-weight:800;color:#fff;background:var(--ac);display:inline-block;border-radius:999px;padding:4px 12px;margin:16px 0 10px}',
-      '.pt-map .pt-row{position:relative;width:88%}.pt-map .pt-row:nth-child(4n+1){margin-left:0}.pt-map .pt-row:nth-child(4n+2){margin-left:6%}.pt-map .pt-row:nth-child(4n+3){margin-left:12%}.pt-map .pt-row:nth-child(4n){margin-left:6%}',
-      '.pt-map .pt-row::before{content:"";position:absolute;left:29px;top:-9px;width:2px;height:9px;background:var(--bd)}.pt-map .pt-row.boss{width:100%;margin-left:0;background:linear-gradient(135deg,rgba(124,58,237,.08),transparent)}',
+      '.pt-mapbody .pt-row{position:relative;width:88%}.pt-mapbody .pt-rw:nth-of-type(4n+1) .pt-row{margin-left:0}.pt-mapbody .pt-rw:nth-of-type(4n+2) .pt-row{margin-left:6%}.pt-mapbody .pt-rw:nth-of-type(4n+3) .pt-row{margin-left:12%}.pt-mapbody .pt-rw:nth-of-type(4n) .pt-row{margin-left:6%}',
+      '.pt-mapbody .pt-row::before{content:"";position:absolute;left:29px;top:-9px;width:2px;height:9px;background:var(--bd)}.pt-mapbody .pt-row.boss{width:100%;margin-left:0;background:linear-gradient(135deg,rgba(124,58,237,.08),transparent)}',
       '.pt-quest-sub{font-size:13px;color:var(--tx2);margin:-4px 0 10px}.pt-quests{display:grid;grid-template-columns:minmax(0,1fr);gap:8px;position:relative}',
       '.pt-qrow{min-width:0;max-width:100%}.pt-tx b{display:block}',
       '.pt-qrow{display:flex;align-items:center;gap:12px;width:100%;text-align:left;font:inherit;color:var(--tx);background:var(--bg);border:1.5px solid var(--bd);border-radius:14px;padding:10px 12px;cursor:pointer;position:relative}',
@@ -313,7 +394,7 @@
       '.pt-placed{display:flex;flex-direction:column;gap:6px;background:var(--bg3);border-radius:12px;padding:10px 12px;margin:-2px 0 10px;font-size:12.5px;color:var(--tx);line-height:1.5}.pt-placed-btns{display:flex;gap:14px}.pt-placed .pt-link{font-size:12.5px;color:var(--ac);text-decoration:none;font-weight:700}',
       '.pt-arrow-sm{color:var(--tx3);font-weight:400}.pt-link{font:inherit;font-size:12px;color:var(--tx3);background:none;border:0;padding:0;cursor:pointer;text-decoration:underline}',
       '.pt-row{display:flex;align-items:center;gap:12px;width:100%;text-align:left;font:inherit;color:var(--tx);background:var(--bg);border:1.5px solid var(--bd);border-radius:14px;padding:10px 12px;margin-bottom:8px;cursor:pointer}',
-      '.pt-row.cur{border-color:var(--ac);background:var(--soft,rgba(212,101,74,.08))}.pt-row.lock{opacity:.55;cursor:default}.pt-row.lock .pt-node{background:var(--bg3);color:var(--tx3);box-shadow:none}.pt-row.done .pt-node{background:var(--correct-bd,#16a34a)}',
+      '.pt-row.cur{border-color:var(--ac);background:var(--soft,rgba(212,101,74,.08))}.pt-row.lock{opacity:.6}.pt-row.lock .pt-node{background:var(--bg3);color:var(--tx3);box-shadow:none}.pt-row.done .pt-node{background:var(--correct-bd,#16a34a)}',
       '.pt-row .pt-node{width:36px;height:36px;font-size:14px}.pt-row .pt-tx b{font-size:14px}.pt-row .pt-tx small{font-size:11.5px}.pt-row small .dim,.pt-stars .dim{opacity:.25}',
       '.pt-go{font-size:12px;font-weight:800;color:#fff;background:var(--ac);border-radius:999px;padding:4px 10px}',
       '.pt-step{padding-bottom:4px}.pt-g-t{font-size:20px;font-weight:900;margin:14px 0 6px;line-height:1.3}.pt-g-p{font-size:14px;color:var(--ac);font-weight:700;margin-bottom:8px}.pt-g-ex{font-size:13.5px;color:var(--tx2);line-height:1.6;margin-bottom:12px}',
@@ -328,5 +409,5 @@
     document.head.appendChild(st);
   }
 
-  root.Path = { hubCardHtml, openMap, close, startUnit, setLevel, level, units, sig, resetLevel, dismissPlaced, _quiz: () => quizStep(QUIZ_N), _ans, _next };
+  root.Path = { hubCardHtml, openMap, close, startUnit, setLevel, level, units, sig, resetLevel, dismissPlaced, startFrom, askStartFrom, menu, confirmReset, _quiz: () => quizStep(QUIZ_N), _ans, _next };
 })(window);
