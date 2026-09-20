@@ -167,6 +167,16 @@
   function pickNew(count, d) {
     if (count <= 0) return [];
     d = d || srsData(); const s = sets(); const out = [];
+    // 自己輸入的字(my-vocab.js)排最前面:使用者親手加的,優先度最高,也不受單字集等級開關影響
+    try {
+      if (root.MyVocab) {
+        for (const v of MyVocab.list()) {
+          if (d['my:' + v.w]) continue;
+          out.push({ ...v, level: 'my', isNew: true });
+          if (out.length >= count) return out;
+        }
+      }
+    } catch (e) {}
     for (const lv of enabledLevels()) {
       const pf = lv + ':';
       for (const v of levelPool(lv, s)) {

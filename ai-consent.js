@@ -20,8 +20,8 @@
       box.style.cssText = 'background:var(--bg,#fff);color:var(--tx,#222);border-radius:16px;max-width:420px;width:100%;padding:20px 20px 16px;box-shadow:0 20px 60px rgba(0,0,0,.3);font-size:14.5px;line-height:1.7';
       box.innerHTML =
         '<div style="font-size:17px;font-weight:800;margin-bottom:8px">' + T('AI 功能會把你的練習內容送出去', 'AI features send your practice text to a third party') + '</div>' +
-        '<div>' + T('使用「AI 跟讀」「AI 聊聊」時,StayJP 會把<b>你念的句子(已轉成文字)或你輸入的對話文字</b>,透過 StayJP 伺服器送到 <b>Anthropic(Claude 語言模型)</b> 產生評分與回覆。',
-                    'When you use “AI Shadowing” or “AI Chat”, StayJP sends <b>the sentence you read (converted to text) or the chat text you type</b> through StayJP’s server to <b>Anthropic (Claude)</b> to generate feedback and replies.') + '</div>' +
+        '<div>' + T('使用「AI 跟讀」「AI 聊聊」「小狸助教」「我的單字本」時,StayJP 會把<b>你念的句子(已轉成文字)、你輸入的對話文字,或你查詢與造句的單字內容</b>,透過 StayJP 伺服器送到 <b>Anthropic(Claude 語言模型)</b> 產生評分、解釋與回覆。',
+                    'When you use “AI Shadowing”, “AI Chat”, the tutor or “My words”, StayJP sends <b>the sentence you read (converted to text), the chat text you type, or the words and sentences you look up and write</b> through StayJP’s server to <b>Anthropic (Claude)</b> to generate feedback, explanations and replies.') + '</div>' +
         '<ul style="margin:10px 0 0 18px;padding:0;color:var(--tx2,#666);font-size:13.5px">' +
           '<li>' + T('不會送出錄音檔、姓名、Email 或任何帳號識別資料。', 'No audio recordings, name, email, or account identifiers are sent.') + '</li>' +
           '<li>' + T('依 Anthropic API 條款,送出的內容不用於訓練模型。', 'Under Anthropic’s API terms, the content is not used to train models.') + '</li>' +
