@@ -19,8 +19,80 @@
   function fr(t) { try { return root.furiganaHTML ? root.furiganaHTML(t) : esc(t); } catch (e) { return esc(t); } }
   function now() { return Date.now(); }
   function cloud() { try { if (typeof saveAllCloud === 'function') saveAllCloud(); } catch (e) {} }
-  function say(txt) { try { if (typeof speak === 'function') speak(txt); } catch (e) {} }
   function toast(msg) { try { (root.AppUI ? AppUI.alert : alert)(msg); } catch (e) {} }
+
+  // ── 發音 ────────────────────────────────────────────────
+  // 全站的 speak() 只播預先生成的 VOICEVOX 音檔,查不到就靜音(刻意的:不要瀏覽器機器音)。
+  // 自己加的字當然沒預錄 → 站上有就用站上的(免費、音色一致),沒有才走雲端合成(ttsSpeak,Google TTS)。
+  // 合成結果存 mv_tts(純本機快取,不進 SYNC_KEYS),同一個字之後再按就不花額度也不用等。
+  var FN_TTS = 'https://asia-east1-jpnote-1bdd6.cloudfunctions.net/ttsSpeak';
+  var TTS_KEY = 'mv_tts', TTS_KEEP = 24;
+  var _mem = {}, _au = null, _seq = 0;
+
+  function ttsCache() { try { return JSON.parse(localStorage.getItem(TTS_KEY)) || {}; } catch (e) { return {}; } }
+  function ttsCacheGet(k) { if (_mem[k]) return _mem[k]; var c = ttsCache(); return c[k] && c[k].b || null; }
+  function ttsCachePut(k, b64) {
+    _mem[k] = b64;
+    try {
+      var c = ttsCache();
+      c[k] = { b: b64, t: now() };
+      var keys = Object.keys(c).sort(function (a, b) { return (c[b].t || 0) - (c[a].t || 0); });
+      if (keys.length > TTS_KEEP) keys.slice(TTS_KEEP).forEach(function (x) { delete c[x]; });
+      localStorage.setItem(TTS_KEY, JSON.stringify(c));
+    } catch (e) {
+      // 空間滿了:丟掉整包重來,記憶體那份還在,本次播放不受影響
+      try { localStorage.removeItem(TTS_KEY); } catch (e2) {}
+    }
+  }
+  // 聲音跟「用聽的背」設定一致:13=男 → m、8=柔女 → f2、其他 → f
+  function voiceCode() {
+    try { var v = localStorage.getItem('tts_voice') || '2'; return v === '13' ? 'm' : (v === '8' ? 'f2' : 'f'); } catch (e) { return 'f'; }
+  }
+  function playB64(b64, seq) {
+    if (seq !== _seq) return;
+    // App 內(WKWebView)交給原生播,跟 AI 聊聊同一條橋
+    try { if (root.STAYJP_NATIVE && root.STAYJP_NATIVE.canPlayB64 && root.ReactNativeWebView) { root.ReactNativeWebView.postMessage(JSON.stringify({ type: 'PLAY_B64', b64: b64 })); return; } } catch (e) {}
+    try { if (_au) _au.pause(); } catch (e) {}
+    _au = new Audio('data:audio/mp3;base64,' + b64);
+    _au.playbackRate = (typeof getTtsSpeed === 'function') ? getTtsSpeed() : 1;
+    _au.play().catch(function () {});
+  }
+  async function say(txt, ev) {
+    var t = String(txt || '').trim(); if (!t) return;
+    var el = null; try { el = ev && (ev.currentTarget || ev.target); } catch (e) {}
+    var seq = ++_seq;
+    // 1) 站上已經有這個字的預錄音檔 → 走原本的 speak()
+    try {
+      if (!root.__TTS_READY && root.ensureTTS) await root.ensureTTS();
+      if (root.__TTS && root.__TTS[t]) { if (typeof speak === 'function') speak(t); return; }
+    } catch (e) {}
+    // 2) 快取裡有合成過的
+    var hit = ttsCacheGet(t);
+    if (hit) { playB64(hit, seq); return; }
+    // 3) 雲端合成
+    var user = currentUser();
+    if (!user) { toast(L('自己加的字要登入才能發音（站上原本的單字不用登入）。', 'Sign in to hear your own words read aloud (built-in words work without signing in).')); return; }
+    try { if (root.AIConsent && !(await root.AIConsent.ensure())) return; } catch (e) {}
+    if (el) { try { el.style.opacity = '.45'; } catch (e) {} }
+    try {
+      var tok = await user.getIdToken();
+      var r = await fetch(FN_TTS, {
+        method: 'POST', headers: { 'content-type': 'application/json', authorization: 'Bearer ' + tok },
+        body: JSON.stringify({ text: t.slice(0, 200), voice: voiceCode() }),
+      });
+      var d = null; try { d = await r.json(); } catch (e) {}
+      if (!r.ok || !d || !d.audio) {
+        toast((d && d.message) || L('這個字的發音暫時合成不出來，等一下再試。', 'Couldn’t generate audio just now — try again shortly.'));
+        return;
+      }
+      ttsCachePut(t, d.audio);
+      playB64(d.audio, seq);
+    } catch (e) {
+      toast(L('網路不穩，發音失敗。', 'Network error — no audio.'));
+    } finally {
+      if (el) { try { el.style.opacity = ''; } catch (e) {} }
+    }
+  }
 
   // ── 資料 ────────────────────────────────────────────────
   function raw() { try { return JSON.parse(localStorage.getItem(KEY)) || []; } catch (e) { return []; } }
@@ -304,8 +376,8 @@
         + '<div class="mv-item-m">' + esc(it.m || L('（還沒填意思）', '(no meaning yet)')) + '</div>'
         + (it.ex && it.ex.j ? '<div class="mv-item-ex">' + fr(it.ex.j) + (it.ex.z ? '<br>' + esc(it.ex.z) : '') + '</div>' : '')
         + '<div class="mv-item-btm">'
-          + '<button type="button" class="mv-ibtn" onclick="MyVocab.say(\'' + attr(it.r || it.w) + '\')"><i data-ic=volume></i> ' + L('發音', 'Play') + '</button>'
-          + (it.ex && it.ex.j ? '<button type="button" class="mv-ibtn" onclick="MyVocab.say(\'' + attr(it.ex.j) + '\')"><i data-ic=speak></i> ' + L('唸例句', 'Example') + '</button>' : '')
+          + '<button type="button" class="mv-ibtn" onclick="MyVocab.say(\'' + attr(it.r || it.w) + '\', event)"><i data-ic=volume></i> ' + L('發音', 'Play') + '</button>'
+          + (it.ex && it.ex.j ? '<button type="button" class="mv-ibtn" onclick="MyVocab.say(\'' + attr(it.ex.j) + '\', event)"><i data-ic=speak></i> ' + L('唸例句', 'Example') + '</button>' : '')
           + (pr.n ? '<span class="mv-pr">' + L('練過 ' + pr.n + ' 次 · 對 ' + (pr.ok || 0), 'practiced ' + pr.n + ' · ' + (pr.ok || 0) + ' right') + '</span>' : '')
           + '<button type="button" class="mv-ibtn del" onclick="MyVocab.del(\'' + attr(it.w) + '\')"><i data-ic=trash></i> ' + L('移除', 'Remove') + '</button>'
         + '</div>'
@@ -379,14 +451,14 @@
       + (p.r && p.r !== p.w ? '<span class="mv-prev-r">' + esc(p.r) + '</span>' : '')
       + (p.c ? '<span class="mv-tag">' + esc(p.c) + '</span>' : '')
       + (p.lv ? '<span class="mv-tag">' + esc(String(p.lv).toUpperCase()) + '</span>' : '')
-      + '<button type="button" class="mv-ibtn" style="margin-left:auto" onclick="MyVocab.say(\'' + attr(p.r || p.w) + '\')"><i data-ic=volume></i> ' + L('發音', 'Play') + '</button>'
+      + '<button type="button" class="mv-ibtn" style="margin-left:auto" onclick="MyVocab.say(\'' + attr(p.r || p.w) + '\', event)"><i data-ic=volume></i> ' + L('發音', 'Play') + '</button>'
       + '</div>'
       + '<div class="mv-prev-m">' + esc(p.m) + '</div>'
       + (p.note ? '<div class="mv-note">' + esc(p.note) + '</div>' : '');
     [p.ex, p.ex2].forEach(function (e) {
       if (!e || !e.j) return;
       h += '<div class="mv-ex"><span class="j">' + fr(e.j) + '</span>'
-        + '<button type="button" class="spk" onclick="MyVocab.say(\'' + attr(e.j) + '\')" aria-label="' + L('播放', 'Play') + '"><i data-ic=volume></i></button>'
+        + '<button type="button" class="spk" onclick="MyVocab.say(\'' + attr(e.j) + '\', event)" aria-label="' + L('播放', 'Play') + '"><i data-ic=volume></i></button>'
         + (e.z ? '<div class="z">' + esc(e.z) + '</div>' : '') + '</div>';
     });
     h += '<div class="mv-manual-btns" style="margin-top:14px">'
@@ -543,7 +615,7 @@
         + '<div class="mv-q-scene">' + esc(x.scene) + '</div>'
         + '<div class="mv-res">'
           + '<div class="mv-res-hd ' + cls + '"><i data-ic=' + (x.correct ? 'check' : 'x') + '></i> ' + esc(label) + '</div>'
-          + (x.fix ? '<div class="mv-res-fix">' + fr(x.fix) + '<button type="button" class="spk mv-ibtn" onclick="MyVocab.say(\'' + attr(x.fix) + '\')"><i data-ic=volume></i></button></div>' : '')
+          + (x.fix ? '<div class="mv-res-fix">' + fr(x.fix) + '<button type="button" class="spk mv-ibtn" onclick="MyVocab.say(\'' + attr(x.fix) + '\', event)"><i data-ic=volume></i></button></div>' : '')
           + (x.why ? '<div class="mv-res-why">' + esc(x.why) + '</div>' : '')
           + (x.answer ? '<div class="mv-res-mine">' + L('你寫的：', 'You wrote: ') + esc(x.answer) + '</div>' : '')
         + '</div>'

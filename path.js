@@ -107,9 +107,79 @@
     for (let i = a.length - 1; i > 0; i--) { s = (s * 1103515245 + 12345) % 2147483648; const j = s % (i + 1); [a[i], a[j]] = [a[j], a[i]]; }
     return a.slice(0, n);
   }
+  // ── 小測出題:只考「這一關(含之前)教過的」────────────────
+  // 2026-09-20 Mia 實測回饋:「第一關的小考是關卡還沒教的」——原本是從整個等級的題庫亂抽。
+  // 現在:①精編題庫只留考到教過內容的題 ②至少 2 題直接出自這關剛背的 10 個字(保證對得上)。
+  function taughtOf(lv, k) {
+    const us = units(lv), words = [], grams = [];
+    for (let i = 0; i <= Math.min(k, us.length - 1); i++) {
+      const u = us[i]; if (!u) continue;
+      (u.words || []).forEach(w => words.push(w));
+      if (u.grammar) grams.push(u.grammar);
+    }
+    return { words: words, grams: grams };
+  }
+  function gKey(g) { try { return String(strip(g && g.t) || '').replace(/[〜~･・\s]/g, '').trim(); } catch (e) { return ''; } }
+  function qInScope(q, words, grams) {
+    const stem = String(q.q || '');
+    const m = stem.match(/【([^】]+)】/);
+    if (m) return words.some(w => w.w === m[1] || (w.w && w.w.length >= 2 && m[1].indexOf(w.w) >= 0));   // 漢字読み:底線目標詞要教過
+    if (q.t === 'context') {                                                                              // 文脈規定:正解那個詞要教過
+      const ans = String((q.o || [])[q.a] || '');
+      return words.some(w => ans && (w.w === ans || w.r === ans));
+    }
+    if (q.t === 'grammar') {                                                                              // 文法形式:考的句型要教過
+      return grams.some(g => { const s = gKey(g); return s && (stem.indexOf(s) >= 0 || (q.o || []).some(o => String(o).indexOf(s) >= 0)); });
+    }
+    return words.some(w => w.w && w.w.length >= 2 && stem.indexOf(w.w) >= 0);
+  }
+  // 直接用剛背的字出題(讀音 / 意思 / 中→日),資料驅動、一定只考教過的
+  function genFromWords(lv, words, n, seed) {
+    if (!words.length || n <= 0) return [];
+    const all = (typeof getVocabData === 'function' ? getVocabData(lv) : []) || [];
+    const bank = words.length >= 8 ? words : (all.length ? all : words);
+    const src = seededPick(words, words.length, seed + 3);
+    const out = [];
+    for (let i = 0; i < src.length && out.length < n; i++) {
+      const w = src[i]; if (!w || !w.w) continue;
+      const hasKanji = !!(w.r && w.w !== w.r);
+      const kind = hasKanji ? (i % 3) : (i % 2 === 0 ? 1 : 2);   // 沒漢字的字不出讀音題
+      if (kind === 0) {
+        let wrongs = [];
+        try { if (root.Quiz && Quiz.genPhoneticConfusables) wrongs = seededPick(Quiz.genPhoneticConfusables(w.r) || [], 3, seed + i); } catch (e) {}
+        const seen = {}; seen[w.r] = 1; wrongs.forEach(function (x) { seen[x] = 1; });
+        if (wrongs.length < 3) wrongs = wrongs.concat(seededPick(bank.filter(x => x.r && !seen[x.r]), 3 - wrongs.length, seed + i + 7).map(x => x.r));
+        if (wrongs.length < 3) continue;
+        out.push({ lv: lv, t: 'kanji', a: 0, o: [w.r].concat(wrongs),
+          q: L('「' + w.w + '」的讀音是?', 'How do you read 「' + w.w + '」?'),
+          x: '<b>' + w.w + '＝' + w.r + '</b>' + (w.m ? '（' + w.m + '）' : '') });
+      } else if (kind === 1) {
+        const wrongs = seededPick(bank.filter(x => x.m && x.m !== w.m), 3, seed + i + 11).map(x => x.m);
+        if (wrongs.length < 3) continue;
+        out.push({ lv: lv, t: 'para', a: 0, o: [w.m].concat(wrongs),
+          q: L('「' + w.w + '」' + (hasKanji ? '（' + w.r + '）' : '') + '的意思是?', 'What does 「' + w.w + '」 mean?'),
+          x: '<b>' + w.w + (hasKanji ? '（' + w.r + '）' : '') + '＝' + w.m + '</b>' });
+      } else {
+        const wrongs = seededPick(bank.filter(x => x.w !== w.w && x.m !== w.m), 3, seed + i + 13).map(x => x.w);
+        if (wrongs.length < 3) continue;
+        out.push({ lv: lv, t: 'para', a: 0, o: [w.w].concat(wrongs),
+          q: L('「' + w.m + '」的日文是?', 'Which is Japanese for 「' + w.m + '」?'),
+          x: '<b>' + w.w + (hasKanji ? '（' + w.r + '）' : '') + '＝' + w.m + '</b>' });
+      }
+    }
+    return out;
+  }
   function questionsFor(lv, k, n) {
-    const pool = (root.JLPT_Q || []).filter(q => q.lv === lv && QUIZ_TYPES.includes(q.t));
-    return seededPick(pool, n, k + 1);
+    const t = taughtOf(lv, k);
+    const u = units(lv)[k] || {};
+    const own = (u.words && u.words.length) ? u.words : t.words;
+    const pool = (root.JLPT_Q || []).filter(q => q.lv === lv && QUIZ_TYPES.includes(q.t) && qInScope(q, t.words, t.grams));
+    const ownN = own.length ? Math.min(2, n) : 0;                    // 至少 2 題出自這關剛學的字
+    const out = seededPick(pool, Math.max(0, n - ownN), k + 1);
+    const seen = {}; out.forEach(q => { seen[q.q] = 1; });
+    genFromWords(lv, own, n - out.length, k + 1).forEach(q => { if (!seen[q.q]) { seen[q.q] = 1; out.push(q); } });
+    if (out.length < n) seededPick(pool, n, k + 101).forEach(q => { if (out.length < n && !seen[q.q]) { seen[q.q] = 1; out.push(q); } });
+    return out.slice(0, n);
   }
 
   // 連續「每日通關」天數:days 紀錄裡連著幾天都達到當天建議關數(以今天/昨天起算)
@@ -409,5 +479,5 @@
     document.head.appendChild(st);
   }
 
-  root.Path = { hubCardHtml, openMap, close, startUnit, setLevel, level, units, sig, resetLevel, dismissPlaced, startFrom, askStartFrom, menu, confirmReset, _quiz: () => quizStep(QUIZ_N), _ans, _next };
+  root.Path = { hubCardHtml, openMap, close, startUnit, setLevel, level, units, sig, resetLevel, dismissPlaced, startFrom, askStartFrom, menu, confirmReset, _quiz: () => quizStep(QUIZ_N), _ans, _next, _qFor: questionsFor };
 })(window);
