@@ -257,6 +257,7 @@ window.Articles = (function () {
     st.textContent = [
       '.art-mask{position:fixed;inset:0;z-index:9000;background:var(--bg,#faf9f6);overflow-y:auto;-webkit-overflow-scrolling:touch}',
       '.art-wrap{max-width:640px;margin:0 auto;padding:0 0 120px}',
+      '.art-pb.art-radio.on{background:var(--ac,#D4654A);color:#fff;border-color:var(--ac,#D4654A)}',
       // top bar
       '.art-top{position:sticky;top:0;background:var(--bg,#faf9f6);display:flex;align-items:center;gap:8px;padding:8px 12px;border-bottom:1px solid var(--bd,#e8e5e0);z-index:5;min-height:54px}',
       '.art-top .tt{font-size:16px;font-weight:800;margin:0 auto 0 2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
@@ -534,6 +535,7 @@ window.Articles = (function () {
       '</div>' +
       // bottom player
       '<div class="art-player" id="artPlayer"><div class="art-pbar">' +
+      '<button class="art-pb art-radio' + (radioOn() ? ' on' : '') + '" id="artRadioBtn" onclick="Articles.toggleRadio()" title="' + enOr('廣播模式:一篇接一篇連續播', 'Radio: play articles back to back') + '"><i data-ic=headphones></i></button>' +
       '<button class="art-pb" onclick="Articles.playFrom(0)" title="' + enOr('從頭', 'Restart') + '">⏮</button>' +
       '<button class="art-pb main" id="artPlayBtn" onclick="Articles.togglePlay()">▶</button>' +
       '<span class="art-ptext" id="artPText">— / —</span>' +
@@ -865,6 +867,31 @@ window.Articles = (function () {
     } catch (e) {}
   }
   function msState(st) { try { if ('mediaSession' in navigator) navigator.mediaSession.playbackState = st; } catch (e) {} }
+  // ── 廣播模式(2026-09-20 回饋:「是否可以有像聽廣播或 podcast 的區域」)──
+  // 播完一篇自動接下一篇(依目前清單的順序,優先沒讀過的),螢幕關著也會繼續;鎖屏控制沿用既有 mediaSession。
+  function radioOn() { try { return localStorage.getItem('art_radio') === '1'; } catch (e) { return false; } }
+  function setRadio(on) {
+    try { localStorage.setItem('art_radio', on ? '1' : ''); } catch (e) {}
+    var b = document.getElementById('artRadioBtn'); if (b) b.classList.toggle('on', !!on);
+    var t = document.getElementById('artRadioTip'); if (t) t.textContent = on ? enOr('播完這篇會自動接下一篇', 'Auto-continues to the next article') : '';
+  }
+  function toggleRadio() { var on = !radioOn(); setRadio(on); if (on && !pl.playing) playFrom(pl.idx >= 0 ? pl.idx : 0); }
+  function nextArticle() {
+    var all = list(), read = readSet();
+    var i = all.findIndex(function (a) { return a.id === curId; });
+    // 先找後面沒讀過的,沒有就順著往下,再沒有就回到第一篇
+    var nx = null;
+    for (var k = i + 1; k < all.length; k++) { if (!read[all[k].id]) { nx = all[k]; break; } }
+    if (!nx && i + 1 < all.length) nx = all[i + 1];
+    if (!nx) nx = all[0];
+    if (!nx || nx.id === curId) { pl.playing = false; pl.idx = -1; setBtn(); setPText(); return; }
+    read2(nx.id, { autoplay: true });
+  }
+  // 開啟某篇並自動從第一句播(廣播模式用)
+  function read2(id, opt) {
+    read(id);
+    if (opt && opt.autoplay) setTimeout(function () { try { playFrom(0); } catch (e) {} }, 420);
+  }
   function playFrom(i) {
     if (!sentSeq.length) return;
     stopPlay();
@@ -872,6 +899,7 @@ window.Articles = (function () {
     function step(n) {
       if (n >= sentSeq.length) {
         if (pl.repeat === 'all') { step(0); return; }   // 整篇循環:播完自動從頭
+        if (radioOn()) { nextArticle(); return; }       // 廣播模式:接著播下一篇(使用者回饋:想要像聽廣播/podcast)
         pl.playing = false; pl.idx = -1; setBtn(); highlight(-1); setPText(); return;
       }
       pl.idx = n; highlight(n); setPText(); setBtn();
@@ -993,7 +1021,7 @@ window.Articles = (function () {
     open: open, close: close, read: read, tab: tab, entryCardHtml: entryCardHtml,
     toggleFuri: toggleFuri, toggleZh: toggleZh, toggleRomaji: toggleRomaji, cycleFs: cycleFs,
     playFrom: playFrom, togglePlay: togglePlay, stepRate: stepRate, say: say, spTap: spTap, togglePos: togglePos,
-    toggleRepeat: toggleRepeat, toggleSingle: toggleSingle,
+    toggleRepeat: toggleRepeat, toggleSingle: toggleSingle, toggleRadio: toggleRadio,
     answer: answer, quizNext: quizNext, gd: gd, done: done
   };
 })();

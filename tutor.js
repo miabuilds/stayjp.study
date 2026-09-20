@@ -33,7 +33,12 @@
       '#tutorPanel .tt-top{display:flex;align-items:center;gap:10px;padding:10px 12px 8px;border-bottom:1px solid var(--bd,#E8E5E0)}',
       '#tutorPanel .tt-top img{width:36px;height:36px;object-fit:contain}',
       '#tutorPanel .tt-name{font-weight:700;font-size:15px;color:var(--tx,#2C2C2C)}#tutorPanel .tt-sub{font-size:11.5px;color:var(--tx2,#7A7A7A);margin-top:1px}',
-      '#tutorPanel .tt-x{margin-left:auto;background:none;border:none;font-size:22px;line-height:1;color:var(--tx2,#7A7A7A);cursor:pointer;padding:4px 6px}',
+      '#tutorPanel .tt-big-b{margin-left:auto;background:none;border:none;font-size:17px;line-height:1;color:var(--tx2,#7A7A7A);cursor:pointer;padding:4px 6px}',
+      '#tutorPanel .tt-x{background:none;border:none;font-size:22px;line-height:1;color:var(--tx2,#7A7A7A);cursor:pointer;padding:4px 6px}',
+      // 放大:手機吃滿整個畫面、桌機加寬加高(回饋:拆解後版面太小太長型)
+      '#tutorPanel.tt-big{left:0;right:0;bottom:0;top:0;width:auto;max-height:none;border-radius:0}',
+      '@media(min-width:900px){#tutorPanel.tt-big{left:auto;right:24px;bottom:24px;top:24px;width:min(760px,92vw);max-height:none;border-radius:18px}}',
+      '#tutorPanel .tt-full{display:block;width:100%;margin-top:8px;background:var(--ac,#D4654A);color:#fff;border:0;border-radius:10px;padding:9px 12px;font:inherit;font-size:13px;font-weight:800;cursor:pointer}',
       '#tutorPanel .tt-ctx{display:flex;align-items:center;gap:6px;margin:8px 12px 0;padding:6px 10px;border-radius:10px;background:var(--bg3,#F3F1ED);font-size:12.5px;color:var(--tx,#2C2C2C)}',
       '#tutorPanel .tt-ctx b{color:var(--ac,#D4654A);font-weight:700;flex:none}#tutorPanel .tt-ctx span{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}',
       '#tutorPanel .tt-ctx button{border:none;background:none;color:var(--tx2,#7A7A7A);cursor:pointer;font-size:15px;padding:0 2px}',
@@ -88,6 +93,7 @@
     var p = document.createElement('div'); p.id = 'tutorPanel'; p.style.display = 'none';
     p.innerHTML =
       '<div class="tt-top"><img src="' + IMG + '" alt=""><div><div class="tt-name">' + L('小狸助教', 'Tanuki Tutor') + '</div><div class="tt-sub" id="tutorSub">' + L('文法、單字、句子都可以問', 'Ask about grammar, words or sentences') + '</div></div>' +
+      '<button class="tt-big-b" id="tutorBig" type="button" onclick="Tutor.toggleBig()" title="' + L('放大 / 還原', 'Expand / restore') + '" aria-label="expand">⤢</button>' +
       '<button class="tt-x" type="button" onclick="Tutor.close()" aria-label="close">×</button></div>' +
       '<div class="tt-ctx" id="tutorCtx" style="display:none"><b>📌</b><span id="tutorCtxT"></span><button type="button" onclick="Tutor.clearCtx()" title="' + L('不帶這個內容', 'Drop context') + '">×</button></div>' +
       '<div class="tt-msgs" id="tutorMsgs"></div>' +
@@ -234,8 +240,17 @@
     ask(v, 'parse');
   }
 
+  // 放大/還原(使用者回饋:拆解後版面太小太長型)
+  function toggleBig() {
+    var p = $('tutorPanel'); if (!p) return;
+    var on = !p.classList.contains('tt-big'); p.classList.toggle('tt-big', on);
+    try { localStorage.setItem('tutor_big', on ? '1' : ''); } catch (e) {}
+    var b = $('tutorBig'); if (b) b.textContent = on ? '⤡' : '⤢';
+    var t = $('tutorMsgs'); if (t) t.scrollTop = t.scrollHeight;
+  }
   function open(c, opts) {
     build();
+    try { if (localStorage.getItem('tutor_big') === '1') { var pp = $('tutorPanel'); if (pp && !pp.classList.contains('tt-big')) { pp.classList.add('tt-big'); var bb = $('tutorBig'); if (bb) bb.textContent = '⤡'; } } } catch (e) {}
     if (c) setCtx(c);
     var p = $('tutorPanel'); p.style.display = 'flex'; isOpen = true; document.body.classList.add('tutor-open');
     var box = $('tutorMsgs');
@@ -243,9 +258,27 @@
       box.innerHTML = '<div class="tt-welcome">' + L('嗨,我是小狸 🦝 文法看不懂、單字怎麼用、或是自己寫的句子對不對,都可以問我。貼一句日文按「拆解」,我幫你逐詞拆給你看。', 'Hi, I\'m the tanuki tutor 🦝 Ask me about grammar, word usage, or whether your own sentence is right. Paste a Japanese sentence and tap Parse for a word-by-word breakdown.') + '</div>';
     }
     renderCtx(); setSub();
-    if (opts && opts.parse && c && c.body) { ask(c.body, 'parse'); return; }
+    if (opts && opts.parse && c && c.body) {
+      // 先給「馬上看得到」的:本地斷句+助詞標示(零等待、不花額度);要完整文法解析再按鈕叫小狸
+      // (使用者回饋:「不一定每句都要完整拆解,因為都要等一下」)
+      quickFirst(c.body);
+      return;
+    }
     if (window.matchMedia('(min-width:900px)').matches) { try { $('tutorIn').focus(); } catch (e) {} }
   }
+  // 本地即時斷句 → 一則訊息;底下給「完整拆解」按鈕(才會用 AI 額度)
+  function quickFirst(sentence) {
+    var q = '';
+    try { if (root.QuickParse) q = root.QuickParse.html(sentence); } catch (e) {}
+    var jp = esc(String(sentence || '').slice(0, 200));
+    var head = '<div class="tt-h">' + L('這句的斷句', 'Sentence segments') + '</div>';
+    var btn = '<button type="button" class="tt-full" onclick="Tutor.fullParse()">'
+      + L('讓小狸完整拆解(文法、語氣)', 'Full breakdown with the tutor') + '</button>';
+    addMsg('ai', head + (q || '<p>' + jp + '</p>') + btn);
+    lastSentence = sentence;
+  }
+  var lastSentence = '';
+  function fullParse() { var s = lastSentence; if (!s) return; ask(s, 'parse'); }
   function close() { var p = $('tutorPanel'); if (p) p.style.display = 'none'; isOpen = false; document.body.classList.remove('tutor-open'); }
   function setCtx(c) { ctx = c || null; if (ctx && hist.length) { /* 換 context 保留對話,只換 chip */ } renderCtx(); }
   function clearCtx() { ctx = null; renderCtx(); }
@@ -266,6 +299,6 @@
   }
   function init() { if (document.body) build(); else document.addEventListener('DOMContentLoaded', build); }
 
-  root.Tutor = { open: open, close: close, send: send, sendParse: sendParse, ask: ask, setCtx: setCtx, clearCtx: clearCtx, ctxFromCard: ctxFromCard, askSentence: askSentence, init: init, isOpen: function () { return isOpen; } };
+  root.Tutor = { open: open, fullParse: fullParse, toggleBig: toggleBig, close: close, send: send, sendParse: sendParse, ask: ask, setCtx: setCtx, clearCtx: clearCtx, ctxFromCard: ctxFromCard, askSentence: askSentence, init: init, isOpen: function () { return isOpen; } };
   init();
 })(window);
