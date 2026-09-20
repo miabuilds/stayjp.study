@@ -57,8 +57,9 @@
     _au.playbackRate = (typeof getTtsSpeed === 'function') ? getTtsSpeed() : 1;
     _au.play().catch(function () {});
   }
-  async function say(txt, ev) {
+  async function say(txt, ev, quiet) {
     var t = String(txt || '').trim(); if (!t) return;
+    function warn(m) { if (!quiet) toast(m); }
     var el = null; try { el = ev && (ev.currentTarget || ev.target); } catch (e) {}
     var seq = ++_seq;
     // 1) 站上已經有這個字的預錄音檔 → 走原本的 speak()
@@ -71,7 +72,8 @@
     if (hit) { playB64(hit, seq); return; }
     // 3) 雲端合成
     var user = currentUser();
-    if (!user) { toast(L('自己加的字要登入才能發音（站上原本的單字不用登入）。', 'Sign in to hear your own words read aloud (built-in words work without signing in).')); return; }
+    if (!user) { warn(L('自己加的字要登入才能發音（站上原本的單字不用登入）。', 'Sign in to hear your own words read aloud (built-in words work without signing in).')); return; }
+    if (quiet && root.AIConsent && root.AIConsent.has && !root.AIConsent.has()) return;   // 字卡自動播:不要跳同意視窗打斷複習
     try { if (root.AIConsent && !(await root.AIConsent.ensure())) return; } catch (e) {}
     if (el) { try { el.style.opacity = '.45'; } catch (e) {} }
     try {
@@ -82,13 +84,13 @@
       });
       var d = null; try { d = await r.json(); } catch (e) {}
       if (!r.ok || !d || !d.audio) {
-        toast((d && d.message) || L('這個字的發音暫時合成不出來，等一下再試。', 'Couldn’t generate audio just now — try again shortly.'));
+        warn((d && d.message) || L('這個字的發音暫時合成不出來，等一下再試。', 'Couldn’t generate audio just now — try again shortly.'));
         return;
       }
       ttsCachePut(t, d.audio);
       playB64(d.audio, seq);
     } catch (e) {
-      toast(L('網路不穩，發音失敗。', 'Network error — no audio.'));
+      warn(L('網路不穩，發音失敗。', 'Network error — no audio.'));
     } finally {
       if (el) { try { el.style.opacity = ''; } catch (e) {} }
     }
@@ -169,6 +171,14 @@
     var st = stems(item);
     for (var i = 0; i < st.length; i++) if (s.indexOf(st[i]) >= 0) return true;
     return false;
+  }
+
+  // 這段文字是不是自訂單字(或它的例句)→ 全站 speak() 撞不到預錄音檔時用這個決定要不要幫忙合成
+  function owns(txt) {
+    var t = String(txt || '').trim(); if (!t) return false;
+    return list().some(function (x) {
+      return x.w === t || x.r === t || (x.ex && x.ex.j === t) || (x.ex2 && x.ex2.j === t);
+    });
   }
 
   // ── 後端 ────────────────────────────────────────────────
@@ -634,6 +644,6 @@
     add: add, remove: remove, del: del,
     lookup: lookup, savePreview: savePreview, toggleManual: toggleManual, saveManual: saveManual,
     practice: practice, toggle: toggle, startQuiz: startQuiz, submit: submit, keep: keep,
-    reviewNow: reviewNow, say: say,
+    reviewNow: reviewNow, say: say, owns: owns,
   };
 })(window);
