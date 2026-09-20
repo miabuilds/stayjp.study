@@ -112,6 +112,12 @@
   .muted{color:var(--ink3);font-size:12px;margin-top:6px}
   .err{color:var(--bad);font-size:13px;margin-top:6px}
   .hints{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:10px}
+  /* 翻譯鈕(回饋:想用中文打,再翻成日文送出) */
+  .transrow{display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap}
+  .trans-btn{font:inherit;font-size:13px;font-weight:700;color:var(--ink2);background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:7px 14px;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+  .trans-btn:disabled{opacity:.45;cursor:default}
+  .trans-note{font-size:12px;color:var(--ink2);line-height:1.6;flex:1;min-width:0}
+  .trans-note button{font:inherit;font-size:12px;color:var(--ac,#d4654a);background:none;border:0;padding:0 0 0 6px;cursor:pointer;text-decoration:underline}
   .hint-toggle{font:inherit;font-size:13px;color:var(--ink2);background:var(--panel);border:1px dashed var(--line);border-radius:14px;padding:7px 14px;cursor:pointer}
   .hint-toggle:hover{color:var(--accent);border-color:var(--accent)}
   .hints-lb{width:100%;font-size:12px;color:var(--ink2);margin-bottom:-2px}
@@ -169,6 +175,7 @@
     <div class="msgs" id="msgs"></div>
     <div class="inbar">
       <div class="hints" id="hints"></div>
+      <div class="transrow"><button class="trans-btn" id="transBtn" onclick="transMine()"><i data-ic=globe></i> <span>翻譯</span></button><span class="trans-note" id="transNote"></span></div>
       <div class="inrow">
         <button id="recBtn" class="btn rec" onclick="toggleRec()"><i data-ic=mic></i></button>
         <textarea id="say" class="say" rows="1" placeholder="用說的或打字…"></textarea>
@@ -600,6 +607,41 @@ function appendErr(msg){ const box=document.getElementById('msgs'); box.insertAd
 function setBusy(b){ document.getElementById('sendBtn').disabled=b; }
 
 // 非日文偵測:有假名=日文;有英文字母或純漢字(可能是中文)→ 丟後端正規化(自然日文會原樣返回)
+// ── 翻譯鈕(回饋:「這裡需要多一個按鈕『翻譯』」)──
+// 送出時本來就會自動把中文翻成日文,但那是在背後做的,使用者看不到也改不了。
+// 這顆按鈕讓你先看到日文、可以改、確認後再送出 —— 順便知道自己那句該怎麼講。
+let _transOrig = null;
+async function transMine(){
+  const el=document.getElementById('say'); const note=document.getElementById('transNote'); const btn=document.getElementById('transBtn');
+  const txt=(el.value||'').trim();
+  if(!txt){ el.focus(); return; }
+  if(!auth.currentUser){ if(note) note.textContent=enOr('登入後才能用翻譯。','Sign in to use translation.'); return; }
+  if(window.AIConsent && !(await AIConsent.ensure())) return;
+  if(btn) btn.disabled=true;
+  if(note) note.textContent=enOr('翻譯中…','Translating…');
+  try{
+    const tk=await auth.currentUser.getIdToken();
+    const r=await fetch(FN_CHAT,{ method:'POST', headers:{'Content-Type':'application/json',Authorization:'Bearer '+tk}, body:JSON.stringify({ mode:'toJa', text:txt }) });
+    const d=await r.json().catch(()=>null);
+    if(!r.ok || !d || !d.ja || !d.ja.trim()){
+      if(note) note.textContent=(d&&d.message) || enOr('翻譯失敗,再試一次。','Translation failed — try again.');
+      return;
+    }
+    _transOrig=txt;
+    el.value=d.ja.trim(); autoGrow();
+    if(note) note.innerHTML=enOr('原本寫的:','You wrote: ')+esc(txt)+'<button type="button" onclick="undoTrans()">'+enOr('改回去','undo')+'</button>';
+  }catch(e){
+    if(note) note.textContent=enOr('網路不穩,翻譯失敗。','Network error — translation failed.');
+  }finally{
+    if(btn) btn.disabled=false;
+  }
+}
+function undoTrans(){
+  if(_transOrig==null) return;
+  const el=document.getElementById('say'); el.value=_transOrig; autoGrow(); _transOrig=null;
+  const note=document.getElementById('transNote'); if(note) note.textContent='';
+  el.focus();
+}
 function needsJa(t){
   if(/[ぁ-ゖァ-ヺー]/.test(t)) return false;
   if(/[a-zA-Z]{2,}/.test(t)) return true;
@@ -636,6 +678,7 @@ async function sendMine(){
   history.push({ role:'me', text:showTxt, orig:origTxt });
   try{ StayDaily.log('quiz'); }catch(e2){}   // 情境對話每回一句=今日目標一個動作
   el.value=''; autoGrow();
+  _transOrig=null; { const tn=document.getElementById('transNote'); if(tn) tn.textContent=''; }   // 翻譯提示跟著清掉
   _prevRawNative='';   // 訊息已送出:下一段辨識是全新開始,別再剝上一段前綴
   renderHints([]);   // 你已經回了 → 清掉上一輪建議
   renderMsgs();

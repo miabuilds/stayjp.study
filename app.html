@@ -2519,7 +2519,7 @@ const Journey = (() => {
         go: () => { if (window.NavBack) NavBack.push('journey'); Journey.close(); Kana.open(); } },
     ]},
     { t: L('第 2 章 · 開口說第一句', 'Ch.2 · First words'), steps: [
-      { k: 'essentials', t: L('必學基礎句', 'Essential phrases'), d: L('打招呼、自我介紹這些一定用得到的句子', 'Greetings and self-intro basics'),
+      { k: 'essentials', t: L('必學基礎詞', 'Essential basics'), d: L('數字量詞、時間日期、家族稱謂、疑問詞與助詞', 'Numbers, time, family terms, question words and particles'),
         cond: L('做完一次隨堂測驗', 'Finish the mini quiz'), chk: () => !!_ls('jr_essentials'),
         go: () => { if (window.NavBack) NavBack.pushPage('journey', 'essentials.html'); location.href = 'essentials.html'; } },
       { k: 'phrases', t: L('生活會話', 'Everyday phrases'), d: L('用餐、交通、購物…場景分類,點了就唸', 'Real-life phrases by scene, tap to hear'),

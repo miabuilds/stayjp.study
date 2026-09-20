@@ -48,8 +48,11 @@
   .bubble:active{transform:scale(.97)}
   .shx{display:flex;align-items:center;gap:8px;margin-top:7px}
   .shx-mic{display:inline-flex;align-items:center;gap:5px;border:1px solid var(--bd,#e5e0d8);background:var(--bg2,#fff);color:var(--tx2,#777);border-radius:99px;padding:4px 11px;font:inherit;font-size:12px;font-weight:700;cursor:pointer}
-  .shx-mic.on{background:#b3402a;border-color:#b3402a;color:#fff;animation:shxp 1.2s infinite}
-  @keyframes shxp{50%{opacity:.75}}
+  .shx-mic.on{background:#b3402a;border-color:#b3402a;color:#fff;animation:shxp 1.1s infinite}
+  .shx-mic.on::after{content:"";width:7px;height:7px;border-radius:50%;background:#fff;animation:shxdot .8s infinite}
+  @keyframes shxp{0%{box-shadow:0 0 0 0 rgba(179,64,42,.5)}70%{box-shadow:0 0 0 9px rgba(179,64,42,0)}100%{box-shadow:0 0 0 0 rgba(179,64,42,0)}}
+  @keyframes shxdot{50%{opacity:.2}}
+  .bubble.rec{outline:2px solid #b3402a;outline-offset:2px}
   .shx-sc{font-size:12px;font-weight:800}
   .shx-sc[data-done="1"]{color:#2E7D57}
   .jp .hit{color:#2E7D57;font-weight:700}
@@ -477,10 +480,13 @@ const PShadow = (() => {
   }
   function paint(hits){
     if(!jpEl) return;
+    // 喇叭 icon 要原封不動接回去 —— 以前這裡直接覆蓋掉,跟讀完播放鈕就不見了
+    // (使用者回報:「練習完後,播放按鈕會消失,我以為不能再播放了」)
+    const spk = jpEl.querySelector('.spk');
+    const spkHtml = spk ? spk.outerHTML : '';
     let h='', k=0;
     for(const ch of target){ if(norm(ch)===''){h+=ch;continue;} h += hits[k]?'<span class="hit">'+ch+'</span>':ch; k++; }
-    // 保留喇叭 icon
-    jpEl.innerHTML = h + (jpEl.querySelector('.spk')? '' : '');
+    jpEl.innerHTML = h + spkHtml;
   }
   function feed(text,fin){
     const m=match(target,text);
@@ -519,7 +525,17 @@ const PShadow = (() => {
     ui(false);
     if(settleIt&&was) settle(match(target,acc||'').ratio>=0? match(target,acc||'').ratio : 0);
   }
-  function ui(rec_on){ if(btn) btn.classList.toggle('on',rec_on); }
+  // 錄音狀態要明顯(回報:「跟讀時,有點難判斷是否有在錄製」):
+  // 按鈕變紅+脈動+改成「錄音中…」,正在錄的那一句再加一圈外框
+  function ui(rec_on){
+    if(!btn) return;
+    btn.classList.toggle('on',rec_on);
+    const zh=btn.querySelector('[data-t="zh"]'), en=btn.querySelector('[data-t="en"]');
+    if(zh) zh.textContent = rec_on ? '錄音中…' : '跟讀';
+    if(en) en.textContent = rec_on ? 'Listening…' : 'Say it';
+    const bub=btn.closest('.bubble'); if(bub) bub.classList.toggle('rec',rec_on);
+    if(!rec_on){ try{ document.querySelectorAll('.bubble.rec').forEach(x=>x.classList.remove('rec')); }catch(e){} }
+  }
   function toggle(ev,b){ ev.stopPropagation(); on ? stop(true) : start(b); }
   return { toggle, isDone };
 })();
