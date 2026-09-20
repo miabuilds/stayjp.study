@@ -112,17 +112,17 @@
     if (document.getElementById('qpCss')) return;
     var st = document.createElement('style'); st.id = 'qpCss';
     st.textContent = [
-      '.qp{margin:2px 0 4px}',
-      '.qp-hd{display:flex;align-items:baseline;gap:8px;font-size:12.5px;font-weight:800;color:var(--tx2,#7A7A7A);margin-bottom:6px}.qp-hd small{font-weight:400;font-size:11px;color:var(--tx3,#ACACAC)}',
-      '.qp-line{display:flex;flex-wrap:wrap;gap:4px;align-items:flex-end;margin-bottom:8px}',
+      '.qp{margin:2px 0 6px}',
+      '.qp-hd{display:flex;align-items:baseline;gap:8px;font-size:12.5px;font-weight:800;color:var(--tx2,#7A7A7A);margin-bottom:10px}.qp-hd small{font-weight:400;font-size:11px;color:var(--tx3,#ACACAC)}',
+      '.qp-line{display:flex;flex-wrap:wrap;gap:6px;align-items:flex-end;margin-bottom:14px}',
       '.qp-t{font:inherit;display:flex;flex-direction:column;align-items:center;gap:1px;background:var(--bg2,#fff);border:1px solid var(--bd,#E8E5E0);border-radius:8px;padding:4px 7px;cursor:pointer;color:var(--tx,#2C2C2C);line-height:1.3}',
       '.qp-t .qp-s{font-size:16px}.qp-t .qp-r{font-size:9.5px;color:var(--tx3,#ACACAC)}',
       '.qp-t.fn{background:var(--soft,rgba(212,101,74,.1));border-color:rgba(212,101,74,.35);color:var(--ac,#D4654A)}',
       '.qp-t.pv{border-bottom:2px solid #E8734A}.qp-t.pa{border-bottom:2px solid #3E9E6B}',
       '.qp-t.un{opacity:.55;cursor:default}',
       '.qp-p{align-self:flex-end;color:var(--tx3,#ACACAC);padding:0 1px;font-size:15px}',
-      '.qp-list{display:grid;gap:3px;border-top:1px dashed var(--bd,#E8E5E0);padding-top:7px}',
-      '.qp-row{display:flex;gap:6px;align-items:baseline;font-size:12.5px;line-height:1.55;color:var(--tx,#2C2C2C)}',
+      '.qp-list{display:grid;gap:0;border-top:1px solid var(--bd,#E8E5E0);padding-top:2px}',
+      '.qp-row{display:flex;gap:8px;align-items:baseline;font-size:12.5px;line-height:1.6;color:var(--tx,#2C2C2C);padding:7px 0;border-bottom:1px solid var(--bd,#E8E5E0)}.qp-row:last-child{border-bottom:0;padding-bottom:2px}',
       '.qp-row b{min-width:3.2em;font-size:13.5px}.qp-row i{font-style:normal;color:var(--tx3,#ACACAC);font-size:11px;min-width:3em}',
       '.qp-row span{flex:1}.qp-row em{font-style:normal;font-size:10.5px;color:var(--tx3,#ACACAC);white-space:nowrap}',
       '.qp-row.fn b{color:var(--ac,#D4654A)}',
