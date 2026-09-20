@@ -46,7 +46,7 @@
     const o = { ...get(), ...(patch || {}) };
     try { localStorage.setItem(KEY, JSON.stringify(o)); } catch (e) {}
     cloud();
-    try { if (typeof doRender === 'function') { root._hubSig = ''; doRender(); } } catch (e) {}
+    try { if (typeof doRender === 'function') { if (root.hubInvalidate) root.hubInvalidate(); doRender(); } } catch (e) {}
     return o;
   }
 
@@ -325,7 +325,7 @@
   }
   function closeSettings() {
     const bg = document.getElementById('quizBg'); if (bg) bg.classList.remove('show');
-    try { root._hubSig = ''; if (typeof doRender === 'function') doRender(); } catch (e) {}
+    try { if (root.hubInvalidate) root.hubInvalidate(); if (typeof doRender === 'function') doRender(); } catch (e) {}
     try { if (root.SRS && SRS.updateReviewCount) SRS.updateReviewCount(); } catch (e) {}
   }
   function toggleLevel(lv, on) { const s = sets(); s.on[lv] = !!on; saveSets(s); openSettings(); }

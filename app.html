@@ -2432,6 +2432,8 @@ let inHub = true;   // 進入點是學習面板;點單字/文法或搜尋才進�
 let _hubAnimated = false;   // 進場動畫每頁只播一次(避免載入時多次 renderHub 讓卡片重播動畫 → 閃一下)
 let _hubRaf = 0;            // 載入時 doRender 會被呼叫多次;面板用 rAF 去重,一幀只渲染一次(免閃)
 let _hubSig = '';          // 面板內容簽章:資料沒變就不重繪(擋掉載入時的重複渲染,保住進場動畫不被打斷)
+window.hubInvalidate = function () { _hubSig = ''; };   // 給 study-plan/path/focus-time 等模組強制重繪面板用(let 不在 window 上,root._hubSig='' 沒作用)
+window.hubIsOpen = function () { return !!inHub; };     // 同理:inHub 也是 let,模組要判斷「現在在面板」用這個
 
 // Restore saved mode/level UI on load
 (function initSavedState() {

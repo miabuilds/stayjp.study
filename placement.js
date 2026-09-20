@@ -9,7 +9,7 @@
   const esc = s => String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   function box() { return document.getElementById('quizBox'); }
   function show() { const b = document.getElementById('quizBg'); if (b) b.classList.add('show'); }
-  function hide() { const b = document.getElementById('quizBg'); if (b) b.classList.remove('show'); try { if (typeof doRender === 'function') { root._hubSig = ''; doRender(); } } catch (e) {} }
+  function hide() { const b = document.getElementById('quizBg'); if (b) b.classList.remove('show'); try { if (typeof doRender === 'function') { if (root.hubInvalidate) root.hubInvalidate(); doRender(); } } catch (e) {} }
   function hydrate() { try { if (root.Icons && Icons.hydrate) Icons.hydrate(); } catch (e) {} }
   let st = null;
 

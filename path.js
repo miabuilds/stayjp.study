@@ -16,7 +16,7 @@
   function box() { return document.getElementById('quizBox'); }
   function bg() { return document.getElementById('quizBg'); }
   function show() { const b = bg(); if (b) b.classList.add('show'); }
-  function hide() { const b = bg(); if (b) b.classList.remove('show'); try { if (typeof doRender === 'function') { root._hubSig = ''; doRender(); } } catch (e) {} }
+  function hide() { const b = bg(); if (b) b.classList.remove('show'); try { if (typeof doRender === 'function') { if (root.hubInvalidate) root.hubInvalidate(); doRender(); } } catch (e) {} }
   function hydrate() { try { if (root.Icons && Icons.hydrate) Icons.hydrate(); } catch (e) {} }
   function logAct(t) { try { if (root.StayDaily) StayDaily.log(t); else if (typeof Calendar !== 'undefined') Calendar.logActivity(t); } catch (e) {} }
 
@@ -29,7 +29,7 @@
     try { const g = localStorage.getItem('goal_level'); if (LEVELS.includes(g)) return g; } catch (e) {}
     return (typeof currentLevel !== 'undefined' && LEVELS.includes(currentLevel)) ? currentLevel : 'n5';
   }
-  function setLevel(lv) { if (!LEVELS.includes(lv)) return; const p = prog(); p.level = lv; save(p); try { root._hubSig = ''; if (typeof doRender === 'function') doRender(); } catch (e) {} }
+  function setLevel(lv) { if (!LEVELS.includes(lv)) return; const p = prog(); p.level = lv; save(p); try { if (root.hubInvalidate) root.hubInvalidate(); if (typeof doRender === 'function') doRender(); } catch (e) {} }
   function markDone(lv, k, stars) {
     const p = prog(); p[lv] = p[lv] || {}; p[lv].done = p[lv].done || {}; p[lv].days = p[lv].days || {};
     p[lv].done[k] = Math.max(p[lv].done[k] || 0, stars);
@@ -37,6 +37,29 @@
     save(p);
   }
   function todayCount(lv) { return lvProg(lv).days[today()] || 0; }
+  // 自動定位(Mia:已經學一半的人怎麼辦):第一次進某級時,看 srs_data 裡這級已學過的字,
+  // 連續「這關 10 個字裡 ≥ 半數學過」的關(含夾在中間的小考)直接標成已學過(done=0、skip=1),從第一個不熟的關開始。
+  // 只做一次(placed 旗標);使用者可按「從第 1 關開始」清掉。
+  function autoPlace(lv) {
+    const p = prog(); if (p[lv] && p[lv].placed) return;
+    let srs = {}; try { srs = JSON.parse(localStorage.getItem('srs_data')) || {}; } catch (e) {}
+    const us = units(lv); const done = {}, skip = {}; let at = 0;
+    for (let k = 0; k < us.length; k++) {
+      const u = us[k];
+      if (u.boss) { if (at === k) { done[k] = 0; skip[k] = 1; at = k + 1; } continue; }   // 前面的課都跳過,小考也跟著跳
+      const known = u.words.filter(w => srs[lv + ':' + w.w]).length;
+      if (u.words.length && known >= Math.ceil(u.words.length / 2)) { done[k] = 0; skip[k] = 1; at = k + 1; } else break;
+    }
+    p[lv] = Object.assign({ done: {}, days: {} }, p[lv] || {});
+    Object.keys(done).forEach(k => { if (p[lv].done[k] == null) p[lv].done[k] = 0; });
+    p[lv].skip = Object.assign({}, p[lv].skip || {}, skip);
+    p[lv].placed = { at, n: Object.keys(skip).length, dismissed: false };
+    save(p);
+  }
+  function resetLevel(lv) { const p = prog(); p[lv] = { done: {}, days: {}, skip: {}, placed: { at: 0, n: 0, dismissed: true } }; save(p); try { if (root.hubInvalidate) root.hubInvalidate(); if (typeof doRender === 'function') doRender(); } catch (e) {} }
+  function dismissPlaced(lv) { const p = prog(); if (p[lv] && p[lv].placed) { p[lv].placed.dismissed = true; save(p); } try { if (root.hubInvalidate) root.hubInvalidate(); if (typeof doRender === 'function') doRender(); } catch (e) {} }
+  function placedInfo(lv) { const p = prog()[lv]; return (p && p.placed && p.placed.n > 0 && !p.placed.dismissed) ? p.placed : null; }
+  function isSkipped(lv, k) { const p = prog()[lv]; return !!(p && p.skip && p.skip[k]); }
 
   // ── 關卡生成(純由等級內容推導,不存內容)──
   function units(lv) {
@@ -51,7 +74,7 @@
     }
     return out;
   }
-  function currentIndex(lv) { const d = lvProg(lv).done; const us = units(lv); for (let k = 0; k < us.length; k++) if (!d[k]) return k; return us.length; }
+  function currentIndex(lv) { const d = lvProg(lv).done; const us = units(lv); for (let k = 0; k < us.length; k++) if (d[k] == null) return k; return us.length; }
   function sig() { try { const lv = level(); return lv + '/' + Object.keys(lvProg(lv).done).length + '/' + todayCount(lv) + '/' + units(lv).length + '/' + ((root.StudyPlan && StudyPlan.rhythm) ? StudyPlan.rhythm() : ''); } catch (e) { return ''; } }
 
   // ── JLPT 精編題(app.html 不預載 447KB,要用才抓)──
@@ -95,7 +118,7 @@
       rows.push('<button type="button" class="pt-qrow' + (done ? ' done' : k === cur ? ' cur' : '') + '" onclick="Path.startUnit(' + k + ')">'
         + '<span class="pt-node' + (u.boss ? ' boss' : '') + '">' + (done ? '<i data-ic=check></i>' : u.boss ? '<i data-ic=target></i>' : (k + 1)) + '</span>'
         + '<span class="pt-tx"><b>' + L('第 ' + (k + 1) + ' 關', 'Level ' + (k + 1)) + ' · ' + (u.boss ? L('小考', 'Checkpoint') : esc(u.title)) + '</b>'
-        + '<small>' + (done ? '★'.repeat(lvProg(lv).done[k] || 0) : u.boss ? L(BOSS_N + ' 題', BOSS_N + ' questions') : L(u.words.length + ' 字 · 1 文法 · ' + QUIZ_N + ' 題', u.words.length + ' words · 1 grammar · ' + QUIZ_N + ' q')) + '</small></span>'
+        + '<small>' + (done ? (isSkipped(lv, k) ? L('已學過', 'Already known') : '★'.repeat(lvProg(lv).done[k] || 0)) : u.boss ? L(BOSS_N + ' 題', BOSS_N + ' questions') : L(u.words.length + ' 字 · 1 文法 · ' + QUIZ_N + ' 題', u.words.length + ' words · 1 grammar · ' + QUIZ_N + ' q')) + '</small></span>'
         + (k === cur ? '<span class="pt-go">' + L('開始', 'Start') + '</span>' : '')
         + '</button>');
     }
@@ -103,6 +126,7 @@
     return '<div class="pt-card pt-quest' + (allDone ? ' cleared' : '') + '">'
       + '<div class="pt-top"><button type="button" class="pt-lv" onclick="Path.openMap()">' + L('今日關卡', 'Today\'s quests') + ' · ' + lv.toUpperCase() + ' <span class="pt-arrow-sm">›</span></button>'
         + '<span class="pt-today' + (allDone ? ' ok' : '') + '">' + (streak > 0 ? '<i data-ic=fire></i> ' + L('連續通關 ' + streak + ' 天', streak + '-day clear streak') : L('今天 ' + tc + ' / ' + suggest + ' 關', 'Today ' + tc + ' / ' + suggest)) + '</span></div>'
+      + (placedInfo(lv) ? '<div class="pt-placed"><span>' + L('你已經學過前 ' + placedInfo(lv).n + ' 關的單字,直接從第 ' + (placedInfo(lv).at + 1) + ' 關開始', 'You already know the words in the first ' + placedInfo(lv).n + ' levels — starting at level ' + (placedInfo(lv).at + 1)) + '</span><span class="pt-placed-btns"><button type="button" class="pt-link" onclick="Path.resetLevel(\'' + lv + '\')">' + L('從第 1 關開始', 'Start from level 1') + '</button><button type="button" class="pt-link" onclick="Path.dismissPlaced(\'' + lv + '\')">' + L('知道了', 'OK') + '</button></span></div>' : '')
       + (allDone
         ? '<div class="pt-clear"><img src="images/mascot/tanuki-p06.png" alt=""><div><b>' + L('今日通關 🎉', 'All clear for today 🎉') + '</b><small>' + L('今天的 ' + suggest + ' 關都過了。想多學就再一關,不想也沒關係。', 'Today\'s ' + suggest + ' levels done. One more if you like — or rest.') + '</small></div></div>'
         : '<div class="pt-quest-sub">' + L('今天要過 ' + suggest + ' 關' + (tc ? ',還剩 ' + left + ' 關' : ''), suggest + ' levels today' + (tc ? ', ' + left + ' left' : '')) + '</div>')
@@ -117,6 +141,7 @@
     ensureCss();
     const lv = level(), us = units(lv);
     if (!us.length) return '';
+    autoPlace(lv);
     if (root.StudyPlan && StudyPlan.rhythm && StudyPlan.rhythm() === 'path' && currentIndex(lv) < us.length) return questCardHtml(lv, us);
     const cur = currentIndex(lv), doneN = Object.keys(lvProg(lv).done).length, total = us.length;
     const suggest = (root.StudyPlan && StudyPlan.modeInfo) ? StudyPlan.modeInfo().units : 2;
@@ -148,7 +173,8 @@
   // ── 全地圖 ──
   function openMap() {
     ensureCss();
-    const lv = level(), us = units(lv), d = lvProg(lv).done, cur = currentIndex(lv);
+    const lv = level(); autoPlace(lv);
+    const us = units(lv), d = lvProg(lv).done, cur = currentIndex(lv);
     const chips = LEVELS.map(l => '<button type="button" class="pt-chip' + (l === lv ? ' on' : '') + '" onclick="Path.setLevel(\'' + l + '\');Path.openMap()">' + l.toUpperCase() + '</button>').join('');
     let h = '<div class="pt-map"><div class="qhd"><h3 style="margin:0">' + L('闖關地圖', 'Path') + '</h3><button class="qclose" style="width:auto;margin:0;padding:2px 10px" onclick="Path.close()"><i data-ic=x></i></button></div>'
       + '<div class="pt-chips">' + chips + '</div>'
@@ -156,8 +182,8 @@
     let chapter = 0;
     us.forEach((u, k) => {
       if (k % (LESSONS_PER_BOSS + 1) === 0) { chapter++; h += '<div class="pt-ch">' + L('第 ' + chapter + ' 章', 'Chapter ' + chapter) + '</div>'; }
-      const st = d[k] ? 'done' : (k === cur ? 'cur' : 'lock');
-      const stars = d[k] ? '★'.repeat(d[k]) + '<span class="dim">' + '★'.repeat(3 - d[k]) + '</span>' : '';
+      const st = (d[k] != null) ? 'done' : (k === cur ? 'cur' : 'lock');
+      const stars = isSkipped(lv, k) ? L('已學過', 'Already known') : d[k] ? '★'.repeat(d[k]) + '<span class="dim">' + '★'.repeat(3 - d[k]) + '</span>' : '';
       h += '<button type="button" class="pt-row ' + st + (u.boss ? ' boss' : '') + '" ' + (st === 'lock' ? 'disabled' : 'onclick="Path.startUnit(' + k + ')"') + '>'
         + '<span class="pt-node' + (u.boss ? ' boss' : '') + '">' + (st === 'done' ? '<i data-ic=check></i>' : st === 'lock' ? '<i data-ic=lock></i>' : (u.boss ? '<i data-ic=target></i>' : (k + 1))) + '</span>'
         + '<span class="pt-tx"><b>' + L('第 ' + (k + 1) + ' 關', 'Level ' + (k + 1)) + (u.boss ? ' · ' + L('小考', 'Checkpoint') : ' · ' + esc(u.title)) + '</b>'
@@ -284,6 +310,7 @@
       '.pt-qrow .pt-node{width:38px;height:38px;font-size:15px}.pt-qrow .pt-tx b{font-size:14px}.pt-qrow .pt-tx small{font-size:11.5px;color:#F5B301}.pt-qrow:not(.done) .pt-tx small{color:var(--tx2)}',
       '.pt-qrow + .pt-qrow::before{content:"";position:absolute;left:29px;top:-9px;width:2px;height:9px;background:var(--bd)}',
       '.pt-clear{display:flex;align-items:center;gap:12px;margin:-2px 0 12px}.pt-clear img{width:64px;height:auto}.pt-clear b{display:block;font-size:16px}.pt-clear small{font-size:12.5px;color:var(--tx2);line-height:1.5}',
+      '.pt-placed{display:flex;flex-direction:column;gap:6px;background:var(--bg3);border-radius:12px;padding:10px 12px;margin:-2px 0 10px;font-size:12.5px;color:var(--tx);line-height:1.5}.pt-placed-btns{display:flex;gap:14px}.pt-placed .pt-link{font-size:12.5px;color:var(--ac);text-decoration:none;font-weight:700}',
       '.pt-arrow-sm{color:var(--tx3);font-weight:400}.pt-link{font:inherit;font-size:12px;color:var(--tx3);background:none;border:0;padding:0;cursor:pointer;text-decoration:underline}',
       '.pt-row{display:flex;align-items:center;gap:12px;width:100%;text-align:left;font:inherit;color:var(--tx);background:var(--bg);border:1.5px solid var(--bd);border-radius:14px;padding:10px 12px;margin-bottom:8px;cursor:pointer}',
       '.pt-row.cur{border-color:var(--ac);background:var(--soft,rgba(212,101,74,.08))}.pt-row.lock{opacity:.55;cursor:default}.pt-row.lock .pt-node{background:var(--bg3);color:var(--tx3);box-shadow:none}.pt-row.done .pt-node{background:var(--correct-bd,#16a34a)}',
@@ -301,5 +328,5 @@
     document.head.appendChild(st);
   }
 
-  root.Path = { hubCardHtml, openMap, close, startUnit, setLevel, level, units, sig, _quiz: () => quizStep(QUIZ_N), _ans, _next };
+  root.Path = { hubCardHtml, openMap, close, startUnit, setLevel, level, units, sig, resetLevel, dismissPlaced, _quiz: () => quizStep(QUIZ_N), _ans, _next };
 })(window);

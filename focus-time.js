@@ -21,7 +21,7 @@
     if (Date.now() - last > IDLE) return;
     bump(TICK / 60000);
     // 面板上的倒數條跟著動(有 StudyPlan 的頁面才有;其他頁只累加)
-    try { if (root.StudyPlan && root.StudyPlan.mode && root.StudyPlan.mode() === 'intense' && typeof root.doRender === 'function' && root.inHub) { root._hubSig = ''; root.doRender(); } } catch (e) {}
+    try { if (root.StudyPlan && root.StudyPlan.mode && root.StudyPlan.mode() === 'intense' && typeof root.doRender === 'function' && root.hubIsOpen && root.hubIsOpen()) { if (root.hubInvalidate) root.hubInvalidate(); root.doRender(); } } catch (e) {}
   }, TICK);
   root.FocusTime = { todayMinutes: function () { try { var all = JSON.parse(localStorage.getItem('study_log')) || {}; var d = all[today()]; return d && d.minutes ? d.minutes : 0; } catch (e) { return 0; } } };
 })(window);
