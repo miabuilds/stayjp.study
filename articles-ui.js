@@ -257,7 +257,10 @@ window.Articles = (function () {
     st.textContent = [
       '.art-mask{position:fixed;inset:0;z-index:9000;background:var(--bg,#faf9f6);overflow-y:auto;-webkit-overflow-scrolling:touch}',
       '.art-wrap{max-width:640px;margin:0 auto;padding:0 0 120px}',
-      '.art-pb.art-radio.on{background:var(--ac,#D4654A);color:#fff;border-color:var(--ac,#D4654A)}',
+      '.art-pbreak{flex-basis:100%;height:0;margin:0}',
+      'body.art-reading #quotaBadge{bottom:calc(118px + env(safe-area-inset-bottom))!important}',
+      '.art-pb.art-mode{gap:4px}',
+      '.art-pb.art-radio.on{background:var(--ac,#D4654A);color:#fff;opacity:1}',
       // top bar
       '.art-top{position:sticky;top:0;background:var(--bg,#faf9f6);display:flex;align-items:center;gap:8px;padding:8px 12px;border-bottom:1px solid var(--bd,#e8e5e0);z-index:5;min-height:54px}',
       '.art-top .tt{font-size:16px;font-weight:800;margin:0 auto 0 2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
@@ -385,7 +388,9 @@ window.Articles = (function () {
       // bottom player
       '.art-player{position:fixed;left:0;right:0;bottom:0;z-index:20;display:flex;justify-content:center;pointer-events:none;padding:0 12px calc(14px + env(safe-area-inset-bottom)) 12px}',
       '.art-player.hide{display:none}',
-      '.art-pbar{pointer-events:auto;display:flex;align-items:center;gap:4px;background:#2c2c2e;color:#fff;border:1px solid transparent;border-radius:40px;padding:6px 10px;box-shadow:0 6px 24px rgba(0,0,0,.28);max-width:440px;width:100%}',
+      // 播放列 9 個元件(廣播/從頭/播放/進度/減速/倍速/加速/循環/單句)放不下就換行,不要硬擠破版
+      // (2026-09-20 Mia 回饋;英文版「1 sent.」更寬,固定單行必爆)
+      '.art-pbar{pointer-events:auto;display:flex;flex-wrap:wrap;justify-content:center;row-gap:5px;align-items:center;gap:4px;background:#2c2c2e;color:#fff;border:1px solid transparent;border-radius:40px;padding:6px 10px;box-shadow:0 6px 24px rgba(0,0,0,.28);max-width:440px;width:100%}',
       '[data-theme="dark"] .art-pbar{background:#2e2d33;border-color:rgba(255,255,255,.12);box-shadow:0 6px 24px rgba(0,0,0,.55)}',
       // flex-shrink:0 防壓扁(bar 元件多時主播放鈕被壓成橢圓、「單句」被壓成直排)
       '.art-pb{flex-shrink:0;white-space:nowrap;border:none;background:none;color:#fff;cursor:pointer;width:40px;height:40px;border-radius:50%;font-size:17px;display:inline-flex;align-items:center;justify-content:center}',
@@ -398,10 +403,12 @@ window.Articles = (function () {
       '.art-prate{background:rgba(255,255,255,.16);color:#fff;border-radius:20px;padding:0 10px;height:34px;font-size:13px;font-weight:700;min-width:50px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;font-variant-numeric:tabular-nums}',
       // 窄螢幕(手機直立):全元件 flex-shrink:0 會讓總寬爆出去、「單句」被切——整條壓縮一號
       '@media (max-width:430px){' +
-        '.art-pbar{gap:2px;padding:6px 8px}' +
+        '.art-pbar{gap:2px;row-gap:4px;padding:6px 7px;border-radius:22px}' +
         '.art-pb{width:36px;height:36px;font-size:15px}' +
         '.art-pb.main{width:44px;height:44px;font-size:18px}' +
-        '.art-prate{min-width:40px;padding:0 6px;height:30px;font-size:12px}' +
+        '.art-prate{min-width:42px;padding:0 5px;height:30px;font-size:12px}' +
+        '.art-ptext{min-width:44px;margin:0 2px}' +
+        '.art-rstep{width:32px;height:32px;font-size:19px}' +
         '.art-ptext{font-size:12px}' +
         '.art-pb.art-mode{min-width:32px;padding:0 7px;font-size:12px}' +
       '}',
@@ -413,7 +420,7 @@ window.Articles = (function () {
     document.head.appendChild(st);
   }
 
-  function close() { stopPlay(); var m = document.getElementById('artMask'); if (m) m.remove(); }
+  function close() { stopPlay(); var m = document.getElementById('artMask'); if (m) m.remove(); document.body.classList.remove('art-reading'); }
 
   // ─────────── 清單 ───────────
   // 資料檔(articles.js)還在下載時開清單會是空的 → 顯示載入中並自動重試,
@@ -535,19 +542,22 @@ window.Articles = (function () {
       '</div>' +
       // bottom player
       '<div class="art-player" id="artPlayer"><div class="art-pbar">' +
-      '<button class="art-pb art-radio' + (radioOn() ? ' on' : '') + '" id="artRadioBtn" onclick="Articles.toggleRadio()" title="' + enOr('廣播模式:一篇接一篇連續播', 'Radio: play articles back to back') + '"><i data-ic=headphones></i></button>' +
       '<button class="art-pb" onclick="Articles.playFrom(0)" title="' + enOr('從頭', 'Restart') + '">⏮</button>' +
       '<button class="art-pb main" id="artPlayBtn" onclick="Articles.togglePlay()">▶</button>' +
       '<span class="art-ptext" id="artPText">— / —</span>' +
       '<button class="art-pb art-rstep" onclick="Articles.stepRate(-1)" title="' + enOr('慢一點', 'Slower') + '" aria-label="' + enOr('慢一點', 'Slower') + '">−</button>' +
       '<span class="art-prate" id="artRate">' + (pl.rate.toFixed(2).replace(/0$/, '')) + '×</span>' +
       '<button class="art-pb art-rstep" onclick="Articles.stepRate(1)" title="' + enOr('快一點', 'Faster') + '" aria-label="' + enOr('快一點', 'Faster') + '">＋</button>' +
+      // 強制換行:上排=播放控制,下排=模式(廣播/循環/單句)。9 個元件擠一排在手機一定破版
+      '<span class="art-pbreak"></span>' +
+      '<button class="art-pb art-mode art-radio' + (radioOn() ? ' on' : '') + '" id="artRadioBtn" onclick="Articles.toggleRadio()" title="' + enOr('廣播模式:一篇接一篇連續播', 'Radio: play articles back to back') + '"><i data-ic=headphones></i> ' + enOr('廣播', 'Radio') + '</button>' +
       '<button class="art-pb art-mode" id="artRepBtn" onclick="Articles.toggleRepeat()" title="' + enOr('循環播放:這一句 → 整篇', 'Loop: one line → whole article') + '">↻</button>' +
       '<button class="art-pb art-mode" id="artSingleBtn" onclick="Articles.toggleSingle()" title="' + enOr('只播這一句就停', 'Play one sentence') + '">' + enOr('單句', '1 sent.') + '</button>' +
       '</div></div>' +
       '</div>';
     var d = document.createElement('div'); d.innerHTML = h; document.body.appendChild(d.firstChild);
     document.getElementById('artMask').scrollTop = 0;
+    document.body.classList.add('art-reading');   // 讓額度小牌避開底部播放列
     renderTab('read');
     try { if (typeof track === 'function') track('article_read', { id: id, level: a.level }); } catch (e) {}
     preloadSent(0); preloadSent(1);   // 開文章先載前兩句,按播放零等待
