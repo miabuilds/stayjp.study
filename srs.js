@@ -144,10 +144,16 @@ const SRS = (() => {
   }
 
   let againQueue = [], inAgain = false;   // B7 錯題重考:本輪答錯的卡,結尾再考一次
+  let _onDone = null;   // 闖關(path.js)用:這輪結束不顯示預設結算,改叫回呼接下一步
   function start(level, opts) {
     lvl = level || (typeof currentLevel !== 'undefined' ? currentLevel : 'n5');
     againQueue = []; inAgain = false;
-    if (window.StudyPlan) {
+    _onDone = (opts && typeof opts.onDone === 'function') ? opts.onDone : null;
+    if (opts && Array.isArray(opts.words) && opts.words.length) {
+      // 指定字表(闖關單元的 10 個字):已在 srs_data 的當複習、沒有的當新字 → 一樣寫進 SRS 排程
+      const d = getData();
+      queue = opts.words.map(v => ({ ...v, level: lvl, isNew: !d[lvl + ':' + v.w] }));
+    } else if (window.StudyPlan) {
       // 每日計畫(study-plan.js):複習上限、新字上限(扣掉今天已學)、交錯/先複習、單字集排序與主題開關
       queue = StudyPlan.buildQueue(opts && opts.extraNew ? opts.extraNew : 0);
     } else {
@@ -325,6 +331,7 @@ const SRS = (() => {
   }
 
   function showDone() {
+    if (_onDone) { const cb = _onDone; _onDone = null; cb({ total: queue.length }); return; }
     const st = getStats(lvl);
     document.getElementById('quizBox').innerHTML = `
       <h3>${t('srs_done')}</h3>
@@ -338,6 +345,7 @@ const SRS = (() => {
   }
 
   function close() {
+    _onDone = null;
     document.getElementById('quizBg').classList.remove('show');
     updateReviewCount();
   }
