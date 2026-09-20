@@ -199,7 +199,9 @@ function browserSpeak(t){
   const jp=speechSynthesis.getVoices().find(v=>/ja|Japanese/i.test(v.lang)); if(jp) u.voice=jp;
   speechSynthesis.speak(u);
 }
-function fr(t){ try{ return window.furiganaHTML ? window.furiganaHTML(t) : t; }catch(e){ return t; } }
+// 例句資料裡用 <b> 標出要看的助詞 → 必須走 Rich 版(白名單放行 <b>),
+// 普通版會把標籤轉義,畫面上就出現字面的 <b>(2026-09-20 使用者截圖回報)。
+function fr(t){ try{ return window.furiganaHTMLRich ? window.furiganaHTMLRich(t) : (window.furiganaHTML ? window.furiganaHTML(t) : t); }catch(e){ return t; } }
 function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
 // 詞格:form=顯示、yomi=假名(也是發音文本);irr=是否標紅
 function cell(form, yomi, irr, en){
