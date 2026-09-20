@@ -155,7 +155,7 @@ const SRS = (() => {
       queue = opts.words.map(v => ({ ...v, level: lvl, isNew: !d[lvl + ':' + v.w] }));
     } else if (window.StudyPlan) {
       // 每日計畫(study-plan.js):複習上限、新字上限(扣掉今天已學)、交錯/先複習、單字集排序與主題開關
-      queue = StudyPlan.buildQueue(opts && opts.extraNew ? opts.extraNew : 0);
+      queue = StudyPlan.buildQueue(opts && opts.extraNew ? opts.extraNew : 0, opts || {});   // opts.reviewOnly → 只排到期複習(關卡節奏)
     } else {
       // 複習跨級別：底部「複習(195)」是全級別計數，start 也要對齊
       const allDue = getAllDue();

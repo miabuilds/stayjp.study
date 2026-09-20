@@ -52,7 +52,7 @@
     return out;
   }
   function currentIndex(lv) { const d = lvProg(lv).done; const us = units(lv); for (let k = 0; k < us.length; k++) if (!d[k]) return k; return us.length; }
-  function sig() { try { const lv = level(); return lv + '/' + Object.keys(lvProg(lv).done).length + '/' + todayCount(lv) + '/' + units(lv).length; } catch (e) { return ''; } }
+  function sig() { try { const lv = level(); return lv + '/' + Object.keys(lvProg(lv).done).length + '/' + todayCount(lv) + '/' + units(lv).length + '/' + ((root.StudyPlan && StudyPlan.rhythm) ? StudyPlan.rhythm() : ''); } catch (e) { return ''; } }
 
   // ── JLPT 精編題(app.html 不預載 447KB,要用才抓)──
   let _qP = null;
@@ -74,11 +74,50 @@
     return seededPick(pool, n, k + 1);
   }
 
+  // 連續「每日通關」天數:days 紀錄裡連著幾天都達到當天建議關數(以今天/昨天起算)
+  function clearStreak(lv) {
+    const days = lvProg(lv).days, need = (root.StudyPlan && StudyPlan.modeInfo) ? StudyPlan.modeInfo().units : 2;
+    let n = 0; const d = new Date();
+    if (!((days[d.toISOString().split('T')[0]] || 0) >= need)) d.setDate(d.getDate() - 1);   // 今天還沒過完不算斷
+    for (let i = 0; i < 400; i++) { const k = d.toISOString().split('T')[0]; if ((days[k] || 0) >= need) { n++; d.setDate(d.getDate() - 1); } else break; }
+    return n;
+  }
+  // 今日任務:從目前關開始、依模式建議數列出「今天要過的關」;做完的打勾
+  function questCardHtml(lv, us) {
+    const cur = currentIndex(lv), doneN = Object.keys(lvProg(lv).done).length, total = us.length;
+    const suggest = (root.StudyPlan && StudyPlan.modeInfo) ? StudyPlan.modeInfo().units : 2;
+    const tc = todayCount(lv), left = Math.max(0, suggest - tc);
+    const streak = clearStreak(lv);
+    // 今天的清單 = 今天已過的(從 cur 往回 tc 關)+ 接下來還要過的(left 關)
+    const rows = [];
+    for (let k = Math.max(0, cur - tc); k < Math.min(total, cur + left); k++) {
+      const u = us[k], done = k < cur;
+      rows.push('<button type="button" class="pt-qrow' + (done ? ' done' : k === cur ? ' cur' : '') + '" onclick="Path.startUnit(' + k + ')">'
+        + '<span class="pt-node' + (u.boss ? ' boss' : '') + '">' + (done ? '<i data-ic=check></i>' : u.boss ? '<i data-ic=target></i>' : (k + 1)) + '</span>'
+        + '<span class="pt-tx"><b>' + L('第 ' + (k + 1) + ' 關', 'Level ' + (k + 1)) + ' · ' + (u.boss ? L('小考', 'Checkpoint') : esc(u.title)) + '</b>'
+        + '<small>' + (done ? '★'.repeat(lvProg(lv).done[k] || 0) : u.boss ? L(BOSS_N + ' 題', BOSS_N + ' questions') : L(u.words.length + ' 字 · 1 文法 · ' + QUIZ_N + ' 題', u.words.length + ' words · 1 grammar · ' + QUIZ_N + ' q')) + '</small></span>'
+        + (k === cur ? '<span class="pt-go">' + L('開始', 'Start') + '</span>' : '')
+        + '</button>');
+    }
+    const allDone = left === 0;
+    return '<div class="pt-card pt-quest' + (allDone ? ' cleared' : '') + '">'
+      + '<div class="pt-top"><button type="button" class="pt-lv" onclick="Path.openMap()">' + L('今日關卡', 'Today\'s quests') + ' · ' + lv.toUpperCase() + ' <span class="pt-arrow-sm">›</span></button>'
+        + '<span class="pt-today' + (allDone ? ' ok' : '') + '">' + (streak > 0 ? '<i data-ic=fire></i> ' + L('連續通關 ' + streak + ' 天', streak + '-day clear streak') : L('今天 ' + tc + ' / ' + suggest + ' 關', 'Today ' + tc + ' / ' + suggest)) + '</span></div>'
+      + (allDone
+        ? '<div class="pt-clear"><img src="images/mascot/tanuki-p06.png" alt=""><div><b>' + L('今日通關 🎉', 'All clear for today 🎉') + '</b><small>' + L('今天的 ' + suggest + ' 關都過了。想多學就再一關,不想也沒關係。', 'Today\'s ' + suggest + ' levels done. One more if you like — or rest.') + '</small></div></div>'
+        : '<div class="pt-quest-sub">' + L('今天要過 ' + suggest + ' 關' + (tc ? ',還剩 ' + left + ' 關' : ''), suggest + ' levels today' + (tc ? ', ' + left + ' left' : '')) + '</div>')
+      + '<div class="pt-quests">' + rows.join('') + (allDone && cur < total ? '<button type="button" class="pt-qrow more" onclick="Path.startUnit(' + cur + ')"><span class="pt-node">' + (cur + 1) + '</span><span class="pt-tx"><b>' + L('再多一關', 'One more') + ' · ' + esc(us[cur].boss ? L('小考', 'Checkpoint') : us[cur].title) + '</b><small>' + L('額外,不算在今天的任務裡', 'Extra — not required today') + '</small></span></button>' : '') + '</div>'
+      + '<div class="pt-bar"><i style="width:' + Math.round(doneN / total * 100) + '%"></i></div>'
+      + '<div class="pt-prog">' + L(lv.toUpperCase() + ' 已完成 ' + doneN + ' / ' + total + ' 關', doneN + ' / ' + total + ' done') + ' · <button type="button" class="pt-link" onclick="StudyPlan.setRhythm(\'free\')">' + L('改成自由節奏', 'Switch to free pace') + '</button></div>'
+      + '</div>';
+  }
+
   // ── 面板卡 ──
   function hubCardHtml() {
     ensureCss();
     const lv = level(), us = units(lv);
     if (!us.length) return '';
+    if (root.StudyPlan && StudyPlan.rhythm && StudyPlan.rhythm() === 'path' && currentIndex(lv) < us.length) return questCardHtml(lv, us);
     const cur = currentIndex(lv), doneN = Object.keys(lvProg(lv).done).length, total = us.length;
     const suggest = (root.StudyPlan && StudyPlan.modeInfo) ? StudyPlan.modeInfo().units : 2;
     const tc = todayCount(lv);
@@ -101,7 +140,7 @@
         + '<span class="pt-arrow">›</span>'
       + '</button>'
       + '<div class="pt-bar"><i style="width:' + pct + '%"></i></div>'
-      + '<div class="pt-prog">' + L('已完成 ' + doneN + ' / ' + total + ' 關', doneN + ' / ' + total + ' done') + '</div>'
+      + '<div class="pt-prog">' + L('已完成 ' + doneN + ' / ' + total + ' 關', doneN + ' / ' + total + ' done') + ' · <button type="button" class="pt-link" onclick="StudyPlan.setRhythm(\'path\')">' + L('改成每日關卡任務', 'Switch to daily quests') + '</button></div>'
       + '<button type="button" class="pt-cta" onclick="Path.startUnit(' + cur + ')">' + L('開始第 ' + (cur + 1) + ' 關', 'Start level ' + (cur + 1)) + ' →</button>'
       + '</div>';
   }
@@ -235,7 +274,17 @@
       '.pt-sub{font-size:13px;color:var(--tx2)}',
       '.pt-map{max-height:78vh;overflow:auto;padding-bottom:6px}.pt-chips{display:flex;gap:6px;margin:10px 0 8px}.pt-chip{font:inherit;font-weight:800;font-size:12.5px;border:1.5px solid var(--bd);background:var(--bg);color:var(--tx2);border-radius:999px;padding:5px 12px;cursor:pointer}.pt-chip.on{border-color:var(--ac);color:var(--ac);background:var(--soft,rgba(212,101,74,.08))}',
       '.pt-map-sub{font-size:12px;color:var(--tx2);margin-bottom:8px;line-height:1.5}',
-      '.pt-ch{font-size:11.5px;font-weight:800;color:var(--tx3);letter-spacing:.06em;margin:14px 0 6px}',
+      '.pt-ch{font-size:11.5px;font-weight:800;color:#fff;background:var(--ac);display:inline-block;border-radius:999px;padding:4px 12px;margin:16px 0 10px}',
+      '.pt-map .pt-row{position:relative;width:88%}.pt-map .pt-row:nth-child(4n+1){margin-left:0}.pt-map .pt-row:nth-child(4n+2){margin-left:6%}.pt-map .pt-row:nth-child(4n+3){margin-left:12%}.pt-map .pt-row:nth-child(4n){margin-left:6%}',
+      '.pt-map .pt-row::before{content:"";position:absolute;left:29px;top:-9px;width:2px;height:9px;background:var(--bd)}.pt-map .pt-row.boss{width:100%;margin-left:0;background:linear-gradient(135deg,rgba(124,58,237,.08),transparent)}',
+      '.pt-quest-sub{font-size:13px;color:var(--tx2);margin:-4px 0 10px}.pt-quests{display:grid;grid-template-columns:minmax(0,1fr);gap:8px;position:relative}',
+      '.pt-qrow{min-width:0;max-width:100%}.pt-tx b{display:block}',
+      '.pt-qrow{display:flex;align-items:center;gap:12px;width:100%;text-align:left;font:inherit;color:var(--tx);background:var(--bg);border:1.5px solid var(--bd);border-radius:14px;padding:10px 12px;cursor:pointer;position:relative}',
+      '.pt-qrow.cur{border-color:var(--ac);background:var(--soft,rgba(212,101,74,.08))}.pt-qrow.done{opacity:.7}.pt-qrow.done .pt-node{background:var(--correct-bd,#16a34a)}.pt-qrow.more{border-style:dashed}.pt-qrow.more .pt-node{background:var(--bg3);color:var(--tx2);box-shadow:none}',
+      '.pt-qrow .pt-node{width:38px;height:38px;font-size:15px}.pt-qrow .pt-tx b{font-size:14px}.pt-qrow .pt-tx small{font-size:11.5px;color:#F5B301}.pt-qrow:not(.done) .pt-tx small{color:var(--tx2)}',
+      '.pt-qrow + .pt-qrow::before{content:"";position:absolute;left:29px;top:-9px;width:2px;height:9px;background:var(--bd)}',
+      '.pt-clear{display:flex;align-items:center;gap:12px;margin:-2px 0 12px}.pt-clear img{width:64px;height:auto}.pt-clear b{display:block;font-size:16px}.pt-clear small{font-size:12.5px;color:var(--tx2);line-height:1.5}',
+      '.pt-arrow-sm{color:var(--tx3);font-weight:400}.pt-link{font:inherit;font-size:12px;color:var(--tx3);background:none;border:0;padding:0;cursor:pointer;text-decoration:underline}',
       '.pt-row{display:flex;align-items:center;gap:12px;width:100%;text-align:left;font:inherit;color:var(--tx);background:var(--bg);border:1.5px solid var(--bd);border-radius:14px;padding:10px 12px;margin-bottom:8px;cursor:pointer}',
       '.pt-row.cur{border-color:var(--ac);background:var(--soft,rgba(212,101,74,.08))}.pt-row.lock{opacity:.55;cursor:default}.pt-row.lock .pt-node{background:var(--bg3);color:var(--tx3);box-shadow:none}.pt-row.done .pt-node{background:var(--correct-bd,#16a34a)}',
       '.pt-row .pt-node{width:36px;height:36px;font-size:14px}.pt-row .pt-tx b{font-size:14px}.pt-row .pt-tx small{font-size:11.5px}.pt-row small .dim,.pt-stars .dim{opacity:.25}',

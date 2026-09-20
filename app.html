@@ -2641,6 +2641,7 @@ function renderHub() {
   else if (done > 0) motto = L('再 ' + (GOAL - done) + ' 個就達標，衝！', 'Just ' + (GOAL - done) + ' to go — push!');
   else if (streak > 0) motto = L('別讓 ' + streak + ' 天連續斷掉，來 5 分鐘！', 'Keep your ' + streak + '-day streak — 5 min!');
   else motto = _gr ? _gr.motto : L('今天還沒開始 — 先來 5 分鐘暖身？', 'Fresh start — warm up 5 min?');
+  const _pathFirst = !!(window.StudyPlan && StudyPlan.rhythm && StudyPlan.rhythm() === 'path' && window.Path);
   if (done < GOAL && window.StudyPlan && StudyPlan.mode && StudyPlan.mode() === 'intense') motto = StudyPlan.nagLine();   // 情勒模式:沒達標就用情勒句
   const wod = _hubWordOfDay();
   const lm = localStorage.getItem('lastMode');
@@ -2670,8 +2671,10 @@ function renderHub() {
         + '</div>'
       + '</div>'
       // 每日計畫卡(獨立一張,今日目標濃縮成卡底一條細線;2026-09-17 Mia:面板太擠)
+      // 關卡節奏:今日關卡卡在最上面、計畫卡縮成複習卡;自由節奏:計畫卡在上、闖關卡在下
+      + (_pathFirst && window.Path ? Path.hubCardHtml() : '')
       + (window.StudyPlan ? StudyPlan.hubCardHtml({ done: done, goal: GOAL, pct: firstHub ? 0 : pct }) : '')
-      + (window.Path ? Path.hubCardHtml() : '')   // 闖關卡(path.js)
+      + (!_pathFirst && window.Path ? Path.hubCardHtml() : '')
       + resume
       + (wod ? '<div class="hub-wod">'
         + '<div class="hub-wod-main">'

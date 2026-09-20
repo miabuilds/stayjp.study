@@ -8,7 +8,8 @@
 (function (root) {
   const KEY = 'sp_settings', SETS_KEY = 'sp_sets';
   const LEVELS = ['n5', 'n4', 'n3', 'n2', 'n1'];
-  const DEF = { newPerDay: 20, reviewPerDay: 200, order: 'mix', front: 'jp', again: true, pitch: false, mode: 'normal', minTarget: 20, modeChosen: false };
+  const DEF = { newPerDay: 20, reviewPerDay: 200, order: 'mix', front: 'jp', again: true, pitch: false, mode: 'normal', minTarget: 20, modeChosen: false, rhythm: 'path' };
+  // rhythm:'path' 每天有指定關卡要過(預設,關卡感)/ 'free' 自己的節奏(只看今日目標動作數)
   // 學習模式(2026-09-20 Mia:情勒/倒數/輕鬆):一個選擇同時決定 今日目標動作數、新字/複習上限、每天最低專注分鐘、提醒語氣、每日建議關數
   const MODES = {
     easy:    { goal: 10, newPerDay: 10, reviewPerDay: 60,  minTarget: 0,  tone: 'gentle', units: 1, name: ['輕鬆', 'Relaxed'],  desc: ['每天 5 分鐘,有做就好;小狸只會溫柔提醒', '5 min a day, no pressure; gentle nudges only'] },
@@ -38,6 +39,7 @@
     if (!MODES[o.mode]) o.mode = 'normal';
     o.minTarget = [10, 20, 30, 45].includes(parseInt(o.minTarget, 10)) ? parseInt(o.minTarget, 10) : 20;
     o.modeChosen = o.modeChosen === true;
+    if (o.rhythm !== 'free') o.rhythm = 'path';
     return o;
   }
   function set(patch) {
@@ -84,6 +86,8 @@
     } catch (e) {}
   }
   function setMinTarget(n) { set({ minTarget: parseInt(n, 10) }); }
+  function rhythm() { return get().rhythm; }
+  function setRhythm(r) { set({ rhythm: r === 'free' ? 'free' : 'path' }); }
   // 情勒句池(app 內文案;推播那套在 native notifications.ts TONE_BODIES)— 依小時輪播
   const NAG = [
     ['小狸等你等到快睡著了,今天還沒讀。', 'The tanuki has been waiting. Nothing studied yet today.'],
@@ -188,8 +192,9 @@
     return { due: dueItems, fresh: newItems, dueTotal: due.length, minutes, cfg };
   }
   // 出題順序:交錯(每 2 張複習插 1 張新字,比例不夠就照剩的排)或先複習
-  function buildQueue(extraNew) {
+  function buildQueue(extraNew, opts) {
     const p = plan(extraNew);
+    if (opts && opts.reviewOnly) return p.due.slice();   // 關卡節奏:新字由關卡帶,這裡只清到期複習
     if (p.cfg.order === 'reviewFirst' || !p.due.length || !p.fresh.length) return p.due.concat(p.fresh);
     const q = []; let di = 0, ni = 0;
     const ratio = Math.max(1, Math.round(p.due.length / p.fresh.length));
@@ -199,7 +204,7 @@
     }
     return q;
   }
-  function sig() { try { const p = plan(), c = get(); return p.due.length + '/' + p.fresh.length + '/' + newToday() + '/' + c.mode + '/' + c.modeChosen + '/' + Math.floor(minutesToday()); } catch (e) { return ''; } }
+  function sig() { try { const p = plan(), c = get(); return p.due.length + '/' + p.fresh.length + '/' + newToday() + '/' + c.mode + '/' + c.rhythm + '/' + c.modeChosen + '/' + Math.floor(minutesToday()); } catch (e) { return ''; } }
 
   // ── A3 時段問候 ──
   function greeting() {
@@ -227,6 +232,18 @@
     const doneAll = n === 0 && d === 0;
     // 今日目標濃縮成卡底一條:「今日目標 5 / 30」+ 細進度條(點了看說明)
     const goalLine = g ? '<button type="button" class="sp-goal" onclick="dailyHelp&&dailyHelp()"><span>' + L('今日目標', 'Today’s goal') + '</span><span class="sp-goal-n">' + Math.min(g.done, g.goal) + ' / ' + g.goal + '</span><i class="sp-goal-bar"><b style="width:' + Math.min(100, Math.round(g.done / g.goal * 100)) + '%"></b></i></button>' : '';
+    if (get().rhythm === 'path' && root.Path) {
+      // 關卡節奏:新單字由關卡帶,這張卡只管到期複習 + 模式/倒數/今日目標
+      const gear = '<span class="sp-top-r">' + modeChip() + '<button type="button" class="sp-gear" onclick="StudyPlan.openSettings()" aria-label="settings"><i data-ic=settings></i></button></span>';
+      return '<div class="sp-card sp-review">'
+        + '<div class="sp-top"><b>' + (d ? L('待複習 ' + d + ' 張', d + ' cards to review') : L('複習都清完了 ✓', 'Reviews all clear ✓')) + '</b>' + gear + '</div>'
+        + chooserHtml()
+        + '<div class="sp-sub">' + (d ? L('關卡學新的,這裡清舊的;大約 ' + Math.max(1, Math.round(d / 4)) + ' 分鐘', 'Levels teach new words; this clears due reviews (~' + Math.max(1, Math.round(d / 4)) + ' min)') : L('新單字在關卡裡學,背過的字到期會回到這裡', 'New words come from the path; learned words return here when due')) + '</div>'
+        + (d ? '<button type="button" class="sp-cta sp-cta-sub" onclick="SRS.start(null,{reviewOnly:true})">' + L('複習 ' + d + ' 張', 'Review ' + d) + ' →</button>' : '')
+        + timerHtml()
+        + goalLine
+        + '</div>';
+    }
     if (doneAll) {
       return '<div class="sp-card sp-done">'
         + '<div class="sp-top"><b>' + L('今天的份完成了 🎉', 'Today\'s share is done 🎉') + '</b><span class="sp-top-r">' + modeChip() + '<button type="button" class="sp-gear" onclick="StudyPlan.openSettings()" aria-label="settings"><i data-ic=settings></i></button></span></div>'
@@ -278,6 +295,8 @@
       + '<div class="sp-seg">' + Object.keys(MODES).map(k => '<button type="button" class="' + (cfg.mode === k ? 'on' : '') + ' sp-mode-' + k + '" onclick="StudyPlan.setMode(\'' + k + '\');StudyPlan.openSettings()"><b>' + L(MODES[k].name[0], MODES[k].name[1]) + '</b><small>' + L(MODES[k].desc[0], MODES[k].desc[1]) + '</small></button>').join('') + '</div>'
       + (cfg.mode === 'intense' ? row(L('每日最低專注時間', 'Daily focus minimum'), L('面板會倒數;只算「頁面在前景且有操作」的時間', 'Counts foreground time with activity; the dashboard counts down'),
         '<select onchange="StudyPlan.setMinTarget(this.value)">' + [10, 20, 30, 45].map(n => '<option value="' + n + '"' + (cfg.minTarget === n ? ' selected' : '') + '>' + n + L(' 分', ' min') + '</option>').join('') + '</select>') : '')
+      + row(L('每日節奏', 'Daily rhythm'), L('關卡任務:每天有指定關卡要過,面板列出今天的關;自由節奏:只看今日目標動作數,想做什麼自己排', 'Quests: specific levels to clear each day; Free: just a daily action goal, study whatever you like'),
+        '<select onchange="StudyPlan.setRhythm(this.value);StudyPlan.openSettings()"><option value="path"' + (cfg.rhythm === 'path' ? ' selected' : '') + '>' + L('關卡任務（預設）', 'Quests (default)') + '</option><option value="free"' + (cfg.rhythm === 'free' ? ' selected' : '') + '>' + L('自由節奏', 'Free pace') + '</option></select>')
       + '<div class="sp-sec">' + L('學習目標', 'Daily goals') + '</div>'
       + row(L('每日新單字上限', 'New words per day'), L('每天最多抽幾個沒學過的新字（建議 10–30）', 'Max new words drawn each day (10–30 recommended)'),
         '<input type="number" min="0" max="200" inputmode="numeric" value="' + cfg.newPerDay + '" onchange="StudyPlan.set({newPerDay:this.value})">')
@@ -368,5 +387,5 @@
   }
   if (document.head) ensureCss();
 
-  root.StudyPlan = { get, set, mode, modeInfo, MODES, goal, setMode, setMinTarget, minutesToday, nagLine, sets, plan, buildQueue, sig, greeting, hubCardHtml, openSettings, closeSettings, toggleLevel, moveLevel, toggleTheme, newToday, enabledLevels, LEVELS, pitchOf, pitchMark, voice, setVoice, VOICES };
+  root.StudyPlan = { get, set, mode, modeInfo, MODES, goal, setMode, setMinTarget, rhythm, setRhythm, minutesToday, nagLine, sets, plan, buildQueue, sig, greeting, hubCardHtml, openSettings, closeSettings, toggleLevel, moveLevel, toggleTheme, newToday, enabledLevels, LEVELS, pitchOf, pitchMark, voice, setVoice, VOICES };
 })(window);
