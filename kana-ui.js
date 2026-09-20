@@ -79,7 +79,7 @@ window.Kana = (function () {
     ].join('');
     document.head.appendChild(st);
   }
-  function close() { var m = document.getElementById('kanaMask'); if (m) m.remove(); }
+  function close() { var m = document.getElementById('kanaMask'); if (m) m.remove(); try { if (window.NavBack) NavBack.back(); } catch (e) {} }   // 從「日語從頭學」點進來 → 關掉回那張清單
   function wrapEl() { var m = document.getElementById('kanaMask'); return m && m.querySelector('.kana-wrap'); }
 
   function chartHtml() {

@@ -973,6 +973,7 @@ const MockExam = (() => {
     clearInterval(timerInterval);
     timerInterval = null;
     document.getElementById('quizBg').classList.remove('show');
+    try { if (window.NavBack) NavBack.back(); } catch (e) {}   // 從「日語從頭學」點進來 → 關掉回那張清單
   }
 
   return { start, beginExam, startTimer, answer, close, shareCard };

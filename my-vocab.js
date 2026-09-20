@@ -313,10 +313,11 @@
     render();
     try { if (typeof track === 'function') track('myvocab_open', { n: count() }); } catch (e) {}
   }
-  function close() {
+  function close(keepStack) {
     var m = mask(); if (m) m.remove();
     document.body.classList.remove('mv-open');
     try { if (root.hubInvalidate) root.hubInvalidate(); if (typeof doRender === 'function') doRender(); } catch (e) {}
+    if (!keepStack) { try { if (root.NavBack) NavBack.back(); } catch (e) {} }   // 有來源畫面就回去,沒有就維持原本行為
   }
   function hydrate() { try { if (root.Icons && Icons.hydrate) Icons.hydrate(); } catch (e) {} }
 
@@ -501,7 +502,8 @@
     var items = list();
     if (!items.length) return;
     if (typeof SRS === 'undefined' || !SRS.start) { toast(L('複習功能還沒載入好，重新整理再試', 'Review isn’t ready yet — reload and try again')); return; }
-    close();
+    close(true);
+    try { if (root.NavBack) NavBack.push('myvocab'); } catch (e) {}   // 背完/關掉字卡 → 回單字本,不要掉回面板
     SRS.start('my', { words: items.slice(0, 20) });
   }
 
@@ -650,4 +652,5 @@
     practice: practice, toggle: toggle, startQuiz: startQuiz, submit: submit, keep: keep,
     reviewNow: reviewNow, say: say, owns: owns,
   };
+  try { if (root.NavBack) NavBack.register('myvocab', function () { open(); }); } catch (e) {}
 })(window);

@@ -348,6 +348,7 @@ const SRS = (() => {
     _onDone = null;
     document.getElementById('quizBg').classList.remove('show');
     updateReviewCount();
+    try { if (window.NavBack) NavBack.back(); } catch (e) {}   // 從我的單字本/闖關進來 → 回那個畫面,不要掉回面板
   }
 
   function updateReviewCount() {
