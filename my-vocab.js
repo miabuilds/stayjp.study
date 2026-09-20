@@ -27,7 +27,10 @@
   // 合成結果存 mv_tts(純本機快取,不進 SYNC_KEYS),同一個字之後再按就不花額度也不用等。
   var FN_TTS = 'https://asia-east1-jpnote-1bdd6.cloudfunctions.net/ttsSpeak';
   var TTS_KEY = 'mv_tts', TTS_KEEP = 24;
-  var _mem = {}, _au = null, _seq = 0;
+  var _mem = {}, _au = null, _seq = 0, _lastTap = 0;
+  // 分辨「使用者剛按了喇叭」vs「字卡自動播」:前者該照常問同意/給提示,後者才真的安靜。
+  // (不能用 navigator.userActivation,舊 Safari/WebView 沒有)
+  try { ['pointerdown', 'click', 'keydown'].forEach(function (t) { document.addEventListener(t, function () { _lastTap = Date.now(); }, true); }); } catch (e) {}
 
   function ttsCache() { try { return JSON.parse(localStorage.getItem(TTS_KEY)) || {}; } catch (e) { return {}; } }
   function ttsCacheGet(k) { if (_mem[k]) return _mem[k]; var c = ttsCache(); return c[k] && c[k].b || null; }
@@ -59,7 +62,8 @@
   }
   async function say(txt, ev, quiet) {
     var t = String(txt || '').trim(); if (!t) return;
-    function warn(m) { if (!quiet) toast(m); }
+    var silent = !!quiet && (Date.now() - _lastTap > 3000);   // 真的是自動播才安靜
+    function warn(m) { if (!silent) toast(m); }
     var el = null; try { el = ev && (ev.currentTarget || ev.target); } catch (e) {}
     var seq = ++_seq;
     // 1) 站上已經有這個字的預錄音檔 → 走原本的 speak()
@@ -73,7 +77,7 @@
     // 3) 雲端合成
     var user = currentUser();
     if (!user) { warn(L('自己加的字要登入才能發音（站上原本的單字不用登入）。', 'Sign in to hear your own words read aloud (built-in words work without signing in).')); return; }
-    if (quiet && root.AIConsent && root.AIConsent.has && !root.AIConsent.has()) return;   // 字卡自動播:不要跳同意視窗打斷複習
+    if (silent && root.AIConsent && root.AIConsent.has && !root.AIConsent.has()) return;   // 字卡自動播:不要跳同意視窗打斷複習
     try { if (root.AIConsent && !(await root.AIConsent.ensure())) return; } catch (e) {}
     if (el) { try { el.style.opacity = '.45'; } catch (e) {} }
     try {
