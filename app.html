@@ -376,6 +376,9 @@ select.lang-btn {
 .hub-grid2 { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:0 0 18px; }
 .hub-card { position:relative; overflow:hidden; display:flex; flex-direction:column; gap:9px; background:var(--bg2); border:1px solid var(--bd); border-radius:16px; padding:16px 16px 15px; text-decoration:none; color:var(--tx); cursor:pointer; text-align:left; box-shadow:0 1px 3px rgba(0,0,0,.04); }
 .hub-card:active { transform: scale(.98); }
+/* 今日運勢:還沒抽的時候右上角一個小紅點 */
+.hub-quick button.hq-omk { position: relative; }
+.hub-quick button.hq-new::after { content:""; position:absolute; top:7px; right:8px; width:7px; height:7px; border-radius:50%; background:#ef4444; }
 /* 我的單字本:自成一列的寬卡(圖示在左、文字在右),跟上面兩欄的方卡區隔開 */
 .hub-card-wide { width:100%; box-sizing:border-box; flex-direction:row; align-items:center; gap:14px; flex-wrap:wrap; margin-top:12px; }
 .hub-card-wide .hc-t { flex:1 1 100%; order:2; margin-top:0; }
@@ -1854,6 +1857,8 @@ try {
 <!-- 2026-09-16 Mia:YouTube 跟讀在 iOS App 內恢復顯示(先前為 1.0.8 送審暫藏);no-yt class 不再加 -->
 <script src="nav-back.js"></script>
 <script src="review-ask.js"></script>
+<script src="omikuji-data.js"></script>
+<script src="omikuji.js"></script>
 <script src="icons.js"></script>
 <script src="ui-modal.js"></script>
 <script src="content-loader.js"></script>
@@ -2680,7 +2685,7 @@ function renderHub() {
   }
   // 內容簽章:載入時 doRender 會被叫多次,資料相同就不重繪 → 只渲染一次,進場動畫不被打斷、不閃
   const _jrDone = (() => { try { return window.Journey ? Journey.stats().done : ''; } catch (e) { return ''; } })();
-  const _sig = [(typeof I18n !== 'undefined' && I18n.getLang ? I18n.getLang() : ''), streak, done, wod ? wod.w : '', lm || '', ll || '', _jrDone, (window.StudyPlan ? StudyPlan.sig() : ''), (window.Path ? Path.sig() : ''), _gr ? _gr.slot : '', (window.MyVocab ? MyVocab.count() : 0)].join('|');
+  const _sig = [(typeof I18n !== 'undefined' && I18n.getLang ? I18n.getLang() : ''), streak, done, wod ? wod.w : '', lm || '', ll || '', _jrDone, (window.StudyPlan ? StudyPlan.sig() : ''), (window.Path ? Path.sig() : ''), _gr ? _gr.slot : '', (window.MyVocab ? MyVocab.count() : 0), (window.Omikuji ? (Omikuji.drawnToday() ? 1 : 0) : '')].join('|');
   if (_sig === _hubSig && mn.querySelector('.hub')) return;
   _hubSig = _sig;
   const blossom = c => '<svg class="bl ' + c + '" viewBox="0 0 40 40"><g><ellipse cx="20" cy="11" rx="4.6" ry="7.4"/><ellipse cx="20" cy="11" rx="4.6" ry="7.4" transform="rotate(72 20 20)"/><ellipse cx="20" cy="11" rx="4.6" ry="7.4" transform="rotate(144 20 20)"/><ellipse cx="20" cy="11" rx="4.6" ry="7.4" transform="rotate(216 20 20)"/><ellipse cx="20" cy="11" rx="4.6" ry="7.4" transform="rotate(288 20 20)"/></g><circle cx="20" cy="20" r="2.6" fill="#fff"/></svg>';
@@ -2739,6 +2744,7 @@ function renderHub() {
         + '<button onclick="MockExam.start()"><span class="hq-ic"><i data-ic=clipboard></i></span>' + L('快速小考', 'Quick test') + '</button>'
         + '<button onclick="FlashCard.start()"><span class="hq-ic"><i data-ic=bolt></i></span>' + L('快速背單字', 'Flashcards') + '</button>'
         + '<button onclick="VocabListen.open()"><span class="hq-ic"><i data-ic=headphones></i></span>' + L('用聽的背', 'Listen') + '</button>'
+        + '<button onclick="Omikuji.open()" class="hq-omk' + ((window.Omikuji && Omikuji.drawnToday()) ? '' : ' hq-new') + '"><span class="hq-ic"><i data-ic=sparkle></i></span>' + L('今日運勢', 'Fortune') + '</button>'
       + '</div>'
       + '<div class="hub-foot"><img src="images/mascot/tanuki-p06.png" alt=""><span>' + L('今天也一起加油！', 'Let’s study today!') + '</span></div>'
     + '</div>'
