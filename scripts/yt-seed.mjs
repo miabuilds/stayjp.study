@@ -134,12 +134,17 @@ if (cmd === 'probe') {
     await sleep(25000);
   }
 } else if (cmd === 'backfill') {
+  // 指定 id 就只補那幾支,不指定就掃整個快取
+  const only = new Set(ids);
   const snap = await db.collection(COL).get();
-  console.log('快取裡共', snap.size, '支');
+  console.log('快取裡共', snap.size, '支', only.size ? `(只補指定的 ${only.size} 支)` : '');
   let done = 0, skip = 0;
   for (const d of snap.docs) {
+    if (only.size && !only.has(d.id)) continue;
     const c = d.data();
-    if ((c.lines || []).some(x => x.en)) { skip++; continue; }
+    const L = c.lines || [];
+    // 中文或英文任一缺就重抓 —— 限流時常常只拿到一種,只看英文會漏掉缺中文的
+    if (L.some(x => x.zh) && L.some(x => x.en)) { skip++; continue; }
     if (c.track === 'user') { skip++; continue; }        // 使用者貼的逐字稿沒有官方翻譯軌
     try {
       const r = await seed(d.id);
