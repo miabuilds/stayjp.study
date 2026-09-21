@@ -134,10 +134,15 @@ export const ytCaptions = functions.onRequest(
       const lines = await fetchTrack(ja.baseUrl);
       if (!lines.length) { res.json({ error: "no_captions", title: vd.title || "", author: vd.author || "" }); return; }
 
-      // 中文翻譯軌(YouTube 自動翻譯;偶爾不可用就略過,前端照常運作)
+      // 翻譯軌(YouTube 自動翻譯;偶爾不可用就略過,前端照常運作)。
+      // 2026-09-21:本來只抓中文 → 英文介面的人只看得到中文翻譯(Mia 回報),改成中英都抓。
+      // 簡中不另外抓,前端用 cvt 從繁中轉(省一次請求,也避免更容易被 YouTube 限流)。
       let zh: { t: number; text: string }[] = [];
+      let en: { t: number; text: string }[] = [];
       try { zh = (await fetchTrack(ja.baseUrl, "zh-Hant")).map(x => ({ t: x.t, text: x.text })); } catch (e) { /* 無翻譯軌:不影響主功能 */ }
+      try { en = (await fetchTrack(ja.baseUrl, "en")).map(x => ({ t: x.t, text: x.text })); } catch (e) { /* 同上 */ }
       const zhByT = new Map(zh.map(x => [x.t, x.text]));
+      const enByT = new Map(en.map(x => [x.t, x.text]));
 
       const data = {
         title: vd.title || "",
@@ -145,7 +150,7 @@ export const ytCaptions = functions.onRequest(
         seconds: parseInt(vd.lengthSeconds || "0", 10) || 0,
         track: ja.kind === "asr" ? "asr" : "manual",
         lang: ja.languageCode,
-        lines: lines.slice(0, 600).map(l => ({ t: l.t, d: l.d, ja: l.text, zh: zhByT.get(l.t) || "" })),
+        lines: lines.slice(0, 600).map(l => ({ t: l.t, d: l.d, ja: l.text, zh: zhByT.get(l.t) || "", en: enByT.get(l.t) || "" })),
       };
       CACHE.set(v, { at: Date.now(), data });
       try { await admin.firestore().collection("yt_captions_cache").doc(v).set(data); } catch (e) { /* 寫不進快取不影響回應 */ }

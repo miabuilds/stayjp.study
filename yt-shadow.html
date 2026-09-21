@@ -318,6 +318,22 @@ const YTS = (() => {
   // 範例庫:全部「開放嵌入+日文字幕」且已種進快取(即點即練);cat=分類 chips
   // 範例庫:全部「開放嵌入+日文字幕」且已種進快取(即點即練);cat=分類 chips
   const SAMPLES = [
+    // ── 2026-09-21 新增 15 支(全部本機驗過:可嵌入 + 有日文人工字幕,字幕已種進快取)──
+    { v:'6mkb2BEPp6E', cat:'入門', t:'日本語シャドーイング練習', tag:'跟讀專用 · 慢速' },
+    { v:'w5dRQPrG89w', cat:'入門', t:'15 分鐘 やさしい日本語聽力', tag:'N5-N4 · 跟讀' },
+    { v:'tpVuWVL1A_0', cat:'入門', t:'コンビニのストーリー(聽力故事)', tag:'便利商店 · 故事式聽力' },
+    { v:'S5pAKtsiyxw', cat:'故事', t:'鶴の恩返し(日本昔話動畫)', tag:'N5-N4 · 童話 · 中英字幕' },
+    { v:'eKAXaiXImBg', cat:'故事', t:'十二支の話(日本昔話動畫)', tag:'N5-N4 · 童話 · 生肖由來' },
+    { v:'SNsobT1bN7U', cat:'Vlog', t:'私の週末の過ごし方・家事をする一日', tag:'生活作息 · 中日字幕' },
+    { v:'6s5ZK0cx3H0', cat:'Vlog', t:'早起きして朝を満喫した一日', tag:'晨間作息 · 中日字幕' },
+    { v:'DyDb46yjA7M', cat:'Vlog', t:'秋のモーニングルーティン', tag:'居家生活 · 字幕付き' },
+    { v:'Efom783DPGE', cat:'新聞', t:'やさしい日本語ニュース(時事)', tag:'簡易新聞 · 慢速' },
+    { v:'gd1oCg8omis', cat:'新聞', t:'職場を変える「やさしい日本語」', tag:'職場 · 4 分鐘短片' },
+    { v:'DmQyBo-H6WU', cat:'會話', t:'レストランでの日本語(Onomappu)', tag:'餐廳實戰 · 中日字幕' },
+    { v:'pUR91Z621kc', cat:'會話', t:'レストラン・居酒屋・ラーメン屋の会話', tag:'外食場景 · 中日字幕' },
+    { v:'jaBDg4dmdKM', cat:'會話', t:'在餐廳用日文點餐・結帳', tag:'台灣學生常錯 · 餐飲用語' },
+    { v:'M8kOn7pAnSM', cat:'會話', t:'特別な尊敬語を 8 つ覚えよう', tag:'敬語 · 3 分鐘' },
+    { v:'gv0avhra6Co', cat:'會話', t:'「お」vs「ご」使い分けの基本', tag:'敬語 · 接頭辭' },
     { v:'rjmKQ-fjnyQ', cat:'入門', t:'慢速日語會話 #1', tag:'慢速 · 中日字幕' },
     { v:'aRS80OfBJ9o', cat:'入門', t:'慢速日語會話 #2', tag:'慢速 · 中日字幕' },
     { v:'JYEutL_zQQc', cat:'入門', t:'昨日、何をしましたか?(基本動詞)', tag:'簡單對話 · 中日字幕' },
@@ -595,7 +611,20 @@ const YTS = (() => {
     // 過濾音效標籤句([音楽]/[拍手]/(笑) 這類整句都是括號標記的,不能拿來練)
     lines=ls.filter(l=>!/^[\[（(【][^\]）)】]*[\]）)】]$/.test((l.ja||'').trim()));
     if(!lines.length) lines=ls;
-    lines.forEach(l=>{ l.ja=stripRomaji(l.ja); l.zh=dedupeZh(l.ja,l.zh); });
+    // 翻譯依介面語言挑:英文用 YouTube 的英文翻譯軌,簡中由繁中 cvt 轉。
+    // (2026-09-21 Mia 回報「YouTube 那頁只有中文翻譯」——以前後端只抓 zh-Hant。)
+    // 下游七處都讀 l.zh,所以在這裡就把 l.zh 換成「該語言要顯示的那一句」,不用各處改。
+    // ⚠️ 只動翻譯欄位,日文原文 l.ja 絕對不過 cvt(會誤轉日文漢字)。
+    lines.forEach(l=>{
+      l.ja=stripRomaji(l.ja);
+      let tr=l.zh||'';
+      try{
+        const lg=(typeof I18n!=='undefined'&&I18n.getLang)?I18n.getLang():'zh-TW';
+        if(lg==='en') tr=(l.en||'').trim()||l.zh||'';
+        else if(lg==='zh-CN'&&typeof cvt==='function') tr=cvt(l.zh||'');
+      }catch(e){}
+      l.zh=dedupeZh(l.ja,tr);
+    });
     hasZh = lines.some(l=>(l.zh||'').trim());
     try{ done=JSON.parse(localStorage.getItem(doneKey()))||{}; }catch(e){ done={}; }
     document.getElementById('inputCard').style.display='none';
