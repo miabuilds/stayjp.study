@@ -10,6 +10,15 @@
   var esc = function (s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); };
   function fr(t) { try { return root.furiganaHTMLRich ? root.furiganaHTMLRich(t) : esc(t); } catch (e) { return esc(t); } }
   function today() { return new Date().toISOString().slice(0, 10); }
+  // 籤文三語:英文用資料裡的 zhE/tipE/w[3];簡中用 cvt 轉繁中。
+  // ⚠️ 只轉中文欄位 —— 日文原文與單字漢字絕對不能過 cvt(會把日文漢字誤轉,例:「変」→「變」)。
+  function lang() { try { return (typeof I18n !== 'undefined' && I18n.getLang) ? I18n.getLang() : 'zh-TW'; } catch (e) { return 'zh-TW'; } }
+  function T(zhText, enText) {
+    var l = lang();
+    if (l === 'en') return enText || zhText;
+    if (l === 'zh-CN') { try { return (typeof cvt === 'function') ? cvt(zhText) : zhText; } catch (e) { return zhText; } }
+    return zhText;
+  }
   function pool() { return root.OMIKUJI || []; }
 
   // 今天抽到哪一支:同一天同一人固定(換裝置也一樣,純日期決定),步長 7 與 30 互質
@@ -168,7 +177,7 @@
     var words = e.w.map(function (w) {
       return '<div class="omk-w"><b>' + esc(w[0]) + '</b><i>' + esc(w[1]) + '</i>'
         + '<button type="button" onclick="Omikuji.say(\'' + esc(w[1]).replace(/'/g, '&#39;') + '\')" aria-label="' + L('發音', 'Play') + '"><i data-ic=volume></i></button>'
-        + '<span>' + esc(w[2]) + '</span></div>';
+        + '<span>' + esc(T(w[2], w[3])) + '</span></div>';
     }).join('');
     m.innerHTML = '<button type="button" class="omk-x" onclick="Omikuji.close()" aria-label="' + L('關閉', 'Close') + '">✕</button>'
       + '<div class="omk-wrap">'
@@ -176,10 +185,10 @@
           + '<div class="omk-head"><div class="no">' + numJa(i + 1) + '番</div>'
             + '<div class="omk-rank"><b>' + esc(e.r) + '</b><small>' + esc(e.k) + '</small></div></div>'
           + '<div class="omk-vert"><div class="omk-poem">' + poem + '</div></div>'
-          + '<div class="omk-zh">' + esc(e.zh) + '</div>'
+          + '<div class="omk-zh">' + esc(T(e.zh, e.zhE)) + '</div>'
           + '<div class="omk-words">' + words + '</div>'
-          + (e.tip ? '<div class="omk-tip"><b>学問</b>　' + esc(e.tip) + '</div>' : '')
-          + '<div class="omk-foot"><span>日本再留計劃</span><div class="omk-seal">御籤</div></div>'
+          + (e.tip ? '<div class="omk-tip"><b>' + L('学問', 'Studies') + '</b>　' + esc(T(e.tip, e.tipE)) + '</div>' : '')
+          + '<div class="omk-foot"><span>' + L('日本再留計劃', 'StayJP') + '</span><div class="omk-seal">御籤</div></div>'
         + '</div>'
         + '<div class="omk-acts">'
           + '<button type="button" onclick="Omikuji.close()">' + L('收起來', 'Close') + '</button>'
