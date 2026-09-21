@@ -109,15 +109,29 @@ async function seed(v) {
   await sleep(12000);
   try { en = await track(info.jaTrack.baseUrl, 'en'); } catch { /* 同上 */ }
   const zhBy = new Map(zh.map(x => [x.t, x.text])), enBy = new Map(en.map(x => [x.t, x.text]));
+  // ⚠️ 絕對不能「抓不到就寫空字串」—— 被限流時會把先前抓好的翻譯洗掉(2026-09-21 實際發生,
+  // 兩支影片的中/英翻譯被歸零)。一律跟現有資料合併,舊的有、新的沒有就留舊的。
+  const prev = (await db.collection(COL).doc(v).get()).data() || {};
+  const prevBy = new Map((prev.lines || []).map(l => [l.t, l]));
+  const merged = lines.slice(0, 600).map(l => {
+    const old = prevBy.get(l.t) || {};
+    return { t: l.t, d: l.d, ja: l.text, zh: zhBy.get(l.t) || old.zh || '', en: enBy.get(l.t) || old.en || '' };
+  });
+  // 沒帶來任何新翻譯、而且本來就有這支 → 不要寫,省一次無謂的覆蓋
+  const gained = merged.filter(x => x.zh).length + merged.filter(x => x.en).length;
+  const had = (prev.lines || []).filter(x => x.zh).length + (prev.lines || []).filter(x => x.en).length;
+  if (prev.lines && gained <= had && !zh.length && !en.length) {
+    return { v, skip: 'no_new_translation', zh: merged.filter(x => x.zh).length, en: merged.filter(x => x.en).length };
+  }
   const data = {
     title: info.title, author: info.author, seconds: info.seconds,
     track: info.manual ? 'manual' : 'asr', lang: 'ja',
-    lines: lines.slice(0, 600).map(l => ({ t: l.t, d: l.d, ja: l.text, zh: zhBy.get(l.t) || '', en: enBy.get(l.t) || '' })),
+    lines: merged,
     seededAt: Date.now(),
   };
   await db.collection(COL).doc(v).set(data);
   return { v, ok: true, title: info.title.slice(0, 40), lines: data.lines.length,
-           zh: data.lines.filter(x => x.zh).length, en: data.lines.filter(x => x.en).length, track: data.track };
+           zh: merged.filter(x => x.zh).length, en: merged.filter(x => x.en).length, track: data.track };
 }
 
 const cmd = process.argv[2], ids = process.argv.slice(3);
