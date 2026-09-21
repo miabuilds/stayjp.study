@@ -57,6 +57,12 @@
   .qstem u{text-decoration-color:var(--ac);text-decoration-thickness:2px;text-underline-offset:4px;font-weight:700}
   .qhint{color:var(--tx3);font-size:12.5px;margin-top:8px}
   .opts{display:grid;gap:12px;margin-top:24px}
+
+  /* 答完把你選的詞填回空格:對的綠底,錯的紅底刪除線後面接正解 */
+  .blank-fill{display:inline-block;padding:1px 9px;margin:0 2px;border-radius:7px;font-weight:700;white-space:nowrap}
+  .blank-fill.ok{background:var(--correct-bg,#dcfce7);color:var(--correct-tx,#15803d);border:1.5px solid var(--correct-bd,#16a34a)}
+  /* 你選錯的那個:只用刪除線+紅字,不要也做成大色塊 —— 兩個色塊並排會把句子撐爛、也分不出主從 */
+  .blank-fill.ng{background:none;border:0;padding:1px 2px;color:#b91c1c;text-decoration:line-through;text-decoration-thickness:2px;font-weight:600}
   .opt{font:inherit;text-align:left;font-size:16.5px;line-height:1.6;background:var(--bg);border:1.5px solid var(--bd);border-radius:14px;padding:15px 16px;cursor:pointer;color:var(--tx);display:flex;gap:11px;align-items:baseline;transition:border-color .12s,transform .08s}
   .opt .no{color:var(--tx3);font-size:13px;font-weight:700;flex-shrink:0}
   .opt:hover{border-color:var(--ac)}
@@ -425,6 +431,18 @@ function today(){ const d=new Date(); return d.getFullYear()+'/'+(d.getMonth()+1
 function esc(s){ return String(s==null?'':s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
 // 題幹裡用【】標的目標詞 → 底線強調
 function stem(q){ return esc(q.q).replace(/【(.+?)】/g,'<u>$1</u>').replace(/\(\s*\)/g,'(　　)').replace(/\n/g,'<br>'); }
+// 答完之後,把「你選的那個詞」填回題幹的空格裡 —— 借鏡日檢手帖:
+// 只說「答錯了」學不到東西,把 パンを牛乳を 整句拼出來,一看就知道為什麼怪。
+// 只處理有空格的題型;漢字読み/表記/重組/読解/聴解 沒有可填的空,維持原樣。
+function stemFilled(q, picked, ok){
+  const base = esc(q.q).replace(/【(.+?)】/g,'<u>$1</u>').replace(/\n/g,'<br>');
+  if(!/\(\s*\)|（\s*）/.test(q.q||'')) return null;
+  const right = esc(q.o[q.a]);
+  const fill = ok
+    ? '<span class="blank-fill ok">'+right+'</span>'
+    : '<span class="blank-fill ng">'+esc(picked)+'</span><span class="blank-fill ok">'+right+'</span>';
+  return base.replace(/\(\s*\)|（\s*）/, fill);
+}
 // 詳解裡的「答案①〜④」指的是資料原序,但選項在畫面上是亂序 → 換成正解文字,才不會對不上。
 // 編號與 q.a 不符時原樣保留(那代表該題資料有誤,不該被蓋掉)。
 function xText(q){
@@ -590,6 +608,14 @@ function answer(el, ok){
   const q = queue[qi];
   if(!ok){ const _t=(el&&el.querySelector&&el.querySelector('.no'))?Array.from(el.childNodes).filter(n=>!(n.classList&&n.classList.contains('no'))).map(n=>n.textContent).join(''):(el&&el.textContent||''); roundWrong.push({ id:q.id, ch:_t.trim().slice(0,60) }); }   // 你選的:去掉選項編號 span
   sayWordAudio(q);
+  // 你選的那個選項文字(按鈕裡第二個 span;第一個是編號)
+  let _picked = '';
+  try{ const sp=el.querySelectorAll('span'); _picked = sp.length>1 ? sp[1].textContent : ''; }catch(e){}
+  try{
+    const filled = stemFilled(q, _picked, !!ok);
+    if(filled) document.getElementById('qstem').innerHTML =
+      (q.t==='listening' ? document.getElementById('qstem').innerHTML.replace(/<\/button>[\s\S]*$/, '</button>') : '') + filled;
+  }catch(e){}
   document.querySelectorAll('.opt').forEach(b=>{
     b.disabled=true;
     if(b.getAttribute('data-ok')==='1') b.classList.add('correct'); else b.classList.add('dim');
