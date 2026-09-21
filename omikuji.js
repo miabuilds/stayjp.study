@@ -26,7 +26,9 @@
     if (document.getElementById('omkCss')) return;
     var s = document.createElement('style'); s.id = 'omkCss';
     s.textContent = [
-      '.omk-mask{position:fixed;inset:0;z-index:9500;background:radial-gradient(120% 90% at 50% 0%,#2b2119 0%,#1a1411 60%,#120e0c 100%);display:flex;flex-direction:column;align-items:center;overflow-y:auto;-webkit-overflow-scrolling:touch}',
+      // 長按搖籤會被瀏覽器當成「選字」→ 反白+跳出選單,整個手感就沒了(Mia 回報)。
+      // 整層禁止選取與長按選單,只有紙籤內容放行(那邊可能想複製籤文)。
+      '.omk-mask{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-user-drag:none;position:fixed;inset:0;z-index:9500;background:radial-gradient(120% 90% at 50% 0%,#2b2119 0%,#1a1411 60%,#120e0c 100%);display:flex;flex-direction:column;align-items:center;overflow-y:auto;-webkit-overflow-scrolling:touch}',
       'body.omk-open{overflow:hidden}body.omk-open #tutorFab,body.omk-open #tutorHint,body.omk-open .bt,body.omk-open #quotaBadge,body.omk-open #backToTop{display:none!important}',
       '.omk-x{position:absolute;top:calc(10px + env(safe-area-inset-top));right:12px;z-index:3;background:rgba(255,255,255,.1);border:0;color:#F3EADF;font-size:18px;line-height:1;padding:9px 12px;border-radius:12px;cursor:pointer}',
       '.omk-wrap{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;padding:calc(56px + env(safe-area-inset-top)) 20px calc(40px + env(safe-area-inset-bottom));width:100%;max-width:520px}',
@@ -50,7 +52,7 @@
       '.omk-stick span{position:absolute;inset:26px 0 6px;writing-mode:vertical-rl;display:flex;align-items:center;justify-content:center;font-size:13px;letter-spacing:.1em;color:#4a3320;font-family:"Hiragino Mincho ProN","Noto Serif JP",serif}',
       // ── 紙籤(和紙 + 縦書き + 朱印)──
       '@keyframes omkUnroll{from{clip-path:inset(0 0 100% 0);transform:translateY(-6px)}to{clip-path:inset(0 0 0 0);transform:none}}',
-      '.omk-slip{position:relative;width:100%;max-width:340px;background:#FBF6EA;border-radius:4px;padding:22px 20px 20px;box-shadow:0 22px 50px rgba(0,0,0,.55);animation:omkUnroll .75s ease forwards;color:#2a2018}',
+      '.omk-slip{-webkit-user-select:text;user-select:text;-webkit-touch-callout:default;position:relative;width:100%;max-width:340px;background:#FBF6EA;border-radius:4px;padding:22px 20px 20px;box-shadow:0 22px 50px rgba(0,0,0,.55);animation:omkUnroll .75s ease forwards;color:#2a2018}',
       '.omk-slip:before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(120,90,50,.055) 0 1px,transparent 1px 4px),repeating-linear-gradient(90deg,rgba(120,90,50,.045) 0 1px,transparent 1px 5px)}',
       '.omk-slip:after{content:"";position:absolute;left:0;right:0;top:0;height:5px;background:linear-gradient(90deg,#B3402A,#d9694f,#B3402A);border-radius:4px 4px 0 0}',
       '.omk-slip .no{font-size:12px;color:#8a7358;letter-spacing:.14em;font-family:"Hiragino Mincho ProN","Noto Serif JP",serif}',
@@ -125,6 +127,8 @@
       clearTimeout(holdT); shaking = false; box.classList.remove('shaking');
       var h = document.getElementById('omkHint'); if (h) h.textContent = L('再搖久一點，籤棒才會出來', 'Hold a little longer');
     };
+    box.addEventListener('contextmenu', function (ev) { ev.preventDefault(); });
+    box.addEventListener('selectstart', function (ev) { ev.preventDefault(); });
     box.addEventListener('pointerdown', start);
     box.addEventListener('pointerup', cancel);
     box.addEventListener('pointercancel', cancel);
