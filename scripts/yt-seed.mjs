@@ -40,7 +40,11 @@ async function track(baseUrl, tlang, tries = 4) {
   if (tlang) u += '&tlang=' + tlang;
   let body = '', status = 0;
   for (let i = 0; i < tries; i++) {
-    const r = await fetch(u, { headers: { 'user-agent': UA_ANDROID } });
+    // ⚠️ 一定要給逾時:被限流時 YouTube 會把連線掛著不回,沒逾時的 fetch 會永遠卡住
+    // (2026-09-21 實際發生:一支影片的翻譯抓了 48 分鐘都沒回,整個 backfill 停在第一支)
+    let r;
+    try { r = await fetch(u, { headers: { 'user-agent': UA_ANDROID }, signal: AbortSignal.timeout(20000) }); }
+    catch (err) { console.log(`    (${tlang || 'ja'} 連線逾時/失敗:${String(err.message || err).slice(0, 40)})`); await sleep(20000 * (i + 1)); continue; }
     status = r.status; body = await r.text();
     if (r.ok && !body.startsWith('<html')) break;
     const wait = 20000 * (i + 1);
