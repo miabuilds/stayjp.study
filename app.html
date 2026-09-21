@@ -1853,6 +1853,7 @@ try {
 <style>html.no-yt .yt-web-only{display:none!important}</style>
 <!-- 2026-09-16 Mia:YouTube 跟讀在 iOS App 內恢復顯示(先前為 1.0.8 送審暫藏);no-yt class 不再加 -->
 <script src="nav-back.js"></script>
+<script src="review-ask.js"></script>
 <script src="icons.js"></script>
 <script src="ui-modal.js"></script>
 <script src="content-loader.js"></script>
@@ -2769,6 +2770,7 @@ function renderHub() {
       if (localStorage.getItem('hub_celebrated') !== today) {
         localStorage.setItem('hub_celebrated', today);
         setTimeout(hubConfetti, 350);
+        try { if (window.ReviewAsk) ReviewAsk.maybe(2200); } catch (e) {}   // 達標=正向時刻,彩蛋跑完再問評分
       }
     } catch (e) {}
   }
