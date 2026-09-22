@@ -11,7 +11,8 @@
 
 import * as functions from "firebase-functions/v2/https";
 import * as admin from "firebase-admin";
-import { ECPG_SECRETS, ECPG_TRIAL_DAYS, ecpgConfig, ecpayConfig, PLANS, PlanKey } from "./utils/constants";
+import { ECPG_TRIAL_DAYS, ecpgConfig, ecpayConfig, PLANS, PlanKey } from "./utils/constants";
+import { ECPG_SECRETS } from "./utils/ecpg-secrets";
 import { ecpgPost, ecpaymentHost, parseCallback } from "./utils/ecpg";
 import { normalizeEmail, trialEmailKey } from "./utils/ecpg-shared";
 

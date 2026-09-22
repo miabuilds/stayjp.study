@@ -6,7 +6,8 @@
 
 import * as functions from "firebase-functions/v2/https";
 import * as admin from "firebase-admin";
-import { ECPG_SECRETS, ecpgConfig } from "./utils/constants";
+import { ecpgConfig } from "./utils/constants";
+import { ECPG_SECRETS } from "./utils/ecpg-secrets";
 import { parseCallback } from "./utils/ecpg";
 
 if (admin.apps.length === 0) admin.initializeApp();

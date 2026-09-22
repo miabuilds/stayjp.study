@@ -34,13 +34,9 @@ export const INVOICE_SECRET_NAMES = [
   defineSecret("ECPAY_INV_HASH_IV"),
 ];
 
-export const ECPG_SECRETS = [
-  defineSecret("ECPG_MERCHANT_ID"),
-  defineSecret("ECPG_HASH_KEY"),
-  defineSecret("ECPG_HASH_IV"),
-  ...ECPAY_SECRETS,
-  ...INVOICE_SECRET_NAMES,
-];
+// ⚠️ 綁卡的 ECPG_SECRETS 已搬到 utils/ecpg-secrets.ts。
+//    原因:defineSecret() 在模組載入時就註冊,放這裡會讓每次 firebase deploy
+//    都卡在「Enter a value for ECPG_MERCHANT_ID」(綁卡沒開通,那三個 secret 不存在)。
 
 // 綁卡驗證金額。沙盒實測:0 元被擋(TotalAmount 格式錯)、1 元被擋(低於下限)、2 元起才過。
 // 這筆是「授權」不是收款 — 綁卡成功後立刻 DoAction Action=N 放棄請款,錢不會真的扣走,

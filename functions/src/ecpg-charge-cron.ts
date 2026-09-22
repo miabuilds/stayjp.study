@@ -9,7 +9,8 @@
 
 import { onSchedule } from "firebase-functions/v2/scheduler";
 import * as admin from "firebase-admin";
-import { ECPG_SECRETS, PLANS, PlanKey, ecpgConfig } from "./utils/constants";
+import { PLANS, PlanKey, ecpgConfig } from "./utils/constants";
+import { ECPG_SECRETS } from "./utils/ecpg-secrets";
 import { ecpgPost, ecpgHost, ecpgDateTW } from "./utils/ecpg";
 import { ecpgReturnUrl } from "./utils/ecpg-shared";
 

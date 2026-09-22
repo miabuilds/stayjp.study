@@ -18,8 +18,9 @@
 import * as functions from "firebase-functions/v2/https";
 import * as admin from "firebase-admin";
 import {
-  PLANS, PlanKey, ECPG_SECRETS, ECPG_BIND_VERIFY_TWD, ecpgConfig, ecpayConfig,
+  PLANS, PlanKey, ECPG_BIND_VERIFY_TWD, ecpgConfig, ecpayConfig,
 } from "./utils/constants";
+import { ECPG_SECRETS } from "./utils/ecpg-secrets";
 import { ecpgPost, ecpgHost, ecpgDateTW } from "./utils/ecpg";
 import { normalizeEmail, trialEmailKey, ecpgReturnUrl, ecpgResultUrl } from "./utils/ecpg-shared";
 
