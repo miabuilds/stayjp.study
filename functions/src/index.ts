@@ -58,12 +58,16 @@ export { trialEmailCron } from "./trial-email-cron";
 export { examCampaignCron } from "./exam-campaign-cron";
 
 // 站內付 2.0 綁卡試用(官網 7 天免費試用 → 到期自動扣款)
-// 綠界後台要先開通「站內付 2.0 + 記憶卡號」,secrets:ECPG_MERCHANT_ID / ECPG_HASH_KEY / ECPG_HASH_IV
-export { ecpgBindStart } from "./ecpg-bind-start";
-export { ecpgBindCreate } from "./ecpg-bind-create";
-export { ecpgBindResult } from "./ecpg-bind-result";
-export { ecpgNotify } from "./ecpg-notify";
-export { ecpgChargeCron } from "./ecpg-charge-cron";
+//
+// ⚠️ 2026-09-22 暫不啟用:綠界站內付 2.0 要另外付費開通(年費三萬多),Mia 評估不划算。
+//    程式碼完整保留(沙盒實測通過),哪天要用把下面五行 uncomment、
+//    設好 ECPG_MERCHANT_ID / ECPG_HASH_KEY / ECPG_HASH_IV 再部署即可。
+//    先 export 的話,每次 firebase deploy 都會因為找不到那三個 secret 而卡住問你。
+// export { ecpgBindStart } from "./ecpg-bind-start";
+// export { ecpgBindCreate } from "./ecpg-bind-create";
+// export { ecpgBindResult } from "./ecpg-bind-result";
+// export { ecpgNotify } from "./ecpg-notify";
+// export { ecpgChargeCron } from "./ecpg-charge-cron";
 
 // 每日盯梢發票字軌(財政部配號由綠界業務兩個月申請一次,我們只能提早知道要催)
 export { invoiceWordCron } from "./invoice-word-cron";
