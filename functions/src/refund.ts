@@ -18,6 +18,7 @@ import * as admin from "firebase-admin";
 import axios from "axios";
 import { PLANS, REFUND_POLICY, ecpayConfig, ecpgConfig, ecpayRefundEndpoint, ecpayPeriodQueryEndpoint, ecpayPeriodActionEndpoint, ECPG_SECRETS } from "./utils/constants";
 import { ecpgPost, ecpaymentHost } from "./utils/ecpg";
+import { refundInvoice } from "./utils/invoice-flow";
 import { checkMacValue } from "./utils/ecpay";
 import {
   getSubscription, patchSubscription, writeTransaction,
@@ -318,6 +319,21 @@ export const refund = functions.onRequest(
       }
       // 失敗時優先回報 R 的原因:E/N 對已關帳交易必回 error_closed,會蓋掉真正原因(如餘額不足)
       if (!refundOk) ecpayMsg = rMsg || ecpayMsg;
+
+      // 退款成功 → 處理發票:全額退且還在同一申報期就作廢,否則開折讓。
+      // ⚠️ 兩者不可並用,已折讓的發票綠界不給作廢。錢已經退出去了,發票失敗不能讓這支 API 失敗,
+      //    處理不了會留一筆在 invoice_todo 給客服。
+      if (refundOk) {
+        await refundInvoice({
+          uid,
+          tradeNo: isEcpg ? ecpgMerchantTradeNo : sub.ecpay_order,
+          refundTwd: refundAmount,
+          paidTwd: paidTwd,
+          email,
+          itemName: `StayJP ${PLANS[sub.plan]?.display_name || sub.plan}`,
+          reason: "用戶退費",
+        }).catch(e => console.error("退款發票處理略過:", e));
+      }
 
       if (!refundOk) {
         // 綠界退費失敗 → 不要更新 Firestore,避免錢沒退用戶降級

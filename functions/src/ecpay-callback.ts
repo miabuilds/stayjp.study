@@ -15,7 +15,9 @@
 //   6. 回應綠界 "1|OK"(成功)或 "0|Error"
 
 import * as functions from "firebase-functions/v2/https";
-import { PLANS, PlanKey, ECPAY_SECRETS } from "./utils/constants";
+import * as admin from "firebase-admin";
+import { issueForPayment } from "./utils/invoice-flow";
+import { PLANS, PlanKey, ECPAY_SECRETS, INVOICE_SECRET_NAMES } from "./utils/constants";
 import { verifyCheckMacValue } from "./utils/ecpay";
 import {
   writeTransaction, getSubscription, writeSubscription, patchSubscription, getRefCode,
@@ -26,7 +28,7 @@ import {
 
 export const ecpayCallback = functions.onRequest(
   {
-    secrets: ECPAY_SECRETS,
+    secrets: [...ECPAY_SECRETS, ...INVOICE_SECRET_NAMES],
     region: "asia-east1",
     invoker: "public",
     maxInstances: 20,         // server-to-server,允許多一點
@@ -213,6 +215,17 @@ export const ecpayCallback = functions.onRequest(
         };
         if (body.InvoiceNo) txn.invoice_no = body.InvoiceNo;
         await writeTransaction(txn);
+
+        // 開立電子發票(best-effort:人已經付錢了,發票開不出來不能讓 callback 失敗
+        // 讓綠界重送、重複開通)。失敗會留在 invoices/{tradeNo} status=failed 供事後補開。
+        // 冪等:同一筆交易只開一張,定期定額每期各自一張。
+        await issueForPayment({
+          uid,
+          email: (await admin.auth().getUser(uid).catch(() => null))?.email || "",
+          tradeNo: merchantTradeNo,
+          itemName: `StayJP ${PLANS[plan]?.display_name || plan}`,
+          amountTwd: amount,
+        }).catch((e: unknown) => console.error("開立發票略過:", e));
 
         // 用戶推薦好友雙向獎勵 · 獎推薦人那半:朋友(uid)真付費 → 給碼主 +7 天。
         // best-effort、冪等(referrer_paid_at)、非 user 型碼/自我推薦自動略過;絕不影響主開通流程。

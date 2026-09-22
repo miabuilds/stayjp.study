@@ -26,11 +26,20 @@ export const ECPAY_SECRETS = [
 // ⚠️ 與上面的 AIO 是「不同產品線」,綠界後台要另外開通「站內付 2.0 + 記憶卡號」。
 //    商店代號可能相同、也可能不同,HashKey/IV 亦然 → 給它獨立 secret,沒設才沿用 AIO 的。
 //    firebase functions:secrets:set ECPG_MERCHANT_ID / ECPG_HASH_KEY / ECPG_HASH_IV
+// 電子發票金鑰。⚠️ 與金流「完全不同」的一組,不可共用 ECPAY_HASH_KEY
+//   firebase functions:secrets:set ECPAY_INV_MERCHANT_ID / ECPAY_INV_HASH_KEY / ECPAY_INV_HASH_IV
+export const INVOICE_SECRET_NAMES = [
+  defineSecret("ECPAY_INV_MERCHANT_ID"),
+  defineSecret("ECPAY_INV_HASH_KEY"),
+  defineSecret("ECPAY_INV_HASH_IV"),
+];
+
 export const ECPG_SECRETS = [
   defineSecret("ECPG_MERCHANT_ID"),
   defineSecret("ECPG_HASH_KEY"),
   defineSecret("ECPG_HASH_IV"),
   ...ECPAY_SECRETS,
+  ...INVOICE_SECRET_NAMES,
 ];
 
 // 綁卡驗證金額。沙盒實測:0 元被擋(TotalAmount 格式錯)、1 元被擋(低於下限)、2 元起才過。
