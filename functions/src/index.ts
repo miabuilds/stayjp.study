@@ -71,3 +71,5 @@ export { examCampaignCron } from "./exam-campaign-cron";
 
 // 每日盯梢發票字軌(財政部配號由綠界業務兩個月申請一次,我們只能提早知道要催)
 export { invoiceWordCron } from "./invoice-word-cron";
+// 每日對帳:收了幾筆錢 vs 開了幾張發票,漏開隔天就會被抓到
+export { invoiceAuditCron } from "./invoice-audit-cron";

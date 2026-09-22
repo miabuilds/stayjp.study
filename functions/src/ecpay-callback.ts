@@ -222,7 +222,8 @@ export const ecpayCallback = functions.onRequest(
         await issueForPayment({
           uid,
           email: (await admin.auth().getUser(uid).catch(() => null))?.email || "",
-          tradeNo: merchantTradeNo,
+          // ⚠️ 用綠界 TradeNo(每期唯一),不是 MerchantTradeNo(定期定額每期都一樣)
+          ecpayTradeNo: tradeNo || merchantTradeNo,
           itemName: `StayJP ${PLANS[plan]?.display_name || plan}`,
           amountTwd: amount,
         }).catch((e: unknown) => console.error("開立發票略過:", e));

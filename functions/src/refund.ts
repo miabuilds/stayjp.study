@@ -326,7 +326,8 @@ export const refund = functions.onRequest(
       if (refundOk) {
         await refundInvoice({
           uid,
-          tradeNo: isEcpg ? ecpgMerchantTradeNo : sub.ecpay_order,
+          // 要跟開立時同一把鑰匙(綠界 TradeNo),否則查不到那一期的發票
+          ecpayTradeNo: tradeNo,
           refundTwd: refundAmount,
           paidTwd: paidTwd,
           email,

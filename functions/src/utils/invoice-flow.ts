@@ -12,7 +12,14 @@
 import * as admin from "firebase-admin";
 import { issueInvoice, invalidInvoice, allowanceInvoice, canVoid, invDateTW } from "./ecpay-invoice";
 
-/** 交易編號 → 發票用的 RelateNumber(只留英數,綠界不吃特殊符號)*/
+/**
+ * 交易編號 → 發票用的 RelateNumber(只留英數,綠界不吃特殊符號)。
+ *
+ * ⚠️ 這裡一定要用「綠界的 TradeNo」,不能用 MerchantTradeNo:
+ *    定期定額每一期的 MerchantTradeNo 都是同一個(原始訂單號),
+ *    只有 TradeNo 每期不同。用錯的話第二期開始會被冪等鎖當成重複而跳過
+ *    → 續訂的錢照收、發票漏開,是稅務問題不是小 bug。
+ */
 function relNo(tradeNo: string): string {
   return String(tradeNo).replace(/[^A-Za-z0-9]/g, "").slice(0, 50);
 }
@@ -22,9 +29,12 @@ function relNo(tradeNo: string): string {
  * 回傳是否真的開成功(呼叫端不必理會,純 log 用)。
  */
 export async function issueForPayment(a: {
-  uid: string; email: string; tradeNo: string; itemName: string; amountTwd: number; identifier?: string;
+  uid: string; email: string;
+  /** ⚠️ 綠界的 TradeNo(每期唯一),不是你自己的 MerchantTradeNo(定期定額每期都一樣)*/
+  ecpayTradeNo: string;
+  itemName: string; amountTwd: number; identifier?: string;
 }): Promise<boolean> {
-  const rel = relNo(a.tradeNo);
+  const rel = relNo(a.ecpayTradeNo);
   if (!rel || !a.email || !(a.amountTwd > 0)) return false;
   const db = admin.firestore();
   const ref = db.doc("invoices/" + rel);
@@ -34,7 +44,7 @@ export async function issueForPayment(a: {
     const s = await tx.get(ref);
     if (s.exists) return false;
     tx.set(ref, {
-      uid: a.uid, trade_no: a.tradeNo, amount_twd: a.amountTwd,
+      uid: a.uid, trade_no: a.ecpayTradeNo, amount_twd: a.amountTwd,
       email: a.email, status: "issuing", created_at: Date.now(),
     });
     return true;
@@ -58,11 +68,11 @@ export async function issueForPayment(a: {
     }
     // 失敗把鎖解開(狀態改 failed),留著讓人工/日後補開,不要吞掉
     await ref.set({ status: "failed", fail_code: r.rtnCode ?? null, fail_msg: r.rtnMsg || r.error || null }, { merge: true });
-    console.error("開立發票失敗", a.tradeNo, r.rtnCode, r.rtnMsg || r.error);
+    console.error("開立發票失敗", a.ecpayTradeNo, r.rtnCode, r.rtnMsg || r.error);
     return false;
   } catch (e) {
     await ref.set({ status: "failed", fail_msg: String(e) }, { merge: true }).catch(() => undefined);
-    console.error("開立發票例外", a.tradeNo, e);
+    console.error("開立發票例外", a.ecpayTradeNo, e);
     return false;
   }
 }
@@ -74,9 +84,12 @@ export async function issueForPayment(a: {
  * 找不到發票紀錄(例如導入發票之前的舊交易)→ 記一筆待人工處理,不擋退款。
  */
 export async function refundInvoice(a: {
-  uid: string; tradeNo: string; refundTwd: number; paidTwd: number; email: string; itemName: string; reason?: string;
+  uid: string;
+  /** ⚠️ 同上:要跟開立時同一把鑰匙,綠界 TradeNo */
+  ecpayTradeNo: string;
+  refundTwd: number; paidTwd: number; email: string; itemName: string; reason?: string;
 }): Promise<{ done: boolean; mode: string; msg?: string }> {
-  const rel = relNo(a.tradeNo);
+  const rel = relNo(a.ecpayTradeNo);
   const db = admin.firestore();
   const ref = db.doc("invoices/" + rel);
   const snap = await ref.get().catch(() => null);
@@ -85,7 +98,7 @@ export async function refundInvoice(a: {
   if (!inv || inv.status !== "issued" || !inv.invoice_no) {
     // 沒開過發票就沒得作廢。留單子給客服處理,不要讓退款失敗。
     await db.collection("invoice_todo").add({
-      uid: a.uid, trade_no: a.tradeNo, refund_twd: a.refundTwd,
+      uid: a.uid, trade_no: a.ecpayTradeNo, refund_twd: a.refundTwd,
       note: inv ? `發票狀態為 ${inv.status},無法自動處理` : "查無發票紀錄(可能是導入發票前的舊交易)",
       created_at: Date.now(),
     }).catch(() => undefined);
@@ -124,7 +137,7 @@ export async function refundInvoice(a: {
   } catch (e) {
     console.error("退款發票處理例外", invoiceNo, e);
     await db.collection("invoice_todo").add({
-      uid: a.uid, trade_no: a.tradeNo, invoice_no: invoiceNo,
+      uid: a.uid, trade_no: a.ecpayTradeNo, invoice_no: invoiceNo,
       refund_twd: a.refundTwd, note: "自動處理發生例外:" + String(e), created_at: Date.now(),
     }).catch(() => undefined);
     return { done: false, mode: "error", msg: String(e) };
