@@ -29,6 +29,13 @@ type WordRow = {
   InvoiceStart: string; InvoiceEnd: string; InvoiceNo: string; UseStatus: number;
 };
 
+// ⚠️ 官方 7881.md 的定義,跟直覺不一樣:2 才是「使用中」。
+//    別把 2 讀成「未使用」—— 只有 2 能開發票,其餘狀態張數再多都開不出來。
+const USE_STATUS: Record<number, string> = {
+  1: "未啟用", 2: "使用中", 3: "已停用", 4: "暫停中", 5: "待審核", 6: "審核不通過",
+};
+const ACTIVE = 2;
+
 /** 期別:1=一二月 2=三四月 … 6=十一十二月 */
 function termOf(month: number): number { return Math.ceil(month / 2); }
 
@@ -97,17 +104,24 @@ export const invoiceWordCron = onSchedule(
         issues.push(`本期(民國 ${rocYear} 年 期別${term})沒有任何字軌,現在就開不出發票`);
         summary.current_remain = 0;
       } else {
+        // 只有「使用中」的字軌能開發票,其餘狀態不列入可用張數
+        const usable = cur.filter((r) => Number(r.UseStatus) === ACTIVE);
+        if (!usable.length) {
+          const states = cur.map((r) => `${r.InvoiceHeader}=${USE_STATUS[Number(r.UseStatus)] || r.UseStatus}`).join("、");
+          issues.push(`本期字軌存在但沒有一組是「使用中」(${states}),現在開發票會失敗`);
+        }
         let remain = 0, total = 0;
-        for (const r of cur) {
+        for (const r of usable) {
           const start = Number(r.InvoiceStart), end = Number(r.InvoiceEnd);
           const used = r.InvoiceNo ? Number(r.InvoiceNo) - start + 1 : 0;
           total += end - start + 1;
           remain += end - start + 1 - Math.max(0, used);
         }
+        summary.current_status = cur.map((r) => USE_STATUS[Number(r.UseStatus)] || String(r.UseStatus)).join("、");
         summary.current_remain = remain;
         summary.current_total = total;
         summary.current_header = cur.map((r) => r.InvoiceHeader).join(",");
-        if (remain <= LOW_REMAIN) {
+        if (usable.length && remain <= LOW_REMAIN) {
           issues.push(
             `本期字軌只剩 ${remain} 張(共 ${total} 張),用完就開不出發票。` +
             "核准數量是國稅局定的 → 直接向國稅局申請增加字軌號碼(不是找綠界業務)",
@@ -116,8 +130,13 @@ export const invoiceWordCron = onSchedule(
       }
 
       // ── 下一期 ──
-      const next = nextRows.filter((r) => Number(r.InvoiceTerm) === nextTerm);
+      const next = nextRows.filter((r) => Number(r.InvoiceTerm) === nextTerm && Number(r.UseStatus) === ACTIVE);
+      const nextAny = nextRows.filter((r) => Number(r.InvoiceTerm) === nextTerm);
       summary.next_ready = next.length > 0;
+      if (!next.length && nextAny.length) {
+        const states = nextAny.map((r) => USE_STATUS[Number(r.UseStatus)] || String(r.UseStatus)).join("、");
+        issues.push(`下一期字軌已配號但狀態是「${states}」,不是「使用中」→ 期初會開不出發票,請確認綠界後台是否要啟用`);
+      }
       if (!next.length && daysToNext <= LEAD_DAYS) {
         issues.push(
           `下一期(民國 ${nextRocYear} 年 期別${nextTerm})還沒有字軌,${daysToNext} 天後開始,` +
