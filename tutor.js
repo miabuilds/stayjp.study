@@ -129,6 +129,35 @@
     $('tutorCtxT').textContent = (tag ? tag + '・' : '') + (ctx.title || ctx.body || '').slice(0, 60);
     renderChips();
   }
+  // ── 預設問題用寫好的答案,不打 API ──
+  // Mia 2026-09-22:「那兩個預設問題不用打 api,因為回答都一樣」。
+  // 零成本、零等待、不吃每日額度,而且答案品質固定。
+  // 格式沿用 render() 認得的:【小標】/「- 」條列/「例:句 → 翻譯」/全形｜表格/**粗體**。
+  var CANNED = { wa_ga: { zh: "【一句話】\n「が」是指出「是誰、是哪個」;「は」是把它當成主題,順便跟別的東西做對比。\n\n【三個好用的判斷法】\n- **第一次登場用が,講過之後用は**:新資訊先用「が」點名,之後改用「は」接著講。\n- **疑問詞那邊一定是が**:「誰が」「どれが」「何が」,回答也跟著用が。\n- **對比、否定多半用は**:一句話裡出現兩個對照的東西,通常都掛は。\n\n例:昔々、おじいさんがいました。→ 從前從前,有位老爺爺。(第一次出現,用が)\n例:おじいさんは山へ行きました。→ 老爺爺上山去了。(已經知道是誰,改用は)\n例:誰が窓を開けましたか。→ 是誰把窗戶打開的?(疑問詞用が)\n例:肉は食べますが、魚は食べません。→ 肉我吃,魚不吃。(對比用は)\n\n【最常見的誤用】\n- 自我介紹說「私が学生です」文法沒錯,但語氣變成「(別人不是)我才是學生」。要講自己是誰,用「私は学生です」。\n- 講喜好、能力、想要的對象,那個對象用が:「日本語が上手ですね」「水が飲みたい」。", en: "【In one line】\n「が」 points out WHICH one it is. 「は」 takes it as the topic, usually implying a contrast.\n\n【Three quick tests】\n- **New info takes が, known info takes は**: introduce with が, switch to は once it is established.\n- **Question words always take が**: 誰が / どれが / 何が — and the answer keeps が.\n- **Contrast and negation usually take は**: two things compared in one sentence normally both take は.\n\n例:昔々、おじいさんがいました。→ Once upon a time there was an old man. (first mention)\n例:おじいさんは山へ行きました。→ The old man went to the mountain. (already known)\n例:誰が窓を開けましたか。→ Who opened the window? (question word)\n例:肉は食べますが、魚は食べません。→ I eat meat, but not fish. (contrast)\n\n【The usual mistake】\n- 「私が学生です」 is grammatical but means \"I am the one who is the student\". To say who you are, use 「私は学生です」.\n- Likes, abilities and wants mark their object with が: 「日本語が上手ですね」「水が飲みたい」." }, jita: { zh: "【一句話】\n他動詞是「人去對某個東西做」,前面配を;自動詞是「東西自己變成那樣」,前面配が。\n\n【怎麼分最快】\n- 看助詞最準:ドア**を**開ける(他)/ ドア**が**開く(自)。\n- 這類動詞幾乎都成對出現,**成對背比單背快**。\n- 常見規律:語尾 **〜aru 多半是自動詞**(集まる・閉まる・止まる),**〜eru 多半是他動詞**(集める・閉める・止める)。有例外,但先抓這個方向。\n\n詞｜讀音｜自他｜說明\n開ける｜あける｜他｜(人)把它打開\n開く｜あく｜自｜(門窗)開了\n閉める｜しめる｜他｜(人)把它關上\n閉まる｜しまる｜自｜(門窗)關上了\n始める｜はじめる｜他｜(人)開始做某事\n始まる｜はじまる｜自｜(活動)開始了\n\n例:窓を開けます。→ 我把窗戶打開。(有人動手)\n例:風で窓が開きました。→ 窗戶被風吹開了。(自己開的)\n\n【考試最愛考這裡】\n- 「〜てある」只接他動詞,表示**有人刻意做了、結果還留著**:窓が開けてある(有人為了通風開的)。\n- 「〜ている」接自動詞時表示**單純的狀態**:窓が開いている(就是開著,不管誰開的)。", en: "【In one line】\nTransitive verbs are things a person does TO something (marked を). Intransitive verbs happen BY themselves (marked が).\n\n【Fastest way to tell】\n- Trust the particle: ドア**を**開ける (transitive) vs ドア**が**開く (intransitive).\n- They come in pairs — **learning the pair is faster than learning one**.\n- Rough rule: **〜aru endings are usually intransitive** (集まる・閉まる・止まる), **〜eru endings usually transitive** (集める・閉める・止める). Exceptions exist, but start here.\n\n詞｜讀音｜自他｜說明\n開ける｜あける｜transitive｜someone opens it\n開く｜あく｜intransitive｜it opens\n閉める｜しめる｜transitive｜someone closes it\n閉まる｜しまる｜intransitive｜it closes\n始める｜はじめる｜transitive｜someone starts it\n始まる｜はじまる｜intransitive｜it starts\n\n例:窓を開けます。→ I open the window. (someone does it)\n例:風で窓が開きました。→ The window blew open. (by itself)\n\n【What exams test】\n- 「〜てある」 only takes transitive verbs: someone did it on purpose and the result remains — 窓が開けてある.\n- 「〜ている」 with an intransitive verb is just the state — 窓が開いている." } };
+  // ⚠️ 簡中不能整段丟 cvt(會把日文漢字一起轉掉);只轉「整行都沒有假名」的那幾行。
+  function cannedText(key) {
+    var o = CANNED[key]; if (!o) return '';
+    var l = lang();
+    if (l === 'en') return o.en;
+    if (l !== 'zh-CN' || typeof cvt !== 'function') return o.zh;
+    return o.zh.split('\n').map(function (ln) {
+      return /[\u3041-\u3096\u30a1-\u30fa\u30fc]/.test(ln) ? ln : cvt(ln);
+    }).join('\n');
+  }
+  function askCanned(key, label) {
+    if (busy) return;
+    addMsg('me', esc(label));
+    hist.push({ role: 'me', text: label });
+    renderChips();
+    var t = cannedText(key);
+    var d = addMsg('ai', render(t) || esc(t));
+    d.querySelectorAll('.tt-spk').forEach(function (b) { b.onclick = function () { try { root.speak(b.getAttribute('data-jp')); } catch (e) {} }; });
+    hist.push({ role: 'ai', text: t });
+    try { if (typeof track === 'function') track('tutor_ask', { mode: 'canned', ctx: 'none' }); } catch (e) {}
+    try { if (root.StayDaily && root.StayDaily.log) root.StayDaily.log('tutor'); } catch (e) {}
+    $('tutorMsgs').scrollTop = $('tutorMsgs').scrollHeight;
+  }
+
   function renderChips() {
     var c = $('tutorChips'); if (!c) return;
     if (hist.length) { c.innerHTML = ''; return; }
@@ -136,11 +165,12 @@
     if (ctx && ctx.type === 'grammar') chips = [[L('用白話解釋這個文法', 'Explain this simply'), L('用白話解釋這個文法,並給我 2 個生活例句', 'Explain this grammar point simply, with 2 everyday example sentences')], [L('跟相似文法差在哪?', 'Similar grammar?'), L('這個文法跟意思相近的其他說法差在哪?什麼時候該用哪個?', 'How does this differ from similar expressions, and when should I use which?')], [L('常見錯誤', 'Common mistakes'), L('台灣人學這個文法最常犯什麼錯?', 'What mistakes do Chinese-speaking learners often make with this?')], [L('JLPT 怎麼考', 'On the JLPT'), L('JLPT 考這個文法常怎麼出題?給我一題練習', 'How does the JLPT test this? Give me one practice question')]];
     else if (ctx && ctx.type === 'vocab') chips = [[L('這個字怎麼用', 'How to use it'), L('這個單字怎麼用?給我 3 個不同場合的例句', 'How is this word used? Give 3 example sentences in different situations')], [L('相似字差別', 'Similar words'), L('跟這個單字意思相近的字有哪些?差別是什麼?', 'What words are similar to this, and how do they differ?')], [L('搭配詞', 'Collocations'), L('這個單字常跟什麼動詞/助詞搭配?', 'What verbs or particles does this word usually go with?')]];
     else if (ctx && (ctx.type === 'article' || ctx.type === 'sentence')) chips = [[L('這句在講什麼', 'Meaning?'), L('這句話的意思和文法重點是什麼?', 'What does this sentence mean, and what grammar is key here?')], [L('拆解這句', 'Parse'), '__parse__'], [L('換個說法', 'Rephrase'), L('這句可以怎麼換成更口語/更禮貌的說法?', 'How could I say this more casually or more politely?')]];
-    else chips = [[L('は跟が差在哪', 'は vs が'), L('「は」跟「が」到底差在哪?用最簡單的方式解釋', 'What is the real difference between は and が? Explain simply')], [L('自動詞他動詞', 'Transitive pairs'), L('自動詞跟他動詞怎麼分?有沒有好記的方法?', 'How do I tell transitive and intransitive verbs apart? Any memory tricks?')], [L('貼一句幫我拆解', 'Paste a sentence'), '__hint__']];
+    else chips = [[L('は跟が差在哪', 'は vs が'), '__canned:wa_ga__'], [L('自動詞他動詞', 'Transitive pairs'), '__canned:jita__'], [L('貼一句幫我拆解', 'Paste a sentence'), '__hint__']];
     c.innerHTML = chips.map(function (x, i) { return '<button type="button" class="tt-chip" data-i="' + i + '">' + esc(x[0]) + '</button>'; }).join('');
     c.querySelectorAll('.tt-chip').forEach(function (b) {
       b.onclick = function () {
         var x = chips[+b.getAttribute('data-i')];
+        if (x[1] && x[1].indexOf('__canned:') === 0) { askCanned(x[1].slice(9, -2), x[0]); return; }   // 固定答案,不打 API
         if (x[1] === '__parse__') { if (ctx && ctx.body) ask(ctx.body, 'parse'); return; }
         if (x[1] === '__hint__') { var ta = $('tutorIn'); ta.placeholder = L('把日文句子貼這裡,然後按「拆解」', 'Paste a Japanese sentence here, then tap Parse'); ta.focus(); return; }
         ask(x[1], 'ask');
