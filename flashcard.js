@@ -342,7 +342,7 @@ const FlashCard = (() => {
         </div>
       </div>
       <div style="display:flex;justify-content:center;align-items:center;gap:14px;margin-top:10px">
-        <button onclick="event.stopPropagation();speak('${(item.r||item.w).replace(/'/g,"\\'")}')" style="background:var(--bg3);border:1px solid var(--bd);border-radius:20px;padding:6px 16px;cursor:pointer;color:var(--ac2);font-size:13px"><i data-ic=volume></i> ${_E('播音','Play')}</button>
+        <button onclick="event.stopPropagation();speak('${(item.r||item.w).replace(/'/g,"\\'")}')" style="background:var(--bg3);border:1px solid var(--bd);border-radius:22px;padding:0 18px;min-height:44px;display:inline-flex;align-items:center;gap:6px;cursor:pointer;color:var(--ac2);font-size:13px"><i data-ic=volume></i> ${_E('播音','Play')}</button>
         <a href="${window.stayjpReportHref?window.stayjpReportHref('單字卡',item.w,'單字：'+item.w+'\n讀音：'+item.r+'\n意思：'+(typeof cvt==='function'?cvt(item.m):item.m)):'#'}" target="_blank" rel="noopener" onclick="event.stopPropagation()" style="color:var(--tx3);font-size:12px;text-decoration:none"><i data-ic=flag></i> ${_E('回報錯誤','Report')}</a>
       </div>`;
     // 不自動播音，使用者要聽點 🔊 按鈕

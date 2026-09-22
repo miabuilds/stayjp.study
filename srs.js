@@ -292,12 +292,13 @@ const SRS = (() => {
             ? `<div class="srs-meaning" style="font-size:24px;font-weight:800;margin-top:10px">${typeof cvt==='function'?cvt(item.m):item.m}</div>${item.c?'<div class="qsub">［'+item.c+'］</div>':''}<div class="srs-hint" style="margin-top:10px">${_E('回想日文怎麼說 → 點卡翻面','Recall the Japanese → tap to flip')}</div>`
             : `<div class="qmain">${item.w}</div>
           ${item.w!==item.r?'<div class="qsub">'+item.r+'</div>':''}
-          <div style="margin:8px 0"><svg class="spk" style="width:24px;height:24px;opacity:.6" onclick="event.stopPropagation();speak('${(item.r || item.w).replace(/'/g,"\\'")}')" viewBox="0 0 24 24"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.54 8.46a5 5 0 010 7.07M19.07 4.93a10 10 0 010 14.14"/></svg></div>
+          <div class="srs-spk-row">${spkBtn(item.r || item.w)}</div>
           <div class="srs-hint">${t('srs_flip')}</div>`}
         </div>
         <div class="srs-back" id="srsBack" style="display:none">
           <div class="qmain">${item.w}${(window.StudyPlan&&StudyPlan.pitchMark)?StudyPlan.pitchMark(item):''}</div>
           ${item.w!==item.r?'<div class="qsub">'+item.r+'</div>':''}
+          <div class="srs-spk-row">${spkBtn(item.r || item.w)}</div>
           ${item.m && item.m!==item.w ? '<div class="srs-meaning">'+(typeof cvt==='function'?cvt(item.m):item.m)+'</div>' : ''}
           ${cfHint?'<div class="confuse-hint">'+cfHint+'</div>':''}
           <div class="srs-btns">
@@ -307,6 +308,16 @@ const SRS = (() => {
         </div>
       </div>
       ${statsDonut(st)}`;
+  }
+
+  // 字卡發音鈕(2026-09-22 KOL 探長 + Mia 都回報):
+  //   原本是 24px 的裸 svg，而且整張卡都綁著翻面 → 按不中就直接翻開答案，
+  //   翻開之後背面又沒有發音鈕，等於這張卡就聽不到了。
+  //   改成 44px 觸控區(Apple 建議最小尺寸)、有圓形底看得出來可以按，而且正反面都放。
+  function spkBtn(text, label) {
+    var t = String(text || '').replace(/'/g, "\\'");
+    return '<button type="button" class="srs-spk" onclick="event.stopPropagation();speak(\'' + t + '\')" aria-label="' + (label || _E('播放發音', 'Play')) + '">'
+      + '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.54 8.46a5 5 0 010 7.07M19.07 4.93a10 10 0 010 14.14"/></svg></button>';
   }
 
   function flip() {

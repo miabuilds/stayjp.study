@@ -1365,6 +1365,14 @@ body.imm-zh .vi.zh-show .vm, body.imm-zh .vi.zh-show .exz { filter:none; opacity
   transition: border-color .2s var(--ease); background: var(--bg2);
 }
 .srs-card:hover { border-color: var(--ac2); }
+/* 字卡發音鈕:44px 觸控區(Apple 建議最小尺寸)+ 圓底,一眼看得出來可以按。
+   以前是 24px 裸圖示,按不中就變成翻面看答案(KOL 探長 2026-09-22 回報,Mia 也中過)。 */
+.srs-spk-row { display: flex; justify-content: center; margin: 10px 0 4px; }
+.srs-spk { width: 44px; height: 44px; flex: none; display: inline-flex; align-items: center; justify-content: center;
+  border-radius: 50%; border: 1.5px solid var(--bd); background: var(--bg3); color: var(--ac2, #4A7FD4);
+  cursor: pointer; padding: 0; font: inherit; -webkit-tap-highlight-color: transparent; }
+.srs-spk:active { transform: scale(.92); background: var(--bg); }
+.srs-spk svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 .srs-hint { font-size:13px; color: var(--tx3); margin-top: 10px; }
 .srs-meaning { font-size: 22px; color: var(--ac); margin: 12px 0; font-weight: 600; }
 .srs-btns { display: flex; gap: 12px; justify-content: center; margin-top: 14px; }
