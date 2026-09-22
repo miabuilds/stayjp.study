@@ -1,8 +1,10 @@
 // 每日盯梢發票字軌。
 //
-// 為什麼要盯:字軌是財政部配號、由綠界業務兩個月幫忙申請一次。
-// 我們自己沒辦法申請,但「沒配下來」或「號碼用完」的後果是發票開不出來,
-// 所以至少要在來得及催業務之前就知道。
+// 為什麼要盯:發票號碼開不出來就收不了錢的帳,而我們自己生不出號碼。
+// 兩件事找的對象不一樣,別搞混:
+//   · 每期的字軌配號 → 綠界業務兩個月幫忙申請一次
+//   · 每期「幾張」   → 核准數量是國稅局定的,要加量直接向國稅局申請增加字軌號碼
+// 所以告警要講清楚該找誰,不然期限前會去催錯人。
 //
 // 兩個會出事的情境:
 //   1. 本期號碼快用完 → 開到一半開不出來
@@ -102,7 +104,10 @@ export const invoiceWordCron = onSchedule(
         summary.current_total = total;
         summary.current_header = cur.map((r) => r.InvoiceHeader).join(",");
         if (remain <= LOW_REMAIN) {
-          issues.push(`本期字軌只剩 ${remain} 張(共 ${total} 張),用完就開不出發票,請找綠界業務加配`);
+          issues.push(
+            `本期字軌只剩 ${remain} 張(共 ${total} 張),用完就開不出發票。` +
+            "核准數量是國稅局定的 → 直接向國稅局申請增加字軌號碼(不是找綠界業務)",
+          );
         }
       }
 
@@ -112,7 +117,7 @@ export const invoiceWordCron = onSchedule(
       if (!next.length && daysToNext <= LEAD_DAYS) {
         issues.push(
           `下一期(民國 ${nextRocYear} 年 期別${nextTerm})還沒有字軌,${daysToNext} 天後開始,` +
-          "到時候發票會全部開失敗。請找綠界業務申請財政部配號。",
+          "到時候發票會全部開失敗 → 找綠界業務申請配號(這件是業務代辦的)",
         );
       }
     } catch (e) {

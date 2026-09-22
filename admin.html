@@ -1441,7 +1441,7 @@ async function loadInvoiceWord() {
       box.innerHTML = `<div style="padding:8px 11px;background:rgba(22,163,74,.1);border:1px solid #16A34A;border-radius:8px;color:#16A34A"><i data-ic=check></i> 發票字軌正常 <span style="color:var(--tx2);font-weight:400">${base}</span> <span style="color:var(--tx3);font-weight:400">(${when})</span></div>`;
     } else {
       const list = (a.issues || []).map(t => `<div style="padding:3px 0">・${t}</div>`).join('');
-      box.innerHTML = `<div style="padding:8px 11px;background:rgba(239,68,68,.1);border:1px solid #EF4444;border-radius:8px;color:#EF4444"><b><i data-ic=warning></i> 發票字軌要處理(找綠界業務)</b> <span style="color:var(--tx3);font-weight:400">(${when})</span>${list}<div style="margin-top:4px;color:var(--tx2);font-size:12px">${base}</div></div>`;
+      box.innerHTML = `<div style="padding:8px 11px;background:rgba(239,68,68,.1);border:1px solid #EF4444;border-radius:8px;color:#EF4444"><b><i data-ic=warning></i> 發票字軌要處理</b> <span style="color:var(--tx3);font-weight:400">(${when})</span>${list}<div style="margin-top:4px;color:var(--tx2);font-size:12px">${base}</div><div style="margin-top:4px;color:var(--tx3);font-size:11px">下一期沒配號 → 找綠界業務;張數不夠 → 直接向國稅局申請增加字軌號碼</div></div>`;
     }
   } catch (e) { box.innerHTML = '<span style="color:var(--tx3)">字軌讀取失敗:' + e.message + '</span>'; }
 }
