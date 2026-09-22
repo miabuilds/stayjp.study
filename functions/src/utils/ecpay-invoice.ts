@@ -58,15 +58,22 @@ async function invoicePost<T = Record<string, unknown>>(
   } catch (e: unknown) { return { ok: false, error: "network: " + String((e as Error)?.message || e) }; }
   if (!res.ok) return { ok: false, error: "http_" + res.status };
 
-  let outer: { TransCode?: number; TransMsg?: string; Data?: string };
+  // ⚠️ Data 不一定是密文!開立/作廢/折讓回的是 AES Base64 字串,
+  //    但查詢類(實測 GetIssueList)直接回「沒加密的 JSON 物件」。
+  //    一律當字串去解密的話,遇到那種回應會丟 wrong final block length 直接炸。
+  let outer: { TransCode?: number; TransMsg?: string; Data?: string | Record<string, unknown> };
   try { outer = await res.json() as typeof outer; }
   catch { return { ok: false, error: "bad_json" }; }
   if (Number(outer.TransCode) !== 1) {
     return { ok: false, transCode: Number(outer.TransCode), transMsg: outer.TransMsg, error: "trans_code" };
   }
   let inner: T & { RtnCode?: number; RtnMsg?: string };
-  try { inner = aesDecrypt<T & { RtnCode?: number; RtnMsg?: string }>(String(outer.Data || ""), env.hashKey, env.hashIV); }
-  catch (e: unknown) { return { ok: false, transCode: 1, error: "decrypt: " + String((e as Error)?.message || e) }; }
+  if (outer.Data && typeof outer.Data === "object") {
+    inner = outer.Data as T & { RtnCode?: number; RtnMsg?: string };
+  } else {
+    try { inner = aesDecrypt<T & { RtnCode?: number; RtnMsg?: string }>(String(outer.Data || ""), env.hashKey, env.hashIV); }
+    catch (e: unknown) { return { ok: false, transCode: 1, error: "decrypt: " + String((e as Error)?.message || e) }; }
+  }
   // ⚠️ RtnCode 是「整數 1」不是字串 "1",用 == 比字串會誤判
   const rtn = Number(inner.RtnCode);
   return { ok: rtn === 1, transCode: 1, transMsg: outer.TransMsg, rtnCode: rtn, rtnMsg: inner.RtnMsg, data: inner };

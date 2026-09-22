@@ -47,9 +47,13 @@ async function queryWords(year: string): Promise<WordRow[]> {
     }),
     signal: AbortSignal.timeout(20000),
   });
-  const outer = await res.json() as { TransCode?: number; Data?: string };
+  const outer = await res.json() as { TransCode?: number; Data?: string | Record<string, unknown> };
   if (Number(outer.TransCode) !== 1) throw new Error("TransCode=" + outer.TransCode);
-  const inner = aesDecrypt<{ RtnCode?: number; InvoiceInfo?: WordRow[] }>(String(outer.Data || ""), env.hashKey, env.hashIV);
+  // 查詢類端點有的回明文物件、有的回密文字串,兩種都要吃(見 ecpay-invoice.ts 的說明)
+  type WordResp = { RtnCode?: number; InvoiceInfo?: WordRow[] };
+  const inner: WordResp = (outer.Data && typeof outer.Data === "object")
+    ? outer.Data as WordResp
+    : aesDecrypt<WordResp>(String(outer.Data || ""), env.hashKey, env.hashIV);
   // RtnCode 7 = 查無資料(那一年還沒有任何字軌),不是錯誤
   if (Number(inner.RtnCode) !== 1) return [];
   return inner.InvoiceInfo || [];
