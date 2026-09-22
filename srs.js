@@ -316,8 +316,10 @@ const SRS = (() => {
   //   改成 44px 觸控區(Apple 建議最小尺寸)、有圓形底看得出來可以按，而且正反面都放。
   function spkBtn(text, label) {
     var t = String(text || '').replace(/'/g, "\\'");
-    return '<button type="button" class="srs-spk" onclick="event.stopPropagation();speak(\'' + t + '\')" aria-label="' + (label || _E('播放發音', 'Play')) + '">'
-      + '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.54 8.46a5 5 0 010 7.07M19.07 4.93a10 10 0 010 14.14"/></svg></button>';
+    // 有字的按鈕比光 icon 好按也好懂(Mia 2026-09-22:「可以再大一點點和弄個 button」)
+    return '<button type="button" class="srs-spk" onclick="event.stopPropagation();speak(\'' + t + '\')">'
+      + '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.54 8.46a5 5 0 010 7.07M19.07 4.93a10 10 0 010 14.14"/></svg>'
+      + '<span>' + (label || _E('發音', 'Play')) + '</span></button>';
   }
 
   function flip() {
