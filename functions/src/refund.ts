@@ -16,7 +16,8 @@
 import * as functions from "firebase-functions/v2/https";
 import * as admin from "firebase-admin";
 import axios from "axios";
-import { PLANS, REFUND_POLICY, ecpayConfig, ecpayRefundEndpoint, ecpayPeriodQueryEndpoint, ecpayPeriodActionEndpoint, ECPAY_SECRETS } from "./utils/constants";
+import { PLANS, REFUND_POLICY, ecpayConfig, ecpgConfig, ecpayRefundEndpoint, ecpayPeriodQueryEndpoint, ecpayPeriodActionEndpoint, ECPG_SECRETS } from "./utils/constants";
+import { ecpgPost, ecpaymentHost } from "./utils/ecpg";
 import { checkMacValue } from "./utils/ecpay";
 import {
   getSubscription, patchSubscription, writeTransaction,
@@ -89,7 +90,7 @@ async function stopPeriodOrder(
 
 export const refund = functions.onRequest(
   {
-    secrets: ECPAY_SECRETS,
+    secrets: ECPG_SECRETS,
     cors: true,
     region: "asia-east1",
     invoker: "public",
@@ -114,7 +115,9 @@ export const refund = functions.onRequest(
       const sub = await getSubscription(uid);
       if (!sub) { res.status(400).json({ error: "no_subscription" }); return; }
 
-      if (sub.source !== "web") {
+      // web = 綠界 AIO 定期定額;web_ecpg = 站內付 2.0 綁卡。兩種都是我們自己收的錢,都能退。
+      const isEcpg = sub.source === "web_ecpg";
+      if (sub.source !== "web" && !isEcpg) {
         res.status(400).json({
           error: "wrong_platform",
           reason: "App 訂閱請至「設定 → Apple ID / Google Pay」管理。",
@@ -219,8 +222,30 @@ export const refund = functions.onRequest(
       // 這是修「綠界訂閱退費一直回『訂單不存在』」的核心:舊碼直接拿 callback 首存號碼,
       // 對定期定額不是可退刷的單筆交易號 → 綠界查無此單。
       const cfg = ecpayConfig();
-      let tradeNo = await getLatestSuccessTradeNo(uid);
+      let tradeNo = "";
+      // 綁卡訂閱沒有定期定額約定可查,退的是 ecpg_charges 裡最後一筆成功扣款。
+      // 試用期內取消(還沒扣過任何一筆)→ 本來就沒錢可退,走 cancelSubscription 就好。
+      let ecpgMerchantTradeNo = "";
+      if (isEcpg) {
+        const cs = await admin.firestore().collection("ecpg_charges")
+          .where("uid", "==", uid).where("ok", "==", true)
+          .orderBy("at", "desc").limit(1).get();
+        const c = cs.docs[0];
+        if (!c) {
+          res.status(400).json({ error: "no_charge", reason: "這個帳號還沒有成功的扣款紀錄(試用期內取消不會扣款),無需退費。" });
+          return;
+        }
+        tradeNo = String(c.data().trade_no || "");
+        ecpgMerchantTradeNo = c.id;
+        if (!tradeNo) {
+          res.status(500).json({ error: "missing_trade_no", reason: "找不到對應的扣款交易,請聯絡客服。" });
+          return;
+        }
+      } else {
+        tradeNo = (await getLatestSuccessTradeNo(uid)) || "";
+      }
       try {
+        if (isEcpg) throw new Error("skip");   // 綁卡不走定期定額查詢
         const q = await queryPeriodTradeNo(sub.ecpay_order, cfg);
         console.log(`ECPay period query (order=${sub.ecpay_order}):`, JSON.stringify(q.raw));
         if (q.tradeNo) {
@@ -228,7 +253,7 @@ export const refund = functions.onRequest(
           tradeNo = q.tradeNo;
         }
       } catch (e) {
-        console.error("ECPay period query failed, fallback to stored TradeNo:", e);
+        if (!isEcpg) console.error("ECPay period query failed, fallback to stored TradeNo:", e);
       }
       if (!tradeNo) {
         res.status(500).json({ error: "missing_trade_no", reason: "找不到對應的扣款交易,請聯絡客服。" });
@@ -252,6 +277,20 @@ export const refund = functions.onRequest(
       let refundOk = false;
       let usedAction = "";
       for (const action of actions) {
+        if (isEcpg) {
+          // 站內付 2.0 的請退款在 ecpayment 網域、用 AES 加密,不是 CheckMacValue。
+          // ⚠️ 綠界官方明說沙盒「無法提供實際授權」→ 這支 API 測試環境不存在,只有正式環境能驗。
+          const env = ecpgConfig();
+          const rr = await ecpgPost(ecpaymentHost(env) + "/1.0.0/Credit/DoAction", {
+            PlatformID: "", MerchantTradeNo: ecpgMerchantTradeNo, TradeNo: tradeNo,
+            Action: action, TotalAmount: refundAmount, CustomField: "",
+          }, env);
+          const m = `RtnCode=${rr.rtnCode} ${rr.rtnMsg || rr.error || ""}`;
+          console.log(`ECPG refund response (Action=${action}):`, m);
+          if (rr.ok) { refundOk = true; usedAction = action; ecpayMsg = m; break; }
+          if (action === "R") rMsg = m;
+          continue;
+        }
         const refundParams: Record<string, string | number> = {
           MerchantID: cfg.merchantId,
           MerchantTradeNo: sub.ecpay_order,

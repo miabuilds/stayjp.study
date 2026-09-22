@@ -56,3 +56,11 @@ export { rcSyncSubscription } from "./rc-sync-subscription";
 export { startTrial } from "./start-trial";
 export { trialEmailCron } from "./trial-email-cron";
 export { examCampaignCron } from "./exam-campaign-cron";
+
+// 站內付 2.0 綁卡試用(官網 7 天免費試用 → 到期自動扣款)
+// 綠界後台要先開通「站內付 2.0 + 記憶卡號」,secrets:ECPG_MERCHANT_ID / ECPG_HASH_KEY / ECPG_HASH_IV
+export { ecpgBindStart } from "./ecpg-bind-start";
+export { ecpgBindCreate } from "./ecpg-bind-create";
+export { ecpgBindResult } from "./ecpg-bind-result";
+export { ecpgNotify } from "./ecpg-notify";
+export { ecpgChargeCron } from "./ecpg-charge-cron";

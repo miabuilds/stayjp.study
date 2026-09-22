@@ -22,12 +22,34 @@ export const ECPAY_SECRETS = [
   defineSecret("ECPAY_PRODUCTION"),
 ];
 
+// ── 站內付 2.0 / 綁卡(ECPG)───────────────────────────────────────────
+// ⚠️ 與上面的 AIO 是「不同產品線」,綠界後台要另外開通「站內付 2.0 + 記憶卡號」。
+//    商店代號可能相同、也可能不同,HashKey/IV 亦然 → 給它獨立 secret,沒設才沿用 AIO 的。
+//    firebase functions:secrets:set ECPG_MERCHANT_ID / ECPG_HASH_KEY / ECPG_HASH_IV
+export const ECPG_SECRETS = [
+  defineSecret("ECPG_MERCHANT_ID"),
+  defineSecret("ECPG_HASH_KEY"),
+  defineSecret("ECPG_HASH_IV"),
+  ...ECPAY_SECRETS,
+];
+
+// 綁卡驗證金額。沙盒實測:0 元被擋(TotalAmount 格式錯)、1 元被擋(低於下限)、2 元起才過。
+// 這筆是「授權」不是收款 — 綁卡成功後立刻 DoAction Action=N 放棄請款,錢不會真的扣走,
+// 用戶只會在帳單上看到一筆很快消失的預授權(Netflix/Spotify 都是這個做法)。
+// ⚠️ DoAction 只有正式環境有,沙盒測不到 → 上線第一筆必須拿真卡走一遍確認授權有被放棄。
+export const ECPG_BIND_VERIFY_TWD = 5;
+
+// 官網綁卡試用天數(App 走 RevenueCat 也是 7 天,兩邊對齊)。
+// 舊的「不綁卡 3 天試用」是 start-trial.ts,兩者共用 trial_used/{email} → 用過就不能再試。
+export const ECPG_TRIAL_DAYS = 7;
+
 export const EARLY_BIRD_LIMIT = 100;
 // 早鳥收官:此刻起不再接受「新購」早鳥(既有早鳥續扣不受影響——續扣走 callback 沿用 is_early_bird 原價)
 export const EARLY_BIRD_END_MS = Date.UTC(2026, 7, 27, 3, 0, 0);   // 2026-08-27 12:00 JST
 
 export type PlanKey = "monthly" | "yearly" | "yearly_early_bird" | "lifetime";
-export type Source = "web" | "app";
+// web = 綠界 AIO 定期定額(舊);web_ecpg = 站內付 2.0 綁卡(新,官網 7 天試用走這條);app = RevenueCat
+export type Source = "web" | "web_ecpg" | "app";
 export type SubStatus = "trialing" | "active" | "cancelled" | "expired" | "refunded" | "voided";
 
 export const PLANS: Record<PlanKey, {
@@ -151,6 +173,25 @@ export function ecpayConfig() {
     callbackUrl: process.env.ECPAY_CALLBACK_URL || "https://ecpaycallback-lsd7okt5qa-de.a.run.app",
     // user POST redirect URL — ECPay 結帳完把 user 送到這個 function,function 302 轉到 account.html
     returnUrl: process.env.ECPAY_RETURN_URL || "https://ecpayreturn-lsd7okt5qa-de.a.run.app",
+  };
+}
+
+// ECPG(站內付 2.0)設定。與 ecpayConfig() 一樣 fail-closed:正式環境缺金鑰就丟錯,
+// 絕不 fallback 到綠界官方公開的沙盒金鑰(那等於把開通權限送給全世界)。
+export function ecpgConfig() {
+  const isProduction = process.env.ECPAY_PRODUCTION === "true";
+  const merchantId = process.env.ECPG_MERCHANT_ID || process.env.ECPAY_MERCHANT_ID || "";
+  const hashKey = process.env.ECPG_HASH_KEY || process.env.ECPAY_HASH_KEY || "";
+  const hashIV = process.env.ECPG_HASH_IV || process.env.ECPAY_HASH_IV || "";
+  if (isProduction && (!merchantId || !hashKey || !hashIV)) {
+    throw new Error("ECPG production 金鑰未設定,拒絕以測試金鑰運行");
+  }
+  return {
+    // sandbox 預設是綠界公開的「站內付 2.0」測試帳號(與 AIO 的 2000132 不同,不可混用)
+    merchantId: merchantId || "3002607",
+    hashKey: hashKey || "pwFHCqoQZGmho4w6",
+    hashIV: hashIV || "EkRm7iFT261dpevs",
+    production: isProduction,
   };
 }
 
