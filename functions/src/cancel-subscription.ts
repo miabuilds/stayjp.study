@@ -40,33 +40,6 @@ export const cancelSubscription = functions.onRequest(
       const sub = await getSubscription(uid);
       if (!sub) { res.status(400).json({ error: "no_subscription" }); return; }
 
-      // ── 綁卡訂閱(站內付 2.0)──────────────────────────────────────
-      // 沒有定期定額約定可以取消,「取消」= 我們自己不再排程扣款,所以不用呼叫綠界。
-      // 試用中(trialing)也必須能取消 — 七天內隨時可退出是這個方案的前提,
-      // 走下面的流程會被 status !== "active" 擋掉,所以在這裡先處理掉。
-      if (sub.source === "web_ecpg") {
-        if (!["active", "trialing"].includes(String(sub.status))) {
-          res.status(400).json({ error: "already_cancelled", reason: `訂閱狀態為「${sub.status}」,無需取消。` });
-          return;
-        }
-        await admin.firestore().doc("users/" + uid).set({
-          subscription: {
-            ...sub,
-            status: "cancelled",
-            next_charge_at: null,          // 排程看到 null 就不會再扣
-            cancelled_at: Date.now(),
-          },
-        }, { merge: true });
-        res.json({
-          ok: true,
-          reason: sub.status === "trialing"
-            ? "已取消,試用期間不會扣款,權限保留到試用結束。"
-            : "已取消自動續訂,權限保留到本期結束。",
-          expires_at: sub.expiresAt || null,
-        });
-        return;
-      }
-
       if (sub.source !== "web") {
         res.status(400).json({
           error: "wrong_platform",
