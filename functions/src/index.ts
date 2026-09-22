@@ -64,3 +64,6 @@ export { ecpgBindCreate } from "./ecpg-bind-create";
 export { ecpgBindResult } from "./ecpg-bind-result";
 export { ecpgNotify } from "./ecpg-notify";
 export { ecpgChargeCron } from "./ecpg-charge-cron";
+
+// 每日盯梢發票字軌(財政部配號由綠界業務兩個月申請一次,我們只能提早知道要催)
+export { invoiceWordCron } from "./invoice-word-cron";
