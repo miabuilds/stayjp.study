@@ -35,6 +35,9 @@ export async function getAiConfig(): Promise<AiConfig> {
   } catch { return { ...DEFAULTS }; }
 }
 
+// 網頁免費試用天數。必須與前端 tool-quota.js 的 TRIAL_DAYS 相同。
+const WEB_TRIAL_DAYS = 3;
+
 async function isPremium(uid: string): Promise<boolean> {
   try {
     // 白名單(free_users/{uid})= Premium 等級:前端工具額度早就全開,AI 額度也要對齊,
@@ -44,7 +47,21 @@ async function isPremium(uid: string): Promise<boolean> {
       admin.firestore().doc("free_users/" + uid).get(),
     ]);
     if (freeSnap.exists) return true;
-    const sub = (userSnap.data() || {}).subscription;
+    const u = userSnap.data() || {};
+
+    // 網頁免費試用期間 = Premium 等級。
+    // ⚠️ 原本這裡只看 subscription.status,但網頁試用(start-trial.ts)只寫 trial_started_at、
+    //    從來不設 subscription → 前端 tool-quota.js 的 inTrial() 把畫面全解鎖了,
+    //    後端卻仍把人當免費仔(小狸一天 2 次而不是 30 次)。
+    //    結果就是「網站說你有 3 天全功能試用」但最想試的 AI 功能兩次就卡死,
+    //    App 的試用反而是完整的 → 網頁試用體感差一大截。這是 bug,不是設計。
+    // 天數要跟前端 tool-quota.js 的 TRIAL_DAYS 一致,改一邊要改兩邊。
+    const trialStart = u.trial_started_at;
+    const startMs = trialStart && typeof trialStart.toMillis === "function" ? trialStart.toMillis()
+      : (trialStart && trialStart.seconds ? trialStart.seconds * 1000 : 0);
+    if (startMs > 0 && Date.now() < startMs + WEB_TRIAL_DAYS * 86400_000) return true;
+
+    const sub = u.subscription;
     if (!sub) return false;
     if (sub.status !== "active" && sub.status !== "trialing" && sub.status !== "cancelled") return false;
     return (sub.expiresAt || 0) > Date.now();
