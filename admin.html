@@ -1459,7 +1459,8 @@ async function loadInvoiceAudit() {
     const a = d.data();
     const when = a.checked_at ? new Date(Number(a.checked_at)).toLocaleString('zh-TW', { hour12: false }) : '—';
     if (!a.issue_count) {
-      box.innerHTML = `<div style="padding:8px 11px;background:rgba(22,163,74,.1);border:1px solid #16A34A;border-radius:8px;color:#16A34A"><i data-ic=check></i> 發票對帳:近 ${a.lookback_days} 天 ${a.paid_count} 筆收款全部有發票 <span style="color:var(--tx3);font-weight:400">(${when})</span></div>`;
+      const from = a.audited_from ? new Date(Number(a.audited_from)).toLocaleDateString('zh-TW') : '';
+      box.innerHTML = `<div style="padding:8px 11px;background:rgba(22,163,74,.1);border:1px solid #16A34A;border-radius:8px;color:#16A34A"><i data-ic=check></i> 發票對帳:${a.paid_count} 筆收款全部有發票 <span style="color:var(--tx2);font-weight:400">(對帳範圍 ${from} 起,發票功能上線前的收款不列入)</span> <span style="color:var(--tx3);font-weight:400">(${when})</span></div>`;
     } else {
       const row = x => `<div style="padding:3px 0">・<code>${x.trade_no || x.txn}</code> · ${x.uid || ''} ${x.amount ? 'NT$' + x.amount : ''} ${x.msg || x.reason || ''}</div>`;
       box.innerHTML = `<div style="padding:8px 11px;background:rgba(239,68,68,.1);border:1px solid #EF4444;border-radius:8px;color:#EF4444"><b><i data-ic=warning></i> 發票對帳不符:近 ${a.lookback_days} 天收款 ${a.paid_count} 筆,沒開發票 ${a.missing_count} 筆、開失敗 ${a.failed_count} 筆</b> <span style="color:var(--tx3);font-weight:400">(${when})</span>${(a.missing || []).map(row).join('')}${(a.failed || []).map(row).join('')}<div style="margin-top:4px;color:var(--tx3);font-size:11px">漏開要補開:拿 trade_no 去綠界後台手動開,或叫我寫補開腳本。</div></div>`;

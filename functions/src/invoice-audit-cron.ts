@@ -25,7 +25,17 @@ export const invoiceAuditCron = onSchedule(
   },
   async () => {
     const db = admin.firestore();
-    const since = admin.firestore.Timestamp.fromMillis(Date.now() - LOOKBACK_DAYS * 86400_000);
+    const alertRef = db.doc("system_alerts/invoice_audit");
+
+    // 上線界線:發票功能之前的收款本來就沒有發票,拿去對帳只會天天紅字。
+    // 第一次跑的時候把「現在」記下來當界線,之後只對帳這之後的收款。
+    // (界線之前那些沒開的發票是另一件事 —— 要不要補開是稅務決定,不是程式問題,
+    //  所以這裡只記一個數字給 Mia 看,不列成待處理。)
+    const prev = (await alertRef.get()).data() || {};
+    const goLiveAt: number = Number(prev.go_live_at) || Date.now();
+
+    const lookbackFrom = Math.max(goLiveAt, Date.now() - LOOKBACK_DAYS * 86400_000);
+    const since = admin.firestore.Timestamp.fromMillis(lookbackFrom);
 
     // 綠界的收款交易(訂閱首購 + 續扣)。PayPal / App 內購不走我們開發票,排除。
     const snap = await db.collection("transactions")
@@ -56,7 +66,9 @@ export const invoiceAuditCron = onSchedule(
 
     const summary = {
       checked_at: Date.now(),
+      go_live_at: goLiveAt,
       lookback_days: LOOKBACK_DAYS,
+      audited_from: lookbackFrom,
       paid_count: paidCount,
       missing_count: missing.length,
       failed_count: failed.length,
@@ -64,7 +76,7 @@ export const invoiceAuditCron = onSchedule(
       missing: missing.slice(0, 50),
       failed: failed.slice(0, 50),
     };
-    await db.doc("system_alerts/invoice_audit").set(summary);
+    await alertRef.set(summary);
 
     if (summary.issue_count) {
       console.error(
