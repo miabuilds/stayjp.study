@@ -270,7 +270,7 @@
       '#jlkPop .jfreq{margin-top:9px;font-size:12.5px;font-weight:700;color:var(--ac,#d4654a)}',
       '#jlkPop .jfreq-dim{font-weight:600;color:var(--tx2,#8a8a8a)}',
       '#jlkPop .jact-pulse{background:var(--ac,#d4654a);color:#fff;border-color:var(--ac,#d4654a);animation:jpulse 1.1s ease-in-out infinite}',
-      '@keyframes jpulse{0%,100%{box-shadow:0 0 0 0 rgba(212,101,74,.45)}50%{box-shadow:0 0 0 5px rgba(212,101,74,0)}}',
+      '@keyframes jpulse{0%,100%{box-shadow:0 0 0 0 rgba(var(--ac-rgb),.45)}50%{box-shadow:0 0 0 5px rgba(var(--ac-rgb),0)}}',
     ].join('');
     document.head.appendChild(st);
   }

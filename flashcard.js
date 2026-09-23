@@ -367,7 +367,9 @@ const FlashCard = (() => {
     const inp = document.getElementById('fcTypeIn'); if (inp) { inp.readOnly = true; inp.classList.add(right ? 'ok' : 'ng'); }
     const btns = document.querySelector('#fcFront .srs-btns'); if (btns) btns.style.display = 'none';
     const res = document.getElementById('fcTypeRes'); if (!res) return;
-    const ex = (item.ex && item.ex.j) ? '<div style="margin-top:6px">' + E(item.ex.j) + '</div><div style="font-size:12.5px;color:var(--tx2)">' + (typeof cvt === 'function' ? cvt(E(item.ex.z || '')) : E(item.ex.z || '')) + '</div>' : '';
+    // 例句漢字標平假名(用戶 2026-09-22 回饋);furiganaHTMLRich 自帶轉義,可取代 E()
+    const _fr = t => { const f = window.furiganaHTMLRich || window.furiganaHTML; try { return f ? f(t) : E(t); } catch (e) { return E(t); } };
+    const ex = (item.ex && item.ex.j) ? '<div class="srs-ex-j" style="margin-top:6px">' + _fr(item.ex.j) + '</div><div style="font-size:12.5px;color:var(--tx2)">' + (typeof cvt === 'function' ? cvt(E(item.ex.z || '')) : E(item.ex.z || '')) + '</div>' : '';
     res.innerHTML = '<div style="font-weight:800;font-size:15px;margin-top:10px;color:' + (right ? 'var(--correct-tx,#2E7D57)' : 'var(--ac)') + '">' + (right ? _E('答對了!', 'Correct!') : _E('正解:', 'Answer: ') + E(item.w) + (item.r && item.r !== item.w ? '（' + E(item.r) + '）' : '')) + '</div>'
       + (!right && val ? '<div style="font-size:12.5px;color:var(--tx2)">' + _E('你打的:', 'You typed: ') + E(val) + '</div>' : '')
       + '<div class="srs-type-res"><div style="font-size:18px;font-weight:700">' + E(item.w) + (item.r && item.r !== item.w ? ' <span style="font-size:13px;color:var(--tx2)">' + E(item.r) + '</span>' : '') + '</div>' + ex + '</div>'

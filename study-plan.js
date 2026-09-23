@@ -141,7 +141,7 @@
       '.sp-choice.sp-mode-intense{border-color:#F3C6BA}.sp-choice.sp-mode-easy{border-color:#CDE8D6}',
       '.sp-seg{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:6px 0 12px}',
       '.sp-seg button{font:inherit;display:flex;flex-direction:column;gap:3px;align-items:flex-start;text-align:left;background:var(--bg);border:1.5px solid var(--bd);border-radius:12px;padding:10px;cursor:pointer;color:var(--tx)}.sp-seg button b{font-size:13.5px}.sp-seg button small{font-size:11px;color:var(--tx2);line-height:1.35}',
-      '.sp-seg button.on{border-color:var(--ac);background:var(--soft,rgba(212,101,74,.08))}',
+      '.sp-seg button.on{border-color:var(--ac);background:var(--soft,rgba(var(--ac-rgb),.08))}',
     ].join('');
     document.head.appendChild(st);
   }

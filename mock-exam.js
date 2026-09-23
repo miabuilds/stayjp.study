@@ -579,7 +579,12 @@ const MockExam = (() => {
       if (w.m) h += ' ' + E(typeof cvt === 'function' ? cvt(w.m) : w.m);
       if (w.c) h += ' <span style="color:var(--tx2)">[' + E(w.c) + ']</span>';
       const ex = w.ex || (Array.isArray(w.e) ? w.e[0] : null);
-      if (ex && ex.j) h += '<br>' + eo('例:', 'e.g. ') + E(ex.j) + (ex.z ? '　' + E(typeof cvt === 'function' ? cvt(ex.z) : ex.z) : '');
+      if (ex && ex.j) {
+        // 例句漢字標平假名(用戶 2026-09-22 回饋:例句看不懂漢字怎麼唸)
+        const _f = window.furiganaHTMLRich || window.furiganaHTML;
+        let _j; try { _j = _f ? _f(ex.j) : E(ex.j); } catch (e) { _j = E(ex.j); }
+        h += '<br>' + eo('例:', 'e.g. ') + '<span class="srs-ex-j">' + _j + '</span>' + (ex.z ? '　' + E(typeof cvt === 'function' ? cvt(ex.z) : ex.z) : '');
+      }
       return h;
     }
     if (g) {

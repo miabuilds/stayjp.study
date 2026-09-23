@@ -277,7 +277,7 @@
       // 練習
       '.mv-pick{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:18px}',
       '.mv-chip{font:inherit;font-size:13.5px;font-weight:700;border:1.5px solid var(--bd);background:var(--bg2);color:var(--tx);border-radius:999px;padding:8px 14px;cursor:pointer}',
-      '.mv-chip.on{border-color:var(--ac);color:var(--ac);background:var(--soft,rgba(212,101,74,.08))}',
+      '.mv-chip.on{border-color:var(--ac);color:var(--ac);background:var(--soft,rgba(var(--ac-rgb),.08))}',
       '.mv-q{background:var(--bg2);border:1px solid var(--bd);border-radius:16px;padding:15px;margin-bottom:14px}',
       '.mv-q-w{font-size:17px;font-weight:800}.mv-q-r{font-size:12.5px;color:var(--tx2);margin-left:8px;font-weight:400}',
       '.mv-q-scene{font-size:14px;line-height:1.7;margin-top:10px}',

@@ -190,6 +190,15 @@ const SRS = (() => {
       return n === v || n.replace(/[〜~()（）]/g, '') === v;   // 「〜する」「（お）金」這類註記去掉再比
     });
   }
+  // 例句漢字自動標平假名。站上文章/聽力/文法都用這個,單字卡原本漏掉
+  // (用戶 2026-09-22 回饋「例句的漢字是否可以設定有平假名標示」)。
+  // furiganaHTMLRich 內建標籤白名單 + 轉義,所以它同時取代 E()。
+  function FR(t) {
+    var f = window.furiganaHTMLRich || window.furiganaHTML;
+    if (f) { try { return f(t); } catch (e) {} }
+    return String(t == null ? '' : t).replace(/&/g, '&amp;').replace(/</g, '&lt;');
+  }
+
   let typedDone = false, typedRight = false;
   // 打字模式結果畫面:按 Enter = 下一題(不用伸手點按鈕);組字中的 Enter 不算
   document.addEventListener('keydown', function (e) {
@@ -223,8 +232,16 @@ const SRS = (() => {
     const inp = document.getElementById('srsTypeIn');
     if (inp) setTimeout(() => { try { inp.focus(); } catch (e) {} }, 50);
   }
+  // 答錯 / 按不會之後,要照著打對幾次才放行。
+  // 用戶回饋(2026-09-23):「按不會就讓我重打一次嗎?然後讓我可以一直打,直到程式覺得我記著了」
+  // 第 1 次看著正解照打(建立手感),第 2 次起把正解蓋起來 → 真的要自己回想才打得出來。
+  // 隨時可以按「跳過」,不會把人卡死。
+  const RETYPE_NEED = 3;
+  let retypeGot = 0;
+
   function revealTyped(right, val) {
     if (typedDone) return; typedDone = true; typedRight = !!right;
+    retypeGot = 0;
     const item = queue[cur];
     const C = x => (typeof cvt === 'function' ? cvt(x) : x);
     const E = x => String(x == null ? '' : x).replace(/&/g, '&amp;').replace(/</g, '&lt;');
@@ -239,12 +256,12 @@ const SRS = (() => {
       '<div style="font-weight:800;font-size:15px;color:' + (right ? 'var(--correct-tx,#2E7D57)' : 'var(--ac)') + '">' +
         (right ? _E('答對了!','Correct!') : _E('正解:','Answer: ') + E(item.w) + (item.r && item.r !== item.w ? '（' + E(item.r) + '）' : '')) + '</div>' +
       (!right && val ? '<div style="font-size:12.5px;color:var(--tx2)">' + _E('你打的:','You typed: ') + E(val) + '</div>' : '') +
-      '<div class="srs-type-res"><div style="font-size:18px;font-weight:700">' + E(item.w) + (item.r && item.r !== item.w ? ' <span style="font-size:13px;color:var(--tx2)">' + E(item.r) + '</span>' : '') + '</div>' +
-        (item.ex && item.ex.j ? '<div style="margin-top:4px">' + E(item.ex.j) + '</div><div style="font-size:12.5px;color:var(--tx2)">' + C(E(item.ex.z || '')) + '</div>' : '') +
+      '<div class="srs-type-res" id="srsAnsBox"><div style="font-size:18px;font-weight:700">' + E(item.w) + (item.r && item.r !== item.w ? ' <span style="font-size:13px;color:var(--tx2)">' + E(item.r) + '</span>' : '') + '</div>' +
+        (item.ex && item.ex.j ? '<div class="srs-ex-j" style="margin-top:4px">' + FR(item.ex.j) + '</div><div style="font-size:12.5px;color:var(--tx2)">' + C(E(item.ex.z || '')) + '</div>' : '') +
         (cfHint ? '<div class="confuse-hint" style="margin-top:6px">' + cfHint + '</div>' : '') + '</div>' +
       (right
         ? '<button class="qstart" style="margin-top:10px" onclick="SRS.nextTyped(true)">' + (cur + 1 >= queue.length ? _E('看結果 →','Results →') : _E('下一題 →','Next →')) + '</button>'
-        : '<div style="margin-top:10px;font-size:13px;font-weight:700;color:var(--ac)">' + _E('照著再打一次 ✍️','Type it once more ✍️') + '</div>' +
+        : '<div style="margin-top:10px;font-size:13px;font-weight:700;color:var(--ac)"><span id="srsRetypeTip">' + _E('照著打一次 ✍️','Type it once ✍️') + '</span> <span id="srsRetypeProg" style="color:var(--tx2);font-weight:600">0 / ' + RETYPE_NEED + '</span></div>' +
           '<input id="srsRetypeIn" class="srs-type-in" lang="ja" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="done" placeholder="' + E(item.w) + '" onkeydown="if(event.key===\'Enter\'&&!event.isComposing&&event.keyCode!==229){event.preventDefault();SRS.checkRetype();}" oncompositionstart="this.dataset.c=1" oncompositionend="this.dataset.c=\'\';SRS.checkRetype(true)" oninput="SRS.checkRetype(true)">' +
           '<div style="display:flex;gap:8px;margin-top:8px"><button class="qstart" style="margin:0;width:auto;flex:1 1 0" onclick="SRS.checkRetype()">' + _E('送出','Check') + '</button>' +
           '<button class="qstart" style="margin:0;width:auto;flex:0 0 92px;background:none;color:var(--tx2);border:1px solid var(--bd,#ddd)" onclick="SRS.nextTyped(false)">' + _E('跳過','Skip') + '</button></div>');
@@ -266,13 +283,32 @@ const SRS = (() => {
     if (live && ri.dataset.c) return;   // IME 組字中:等 compositionend 再比
     const ok = isTypedRight(queue[cur], ri.value);
     if (ok) {
-      // 使用者回饋:重打對了直接跳下一題很突然 → 先亮綠、說「打對了」,按「下一題」才走
+      retypeGot++;
+      const prog = document.getElementById('srsRetypeProg');
+      if (prog) prog.textContent = retypeGot + ' / ' + RETYPE_NEED;
+      try { if (typeof speak === 'function') speak(queue[cur].r || queue[cur].w); } catch (e) {}
+
+      if (retypeGot < RETYPE_NEED) {
+        // 還沒打滿:清空重來,而且從第 2 次起把正解蓋掉 —— 照抄不算記住,要自己想得出來才算。
+        const ans = document.getElementById('srsAnsBox');
+        if (ans) ans.style.visibility = 'hidden';
+        const tip = document.getElementById('srsRetypeTip');
+        if (tip) tip.textContent = _E('不看答案再打一次 ✍️', 'Again, without looking ✍️');
+        ri.classList.remove('ng'); ri.classList.add('ok');
+        setTimeout(function () {
+          ri.value = ''; ri.placeholder = ''; ri.classList.remove('ok');
+          try { ri.focus(); } catch (e) {}
+        }, 400);
+        return;
+      }
+      // 打滿了 → 先亮綠、說「記住了」,按「下一題」才走(不要自動跳,很突然)
       ri.classList.remove('ng'); ri.classList.add('ok'); ri.readOnly = true; retypePending = false; typedRight = false;
+      const ans2 = document.getElementById('srsAnsBox'); if (ans2) ans2.style.visibility = '';
+      const tip2 = document.getElementById('srsRetypeTip'); if (tip2) tip2.textContent = _E('記住了 👍', 'Got it 👍');
       ri.onkeydown = function (e) { if (e.key === 'Enter' && !e.isComposing && e.keyCode !== 229) { e.preventDefault(); nextTyped(false); } };
       const wrap = ri.parentElement;
       const btns = wrap && wrap.querySelector('div[style*="display:flex"]');
-      if (btns) btns.innerHTML = '<div style="flex:1;align-self:center;font-weight:800;color:var(--correct-tx,#2E7D57)">✓ ' + _E('打對了!','Correct!') + '</div><button class="qstart" style="margin:0;width:auto;flex:0 0 120px" onclick="SRS.nextTyped(false)">' + (cur + 1 >= queue.length ? _E('看結果 →','Results →') : _E('下一題 →','Next →')) + '</button>';
-      try { if (typeof speak === 'function') speak(queue[cur].r || queue[cur].w); } catch (e) {}
+      if (btns) btns.innerHTML = '<div style="flex:1;align-self:center;font-weight:800;color:var(--correct-tx,#2E7D57)">✓ ' + _E('打對 ' + RETYPE_NEED + ' 次,記住了!', 'Typed ' + RETYPE_NEED + '× — got it!') + '</div><button class="qstart" style="margin:0;width:auto;flex:0 0 120px" onclick="SRS.nextTyped(false)">' + (cur + 1 >= queue.length ? _E('看結果 →','Results →') : _E('下一題 →','Next →')) + '</button>';
       return;
     }
     if (!live) { ri.classList.add('ng'); ri.select && ri.select(); }

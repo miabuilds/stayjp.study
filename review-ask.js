@@ -48,7 +48,7 @@
       '#rvaCard small{display:block;font-size:12.5px;color:var(--tx2,#7A7A7A);line-height:1.6;margin-top:3px}',
       '#rvaCard .rva-btns{display:flex;gap:10px;margin-top:14px}',
       '#rvaCard button{flex:1;font:inherit;font-size:14px;font-weight:800;border-radius:12px;padding:11px 12px;cursor:pointer;border:1px solid var(--bd,#E8E5E0);background:var(--bg3,#F3F1ED);color:var(--tx,#2C2C2C)}',
-      '#rvaCard .rva-go{background:var(--ac,#D4654A);border-color:var(--ac,#D4654A);color:#fff}',
+      '#rvaCard .rva-go{background:var(--ac,var(--ac));border-color:var(--ac,var(--ac));color:#fff}',
       // 卡片在最下面 → 左下角額度小牌、右下角小狸鈕/回頂部會壓到按鈕,顯示期間先收起來
       'body.rva-open #quotaBadge,body.rva-open #tutorFab,body.rva-open #tutorHint,body.rva-open .bt,body.rva-open #backToTop{display:none!important}',
     ].join('\n');

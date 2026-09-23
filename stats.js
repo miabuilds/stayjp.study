@@ -75,7 +75,7 @@ const Stats = (() => {
       (!loggedIn ? `<button class="pf-login" onclick="handleAuth&&handleAuth()">${_e('登入同步進度', 'Sign in to sync')}</button>` : '');
     return `<style>
     .pf-hero{display:flex;align-items:center;gap:14px;background:linear-gradient(135deg,var(--bg2),var(--bg3,var(--bg2)));border:1px solid var(--bd);border-radius:18px;padding:16px;margin-bottom:14px}
-    .pf-ava{width:64px;height:64px;border-radius:50%;object-fit:cover;flex-shrink:0;border:2px solid var(--bd);background:var(--soft,rgba(198,85,59,.08))}
+    .pf-ava{width:64px;height:64px;border-radius:50%;object-fit:cover;flex-shrink:0;border:2px solid var(--bd);background:var(--soft,rgba(var(--ac-rgb),.08))}
     .pf-ava-tk{object-fit:contain;padding:6px}
     .pf-name{font-size:17px;font-weight:800;line-height:1.3;display:flex;align-items:center;gap:8px;flex-wrap:wrap;min-width:0}
     .pf-badge{font-size:10.5px;font-weight:800;color:var(--ac);border:1px solid var(--ac);border-radius:999px;padding:1px 8px}

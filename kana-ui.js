@@ -42,7 +42,7 @@ window.Kana = (function () {
       '.kana-cell-on .kana-c{color:#fff!important}',
       '.kana-cell-on .kana-r{color:rgba(255,255,255,.9)!important}',
       '.kana-back{border:none;background:none;cursor:pointer;color:var(--ac,#d4654a);font-size:15px;font-weight:700;padding:6px 10px 6px 4px;border-radius:10px;font-family:inherit}',
-      '.kana-back:active{background:rgba(212,101,74,.1)}',
+      '.kana-back:active{background:rgba(var(--ac-rgb),.1)}',
       '.kana-sec-h{display:flex;align-items:center;gap:10px;font-size:13px;font-weight:800;letter-spacing:.05em;color:var(--tx2,#888);margin:22px 0 10px}',
       '.kana-sec-h::after{content:"";flex:1;height:1px;background:var(--bd,#e8e5e0)}',
       '.kana-sec-h em{font-style:normal;color:var(--ac,#c6553b)}',
