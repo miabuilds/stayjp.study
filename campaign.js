@@ -7,9 +7,13 @@
 //
 // 加新活動:往 LIST 裡加一筆就好,結束時間一到全站自動失效,不必回來拆任何東西。
 (function () {
+  // ⚠️ banner 是否顯示看 `banner: true`。
+  //    2026-09-23 Mia 決定先關掉中秋倒數條:雖然已經擋住「活動碼蓋掉 KOL 碼」,
+  //    但要不要在站上主動推活動、會不會稀釋 KOL 的推廣效果,是行銷決策不是技術問題,
+  //    想清楚機制再開。把 banner 設回 true 就會恢復,其餘邏輯(過期清碼、claim 保護)照常運作。
   var LIST = [
     { code: 'TSUKIMI', end: Date.UTC(2026, 8, 25, 15, 59, 59), link: '/tsukimi.html',
-      zh: '中秋 9 折', en: 'Mid-Autumn 10% off' }
+      zh: '中秋 9 折', en: 'Mid-Autumn 10% off', banner: false }
   ];
   var now = Date.now();
 
@@ -23,10 +27,15 @@
     var m = isCampaignCode(c);
     return !!(m && now > m.end);
   }
-  /** 目前進行中的活動(沒有就 null)*/
+  /** 目前進行中的活動(沒有就 null)。碼的效期判斷用這個。 */
   function active() {
     for (var i = 0; i < LIST.length; i++) if (now <= LIST[i].end) return LIST[i];
     return null;
+  }
+  /** 目前「要顯示倒數條」的活動(沒有就 null)。banner:false 的活動碼照樣有效,只是站上不主動推。 */
+  function banner() {
+    var a = active();
+    return (a && a.banner) ? a : null;
   }
 
   // 一進站就清掉過期的活動碼,免得後面每一頁都帶著它跑
@@ -56,5 +65,5 @@
     } catch (e) { return false; }
   }
 
-  window.Campaign = { list: LIST, active: active, isExpired: isExpired, isCampaignCode: isCampaignCode, claim: claim };
+  window.Campaign = { list: LIST, active: active, isExpired: isExpired, isCampaignCode: isCampaignCode, claim: claim, banner: banner };
 })();

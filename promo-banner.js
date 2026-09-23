@@ -10,7 +10,7 @@
 (function () {
   // 活動內容統一由 campaign.js 提供(它同時負責把過期的碼從 localStorage 清掉)。
   // 拿不到就不顯示 —— 寧可不出現,也不要顯示一個對不上的活動。
-  var C = window.Campaign && window.Campaign.active && window.Campaign.active();
+  var C = window.Campaign && window.Campaign.banner && window.Campaign.banner();
   if (!C) return;
   var END = C.end, CODE = C.code, LINK = C.link;
   var DISMISS_KEY = 'promo_tsukimi_off';
