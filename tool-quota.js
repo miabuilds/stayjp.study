@@ -440,7 +440,9 @@
       authReady = true;
       cachedTrialStart = null; trialWriteDone = false; trialResolved = false;   // 換帳號/登出 → 重置試用狀態,重新依該 user 的 doc 評估
       cachedUserCreatedMs = null; rcSyncTried = false;
-      if (!user) { cachedUserEmail = null; cachedSub = null; cachedFreeAccess = false; subLoaded = true; refreshBadge(); rerenderTools(); return; }
+      if (!user) { cachedUserEmail = null; cachedSub = null; cachedFreeAccess = false; subLoaded = true;
+        try { localStorage.setItem('premium_hint', '0'); } catch (e) {}
+        refreshBadge(); rerenderTools(); return; }
       cachedUserEmail = user.email || null;
       // 註冊時間(判斷免費制世代:packStartMs 之後註冊 → 總次數包;之前 → 原每日制)
       try {
@@ -492,6 +494,9 @@
           }
         }
         subLoaded = true;
+        // 把「是不是已訂購」快取起來,讓沒載 firebase 的頁面(首頁/方案頁)也判斷得出來。
+        // 只認真正的訂閱(active/trialing/cancelled 未到期);網頁 3 天免費試用不算「已訂購」。
+        try { localStorage.setItem('premium_hint', isPremium() ? '1' : '0'); } catch (e) {}
         refreshBadge();
         applyGating();
         rerenderTools();   // 訂閱狀態載完 → 重繪,工具按鈕的 <i data-ic=lock></i> 才會在進頁面當下就正確(免換頁觸發)
