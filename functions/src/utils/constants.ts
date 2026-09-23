@@ -15,19 +15,27 @@ import { defineSecret } from "firebase-functions/params";
 //   firebase functions:secrets:set ECPAY_HASH_IV       # 正式 HashIV
 //   firebase functions:secrets:set ECPAY_PRODUCTION    # 輸入 true
 //   firebase deploy --only functions
+// ECPAY_PRODUCTION 決定「打正式還是測試主機」,金流跟發票都要看它 → 抽出來共用,
+// 同一個名字不能 defineSecret 兩次。
+const ECPAY_PRODUCTION_SECRET = defineSecret("ECPAY_PRODUCTION");
+
 export const ECPAY_SECRETS = [
   defineSecret("ECPAY_MERCHANT_ID"),
   defineSecret("ECPAY_HASH_KEY"),
   defineSecret("ECPAY_HASH_IV"),
-  defineSecret("ECPAY_PRODUCTION"),
+  ECPAY_PRODUCTION_SECRET,
 ];
 
 // 電子發票金鑰。⚠️ 與金流「完全不同」的一組,不可共用 ECPAY_HASH_KEY
 //   firebase functions:secrets:set ECPAY_INV_MERCHANT_ID / ECPAY_INV_HASH_KEY / ECPAY_INV_HASH_IV
+// ⚠️ 一定要連 ECPAY_PRODUCTION 一起注入。2026-09-23 踩到:字軌 cron 只帶了三個發票金鑰,
+//    ECPAY_PRODUCTION 沒注入 → production=false → 拿「正式商店代號」去打「測試主機」
+//    → TransCode=115「功能尚未開通」。更危險的是對帳 cron 若補開,會在測試主機「成功」開出假發票。
 export const INVOICE_SECRET_NAMES = [
   defineSecret("ECPAY_INV_MERCHANT_ID"),
   defineSecret("ECPAY_INV_HASH_KEY"),
   defineSecret("ECPAY_INV_HASH_IV"),
+  ECPAY_PRODUCTION_SECRET,
 ];
 
 export const EARLY_BIRD_LIMIT = 100;

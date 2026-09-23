@@ -298,6 +298,7 @@ export interface TransactionDoc {
   source: Source;
   plan: PlanKey | "n/a";
   amount_twd: number;          // 正數 = 收入,負數 = 退費(綠界=實收 TWD;Apple/Google=台幣牌價,僅供參考)
+  invoice_key?: string;        // 發票冪等鍵(invoices/{key});續扣沒 TradeNo 時是 MerchantTradeNo+G+gwsr
   currency?: string;           // 實際結帳幣別(Apple/Google IAP,如 TWD/USD/JPY);綠界一律 TWD
   amount_paid?: number;        // 該幣別的實付金額(外國人買 iOS 時,真金額在這,不是 amount_twd)
   is_sandbox?: boolean;        // Apple/Google 沙盒測試交易(非真實金流)→ 後台對帳要排除

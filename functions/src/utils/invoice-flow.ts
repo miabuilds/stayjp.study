@@ -119,9 +119,22 @@ export async function refundInvoice(a: {
 }): Promise<{ done: boolean; mode: string; msg?: string }> {
   const rel = relNo(a.ecpayTradeNo);
   const db = admin.firestore();
-  const ref = db.doc("invoices/" + rel);
+  let ref = db.doc("invoices/" + rel);
   const snap = await ref.get().catch(() => null);
-  const inv = snap && snap.exists ? snap.data() : null;
+  let inv = snap && snap.exists ? snap.data() : null;
+
+  // 退續扣那一期時,refund.ts 手上是綠界 ExecLog 的 TradeNo,但那一期開票時的鍵是 MerchantTradeNo+G+gwsr
+  // (PeriodReturnURL 沒給 TradeNo)→ 直接查會落空。退到:這個人「最近一張還沒沖過、金額 = 這次實付」的發票。
+  // 條件夠嚴(uid + issued + 金額吻合),不會沖到別張。
+  if (!inv) {
+    const cands = await db.collection("invoices").where("uid", "==", a.uid).limit(30).get().catch(() => null);
+    type InvDoc = { id: string; status?: string; amount_twd?: number; issued_at?: number; invoice_no?: string; invoice_date?: string };
+    const hit = (cands?.docs || [])
+      .map((d): InvDoc => ({ id: d.id, ...(d.data() as Omit<InvDoc, "id">) }))
+      .filter((d) => d.status === "issued" && Math.round(Number(d.amount_twd)) === Math.round(a.paidTwd))
+      .sort((x, y) => Number(y.issued_at || 0) - Number(x.issued_at || 0))[0];
+    if (hit) { ref = db.doc("invoices/" + hit.id); inv = hit; }
+  }
 
   if (!inv || inv.status !== "issued" || !inv.invoice_no) {
     // 沒開過發票就沒得作廢。留單子給客服處理,不要讓退款失敗。

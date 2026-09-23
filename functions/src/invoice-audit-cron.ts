@@ -62,7 +62,8 @@ export const invoiceAuditCron = onSchedule(
       if (t.type !== "subscribe" && t.type !== "renew") continue;
       paidCount++;
 
-      const key = String(t.external_id || "").replace(/[^A-Za-z0-9]/g, "").slice(0, 50);
+      // 新交易有 invoice_key(續扣用 gwsr 組的);舊交易退回 external_id
+      const key = String(t.invoice_key || t.external_id || "").replace(/[^A-Za-z0-9]/g, "").slice(0, 50);
       if (!key) { missing.push({ txn: d.id, uid: t.uid, reason: "交易沒有 external_id,無法補開" }); continue; }
       const inv = (await db.doc("invoices/" + key).get()).data();
       const st = String(inv?.status || "");

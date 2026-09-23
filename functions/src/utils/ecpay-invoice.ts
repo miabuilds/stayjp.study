@@ -18,9 +18,16 @@ export function invoiceConfig(): InvoiceEnv {
   const merchantId = process.env.ECPAY_INV_MERCHANT_ID || "";
   const hashKey = process.env.ECPAY_INV_HASH_KEY || "";
   const hashIV = process.env.ECPAY_INV_HASH_IV || "";
-  // fail-closed:正式環境缺發票金鑰就丟錯,絕不用公開測試金鑰去開真發票
+  // fail-closed 兩個方向都擋:
+  //   正式環境缺發票金鑰 → 丟錯,絕不用公開測試金鑰去開真發票
+  //   有正式發票金鑰卻不是 production → 丟錯,絕不拿真商店代號去打測試主機
+  //   (第二種就是 ECPAY_PRODUCTION 沒注入時會發生的事;測試主機回 TransCode=115,
+  //    但若哪天測試主機認得這個代號,就會「成功」開出一堆假發票還記成 issued)
   if (production && (!merchantId || !hashKey || !hashIV)) {
     throw new Error("ECPay 發票金鑰未設定,拒絕以測試金鑰開立發票");
+  }
+  if (!production && merchantId && merchantId !== "2000132") {
+    throw new Error("設了正式發票金鑰但 ECPAY_PRODUCTION 不是 true:secrets 清單漏了 ECPAY_PRODUCTION?");
   }
   return {
     merchantId: merchantId || "2000132",

@@ -59,6 +59,16 @@ export const ecpayCallback = functions.onRequest(
 
       const merchantTradeNo = body.MerchantTradeNo;
       const tradeNo         = body.TradeNo;
+      // 發票的冪等鍵。⚠️ 定期定額「第二期起」走 PeriodReturnURL,那個 payload 沒有 TradeNo,
+      // 只有 gwsr(授權單號,每期不同)。實際帳本驗過:3/4 筆續扣的 external_id 都退成了
+      // MerchantTradeNo(每期一樣)→ 若拿它當鍵,第二期起全部撞鎖、一張都不開。
+      // 優先序:TradeNo(首購/一次性)→ MerchantTradeNo+G+gwsr(續扣)→ MerchantTradeNo+T+第幾次(最後保底)
+      const gwsr            = String(body.gwsr || body.Gwsr || "");
+      const nthCharge       = String(body.TotalSuccessTimes || body.ExecTimes || "");
+      const invoiceKey      = tradeNo ? String(tradeNo)
+        : gwsr ? `${merchantTradeNo}G${gwsr}`
+        : nthCharge ? `${merchantTradeNo}T${nthCharge}`
+        : String(merchantTradeNo);
       // 實收金額：一次性結帳回呼帶 TradeAmt；定期定額「續扣」回呼不帶 TradeAmt，
       // 而是用 Amount / PeriodAmount 帶當期實扣金額。早期綠界月費 149 的定期定額用戶，
       // 每期仍實扣 149（授權金額鎖定），若只讀 TradeAmt 會 fallback 到現行牌價 150，
@@ -213,6 +223,7 @@ export const ecpayCallback = functions.onRequest(
           note: rtnMsg,
         };
         if (body.InvoiceNo) txn.invoice_no = body.InvoiceNo;
+        txn.invoice_key = invoiceKey;          // 對帳 cron 靠這個對回 invoices/{key}
         await writeTransaction(txn);
 
         // 開立電子發票(best-effort:人已經付錢了,發票開不出來不能讓 callback 失敗
@@ -221,8 +232,7 @@ export const ecpayCallback = functions.onRequest(
         await issueForPayment({
           uid,
           email: await resolveEmail(uid),
-          // ⚠️ 用綠界 TradeNo(每期唯一),不是 MerchantTradeNo(定期定額每期都一樣)
-          ecpayTradeNo: tradeNo || merchantTradeNo,
+          ecpayTradeNo: invoiceKey,
           itemName: `StayJP ${PLANS[plan]?.display_name || plan}`,
           amountTwd: amount,
         }).catch((e: unknown) => console.error("開立發票略過:", e));
