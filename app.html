@@ -1743,8 +1743,9 @@ html[data-fs="xlarge"] .quiz-box{zoom:1.28;max-height:calc(85vh/1.28)}
 try {
   var _rm = (location.search || '').match(/[?&]ref=([A-Za-z0-9_-]{1,32})/);
   // 過期的活動碼不要收(campaign.js 已在前面清過 localStorage,這裡擋的是網址新帶進來的舊連結)
+  // 走 Campaign.claim:擋過期碼,而且活動碼不會蓋掉已存在的 KOL / 個人碼(保護分潤)
   var _rc = _rm ? _rm[1].toUpperCase() : '';
-  if (_rc && !(window.Campaign && Campaign.isExpired(_rc))) localStorage.setItem('stayjp_ref', _rc);
+  if (_rc) { if (window.Campaign) Campaign.claim(_rc); else localStorage.setItem('stayjp_ref', _rc); }
 } catch (e) {}
 </script>
 <link rel="stylesheet" href="tactile.css">

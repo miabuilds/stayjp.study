@@ -35,5 +35,26 @@
     if (saved && isExpired(saved)) localStorage.removeItem('stayjp_ref');
   } catch (e) {}
 
-  window.Campaign = { list: LIST, active: active, isExpired: isExpired, isCampaignCode: isCampaignCode };
+  /**
+   * 收下一個碼(寫進 localStorage)。回傳有沒有真的寫進去。
+   *
+   * ⚠️ 活動碼「絕不」蓋掉已經存在的碼 —— 這是保護 KOL 的分潤:
+   *    有人從探長的貼文點進來(存了他的碼),又看到站上的中秋活動去點一下,
+   *    如果讓 TSUKIMI 覆蓋過去,使用者折扣一模一樣(都是年費現折 200),
+   *    但探長的 10% 分潤就這樣沒了,而且沒有任何人會發現。
+   *    活動碼只填「空位」;KOL 碼與個人碼照舊可以互相覆蓋(使用者自己選最後點的那個)。
+   */
+  function claim(code) {
+    code = String(code || '').toUpperCase();
+    if (!code || isExpired(code)) return false;
+    try {
+      var cur = localStorage.getItem('stayjp_ref');
+      // 想寫入的是活動碼,而位子上已經有別的碼(且不是過期活動碼)→ 讓位
+      if (isCampaignCode(code) && cur && cur !== code && !isExpired(cur)) return false;
+      localStorage.setItem('stayjp_ref', code);
+      return true;
+    } catch (e) { return false; }
+  }
+
+  window.Campaign = { list: LIST, active: active, isExpired: isExpired, isCampaignCode: isCampaignCode, claim: claim };
 })();

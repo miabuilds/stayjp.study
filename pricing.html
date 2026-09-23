@@ -602,10 +602,17 @@ try {
   const _m = (location.search || '').match(/[?&]ref=([A-Za-z0-9_-]{1,32})/);
   const _r = (_m ? _m[1].toUpperCase() : '') || localStorage.getItem('stayjp_ref');
   // 過期的活動碼一律當它不存在(連從網址帶進來的也是)
-  if (_r && !(window.Campaign && Campaign.isExpired(_r))) {
+  if (_r && window.Campaign) {
+    if (Campaign.isExpired(_r)) { try { localStorage.removeItem('stayjp_ref'); } catch (e) {} }
+    else {
+      Campaign.claim(_r);   // 活動碼不會蓋掉已存在的 KOL / 個人碼
+      const _c = localStorage.getItem('stayjp_ref');
+      const _i = document.getElementById('refInput'); if (_i && !_i.value && _c) _i.value = _c;
+    }
+  } else if (_r) {
     try { localStorage.setItem('stayjp_ref', _r); } catch (e) {}
     const _i = document.getElementById('refInput'); if (_i && !_i.value) _i.value = _r;
-  } else if (_r) { try { localStorage.removeItem('stayjp_ref'); } catch (e) {} }
+  }
 } catch (e) {}
 
 // Cloud Function endpoints(stayjp.study 走 GitHub Pages,不能用 /api/* rewrite)
