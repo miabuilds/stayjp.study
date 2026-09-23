@@ -262,7 +262,7 @@ const SRS = (() => {
       (right
         ? '<button class="qstart" style="margin-top:10px" onclick="SRS.nextTyped(true)">' + (cur + 1 >= queue.length ? _E('看結果 →','Results →') : _E('下一題 →','Next →')) + '</button>'
         : '<div style="margin-top:10px;font-size:13px;font-weight:700;color:var(--ac)"><span id="srsRetypeTip">' + _E('照著打一次 ✍️','Type it once ✍️') + '</span> <span id="srsRetypeProg" style="color:var(--tx2);font-weight:600">0 / ' + RETYPE_NEED + '</span></div>' +
-          '<input id="srsRetypeIn" class="srs-type-in" lang="ja" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="done" placeholder="' + E(item.w) + '" onkeydown="if(event.key===\'Enter\'&&!event.isComposing&&event.keyCode!==229){event.preventDefault();SRS.checkRetype();}" oncompositionstart="this.dataset.c=1" oncompositionend="this.dataset.c=\'\';SRS.checkRetype(true)" oninput="SRS.checkRetype(true)">' +
+          '<input id="srsRetypeIn" class="srs-type-in" lang="ja" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="done" placeholder="' + E(item.w) + '" onkeydown="if(event.key===\'Enter\'&&!event.isComposing&&event.keyCode!==229){event.preventDefault();SRS.checkRetype();}" oncompositionstart="this.dataset.c=1" oncompositionend="this.dataset.c=\'\'">' +
           '<div style="display:flex;gap:8px;margin-top:8px"><button class="qstart" style="margin:0;width:auto;flex:1 1 0" onclick="SRS.checkRetype()">' + _E('送出','Check') + '</button>' +
           '<button class="qstart" style="margin:0;width:auto;flex:0 0 92px;background:none;color:var(--tx2);border:1px solid var(--bd,#ddd)" onclick="SRS.nextTyped(false)">' + _E('跳過','Skip') + '</button></div>');
     if (!right) { const ri = document.getElementById('srsRetypeIn'); if (ri) setTimeout(() => { try { ri.focus(); } catch (e) {} }, 80); }
@@ -277,10 +277,12 @@ const SRS = (() => {
   function giveUp() { revealTyped(false, ''); }
   function nextTyped(right) { retypePending = false; rate(!!right); }
   let retypePending = false;
-  // 重打:打對(邊打邊比對,對了就綁綠框 + 自動進下一題;仍算「答錯」進 SRS)。live=true 是 oninput 觸發,打錯不提示。
-  function checkRetype(live) {
+  // 重打:一定要使用者自己按「送出」或 Enter 才比對。
+  // ⚠️ 不要 oninput 邊打邊比對、打對就自動跳 —— 打到一半被搶走很怪(Mia 2026-09-23 回饋),
+  //    而且日文 IME 組字過程中會短暫出現正確字,等於還沒打完就被判定送出。
+  function checkRetype() {
     const ri = document.getElementById('srsRetypeIn'); if (!ri || !retypePending) return;
-    if (live && ri.dataset.c) return;   // IME 組字中:等 compositionend 再比
+    if (ri.dataset.c) return;           // IME 還在組字 → 不算數
     const ok = isTypedRight(queue[cur], ri.value);
     if (ok) {
       retypeGot++;
@@ -311,8 +313,7 @@ const SRS = (() => {
       if (btns) btns.innerHTML = '<div style="flex:1;align-self:center;font-weight:800;color:var(--correct-tx,#2E7D57)">✓ ' + _E('打對 ' + RETYPE_NEED + ' 次,記住了!', 'Typed ' + RETYPE_NEED + '× — got it!') + '</div><button class="qstart" style="margin:0;width:auto;flex:0 0 120px" onclick="SRS.nextTyped(false)">' + (cur + 1 >= queue.length ? _E('看結果 →','Results →') : _E('下一題 →','Next →')) + '</button>';
       return;
     }
-    if (!live) { ri.classList.add('ng'); ri.select && ri.select(); }
-    else ri.classList.remove('ng');
+    ri.classList.add('ng'); ri.select && ri.select();
   }
 
   function renderCard() {
