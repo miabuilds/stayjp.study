@@ -173,6 +173,20 @@ export async function issueInvoice(a: IssueArgs): Promise<InvResult<{ InvoiceNo?
   }, env);
 }
 
+/**
+ * 叫綠界寄發票通知信給消費者。
+ * ⚠️ 開立成功綠界「不一定」會自動寄 —— 那靠廠商後台的通知設定,2026-09-23 實測 Mia 自己買一筆沒收到。
+ *    客人拿不到發票會來問、會投訴,所以開立後由我們主動叫一次,不賭後台開關。
+ *    測試環境只驗參數不真寄。
+ */
+export async function notifyInvoice(invoiceNo: string, email: string) {
+  const env = invoiceConfig();
+  return invoicePost("/B2CInvoice/InvoiceNotify", {
+    InvoiceNo: invoiceNo, AllowanceNo: "", NotifyMail: email, Phone: "",
+    Notify: "E", InvoiceTag: "I", Notified: "C",
+  }, env);
+}
+
 /** 作廢發票(同一申報期內才可以)*/
 export async function invalidInvoice(invoiceNo: string, invoiceDate: string, reason: string) {
   const env = invoiceConfig();

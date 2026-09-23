@@ -10,7 +10,7 @@
 //      (沙盒實測 RtnCode=5070450)。
 
 import * as admin from "firebase-admin";
-import { issueInvoice, invalidInvoice, allowanceInvoice, canVoid, invDateTW } from "./ecpay-invoice";
+import { issueInvoice, invalidInvoice, allowanceInvoice, notifyInvoice, canVoid, invDateTW } from "./ecpay-invoice";
 
 /**
  * 交易編號 → 發票用的 RelateNumber(只留英數,綠界不吃特殊符號)。
@@ -92,6 +92,10 @@ export async function issueForPayment(a: {
         invoice_date: String(r.data.InvoiceDate || invDateTW()).slice(0, 10),
         issued_at: Date.now(),
       }, { merge: true });
+      // 主動寄通知信(best-effort,寄不出去不影響「已開立」這個事實,只記下來)
+      const n = await notifyInvoice(String(r.data.InvoiceNo), a.email).catch((e) => ({ ok: false, error: String(e) } as { ok: boolean; rtnMsg?: string; error?: string }));
+      await ref.set({ notified: n.ok, notify_msg: n.rtnMsg || n.error || null }, { merge: true }).catch(() => undefined);
+      if (!n.ok) console.error("發票通知信寄送失敗", r.data.InvoiceNo, n.rtnMsg || n.error);
       return true;
     }
     // 失敗把鎖解開(狀態改 failed),留著讓人工/日後補開,不要吞掉

@@ -14,7 +14,7 @@
 // 認證:同 scripts/pricing-metrics.mjs(firebase login 的 refresh token);金鑰走環境變數。
 const fs=require('fs'),os=require('os'),path=require('path');
 const admin=require('../functions/node_modules/firebase-admin');
-const { issueInvoice } = require('../functions/lib/utils/ecpay-invoice.js');
+const { issueInvoice, notifyInvoice } = require('../functions/lib/utils/ecpay-invoice.js');
 const { aesEncrypt, aesDecrypt } = require('../functions/lib/utils/ecpay-aes.js');
 
 const GO_LIVE = new Date('2026-09-22T13:00:00Z').getTime();   // 9/22 21:00 台北 部署發票功能
@@ -73,7 +73,9 @@ async function remainingWords(){
     if(!email){ console.log(`  ✗ ${t.key} 找不到 email,跳過`); bad++; continue; }
     await ref.set({uid:t.uid,trade_no:t.external_id||null,txn_id:t.id,amount_twd:Number(t.amount_twd),email,status:'issuing',created_at:Date.now(),backfill:true,paid_at:t.at},{merge:true});
     const r=await issueInvoice({relateNumber:t.key,email,amountTwd:Number(t.amount_twd),itemName:`StayJP ${PLAN_NAME[t.plan]||t.plan}`,remark:`補開:原交易日 ${tw(t.at)}`});
-    if(r.ok&&r.data?.InvoiceNo){ await ref.set({status:'issued',invoice_no:r.data.InvoiceNo,invoice_date:String(r.data.InvoiceDate||'').slice(0,10),issued_at:Date.now()},{merge:true}); ok++; console.log(`  ✓ ${tw(t.at)} NT$${t.amount_twd} → ${r.data.InvoiceNo}`); }
+    if(r.ok&&r.data?.InvoiceNo){ await ref.set({status:'issued',invoice_no:r.data.InvoiceNo,invoice_date:String(r.data.InvoiceDate||'').slice(0,10),issued_at:Date.now()},{merge:true});
+      const n=await notifyInvoice(r.data.InvoiceNo,email).catch(e=>({ok:false,error:String(e)})); await ref.set({notified:!!n.ok,notify_msg:n.rtnMsg||n.error||null},{merge:true});
+      ok++; console.log(`  ✓ ${tw(t.at)} NT$${t.amount_twd} → ${r.data.InvoiceNo}${n.ok?' 已寄':' (通知寄送失敗:'+(n.rtnMsg||n.error)+')'}`); }
     else { await ref.set({status:'failed',fail_code:r.rtnCode??null,fail_msg:r.rtnMsg||r.error||null},{merge:true}); bad++; console.log(`  ✗ ${tw(t.at)} NT$${t.amount_twd} 失敗:${r.rtnCode} ${r.rtnMsg||r.error}`); }
   }
   console.log(`\n完成:成功 ${ok} / 失敗 ${bad} / 這批之後還剩 ${todo.length-cap} 筆沒補`);
