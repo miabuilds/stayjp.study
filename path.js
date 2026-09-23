@@ -256,6 +256,13 @@
   }
 
   // ── 全地圖(整頁,不是彈窗:清單很長,彈窗要滑回最上面才關得掉)──
+  /** 只收起闖關地圖(不碰 quiz 層),進關卡前一定要呼叫,否則地圖會蓋住單字卡 */
+  function closeMap() {
+    var m = document.getElementById('pathMask'); if (m) m.remove();
+    var mm = document.getElementById('pathMenu'); if (mm) mm.remove();
+    document.body.classList.remove('pt-open');
+  }
+
   function openMap() {
     ensureCss();
     var lv = level(); autoPlace(lv);
@@ -337,6 +344,11 @@
   let run = null;
   function startUnit(k) {
     const lv = level(), us = units(lv), u = us[k]; if (!u) return;
+    // ⚠️ 從闖關地圖按「開始」時,地圖遮罩(.pt-mask z-index:9200)還蓋在畫面上,
+    //    而單字卡/小測是開在 .quiz-bg(z-index:300)—— 東西有開,只是整個被地圖蓋住,
+    //    使用者看到的就是「按了完全沒反應」(Mia 2026-09-23 從抽籤導過去時回報)。
+    //    要進關卡就先把地圖收起來。
+    closeMap();
     run = { lv, k, u, correct: 0, total: 0, stepsDone: 0 };
     if (u.boss) { ensureJlptQ().then(() => quizStep(BOSS_N)); return; }
     if (!root.SRS || !u.words.length) { grammarStep(); return; }
