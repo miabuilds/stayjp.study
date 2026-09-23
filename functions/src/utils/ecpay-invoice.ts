@@ -174,10 +174,9 @@ export async function issueInvoice(a: IssueArgs): Promise<InvResult<{ InvoiceNo?
 }
 
 /**
- * 叫綠界寄發票通知信給消費者。
- * ⚠️ 開立成功綠界「不一定」會自動寄 —— 那靠廠商後台的通知設定,2026-09-23 實測 Mia 自己買一筆沒收到。
- *    客人拿不到發票會來問、會投訴,所以開立後由我們主動叫一次,不賭後台開關。
- *    測試環境只驗參數不真寄。
+ * 叫綠界補寄一次發票通知信。只給「客人說沒收到」時手動用,開立流程「不要」呼叫。
+ * ⚠️ 2026-09-23 實測:綠界開立成功後「會」自動寄,只是慢幾分鐘;
+ *    我一度以為沒寄而在開立後主動叫,結果 Mia 收到兩封。自動寄是後台設定,目前是開的。
  */
 export async function notifyInvoice(invoiceNo: string, email: string) {
   const env = invoiceConfig();
