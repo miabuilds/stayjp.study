@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
+<script src="campaign.js"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <link rel="canonical" href="https://stayjp.study/app.html">
@@ -1741,7 +1742,9 @@ html[data-fs="xlarge"] .quiz-box{zoom:1.28;max-height:calc(85vh/1.28)}
 // 登入後由 app.html 寫進 users.ref_code、付費時後端發雙方 +7 天。沒這段,分享連結的碼會直接蒸發(審查抓漏)。
 try {
   var _rm = (location.search || '').match(/[?&]ref=([A-Za-z0-9_-]{1,32})/);
-  if (_rm) localStorage.setItem('stayjp_ref', _rm[1].toUpperCase());
+  // 過期的活動碼不要收(campaign.js 已在前面清過 localStorage,這裡擋的是網址新帶進來的舊連結)
+  var _rc = _rm ? _rm[1].toUpperCase() : '';
+  if (_rc && !(window.Campaign && Campaign.isExpired(_rc))) localStorage.setItem('stayjp_ref', _rc);
 } catch (e) {}
 </script>
 <link rel="stylesheet" href="tactile.css">

@@ -8,9 +8,11 @@
 // 版位選底部浮動藥丸而不是頂部橫幅:頂部要推擠版面,app.html 的固定表頭會疊到;
 // 底部只要避開既有的 bottom nav 就不會動到任何現有排版。
 (function () {
-  var END = Date.UTC(2026, 8, 25, 15, 59, 59);   // 2026-09-25 23:59:59 台灣時間(UTC+8)
-  var CODE = 'TSUKIMI';
-  var LINK = '/tsukimi.html';
+  // 活動內容統一由 campaign.js 提供(它同時負責把過期的碼從 localStorage 清掉)。
+  // 拿不到就不顯示 —— 寧可不出現,也不要顯示一個對不上的活動。
+  var C = window.Campaign && window.Campaign.active && window.Campaign.active();
+  if (!C) return;
+  var END = C.end, CODE = C.code, LINK = C.link;
   var DISMISS_KEY = 'promo_tsukimi_off';
   var DISMISS_MS = 6 * 3600 * 1000;              // 關掉只安靜 6 小時,越接近截止越該看得到
 
@@ -69,7 +71,7 @@
     bar = document.createElement('div');
     bar.className = 'promo-bar';
     bar.innerHTML =
-      '<div class="promo-tx"><div><b>' + L('中秋 9 折', 'Mid-Autumn 10% off') + '</b> · ' +
+      '<div class="promo-tx"><div><b>' + L(C.zh, C.en) + '</b> · ' +
         '<span id="promoCd">—</span></div>' +
         '<div class="promo-t2">' + L('折扣碼', 'Code') + ' <span class="promo-code" id="promoCode">' + CODE + '</span> ' +
         L('點一下複製', 'tap to copy') + '</div></div>' +

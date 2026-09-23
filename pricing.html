@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
+<script src="campaign.js"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="canonical" href="https://stayjp.study/pricing.html">
@@ -558,6 +559,17 @@ function clearRefCode() {
 function syncRefCode(data) {
   try {
     const inp = document.getElementById('refInput'), m = document.getElementById('refMsg');
+    // 活動結束後,帳號裡殘留的活動碼要清掉:後端本來就會拒絕過期碼,
+    // 但畫面若還顯示折後價,按下訂閱會被「價格已更新」擋掉,用戶只會覺得壞了。
+    if (data.ref_code && window.Campaign && Campaign.isExpired(data.ref_code)) {
+      try { localStorage.removeItem('stayjp_ref'); } catch (e) {}
+      if (_auth.currentUser) _db.doc('users/' + _auth.currentUser.uid)
+        .set({ ref_code: firebase.firestore.FieldValue.delete() }, { merge: true }).catch(() => {});
+      if (inp) { inp.value = ''; inp.disabled = false; }
+      if (m) { m.style.color = 'var(--tx3)'; m.textContent = '先前的活動碼已到期,已自動移除。'; }
+      setRefActive(false);
+      return;
+    }
     if (data.ref_code) {
       const rewarded = !!data.ref_bonus_at;   // 已發放 → 鎖定;否則可改/可清
       if (inp) { inp.value = data.ref_code; inp.disabled = rewarded; }
@@ -573,6 +585,10 @@ function syncRefCode(data) {
       if (m) { m.style.color = 'var(--tx3)'; m.textContent = '這是你自己的推薦碼,請分享給別人 '; }
       return;
     }
+    if (pending && window.Campaign && Campaign.isExpired(pending)) {
+      try { localStorage.removeItem('stayjp_ref'); } catch (e) {}   // 過期活動碼不寫進帳號
+      return;
+    }
     if (pending && _auth.currentUser) {
       _db.doc('users/' + _auth.currentUser.uid).set({ ref_code: pending, ref_at: Date.now() }, { merge: true }).catch(() => {});
       if (inp && !inp.value) inp.value = pending;
@@ -585,7 +601,11 @@ function syncRefCode(data) {
 try {
   const _m = (location.search || '').match(/[?&]ref=([A-Za-z0-9_-]{1,32})/);
   const _r = (_m ? _m[1].toUpperCase() : '') || localStorage.getItem('stayjp_ref');
-  if (_r) { try { localStorage.setItem('stayjp_ref', _r); } catch (e) {} const _i = document.getElementById('refInput'); if (_i && !_i.value) _i.value = _r; }
+  // 過期的活動碼一律當它不存在(連從網址帶進來的也是)
+  if (_r && !(window.Campaign && Campaign.isExpired(_r))) {
+    try { localStorage.setItem('stayjp_ref', _r); } catch (e) {}
+    const _i = document.getElementById('refInput'); if (_i && !_i.value) _i.value = _r;
+  } else if (_r) { try { localStorage.removeItem('stayjp_ref'); } catch (e) {} }
 } catch (e) {}
 
 // Cloud Function endpoints(stayjp.study 走 GitHub Pages,不能用 /api/* rewrite)
