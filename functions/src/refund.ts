@@ -16,7 +16,7 @@
 import * as functions from "firebase-functions/v2/https";
 import * as admin from "firebase-admin";
 import axios from "axios";
-import { PLANS, REFUND_POLICY, ecpayConfig, ecpayRefundEndpoint, ecpayPeriodQueryEndpoint, ecpayPeriodActionEndpoint, ECPAY_SECRETS, INVOICE_SECRET_NAMES } from "./utils/constants";
+import { PLANS, REFUND_POLICY, ecpayConfig, ecpayRefundEndpoint, ecpayPeriodQueryEndpoint, ecpayPeriodActionEndpoint, PAYMENT_AND_INVOICE_SECRETS } from "./utils/constants";
 import { refundInvoice } from "./utils/invoice-flow";
 import { checkMacValue } from "./utils/ecpay";
 import {
@@ -90,7 +90,7 @@ async function stopPeriodOrder(
 
 export const refund = functions.onRequest(
   {
-    secrets: [...ECPAY_SECRETS, ...INVOICE_SECRET_NAMES],
+    secrets: PAYMENT_AND_INVOICE_SECRETS,
     cors: true,
     region: "asia-east1",
     invoker: "public",

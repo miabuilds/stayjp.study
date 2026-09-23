@@ -16,7 +16,7 @@
 
 import * as functions from "firebase-functions/v2/https";
 import { issueForPayment, resolveEmail } from "./utils/invoice-flow";
-import { PLANS, PlanKey, ECPAY_SECRETS, INVOICE_SECRET_NAMES } from "./utils/constants";
+import { PLANS, PlanKey, PAYMENT_AND_INVOICE_SECRETS } from "./utils/constants";
 import { verifyCheckMacValue } from "./utils/ecpay";
 import {
   writeTransaction, getSubscription, writeSubscription, patchSubscription, getRefCode,
@@ -27,7 +27,7 @@ import {
 
 export const ecpayCallback = functions.onRequest(
   {
-    secrets: [...ECPAY_SECRETS, ...INVOICE_SECRET_NAMES],
+    secrets: PAYMENT_AND_INVOICE_SECRETS,
     region: "asia-east1",
     invoker: "public",
     maxInstances: 20,         // server-to-server,允許多一點
