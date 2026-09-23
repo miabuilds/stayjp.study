@@ -20,8 +20,26 @@ import { issueInvoice, invalidInvoice, allowanceInvoice, canVoid, invDateTW } fr
  *    只有 TradeNo 每期不同。用錯的話第二期開始會被冪等鎖當成重複而跳過
  *    → 續訂的錢照收、發票漏開,是稅務問題不是小 bug。
  */
+/** issuing 卡超過這麼久就當作上次掛了,允許重試(正常開立 20 秒內會結束)*/
+const STALE_ISSUING_MS = 10 * 60_000;
+
 function relNo(tradeNo: string): string {
   return String(tradeNo).replace(/[^A-Za-z0-9]/g, "").slice(0, 50);
+}
+
+/**
+ * 找這個人的 email(發票要寄去哪)。先 Auth,再退到 users/{uid}.email。
+ * 兩邊都沒有 → 回空字串,呼叫端會跳過開立;對帳那支會把它列成「沒開」讓人看到。
+ */
+export async function resolveEmail(uid: string): Promise<string> {
+  try {
+    const u = await admin.auth().getUser(uid);
+    if (u.email) return u.email;
+  } catch { /* 帳號可能已刪 */ }
+  try {
+    const d = (await admin.firestore().doc("users/" + uid).get()).data();
+    return String(d?.email || "");
+  } catch { return ""; }
 }
 
 /**
@@ -39,14 +57,24 @@ export async function issueForPayment(a: {
   const db = admin.firestore();
   const ref = db.doc("invoices/" + rel);
 
-  // 先用 transaction 搶鎖,搶不到代表別人已經開過(或正在開)→ 直接跳過
+  // 搶鎖。但「文件存在就一律跳過」會出事:
+  //   · 上次開立失敗(綠界暫時掛掉、網路抖一下)→ status=failed,那筆就永遠不會再開
+  //   · 標記 issuing 之後 function 當掉 → 永遠卡在 issuing
+  // 收了錢卻沒發票是稅務問題,所以這兩種狀態要允許再試一次;
+  // 已經開出來的(issued / invalid / allowance)才是真的不能再開。
   const got = await db.runTransaction(async (tx) => {
     const s = await tx.get(ref);
-    if (s.exists) return false;
+    const d = s.data();
+    if (s.exists) {
+      const st = String(d?.status || "");
+      const stale = st === "issuing" && Date.now() - Number(d?.created_at || 0) > STALE_ISSUING_MS;
+      if (st !== "failed" && !stale) return false;      // 已開立或正在開 → 不動
+    }
     tx.set(ref, {
       uid: a.uid, trade_no: a.ecpayTradeNo, amount_twd: a.amountTwd,
       email: a.email, status: "issuing", created_at: Date.now(),
-    });
+      attempts: Number(d?.attempts || 0) + 1,
+    }, { merge: true });
     return true;
   }).catch(() => false);
   if (!got) return false;
@@ -110,30 +138,43 @@ export async function refundInvoice(a: {
   const isFull = Math.round(a.refundTwd) >= Math.round(a.paidTwd);
 
   try {
+    let voidMsg = "";
     if (isFull && canVoid(invoiceDate)) {
       const r = await invalidInvoice(invoiceNo, invoiceDate, (a.reason || "用戶退費").slice(0, 20));
-      await ref.set({
-        status: r.ok ? "invalid" : "issued",
-        invalid_at: r.ok ? Date.now() : null,
-        last_msg: r.rtnMsg || r.error || null,
-      }, { merge: true });
-      if (!r.ok) console.error("作廢發票失敗", invoiceNo, r.rtnCode, r.rtnMsg || r.error);
-      return { done: r.ok, mode: "invalid", msg: r.rtnMsg || r.error };
+      if (r.ok) {
+        await ref.set({ status: "invalid", invalid_at: Date.now(), last_msg: r.rtnMsg || null }, { merge: true });
+        return { done: true, mode: "invalid", msg: r.rtnMsg };
+      }
+      // 我們算的期限跟綠界實際狀態可能有落差(例如已上傳財政部)。
+      // 作廢不成不要就這樣結束 —— 折讓永遠合法,退下去用折讓把帳沖平。
+      voidMsg = r.rtnMsg || r.error || "";
+      console.error("作廢發票失敗,改走折讓", invoiceNo, r.rtnCode, voidMsg);
     }
-    // 部分退 or 已跨期 → 折讓
+    // 部分退 / 已跨期 / 作廢失敗 → 折讓
     const r = await allowanceInvoice({
       invoiceNo, invoiceDate, amountTwd: a.refundTwd,
       email: a.email, itemName: a.itemName, reason: a.reason || "用戶退費",
     });
-    await ref.set({
-      status: r.ok ? "allowance" : "issued",
-      allowance_no: r.data?.IA_Allow_No || null,
-      allowance_twd: r.ok ? Math.round(a.refundTwd) : null,
-      allowance_at: r.ok ? Date.now() : null,
-      last_msg: r.rtnMsg || r.error || null,
-    }, { merge: true });
-    if (!r.ok) console.error("開立折讓失敗", invoiceNo, r.rtnCode, r.rtnMsg || r.error);
-    return { done: r.ok, mode: "allowance", msg: r.rtnMsg || r.error };
+    if (r.ok) {
+      await ref.set({
+        status: "allowance",
+        allowance_no: r.data?.IA_Allow_No || null,
+        allowance_twd: Math.round(a.refundTwd),
+        allowance_at: Date.now(),
+        last_msg: r.rtnMsg || null,
+        ...(voidMsg ? { void_fail_msg: voidMsg } : {}),
+      }, { merge: true });
+      return { done: true, mode: "allowance", msg: r.rtnMsg };
+    }
+    // 作廢跟折讓都不成 → 錢已退、發票沒沖。這種一定要有人看到,不能只留在 log。
+    const msg = `作廢:${voidMsg || "未嘗試"};折讓:${r.rtnMsg || r.error || ""}`;
+    console.error("退款發票處理失敗", invoiceNo, msg);
+    await ref.set({ last_msg: msg }, { merge: true });
+    await db.collection("invoice_todo").add({
+      uid: a.uid, trade_no: a.ecpayTradeNo, invoice_no: invoiceNo,
+      refund_twd: a.refundTwd, note: "退款成功但發票沖不掉:" + msg, created_at: Date.now(),
+    }).catch(() => undefined);
+    return { done: false, mode: "failed", msg };
   } catch (e) {
     console.error("退款發票處理例外", invoiceNo, e);
     await db.collection("invoice_todo").add({

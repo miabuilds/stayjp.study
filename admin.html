@@ -1458,12 +1458,13 @@ async function loadInvoiceAudit() {
     if (!d.exists) { box.innerHTML = '<span style="color:var(--tx3)">發票對帳尚未執行(每天早上 10:20 跑)。</span>'; return; }
     const a = d.data();
     const when = a.checked_at ? new Date(Number(a.checked_at)).toLocaleString('zh-TW', { hour12: false }) : '—';
+    const row = x => `<div style="padding:3px 0">・<code>${x.trade_no || x.txn}</code> · ${x.uid || ''} ${x.amount ? 'NT$' + x.amount : ''} ${x.msg || x.reason || ''}</div>`;
+    const healedNote = a.healed_count ? `<div style="margin-top:4px;color:var(--tx2);font-size:12px">其中 ${a.healed_count} 筆是這次自動補開的:${(a.healed || []).map(row).join('')}</div>` : '';
     if (!a.issue_count) {
       const from = a.audited_from ? new Date(Number(a.audited_from)).toLocaleDateString('zh-TW') : '';
-      box.innerHTML = `<div style="padding:8px 11px;background:rgba(22,163,74,.1);border:1px solid #16A34A;border-radius:8px;color:#16A34A"><i data-ic=check></i> 發票對帳:${a.paid_count} 筆收款全部有發票 <span style="color:var(--tx2);font-weight:400">(對帳範圍 ${from} 起,發票功能上線前的收款不列入)</span> <span style="color:var(--tx3);font-weight:400">(${when})</span></div>`;
+      box.innerHTML = `<div style="padding:8px 11px;background:rgba(22,163,74,.1);border:1px solid #16A34A;border-radius:8px;color:#16A34A"><i data-ic=check></i> 發票對帳:${a.paid_count} 筆收款全部有發票 <span style="color:var(--tx2);font-weight:400">(對帳範圍 ${from} 起,發票功能上線前的收款不列入)</span> <span style="color:var(--tx3);font-weight:400">(${when})</span>${healedNote}</div>`;
     } else {
-      const row = x => `<div style="padding:3px 0">・<code>${x.trade_no || x.txn}</code> · ${x.uid || ''} ${x.amount ? 'NT$' + x.amount : ''} ${x.msg || x.reason || ''}</div>`;
-      box.innerHTML = `<div style="padding:8px 11px;background:rgba(239,68,68,.1);border:1px solid #EF4444;border-radius:8px;color:#EF4444"><b><i data-ic=warning></i> 發票對帳不符:近 ${a.lookback_days} 天收款 ${a.paid_count} 筆,沒開發票 ${a.missing_count} 筆、開失敗 ${a.failed_count} 筆</b> <span style="color:var(--tx3);font-weight:400">(${when})</span>${(a.missing || []).map(row).join('')}${(a.failed || []).map(row).join('')}<div style="margin-top:4px;color:var(--tx3);font-size:11px">漏開要補開:拿 trade_no 去綠界後台手動開,或叫我寫補開腳本。</div></div>`;
+      box.innerHTML = `<div style="padding:8px 11px;background:rgba(239,68,68,.1);border:1px solid #EF4444;border-radius:8px;color:#EF4444"><b><i data-ic=warning></i> 發票對帳:近 ${a.lookback_days} 天收款 ${a.paid_count} 筆,有 ${a.missing_count} 筆自動補開也失敗</b> <span style="color:var(--tx3);font-weight:400">(${when})</span>${(a.missing || []).map(row).join('')}${healedNote}<div style="margin-top:4px;color:var(--tx3);font-size:11px">程式每天會再試;一直失敗的看 msg 欄(多半是 email 缺失或字軌問題),或拿 trade_no 去綠界後台手動開。</div></div>`;
     }
   } catch (e) { box.innerHTML = '<span style="color:var(--tx3)">對帳讀取失敗:' + e.message + '</span>'; }
 }

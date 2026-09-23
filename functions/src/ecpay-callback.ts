@@ -15,8 +15,7 @@
 //   6. 回應綠界 "1|OK"(成功)或 "0|Error"
 
 import * as functions from "firebase-functions/v2/https";
-import * as admin from "firebase-admin";
-import { issueForPayment } from "./utils/invoice-flow";
+import { issueForPayment, resolveEmail } from "./utils/invoice-flow";
 import { PLANS, PlanKey, ECPAY_SECRETS, INVOICE_SECRET_NAMES } from "./utils/constants";
 import { verifyCheckMacValue } from "./utils/ecpay";
 import {
@@ -221,7 +220,7 @@ export const ecpayCallback = functions.onRequest(
         // 冪等:同一筆交易只開一張,定期定額每期各自一張。
         await issueForPayment({
           uid,
-          email: (await admin.auth().getUser(uid).catch(() => null))?.email || "",
+          email: await resolveEmail(uid),
           // ⚠️ 用綠界 TradeNo(每期唯一),不是 MerchantTradeNo(定期定額每期都一樣)
           ecpayTradeNo: tradeNo || merchantTradeNo,
           itemName: `StayJP ${PLANS[plan]?.display_name || plan}`,
