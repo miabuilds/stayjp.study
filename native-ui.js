@@ -193,6 +193,71 @@
     (document.body || document.documentElement).appendChild(bar);
   }
 
+  // ── App Store 連結在「社群 App 內建瀏覽器」點不動的修正(Mia 2026-09-23 回報)──
+  //
+  // 原因不在我們的連結:只要 UA 是 iOS,Apple 一律把 apps.apple.com 301 轉到
+  // 自訂 scheme itms-appss://(實測:帶不帶國別代碼都一樣)。Safari 能接這個 scheme、
+  // 會跳去 App Store;但 Threads / IG / FB / LINE 的內建瀏覽器(WKWebView)遇到不明 scheme
+  // 是「直接忽略、不報錯」,所以使用者看到的就是點了完全沒反應。
+  // Google Play 那邊回的是一般網頁(HTTP 200),內建瀏覽器渲染得出來,所以 Android 沒事。
+  //
+  // 做兩層:①一律 target=_blank —— 這些內建瀏覽器多半會改用系統瀏覽器開新分頁,那就成了。
+  //        ②仍留在原頁 → 跳一條提示,給「複製連結」讓他自己貼到 Safari。
+  (function fixStoreLinks() {
+    var ua = navigator.userAgent || '';
+    var inApp = /FBAN|FBAV|FB_IAB|Instagram|Barcelona|Threads|Line\/|MicroMessenger/i.test(ua);
+    var isIOS = /iPhone|iPad|iPod/i.test(ua) || (/Macintosh/.test(ua) && (navigator.maxTouchPoints || 0) > 1);
+
+    function wire() {
+      var links = document.querySelectorAll('a[href*="apps.apple.com"], a[href*="play.google.com"]');
+      for (var i = 0; i < links.length; i++) {
+        var a = links[i];
+        if (a.dataset.storeFixed) continue;
+        a.dataset.storeFixed = '1';
+        // 一般瀏覽器不受影響:開新分頁本來就是商店連結該有的行為
+        a.target = '_blank';
+        a.rel = 'noopener';
+        if (!(inApp && isIOS) || a.href.indexOf('apps.apple.com') < 0) continue;
+        a.addEventListener('click', function (e) {
+          var url = e.currentTarget.href;
+          // 點下去之後如果頁面還在(沒被切走),就代表 scheme 被內建瀏覽器吃掉了
+          setTimeout(function () { if (!document.hidden) hint(url); }, 1200);
+        });
+      }
+    }
+
+    function hint(url) {
+      if (document.getElementById('storeHint')) return;
+      var en = false;
+      try { en = localStorage.getItem('ui_lang') === 'en'; } catch (e) {}
+      var box = document.createElement('div');
+      box.id = 'storeHint';
+      box.style.cssText = 'position:fixed;left:50%;transform:translateX(-50%);bottom:18px;z-index:99999;' +
+        'width:min(92vw,420px);box-sizing:border-box;background:#1f2937;color:#fff;border-radius:14px;' +
+        'padding:13px 14px;box-shadow:0 8px 28px rgba(0,0,0,.35);font-size:13px;line-height:1.5';
+      box.innerHTML = '<div style="margin-bottom:9px">' +
+        (en ? 'In-app browsers can\'t open the App Store. Tap ••• and choose "Open in Safari", or copy the link.'
+            : 'App 內建的瀏覽器沒辦法開 App Store。請點右上角 ••• 選「在 Safari 開啟」,或直接複製連結。') +
+        '</div><div style="display:flex;gap:8px">' +
+        '<button id="storeHintCopy" style="flex:1;background:#fff;color:#1f2937;border:0;border-radius:9px;padding:8px;font-weight:700;font-size:13px">' +
+        (en ? 'Copy link' : '複製連結') + '</button>' +
+        '<button id="storeHintX" style="flex:0 0 64px;background:transparent;color:#cbd5e1;border:1px solid #475569;border-radius:9px;padding:8px;font-size:13px">' +
+        (en ? 'Close' : '關閉') + '</button></div>';
+      (document.body || document.documentElement).appendChild(box);
+      box.querySelector('#storeHintX').onclick = function () { box.remove(); };
+      box.querySelector('#storeHintCopy').onclick = function (ev) {
+        try {
+          navigator.clipboard.writeText(url);
+          ev.currentTarget.textContent = en ? 'Copied!' : '已複製!';
+        } catch (e) {}
+      };
+    }
+
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', wire);
+    else wire();
+    window.addEventListener('load', wire);
+  })();
+
   function tick() {
     var info = nativeInfo();
     if (info) { apply(info); return true; }
