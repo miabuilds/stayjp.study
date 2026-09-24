@@ -13,7 +13,7 @@
   //    想清楚機制再開。把 banner 設回 true 就會恢復,其餘邏輯(過期清碼、claim 保護)照常運作。
   var LIST = [
     { code: 'TSUKIMI', end: Date.UTC(2026, 8, 25, 15, 59, 59), link: '/tsukimi.html',
-      zh: '中秋 9 折', en: 'Mid-Autumn 10% off', banner: true }
+      zh: '中秋 9 折', en: 'Mid-Autumn 10% off', banner: false }
   ];
   var now = Date.now();
 
