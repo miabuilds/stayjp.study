@@ -120,9 +120,22 @@
   }
   root.ensureJlptQ = ensureJlptQ;
   // 固定種子洗牌:同一關每次抽到同一組題(重考才有意義)
+  //
+  // ⚠️ 2026-09-24 使用者回報「答案都是第四個選項」—— 實測 300 次有 299 次正解落在第 4 個。
+  //    原因是整數溢位:舊版算 s * 1103515245,s 可到 2^31,乘完 ≈ 2.4e18,
+  //    遠超過 JS 安全整數 9e15 → 低位被精度吃掉,LCG 退化成幾乎固定的序列,等於沒洗。
+  //    改用 Math.imul 做 32 位元乘法(不會溢位),並取高位元當亂數來源(LCG 低位品質差)。
   function seededPick(arr, n, seed) {
-    const a = arr.slice(); let s = (seed * 2654435761) % 4294967296 || 1;
-    for (let i = a.length - 1; i > 0; i--) { s = (s * 1103515245 + 12345) % 2147483648; const j = s % (i + 1); [a[i], a[j]] = [a[j], a[i]]; }
+    const a = arr.slice();
+    let s = (Math.imul(seed | 0, 2654435761) >>> 0) || 1;
+    var next = function () {
+      s = (Math.imul(s, 1664525) + 1013904223) >>> 0;   // Numerical Recipes 的 LCG,32 位元
+      return s >>> 8;                                   // 取高 24 位:低位週期短,別用
+    };
+    for (var i = a.length - 1; i > 0; i--) {
+      var j = next() % (i + 1);
+      var t = a[i]; a[i] = a[j]; a[j] = t;
+    }
     return a.slice(0, n);
   }
   // ── 小測出題:只考「這一關(含之前)教過的」────────────────
@@ -197,6 +210,16 @@
     const seen = {}; out.forEach(q => { seen[q.q] = 1; });
     genFromWords(lv, own, n - out.length, k + 1).forEach(q => { if (!seen[q.q]) { seen[q.q] = 1; out.push(q); } });
     if (out.length < n) seededPick(pool, n, k + 101).forEach(q => { if (out.length < n && !seen[q.q]) { seen[q.q] = 1; out.push(q); } });
+    // ⚠️ 2026-09-24 使用者回報「小測關卡的問題不斷重複」。
+    //    實測 N5:題庫過濾成「只考教過的內容」後,第 6 關小考只有 4 題可出但要 10 題、
+    //    第 12 關只有 6 題要 10 題 —— 不足的部分原本就只能重複同幾題。
+    //    一般關不會發生,因為它能從「這關剛學的 10 個字」自動生題;
+    //    小考自己沒有單字(words: []),所以補不了 → 這裡讓它改用「教過的所有字」生題。
+    if (out.length < n && t.words.length) {
+      genFromWords(lv, t.words, n - out.length, k + 211).forEach(function (q) {
+        if (out.length < n && !seen[q.q]) { seen[q.q] = 1; out.push(q); }
+      });
+    }
     return out.slice(0, n);
   }
 
