@@ -77,6 +77,24 @@
   function isSkipped(lv, k) { const p = prog()[lv]; return !!(p && p.skip && p.skip[k]); }
 
   // ── 關卡生成(純由等級內容推導,不存內容)──
+  /**
+   * 這一關的代表例句。文法的 eg[0].j 裡用 <em> 標了目標句型 → 換成帶色的 span。
+   * 沒有例句就回空字串,呼叫端自己退回「列單字」。
+   */
+  function egOf(u) {
+    try {
+      var e = u.grammar && u.grammar.eg && u.grammar.eg[0];
+      if (!e || !e.j) return '';
+      // 只放行 <em>(資料自己的標記),其餘一律轉義 —— 內容會進 innerHTML
+      var html = String(e.j).split(/(<\/?em>)/).map(function (seg) {
+        if (seg === '<em>') return '<span class="pt-hl">';
+        if (seg === '</em>') return '</span>';
+        return esc(seg);
+      }).join('');
+      return '<span class="pt-eg1">' + html + '</span>';
+    } catch (err) { return ''; }
+  }
+
   function units(lv) {
     const V = (typeof getVocabData === 'function' ? getVocabData(lv) : []) || [];
     const G = (typeof getGrammarData === 'function' ? (getGrammarData(lv).data || []) : []) || [];
@@ -272,12 +290,25 @@
     var body = '';
     var chapter = 0;
     us.forEach(function (u, k) {
-      if (k % (LESSONS_PER_BOSS + 1) === 0) { chapter++; body += '<div class="pt-ch">' + L('第 ' + chapter + ' 章', 'Chapter ' + chapter) + '</div>'; }
+      if (k % (LESSONS_PER_BOSS + 1) === 0) {
+        chapter++;
+        // 88 關攤成一條會勸退 —— 每章給自己的進度,填滿一章是看得到的目標
+        var chN = 0, chDone = 0;
+        for (var ci = k; ci < us.length && ci < k + LESSONS_PER_BOSS + 1; ci++) { chN++; if (d[ci] != null) chDone++; }
+        var pct = chN ? Math.round(chDone / chN * 100) : 0;
+        body += '<div class="pt-ch">'
+          + '<span>' + L('第 ' + chapter + ' 章', 'Chapter ' + chapter) + '</span>'
+          + '<span class="pt-ch-n">' + chDone + ' / ' + chN + '</span>'
+          + '<span class="pt-ch-bar"><i style="width:' + pct + '%"></i></span>'
+          + '</div>';
+      }
       var st = (d[k] != null) ? 'done' : (k === cur ? 'cur' : 'lock');
+      // 卡片副標:優先給「這關學完你會講的句子」而不是四個單字。
+      // 文法資料本來就有例句(g.eg),原本沒用到 —— 看到整句比看到文法名稱具體得多。
       var sub = isSkipped(lv, k) ? L('已學過', 'Already known')
         : (d[k] != null) ? '★'.repeat(d[k]) + '<span class="dim">' + '★'.repeat(3 - d[k]) + '</span>'
         : u.boss ? L(BOSS_N + ' 題', BOSS_N + ' questions')
-        : esc(u.words.slice(0, 4).map(function (w) { return w.w; }).join('、')) + '…';
+        : (egOf(u) || (esc(u.words.slice(0, 4).map(function (w) { return w.w; }).join('、')) + '…'));
       body += '<div class="pt-rw">'
         + '<button type="button" class="pt-row ' + st + (u.boss ? ' boss' : '') + '" onclick="' + (st === 'lock' ? 'Path.askStartFrom(' + k + ')' : 'Path.startUnit(' + k + ')') + '">'
         + '<span class="pt-node' + (u.boss ? ' boss' : '') + '">' + (st === 'done' ? '<i data-ic=check></i>' : st === 'lock' ? (k + 1) : (u.boss ? '<i data-ic=target></i>' : (k + 1))) + '</span>'
@@ -295,16 +326,45 @@
       + '<div class="pt-chips">' + chips + '</div>'
       + '</div>'
       + '<div class="pt-mapbody">'
+      + nextCard(lv, us, cur)
       + '<div class="pt-map-sub">' + L('每關:10 個單字 → 1 個文法 → 5 題,每 5 關一次小考。<b>點還沒解鎖的關</b>可以直接從那裡開始;右上角 ⋯ 可以清空重刷。', 'Each level: 10 words → 1 grammar → 5 questions; checkpoint every 5. <b>Tap a locked level</b> to start there; ⋯ to reset.') + '</div>'
       + body + '</div>';
     document.body.classList.add('pt-open');
     hydrate();
     // ⚠️ 不能用 scrollIntoView:它會連外層一起捲,把 position:sticky 的頂列推出畫面(實測頂列被切掉)
+    // 有「接下來這關」大卡時就停在最上面 —— 那張卡本來就是為了「進來只有一個動作」而做的,
+    // 再自動捲到清單中間會把它推出畫面(2026-09-24 截圖發現)。
+    // 沒有大卡(全部破關)才沿用舊行為捲到目前關卡。
     try {
-      var body = mask.querySelector('.pt-mapbody'), c = mask.querySelector('.pt-row.cur');
-      if (body && c) body.scrollTop = Math.max(0, c.offsetTop - body.clientHeight / 2);
+      var body = mask.querySelector('.pt-mapbody');
+      if (body && !mask.querySelector('.pt-next')) {
+        var c = mask.querySelector('.pt-row.cur');
+        if (c) body.scrollTop = Math.max(0, c.offsetTop - body.clientHeight / 2);
+      }
     } catch (e) {}
   }
+  /**
+   * 地圖最上面的「接下來這關」大卡。
+   * 88 關攤成一條,使用者要自己找哪個是現在該做的 —— 把它抽出來放頂部配一顆大按鈕,
+   * 進來只有一個動作可做(競品 TOPIK Note 就是這樣,Mia 2026-09-24 指出「想一直做下去」)。
+   */
+  function nextCard(lv, us, cur) {
+    var u = us[cur]; if (!u) return '';        // 全破了就不顯示
+    var chapter = Math.floor(cur / (LESSONS_PER_BOSS + 1)) + 1;
+    var eg = u.boss ? '' : egOf(u);
+    var steps = u.boss ? BOSS_N : (u.words.length + 1 + QUIZ_N);
+    return '<div class="pt-next">'
+      + '<div class="pt-next-hd"><span>' + L('第 ' + chapter + ' 章 · 接下來', 'Chapter ' + chapter + ' · Up next')
+        + '</span><span>' + L('第 ' + (cur + 1) + ' / ' + us.length + ' 關', (cur + 1) + ' / ' + us.length) + '</span></div>'
+      + '<div class="pt-next-t">' + (u.boss ? L('小考', 'Checkpoint') : esc(u.title)) + '</div>'
+      + (eg ? '<div class="pt-next-eg">' + eg + '</div>' : '')
+      + '<div class="pt-next-bar"><i style="width:0%"></i></div>'
+      + '<div class="pt-next-n">0 / ' + steps + '</div>'
+      + '<button type="button" class="pt-next-go" onclick="Path.startUnit(' + cur + ')">'
+        + '<i data-ic=play></i> ' + L('開始這一關', 'Start this level') + '</button>'
+      + '</div>';
+  }
+
   function menu() {
     var lv = level();
     var m = document.getElementById('pathMenu');
@@ -463,7 +523,26 @@
       '.pt-ask-btns{display:flex;gap:8px}.pt-ask-btns button{flex:1;font:inherit;font-size:14px;font-weight:800;border-radius:10px;padding:10px;cursor:pointer;border:1px solid var(--bd);background:var(--bg3);color:var(--tx)}.pt-ask-btns .yes{background:var(--ac);color:#fff;border-color:var(--ac)}',
       '.pt-chips{display:flex;gap:6px;margin:10px 0 8px}.pt-chip{font:inherit;font-weight:800;font-size:12.5px;border:1.5px solid var(--bd);background:var(--bg);color:var(--tx2);border-radius:999px;padding:5px 12px;cursor:pointer}.pt-chip.on{border-color:var(--ac);color:var(--ac);background:var(--soft,rgba(var(--ac-rgb),.08))}',
       '.pt-map-sub{font-size:12px;color:var(--tx2);margin-bottom:8px;line-height:1.5}',
-      '.pt-ch{font-size:11.5px;font-weight:800;color:#fff;background:var(--ac);display:inline-block;border-radius:999px;padding:4px 12px;margin:16px 0 10px}',
+      // 章節標題改成一整列:標籤 + 幾關完成 + 進度條(進度條讓人想填滿,比純數字有效)
+      // 「接下來這關」大卡:進地圖只有一個動作
+      '.pt-next{background:var(--bg2);border:1px solid var(--bd);border-radius:18px;padding:16px 16px 14px;margin:4px 0 6px;box-shadow:0 2px 10px rgba(0,0,0,.04)}',
+      '.pt-next-hd{display:flex;justify-content:space-between;font-size:11.5px;font-weight:700;color:var(--ac);margin-bottom:8px}',
+      '.pt-next-hd span:last-child{color:var(--tx2)}',
+      '.pt-next-t{font-size:19px;font-weight:800;color:var(--tx);line-height:1.4}',
+      '.pt-next-eg{font-size:14px;line-height:1.7;color:var(--tx);margin-top:6px}',
+      '.pt-next-bar{height:6px;border-radius:999px;background:var(--bd,#E8E5E0);overflow:hidden;margin:14px 0 4px}',
+      '.pt-next-bar i{display:block;height:100%;background:var(--ac);border-radius:999px}',
+      '.pt-next-n{font-size:11.5px;color:var(--tx2);text-align:right}',
+      '.pt-next-go{width:100%;margin-top:12px;border:0;border-radius:999px;background:var(--ac);color:#fff;font-size:16px;font-weight:800;padding:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px}',
+      '.pt-next-go i{width:17px;height:17px}',
+      '.pt-ch{display:flex;align-items:center;gap:10px;margin:20px 0 10px}',
+      '.pt-ch>span:first-child{font-size:11.5px;font-weight:800;color:#fff;background:var(--ac);border-radius:999px;padding:4px 12px;flex:none}',
+      '.pt-ch-n{font-size:11.5px;font-weight:700;color:var(--tx2);flex:none}',
+      '.pt-ch-bar{flex:1;height:5px;border-radius:999px;background:var(--bd,#E8E5E0);overflow:hidden}',
+      '.pt-ch-bar i{display:block;height:100%;background:var(--ac);border-radius:999px;transition:width .3s}',
+      // 關卡卡上的例句:目標句型標色,一眼看到「學完會講這句」
+      '.pt-eg1{font-size:12.5px;line-height:1.6}',
+      '.pt-hl{color:var(--ac);font-weight:800}',
       '.pt-mapbody .pt-row{position:relative;width:88%}.pt-mapbody .pt-rw:nth-of-type(4n+1) .pt-row{margin-left:0}.pt-mapbody .pt-rw:nth-of-type(4n+2) .pt-row{margin-left:6%}.pt-mapbody .pt-rw:nth-of-type(4n+3) .pt-row{margin-left:12%}.pt-mapbody .pt-rw:nth-of-type(4n) .pt-row{margin-left:6%}',
       '.pt-mapbody .pt-row::before{content:"";position:absolute;left:29px;top:-9px;width:2px;height:9px;background:var(--bd)}.pt-mapbody .pt-row.boss{width:100%;margin-left:0;background:linear-gradient(135deg,rgba(124,58,237,.08),transparent)}',
       '.pt-quest-sub{font-size:13px;color:var(--tx2);margin:-4px 0 10px}.pt-quests{display:grid;grid-template-columns:minmax(0,1fr);gap:8px;position:relative}',
