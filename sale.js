@@ -29,9 +29,29 @@
     '.sale-anchor{margin-top:4px;font-size:12.5px;color:var(--tx2)}';
   (document.head || document.documentElement).appendChild(css);
 
+  /**
+   * 折扣是不是「真的會套用在這個人身上」。
+   * ⚠️ 不可以無條件顯示特價:實際扣款金額是 resolvedTerms() 依 window.__refActive 算的,
+   *    沒有活動碼的人看到 5,390 卻被扣 5,990 —— 顯示價 ≠ 扣款價,踩消保法「下單前明示金額」。
+   *    所以一律跟著 __refActive 走,它為真才顯示特價。
+   */
+  function discountOn() {
+    try { return !!window.__refActive; } catch (e) { return false; }
+  }
+
+  function unpaint() {
+    var list = document.querySelectorAll('.sale-cd, .sale-anchor');
+    for (var i = 0; i < list.length; i++) list[i].remove();
+    Object.keys(PLANS).forEach(function (k) {
+      var el = document.getElementById(PLANS[k].id);
+      if (el) delete el.dataset.sale;     // 讓 renderRefPricing() 的原價版本留在畫面上
+    });
+  }
+
   function paint() {
     var left = END - Date.now();
     if (left <= 0) return false;
+    if (!discountOn()) { unpaint(); return true; }   // 還沒套用到 → 顯示原價,等套用了再變
     Object.keys(PLANS).forEach(function (k) {
       var p = PLANS[k], el = document.getElementById(p.id);
       if (!el || el.dataset.sale) return;
