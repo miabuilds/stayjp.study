@@ -253,6 +253,19 @@ window.addEventListener('load',function(){ setTimeout(ensureTTS,1000); });
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <script src="i18n.js"></script>
 <script>
+// 英文版詳解(262KB)+整句翻譯(59KB)只有英文介面用得到,中文使用者佔絕大多數,不該白抓 320KB。
+// 判準只有一個:I18n.getLang() —— 不要自己再寫一套語言偵測,兩套規則遲早會走鐘,
+//   結果就是「介面英文、詳解中文」,正是這次要修掉的那個回饋。所以要等 i18n.js 載完才問。
+// 非同步載入不擋畫面:從進頁、挑分類、讀完題目到按送出至少好幾秒,資料早就到了;
+//   萬一真的還沒到,xText() 本來就會退回中文,不會空白。
+(function () {
+  try { if (typeof I18n === 'undefined' || I18n.getLang() !== 'en') return; } catch (e) { return; }
+  ['jlpt-questions-en.js', 'jlpt-q-trans-en.js'].forEach(function (f) {
+    var s = document.createElement('script'); s.src = f; s.async = false; document.head.appendChild(s);
+  });
+})();
+</script>
+<script>
 // ========== JLPT 刷題特區 ==========
 // 題庫在 jlpt-questions.js(window.JLPT_Q):精編靜態題,每題附詳解。
 
@@ -449,18 +462,22 @@ function stemFilled(q, picked, ok){
 // 編號與 q.a 不符時原樣保留(那代表該題資料有誤,不該被蓋掉)。
 function xText(q){
   if(!q || !q.x) return '';
-  // ⚠️ 題庫 893 題的詳解(q.x)目前只有中文,沒有英文版 —— 英文介面的使用者會看到中文解析
-  //    (chowe77 2026-09-21 回報「the answer is in Chinese despite my app being set to English」)。
-  //    翻譯 893 題要另外批次跑,在那之前至少講清楚不是壞掉,不要讓人以為 app 有問題。
-  var note = (typeof I18n !== 'undefined' && I18n.getLang && I18n.getLang() === 'en')
-    ? '<div style="margin-bottom:6px;padding:6px 9px;border-radius:8px;background:var(--bg3);'
-      + 'color:var(--tx2);font-size:12px;line-height:1.5">'
-      + 'Explanations are currently available in Chinese only — English versions are on the way.'
-      + '</div>'
-    : '';
-  return note + q.x.replace(/答案([\u2460-\u2463])(\s*[:\uff1a])?/g, function(m, n, colon){
+  // 詳解原本只有中文,英文介面的人會看到整段中文(chowe77 2026-09-21 回報)。
+  // jlpt-questions-en.js 是 scripts/gen-drill-en.mjs 批次翻出來的英文版,以 id 對照。
+  // 翻譯檔是衍生檔,萬一沒載入或某題漏翻 → 退回中文,不會空白。
+  var en = (typeof I18n !== 'undefined' && I18n.getLang && I18n.getLang() === 'en')
+    && window.JLPT_Q_EN && window.JLPT_Q_EN[q.id];
+  var txt = en || q.x;
+  // 詳解裡的「答案①〜④」指的是資料原序,但選項在畫面上是亂序 → 換成正解文字,才不會對不上。
+  // 編號與 q.a 不符時原樣保留(那代表該題資料有誤,不該被蓋掉)。
+  // 英文版的寫法不只一種:Answer ②、Answer: ③、answer ② 都有 → 冒號前後都容許,大小寫原樣保留。
+  return txt.replace(/(\u7b54\u6848|Answer)([:\uff1a]?\s*)([\u2460-\u2463])(\s*[:\uff1a])?/gi, function(m, word, mid, n, colon){
     if('\u2460\u2461\u2462\u2463'.indexOf(n) !== q.a) return m;
-    return colon ? '\u7b54\u6848:' : '\u7b54\u6848\u300c' + esc(q.o[q.a]) + '\u300d';
+    var isEn = word.toLowerCase() === 'answer';
+    var lead = isEn ? word : '\u7b54\u6848';
+    if(colon) return lead + ':';
+    return isEn ? lead + ' \u201c' + esc(q.o[q.a]) + '\u201d'
+                : lead + '\u300c' + esc(q.o[q.a]) + '\u300d';
   });
 }
 function shuffle(a){ const x=a.slice(); for(let i=x.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [x[i],x[j]]=[x[j],x[i]]; } return x; }
@@ -645,7 +662,10 @@ function answer(el, ok){
   // 詳解(題庫內含 <b> 標記,自行控管內容安全);聴解附上音檔原文
   document.getElementById('xp').classList.toggle('good', ok);   // 答對綠底、答錯橘底(固定橘會讓答對的人以為錯了)
   const _rep = window.stayjpReportHref ? window.stayjpReportHref('刷題 '+(q.id||''), q.id||'', '題目 ID：'+(q.id||'')+'\n題幹：'+((q.q||q.at||'').slice(0,80))+'\n正解：'+esc(q.o[q.a]||'')) : '';
-  const _tr = (window.JLPT_Q_TRANS && JLPT_Q_TRANS[q.id]) ? JLPT_Q_TRANS[q.id] : '';
+  // 整句翻譯:英文介面優先給英文版(jlpt-q-trans-en.js),沒有才退回中文 —— 總比空白好
+  const _trEn = (typeof I18n !== 'undefined' && I18n.getLang && I18n.getLang() === 'en')
+    && window.JLPT_Q_TRANS_EN && JLPT_Q_TRANS_EN[q.id];
+  const _tr = _trEn || ((window.JLPT_Q_TRANS && JLPT_Q_TRANS[q.id]) ? JLPT_Q_TRANS[q.id] : '');
   document.getElementById('xp').innerHTML =
     (q.au ? '<div style="margin-bottom:8px;padding-bottom:8px;border-bottom:1px dashed var(--bd)"><b>スクリプト:</b>'+esc(q.au)+'</div>' : '') + xText(q)
     + (_tr ? '<div style="margin-top:10px;padding-top:9px;border-top:1px dashed var(--bd)"><button type="button" onclick="var d=this.nextElementSibling;d.hidden=!d.hidden;this.textContent=d.hidden?'+"'"+'▸ '+enOr('顯示整句翻譯','Show translation')+"'"+':'+"'"+'▾ '+enOr('整句翻譯','Translation')+"'"+'" style="background:none;border:0;color:var(--ac);font:inherit;font-size:13px;font-weight:700;cursor:pointer;padding:0">▸ '+enOr('顯示整句翻譯','Show translation')+'</button><div hidden style="color:var(--tx2);font-size:13.5px;line-height:1.75;margin-top:6px">'+esc(_tr)+'</div></div>' : '')

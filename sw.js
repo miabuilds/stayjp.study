@@ -36,6 +36,8 @@ const ASSETS = [
   './jlpt-drill.html',
   './jlpt-questions.js',
   './jlpt-q-trans.js',
+  './jlpt-questions-en.js',
+  './jlpt-q-trans-en.js',
   './jlpt-questions-gen.js',
   './contact.html',
   // vocab-n*.js / grammar-n*.js / confusables.js 移除：資料已搬 Firestore content/master，
@@ -205,7 +207,7 @@ self.addEventListener('fetch', (e) => {
   // 之前一律 network-first + cache:'reload',刷題頁一開就重抓 ~1MB(gz)的題庫+語音索引+Firebase SDK,登入/切類別都拖慢。
   const isVersionedData = url.origin !== self.location.origin
     ? /^https:\/\/(www\.gstatic\.com\/firebasejs\/|cdn\.jsdelivr\.net\/npm\/[^/]+@\d)/.test(url.href)
-    : /\/(?:audio\/tts(?:-v)?\/manifest|jlpt-questions(?:-gen)?|jlpt-q-trans|pitch-accent|articles|article-tokens|article-timings|article-dict|vocab-themes|grammar-detail|grammar-kanji-readings|reading-listening-en|vocab-n\d|grammar-n\d|ui-map|i18n)\.js$/.test(url.pathname);
+    : /\/(?:audio\/tts(?:-v)?\/manifest|jlpt-questions(?:-gen|-en)?|jlpt-q-trans(?:-en)?|pitch-accent|articles|article-tokens|article-timings|article-dict|vocab-themes|grammar-detail|grammar-kanji-readings|reading-listening-en|vocab-n\d|grammar-n\d|ui-map|i18n)\.js$/.test(url.pathname);
   if (isVersionedData && !url.search) {
     e.respondWith(
       caches.open(PRECACHE).then((cache) => cache.match(e.request).then((hit) => hit || fetch(e.request).then((response) => {
