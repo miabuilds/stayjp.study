@@ -449,7 +449,16 @@ function stemFilled(q, picked, ok){
 // 編號與 q.a 不符時原樣保留(那代表該題資料有誤,不該被蓋掉)。
 function xText(q){
   if(!q || !q.x) return '';
-  return q.x.replace(/答案([\u2460-\u2463])(\s*[:\uff1a])?/g, function(m, n, colon){
+  // ⚠️ 題庫 893 題的詳解(q.x)目前只有中文,沒有英文版 —— 英文介面的使用者會看到中文解析
+  //    (chowe77 2026-09-21 回報「the answer is in Chinese despite my app being set to English」)。
+  //    翻譯 893 題要另外批次跑,在那之前至少講清楚不是壞掉,不要讓人以為 app 有問題。
+  var note = (typeof I18n !== 'undefined' && I18n.getLang && I18n.getLang() === 'en')
+    ? '<div style="margin-bottom:6px;padding:6px 9px;border-radius:8px;background:var(--bg3);'
+      + 'color:var(--tx2);font-size:12px;line-height:1.5">'
+      + 'Explanations are currently available in Chinese only — English versions are on the way.'
+      + '</div>'
+    : '';
+  return note + q.x.replace(/答案([\u2460-\u2463])(\s*[:\uff1a])?/g, function(m, n, colon){
     if('\u2460\u2461\u2462\u2463'.indexOf(n) !== q.a) return m;
     return colon ? '\u7b54\u6848:' : '\u7b54\u6848\u300c' + esc(q.o[q.a]) + '\u300d';
   });
