@@ -151,6 +151,20 @@ body{margin:0;background:var(--bg);color:var(--tx);font-family:-apple-system,"Pi
 .gal-cats{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}
 .gal-cats button{border:1px solid var(--bd);background:var(--bg);color:var(--tx2);border-radius:99px;padding:5px 13px;font:inherit;font-size:12.5px;font-weight:700;cursor:pointer}
 .gal-cats button.on{background:var(--ac);border-color:var(--ac);color:#fff}
+.gal-lvs{margin-top:8px;align-items:center}
+.gal-lvs .lv-lb{font-size:12px;font-weight:800;color:var(--tx3);margin-right:2px}
+.gal-lvs button{padding:4px 11px;font-size:12px}
+.gal-c .glv,.rc .glv{position:absolute;top:7px;left:7px;background:rgba(0,0,0,.66);color:#fff;font-size:10.5px;font-weight:800;border-radius:6px;padding:2px 6px;letter-spacing:.02em}
+.gal-empty{grid-column:1/-1;padding:18px 10px;text-align:center;color:var(--tx3);font-size:13px}
+/* 繼續練:橫向捲動的小卡 */
+.rc-row{display:flex;gap:10px;overflow-x:auto;padding:10px 2px 6px;scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch}
+.rc{position:relative;flex:0 0 150px;scroll-snap-align:start;border:1px solid var(--bd);border-radius:14px;overflow:hidden;cursor:pointer;background:var(--bg);text-align:left;font:inherit;color:inherit;padding:0}
+.rc:active{transform:scale(.98)}
+.rc img{width:100%;aspect-ratio:16/9;object-fit:cover;display:block}
+.rc .gt{font-size:12px;font-weight:700;padding:7px 9px 4px;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:38px}
+.rc-p{height:4px;background:var(--soft);margin:0 9px;border-radius:99px;overflow:hidden}
+.rc-p span{display:block;height:100%;background:var(--ac);border-radius:99px}
+.rc-n{font-size:11px;color:var(--tx2);padding:5px 9px 9px}
 .own{margin-top:14px;border-top:1px dashed var(--bd);padding-top:10px}
 .own summary{font-size:13px;color:var(--tx2);cursor:pointer;font-weight:700;list-style:none}
 .own summary::-webkit-details-marker{display:none}
@@ -212,8 +226,10 @@ body{margin:0;background:var(--bg);color:var(--tx);font-family:-apple-system,"Pi
   <div class="card" id="inputCard">
     <button class="btn backpr" id="backPr" onclick="YTS.backToPractice()">← 回到練習(影片還在)</button>
     <div id="todayPick"></div>
+    <div id="recentRow" style="display:none"></div>
     <div class="gal-hd" id="galHd">挑一支影片開始練(全部即點即用):</div>
     <div class="gal-cats" id="galCats"></div>
+    <div class="gal-cats gal-lvs" id="galLvs"></div>
     <div class="gal" id="gal"></div>
     <details class="own" id="ownVid" style="display:none"><!-- 自貼影片先隱藏(用戶:太陽春),流程優化好再放出來 -->
       <summary id="ownSum">用自己的 YouTube 影片練 ▾</summary>
@@ -303,8 +319,10 @@ if(I18n.getLang()==='zh-CN') ensureOpenCC().then(function(){ try{ YTS._retext();
 <script src="vocab-n4.js"></script>
 <script src="ux-extras.js"></script>
 <script>
-// 單字查詢彈窗(ux-extras)的「發音」呼叫全域 speak();本頁用瀏覽器合成音(ja)
-window.speak = function(t){
+// 單字查詢彈窗(ux-extras)的「發音」呼叫全域 speak()。
+// 本頁沒載預錄 manifest(1.2MB,影片頁不值得),所以:登入者走雲端 TTS(App 內由原生播,錄過音也不會被靜音);
+// 沒登入/雲端失敗 → 瀏覽器合成音(ja)。2026-10-02 前這裡只有瀏覽器合成,而彈窗的「發音」鈕根本沒走到這 → 用戶回報無聲。
+function browserSay(t){
   try{
     if(!window.speechSynthesis || !t) return;
     speechSynthesis.cancel();
@@ -313,6 +331,10 @@ window.speak = function(t){
     if(v) u.voice=v;
     speechSynthesis.speak(u);
   }catch(e){}
+}
+window.speak = function(t){
+  if(!t) return;
+  if(window.stayjpCloudSay) stayjpCloudSay(t, ()=>browserSay(t)); else browserSay(t);
 };
 const YTS = (() => {
   const FN = 'https://asia-east1-jpnote-1bdd6.cloudfunctions.net/ytCaptions';
@@ -323,22 +345,34 @@ const YTS = (() => {
   // ⚠️ 只收「人工日文字幕」的影片。YouTube 自動字幕(asr)錯字多、時間軸歪、翻譯也跟著錯
   //   (2026-10 用戶回饋 すずめ PV 聽寫/填空對不上 → 連同 4 支動漫預告、3 支 ANN 新聞一起下架;
   //    下架前先 node scripts/yt-seed.mjs probe <id> 看 manual:true 才放回來)
+  // lv = 等級標籤(卡片角標 + 等級篩選);沒寫的用 LV_BY_CAT 推
+  const LV_BY_CAT = { '入門':'N5', '故事':'N5', 'Vlog':'N4', '新聞':'N4', '會話':'N4', '歌':'N3' };
   const SAMPLES = [
+    // ── 2026-10-02 Aki 先生(Akiko_Japanese_Conversations)N5 慢速聽力 8 支:用戶推薦「講得很慢、生字只有幾個」。
+    //    全頻道 30 支都是人工日文字幕+開放嵌入(probe 過),要再加就從 scripts/yt-seed.mjs probe 開始 ──
+    { v:'FwW9j6Ot8RU', cat:'入門', lv:'N5', t:'辦了 150 人的派對・海邊(Aki 先生)', tag:'N5 慢速 · 中日字幕' },
+    { v:'TRzexSio3bc', cat:'入門', lv:'N5', t:'美術館・畫畫・跑步(Aki 先生)', tag:'N5 慢速 · 中日字幕' },
+    { v:'yvRNB3Urmic', cat:'入門', lv:'N5', t:'櫻花・美術館(Aki 先生)', tag:'N5 慢速 · 中日字幕' },
+    { v:'o5zuxE8Ilbg', cat:'入門', lv:'N5', t:'搬家!(Aki 先生)', tag:'N5 慢速 · 中日字幕' },
+    { v:'JKSS4-cHcqo', cat:'入門', lv:'N5', t:'嚇一跳的餐廳帳單・新公寓・做菜(Aki 先生)', tag:'N5 慢速 · 中日字幕' },
+    { v:'_v06m6hNmME', cat:'入門', lv:'N5', t:'一起做大阪燒(Aki 先生)', tag:'N5-N4 · 初學者聽力' },
+    { v:'6LMmkx_oNgk', cat:'新聞', lv:'N5', t:'颱風 25 號・食品稅・百歲人瑞 10 萬人(Aki 先生)', tag:'N5 慢速新聞 · 中日字幕' },
+    { v:'XcgzoXpi-ms', cat:'新聞', lv:'N5', t:'自動販賣機・東京電車延誤(Aki 先生)', tag:'N5 慢速新聞 · 中日字幕' },
     // ── 2026-09-21 新增 15 支(全部本機驗過:可嵌入 + 有日文人工字幕,字幕已種進快取)──
-    { v:'6mkb2BEPp6E', cat:'入門', t:'日本語シャドーイング練習', tag:'跟讀專用 · 慢速' },
-    { v:'w5dRQPrG89w', cat:'入門', t:'15 分鐘 やさしい日本語聽力', tag:'N5-N4 · 跟讀' },
+    { v:'6mkb2BEPp6E', cat:'入門', lv:'N5', t:'日本語シャドーイング練習', tag:'跟讀專用 · 慢速' },
+    { v:'w5dRQPrG89w', cat:'入門', lv:'N4', t:'15 分鐘 やさしい日本語聽力', tag:'N5-N4 · 跟讀' },
     { v:'tpVuWVL1A_0', cat:'入門', t:'コンビニのストーリー(聽力故事)', tag:'便利商店 · 故事式聽力' },
     { v:'S5pAKtsiyxw', cat:'故事', t:'鶴の恩返し(日本昔話動畫)', tag:'N5-N4 · 童話 · 中英字幕' },
     { v:'eKAXaiXImBg', cat:'故事', t:'十二支の話(日本昔話動畫)', tag:'N5-N4 · 童話 · 生肖由來' },
     { v:'SNsobT1bN7U', cat:'Vlog', t:'私の週末の過ごし方・家事をする一日', tag:'生活作息 · 中日字幕' },
     { v:'6s5ZK0cx3H0', cat:'Vlog', t:'早起きして朝を満喫した一日', tag:'晨間作息 · 中日字幕' },
-    { v:'Efom783DPGE', cat:'新聞', t:'やさしい日本語ニュース(時事)', tag:'簡易新聞 · 慢速' },
-    { v:'gd1oCg8omis', cat:'新聞', t:'職場を変える「やさしい日本語」', tag:'職場 · 4 分鐘短片' },
+    { v:'Efom783DPGE', cat:'新聞', lv:'N4', t:'やさしい日本語ニュース(時事)', tag:'簡易新聞 · 慢速' },
+    { v:'gd1oCg8omis', cat:'新聞', lv:'N3', t:'職場を変える「やさしい日本語」', tag:'職場 · 4 分鐘短片' },
     { v:'DmQyBo-H6WU', cat:'會話', t:'レストランでの日本語(Onomappu)', tag:'餐廳實戰 · 中日字幕' },
     { v:'pUR91Z621kc', cat:'會話', t:'レストラン・居酒屋・ラーメン屋の会話', tag:'外食場景 · 中日字幕' },
     { v:'jaBDg4dmdKM', cat:'會話', t:'在餐廳用日文點餐・結帳', tag:'台灣學生常錯 · 餐飲用語' },
-    { v:'M8kOn7pAnSM', cat:'會話', t:'特別な尊敬語を 8 つ覚えよう', tag:'敬語 · 3 分鐘' },
-    { v:'gv0avhra6Co', cat:'會話', t:'「お」vs「ご」使い分けの基本', tag:'敬語 · 接頭辭' },
+    { v:'M8kOn7pAnSM', cat:'會話', lv:'N3', t:'特別な尊敬語を 8 つ覚えよう', tag:'敬語 · 3 分鐘' },
+    { v:'gv0avhra6Co', cat:'會話', lv:'N3', t:'「お」vs「ご」使い分けの基本', tag:'敬語 · 接頭辭' },
     { v:'rjmKQ-fjnyQ', cat:'入門', t:'慢速日語會話 #1', tag:'慢速 · 中日字幕' },
     { v:'aRS80OfBJ9o', cat:'入門', t:'慢速日語會話 #2', tag:'慢速 · 中日字幕' },
     { v:'JYEutL_zQQc', cat:'入門', t:'昨日、何をしましたか?(基本動詞)', tag:'簡單對話 · 中日字幕' },
@@ -348,8 +382,8 @@ const YTS = (() => {
     { v:'C3oPjuudXas', cat:'會話', t:'スーパーの日本語(聽力)', tag:'超市場景 · 中日字幕' },
     { v:'kkTLvPACjdE', cat:'會話', t:'100均で買ったもの', tag:'購物開箱 · 人工字幕' },
     { v:'cLjZy0UzLDU', cat:'會話', t:'ネットスーパーで注文してみよう', tag:'網購場景 · 人工字幕' },
-    { v:'mxLRZSkz7CI', cat:'會話', t:'単語を覚える3つの方法(あかね)', tag:'初中級 · 中日字幕' },
-    { v:'iIkEj1rZWa0', cat:'會話', t:'日本語の会話が上手になる3つのポイント', tag:'學習法 · 中日字幕' },
+    { v:'mxLRZSkz7CI', cat:'會話', lv:'N3', t:'単語を覚える3つの方法(あかね)', tag:'初中級 · 中日字幕' },
+    { v:'iIkEj1rZWa0', cat:'會話', lv:'N3', t:'日本語の会話が上手になる3つのポイント', tag:'學習法 · 中日字幕' },
     { v:'3k75rkB61Bk', cat:'故事', t:'桃太郎(日本昔話動畫)', tag:'N5-N4 · 童話 · 中日字幕' },
     { v:'hlm-RqVknfE', cat:'故事', t:'浦島太郎(日本昔話動畫)', tag:'N5-N4 · 童話朗讀' },
     { v:'YoohVpVo7xk', cat:'故事', t:'かぐや姫(日本昔話動畫)', tag:'N5-N4 · 童話朗讀' },
@@ -359,22 +393,25 @@ const YTS = (() => {
     { v:'3kzcFgS9BFU', cat:'故事', t:'かさ地蔵(日本昔話動畫)', tag:'N5-N4 · 童話 · 中日字幕' },
     { v:'-MKEml4D7BI', cat:'故事', t:'金太郎(日本昔話動畫)', tag:'N5-N4 · 童話 · 中日字幕' },
     { v:'TLcyStZMQ-o', cat:'故事', t:'おむすびころりん(日本昔話動畫)', tag:'N5-N4 · 童話 · 中日字幕' },
-    { v:'Bwe7zLSPtXA', cat:'Vlog', t:'日本語散歩:よく眠れていますか?', tag:'N4-N3 · 中日字幕' },
-    { v:'Xw3NjBuXMLY', cat:'Vlog', t:'日本語散歩:東京駅から新橋まで', tag:'N4-N3 · 中日字幕' },
+    { v:'Bwe7zLSPtXA', cat:'Vlog', lv:'N3', t:'日本語散歩:よく眠れていますか?', tag:'N4-N3 · 中日字幕' },
+    { v:'Xw3NjBuXMLY', cat:'Vlog', lv:'N3', t:'日本語散歩:東京駅から新橋まで', tag:'N4-N3 · 中日字幕' },
     { v:'PweksFQGzmI', cat:'Vlog', t:'私の日本での朝の過ごし方', tag:'生活作息 · 中日字幕' },
-    { v:'kIDaXEnkjmk', cat:'Vlog', t:'留学するか悩んでいる人に伝えたいこと', tag:'留學心情 · 中日字幕' },
+    { v:'kIDaXEnkjmk', cat:'Vlog', lv:'N3', t:'留学するか悩んでいる人に伝えたいこと', tag:'留學心情 · 中日字幕' },
     { v:'NyUTYwZe_l4', cat:'歌', t:'YOASOBI「群青」THE FIRST TAKE', tag:'歌詞字幕' },
     { v:'MpYy6wwqxoo', cat:'歌', t:'LiSA「紅蓮華」THE FIRST TAKE', tag:'鬼滅 · 中日字幕' },
     { v:'4Q9DWZLaY2U', cat:'歌', t:'LiSA「炎」THE FIRST TAKE', tag:'鬼滅 · 中日字幕' },
-    { v:'tLQLa6lM3Us', cat:'歌', t:'Aimer「残響散歌」MV', tag:'鬼滅 · 中日字幕' },
-    { v:'GsLsBs4oW30', cat:'歌', t:'TK from 凛として時雨「unravel」', tag:'東京喰種 · 中日字幕' },
+    { v:'tLQLa6lM3Us', cat:'歌', lv:'N2', t:'Aimer「残響散歌」MV', tag:'鬼滅 · 中日字幕' },
+    { v:'GsLsBs4oW30', cat:'歌', lv:'N2', t:'TK from 凛として時雨「unravel」', tag:'東京喰種 · 中日字幕' },
     { v:'iBUV7dxGhno', cat:'歌', t:'宇多田ヒカル「First Love」', tag:'經典 · 中日字幕' },
-    { v:'ujyJRxAKpVE', cat:'歌', t:'Ado「うっせぇわ」THE FIRST TAKE', tag:'話題曲 · 中日字幕' },
+    { v:'ujyJRxAKpVE', cat:'歌', lv:'N2', t:'Ado「うっせぇわ」THE FIRST TAKE', tag:'話題曲 · 中日字幕' },
     { v:'h1L_fLJX7Gk', cat:'歌', t:'松原みき「真夜中のドア〜Stay With Me」', tag:'昭和 City Pop · 歌詞字幕' },
     { v:'yXZd7xVdpJ0', cat:'歌', t:'優里「ドライフラワー」THE FIRST TAKE', tag:'抒情 · 歌詞字幕' },
     { v:'Lz24PqZkF2s', cat:'歌', t:'T.M.Revolution「HOT LIMIT」THE FIRST TAKE', tag:'經典動漫歌 · 歌詞字幕' },
   ];
-  let galCat='全部';
+  let galCat='全部', galLv='全部';   // 分類 / 等級 兩層篩選(照用戶給的參考 App:N5~N1 角標+等級 chips)
+  const LVS=['全部','N5','N4','N3+'];
+  const lvOf=x=>x.lv||LV_BY_CAT[x.cat]||'';
+  const lvHit=x=>galLv==='全部'||(galLv==='N3+'?/N3|N2|N1/.test(lvOf(x)):lvOf(x)===galLv);
   let zhOn = (localStorage.getItem('yts_zh')||'1')==='1';   // 中文翻譯顯示開關
   let hasZh = false;   // 這支影片有沒有中文翻譯(沒有就不顯示開關,免得按了沒反應)
   const SPEEDS = [1, 0.75, 0.5];
@@ -565,6 +602,7 @@ const YTS = (() => {
       const d=await r.json();
       if(d && Array.isArray(d.lines) && d.lines.length){
         setLines(d.lines);
+        pushRecent(v, d.title||'', lines.length);
         const an=document.getElementById('asrNote'); if(an) an.style.display = d.track==='asr' ? 'block' : 'none';   // 自動字幕:先講清楚會有錯字
         document.getElementById('pasteBox').style.display='none';
         return;
@@ -832,6 +870,7 @@ const YTS = (() => {
   // ── 跟讀:瀏覽器 STT / App 原生 STT 雙路(照 speak.html) ──
   const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
   const NATIVE_STT=!!(window.STAYJP_NATIVE&&window.STAYJP_NATIVE.canSpeech&&window.ReactNativeWebView);
+  const IN_APP=!!(window.STAYJP_NATIVE&&window.STAYJP_NATIVE.isNativeApp&&window.ReactNativeWebView);
   function _nPost(o){ try{ window.ReactNativeWebView.postMessage(JSON.stringify(o)); }catch(e){} }
   let rec=null, recording=false, _acc='', _nBase='', _prevRawN='', _settled=false;
   function toggleRec(){ recording?stopRec(true):startRec(); }
@@ -921,7 +960,7 @@ const YTS = (() => {
     const was=recording;
     recording=false;   // 先降旗:onend 才不會自動重啟
     if(NATIVE_STT&&was){ _nPost({type:'SPEECH_STOP'}); }
-    else if(rec&&was){ try{rec.stop();}catch(e){} }
+    else if(rec&&was){ try{rec.stop();}catch(e){} if(IN_APP) _nPost({type:'AUDIO_RESTORE'}); }   // 舊版 App 用 WKWebView 辨識:錄完 session 卡錄音模式 → 之後查字發音沒聲,請原生還原(同 speak.html)
     _recUI(false);
     if(!settle || !was || mode!=='shadow') return;
     const inp=document.getElementById('saidIn');
@@ -1280,13 +1319,46 @@ const YTS = (() => {
   function renderGallery(){
     const g=document.getElementById('gal'); if(!g) return;
     const cats=['全部',...new Set(SAMPLES.map(x=>x.cat))];
-    document.getElementById('galCats').innerHTML=cats.map(c=>`<button class="${c===galCat?'on':''}" onclick="YTS.setCat('${c}')">${esc(c)}</button>`).join('');
-    g.innerHTML=SAMPLES.filter(x=>galCat==='全部'||x.cat===galCat).map(x=>`<button class="gal-c" onclick="YTS.loadSample('${x.v}')">
+    const en=I18n.getLang()==='en';
+    const catTx=c=>c==='全部'?(en?'All':cvt('全部')):(en?({'入門':'Beginner','故事':'Stories','Vlog':'Vlog','新聞':'News','會話':'Conversation','歌':'Songs'}[c]||c):cvt(c));
+    document.getElementById('galCats').innerHTML=cats.map(c=>`<button class="${c===galCat?'on':''}" onclick="YTS.setCat('${c}')">${esc(catTx(c))}</button>`).join('');
+    const lvEl=document.getElementById('galLvs');
+    if(lvEl) lvEl.innerHTML='<span class="lv-lb">'+enOr('程度','Level')+'</span>'+LVS.map(c=>`<button class="${c===galLv?'on':''}" onclick="YTS.setLv('${c}')">${esc(c==='全部'?(en?'All':cvt('全部')):c)}</button>`).join('');
+    const list=SAMPLES.filter(x=>(galCat==='全部'||x.cat===galCat)&&lvHit(x));
+    g.innerHTML=list.map(x=>`<button class="gal-c" onclick="YTS.loadSample('${x.v}')">
       <img src="https://i.ytimg.com/vi/${x.v}/maxresdefault.jpg" alt="" loading="lazy" data-v="${x.v}" data-step="0" onerror="YTS.thumbFallback(this)" onload="YTS.thumbCheck(this)">
+      ${lvOf(x)?'<span class="glv">'+esc(lvOf(x))+'</span>':''}
       <div class="gt">${esc(x.t)}</div><span class="gtag">${esc(x.tag)}</span>
-    </button>`).join('');
+    </button>`).join('') || '<div class="gal-empty">'+enOr('這個組合沒有影片,換個分類或程度試試。','No videos match — try another category or level.')+'</div>';
+    renderRecent();
   }
   function setCat(c){ galCat=c; renderGallery(); }
+  function setLv(c){ galLv=c; renderGallery(); }
+  // ── 最近練過(繼續練):進過的影片存 localStorage yts_recent,回到首頁最上面一排接著練 ──
+  function recentList(){ try{ return JSON.parse(localStorage.getItem('yts_recent'))||[]; }catch(e){ return []; } }
+  function pushRecent(v,title,n){
+    try{
+      const s=SAMPLES.find(x=>x.v===v);
+      const list=recentList().filter(x=>x.v!==v);
+      list.unshift({ v, t:(s&&s.t)||title||v, lv:s?lvOf(s):'', n:n||0, ts:Date.now() });
+      localStorage.setItem('yts_recent',JSON.stringify(list.slice(0,8)));
+    }catch(e){}
+  }
+  function renderRecent(){
+    const el=document.getElementById('recentRow'); if(!el) return;
+    const list=recentList(); if(!list.length){ el.style.display='none'; el.innerHTML=''; return; }
+    el.style.display='block';
+    el.innerHTML='<div class="gal-hd" style="margin-top:14px">'+enOr('繼續練','Continue')+'</div><div class="rc-row">'+list.map(x=>{
+      let dn=0; try{ dn=Object.keys(JSON.parse(localStorage.getItem('yts_done_'+x.v))||{}).length; }catch(e){}
+      const n=x.n||0, pct=n?Math.min(100,Math.round(dn/n*100)):0;
+      return `<button class="rc" onclick="YTS.loadSample('${x.v}')">
+        <img src="https://i.ytimg.com/vi/${x.v}/mqdefault.jpg" alt="" loading="lazy" data-v="${x.v}" data-step="2" onerror="YTS.thumbFallback(this)">
+        ${x.lv?'<span class="glv">'+esc(x.lv)+'</span>':''}
+        <div class="gt">${esc(x.t)}</div>
+        <div class="rc-p"><span style="width:${pct}%"></span></div>
+        <div class="rc-n">${n?(dn+' / '+n+' '+enOr('句','lines')):enOr('接著練','Resume')}</div>
+      </button>`; }).join('')+'</div>';
+  }
   function theater(){
     const c=document.querySelector('.cols'); if(!c) return;
     const on=c.classList.toggle('theater');
@@ -1315,8 +1387,8 @@ const YTS = (() => {
     const en=I18n.getLang()==='en';
     const S=(n,zhT,enT,zhP,enP)=>`<div class="tut-step"><span class="tut-n">${n}</span><div><b>${en?enT:cvt(zhT)}</b><p>${en?enP:cvt(zhP)}</p></div></div>`;
     return S(1,'挑一支影片','Pick a video',
-        '首頁的片庫全部可以直接練——用上面的分類挑(入門、會話、故事、Vlog、動漫、歌、新聞),點縮圖就開始,不用設定任何東西。',
-        'Every video in the gallery is ready to go — filter by category (Beginner, Conversation, Stories, Vlog, Anime, Songs, News) and just tap a thumbnail.')
+        '首頁的片庫全部可以直接練——用上面的分類(入門、會話、故事、Vlog、歌、新聞)和程度(N5／N4／N3+)挑,點縮圖就開始,不用設定任何東西。',
+        'Every video in the gallery is ready to go — filter by category (Beginner, Conversation, Stories, Vlog, Songs, News) or level (N5 / N4 / N3+) and just tap a thumbnail.')
       + S(2,'四種練法,由淺入深','Four ways to practice',
         '<em>跟播</em>=影片一直播,字幕自動跳、當前句像 KTV 一樣刷色;<em>跟讀</em>=開麥跟著唸,唸到的字亮綠給分;<em>聽寫</em>=句子先遮住,聽完打出來對答案;<em>測驗</em>=聽句選句和克漏字,每題都有詳解。',
         '<em>Follow</em>: captions auto-advance with a karaoke highlight. <em>Shadow</em>: speak along and matched words light up with a score. <em>Dictation</em>: the line is hidden until you type it. <em>Quiz</em>: listening and cloze questions, each with an explanation.')
@@ -1345,7 +1417,7 @@ const YTS = (() => {
     if(ta) ta.addEventListener('paste',()=>{ setTimeout(()=>{ if((ta.value||'').trim()) parsePaste(); },80); });   // 貼上即解析
     try{ if(!localStorage.getItem('yts_tut_seen')) tut(true); }catch(e){}
   });
-  return { load, parsePaste, nav, jump, replay, togglePlayPause, cycleSpeed, toggleLoop, setMode, toggleRec, submitSaid, revealAnswer, checkDict, toggleList, toggleZh, tut, loadSample, setCat, backToPractice, openTranscript, swap, theater, startQuiz, qzBegin, qzPlay, qzAnswer, qzNext, jumpPlay, openLearn, learnTab, saveWord, speakWord, thumbFallback, thumbCheck, renderToday, _retext };
+  return { load, parsePaste, nav, jump, replay, togglePlayPause, cycleSpeed, toggleLoop, setMode, toggleRec, submitSaid, revealAnswer, checkDict, toggleList, toggleZh, tut, loadSample, setCat, backToPractice, openTranscript, swap, theater, startQuiz, qzBegin, qzPlay, qzAnswer, qzNext, jumpPlay, openLearn, learnTab, saveWord, speakWord, thumbFallback, thumbCheck, renderToday, setLv, renderRecent, _retext };
 })();
 </script>
 <script src="font-scale.js"></script>

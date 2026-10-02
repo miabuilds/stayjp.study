@@ -274,24 +274,46 @@
     ].join('');
     document.head.appendChild(st);
   }
-  // 雲端發音兜底(預錄缺口):ttsSpeak function 以假名合成;記憶體快取,登出/失敗靜默
+  // 雲端發音兜底(預錄缺口):ttsSpeak function 以假名合成;記憶體快取。
+  // 2026-10-02 用戶回報「YouTube 影片查到的單字不能發音」:這裡以前「沒登入/失敗就靜默」,
+  // 而 yt-shadow 頁沒載預錄 manifest → 每個字都走這條 → 沒登入的人永遠無聲。
+  // 現在:① App 內交給原生播(錄過音後 WKWebView 頁內播放會被 iOS 靜音,跟 AI 聊聊同一條橋)
+  //      ② 沒登入 / 雲端失敗 / 沒聲音 → 呼叫 fallback(各頁的 speak(),有預錄用預錄、沒有用瀏覽器合成),絕不無聲
   var _cloudCache = {};
   var _cloudAu = null;
-  function cloudSay(kana) {
+  function _playB64(b64) {
+    try { if (window.STAYJP_NATIVE && window.STAYJP_NATIVE.canPlayB64 && window.ReactNativeWebView) { window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'PLAY_B64', b64: b64 })); return true; } } catch (e) {}
+    try { _cloudAu && _cloudAu.pause(); } catch (e2) {}
+    _cloudAu = new Audio('data:audio/mp3;base64,' + b64);
+    var p = _cloudAu.play(); if (p && p.catch) p.catch(function () {});
+    return true;
+  }
+  function cloudSay(kana, fallback) {
+    var fb = function () { try { if (typeof fallback === 'function') fallback(); } catch (e) {} };
     try {
-      if (!kana) return;
-      if (_cloudCache[kana]) { try { _cloudAu && _cloudAu.pause(); } catch (e2) {} _cloudAu = new Audio('data:audio/mp3;base64,' + _cloudCache[kana]); _cloudAu.play().catch(function(){}); return; }
+      if (!kana) return fb();
+      if (_cloudCache[kana]) { _playB64(_cloudCache[kana]); return; }
       var user = (typeof firebase !== 'undefined' && firebase.auth) ? firebase.auth().currentUser : null;
-      if (!user) return;
+      if (!user) return fb();
       user.getIdToken().then(function (tk) {
         return fetch('https://asia-east1-jpnote-1bdd6.cloudfunctions.net/ttsSpeak', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + tk }, body: JSON.stringify({ text: kana, voice: 'f' }) });
       }).then(function (r) { return r.json(); }).then(function (d) {
-        if (!d || !d.audio) return;
+        if (!d || !d.audio) return fb();
         _cloudCache[kana] = d.audio;
-        try { _cloudAu && _cloudAu.pause(); } catch (e2) {}
-        _cloudAu = new Audio('data:audio/mp3;base64,' + d.audio);
-        _cloudAu.play().catch(function(){});
-      }).catch(function(){});
+        _playB64(d.audio);
+      }).catch(fb);
+    } catch (e) { fb(); }
+  }
+  window.stayjpCloudSay = cloudSay;   // 給沒載預錄 manifest 的頁(yt-shadow)當 speak() 的主路徑
+  // 最後一層:頁面連 speak() 都沒有(jlpt-drill / speak-chat)→ 瀏覽器合成,總比沒聲音好
+  function _browserSay(t) {
+    try {
+      if (!window.speechSynthesis || !t) return;
+      speechSynthesis.cancel();
+      var u = new SpeechSynthesisUtterance(t); u.lang = 'ja-JP'; u.rate = .95;
+      var v = speechSynthesis.getVoices().filter(function (x) { return /ja|Japanese/i.test(x.lang); })[0];
+      if (v) u.voice = v;
+      speechSynthesis.speak(u);
     } catch (e) {}
   }
   function closePop() { if (_pop) { _pop.remove(); _pop = null; } }
@@ -347,14 +369,15 @@
     pop.style.top = top + 'px';
     pop.querySelector('.jx').addEventListener('click', function (e) { e.stopPropagation(); closePop(); });
     // 🔊 發音:預錄 mp3 依「讀音→詞」順序找鍵(音檔有的以詞為鍵、有的以假名為鍵);
-    // 都沒有 → 登入者用雲端 TTS 以假名讀音即時合成(字音必對),絕不無聲、絕不瀏覽器機器音。
+    // 都沒有 → 登入者用雲端 TTS 以假名讀音即時合成(字音必對);雲端不可用再退回頁面 speak()(寧可機器音也不要無聲)。
     var spk = pop.querySelector('.jact-spk');
     if (spk) spk.addEventListener('click', function (e) {
       e.stopPropagation();
       var T = window.__TTS || {};
       var key = T[data.r] ? data.r : (T[data.w] ? data.w : null);
       if (key) { if (typeof speak === 'function') speak(key); return; }
-      cloudSay(data.r || data.w);
+      var kana = data.r || data.w;
+      cloudSay(kana, function () { if (typeof speak === 'function') speak(kana); else _browserSay(kana); });
     });
     // 🦝 問小狸:帶著這個詞(讀音/詞性/釋義)開助教,直接問用法(回饋:點單字後想看更多用法介紹)
     var ask = pop.querySelector('.jact-ask');
