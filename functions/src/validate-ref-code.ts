@@ -5,6 +5,7 @@
 import * as functions from "firebase-functions/v2/https";
 import * as admin from "firebase-admin";
 import { db } from "./utils/firestore";
+import { isCampaignRefCode } from "./utils/constants";
 
 if (admin.apps.length === 0) admin.initializeApp();
 
@@ -39,7 +40,8 @@ export const validateRefCode = functions.onRequest(
           self = uid === c!.owner_uid;
         } catch { /* token 壞掉不擋,當作非本人 */ }
       }
-      res.json({ valid, kol: valid ? (c!.kol || "") : "", type: valid ? (c!.type || "kol") : "", self });
+      // campaign:活動碼(官方/限期)→ 前端據此判斷有沒有雙十「KOL 搶先」資格,與 createPayment 同一個判斷式
+      res.json({ valid, kol: valid ? (c!.kol || "") : "", type: valid ? (c!.type || "kol") : "", campaign: valid ? isCampaignRefCode(c) : false, self });
     } catch (err) {
       console.error("validateRefCode error:", err);
       // 出錯回 error 旗標 → 前端 fail-open(不擋使用者,但標示暫無法驗證)

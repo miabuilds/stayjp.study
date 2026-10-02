@@ -139,6 +139,49 @@ export const WEB_CODE_DISCOUNT_TWD: Partial<Record<PlanKey, number>> = {
   lifetime: 600,   // 折後 5,390,一次性;App 內碼折要等 1.0.8 雙 SKU(輸碼解鎖 5,390 商品)
 };
 
+// ── 雙十檔期(2026-10,Mia 定案)── 官網限定、不用輸碼、人人有;有效推薦碼再疊折。
+// 時間一到全自動恢復原價,不必回來改任何東西。前端 campaign.js 的 SALE 必須與這裡一字不差
+// (createPayment 會核對 expected_twd,兩邊算出來的價錢不同就擋單)。
+//   檔期:2026-10-08 00:00 ~ 2026-10-11 23:59:59(台灣時間)
+//   KOL 搶先:2026-10-07 20:00 起,帳上有有效 KOL/個人碼(非活動碼)的人先享檔期價
+//   年費 1,990→1,490(定期定額 PeriodAmount=實扣價 → 之後每年續扣都鎖 1,490)、買斷 5,990→3,990;月費不動
+//   檔期內有效推薦碼再折:年費 −150(=1,340)、買斷 −400(=3,590);檔期外照舊 WEB_CODE_DISCOUNT_TWD
+export const SALE = {
+  id: "double10_2026",
+  start: Date.UTC(2026, 9, 7, 16, 0, 0),           // 2026-10-08 00:00 台灣
+  kolEarlyStart: Date.UTC(2026, 9, 7, 12, 0, 0),   // 2026-10-07 20:00 台灣
+  end: Date.UTC(2026, 9, 11, 15, 59, 59),          // 2026-10-11 23:59:59 台灣(含)
+  prices: { yearly: 1490, lifetime: 3990 } as Partial<Record<PlanKey, number>>,
+  refDiscount: { yearly: 150, lifetime: 400 } as Partial<Record<PlanKey, number>>,
+};
+
+/**
+ * ref_codes 文件是不是「活動碼」(官方/限期碼,如 TSUKIMI、STAYJP200)。
+ * 活動碼照樣可以拿推薦碼折價,但「沒有」KOL 搶先資格 —— 搶先是給 KOL/個人碼的粉絲的。
+ */
+export function isCampaignRefCode(c: { type?: unknown; expires_at?: unknown } | undefined | null): boolean {
+  if (!c) return false;
+  return c.type === "official" || c.type === "campaign" || typeof c.expires_at === "number";
+}
+
+/**
+ * 官網(綠界)建單金額的唯一算法。純函式,createPayment 與測試共用。
+ * @param hasValidRefCode 帳上推薦碼有效(存在/active/非停權/非本人/未過期)
+ * @param isCampaignCode  該碼是活動碼(見 isCampaignRefCode)→ 沒有 KOL 搶先資格
+ */
+export function resolveWebPrice(plan: PlanKey, now: number, hasValidRefCode: boolean, isCampaignCode: boolean) {
+  const list = PLANS[plan].price_twd;
+  const salePrice = SALE.prices[plan];
+  const inWindow = now >= SALE.start && now <= SALE.end;
+  const kolEarly = now >= SALE.kolEarlyStart && now < SALE.start && hasValidRefCode && !isCampaignCode;
+  if (salePrice != null && (inWindow || kolEarly)) {
+    const refOff = hasValidRefCode ? (SALE.refDiscount[plan] || 0) : 0;
+    return { twd: salePrice - refOff, list, onSale: true, refOff };
+  }
+  const refOff = hasValidRefCode ? (WEB_CODE_DISCOUNT_TWD[plan] || 0) : 0;
+  return { twd: list - refOff, list, onSale: false, refOff };
+}
+
 // 退費規則(全自動)
 export const REFUND_POLICY = {
   full_refund_days: 7,             // 首次訂閱 7 天內全退

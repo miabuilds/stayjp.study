@@ -10,13 +10,25 @@
 (function () {
   // 活動內容統一由 campaign.js 提供(它同時負責把過期的碼從 localStorage 清掉)。
   // 拿不到就不顯示 —— 寧可不出現,也不要顯示一個對不上的活動。
-  var C = window.Campaign && window.Campaign.banner && window.Campaign.banner();
+  var CP = window.Campaign;
+  var C = CP && CP.banner && CP.banner();
+  // 雙十檔期(2026-10):不用碼、人人有 → 沒有「活動碼倒數條」時,檔期內改掛檔期條。
+  // 只在正式檔期(phase=on)掛;KOL 搶先那 4 小時不掛(那是 KOL 自己推的,站上不搶他的話題)。
+  // pricing.html 自己有檔期卡,不重複掛。
+  var SALE_BAR = false;
+  if (!C && CP && CP.salePhase && CP.salePhase() === 'on' && !/\/pricing(\.html)?$/.test(location.pathname)) {
+    var S = CP.SALE;
+    C = { end: S.end, code: '', link: S.link + '?utm_source=site&utm_campaign=' + S.id,
+      zh: CP.tr(S.zh, S.en, S.cn) };
+    SALE_BAR = true;
+  }
   if (!C) return;
   var END = C.end, CODE = C.code, LINK = C.link;
-  var DISMISS_KEY = 'promo_tsukimi_off';
+  var DISMISS_KEY = SALE_BAR ? 'promo_double10_off' : 'promo_tsukimi_off';
+  var NOW = function () { return (CP && CP.now) ? CP.now() : Date.now(); };
   var DISMISS_MS = 6 * 3600 * 1000;              // 關掉只安靜 6 小時,越接近截止越該看得到
 
-  function ended() { return Date.now() > END; }
+  function ended() { return NOW() > END; }
   function inApp() {
     try {
       if (document.documentElement.classList.contains('stayjp-native')) return true;
@@ -25,7 +37,7 @@
     return false;
   }
   function dismissed() {
-    try { return Date.now() - Number(localStorage.getItem(DISMISS_KEY) || 0) < DISMISS_MS; } catch (e) { return false; }
+    try { return NOW() - Number(localStorage.getItem(DISMISS_KEY) || 0) < DISMISS_MS; } catch (e) { return false; }
   }
   function premium() {
     // 已訂購就不推銷。tool-quota.js 會把狀態寫進 premium_hint,沒載 firebase 的頁面也讀得到。
@@ -70,21 +82,27 @@
   function build() {
     bar = document.createElement('div');
     bar.className = 'promo-bar';
+    var y = SALE_BAR ? CP.price('yearly', false, false) : null, lf = SALE_BAR ? CP.price('lifetime', false, false) : null;
+    var nf = function (n) { return Number(n).toLocaleString('en-US'); };
     bar.innerHTML =
-      '<div class="promo-tx"><div><b>' + L(C.zh, C.en) + '</b> · ' +
+      '<div class="promo-tx"><div><b>' + (SALE_BAR ? C.zh : L(C.zh, C.en)) + '</b> · ' +
         '<span id="promoCd">—</span></div>' +
-        '<div class="promo-t2">' + L('折扣碼', 'Code') + ' <span class="promo-code" id="promoCode">' + CODE + '</span> ' +
-        L('點一下複製', 'tap to copy') + '</div></div>' +
-      '<a class="promo-go" href="' + LINK + '">' + L('看方案', 'View') + '</a>' +
+        (SALE_BAR
+          ? '<div class="promo-t2">' + CP.tr('年費 NT$' + nf(y.twd) + ' 年年鎖・買斷 NT$' + nf(lf.twd) + '・不用輸碼',
+              'Annual NT$' + nf(y.twd) + ' locked yearly · Lifetime NT$' + nf(lf.twd) + ' · no code needed',
+              '年费 NT$' + nf(y.twd) + ' 年年锁・买断 NT$' + nf(lf.twd) + '・不用输码') + '</div></div>'
+          : '<div class="promo-t2">' + L('折扣碼', 'Code') + ' <span class="promo-code" id="promoCode">' + CODE + '</span> ' +
+            L('點一下複製', 'tap to copy') + '</div></div>') +
+      '<a class="promo-go" href="' + LINK + '">' + (SALE_BAR ? CP.tr('看方案', 'See plans', '看方案') : L('看方案', 'View')) + '</a>' +
       '<button class="promo-x" aria-label="' + L('關閉', 'Close') + '">×</button>';
     document.body.appendChild(bar);
 
     bar.querySelector('.promo-x').onclick = function () {
-      try { localStorage.setItem(DISMISS_KEY, String(Date.now())); } catch (e) {}
+      try { localStorage.setItem(DISMISS_KEY, String(NOW())); } catch (e) {}
       if (tick) clearInterval(tick);
       bar.remove();
     };
-    bar.querySelector('#promoCode').onclick = function (e) {
+    if (!SALE_BAR) bar.querySelector('#promoCode').onclick = function (e) {
       var el = e.currentTarget;
       try {
         navigator.clipboard.writeText(CODE);
@@ -96,9 +114,9 @@
 
     var cd = bar.querySelector('#promoCd');
     var upd = function () {
-      var left = END - Date.now();
+      var left = END - NOW();
       if (left <= 0) { clearInterval(tick); bar.remove(); return; }   // 活動一結束自己消失
-      cd.innerHTML = L('倒數 ', 'ends in ') + '<b>' + fmt(left) + '</b>';
+      cd.innerHTML = (SALE_BAR ? CP.tr('倒數 ', 'ends in ', '倒数 ') : L('倒數 ', 'ends in ')) + '<b>' + (SALE_BAR ? CP.fmtLeft(left) : fmt(left)) + '</b>';
     };
     upd();
     tick = setInterval(upd, 1000);

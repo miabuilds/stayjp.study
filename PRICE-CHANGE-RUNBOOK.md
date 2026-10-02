@@ -1,5 +1,36 @@
 # 2026-09 調價日 Runbook
 
+## 雙十檔期 2026-10(分支 `sale-1010`)
+
+**規則**:10/8 00:00 ~ 10/11 23:59:59(台灣)官網人人有、不用碼:年費 1,990→**1,490**(定期定額=之後每年續扣都鎖 1,490)、買斷 5,990→**3,990**,月費不動。
+有效推薦碼再疊折:年費 **1,340**、買斷 **3,590**。KOL 搶先:10/7 20:00 起帳上有 KOL/個人碼(非活動碼:type≠official 且無 expires_at)就先享檔期價。
+單一事實來源:後端 `functions/src/utils/constants.ts` 的 `SALE` + `resolveWebPrice()`;前端 `campaign.js` 的 `Campaign.SALE` + `Campaign.price()`。兩邊數字必須一致 → `node scripts/test-sale-price.cjs` 會逐時間點對答案。
+
+**部署順序(⚠️ 先 Pages、再 functions)** —— 原因同 9/14:createPayment 有 `expected_twd` 護欄,前端顯示價 ≠ 後端算的價就 409 擋單。
+新前端在 10/7 20:00 前算出來的價錢跟舊後端一模一樣,所以「先推 Pages」整段期間都不會擋單;反過來先上後端也沒事(檔期前兩邊同價),
+但**兩者都必須在 10/7 20:00 前上線**,否則 KOL 搶先/檔期開跑時一邊有特價一邊沒有 → 全部 409。建議 10/6 前完成。
+```bash
+cd ~/Documents/GitHub/stay-jp-notes
+(cd functions && npx tsc) && node scripts/test-sale-price.cjs && node scripts/test-product-plan.cjs   # 兩個都要綠
+git checkout main && git merge sale-1010 && git push          # 1. Pages
+curl -s https://stayjp.study/campaign.js | grep -c "double10_2026"   # 應 =1(GitHub Pages 約 10 分鐘快取,沒出來就等)
+curl -s https://stayjp.study/pricing.html | grep -c "saleHero"       # 應 >0
+cd functions && npm run build && firebase deploy --only functions:createPayment,functions:validateRefCode,functions:trialEmailCron,functions:revenuecatWebhook,functions:rcSyncSubscription   # 2. functions
+#   revenuecatWebhook/rcSyncSubscription = App 檔期商品 yearly_sale75 / lifetime_sale65 的 product→plan 對照(utils/product-plan.ts),App 開賣前必須先上
+curl -s "https://asia-east1-jpnote-1bdd6.cloudfunctions.net/validateRefCode?code=STAYJP200"   # 回傳要多一個 "campaign":true 欄位 = 新版已上線
+```
+**本機預覽任一時刻**:`python3 -m http.server` → `http://localhost:8000/pricing.html?sale_now=<ms>`(只在 localhost 生效、只改畫面;正式站帶這參數沒用)。
+例:搶先 `1791378000000`、檔期中 `1791518400000`、結束後 `1791738000000`。
+
+**檔期當天驗收**:無痕開 pricing → 頂部檔期卡＋倒數、年費 ~~1,990~~ 1,490「年年鎖」、買斷 ~~5,990~~ 3,990;訂年費到消保視窗應寫「每期 NT$1,490(雙十活動價)」→ 綠界 1,490(到輸卡頁退出)。
+有 KOL 碼帳號 → 1,340 / 3,590。首頁方案卡與底部檔期條(App 內、已付費、pricing 頁不顯示)也要是檔期價。
+
+**10/11 23:59:59 之後自動發生的事(零手動)**:後端 `resolveWebPrice` 回原價(1,990 / 5,990、碼折 200 / 600);前端 `Campaign.price` 同步回原價,
+開著的 pricing 頁在那一秒由 sale.js 重畫回原價(不會拿舊畫面送出錯的 expected_twd),檔期卡/底部條/首頁卡/帳號頁說明全部消失、HTML 原文回來;
+試用到期信自動改回原文案。已在檔期內訂閱的年費戶:綠界 PeriodAmount 已鎖 1,490(或 1,340),之後每年照這個價續扣,不用做任何事。
+事後想清乾淨可以刪 SALE 相關 code,但不刪也不影響任何東西。
+
+
 ## 🔴 最終定案(2026-09-06)＋ 9/14(一)執行清單 —— 以本節為準,下方舊章節僅供背景
 
 **新價(9/14 起,三平台牌價統一)**:月費 290→**390**、年費 1,490→**1,990**、買斷 2,990→**5,990**(9/6 定案)。
