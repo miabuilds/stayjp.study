@@ -1,95 +1,34 @@
-// 檔期特價的呈現層。Mia 2026-09-24。
+// 檔期特價的「時鐘」。Mia 2026-09-24 建,2026-10 雙十改寫。
 //
-// 只做「怎麼呈現」,不碰價格邏輯 —— 實際折扣仍由 campaign.js 的活動碼 + 後端 PLANS 決定,
-// 這支負責把它包裝成看得出急迫感的樣子:原價劃掉、省多少、倒數。
+// 價錢怎麼算、畫面怎麼畫都不在這裡:
+//   - 金額:campaign.js 的 Campaign.price(與後端 resolveWebPrice 同一套,scripts/test-sale-price.cjs 對答案)
+//   - 畫面:各頁自己的 window.renderSalePrices()(pricing.html = renderRefPricing)
+// 這支只做兩件事:
+//   1. 每秒更新頁面上所有 [data-sale-cd] 的倒數
+//   2. 檔期階段一變(KOL 搶先開始 / 檔期開始 / 檔期結束)就叫 renderSalePrices() 重畫
+//      → 頁面開著跨過 10/11 23:59:59,價錢當場變回原價,不會讓人用舊畫面送出錯的 expected_twd
 //
-// 為什麼值得做:Mia 的營收 48.8% 來自買斷、2.7% 來自月費(2026-09-24 實算),
-// 所以特價要打在買斷,不是月費。競品(TOPIK Note)那張付費牆之所以有殺傷力,
-// 主要不是折數,是「原價劃掉 + 倒數 + 拿使用者原本會花的錢錨定」。
+// ⚠️ 不可以無條件顯示特價:顯示價 ≠ 扣款價會踩消保法「下單前明示金額」。
+//    所以畫面一律由 Campaign.price 決定,它跟後端是同一個算式。
 (function () {
-  var C = window.Campaign && window.Campaign.active && window.Campaign.active();
-  if (!C) return;                       // 沒有進行中的活動就什麼都不做
-  var END = C.end;
-  if (Date.now() > END) return;
+  var C = window.Campaign;
+  if (!C || !C.SALE || !C.salePhase) return;
+  // 檔期結束超過一天就什麼都不做(還是會載入,但零成本)
+  if (C.now() > C.SALE.end + 864e5) return;
 
-  // 各方案的原價 / 活動價。與後端 PLANS、campaign 折扣一致,改價要三處一起改。
-  var PLANS = {
-    yearly:   { was: 1990, now: 1790, id: 'yearlyPrice',   unit: '/ 年' },
-    lifetime: { was: 5990, now: 5390, id: 'lifetimePrice', unit: '' }
-  };
-  var L = function (zh, en) { try { return (typeof enOr === 'function') ? enOr(zh, en) : zh; } catch (e) { return zh; } };
-  var nf = function (n) { return n.toLocaleString(); };
-
-  var css = document.createElement('style');
-  css.textContent =
-    '.sale-was{font-size:15px;color:var(--tx3);text-decoration:line-through;font-weight:600;margin-right:8px}' +
-    '.sale-save{display:inline-block;font-size:12px;font-weight:800;color:#fff;background:var(--ac);' +
-      'border-radius:999px;padding:2px 9px;vertical-align:middle;margin-left:8px}' +
-    '.sale-cd{margin-top:6px;font-size:12.5px;font-weight:700;color:var(--ac)}' +
-    '.sale-anchor{margin-top:4px;font-size:12.5px;color:var(--tx2)}';
-  (document.head || document.documentElement).appendChild(css);
-
-  /**
-   * 折扣是不是「真的會套用在這個人身上」。
-   * ⚠️ 不可以無條件顯示特價:實際扣款金額是 resolvedTerms() 依 window.__refActive 算的,
-   *    沒有活動碼的人看到 5,390 卻被扣 5,990 —— 顯示價 ≠ 扣款價,踩消保法「下單前明示金額」。
-   *    所以一律跟著 __refActive 走,它為真才顯示特價。
-   */
-  function discountOn() {
-    try { return !!window.__refActive; } catch (e) { return false; }
+  var lastPhase = C.salePhase();
+  function tick() {
+    var phase = C.salePhase();
+    if (phase !== lastPhase) {
+      lastPhase = phase;
+      try { if (typeof window.renderSalePrices === 'function') window.renderSalePrices(); } catch (e) {}
+    }
+    var left = C.SALE.end - C.now();
+    var txt = C.fmtLeft(left);
+    var list = document.querySelectorAll('[data-sale-cd]');
+    for (var i = 0; i < list.length; i++) if (list[i].textContent !== txt) list[i].textContent = txt;
   }
-
-  function unpaint() {
-    var list = document.querySelectorAll('.sale-cd, .sale-anchor');
-    for (var i = 0; i < list.length; i++) list[i].remove();
-    Object.keys(PLANS).forEach(function (k) {
-      var el = document.getElementById(PLANS[k].id);
-      if (el) delete el.dataset.sale;     // 讓 renderRefPricing() 的原價版本留在畫面上
-    });
-  }
-
-  function paint() {
-    var left = END - Date.now();
-    if (left <= 0) return false;
-    if (!discountOn()) { unpaint(); return true; }   // 還沒套用到 → 顯示原價,等套用了再變
-    Object.keys(PLANS).forEach(function (k) {
-      var p = PLANS[k], el = document.getElementById(p.id);
-      if (!el || el.dataset.sale) return;
-      el.dataset.sale = '1';
-      el.innerHTML =
-        '<span class="sale-was">NT$' + nf(p.was) + '</span>' +
-        '<span class="currency">NT$</span>' + nf(p.now) +
-        (p.unit ? '<span class="unit">' + p.unit + '</span>' : '') +
-        // 年費卡標題本來就有「省 57%」(年費 vs 月費繳一年,合理比法)。
-        // 這裡寫「活動再省」才看得出是另外疊上去的,不會跟那個數字打架。
-        '<span class="sale-save">' + L('活動再省 ', 'Extra ') + 'NT$' + nf(p.was - p.now) + '</span>';
-      var box = el.parentElement;
-      if (box && !box.querySelector('.sale-cd')) {
-        var cd = document.createElement('div');
-        cd.className = 'sale-cd'; cd.dataset.k = k;
-        el.insertAdjacentElement('afterend', cd);
-        // 拿使用者原本會花的錢錨定,不跟別的 app 比價
-        var a = document.createElement('div');
-        a.className = 'sale-anchor';
-        a.textContent = k === 'lifetime'
-          ? L('一堂日文家教課的價格,用到考過為止', 'Less than one tutoring session — yours for good')
-          : L('一個月不到 NT$150', 'Under NT$150 a month');
-        cd.insertAdjacentElement('afterend', a);
-      }
-    });
-    var s = Math.max(0, Math.floor(left / 1000));
-    var d = Math.floor(s / 86400), h = Math.floor(s % 86400 / 3600), m = Math.floor(s % 3600 / 60), ss = s % 60;
-    var pad = function (n) { return String(n).padStart(2, '0'); };
-    var txt = L('活動剩 ', 'Ends in ') + (d ? d + L(' 天 ', 'd ') : '') + pad(h) + ':' + pad(m) + ':' + pad(ss);
-    var list = document.querySelectorAll('.sale-cd');
-    for (var i = 0; i < list.length; i++) list[i].textContent = txt;
-    return true;
-  }
-
-  function start() {
-    if (!paint()) return;
-    var t = setInterval(function () { if (!paint()) clearInterval(t); }, 1000);
-  }
+  function start() { tick(); setInterval(tick, 1000); }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start);
   else start();
 })();

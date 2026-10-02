@@ -16,17 +16,24 @@
 import * as functions from "firebase-functions/v2/scheduler";
 import * as admin from "firebase-admin";
 import { db, nowMs } from "./utils/firestore";
-import { EARLY_BIRD_END_MS } from "./utils/constants";
+import { EARLY_BIRD_END_MS, SALE } from "./utils/constants";
 
 if (admin.apps.length === 0) admin.initializeApp();
 
 const TRIAL_DAYS = 3;
 const SITE = "https://stayjp.study";
 
+// 雙十檔期:檔期開始前一天(10/7 那封)起到檔期結束,改推檔期價。檔期一過自動回原文案。
+function saleLine(): string {
+  const now = nowMs();
+  if (now < SALE.start - 864e5 || now > SALE.end) return "";
+  return `<p style="margin:0 0 16px"><strong style="color:#B8362A">雙十限定 10/8–10/11:年費 NT$${SALE.prices.yearly!.toLocaleString("en-US")}/年</strong>(原價 1,990),活動期間訂閱,之後每年續訂都是 NT$${SALE.prices.yearly!.toLocaleString("en-US")}。<br>買斷 <strong>NT$${SALE.prices.lifetime!.toLocaleString("en-US")}</strong>(原價 5,990)。有推薦碼再折一次。</p>`;
+}
+
 function buildHtml(name: string, ebLeft: number | null): { subject: string; html: string } {
   const ebLine = ebLeft && ebLeft > 0
     ? `<p style="margin:0 0 16px"><strong style="color:#B8362A">早鳥年費 NT$990/年</strong>(月均 82 元,限量 100 名,目前只剩 <strong>${ebLeft}</strong> 名)<br>續訂永遠鎖這個價,之後恢復標準價 NT$1,490。</p>`
-    : `<p style="margin:0 0 16px"><strong style="color:#B8362A">年費 NT$1,990/年</strong>(月均 166 元),整個備考週期完整覆蓋。<br>🎟️ 有推薦碼?在付款頁輸入,年費<strong>現折 NT$200</strong>、續扣終身鎖 NT$1,790。</p>`;
+    : saleLine() || `<p style="margin:0 0 16px"><strong style="color:#B8362A">年費 NT$1,990/年</strong>(月均 166 元),整個備考週期完整覆蓋。<br>🎟️ 有推薦碼?在付款頁輸入,年費<strong>現折 NT$200</strong>、續扣終身鎖 NT$1,790。</p>`;
   return {
     subject: "你的全功能試用,明天就到期了",
     html: `

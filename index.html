@@ -404,6 +404,9 @@ html:not(.stayjp-native) .hero-dl .app-android { display: inline-flex !important
 .pt-price span { font-size: 16px; font-weight: 600; color: var(--tx2); margin-right: 2px; vertical-align: top; }
 .pt-price small { font-size: 13px; font-weight: 600; color: var(--tx2); margin-left: 4px; }
 .pt-desc { font-size: 13px; color: var(--tx2); }
+.pt-was { font-size: 13px; font-weight: 700; color: var(--ac); margin: 2px 0 8px; }
+.pt-was[hidden] { display: none; }
+.pt-was s { color: var(--tx3); font-weight: 600; margin-right: 4px; }
 
 /* == Features · 編號式，不用 icon 塗色 == */
 .features {
@@ -818,10 +821,11 @@ try {
     <div class="pt-mascot reveal" aria-hidden="true"><img src="images/mascot/tanuki-p03.png" alt=""></div>
     <div class="pt-grid">
       <div class="pt-card pt-featured reveal">
-        <div class="pt-badge pt-badge-best">最划算 · 推薦碼再折 200</div>
+        <div class="pt-badge pt-badge-best" id="ptYBadge">最划算 · 推薦碼再折 200</div>
         <div class="pt-name">年費訂閱</div>
-        <div class="pt-price"><span>NT$</span>1,990<small>/ 年</small></div>
-        <div class="pt-desc">平均 NT$166 / 月 · 長期備考首選</div>
+        <div class="pt-was" id="ptYWas" hidden></div>
+        <div class="pt-price" id="ptYPrice"><span>NT$</span>1,990<small>/ 年</small></div>
+        <div class="pt-desc" id="ptYDesc">平均 NT$166 / 月 · 長期備考首選</div>
       </div>
       <div class="pt-card reveal reveal-d1">
         <div class="pt-badge">彈性月付</div>
@@ -832,10 +836,31 @@ try {
       <div class="pt-card reveal reveal-d2">
         <div class="pt-badge" style="background:#F59E0B;color:#fff">一次解決</div>
         <div class="pt-name">買斷方案</div>
-        <div class="pt-price"><span>NT$</span>5,990</div>
-        <div class="pt-desc">一次付清 · 買斷功能 · 不再扣款</div>
+        <div class="pt-was" id="ptLWas" hidden></div>
+        <div class="pt-price" id="ptLPrice"><span>NT$</span>5,990</div>
+        <div class="pt-desc" id="ptLDesc">一次付清 · 買斷功能 · 不再扣款</div>
       </div>
     </div>
+    <script>
+    // 雙十檔期(2026-10):檔期內首頁方案卡跟著顯示檔期價(人人有、不用碼,所以這裡不看推薦碼)。
+    // 金額來自 campaign.js 的 Campaign.price(與後端同一套);檔期外什麼都不改,HTML 原樣就是原價。
+    (function () {
+      try {
+        var C = window.Campaign; if (!C || !C.price) return;
+        var y = C.price('yearly', false, false), l = C.price('lifetime', false, false);
+        if (!y.onSale) return;
+        var nf = function (n) { return Number(n).toLocaleString('en-US'); };
+        var $ = function (id) { return document.getElementById(id); };
+        $('ptYBadge').textContent = C.tr('雙十限定 · 10/11 截止', 'Double Ten Sale · ends Oct 11', '双十限定 · 10/11 截止');
+        $('ptYWas').innerHTML = '<s>NT$' + nf(y.list) + '</s> ' + C.tr('省 ', 'save ', '省 ') + nf(y.list - y.twd); $('ptYWas').hidden = false;
+        $('ptYPrice').innerHTML = '<span>NT$</span>' + nf(y.twd) + '<small>/ 年</small>';
+        $('ptYDesc').textContent = C.tr('活動期間訂閱，之後每年續訂都是 NT$' + nf(y.twd), 'Subscribe during the sale — every renewal stays at NT$' + nf(y.twd), '活动期间订阅，之后每年续订都是 NT$' + nf(y.twd));
+        $('ptLWas').innerHTML = '<s>NT$' + nf(l.list) + '</s> ' + C.tr('省 ', 'save ', '省 ') + nf(l.list - l.twd); $('ptLWas').hidden = false;
+        $('ptLPrice').innerHTML = '<span>NT$</span>' + nf(l.twd);
+        $('ptLDesc').textContent = C.tr('一次付清 · 不再扣款 · 10/11 過後回到 5,990', 'Pay once · never billed again · back to 5,990 after Oct 11', '一次付清 · 不再扣款 · 10/11 过后回到 5,990');
+      } catch (e) {}
+    })();
+    </script>
     <div class="trust-row reveal">
       <span><i data-ic=check data-sz=15></i> 登入即送 3 天全功能試用</span>
       <span><i data-ic=check data-sz=15></i> 7 天無條件全額退費</span>

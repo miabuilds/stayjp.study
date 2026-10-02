@@ -10,12 +10,13 @@
 import * as functions from "firebase-functions/v2/https";
 import * as admin from "firebase-admin";
 import * as crypto from "crypto";
-import { PLANS, PlanKey } from "./utils/constants";
+import { PLANS } from "./utils/constants";
 import {
   writeSubscription, writeTransaction, getSubscription, getRefCode,
   rewardReferrerOnPayment, recordKolCommission, voidKolCommission, grantAiBonus, refBonusDays,
   patchSubscription, nowMs, plusDays, tryReserveEarlyBird, SubscriptionDoc, getLatestSuccessChargeTwd,
 } from "./utils/firestore";
+import { mapProductIdToPlan } from "./utils/product-plan";
 
 if (admin.apps.length === 0) admin.initializeApp();
 
@@ -335,26 +336,7 @@ export const revenuecatWebhook = functions.onRequest(
   },
 );
 
-function mapProductIdToPlan(productId: string): PlanKey | null {
-  // Product IDs 定義在 stayjp-app/src/lib/subscription.ts:PLANS
-  // App Store Connect / Play Console 上要建這些 product
-  const map: Record<string, PlanKey> = {
-    "com.stayjp.app.monthly": "monthly",
-    "stayjp_monthly": "monthly",
-    "com.stayjp.app.yearly": "yearly",
-    "stayjp_yearly": "yearly",
-    "com.stayjp.app.yearly_early_bird": "yearly_early_bird",
-    "stayjp_yearly_early_bird": "yearly_early_bird",
-    "com.stayjp.app.lifetime": "lifetime",   // 原本漏了 → app 買斷版會寫不進(unknown product)
-    "stayjp_lifetime": "lifetime",
-    // 推薦碼優惠版(9 折,App 內輸碼解鎖的雙 SKU):方案同原商品,實付由 price_in_purchased_currency 記
-    "com.stayjp.app.yearly_ref": "yearly",
-    "stayjp_yearly_ref": "yearly",
-    "com.stayjp.app.lifetime_ref": "lifetime",
-    "stayjp_lifetime_ref": "lifetime",
-  };
-  return map[productId] ?? null;
-}
+// mapProductIdToPlan:搬到 utils/product-plan.ts(兩支共用,加新商品只改一處)
 
 // ── TRANSFER 用:跟 RevenueCat REST 對帳(獨立驗證,跟 rc-sync-subscription.ts 同一套邏輯)──
 interface RcEnt { ok: boolean; active: boolean; productId?: string; expiresDate?: string | null; unsubscribed?: boolean; }

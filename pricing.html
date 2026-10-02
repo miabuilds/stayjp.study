@@ -128,6 +128,28 @@ a:hover{text-decoration:underline}
 .plan.entry{border:1.5px dashed var(--ac2);position:relative}
 .plan.entry::before{content:"彈性月付";position:absolute;top:-12px;right:16px;background:var(--ac2);color:#fff;font-size:11px;font-weight:700;padding:4px 12px;border-radius:999px}
 .plan-subtitle{font-size:13px;font-weight:600;color:var(--ac2);background:rgba(74,127,212,.1);border-radius:8px;padding:7px 10px;margin-bottom:16px;text-align:center}
+
+/* 雙十檔期(2026-10)。只在檔期內由 JS 打開,平常 hidden。 */
+.sale-hero{max-width:560px;margin:22px auto 6px;padding:18px 20px;border-radius:16px;text-align:center;
+  background:linear-gradient(135deg,rgba(212,101,74,.12),rgba(245,158,11,.12));border:1.5px solid var(--ac)}
+.sale-hero[hidden]{display:none}
+.sale-hero .sh-top{display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:8px;font-size:12.5px;color:var(--tx2)}
+.sale-hero .sh-tag{background:var(--ac);color:#fff;font-weight:800;border-radius:999px;padding:3px 12px;font-size:12.5px;letter-spacing:.5px}
+.sale-hero .sh-main{margin-top:12px;font-size:20px;font-weight:800;color:var(--tx);line-height:1.5}
+.sale-hero .sh-main s{font-size:14px;font-weight:600;color:var(--tx3);margin-left:4px}
+.sale-hero .sh-main .sh-item{white-space:nowrap}
+.sale-hero .sh-main .sh-sep{display:inline-block;margin:0 10px;color:var(--tx3)}
+.sale-hero .sh-sub{margin-top:8px;font-size:13.5px;color:var(--tx);line-height:1.6}
+.sale-hero .sh-cd{display:inline-block;margin-top:12px;font-size:13px;font-weight:700;color:var(--ac);background:var(--bg2);
+  border:1px solid var(--bd);border-radius:999px;padding:5px 14px;font-variant-numeric:tabular-nums}
+.plan-price .sale-was{font-size:16px;color:var(--tx3);text-decoration:line-through;font-weight:600;margin-right:8px}
+.sale-note{margin:12px 0 14px;display:flex;flex-direction:column;align-items:flex-start;gap:8px}
+.sale-note .sn-row{display:flex;align-items:center;flex-wrap:wrap;gap:6px 10px}
+.sale-note .sn-break{font-size:12px;color:var(--tx2)}
+.sale-note[hidden]{display:none}
+.sale-note .sn-save{display:inline-block;font-size:12px;font-weight:800;color:#fff;background:var(--ac);border-radius:999px;padding:3px 10px}
+.sale-note .sn-lock{font-size:12.5px;font-weight:700;color:var(--tx);background:var(--bg3);border-left:3px solid var(--ac);border-radius:6px;padding:6px 10px;line-height:1.5}
+@media(max-width:560px){.sale-hero{margin-left:0;margin-right:0;padding:16px 14px}.sale-hero .sh-main{font-size:18px}.sale-hero .sh-main .sh-item{display:block}.sale-hero .sh-main .sh-sep{display:none}}
 </style>
 </head>
 <body>
@@ -190,7 +212,7 @@ a:hover{text-decoration:underline}
   <style>html.ios-app #refBox{display:none!important}</style>
   <script>try{if(window.STAYJP_NATIVE&&STAYJP_NATIVE.isNativeApp&&STAYJP_NATIVE.platform==='ios')document.documentElement.classList.add('ios-app');}catch(e){}</script>
   <div id="refBox" style="max-width:440px;margin:8px auto 0;padding:13px 15px;background:var(--bg3);border:1px solid var(--bd);border-radius:var(--r)">
-    <div style="font-size:13px;color:var(--tx2);margin-bottom:8px"><i data-ic=ticket></i> 有推薦碼?輸入立刻享:年費、買斷<b style="color:var(--tx)">打 9 折</b>(年費 1,790 續扣終身鎖、買斷 5,390)、月費多 <b style="color:var(--tx)">7 天</b>(選填):</div>
+    <div id="refHead" style="font-size:13px;color:var(--tx2);margin-bottom:8px"><i data-ic=ticket></i> 有推薦碼?輸入立刻享:年費、買斷<b style="color:var(--tx)">打 9 折</b>(年費 1,790 續扣終身鎖、買斷 5,390)、月費多 <b style="color:var(--tx)">7 天</b>(選填):</div>
     <div style="display:flex;gap:8px;flex-wrap:wrap">
       <input id="refInput" placeholder="推薦碼" autocapitalize="characters" style="flex:1;min-width:120px;padding:9px 11px;border:1px solid var(--bd);border-radius:9px;background:var(--bg);color:var(--tx);font-size:14px;text-transform:uppercase">
       <button type="button" onclick="applyRefCode()" style="white-space:nowrap;padding:9px 18px;border-radius:9px;border:none;background:var(--ac);color:#fff;font-weight:600;cursor:pointer">套用</button>
@@ -215,16 +237,20 @@ a:hover{text-decoration:underline}
   })();
   </script>
 
+  <!-- === 雙十檔期(內容由 renderRefPricing 依 Campaign.price 產生;檔期外 hidden)=== -->
+  <div id="saleHero" class="sale-hero" hidden></div>
+
   <!-- === 四付費方案 === -->
-  <div class="plans">
+  <div class="plans" id="plans">
 
     <div class="plan" data-plan="yearly">
-      <div class="plan-name">年費訂閱 <span class="save-badge">省 57%</span></div>
-      <div class="plan-tag">長期備考首選 · 輸推薦碼 9 折</div>
+      <div class="plan-name">年費訂閱 <span class="save-badge" id="yearlySaveBadge">省 57%</span></div>
+      <div class="plan-tag" id="yearlyTag">長期備考首選 · 輸推薦碼 9 折</div>
       <div class="plan-price" id="yearlyPrice"><span class="currency">NT$</span>1,990<span class="unit">/ 年</span></div>
-      <div class="plan-cycle">平均 NT$166 / 月 · 自動續扣</div>
+      <div class="sale-note" id="yearlySaleNote" hidden></div>
+      <div class="plan-cycle" id="yearlyCycle">平均 NT$166 / 月 · 自動續扣</div>
       <ul class="plan-features">
-        <li>輸推薦碼 1,990 → 1,790，續扣年年鎖 1,790</li>
+        <li id="yearlyRefLi">輸推薦碼 1,990 → 1,790，續扣年年鎖 1,790</li>
         <li>JLPT 備考週期完整覆蓋</li>
         <li>跨裝置雲端同步</li>
         <li>一次付清 12 個月，省心</li>
@@ -251,7 +277,8 @@ a:hover{text-decoration:underline}
       <div class="plan-name">買斷方案</div>
       <div class="plan-tag">一次付清 · 永不續扣 · 買斷現有功能*</div>
       <div class="plan-price" id="lifetimePrice"><span class="currency">NT$</span>5,990</div>
-      <div class="plan-cycle">等於 3 年年費，之後不再扣款* · 輸推薦碼 9 折</div>
+      <div class="sale-note" id="lifetimeSaleNote" hidden></div>
+      <div class="plan-cycle" id="lifetimeCycle">等於 3 年年費，之後不再扣款* · 輸推薦碼 9 折</div>
       <ul class="plan-features">
         <li>跟年費同所有功能，一次買斷、不再續扣</li>
         <li>不再扣款、不會被漲價</li>
@@ -520,7 +547,7 @@ function applyRefCode() {
   const raw = (document.getElementById('refInput').value || '').trim().toUpperCase().replace(/[^A-Z0-9_-]/g, '').slice(0, 32);
   const msg = document.getElementById('refMsg');
   if (!raw) { msg.style.color = 'var(--tx3)'; msg.textContent = '請輸入推薦碼。'; return; }
-  const VALIDATE_URL = 'https://asia-east1-jpnote-1bdd6.cloudfunctions.net/validateRefCode';
+  const VALIDATE_URL = REF_VALIDATE_URL;
   const u = _auth.currentUser;
   msg.style.color = 'var(--tx3)'; msg.textContent = '驗證中…';
   // 先驗證碼存不存在;查無就擋下、不亂存。驗證斷線 → fail-open(先記住)。
@@ -532,11 +559,11 @@ function applyRefCode() {
       const dd = d.exists && d.data() ? d.data() : {};
       // 只有「已發放 7 天好康」才鎖定;發放前可更改(修打錯/測試碼)
       if (dd.ref_code && dd.ref_bonus_at) { msg.style.color = 'var(--tx3)'; document.getElementById('refInput').value = dd.ref_code; document.getElementById('refInput').disabled = true; msg.textContent = '已套用推薦碼:' + dd.ref_code + '(好康已發放,不可更改)'; return; }
-      ref.set({ ref_code: raw, ref_at: Date.now() }, { merge: true }).then(() => { msg.style.color = '#16A34A'; msg.textContent = label; setRefActive(true); const clr = document.getElementById('refClear'); if (clr) clr.style.display = 'inline-block'; }).catch(() => { msg.style.color = '#EF4444'; msg.textContent = '套用失敗,請稍後再試。'; });
+      ref.set({ ref_code: raw, ref_at: Date.now() }, { merge: true }).then(() => { msg.style.color = '#16A34A'; msg.textContent = label; setRefActive(true, raw); const clr = document.getElementById('refClear'); if (clr) clr.style.display = 'inline-block'; }).catch(() => { msg.style.color = '#EF4444'; msg.textContent = '套用失敗,請稍後再試。'; });
     }).catch(() => { msg.style.color = '#EF4444'; msg.textContent = '讀取失敗,請稍後再試。'; });
   };
   fetch(VALIDATE_URL + '?code=' + encodeURIComponent(raw)).then(r => r.json()).then(v => {
-    if (v && v.valid) writeFor('✓ 已套用 ' + raw + (v.kol ? '(' + v.kol + ')' : '') + ':年費現折 NT$200、買斷現折 NT$600(9 折)、月費 +7 天!');
+    if (v && v.valid) writeFor('✓ 已套用 ' + raw + (v.kol ? '(' + v.kol + ')' : '') + ':' + refPerkText() + '!');
     else if (v && v.error) writeFor('已套用 ' + raw + '(暫時無法即時驗證)');
     else { msg.style.color = '#EF4444'; msg.textContent = '查無此推薦碼,請確認後再輸入。'; }
   }).catch(() => writeFor('已套用 ' + raw + '(暫時無法驗證)'));
@@ -574,8 +601,8 @@ function syncRefCode(data) {
       const rewarded = !!data.ref_bonus_at;   // 已發放 → 鎖定;否則可改/可清
       if (inp) { inp.value = data.ref_code; inp.disabled = rewarded; }
       const clr = document.getElementById('refClear'); if (clr) clr.style.display = rewarded ? 'none' : 'inline-block';
-      if (m) { m.style.color = 'var(--tx3)'; m.textContent = rewarded ? ('已套用推薦碼:' + data.ref_code + '(好康已發放,不可更改)') : ('目前推薦碼:' + data.ref_code + '(年費現折 200、買斷現折 600、月費 +7 天;發放前可更改或清除)'); }
-      if (!rewarded) setRefActive(true);
+      if (m) { m.style.color = 'var(--tx3)'; m.textContent = rewarded ? ('已套用推薦碼:' + data.ref_code + '(好康已發放,不可更改)') : ('目前推薦碼:' + data.ref_code + '(' + refPerkText() + ';發放前可更改或清除)'); }
+      if (!rewarded) setRefActive(true, data.ref_code);
       return;
     }
     const pending = localStorage.getItem('stayjp_ref');
@@ -592,8 +619,8 @@ function syncRefCode(data) {
     if (pending && _auth.currentUser) {
       _db.doc('users/' + _auth.currentUser.uid).set({ ref_code: pending, ref_at: Date.now() }, { merge: true }).catch(() => {});
       if (inp && !inp.value) inp.value = pending;
-      if (m) { m.style.color = '#16A34A'; m.textContent = '推薦碼 ' + pending + ' 已套用:年費現折 200、買斷現折 600、月費 +7 天!'; }
-      setRefActive(true);
+      if (m) { m.style.color = '#16A34A'; m.textContent = '推薦碼 ' + pending + ' 已套用:' + refPerkText() + '!'; }
+      setRefActive(true, pending);
     }
   } catch (e) {}
 }
@@ -630,27 +657,154 @@ const PLAN_TERMS = {
   lifetime:          { name: '買斷方案', price: 'NT$5,990', twd: 5990, cycle: '一次付清', recurring: false },
 };
 
-// ── 推薦碼折價(官網限定):帳上有有效推薦碼 → 年費現折 200。與後端 WEB_CODE_DISCOUNT_TWD 對齊。
+// ── 建單金額(官網限定):推薦碼折價 + 雙十檔期,一律走 campaign.js 的 Campaign.price ──
+// Campaign.price 與後端 resolveWebPrice 同一套算法(scripts/test-sale-price.cjs 對答案)。
 // resolvedTerms() 供消保視窗與 expected_twd 取「實際扣款金額」;後端會再驗證碼有效性,不符回 409。
-const CODE_DISCOUNT = { yearly: 200, lifetime: 600 };   // 話術 9 折,取整到十位
+const CODE_DISCOUNT = { yearly: 200, lifetime: 600 };   // campaign.js 沒載到時的退路(=平時碼折)
+const REF_VALIDATE_URL = 'https://asia-east1-jpnote-1bdd6.cloudfunctions.net/validateRefCode';
 window.__refActive = false;
-function setRefActive(on) { window.__refActive = !!on; renderRefPricing(); }
+window.__refCode = '';
+window.__refCampaign = true;   // 碼的種類還沒確認前當「活動碼」(=沒有 KOL 搶先),確認是 KOL/個人碼才打開
+function setRefActive(on, code) {
+  window.__refActive = !!on;
+  let c = '';
+  if (on) { c = String(code || ''); if (!c) { try { c = localStorage.getItem('stayjp_ref') || ''; } catch (e) {} } }
+  c = c.toUpperCase();
+  if (c !== window.__refCode) window.__refCampaign = true;
+  window.__refCode = c;
+  if (on && c) checkRefType(c);
+  renderRefPricing();
+}
+// KOL 搶先(10/7 20:00 起 4 小時)只給 KOL/個人碼,不給活動碼 → 這段時間要問後端這個碼是哪一種。
+// 其他時間碼的種類不影響價錢,就不多打一次 API。
+function checkRefType(code) {
+  if (!window.Campaign || Campaign.isCampaignCode(code)) return;
+  const S = Campaign.SALE, t = Campaign.now();
+  if (!(t >= S.kolEarlyStart - 6 * 3600e3 && t < S.start)) return;
+  fetch(REF_VALIDATE_URL + '?code=' + encodeURIComponent(code)).then(r => r.json()).then(v => {
+    if (!v || !v.valid || window.__refCode !== code) return;
+    window.__refCampaign = (typeof v.campaign === 'boolean') ? v.campaign : (v.type === 'official');
+    renderRefPricing();
+  }).catch(() => {});
+}
+function _fmt(n) { return Number(n).toLocaleString('en-US'); }
+function _T(zh, en, cn) { return (window.Campaign && Campaign.tr) ? Campaign.tr(zh, en, cn) : zh; }
+function _price(plan) {
+  if (window.Campaign && Campaign.price) return Campaign.price(plan, window.__refActive, window.__refCampaign);
+  const list = (PLAN_TERMS[plan] || {}).twd || 0, off = window.__refActive ? (CODE_DISCOUNT[plan] || 0) : 0;
+  return { twd: list - off, list, onSale: false, refOff: off, saleTwd: list };
+}
 function resolvedTerms(plan) {
   const t = Object.assign({}, PLAN_TERMS[plan] || { name: '方案', price: '', twd: 0, cycle: '', recurring: true });
-  const d = window.__refActive ? (CODE_DISCOUNT[plan] || 0) : 0;
-  if (d) { t.twd = t.twd - d; t.price = 'NT$' + t.twd.toLocaleString() + '（已套用推薦碼,原價 NT$' + (t.twd + d).toLocaleString() + '）'; }
+  if (!PLAN_TERMS[plan]) return t;
+  const p = _price(plan);
+  if (p.twd !== t.twd) {
+    const why = p.onSale
+      ? (p.refOff ? _T('雙十活動價＋推薦碼', 'Double Ten sale + referral code', '双十活动价＋推荐码') : _T('雙十活動價', 'Double Ten sale', '双十活动价'))
+      : '已套用推薦碼';
+    t.twd = p.twd;
+    t.price = 'NT$' + _fmt(p.twd) + '（' + why + ',原價 NT$' + _fmt(p.list) + '）';
+  }
   return t;
 }
-function renderRefPricing() {
-  const y = document.getElementById('yearlyPrice');
-  if (y) y.innerHTML = window.__refActive
-    ? '<span style="font-size:16px;color:var(--tx3);text-decoration:line-through;font-weight:600">NT$1,990</span> <span class="currency">NT$</span>1,790<span class="unit">/ 年</span>'
-    : '<span class="currency">NT$</span>1,990<span class="unit">/ 年</span>';
-  const l = document.getElementById('lifetimePrice');
-  if (l) l.innerHTML = window.__refActive
-    ? '<span style="font-size:16px;color:var(--tx3);text-decoration:line-through;font-weight:600">NT$5,990</span> <span class="currency">NT$</span>5,390'
-    : '<span class="currency">NT$</span>5,990';
+// 推薦碼套用成功時的說明(檔期內講疊折後的價錢,檔期外照舊)
+function refPerkText() {
+  const phase = window.Campaign ? Campaign.salePhase() : 'before';
+  if (phase === 'early') return _T('推薦碼已套用(KOL 粉絲搶先價以下方方案卡為準)、月費 +7 天', 'Referral code applied (early-access prices shown on the plans below), monthly +7 days', '推荐码已套用(KOL 粉丝抢先价以下方方案卡为准)、月费 +7 天');
+  const y = phase === 'on' ? Campaign.price('yearly', true, false) : null;
+  if (y && y.onSale) {
+    const l = Campaign.price('lifetime', true, false);
+    return _T('雙十活動價再折:年費 NT$' + _fmt(y.twd) + '(之後每年續訂都是這個價)、買斷 NT$' + _fmt(l.twd) + '、月費 +7 天',
+      'Double Ten price, plus your code: annual NT$' + _fmt(y.twd) + ' (every renewal stays at this price), lifetime NT$' + _fmt(l.twd) + ', monthly +7 days',
+      '双十活动价再折:年费 NT$' + _fmt(y.twd) + '(之后每年续订都是这个价)、买断 NT$' + _fmt(l.twd) + '、月费 +7 天');
+  }
+  return '年費現折 NT$200、買斷現折 NT$600(9 折)、月費 +7 天';
 }
+// 第一次改動前的原始 HTML,檔期一過(或還沒開始)就原樣放回去
+const _saleOrig = {};
+function _saleSet(id, html) {
+  const el = document.getElementById(id); if (!el) return;
+  if (!(id in _saleOrig)) _saleOrig[id] = el.innerHTML;
+  if (el.dataset.saleHtml !== html) { el.innerHTML = html; el.dataset.saleHtml = html; }
+}
+function _saleRestore(id) {
+  const el = document.getElementById(id); if (!el || !(id in _saleOrig)) return;
+  el.innerHTML = _saleOrig[id]; delete _saleOrig[id]; delete el.dataset.saleHtml;
+}
+function renderRefPricing() {
+  const y = _price('yearly'), l = _price('lifetime');
+  const was = (n) => '<span class="sale-was">NT$' + _fmt(n) + '</span>';
+  const yEl = document.getElementById('yearlyPrice');
+  if (yEl) yEl.innerHTML = (y.twd < y.list ? was(y.list) : '') + '<span class="currency">NT$</span>' + _fmt(y.twd) + '<span class="unit">/ 年</span>';
+  const lEl = document.getElementById('lifetimePrice');
+  if (lEl) lEl.innerHTML = (l.twd < l.list ? was(l.list) : '') + '<span class="currency">NT$</span>' + _fmt(l.twd);
+
+  const on = y.onSale;
+  const hero = document.getElementById('saleHero');
+  const yNote = document.getElementById('yearlySaleNote'), lNote = document.getElementById('lifetimeSaleNote');
+  if (!on || !window.Campaign) {
+    if (hero) { hero.hidden = true; hero.innerHTML = ''; }
+    if (yNote) { yNote.hidden = true; yNote.innerHTML = ''; }
+    if (lNote) { lNote.hidden = true; lNote.innerHTML = ''; }
+    ['yearlySaveBadge', 'yearlyTag', 'yearlyCycle', 'yearlyRefLi', 'lifetimeCycle', 'refHead'].forEach(_saleRestore);
+    return;
+  }
+  const S = Campaign.SALE, phase = Campaign.salePhase();
+  const ref = !!window.__refActive;
+  const ySale = S.prices.yearly, lSale = S.prices.lifetime;
+  const yOff = S.refDiscount.yearly, lOff = S.refDiscount.lifetime;
+
+  // 頂部檔期卡
+  if (hero) {
+    const top = phase === 'early'
+      ? '<span class="sh-tag">' + _T('KOL 粉絲搶先', 'Early access', 'KOL 粉丝抢先') + '</span><span>'
+        + _T('你的推薦碼已解鎖搶先價 · 10/8 00:00 全面開放', 'Your referral code unlocked early access · opens to everyone Oct 8, 00:00 (Taiwan)', '你的推荐码已解锁抢先价 · 10/8 00:00 全面开放') + '</span>'
+      : '<span class="sh-tag">' + _T('雙十限定', 'Double Ten Sale', '双十限定') + '</span><span>'
+        + _T('10/8–10/11 · 官網限定 · 不用輸碼', 'Oct 8–11 · website only · no code needed', '10/8–10/11 · 官网限定 · 不用输码') + '</span>';
+    const main = '<span class="sh-item">' + _T('年費', 'Annual', '年费') + ' NT$' + _fmt(y.twd) + '<s>' + _fmt(y.list) + '</s></span><span class="sh-sep">・</span>'
+      + '<span class="sh-item">' + _T('買斷', 'Lifetime', '买断') + ' NT$' + _fmt(l.twd) + '<s>' + _fmt(l.list) + '</s></span>';
+    const sub = _T('年費在活動期間訂閱，之後每年續訂都是 NT$' + _fmt(y.twd) + '，不會漲回 1,990',
+        'Subscribe annual during the sale and every renewal stays at NT$' + _fmt(y.twd) + ' — never back to 1,990',
+        '年费在活动期间订阅，之后每年续订都是 NT$' + _fmt(y.twd) + '，不会涨回 1,990')
+      + (ref ? '' : '<br>' + _T('有推薦碼再折一次：年費 ' + _fmt(ySale - yOff) + '、買斷 ' + _fmt(lSale - lOff),
+        'Have a referral code? It stacks: annual ' + _fmt(ySale - yOff) + ', lifetime ' + _fmt(lSale - lOff),
+        '有推荐码再折一次：年费 ' + _fmt(ySale - yOff) + '、买断 ' + _fmt(lSale - lOff)));
+    _saleSet('saleHero', '<div class="sh-top">' + top + '</div><div class="sh-main">' + main + '</div><div class="sh-sub">' + sub + '</div>'
+      + '<div class="sh-cd">' + _T('活動倒數 ', 'Ends in ', '活动倒数 ') + '<span data-sale-cd>' + Campaign.fmtLeft(S.end - Campaign.now()) + '</span></div>');
+    hero.hidden = false;
+  }
+  // 年費卡
+  const ySave = y.list - y.twd, lSave = l.list - l.twd;
+  if (yNote) {
+    _saleSet('yearlySaleNote', '<span class="sn-row"><span class="sn-save">' + _T('省 NT$', 'Save NT$', '省 NT$') + _fmt(ySave) + '</span>'
+      + (y.refOff ? '<span class="sn-break">' + _T('活動 ' + _fmt(y.list - ySale) + ' ＋ 推薦碼 ' + _fmt(y.refOff), 'sale ' + _fmt(y.list - ySale) + ' + code ' + _fmt(y.refOff), '活动 ' + _fmt(y.list - ySale) + ' ＋ 推荐码 ' + _fmt(y.refOff)) + '</span>' : '')
+      + '</span><span class="sn-lock">' + _T('年年鎖 NT$' + _fmt(y.twd) + '：活動期間訂閱，之後每年續訂都是 NT$' + _fmt(y.twd),
+        'Locked at NT$' + _fmt(y.twd) + ' every year: subscribe during the sale and every renewal stays at NT$' + _fmt(y.twd),
+        '年年锁 NT$' + _fmt(y.twd) + '：活动期间订阅，之后每年续订都是 NT$' + _fmt(y.twd)) + '</span>');
+    yNote.hidden = false;
+  }
+  _saleSet('yearlySaveBadge', _T('省 ', 'Save ', '省 ') + Math.round((1 - y.twd / (390 * 12)) * 100) + '%');
+  _saleSet('yearlyTag', ref ? _T('雙十活動價 · 已疊推薦碼', 'Double Ten price · referral code stacked', '双十活动价 · 已叠推荐码')
+    : _T('雙十活動價 · 有推薦碼再折 ' + yOff, 'Double Ten price · referral code takes another ' + yOff + ' off', '双十活动价 · 有推荐码再折 ' + yOff));
+  _saleSet('yearlyCycle', _T('平均 NT$' + Math.round(y.twd / 12) + ' / 月 · 自動續扣', 'About NT$' + Math.round(y.twd / 12) + ' / month · auto-renews', '平均 NT$' + Math.round(y.twd / 12) + ' / 月 · 自动续扣'));
+  _saleSet('yearlyRefLi', ref ? _T('已套用推薦碼：活動價再折 ' + yOff + '，一樣年年鎖', 'Referral code applied: another ' + yOff + ' off, still locked every year', '已套用推荐码：活动价再折 ' + yOff + '，一样年年锁')
+    : _T('有推薦碼再折 ' + yOff + ' → ' + _fmt(ySale - yOff) + '，一樣年年鎖', 'Referral code: another ' + yOff + ' off → ' + _fmt(ySale - yOff) + ', locked every year', '有推荐码再折 ' + yOff + ' → ' + _fmt(ySale - yOff) + '，一样年年锁'));
+  // 買斷卡
+  if (lNote) {
+    _saleSet('lifetimeSaleNote', '<span class="sn-row"><span class="sn-save">' + _T('省 NT$', 'Save NT$', '省 NT$') + _fmt(lSave) + '</span>'
+      + (l.refOff ? '<span class="sn-break">' + _T('活動 ' + _fmt(l.list - lSale) + ' ＋ 推薦碼 ' + _fmt(l.refOff), 'sale ' + _fmt(l.list - lSale) + ' + code ' + _fmt(l.refOff), '活动 ' + _fmt(l.list - lSale) + ' ＋ 推荐码 ' + _fmt(l.refOff)) + '</span>' : '')
+      + '</span><span class="sn-lock">' + _T('活動價只到 10/11，之後回到 NT$5,990', 'Sale price ends Oct 11 — back to NT$5,990 after that', '活动价只到 10/11，之后回到 NT$5,990') + '</span>');
+    lNote.hidden = false;
+  }
+  _saleSet('lifetimeCycle', ref ? _T('一次付清，之後不再扣款* · 已疊推薦碼', 'One payment, never billed again* · referral code stacked', '一次付清，之后不再扣款* · 已叠推荐码')
+    : _T('一次付清，之後不再扣款* · 有推薦碼再折 ' + lOff, 'One payment, never billed again* · referral code takes another ' + lOff + ' off', '一次付清，之后不再扣款* · 有推荐码再折 ' + lOff));
+  // 推薦碼輸入框標題
+  _saleSet('refHead', '<i data-ic=ticket></i> ' + _T('有推薦碼?雙十活動價再折一次:年費 <b style="color:var(--tx)">' + _fmt(ySale - yOff) + '</b>(之後每年續訂都鎖 ' + _fmt(ySale - yOff) + ')、買斷 <b style="color:var(--tx)">' + _fmt(lSale - lOff) + '</b>、月費多 <b style="color:var(--tx)">7 天</b>(選填):',
+    'Have a referral code? It stacks on the sale: annual <b style="color:var(--tx)">' + _fmt(ySale - yOff) + '</b> (every renewal locked at ' + _fmt(ySale - yOff) + '), lifetime <b style="color:var(--tx)">' + _fmt(lSale - lOff) + '</b>, monthly <b style="color:var(--tx)">+7 days</b> (optional):',
+    '有推荐码?双十活动价再折一次:年费 <b style="color:var(--tx)">' + _fmt(ySale - yOff) + '</b>(之后每年续订都锁 ' + _fmt(ySale - yOff) + ')、买断 <b style="color:var(--tx)">' + _fmt(lSale - lOff) + '</b>、月费多 <b style="color:var(--tx)">7 天</b>(选填):'));
+}
+window.renderSalePrices = renderRefPricing;   // sale.js 在檔期開始/結束那一秒會叫它重畫
+renderRefPricing();
 
 // 下單前確認框:強制勾選「同意續扣條款」+「已滿18歲」才可付款
 function showConsentDialog(plan) {
