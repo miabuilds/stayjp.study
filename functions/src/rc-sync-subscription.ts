@@ -10,32 +10,15 @@
 
 import * as functions from "firebase-functions/v2/https";
 import * as admin from "firebase-admin";
-import { PlanKey } from "./utils/constants";
 import { writeSubscription, getSubscription, getRefCode, grantAiBonus, rewardReferrerOnPayment, recordKolCommission, refBonusDays, nowMs, SubscriptionDoc } from "./utils/firestore";
 import { PLANS } from "./utils/constants";
+import { mapProductIdToPlan } from "./utils/product-plan";
 
 if (admin.apps.length === 0) admin.initializeApp();
 
 const ENTITLEMENT_ID = "StayJP Plan Premium";
 
-function mapProductIdToPlan(productId: string): PlanKey | null {
-  const map: Record<string, PlanKey> = {
-    "com.stayjp.app.monthly": "monthly",
-    "stayjp_monthly": "monthly",
-    "com.stayjp.app.yearly": "yearly",
-    "stayjp_yearly": "yearly",
-    "com.stayjp.app.yearly_early_bird": "yearly_early_bird",
-    "stayjp_yearly_early_bird": "yearly_early_bird",
-    "com.stayjp.app.lifetime": "lifetime",
-    "stayjp_lifetime": "lifetime",
-    // 推薦碼優惠版(9 折,2026-09-14 起 App 內輸碼解鎖):權益/方案同原商品
-    "com.stayjp.app.yearly_ref": "yearly",
-    "stayjp_yearly_ref": "yearly",
-    "com.stayjp.app.lifetime_ref": "lifetime",
-    "stayjp_lifetime_ref": "lifetime",
-  };
-  return map[productId] ?? null;
-}
+// mapProductIdToPlan:搬到 utils/product-plan.ts(兩支共用,加新商品只改一處)
 
 export const rcSyncSubscription = functions.onRequest(
   {
