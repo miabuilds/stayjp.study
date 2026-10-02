@@ -243,6 +243,7 @@ body{margin:0;background:var(--bg);color:var(--tx);font-family:-apple-system,"Pi
           <button id="mQuiz" onclick="YTS.setMode('quiz')">測驗</button>
           <button id="mSwap" style="flex:0 0 auto" onclick="YTS.swap()">換影片</button>
         </div>
+        <div class="note" id="asrNote" style="display:none;margin:0 0 10px;padding:8px 12px;background:var(--soft);border-radius:10px;color:var(--tx2)">⚠️ 這支是 YouTube 自動產生的字幕,錯字和時間差在所難免,聽寫/測驗請當參考。</div>
         <div class="pc">
           <div class="pc-ctr">
             <button class="nav" onclick="YTS.nav(-1)" aria-label="上一句">‹</button>
@@ -319,6 +320,9 @@ const YTS = (() => {
   // 範例牆:全部「開放嵌入+日文字幕」且字幕已種進快取(即點即練)
   // 範例庫:全部「開放嵌入+日文字幕」且已種進快取(即點即練);cat=分類 chips
   // 範例庫:全部「開放嵌入+日文字幕」且已種進快取(即點即練);cat=分類 chips
+  // ⚠️ 只收「人工日文字幕」的影片。YouTube 自動字幕(asr)錯字多、時間軸歪、翻譯也跟著錯
+  //   (2026-10 用戶回饋 すずめ PV 聽寫/填空對不上 → 連同 4 支動漫預告、3 支 ANN 新聞一起下架;
+  //    下架前先 node scripts/yt-seed.mjs probe <id> 看 manual:true 才放回來)
   const SAMPLES = [
     // ── 2026-09-21 新增 15 支(全部本機驗過:可嵌入 + 有日文人工字幕,字幕已種進快取)──
     { v:'6mkb2BEPp6E', cat:'入門', t:'日本語シャドーイング練習', tag:'跟讀專用 · 慢速' },
@@ -359,10 +363,6 @@ const YTS = (() => {
     { v:'Xw3NjBuXMLY', cat:'Vlog', t:'日本語散歩:東京駅から新橋まで', tag:'N4-N3 · 中日字幕' },
     { v:'PweksFQGzmI', cat:'Vlog', t:'私の日本での朝の過ごし方', tag:'生活作息 · 中日字幕' },
     { v:'kIDaXEnkjmk', cat:'Vlog', t:'留学するか悩んでいる人に伝えたいこと', tag:'留學心情 · 中日字幕' },
-    { v:'rm3eUFfjFms', cat:'動漫', t:'映画クレヨンしんちゃん 特別映像', tag:'官方 · 日常口語' },
-    { v:'pZnF6-p4Clg', cat:'動漫', t:'名探偵コナン 劇場版特別映像', tag:'官方 · 劇情對白' },
-    { v:'8zGz4z3bdzg', cat:'動漫', t:'すずめの戸締まり PV', tag:'官方 · 中日字幕' },
-    { v:'ZfIXXgqxVn8', cat:'動漫', t:'劇場版「鬼滅の刃」無限城編 本予告', tag:'官方 · 熱門' },
     { v:'NyUTYwZe_l4', cat:'歌', t:'YOASOBI「群青」THE FIRST TAKE', tag:'歌詞字幕' },
     { v:'MpYy6wwqxoo', cat:'歌', t:'LiSA「紅蓮華」THE FIRST TAKE', tag:'鬼滅 · 中日字幕' },
     { v:'4Q9DWZLaY2U', cat:'歌', t:'LiSA「炎」THE FIRST TAKE', tag:'鬼滅 · 中日字幕' },
@@ -373,9 +373,6 @@ const YTS = (() => {
     { v:'h1L_fLJX7Gk', cat:'歌', t:'松原みき「真夜中のドア〜Stay With Me」', tag:'昭和 City Pop · 歌詞字幕' },
     { v:'yXZd7xVdpJ0', cat:'歌', t:'優里「ドライフラワー」THE FIRST TAKE', tag:'抒情 · 歌詞字幕' },
     { v:'Lz24PqZkF2s', cat:'歌', t:'T.M.Revolution「HOT LIMIT」THE FIRST TAKE', tag:'經典動漫歌 · 歌詞字幕' },
-    { v:'Ifux-aLb4RQ', cat:'新聞', t:'関東の天気:週明け大雨の恐れ', tag:'真實語速' },
-    { v:'iQn2LbktWN0', cat:'新聞', t:'水中の「ガイコツパンダ」新種!', tag:'趣聞 · 中日字幕' },
-    { v:'DaMQxOB4oTY', cat:'新聞', t:'旅立ちの時に咲き誇る桜(さくらニュース)', tag:'季節 · 中日字幕' },
   ];
   let galCat='全部';
   let zhOn = (localStorage.getItem('yts_zh')||'1')==='1';   // 中文翻譯顯示開關
@@ -403,6 +400,7 @@ const YTS = (() => {
     set('pbNoCap','找不到「顯示轉譯稿」?表示這支影片沒有字幕,換一支比較快(範例牆的都能直接練)。','No “Show transcript” option? The video has no captions — picking another one is faster (all gallery videos work instantly).');
     set('pbHelp','手機怎麼複製?','How to copy on phone?');
     set('loopBtn','循環','Loop'); set('listBtn','全部句子','All lines'); set('nextBtn','下一句 →','Next →');
+    set('asrNote','⚠️ 這支是 YouTube 自動產生的字幕,錯字和時間差在所難免,聽寫/測驗請當參考。','⚠️ These are YouTube auto-generated captions — expect typos and timing drift; treat dictation/quiz as a rough guide.');
 
     const u=document.getElementById('urlIn'); if(u) u.placeholder = en?'Paste a YouTube link or video ID':cvt('貼上 YouTube 連結或影片 ID');
     const pt=document.getElementById('pasteTa'); if(pt) pt.placeholder = en?'Paste here — it parses automatically':cvt('複製好貼在這裡,貼上就自動解析');
@@ -444,10 +442,53 @@ const YTS = (() => {
     for(let i=0;i<t.length;i++){ const c=normK(t[i]); const idx=c?s.indexOf(c,p):-1; if(idx>=0){ hits[i]=true; p=idx+1; } }
     const hitN = hits.filter(Boolean).length;
     const rawRatio = t.length ? hitN/Math.max(normK(target).length, s.length||1) : 0;
-    const kanaRatio = lcsRatio(said, kanaOf(target) || target);   // 整句用假名唸/打也算對
+    const kanaRatio = lcsRatio(said, kanaOfLine(lines[cur]) || kanaOf(target) || target);   // 整句用假名唸/打也算對
     return { hits, ratio: Math.max(rawRatio, kanaRatio) };
   }
   function fr(t){ try{ return (window.furiganaHTML? furiganaHTML(t) : esc(t)); }catch(e){ return esc(t); } }
+  // 逐詞注音:快取裡的 l.tk 由 scripts/yt-ruby.mjs(kuromoji)預算,格式 '表層\t讀音\t原形'。
+  // 站上字庫注音(fr)只認 N5~N1 收錄的詞,字幕裡 扉/災い 這類沒收的就一片空白(用戶回饋「不知道怎麼唸」)
+  // → 有 tk 就用 tk 畫,每個漢字詞包成 .jlk 可點查(有收錄給意思,沒收錄給辭典連結)。
+  let _dictMap=null, _dictN=0;
+  function dictOf(w){
+    const lv=['N5','N4','N3','N2','N1'].filter(x=>Array.isArray(window['VOCAB_'+x]));
+    if(!_dictMap||lv.length!==_dictN){ _dictMap={}; _dictN=lv.length; lv.forEach(x=>window['VOCAB_'+x].forEach(e=>{ if(e&&e.w&&!_dictMap[e.w]) _dictMap[e.w]=e; })); }
+    return _dictMap[w]||null;
+  }
+  function tokRuby(l){
+    if(!l) return '';
+    if(!Array.isArray(l.tk)||!l.tk.length) return fr(l.ja);
+    let html='';
+    for(const s of l.tk){
+      const p=String(s).split('\t');
+      if(p.length<2){ html+=esc(p[0]); continue; }
+      const surf=p[0], rd=p[1], base=p[2]||surf;
+      const tail=(surf.match(/[ぁ-ゖ]+$/)||[''])[0];
+      let inner;
+      if(tail && rd.length>tail.length && rd.endsWith(tail)) inner='<ruby>'+esc(surf.slice(0,surf.length-tail.length))+'<rt>'+esc(rd.slice(0,rd.length-tail.length))+'</rt></ruby>'+esc(tail);
+      else if(!tail) inner='<ruby>'+esc(surf)+'<rt>'+esc(rd)+'</rt></ruby>';
+      else inner=esc(surf);   // 讀音尾對不上送假名 → 這個詞不標(寧缺勿錯)
+      const e=dictOf(base)||dictOf(surf);
+      html+='<span class="jlk" role="button" tabindex="0" data-w="'+esc(base)+'" data-r="'+esc(e?e.r||'':(base===surf?rd:''))+'" data-m="'+esc(e?e.m||'':'')+'" data-c="'+esc(e&&e.c?e.c:'')+'" data-f="">'+inner+'</span>';
+    }
+    return html;
+  }
+  // 整句假名(給「看答案」和假名比對用):有 tk 直接串讀音,否則退回站上字庫
+  function kanaOfLine(l){
+    if(!l) return '';
+    if(Array.isArray(l.tk)&&l.tk.length) return l.tk.map(s=>{ const p=String(s).split('\t'); return p[1]||p[0]; }).join('');
+    return kanaOf(l.ja);
+  }
+  // 答案區:注音句 + 整句假名 + 再聽一次(用戶回饋「看答案也沒有可以得知正確發音的地方」)
+  function answerBlock(l){
+    const kana=kanaOfLine(l);
+    const rep=(window.stayjpReportHref?('<a href="'+window.stayjpReportHref('YouTube注音', vid, '句子:'+l.ja+'\n目前注音:'+kana)+'" target="_blank" rel="noopener" style="color:var(--tx3);text-decoration:underline">'+enOr('注音有誤?回報','Wrong reading? Report')+'</a>'):'');
+    return '<div class="rt2" style="font-size:16px;line-height:2.2">'+tokRuby(l)+'</div>'
+      + (kana&&kana!==l.ja?'<div class="rt2" style="font-size:12.5px">'+enOr('讀音:','Reading: ')+esc(kana)+'</div>':'')
+      + ((l.zh&&hasZh)?'<div class="rt2">'+esc(l.zh)+'</div>':'')
+      + '<div style="display:flex;gap:8px;align-items:center;margin-top:8px;flex-wrap:wrap"><button class="btn" style="padding:7px 14px;font-size:13px" onclick="YTS.replay()"><i data-ic=volume></i> '+enOr('再聽一次','Listen again')+'</button>'
+      + '<span style="font-size:11.5px;color:var(--tx3)">'+enOr('注音為自動判讀','Readings are auto-generated')+(rep?' · '+rep:'')+'</span></div>';
+  }
   // 有效句長(ms):ASR 字幕的 d 常延伸蓋過下一句 → 截到下一句開始,KTV 刷色才對得上
   function effD(i){
     const l=lines[i]; if(!l) return 4000;
@@ -524,6 +565,7 @@ const YTS = (() => {
       const d=await r.json();
       if(d && Array.isArray(d.lines) && d.lines.length){
         setLines(d.lines);
+        const an=document.getElementById('asrNote'); if(an) an.style.display = d.track==='asr' ? 'block' : 'none';   // 自動字幕:先講清楚會有錯字
         document.getElementById('pasteBox').style.display='none';
         return;
       }
@@ -665,7 +707,7 @@ const YTS = (() => {
       return;
     }
     stopKtv();
-    jp.innerHTML=fr(l.ja);
+    jp.innerHTML=tokRuby(l);
     jp.classList.toggle('blur', mode==='dict' && !l._rev);
     document.getElementById('pcZh').textContent=l.zh||'';
     if(mode==='shadow'){
@@ -706,7 +748,7 @@ const YTS = (() => {
   function renderKtv(){
     const l=lines[cur]; if(!l) return;
     document.getElementById('ktvPrev').innerHTML = cur>0 ? esc(lines[cur-1].ja) : '';
-    document.getElementById('ktvCur').innerHTML = '<span class="kt" id="ktSpan">'+fr(l.ja)+'</span>';
+    document.getElementById('ktvCur').innerHTML = '<span class="kt" id="ktSpan">'+tokRuby(l)+'</span>';
     document.getElementById('ktvZh').textContent = l.zh||'';
     document.getElementById('ktvNext').innerHTML = cur<lines.length-1 ? esc(lines[cur+1].ja) : '';
     document.getElementById('pcIdx').textContent=(cur+1)+' / '+lines.length+'　'+fmtT(l.t);
@@ -818,9 +860,10 @@ const YTS = (() => {
     const res=document.getElementById('pcRes');
     res.className='pc-result '+(pass?'pass':'fail');
     const l=lines[cur];
-    const answerHtml = pass ? '' : `<div class="rt2">${enOr('正解:','Answer: ')}${esc(l?l.ja:'')}${(l&&l.zh&&hasZh)?'　'+esc(l.zh):''}</div>`;
+    const answerHtml = (pass||!l) ? '' : `<div class="rt2" style="margin-top:6px">${enOr('正解:','Answer:')}</div>`+answerBlock(l);
     res.innerHTML=`<div class="rt1">${pass?enOr('答對了!','Correct!'):enOr('再試一次會更好','Almost — try again')} ${pct}%${pass?' ✓':''}</div>`
       + (diffHtml?`<div class="rt2">${diffHtml}</div>`:'') + answerHtml;
+    try{ if(window.Icons&&Icons.hydrate)Icons.hydrate(); }catch(e){}
     if(!pass) document.getElementById('pcNext').style.display='flex';   // 沒過也能往下一句,不卡住
     if(pass){
       done[cur]=1; try{ localStorage.setItem(doneKey(),JSON.stringify(done)); }catch(e){}
@@ -833,7 +876,7 @@ const YTS = (() => {
     if(_settled){ _acc=''; _prevRawN=''; _nBase=''; _settled=false;   // 上一輪已給分:重新開始,不沿用舊累積
       const res=document.getElementById('pcRes'); if(res){ res.className='pc-result'; res.innerHTML=''; }
       document.getElementById('pcNext').style.display='none';
-      const jp=document.getElementById('pcJp'); if(jp&&lines[cur]) jp.innerHTML=fr(lines[cur].ja);
+      const jp=document.getElementById('pcJp'); if(jp&&lines[cur]) jp.innerHTML=tokRuby(lines[cur]);
     }
     try{ player&&player.pauseVideo(); }catch(e){}
     clearWatch();
@@ -903,12 +946,12 @@ const YTS = (() => {
   function revealAnswer(){
     if(recording) stopRec(false);
     const l=lines[cur]; if(!l) return;
-    const jp=document.getElementById('pcJp'); if(jp){ jp.classList.remove('blur'); jp.innerHTML=fr(l.ja); }
+    const jp=document.getElementById('pcJp'); if(jp){ jp.classList.remove('blur'); jp.innerHTML=tokRuby(l); }
     document.getElementById('pcZh').style.filter='';
     const res=document.getElementById('pcRes');
     res.className='pc-result fail';
-    res.innerHTML='<div class="rt1">'+enOr('這句先看過就好','Here’s the line')+'</div>'
-      + '<div class="rt2">'+esc(l.ja)+((l.zh&&hasZh)?'<br>'+esc(l.zh):'')+'</div>';
+    res.innerHTML='<div class="rt1">'+enOr('這句先看過就好','Here’s the line')+'</div>'+answerBlock(l);
+    try{ if(window.Icons&&Icons.hydrate)Icons.hydrate(); }catch(e){}
     document.getElementById('pcNext').style.display='flex';
     _settled=true;
   }
@@ -929,7 +972,7 @@ const YTS = (() => {
     for(let k=0;k<s.length;k++) html+=keepS.has(k)?'<span class="dok">'+esc(s[k])+'</span>':'<span class="dng">'+esc(s[k])+'</span>';
     document.getElementById('pcJp').classList.remove('blur');
     document.getElementById('pcZh').style.filter='';
-    showResult(Math.max(t.length?dp[s.length][t.length]/Math.max(t.length,s.length):0, lcsRatio(said, kanaOf(l.ja)||l.ja)), html);
+    showResult(Math.max(t.length?dp[s.length][t.length]/Math.max(t.length,s.length):0, lcsRatio(said, kanaOfLine(l)||l.ja)), html);
   }
 
   // ── 這支影片的單字・文法:掃字幕比對站上題庫,點開才載入大檔(vocab 每級 600KB) ──
@@ -1123,7 +1166,7 @@ const YTS = (() => {
       : enOr('把整句唸一次,注意這個詞在句中的位置和前後接續。','Read the whole line aloud and note how this word connects to what comes before and after.');
     document.getElementById('qzEx').innerHTML =
       '<div class="qz-ex"><b>'+(correct?enOr('答對了!','Correct!'):enOr('正解:','Answer: '))+'</b>'+esc(q.ans)
-      + '<div class="exj">'+fr(l.ja)+'</div>'+zhLine
+      + '<div class="exj">'+tokRuby(l)+'</div>'+zhLine
       + '<div style="color:var(--tx2);font-size:12.5px;margin-top:4px">'+why+'</div>'
       + '<div class="qz-actions"><button class="btn" onclick="YTS.qzPlay()"><i data-ic=volume></i> '+enOr('再聽一次','Replay')+'</button>'
       + '<button class="btn pri" onclick="YTS.qzNext()">'+(qz.i+1>=qz.list.length?enOr('看結果 →','Results →'):enOr('下一題 →','Next →'))+'</button></div></div>';
@@ -1143,7 +1186,7 @@ const YTS = (() => {
       h += '<div class="qz-rv-item"><div class="rq">'+(n+1)+'. '+(r.kind==='listen'?enOr('聽句','Listening'):enOr('克漏字','Cloze'))+'　'+fmtT(l.t)+'</div>'
         + (r.correct?'':'<div class="mine">✗ '+esc(r.mine)+'</div>')
         + '<div class="corr">✓ '+esc(r.ans)+'</div>'
-        + '<div style="margin-top:4px;line-height:2">'+fr(l.ja)+'</div>'
+        + '<div style="margin-top:4px;line-height:2">'+tokRuby(l)+'</div>'
         + ((l.zh&&hasZh)?'<div class="exz" style="color:var(--tx2);font-size:12.5px">'+esc(l.zh)+'</div>':'')
         + '<button class="btn" style="margin-top:6px;padding:5px 12px;font-size:12.5px" onclick="YTS.jumpPlay('+r.idx+')"><i data-ic=volume></i> '+enOr('聽這句','Play')+'</button></div>';
     });
@@ -1211,7 +1254,10 @@ const YTS = (() => {
   const THUMB_STEPS=['sddefault','hqdefault','mqdefault'];
   function thumbFallback(img){
     const n=parseInt(img.dataset.step||'0',10);
-    if(n>=THUMB_STEPS.length){ img.onerror=null; img.onload=null; return; }
+    if(n>=THUMB_STEPS.length){ img.onerror=null; img.onload=null;
+      // 連 mqdefault 都沒有 = 影片已被刪除/下架(用戶回報「有影片不能看」)→ 整張卡藏掉
+      const card=img.closest('.gal-c,.tp'); if(card) card.style.display='none';
+      return; }
     img.dataset.step=String(n+1);
     img.src='https://i.ytimg.com/vi/'+img.dataset.v+'/'+THUMB_STEPS[n]+'.jpg';
   }

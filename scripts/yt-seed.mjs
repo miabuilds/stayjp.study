@@ -119,7 +119,9 @@ async function seed(v) {
   const prevBy = new Map((prev.lines || []).map(l => [l.t, l]));
   const merged = lines.slice(0, 600).map(l => {
     const old = prevBy.get(l.t) || {};
-    return { t: l.t, d: l.d, ja: l.text, zh: zhBy.get(l.t) || old.zh || '', en: enBy.get(l.t) || old.en || '' };
+    const row = { t: l.t, d: l.d, ja: l.text, zh: zhBy.get(l.t) || old.zh || '', en: enBy.get(l.t) || old.en || '' };
+    if (old.tk && old.ja === l.text) row.tk = old.tk;   // 逐詞讀音(scripts/yt-ruby.mjs 產的)句子沒變就留著;變了重跑 yt-ruby
+    return row;
   });
   // 沒帶來任何新翻譯、而且本來就有這支 → 不要寫,省一次無謂的覆蓋
   const gained = merged.filter(x => x.zh).length + merged.filter(x => x.en).length;
