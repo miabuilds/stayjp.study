@@ -43,6 +43,23 @@
   try {
     var _refm = (location.search || '').match(/[?&]ref=([A-Za-z0-9_-]{1,32})/);
     if (_refm && !localStorage.getItem('stayjp_ref')) localStorage.setItem('stayjp_ref', _refm[1].toUpperCase());
+    // KOL 連結點擊計數(refClick):每個分頁 session 每個碼只送一次;sendBeacon 不擋渲染,錯誤全吞。
+    // 後端只存 IP 的加鹽雜湊、48 小時後刪 —— 用來把「剛點完連結 → 去 App 註冊」的人自動歸給這位 KOL(claimRefByIp)。
+    if (_refm) {
+      try {
+        var _rc = _refm[1].toUpperCase(), _rk = 'ref_click_' + _rc;
+        if (!sessionStorage.getItem(_rk)) {
+          sessionStorage.setItem(_rk, '1');
+          var _ua = navigator.userAgent || '';
+          var _plat = /iPhone|iPad|iPod/.test(_ua) ? 'ios' : (/Android/.test(_ua) ? 'android' : 'other');
+          var _payload = JSON.stringify({ code: _rc, plat: _plat });
+          var _url = 'https://asia-east1-jpnote-1bdd6.cloudfunctions.net/refClick';
+          var _sent = false;
+          try { if (navigator.sendBeacon) _sent = navigator.sendBeacon(_url, new Blob([_payload], { type: 'text/plain' })); } catch (e) {}
+          if (!_sent && window.fetch) fetch(_url, { method: 'POST', body: _payload, keepalive: true, mode: 'no-cors', headers: { 'Content-Type': 'text/plain' } }).catch(function () {});
+        }
+      } catch (e) {}
+    }
     // iPhone Safari 點推薦連結:順手給「在 App 開啟」(stayjp://ref/CODE 深連結 → App 內自動套推薦價;Apple 3.1.1 後 iOS App 無輸碼欄,連結就是唯一入口)
     if (_refm && /iPhone|iPad/.test(navigator.userAgent) && !(window.STAYJP_NATIVE && STAYJP_NATIVE.isNativeApp) && !sessionStorage.getItem('ref_app_bar')) {
       var _code = _refm[1].toUpperCase();

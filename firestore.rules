@@ -287,6 +287,16 @@ service cloud.firestore {
       allow create, delete: if false;
     }
 
+    // KOL 連結點擊紀錄(refClick 寫、claimRefByIp 讀、refClickCleanup 48h 刪)— 只存 IP 加鹽雜湊,
+    // 前端一律不得讀寫(連 admin 也不開),只走 Admin SDK。
+    match /ref_clicks/{id} {
+      allow read, write: if false;
+    }
+    // IP 雜湊的鹽 — 外洩就能反推 IP,前端全拒,只有 Cloud Function(Admin SDK)讀/建立
+    match /config/ref_salt {
+      allow read, write: if false;
+    }
+
     // 預設拒絕：未明確允許的所有路徑皆擋
     match /{document=**} {
       allow read, write: if false;

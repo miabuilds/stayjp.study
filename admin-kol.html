@@ -142,6 +142,13 @@ function refCommissionFor(code) {
 }
 
 let _allComms = [];
+// ref_codes.clicks_by_day 的 key 是台灣日期 YYYYMMDD(refClick 寫);加總含今天的最近 N 天,與 kolStats 同算法
+function clicksDays(byDay, days) {
+  if (!byDay) return 0;
+  const p = n => (n < 10 ? '0' : '') + n; let s = 0;
+  for (let i = 0; i < days; i++) { const d = new Date(Date.now() - i * 864e5 + 8 * 3600e3); s += Number(byDay[d.getUTCFullYear() + p(d.getUTCMonth() + 1) + p(d.getUTCDate())]) || 0; }
+  return s;
+}
 async function loadAll() {
   // 先抓訂閱者(算歸因/抽成),再畫兩塊
   try {
@@ -172,7 +179,7 @@ async function loadRefCodes() {
       const comm = refCommissionFor(code);
       return `<div style="padding:8px 0;border-bottom:1px solid var(--bd)${c.active===false?';opacity:.5':''}">
         <b>${esc(code)}</b> · ${esc(c.kol||'')} ${c.active===false?'<span style="color:#EF4444">(停用)</span>':''}
-        <span style="color:var(--tx2);margin-left:6px">抽成 ${pct}% · 成交 ${comm.deals} 筆 · 目前付費中 ${comm.paying} 人 · 分潤(帳本) <b style="color:#16A34A">NT$${comm.amount.toLocaleString()}</b></span>
+        <span style="color:var(--tx2);margin-left:6px">抽成 ${pct}% · <span title="連結點擊(同 IP 30 分鐘內只算一次)"><i data-ic=target></i> 點擊 <b style="color:var(--tx)">${(Number(c.clicks)||0).toLocaleString()}</b>(7 天 ${clicksDays(c.clicks_by_day,7)} / 30 天 ${clicksDays(c.clicks_by_day,30)})</span> · 成交 ${comm.deals} 筆 · 目前付費中 ${comm.paying} 人 · 分潤(帳本) <b style="color:#16A34A">NT$${comm.amount.toLocaleString()}</b></span>
         <div style="margin-top:4px;display:flex;gap:6px;flex-wrap:wrap">
           <button class="btn" style="font-size:11px;padding:3px 8px" onclick="copyTxt('${refLink}')">複製推薦連結</button>
           ${c.token ? `<button class="btn" style="font-size:11px;padding:3px 8px" onclick="copyTxt('${kolLink}')">複製 KOL 查詢頁連結</button>` : '<span style="font-size:11px;color:var(--tx3)">(無 token,不提供查詢頁)</span>'}

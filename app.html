@@ -1746,6 +1746,15 @@ try {
   // 走 Campaign.claim:擋過期碼,而且活動碼不會蓋掉已存在的 KOL / 個人碼(保護分潤)
   var _rc = _rm ? _rm[1].toUpperCase() : '';
   if (_rc) { if (window.Campaign) Campaign.claim(_rc); else localStorage.setItem('stayjp_ref', _rc); }
+  // KOL 連結點擊計數(refClick)——app.html 沒載 auth-header.js,這裡同一份邏輯;sessionStorage key 相同 → 同分頁不重複送
+  if (_rc && !sessionStorage.getItem('ref_click_' + _rc)) {
+    sessionStorage.setItem('ref_click_' + _rc, '1');
+    var _ua = navigator.userAgent || '';
+    var _pl = JSON.stringify({ code: _rc, plat: /iPhone|iPad|iPod/.test(_ua) ? 'ios' : (/Android/.test(_ua) ? 'android' : 'other') });
+    var _ru = 'https://asia-east1-jpnote-1bdd6.cloudfunctions.net/refClick', _sent = false;
+    try { if (navigator.sendBeacon) _sent = navigator.sendBeacon(_ru, new Blob([_pl], { type: 'text/plain' })); } catch (e) {}
+    if (!_sent && window.fetch) fetch(_ru, { method: 'POST', body: _pl, keepalive: true, mode: 'no-cors', headers: { 'Content-Type': 'text/plain' } }).catch(function () {});
+  }
 } catch (e) {}
 </script>
 <link rel="stylesheet" href="tactile.css">
@@ -1949,11 +1958,37 @@ if (fbConfig) {
   function storeRefCode() {
     try {
       var ref = localStorage.getItem('stayjp_ref');
+      if (!ref && currentUser) { claimRefByIp(currentUser); return; }
       if (!ref || !currentUser || !db) return;
       var docRef = db.collection('users').doc(currentUser.uid);
       docRef.get().then(function (d) {
         if (d.exists && d.data() && d.data().ref_code) return;   // 首次歸因,不覆蓋既有
         docRef.set({ ref_code: ref, ref_at: Date.now() }, { merge: true });
+      }).catch(function () {});
+    } catch (e) {}
+  }
+  // 本機沒有 ?ref= 紀錄(典型:Safari/Threads 點 KOL 連結 → 去 App 註冊,localStorage 帶不過來)
+  // → 請後端用「同 IP 剛點過的連結」配對(claimRefByIp:新帳號 6h 內、剛好一個碼才歸因,IP 只存雜湊 48h 刪)。
+  // 每台裝置 × uid 只問一次;完全靜默,沒有任何 UI(iOS App 內 Apple 3.1.1 禁碼字樣)。帳上已有碼就不打。
+  function claimRefByIp(u) {
+    try {
+      var gk = 'ref_ipclaim_' + u.uid;
+      if (localStorage.getItem(gk)) return;
+      // 只有新帳號才可能配對成功 → 舊帳號直接記旗標,不打 API
+      var ct = Date.parse((u.metadata && u.metadata.creationTime) || '') || 0;
+      if (!ct || Date.now() - ct > 6 * 3600e3) { localStorage.setItem(gk, '1'); return; }
+      localStorage.setItem(gk, '1');
+      var N = window.STAYJP_NATIVE, ua = navigator.userAgent || '';
+      var plat = (N && N.isNativeApp && (N.platform === 'ios' || N.platform === 'android')) ? N.platform
+        : (/iPhone|iPad|iPod/.test(ua) ? 'ios' : (/Android/.test(ua) ? 'android' : 'other'));
+      db.collection('users').doc(u.uid).get().then(function (d) {
+        if (d.exists && d.data() && d.data().ref_code) return;
+        return u.getIdToken().then(function (t) {
+          return fetch('https://asia-east1-jpnote-1bdd6.cloudfunctions.net/claimRefByIp', {
+            method: 'POST', headers: { 'Authorization': 'Bearer ' + t, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ plat: plat })
+          });
+        });
       }).catch(function () {});
     } catch (e) {}
   }

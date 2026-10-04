@@ -30,6 +30,8 @@ export { redeemCode } from "./redeem-code";
 export { adminUnblockUser } from "./admin-unblock-user";
 export { adminUserStats } from "./admin-user-stats";
 export { kolStats } from "./kol-stats";
+// KOL 連結點擊 + App 註冊 IP 歸因(IP 只存加鹽雜湊、48h 刪除;見 ref-click.ts)
+export { refClick, claimRefByIp, refClickCleanup } from "./ref-click";
 export { validateRefCode } from "./validate-ref-code";
 export { getMyRefCode } from "./get-my-ref-code";
 export { partnerJoin } from "./partner-join";

@@ -15,6 +15,12 @@
   h1{font-size:20px;margin-bottom:2px}
   .kol{font-size:14px;color:var(--tx2);margin-bottom:20px}
   .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:18px}
+  .stats.top{grid-template-columns:repeat(2,1fr);margin-bottom:10px}
+  .stats.two{grid-template-columns:repeat(2,1fr)}
+  .stat .s{font-size:11px;color:var(--tx3);margin-top:4px;font-variant-numeric:tabular-nums}
+  .clicks .v{color:var(--ac)}
+  .click-help{display:flex;align-items:flex-start;gap:6px;font-size:12px;color:var(--tx2);line-height:1.6;margin:0 0 14px}
+  .click-help i{flex:none;margin-top:2px}
   .stat{background:var(--bg);border:1px solid var(--bd);border-radius:12px;padding:14px 8px;text-align:center}
   .stat .v{font-size:26px;font-weight:800;letter-spacing:-.5px}
   .stat .l{font-size:12px;color:var(--tx2);margin-top:3px}
@@ -80,12 +86,17 @@
         const now = new Date();
         const first = new Date(now.getFullYear(), now.getMonth(), 1);
         body.innerHTML =
-          '<div class="stats">' +
-            '<div class="stat"><div class="v">' + d.total + '</div><div class="l">帶來人數</div></div>' +
+          '<div class="stats top">' +
+            '<div class="stat clicks"><div class="v">' + (Number(d.clicks) || 0).toLocaleString() + '</div><div class="l"><i data-ic=target></i> 點擊次數</div>' +
+              '<div class="s">近 7 天 ' + (Number(d.clicks_7d) || 0) + '<br>近 30 天 ' + (Number(d.clicks_30d) || 0) + '</div></div>' +
+            '<div class="stat"><div class="v">' + d.total + '</div><div class="l"><i data-ic=user></i> 帶來人數</div></div>' +
+          '</div>' +
+          '<div class="click-help"><i data-ic=bulb></i><span>有人點你的連結就算一次（同一人 30 分鐘內只算一次）</span></div>' +
+          '<div class="stats two">' +
             '<div class="stat paid"><div class="v">' + d.paid + '</div><div class="l">已付費</div></div>' +
             '<div class="stat trial"><div class="v">' + d.trialing + '</div><div class="l">試用中</div></div>' +
           '</div>' +
-          '<div class="note">「帶來人數」= 透過你的推薦碼註冊的人;「已付費」= 其中目前付費訂閱中(結算依據);「試用中」= 免費試用尚未轉付費。數字即時更新。</div>' +
+          '<div class="note">「帶來人數」= 透過你的推薦碼註冊的人(含點你的連結後改到 App 註冊、系統自動配對到的人);「已付費」= 其中目前付費訂閱中(結算依據);「試用中」= 免費試用尚未轉付費。「點擊次數」從點擊統計上線後開始累計,比較早的點擊不會補算。數字即時更新。</div>' +
           '<div class="range-box">' +
             '<div class="range-title"><i data-ic=calendar></i> 期間查詢</div>' +
             '<div class="range-row"><input type="date" id="rFrom" value="' + iso(first) + '"><span>~</span><input type="date" id="rTo" value="' + iso(now) + '"><button id="rBtn">查詢</button></div>' +

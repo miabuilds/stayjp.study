@@ -5,6 +5,7 @@
 import * as functions from "firebase-functions/v2/https";
 import * as admin from "firebase-admin";
 import { db } from "./utils/firestore";
+import { sumClicksDays } from "./utils/ref-attrib";
 
 if (admin.apps.length === 0) admin.initializeApp();
 
@@ -87,6 +88,10 @@ export const kolStats = functions.onRequest(
       res.json({
         ok: true, code, kol: c.kol || "", total, paid, trialing, range,
         commission_pct: typeof c.commission_pct === "number" ? c.commission_pct : null,
+        // 連結點擊(refClick 寫;同 IP 30 分鐘內只算一次)。舊碼沒這欄 → 0
+        clicks: Number(c.clicks) || 0,
+        clicks_7d: sumClicksDays(c.clicks_by_day, Date.now(), 7),
+        clicks_30d: sumClicksDays(c.clicks_by_day, Date.now(), 30),
       });
     } catch (err) {
       console.error("kolStats error:", err);
