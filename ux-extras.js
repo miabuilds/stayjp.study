@@ -135,17 +135,39 @@
     return '<span class="jlk' + pos + '" role="button" tabindex="0"'
       + ' data-w="' + escAttr(data.w) + '" data-r="' + escAttr(data.r) + '"'
       + ' data-m="' + escAttr(data.m) + '" data-c="' + escAttr(data.c || '') + '"'
-      + ' data-f="' + escAttr(data.f || '') + '">' + inner + '</span>';
+      + ' data-f="' + escAttr(data.f || '') + '"' + (data.u ? ' data-u="1"' : '') + '>' + inner + '</span>';
   }
 
   // 數字 + 計數漢字 → 計數讀音(規則且高頻;避開不規則的 日/分/人)。前一字為阿拉伯或全形數字時套用。
   var COUNTER_READ = { '月': 'がつ', '年': 'ねん', '円': 'えん', '時': 'じ' };
-  function furiganaHTML(text) {
+  // opts.kana=true(目前只有 AI 情境對話頁開):純假名詞也可點(kana-lookup.js 的保守比對器);
+  // opts.kanaExtra = 該則 AI 回覆附的 WORDS(優先於字典)。沒帶 opts 的頁面行為完全不變。
+  function kanaMatchesAt(text, opts) {
+    if (!opts || !opts.kana || !window.KanaLookup) return null;
+    try {
+      var ms = window.KanaLookup.findMatches(text, window.KanaLookup.getIndex(), opts.kanaExtra);
+      if (!ms.length) return null;
+      var at = Object.create(null);
+      ms.forEach(function (m) { at[m.start] = m; });
+      return at;
+    } catch (e) { return null; }
+  }
+  function furiganaHTML(text, opts) {
     if (text == null) return '';
+    text = String(text);
     var dc = dict();
+    var kAt = kanaMatchesAt(text, opts);
     var out = '', i = 0;
     while (i < text.length) {
-      if (!isKanji(text[i])) { out += escapeHtml(text[i]); i++; continue; }
+      if (!isKanji(text[i])) {
+        var km = kAt && kAt[i];
+        if (km) {   // 假名詞:同一套 .jlk 虛線+彈窗;未收錄片假名帶 u 旗標(彈窗顯示「外來語・字典沒有收錄」、收藏存空意思)
+          out += tapSpan(escapeHtml(text.slice(km.start, km.end)),
+            { w: km.w, r: km.r, m: km.src === 'unknown' ? '' : km.m, c: km.c, f: '', u: km.src === 'unknown' });
+          i = km.end; continue;
+        }
+        out += escapeHtml(text[i]); i++; continue;
+      }
       if (text[i] === '数' && /[かヶヵ]/.test(text[i + 1] || '')) {   // 数か月/数ヶ国 → すう(非かず)
         out += '<ruby>数<rt>すう</rt></ruby>'; i++; continue;
       }
@@ -223,7 +245,7 @@
     return out;
   }
   // 保留既有簡單標籤(如例句標文法點的 <em>):只對標籤外文字上 furigana/可點,標籤原樣穿過
-  function furiganaHTMLRich(html) {
+  function furiganaHTMLRich(html, opts) {
     if (html == null) return '';
     // 標籤白名單:只有內容裡合法會出現的排版標籤放行(文法例句的 <em>、既有 ruby 等);
     // 其他一律轉義——AI 生成的台詞會經過這裡進 innerHTML,模型被誘導輸出 <img onerror=…> 這類
@@ -231,7 +253,7 @@
     var SAFE_TAG = /^<\/?(em|b|i|u|strong|br|ruby|rt|rp|span)((\s+(class|style)="[^"<>]*")*\s*\/?)>$/i;   // 屬性只准 class/style(雙引號):span onclick=… 這種一律轉義
     return String(html).split(/(<[^>]+>)/).map(function (seg) {
       if (seg.charAt(0) === '<') return SAFE_TAG.test(seg) ? seg : escapeHtml(seg);
-      return furiganaHTML(seg);
+      return furiganaHTML(seg, opts);
     }).join('');
   }
 
@@ -347,9 +369,9 @@
     if (data.c) tags += '<span class="jtag">' + escapeHtml(data.c) + '</span>';
     if (data.f) tags += '<span class="jtag">' + escapeHtml(data.f) + '</span>';
     pop.innerHTML = '<span class="jx" role="button" aria-label="關閉">✕</span>'
-      + '<div><span class="jw">' + escapeHtml(data.w) + '</span><span class="jr">' + escapeHtml(data.r) + '</span></div>'
+      + '<div><span class="jw">' + escapeHtml(data.w) + '</span>' + (data.r && data.r !== data.w ? '<span class="jr">' + escapeHtml(data.r) + '</span>' : '') + '</div>'   // 純假名詞讀音=本身 → 不重複印
       + (tags ? '<div class="jtags">' + tags + '</div>' : '')
-      + '<div class="jm">' + escapeHtml(data.m || '（本站未收錄，可查辭典 ↓）') + '</div>'
+      + '<div class="jm">' + escapeHtml(data.m || (data.u ? '外來語・字典沒有收錄' : '（本站未收錄，可查辭典 ↓）')) + '</div>'
       + (data.f ? '<div class="jbase">辭書形（原形）：<b>' + escapeHtml(data.w) + '</b></div>' : '')
       + (_nudge ? '<div class="jfreq"><i data-ic=refresh></i> 你查過這個字 ' + _ln + ' 次，收藏起來複習吧</div>'
         : (_ln >= 2 ? '<div class="jfreq jfreq-dim"><i data-ic=search></i> 查過 ' + _ln + ' 次</div>' : ''))
@@ -414,7 +436,7 @@
     var sp = e.target.closest && e.target.closest('.jlk');
     if (sp) {
       e.stopPropagation();
-      showLookup({ w: sp.dataset.w, r: sp.dataset.r, m: sp.dataset.m, c: sp.dataset.c, f: sp.dataset.f }, sp);
+      showLookup({ w: sp.dataset.w, r: sp.dataset.r, m: sp.dataset.m, c: sp.dataset.c, f: sp.dataset.f, u: sp.dataset.u === '1' }, sp);
     }
   }, true);
   // 冒泡階段:點彈窗以外的地方 → 關閉

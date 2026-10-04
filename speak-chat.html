@@ -88,7 +88,9 @@
   /* 對話中:即點即查提示 + 彈窗吃本頁配色(ux-extras 的變數名跟本頁不同 → 深色模式對齊) */
   .lk-hint{align-self:flex-start;display:inline-flex;align-items:center;gap:6px;font-size:12.5px;color:var(--ink2);background:var(--panel);border:1px dashed var(--accent);border-radius:12px;padding:6px 11px}
   .lk-hint button{font:inherit;font-size:12px;color:var(--ink3);background:none;border:0;padding:0 0 0 4px;cursor:pointer}
-  .bubble.ai .jlk{border-bottom-color:var(--accent)}
+  /* 虛線本頁自帶:ux-extras 的 .jlk 樣式要等第一次點查才注入 → 沒點過之前提示說「點有虛線」卻看不到虛線 */
+  .bubble.ai .jlk{cursor:pointer;border-radius:3px;border-bottom:1.5px dotted var(--accent)}
+  #jlkPop a.jact{text-decoration:none}   /* 未收錄詞的「中文辭典/Jisho」連結鈕:跟發音/收藏同款,不要底線 */
   #jlkPop{--bg2:var(--panel);--tx:var(--ink);--tx2:var(--ink2);--tx3:var(--ink3);--bd:var(--line);--bg:var(--bg3);--ac:var(--accent)}
   .sc-prog{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--ink3);margin:2px 0 10px}
   .sc-prog .bar{flex:0 0 90px;height:5px;border-radius:99px;background:var(--line);overflow:hidden}
@@ -275,6 +277,7 @@
 <script src="grammar-kanji-readings.js" defer></script>
 <script src="vocab-n5.js" defer></script>
 <script src="vocab-n4.js" defer></script>
+<script src="kana-lookup.js" defer></script>
 <script src="ux-extras.js" defer></script>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
@@ -631,11 +634,18 @@ if(!window.stayjpAddWord) window.stayjpAddWord = function(w, r, m, lv){
   try{ localStorage.setItem('word_notebook', JSON.stringify(nb)); }catch(e){}
   return 'added';
 };
+// 假名詞也可點(コンビニ/ありがとう/ちょっと):只有本頁開 kana 旗標,其他頁的 furigana 行為不變。
+// AI 附的 WORDS 優先(意思轉成目前語系);字典只收詞頭純假名的 vocab + kana-lookup.js 精選詞。
+function kanaOpts(words){
+  let extra=[];
+  try{ if(words && window.KanaLookup) extra=KanaLookup.parseAiWords(words).map(e=>({ w:e.w, r:e.r, m:cvt(e.m||'') })); }catch(e){}
+  return { kana:true, kanaExtra:extra };
+}
 function aiBubble(m){
   const jp = m.jp || m.text || '';
   addWordEntries(m.words);
   return `<div class="msg ai"><div class="bubble ai">
-    <div class="bjp"><span>${(jp&&window.furiganaHTMLRich)?window.furiganaHTMLRich(jp):(esc(jp)||'…')}</span>${jp?`<button class="spk" title="${enOr('播放','Play')}" onclick="playTTS(${JSON.stringify(jp).replace(/"/g,'&quot;')}, scene&&scene.voice)"><i data-ic=volume></i></button><button class="spk favstar" title="${enOr('收藏這句','Save this sentence')}" onclick="favFromBubble(this)" data-jp="${esc(jp)}" data-kana="${esc(m.kana||'')}" data-zh="${esc(m.zh||'')}">${(window.FavSents&&FavSents.isFav(jp))?'★':'☆'}</button>`:''}</div>
+    <div class="bjp"><span>${(jp&&window.furiganaHTMLRich)?window.furiganaHTMLRich(jp, kanaOpts(m.words)):(esc(jp)||'…')}</span>${jp?`<button class="spk" title="${enOr('播放','Play')}" onclick="playTTS(${JSON.stringify(jp).replace(/"/g,'&quot;')}, scene&&scene.voice)"><i data-ic=volume></i></button><button class="spk favstar" title="${enOr('收藏這句','Save this sentence')}" onclick="favFromBubble(this)" data-jp="${esc(jp)}" data-kana="${esc(m.kana||'')}" data-zh="${esc(m.zh||'')}">${(window.FavSents&&FavSents.isFav(jp))?'★':'☆'}</button>`:''}</div>
 
     ${(showZh && m.zh)?`<div class="bzh">${esc(cvt(m.zh))}</div>`:''}
     ${(showZh && m.words)?wordChips(m.words):''}
@@ -918,7 +928,7 @@ function viewLog(id){
     if(m.r==='m') return '<div class="msg me"><div class="bubble me"><div class="bjp">'+esc(m.jp)+'</div></div></div>';
     // furigana 必須包在單一 <span> 裡:.bubble.ai .bjp 是 flex,裸放會讓每個 ruby 變獨立 flex item 排成直欄(跑版實錘)
     return '<div class="msg ai"><div class="bubble ai">'
-      +'<div class="bjp"><span>'+(window.furiganaHTMLRich?furiganaHTMLRich(m.jp):esc(m.jp))+'</span><button class="spk" onclick="playTTS(window.__logs[\''+id+'\'].msgs['+i+'].jp,\''+(v.voice||'f')+'\')"><i data-ic=volume></i></button><button class="spk" onclick="favFromBubble(this)" data-jp="'+esc(m.jp)+'" data-kana="'+esc(m.k||'')+'" data-zh="'+esc(m.zh||'')+'">'+((window.FavSents&&FavSents.isFav(m.jp))?'★':'☆')+'</button></div>'
+      +'<div class="bjp"><span>'+(window.furiganaHTMLRich?furiganaHTMLRich(m.jp, kanaOpts()):esc(m.jp))+'</span><button class="spk" onclick="playTTS(window.__logs[\''+id+'\'].msgs['+i+'].jp,\''+(v.voice||'f')+'\')"><i data-ic=volume></i></button><button class="spk" onclick="favFromBubble(this)" data-jp="'+esc(m.jp)+'" data-kana="'+esc(m.k||'')+'" data-zh="'+esc(m.zh||'')+'">'+((window.FavSents&&FavSents.isFav(m.jp))?'★':'☆')+'</button></div>'
       +(m.zh?'<div class="bzh">'+esc(cvt(m.zh))+'</div>':'')
       +'</div></div>'
       +(m.c?'<div class="coach"><b>'+enOr('教練','Coach')+'</b>:'+esc(cvt(m.c))+'</div>':''); }).join('')
