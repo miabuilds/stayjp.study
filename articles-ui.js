@@ -1,3 +1,28 @@
+// 排程上架(2026-10):文章可帶 publish_at(ISO 8601 含時區,如 "2026-10-12T08:00:00+08:00"),
+// 時間到才會出現在清單/首頁紅標/接著讀/測驗題庫,也開不了 deep link;一次 commit 多篇就能每週自動上一篇。
+// 沒有 publish_at = 立即上架(既有文章不受影響);日期寫錯解析不了 = 不上架(寧可晚上不可誤上)。
+// 本機預覽:只在 localhost/127.0.0.1 生效,網址加 ?artpreview=1 或 localStorage art_preview=1。
+window.ArticleSchedule = (function () {
+  function isPreview() {
+    try {
+      var h = location.hostname;
+      if (h !== 'localhost' && h !== '127.0.0.1') return false;
+      return /[?&]artpreview=1(&|$)/.test(location.search || '') || localStorage.getItem('art_preview') === '1';
+    } catch (e) { return false; }
+  }
+  function isLive(a, now) {
+    if (!a || !a.publish_at) return true;
+    var t = Date.parse(a.publish_at);
+    if (isNaN(t)) return false;
+    return (now == null ? Date.now() : now) >= t;
+  }
+  function visible(arr, now, preview) {
+    arr = arr || [];
+    if (preview == null ? isPreview() : preview) return arr;
+    return arr.filter(function (a) { return isLive(a, now); });
+  }
+  return { isLive: isLive, visible: visible, isPreview: isPreview };
+})();
 // 文章閱讀 UI — Readle 式沉浸閱讀器:分頁(文章/測驗/單字/文法)、底部連播播放器、字級調整、大按鈕、手機優先。
 // 重用 furiganaHTMLRich→自動 furigana + 即點即查;播音只用預錄 mp3(絕不瀏覽器語音)。純前端、零 API 成本。
 window.Articles = (function () {
@@ -15,7 +40,7 @@ window.Articles = (function () {
     if(b) b.classList.toggle('on', posOn());
   }
   var FS = ['18px', '20px', '23px'];   // 字級三段
-  function list() { return window.ARTICLES || []; }
+  function list() { return window.ArticleSchedule.visible(window.ARTICLES || []); }   // 未到 publish_at 的不出現
   // 三語:en→英文;zh-CN→OpenCC 轉簡(cvt);zh-TW→原樣繁體
   function enOr(zh, en) { try { var l = (typeof I18n !== 'undefined' && I18n.getLang) ? I18n.getLang() : (localStorage.getItem('ui_lang') || 'zh-TW'); if (l === 'en') return en; return (typeof cvt === 'function') ? cvt(zh) : zh; } catch (e) { return zh; } }
   function zc(s) { try { return (typeof cvt === 'function') ? cvt(s) : s; } catch (e) { return s; } }   // 中文內容(中譯/意思):簡中轉簡,其餘原樣
@@ -41,7 +66,7 @@ window.Articles = (function () {
       } else {
         var nx = segs[i + 1];
         if (nx && !isKj(nx[0])) {                   // 漢字段：讀到下一個假名段出現處
-          var pos = rd.indexOf(nx, ri);
+          var pos = rd.indexOf(nx, ri + 1);           // 漢字至少吃一個假名(否則 書か/かか、意味合い/いみあい 的 rt 會是空的)
           if (pos < 0) return whole;
           out += '<ruby>' + esc(seg) + '<rt>' + esc(rd.slice(ri, pos)) + '</rt></ruby>'; ri = pos;
         } else {                                    // 結尾漢字段：吃掉剩餘讀音
@@ -286,6 +311,7 @@ window.Articles = (function () {
       '.art-card-b{min-width:0;flex:1}',
       '.art-card-t{font-size:17px;font-weight:700;color:var(--tx,#2c2c2c);font-family:"Hiragino Mincho ProN","Noto Serif JP",serif;line-height:1.35;display:flex;align-items:center;gap:6px}',
       '.art-done{color:#16a34a;font-size:15px;flex-shrink:0}',
+      '.art-sched{font-size:11px;font-weight:800;color:#fff;background:#f59e0b;border-radius:20px;padding:1px 8px;line-height:1.6;flex-shrink:0}',   // 本機預覽:未上架文章的預定日
       '.art-top-n{margin-left:auto;margin-right:8px;font-size:12.5px;color:var(--tx3,#aaa);font-variant-numeric:tabular-nums}',
       '.art-next{display:flex;gap:14px;align-items:center;background:var(--bg2,#fff);border:2px solid var(--ac,var(--ac));border-radius:18px;padding:12px 14px;margin:6px 0 14px;cursor:pointer;position:relative}',
       '.art-next .art-next-l{font-size:11.5px;font-weight:800;color:var(--ac,var(--ac));letter-spacing:.06em;margin-bottom:2px}.art-next-go{margin-left:auto;font-size:22px;color:var(--tx3,#aaa)}',
@@ -479,7 +505,7 @@ window.Articles = (function () {
       return '<div class="art-card' + (read[a.id] ? ' is-read' : '') + '" onclick="Articles.read(\'' + a.id + '\')">' +
         '<div class="art-thumb" style="background:linear-gradient(135deg,' + g[0] + ',' + g[1] + ')"><span class="art-th-e">' + topicEmoji(a.topic + a.title) + '</span><img class="art-th-i" src="' + imgUrl(a.id) + '" alt="" onerror="this.remove()"></div>' +
         '<div class="art-card-b">' +
-        '<div class="art-card-t">' + esc(a.title) + (read[a.id] ? '<span class="art-done"><i data-ic=check></i></span>' : '') + '</div>' +
+        '<div class="art-card-t">' + esc(a.title) + (read[a.id] ? '<span class="art-done"><i data-ic=check></i></span>' : '') + (a.publish_at && !window.ArticleSchedule.isLive(a) ? '<span class="art-sched">' + esc(a.publish_at.slice(5, 10)) + '</span>' : '') + '</div>' +
         '<div class="art-card-z">' + esc(Lc(a.title_zh, a.title_en)) + ' · ' + esc(Lc(a.topic, a.topic_en)) + '</div>' +
         '</div></div>';
     }

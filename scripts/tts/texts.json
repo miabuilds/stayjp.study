@@ -224,6 +224,13 @@
     ]
   },
   {
+    "text": "「ピッ」とみじかいおとがします。",
+    "hash": "c502e9d45d62",
+    "sources": [
+      "article#a-n5-11"
+    ]
+  },
+  {
     "text": "「もう少し待ってください、そろそろ届きます」と言われて、やっと安心しました。",
     "hash": "cd519b109649",
     "sources": [
@@ -5587,6 +5594,13 @@
     ]
   },
   {
+    "text": "いざかや",
+    "hash": "fd7581e2e935",
+    "sources": [
+      "article-vocab#a-n2-11"
+    ]
+  },
+  {
     "text": "いさぎよい",
     "hash": "dff6ad9f9916",
     "sources": [
@@ -6988,6 +7002,13 @@
     ]
   },
   {
+    "text": "いまは、えきに入るまえに、カードのおかねを見ます。",
+    "hash": "15413bbad121",
+    "sources": [
+      "article#a-n5-11"
+    ]
+  },
+  {
     "text": "いまわしい",
     "hash": "3f374db9096c",
     "sources": [
@@ -7002,6 +7023,13 @@
       "vocab-n5",
       "vocab-n4",
       "vocab-n3"
+    ]
+  },
+  {
+    "text": "いみあい",
+    "hash": "83201f3db4b9",
+    "sources": [
+      "article-vocab#a-n2-11"
     ]
   },
   {
@@ -7520,7 +7548,8 @@
     "text": "うけつけ",
     "hash": "0a1544d65547",
     "sources": [
-      "vocab-n4"
+      "vocab-n4",
+      "article-vocab#a-n4-12"
     ]
   },
   {
@@ -8524,7 +8553,22 @@
     "text": "えき",
     "hash": "1f819272ac2b",
     "sources": [
-      "vocab-n5"
+      "vocab-n5",
+      "article-vocab#a-n5-11"
+    ]
+  },
+  {
+    "text": "えきいん",
+    "hash": "5f33e30a0a59",
+    "sources": [
+      "article-vocab#a-n5-11"
+    ]
+  },
+  {
+    "text": "えきいんさんが「あちらのきかいでチャージしてください」とおしえてくれました。",
+    "hash": "ecf4be6da250",
+    "sources": [
+      "article#a-n5-11"
     ]
   },
   {
@@ -9252,6 +9296,13 @@
     ]
   },
   {
+    "text": "おきはい",
+    "hash": "0f0a8c5a084f",
+    "sources": [
+      "article-vocab#a-n3-13"
+    ]
+  },
+  {
     "text": "おきゃくさま",
     "hash": "63baaa452423",
     "sources": [
@@ -9339,6 +9390,13 @@
     "hash": "7195fbef4ac4",
     "sources": [
       "vocab-n3"
+    ]
+  },
+  {
+    "text": "おくりぬし",
+    "hash": "b325792ac7bd",
+    "sources": [
+      "article-vocab#a-n3-13"
     ]
   },
   {
@@ -9455,7 +9513,8 @@
     "text": "おしえる",
     "hash": "0fae16ccb30c",
     "sources": [
-      "vocab-n5"
+      "vocab-n5",
+      "article-vocab#a-n5-11"
     ]
   },
   {
@@ -9819,6 +9878,13 @@
     "hash": "56caed973ccc",
     "sources": [
       "essentials"
+    ]
+  },
+  {
+    "text": "おとおし",
+    "hash": "f005ea35c4cd",
+    "sources": [
+      "article-vocab#a-n2-11"
     ]
   },
   {
@@ -11570,6 +11636,13 @@
     ]
   },
   {
+    "text": "カードのおかねがたりませんでした。",
+    "hash": "9973b2cbf0ef",
+    "sources": [
+      "article#a-n5-11"
+    ]
+  },
+  {
     "text": "カードもつかえて、べんりでした。",
     "hash": "e92b4dd4674f",
     "sources": [
@@ -11668,7 +11741,8 @@
     "text": "かいけい",
     "hash": "8068eae65080",
     "sources": [
-      "vocab-n3"
+      "vocab-n3",
+      "article-vocab#a-n2-11"
     ]
   },
   {
@@ -11764,6 +11838,13 @@
     "hash": "9403a2a8c8b7",
     "sources": [
       "vocab-n2"
+    ]
+  },
+  {
+    "text": "かいさつ",
+    "hash": "ccc8768f787a",
+    "sources": [
+      "article-vocab#a-n5-11"
     ]
   },
   {
@@ -12937,6 +13018,13 @@
     "hash": "30d877ab56a7",
     "sources": [
       "vocab-n5#忘れる"
+    ]
+  },
+  {
+    "text": "かさん",
+    "hash": "afa23355d4f9",
+    "sources": [
+      "article-vocab#a-n2-11"
     ]
   },
   {
@@ -15062,7 +15150,8 @@
       "vocab-n3",
       "vocab-n1",
       "article-vocab#a-n4-6",
-      "article-vocab#a-n4-10"
+      "article-vocab#a-n4-10",
+      "article-vocab#a-n5-11"
     ]
   },
   {
@@ -15070,6 +15159,13 @@
     "hash": "1e1fbf4bf4d9",
     "sources": [
       "vocab-n3"
+    ]
+  },
+  {
+    "text": "きかいに千円を入れました。",
+    "hash": "ab14b0f832a2",
+    "sources": [
+      "article#a-n5-11"
     ]
   },
   {
@@ -15671,7 +15767,15 @@
     "text": "きっぷ",
     "hash": "635a52a3cb17",
     "sources": [
-      "vocab-n5"
+      "vocab-n5",
+      "article-vocab#a-n5-11"
+    ]
+  },
+  {
+    "text": "きっぷを買うじかんがいりません。",
+    "hash": "2c36d46f6e45",
+    "sources": [
+      "article#a-n5-11"
     ]
   },
   {
@@ -15782,6 +15886,13 @@
     "hash": "1164e1f4322e",
     "sources": [
       "vocab-n5#買い物する"
+    ]
+  },
+  {
+    "text": "きのう、かいさつで「ピンポーン」と大きいおとがしました。",
+    "hash": "0ff621d2b1e1",
+    "sources": [
+      "article#a-n5-11"
     ]
   },
   {
@@ -19419,6 +19530,13 @@
     ]
   },
   {
+    "text": "けんこうほけん",
+    "hash": "6f1e32173ad0",
+    "sources": [
+      "article-vocab#a-n4-12"
+    ]
+  },
+  {
     "text": "げんごか",
     "hash": "1957ad8a14ea",
     "sources": [
@@ -20020,7 +20138,8 @@
     "hash": "5d670da729bd",
     "sources": [
       "vocab-n3",
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n4-12"
     ]
   },
   {
@@ -21524,6 +21643,13 @@
     "hash": "b6a9333e2c40",
     "sources": [
       "vocab-n2"
+    ]
+  },
+  {
+    "text": "こころづかい",
+    "hash": "ca0cb82a89fd",
+    "sources": [
+      "article-vocab#a-n2-11"
     ]
   },
   {
@@ -27856,6 +27982,13 @@
     ]
   },
   {
+    "text": "こばち",
+    "hash": "1d8ec485f616",
+    "sources": [
+      "article-vocab#a-n2-11"
+    ]
+  },
+  {
     "text": "こはば",
     "hash": "5e1cb9d35e6a",
     "sources": [
@@ -28203,6 +28336,13 @@
     ]
   },
   {
+    "text": "これが「お通し」だ。",
+    "hash": "0ca0756be5ff",
+    "sources": [
+      "article#a-n2-11"
+    ]
+  },
+  {
     "text": "これができるかどうかで、仕事のうまくいき方が大きく変わる。",
     "hash": "e813cf1da199",
     "sources": [
@@ -28459,6 +28599,13 @@
     "hash": "901290e3968e",
     "sources": [
       "article#a-n3-5"
+    ]
+  },
+  {
+    "text": "これを「再配達」という。",
+    "hash": "417ba824ba70",
+    "sources": [
+      "article#a-n3-13"
     ]
   },
   {
@@ -29300,6 +29447,13 @@
     "hash": "140152499c99",
     "sources": [
       "vocab-n2"
+    ]
+  },
+  {
+    "text": "さいはいたつ",
+    "hash": "fe60ac599896",
+    "sources": [
+      "article-vocab#a-n3-13"
     ]
   },
   {
@@ -31008,7 +31162,8 @@
     "text": "じかんたい",
     "hash": "00ecab79cea6",
     "sources": [
-      "article-vocab#a-n3-7"
+      "article-vocab#a-n3-7",
+      "article-vocab#a-n3-13"
     ]
   },
   {
@@ -38920,7 +39075,8 @@
     "text": "そうば",
     "hash": "4d22ac28221f",
     "sources": [
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n2-11"
     ]
   },
   {
@@ -39114,6 +39270,13 @@
     "sources": [
       "vocab-n3",
       "confusables-word"
+    ]
+  },
+  {
+    "text": "そこで便利なのが「置き配」や宅配ボックスだ。",
+    "hash": "7ed35df3f4dc",
+    "sources": [
+      "article#a-n3-13"
     ]
   },
   {
@@ -40296,6 +40459,13 @@
       "vocab-n4",
       "vocab-n3",
       "confusables-word"
+    ]
+  },
+  {
+    "text": "それで、今年は早めに予防接種を受けることにしました。",
+    "hash": "dedfea810e1a",
+    "sources": [
+      "article#a-n4-12"
     ]
   },
   {
@@ -41687,6 +41857,13 @@
     ]
   },
   {
+    "text": "たくはいびん",
+    "hash": "91f0d2bcebc4",
+    "sources": [
+      "article-vocab#a-n3-13"
+    ]
+  },
+  {
     "text": "たくはいびんを出したり、お金をおろしたりすることもできます。",
     "hash": "6edd2321b9ce",
     "sources": [
@@ -41980,6 +42157,13 @@
     "hash": "eb896ae29c7d",
     "sources": [
       "article#a-n3-12"
+    ]
+  },
+  {
+    "text": "ただし、不在票には保管期限も書いてある。",
+    "hash": "4383cb6bd36f",
+    "sources": [
+      "article#a-n3-13"
     ]
   },
   {
@@ -42725,7 +42909,8 @@
     "hash": "84dbb9c5d1db",
     "sources": [
       "vocab-n4",
-      "vocab-n3"
+      "vocab-n3",
+      "article-vocab#a-n5-11"
     ]
   },
   {
@@ -43504,6 +43689,13 @@
     ]
   },
   {
+    "text": "チャージする",
+    "hash": "ae574e33ec90",
+    "sources": [
+      "article-vocab#a-n5-11"
+    ]
+  },
+  {
     "text": "チャイムが鳴るが早いか、子供たちは教室を飛び出した。",
     "hash": "edc34ac83a1e",
     "sources": [
@@ -43652,7 +43844,8 @@
     "hash": "fd1ee60c470c",
     "sources": [
       "vocab-n4",
-      "vocab-n3"
+      "vocab-n3",
+      "article-vocab#a-n4-12"
     ]
   },
   {
@@ -43800,6 +43993,13 @@
     "hash": "1e98246de5d0",
     "sources": [
       "vocab-n1"
+    ]
+  },
+  {
+    "text": "ちょうし",
+    "hash": "8c2c8aa297eb",
+    "sources": [
+      "article-vocab#a-n4-12"
     ]
   },
   {
@@ -44515,6 +44715,13 @@
     "hash": "fc8aa4fe81a6",
     "sources": [
       "vocab-n1"
+    ]
+  },
+  {
+    "text": "つうはん",
+    "hash": "3a977417f403",
+    "sources": [
+      "article-vocab#a-n3-13"
     ]
   },
   {
@@ -46058,6 +46265,13 @@
     ]
   },
   {
+    "text": "てもちぶさた",
+    "hash": "14737270d71c",
+    "sources": [
+      "article-vocab#a-n2-11"
+    ]
+  },
+  {
     "text": "デモ隊が幹線道路を封鎖したため、市内の交通は完全に麻痺してしまった。",
     "hash": "e476b63d8833",
     "sources": [
@@ -46311,6 +46525,20 @@
     "hash": "c5b48d951de5",
     "sources": [
       "vocab-n5"
+    ]
+  },
+  {
+    "text": "でんしゃだけではありません。",
+    "hash": "3ad0fbf231b7",
+    "sources": [
+      "article#a-n5-11"
+    ]
+  },
+  {
+    "text": "でんしゃにのるとき、かいさつでカードをタッチします。",
+    "hash": "54382cc12e45",
+    "sources": [
+      "article#a-n5-11"
     ]
   },
   {
@@ -47962,6 +48190,13 @@
     ]
   },
   {
+    "text": "とてもべんりです。",
+    "hash": "9d7c4af8945a",
+    "sources": [
+      "article#a-n5-11"
+    ]
+  },
+  {
     "text": "とても楽しかったです。",
     "hash": "be92ec0c5f8e",
     "sources": [
@@ -48195,6 +48430,13 @@
     ]
   },
   {
+    "text": "とはいえ、断れるかどうかは店の方針次第であり、最近はお通しを出さない店も増えつつある。",
+    "hash": "c540c863349c",
+    "sources": [
+      "article#a-n2-11"
+    ]
+  },
+  {
     "text": "とばす",
     "hash": "ccd8b0f8f411",
     "sources": [
@@ -48269,7 +48511,8 @@
     "text": "とまどう",
     "hash": "7304233a264c",
     "sources": [
-      "article-vocab#a-n3-10"
+      "article-vocab#a-n3-10",
+      "article-vocab#a-n2-11"
     ]
   },
   {
@@ -48382,6 +48625,13 @@
     "hash": "62dedae6f861",
     "sources": [
       "article#a-n5-9"
+    ]
+  },
+  {
+    "text": "ドライバー不足が社会問題になっている今、なるべく一度で受け取ることが求められている。",
+    "hash": "50288bdc0d5f",
+    "sources": [
+      "article#a-n3-13"
     ]
   },
   {
@@ -52450,6 +52700,13 @@
     ]
   },
   {
+    "text": "バスやコンビニでもつかうことができます。",
+    "hash": "875360329b44",
+    "sources": [
+      "article#a-n5-11"
+    ]
+  },
+  {
     "text": "はずれる",
     "hash": "d07effdeac81",
     "sources": [
@@ -53132,6 +53389,13 @@
     "sources": [
       "vocab-n4",
       "vocab-n3"
+    ]
+  },
+  {
+    "text": "はやめ",
+    "hash": "af63418730ca",
+    "sources": [
+      "article-vocab#a-n4-12"
     ]
   },
   {
@@ -54234,6 +54498,13 @@
     "sources": [
       "vocab-n5",
       "essentials"
+    ]
+  },
+  {
+    "text": "ひとで",
+    "hash": "57fee773b393",
+    "sources": [
+      "article-vocab#a-n3-13"
     ]
   },
   {
@@ -55475,6 +55746,13 @@
     "hash": "b95da0807b74",
     "sources": [
       "vocab-n1"
+    ]
+  },
+  {
+    "text": "ふざいれんらくひょう",
+    "hash": "b0d28d325ae1",
+    "sources": [
+      "article-vocab#a-n3-13"
     ]
   },
   {
@@ -57165,7 +57443,8 @@
       "vocab-n2",
       "article-vocab#a-n3-1",
       "article-vocab#a-n5-4",
-      "article-vocab#a-n5-10"
+      "article-vocab#a-n5-10",
+      "article-vocab#a-n5-11"
     ]
   },
   {
@@ -57462,7 +57741,8 @@
     "hash": "41f2c10ee69a",
     "sources": [
       "vocab-n3",
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n2-11"
     ]
   },
   {
@@ -57714,6 +57994,13 @@
     "hash": "2c994f470949",
     "sources": [
       "vocab-n2"
+    ]
+  },
+  {
+    "text": "ほかんきげん",
+    "hash": "3f6deffbe418",
+    "sources": [
+      "article-vocab#a-n3-13"
     ]
   },
   {
@@ -58810,6 +59097,13 @@
     ]
   },
   {
+    "text": "また、料理が出てくるまでの間、客を手持ち無沙汰にさせないための心遣いだという見方もある。",
+    "hash": "8f17ec7bdf9a",
+    "sources": [
+      "article#a-n2-11"
+    ]
+  },
+  {
     "text": "またぐ",
     "hash": "02cc380a10f2",
     "sources": [
@@ -58920,6 +59214,13 @@
     "hash": "75fb0ca0a3a4",
     "sources": [
       "vocab-n5"
+    ]
+  },
+  {
+    "text": "まちあいしつ",
+    "hash": "26312965c294",
+    "sources": [
+      "article-vocab#a-n4-12"
     ]
   },
   {
@@ -62656,6 +62957,13 @@
     ]
   },
   {
+    "text": "ゆうびんうけ",
+    "hash": "a04a1fccda08",
+    "sources": [
+      "article-vocab#a-n3-13"
+    ]
+  },
+  {
     "text": "ゆうびんきょく",
     "hash": "022b7bdd1855",
     "sources": [
@@ -63564,7 +63872,8 @@
     "hash": "a83c0e474291",
     "sources": [
       "vocab-n3",
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n4-12"
     ]
   },
   {
@@ -64315,6 +64624,13 @@
     ]
   },
   {
+    "text": "りゅうこうする",
+    "hash": "bbc80e2afbf1",
+    "sources": [
+      "article-vocab#a-n4-12"
+    ]
+  },
+  {
     "text": "りゅうせい",
     "hash": "543f3d174897",
     "sources": [
@@ -64691,6 +65007,13 @@
     "hash": "5500555d00da",
     "sources": [
       "daily-story#n4_24"
+    ]
+  },
+  {
+    "text": "るす",
+    "hash": "3646d9d4637e",
+    "sources": [
+      "article-vocab#a-n3-13"
     ]
   },
   {
@@ -66223,7 +66546,8 @@
     "sources": [
       "vocab-n5",
       "vocab-n3",
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n4-12"
     ]
   },
   {
@@ -66499,6 +66823,13 @@
     "hash": "6d49951c0220",
     "sources": [
       "article#a-n2-5"
+    ]
+  },
+  {
+    "text": "以前は紙に書かれた番号に電話をするのが普通だったが、今はスマホで簡単に申し込める。",
+    "hash": "f7966158ed38",
+    "sources": [
+      "article#a-n3-13"
     ]
   },
   {
@@ -67542,6 +67873,13 @@
     "hash": "eade3f05283e",
     "sources": [
       "article#a-n2-5"
+    ]
+  },
+  {
+    "text": "一方で、再配達にはトラックの燃料も人手もかかる。",
+    "hash": "57d1b5896dc9",
+    "sources": [
+      "article#a-n3-13"
     ]
   },
   {
@@ -73791,6 +74129,13 @@
     ]
   },
   {
+    "text": "関西では「突き出し」と呼ばれることも多く、枝豆や煮物、和え物など、中身は店によってさまざまである。",
+    "hash": "47321da05fe2",
+    "sources": [
+      "article#a-n2-11"
+    ]
+  },
+  {
     "text": "関東から東北にかけて、明日は荒れ模様の天気となる見込みだ。",
     "hash": "7731d73e08cc",
     "sources": [
@@ -74210,6 +74555,13 @@
     "hash": "c5325ce25b5f",
     "sources": [
       "vocab-n3#応募する"
+    ]
+  },
+  {
+    "text": "気になるなら、店に入るときに一言確かめておけば済む話だ。",
+    "hash": "20e82639ea63",
+    "sources": [
+      "article#a-n2-11"
     ]
   },
   {
@@ -75498,6 +75850,13 @@
     "hash": "937555477ae4",
     "sources": [
       "vocab-n3#僅かに"
+    ]
+  },
+  {
+    "text": "去年の冬、わたしはインフルエンザにかかって、一週間も会社を休まなければなりませんでした。",
+    "hash": "74b45f9404d5",
+    "sources": [
+      "article#a-n4-12"
     ]
   },
   {
@@ -78801,6 +79160,13 @@
     ]
   },
   {
+    "text": "玄関の前やボックスに荷物を置いてもらえば、家にいなくても受け取れる。",
+    "hash": "7200482692d1",
+    "sources": [
+      "article#a-n3-13"
+    ]
+  },
+  {
     "text": "現金とキャッシュレスがうまく共存できる社会が求められている。",
     "hash": "602a0be72980",
     "sources": [
@@ -79953,6 +80319,13 @@
     "hash": "c9a728cd296b",
     "sources": [
       "vocab-n2#排除する"
+    ]
+  },
+  {
+    "text": "効果が出るまで二週間ぐらいかかるそうです。",
+    "hash": "59ed99644dd4",
+    "sources": [
+      "article#a-n4-12"
     ]
   },
   {
@@ -84767,6 +85140,13 @@
     ]
   },
   {
+    "text": "仕事から帰ると、郵便受けに一枚の紙が入っていた。",
+    "hash": "d52d6d48f623",
+    "sources": [
+      "article#a-n3-13"
+    ]
+  },
+  {
     "text": "仕事が辛いときは、無理をしないでください。",
     "hash": "63bea8ccecac",
     "sources": [
@@ -86440,6 +86820,13 @@
     ]
   },
   {
+    "text": "私も最近は、通販で注文するときに受け取り方法まで考えるようにしている。",
+    "hash": "cecf3cbafa20",
+    "sources": [
+      "article#a-n3-13"
+    ]
+  },
+  {
     "text": "私見ではございますが、一言申し添えます。",
     "hash": "5eec794588ad",
     "sources": [
@@ -86458,6 +86845,13 @@
     "hash": "b518367b0ecc",
     "sources": [
       "vocab-n1#張力"
+    ]
+  },
+  {
+    "text": "紙にあるQRコードを読み取って、希望の日と時間帯を選ぶだけで済む。",
+    "hash": "bc2f729f107d",
+    "sources": [
+      "article#a-n3-13"
     ]
   },
   {
@@ -90158,6 +90552,13 @@
     ]
   },
   {
+    "text": "終わったあと、しばらく待合室で休んでくださいと言われました。",
+    "hash": "b84d139b32ef",
+    "sources": [
+      "article#a-n4-12"
+    ]
+  },
+  {
     "text": "終わった後、血の流れが良くなって、声まで元気になります。",
     "hash": "ca2919ace9f4",
     "sources": [
@@ -90449,6 +90850,13 @@
     "hash": "e7bf6422ebb3",
     "sources": [
       "vocab-n5#十一月"
+    ]
+  },
+  {
+    "text": "十月になると、近くのクリニックに「インフルエンザ予防接種、始めました」という紙がはってありました。",
+    "hash": "aa839c71769d",
+    "sources": [
+      "article#a-n4-12"
     ]
   },
   {
@@ -91279,6 +91687,13 @@
     ]
   },
   {
+    "text": "初めて日本を訪れた人の中には、会計の際にお通し代が加算されているのを見て、不当な請求ではないかと戸惑う人も少なくない。",
+    "hash": "c490395cfcbc",
+    "sources": [
+      "article#a-n2-11"
+    ]
+  },
+  {
     "text": "初めて彼に会ったときの印象が、今でも強烈に残っている。",
     "hash": "a8ce251d000a",
     "sources": [
@@ -92025,6 +92440,13 @@
     "hash": "3b00488c2b2d",
     "sources": [
       "vocab-n1#翻弄する"
+    ]
+  },
+  {
+    "text": "小さな工夫だが、自分にもドライバーにもうれしい習慣だ。",
+    "hash": "2e8d76f4b9d2",
+    "sources": [
+      "article#a-n3-13"
     ]
   },
   {
@@ -99317,6 +99739,13 @@
     ]
   },
   {
+    "text": "早めに手続きしないと、荷物が送り主に返されてしまうこともあるので注意したい。",
+    "hash": "e02afab7c87f",
+    "sources": [
+      "article#a-n3-13"
+    ]
+  },
+  {
     "text": "早めに相談すればいいものを、黙っているから問題がこじれる。",
     "hash": "297cff639a2b",
     "sources": [
@@ -99454,6 +99883,13 @@
     "hash": "0c40485a2e8e",
     "sources": [
       "vocab-n1#追い詰める"
+    ]
+  },
+  {
+    "text": "相場はだいたい三百円から五百円程度と言われ、店にとっては席料に近い意味合いを持っている。",
+    "hash": "3ee68cdd269e",
+    "sources": [
+      "article#a-n2-11"
     ]
   },
   {
@@ -101207,6 +101643,13 @@
     ]
   },
   {
+    "text": "宅配便の「不在連絡票」だ。",
+    "hash": "72eb3d71874c",
+    "sources": [
+      "article#a-n3-13"
+    ]
+  },
+  {
     "text": "棚の引き出しに歯磨きとタオル、石鹸も置いてありました。",
     "hash": "20910dc84b95",
     "sources": [
@@ -101673,6 +102116,13 @@
     "hash": "5e44ad993702",
     "sources": [
       "vocab-n3#品質"
+    ]
+  },
+  {
+    "text": "値段は病院によって違うそうですが、わたしは三千五百円でした。",
+    "hash": "2aee5afcd340",
+    "sources": [
+      "article#a-n4-12"
     ]
   },
   {
@@ -102345,6 +102795,13 @@
     "hash": "b5e15a8c4eee",
     "sources": [
       "vocab-n5#昼"
+    ]
+  },
+  {
+    "text": "注射は思ったより痛くありませんでした。",
+    "hash": "338da0c25793",
+    "sources": [
+      "article#a-n4-12"
     ]
   },
   {
@@ -105484,6 +105941,13 @@
     ]
   },
   {
+    "text": "電話で予約してから行くと、受付で問診票を渡されました。",
+    "hash": "099dd6256989",
+    "sources": [
+      "article#a-n4-12"
+    ]
+  },
+  {
     "text": "電話に出ているうちに、フライパンの魚を焦がしてしまった。",
     "hash": "65ea14445ce4",
     "sources": [
@@ -107739,6 +108203,13 @@
     ]
   },
   {
+    "text": "日本にきて、はじめてえきでICカードを買いました。",
+    "hash": "e05fe6b3da58",
+    "sources": [
+      "article#a-n5-11"
+    ]
+  },
+  {
     "text": "日本にしばらく住んでいたので、自然に敬語が使えるようになった。",
     "hash": "d3358fbb1a5b",
     "sources": [
@@ -107890,6 +108361,13 @@
     "hash": "1c3721eeec2d",
     "sources": [
       "daily-story#n4_0"
+    ]
+  },
+  {
+    "text": "日本の居酒屋で席に着くと、注文していないのに小鉢が運ばれてくることがある。",
+    "hash": "34375f7ec505",
+    "sources": [
+      "article#a-n2-11"
     ]
   },
   {
@@ -108719,6 +109197,13 @@
     ]
   },
   {
+    "text": "熱をはかって、体の調子について書きます。",
+    "hash": "80d855abe42c",
+    "sources": [
+      "article#a-n4-12"
+    ]
+  },
+  {
     "text": "熱中症を防ぐためには、のどがかわく前に、こまめに水を飲むことが大切だ。",
     "hash": "094a15cb3ca2",
     "sources": [
@@ -109073,6 +109558,13 @@
     "hash": "f0ad7fb03317",
     "sources": [
       "vocab-n1#悄然"
+    ]
+  },
+  {
+    "text": "背景を知っていれば、見慣れない小鉢も、日本の飲み文化の一部として楽しめるのではないだろうか。",
+    "hash": "7a34fc842b46",
+    "sources": [
+      "article#a-n2-11"
     ]
   },
   {
@@ -120343,6 +120835,13 @@
     ]
   },
   {
+    "text": "予防接種には健康保険が使えないので、少し高いと感じました。",
+    "hash": "18e3959bae57",
+    "sources": [
+      "article#a-n4-12"
+    ]
+  },
+  {
     "text": "予約",
     "hash": "e183430c05b6",
     "sources": [
@@ -121876,6 +122375,13 @@
     ]
   },
   {
+    "text": "流行する前に受けておくと、安心して冬を過ごせます。",
+    "hash": "1d0aa1c90f36",
+    "sources": [
+      "article#a-n4-12"
+    ]
+  },
+  {
     "text": "流行を追いかけるだけでは、本当の個性は生まれない。",
     "hash": "9c00b3dd8795",
     "sources": [
@@ -121964,6 +122470,13 @@
     "hash": "405688319d60",
     "sources": [
       "grammar-n3#n3-76"
+    ]
+  },
+  {
+    "text": "留守の間に荷物が届いたので、もう一度届けてくれるように頼まなければならない。",
+    "hash": "bab2d87dd6f9",
+    "sources": [
+      "article#a-n3-13"
     ]
   },
   {

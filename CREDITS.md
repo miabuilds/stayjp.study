@@ -31,3 +31,9 @@
 - `a-n3-10.jpg` Recycle Logo From Recycling Bin — flickr.com/photos/34331948@N06/3566044905（CC0）
 - `a-n2-10.jpg` Chaos / Order — flickr.com/photos/37996646802@N01/2373867187（CC0）
 - `a-n1-9.jpg` Pte pause 'tatami' — flickr.com/photos/192395121@N02/52149671008（PDM）
+
+2026-10 新增（皆為 CC0，已於來源頁核對授權）：
+- `a-n5-11.jpg` Kanni Suica Kaisatsuki at Ogose Station(in)（Kznrhsd）— commons.wikimedia.org/wiki/File:Kanni_Suica_Kaisatsuki_at_Ogose_Station(in).jpg（CC0）
+- `a-n4-12.jpg` Influenza Vaccine (51551576704)（Pete from Liverpool）— commons.wikimedia.org/wiki/File:Influenza_Vaccine_(51551576704).jpg（CC0）
+- `a-n3-13.jpg` Today's Favorite Color is UPS / B&H Brown!（cogdogblog）— flickr.com/photos/37996646802@N01/4267944720（CC0）
+- `a-n2-11.jpg` Ume suisho Japanese appetizer（Hanabishi）— commons.wikimedia.org/wiki/File:Ume_suisho_Japanese_appetizer.jpg（CC0）
