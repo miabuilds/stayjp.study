@@ -4,7 +4,7 @@
 // 模型:config/ai.tutorModel(預設 claude-sonnet-5,文法解釋要準)。成本走 trackAiCost 記帳。
 //
 // mode:
-//   ask   自由問答(預設)          parse 整句拆解
+//   ask   自由問答(預設)          parse 句子解析(語意分段/重點單字/難點解析/整句意思/小狸提醒;追問走 ask + history)
 //   word  查一個字/片語 → 回字典 JSON(存進「我的單字本」;my-vocab.js)
 //   quiz  給目標詞 → 回造句情境 JSON(一次出一整輪,省額度)
 //   grade 批改使用者造的句子 → 回 JSON(有沒有真的用到目標詞、對不對、修正句)
@@ -94,17 +94,23 @@ function systemPrompt(lang: string | undefined, mode: string, ctx: { type?: stri
 5. 學習者程度${lv ? `約 ${lv}` : "不確定(預設 N4 左右)"}:解釋用詞跟例句難度配合程度,N5/N4 不要丟太難的漢字例句。
 6. 不確定就說不確定,不要編造用法;敬語/口語差異、男女用語差異要點出來。`;
   if (mode === "parse") {
+    // 2026-10 句子解析改版(KOL 回饋,對標 ListenLeap):先「語意分段」讓人一眼看懂句子怎麼切,
+    // 再「重點單字」「難點解析」。小標名稱與欄位順序前端 tutor.js render() 認得,改名要一起改。
     s += `
 
-現在的任務是「整句拆解」。使用者會給一句日文(可能是自己寫的、可能有錯)。請嚴格照以下結構輸出:
-【拆解】
-每個詞一行,格式「詞｜讀音(平假名)｜詞性｜說明」;助詞、助動詞、活用形都要拆出來並說明功能(例:「て形+いる」進行/狀態)。
-【文法重點】
-- 2~4 點:這句用到的關鍵文法、助詞為何是這個不是別的。
+現在的任務是「句子解析」。使用者會給一句日文(可能來自影片字幕、對話、或自己寫的,可能有錯)。請嚴格照以下五段輸出,小標名稱一字不改:
+【語意分段】
+把句子依「意思」切成 3~7 段,照原句順序,每段一行,格式「日文片段｜${L}意思」(只有兩欄,用全形｜分隔)。片段要能拼回整句;意思用口語短句,讓人一眼看懂這段在講什麼。
+【重點單字】
+挑這句真正值得學的詞(3~6 個,助詞不算),每個詞一行,格式「詞｜讀音(平假名)｜詞性｜說明」。說明要講清楚它在這句的形態與作用(例:「是 足す 的て形」「表示原因」),不要只貼字典意思。
+【難點解析】
+- 2~5 點,每點一行、30 字內:這句的文法、助詞、活用、語氣為什麼這樣用;用白話講,不要寫教科書術語一長串。
 【整句意思】
 一行自然的${L}翻譯。
 【小狸提醒】
-- 若句子有錯或不自然:指出並給修正句(修正句以「例:」開頭)。若沒錯:給 1 句同結構的替換例句(以「例:」開頭)。`;
+- 可省略。只有句子有錯/不自然(指出並給修正句,修正句以「例:」開頭),或有容易混淆的用法要補一句時才寫。
+
+追問規則:若對話歷史裡已經有這句的解析,使用者再問問題時只回答他問的那一點(150 字內),不要重複整份解析。`;
   }
   if (ctx && (ctx.title || ctx.body)) {
     const kind = ctx.type === "grammar" ? "文法點" : ctx.type === "vocab" ? "單字" : ctx.type === "article" ? "文章" : ctx.type === "sentence" ? "句子" : "內容";
@@ -153,11 +159,12 @@ export const askTutor = functions.onRequest(
       if ((mode === "quiz" || mode === "grade") && !items.length) { res.status(400).json({ error: "empty" }); return; }
       if (!isJson && !q) { res.status(400).json({ error: "empty" }); return; }
       const ctx = body.ctx || {};
-      // 歷史只留最近 6 則(3 輪),input 不隨對話無限長
+      // 歷史只留最近 6 則(3 輪),input 不隨對話無限長。
+      // 句子解析的回覆(五段+兩張表)約 1500~2200 字,追問時要整份帶回去模型才知道「第二點」是哪點 → assistant 側放寬到 2400。
       const hist = (Array.isArray(body.history) ? body.history : [])
         .filter(h => h && h.text && (h.role === "me" || h.role === "ai"))
         .slice(-6)
-        .map(h => ({ role: h.role === "me" ? "user" : "assistant", content: String(h.text).slice(0, 1500) }));
+        .map(h => ({ role: h.role === "me" ? "user" : "assistant", content: String(h.text).slice(0, h.role === "ai" ? 2400 : 1500) }));
 
       // 額度:admin 只記錄不擋
       if (isAdmin) { void recordAiUse(decoded.uid, "ask"); }
@@ -172,7 +179,7 @@ export const askTutor = functions.onRequest(
       const lvUp = ctx.level ? String(ctx.level).toUpperCase() : "";
       const canPrefill = /haiku/i.test(model);   // Sonnet 不支援 assistant prefill
       const pre = canPrefill ? [{ role: "assistant", content: "{" }] : [];
-      let system: string, messages: Array<{ role: string; content: string }>, maxTokens = 900;
+      let system: string, messages: Array<{ role: string; content: string }>, maxTokens = mode === "parse" ? 1200 : 900;   // 解析五段+兩張表,900 會被截在整句意思前
       if (mode === "word") {
         system = wordSystem(body.lang, lvUp);
         messages = [{ role: "user", content: `要查的:${q}` }, ...pre];
@@ -191,7 +198,7 @@ export const askTutor = functions.onRequest(
         maxTokens = 400 + items.length * 300;   // 講評是中文,抓寬一點;截斷會直接 JSON parse 失敗(2026-09-20 踩過)
       } else {
         system = systemPrompt(body.lang, mode, ctx);
-        messages = [...hist, { role: "user", content: mode === "parse" ? `請拆解這句:${q}` : q }];
+        messages = [...hist, { role: "user", content: mode === "parse" ? `請解析這句:${q}` : q }];
       }
       const up = await fetch("https://api.anthropic.com/v1/messages", {
         method: "POST",
