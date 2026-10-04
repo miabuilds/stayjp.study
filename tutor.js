@@ -266,7 +266,9 @@
       var d = null; try { d = await r.json(); } catch (e) {}
       if (!r.ok) {
         var msg = (d && d.message) || (r.status === 401 ? L('請重新登入', 'Please sign in again') : L('小狸暫時連不上,等一下再試', 'The tutor is unavailable, try again shortly'));
-        var extra = (r.status === 429) ? ' <a href="pricing.html">' + L('看 Premium', 'See Premium') + '</a>' : '';
+        // iOS App 內不放官網價目連結(Apple 3.1.1 反導流;html.ios-app 由 native-ui.js 標)
+        var iosApp = document.documentElement.classList.contains('ios-app');
+        var extra = (r.status === 429 && !iosApp) ? ' <a href="pricing.html">' + L('看 Premium', 'See Premium') + '</a>' : '';
         th.className = 'tt-m ai err'; th.innerHTML = esc(msg) + extra; hist.pop(); busy = false; $('tutorSend').disabled = false; $('tutorParse').disabled = false; setSub(); return;
       }
       th.innerHTML = render(d.text) || esc(d.text || '');
