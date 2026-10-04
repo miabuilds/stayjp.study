@@ -35,7 +35,10 @@ t('近 7/30 天加總', () => {
 });
 
 console.log('IP 正規化');
-t('XFF 取第一段', () => assert.strictEqual(R.clientIp('1.2.3.4, 10.0.0.1'), '1.2.3.4'));
+t('XFF 跳過右邊私有網段', () => assert.strictEqual(R.clientIp('1.2.3.4, 10.0.0.1'), '1.2.3.4'));
+t('XFF 用戶偽造的左邊值不採用(取 Google 附加的真位址)', () => assert.strictEqual(R.clientIp('6.6.6.6, 1.2.3.4'), '1.2.3.4'));
+t('XFF 跳過 Google 前端位址', () => assert.strictEqual(R.clientIp('6.6.6.6, 1.2.3.4, 35.191.10.20'), '1.2.3.4'));
+t('XFF 陣列形式', () => assert.strictEqual(R.clientIp(['6.6.6.6', '1.2.3.4']), '1.2.3.4'));
 t('IPv6 取 /64', () => {
   assert.strictEqual(R.clientIp('2001:db8:abcd:12:1111:2222:3333:4444'), '2001:db8:abcd:12::/64');
   assert.strictEqual(R.clientIp('2001:db8:abcd:12::9'), '2001:db8:abcd:12::/64');

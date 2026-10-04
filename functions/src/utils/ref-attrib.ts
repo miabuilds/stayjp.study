@@ -21,10 +21,27 @@ export function normCode(v: unknown): string {
   return String(v || "").toUpperCase().replace(/[^A-Z0-9_-]/g, "").slice(0, 32);
 }
 
-/** x-forwarded-for 第一段;IPv6 取 /64 前綴(手機 IPv6 臨時位址會換尾碼,同一台機器的 /64 不變)。 */
+/** Google 前端 / 私有網段:不可能是真正的用戶位址,從 x-forwarded-for 挑位址時要跳過。 */
+function isInfraIp(ip: string): boolean {
+  if (!ip) return true;
+  if (ip.startsWith("::ffff:")) ip = ip.slice(7);
+  if (/^(10\.|127\.|192\.168\.|169\.254\.|35\.191\.|130\.211\.)/.test(ip)) return true;
+  if (/^172\.(1[6-9]|2\d|3[01])\./.test(ip)) return true;
+  const l = ip.toLowerCase();
+  return l === "::1" || l.startsWith("fc") || l.startsWith("fd") || l.startsWith("fe80");
+}
+
+/**
+ * 從 x-forwarded-for 取用戶位址:由「右往左」找第一個非 Google/私有網段的位址。
+ * ⚠️ 不能取第一段:最左邊是用戶端自己可以亂帶的值(可灌點擊數);Google 前端會把真正連進來的位址
+ *    附加在後面。IPv6 取 /64 前綴(手機 IPv6 臨時位址會換尾碼,同一台機器的 /64 不變)。
+ */
 export function clientIp(xff: unknown, fallback?: unknown): string {
-  const raw = Array.isArray(xff) ? xff[0] : xff;
-  let ip = String(raw || "").split(",")[0].trim() || String(fallback || "").trim();
+  const raw = Array.isArray(xff) ? xff.join(",") : xff;
+  const parts = String(raw || "").split(",").map((s) => s.trim()).filter(Boolean);
+  let ip = "";
+  for (let i = parts.length - 1; i >= 0; i--) { if (!isInfraIp(parts[i])) { ip = parts[i]; break; } }
+  if (!ip) ip = String(fallback || "").trim();
   if (ip.startsWith("::ffff:")) ip = ip.slice(7);              // IPv4-mapped IPv6
   if (ip.includes(":")) {
     const parts = expandV6(ip);
