@@ -43,6 +43,13 @@ body{margin:0;background:var(--bg);color:var(--tx);font-family:-apple-system,"Pi
 .pc-jp .hit{color:var(--good);font-weight:700}
 .pc-jp.blur{filter:blur(7px);user-select:none;pointer-events:none}
 .pc-zh{text-align:center;font-size:13px;color:var(--tx2);margin-bottom:10px;min-height:18px}
+/* 句子解析鈕(小狸助教 parse):跟播/跟讀/聽寫共用一顆,放在句子下方、動作區上方;聽寫未揭曉時藏(會爆答案) */
+.pc-tools{display:flex;justify-content:center;margin:2px 0 14px}
+.pc-parse{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--bd);background:var(--bg3);color:var(--tx);border-radius:999px;padding:8px 15px;font:inherit;font-size:13px;font-weight:700;cursor:pointer;line-height:1}
+.pc-parse:active{transform:scale(.96)}
+.pc-parse i{color:var(--ac)}
+/* 這頁的小狸入口是每句的「解析」鈕;右下角浮動小狸會壓到「下一句」大鈕與劇院模式鈕 → 不顯示 */
+#tutorFab,#tutorHint{display:none!important}
 .pc-act{display:flex;flex-direction:column;gap:10px;align-items:center;margin-top:6px}
 .micbtn{width:100%;max-width:340px;padding:14px;font-size:16px;border-radius:14px}
 .micbtn.rec-on{background:var(--bad)!important;color:#fff;animation:pulse 1.2s infinite}
@@ -282,6 +289,7 @@ body{margin:0;background:var(--bg);color:var(--tx);font-family:-apple-system,"Pi
           </div>
           <div class="pc-jp" id="pcJp"></div>
           <div class="pc-zh" id="pcZh"></div>
+          <div class="pc-tools" id="pcTools"><button class="pc-parse" id="pcParseBtn" type="button" onclick="YTS.parseCur()"><i data-ic=sparkle></i><span id="pcParseLb">解析這句</span></button></div>
           <div class="pc-act" id="pcAct"></div>
           <div class="pc-result" id="pcRes"></div>
           <div class="pc-act" id="pcNext" style="display:none"><button class="btn nextbtn" onclick="YTS.nav(1)" id="nextBtn">下一句 →</button></div>
@@ -324,6 +332,21 @@ if(I18n.getLang()==='zh-CN') ensureOpenCC().then(function(){ try{ YTS._retext();
 <script src="kana-lookup.js"></script>
 <script src="yt-word.js"></script>
 <script src="ux-extras.js"></script>
+<!-- 句子解析(小狸助教)需要登入 token:載 firebase auth(與 app.html 同一個 project,登入狀態跨頁共用)-->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script>
+try{ if(!firebase.apps.length) firebase.initializeApp({ apiKey:"AIzaSyDnmg2XOuvwgE8m8xCF5sS4o0nQYoUplPI", authDomain:"jpnote-1bdd6.firebaseapp.com", projectId:"jpnote-1bdd6", storageBucket:"jpnote-1bdd6.firebasestorage.app", messagingSenderId:"666368174384" }); }catch(e){}
+// tutor.js 未登入時會顯示「用 Google 登入」鈕 → 呼叫這個
+var _ytSigning=false;
+function loginWith(p){
+  if(_ytSigning) return; _ytSigning=true;
+  var provider = (p==='apple') ? new firebase.auth.OAuthProvider('apple.com') : new firebase.auth.GoogleAuthProvider();
+  firebase.auth().signInWithPopup(provider).catch(function(e){ var c=e&&e.code; if(c==='auth/cancelled-popup-request'||c==='auth/popup-closed-by-user') return; try{ alert((typeof enOr==='function'?enOr('登入失敗:','Sign-in failed: '):'登入失敗:')+(e&&e.message||e)); }catch(e2){} }).finally(function(){ _ytSigning=false; });
+}
+</script>
+<script src="ai-consent.js"></script>
+<script src="tutor.js"></script>
 <script>
 // 單字查詢彈窗(ux-extras)的「發音」呼叫全域 speak()。
 // 本頁沒載預錄 manifest(1.2MB,影片頁不值得),所以:登入者走雲端 TTS(App 內由原生播,錄過音也不會被靜音);
@@ -421,7 +444,7 @@ const YTS = (() => {
   let zhOn = (localStorage.getItem('yts_zh')||'1')==='1';   // 中文翻譯顯示開關
   let hasZh = false;   // 這支影片有沒有中文翻譯(沒有就不顯示開關,免得按了沒反應)
   const SPEEDS = [1, 0.75, 0.5];
-  let player=null, apiReady=false, vid='', lines=[], cur=0, mode='ktv', loopOn=false, watchT=0, done={}, spdIdx=0, listOpen=false, ktvT=0;
+  let player=null, apiReady=false, vid='', vidTitle='', lines=[], cur=0, mode='ktv', loopOn=false, watchT=0, done={}, spdIdx=0, listOpen=false, ktvT=0;
 
   // ── i18n 靜態字 ──
   function _retext(){
@@ -434,7 +457,7 @@ const YTS = (() => {
     set('galHd','挑一支影片開始練(全部即點即用):','Pick a video to start (all ready to practice):');
     set('ownSum','用自己的 YouTube 影片練 ▾','Use your own YouTube video ▾');
     set('backPr','← 回到練習(影片還在)','← Back to practice (your video is still here)');
-    set('mKtv','跟播','Follow'); set('mShadow','跟讀','Shadow'); set('mDict','聽寫','Dictation'); set('mQuiz','測驗','Quiz'); set('mSwap','換影片','Change video');
+    set('pcParseLb','解析這句','Analyze'); set('mKtv','跟播','Follow'); set('mShadow','跟讀','Shadow'); set('mDict','聽寫','Dictation'); set('mQuiz','測驗','Quiz'); set('mSwap','換影片','Change video');
     set('lpSum','這支影片的單字・文法 ▾','Words & grammar in this video ▾');
     set('lpTabW','單字','Words'); set('lpTabG','文法','Grammar');
     set('loadBtn','讀取','Load'); set('parseBtn','解析','Parse');
@@ -609,6 +632,7 @@ const YTS = (() => {
       const d=await r.json();
       if(d && Array.isArray(d.lines) && d.lines.length){
         setLines(d.lines);
+        vidTitle=d.title||'';
         pushRecent(v, d.title||'', lines.length);
         const an=document.getElementById('asrNote'); if(an) an.style.display = d.track==='asr' ? 'block' : 'none';   // 自動字幕:先講清楚會有錯字
         document.getElementById('pasteBox').style.display='none';
@@ -742,6 +766,7 @@ const YTS = (() => {
     zhEl.style.filter=(mode==='dict'&&!l._rev)?'blur(6px)':'';   // 聽寫:翻譯也遮住,對完答案才揭曉
     const res=document.getElementById('pcRes'); res.className='pc-result'; res.innerHTML='';
     document.getElementById('pcNext').style.display='none';
+    updParseBtn();
     const act=document.getElementById('pcAct');
     if(isKtv){
       act.innerHTML='';
@@ -789,6 +814,20 @@ const YTS = (() => {
     renderCard();
   }
 
+  // ── 句子解析(小狸助教):每句一顆「解析」鈕 → Tutor.askSentence 直接打 parse ──
+  // 聽寫模式句子還遮著時不給按(解析會把答案整句印出來);測驗模式整排藏掉。
+  function updParseBtn(){
+    const b=document.getElementById('pcTools'); if(!b) return;
+    const l=lines[cur];
+    const hide = !l || mode==='quiz' || (mode==='dict' && !l._rev) || !window.Tutor;
+    b.style.display = hide ? 'none' : 'flex';
+  }
+  function parseCur(){
+    const l=lines[cur]; if(!l || !window.Tutor) return;
+    if(mode==='ktv'){ try{ player&&player.pauseVideo(); }catch(e){} }   // 看解析時影片先停,不然句子一直往前跑
+    Tutor.askSentence(l.ja, { source:'yt', title: vidTitle, direct:true });
+  }
+
   // ── KTV 跟播:影片連續播,句子隨時間自動跳轉+當前句刷色 ──
   function renderKtv(){
     const l=lines[cur]; if(!l) return;
@@ -797,7 +836,7 @@ const YTS = (() => {
     document.getElementById('ktvZh').textContent = l.zh||'';
     document.getElementById('ktvNext').innerHTML = cur<lines.length-1 ? esc(lines[cur+1].ja) : '';
     document.getElementById('pcIdx').textContent=(cur+1)+' / '+lines.length+'　'+fmtT(l.t);
-    applyZh();
+    applyZh(); updParseBtn();
   }
   function startKtv(){
     if(!player) return;
@@ -999,14 +1038,14 @@ const YTS = (() => {
     res.innerHTML='<div class="rt1">'+enOr('這句先看過就好','Here’s the line')+'</div>'+answerBlock(l);
     try{ if(window.Icons&&Icons.hydrate)Icons.hydrate(); }catch(e){}
     document.getElementById('pcNext').style.display='flex';
-    _settled=true;
+    _settled=true; updParseBtn();
   }
 
   // ── 聽寫 ──
   function checkDict(){
     const ta=document.getElementById('dictIn'); const said=(ta&&ta.value||'').trim();
     if(!said) return;
-    const l=lines[cur]; l._rev=true;
+    const l=lines[cur]; l._rev=true; updParseBtn();
     try{ StayDaily.log('quiz'); }catch(e2){}   // 聽寫送出一句=今日目標一個動作
     // 漢字寫法與假名寫法都算對:兩種比對取高分
     const t=normK(l.ja), s=normK(said);
@@ -1283,7 +1322,7 @@ const YTS = (() => {
     if(m==='quiz'){
       stopKtv();
       // 測驗:只留題目卡(藏掉跟播/跟讀那組元件)
-      ['ktvBox','pcJp','pcZh','pcAct','pcRes','pcNext'].forEach(id=>{ const el=document.getElementById(id); if(el) el.style.display='none'; });
+      ['ktvBox','pcJp','pcZh','pcAct','pcRes','pcNext','pcTools'].forEach(id=>{ const el=document.getElementById(id); if(el) el.style.display='none'; });
       document.getElementById('pcIdx').textContent='';
       document.querySelector('.pc-ctr').style.display='none';
       startQuiz();
@@ -1424,7 +1463,7 @@ const YTS = (() => {
     if(ta) ta.addEventListener('paste',()=>{ setTimeout(()=>{ if((ta.value||'').trim()) parsePaste(); },80); });   // 貼上即解析
     try{ if(!localStorage.getItem('yts_tut_seen')) tut(true); }catch(e){}
   });
-  return { load, parsePaste, nav, jump, replay, togglePlayPause, cycleSpeed, toggleLoop, setMode, toggleRec, submitSaid, revealAnswer, checkDict, toggleList, toggleZh, tut, loadSample, setCat, backToPractice, openTranscript, swap, theater, startQuiz, qzBegin, qzPlay, qzAnswer, qzNext, jumpPlay, openLearn, learnTab, saveWord, speakWord, thumbFallback, thumbCheck, renderToday, setLv, renderRecent, _retext };
+  return { load, parsePaste, nav, jump, replay, togglePlayPause, cycleSpeed, toggleLoop, setMode, toggleRec, submitSaid, revealAnswer, checkDict, toggleList, toggleZh, tut, loadSample, setCat, backToPractice, openTranscript, swap, theater, startQuiz, qzBegin, qzPlay, qzAnswer, qzNext, jumpPlay, openLearn, learnTab, saveWord, speakWord, thumbFallback, thumbCheck, renderToday, setLv, renderRecent, parseCur, _retext };
 })();
 </script>
 <script src="font-scale.js"></script>

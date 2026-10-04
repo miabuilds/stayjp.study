@@ -1,6 +1,8 @@
 // 小狸助教:右下角浮動 AI 助教(文法 Q&A + 整句拆解)。
 // 後端 askTutor(Claude);額度 ai_usage.askDay(免費每日 2、Premium 30);首次用前跑 AIConsent.ensure()。
 // context:翻開文法/單字卡 → Tutor.ctxFromCard(卡片 DOM);文章句子 → Tutor.askSentence(句子, 文章標題)。
+// 句子解析(2026-10,YouTube 跟讀/AI 聊聊的「解析」鈕)→ Tutor.askSentence(句子, {source:'yt'|'chat', title, scene, direct:true}):
+//   direct=true 跳過本地斷句、直接打 parse(按鈕本身就是明確意圖);回覆格式見 functions/src/ask-tutor.ts parse 段。
 // 三語:UI 文字用 L(zh,en)(簡中走 cvt);問答語言由後端依 lang 決定。
 (function (root) {
   var FN = 'https://asia-east1-jpnote-1bdd6.cloudfunctions.net/askTutor';
@@ -47,7 +49,7 @@
       '#tutorPanel .tt-m{max-width:92%;padding:13px 14px;border-radius:14px;font-size:14px;line-height:1.7;color:var(--tx,#2C2C2C);word-break:break-word}',
       '#tutorPanel .tt-m.me{align-self:flex-end;background:var(--ac,var(--ac));color:#fff;border-bottom-right-radius:4px;white-space:pre-wrap}',
       '#tutorPanel .tt-m.ai{align-self:flex-start;background:var(--bg3,#F3F1ED);border-bottom-left-radius:4px}',
-      '#tutorPanel .tt-m.ai .tt-h{font-weight:700;color:var(--ac,var(--ac));margin:8px 0 3px;font-size:13.5px}#tutorPanel .tt-m.ai .tt-h:first-child{margin-top:0}',
+      '#tutorPanel .tt-m.ai .tt-h{font-weight:700;color:var(--ac,var(--ac));margin:14px 0 5px;font-size:13.5px}#tutorPanel .tt-m.ai .tt-h:first-child{margin-top:0}',
       '#tutorPanel .tt-m.ai p{margin:0 0 6px}#tutorPanel .tt-m.ai p:last-child{margin-bottom:0}',
       '#tutorPanel .tt-m.ai ul{margin:0 0 6px;padding-left:18px}#tutorPanel .tt-m.ai li{margin:2px 0}',
       '#tutorPanel .tt-m.ai .tt-eg{margin:4px 0 6px;padding:6px 8px 6px 10px;border-left:3px solid var(--ac2,#4A7FD4);background:var(--bg2,#fff);border-radius:6px}',
@@ -57,6 +59,13 @@
       '#tutorPanel .tt-m.ai table{border-collapse:collapse;width:100%;font-size:13px;margin:4px 0 8px;background:var(--bg2,#fff);border-radius:8px;overflow:hidden}',
       '#tutorPanel .tt-m.ai td{padding:5px 6px;border-bottom:1px solid var(--bd,#E8E5E0);vertical-align:top}#tutorPanel .tt-m.ai tr:last-child td{border-bottom:none}',
       '#tutorPanel .tt-m.ai td:first-child{font-weight:700;white-space:nowrap}#tutorPanel .tt-m.ai td:nth-child(2){color:var(--tx2,#7A7A7A);white-space:nowrap}#tutorPanel .tt-m.ai td:nth-child(3){color:var(--ac2,#4A7FD4);white-space:nowrap;font-size:12px}',
+      // 語意分段(兩欄:日文片段｜意思):片段可換行、意思用正文色;四欄單字表的 nowrap 規則不適用
+      '#tutorPanel .tt-m.ai table.tt-seg td{padding:7px 8px}#tutorPanel .tt-m.ai table.tt-seg td:first-child{white-space:normal;font-size:14.5px;line-height:1.9;width:48%}#tutorPanel .tt-m.ai table.tt-seg td:first-child rt{font-size:.55em;color:var(--tx2,#7A7A7A)}#tutorPanel .tt-m.ai table.tt-seg td:nth-child(2){white-space:normal;color:var(--tx,#2C2C2C);font-size:13px}',
+      '#tutorPanel .tt-m.ai table.tt-word td:nth-child(4){font-size:12.5px;color:var(--tx,#2C2C2C)}',
+      // 解析讀取中的骨架(取代三個點):一句話+三條流動的灰條
+      '#tutorPanel .tt-sk{display:flex;flex-direction:column;gap:9px;min-width:200px}#tutorPanel .tt-sk .tt-sk-t{font-size:13px;color:var(--tx2,#7A7A7A)}',
+      '#tutorPanel .tt-sk i{display:block;height:11px;border-radius:6px;background:linear-gradient(90deg,var(--bd,#E8E5E0) 25%,var(--bg2,#fff) 50%,var(--bd,#E8E5E0) 75%);background-size:200% 100%;animation:ttSk 1.2s infinite}#tutorPanel .tt-sk i:nth-child(3){width:78%}#tutorPanel .tt-sk i:nth-child(4){width:56%}',
+      '@keyframes ttSk{from{background-position:200% 0}to{background-position:-200% 0}}',
       '#tutorPanel .tt-m.ai.err{background:#FEF2F2;color:#991B1B}#tutorPanel .tt-m.ai.err a,#tutorPanel .tt-m.ai.err button{color:var(--ac,var(--ac));font-weight:700;background:none;border:none;cursor:pointer;font-size:14px;padding:0;text-decoration:underline}',
       '#tutorPanel .tt-think{display:flex;gap:4px;align-items:center}#tutorPanel .tt-think i{width:6px;height:6px;border-radius:50%;background:var(--tx2,#7A7A7A);animation:ttB 1s infinite}#tutorPanel .tt-think i:nth-child(2){animation-delay:.15s}#tutorPanel .tt-think i:nth-child(3){animation-delay:.3s}',
       '@keyframes ttB{0%,80%,100%{opacity:.3}40%{opacity:1}}',
@@ -189,16 +198,22 @@
   function fr(t) { try { return root.furiganaHTMLRich ? root.furiganaHTMLRich(t) : esc(t); } catch (e) { return esc(t); } }
   function render(text) {
     var lines = String(text || '').replace(/\r/g, '').split('\n');
-    var out = [], ul = [], tb = [];
+    var out = [], ul = [], tb = [], sec = '';
+    // 表格分兩種:【語意分段】是兩欄「片段｜意思」(第一欄標假名、兩欄都可換行);其他是「詞｜讀音｜詞性｜說明」四欄
+    function isSeg() { return /語意分段|语意分段|分段|segment|chunk/i.test(sec); }
     function flush() {
       if (ul.length) { out.push('<ul>' + ul.map(function (x) { return '<li>' + inline(x) + '</li>'; }).join('') + '</ul>'); ul = []; }
-      if (tb.length) { out.push('<table>' + tb.map(function (r) { return '<tr>' + r.map(function (c) { return '<td>' + inline(c) + '</td>'; }).join('') + '</tr>'; }).join('') + '</table>'); tb = []; }
+      if (tb.length) {
+        var seg = isSeg() && tb.every(function (r) { return r.length === 2; });
+        out.push('<table class="' + (seg ? 'tt-seg' : 'tt-word') + '">' + tb.map(function (r) { return '<tr>' + r.map(function (c, i) { return '<td>' + ((seg && i === 0) ? fr(c) : inline(c)) + '</td>'; }).join('') + '</tr>'; }).join('') + '</table>'); tb = [];
+      }
     }
     lines.forEach(function (ln) {
       var t = ln.trim(); if (!t) { flush(); return; }
       var m;
-      if (/^【.+】$/.test(t)) { flush(); out.push('<div class="tt-h">' + esc(t.slice(1, -1)) + '</div>'); return; }
-      if ((t.match(/｜/g) || []).length >= 2) { if (ul.length) flush(); var cells = t.split('｜').map(function (x) { return x.trim(); }); if (/^(詞|単語|單字|word)$/i.test(cells[0])) return; tb.push(cells); return; }
+      if (/^【.+】$/.test(t)) { flush(); sec = t.slice(1, -1); out.push('<div class="tt-h">' + esc(sec) + '</div>'); return; }
+      var bars = (t.match(/｜/g) || []).length;
+      if (bars >= 2 || (bars === 1 && isSeg())) { if (ul.length) flush(); var cells = t.split('｜').map(function (x) { return x.trim(); }); if (/^(詞|単語|單字|word|片段|日文片段|分段|segment|chunk)$/i.test(cells[0])) return; tb.push(cells); return; }
       if ((m = t.match(/^(?:例|Ex|Example)\s*[:：]\s*(.+)$/i))) {
         flush(); var body = m[1], jp = body, zh = '';
         var k = body.indexOf('→'); if (k > 0) { jp = body.slice(0, k).trim(); zh = body.slice(k + 1).trim(); }
@@ -236,10 +251,13 @@
     try { if (root.AIConsent && !(await root.AIConsent.ensure())) return; } catch (e) {}
     busy = true; $('tutorSend').disabled = true; $('tutorParse').disabled = true;
     var ta = $('tutorIn'); ta.value = ''; ta.style.height = 'auto';
-    addMsg('me', esc(mode === 'parse' ? L('拆解:', 'Parse: ') + text : text));
-    hist.push({ role: 'me', text: mode === 'parse' ? '請拆解這句:' + text : text });
+    addMsg('me', esc(mode === 'parse' ? L('解析:', 'Analyze: ') + text : text));
+    hist.push({ role: 'me', text: mode === 'parse' ? '請解析這句:' + text : text });
     renderChips();
-    var th = addMsg('ai', '<div class="tt-think"><i></i><i></i><i></i></div>');
+    var th = addMsg('ai', mode === 'parse'
+      ? '<div class="tt-sk"><div class="tt-sk-t">' + L('小狸在讀這句…', 'Reading the sentence…') + '</div><i></i><i></i><i></i></div>'
+      : '<div class="tt-think"><i></i><i></i><i></i></div>');
+    if (mode === 'parse') { var sb = $('tutorSub'); if (sb) sb.textContent = L('句子解析・小狸幫你解讀這句', 'Sentence analysis'); }
     try {
       var tok = await user.getIdToken();
       var lv = ''; try { lv = (ctx && ctx.level) || root.currentLevel || ''; } catch (e) {}
@@ -248,20 +266,29 @@
       var d = null; try { d = await r.json(); } catch (e) {}
       if (!r.ok) {
         var msg = (d && d.message) || (r.status === 401 ? L('請重新登入', 'Please sign in again') : L('小狸暫時連不上,等一下再試', 'The tutor is unavailable, try again shortly'));
-        var extra = (r.status === 429) ? ' <a href="pricing.html">' + L('看 Premium', 'See Premium') + '</a>' : '';
-        th.className = 'tt-m ai err'; th.innerHTML = esc(msg) + extra; hist.pop(); busy = false; $('tutorSend').disabled = false; $('tutorParse').disabled = false; return;
+        // iOS App 內不放官網價目連結(Apple 3.1.1 反導流;html.ios-app 由 native-ui.js 標)
+        var iosApp = document.documentElement.classList.contains('ios-app');
+        var extra = (r.status === 429 && !iosApp) ? ' <a href="pricing.html">' + L('看 Premium', 'See Premium') + '</a>' : '';
+        th.className = 'tt-m ai err'; th.innerHTML = esc(msg) + extra; hist.pop(); busy = false; $('tutorSend').disabled = false; $('tutorParse').disabled = false; setSub(); return;
       }
       th.innerHTML = render(d.text) || esc(d.text || '');
       th.querySelectorAll('.tt-spk').forEach(function (b) { b.onclick = function () { try { root.speak(b.getAttribute('data-jp')); } catch (e) {} }; });
       hist.push({ role: 'ai', text: d.text || '' }); if (hist.length > 8) hist = hist.slice(-8);
-      if (typeof d.remain === 'number') { remain = d.remain; setSub(); }
-      try { if (typeof track === 'function') track('tutor_ask', { mode: mode || 'ask', ctx: ctx ? ctx.type : 'none' }); } catch (e) {}
+      if (typeof d.remain === 'number') { remain = d.remain; } setSub();
+      try { if (typeof track === 'function') track('tutor_ask', { mode: mode || 'ask', ctx: ctx ? ctx.type : 'none', src: (ctx && ctx.source) || '' }); } catch (e) {}
       try { if (root.StayDaily && root.StayDaily.log) root.StayDaily.log('tutor'); } catch (e) {}
+      if (mode === 'parse') {
+        try { ta.placeholder = L('有問題儘管問小狸', 'Ask anything about this sentence'); } catch (e) {}   // 解析後接著追問(history 會把解析帶回去)
+        // 解析很長:捲到這則回覆的開頭(先看語意分段),不要像一般回覆那樣貼底
+        try { var mb = $('tutorMsgs'); mb.scrollTop = Math.max(0, th.offsetTop - mb.offsetTop - 8); } catch (e) {}
+        return done();
+      }
     } catch (e) {
-      th.className = 'tt-m ai err'; th.textContent = L('網路不穩,再試一次', 'Network error, please retry'); hist.pop();
+      th.className = 'tt-m ai err'; th.textContent = L('網路不穩,再試一次', 'Network error, please retry'); hist.pop(); setSub();
     }
-    busy = false; $('tutorSend').disabled = false; $('tutorParse').disabled = false;
+    done();
     $('tutorMsgs').scrollTop = $('tutorMsgs').scrollHeight;
+    function done() { busy = false; $('tutorSend').disabled = false; $('tutorParse').disabled = false; }
   }
   function send() { ask($('tutorIn').value, 'ask'); }
   function sendParse() {
@@ -285,7 +312,7 @@
     if (c) setCtx(c);
     var p = $('tutorPanel'); p.style.display = 'flex'; isOpen = true; document.body.classList.add('tutor-open');
     var box = $('tutorMsgs');
-    if (!box.children.length) {
+    if (!box.children.length && !(opts && opts.quiet)) {   // 解析鈕直達:不放歡迎詞,畫面只留句子+解析
       box.innerHTML = '<div class="tt-welcome">' + L('嗨,我是小狸 🦝 文法看不懂、單字怎麼用、或是自己寫的句子對不對,都可以問我。貼一句日文按「拆解」,我幫你逐詞拆給你看。', 'Hi, I\'m the tanuki tutor 🦝 Ask me about grammar, word usage, or whether your own sentence is right. Paste a Japanese sentence and tap Parse for a word-by-word breakdown.') + '</div>';
     }
     renderCtx(); setSub();
@@ -324,12 +351,21 @@
       setCtx({ type: mode, id: card.id || '', title: title, body: body, level: root.currentLevel || '' });
     } catch (e) {}
   }
-  // 文章句子鈕:帶句子開面板並直接拆解
+  // 文章句子鈕:帶句子開面板(先本地斷句,再按鈕叫小狸)。
+  // 第二個參數給物件 {source,title,scene,level,direct} 時(YouTube 跟讀/AI 聊聊的「解析」鈕):
+  // direct=true 直接打 parse——按「解析」已經是明確意圖,不再多一層「讓小狸完整拆解」。
   function askSentence(sentence, title, level) {
-    open({ type: 'sentence', title: title || '', body: String(sentence || '').trim(), level: level || '' }, { parse: true });
+    var o = (title && typeof title === 'object') ? title : { title: title, level: level };
+    var body = String(sentence || '').trim(); if (!body) return;
+    var c = { type: 'sentence', title: o.title || o.scene || '', body: body, level: o.level || '', source: o.source || '' };
+    if (!o.direct) { open(c, { parse: true }); return; }
+    open(c, { quiet: true });
+    lastSentence = body;
+    try { if (typeof track === 'function') track('tutor_parse_open', { src: o.source || '' }); } catch (e) {}
+    ask(body, 'parse');
   }
   function init() { if (document.body) build(); else document.addEventListener('DOMContentLoaded', build); }
 
-  root.Tutor = { open: open, fullParse: fullParse, toggleBig: toggleBig, close: close, send: send, sendParse: sendParse, ask: ask, setCtx: setCtx, clearCtx: clearCtx, ctxFromCard: ctxFromCard, askSentence: askSentence, init: init, isOpen: function () { return isOpen; } };
+  root.Tutor = { open: open, fullParse: fullParse, toggleBig: toggleBig, close: close, send: send, sendParse: sendParse, ask: ask, setCtx: setCtx, clearCtx: clearCtx, ctxFromCard: ctxFromCard, askSentence: askSentence, render: render, init: init, isOpen: function () { return isOpen; } };
   init();
 })(window);
