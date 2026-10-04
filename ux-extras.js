@@ -346,7 +346,7 @@
     var tags = '';
     if (data.c) tags += '<span class="jtag">' + escapeHtml(data.c) + '</span>';
     if (data.f) tags += '<span class="jtag">' + escapeHtml(data.f) + '</span>';
-    pop.innerHTML = '<span class="jx" role="button" aria-label="關閉"></span>'
+    pop.innerHTML = '<span class="jx" role="button" aria-label="關閉">✕</span>'
       + '<div><span class="jw">' + escapeHtml(data.w) + '</span><span class="jr">' + escapeHtml(data.r) + '</span></div>'
       + (tags ? '<div class="jtags">' + tags + '</div>' : '')
       + '<div class="jm">' + escapeHtml(data.m || '（本站未收錄，可查辭典 ↓）') + '</div>'
@@ -401,7 +401,7 @@
         if (!window.stayjpAddWord) { showToast('收藏功能未載入'); return; }
         var res = window.stayjpAddWord(data.w, data.r, data.m);
         fav.textContent = '★ 已收藏'; fav.classList.add('on');
-        showToast(res === 'exists' ? '已在生字本 <i data-ic=book></i>' : '已加入生字本 <i data-ic=book></i>');
+        showToast(res === 'exists' ? '已在生字本' : '已加入生字本 ✓');   // showToast 走 textContent:不能放 <i data-ic>(會印字面)
       });
     }
     // 整張卡片點擊 = 發音(✕/發音/收藏 已各自 stopPropagation,不會誤觸)

@@ -49,6 +49,47 @@
   .sc-resume .rt1{font-size:11.5px;color:var(--ink3);font-weight:700}
   .sc-resume .rt2{font-weight:800;color:var(--accent);font-size:15px}
   .sc-resume .go{margin-left:auto;font-weight:800;color:var(--accent);font-size:18px}
+  /* 自創情境 hero(KOL:「自創情景」是賣點,要放最顯眼)+ 每日推薦卡 */
+  :root{--hero1:#C6553B;--hero2:#A9442D}
+  @media(prefers-color-scheme:dark){:root:not([data-theme=light]){--hero1:#B4502F;--hero2:#8A3720}}
+  :root[data-theme=dark]{--hero1:#B4502F;--hero2:#8A3720}
+  .sc-hero{position:relative;overflow:hidden;background:linear-gradient(135deg,var(--hero1),var(--hero2));color:#fff;border-radius:18px;padding:18px 18px 16px;box-shadow:var(--sh);margin:4px 0 14px}
+  .sc-hero::after{content:'';position:absolute;right:-34px;top:-34px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,.09);pointer-events:none}
+  .sc-hero .hr-top{display:flex;align-items:center;gap:12px}
+  .sc-hero .hr-ic{flex-shrink:0;width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;font-size:21px}
+  .sc-hero .hr-t{font-size:19px;font-weight:800;line-height:1.3;letter-spacing:.02em}
+  .sc-hero .hr-d{font-size:13.5px;line-height:1.6;opacity:.93;margin-top:2px}
+  .sc-hero .hr-go{position:relative;z-index:1;display:flex;align-items:center;justify-content:center;gap:7px;width:100%;margin-top:14px;font:inherit;font-size:16px;font-weight:800;color:var(--hero2);background:#fff;border:0;border-radius:12px;padding:12px 0;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.12)}
+  .sc-hero .hr-go:active{transform:scale(.98)}
+  .sc-feat{display:flex;align-items:center;gap:13px;background:var(--panel);border:1.5px solid var(--accent);border-radius:16px;box-shadow:var(--sh);padding:14px 15px;margin:0 0 16px;cursor:pointer;transition:transform .08s}
+  .sc-feat:active{transform:scale(.98)}
+  .sc-feat .ft-ic{flex-shrink:0;width:48px;height:48px;border-radius:50%;background:var(--soft);display:flex;align-items:center;justify-content:center;font-size:22px;color:var(--accent);overflow:hidden}
+  .sc-feat .ft-ic img{width:48px;height:48px;display:block;border-radius:50%}
+  .sc-feat .ft-body{flex:1;min-width:0}
+  .sc-feat .ft-lb{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:800;color:var(--accent);background:var(--soft);border-radius:20px;padding:2px 9px;letter-spacing:.04em}
+  .sc-feat .ft-t{font-weight:800;font-size:15.5px;line-height:1.35;margin-top:6px}
+  .sc-feat .ft-d{color:var(--ink2);font-size:12.5px;line-height:1.55;margin-top:3px}
+  .sc-feat .ft-go{flex-shrink:0;color:var(--accent);font-size:18px}
+  /* 自創情境表單 */
+  .cf{background:var(--panel);border:1px solid var(--line);border-radius:16px;box-shadow:var(--sh);padding:16px}
+  .cf-lb{font-size:12.5px;font-weight:800;color:var(--ink3);letter-spacing:.04em;margin-bottom:8px}
+  .cf-chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+  .cf-chip{font:inherit;font-size:13px;font-weight:600;color:var(--ink);background:var(--bg3);border:1px solid var(--line);border-radius:16px;padding:7px 13px;cursor:pointer}
+  .cf-chip:hover,.cf-chip.on{border-color:var(--accent);color:var(--accent);background:var(--soft)}
+  .cf-f{display:block;margin-bottom:14px}
+  .cf-f>span{display:block;font-size:13.5px;font-weight:700;margin-bottom:6px}
+  .cf-f>span small{font-weight:500;color:var(--ink3);margin-left:4px}
+  .cf-f input,.cf-f textarea{display:block;width:100%;font:inherit;font-size:16px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:11px;padding:10px 12px;resize:none}
+  .cf-f input:focus,.cf-f textarea:focus{outline:none;border-color:var(--accent)}
+  .cf-f.bad input{border-color:var(--bad)}
+  .cf .lvtabs{margin:0 0 16px}
+  .cf-go{width:100%;font-size:16px;padding:12px 0;border-radius:12px}
+  .cf-note{color:var(--ink3);font-size:12px;line-height:1.6;margin-top:10px}
+  /* 對話中:即點即查提示 + 彈窗吃本頁配色(ux-extras 的變數名跟本頁不同 → 深色模式對齊) */
+  .lk-hint{align-self:flex-start;display:inline-flex;align-items:center;gap:6px;font-size:12.5px;color:var(--ink2);background:var(--panel);border:1px dashed var(--accent);border-radius:12px;padding:6px 11px}
+  .lk-hint button{font:inherit;font-size:12px;color:var(--ink3);background:none;border:0;padding:0 0 0 4px;cursor:pointer}
+  .bubble.ai .jlk{border-bottom-color:var(--accent)}
+  #jlkPop{--bg2:var(--panel);--tx:var(--ink);--tx2:var(--ink2);--tx3:var(--ink3);--bd:var(--line);--bg:var(--bg3);--ac:var(--accent)}
   .sc-prog{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--ink3);margin:2px 0 10px}
   .sc-prog .bar{flex:0 0 90px;height:5px;border-radius:99px;background:var(--line);overflow:hidden}
   .sc-prog .bar i{display:block;height:100%;background:var(--accent);border-radius:99px}
@@ -158,11 +199,21 @@
     <div style="margin-bottom:8px"><a href="#" class="backbtn" onclick="if(window.history.length>1){window.history.back()}else{location.href='app.html'};return false"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>返回</a></div>
     <h1>情境對話 <span class="muted" style="font-weight:400">Beta</span></h1>
     <div class="sub">選一個情境和難度,AI 會扮演對方跟你一來一往練對話。可以用說的(語音辨識)或打字。免費體驗 1 場,Premium 每天 5 場。</div>
+    <div id="scTop"></div>
     <div class="lvtabs" id="lvtabs"></div>
     <div class="sc-prog" id="scProg"></div>
     <div class="scenes" id="scenes"></div>
     <div class="muted" style="margin-top:14px"><i data-ic=bulb></i> AI 回覆與評分由模型自動生成,可能有誤,僅供練習參考。 這是「對話」練習;想練單句跟讀請到 <a href="speak.html" style="color:var(--accent)">跟讀練習</a>。</div>
     <div style="margin-top:10px"><button class="btn sm" onclick="openLogs()"><i data-ic=clock></i> 對話紀錄</button> <button class="btn sm" onclick="FavSents.open()">⭐ 收藏句</button></div>
+  </div>
+
+  <!-- 自創情境表單 -->
+  <div id="create" style="display:none">
+    <div class="chatbar">
+      <span class="ttl" id="cfTtl"></span>
+      <button class="btn sm" id="cfBack" onclick="show('pick')"></button>
+    </div>
+    <div class="cf" id="cfBox"></div>
   </div>
 
   <!-- 對話 -->
@@ -304,6 +355,10 @@ const SCENES = [
     desc:'你是主持會議的上司,部下正在報告專案進度。你會追問時程、風險與對策,並要求下一步的具體行動,語氣專業但不刁難。' },
   { k:'friend', ur:'朋友', jp:'週末の予定', yomi:'よてい', ic:'☕', t:'約朋友出門', d:'邀約、喬時間、改期', tE:'Making plans', dE:'Inviting, scheduling', voice:'f',
     desc:'你是對方的日本朋友,正在用 LINE 般的口吻約週末見面。你會提議地點、喬時間、也可能臨時要改期,語氣輕鬆用常體。' },
+  // 每日推薦(KOL 回饋):走同一條 speakChat 路徑,只是 desc 寫好的預設情境。不進分組格子、不算探索進度(feat)。
+  // ⚠️ 後端 scene 只收前 400 字(hint 審核只看前 300),desc 要精簡。
+  { k:'daily5', ur:'學習者', jp:'今日の5分', yomi:'', ic:'☀️', img:'smalltalk', t:'每天 5 分鐘日語小時光', d:'聊聊你的今天,AI 用短句陪你說,說錯會溫柔幫你改', tE:'5-minute daily Japanese', dE:'Chat about your day in short sentences — gentle corrections included', voice:'f', feat:true,
+    desc:'你是學習者的日本朋友,陪他進行「每天5分鐘日語小時光」的輕鬆聊天。從問他今天過得怎樣開始(做了什麼、吃了什麼、心情如何),一次只問一件事,句子短,嚴格配合他的程度,語氣溫暖。他說錯或不自然時,先自然接話,再在 COACH 溫和指出錯處並給更自然的說法;大約每三輪一次,在 COACH 請他把修正後的句子再說一遍,他照說了就稱讚。聊滿約 8 輪就自然收尾,約好明天見。' },
   { k:'custom', ur:'對話的另一方', jp:'自由トーク', yomi:'', ic:'✏️', t:'自訂主題', d:'想聊什麼自己定', tE:'Custom topic', dE:'You decide what to chat about', voice:'f', custom:true },
 ];
 const LEVELS = ['N5','N4','N3','N2','N1'];
@@ -316,7 +371,7 @@ function toggleZh(){ showZh=!showZh; const b=document.getElementById('cnBtn'); i
 
 // ── 畫面切換 ──
 function show(id){
-  ['pick','chat','review','logs','logview'].forEach(x=>document.getElementById(x).style.display = x===id?(x==='chat'?'flex':'block'):'none');
+  ['pick','create','chat','review','logs','logview'].forEach(x=>document.getElementById(x).style.display = x===id?(x==='chat'?'flex':'block'):'none');
   const wrap=document.querySelector('.wrap'); if(wrap) wrap.classList.toggle('chatting', id==='chat');
   if(id==='chat') requestAnimationFrame(fitChatHeight);
 }
@@ -329,10 +384,13 @@ function fitChatHeight(){
 try{ (window.visualViewport||window).addEventListener('resize', fitChatHeight); }catch(e){}
 function renderLvTabs(){
   const D={N5:enOr('最基本','Basics'),N4:enOr('日常','Daily'),N3:enOr('中級','Intermediate'),N2:enOr('中上','Upper-int'),N1:enOr('高階','Advanced')};
-  document.getElementById('lvtabs').innerHTML = LEVELS.map(lv=>
+  const h = LEVELS.map(lv=>
     `<div class="lvtab${lv===activeLv?' on':''}" onclick="pickLv('${lv}')">${lv}<small>${D[lv]}</small></div>`).join('');
+  ['lvtabs','cfLv'].forEach(id=>{ const el=document.getElementById(id); if(el) el.innerHTML=h; });   // 選情境頁+自創表單共用同一個難度
+  const fl=document.getElementById('featLv'); if(fl) fl.textContent=activeLv;
 }
 function pickLv(lv){ try{ localStorage.setItem('sc_lv',lv); }catch(e){} activeLv=lv; renderLvTabs(); }
+function sceneImgK(k){ const s=SCENES.find(x=>x.k===k); return (s&&s.img)||k; }   // daily5 這類預設情境借用既有插圖
 function sceneTitle(s){ return s.tE ? enOr(s.t, s.tE) : s.t; }   // custom 主題的 t 是使用者輸入,不翻
 // 每情境本地練習次數(開始對話 +1),情境卡右上角顯示「練過N次」進度徽章
 function scCounts(){ try{ return JSON.parse(localStorage.getItem('sc_cnt')||'{}')||{}; }catch(e){ return {}; } }
@@ -341,7 +399,7 @@ function scBump(k){ try{ const m=scCounts(); m[k]=(m[k]||0)+1; localStorage.setI
 const SCENE_GROUPS = [
   { t:'日常生活', tE:'Daily life',        ks:['conbini','resto','shop','salon','station','delivery','ticket','friend'] },
   { t:'辦事・正式場合', tE:'Errands & formal', ks:['clinic','dentist','cityhall','bank','post','phone','house','moving','trouble','gym','school','interview'] },
-  { t:'社交・閒聊', tE:'Social',           ks:['coworker','izakaya','meeting','smalltalk','custom'] },
+  { t:'社交・閒聊', tE:'Social',           ks:['coworker','izakaya','meeting','smalltalk'] },   // custom 移到頁首 hero(KOL:自創情境要顯眼)
 ];
 function renderScenes(){
   const cnt = scCounts();
@@ -355,7 +413,7 @@ function renderScenes(){
     const last = JSON.parse(localStorage.getItem('sc_last')||'null');
     const ls = last && SCENES.find(x=>x.k===last.k && x.k!=='custom');
     if (ls) h += `<div class="sc-resume" onclick="activeLv='${esc(last.lv||'N4')}';renderLvTabs&&renderLvTabs();startChat('${ls.k}')">
-      <img src="images/scenes/${ls.k}.png" alt="">
+      <img src="images/scenes/${ls.img||ls.k}.png" alt="">
       <span><span class="rt1">${enOr('繼續上次','Continue')}</span><br><span class="rt2">${esc(ls.jp)}(${esc(sceneTitle(ls))}) · ${esc(last.lv||'N4')}</span></span>
       <span class="go">→</span></div>`;
   } catch(e) {}
@@ -364,13 +422,86 @@ function renderScenes(){
     h += g.ks.map(k => SCENES.find(x=>x.k===k)).filter(Boolean).map(sceneCard).join('');
   }
   document.getElementById('scenes').innerHTML = h;
+  renderTop();
   // 探索進度:練過幾個情境(收集慾;custom 不算)
   try {
-    const total = SCENES.filter(x=>x.k!=='custom').length;
-    const done = SCENES.filter(x=>x.k!=='custom' && cnt[x.k]).length;
+    const total = SCENES.filter(x=>!x.custom && !x.feat).length;
+    const done = SCENES.filter(x=>!x.custom && !x.feat && cnt[x.k]).length;
     const el = document.getElementById('scProg');
     if (el) el.innerHTML = done ? `${enOr('已探索','Explored')} <b>${done} / ${total}</b> ${enOr('個情境','scenes')} <span class="bar"><i style="width:${Math.round(done/total*100)}%"></i></span>` : '';
   } catch(e) {}
+}
+// ── 頁首:自創情境 hero + 每日推薦(KOL 回饋:競品用戶選它的理由「自創情景」排第四,要放最顯眼)──
+function renderTop(){
+  const el=document.getElementById('scTop'); if(!el) return;
+  const f=SCENES.find(x=>x.k==='daily5');
+  el.innerHTML =
+    `<div class="sc-hero">
+      <div class="hr-top"><span class="hr-ic"><i data-ic=sparkle></i></span>
+        <div><div class="hr-t">${enOr('自創情境','Create your own scene')}</div>
+        <div class="hr-d">${enOr('想練什麼情境自己設定,馬上開始專屬對話','Set up any situation you want to practice and start a chat made just for you')}</div></div></div>
+      <button class="hr-go" onclick="openCreate()"><i data-ic=edit></i> ${enOr('建立','Create')}</button>
+    </div>`
+    + (f ? `<div class="sc-feat" onclick="startChat('daily5')">
+      <span class="ft-ic"><img src="images/scenes/${f.img}.png" alt="" onerror="this.outerHTML='<i data-ic=sun></i>'"></span>
+      <span class="ft-body"><span class="ft-lb"><i data-ic=star></i> ${enOr('每日推薦','Daily pick')}</span>
+        <div class="ft-t">${esc(enOr(f.t,f.tE))}</div>
+        <div class="ft-d">${esc(enOr(f.d,f.dE))} · <span id="featLv">${esc(activeLv)}</span></div></span>
+      <span class="ft-go"><i data-ic=arrowRight></i></span>
+    </div>` : '');
+}
+
+// ── 自創情境表單:情境/地點 + 我的角色 + 對方角色(選填)+ 想練的重點(選填)──
+// 組成一段 desc 走原本的 speakChat scene 參數(後端零改動);我的角色同時當 userRole → 提示句視角審核照樣生效。
+const CF_EX = [
+  { l:'在便利商店退貨', lE:'Return an item at a konbini', place:'在便利商店退貨(買錯東西了想退)', placeE:'Returning an item at a convenience store (bought the wrong thing)', me:'顧客', meE:'Customer', them:'店員', themE:'Clerk', focus:'說明原因、有禮貌地拜託', focusE:'Explain why and ask politely' },
+  { l:'跟房東說熱水器壞了', lE:'Water heater is broken', place:'打電話跟房東說熱水器壞了', placeE:'Calling the landlord because the water heater broke', me:'房客', meE:'Tenant', them:'房東', themE:'Landlord', focus:'描述故障狀況、約修理時間', focusE:'Describe the problem and set a repair time' },
+  { l:'打工面試自我介紹', lE:'Part-time job interview', place:'居酒屋的打工面試', placeE:'Part-time job interview at an izakaya', me:'應徵者', meE:'Applicant', them:'店長', themE:'Manager', focus:'自我介紹、說明能上班的時段', focusE:'Self-introduction and available shifts' },
+  { l:'跟同事約吃午餐', lE:'Lunch with a coworker', place:'午休時約同事一起去吃午餐', placeE:'Inviting a coworker to lunch', me:'同事', meE:'Coworker', them:'日本同事', themE:'Japanese coworker', focus:'邀約、決定吃什麼', focusE:'Inviting and deciding what to eat' },
+];
+function cfLast(){ try{ return JSON.parse(localStorage.getItem('sc_custom_last')||'null')||{}; }catch(e){ return {}; } }
+function openCreate(){
+  const v=cfLast();
+  const fld=(id,lb,ph,opt,val,ta)=>`<label class="cf-f" id="${id}F"><span>${lb}${opt?`<small>${enOr('選填','optional')}</small>`:''}</span>`
+    +(ta?`<textarea id="${id}" rows="2" maxlength="100" placeholder="${esc(ph)}">${esc(val||'')}</textarea>`
+        :`<input id="${id}" maxlength="${id==='cfPlace'?120:30}" placeholder="${esc(ph)}" value="${esc(val||'').replace(/"/g,'&quot;')}">`)+`</label>`;
+  document.getElementById('cfTtl').innerHTML=`<span style="display:inline-flex;align-items:center;gap:7px"><i data-ic=sparkle></i>${enOr('自創情境','Create your own scene')}</span>`;
+  document.getElementById('cfBack').textContent=enOr('返回','Back');
+  document.getElementById('cfBox').innerHTML=
+    `<div class="cf-lb">${enOr('不知道練什麼?點一個範例','Need ideas? Tap an example')}</div>
+    <div class="cf-chips">${CF_EX.map((x,i)=>`<button class="cf-chip" onclick="cfFill(${i},this)">${esc(enOr(x.l,x.lE))}</button>`).join('')}</div>`
+    + fld('cfPlace', enOr('情境 / 地點','Situation / place'), enOr('例:在藥妝店問有沒有感冒藥','e.g. Asking for cold medicine at a drugstore'), false, v.place)
+    + fld('cfMe', enOr('我的角色','My role'), enOr('例:客人、房客、新人','e.g. customer, tenant, new hire'), false, v.me)
+    + fld('cfThem', enOr('對方角色','Their role'), enOr('沒填就讓 AI 依情境決定','Leave blank and the AI will pick'), true, v.them)
+    + fld('cfFocus', enOr('想練的重點','What to practice'), enOr('例:敬語、拒絕的說法、問價錢','e.g. keigo, saying no, asking prices'), true, v.focus, true)
+    + `<div class="cf-lb">${enOr('難度','Level')}</div><div class="lvtabs" id="cfLv"></div>
+    <button class="btn pri cf-go" onclick="startCustom()">${enOr('開始對話','Start chatting')}</button>
+    <div class="cf-note">${enOr('AI 會照你的設定扮演對方;跟其他情境一樣算一場對話。','The AI plays the other person based on your setup. Counts as one session, like other scenes.')}</div>`;
+  renderLvTabs();
+  show('create');
+  window.scrollTo(0,0);
+}
+function cfFill(i,btn){
+  const x=CF_EX[i]; if(!x) return;
+  const en=I18n.getLang()==='en';
+  const set=(id,zh,e)=>{ const el=document.getElementById(id); if(el) el.value=en?e:cvt(zh); };
+  set('cfPlace',x.place,x.placeE); set('cfMe',x.me,x.meE); set('cfThem',x.them,x.themE); set('cfFocus',x.focus,x.focusE);
+  document.querySelectorAll('.cf-chip').forEach(b=>b.classList.toggle('on',b===btn));
+  const pf=document.getElementById('cfPlaceF'); if(pf) pf.classList.remove('bad');
+}
+function startCustom(){
+  const g=id=>((document.getElementById(id)||{}).value||'').trim().replace(/\s+/g,' ');
+  const place=g('cfPlace').slice(0,120), me=g('cfMe').slice(0,30), them=g('cfThem').slice(0,30), focus=g('cfFocus').slice(0,100);
+  if(!place){ const pf=document.getElementById('cfPlaceF'); if(pf) pf.classList.add('bad'); const i=document.getElementById('cfPlace'); if(i) i.focus(); return; }
+  try{ localStorage.setItem('sc_custom_last', JSON.stringify({place,me,them,focus})); }catch(e){}
+  // desc ≤ 400 字(後端截斷上限):欄位各自截過長度,最壞情況約 330 字
+  const desc='自訂情境(由學習者設定,請照著演):'+place
+    +'\n你的角色:'+(them||'依情境最自然的那一方(例如店員、房東、面試官、朋友)')
+    +(me?'\n學習者的角色:'+me:'')
+    +(focus?'\n學習者想練的重點:'+focus+'——請在對話中自然製造機會讓他練到。':'')
+    +'\n若設定不夠具體,就自行補上合理細節,自然推進對話。';
+  const ttl=place.length>14? place.slice(0,14)+'…' : place;
+  startChat('custom', { k:'custom', ic:'✏️', jp:'', t:ttl, ur:me, voice:'f', desc });
 }
 function backToPick(){ hardStopRec(); try{ if(_turnAbort) _turnAbort.abort(); }catch(e){} busy=false; setBusy(false); scene=null; history=[]; _logSaved=false; _logDocId=null; show('pick'); }
 
@@ -415,21 +546,15 @@ function ensureDictLv(lv){
   }catch(e){} };
   document.head.appendChild(sc);
 }
-function startChat(k){
-  if(window.AIConsent && !AIConsent.has()){ AIConsent.ensure().then(function(ok){ if(ok) startChat(k); }); return; }   // 第一次用 AI 聊聊先取得資料傳送同意
+function startChat(k, customScene){
+  const s0 = SCENES.find(s=>s.k===k); if(!s0) return;
+  if(s0.custom && !customScene){ openCreate(); return; }   // 自訂主題 → 自創情境表單(原本是 prompt() 一行字)
+  if(window.AIConsent && !AIConsent.has()){ AIConsent.ensure().then(function(ok){ if(ok) startChat(k, customScene); }); return; }   // 第一次用 AI 聊聊先取得資料傳送同意
   ensureDictLv(activeLv);
   if(!auth.currentUser){ showLoginCard(); return; }
-  const s0 = SCENES.find(s=>s.k===k); if(!s0) return;
-  if(s0.custom){
-    // 自訂主題:自由輸入想聊什麼,AI 照這個設定演
-    const topic = (prompt(enOr('想聊什麼?用一兩句描述情境或話題,例如:\n「我是店長,你是來應徵打工的人」\n「聊最近看的動漫」\n「你是我的日本朋友,幫我規劃九州旅行」','What do you want to talk about? Describe the scene or topic in a sentence or two, e.g.:\n"You are the manager interviewing me for a part-time job"\n"Chat about anime we watched lately"\n"You are my Japanese friend helping me plan a Kyushu trip"'))||'').trim();
-    if(!topic) return;
-    scene = { k:'custom', ic:'✏️', t: topic.length>12? topic.slice(0,12)+'…' : topic, voice:'f',
-      desc:'自訂情境(由學習者描述,請照著演):'+topic+'\n如果描述裡沒指定你的角色,就當一位聊得來的日本人,自然地聊這個話題。' };
-  } else {
-    scene = s0;
-  }
+  scene = customScene || s0;
   history = []; _logSaved=false;
+  if(_lkHintIdx!==-1) _lkHintIdx=-2;   // 查字提示只在第一場出現過一次
   scBump(k);   // 本地練習次數 +1(情境卡進度徽章用)
   document.getElementById('chatTtl').innerHTML = `<span class="t-jp">${esc(scene.jp||'')}</span><span class="t-sub">${esc(sceneTitle(scene))} · ${activeLv}</span>`;
   document.getElementById('msgs').innerHTML = '';
@@ -439,7 +564,8 @@ function startChat(k){
   // 場景背景圖(有切好的才掛;veil 由 CSS 蓋淡)
   const chatEl=document.getElementById('chat');
   const bgOk=['conbini','resto','station','clinic','shop','interview','house','coworker','cityhall','phone','salon','izakaya','delivery','smalltalk','custom'];
-  if(bgOk.includes(scene.k)){ chatEl.style.setProperty('--chatbg','url(images/scenes/bg/'+scene.k+'.jpg)'); chatEl.classList.add('has-bg'); }
+  const bgK=scene.img||scene.k;
+  if(bgOk.includes(bgK)){ chatEl.style.setProperty('--chatbg','url(images/scenes/bg/'+bgK+'.jpg)'); chatEl.classList.add('has-bg'); }
   else { chatEl.classList.remove('has-bg'); }
   show('chat');
   turn();   // AI 先開場
@@ -449,11 +575,15 @@ function esc(s){ return String(s==null?'':s).replace(/[&<>]/g,c=>({'&':'&amp;','
 function renderMsgs(streamingAi){
   const box = document.getElementById('msgs');
   let html = '';
-  for(const m of history){
+  for(let hi=0; hi<history.length; hi++){
+    const m=history[hi];
     if(m.role==='me'){
       html += `<div class="msg me"><div class="bubble me"><div class="bjp">${esc(m.text)}</div>${m.orig?`<div class="bzh">${esc(m.orig)}</div>`:''}</div></div>`;
     } else {
-      html += aiBubble(m);
+      const ab = aiBubble(m);
+      html += ab;
+      if(_lkHintIdx===-1 && !lkHintSeen() && ab.indexOf('class="jlk')>-1){ _lkHintIdx=hi; try{ localStorage.setItem('sc_lk_hint','1'); }catch(e){} }   // 出現即記一次,之後的場不再出
+      if(hi===_lkHintIdx) html += lkHintHTML();
       if(m.coach) html += `<div class="coach"><b>${enOr('教練','Coach')}</b>:${esc(cvt(m.coach))}</div>`;
     }
   }
@@ -475,8 +605,35 @@ function renderMsgs(streamingAi){
     }
   }
 }
+// ── 即點即查(ux-extras.js 的 .jlk + 彈窗,文章/文法同一套)──
+// AI 泡泡本來就走 furiganaHTMLRich → 字典查得到的漢字詞已可點;這裡再把 AI 給的 WORDS(単語|よみ|意思)
+// 併進字典,讓單字庫沒收的詞也能點。字典遇單字檔載入會重建,所以每次渲染前都補一次(addEntries 只補缺,不蓋正本讀音)。
+function addWordEntries(words){
+  if(!words || !window.furiAddEntries) return;
+  try{
+    const list=String(words).split(/[;;﹔]/).map(it=>{ const p=it.split(/[|｜]/); return { w:(p[0]||'').trim(), r:(p[1]||'').trim(), m:cvt((p[2]||'').trim()) }; })
+      .filter(e=>e.w && /[一-鿿]/.test(e.w) && e.r && !/[一-鿿]/.test(e.r));
+    if(list.length) window.furiAddEntries(list);
+  }catch(e){}
+}
+// 提示「點單字可以查」:每位用戶只出現一次(localStorage),掛在第一則「有可點單字」的 AI 訊息下面
+let _lkHintIdx = -1;
+function lkHintSeen(){ try{ return localStorage.getItem('sc_lk_hint')==='1'; }catch(e){ return true; } }
+function lkHintHTML(){ return `<div class="lk-hint"><i data-ic=search></i> ${enOr('點有虛線的日文單字,可以查意思、收藏','Tap a dotted-underlined Japanese word to look it up')}<button onclick="dismissLkHint()" aria-label="${enOr('關閉','Close')}">✕</button></div>`; }
+function dismissLkHint(){ _lkHintIdx=-2; try{ localStorage.setItem('sc_lk_hint','1'); }catch(e){} document.querySelectorAll('#msgs .lk-hint').forEach(x=>x.remove()); }
+document.addEventListener('click', function(e){ if(_lkHintIdx>=0 && e.target.closest && e.target.closest('#msgs .jlk')) dismissLkHint(); }, true);
+// 生字本收藏:stayjpAddWord 只有 app.html 有 → 本頁補同格式(word_notebook,app.html 開啟時與雲端聯集合併)
+if(!window.stayjpHasWord) window.stayjpHasWord = function(w){ try{ return (JSON.parse(localStorage.getItem('word_notebook'))||[]).some(x=>x&&x.w===w); }catch(e){ return false; } };
+if(!window.stayjpAddWord) window.stayjpAddWord = function(w, r, m, lv){
+  let nb; try{ nb=JSON.parse(localStorage.getItem('word_notebook'))||[]; }catch(e){ nb=[]; }
+  if(nb.some(x=>x&&x.w===w)) return 'exists';
+  nb.push({ w:w, r:r||w, m:m||'', lv:lv||String(activeLv||'N5').toLowerCase(), added:new Date().toISOString() });
+  try{ localStorage.setItem('word_notebook', JSON.stringify(nb)); }catch(e){}
+  return 'added';
+};
 function aiBubble(m){
   const jp = m.jp || m.text || '';
+  addWordEntries(m.words);
   return `<div class="msg ai"><div class="bubble ai">
     <div class="bjp"><span>${(jp&&window.furiganaHTMLRich)?window.furiganaHTMLRich(jp):(esc(jp)||'…')}</span>${jp?`<button class="spk" title="${enOr('播放','Play')}" onclick="playTTS(${JSON.stringify(jp).replace(/"/g,'&quot;')}, scene&&scene.voice)"><i data-ic=volume></i></button><button class="spk favstar" title="${enOr('收藏這句','Save this sentence')}" onclick="favFromBubble(this)" data-jp="${esc(jp)}" data-kana="${esc(m.kana||'')}" data-zh="${esc(m.zh||'')}">${(window.FavSents&&FavSents.isFav(jp))?'★':'☆'}</button>`:''}</div>
 
@@ -746,7 +903,7 @@ async function openLogs(){
     box.innerHTML=snap.docs.map(d=>{ const v=d.data(); window.__logs[d.id]=v;
       const dt=new Date(v.ts); const ds=(dt.getMonth()+1)+'/'+dt.getDate()+' '+String(dt.getHours()).padStart(2,'0')+':'+String(dt.getMinutes()).padStart(2,'0');
       return '<div class="hist-row" style="display:flex;gap:10px;align-items:center;padding:12px 4px;border-bottom:1px solid var(--line);cursor:pointer" onclick="viewLog(\''+d.id+'\')">'
-        +(v.sceneK?'<img src="images/scenes/'+esc(v.sceneK)+'.png" alt="" style="width:26px;height:26px;border-radius:50%" onerror="this.style.display=\'none\'">':'<span style="font-size:20px">'+esc(v.sceneIc||'💬')+'</span>')
+        +(v.sceneK?'<img src="images/scenes/'+esc(sceneImgK(v.sceneK))+'.png" alt="" style="width:26px;height:26px;border-radius:50%" onerror="this.style.display=\'none\'">':'<span style="font-size:20px">'+esc(v.sceneIc||'💬')+'</span>')
         +'<span style="flex:1"><b>'+esc(cvt(v.sceneT||''))+'</b> <span class="muted">· '+esc(v.lv||'')+' · '+ds+'</span></span>'
         +(v.score!=null?'<span style="font-weight:700;color:'+(v.score>=85?'var(--ok)':v.score>=60?'var(--warn)':'var(--bad)')+'">'+v.score+'</span>':'')
         +'<span class="muted">›</span></div>'; }).join('');
@@ -755,7 +912,7 @@ async function openLogs(){
 function viewLog(id){
   const v=(window.__logs||{})[id]; if(!v) return;
   show('logview');
-  document.getElementById('lvTtl').innerHTML=(v.sceneK?'<img src="images/scenes/'+esc(v.sceneK)+'.png" alt="" style="width:22px;height:22px;border-radius:50%;vertical-align:-4px" onerror="this.style.display=\'none\'"> ':esc(v.sceneIc||'💬')+' ')+esc(cvt(v.sceneT||''))+' · '+esc(v.lv||'');
+  document.getElementById('lvTtl').innerHTML=(v.sceneK?'<img src="images/scenes/'+esc(sceneImgK(v.sceneK))+'.png" alt="" style="width:22px;height:22px;border-radius:50%;vertical-align:-4px" onerror="this.style.display=\'none\'"> ':esc(v.sceneIc||'💬')+' ')+esc(cvt(v.sceneT||''))+' · '+esc(v.lv||'');
   const wrap=document.getElementById('logMsgs');
   wrap.innerHTML=(v.msgs||[]).map(function(m,i){
     if(m.r==='m') return '<div class="msg me"><div class="bubble me"><div class="bjp">'+esc(m.jp)+'</div></div></div>';
