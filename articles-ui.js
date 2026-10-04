@@ -66,7 +66,7 @@ window.Articles = (function () {
       } else {
         var nx = segs[i + 1];
         if (nx && !isKj(nx[0])) {                   // 漢字段：讀到下一個假名段出現處
-          var pos = rd.indexOf(nx, ri);
+          var pos = rd.indexOf(nx, ri + 1);           // 漢字至少吃一個假名(否則 書か/かか、意味合い/いみあい 的 rt 會是空的)
           if (pos < 0) return whole;
           out += '<ruby>' + esc(seg) + '<rt>' + esc(rd.slice(ri, pos)) + '</rt></ruby>'; ri = pos;
         } else {                                    // 結尾漢字段：吃掉剩餘讀音
