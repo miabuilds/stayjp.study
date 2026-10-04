@@ -36,6 +36,10 @@ body{margin:0;background:var(--bg);color:var(--tx);font-family:-apple-system,"Pi
 .pc-idx{text-align:center;font-size:12px;color:var(--tx3);margin:6px 0 10px;font-variant-numeric:tabular-nums}
 .pc-jp{font-size:21px;line-height:2.1;text-align:center;min-height:56px;word-break:break-word;margin-bottom:2px}
 .pc-jp rt{font-size:10.5px;color:var(--tx3)}
+/* 字幕每個詞可點查:虛線本頁自帶(ux-extras 的 .jlk 樣式要第一次點查才注入,沒點過看不到虛線)。助詞/助動詞不包 .jlk → 不畫線 */
+.jlk{cursor:pointer;border-radius:3px;border-bottom:1.5px dotted rgba(198,85,59,.55);margin:0 1px}
+.jlk:hover,.jlk:focus{background:var(--soft);outline:none}
+#jlkPop a.jact{text-decoration:none}   /* 未收錄詞的「中文辭典/Jisho」連結鈕跟發音/收藏同款 */
 .pc-jp .hit{color:var(--good);font-weight:700}
 .pc-jp.blur{filter:blur(7px);user-select:none;pointer-events:none}
 .pc-zh{text-align:center;font-size:13px;color:var(--tx2);margin-bottom:10px;min-height:18px}
@@ -317,6 +321,8 @@ if(I18n.getLang()==='zh-CN') ensureOpenCC().then(function(){ try{ YTS._retext();
 <script src="grammar-kanji-readings.js"></script>
 <script src="vocab-n5.js"></script>
 <script src="vocab-n4.js"></script>
+<script src="kana-lookup.js"></script>
+<script src="yt-word.js"></script>
 <script src="ux-extras.js"></script>
 <script>
 // 單字查詢彈窗(ux-extras)的「發音」呼叫全域 speak()。
@@ -482,31 +488,32 @@ const YTS = (() => {
     const kanaRatio = lcsRatio(said, kanaOfLine(lines[cur]) || kanaOf(target) || target);   // 整句用假名唸/打也算對
     return { hits, ratio: Math.max(rawRatio, kanaRatio) };
   }
-  function fr(t){ try{ return (window.furiganaHTML? furiganaHTML(t) : esc(t)); }catch(e){ return esc(t); } }
+  // 沒 tk 的句子(舊快取/純假名句):站上字庫注音 + 假名詞比對(kana-lookup,跟 AI 情境對話同一套)
+  function fr(t){ try{ return (window.furiganaHTML? furiganaHTML(t, { kana:true }) : esc(t)); }catch(e){ return esc(t); } }
   // 逐詞注音:快取裡的 l.tk 由 scripts/yt-ruby.mjs(kuromoji)預算,格式 '表層\t讀音\t原形'。
   // 站上字庫注音(fr)只認 N5~N1 收錄的詞,字幕裡 扉/災い 這類沒收的就一片空白(用戶回饋「不知道怎麼唸」)
   // → 有 tk 就用 tk 畫,每個漢字詞包成 .jlk 可點查(有收錄給意思,沒收錄給辭典連結)。
-  let _dictMap=null, _dictN=0;
-  function dictOf(w){
-    const lv=['N5','N4','N3','N2','N1'].filter(x=>Array.isArray(window['VOCAB_'+x]));
-    if(!_dictMap||lv.length!==_dictN){ _dictMap={}; _dictN=lv.length; lv.forEach(x=>window['VOCAB_'+x].forEach(e=>{ if(e&&e.w&&!_dictMap[e.w]) _dictMap[e.w]=e; })); }
-    return _dictMap[w]||null;
+  // 2026-10-04 KOL 回饋(對標 ListenLeap):「字幕每個字都要能查」→ 斷詞→查詢改由 yt-word.js 決定:
+  //   漢字詞照舊全可點;假名內容詞(コンビニ/ちょっと/おいしかった)也可點,有 tp 詞性就用原形查;
+  //   助詞/助動詞(は/が/です/ました)不畫虛線。查不到 → 彈窗走「未收錄+發音+辭典連結」。
+  let _lookup=null;
+  function ywLookup(){ if(!_lookup && window.YtWord) _lookup=YtWord.makeLookup(window); return _lookup; }
+  function rubyHTML(surf, rd){
+    if(!rd) return esc(surf);
+    const tail=(surf.match(/[ぁ-ゖ]+$/)||[''])[0];
+    if(tail && rd.length>tail.length && rd.endsWith(tail)) return '<ruby>'+esc(surf.slice(0,surf.length-tail.length))+'<rt>'+esc(rd.slice(0,rd.length-tail.length))+'</rt></ruby>'+esc(tail);
+    if(!tail) return '<ruby>'+esc(surf)+'<rt>'+esc(rd)+'</rt></ruby>';
+    return esc(surf);   // 讀音尾對不上送假名 → 這個詞不標(寧缺勿錯)
   }
   function tokRuby(l){
     if(!l) return '';
-    if(!Array.isArray(l.tk)||!l.tk.length) return fr(l.ja);
+    const segs = window.YtWord && YtWord.segments(l, ywLookup());
+    if(!segs) return fr(l.ja);
     let html='';
-    for(const s of l.tk){
-      const p=String(s).split('\t');
-      if(p.length<2){ html+=esc(p[0]); continue; }
-      const surf=p[0], rd=p[1], base=p[2]||surf;
-      const tail=(surf.match(/[ぁ-ゖ]+$/)||[''])[0];
-      let inner;
-      if(tail && rd.length>tail.length && rd.endsWith(tail)) inner='<ruby>'+esc(surf.slice(0,surf.length-tail.length))+'<rt>'+esc(rd.slice(0,rd.length-tail.length))+'</rt></ruby>'+esc(tail);
-      else if(!tail) inner='<ruby>'+esc(surf)+'<rt>'+esc(rd)+'</rt></ruby>';
-      else inner=esc(surf);   // 讀音尾對不上送假名 → 這個詞不標(寧缺勿錯)
-      const e=dictOf(base)||dictOf(surf);
-      html+='<span class="jlk" role="button" tabindex="0" data-w="'+esc(base)+'" data-r="'+esc(e?e.r||'':(base===surf?rd:''))+'" data-m="'+esc(e?e.m||'':'')+'" data-c="'+esc(e&&e.c?e.c:'')+'" data-f="">'+inner+'</span>';
+    for(const g of segs){
+      const inner = rubyHTML(g.t, /[一-鿿々〆ヶ]/.test(g.t) ? g.rd : '');
+      if(!g.tap){ html+=inner; continue; }
+      html+='<span class="jlk" role="button" tabindex="0" data-w="'+esc(g.w)+'" data-r="'+esc(g.r||'')+'" data-m="'+esc(g.m||'')+'" data-c="'+esc(g.c||'')+'" data-f="'+esc(g.f||'')+'"'+(g.u?' data-u="1"':'')+'>'+inner+'</span>';
     }
     return html;
   }
@@ -684,7 +691,7 @@ const YTS = (() => {
   let _dictBoosted=false;
   function boostDict(){
     if(_dictBoosted) return; _dictBoosted=true;
-    ['vocab-n3.js','vocab-n2.js','vocab-n1.js']
+    ['vocab-n3.js','vocab-n2.js','vocab-n1.js','article-dict.js']   // article-dict:機能語/專有名詞補充(10KB gz),假名詞查得到意思
       .reduce((p,f)=>p.then(()=>loadScript(f)), Promise.resolve())
       .then(()=>{ try{ if(mode==='ktv') renderKtv(); else if(mode!=='quiz') renderCard(false); if(listOpen) renderList(); }catch(e){} });
   }
@@ -1393,8 +1400,8 @@ const YTS = (() => {
         '<em>跟播</em>=影片一直播,字幕自動跳、當前句像 KTV 一樣刷色;<em>跟讀</em>=開麥跟著唸,唸到的字亮綠給分;<em>聽寫</em>=句子先遮住,聽完打出來對答案;<em>測驗</em>=聽句選句和克漏字,每題都有詳解。',
         '<em>Follow</em>: captions auto-advance with a karaoke highlight. <em>Shadow</em>: speak along and matched words light up with a score. <em>Dictation</em>: the line is hidden until you type it. <em>Quiz</em>: listening and cloze questions, each with an explanation.')
       + S(3,'邊看邊查、順手收單字','Look things up as you go',
-        '句子裡的漢字點一下就查(有讀音和意思);「<em>這支影片的單字・文法</em>」會列出這支片用到的 JLPT 單字和句型,標級數、可跳去那一句聽,☆ 收進生詞本就會進複習系統。速度可切 0.5x、循環單句、中文翻譯也能開關。',
-        'Tap any kanji in a line to look it up. The <em>Words &amp; grammar in this video</em> panel lists the JLPT vocabulary and patterns it uses — with levels, jump-to-line playback, and ☆ to save into your review deck. You can also slow to 0.5x, loop a line, and toggle the Chinese translation.');
+        '句子裡有虛線的單字點一下就查(漢字、假名、外來語都可以,有讀音和意思);「<em>這支影片的單字・文法</em>」會列出這支片用到的 JLPT 單字和句型,標級數、可跳去那一句聽,☆ 收進生詞本就會進複習系統。速度可切 0.5x、循環單句、中文翻譯也能開關。',
+        'Tap any dotted word in a line (kanji, kana or loanword) to look it up. The <em>Words &amp; grammar in this video</em> panel lists the JLPT vocabulary and patterns it uses — with levels, jump-to-line playback, and ☆ to save into your review deck. You can also slow to 0.5x, loop a line, and toggle the Chinese translation.');
   }
   function tut(show){
     const m=document.getElementById('tutMask');
