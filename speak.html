@@ -243,6 +243,7 @@
 <script src="i18n.js"></script>
 <script src="audio/tts/manifest.js"></script>
 <script src="speak-ruby.js"></script>
+<script src="shadow-core.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
@@ -870,22 +871,8 @@ const Lesson=(()=>{
   let rec2=null, listening=false, savedNativeHandlers=null, autoTimer=null;
 
   const PUNCT=/[、。,.!?！？…・「」\s]/;
-  function kata2hira(t){ return t.replace(/[ァ-ヶ]/g,c=>String.fromCharCode(c.charCodeAt(0)-0x60)); }
-  // 辨識引擎會把數詞轉阿拉伯數字(ふたつ→「2つ」),但目標句是假名 → 對不上(用戶實錘)。
-  // 比對前把「數字+量詞」還原成假名讀音;蓋不到的量詞退回數字的音讀。
-  const NUM_TSU=['','ひとつ','ふたつ','みっつ','よっつ','いつつ','むっつ','ななつ','やっつ','ここのつ','とお'];
-  const NUM_NIN=['','ひとり','ふたり','さんにん','よにん','ごにん','ろくにん','ななにん','はちにん','きゅうにん','じゅうにん'];
-  const NUM_JI=['','いちじ','にじ','さんじ','よじ','ごじ','ろくじ','しちじ','はちじ','くじ','じゅうじ','じゅういちじ','じゅうにじ'];
-  const NUM_ON=['ゼロ','いち','に','さん','よん','ご','ろく','なな','はち','きゅう','じゅう'];
-  function numNorm(t){
-    return String(t||'')
-      .replace(/[０-９]/g,c=>String.fromCharCode(c.charCodeAt(0)-0xFEE0))
-      .replace(/(10|[0-9])つ/g,(m,n)=>NUM_TSU[+n]||m)
-      .replace(/(10|[0-9])人/g,(m,n)=>NUM_NIN[+n]||m)
-      .replace(/(1[0-2]|[0-9])時/g,(m,n)=>NUM_JI[+n]||m)
-      .replace(/(10|[0-9])/g,(m,n)=>NUM_ON[+n]||'');
-  }
-  function lnorm(t){ return kata2hira(numNorm(t)).replace(/[、。,.!?！？…・「」\s]/g,''); }
+  // 比對前正規化(假名化、數字+量詞還原讀音)抽到 shadow-core.js,單字跟讀(日語從頭學)共用同一套
+  const kata2hira=ShadowCore.kata2hira, numNorm=ShadowCore.numNorm, lnorm=ShadowCore.lnorm;
 
   // 句子 → 匹配單元:有 SPEAK_RUBY 用逐段(漢字段帶讀音),否則逐字元
   function parseUnits(jp){

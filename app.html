@@ -350,10 +350,30 @@ select.lang-btn {
 .hub-zero small { font-size:11.5px; color:var(--tx2); }
 .hub-zero .hz-prog { font-size:11px; color:var(--ac); font-weight:800; }
 .hub-zero .hj-arrow { margin-left:auto; font-size:20px; color:var(--ac); }
+/* 單字/文法每日批次:三步學習引導(study-guide.js) */
+.sg { background:var(--bg2); border:1px solid var(--bd); border-radius:16px; margin:0 0 16px; overflow:hidden; }
+.sg-h { font:inherit; display:flex; align-items:center; gap:10px; width:100%; background:none; border:0; color:var(--tx); padding:12px 15px; cursor:pointer; text-align:left; }
+.sg-h b { flex:1; font-size:14px; font-weight:800; }
+.sg-cnt { font-size:12px; font-weight:800; color:var(--ac); display:inline-flex; align-items:center; gap:3px; }
+.sg-tg { font-size:12px; color:var(--tx2); border:1px solid var(--bd); border-radius:999px; padding:3px 10px; }
+.sg-steps { display:flex; align-items:center; gap:8px; padding:12px 15px; border-top:1px solid var(--bd); }
+.sg-st { font:inherit; display:flex; align-items:center; gap:7px; background:var(--bg); border:1.5px solid var(--bd); border-radius:999px; padding:6px 13px 6px 6px; cursor:pointer; color:var(--tx2); flex-shrink:0; }
+.sg-st .sg-n { width:24px; height:24px; border-radius:50%; background:var(--bg3); display:inline-flex; align-items:center; justify-content:center; font-size:12px; font-weight:800; }
+.sg-st .sg-t { font-size:13.5px; font-weight:800; display:inline-flex; align-items:center; gap:3px; }
+.sg-st.cur { border-color:var(--ac); color:var(--ac); background:rgba(var(--ac-rgb),.08); }
+.sg-st.cur .sg-n { background:var(--ac); color:#fff; }
+.sg-st.done { color:var(--correct-tx); border-color:var(--correct-bd); }
+.sg-st.done .sg-n { background:var(--correct-bd); color:#fff; }
+.sg-line { flex:1; min-width:8px; height:2px; background:var(--bd); border-radius:2px; }
+.sg-line.done { background:var(--correct-bd); }
+.sg-desc { font-size:13px; color:var(--tx2); line-height:1.65; padding:0 15px 12px; }
+.sg-desc b { color:var(--tx); }
+.sg-next { font:inherit; display:block; width:calc(100% - 30px); margin:0 15px 14px; background:var(--ac); color:#fff; border:0; border-radius:12px; padding:11px; font-size:14px; font-weight:800; cursor:pointer; }
+.sg-next:active, .sg-st:active { transform:scale(.98); }
 /* Journey 課程地圖 */
 .jr-mask { position:fixed; inset:0; z-index:820; background:var(--bg); overflow:auto; }
 .jr-wrap { max-width:640px; margin:0 auto; padding:16px 18px calc(env(safe-area-inset-bottom,0px) + 40px); }
-.jr-top { display:flex; align-items:center; gap:10px; position:sticky; top:0; background:var(--bg); padding:10px 0; z-index:2; }
+.jr-top { display:flex; align-items:center; gap:10px; position:sticky; top:0; background:var(--bg); padding:10px 0; z-index:2; border-bottom:1px solid var(--bd); margin-bottom:12px; }
 .jr-x { font:inherit; border:1px solid var(--bd); background:var(--bg2); color:var(--tx2); border-radius:10px; padding:6px 12px; cursor:pointer; }
 .jr-hero { display:flex; align-items:center; gap:14px; background:var(--bg2); border:1px solid var(--bd); border-radius:18px; padding:16px; margin:6px 0 16px; }
 .jr-hero img { width:76px; height:auto; }
@@ -2318,6 +2338,13 @@ function loadCloudData() {
           // Object: cloud values win if newer, local wins otherwise
           Object.entries(local).forEach(([key, val]) => {
             if (!merged[key]) merged[key] = val;
+            else if ((k === 'ess_progress' || k === 'guide_steps') && val && typeof val === 'object') {
+              // 小課成績 / 學習引導勾選:兩邊合併,數字欄取大(成績取正確率較高那筆),不讓舊裝置倒退進度
+              const c = merged[key], m = Object.assign({}, c, val);
+              Object.keys(m).forEach(f => { if (typeof c[f] === 'number' && typeof val[f] === 'number') m[f] = Math.max(c[f], val[f]); });
+              if (k === 'ess_progress') { const take = (c.t && (!val.t || c.b / c.t >= val.b / val.t)) ? c : val; m.b = take.b; m.t = take.t; }
+              merged[key] = m;
+            }
             else if (val && typeof val === 'object' && val.lastReview && (!merged[key].lastReview || val.lastReview > merged[key].lastReview)) merged[key] = val;
           });
           localStorage.setItem(k, JSON.stringify(merged));
@@ -2399,7 +2426,7 @@ function saveSRSCloud() {
   saveProgressKeys({ srs_data: d });
 }
 // ── Sync ALL data ──
-const SYNC_KEYS = ['sp_settings','sp_sets','tts_voice','study_log','word_notebook','grammar_srs','daily_progress','mock_exam_history','exam_date','base_level','goal_level','reading_done','reading_scores','listening_scores','listening_done','shadow_favs','wrong_questions','ls_done','jr_kana','jr_essentials','jr_phrases','jr_chat','jr_vb_seen','jr_gr_seen','path_progress','my_vocab'];
+const SYNC_KEYS = ['sp_settings','sp_sets','tts_voice','study_log','word_notebook','grammar_srs','daily_progress','mock_exam_history','exam_date','base_level','goal_level','reading_done','reading_scores','listening_scores','listening_done','shadow_favs','wrong_questions','ls_done','jr_kana','jr_essentials','jr_phrases','jr_chat','jr_vb_seen','jr_gr_seen','path_progress','my_vocab','ess_progress','guide_steps'];
 // 學習日曆逐日上傳:update('study_log.日期', 值) 只動那一天 → 雲端日曆只增不減,
 // 任何裝置的 stale 本機資料都毀不掉歷史(root cause 修:整包 set 會整欄覆蓋)。
 function saveStudyDayCloud(dates) {
@@ -2583,8 +2610,9 @@ const Journey = (() => {
     ]},
     { t: L('第 2 章 · 開口說第一句', 'Ch.2 · First words'), steps: [
       { k: 'essentials', t: L('必學基礎詞', 'Essential basics'), d: L('數字量詞、時間日期、家族稱謂、疑問詞與助詞', 'Numbers, time, family terms, question words and particles'),
-        cond: L('做完一次隨堂測驗', 'Finish the mini quiz'), chk: () => !!_ls('jr_essentials'),
-        go: () => { if (window.NavBack) NavBack.pushPage('journey', 'essentials.html'); location.href = 'essentials.html'; } },
+        // 2026-10 KOL:改成多鄰國式小課(essentials-lessons.js)。打勾=通過綜合測驗(同一個 jr_essentials;舊版隨堂測驗做過的人維持打勾)
+        cond: L('通過最後的綜合測驗', 'Pass the final review quiz'), chk: () => !!_ls('jr_essentials'),
+        go: () => { if (window.EssLessons) EssLessons.openNext(); else { if (window.NavBack) NavBack.pushPage('journey', 'essentials.html'); location.href = 'essentials.html'; } } },
       { k: 'phrases', t: L('生活會話', 'Everyday phrases'), d: L('用餐、交通、購物…場景分類,點了就唸', 'Real-life phrases by scene, tap to hear'),
         cond: L('點聽 5 句會話', 'Tap-listen to 5 phrases'), chk: () => !!_ls('jr_phrases'),
         go: () => { if (window.NavBack) NavBack.pushPage('journey', 'phrases.html'); location.href = 'phrases.html'; } },
@@ -2613,6 +2641,8 @@ const Journey = (() => {
   ];
   function stats(){ const chs=CHAPTERS(); let tot=0, done=0; chs.forEach(c=>c.steps.forEach(st=>{ tot++; try{ if(st.chk()) done++; }catch(e){} })); return { tot, done }; }
   function open(){
+    // 小課畫面關掉/收合路徑時重畫地圖,保留捲動位置(essentials-lessons.js 比 Journey 晚載入,所以在這裡掛)
+    try { if (window.EssLessons && !EssLessons.onChange) EssLessons.onChange = () => { const m = document.getElementById('jrMask'); if (m && m.style.display !== 'none') { const y = m.scrollTop; open(); m.scrollTop = y; } }; } catch (e) {}
     const chs = CHAPTERS();
     const st = stats();
     const pct = st.tot ? Math.round(st.done/st.tot*100) : 0;
@@ -2636,7 +2666,9 @@ const Journey = (() => {
           + '<span class="jr-st-tx"><b>' + stp.t + '</b><small>' + stp.d + '</small>'
           + (dn ? '' : '<small class="jr-cond">' + L('打勾條件','To check off') + ':' + stp.cond + '</small>')
           + '</span>'
-          + '<button class="jr-go" data-jk="' + stp.k + '">' + (dn ? L('再做一次','Again') : L('開始','Start')) + '</button></div>';
+          + '<button class="jr-go" data-jk="' + stp.k + '">' + (dn ? L('再做一次','Again') : (stp.k === 'essentials' && window.EssLessons && EssLessons.stats().done ? L('繼續','Continue') : L('開始','Start'))) + '</button></div>';
+        // 必學基礎詞:步驟下面直接列出小課路徑(進度/鎖/完成/再做一次)
+        if (stp.k === 'essentials' && window.EssLessons) { try { h += EssLessons.journeyHtml(); } catch (e) {} }
       });
       h += '</div>';
     });
@@ -4633,6 +4665,7 @@ function renderVocab() {
         ${prog.totalOffset>0?`<button class="daily-btn daily-reset" onclick="resetDailyBatch()" title="${t('reset_progress')}">↺</button>`:''}
       </div>`:''}
     </div>`;
+    if (dailyView && window.StudyGuide) h += StudyGuide.html('v');   // 三步學習引導:看 → 練 → 測
     if (!dailyView) {
       h += `<div class="intro"><h2>${t('vocab_title', { lv })}</h2><p>${t('vocab_desc', { lv, n: cnt })}</p><div class="tg"><span>JLPT ${lv}</span><span>${t('vocab_tag', { n: cnt })}</span><span>${t('listen_tag')}</span></div></div>`;
     } else {
@@ -4870,6 +4903,7 @@ function render() {
         ${gProg.totalOffset>0?`<button class="daily-btn daily-reset" onclick="resetGrammarBatch()" title="${t('reset_progress')}">↺</button>`:''}
       </div>`:''}
     </div>`;
+    if (grammarDailyMode && window.StudyGuide) h += StudyGuide.html('g');   // 三步學習引導:看 → 練 → 測
     if (!grammarDailyMode) {
       h += `<div class="intro"><h2>${t('grammar_title', { lv })}</h2><p>${t('grammar_desc', { lv, n: cnt })}</p><div class="tg"><span>JLPT ${lv}</span><span>${t('grammar_tag', { n: cnt })}</span><span>${t('brand_tag')}</span></div></div>`;
     } else {
@@ -5458,6 +5492,10 @@ function toggleDetail(btn) {
 <script src="kana.js"></script>
 <script src="kana-strokes.js"></script>
 <script src="kana-ui.js"></script>
+<script src="essentials-data.js"></script>
+<script src="shadow-core.js"></script>
+<script src="essentials-lessons.js"></script>
+<script src="study-guide.js"></script>
 <script src="listening.js"></script>
 <script src="flashcard.js"></script>
 <script src="keigo-quiz.js"></script>
