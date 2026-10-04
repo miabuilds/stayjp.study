@@ -92,6 +92,12 @@
   .bubble.ai .jlk{cursor:pointer;border-radius:3px;border-bottom:1.5px dotted var(--accent)}
   #jlkPop a.jact{text-decoration:none}   /* 未收錄詞的「中文辭典/Jisho」連結鈕:跟發音/收藏同款,不要底線 */
   #jlkPop{--bg2:var(--panel);--tx:var(--ink);--tx2:var(--ink2);--tx3:var(--ink3);--bd:var(--line);--bg:var(--bg3);--ac:var(--accent)}
+  /* 小狸助教面板(tutor.js)吃站內 --bg2/--tx/--bd/--ac 這組 token,這頁命名不同 → 映射過去,深色自動跟 */
+  #tutorPanel{--bg2:var(--panel);--tx:var(--ink);--tx2:var(--ink2);--tx3:var(--ink3);--bd:var(--line);--bg:var(--bg3);--bg3:var(--ai);--ac:var(--accent);--ac2:var(--accent)}
+  /* 這頁的小狸入口是每個 AI 泡泡的「解析」鈕;浮動小狸會壓到輸入列右側的送出鈕 → 不顯示 */
+  #tutorFab,#tutorHint{display:none!important}
+  .spk.parse{display:inline-flex;align-items:center;gap:3px;font-size:12.5px;font-weight:700;padding:2px 8px;border:1px solid var(--line);border-radius:999px;color:var(--ink2);margin-left:2px;line-height:1.3}
+  .spk.parse i{color:var(--accent)}
   .sc-prog{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--ink3);margin:2px 0 10px}
   .sc-prog .bar{flex:0 0 90px;height:5px;border-radius:99px;background:var(--line);overflow:hidden}
   .sc-prog .bar i{display:block;height:100%;background:var(--accent);border-radius:99px}
@@ -290,6 +296,7 @@ document.addEventListener('DOMContentLoaded', function () {
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <script src="fav-sents.js"></script>
+<script src="tutor.js"></script>
 <script>
 // ── 三語 shim:cvt(OpenCC 繁→簡)+ enOr(en 用英文,否則 cvt)──
 let _tw2cn=null;
@@ -645,7 +652,7 @@ function aiBubble(m){
   const jp = m.jp || m.text || '';
   addWordEntries(m.words);
   return `<div class="msg ai"><div class="bubble ai">
-    <div class="bjp"><span>${(jp&&window.furiganaHTMLRich)?window.furiganaHTMLRich(jp, kanaOpts(m.words)):(esc(jp)||'…')}</span>${jp?`<button class="spk" title="${enOr('播放','Play')}" onclick="playTTS(${JSON.stringify(jp).replace(/"/g,'&quot;')}, scene&&scene.voice)"><i data-ic=volume></i></button><button class="spk favstar" title="${enOr('收藏這句','Save this sentence')}" onclick="favFromBubble(this)" data-jp="${esc(jp)}" data-kana="${esc(m.kana||'')}" data-zh="${esc(m.zh||'')}">${(window.FavSents&&FavSents.isFav(jp))?'★':'☆'}</button>`:''}</div>
+    <div class="bjp"><span>${(jp&&window.furiganaHTMLRich)?window.furiganaHTMLRich(jp, kanaOpts(m.words)):(esc(jp)||'…')}</span>${jp?`<button class="spk" title="${enOr('播放','Play')}" onclick="playTTS(${JSON.stringify(jp).replace(/"/g,'&quot;')}, scene&&scene.voice)"><i data-ic=volume></i></button><button class="spk favstar" title="${enOr('收藏這句','Save this sentence')}" onclick="favFromBubble(this)" data-jp="${esc(jp)}" data-kana="${esc(m.kana||'')}" data-zh="${esc(m.zh||'')}">${(window.FavSents&&FavSents.isFav(jp))?'★':'☆'}</button><button class="spk parse" title="${enOr('句子解析','Analyze sentence')}" onclick="parseFromBubble(this)" data-jp="${esc(jp)}"><i data-ic=sparkle></i>${enOr('解析','Analyze')}</button>`:''}</div>
 
     ${(showZh && m.zh)?`<div class="bzh">${esc(cvt(m.zh))}</div>`:''}
     ${(showZh && m.words)?wordChips(m.words):''}
@@ -684,6 +691,15 @@ async function favFromBubble(btn){
   const r=await FavSents.toggle({jp:btn.dataset.jp,kana:btn.dataset.kana,zh:btn.dataset.zh,src:'chat',v:(scene&&scene.voice)||'f'});
   if(r!==null) btn.textContent=r?'★':'☆';
 }
+// 句子解析(小狸助教 parse):AI 泡泡的「解析」鈕 → 底部面板,帶情境名當 context
+function parseFromBubble(btn){
+  if(!window.Tutor) return;
+  const jp=btn.dataset.jp||''; if(!jp) return;
+  hardStopRec();   // 看解析時先收麥,免得泡泡裡的聲音被當成使用者在講話
+  Tutor.askSentence(jp, { source:'chat', scene: scene ? (enOr(scene.t||'', scene.tE||scene.t||'')) : '', direct:true });
+}
+// tutor.js 例句的 🔊 走 window.speak;這頁沒有預錄音,接雲端 TTS(同泡泡的播放鈕)
+if(!window.speak) window.speak=function(t){ try{ playTTS(t, scene&&scene.voice); }catch(e){} };
 firebase.auth().onAuthStateChanged(function(u){ if(u&&window.FavSents) FavSents.load(true); });
 let _hints=[];
 // 角色標記驗證:後端要求模型每個 HINT 開頭寫「<使用者角色>»」——寫標記這個動作本身逼模型想清楚說話者;
@@ -928,7 +944,7 @@ function viewLog(id){
     if(m.r==='m') return '<div class="msg me"><div class="bubble me"><div class="bjp">'+esc(m.jp)+'</div></div></div>';
     // furigana 必須包在單一 <span> 裡:.bubble.ai .bjp 是 flex,裸放會讓每個 ruby 變獨立 flex item 排成直欄(跑版實錘)
     return '<div class="msg ai"><div class="bubble ai">'
-      +'<div class="bjp"><span>'+(window.furiganaHTMLRich?furiganaHTMLRich(m.jp, kanaOpts()):esc(m.jp))+'</span><button class="spk" onclick="playTTS(window.__logs[\''+id+'\'].msgs['+i+'].jp,\''+(v.voice||'f')+'\')"><i data-ic=volume></i></button><button class="spk" onclick="favFromBubble(this)" data-jp="'+esc(m.jp)+'" data-kana="'+esc(m.k||'')+'" data-zh="'+esc(m.zh||'')+'">'+((window.FavSents&&FavSents.isFav(m.jp))?'★':'☆')+'</button></div>'
+      +'<div class="bjp"><span>'+(window.furiganaHTMLRich?furiganaHTMLRich(m.jp, kanaOpts()):esc(m.jp))+'</span><button class="spk" onclick="playTTS(window.__logs[\''+id+'\'].msgs['+i+'].jp,\''+(v.voice||'f')+'\')"><i data-ic=volume></i></button><button class="spk" onclick="favFromBubble(this)" data-jp="'+esc(m.jp)+'" data-kana="'+esc(m.k||'')+'" data-zh="'+esc(m.zh||'')+'">'+((window.FavSents&&FavSents.isFav(m.jp))?'★':'☆')+'</button><button class="spk parse" onclick="parseFromBubble(this)" data-jp="'+esc(m.jp)+'"><i data-ic=sparkle></i>'+enOr('解析','Analyze')+'</button></div>'
       +(m.zh?'<div class="bzh">'+esc(cvt(m.zh))+'</div>':'')
       +'</div></div>'
       +(m.c?'<div class="coach"><b>'+enOr('教練','Coach')+'</b>:'+esc(cvt(m.c))+'</div>':''); }).join('')
