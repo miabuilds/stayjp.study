@@ -700,7 +700,7 @@ const Stats = (() => {
     if (!arr.length) {
       h += `<div class="st-empty">還沒有錯題。<br>聽力、閱讀、模考答錯時會自動收進這裡。</div>`;
     } else {
-      const modeLbl = { listening: '<i data-ic=headphones></i> 聽力', reading: '<i data-ic=book></i> 閱讀', mock: '<i data-ic=edit></i> 模考' };
+      const modeLbl = { listening: '<i data-ic=headphones></i> 聽力', reading: '<i data-ic=book></i> 閱讀', mock: '<i data-ic=edit></i> 模考', basics: '<i data-ic=grid></i> 基礎詞' };
       const modeColor = { listening: '#2563EB', reading: '#16a34a', mock: '#9333EA' };
       h += '<div style="max-height:400px;overflow-y:auto;display:flex;flex-direction:column;gap:8px">';
       arr.forEach(w => {
@@ -733,7 +733,7 @@ const Stats = (() => {
       h += `<div style="display:flex;gap:8px;margin-top:12px">
         <button class="qstart" style="flex:1" onclick="Stats.quizWrongQuestions()"><i data-ic=refresh></i> 重考全部 (${arr.length})</button>
       </div>`;
-      h += `<div style="margin-top:10px;font-size:11px;color:var(--tx3)">提示：聽力/閱讀/模考非單字題答錯會自動加入這裡。單字答錯仍會進「生詞本」。</div>`;
+      h += `<div style="margin-top:10px;font-size:11px;color:var(--tx3)">提示：聽力/閱讀/模考/基礎詞小課非單字題答錯會自動加入這裡。單字答錯仍會進「生詞本」。</div>`;
     }
     h += '</div>';
     return h;
@@ -750,7 +750,7 @@ const Stats = (() => {
   }
   function _renderWrongQ() {
     const w = _wq.arr[_wq.cur];
-    const modeLbl = { listening: '<i data-ic=headphones></i> 聽力', reading: '<i data-ic=book></i> 閱讀', mock: '<i data-ic=edit></i> 模考' };
+    const modeLbl = { listening: '<i data-ic=headphones></i> 聽力', reading: '<i data-ic=book></i> 閱讀', mock: '<i data-ic=edit></i> 模考', basics: '<i data-ic=grid></i> 基礎詞' };
     document.getElementById('quizBox').innerHTML = `
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
         <span style="font-size:12px;color:var(--tx2)">${modeLbl[w.mode]||w.mode} · ${(w.level||'').toUpperCase()} · ${_wq.cur+1}/${_wq.arr.length}</span>

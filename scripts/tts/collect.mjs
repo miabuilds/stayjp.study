@@ -161,12 +161,13 @@ while ((cj = egRe.exec(conjHtml))) {
   add(j, 'conjunctions');
 }
 
-// 必學基礎 — essentials.html 的資料陣列(數字/量詞/時間/日期/家族/疑問詞/助詞)。
-// 前端 speak(讀音);替讀「よん / し」只念第一個。取資料段(純字面陣列)eval 出來收字串。
+// 必學基礎 — essentials-data.js(總表 essentials.html 與日語從頭學小課共用)的資料陣列(數字/量詞/時間/日期/家族/疑問詞/助詞)。
+// 前端 speak(讀音);替讀「よん / し」只念第一個。
 try {
-  const essHtml = fs.readFileSync(path.join(ROOT, 'essentials.html'), 'utf8');
-  const dataSeg = essHtml.slice(essHtml.indexOf('// ══════════ 資料'), essHtml.indexOf('// ══════════ icon'));
-  const arrs = (new Function(dataSeg + '; return {NUM,NUM_CH,COUNTERS,JI,FUN,YOUBI,GATSU,NICHI,KAZOKU,GIMON,JOSHI};'))();
+  const essSrc = fs.readFileSync(path.join(ROOT, 'essentials-data.js'), 'utf8');
+  const sandbox = {};
+  (new Function('window', 'module', essSrc))(sandbox, undefined);
+  const arrs = sandbox.ESS;
   const say = y => String(y).split('/')[0].trim();
   for (const key of ['NUM', 'NUM_CH', 'JI', 'FUN', 'YOUBI', 'GATSU', 'NICHI', 'GIMON']) {
     for (const r of arrs[key]) add(say(r[1]), 'essentials');

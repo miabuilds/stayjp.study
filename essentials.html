@@ -78,28 +78,6 @@
   .howto b{color:var(--ac)}
   .quizbtn{width:100%;background:var(--ac);color:#fff;border:0;border-radius:14px;padding:14px;font:inherit;font-size:16px;font-weight:800;cursor:pointer;transition:background .12s}
   .quizbtn:hover{background:var(--ac2)} .quizbtn:active{transform:scale(.99)}
-  .qbg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:900;align-items:center;justify-content:center;padding:16px}
-  .qbg.show{display:flex}
-  .qbox{background:var(--bg2);border:1px solid var(--bd);border-radius:18px;padding:22px 20px;max-width:440px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.3)}
-  .qhead{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;font-size:13px;color:var(--tx3);font-weight:700}
-  .qhead .x{background:none;border:0;color:var(--tx3);font-size:20px;cursor:pointer;line-height:1}
-  .qbar{height:5px;background:var(--bg3);border-radius:4px;overflow:hidden;margin-bottom:18px}
-  .qbar i{display:block;height:100%;background:var(--ac);border-radius:4px;transition:width .3s}
-  .qq{text-align:center;margin-bottom:6px;font-size:13px;color:var(--tx2)}
-  .qform{text-align:center;font-weight:800;font-size:32px;margin-bottom:18px;font-family:var(--serif)}
-  .qopts{display:grid;gap:10px}
-  .qopt{font:inherit;font-size:18px;font-weight:700;background:var(--bg);border:1.5px solid var(--bd);border-radius:12px;padding:13px;cursor:pointer;color:var(--tx);transition:border-color .12s,transform .07s}
-  .qopt:hover{border-color:var(--ac)} .qopt:active{transform:scale(.98)}
-  .qopt.ok{border-color:var(--ok);background:color-mix(in srgb,var(--ok) 12%,transparent);color:var(--ok)}
-  .qopt.ng{border-color:var(--bad);background:color-mix(in srgb,var(--bad) 12%,transparent);color:var(--bad)}
-  .qopt:disabled{cursor:default}
-  .qnext{width:100%;margin-top:16px;background:var(--ac);color:#fff;border:0;border-radius:12px;padding:13px;font:inherit;font-size:15px;font-weight:800;cursor:pointer;display:none}
-  .qnext.show{display:block}
-  .qresult{text-align:center}
-  .qscore{font-family:var(--serif);font-size:46px;font-weight:800;color:var(--ac)}
-  .qrsub{color:var(--tx2);font-size:14px;margin:4px 0 18px}
-  .qrbtns{display:flex;gap:10px} .qrbtns button{flex:1;font:inherit;font-size:14px;font-weight:700;border-radius:12px;padding:12px;cursor:pointer;border:1px solid var(--bd);background:var(--bg2);color:var(--tx)}
-  .qrbtns .pri{background:var(--ac);color:#fff;border-color:var(--ac)}
 </style>
 <script src="accent.js"></script>
 </head>
@@ -118,16 +96,12 @@
     <div class="howto">
       <b>怎麼用:</b>①先點一輪聽發音 → ②蓋住假名自己念念看 → ③用下面「<b>隨堂測驗</b>」抽考。<b>紅字</b>(4/7/9、變音、日期)最容易錯。
     </div>
-    <button class="quizbtn" onclick="Quiz.start()">隨堂測驗 · 抽考 10 題</button>
+    <button class="quizbtn" onclick="EssLessons.practiceAll()">隨堂測驗 · 抽考 10 題</button>
   </div>
 
   <nav class="toc" id="toc"></nav>
   <div id="list"></div>
 
-  <!-- 測驗覆蓋層 -->
-  <div id="quizBg" class="qbg" onclick="if(event.target===this)Quiz.close()">
-    <div class="qbox" id="quizBox"></div>
-  </div>
 
   <div class="note">
     <b>紅色</b> 標的是特別容易念錯的地方:數字的 <b>4(よん/し)・7(なな/しち)・9(きゅう/く)</b>、量詞變音(<b>本 ほん→ぼん→ぽん</b>)、日期的 <b>ついたち・はつか</b>。這些不是規則能推的,直接記起來最快。
@@ -139,6 +113,7 @@
 <script src="icons.js"></script>
 <script src="grammar-kanji-readings.js"></script>
 <script src="vocab-n5.js"></script>
+<script src="essentials-data.js"></script>
 <script src="audio/tts/manifest.js"></script>
 <script src="i18n.js"></script>
 <script>
@@ -148,44 +123,12 @@ function ensureOpenCC(){ return new Promise(function(res){ if(_tw2cn)return res(
 function cvt(x){ return (!x||I18n.getLang()!=='zh-CN'||!_tw2cn)?x:_tw2cn(x); }
 function enOr(zh,en){ return I18n.getLang()==='en'?en:cvt(zh); }
 // 本頁翻譯:T(繁中) → EN 查表 / 簡中 cvt / 繁中原樣。日文字串一律不進 T(查不到表就原樣,cvt 只動中文)。
-const EN_T = {
-  '基本數字':'Basic numbers','0〜億':'0 – 100,000,000','百・千 的變音':'Sound changes in 100s & 1000s','要特別記':'memorize these',
-  '幾點':"o'clock",'幾分':'minutes','星期':'weekdays','月份':'months','日期':'days of the month',
-  '星期一':'Monday','星期二':'Tuesday','星期三':'Wednesday','星期四':'Thursday','星期五':'Friday','星期六':'Saturday','星期日':'Sunday','星期幾':'what day',
-  '疑問詞':'Question words','問句必備':'question essentials','基本助詞':'Basic particles','句子的關節':'the joints of a sentence',
-  '<b>4・7・9</b> 各有兩種念法(4時よじ、4月しがつ、4個よんこ)。':'<b>4, 7, 9</b> each have two readings (4時 yoji, 4月 shigatsu, 4個 yonko).',
-  '注意 <b>4時よじ・7時しちじ・9時くじ</b>。':'Watch out for <b>4時 yoji · 7時 shichiji · 9時 kuji</b>.',
-  'ぷん / ふん 交替,半 = 30分。':'ぷん / ふん alternate; はん (half) = 30 min.',
-  '<b>4月しがつ・7月しちがつ・9月くがつ</b>(和「時」的念法不同!)。':'<b>4月 shigatsu · 7月 shichigatsu · 9月 kugatsu</b> — different from the hour readings!',
-  '1〜10 日、14/20/24 日 全是<b>不規則</b>和語念法,直接背。':'Days 1–10 and 14/20/24 all use <b>irregular</b> native readings — just memorize them.',
-  '左=<b>講自己家人</b>(謙稱)、右=<b>稱呼別人家人</b>(敬稱)。點任一邊聽發音。':'Left = <b>your own family</b> (humble) · right = <b>someone else’s family</b> (honorific). Tap either side to hear it.',
-  '<b>は</b>讀「わ」、<b>へ</b>讀「え」、<b>を</b>讀「お」——寫法和讀音不同,先記住。':'<b>は</b> is read “wa”, <b>へ</b> “e”, <b>を</b> “o” — spelling ≠ sound. Memorize these first.',
-  '最通用(和語數法,數一般東西、不確定用哪個量詞時)':'Most universal (native counting — general objects, or when unsure which counter fits)',
-  '小東西、蘋果、雞蛋…':'Small things: apples, eggs…','人數':'People',
-  '細長的:筆、瓶、傘、樹':'Long thin things: pens, bottles, umbrellas, trees',
-  '扁平的:紙、盤子、票、T恤':'Flat things: paper, plates, tickets, T-shirts',
-  '小動物:貓、狗、魚、蟲':'Small animals: cats, dogs, fish, bugs',
-  '杯裝、碗裝:一杯咖啡、一碗飯':'Cups & bowls: a cup of coffee, a bowl of rice','年齡':'Age',
-  '其他常用':'Other common ones','台(機器)・冊(書)・回(次數)・階(樓層)':'台 (machines) · 冊 (books) · 回 (times) · 階 (floors)',
-  '什麼':'what','誰':'who','何時':'when','哪裡':'where','哪邊(禮貌)':'which way (polite)','怎麼樣':'how',
-  '為什麼':'why','為何(書面)':'why (formal)','多少錢':'how much','幾個/幾歲':'how many / how old',
-  '哪一個':'which one','哪個+名詞':'which + noun','什麼樣的':'what kind of',
-  '爸爸':'father','媽媽':'mother','哥哥':'older brother','姊姊':'older sister','弟弟':'younger brother','妹妹':'younger sister',
-  '爺爺/外公':'grandfather','奶奶/外婆':'grandmother','丈夫':'husband','妻子':'wife','兒子':'son','女兒':'daughter','父母':'parents','家人':'family',
-  '主題「〜是…」':'Topic marker — “as for…”','主語/新資訊「是…」':'Subject / new information','受詞「把…、〜を」':'Object marker',
-  '時間點/目的地/對象':'Time / destination / target','地點(動作發生)/方法':'Place of action / means','方向「往…」(讀 え)':'Direction “toward” (read “e”)',
-  '「和…、跟…一起」':'“with, and”','「也…」':'“also, too”','「從…開始」':'“from…”','「到…為止」':'“until…”','「比…」(比較)':'“than…” (comparison)','「…的」(所有/修飾)':'Possessive “…’s”',
-  '我是學生。':'I am a student.','誰來了?':'Who came?','吃飯。':'Eat (a meal).','七點起床。':'Get up at seven.','在圖書館唸書。':'Study at the library.',
-  '去日本。':'Go to Japan.','和朋友說話。':'Talk with a friend.','我也去。':'I will go too.','從九點開始工作。':'Work from nine.','等到五點。':'Wait until five.',
-  '比去年熱。':'Hotter than last year.','我的書。':'My book.','讀':'read',
-  '這個怎麼念?(念念看再選)':'How is this read? (say it out loud, then pick)','看結果 →':'Results →','下一題 →':'Next →',
-  '太強了!這些你很熟 ':'Amazing — you know these well!','不錯,錯的再看一下就更穩':'Nice! Review the misses and you’re solid.','多測幾次,紅字的地方特別練':'Keep drilling — the red readings need extra reps.',
-  '只重考錯的':'Retry wrong only','再抽 10 題':'Another 10','關閉':'Close','此級別無單字資料':'No data for this level','返回':'Back',
-};
+const EN_T = window.ESS.EN_T;
 function T(zh){ return I18n.getLang()==='en' ? (EN_T[zh]||zh) : cvt(zh); }
 if(I18n.getLang()==='zh-CN') ensureOpenCC();
 </script>
 <script src="ux-extras.js"></script>
+<script src="essentials-lessons.js"></script>
 <script>
 // ── 播放:優先 VOICEVOX(__TTS),否則瀏覽器 TTS ──
 let _audio=null;
@@ -215,96 +158,8 @@ function cell(form, yomi, irr, en){
   return `<div class="cell" onclick="speak('${say}')"><span class="form">${esc(form)}</span>${showYomi?`<span class="yomi ${irr?'irr':''}">${esc(yomi)}</span>`:''}${en?`<span class="en">${esc(en)}</span>`:''}</div>`;
 }
 
-// ══════════ 資料 ══════════
-const NUM = [
-  ['1','いち'],['2','に'],['3','さん'],['4','よん / し',1],['5','ご'],
-  ['6','ろく'],['7','なな / しち',1],['8','はち'],['9','きゅう / く',1],['10','じゅう'],
-  ['0','ゼロ / れい'],['100','ひゃく'],['1000','せん'],['10000','いちまん'],['1億','いちおく'],
-];
-const NUM_CH = [ // 百・千 的變音
-  ['300','さんびゃく',1],['600','ろっぴゃく',1],['800','はっぴゃく',1],
-  ['3000','さんぜん',1],['8000','はっせん',1],
-];
-// 量詞:每個 counter 一組 1〜10 讀法(標紅=變音處)
-const COUNTERS = [
-  { t:'〜つ', d:'最通用(和語數法,數一般東西、不確定用哪個量詞時)', rows:[
-    ['1つ','ひとつ'],['2つ','ふたつ'],['3つ','みっつ'],['4つ','よっつ'],['5つ','いつつ'],
-    ['6つ','むっつ'],['7つ','ななつ'],['8つ','やっつ'],['9つ','ここのつ'],['10','とお',1] ]},
-  { t:'〜個(こ)', d:'小東西、蘋果、雞蛋…', rows:[
-    ['1個','いっこ',1],['2個','にこ'],['3個','さんこ'],['4個','よんこ'],['5個','ごこ'],
-    ['6個','ろっこ',1],['7個','ななこ'],['8個','はっこ',1],['9個','きゅうこ'],['10個','じゅっこ',1] ]},
-  { t:'〜人(にん)', d:'人數', rows:[
-    ['1人','ひとり',1],['2人','ふたり',1],['3人','さんにん'],['4人','よにん',1],['5人','ごにん'],
-    ['6人','ろくにん'],['7人','しちにん / ななにん'],['8人','はちにん'],['9人','きゅうにん'],['10人','じゅうにん'] ]},
-  { t:'〜本(ほん)', d:'細長的:筆、瓶、傘、樹', rows:[
-    ['1本','いっぽん',1],['2本','にほん'],['3本','さんぼん',1],['4本','よんほん'],['5本','ごほん'],
-    ['6本','ろっぽん',1],['7本','ななほん'],['8本','はっぽん',1],['9本','きゅうほん'],['10本','じゅっぽん',1] ]},
-  { t:'〜枚(まい)', d:'扁平的:紙、盤子、票、T恤', rows:[
-    ['1枚','いちまい'],['2枚','にまい'],['3枚','さんまい'],['4枚','よんまい'],['5枚','ごまい'],
-    ['6枚','ろくまい'],['7枚','ななまい'],['8枚','はちまい'],['9枚','きゅうまい'],['10枚','じゅうまい'] ]},
-  { t:'〜匹(ひき)', d:'小動物:貓、狗、魚、蟲', rows:[
-    ['1匹','いっぴき',1],['2匹','にひき'],['3匹','さんびき',1],['4匹','よんひき'],['5匹','ごひき'],
-    ['6匹','ろっぴき',1],['7匹','ななひき'],['8匹','はっぴき',1],['9匹','きゅうひき'],['10匹','じゅっぴき',1] ]},
-  { t:'〜杯(はい)', d:'杯裝、碗裝:一杯咖啡、一碗飯', rows:[
-    ['1杯','いっぱい',1],['2杯','にはい'],['3杯','さんばい',1],['4杯','よんはい'],['5杯','ごはい'],
-    ['6杯','ろっぱい',1],['7杯','ななはい'],['8杯','はっぱい',1],['9杯','きゅうはい'],['10杯','じゅっぱい',1] ]},
-  { t:'〜歳(さい)', d:'年齡', rows:[
-    ['1歳','いっさい',1],['2歳','にさい'],['3歳','さんさい'],['4歳','よんさい'],['8歳','はっさい',1],
-    ['10歳','じゅっさい',1],['20歳','はたち',1],['何歳','なんさい'],['おいくつ','おいくつ'] ]},
-  { t:'其他常用', d:'台(機器)・冊(書)・回(次數)・階(樓層)', rows:[
-    ['1台','いちだい'],['1冊','いっさつ',1],['1回','いっかい',1],['1階','いっかい'],['3階','さんがい / さんかい',1],['何回','なんかい'] ]},
-];
-const JI = [ // 時
-  ['1時','いちじ'],['2時','にじ'],['3時','さんじ'],['4時','よじ',1],['5時','ごじ'],['6時','ろくじ'],
-  ['7時','しちじ',1],['8時','はちじ'],['9時','くじ',1],['10時','じゅうじ'],['11時','じゅういちじ'],['12時','じゅうにじ'],['何時','なんじ'] ];
-const FUN = [ // 分
-  ['1分','いっぷん',1],['2分','にふん'],['3分','さんぷん',1],['4分','よんぷん',1],['5分','ごふん'],['6分','ろっぷん',1],
-  ['7分','ななふん'],['8分','はっぷん',1],['9分','きゅうふん'],['10分','じゅっぷん',1],['30分','さんじゅっぷん / はん',1],['何分','なんぷん',1] ];
-const YOUBI = [   // 第 4 格=翻譯(用戶回饋:曜日沒中文)
-  ['月曜日','げつようび',0,'星期一'],['火曜日','かようび',0,'星期二'],['水曜日','すいようび',0,'星期三'],['木曜日','もくようび',0,'星期四'],
-  ['金曜日','きんようび',0,'星期五'],['土曜日','どようび',0,'星期六'],['日曜日','にちようび',0,'星期日'],['何曜日','なんようび',0,'星期幾'] ];
-const GATSU = [
-  ['1月','いちがつ'],['2月','にがつ'],['3月','さんがつ'],['4月','しがつ',1],['5月','ごがつ'],['6月','ろくがつ'],
-  ['7月','しちがつ',1],['8月','はちがつ'],['9月','くがつ',1],['10月','じゅうがつ'],['11月','じゅういちがつ'],['12月','じゅうにがつ'],['何月','なんがつ'] ];
-const NICHI = [
-  ['1日','ついたち',1],['2日','ふつか',1],['3日','みっか',1],['4日','よっか',1],['5日','いつか',1],
-  ['6日','むいか',1],['7日','なのか',1],['8日','ようか',1],['9日','ここのか',1],['10日','とおか',1],
-  ['14日','じゅうよっか',1],['20日','はつか',1],['24日','にじゅうよっか',1],['何日','なんにち'] ];
-const KAZOKU = [ // [自家(謙稱), 讀, 他家(敬稱), 讀, 中文]
-  ['父','ちち','お父さん','おとうさん','爸爸'],
-  ['母','はは','お母さん','おかあさん','媽媽'],
-  ['兄','あに','お兄さん','おにいさん','哥哥'],
-  ['姉','あね','お姉さん','おねえさん','姊姊'],
-  ['弟','おとうと','弟さん','おとうとさん','弟弟'],
-  ['妹','いもうと','妹さん','いもうとさん','妹妹'],
-  ['祖父','そふ','おじいさん','おじいさん','爺爺/外公'],
-  ['祖母','そぼ','おばあさん','おばあさん','奶奶/外婆'],
-  ['夫','おっと','ご主人','ごしゅじん','丈夫'],
-  ['妻','つま','奥さん','おくさん','妻子'],
-  ['息子','むすこ','息子さん','むすこさん','兒子'],
-  ['娘','むすめ','お嬢さん','おじょうさん','女兒'],
-  ['両親','りょうしん','ご両親','ごりょうしん','父母'],
-  ['家族','かぞく','ご家族','ごかぞく','家人'],
-];
-const GIMON = [   // 第3格是「不規則」標記、第4格才是翻譯(cell 的參數順序),中文別放錯格
-  ['何','なに / なん',0,'什麼'],['誰','だれ',0,'誰'],['いつ','いつ',0,'何時'],['どこ','どこ',0,'哪裡'],
-  ['どちら','どちら',0,'哪邊(禮貌)'],['どう','どう',0,'怎麼樣'],['どうして','どうして',0,'為什麼'],['なぜ','なぜ',0,'為何(書面)'],
-  ['いくら','いくら',0,'多少錢'],['いくつ','いくつ',0,'幾個/幾歲'],['どれ','どれ',0,'哪一個'],['どの','どの',0,'哪個+名詞'],['どんな','どんな',0,'什麼樣的'],
-];
-const JOSHI = [
-  ['は','わ','主題「〜是…」','私<b>は</b>学生です。','わたしはがくせいです','我是學生。'],
-  ['が','が','主語/新資訊「是…」','誰<b>が</b>来ましたか。','だれがきましたか','誰來了?'],
-  ['を','お','受詞「把…、〜を」','ご飯<b>を</b>食べる。','ごはんをたべる','吃飯。'],
-  ['に','に','時間點/目的地/對象','7時<b>に</b>起きる。','しちじにおきる','七點起床。'],
-  ['で','で','地點(動作發生)/方法','図書館<b>で</b>勉強する。','としょかんでべんきょうする','在圖書館唸書。'],
-  ['へ','え','方向「往…」(讀 え)','日本<b>へ</b>行く。','にほんへいく','去日本。'],
-  ['と','と','「和…、跟…一起」','友達<b>と</b>話す。','ともだちとはなす','和朋友說話。'],
-  ['も','も','「也…」','私<b>も</b>行きます。','わたしもいきます','我也去。'],
-  ['から','から','「從…開始」','9時<b>から</b>働く。','くじからはたらく','從九點開始工作。'],
-  ['まで','まで','「到…為止」','5時<b>まで</b>待つ。','ごじまでまつ','等到五點。'],
-  ['より','より','「比…」(比較)','去年<b>より</b>暑い。','きょねんよりあつい','比去年熱。'],
-  ['の','の','「…的」(所有/修飾)','私<b>の</b>本。','わたしのほん','我的書。'],
-];
+// 資料在 essentials-data.js(window.ESS),總表/小課/音檔收集共用同一份
+const { NUM, NUM_CH, COUNTERS, JI, FUN, YOUBI, GATSU, NICHI, KAZOKU, GIMON, JOSHI } = window.ESS;
 
 // ══════════ icon ══════════
 function ico(p){ return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">'+p+'</svg>'; }
@@ -428,96 +283,8 @@ staticI18n();
 if(I18n.getLang()==='zh-CN') ensureOpenCC().then(()=>{ render(); staticI18n(); });
 
 // ══════════ 隨堂測驗 ══════════
-// 從同一批資料出題:顯示「形」問「讀音」,干擾選項取自同組(較像真的會混淆的)。
-const Quiz = (function(){
-  const prim = y => String(y).split('/')[0].trim();
-  // 建題庫:每題 {form, ans, pool(同組讀音陣列)}
-  function buildPool(){
-    const groups = [];
-    const push = (rows, mapForm, mapYomi) => {
-      const g = rows.map(r=>({form:mapForm(r), ans:prim(mapYomi(r))})).filter(x=>x.form && x.ans && x.form!==x.ans);
-      if(g.length>=2) groups.push(g);
-    };
-    push(NUM.filter(r=>!/[／\/]/.test(r[0])&&/[0-9]/.test(r[0])), r=>r[0], r=>r[1]);
-    push(JI, r=>r[0], r=>r[1]); push(FUN, r=>r[0], r=>r[1]);
-    push(GATSU, r=>r[0], r=>r[1]); push(NICHI, r=>r[0], r=>r[1]);
-    push(YOUBI, r=>r[0], r=>r[1]);
-    COUNTERS.forEach(c=>push(c.rows, r=>r[0], r=>r[1]));
-    push(KAZOKU, k=>k[0], k=>k[1]);   // 自家
-    push(KAZOKU, k=>k[2], k=>k[3]);   // 他家
-    return groups;
-  }
-  const GROUPS = buildPool();
-  let queue=[], qi=0, score=0, wrongs=[], picked=null;
-
-  function pick(n){
-    // 每組隨機抽幾題,湊 n 題
-    const flat=[];
-    GROUPS.forEach(g=>{ const s=[...g].sort(()=>Math.random()-.5).slice(0,3); s.forEach(item=>flat.push({item,group:g})); });
-    return flat.sort(()=>Math.random()-.5).slice(0,n);
-  }
-  function start(){
-    queue=pick(10); qi=0; score=0; wrongs=[];
-    document.getElementById('quizBg').classList.add('show');
-    renderQ();
-  }
-  function close(){ document.getElementById('quizBg').classList.remove('show'); try{if(_audio)_audio.pause();}catch(e){} }
-  function renderQ(){
-    const q=queue[qi]; picked=null;
-    const {item,group}=q;
-    // 4 選項:正解 + 同組 3 個不重複干擾
-    const opts=[item.ans];
-    const dpool=[...new Set(group.map(x=>x.ans).filter(a=>a!==item.ans))].sort(()=>Math.random()-.5);
-    for(const d of dpool){ if(opts.length>=4) break; opts.push(d); }
-    while(opts.length<4){ opts.push('？'+opts.length); }
-    opts.sort(()=>Math.random()-.5);
-    const box=document.getElementById('quizBox');
-    box.innerHTML = `
-      <div class="qhead"><span>${I18n.getLang()==='en'?`Q ${qi+1} / ${queue.length} · Score ${score}`:cvt(`第 ${qi+1} / ${queue.length} 題　分數 ${score}`)}</span><button class="x" onclick="Quiz.close()"><i data-ic=x></i></button></div>
-      <div class="qbar"><i style="width:${qi/queue.length*100}%"></i></div>
-      <div class="qq">${T('這個怎麼念?(念念看再選)')}</div>
-      <div class="qform">${esc(item.form)}</div>
-      <div class="qopts">${opts.map(o=>`<button class="qopt" onclick="Quiz.answer(this,'${esc(o)}')">${esc(o)}</button>`).join('')}</div>
-      <button class="qnext" id="qnext" onclick="Quiz.next()">${qi+1>=queue.length?T('看結果 →'):T('下一題 →')}</button>`;
-  }
-  function answer(btn, val){
-    if(picked!==null) return;
-    const q=queue[qi]; picked=val;
-    const correct=q.item.ans;
-    speak(correct);   // 聽正確發音
-    document.querySelectorAll('.qopt').forEach(b=>{
-      b.disabled=true;
-      if(b.textContent===correct) b.classList.add('ok');
-      else if(b===btn) b.classList.add('ng');
-    });
-    if(val===correct) score++;
-    else wrongs.push(q);
-    document.getElementById('qnext').classList.add('show');
-  }
-  function next(){
-    qi++;
-    if(qi>=queue.length){ result(); return; }
-    renderQ();
-  }
-  function result(){
-    // 錯題再考一輪
-    const box=document.getElementById('quizBox');
-    const pct=Math.round(score/queue.length*100);
-    try{localStorage.setItem('jr_essentials','1');}catch(e){}   // Journey 證據:隨堂測驗做完
-    const msg = pct>=90?T('太強了!這些你很熟 ') : pct>=60?T('不錯,錯的再看一下就更穩') : T('多測幾次,紅字的地方特別練');
-    box.innerHTML=`<div class="qresult">
-      <div class="qscore">${score}/${queue.length}</div>
-      <div class="qrsub">${msg}</div>
-      <div class="qrbtns">
-        ${wrongs.length?`<button onclick="Quiz.retryWrong()">${T('只重考錯的')} (${wrongs.length})</button>`:''}
-        <button class="pri" onclick="Quiz.start()">${T('再抽 10 題')}</button>
-      </div>
-      <button style="margin-top:12px;background:none;border:0;color:var(--tx3);font:inherit;font-size:13px;cursor:pointer" onclick="Quiz.close()">${T('關閉')}</button>
-    </div>`;
-  }
-  function retryWrong(){ queue=[...wrongs].sort(()=>Math.random()-.5); qi=0; score=0; wrongs=[]; renderQ(); }
-  return { start, close, answer, next, retryWrong };
-})();
+// 改用 essentials-lessons.js 的同一套出題/作答(選 → 送出 → 詳解 → 自己按下一題,錯題進錯題本)。
+// 這裡是總表頁的自由練習,不算進「日語從頭學」的打勾(打勾=小課最後的綜合測驗)。
 </script>
 <script src="font-scale.js"></script>
 <script src="back-to-top.js"></script>
