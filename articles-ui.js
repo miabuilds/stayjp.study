@@ -23,6 +23,49 @@ window.ArticleSchedule = (function () {
   }
   return { isLive: isLive, visible: visible, isPreview: isPreview };
 })();
+// 清單邏輯(純函式,無 DOM;scripts/test-article-list.cjs 直接測):
+// 排序(最新在前)、等級篩選+隱藏已讀、日期標籤、首段預覽。輸入一律是已經過 ArticleSchedule.list() 的陣列。
+window.ArticleList = (function () {
+  function ts(a) { if (!a || !a.publish_at) return 0; var t = Date.parse(a.publish_at); return isNaN(t) ? 0 : t; }
+  // 最新在前:有 publish_at 的照時間倒序;沒有的(舊文章)照陣列倒序(merge-articles.mjs 把新文章 append 在尾端)
+  function sortNewest(arr) {
+    return (arr || []).map(function (a, i) { return { a: a, i: i }; })
+      .sort(function (x, y) { return (ts(y.a) - ts(x.a)) || (y.i - x.i); })
+      .map(function (x) { return x.a; });
+  }
+  // o.level:'n5'…(空=全部);o.hideRead:隱藏已讀;o.read:已讀集合;o.keepId:讀到一半的那篇永遠保留(隱藏已讀也不藏)
+  function apply(arr, o) {
+    o = o || {}; var read = o.read || {};
+    return (arr || []).filter(function (a) {
+      if (o.level && a.level !== o.level) return false;
+      if (o.hideRead && read[a.id] && a.id !== o.keepId) return false;
+      return true;
+    });
+  }
+  // 日期:只有 publish_at 才有(文章資料沒有其他日期欄);沒有就回空字串,不捏造
+  function dateLabel(a, lang) {
+    var t = ts(a); if (!t) return '';
+    var d = new Date(t);
+    if (lang === 'en') return ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][d.getMonth()] + ' ' + d.getDate() + ', ' + d.getFullYear();
+    return d.getFullYear() + '/' + (d.getMonth() + 1) + '/' + d.getDate();
+  }
+  // 首段預覽(日文原文,絕不過 cvt);n=最多字數,超過加「…」
+  function preview(a, n) {
+    var p = String((a && a.body) || '').split('\n').map(function (s) { return s.trim(); }).filter(Boolean)[0] || '';
+    return (n && p.length > n) ? p.slice(0, n).replace(/[、。\s]+$/, '') + '…' : p;
+  }
+  // 讀到一半的文章:最近一次碰過的那篇,還沒讀完(進度 <95%)才算;最近那篇已讀完就沒有「繼續閱讀」
+  function inProgress(prog, ids) {
+    var best = null, bt = -1;
+    Object.keys(prog || {}).forEach(function (id) {
+      var e = prog[id]; if (!e || (ids && ids.indexOf(id) < 0)) return;
+      if ((e.t || 0) > bt) { bt = e.t || 0; best = id; }
+    });
+    if (!best) return null;
+    return (prog[best].p || 0) < 0.95 ? best : null;
+  }
+  return { ts: ts, sortNewest: sortNewest, apply: apply, dateLabel: dateLabel, preview: preview, inProgress: inProgress };
+})();
 // 文章閱讀 UI — Readle 式沉浸閱讀器:分頁(文章/測驗/單字/文法)、底部連播播放器、字級調整、大按鈕、手機優先。
 // 重用 furiganaHTMLRich→自動 furigana + 即點即查;播音只用預錄 mp3(絕不瀏覽器語音)。純前端、零 API 成本。
 window.Articles = (function () {
@@ -49,6 +92,18 @@ window.Articles = (function () {
   function esc(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
   function readSet() { try { return JSON.parse(localStorage.getItem('article_read')) || {}; } catch (e) { return {}; } }
   function markRead(id) { var s = readSet(); s[id] = Date.now(); localStorage.setItem('article_read', JSON.stringify(s)); if (typeof saveAllCloud === 'function') try { saveAllCloud(); } catch (e) {} }
+  // 閱讀進度(2026-10 清單改版):art_prog = {id:{p:0~1, t:最後碰的時間}}。p 由閱讀器捲動位置算(捲到最後一段=1)、
+  // 做完測驗也算 1。「已讀」仍沿用 article_read(開過=已讀,額度/統計都靠它);進度只拿來標「繼續閱讀」。
+  function progSet() { try { return JSON.parse(localStorage.getItem('art_prog')) || {}; } catch (e) { return {}; } }
+  function setProg(id, p) {
+    try {
+      var s = progSet(), cur = s[id] || { p: 0 };
+      s[id] = { p: Math.max(cur.p || 0, Math.min(1, p || 0)), t: Date.now() };
+      localStorage.setItem('art_prog', JSON.stringify(s));
+    } catch (e) {}
+  }
+  function inProgressId() { return window.ArticleList.inProgress(progSet(), list().map(function (a) { return a.id; })); }
+  function hideReadOn() { try { return localStorage.getItem('art_hide_read') === '1'; } catch (e) { return false; } }
   function fr(text) { return window.furiganaHTMLRich ? window.furiganaHTMLRich(text) : esc(text); }
   // ── 逐詞渲染(離線 kuromoji 斷詞)：任何內容詞都可點查，furigana 更準 ──
   function isKj(ch) { return /[一-鿿々]/.test(ch); }
@@ -237,34 +292,53 @@ window.Articles = (function () {
     if (document.getElementById('artEntryCss')) return;
     var st = document.createElement('style'); st.id = 'artEntryCss';
     st.textContent = [
-      '.art-entry{display:flex;align-items:center;gap:13px;background:var(--bg2,#fff);border:1px solid rgba(0,0,0,.05);border-radius:16px;padding:12px;margin:0 0 14px;cursor:pointer;box-shadow:0 1px 2px rgba(30,25,20,.04),0 6px 16px rgba(30,25,20,.05);transition:transform .12s}',
-      '.art-entry:active{transform:scale(.99)}',
-      '.art-entry-thumb{width:60px;height:60px;border-radius:13px;overflow:hidden;position:relative;flex-shrink:0;background:linear-gradient(135deg,#fb7185,#e11d48);display:flex;align-items:center;justify-content:center}',
-      '.art-entry-thumb img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:saturate(.82) brightness(1.05) contrast(.9) sepia(.12)}',
-      '.art-entry-emoji{font-size:26px}',
-      '.art-entry-b{flex:1;min-width:0}',
-      '.art-entry-t{font-size:16px;font-weight:800;color:var(--tx,#2c2c2c);display:flex;align-items:center;gap:8px}',
-      '.art-entry-new{font-size:11px;font-weight:800;color:#fff;background:#ef4444;border-radius:20px;padding:1px 8px;line-height:1.6}',
-      '.art-entry-d{font-size:12.5px;color:var(--tx2,#888);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
-      '.art-entry-p{font-size:12px;color:var(--ac,#d4654a);font-weight:700;margin-top:3px}',
-      '.art-entry-go{color:var(--tx3,#bbb);font-size:24px;flex-shrink:0;padding-right:2px}'
+      // 面板的「文章」橫向條(Toko 式):標題列 + 可橫滑的封面卡;卡寬固定、封面 16:10,文字不疊圖(小卡疊字看不清)
+      '.art-strip{margin:0}',   // 外層 .hub-art 已有 18px 下距
+      '.art-strip-h{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 2px 10px}',
+      '.art-strip-t{display:inline-flex;align-items:center;gap:7px;font-size:15px;font-weight:800;color:var(--tx,#2c2c2c)}',
+      '.art-strip-t i{color:var(--ac,#d4654a)}',
+      '.art-strip-new{font-size:11px;font-weight:800;color:#fff;background:#ef4444;border-radius:20px;padding:1px 8px;line-height:1.6}',
+      '.art-strip-all{border:none;background:none;color:var(--ac,#d4654a);font-weight:700;font-size:13.5px;cursor:pointer;padding:6px 2px 6px 8px;font-family:inherit;white-space:nowrap}',
+      '.art-strip-sc{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x proximity;padding:2px 2px 10px;margin:0 -2px;scrollbar-width:none;-webkit-overflow-scrolling:touch}',
+      '.art-strip-sc::-webkit-scrollbar{display:none}',
+      '@media (max-width:600px){.art-strip-sc{margin:0 -12px;padding:2px 12px 10px;scroll-padding:0 12px}}',   // 手機:滑到底貼齊螢幕邊、左右留 12px gutter
+      '.art-sc{flex:0 0 150px;width:150px;scroll-snap-align:start;background:var(--bg2,#fff);border:1px solid var(--bd,#e8e5e0);border-radius:14px;overflow:hidden;cursor:pointer;text-align:left;padding:0;color:var(--tx,#2c2c2c);font-family:inherit;box-shadow:0 1px 3px rgba(0,0,0,.04);transition:transform .12s}',
+      '.art-sc:active{transform:scale(.98)}',
+      '.art-sc-img{position:relative;aspect-ratio:16/10;background:linear-gradient(135deg,#fb7185,#e11d48);overflow:hidden;color:#fff}',
+      '.art-sc-img .art-th-e{font-size:28px}',
+      '.art-sc-img img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:saturate(.82) brightness(1.05) contrast(.9) sepia(.12)}',
+      '.art-sc-b{padding:9px 11px 11px}',
+      '.art-sc-t{font-size:13.5px;font-weight:700;line-height:1.4;font-family:"Hiragino Mincho ProN","Noto Serif JP",serif;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:2.8em}',
+      '.art-sc-m{font-size:11.5px;color:var(--tx2,#888);margin-top:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
+      // 等級小牌(封面左上)與已讀勾(封面右上):清單/hero/橫條共用
+      '.art-lvb{position:absolute;top:8px;left:8px;font-size:11px;font-weight:800;padding:2px 8px;border-radius:20px;color:#fff;background:rgba(0,0,0,.5);backdrop-filter:blur(3px);letter-spacing:.04em;line-height:1.6;z-index:1}',
+      '.art-rdb{position:absolute;top:8px;right:8px;width:22px;height:22px;border-radius:50%;background:rgba(255,255,255,.92);color:#16a34a;display:inline-flex;align-items:center;justify-content:center;z-index:1}',
+      '.art-rdb i{width:14px;height:14px}'
     ].join('');
     document.head.appendChild(st);
   }
-  // 首頁的文章入口卡(明顯、手機友善);顯示已讀進度 + 新文章紅標
+  // 面板的文章入口(2026-10 改成橫向封面條,最新 6 篇;「顯示全部 ›」進清單)
   function entryCardHtml() {
     var arts = list(); if (!arts.length) return '';
     ensureEntryCss();
-    var read = readSet(), seen = seenSet();
-    var readN = arts.filter(function (a) { return read[a.id]; }).length;
+    var read = readSet(), seen = seenSet(), en = isEn();
     var newN = arts.filter(function (a) { return !seen[a.id]; }).length;
-    var badge = newN > 0 ? '<span class="art-entry-new">' + newN + ' ' + enOr('新', 'new') + '</span>' : '';
-    return '<div class="art-entry" onclick="Articles.open()">' +
-      '<div class="art-entry-thumb"><span class="art-entry-emoji"><i data-ic=book></i></span><img src="' + imgUrl('a-n4-1') + '" alt="" onerror="this.remove()"></div>' +
-      '<div class="art-entry-b"><div class="art-entry-t">' + enOr('文章閱讀', 'Reading') + badge + '</div>' +
-      '<div class="art-entry-d">' + enOr('每天一篇 · 點字查詢 · 真人發音', 'Daily reading · tap to look up · audio') + '</div>' +
-      '<div class="art-entry-p">' + enOr('已讀', 'Read') + ' ' + readN + ' / ' + arts.length + ' ' + enOr('篇', '') + '</div></div>' +
-      '<div class="art-entry-go">›</div></div>';
+    var badge = newN > 0 ? '<span class="art-strip-new">' + newN + ' ' + enOr('新', 'new') + '</span>' : '';
+    var top = window.ArticleList.sortNewest(arts).slice(0, 6);
+    var cards = top.map(function (a) {
+      var g = LVC[a.level] || LVC.n5;
+      var dt = window.ArticleList.dateLabel(a, en ? 'en' : 'zh');
+      return '<button type="button" class="art-sc" onclick="Articles.read(\'' + a.id + '\')">' +
+        '<div class="art-sc-img" style="background:linear-gradient(135deg,' + g[0] + ',' + g[1] + ')"><span class="art-th-e">' + topicEmoji(a.topic + a.title) + '</span>' +
+        '<img src="' + imgUrl(a.id) + '" alt="" width="400" height="400" loading="lazy" decoding="async" onerror="this.remove()">' +
+        '<span class="art-lvb">' + LVN[a.level] + '</span>' + (read[a.id] ? '<span class="art-rdb"><i data-ic=check></i></span>' : '') + '</div>' +
+        '<div class="art-sc-b"><div class="art-sc-t">' + esc(a.title) + '</div>' +
+        '<div class="art-sc-m">' + esc(dt || Lc(a.title_zh, a.title_en)) + '</div></div></button>';
+    }).join('');
+    return '<div class="art-strip">' +
+      '<div class="art-strip-h"><span class="art-strip-t"><i data-ic=book></i> ' + enOr('文章', 'Articles') + badge + '</span>' +
+      '<button type="button" class="art-strip-all" onclick="Articles.open()">' + enOr('顯示全部', 'See all') + ' ›</button></div>' +
+      '<div class="art-strip-sc">' + cards + '</div></div>';
   }
   function imgUrl(id) { return 'images/articles/' + id + '.jpg'; }   // 封面圖(CC0/公共領域);載入失敗自動退回漸層＋emoji
   function hasTts(t) { return !!(window.__TTS && window.__TTS[t]); }
@@ -323,6 +397,46 @@ window.Articles = (function () {
       '.art-card-z{font-size:13px;color:var(--tx2,#888);margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
       '.art-lwrap{padding:16px 16px 4px}',
       '.art-lv{font-size:12px;font-weight:800;color:var(--tx3,#aaa);letter-spacing:.12em;margin:22px 2px 12px}',
+      // ── 2026-10 清單改版(Readle 式):最新文章 hero 大封面 → 分級 chips + 隱藏已讀 → 直列大封面卡 ──
+      '.art-sec{display:flex;align-items:center;gap:7px;font-size:13px;font-weight:800;color:var(--tx2,#888);letter-spacing:.04em;margin:18px 2px 10px}',
+      '.art-sec:first-child{margin-top:4px}',
+      '.art-sec i{color:var(--ac,#d4654a)}',
+      '.art-sec-row{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:22px 0 10px}.art-sec-row .art-sec{margin:0 2px}',
+      // 隱藏已讀切換(藥丸):開啟時填色
+      '.art-hide{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--bd,#e5e5e5);background:var(--bg2,#fff);color:var(--tx2,#777);border-radius:999px;padding:6px 12px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;min-height:34px}',
+      '.art-hide i{width:14px;height:14px}.art-hide.on{background:var(--tx,#2c2c2c);color:var(--bg2,#fff);border-color:var(--tx,#2c2c2c)}',
+      // hero 卡:封面 16:11,文字疊在底部漸層上(標題/中譯/首段預覽/日期)
+      '.art-hc{position:relative;display:block;aspect-ratio:16/11;border-radius:20px;overflow:hidden;cursor:pointer;color:#fff;box-shadow:0 2px 4px rgba(30,25,20,.06),0 12px 28px rgba(30,25,20,.12);transition:transform .12s}',
+      '.art-hc:active{transform:scale(.99)}',
+      '.art-hc .art-th-e{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:56px;opacity:.9}',
+      '.art-hc img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:saturate(.82) brightness(1.04) contrast(.9) sepia(.12)}',
+      '.art-hc-ov{position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.08) 0%,rgba(0,0,0,.18) 35%,rgba(0,0,0,.74) 100%)}',
+      '.art-hc .art-lvb{top:12px;left:12px;font-size:12px;padding:3px 10px}.art-hc .art-rdb{top:12px;right:12px}',
+      '.art-hc-txt{position:absolute;left:0;right:0;bottom:0;padding:0 16px 16px}',
+      '.art-hc-t{font-size:21px;font-weight:800;font-family:"Hiragino Mincho ProN","Noto Serif JP",serif;line-height:1.35;text-shadow:0 1px 2px rgba(0,0,0,.35)}',
+      '.art-hc-z{font-size:13px;opacity:.92;margin-top:3px}',
+      '.art-hc-p{font-size:13px;line-height:1.6;opacity:.88;margin-top:8px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-family:"Hiragino Mincho ProN","Noto Serif JP",serif}',
+      '.art-hc-m{font-size:12px;opacity:.85;margin-top:8px;display:flex;align-items:center;gap:6px;font-variant-numeric:tabular-nums}',
+      // 直列大封面卡:封面 16:10 在上,文字在下(不疊圖)
+      '.art-bc{display:block;background:var(--bg2,#fff);border:1px solid var(--bd,#e8e5e0);border-radius:18px;overflow:hidden;margin:0 0 14px;cursor:pointer;box-shadow:0 1px 2px rgba(30,25,20,.04),0 6px 16px rgba(30,25,20,.05);transition:transform .12s}',
+      '.art-bc:active{transform:scale(.99)}',
+      '.art-bc.is-read .art-bc-img img{filter:saturate(.5) brightness(1.02) contrast(.9) sepia(.12)}.art-bc.is-read .art-bc-t{color:var(--tx2,#777)}',
+      '.art-bc-img{position:relative;aspect-ratio:16/10;overflow:hidden;color:#fff}',
+      '.art-bc-img .art-th-e{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:48px}',
+      '.art-bc-img img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:saturate(.82) brightness(1.06) contrast(.9) sepia(.12)}',
+      '.art-bc-b{padding:13px 15px 15px}',
+      '.art-bc-t{font-size:17px;font-weight:700;color:var(--tx,#2c2c2c);font-family:"Hiragino Mincho ProN","Noto Serif JP",serif;line-height:1.4}',
+      '.art-bc-z{font-size:13px;color:var(--tx2,#888);margin-top:3px}',
+      '.art-bc-p{font-size:13.5px;line-height:1.7;color:var(--tx2,#777);margin-top:8px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-family:"Hiragino Mincho ProN","Noto Serif JP",serif}',
+      '.art-bc-m{display:flex;align-items:center;gap:8px;margin-top:10px;font-size:12px;color:var(--tx3,#aaa);font-variant-numeric:tabular-nums}',
+      '.art-bc-m .art-done{margin-left:auto;display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:700}',
+      // 「繼續閱讀」標記:封面左下藥丸 + 封面底部細進度條
+      '.art-cont{position:absolute;left:10px;bottom:12px;display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:800;color:#fff;background:var(--ac,#d4654a);border-radius:20px;padding:4px 10px;z-index:1;box-shadow:0 2px 6px rgba(0,0,0,.25)}',
+      '.art-cont i{width:13px;height:13px}',
+      '.art-cont-bar{position:absolute;left:0;right:0;bottom:0;height:4px;background:rgba(255,255,255,.35);z-index:1}.art-cont-bar b{display:block;height:100%;background:var(--ac,#d4654a)}',
+      '.art-empty{text-align:center;color:var(--tx3,#aaa);padding:36px 16px;font-size:14px;line-height:1.7}',
+      '.art-empty button{margin-top:12px;border:1px solid var(--bd,#ddd);background:var(--bg2,#fff);color:var(--ac,#d4654a);border-radius:999px;padding:8px 16px;font-size:13.5px;font-weight:700;cursor:pointer;font-family:inherit}',
+      '.art-chips{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;position:static;padding:0 0 2px;margin:0 0 14px;gap:7px}.art-chips::-webkit-scrollbar{display:none}.art-chip{flex-shrink:0;min-height:34px;padding:6px 13px;font-size:13.5px}',
       // hero
       '.art-hero{padding:22px 18px 18px;color:#fff;position:relative;overflow:hidden;min-height:150px;display:flex;flex-direction:column;justify-content:flex-end}',
       '.art-hero-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:saturate(.82) brightness(1.04) contrast(.9) sepia(.12)}',
@@ -472,57 +586,91 @@ window.Articles = (function () {
     }
     _waitTries = 0;
     ensureCss(); close();
-    var read = readSet(), byLv = {};
-    list().forEach(function (a) { (byLv[a.level] = byLv[a.level] || []).push(a); });
+    var all = list(), read = readSet(), total = all.length, readN = all.filter(function (a) { return read[a.id]; }).length;
     var gated = window.ToolQuota && window.ToolQuota.shouldGate && window.ToolQuota.shouldGate();
-    // 2026-09-17 清單改版(Mia:文章越多越要一直滑):等級篩選 chips(記住)+ 未讀排前面 + 已讀收進「已讀 N 篇」可展開 + 頂端「接著讀」
-    var filt = ''; try { filt = localStorage.getItem('art_filter') || ''; } catch (e) {}
-    if (filt && !byLv[filt]) filt = '';
-    var all = list(), total = all.length, readN = all.filter(function (a) { return read[a.id]; }).length;
+    // 2026-10 清單改版(KOL 看 Readle/Toko):最新文章 hero 大封面 → 分級 chips + 隱藏已讀 → 直列大封面卡(封面/標題/首段預覽/等級+日期)
     var h = '<div class="art-mask" id="artMask"><div class="art-wrap">' +
-      '<div class="art-top"><span class="tt"><i data-ic=book></i> ' + enOr('文章閱讀', 'Reading') + '</span><span class="art-top-n">' + readN + ' / ' + total + '</span><button class="art-ic" onclick="Articles.close()"><i data-ic=x></i></button></div>' +
+      '<div class="art-top"><span class="tt"><i data-ic=book></i> ' + enOr('文章閱讀', 'Reading') + '</span><span class="art-top-n">' + readN + ' / ' + total + '</span><button class="art-ic" onclick="Articles.close()" aria-label="' + enOr('關閉', 'Close') + '"><i data-ic=x></i></button></div>' +
       '<div class="art-lwrap">';
     if (gated) h += '<div class="art-trial"><i data-ic=lock></i> ' + enOr('免費版每天可試讀 1 篇,升級後無限暢讀。', 'Free: 1 article/day. Upgrade for unlimited.') + '</div>';
-    // 接著讀:最近讀的那篇之後、同級第一篇未讀;全都讀過就不顯示
-    var lastId = null, lastTs = 0; Object.keys(read).forEach(function (id) { if (read[id] > lastTs) { lastTs = read[id]; lastId = id; } });
-    var lastA = lastId ? all.find(function (a) { return a.id === lastId; }) : null;
-    var nextA = null;
-    if (lastA) { var same = (byLv[lastA.level] || []); var i0 = same.indexOf(lastA); nextA = same.slice(i0 + 1).concat(same.slice(0, i0)).find(function (a) { return !read[a.id]; }) || null; }
-    if (!nextA) nextA = all.find(function (a) { return !read[a.id] && (!filt || a.level === filt); }) || null;
-    if (nextA) {
-      var gN = LVC[nextA.level] || LVC.n5;
-      h += '<div class="art-next" onclick="Articles.read(\'' + nextA.id + '\')">' +
-        '<div class="art-thumb" style="background:linear-gradient(135deg,' + gN[0] + ',' + gN[1] + ')"><span class="art-th-e">' + topicEmoji(nextA.topic + nextA.title) + '</span><img class="art-th-i" src="' + imgUrl(nextA.id) + '" alt="" onerror="this.remove()"></div>' +
-        '<div class="art-card-b"><div class="art-next-l">' + (lastA ? enOr('接著讀', 'Up next') : enOr('從這篇開始', 'Start here')) + ' · ' + LVN[nextA.level] + '</div>' +
-        '<div class="art-card-t">' + esc(nextA.title) + '</div><div class="art-card-z">' + esc(Lc(nextA.title_zh, nextA.title_en)) + '</div></div><span class="art-next-go">›</span></div>';
-    }
-    h += '<div class="art-chips"><button class="art-chip' + (filt ? '' : ' on') + '" onclick="Articles.filter(\'\')">' + enOr('全部', 'All') + '</button>';
-    LEVELS.forEach(function (lv) { var arr = byLv[lv] || []; if (!arr.length) return; var un = arr.filter(function (a) { return !read[a.id]; }).length;
-      h += '<button class="art-chip' + (filt === lv ? ' on' : '') + '" onclick="Articles.filter(\'' + lv + '\')">' + LVN[lv] + (un ? '<small>' + un + '</small>' : '<i data-ic=check></i>') + '</button>'; });
-    h += '</div>';
-    function cardHtml(a) {
-      var g = LVC[a.level] || LVC.n5;
-      return '<div class="art-card' + (read[a.id] ? ' is-read' : '') + '" onclick="Articles.read(\'' + a.id + '\')">' +
-        '<div class="art-thumb" style="background:linear-gradient(135deg,' + g[0] + ',' + g[1] + ')"><span class="art-th-e">' + topicEmoji(a.topic + a.title) + '</span><img class="art-th-i" src="' + imgUrl(a.id) + '" alt="" onerror="this.remove()"></div>' +
-        '<div class="art-card-b">' +
-        '<div class="art-card-t">' + esc(a.title) + (read[a.id] ? '<span class="art-done"><i data-ic=check></i></span>' : '') + (a.publish_at && !window.ArticleSchedule.isLive(a) ? '<span class="art-sched">' + esc(a.publish_at.slice(5, 10)) + '</span>' : '') + '</div>' +
-        '<div class="art-card-z">' + esc(Lc(a.title_zh, a.title_en)) + ' · ' + esc(Lc(a.topic, a.topic_en)) + '</div>' +
-        '</div></div>';
-    }
-    LEVELS.forEach(function (lv) {
-      var arr = byLv[lv] || []; if (!arr.length || (filt && filt !== lv)) return;
-      var unread = arr.filter(function (a) { return !read[a.id]; }), done = arr.filter(function (a) { return read[a.id]; });
-      h += '<div class="art-lv">' + LVN[lv] + '　·　' + (unread.length ? unread.length + ' ' + enOr('篇未讀', 'unread') : enOr('全部讀完 ✓', 'all read ✓')) + '</div>';
-      unread.forEach(function (a) { h += cardHtml(a); });
-      if (done.length) {
-        h += '<details class="art-readfold"' + (unread.length ? '' : ' open') + '><summary>' + enOr('已讀 ' + done.length + ' 篇', done.length + ' read') + ' <i data-ic=check></i></summary>' + done.map(cardHtml).join('') + '</details>';
-      }
-    });
+    h += heroHtml(all, read);
+    h += '<div class="art-sec-row"><div class="art-sec"><i data-ic=grid></i> ' + enOr('分級閱讀', 'By level') + '</div>' +
+      '<button type="button" class="art-hide' + (hideReadOn() ? ' on' : '') + '" id="artHideBtn" onclick="Articles.toggleHideRead()" aria-pressed="' + (hideReadOn() ? 'true' : 'false') + '"><i data-ic=eye></i> ' + enOr('隱藏已讀', 'Hide read') + '</button></div>' +
+      '<div class="art-chips" id="artChips"></div><div id="artList"></div>';
     h += '</div></div></div>';
     var d = document.createElement('div'); d.innerHTML = h; document.body.appendChild(d.firstChild);
+    renderList();
     markSeen();   // 開過清單 → 清掉首頁「N 新」紅標
     try { if (typeof track === 'function') track('article_open', {}); } catch (e) {}
   }
+  // 最新文章:publish_at 最新的那篇(沒有就取最後 append 的);未到時間的本來就不在 list() 裡
+  function newest(all) { return window.ArticleList.sortNewest(all)[0] || null; }
+  function metaHtml(a) {
+    var dt = window.ArticleList.dateLabel(a, isEn() ? 'en' : 'zh');
+    var parts = [LVN[a.level]];
+    if (dt) parts.push(dt);
+    parts.push(Lc(a.topic, a.topic_en));
+    if (a.publish_at && !window.ArticleSchedule.isLive(a)) parts.push(enOr('預定 ', 'Scheduled ') + a.publish_at.slice(5, 10));   // 本機預覽才會看到
+    return parts.map(esc).join('<span aria-hidden="true">·</span>');
+  }
+  function contHtml(a, prog) {
+    var e = prog[a.id]; var pct = e ? Math.round((e.p || 0) * 100) : 0;
+    return '<span class="art-cont"><i data-ic=play></i> ' + enOr('繼續閱讀', 'Continue') + (pct > 0 ? ' · ' + pct + '%' : '') + '</span>' +
+      '<div class="art-cont-bar"><b style="width:' + Math.max(4, pct) + '%"></b></div>';
+  }
+  function coverImg(a, eager) {
+    return '<img src="' + imgUrl(a.id) + '" alt="" width="400" height="400" decoding="async"' + (eager ? ' fetchpriority="high"' : ' loading="lazy"') + ' onerror="this.remove()">';
+  }
+  function heroHtml(all, read) {
+    var a = newest(all); if (!a) return '';
+    var g = LVC[a.level] || LVC.n5, prog = progSet(), cont = inProgressId() === a.id;
+    return '<div class="art-sec"><i data-ic=sparkle></i> ' + enOr('最新文章', 'Latest') + '</div>' +
+      '<div class="art-hc" role="button" tabindex="0" onclick="Articles.read(\'' + a.id + '\')" style="background:linear-gradient(135deg,' + g[0] + ',' + g[1] + ')">' +
+      '<span class="art-th-e">' + topicEmoji(a.topic + a.title) + '</span>' + coverImg(a, true) + '<div class="art-hc-ov"></div>' +
+      '<span class="art-lvb">' + LVN[a.level] + '</span>' + (read[a.id] && !cont ? '<span class="art-rdb"><i data-ic=check></i></span>' : '') +
+      '<div class="art-hc-txt"><div class="art-hc-t">' + esc(a.title) + '</div><div class="art-hc-z">' + esc(Lc(a.title_zh, a.title_en)) + '</div>' +
+      '<div class="art-hc-p">' + esc(window.ArticleList.preview(a, 90)) + '</div>' +
+      '<div class="art-hc-m">' + metaHtml(a) + (cont ? '<span style="margin-left:auto;font-weight:800"><i data-ic=play></i> ' + enOr('繼續閱讀', 'Continue') + '</span>' : '') + '</div></div></div>';
+  }
+  function cardHtml(a, read, prog, contId) {
+    var g = LVC[a.level] || LVC.n5, cont = a.id === contId, isRead = !!read[a.id];
+    return '<div class="art-bc' + (isRead && !cont ? ' is-read' : '') + '" role="button" tabindex="0" onclick="Articles.read(\'' + a.id + '\')">' +
+      '<div class="art-bc-img" style="background:linear-gradient(135deg,' + g[0] + ',' + g[1] + ')"><span class="art-th-e">' + topicEmoji(a.topic + a.title) + '</span>' + coverImg(a) +
+      '<span class="art-lvb">' + LVN[a.level] + '</span>' + (isRead && !cont ? '<span class="art-rdb"><i data-ic=check></i></span>' : '') + (cont ? contHtml(a, prog) : '') + '</div>' +
+      '<div class="art-bc-b"><div class="art-bc-t">' + esc(a.title) + '</div><div class="art-bc-z">' + esc(Lc(a.title_zh, a.title_en)) + '</div>' +
+      '<div class="art-bc-p">' + esc(window.ArticleList.preview(a, 90)) + '</div>' +
+      '<div class="art-bc-m">' + metaHtml(a) + (isRead && !cont ? '<span class="art-done"><i data-ic=check></i> ' + enOr('已讀', 'Read') + '</span>' : '') + '</div></div></div>';
+  }
+  // chips + 卡片清單:換等級/切隱藏已讀只重畫這一段,不整頁重建(視窗不跳回頂端)
+  function renderList() {
+    var chips = document.getElementById('artChips'), box = document.getElementById('artList'); if (!chips || !box) return;
+    var all = list(), read = readSet(), prog = progSet(), hide = hideReadOn(), contId = inProgressId();
+    var byLv = {}; all.forEach(function (a) { (byLv[a.level] = byLv[a.level] || []).push(a); });
+    var filt = ''; try { filt = localStorage.getItem('art_filter') || ''; } catch (e) {}
+    if (filt && !byLv[filt]) filt = '';
+    var ch = '<button class="art-chip' + (filt ? '' : ' on') + '" onclick="Articles.filter(\'\')">' + enOr('全部', 'All') + '</button>';
+    LEVELS.forEach(function (lv) {
+      var arr = byLv[lv] || []; if (!arr.length) return;
+      var un = arr.filter(function (a) { return !read[a.id]; }).length;
+      // 不放未讀數字(六顆 chips 在 390px 要一排放得下;數字在頂欄「已讀/總數」已有);整級讀完才掛勾
+      ch += '<button class="art-chip' + (filt === lv ? ' on' : '') + '" onclick="Articles.filter(\'' + lv + '\')">' + LVN[lv] + (un ? '' : ' <i data-ic=check></i>') + '</button>';
+    });
+    chips.innerHTML = ch;
+    var hero = newest(all);
+    var rows = window.ArticleList.apply(window.ArticleList.sortNewest(all), { level: filt, hideRead: hide, read: read, keepId: contId })
+      .filter(function (a) { return !hero || a.id !== hero.id; });   // hero 已在上面,清單不重複
+    // 讀到一半的那篇排最前面(回來一眼看到接著讀)
+    if (contId) { var ci = rows.findIndex(function (a) { return a.id === contId; }); if (ci > 0) rows.unshift(rows.splice(ci, 1)[0]); }
+    var hb = document.getElementById('artHideBtn'); if (hb) { hb.classList.toggle('on', hide); hb.setAttribute('aria-pressed', hide ? 'true' : 'false'); }
+    if (!rows.length) {
+      box.innerHTML = '<div class="art-empty">' + (hide
+        ? enOr('這裡的文章都讀過了。', 'You have read everything here.') + '<br><button type="button" onclick="Articles.toggleHideRead()">' + enOr('顯示已讀文章', 'Show read articles') + '</button>'
+        : enOr('這個等級目前還沒有文章。', 'No articles at this level yet.')) + '</div>';
+      return;
+    }
+    box.innerHTML = rows.map(function (a) { return cardHtml(a, read, prog, contId); }).join('');
+  }
+  function toggleHideRead() { try { localStorage.setItem('art_hide_read', hideReadOn() ? '0' : '1'); } catch (e) {} renderList(); }
 
   // ─────────── 閱讀器 ───────────
   function read(id) {
@@ -545,7 +693,7 @@ window.Articles = (function () {
       '<span class="tt">' + esc(Lc(a.title_zh,a.title_en)) + '</span>' +
       '<button class="art-ic" onclick="Articles.close()"><i data-ic=x></i></button></div>' +
       '<div class="art-hero" style="background:linear-gradient(135deg,' + g[0] + ',' + g[1] + ')">' +
-      '<img class="art-hero-bg" src="' + imgUrl(a.id) + '" alt="" onerror="this.remove()">' +
+      '<img class="art-hero-bg" src="' + imgUrl(a.id) + '" alt="" width="400" height="400" decoding="async" onerror="this.remove()">' +
       '<div class="art-hero-ov"></div>' +
       '<div class="art-hero-in">' +
       '<div class="hb">' + LVN[a.level] + '　' + esc(Lc(a.topic,a.topic_en)) + '</div>' +
@@ -585,11 +733,27 @@ window.Articles = (function () {
     document.getElementById('artMask').scrollTop = 0;
     document.body.classList.add('art-reading');   // 讓額度小牌避開底部播放列
     renderTab('read');
+    setProg(id, 0); bindProgress(id);   // 進度:碰過就記時間;捲動更新(清單「繼續閱讀」用)
     try { if (typeof track === 'function') track('article_read', { id: id, level: a.level }); } catch (e) {}
     preloadSent(0); preloadSent(1);   // 開文章先載前兩句,按播放零等待
     var _mk=document.querySelector('.art-mask'); if(_mk) _mk.classList.toggle('pos-off', !posOn());
   }
-  function filter(lv) { try { if (lv) localStorage.setItem('art_filter', lv); else localStorage.removeItem('art_filter'); } catch (e) {} open(); }
+  // 閱讀進度:依捲動位置算(第一段頂 → 最後一段底 = 0~1),捲到底=1;只在文章 tab 計,換到測驗不算
+  function bindProgress(id) {
+    var mk = document.getElementById('artMask'); if (!mk) return;
+    var raf = 0;
+    function calc() {
+      raf = 0;
+      if (curId !== id || curTab !== 'read' || !document.body.contains(mk)) return;
+      var ps = mk.querySelectorAll('#artContent .art-para'); if (!ps.length) return;
+      var top = ps[0].getBoundingClientRect().top, bot = ps[ps.length - 1].getBoundingClientRect().bottom, vh = mk.clientHeight;
+      var span = bot - top; if (span <= 0 || !vh) return;
+      setProg(id, Math.max(0, Math.min(1, (vh - top) / span)));
+    }
+    mk.addEventListener('scroll', function () { if (!raf) raf = requestAnimationFrame(calc); }, { passive: true });
+    setTimeout(calc, 300);
+  }
+  function filter(lv) { try { if (lv) localStorage.setItem('art_filter', lv); else localStorage.removeItem('art_filter'); } catch (e) {} if (document.getElementById('artList')) renderList(); else open(); }
   function tabBtn(k, label) { return '<button class="art-tab' + (curTab === k ? ' on' : '') + '" data-tab="' + k + '" onclick="Articles.tab(\'' + k + '\')">' + label + '</button>'; }
 
   function tab(k) {
@@ -721,6 +885,7 @@ window.Articles = (function () {
   function renderQuizItem(c, a) {
     c.className = 'art-cnt';
     if (quiz.idx >= quiz.list.length) {
+      setProg(a.id, 1);   // 做完測驗=這篇讀完(清單不再標「繼續閱讀」)
       // 結束畫面:附「錯題複習」——列出答錯的字(讀音+意思+🔊),看完知道該補哪裡
       var wrongHtml = '';
       if (quiz.wrongs.length) {
@@ -1053,7 +1218,7 @@ window.Articles = (function () {
   function done() { if (curId) markRead(curId); }
 
   return {
-    filter,
+    filter: filter, toggleHideRead: toggleHideRead,
     open: open, close: close, read: read, tab: tab, entryCardHtml: entryCardHtml,
     toggleFuri: toggleFuri, toggleZh: toggleZh, toggleRomaji: toggleRomaji, cycleFs: cycleFs,
     playFrom: playFrom, togglePlay: togglePlay, stepRate: stepRate, say: say, spTap: spTap, togglePos: togglePos,
