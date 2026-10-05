@@ -1905,6 +1905,7 @@ try {
      ContentLoader.ready() Promise 在 init 時等 Firestore fetch。 -->
 <style>html.no-yt .yt-web-only{display:none!important}</style>
 <!-- 2026-09-16 Mia:YouTube 跟讀在 iOS App 內恢復顯示(先前為 1.0.8 送審暫藏);no-yt class 不再加 -->
+<script src="day-key.js"></script>
 <script src="nav-back.js"></script>
 <script src="review-ask.js"></script>
 <script src="omikuji-data.js"></script>
@@ -1914,6 +1915,7 @@ try {
 <script src="ui-modal.js"></script>
 <script src="content-loader.js"></script>
 <script src="progress-codec.js"></script>
+<script src="path-merge.js"></script>
 <script src="grammar-kanji-readings.js"></script>
 <script src="report-form.js" defer></script>
 <script src="ux-extras.js"></script>
@@ -2313,6 +2315,8 @@ function loadCloudData() {
         }
         localStorage.setItem(k, JSON.stringify(merged));
       } else {
+        // 闖關進度:第一層 key 是 level/n5/n4…,「雲端整級蓋過去」會把這台剛過的關/今天的關數洗掉 → 專用合併(path-merge.js:done 取大、skip 聯集、days 取大、level 本機優先)
+        if (k === 'path_progress' && window.PathMerge) { localStorage.setItem(k, JSON.stringify(PathMerge.merge(local, d[k]))); return; }
         const merged = { ...d[k] };
         if (k === 'study_log') {
           // 學習日曆:按「日期聯集、同日各項取最大」合併;本機有雲端缺的日期,
@@ -2433,8 +2437,8 @@ function saveStudyDayCloud(dates) {
   if (!currentUser || !db || !_cloudSynced) return;
   try {
     const log = JSON.parse(localStorage.getItem('study_log') || '{}');
-    // 預設寫「今天」(與 calendar.js today() 同格式);合併補寫時傳入日期陣列
-    const list = dates || [new Date().toISOString().split('T')[0]];
+    // 預設寫「今天」(與 calendar.js today() 同格式:DayKey 本地日曆日);合併補寫時傳入日期陣列
+    const list = dates || [DayKey.today()];
     const upd = {};
     list.forEach(d => { if (log[d]) upd['study_log.' + d] = log[d]; });
     if (!Object.keys(upd).length) return;
@@ -2590,7 +2594,7 @@ window.goHub = goHub;
 function _hubToday() {
   try {
     const sl = JSON.parse(localStorage.getItem('study_log') || '{}');
-    const today = new Date().toISOString().split('T')[0];
+    const today = DayKey.today();
     const d = sl[today]; if (!d) return 0;
     return (d.vocab || 0) + (d.grammar || 0) + (d.quiz || 0);
   } catch (e) { return 0; }
@@ -2712,7 +2716,7 @@ function _hubWordOfDay() {
     const lv = ['n5', 'n4', 'n3', 'n2', 'n1'].includes(localStorage.getItem('lastLevel')) ? localStorage.getItem('lastLevel') : 'n3';
     const data = (typeof getVocabData === 'function') ? getVocabData(lv) : [];
     if (!data || !data.length) return null;
-    const today = new Date().toISOString().split('T')[0];
+    const today = DayKey.today();
     let h = 0; for (let i = 0; i < today.length; i++) h = (h * 31 + today.charCodeAt(i)) >>> 0;
     const w = data[h % data.length];
     return w ? { lv: lv.toUpperCase(), w: w.w, r: w.r, m: w.m } : null;
@@ -2861,7 +2865,7 @@ function renderHub() {
   // 達標彩蛋:每天第一次打開面板且已達標時放一次
   if (done >= GOAL) {
     try {
-      const today = new Date().toISOString().split('T')[0];
+      const today = DayKey.today();
       if (localStorage.getItem('hub_celebrated') !== today) {
         localStorage.setItem('hub_celebrated', today);
         setTimeout(hubConfetti, 350);
@@ -4328,10 +4332,10 @@ function levelGrammarMastery(lv) {
 function getDailyProgress(lv) {
   try {
     const d = JSON.parse(localStorage.getItem(DAILY_KEY) || '{}');
-    const today = new Date().toISOString().split('T')[0];
+    const today = DayKey.today();
     if (!d[lv] || d[lv].date !== today) return { date: today, learned: 0, offset: d[lv] ? d[lv].totalOffset || 0 : 0, totalOffset: d[lv] ? d[lv].totalOffset || 0 : 0 };
     return d[lv];
-  } catch(e) { return { date: new Date().toISOString().split('T')[0], learned: 0, offset: 0, totalOffset: 0 }; }
+  } catch(e) { return { date: DayKey.today(), learned: 0, offset: 0, totalOffset: 0 }; }
 }
 function saveDailyProgress(lv, prog) {
   try {
@@ -4372,7 +4376,7 @@ function nextDailyBatch() {
   const data = getVocabData(lv);
   const prog = getDailyProgress(lv);
   prog.totalOffset = Math.min(prog.totalOffset + DAILY_NEW, data.length);
-  prog.date = new Date().toISOString().split('T')[0];
+  prog.date = DayKey.today();
   saveDailyProgress(lv, prog);
   doRender();
   window.scrollTo({top:0,behavior:'smooth'});
@@ -4381,7 +4385,7 @@ function prevDailyBatch() {
   const lv = currentLevel;
   const prog = getDailyProgress(lv);
   prog.totalOffset = Math.max(prog.totalOffset - DAILY_NEW, 0);
-  prog.date = new Date().toISOString().split('T')[0];
+  prog.date = DayKey.today();
   saveDailyProgress(lv, prog);
   doRender();
   window.scrollTo({top:0,behavior:'smooth'});
@@ -4392,10 +4396,10 @@ function getGrammarDailyProgress(lv) {
   try {
     const d = JSON.parse(localStorage.getItem(DAILY_KEY) || '{}');
     const k = 'g_' + lv;
-    const today = new Date().toISOString().split('T')[0];
+    const today = DayKey.today();
     if (!d[k] || d[k].date !== today) return { date: today, learned: 0, totalOffset: d[k] ? d[k].totalOffset || 0 : 0 };
     return d[k];
-  } catch(e) { return { date: new Date().toISOString().split('T')[0], learned: 0, totalOffset: 0 }; }
+  } catch(e) { return { date: DayKey.today(), learned: 0, totalOffset: 0 }; }
 }
 function saveGrammarDailyProgress(lv, prog) {
   try {
@@ -4428,7 +4432,7 @@ function nextGrammarBatch() {
   const gd = getGrammarData(lv);
   const prog = getGrammarDailyProgress(lv);
   prog.totalOffset = Math.min(prog.totalOffset + GRAMMAR_DAILY_NEW, gd.data.length);
-  prog.date = new Date().toISOString().split('T')[0];
+  prog.date = DayKey.today();
   saveGrammarDailyProgress(lv, prog);
   doRender();
   window.scrollTo({top:0,behavior:'smooth'});
@@ -4437,7 +4441,7 @@ function prevGrammarBatch() {
   const lv = currentLevel;
   const prog = getGrammarDailyProgress(lv);
   prog.totalOffset = Math.max(prog.totalOffset - GRAMMAR_DAILY_NEW, 0);
-  prog.date = new Date().toISOString().split('T')[0];
+  prog.date = DayKey.today();
   saveGrammarDailyProgress(lv, prog);
   doRender();
   window.scrollTo({top:0,behavior:'smooth'});
@@ -4475,14 +4479,14 @@ function showConfirm(opts) {
 async function resetDailyBatch() {
   if (!await showConfirm({ title: t('reset_progress'), message: t('reset_confirm'), okText: t('reset_progress'), cancelText: t('cancel') || '取消', danger: true })) return;
   const lv = currentLevel;
-  saveDailyProgress(lv, { date: new Date().toISOString().split('T')[0], learned: 0, offset: 0, totalOffset: 0 });
+  saveDailyProgress(lv, { date: DayKey.today(), learned: 0, offset: 0, totalOffset: 0 });
   doRender();
   window.scrollTo({top:0,behavior:'smooth'});
 }
 async function resetGrammarBatch() {
   if (!await showConfirm({ title: t('reset_progress'), message: t('reset_confirm'), okText: t('reset_progress'), cancelText: t('cancel') || '取消', danger: true })) return;
   const lv = currentLevel;
-  saveGrammarDailyProgress(lv, { date: new Date().toISOString().split('T')[0], learned: 0, totalOffset: 0 });
+  saveGrammarDailyProgress(lv, { date: DayKey.today(), learned: 0, totalOffset: 0 });
   doRender();
   window.scrollTo({top:0,behavior:'smooth'});
 }

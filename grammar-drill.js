@@ -16,7 +16,7 @@ const GrammarDrill = (() => {
 
   function getSRS() { try { return JSON.parse(localStorage.getItem(GKEY)) || {}; } catch(e) { return {}; } }
   function saveSRS(d) { localStorage.setItem(GKEY, JSON.stringify(d)); if (typeof saveAllCloud === 'function') saveAllCloud(); }
-  function today() { return new Date().toISOString().split('T')[0]; }
+  function today() { return DayKey.today(); }   // 本地日曆日(day-key.js):nextReview 以本地午夜翻日,之前 UTC 版在台日早上 9 點就「到期」
 
   function record(id, correct) {
     const d = getSRS();
@@ -33,7 +33,7 @@ const GrammarDrill = (() => {
       e.ease = Math.max(1.3, e.ease - 0.2);
     }
     const nd = new Date(); nd.setDate(nd.getDate() + e.interval);
-    e.nextReview = nd.toISOString().split('T')[0];
+    e.nextReview = DayKey.of(nd);
     e.lastReview = today();
     d[id] = e;
     saveSRS(d);

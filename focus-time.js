@@ -5,7 +5,7 @@
 (function (root) {
   var TICK = 30000, IDLE = 60000;
   var last = Date.now();
-  function today() { return new Date().toISOString().split('T')[0]; }
+  function today() { return DayKey.today(); }   // 本地日曆日(day-key.js),與 study_log 同一套日界
   function bump(min) {
     try {
       var all = JSON.parse(localStorage.getItem('study_log')) || {}, d = today();

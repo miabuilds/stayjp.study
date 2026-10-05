@@ -92,7 +92,7 @@
     try {
       if (!window.ReactNativeWebView) return;               // 純網頁沒有這個 → 直接略過
       var k = 'stayjp_review_signal_day';
-      var d = new Date().toISOString().slice(0, 10);
+      var n = new Date(), d = n.getFullYear() + '-' + (n.getMonth() + 1) + '-' + n.getDate();   // 本地日(這支在很多頁載入,不依賴 day-key.js)
       if (localStorage.getItem(k) === d) return;            // 今天已發過一次
       localStorage.setItem(k, d);
       window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'STUDY_DONE' }));

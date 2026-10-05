@@ -9,8 +9,8 @@ const SRS = (() => {
   };
   function getData() { try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch(e) { return {}; } }
   function save(d) { localStorage.setItem(KEY, JSON.stringify(d)); }
-  function today() { return new Date().toISOString().split('T')[0]; }
-  function dayOf(ts) { return new Date(ts).toISOString().split('T')[0]; }
+  function today() { return DayKey.today(); }   // 本地日曆日(day-key.js),與 calendar.js/study_log 同一套日界
+  function dayOf(ts) { return DayKey.of(ts); }
   function k(lv, w) { return lv + ':' + w; }
 
   // 統一的 due 判斷：優先用時間戳，沒有就 fallback 到日期字串（相容舊資料）

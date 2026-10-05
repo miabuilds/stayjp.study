@@ -12,7 +12,7 @@
   const L = (zh, en) => { try { return (typeof enOr === 'function') ? enOr((typeof cvt === 'function' ? cvt(zh) : zh), en) : zh; } catch (e) { return zh; } };
   const esc = s => String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   const strip = s => String(s || '').replace(/<[^>]+>/g, '');
-  function today() { return new Date().toISOString().split('T')[0]; }
+  function today() { return DayKey.today(); }   // 本地日曆日(day-key.js),與 study_log 同一套日界
   function box() { return document.getElementById('quizBox'); }
   function bg() { return document.getElementById('quizBg'); }
   function show() { const b = bg(); if (b) b.classList.add('show'); }
@@ -227,8 +227,8 @@
   function clearStreak(lv) {
     const days = lvProg(lv).days, need = (root.StudyPlan && StudyPlan.modeInfo) ? StudyPlan.modeInfo().units : 2;
     let n = 0; const d = new Date();
-    if (!((days[d.toISOString().split('T')[0]] || 0) >= need)) d.setDate(d.getDate() - 1);   // 今天還沒過完不算斷
-    for (let i = 0; i < 400; i++) { const k = d.toISOString().split('T')[0]; if ((days[k] || 0) >= need) { n++; d.setDate(d.getDate() - 1); } else break; }
+    if (!((days[DayKey.of(d)] || 0) >= need)) d.setDate(d.getDate() - 1);   // 今天還沒過完不算斷
+    for (let i = 0; i < 400; i++) { const k = DayKey.of(d); if ((days[k] || 0) >= need) { n++; d.setDate(d.getDate() - 1); } else break; }
     return n;
   }
   // 今日任務:從目前關開始、依模式建議數列出「今天要過的關」;做完的打勾

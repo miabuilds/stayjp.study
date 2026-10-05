@@ -19,8 +19,8 @@
 
   const L = (zh, en) => { try { return (typeof enOr === 'function') ? enOr(zh, en) : zh; } catch (e) { return zh; } };
   const esc = s => String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-  function today() { return new Date().toISOString().split('T')[0]; }
-  function dayOf(ts) { return new Date(ts).toISOString().split('T')[0]; }
+  function today() { return DayKey.today(); }   // 本地日曆日(day-key.js),與 calendar.js/study_log 同一套日界
+  function dayOf(ts) { return DayKey.of(ts); }
   function curLevel() { try { return (typeof currentLevel !== 'undefined' && LEVELS.includes(currentLevel)) ? currentLevel : (localStorage.getItem('lastLevel') || 'n5'); } catch (e) { return 'n5'; } }
   function vocab(lv) { try { return (typeof getVocabData === 'function') ? (getVocabData(lv) || []) : []; } catch (e) { return []; } }
   function srsData() { try { return JSON.parse(localStorage.getItem('srs_data')) || {}; } catch (e) { return {}; } }

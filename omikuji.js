@@ -9,7 +9,7 @@
   var L = function (zh, en) { try { return (typeof enOr === 'function') ? enOr(zh, en) : zh; } catch (e) { return zh; } };
   var esc = function (s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); };
   function fr(t) { try { return root.furiganaHTMLRich ? root.furiganaHTMLRich(t) : esc(t); } catch (e) { return esc(t); } }
-  function today() { return new Date().toISOString().slice(0, 10); }
+  function today() { return DayKey.today(); }   // 本地日曆日(day-key.js):一天一支要跟使用者的「今天」一致,不是 UTC
   // 籤文三語:英文用資料裡的 zhE/tipE/w[3];簡中用 cvt 轉繁中。
   // ⚠️ 只轉中文欄位 —— 日文原文與單字漢字絕對不能過 cvt(會把日文漢字誤轉,例:「変」→「變」)。
   function lang() { try { return (typeof I18n !== 'undefined' && I18n.getLang) ? I18n.getLang() : 'zh-TW'; } catch (e) { return 'zh-TW'; } }

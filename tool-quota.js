@@ -355,7 +355,7 @@
       const isNative = !!(window.STAYJP_NATIVE && window.STAYJP_NATIVE.isNativeApp);
       if (isNative || isPremium() || !inTrial()) return;
       if (trialDaysLeft() > 1) return;
-      const k = 'trial_exp_banner_' + new Date().toISOString().slice(0,10);
+      const k = 'trial_exp_banner_' + dateKey();   // 本地日(跟工具額度同一套日界)
       if (localStorage.getItem(k) || document.getElementById('trialExpBar')) return;
       localStorage.setItem(k, '1');
       const bar = document.createElement('div');

@@ -6,7 +6,7 @@
 // 用法:StayDaily.log('quiz'|'vocab'|'grammar');首頁登入後 StayDaily.attach(uid, onUpdate)。
 (function (root) {
   var PEND = 'daily_pending';   // {date:{type:n}} 還沒送上雲端的動作數
-  function today() { return new Date().toISOString().split('T')[0]; }   // 與 calendar.js 同一套日界(UTC)
+  function today() { return root.DayKey.today(); }   // 與 calendar.js 同一套日界:裝置本地日曆日(day-key.js,之前是 UTC 害台日早上的動作算成昨天)
   function getLog() { try { return JSON.parse(localStorage.getItem('study_log')) || {}; } catch (e) { return {}; } }
   function getPend() { try { return JSON.parse(localStorage.getItem(PEND)) || {}; } catch (e) { return {}; } }
   function setPend(p) { try { localStorage.setItem(PEND, JSON.stringify(p)); } catch (e) {} }

@@ -781,7 +781,7 @@ window.Articles = (function () {
   // 文章閱讀也算進「今日目標」:每篇每天只計一次(重複開同一篇不重複加)
   function logArticleReadActivity(id) {
     try {
-      var today = new Date().toISOString().split('T')[0];
+      var today = DayKey.today();   // 本地日曆日,與 study_log 同一套(day-key.js)
       var d; try { d = JSON.parse(localStorage.getItem('article_activity_day')) || {}; } catch (e) { d = {}; }
       if (d.date !== today) d = { date: today, ids: [] };
       if (d.ids.indexOf(id) < 0) {

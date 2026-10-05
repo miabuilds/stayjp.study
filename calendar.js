@@ -6,7 +6,7 @@ const Calendar = (() => {
     try { return JSON.parse(localStorage.getItem(SKEY)) || {}; } catch(e) { return {}; }
   }
   function saveLog(log) { localStorage.setItem(SKEY, JSON.stringify(log)); }
-  function today() { return new Date().toISOString().split('T')[0]; }
+  function today() { return DayKey.today(); }   // 本地日曆日(day-key.js)。之前是 UTC → 台灣 08:00、日本 09:00 前的動作算成昨天(用戶實錘)
 
   // Record an activity: type = 'vocab' | 'grammar' | 'quiz'
   function logActivity(type) {
@@ -36,7 +36,7 @@ const Calendar = (() => {
     // Walk backwards from today
     const d = new Date();
     for (let i = 0; i < 365; i++) {
-      const key = d.toISOString().split('T')[0];
+      const key = DayKey.of(d);
       if (log[key] && (log[key].vocab > 0 || log[key].grammar > 0 || log[key].quiz > 0)) {
         streak++;
       } else {
@@ -149,7 +149,7 @@ const Calendar = (() => {
       for (let w = 0; w < weeks; w++) {
         const d = new Date(startDate);
         d.setDate(d.getDate() + w * 7 + dow);
-        const key = d.toISOString().split('T')[0];
+        const key = DayKey.of(d);
         const isFuture = d > endDate;
         if (isFuture) {
           gridHTML += '<span class="cal-cell" data-level="empty"></span>';
