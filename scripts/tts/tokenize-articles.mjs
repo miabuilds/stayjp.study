@@ -72,7 +72,7 @@ function tokenizeSentence(clean) {
 
 let added = 0, kept = 0;
 for (const a of ARTICLES) {
-  if (a.level === 'n5') continue;                 // N5 用空格詞塊(frUnit),不需 token
+  // N5 的振假名走空格詞塊(frUnit)不用 token,但「羅馬拼音」要靠 token(romajiForSentence)→ N5 也要產(2026-10-05 Mia 回報 N5 按羅馬拼音沒反應)
   const paras = String(a.body).split('\n').filter(p => p.trim());
   for (const p of paras) {
     const sents = p.match(/[^。！？]+[。！？]?/g) || [p];

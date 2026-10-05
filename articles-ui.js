@@ -518,7 +518,7 @@ window.Articles = (function () {
       '.aq{padding:8px 4px}',
       '.aq-q{font-size:15px;color:var(--tx2,#888);margin-bottom:6px}',
       '.aq-w{font-size:30px;font-weight:800;font-family:"Hiragino Mincho ProN","Noto Serif JP",serif;text-align:center;margin:14px 0 6px;color:var(--tx,#2c2c2c)}',
-      '.aq-r{text-align:center;font-size:14px;color:var(--ac2,#e8734a);margin-bottom:22px}',
+      '.aq-r{display:block;width:100%;border:none;background:none;font:inherit;text-align:center;font-size:14px;color:var(--ac2,#e8734a);margin-bottom:22px;padding:6px 0;cursor:pointer}',
       '.aq-opts{display:grid;gap:11px}',
       '.aq-opt{border:1px solid var(--bd,#ddd);background:var(--bg2,#fff);color:var(--tx,#333);border-radius:14px;padding:16px;font-size:16px;font-weight:600;cursor:pointer;text-align:left;min-height:56px}',
       '.aq-opt:active{transform:scale(.98)}',
@@ -911,7 +911,10 @@ window.Articles = (function () {
     c.innerHTML = '<div class="aq"><div class="aq-prog">' + (quiz.idx + 1) + ' / ' + quiz.list.length + '　·　' + enOr('答對 ', 'Score ') + quiz.score + '</div>' +
       '<div class="aq-q" style="text-align:center">' + enOr('這個字是什麼意思?', 'What does this mean?') + '</div>' +
       '<div class="aq-w" onclick="Articles.say(\'' + esc(v.r || v.w) + '\')">' + esc(v.w) + '</div>' +
-      '<div class="aq-r">' + esc(v.r) + (hasTts(v.r || v.w) ? ' <i data-ic=volume></i>' : '') + '</div>' +
+      // 讀音列整個可按(含喇叭):之前只有上面的大字有 onclick,喇叭圖示按了沒聲音(2026-10-05 Mia 回報)
+      (hasTts(v.r || v.w)
+        ? '<button class="aq-r" type="button" onclick="Articles.say(\'' + esc(v.r || v.w) + '\')" aria-label="' + enOr('播放讀音', 'Play reading') + '">' + esc(v.r) + ' <i data-ic=volume></i></button>'
+        : '<div class="aq-r">' + esc(v.r) + '</div>') +
       '<div class="aq-opts">' + opts.map(function (o) { return '<button class="aq-opt" onclick="Articles.answer(this,\'' + esc(o).replace(/'/g, "\\'") + '\',\'' + esc(correct).replace(/'/g, "\\'") + '\')">' + esc(o) + '</button>'; }).join('') + '</div></div>';
   }
   function answer(btn, chosen, correct) {
