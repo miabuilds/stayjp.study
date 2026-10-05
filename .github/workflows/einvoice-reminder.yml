@@ -1,0 +1,28 @@
+name: E-invoice track reminder
+
+# 綠界電子發票「新增字軌」提醒:每逢雙月 19 號與 26 號台灣 09:00(01:00 UTC)寄信給 Mia。
+# 綠界規定每期雙月 18 號過後要去後台新增下一期字軌並按「通過」,沒做會開不出發票。
+# 26 號那封是保險(19 號沒處理的話再提醒一次);判重在 Firestore ops/einvoice_reminder。
+on:
+  schedule:
+    - cron: '0 1 19 2,4,6,8,10,12 *'
+    - cron: '0 1 26 2,4,6,8,10,12 *'
+  workflow_dispatch:
+    inputs:
+      force: { description: '1=同日重寄(測試用)', default: '' }
+
+jobs:
+  remind:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '22' }
+      - name: Install functions deps (firebase-admin)
+        run: npm ci --prefix functions --omit=dev --no-audit --no-fund
+      - name: Queue reminder mail
+        env:
+          GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
+          FORCE: ${{ github.event.inputs.force }}
+        run: node scripts/einvoice-reminder.mjs
