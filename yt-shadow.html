@@ -376,7 +376,7 @@ const YTS = (() => {
   //   (2026-10 用戶回饋 すずめ PV 聽寫/填空對不上 → 連同 4 支動漫預告、3 支 ANN 新聞一起下架;
   //    下架前先 node scripts/yt-seed.mjs probe <id> 看 manual:true 才放回來)
   // lv = 等級標籤(卡片角標 + 等級篩選);沒寫的用 LV_BY_CAT 推
-  const LV_BY_CAT = { '入門':'N5', '故事':'N5', 'Vlog':'N4', '新聞':'N4', '會話':'N4', '歌':'N3' };
+  const LV_BY_CAT = { '入門':'N5', '故事':'N5', 'Vlog':'N4', '新聞':'N4', '會話':'N4', '動漫':'N3', '歌':'N3' };
   const SAMPLES = [
     // ── 2026-10-02 Aki 先生(Akiko_Japanese_Conversations)N5 慢速聽力 8 支:用戶推薦「講得很慢、生字只有幾個」。
     //    全頻道 30 支都是人工日文字幕+開放嵌入(probe 過),要再加就從 scripts/yt-seed.mjs probe 開始 ──
@@ -427,6 +427,28 @@ const YTS = (() => {
     { v:'Xw3NjBuXMLY', cat:'Vlog', lv:'N3', t:'日本語散歩:東京駅から新橋まで', tag:'N4-N3 · 中日字幕' },
     { v:'PweksFQGzmI', cat:'Vlog', t:'私の日本での朝の過ごし方', tag:'生活作息 · 中日字幕' },
     { v:'kIDaXEnkjmk', cat:'Vlog', lv:'N3', t:'留学するか悩んでいる人に伝えたいこと', tag:'留學心情 · 中日字幕' },
+    // ── 2026-10-05 動漫(用戶:「影片放點流行的動漫題材吧」):全部官方頻道(THE FIRST TAKE/歌手官方/東宝・MBS・MAPPA 官方/oricon)
+    //    + 人工日文字幕(probe manual:true)+ 開放嵌入。預告片只收有台詞的;ASR 字幕一律不收(見上)。
+    //    落選原因紀錄:推しの子/呪術/フリーレン/SPY×FAMILY 官方 PV 全是 ASR;進撃 NC OP/ED 日文軌夾英文;Netflix ダンダダン片段只有喊聲 ──
+    { v:'ubU3yoL9I2s', cat:'動漫', lv:'N5', t:'ちいかわ 主題歌「ひとりごつ」', tag:'吉伊卡哇 · 30 秒 · 日英字幕' },
+    { v:'9rProUQlD-I', cat:'動漫', lv:'N3', t:'薬屋のひとりごと 第3期 本PV', tag:'藥師少女的獨語 · 台詞 · 中日字幕' },
+    { v:'HP5wg0kTh54', cat:'動漫', lv:'N3', t:'劇場版 薬屋のひとりごと 亡妃の秘宝 予告', tag:'藥師少女的獨語 · 電影版 · 中日字幕' },
+    { v:'M-l3mNWB7W8', cat:'動漫', lv:'N3', t:'緑黄色社会「花になって」THE FIRST TAKE', tag:'藥師少女的獨語 OP · 中日字幕' },
+    { v:'CkvWJNt77mU', cat:'動漫', lv:'N3', t:'ヨルシカ「晴る」MV', tag:'葬送的芙莉蓮 第2期 OP · 中日字幕' },
+    { v:'HB4iNVa746E', cat:'動漫', lv:'N3', t:'きただにひろし「ウィーアー!」THE FIRST TAKE', tag:'航海王 ONE PIECE · 中日字幕' },
+    { v:'YkVjY1F-Eoc', cat:'動漫', lv:'N3', t:'SPYAIR「オレンジ」MV', tag:'排球少年!! 垃圾場決戰 · 中日字幕' },
+    { v:'pEnaMPUCDm4', cat:'動漫', lv:'N2', t:'LiSA「明け星」feat. 梶浦由記 THE FIRST TAKE', tag:'鬼滅之刃 無限列車篇 · 日英字幕' },
+    { v:'SEX8OMU-Epw', cat:'動漫', lv:'N2', t:'花江夏樹(炭治郎役)得獎致詞', tag:'鬼滅之刃 · 聲優訪談 · 中日字幕' },
+    { v:'i0K40f-6mLs', cat:'動漫', lv:'N2', t:'キタニタツヤ「青のすみか」THE FIRST TAKE', tag:'咒術迴戰 懷玉・玉折 · 日英字幕' },
+    { v:'fhzKLBZJC3w', cat:'動漫', lv:'N2', t:'King Gnu「SPECIALZ」MV', tag:'咒術迴戰 澀谷事變 · 中日字幕' },
+    { v:'CbH2F0kXgTY', cat:'動漫', lv:'N2', t:'Official髭男dism「ミックスナッツ」MV', tag:'SPY×FAMILY 間諜家家酒 · 中日字幕' },
+    { v:'OFAow6fL0A0', cat:'動漫', lv:'N2', t:'GEMN「ファタール」THE FIRST TAKE', tag:'我推的孩子 第2期 OP · 中日字幕' },
+    { v:'v4yLeNt-kCU', cat:'動漫', lv:'N2', t:'チェンソーマン 本予告(MAPPA)', tag:'鏈鋸人 · 台詞 · 中日字幕' },
+    { v:'M2cckDmNLMI', cat:'動漫', lv:'N2', t:'米津玄師「KICK BACK」MV', tag:'鏈鋸人 OP · 日英字幕' },
+    { v:'LmZD-TU96q4', cat:'動漫', lv:'N2', t:'米津玄師「IRIS OUT」MV', tag:'鏈鋸人 蕾塞篇 · 中日字幕' },
+    { v:'Nw_XzGZ35As', cat:'動漫', lv:'N2', t:'ダンダダン OP映像 Creepy Nuts「オトノケ」', tag:'膽大黨 · 中日字幕' },
+    { v:'H6FUBWGSOIc', cat:'動漫', lv:'N2', t:'Creepy Nuts「Bling-Bang-Bang-Born」THE FIRST TAKE', tag:'肌肉魔法使 MASHLE · 中日字幕' },
+    { v:'A7cp6OVa0Qc', cat:'動漫', lv:'N2', t:'Official髭男dism「Same Blue」MV', tag:'藍色監獄 BLUE LOCK · 中日字幕' },
     { v:'NyUTYwZe_l4', cat:'歌', t:'YOASOBI「群青」THE FIRST TAKE', tag:'歌詞字幕' },
     { v:'MpYy6wwqxoo', cat:'歌', t:'LiSA「紅蓮華」THE FIRST TAKE', tag:'鬼滅 · 中日字幕' },
     { v:'4Q9DWZLaY2U', cat:'歌', t:'LiSA「炎」THE FIRST TAKE', tag:'鬼滅 · 中日字幕' },
@@ -1367,7 +1389,7 @@ const YTS = (() => {
     const g=document.getElementById('gal'); if(!g) return;
     const cats=['全部',...new Set(SAMPLES.map(x=>x.cat))];
     const en=I18n.getLang()==='en';
-    const catTx=c=>c==='全部'?(en?'All':cvt('全部')):(en?({'入門':'Beginner','故事':'Stories','Vlog':'Vlog','新聞':'News','會話':'Conversation','歌':'Songs'}[c]||c):cvt(c));
+    const catTx=c=>c==='全部'?(en?'All':cvt('全部')):(en?({'入門':'Beginner','故事':'Stories','Vlog':'Vlog','新聞':'News','會話':'Conversation','動漫':'Anime','歌':'Songs'}[c]||c):cvt(c));
     document.getElementById('galCats').innerHTML=cats.map(c=>`<button class="${c===galCat?'on':''}" onclick="YTS.setCat('${c}')">${esc(catTx(c))}</button>`).join('');
     const lvEl=document.getElementById('galLvs');
     if(lvEl) lvEl.innerHTML='<span class="lv-lb">'+enOr('程度','Level')+'</span>'+LVS.map(c=>`<button class="${c===galLv?'on':''}" onclick="YTS.setLv('${c}')">${esc(c==='全部'?(en?'All':cvt('全部')):c)}</button>`).join('');
@@ -1434,8 +1456,8 @@ const YTS = (() => {
     const en=I18n.getLang()==='en';
     const S=(n,zhT,enT,zhP,enP)=>`<div class="tut-step"><span class="tut-n">${n}</span><div><b>${en?enT:cvt(zhT)}</b><p>${en?enP:cvt(zhP)}</p></div></div>`;
     return S(1,'挑一支影片','Pick a video',
-        '首頁的片庫全部可以直接練——用上面的分類(入門、會話、故事、Vlog、歌、新聞)和程度(N5／N4／N3+)挑,點縮圖就開始,不用設定任何東西。',
-        'Every video in the gallery is ready to go — filter by category (Beginner, Conversation, Stories, Vlog, Songs, News) or level (N5 / N4 / N3+) and just tap a thumbnail.')
+        '首頁的片庫全部可以直接練——用上面的分類(入門、會話、故事、Vlog、動漫、歌、新聞)和程度(N5／N4／N3+)挑,點縮圖就開始,不用設定任何東西。',
+        'Every video in the gallery is ready to go — filter by category (Beginner, Conversation, Stories, Vlog, Anime, Songs, News) or level (N5 / N4 / N3+) and just tap a thumbnail.')
       + S(2,'四種練法,由淺入深','Four ways to practice',
         '<em>跟播</em>=影片一直播,字幕自動跳、當前句像 KTV 一樣刷色;<em>跟讀</em>=開麥跟著唸,唸到的字亮綠給分;<em>聽寫</em>=句子先遮住,聽完打出來對答案;<em>測驗</em>=聽句選句和克漏字,每題都有詳解。',
         '<em>Follow</em>: captions auto-advance with a karaoke highlight. <em>Shadow</em>: speak along and matched words light up with a score. <em>Dictation</em>: the line is hidden until you type it. <em>Quiz</em>: listening and cloze questions, each with an explanation.')
