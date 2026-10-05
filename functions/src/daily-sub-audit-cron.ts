@@ -20,7 +20,7 @@ export const dailySubAuditCron = functions.onSchedule(
     region: "asia-east1",
     maxInstances: 1,
     timeoutSeconds: 300,
-    memory: "256MiB",
+    memory: "512MiB",   // 2026-10-05:256 連兩天 OOM;主因已用 select() 修,這裡加倍當保險
   },
   async () => {
     // ── 活動碼到期掃除(2026-09-17,官方中秋碼 TSUKIMI 這類):expires_at 過了 → active:false,
@@ -41,8 +41,11 @@ export const dailySubAuditCron = functions.onSchedule(
         console.log(`[sub-audit] 活動碼 ${doc.id} 到期 → 停用,清掉 ${cleared} 個未付費帳號上的碼`);
       }
     } catch (e) { console.error("[sub-audit] 活動碼到期掃除失敗(不影響其餘稽核):", e); }
+    // ⚠️ 只抓 subscription 欄位:users 文件還帶 srs_data/word_notebook 等大物件,整份抓進來
+    //    2026-10-04~05 連兩天 256MiB OOM(用戶變多就撐不住)。select() 讓 Firestore 只回這一欄。
     const snap = await db.collection("users")
       .where("subscription.status", "in", ["active", "trialing", "cancelled", "expired", "refunded"])
+      .select("subscription")
       .get();
 
     const now = nowMs();
