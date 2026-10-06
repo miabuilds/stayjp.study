@@ -102,7 +102,7 @@
   function nagLine() { const h = Math.floor(Date.now() / 3600000); const p = NAG[h % NAG.length]; return L(p[0], p[1]); }
   function modeChip() {
     const m = modeInfo();
-    return '<button type="button" class="sp-mode-chip sp-mode-' + mode() + '" onclick="StudyPlan.openSettings()">' + L(m.name[0] + '模式', m.name[1]) + '</button>';
+    return '<button type="button" class="sp-mode-chip sp-mode-' + mode() + '" onclick="StudyPlan.openSettings()">' + L('模式:' + m.name[0], 'Mode: ' + m.name[1]) + ' ›</button>';
   }
   // 情勒模式:每日專注倒數(分鐘由 focus-time.js 心跳寫進 study_log.minutes)
   function timerHtml() {
@@ -117,9 +117,11 @@
   // 第一次進面板:先選模式(選了才收起)
   function chooserHtml() {
     if (get().modeChosen) return '';
-    return '<div class="sp-choose"><div class="sp-choose-t">' + L('先選一個模式,隨時可改', 'Pick a mode — change anytime') + '</div>'
-      + Object.keys(MODES).map(k => { const m = MODES[k]; return '<button type="button" class="sp-choice sp-mode-' + k + '" onclick="StudyPlan.setMode(\'' + k + '\')"><b>' + L(m.name[0], m.name[1]) + '</b><small>' + L(m.desc[0], m.desc[1]) + '</small></button>'; }).join('')
-      + '</div>';
+    // 2026-10:原本三張大卡佔掉半張複習卡 → 縮成一排三顆(名稱 + 每天份量),細節在 ⚙ 設定裡
+    const short = { easy: ['每天 10 個動作', '10 actions/day'], normal: ['每天 30 個動作', '30 actions/day'], intense: ['60 個 + 專注 20 分', '60 + 20-min focus'] };
+    return '<div class="sp-choose"><div class="sp-choose-t">' + L('先選一個模式,隨時可改', 'Pick a mode — change anytime') + '</div><div class="sp-choose-row">'
+      + Object.keys(MODES).map(k => { const m = MODES[k]; return '<button type="button" class="sp-choice sp-mode-' + k + '" onclick="StudyPlan.setMode(\'' + k + '\')"><b>' + L(m.name[0], m.name[1]) + '</b><small>' + L(short[k][0], short[k][1]) + '</small></button>'; }).join('')
+      + '</div></div>';
   }
   function ensureModeCss() {
     if (document.getElementById('spModeCss')) return;
@@ -136,9 +138,19 @@
       '.sp-timer-row{display:flex;justify-content:space-between;font-size:12.5px;color:var(--tx2)}.sp-timer-row b{color:var(--tx);font-size:14px}',
       '.sp-bar{height:6px;border-radius:999px;background:var(--prog-empty,#e5e7eb);margin:8px 0;overflow:hidden}.sp-bar i{display:block;height:100%;background:var(--ac);border-radius:999px;transition:width .4s}',
       '.sp-nag{font-size:13px;line-height:1.5;color:var(--tx)}',
-      '.sp-choose{margin:12px 0 4px;display:grid;gap:8px}.sp-choose-t{font-size:12.5px;color:var(--tx2)}',
-      '.sp-choice{display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left;font:inherit;background:var(--bg);border:1.5px solid var(--bd);border-radius:14px;padding:10px 12px;cursor:pointer;color:var(--tx)}.sp-choice b{font-size:14px}.sp-choice small{font-size:12px;color:var(--tx2);line-height:1.4}',
+      '.sp-choose{margin:14px 0 2px;display:grid;gap:8px}.sp-choose-t{font-size:12.5px;color:var(--tx2)}.sp-choose-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}',
+      '.sp-choice{display:flex;flex-direction:column;align-items:center;gap:3px;text-align:center;font:inherit;background:var(--bg);border:1.5px solid var(--bd);border-radius:14px;padding:10px 6px;cursor:pointer;color:var(--tx);min-width:0}.sp-choice b{font-size:14px}.sp-choice small{font-size:11px;color:var(--tx2);line-height:1.35}',
       '.sp-choice.sp-mode-intense{border-color:#F3C6BA}.sp-choice.sp-mode-easy{border-color:#CDE8D6}',
+      '.sp-rv .sp-top b{font-size:13px}.sp-rv-main{display:flex;align-items:center;gap:14px;margin-top:14px}',
+      '.sp-rv-ic{flex:none;width:52px;height:52px;border-radius:16px;background:var(--soft,rgba(var(--ac-rgb),.12));color:var(--ac);display:flex;align-items:center;justify-content:center}.sp-rv-ic svg{width:26px!important;height:26px!important;stroke-width:2.2}',
+      '.sp-rv-img{flex:none;width:64px;height:auto}',
+      '.sp-rv-tx{min-width:0}.sp-rv-h{font-size:18px;font-weight:900;color:var(--tx);line-height:1.35}.sp-rv-h b{font-size:26px;color:var(--ac);font-variant-numeric:tabular-nums;margin:0 1px}.sp-rv-dot{color:var(--tx3);font-weight:400;margin:0 7px}',
+      '.sp-rv-s{font-size:12.5px;color:var(--tx2);margin-top:3px;line-height:1.45}',
+      '.sp-rv-go{display:flex;align-items:center;justify-content:center;gap:8px;padding:15px 14px;font-size:16.5px;border-radius:14px;box-shadow:0 4px 0 color-mix(in srgb,var(--ac) 70%,#000)}.sp-rv-go:active{transform:translateY(2px)!important;box-shadow:0 2px 0 color-mix(in srgb,var(--ac) 70%,#000)}.sp-rv-go svg{width:16px!important;height:16px!important}',
+      '.sp-rv.empty{background:linear-gradient(160deg,var(--correct-bg,#dcfce7),var(--bg2) 70%)}',
+      '.sp-rv-hint{font-size:11.5px;color:var(--tx3);margin-top:14px;padding-top:12px;border-top:1px solid var(--bd);line-height:1.5}',
+      '.sp-rv.sp-pop .sp-rv-img{animation:spPop .8s cubic-bezier(.3,1.6,.5,1) .1s backwards}@keyframes spPop{0%{transform:scale(.3) rotate(-12deg);opacity:0}70%{transform:scale(1.12)}100%{transform:none;opacity:1}}',
+      '@media (prefers-reduced-motion:reduce){.sp-rv.sp-pop .sp-rv-img{animation:none}}',
       '.sp-seg{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:6px 0 12px}',
       '.sp-seg button{font:inherit;display:flex;flex-direction:column;gap:3px;align-items:flex-start;text-align:left;background:var(--bg);border:1.5px solid var(--bd);border-radius:12px;padding:10px;cursor:pointer;color:var(--tx)}.sp-seg button b{font-size:13.5px}.sp-seg button small{font-size:11px;color:var(--tx2);line-height:1.35}',
       '.sp-seg button.on{border-color:var(--ac);background:var(--soft,rgba(var(--ac-rgb),.08))}',
@@ -162,6 +174,16 @@
       out.push({ level: key.slice(0, ci), word: key.slice(ci + 1), ts: e.nextReviewTs || 0 });
     });
     return out.sort((a, b) => a.ts - b.ts);
+  }
+  // 明天(本地日)會到期、但現在還沒到期的張數(唯讀,只給面板「明天有 N 張」用)
+  function dueTomorrow(d) {
+    d = d || srsData(); const now = Date.now(), tmr = DayKey.addDays(today(), 1); let n = 0;
+    Object.keys(d).forEach(key => {
+      const e = d[key]; if (!e || key.indexOf(':') < 0) return;
+      if (typeof e.nextReviewTs === 'number') { if (e.nextReviewTs > now && dayOf(e.nextReviewTs) === tmr) n++; }
+      else if (e.nextReview === tmr) n++;
+    });
+    return n;
   }
   // 新字:依單字集排序、跳過已學與關掉的主題
   function pickNew(count, d) {
@@ -243,14 +265,22 @@
     // 今日目標濃縮成卡底一條:「今日目標 5 / 30」+ 細進度條(點了看說明)
     const goalLine = g ? '<button type="button" class="sp-goal" onclick="dailyHelp&&dailyHelp()"><span>' + L('今日目標', 'Today’s goal') + '</span><span class="sp-goal-n">' + Math.min(g.done, g.goal) + ' / ' + g.goal + '</span><i class="sp-goal-bar"><b style="width:' + Math.min(100, Math.round(g.done / g.goal * 100)) + '%"></b></i></button>' : '';
     if (get().rhythm === 'path' && root.Path) {
-      // 關卡節奏:新單字由關卡帶,這張卡只管到期複習 + 模式/倒數/今日目標
+      // 關卡節奏:新單字由關卡帶,這張卡只管到期複習 + 模式/倒數(今日目標 2026-10 移到招呼卡的圓環)
+      // 標題直接講「幾張、幾分鐘」+ 一顆大開始;清空時改成慶祝 + 明天有幾張到期。模式選擇收進「模式:標準 ›」chip / ⚙
       const gear = '<span class="sp-top-r">' + modeChip() + '<button type="button" class="sp-gear" onclick="StudyPlan.openSettings()" aria-label="settings"><i data-ic=settings></i></button></span>';
-      return '<div class="sp-card sp-review">'
-        + '<div class="sp-top"><b>' + (d ? L('待複習 ' + d + ' 張', d + ' cards to review') : L('複習都清完了 ✓', 'Reviews all clear ✓')) + '</b>' + gear + '</div>'
+      const mins = Math.max(1, Math.ceil(d * 15 / 60));   // 一張約 15 秒,無條件進位
+      const tmr = d ? 0 : dueTomorrow();
+      return '<div class="sp-card sp-review sp-rv' + (d ? '' : ' empty') + '" data-due="' + d + '">'
+        + '<div class="sp-top"><b>' + L('間隔複習', 'Reviews') + '</b>' + gear + '</div>'
+        + (d
+          ? '<div class="sp-rv-main"><span class="sp-rv-ic"><i data-ic=refresh></i></span><div class="sp-rv-tx"><div class="sp-rv-h">' + L('待複習 <b>' + d + '</b> 張', '<b>' + d + '</b> cards due') + '<span class="sp-rv-dot">·</span>' + L('約 ' + mins + ' 分鐘', '~' + mins + ' min') + '</div>'
+            + '<div class="sp-rv-s">' + L('現在複習剛好,拖久就忘了', 'Review now, before they fade') + '</div></div></div>'
+            + '<button type="button" class="sp-cta sp-rv-go" onclick="SRS.start(null,{reviewOnly:true})"><i data-ic=play></i> ' + L('開始複習', 'Start review') + '</button>'
+          : '<div class="sp-rv-main"><img class="sp-rv-img" src="images/mascot/tanuki-p06.png" alt=""><div class="sp-rv-tx"><div class="sp-rv-h">' + L('今天複習完了!', 'Reviews done for today!') + '</div>'
+            + '<div class="sp-rv-s">' + (tmr ? L('明天有 ' + tmr + ' 張到期', tmr + ' due tomorrow') : L('明天沒有到期的卡,輕鬆一下', 'Nothing due tomorrow — enjoy')) + '</div></div></div>')
         + chooserHtml()
-        + '<div class="sp-sub">' + (d ? L('關卡學新的,這裡清舊的;大約 ' + Math.max(1, Math.round(d / 4)) + ' 分鐘', 'Levels teach new words; this clears due reviews (~' + Math.max(1, Math.round(d / 4)) + ' min)') : L('新單字在關卡裡學,背過的字到期會回到這裡', 'New words come from the path; learned words return here when due')) + '</div>'
-        + (d ? '<button type="button" class="sp-cta sp-cta-sub" onclick="SRS.start(null,{reviewOnly:true})">' + L('複習 ' + d + ' 張', 'Review ' + d) + ' →</button>' : '')
         + timerHtml()
+        + '<div class="sp-rv-hint">' + L('新單字在關卡裡學,背過的字到期會回到這裡', 'New words come from the path; learned words return here when due') + '</div>'
         + goalLine
         + '</div>';
     }
@@ -397,5 +427,5 @@
   }
   if (document.head) ensureCss();
 
-  root.StudyPlan = { get, set, mode, modeInfo, MODES, goal, setMode, setMinTarget, rhythm, setRhythm, minutesToday, nagLine, sets, plan, buildQueue, sig, greeting, hubCardHtml, openSettings, closeSettings, toggleLevel, moveLevel, toggleTheme, newToday, enabledLevels, LEVELS, pitchOf, pitchMark, voice, setVoice, VOICES };
+  root.StudyPlan = { get, set, mode, modeInfo, MODES, goal, setMode, setMinTarget, rhythm, setRhythm, minutesToday, nagLine, sets, plan, buildQueue, sig, greeting, hubCardHtml, dueTomorrow, openSettings, closeSettings, toggleLevel, moveLevel, toggleTheme, newToday, enabledLevels, LEVELS, pitchOf, pitchMark, voice, setVoice, VOICES };
 })(window);

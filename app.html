@@ -307,6 +307,43 @@ select.lang-btn {
 .hub-petals .bl2 { width: 19px; top: 30px; right: 18px; fill: #EABBAC; opacity: .5; transform: rotate(22deg); }
 .hub-petals .bl3 { width: 15px; bottom: 16px; left: 30px; fill: #E4A594; opacity: .45; transform: rotate(8deg); }
 .hub-petals .bl4 { width: 13px; bottom: 22px; right: 30px; fill: #EABBAC; opacity: .4; transform: rotate(-18deg); }
+/* 招呼卡改版(2026-10):左問候+連續天數,右今日目標圓環,下排本週 7 天火焰 */
+.hub-hero.hh { text-align: left; padding: 18px 16px 14px; }
+.hh .hh-main { display: flex; align-items: center; justify-content: space-between; gap: 14px; }
+.hh .hh-hello { flex: 1; min-width: 0; align-items: flex-start; gap: 7px; }
+.hh .hh-hello h2 { font-size: 21px; }
+.hh .hub-petals .bl2, .hh .hub-petals .bl3, .hh .hub-petals .bl4 { display: none; }   /* 右上是圓環、下排是週火焰,花瓣會壓到 */
+.hh-streak { display: inline-flex; align-items: center; gap: 5px; font-weight: 900; font-size: 14px; color: var(--ac); background: var(--bg2); border: 1px solid rgba(var(--ac-rgb),.35); border-radius: 999px; padding: 4px 11px 4px 9px; }
+.hh-streak svg path { fill: currentColor; }
+.hh .hub-motto { line-height: 1.45; }
+.hh-ring { position: relative; flex: none; width: 104px; height: 104px; border: 0; background: none; padding: 0; cursor: pointer; color: var(--tx); font: inherit; -webkit-tap-highlight-color: transparent; }
+.hh-ring svg { width: 100%; height: 100%; transform: rotate(-90deg); display: block; }
+.hh-ring-bg { fill: none; stroke: var(--bd); stroke-width: 9; }
+.hh-ring-fg { fill: none; stroke: var(--ac); stroke-width: 9; stroke-linecap: round; transition: stroke-dashoffset .9s cubic-bezier(.3,.7,.3,1), stroke .3s; }
+.hh-ring.met .hh-ring-fg { stroke: var(--correct-bd); }
+.hh-ring-c { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1; }
+.hh-ring-c b { font-size: 30px; font-weight: 900; letter-spacing: -1px; font-variant-numeric: tabular-nums; }
+.hh-ring-c small { font-size: 12px; font-weight: 700; color: var(--tx2); margin-top: 2px; font-variant-numeric: tabular-nums; }
+.hh-ring-c em { font-style: normal; font-size: 10.5px; font-weight: 700; color: var(--tx3); margin-top: 5px; letter-spacing: .04em; }
+.hh-ring-ok { width: 40px; height: 40px; border-radius: 50%; background: var(--correct-bd); color: #fff; display: flex; align-items: center; justify-content: center; }
+.hh-ring-ok svg { width: 24px !important; height: 24px !important; stroke-width: 3; transform: none; }
+.hh-ring.hh-bump { animation: hhBump .7s cubic-bezier(.3,1.6,.5,1) .5s; }
+@keyframes hhBump { 0%,100% { transform: scale(1); } 45% { transform: scale(1.08); } }
+.hh-week { position: relative; z-index: 1; display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--bd); }
+.hh-day { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.hh-dot { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: var(--bg3); color: var(--tx3); border: 2px solid transparent; }
+.hh-dot svg { width: 17px !important; height: 17px !important; }
+.hh-day.off .hh-dot { opacity: .55; }
+.hh-day.future .hh-dot { background: transparent; border: 2px dashed var(--bd); color: var(--bd); }
+.hh-day.on .hh-dot { background: rgba(var(--ac-rgb),.14); color: var(--ac); }
+.hh-day.on .hh-dot svg path { fill: rgba(var(--ac-rgb),.35); }
+.hh-day.goal .hh-dot { background: var(--ac); color: #fff; }
+.hh-day.goal .hh-dot svg path { fill: #fff; }
+.hh-day.today .hh-dot { border-color: var(--ac); box-shadow: 0 0 0 3px rgba(var(--ac-rgb),.15); }
+.hh-day.today.todo .hh-dot { background: var(--bg2); color: var(--ac); }
+.hh-dl { font-size: 11px; font-weight: 700; color: var(--tx3); }
+.hh-day.today .hh-dl { color: var(--ac); font-weight: 900; }
+@media (prefers-reduced-motion: reduce) { .hh-ring-fg { transition: none; } .hh-ring.hh-bump { animation: none; } }
 .hub-foot { display: flex; flex-direction: column; align-items: center; margin-top: 24px; }
 .hub-foot img { width: 92px; height: auto; opacity: .95; }
 .hub-foot span { font-size: 12px; color: var(--tx3); margin-top: 6px; }
@@ -2809,6 +2846,56 @@ function hubYtStripHtml(L) {
     '<a class="yt-strip-all" href="yt-shadow.html">' + L('顯示全部', 'See all') + ' ›</a></div>' +
     '<div class="yt-strip-sc">' + cards + '</div></div>';
 }
+// ── 招呼卡:今日目標圓環 + 本週 7 天火焰(2026-10 改版;資料全沿用 _hubToday / study_log / 目前模式的 GOAL)──
+const _HUB_RING_C = 263.89;   // 2π × r42
+function _hubDayTotal(d) { return d ? ((d.vocab || 0) + (d.grammar || 0) + (d.quiz || 0)) : 0; }   // 跟 Calendar.getStreaks 判斷「有讀」同一套欄位
+function _hubWeekHtml(L, GOAL, done) {
+  let sl = {}; try { sl = JSON.parse(localStorage.getItem('study_log') || '{}') || {}; } catch (e) {}
+  const today = DayKey.today(), t = DayKey.parse(today);
+  const mon = DayKey.addDays(today, -((t.getDay() + 6) % 7));   // 週一起算
+  const names = L('一,二,三,四,五,六,日', 'M,T,W,T,F,S,S').split(',');
+  let h = '';
+  for (let i = 0; i < 7; i++) {
+    const k = DayKey.addDays(mon, i);
+    const n = k === today ? done : _hubDayTotal(sl[k]);   // 今天用跟圓環同一個數(含雲端合併後的值)
+    const st = k > today ? 'future' : n >= GOAL ? 'goal' : n > 0 ? 'on' : (k === today ? 'todo' : 'off');
+    h += '<span class="hh-day ' + st + (k === today ? ' today' : '') + '"><span class="hh-dot"><i data-ic=fire></i></span><span class="hh-dl">' + names[i] + '</span></span>';
+  }
+  return '<div class="hh-week" aria-label="' + L('本週', 'This week') + '">' + h + '</div>';
+}
+function _hubRingHtml(L, GOAL, done) {
+  const pct = Math.min(1, done / GOAL), off = (_HUB_RING_C * (1 - pct)).toFixed(2), met = done >= GOAL;
+  return '<button type="button" class="hh-ring' + (met ? ' met' : '') + '" onclick="dailyHelp&&dailyHelp()" aria-label="' + L('今日目標', 'Today’s goal') + ' ' + Math.min(done, GOAL) + ' / ' + GOAL + '">'
+    + '<svg viewBox="0 0 100 100" aria-hidden="true"><circle class="hh-ring-bg" cx="50" cy="50" r="42"/><circle class="hh-ring-fg" cx="50" cy="50" r="42" stroke-dasharray="' + _HUB_RING_C + '" stroke-dashoffset="' + off + '" data-off="' + off + '"/></svg>'
+    + '<span class="hh-ring-c">' + (met ? '<span class="hh-ring-ok"><i data-ic=check></i></span>' : '<b>' + done + '</b><small>/ ' + GOAL + '</small>') + '<em>' + (met ? L('達標', 'Done') : L('今日目標', 'Today')) + '</em></span>'
+    + '</button>';
+}
+// 回面板時的小回饋:跟上次畫的數字比(localStorage hub_seen_v1),目標數變多 → 圓環從舊值長到新值;
+// 關卡今日數變多 → 最新打勾節點彈一下;複習從有到清空 → 小狸跳出來。只讀 DOM 上的 data-*,不重算。
+function _hubFeedback(mn, firstHub, done, GOAL) {
+  let prev = null; try { prev = JSON.parse(localStorage.getItem('hub_seen_v1') || 'null'); } catch (e) {}
+  const today = DayKey.today();
+  const q = mn.querySelector('.pq'), rv = mn.querySelector('.sp-rv');
+  const cur = { d: today, done: done, tc: q ? +q.dataset.tc : -1, lv: q ? q.dataset.lv : '', due: rv ? +rv.dataset.due : -1 };
+  const same = prev && prev.d === today;
+  // 圓環:第一次進頁從 0 長上來(沿用舊進度條的進場);之後只有數字變多才動
+  const fg = mn.querySelector('.hh-ring-fg');
+  const fromDone = firstHub ? 0 : (same && prev.done < done ? prev.done : done);
+  if (fg && fromDone < done && fromDone < GOAL) {
+    const target = fg.dataset.off;
+    fg.style.transition = 'none';
+    fg.style.strokeDashoffset = (_HUB_RING_C * (1 - Math.min(1, fromDone / GOAL))).toFixed(2);
+    fg.getBoundingClientRect();   // 強制套用起點
+    requestAnimationFrame(() => { fg.style.transition = ''; fg.style.strokeDashoffset = target; });
+    if (!firstHub) { const r = mn.querySelector('.hh-ring'); if (r) r.classList.add('hh-bump'); }
+  }
+  if (same && q && prev.lv === cur.lv && cur.tc > prev.tc) {
+    const last = mn.querySelector('.pq-node[data-k="' + (+q.dataset.cur - 1) + '"]');
+    if (last) last.classList.add('pq-pop');
+  }
+  if (same && rv && prev.due > 0 && cur.due === 0) rv.classList.add('sp-pop');
+  try { localStorage.setItem('hub_seen_v1', JSON.stringify(cur)); } catch (e) {}
+}
 function renderHub() {
   const mn = document.getElementById('mn');
   if (!mn) return;
@@ -2838,27 +2925,28 @@ function renderHub() {
   }
   // 內容簽章:載入時 doRender 會被叫多次,資料相同就不重繪 → 只渲染一次,進場動畫不被打斷、不閃
   const _jrDone = (() => { try { return window.Journey ? Journey.stats().done : ''; } catch (e) { return ''; } })();
-  const _sig = [(typeof I18n !== 'undefined' && I18n.getLang ? I18n.getLang() : ''), streak, done, wod ? wod.w : '', lm || '', ll || '', _jrDone, (window.StudyPlan ? StudyPlan.sig() : ''), (window.Path ? Path.sig() : ''), _gr ? _gr.slot : '', (window.MyVocab ? MyVocab.count() : 0), (window.Omikuji ? (Omikuji.drawnToday() ? 1 : 0) : '')].join('|');
+  const _sig = [(typeof I18n !== 'undefined' && I18n.getLang ? I18n.getLang() : ''), streak, done, wod ? wod.w : '', lm || '', ll || '', _jrDone, (window.StudyPlan ? StudyPlan.sig() : ''), (window.Path ? Path.sig() : ''), _gr ? _gr.slot : '', (window.MyVocab ? MyVocab.count() : 0), (window.Omikuji ? (Omikuji.drawnToday() ? 1 : 0) : ''), DayKey.today(), GOAL].join('|');
   if (_sig === _hubSig && mn.querySelector('.hub')) return;
   _hubSig = _sig;
   const blossom = c => '<svg class="bl ' + c + '" viewBox="0 0 40 40"><g><ellipse cx="20" cy="11" rx="4.6" ry="7.4"/><ellipse cx="20" cy="11" rx="4.6" ry="7.4" transform="rotate(72 20 20)"/><ellipse cx="20" cy="11" rx="4.6" ry="7.4" transform="rotate(144 20 20)"/><ellipse cx="20" cy="11" rx="4.6" ry="7.4" transform="rotate(216 20 20)"/><ellipse cx="20" cy="11" rx="4.6" ry="7.4" transform="rotate(288 20 20)"/></g><circle cx="20" cy="20" r="2.6" fill="#fff"/></svg>';
   const hubHtml =
     '<div class="hub">'
     + '<aside class="hub-left">'
-      + '<div class="hub-hero">'
+      + '<div class="hub-hero hh">'
         + '<div class="hub-petals">' + blossom('bl1') + blossom('bl2') + blossom('bl3') + blossom('bl4') + '</div>'
-        + '<div class="hub-hero-main">'
-          + '<img class="hub-mascot2" src="images/mascot/tanuki-hero.png" alt="">'
-          + '<div class="hub-hello"><h2>' + greet + '</h2>'
-            + (streak > 0 ? '<span class="hub-streak"><i data-ic=fire></i> ' + L('連續 ', '') + streak + L(' 天', 'd') + '</span>' : '')
+        + '<div class="hub-hero-main hh-main">'
+          + '<div class="hub-hello hh-hello"><h2>' + greet + '</h2>'
+            + (streak > 0 ? '<span class="hub-streak hh-streak"><i data-ic=fire></i> ' + L('連續 ', '') + streak + L(' 天', '-day streak') + '</span>' : '')
             + '<div class="hub-motto">' + motto + '</div>'
           + '</div>'
+          + _hubRingHtml(L, GOAL, done)
         + '</div>'
+        + _hubWeekHtml(L, GOAL, done)
       + '</div>'
       // 每日計畫卡(獨立一張,今日目標濃縮成卡底一條細線;2026-09-17 Mia:面板太擠)
       // 關卡節奏:今日關卡卡在最上面、計畫卡縮成複習卡;自由節奏:計畫卡在上、闖關卡在下
       + (_pathFirst && window.Path ? Path.hubCardHtml() : '')
-      + (window.StudyPlan ? StudyPlan.hubCardHtml({ done: done, goal: GOAL, pct: firstHub ? 0 : pct }) : '')
+      + (window.StudyPlan ? StudyPlan.hubCardHtml(null) : '')   // 今日目標改在招呼卡圓環(2026-10),卡底不再重複一條
       + (!_pathFirst && window.Path ? Path.hubCardHtml() : '')
       + resume
       + (wod ? '<div class="hub-wod">'
@@ -2919,9 +3007,8 @@ function renderHub() {
   if (firstHub) {
     if (hubEl) hubEl.classList.add('hub-anim');   // 進場動畫只播第一次
     _hubAnimated = true;
-    // 進度條第一次載入時從 0 長到目標值,一點小動感
-    requestAnimationFrame(() => { const f = mn.querySelector('.hub-goal-fill'); if (f) f.style.width = pct + '%'; });
   }
+  try { _hubFeedback(mn, firstHub, done, GOAL); } catch (e) {}   // 圓環長上來 / 新打勾節點彈一下 / 複習清空小狸跳出
   // 達標彩蛋:每天第一次打開面板且已達標時放一次
   if (done >= GOAL) {
     try {
