@@ -234,6 +234,13 @@
   // 今日任務(2026-10 改版:迷你闖關小徑,多鄰國式):今天要過的關畫成圓形節點 + 連線,
   // 目前這關放大+脈動光圈、旁邊站小狸,下面一顆大「開始」。點節點行為跟以前一樣 = Path.startUnit(k)。
   // 資料全部沿用:currentIndex / todayCount / done[k] 星等 / isSkipped / StudyPlan.modeInfo().units。
+  // 小狸隨狀態換表情(Mia 2026-10-06:一個畫面一隻主角就好,用表情變化取代多放圖案)
+  //   還沒開始=拿書等你;做了一半=握拳加油;全部做完=舉手歡呼;晚上 10 點後還沒開始=打瞌睡
+  function mascotFor(tc, allDone) {
+    if (allDone) return 'tanuki-yatta.png';
+    if (tc > 0) return 'tanuki-ganbaro.png';
+    return new Date().getHours() >= 22 ? 'tanuki-sleep.png' : 'tanuki-hero.png';
+  }
   function questCardHtml(lv, us) {
     const cur = currentIndex(lv), doneMap = lvProg(lv).done, doneN = Object.keys(doneMap).length, total = us.length;
     const suggest = (root.StudyPlan && StudyPlan.modeInfo) ? StudyPlan.modeInfo().units : 2;
@@ -271,7 +278,7 @@
       + '<div class="pq-head">' + head + '</div>'
       + '<div class="pq-sub">' + sub + '</div>'
       + '<div class="pq-track"><div class="pq-path">' + nodes + '</div>'
-        + '<img class="pq-mascot' + (allDone ? ' yay' : '') + '" src="images/mascot/' + (allDone ? 'tanuki-p06.png' : 'tanuki-hero.png') + '" alt=""></div>'
+        + '<img class="pq-mascot' + (allDone ? ' yay' : '') + '" src="images/mascot/' + mascotFor(tc, allDone) + '" alt=""></div>'
       + (allDone
         ? (cur < total ? '<button type="button" class="pt-cta pt-cta-sub pq-go" onclick="Path.startUnit(' + cur + ')">' + L('再多一關', 'One more') + ' · ' + nameOf(us[cur]) + '</button>' : '')
         : '<button type="button" class="pt-cta pq-go" onclick="Path.startUnit(' + cur + ')"><i data-ic=play></i> ' + L('開始', 'Start') + '</button>')
@@ -625,11 +632,11 @@
       '.pq-lbl{font-size:11.5px;font-weight:700;color:var(--tx2);white-space:nowrap}.pq-node.cur .pq-lbl{color:var(--ac);font-weight:900}',
       '.pq-stars{display:flex;gap:1px;line-height:1}.pq-stars i svg{width:12px!important;height:12px!important;color:var(--bd)}.pq-stars i.on svg{color:#F5B301}.pq-stars i.on svg path{fill:#F5B301}',
       '.pq-known{font-size:10.5px;color:var(--tx3)}',
-      '.pq-mascot{flex:none;width:64px;height:auto;align-self:flex-end;animation:hubBob 3.2s ease-in-out infinite}.pq-mascot.yay{width:70px}',
+      '.pq-mascot{flex:none;width:64px;height:auto;align-self:flex-end;animation:hubBob 3.2s ease-in-out infinite}.pq-mascot.yay{width:76px}.pq-mascot[src*="sleep"]{width:88px}',
       '.pq-go{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:14px;padding:15px 14px;font-size:16.5px;border-radius:14px;box-shadow:0 4px 0 color-mix(in srgb,var(--ac) 70%,#000)}.pq-go:active{transform:translateY(2px);box-shadow:0 2px 0 color-mix(in srgb,var(--ac) 70%,#000)}.pq-go svg{width:16px!important;height:16px!important}',
       '.pq-go.pt-cta-sub{box-shadow:0 3px 0 var(--bd);border:1px solid var(--bd);font-size:14.5px;padding:13px 14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block}',
       '.pq.cleared{background:linear-gradient(160deg,var(--correct-bg,#dcfce7),var(--bg2) 70%)}',
-      '.pq-foot{display:flex;align-items:center;gap:10px;margin-top:14px;padding-top:12px;border-top:1px solid var(--bd);font-size:11.5px;color:var(--tx3)}.pq-lvn{flex:none;font-variant-numeric:tabular-nums}.pq-minibar{flex:1;height:4px;border-radius:999px;background:var(--bd);overflow:hidden}.pq-minibar b{display:block;height:100%;background:var(--tx3);border-radius:999px}.pq-foot .pt-link{flex:none;font-size:11.5px}',
+      '.pq-foot{display:flex;align-items:center;gap:10px;margin-top:14px;padding-top:12px;padding-right:64px;border-top:1px solid var(--bd);font-size:11.5px;color:var(--tx3)}.pq-lvn{flex:none;font-variant-numeric:tabular-nums}.pq-minibar{flex:1;height:4px;border-radius:999px;background:var(--bd);overflow:hidden}.pq-minibar b{display:block;height:100%;background:var(--tx3);border-radius:999px}.pq-foot .pt-link{flex:none;font-size:11.5px}',
       // 剛過完一關回面板:最新那顆打勾節點彈一下
       '.pq-node.pq-pop .pq-dot{animation:pqPop .7s cubic-bezier(.3,1.6,.5,1) .15s backwards}.pq-node.pq-pop .pq-dot svg{animation:pqTick .5s ease .45s backwards}',
       '@keyframes pqPop{0%{transform:scale(.4);background:var(--ac)}60%{transform:scale(1.18)}100%{transform:scale(1)}}@keyframes pqTick{from{opacity:0;transform:scale(.3) rotate(-25deg)}to{opacity:1;transform:none}}',
