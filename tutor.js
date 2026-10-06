@@ -239,15 +239,42 @@
   }
 
   function currentUser() { try { return (typeof firebase !== 'undefined' && firebase.auth) ? firebase.auth().currentUser : null; } catch (e) { return null; } }
+  // ⚠️ 登入狀態是非同步從 IndexedDB 還原的:頁面剛開就按「解析」時 currentUser 還是 null,
+  //    不能直接判定沒登入(2026-10-06 Mia:明明登入又是 Premium,卻叫她用 Google 登入)。
+  //    第一次 onAuthStateChanged 回來才算「確定」,最多等 4 秒。
+  var _authReady = null;
+  function authReady() {
+    if (_authReady) return _authReady;
+    _authReady = new Promise(function (res) {
+      try {
+        if (typeof firebase === 'undefined' || !firebase.auth) return res(null);
+        var done = false, t = setTimeout(function () { if (!done) { done = true; res(currentUser()); } }, 4000);
+        var off = firebase.auth().onAuthStateChanged(function (u) { if (done) return; done = true; clearTimeout(t); try { off(); } catch (e) {} res(u); });
+      } catch (e) { res(currentUser()); }
+    });
+    return _authReady;
+  }
+  function isNative() { try { return !!(root.STAYJP_NATIVE && root.STAYJP_NATIVE.isNativeApp && root.ReactNativeWebView); } catch (e) { return false; } }
+  // App 內:交給原生登入選單(Google / Apple 都有;WebView 裡網頁 OAuth 會被擋)
+  root.__tutorNativeLogin = function () {
+    try { root.ReactNativeWebView.postMessage(JSON.stringify({ type: 'OPEN_LOGIN', lang: (localStorage.getItem('ui_lang') || 'zh-TW') })); } catch (e) {}
+  };
   function needLogin() {
-    var html = L('登入後就能問小狸(免費每天 2 次,Premium 每天 30 次)。', 'Sign in to ask the tutor (free: 2/day, Premium: 30/day).') + ' ';
-    html += (typeof root.loginWith === 'function') ? '<button type="button" onclick="loginWith(\'google\')">' + L('用 Google 登入', 'Sign in with Google') + '</button>' : '<a href="account.html">' + L('前往登入', 'Sign in') + '</a>';
+    var html = L('先登入,就能請小狸解析這句。', 'Sign in to ask the tutor about this sentence.') + ' ';
+    if (isNative()) {
+      html += '<button type="button" onclick="__tutorNativeLogin()">' + L('登入', 'Sign in') + '</button>';
+    } else if (typeof root.loginWith === 'function') {
+      html += '<button type="button" onclick="loginWith(\'google\')">' + L('用 Google 登入', 'Sign in with Google') + '</button> '
+        + '<button type="button" onclick="loginWith(\'apple\')">' + L('用 Apple 登入', 'Sign in with Apple') + '</button>';
+    } else {
+      html += '<a href="account.html">' + L('前往登入', 'Sign in') + '</a>';
+    }
     addMsg('ai', html, 'err');
   }
 
   async function ask(text, mode) {
     text = String(text || '').trim(); if (!text || busy) return;
-    var user = currentUser(); if (!user) { needLogin(); return; }
+    var user = currentUser() || await authReady(); if (!user) { needLogin(); return; }
     try { if (root.AIConsent && !(await root.AIConsent.ensure())) return; } catch (e) {}
     busy = true; $('tutorSend').disabled = true; $('tutorParse').disabled = true;
     var ta = $('tutorIn'); ta.value = ''; ta.style.height = 'auto';

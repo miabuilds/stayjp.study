@@ -520,7 +520,9 @@ function backToPick(){ hardStopRec(); try{ if(_turnAbort) _turnAbort.abort(); }c
 // 站上標準雙登入(照 auth-header.js)
 let _signingIn=false;
 function loginWith(p){
-  if(_signingIn) return; _signingIn=true;
+  if(_signingIn) return;
+  if (window.STAYJP_NATIVE && STAYJP_NATIVE.isNativeApp && window.ReactNativeWebView) { try{ ReactNativeWebView.postMessage(JSON.stringify({type:'OPEN_LOGIN',lang:(localStorage.getItem('ui_lang')||'zh-TW')})); }catch(e){} return; }
+  _signingIn=true;
   var provider;
   if(p==='apple'){ provider=new firebase.auth.OAuthProvider('apple.com'); provider.addScope('email'); provider.addScope('name'); }
   else { provider=new firebase.auth.GoogleAuthProvider(); }

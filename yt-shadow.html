@@ -342,7 +342,11 @@ try{ if(!firebase.apps.length) firebase.initializeApp({ apiKey:"AIzaSyDnmg2XOuvw
 var _ytSigning=false;
 function loginWith(p){
   if(_ytSigning) return; _ytSigning=true;
-  var provider = (p==='apple') ? new firebase.auth.OAuthProvider('apple.com') : new firebase.auth.GoogleAuthProvider();
+  // App 內 WebView 不能跑網頁 OAuth(Google 會擋)→ 交給原生登入選單
+  if (window.STAYJP_NATIVE && STAYJP_NATIVE.isNativeApp && window.ReactNativeWebView) { _ytSigning=false; try{ ReactNativeWebView.postMessage(JSON.stringify({type:'OPEN_LOGIN',lang:(localStorage.getItem('ui_lang')||'zh-TW')})); }catch(e){} return; }
+  var provider;
+  if (p==='apple') { provider = new firebase.auth.OAuthProvider('apple.com'); provider.addScope('email'); provider.addScope('name'); }
+  else provider = new firebase.auth.GoogleAuthProvider();
   firebase.auth().signInWithPopup(provider).catch(function(e){ var c=e&&e.code; if(c==='auth/cancelled-popup-request'||c==='auth/popup-closed-by-user') return; try{ alert((typeof enOr==='function'?enOr('登入失敗:','Sign-in failed: '):'登入失敗:')+(e&&e.message||e)); }catch(e2){} }).finally(function(){ _ytSigning=false; });
 }
 </script>
