@@ -58,6 +58,7 @@ export { rcSyncSubscription } from "./rc-sync-subscription";
 export { startTrial } from "./start-trial";
 export { trialEmailCron } from "./trial-email-cron";
 export { examCampaignCron } from "./exam-campaign-cron";
+export { kolCommissionReconcileCron } from "./kol-commission-reconcile-cron";
 export { sale1010Cron } from "./sale1010-cron";
 
 // 每日盯梢發票字軌(財政部配號由綠界業務兩個月申請一次,我們只能提早知道要催)

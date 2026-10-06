@@ -70,7 +70,9 @@ export const dailySubAuditCron = functions.onSchedule(
         issues.push({ uid: d.id, type: "over_granted", status, source: s.source || "", expiresAt: exp });
       }
       // ⚪ 沒有到期日(資料異常,非買斷)
-      if (!exp && plan !== "lifetime") {
+      // 已經是 expired/refunded 的沒到期日不影響任何人(不會多給權限),只是舊資料殘留 → 不算異常
+      //(2026-10-06:7 筆全是這種,天天在報錯頁洗版)
+      if (!exp && plan !== "lifetime" && !["expired", "refunded"].includes(status)) {
         issues.push({ uid: d.id, type: "no_expiry", status, source: s.source || "" });
       }
     });
