@@ -274,13 +274,13 @@
     st.textContent = [
       '.jlk{cursor:pointer;border-radius:3px;transition:background .12s;border-bottom:1.5px dotted rgba(214,101,74,.45)}',
       '.jlk:hover,.jlk:focus{background:rgba(214,101,74,.14);outline:none}',
-      '#jlkPop .jacts{display:flex;gap:8px;margin-top:12px}',
-      '#jlkPop .jact{flex:1;white-space:nowrap;text-align:center;border:1px solid var(--bd,#e0e0e0);background:var(--bg,#faf9f6);color:var(--tx,#333);border-radius:10px;padding:9px 6px;font-size:13px;font-weight:700;cursor:pointer}',
+      '#jlkPop .jacts{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}',   // 2026-10-06:五顆鈕(發音/收藏/辭典/Jisho/問小狸)在手機會爆出卡片右邊 → 允許換行
+      '#jlkPop .jact{flex:1 1 auto;min-width:0;white-space:nowrap;text-align:center;border:1px solid var(--bd,#e0e0e0);background:var(--bg,#faf9f6);color:var(--tx,#333);border-radius:10px;padding:9px 6px;font-size:13px;font-weight:700;cursor:pointer}',
       '#jlkPop .jact:active{transform:scale(.96)}',
       '#jlkPop .jreport{display:block;text-align:center;margin-top:10px;font-size:12px;color:var(--tx3,#9a9a9a);text-decoration:none}',
       '#jlkPop .jreport:hover{color:var(--ac,#d4654a);text-decoration:underline}',
       '#jlkPop .jact.on{background:var(--ac,#d4654a);color:#fff;border-color:var(--ac,#d4654a)}',
-      '#jlkPop{position:fixed;z-index:100000;max-width:min(300px,88vw);background:var(--bg2,#fff);color:var(--tx,#222);border:1px solid var(--bd,#e5e5e5);border-radius:14px;box-shadow:0 12px 38px rgba(0,0,0,.28);padding:14px 16px;font-size:14px;line-height:1.7;-webkit-font-smoothing:antialiased;font-family:-apple-system,"PingFang TC","Noto Sans TC",sans-serif}',
+      '#jlkPop{position:fixed;z-index:100000;max-width:min(300px,calc(100vw - 16px));box-sizing:border-box;overflow:hidden;background:var(--bg2,#fff);color:var(--tx,#222);border:1px solid var(--bd,#e5e5e5);border-radius:14px;box-shadow:0 12px 38px rgba(0,0,0,.28);padding:14px 16px;font-size:14px;line-height:1.7;-webkit-font-smoothing:antialiased;font-family:-apple-system,"PingFang TC","Noto Sans TC",sans-serif}',
       '#jlkPop .jw{font-size:21px;font-weight:700;font-family:"Hiragino Mincho ProN","Noto Serif JP",serif;color:var(--tx,#1c1c1e)}',
       '#jlkPop .jr{font-size:13px;color:var(--tx2,#8a8a8a);margin-left:7px}',
       '#jlkPop .jtags{margin:7px 0 2px}',
