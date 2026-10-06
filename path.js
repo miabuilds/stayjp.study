@@ -231,34 +231,51 @@
     for (let i = 0; i < 400; i++) { const k = DayKey.of(d); if ((days[k] || 0) >= need) { n++; d.setDate(d.getDate() - 1); } else break; }
     return n;
   }
-  // 今日任務:從目前關開始、依模式建議數列出「今天要過的關」;做完的打勾
+  // 今日任務(2026-10 改版:迷你闖關小徑,多鄰國式):今天要過的關畫成圓形節點 + 連線,
+  // 目前這關放大+脈動光圈、旁邊站小狸,下面一顆大「開始」。點節點行為跟以前一樣 = Path.startUnit(k)。
+  // 資料全部沿用:currentIndex / todayCount / done[k] 星等 / isSkipped / StudyPlan.modeInfo().units。
   function questCardHtml(lv, us) {
-    const cur = currentIndex(lv), doneN = Object.keys(lvProg(lv).done).length, total = us.length;
+    const cur = currentIndex(lv), doneMap = lvProg(lv).done, doneN = Object.keys(doneMap).length, total = us.length;
     const suggest = (root.StudyPlan && StudyPlan.modeInfo) ? StudyPlan.modeInfo().units : 2;
     const tc = todayCount(lv), left = Math.max(0, suggest - tc);
     const streak = clearStreak(lv);
-    // 今天的清單 = 今天已過的(從 cur 往回 tc 關)+ 接下來還要過的(left 關)
-    const rows = [];
-    for (let k = Math.max(0, cur - tc); k < Math.min(total, cur + left); k++) {
-      const u = us[k], done = k < cur;
-      rows.push('<button type="button" class="pt-qrow' + (done ? ' done' : k === cur ? ' cur' : '') + '" onclick="Path.startUnit(' + k + ')">'
-        + '<span class="pt-node' + (u.boss ? ' boss' : '') + '">' + (done ? '<i data-ic=check></i>' : u.boss ? '<i data-ic=target></i>' : (k + 1)) + '</span>'
-        + '<span class="pt-tx"><b>' + L('第 ' + (k + 1) + ' 關', 'Level ' + (k + 1)) + ' · ' + (u.boss ? L('小考', 'Checkpoint') : esc(u.title)) + '</b>'
-        + '<small>' + (done ? (isSkipped(lv, k) ? L('已學過', 'Already known') : '★'.repeat(lvProg(lv).done[k] || 0)) : u.boss ? L(BOSS_N + ' 題', BOSS_N + ' questions') : L(u.words.length + ' 字 · 1 文法 · ' + QUIZ_N + ' 題', u.words.length + ' words · 1 grammar · ' + QUIZ_N + ' q')) + '</small></span>'
-        + (k === cur ? '<span class="pt-go">' + L('開始', 'Start') + '</span>' : '')
-        + '</button>');
-    }
     const allDone = left === 0;
-    return '<div class="pt-card pt-quest' + (allDone ? ' cleared' : '') + '">'
+    const nameOf = u => u.boss ? L('小考', 'Checkpoint') : esc(u.title);
+    const metaOf = u => u.boss ? L(BOSS_N + ' 題', BOSS_N + ' questions') : L(u.words.length + ' 字 · 1 文法 · ' + QUIZ_N + ' 題', u.words.length + ' words · 1 grammar · ' + QUIZ_N + ' q');
+    const starsHtml = k => { if (isSkipped(lv, k)) return '<span class="pq-known">' + L('已學過', 'Known') + '</span>'; const n = doneMap[k] || 0; let s = ''; for (let i = 0; i < 3; i++) s += '<i data-ic=star class="' + (i < n ? 'on' : '') + '"></i>'; return '<span class="pq-stars">' + s + '</span>'; };
+    // 今天的節點 = 今天已過的(從 cur 往回 tc 關)+ 接下來還要過的(left 關);全過了就多一個虛線「再多一關」
+    const ks = [];
+    for (let k = Math.max(0, cur - tc); k < Math.min(total, cur + left); k++) ks.push(k);
+    if (allDone && cur < total) ks.push(cur);
+    const shown = ks.slice(-5);   // 一天過很多關時只畫最後 5 個,390px 也排得下
+    const nodes = shown.map((k, i) => {
+      const u = us[k], done = k < cur, isCur = k === cur && !allDone, extra = k === cur && allDone;
+      const cls = done ? 'done' : isCur ? 'cur' : extra ? 'extra' : 'todo';
+      const face = done ? '<i data-ic=check></i>' : extra ? '+' : u.boss ? '<i data-ic=target></i>' : (k + 1);
+      return (i ? '<i class="pq-link' + (done ? ' done' : '') + '"></i>' : '')
+        + '<button type="button" class="pq-node ' + cls + (u.boss ? ' boss' : '') + '" data-k="' + k + '" onclick="Path.startUnit(' + k + ')" aria-label="' + esc(L('第 ' + (k + 1) + ' 關', 'Level ' + (k + 1))) + '">'
+        + '<span class="pq-dot">' + face + '</span>'
+        + '<span class="pq-lbl">' + (extra ? L('再一關', 'Extra') : L('第 ' + (k + 1) + ' 關', 'Lv ' + (k + 1))) + '</span>'
+        + (done ? starsHtml(k) : '')
+        + '</button>';
+    }).join('');
+    const head = allDone ? L('今天完成了!', 'Done for today!')
+      : tc === 0 ? L('今天 ' + suggest + ' 關,從這裡開始', suggest + (suggest > 1 ? ' levels' : ' level') + ' today — start here')
+      : L('再 ' + left + ' 關就完成今天', left + ' more to finish today');
+    const sub = allDone ? L('今天的 ' + suggest + ' 關都過了。想多學就再一關,不想也沒關係。', 'Today\'s ' + suggest + ' done. One more if you like — or rest.')
+      : (nameOf(us[cur]) ? L('第 ' + (cur + 1) + ' 關', 'Level ' + (cur + 1)) + ' · ' + nameOf(us[cur]) + ' <span class="pq-meta">· ' + metaOf(us[cur]) + '</span>' : '');
+    return '<div class="pt-card pt-quest pq' + (allDone ? ' cleared' : '') + '" data-tc="' + tc + '" data-lv="' + lv + '" data-cur="' + cur + '">'
       + '<div class="pt-top"><button type="button" class="pt-lv" onclick="Path.openMap()">' + L('今日關卡', 'Today\'s quests') + ' · ' + lv.toUpperCase() + ' <span class="pt-arrow-sm">›</span></button>'
         + '<span class="pt-today' + (allDone ? ' ok' : '') + '">' + (streak > 0 ? '<i data-ic=fire></i> ' + L('連續通關 ' + streak + ' 天', streak + '-day clear streak') : L('今天 ' + tc + ' / ' + suggest + ' 關', 'Today ' + tc + ' / ' + suggest)) + '</span></div>'
       + (placedInfo(lv) ? '<div class="pt-placed"><span>' + L('你已經學過前 ' + placedInfo(lv).n + ' 關的單字,直接從第 ' + (placedInfo(lv).at + 1) + ' 關開始', 'You already know the words in the first ' + placedInfo(lv).n + ' levels — starting at level ' + (placedInfo(lv).at + 1)) + '</span><span class="pt-placed-btns"><button type="button" class="pt-link" onclick="Path.resetLevel(\'' + lv + '\')">' + L('從第 1 關開始', 'Start from level 1') + '</button><button type="button" class="pt-link" onclick="Path.dismissPlaced(\'' + lv + '\')">' + L('知道了', 'OK') + '</button></span></div>' : '')
+      + '<div class="pq-head">' + head + '</div>'
+      + '<div class="pq-sub">' + sub + '</div>'
+      + '<div class="pq-track"><div class="pq-path">' + nodes + '</div>'
+        + '<img class="pq-mascot' + (allDone ? ' yay' : '') + '" src="images/mascot/' + (allDone ? 'tanuki-p06.png' : 'tanuki-hero.png') + '" alt=""></div>'
       + (allDone
-        ? '<div class="pt-clear"><img src="images/mascot/tanuki-p06.png" alt=""><div><b>' + L('今日通關 🎉', 'All clear for today 🎉') + '</b><small>' + L('今天的 ' + suggest + ' 關都過了。想多學就再一關,不想也沒關係。', 'Today\'s ' + suggest + ' levels done. One more if you like — or rest.') + '</small></div></div>'
-        : '<div class="pt-quest-sub">' + L('今天要過 ' + suggest + ' 關' + (tc ? ',還剩 ' + left + ' 關' : ''), suggest + ' levels today' + (tc ? ', ' + left + ' left' : '')) + '</div>')
-      + '<div class="pt-quests">' + rows.join('') + (allDone && cur < total ? '<button type="button" class="pt-qrow more" onclick="Path.startUnit(' + cur + ')"><span class="pt-node">' + (cur + 1) + '</span><span class="pt-tx"><b>' + L('再多一關', 'One more') + ' · ' + esc(us[cur].boss ? L('小考', 'Checkpoint') : us[cur].title) + '</b><small>' + L('額外,不算在今天的任務裡', 'Extra — not required today') + '</small></span></button>' : '') + '</div>'
-      + '<div class="pt-bar"><i style="width:' + Math.round(doneN / total * 100) + '%"></i></div>'
-      + '<div class="pt-prog">' + L(lv.toUpperCase() + ' 已完成 ' + doneN + ' / ' + total + ' 關', doneN + ' / ' + total + ' done') + ' · <button type="button" class="pt-link" onclick="StudyPlan.setRhythm(\'free\')">' + L('改成自由節奏', 'Switch to free pace') + '</button></div>'
+        ? (cur < total ? '<button type="button" class="pt-cta pt-cta-sub pq-go" onclick="Path.startUnit(' + cur + ')">' + L('再多一關', 'One more') + ' · ' + nameOf(us[cur]) + '</button>' : '')
+        : '<button type="button" class="pt-cta pq-go" onclick="Path.startUnit(' + cur + ')"><i data-ic=play></i> ' + L('開始', 'Start') + '</button>')
+      + '<div class="pq-foot"><span class="pq-lvn">' + L(lv.toUpperCase() + ' ' + doneN + ' / ' + total + ' 關', lv.toUpperCase() + ' ' + doneN + ' / ' + total) + '</span><i class="pq-minibar"><b style="width:' + Math.round(doneN / total * 100) + '%"></b></i><button type="button" class="pt-link" onclick="StudyPlan.setRhythm(\'free\')">' + L('改成自由節奏', 'Free pace') + '</button></div>'
       + '</div>';
   }
 
@@ -588,6 +605,35 @@
       '.pt-opt{font:inherit;text-align:left;font-size:16px;line-height:1.5;background:var(--bg);border:1.5px solid var(--bd);border-radius:14px;padding:13px 14px;cursor:pointer;color:var(--tx);display:flex;gap:10px;align-items:baseline}.pt-opt .no{color:var(--tx3);font-size:13px}',
       '.pt-opt.ok{border-color:var(--correct-bd,#16a34a);background:var(--correct-bg,#dcfce7)}.pt-opt.ng{border-color:var(--wrong-bd,#dc2626);background:var(--wrong-bg,#fef2f2)}.pt-opt[disabled]{cursor:default}',
       '.pt-explain{display:none;margin-top:14px;border-top:1px solid var(--bd);padding-top:12px}.pt-verdict{font-weight:800;margin-bottom:6px}.pt-verdict.ok{color:var(--correct-tx,#166534)}.pt-verdict.ng{color:var(--wrong-tx,#991b1b)}.pt-x{font-size:14px;line-height:1.7;color:var(--tx)}',
+      // 今日關卡迷你小徑(2026-10 改版)
+      '.pq .pt-top{margin-bottom:12px}.pq-head{font-size:19px;font-weight:900;color:var(--tx);line-height:1.35;letter-spacing:.01em}',
+      '.pq-sub{font-size:13px;color:var(--tx2);margin-top:4px;line-height:1.5;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.pq.cleared .pq-sub{white-space:normal}.pq-meta{color:var(--tx3)}',
+      '.pq-track{display:flex;align-items:flex-end;gap:12px;margin:16px 0 4px;min-height:96px}',
+      '.pq-path{flex:1;min-width:0;display:flex;align-items:flex-start;justify-content:center;padding-top:6px}',
+      '.pq-link{flex:1 1 18px;max-width:56px;min-width:14px;height:6px;border-radius:999px;background:var(--bd);margin-top:27px;align-self:flex-start}.pq-link.done{background:var(--correct-bd,#16a34a)}',
+      '.pq-node{flex:none;display:flex;flex-direction:column;align-items:center;gap:5px;font:inherit;color:var(--tx);background:none;border:0;padding:0;cursor:pointer;min-width:54px;-webkit-tap-highlight-color:transparent}',
+      '.pq-dot{position:relative;width:46px;height:46px;margin-top:7px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:17px;color:#fff;background:var(--ac);box-shadow:0 4px 0 rgba(0,0,0,.16);transition:transform .15s}',
+      '.pq-node:active .pq-dot{transform:translateY(2px);box-shadow:0 2px 0 rgba(0,0,0,.16)}',
+      '.pq-dot svg{width:22px!important;height:22px!important;stroke-width:3}',
+      '.pq-node.done .pq-dot{background:var(--correct-bd,#16a34a)}',
+      '.pq-node.todo .pq-dot{background:var(--bg3);color:var(--tx3);box-shadow:0 4px 0 var(--bd)}',
+      '.pq-node.extra .pq-dot{background:var(--bg2);color:var(--tx3);border:2px dashed var(--bd);box-shadow:none;font-size:22px;font-weight:700}',
+      '.pq-node.boss .pq-dot{background:#7C3AED}.pq-node.boss.done .pq-dot{background:var(--correct-bd,#16a34a)}.pq-node.boss.todo .pq-dot{background:var(--bg3)}',
+      '.pq-node.cur .pq-dot{width:60px;height:60px;margin-top:0;font-size:22px}',
+      '.pq-node.cur .pq-dot::after{content:"";position:absolute;inset:-7px;border-radius:50%;border:3px solid rgba(var(--ac-rgb),.45);animation:pqPulse 1.8s ease-out infinite}',
+      '@keyframes pqPulse{0%{transform:scale(.9);opacity:1}100%{transform:scale(1.22);opacity:0}}',
+      '.pq-lbl{font-size:11.5px;font-weight:700;color:var(--tx2);white-space:nowrap}.pq-node.cur .pq-lbl{color:var(--ac);font-weight:900}',
+      '.pq-stars{display:flex;gap:1px;line-height:1}.pq-stars i svg{width:12px!important;height:12px!important;color:var(--bd)}.pq-stars i.on svg{color:#F5B301}.pq-stars i.on svg path{fill:#F5B301}',
+      '.pq-known{font-size:10.5px;color:var(--tx3)}',
+      '.pq-mascot{flex:none;width:64px;height:auto;align-self:flex-end;animation:hubBob 3.2s ease-in-out infinite}.pq-mascot.yay{width:70px}',
+      '.pq-go{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:14px;padding:15px 14px;font-size:16.5px;border-radius:14px;box-shadow:0 4px 0 color-mix(in srgb,var(--ac) 70%,#000)}.pq-go:active{transform:translateY(2px);box-shadow:0 2px 0 color-mix(in srgb,var(--ac) 70%,#000)}.pq-go svg{width:16px!important;height:16px!important}',
+      '.pq-go.pt-cta-sub{box-shadow:0 3px 0 var(--bd);border:1px solid var(--bd);font-size:14.5px;padding:13px 14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block}',
+      '.pq.cleared{background:linear-gradient(160deg,var(--correct-bg,#dcfce7),var(--bg2) 70%)}',
+      '.pq-foot{display:flex;align-items:center;gap:10px;margin-top:14px;padding-top:12px;border-top:1px solid var(--bd);font-size:11.5px;color:var(--tx3)}.pq-lvn{flex:none;font-variant-numeric:tabular-nums}.pq-minibar{flex:1;height:4px;border-radius:999px;background:var(--bd);overflow:hidden}.pq-minibar b{display:block;height:100%;background:var(--tx3);border-radius:999px}.pq-foot .pt-link{flex:none;font-size:11.5px}',
+      // 剛過完一關回面板:最新那顆打勾節點彈一下
+      '.pq-node.pq-pop .pq-dot{animation:pqPop .7s cubic-bezier(.3,1.6,.5,1) .15s backwards}.pq-node.pq-pop .pq-dot svg{animation:pqTick .5s ease .45s backwards}',
+      '@keyframes pqPop{0%{transform:scale(.4);background:var(--ac)}60%{transform:scale(1.18)}100%{transform:scale(1)}}@keyframes pqTick{from{opacity:0;transform:scale(.3) rotate(-25deg)}to{opacity:1;transform:none}}',
+      '@media (prefers-reduced-motion:reduce){.pq-node.cur .pq-dot::after,.pq-mascot,.pq-node.pq-pop .pq-dot,.pq-node.pq-pop .pq-dot svg{animation:none}}',
       '.pt-done{text-align:center;padding:6px 0}.pt-done img{width:120px;height:auto}.pt-stars{font-size:28px;color:#F5B301;letter-spacing:.1em;margin:6px 0}.pt-done h3{margin:4px 0 6px}.pt-done-sub{font-size:13.5px;color:var(--tx2);line-height:1.6}',
     ].join('');
     document.head.appendChild(st);
