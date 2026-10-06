@@ -200,11 +200,38 @@
     }
     return out;
   }
+  // 題庫題的「首次可出關」:這題從第幾關開始算教過(之後每一關都會繼續符合 qInScope)。
+  // ⚠️ 2026-10-06 用戶回報「每一關小測都出現『台風の( )で、電車が止まった』」:
+  //    N2 前期符合條件的題庫題只有幾題,而答案「影響」第 1 關就教過 → 之後每關都抽到它。
+  //    改成:題庫題只在「剛教到」的那幾關出(一般關 FRESH_UNITS 關內、小考看自己那 5 關),
+  //    過了就讓位給「用這關新字自動生的題」(要多少有多少,不會重複)。
+  const FRESH_UNITS = 2;
+  const _anchorCache = {};
+  function anchorsOf(lv) {
+    const all = root.JLPT_Q || [];
+    const ck = lv + ':' + all.length;   // 題庫是延後載入的:還沒載好時算出來的是空表,不能快取住
+    if (_anchorCache[ck]) return _anchorCache[ck];
+    const us = units(lv), bank = all.filter(q => q.lv === lv && QUIZ_TYPES.includes(q.t));
+    const map = new Map(); let left = bank.slice();
+    for (let k = 0; k < us.length && left.length; k++) {
+      const t = taughtOf(lv, k);
+      left = left.filter(q => { if (qInScope(q, t.words, t.grams)) { map.set(q, k); return false; } return true; });
+    }
+    if (all.length && us.length) _anchorCache[ck] = map;
+    return map;
+  }
   function questionsFor(lv, k, n) {
     const t = taughtOf(lv, k);
     const u = units(lv)[k] || {};
     const own = (u.words && u.words.length) ? u.words : t.words;
-    const pool = (root.JLPT_Q || []).filter(q => q.lv === lv && QUIZ_TYPES.includes(q.t) && qInScope(q, t.words, t.grams));
+    const isBoss = !(u.words && u.words.length);
+    const span = isBoss ? LESSONS_PER_BOSS + 1 : FRESH_UNITS;
+    const anchors = anchorsOf(lv);
+    const pool = (root.JLPT_Q || []).filter(q => {
+      if (q.lv !== lv || !QUIZ_TYPES.includes(q.t) || !qInScope(q, t.words, t.grams)) return false;
+      const a = anchors.has(q) ? anchors.get(q) : 0;
+      return a > k - span;   // 只留最近幾關才剛教到的題
+    });
     const ownN = own.length ? Math.min(2, n) : 0;                    // 至少 2 題出自這關剛學的字
     const out = seededPick(pool, Math.max(0, n - ownN), k + 1);
     const seen = {}; out.forEach(q => { seen[q.q] = 1; });
