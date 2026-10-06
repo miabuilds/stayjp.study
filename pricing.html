@@ -553,7 +553,9 @@ function applyRefCode() {
   // 先驗證碼存不存在;查無就擋下、不亂存。驗證斷線 → fail-open(先記住)。
   const writeFor = (label) => {
     try { localStorage.setItem('stayjp_ref', raw); } catch (e) {}
-    if (!u) { msg.style.color = '#16A34A'; msg.textContent = label.replace('已套用', '已記住').replace('付費訂閱成功後', '登入並付費後'); return; }
+    // 沒登入：碼先記在本機，價格先照折後價顯示（付款一定要登入，登入時 syncRefCode 會把碼寫進帳號，後端照帳號的碼算錢）
+    // 2026-10-07 Mia：「沒登入的人輸了 KOL 碼還是顯示原價」→ 粉絲以為沒折扣
+    if (!u) { msg.style.color = '#16A34A'; msg.textContent = label.replace('已套用', '已記住').replace('付費訂閱成功後', '登入並付費後') + '（登入付款時自動套用）'; setRefActive(true, raw); return; }
     const ref = _db.doc('users/' + u.uid);
     ref.get().then(d => {
       const dd = d.exists && d.data() ? d.data() : {};
@@ -610,6 +612,7 @@ function syncRefCode(data) {
     if (pending && (pending === data.my_ref_code || pending === data.kol_code)) {
       try { localStorage.removeItem('stayjp_ref'); } catch (e) {}
       if (m) { m.style.color = 'var(--tx3)'; m.textContent = '這是你自己的推薦碼,請分享給別人 '; }
+      setRefActive(false);   // 沒登入時先顯示的折後價要收回，不然按訂閱會被 409 擋
       return;
     }
     if (pending && window.Campaign && Campaign.isExpired(pending)) {
@@ -635,6 +638,7 @@ try {
       Campaign.claim(_r);   // 活動碼不會蓋掉已存在的 KOL / 個人碼
       const _c = localStorage.getItem('stayjp_ref');
       const _i = document.getElementById('refInput'); if (_i && !_i.value && _c) _i.value = _c;
+      if (_c) previewRefForGuest(_c);
     }
   } else if (_r) {
     try { localStorage.setItem('stayjp_ref', _r); } catch (e) {}
@@ -665,6 +669,18 @@ const REF_VALIDATE_URL = 'https://asia-east1-jpnote-1bdd6.cloudfunctions.net/val
 window.__refActive = false;
 window.__refCode = '';
 window.__refCampaign = true;   // 碼的種類還沒確認前當「活動碼」(=沒有 KOL 搶先),確認是 KOL/個人碼才打開
+// 沒登入的訪客帶著碼進來（KOL 連結 ?ref=）：碼有效就先顯示折後價。已登入的人交給 syncRefCode 依帳號決定。
+function previewRefForGuest(code) {
+  setTimeout(() => {
+    if (_auth.currentUser || window.__refActive) return;
+    fetch(REF_VALIDATE_URL + '?code=' + encodeURIComponent(code)).then(r => r.json()).then(v => {
+      if (!v || !v.valid || _auth.currentUser || window.__refActive) return;
+      setRefActive(true, code);
+      const msg = document.getElementById('refMsg');
+      if (msg) { msg.style.color = '#16A34A'; msg.textContent = '✓ 已記住 ' + code + (v.kol ? '(' + v.kol + ')' : '') + '：登入付款時自動套用'; }
+    }).catch(() => {});
+  }, 1500);   // 等 Firebase 判斷登入狀態，避免已登入的人先被訪客邏輯蓋過
+}
 function setRefActive(on, code) {
   window.__refActive = !!on;
   let c = '';
