@@ -383,6 +383,7 @@ const SRS = (() => {
   function showDone() {
     if (_onDone) { const cb = _onDone; _onDone = null; cb({ total: queue.length }); return; }
     const st = getStats(lvl);
+    try { if (window.RatePrompt && queue.length && getDueCount() === 0) RatePrompt.moment('review_cleared'); } catch (e) {}   // 開心時刻 → 評分提醒(rate-prompt.js 自己延遲+判資格)
     document.getElementById('quizBox').innerHTML = `
       <h3>${t('srs_done')}</h3>
       <div class="srs-done-stats">

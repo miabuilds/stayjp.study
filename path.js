@@ -534,6 +534,8 @@
       + '<button type="button" class="pt-cta pt-cta-sub" onclick="Path.close()">' + L('回面板', 'Back') + '</button>'
       + '</div>';
     show(); hydrate();
+    // 開心時刻 → 評分提醒(rate-prompt.js 自己延遲、判資格、一天最多一次)
+    try { if (root.RatePrompt) { if (tc >= suggest) RatePrompt.moment('quests_cleared'); else if (r.total && ratio >= 0.8) RatePrompt.moment('result_80'); } } catch (e) {}
   }
 
   function ensureCss() {

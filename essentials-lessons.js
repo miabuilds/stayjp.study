@@ -586,6 +586,7 @@ body.ess-open #tutorFab,body.ess-open #tutorHint,body.ess-open #quotaBadge,body.
     const Q = S.quiz, tot = Q.qs.length, ok = passed(Q.score, tot);
     const isLesson = S.lid !== 'final' && S.lid !== 'all';
     if (S.lid !== 'all' && !Q.retry) recordResult(S.lid, Q.score, tot);
+    try { if (window.RatePrompt && !Q.retry && tot && Q.score / tot >= 0.8) RatePrompt.moment('result_80'); } catch (e) {}   // 開心時刻 → 評分提醒(rate-prompt.js 自己延遲+判資格)
     const idx = lessonIdx(S.lid);
     const need = Math.ceil(tot * PASS_RATIO);
     let msg;
