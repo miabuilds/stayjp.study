@@ -896,6 +896,7 @@ window.Articles = (function () {
             return '<div style="padding:7px 0;border-bottom:1px dashed var(--bd,#eee);font-size:14.5px"><b>' + esc(v.w) + '</b> <span style="color:var(--ac,#d4654a)">' + esc(v.r || '') + '</span>' + spk + '<br><span style="color:var(--tx2,#888);font-size:13px">' + esc(vm(v)) + '</span></div>';
           }).join('') + '</div>';
       }
+      try { if (window.RatePrompt && quiz.list.length && quiz.score / quiz.list.length >= 0.8) RatePrompt.moment('result_80'); } catch (e) {}   // 開心時刻 → 評分提醒(rate-prompt.js 自己延遲+判資格)
       c.innerHTML = '<div class="aq" style="text-align:center;padding:30px 0">' +
         '<div style="font-size:52px">' + (quiz.score >= quiz.list.length - 1 ? '' : quiz.score >= quiz.list.length / 2 ? '' : '') + '</div>' +
         '<div style="font-size:24px;font-weight:800;margin:10px 0">' + quiz.score + ' / ' + quiz.list.length + '</div>' +

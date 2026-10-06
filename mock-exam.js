@@ -750,6 +750,7 @@ const MockExam = (() => {
     const totalScore = sectionResults.reduce((a, s) => a + s.correct, 0);
     const totalQuestions = sectionResults.reduce((a, s) => a + s.total, 0);
     const totalPct = Math.round(totalScore / totalQuestions * 100);
+    try { if (window.RatePrompt && totalPct >= 80) RatePrompt.moment('result_80'); } catch (e) {}   // 開心時刻 → 評分提醒(rate-prompt.js 自己延遲+判資格)
     const passed = totalPct >= 60;
 
     // Also check per-section pass (JLPT requires each section >= baseline)

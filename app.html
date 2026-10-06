@@ -1966,7 +1966,7 @@ try {
 <!-- 2026-09-16 Mia:YouTube 跟讀在 iOS App 內恢復顯示(先前為 1.0.8 送審暫藏);no-yt class 不再加 -->
 <script src="day-key.js"></script>
 <script src="nav-back.js"></script>
-<script src="review-ask.js"></script>
+<script src="rate-prompt.js"></script>
 <script src="omikuji-data.js"></script>
 <script src="omikuji.js"></script>
 <script src="accent.js"></script>
@@ -2376,6 +2376,7 @@ function loadCloudData() {
       } else {
         // 闖關進度:第一層 key 是 level/n5/n4…,「雲端整級蓋過去」會把這台剛過的關/今天的關數洗掉 → 專用合併(path-merge.js:done 取大、skip 聯集、days 取大、level 本機優先)
         if (k === 'path_progress' && window.PathMerge) { localStorage.setItem(k, JSON.stringify(PathMerge.merge(local, d[k]))); return; }
+        if (k === 'rate_prompt_v1' && window.RatePrompt) { localStorage.setItem(k, JSON.stringify(RatePrompt.merge(local, d[k]))); return; }   // 評分提醒:次數取大、答過取 OR(一般物件合併會讓舊裝置的 shows:0 蓋回來)
         const merged = { ...d[k] };
         if (k === 'study_log') {
           // 學習日曆:按「日期聯集、同日各項取最大」合併;本機有雲端缺的日期,
@@ -2489,7 +2490,7 @@ function saveSRSCloud() {
   saveProgressKeys({ srs_data: d });
 }
 // ── Sync ALL data ──
-const SYNC_KEYS = ['sp_settings','sp_sets','tts_voice','study_log','word_notebook','grammar_srs','daily_progress','mock_exam_history','exam_date','base_level','goal_level','reading_done','reading_scores','listening_scores','listening_done','shadow_favs','wrong_questions','ls_done','jr_kana','jr_essentials','jr_phrases','jr_chat','jr_vb_seen','jr_gr_seen','path_progress','my_vocab','ess_progress','guide_steps'];
+const SYNC_KEYS = ['sp_settings','sp_sets','tts_voice','study_log','word_notebook','grammar_srs','daily_progress','mock_exam_history','exam_date','base_level','goal_level','reading_done','reading_scores','listening_scores','listening_done','shadow_favs','wrong_questions','ls_done','jr_kana','jr_essentials','jr_phrases','jr_chat','jr_vb_seen','jr_gr_seen','path_progress','my_vocab','ess_progress','guide_steps','rate_prompt_v1'];
 // 學習日曆逐日上傳:update('study_log.日期', 值) 只動那一天 → 雲端日曆只增不減,
 // 任何裝置的 stale 本機資料都毀不掉歷史(root cause 修:整包 set 會整欄覆蓋)。
 function saveStudyDayCloud(dates) {
@@ -2893,7 +2894,7 @@ function _hubFeedback(mn, firstHub, done, GOAL) {
     const last = mn.querySelector('.pq-node[data-k="' + (+q.dataset.cur - 1) + '"]');
     if (last) last.classList.add('pq-pop');
   }
-  if (same && rv && prev.due > 0 && cur.due === 0) rv.classList.add('sp-pop');
+  if (same && rv && prev.due > 0 && cur.due === 0) { rv.classList.add('sp-pop'); try { if (window.RatePrompt) RatePrompt.moment('review_cleared'); } catch (e) {} }
   try { localStorage.setItem('hub_seen_v1', JSON.stringify(cur)); } catch (e) {}
 }
 function renderHub() {
@@ -3009,6 +3010,7 @@ function renderHub() {
     _hubAnimated = true;
   }
   try { _hubFeedback(mn, firstHub, done, GOAL); } catch (e) {}   // 圓環長上來 / 新打勾節點彈一下 / 複習清空小狸跳出
+  if ((streak === 3 || streak === 7 || streak === 30) && done > 0) { try { if (window.RatePrompt) RatePrompt.moment('streak_' + streak); } catch (e) {} }   // 連續里程碑日(今天有學才算,一天最多問一次由 rate-prompt.js 擋)
   // 達標彩蛋:每天第一次打開面板且已達標時放一次
   if (done >= GOAL) {
     try {
@@ -3016,7 +3018,7 @@ function renderHub() {
       if (localStorage.getItem('hub_celebrated') !== today) {
         localStorage.setItem('hub_celebrated', today);
         setTimeout(hubConfetti, 350);
-        try { if (window.ReviewAsk) ReviewAsk.maybe(2200); } catch (e) {}   // 達標=正向時刻,彩蛋跑完再問評分
+        try { if (window.RatePrompt) RatePrompt.moment('daily_goal'); } catch (e) {}   // 達標=正向時刻(rate-prompt.js 自己延遲+判資格)
       }
     } catch (e) {}
   }

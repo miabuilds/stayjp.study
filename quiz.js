@@ -324,6 +324,7 @@ const Quiz = (() => {
 
   function showResults() {
     const pct = Math.round(score / questions.length * 100);
+    try { if (window.RatePrompt && pct >= 80) RatePrompt.moment('result_80'); } catch (e) {}   // 開心時刻 → 評分提醒(rate-prompt.js 自己延遲+判資格)
     const h = JSON.parse(localStorage.getItem('quiz_history') || '[]');
     // 錯題明細:單字/讀音/意思/你答的 → 「我的」頁可展開回顧(有跡可循,不是只有分數)
     const _wr = results.filter(r=>!r.correct).slice(0,15).map(r=>({

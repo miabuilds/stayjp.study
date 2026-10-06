@@ -682,6 +682,7 @@ function nextQ(){
 function finish(){
   stopAu();   // 最後一題是聽解時,結果頁不該繼續放音
   const pct = Math.round(score/queue.length*100);
+  try { if (window.RatePrompt && !isWrongMode && queue.length >= 5 && pct >= 80) RatePrompt.moment('result_80'); } catch (e) {}   // 開心時刻 → 評分提醒(rate-prompt.js 自己延遲+判資格)
   document.getElementById('rscore').textContent = score+' / '+queue.length;
   document.getElementById('rsub').textContent = pct>=80? enOr('很穩!繼續保持 ','Solid! Keep it up '):(pct>=60? enOr('不錯,錯題本再刷一輪就熟了','Not bad — one more round in the wrong-answer notebook and you\'ll have it down'):enOr('先看詳解弄懂,錯題本等你 ','Read the explanations first — the wrong-answer notebook is waiting '));
   pushHist({ d:today(), lv:isWrongMode?'wrong':lv, t:isWrongMode?'錯題本':(curType?curType.tt:''), s:score, tot:queue.length, w:roundWrong.slice(0,30) });
@@ -988,6 +989,7 @@ applyStaticEn();
 renderHome();
 </script>
 <script src="report-form.js" defer></script>
+<script src="rate-prompt.js" defer></script>
 <script src="font-scale.js"></script>
 <script src="back-to-top.js"></script>
 <script defer src="promo-banner.js"></script>

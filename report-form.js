@@ -21,10 +21,11 @@
     css(); var meta = q(href);
     var mask = document.createElement('div'); mask.className = 'rpf-mask';
     var email = ''; try { var u = window.firebase && firebase.auth && firebase.auth().currentUser; if (u && u.email) email = u.email; } catch (e) {}
-    mask.innerHTML = '<div class="rpf" role="dialog" aria-modal="true"><h3>' + L('回報問題', 'Report a problem') + '</h3>'
+    var fb = meta.kind === '評分回饋';   // rate-prompt.js「還可以再更好」進來的:是意見不是 bug,標題/提示換一下
+    mask.innerHTML = '<div class="rpf" role="dialog" aria-modal="true"><h3>' + (fb ? L('哪裡可以更好?', 'What could be better?') : L('回報問題', 'Report a problem')) + '</h3>'
       + (meta.detail ? '<div class="sub"></div>' : '')
-      + '<textarea placeholder="' + L('哪裡怪?例:答案跟解析對不上、音檔沒聲音、按了沒反應…', 'What is wrong? e.g. answer vs explanation mismatch, no audio, button does nothing…') + '"></textarea>'
-      + '<input type="email" placeholder="' + L('Email(選填,修好通知你)', 'Email (optional, we will tell you when it is fixed)') + '" value="' + email.replace(/"/g, '') + '">'
+      + '<textarea placeholder="' + (fb ? L('例:想要的功能、用起來卡的地方、看不懂的畫面…', 'e.g. a feature you want, something clunky, a screen that confused you…') : L('哪裡怪?例:答案跟解析對不上、音檔沒聲音、按了沒反應…', 'What is wrong? e.g. answer vs explanation mismatch, no audio, button does nothing…')) + '"></textarea>'
+      + '<input type="email" placeholder="' + (fb ? L('Email(選填,想收到回覆的話)', 'Email (optional, if you want a reply)') : L('Email(選填,修好通知你)', 'Email (optional, we will tell you when it is fixed)')) + '" value="' + email.replace(/"/g, '') + '">'
       + '<div class="row"><button type="button" class="cancel">' + L('取消', 'Cancel') + '</button><button type="button" class="pri send">' + L('送出', 'Send') + '</button></div>'
       + '<a class="alt" href="' + href.replace(/"/g, '&quot;') + '">' + L('或用 Email 寄給我們', 'or send us an email instead') + '</a></div>';
     if (meta.detail) mask.querySelector('.sub').textContent = meta.detail;
@@ -43,7 +44,7 @@
       var p;
       try { doc.created_at = firebase.firestore.FieldValue.serverTimestamp(); p = firebase.firestore().collection('reports').add(doc); } catch (e) { p = Promise.reject(e); }
       p.then(function () {
-        mask.querySelector('.rpf').innerHTML = '<div class="ok">🦝 ' + L('收到了,謝謝!<br>內容錯誤通常 24 小時內修好' + (doc.email ? ',修好會寄信給你' : '') + '。', 'Got it, thanks!<br>Content errors are usually fixed within 24h' + (doc.email ? '; we will email you.' : '.')) + '</div><div class="row"><button type="button" class="pri">' + L('好', 'OK') + '</button></div>';
+        mask.querySelector('.rpf').innerHTML = '<div class="ok">🦝 ' + (fb ? L('收到了,謝謝你願意說!<br>每一則我們都會看。', 'Got it — thank you!<br>We read every note.') : L('收到了,謝謝!<br>內容錯誤通常 24 小時內修好' + (doc.email ? ',修好會寄信給你' : '') + '。', 'Got it, thanks!<br>Content errors are usually fixed within 24h' + (doc.email ? '; we will email you.' : '.'))) + '</div><div class="row"><button type="button" class="pri">' + L('好', 'OK') + '</button></div>';
         mask.querySelector('button').onclick = close;
         try { if (typeof gtag === 'function') gtag('event', 'report_submit', { kind: meta.kind }); } catch (e) {}
       }).catch(function () { try { location.href = href; } catch (e) {} close(); });   // 寫不進去(規則/離線)→ 退回 mailto,回報不會掉
