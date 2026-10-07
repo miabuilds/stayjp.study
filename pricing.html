@@ -829,6 +829,16 @@ window.renderSalePrices = renderRefPricing;   // sale.js 在檔期開始/結束�
 renderRefPricing();
 
 // 下單前確認框:強制勾選「同意續扣條款」+「已滿18歲」才可付款
+// 台灣統編檢查碼(跟後端 functions/src/utils/ecpay-invoice.ts isValidTaxId 同一套規則)
+function isValidTaxId(n) {
+  const d = String(n || '').replace(/\D/g, '');
+  if (d.length !== 8) return false;
+  const w = [1, 2, 1, 2, 1, 2, 4, 1];
+  let sum = 0;
+  for (let i = 0; i < 8; i++) { const p = Number(d[i]) * w[i]; sum += Math.floor(p / 10) + (p % 10); }
+  return sum % 5 === 0 || (d[6] === '7' && (sum + 1) % 5 === 0);
+}
+
 function showConsentDialog(plan) {
   return new Promise(resolve => {
     const t = resolvedTerms(plan);
@@ -868,6 +878,13 @@ function showConsentDialog(plan) {
         .cs-ok{border:none;background:var(--ac);color:#fff;box-shadow:0 8px 20px -6px var(--ac)}
         .cs-ok:disabled{opacity:.38;box-shadow:none;cursor:not-allowed;transform:none}
         .cs-card a{color:var(--ac2)}
+        .cs-tax{margin:8px 0 4px;padding:12px 10px 4px;border-top:1px solid var(--bd)}
+        .cs-tax-lb{display:block;font-size:13px;color:var(--tx2);margin-bottom:6px}
+        .cs-tax input{width:100%;box-sizing:border-box;padding:10px 12px;border-radius:10px;border:1px solid var(--bd);
+          background:var(--bg3);color:var(--tx);font-size:15px;letter-spacing:.08em}
+        .cs-tax input.bad{border-color:#e5484d}
+        .cs-tax-msg{font-size:12px;color:var(--tx2);margin-top:6px;line-height:1.5}
+        .cs-tax-msg.bad{color:#e5484d}
       `;
       document.head.appendChild(st);
     }
@@ -891,6 +908,11 @@ function showConsentDialog(plan) {
           </ul>
           <label class="cs-chk"><input type="checkbox" id="cAgree"><span>我已閱讀並同意上述${t.recurring ? '自動續扣' : '付款'}條款與<a href="terms.html" target="_blank" rel="noopener">服務條款</a>。</span></label>
           <label class="cs-chk"><input type="checkbox" id="cAge"><span>我已年滿 18 歲，或已取得法定代理人同意。</span></label>
+          <div class="cs-tax">
+            <label class="cs-tax-lb" for="cTax">公司統一編號（選填，報帳用）</label>
+            <input id="cTax" inputmode="numeric" maxlength="8" autocomplete="off" placeholder="8 碼數字，不需要可留空">
+            <div class="cs-tax-msg" id="cTaxMsg">填了統編，電子發票會打上統編並寄到你的 Email。</div>
+          </div>
         </div>
         <div class="cs-foot">
           <button class="cs-btn cs-cancel" id="cCancel">取消</button>
@@ -900,8 +922,17 @@ function showConsentDialog(plan) {
     document.body.appendChild(wrap);
     requestAnimationFrame(() => wrap.classList.add('show'));   // 触发进场动画
     const agree = wrap.querySelector('#cAgree'), age = wrap.querySelector('#cAge'), ok = wrap.querySelector('#cOk');
-    const sync = () => { ok.disabled = !(agree.checked && age.checked); };
+    const tax = wrap.querySelector('#cTax'), taxMsg = wrap.querySelector('#cTaxMsg');
+    const taxBad = () => { const v = tax.value.trim(); return !!v && !isValidTaxId(v); };
+    const sync = () => {
+      const bad = taxBad();
+      tax.classList.toggle('bad', bad); taxMsg.classList.toggle('bad', bad);
+      taxMsg.textContent = bad ? '統一編號格式不正確，請再確認一次（不需要可清空）。' : '填了統編，電子發票會打上統編並寄到你的 Email。';
+      ok.disabled = !(agree.checked && age.checked) || bad;
+    };
     agree.onchange = sync; age.onchange = sync;
+    tax.oninput = () => { tax.value = tax.value.replace(/\D/g, '').slice(0, 8); if (tax.value.length === 8 || !tax.value) sync(); else { ok.disabled = true; tax.classList.remove('bad'); taxMsg.classList.remove('bad'); } };
+    tax.onblur = sync;
     let done = false;
     const close = (v) => {
       if (done) return; done = true;
@@ -911,7 +942,7 @@ function showConsentDialog(plan) {
     };
     function onEsc(e) { if (e.key === 'Escape') close(false); }
     wrap.querySelector('#cCancel').onclick = () => close(false);
-    ok.onclick = () => { if (!ok.disabled) close(true); };
+    ok.onclick = () => { if (!ok.disabled) close({ tax_id: tax.value.trim() }); };
     wrap.onclick = (e) => { if (e.target === wrap) close(false); };
     document.addEventListener('keydown', onEsc);
   });
@@ -1033,7 +1064,7 @@ async function startSubscribe(btn) {
         'Authorization': 'Bearer ' + idToken,
       },
       // expected_twd = 本頁 PLAN_TERMS 顯示給用戶的金額;後端核對現行牌價,不符會擋單(防舊快取錯價)
-      body: JSON.stringify({ plan, expected_twd: resolvedTerms(plan).twd }),
+      body: JSON.stringify({ plan, expected_twd: resolvedTerms(plan).twd, tax_id: consented.tax_id || '' }),
     });
     const data = await res.json();
     if (!res.ok) {

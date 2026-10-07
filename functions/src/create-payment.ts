@@ -11,6 +11,7 @@ import * as functions from "firebase-functions/v2/https";
 import * as admin from "firebase-admin";
 import { PLANS, PlanKey, WEB_CODE_DISCOUNT_TWD, SALE, resolveWebPrice, isCampaignRefCode, ecpayConfig, ecpayEndpoint, ECPAY_SECRETS } from "./utils/constants";
 import { checkMacValue, ecpayDateTimeTW, generateMerchantTradeNo } from "./utils/ecpay";
+import { isValidTaxId } from "./utils/ecpay-invoice";
 import {
   precheckSubscribe, writeTransaction, emailHash,
 } from "./utils/firestore";
@@ -46,6 +47,10 @@ export const createPayment = functions.onRequest(
       // ── 2. precheck ──
       const plan = (req.body?.plan || "") as PlanKey;
       if (!PLANS[plan]) { res.status(400).json({ error: "invalid_plan", plan }); return; }
+
+      // 選填統編(報帳用):前端已驗檢查碼,這裡再驗一次;不合法就擋,別讓客人以為有打統編結果發票沒有
+      const taxId = String(req.body?.tax_id || "").replace(/\D/g, "");
+      if (taxId && !isValidTaxId(taxId)) { res.status(400).json({ error: "invalid_tax_id", reason: "統一編號格式不正確,請再確認一次。" }); return; }
 
       // ── 2.4 建單金額:推薦碼折價 + 雙十檔期(官網限定),一律走 resolveWebPrice ──
       // 帳上推薦碼有效(存在/active/非停權/非本人的碼/未過期)→ 有折價;活動碼沒有 KOL 搶先資格。
@@ -109,7 +114,7 @@ export const createPayment = functions.onRequest(
         external_id: merchantTradeNo,
         status: "pending",
         email_hash: emailHash(email),
-        note: "等待 ECPay 扣款 callback" + (priced.onSale ? `(${SALE.id} 檔期價 ${SALE.prices[plan]})` : "") + (codeApplied ? `(推薦碼 ${codeApplied} 折 ${discount})` : ""),
+        note: "等待 ECPay 扣款 callback" + (priced.onSale ? `(${SALE.id} 檔期價 ${SALE.prices[plan]})` : "") + (codeApplied ? `(推薦碼 ${codeApplied} 折 ${discount})` : "") + (taxId ? `(統編 ${taxId})` : ""),
       });
 
       // ── 4. 組綠界表單 ──
@@ -133,6 +138,8 @@ export const createPayment = functions.onRequest(
         // ── 自訂帶回(callback 用來識別)──
         CustomField1: uid,
         CustomField2: plan,
+        // 統編跟著訂單走,callback 開發票時帶上;定期定額續扣的 callback 也會帶回,每期發票都有統編
+        CustomField3: taxId,
       };
 
       // 定期定額(訂閱制)— lifetime 不設,單次付款

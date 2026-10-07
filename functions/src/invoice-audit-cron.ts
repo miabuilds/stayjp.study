@@ -78,6 +78,7 @@ export const invoiceAuditCron = onSchedule(
         uid: String(t.uid || ""), email, ecpayTradeNo: key,
         itemName: `StayJP ${PLANS[plan]?.display_name || plan}`,
         amountTwd: Number(t.amount_twd || 0),
+        identifier: String(t.tax_id || ""),
       }) : false;
       const row = { txn: d.id, uid: t.uid, trade_no: key, amount: t.amount_twd, was: st || "missing" };
       if (ok) healed.push(row);

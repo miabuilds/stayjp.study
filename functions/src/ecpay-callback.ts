@@ -51,6 +51,7 @@ export const ecpayCallback = functions.onRequest(
       // 2. 拿 uid + plan
       const uid  = body.CustomField1 || "";
       const plan = (body.CustomField2 || "") as PlanKey;
+      const taxId = String(body.CustomField3 || "").replace(/\D/g, "");   // 選填統編(create-payment 已驗過)
       if (!uid || !PLANS[plan]) {
         console.error("Missing CustomField:", { uid, plan });
         res.status(400).send("0|Missing CustomField");
@@ -224,6 +225,7 @@ export const ecpayCallback = functions.onRequest(
         };
         if (body.InvoiceNo) txn.invoice_no = body.InvoiceNo;
         txn.invoice_key = invoiceKey;          // 對帳 cron 靠這個對回 invoices/{key}
+        if (taxId) txn.tax_id = taxId;          // 補開發票的 cron 要讀,不然補開的會掉統編
         await writeTransaction(txn);
 
         // 開立電子發票(best-effort:人已經付錢了,發票開不出來不能讓 callback 失敗
@@ -235,6 +237,7 @@ export const ecpayCallback = functions.onRequest(
           ecpayTradeNo: invoiceKey,
           itemName: `StayJP ${PLANS[plan]?.display_name || plan}`,
           amountTwd: amount,
+          identifier: taxId,
         }).catch((e: unknown) => console.error("開立發票略過:", e));
 
         // 用戶推薦好友雙向獎勵 · 獎推薦人那半:朋友(uid)真付費 → 給碼主 +7 天。
