@@ -5164,7 +5164,7 @@ function render() {
       const isFav = isFavG(d);
       const dlv = gLv(d);
       const idx = lf ? getGrammarData(dlv).data.indexOf(d) + 1 : data.indexOf(d) + 1;
-      const reportUrl = `mailto:stayjpplan@gmail.com?subject=${encodeURIComponent('[文法錯誤] ' + d.id + ' ' + d.t)}&body=${encodeURIComponent('文法 ID：' + d.id + '\n文法名：' + d.t + '\n\n錯誤描述：\n（請說明哪裡有錯，例如：接續格式、例句語感、中譯…）\n')}`;
+      const reportUrl = `mailto:support@stayjp.study?subject=${encodeURIComponent('[文法錯誤] ' + d.id + ' ' + d.t)}&body=${encodeURIComponent('文法 ID：' + d.id + '\n文法名：' + d.t + '\n\n錯誤描述：\n（請說明哪裡有錯，例如：接續格式、例句語感、中譯…）\n')}`;
       // 標題 🔊：播放第一個例句(已有 VOICEVOX 預錄,零讀音風險)。不用展開卡片就能先聽一次。
       const _gEx = (d.eg && d.eg[0]) ? d.eg[0].j.replace(/<[^>]+>/g, '').replace(/'/g, "\\'") : '';
       // 文法卡標題喇叭:先唸「文法句型本身」(VOICEVOX 預錄,__TTS_G),唸完自動接第一個例句。

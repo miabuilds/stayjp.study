@@ -2,7 +2,7 @@
 // 這支攔截所有 mailto:stayjpplan@gmail.com?subject=[回報·…] 的連結,改開小表單直接寫進 Firestore `reports`
 // (規則:只准 create、欄位白名單),讓自動處理流程能讀。Firebase 沒載到/寫入失敗 → 退回原本的 mailto,回報永遠不會掉。
 (function () {
-  var MAIL_RE = /^mailto:stayjpplan@gmail\.com\?/i;
+  var MAIL_RE = /^mailto:(stayjpplan@gmail\.com|support@stayjp\.study)\?/i;
   function q(s) { var m = /[?&]subject=([^&]*)/.exec(s), b = /[?&]body=([^&]*)/.exec(s); var subj = m ? decodeURIComponent(m[1].replace(/\+/g, ' ')) : '', body = b ? decodeURIComponent(b[1].replace(/\+/g, ' ')) : ''; var k = /^\[(?:回報·)?([^\]]+)\]\s*(.*)$/.exec(subj) || []; return { kind: (k[1] || 'other').slice(0, 40), id: (k[2] || '').slice(0, 80), detail: body.split('錯誤描述')[0].trim().slice(0, 2000) }; }
   function en() { try { return (localStorage.getItem('lang') || document.documentElement.lang || '').toLowerCase().indexOf('en') === 0; } catch (e) { return false; } }
   function L(zh, e) { return en() ? e : (window.cvt ? window.cvt(zh) : zh); }

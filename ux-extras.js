@@ -261,7 +261,7 @@
   function reportHref(kind, id, detail) {
     var subj = '[回報·' + kind + '] ' + (id || '');
     var body = detail + '\n\n錯誤描述(請補充哪裡怪):\n\n———\n頁面:' + (typeof location !== 'undefined' ? location.href : '');
-    return 'mailto:stayjpplan@gmail.com?subject=' + encodeURIComponent(subj) + '&body=' + encodeURIComponent(body);
+    return 'mailto:support@stayjp.study?subject=' + encodeURIComponent(subj) + '&body=' + encodeURIComponent(body);
   }
   window.stayjpReportHref = reportHref;
 

@@ -28,7 +28,7 @@
   var MAX_SHOWS = 3, SNOOZE_DAYS = 14, MIN_DAYS = 3, WARMUP_MS = 60000, DELAY_MS = 1400;
   var IOS_URL = 'https://apps.apple.com/app/id6778227353?action=write-review';
   var PLAY_URL = 'https://play.google.com/store/apps/details?id=com.stayjp.app&showAllReviews=true';
-  var FEEDBACK_HREF = 'mailto:stayjpplan@gmail.com?subject=' + encodeURIComponent('[回報·評分回饋]');
+  var FEEDBACK_HREF = 'mailto:support@stayjp.study?subject=' + encodeURIComponent('[回報·評分回饋]');
 
   // ───────── 純函式(node 測試共用) ─────────
   function pad(n) { return (n < 10 ? '0' : '') + n; }
