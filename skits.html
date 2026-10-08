@@ -47,6 +47,10 @@
   .ep-t{font-size:12.5px;color:var(--tx2);font-weight:700}
   .ep-p{font-size:16px;font-weight:800;color:var(--ac);line-height:1.35;margin-top:3px}
   .ep-m{font-size:12.5px;color:var(--tx2);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .sec-h{display:flex;align-items:center;gap:8px;margin:26px 0 0;font-size:14px;font-weight:800;color:var(--tx2)}
+  .sec-h::after{content:"";flex:1;height:1px;background:var(--bd)}
+  .sec-h .cnt{font-size:12px;font-weight:700;color:var(--tx3)}
+  .seen-grid .ep-img img{opacity:.75}
   .note{background:var(--soft);border-radius:12px;padding:13px 15px;margin-top:22px;font-size:13.5px;line-height:1.8}
   footer{padding:30px 0 8px;text-align:center;color:var(--tx3);font-size:12px;line-height:1.8}
   /* 播放層 */
@@ -88,7 +92,7 @@
   </div>
   <div class="who" id="who"></div>
 
-  <div class="grid" id="grid"></div>
+  <div id="grid"></div>
 
   <div class="note" id="note"></div>
 
@@ -138,8 +142,9 @@ function render(){
   document.getElementById('who').innerHTML =
     '<span><b>'+esc(L('小狸','Tanuki'))+'</b> · '+esc(L('剛到日本、一直出包','new in Japan, always in trouble'))+'</span>'+
     '<span><b>コン</b> · '+esc(L('日本在地的狐狸朋友','a local fox friend'))+'</span>';
+  // 還沒看的排上面,看過的收到下面「看過的」區,找新集數不用一直往下滑
   const s = seen();
-  document.getElementById('grid').innerHTML = EPS.map(e =>
+  const card = e =>
     '<button class="ep" data-n="'+e.n+'">'+
       '<div class="ep-img"><img src="'+skitFile(e.n,'jpg')+'" alt="" loading="lazy" decoding="async">'+
       '<span class="ep-no">#'+e.n+'</span>'+
@@ -148,7 +153,12 @@ function render(){
       '<div class="ep-b"><div class="ep-t">'+esc(L(e.t,e.en))+'</div>'+
       '<div class="ep-p" lang="ja">'+esc(e.p)+'</div>'+
       '<div class="ep-m">'+esc(L(e.m,e.men))+'</div></div>'+
-    '</button>').join('');
+    '</button>';
+  const fresh = EPS.filter(e=>!s[e.n]), done = EPS.filter(e=>s[e.n]);
+  document.getElementById('grid').innerHTML =
+    (done.length && fresh.length ? '<div class="sec-h">'+esc(L('還沒看','New for you'))+' <span class="cnt">'+fresh.length+'</span></div>' : '')+
+    (fresh.length ? '<div class="grid">'+fresh.map(card).join('')+'</div>' : '')+
+    (done.length ? '<div class="sec-h">'+esc(L('看過的','Watched'))+' <span class="cnt">'+done.length+'</span></div><div class="grid seen-grid">'+done.map(card).join('')+'</div>' : '');
   document.getElementById('note').innerHTML = L(
     '<b>怎麼用:</b>先看一次笑一下,再跟著影片裡的「小狸教你一句」唸兩三遍。下次真的在日本遇到,就說得出口了。',
     '<b>How to use:</b> watch once for fun, then repeat the phrase from the lesson card two or three times. Next time it happens for real, you’ll have the words.');

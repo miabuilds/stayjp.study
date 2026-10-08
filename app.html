@@ -487,6 +487,8 @@ select.lang-btn {
 .sk-sc { flex:0 0 128px; width:128px; }
 .sk-sc .yt-sc-img { aspect-ratio:4/5; }
 .sk-sc .yt-sc-img img { object-position:50% 12%; }
+.sk-sc .sk-seen { position:absolute; top:8px; right:8px; font-size:10.5px; font-weight:800; color:#fff; background:var(--ac); border-radius:20px; padding:1px 7px; line-height:1.6; }
+.sk-sc.is-seen .yt-sc-img img { opacity:.7; }
 .sk-sc .sk-p { font-size:13.5px; font-weight:800; color:var(--ac); line-height:1.35; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .hub-art .art-entry { margin: 0 !important; }
 .hub-wod { display: flex; align-items: center; gap: 12px; background: var(--bg2); border: 1px solid var(--bd); border-radius: 14px; padding: 11px 14px; margin-top: 14px; box-shadow: 0 1px 3px rgba(0,0,0,.04); }
@@ -2861,10 +2863,11 @@ function hubSkitStripHtml(L) {
   var en = (typeof I18n !== 'undefined' && I18n.getLang && I18n.getLang() === 'en');
   var CV = function (x) { return (typeof cvt === 'function') ? cvt(x) : x; };
   var order = list.filter(function (x) { return !seen[x.n]; }).concat(list.filter(function (x) { return seen[x.n]; }));
-  var cards = order.slice(0, 8).map(function (x) {
-    return '<a class="yt-sc sk-sc" href="skits.html?ep=' + x.n + '">' +
+  var cards = order.slice(0, 20).map(function (x) {
+    return '<a class="yt-sc sk-sc' + (seen[x.n] ? ' is-seen' : '') + '" href="skits.html?ep=' + x.n + '">' +
       '<div class="yt-sc-img"><img src="' + skitFile(x.n, 'jpg') + '" alt="" loading="lazy" decoding="async" onerror="this.remove()">' +
-      '<span class="yt-lvb">#' + x.n + '</span><span class="yt-play"><i data-ic=play></i></span></div>' +
+      '<span class="yt-lvb">#' + x.n + '</span>' + (seen[x.n] ? '<span class="sk-seen">' + L('看過', 'Seen') + '</span>' : '') +
+      '<span class="yt-play"><i data-ic=play></i></span></div>' +
       '<div class="yt-sc-b"><div class="sk-p" lang="ja">' + _hubEsc(x.p) + '</div>' +
       '<div class="yt-sc-m">' + _hubEsc(en ? x.men : CV(x.m)) + '</div></div></a>';
   }).join('');
