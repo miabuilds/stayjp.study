@@ -12,6 +12,11 @@ window.SKITS = [
   { n: 8, t: '宅配', en: 'Parcel delivery', p: '再配達お願いします', r: 'さいはいたつおねがいします', m: '麻煩重新配送', men: 'Please redeliver', hook: '包裹沒收到怎麼辦', hookEn: 'Missed your parcel?' },
   { n: 9, t: '點餐', en: 'Ordering', p: 'おすすめは何ですか', r: 'おすすめはなんですか', m: '推薦什麼？', men: 'What do you recommend?', hook: '菜單全看不懂？', hookEn: "Can't read the menu?" },
   { n: 10, t: '公司', en: 'At the office', p: 'お疲れ様でした', r: 'おつかれさまでした', m: '辛苦了', men: 'Thanks for your hard work', hook: '同事下班別回這句', hookEn: "Don't say this at work" },
-  { n: 11, t: '狸貓烏龍麵', en: 'Tanuki udon', p: 'たぬきうどん', r: 'たぬきうどん', m: '加天かす的烏龍麵', men: 'Udon with tempura bits', hook: '新朋友狐狸コン登場', hookEn: 'Meet Kon the fox' }
+  { n: 11, t: '狸貓烏龍麵', en: 'Tanuki udon', p: 'たぬきうどん', r: 'たぬきうどん', m: '加天かす的烏龍麵', men: 'Udon with tempura bits', hook: '新朋友狐狸コン登場', hookEn: 'Meet Kon the fox' },
+  { n: 12, t: '居酒屋點餐', en: 'Izakaya order', p: 'とりあえず生で', r: 'とりあえずなまで', m: '先來杯生啤', men: "Draft beer to start", hook: '居酒屋第一句點什麼？', hookEn: 'The first order at an izakaya' },
+  { n: 13, t: '逛街', en: 'Shopping', p: '見てるだけです', r: 'みてるだけです', m: '我只是看看', men: "I'm just looking", hook: '店員一直靠過來', hookEn: 'When staff keep approaching' },
+  { n: 14, t: '區役所', en: 'City office', p: '番号札を取ってください', r: 'ばんごうふだをとってください', m: '請抽號碼牌', men: 'Please take a number', hook: '等了兩小時的原因', hookEn: 'Why he waited two hours' },
+  { n: 15, t: 'やばい', en: 'Yabai', p: 'やばい', r: 'やばい', m: '糟了／超讚(看語氣)', men: 'Uh-oh / awesome (by tone)', hook: '「やばい」是好是壞？', hookEn: 'Good or bad?' },
+  { n: 16, t: '要袋子嗎', en: 'Need a bag?', p: 'お願いします', r: 'おねがいします', m: '要，麻煩你', men: 'Yes, please', hook: '千萬別回「いいです」', hookEn: "Don't answer いいです" }
 ];
 window.skitFile = function (n, ext) { return 'videos/skit/ep' + (n < 10 ? '0' : '') + n + '.' + ext; };
