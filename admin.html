@@ -991,10 +991,10 @@ function txnChannel(x) {
 }
 function exportLedgerCSV() {
   if (!_ledgerExport.length) { alert('先按「重新整理」載入帳本再匯出'); return; }
-  const head = ['時間', 'Email/UID', '類型', '方案', '金額(NT$)', '付款方式', '狀態', '交易ID'];
+  const head = ['時間', 'Email/UID', '類型', '方案', '金額(NT$)', '付款方式', '狀態', '推薦碼', '交易ID'];
   const q = v => '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"';
   const lines = [head.map(q).join(',')];
-  _ledgerExport.forEach(r => lines.push([r.time, r.who, r.type, r.plan, r.amount, r.pay, r.status, r.ext].map(q).join(',')));
+  _ledgerExport.forEach(r => lines.push([r.time, r.who, r.type, r.plan, r.amount, r.pay, r.status, r.ref, r.ext].map(q).join(',')));
   // BOM 讓 Excel 正確顯示中文
   const blob = new Blob(['﻿' + lines.join('\r\n')], { type: 'text/csv;charset=utf-8;' });
   const a = document.createElement('a');
@@ -1018,6 +1018,20 @@ async function renderLedger() {
     const d = await r.json();
     (d.subscribers || []).forEach(s => { if (s.uid) uidEmail[s.uid] = s.email || s.uid.slice(0, 8); });
   } catch (e) {}
+  // 推薦碼欄:成交那筆用 commissions(buyer_uid + txn_id = 交易 external_id)精準對到 KOL 與分潤;
+  // 未成交(pending)那筆從建單備註「(推薦碼 X 折 N)」讀。個人碼(type:user)沒分潤,只能從 pending 備註看出來。
+  const comByTxn = {}, kolName = {};
+  try {
+    const [cs, rs] = await Promise.all([db.collection('commissions').get(), db.collection('ref_codes').get()]);
+    rs.forEach(d => { kolName[d.id] = d.data().kol || ''; });
+    cs.forEach(d => { const c = d.data(); if (c.buyer_uid && c.txn_id) comByTxn[c.buyer_uid + '|' + c.txn_id] = c; });
+  } catch (e) { console.warn('帳本推薦碼欄載入失敗:', e); }
+  const refOf = x => {
+    const c = comByTxn[x.uid + '|' + x.external_id];
+    if (c) return { code: c.code, kol: kolName[c.code] || '', amount: Number(c.amount_twd) || 0, voided: c.state === 'void' };
+    const m = /推薦碼 ([A-Z0-9_-]+) 折/.exec(x.note || '');
+    return m ? { code: m[1], kol: kolName[m[1]] || '', amount: null } : null;
+  };
   try {
     const snap = await db.collection('transactions').orderBy('occurred_at', 'desc').limit(2000).get();
     // 區間過濾:讀日期輸入框(空=不限)
@@ -1046,6 +1060,7 @@ async function renderLedger() {
     const rows = visibleDocs.map(dd => {
       const x = dd.data();
       const amt = x.amount_twd || 0;
+      const ref = refOf(x);
       _ledgerExport.push({
         time: fmt(x.occurred_at),
         who: uidEmail[x.uid] || x.uid || '',
@@ -1055,6 +1070,7 @@ async function renderLedger() {
         pay: PAY_TXT[x.payment_method] || x.payment_method || '',
         status: TXN_STATUS_TXT[x.status] || x.status || '',
         ext: x.external_id || '',
+        ref: ref ? ref.code + (ref.kol ? ' ' + ref.kol : '') + (ref.amount != null ? ' 分潤' + ref.amount + (ref.voided ? '(作廢)' : '') : '') : '',
         test: x.is_sandbox ? 'sandbox(測試)' : '',
       });
       // 沙盒測試購買不計入營收/退費(否則對帳數字虛高)
@@ -1078,6 +1094,7 @@ async function renderLedger() {
         <td style="padding:6px 6px;text-align:right;white-space:nowrap">${amtCell}</td>
         <td style="padding:6px 6px;white-space:nowrap">${PAY_TXT[x.payment_method] || x.payment_method || '—'}</td>
         <td style="padding:6px 6px">${TXN_STATUS_TXT[x.status] || x.status}</td>
+        <td style="padding:6px 6px;white-space:nowrap">${ref ? `<b>${esc(ref.code)}</b>${ref.kol ? `<div style="font-size:11px;color:var(--tx3)">${esc(ref.kol)}</div>` : ''}${ref.amount != null ? `<div style="font-size:11px;color:${ref.voided ? '#EF4444' : '#C6553B'}">分潤 NT$${ref.amount.toLocaleString()}${ref.voided ? '(作廢)' : ''}</div>` : ''}` : '<span style="color:var(--tx3)">—</span>'}</td>
         <td style="padding:6px 6px;color:var(--tx3);font-size:11px;word-break:break-all">${esc(x.external_id || '—')}</td>
         <td style="padding:6px 6px;white-space:nowrap"><button onclick="purgeUid('${esc(x.uid)}')" style="font-size:10px;padding:2px 7px;border:1px solid var(--bd);border-radius:6px;background:transparent;color:#EF4444;cursor:pointer" title="假刪除此 uid 的訂閱+全部交易(隱藏、可復原;owner 操作)">隱藏此帳號</button></td>
       </tr>`;
@@ -1105,10 +1122,10 @@ async function renderLedger() {
       <div class="stat"><div class="lbl">處理中(未扣款)</div><div class="val">${pending}</div><div class="sub">棄單噪音,可清</div></div>`;
     renderRevenueChart(byMonth);
     renderDailyChart(byDay);
-    box.innerHTML = `<table style="width:100%;border-collapse:collapse;min-width:680px">
+    box.innerHTML = `<table style="width:100%;border-collapse:collapse;min-width:760px">
       <thead><tr style="text-align:left;color:var(--tx2);border-bottom:1px solid var(--bd)">
         <th style="padding:6px 6px">時間</th><th style="padding:6px 6px">帳號</th><th style="padding:6px 6px">類型</th>
-        <th style="padding:6px 6px">方案</th><th style="padding:6px 6px;text-align:right">金額</th><th style="padding:6px 6px">來源</th><th style="padding:6px 6px">狀態</th><th style="padding:6px 6px">單號</th><th style="padding:6px 6px"></th>
+        <th style="padding:6px 6px">方案</th><th style="padding:6px 6px;text-align:right">金額</th><th style="padding:6px 6px">來源</th><th style="padding:6px 6px">狀態</th><th style="padding:6px 6px">推薦碼</th><th style="padding:6px 6px">單號</th><th style="padding:6px 6px"></th>
       </tr></thead><tbody>${rows}</tbody></table>`;
   } catch (e) { box.textContent = '讀取失敗:' + e.message; }
 }
