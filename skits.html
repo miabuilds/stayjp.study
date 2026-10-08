@@ -141,7 +141,8 @@ function render(){
   document.getElementById('hL').textContent = L('每集 20 秒,看小狸在日本出包,順便學一句馬上用得到的日文。','20-second skits: Tanuki messes up in Japan — and you learn one phrase you can use right away.');
   document.getElementById('who').innerHTML =
     '<span><b>'+esc(L('小狸','Tanuki'))+'</b> · '+esc(L('剛到日本、一直出包','new in Japan, always in trouble'))+'</span>'+
-    '<span><b>コン</b> · '+esc(L('日本在地的狐狸朋友','a local fox friend'))+'</span>';
+    '<span><b>コン</b> · '+esc(L('日本在地的狐狸朋友','a local fox friend'))+'</span>'+
+    '<span><b>'+esc(L('柴犬店員','Shiba clerk'))+'</b> · '+esc(L('哪家店都有牠','works at every shop'))+'</span>';
   // 還沒看的排上面,看過的收到下面「看過的」區,找新集數不用一直往下滑
   const s = seen();
   const card = e =>

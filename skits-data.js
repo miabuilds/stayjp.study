@@ -17,6 +17,11 @@ window.SKITS = [
   { n: 13, t: '逛街', en: 'Shopping', p: '見てるだけです', r: 'みてるだけです', m: '我只是看看', men: "I'm just looking", hook: '店員一直靠過來', hookEn: 'When staff keep approaching' },
   { n: 14, t: '區役所', en: 'City office', p: '番号札を取ってください', r: 'ばんごうふだをとってください', m: '請抽號碼牌', men: 'Please take a number', hook: '等了兩小時的原因', hookEn: 'Why he waited two hours' },
   { n: 15, t: 'やばい', en: 'Yabai', p: 'やばい', r: 'やばい', m: '糟了／超讚(看語氣)', men: 'Uh-oh / awesome (by tone)', hook: '「やばい」是好是壞？', hookEn: 'Good or bad?' },
-  { n: 16, t: '要袋子嗎', en: 'Need a bag?', p: 'お願いします', r: 'おねがいします', m: '要，麻煩你', men: 'Yes, please', hook: '千萬別回「いいです」', hookEn: "Don't answer いいです" }
+  { n: 16, t: '要袋子嗎', en: 'Need a bag?', p: 'お願いします', r: 'おねがいします', m: '要，麻煩你', men: 'Yes, please', hook: '千萬別回「いいです」', hookEn: "Don't answer いいです" },
+  { n: 17, t: '麵的硬度', en: 'Noodle firmness', p: 'かためで', r: 'かためで', m: '麵硬一點', men: 'Firm noodles, please', hook: '拉麵店問「麵要多硬」', hookEn: '"How firm?" at a ramen shop' },
+  { n: 18, t: '公司聚會', en: 'Drinking party', p: 'お酒は弱いんです', r: 'おさけはよわいんです', m: '我酒量不好', men: "I can't drink much", hook: '不想喝要怎麼說？', hookEn: 'How to turn down a drink' },
+  { n: 19, t: '趕電車', en: 'Rushing for a train', p: '駆け込み乗車', r: 'かけこみじょうしゃ', m: '衝進快關的車門', men: 'Rushing onto a train', hook: '車站一直廣播這句', hookEn: 'That station announcement' },
+  { n: 20, t: '試穿', en: 'Trying on', p: '試着してもいいですか', r: 'しちゃくしてもいいですか', m: '可以試穿嗎？', men: 'May I try this on?', hook: '試穿前要先問這句', hookEn: 'Ask before trying on' },
+  { n: 21, t: '道歉', en: 'Apologizing', p: '申し訳ございません', r: 'もうしわけございません', m: '非常抱歉(正式)', men: 'I sincerely apologize', hook: '日文道歉有三種', hookEn: 'Three ways to say sorry' }
 ];
 window.skitFile = function (n, ext) { return 'videos/skit/ep' + (n < 10 ? '0' : '') + n + '.' + ext; };
