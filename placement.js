@@ -16,7 +16,7 @@
   function start(opts) {
     ensureCss();
     box().innerHTML = '<div class="pl"><div class="qhd"><h3 style="margin:0">' + L('程度測驗', 'Placement test') + '</h3><button class="qclose" style="width:auto;margin:0;padding:2px 10px" onclick="Placement.close()"><i data-ic=x></i></button></div>'
-      + '<img class="pl-mascot" src="images/mascot/tanuki-p08.png" alt="">'
+      + '<img class="pl-mascot" src="images/mascot/tanuki-ticket.png" alt="">'
       + '<div class="pl-intro">' + L('3 分鐘、最多 24 題。題目會依你的答對率自動變難或變簡單,不用擔心太難。', '3 minutes, up to 24 questions. Difficulty adapts to how you do — don\'t worry if it gets hard.') + '</div>'
       + '<button type="button" class="pl-cta" onclick="Placement._go(1)">' + L('我學過一點,從 N4 題開始', 'I know some Japanese — start at N4') + '</button>'
       + '<button type="button" class="pl-cta pl-cta-sub" onclick="Placement._go(0)">' + L('我幾乎零基礎,從 N5 開始', 'Complete beginner — start at N5') + '</button>'

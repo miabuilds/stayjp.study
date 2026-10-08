@@ -27,7 +27,8 @@
   .lead{color:var(--tx2);font-size:14.5px}
   .cast{display:flex;align-items:flex-end;flex-shrink:0}
   .cast img{width:76px;height:auto;display:block}
-  .cast img + img{width:62px;margin-left:-8px}
+  .cast img + img{width:58px;margin-left:-8px}
+  @media (max-width:480px){ .hero{flex-direction:column-reverse;align-items:flex-start;gap:4px} .cast img{width:62px} .cast img + img{width:48px} }
   .who{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0 4px}
   .who span{font-size:12.5px;color:var(--tx2);background:var(--bg2);border:1px solid var(--bd);border-radius:20px;padding:4px 11px}
   .who b{color:var(--tx)}
@@ -88,7 +89,7 @@
       <h1 id="hT">小狸的日本生活</h1>
       <p class="lead" id="hL">每集 20 秒,看小狸在日本出包,順便學一句馬上用得到的日文。</p>
     </div>
-    <div class="cast" aria-hidden="true"><img src="images/mascot/tanuki-happy.png" alt=""><img src="images/mascot/fox-stand.png" alt=""></div>
+    <div class="cast" aria-hidden="true"><img src="images/mascot/tanuki-happy.png" alt=""><img src="images/mascot/fox-stand.png" alt=""><img src="images/mascot/shiba-bow.png" alt=""></div>
   </div>
   <div class="who" id="who"></div>
 

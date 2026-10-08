@@ -3046,7 +3046,7 @@ function renderHub() {
         + '<button onclick="VocabListen.open()"><span class="hq-ic"><i data-ic=headphones></i></span>' + L('用聽的背', 'Listen') + '</button>'
         + '<button onclick="Omikuji.open()" class="hq-omk' + ((window.Omikuji && Omikuji.drawnToday()) ? '' : ' hq-new') + '"><span class="hq-ic"><i data-ic=sparkle></i></span>' + L('今日運勢', 'Fortune') + '</button>'
       + '</div>'
-      + '<div class="hub-foot"><img src="images/mascot/tanuki-p06.png" alt=""><span>' + L('今天也一起加油！', 'Let’s study today!') + '</span></div>'
+      + '<div class="hub-foot"><img src="images/mascot/fox-highfive.png" alt=""><span>' + L('今天也一起加油！', 'Let’s study today!') + '</span></div>'
     + '</div>'
     + '</div>';
   const _updHzProg = () => { try { const el=document.getElementById('hzProg'); if(el && window.Journey){ const st=Journey.stats(); el.textContent = st.done ? (st.done+' / '+st.tot+' '+L('步完成','steps done')) : L('約 15 分鐘走完第一章','~15 min for chapter one'); } } catch (e) {} };
