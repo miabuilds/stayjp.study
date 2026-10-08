@@ -65,6 +65,20 @@ export const rcSyncSubscription = functions.onRequest(
       // 試用期 → status: trialing(帳號頁顯示「試用中・剩 N 天」,而非「Premium 會員」)
       const periodType = data?.subscriber?.subscriptions?.[prodId]?.period_type;
       const existing = await getSubscription(uid);
+      // 官網(ECPay/PayPal)有效訂閱、且比 App 這筆撐更久 → 不准蓋掉(2026-10-09:App 原價試用中的人
+      // 改去官網買雙十價,開 App 一同步就被蓋回 10/16 到期的試用 = 付了錢卻被降級)。
+      if (existing && existing.source !== "app"
+          && ["active", "trialing", "cancelled"].includes(existing.status)
+          && (existing.expiresAt || 0) > expiresAt) {
+        res.json({ ok: true, premium: true, plan: existing.plan, expiresAt: existing.expiresAt, kept: "web" });
+        return;
+      }
+      // 人工處理中(例:清掉 App 試用讓用戶去官網買)→ 暫停同步到 rc_sync_hold_until
+      const hold = (await admin.firestore().doc(`users/${uid}`).get()).get("rc_sync_hold_until");
+      if (typeof hold === "number" && hold > nowMs()) {
+        res.json({ ok: true, premium: true, plan, expiresAt, held: true });
+        return;
+      }
       const sub: SubscriptionDoc = {
         source: "app",
         plan,
