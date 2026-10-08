@@ -127,7 +127,7 @@ function cvt(x){ return (!x||lang()!=='zh-CN'||!_tw2cn)?x:_tw2cn(x); }
 function L(zh,en){ return lang()==='en'?en:cvt(zh); }
 function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
 
-// 看過哪幾集(只存在這台裝置)
+// 看過哪幾集:localStorage skit_seen {"3":1};已加進 app.html SYNC_KEYS,登入後回到面板就會跟帳號同步(聯集合併)
 function seen(){ try{ return JSON.parse(localStorage.getItem('skit_seen')||'{}')||{}; }catch(e){ return {}; } }
 function markSeen(n){ try{ const s=seen(); s[n]=1; localStorage.setItem('skit_seen',JSON.stringify(s)); }catch(e){} }
 

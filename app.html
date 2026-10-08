@@ -1101,6 +1101,10 @@ body.imm-zh .vi.zh-show .vm, body.imm-zh .vi.zh-show .exz { filter:none; opacity
 .th-chip i { font-style:normal; color:var(--tx3); font-size:11px; }
 .th-chip:hover { border-color:var(--ac); }
 .th-chip.on { background:var(--ac); color:#fff; border-color:var(--ac); }
+/* 搜尋範圍(級別複選)+ 結果卡級別標籤 */
+.srch-scope { display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin:0 0 16px; padding:10px 12px; border:1px solid var(--bd); border-radius:12px; background:var(--bg2); }
+.srch-scope .ss-lbl { font-size:13px; color:var(--tx3); margin-right:2px; }
+.lv-tag { display:inline-block; flex-shrink:0; font-size:11px; font-weight:700; color:var(--ac); border:1px solid var(--ac); border-radius:6px; padding:0 6px; margin-right:6px; line-height:18px; vertical-align:2px; }
 .th-active { display:inline-flex; align-items:center; gap:6px; font-size:12.5px; font-weight:700; color:var(--ac); background:var(--soft,rgba(var(--ac-rgb),.1)); border-radius:999px; padding:5px 12px; }
 .th-active button { font:inherit; font-size:11.5px; border:0; background:none; color:var(--tx2); cursor:pointer; text-decoration:underline; padding:0; }
 .daily-bar .dp-lbl { font-size:13px; color: var(--tx2); margin-bottom: 4px; }
@@ -2498,7 +2502,7 @@ function saveSRSCloud() {
   saveProgressKeys({ srs_data: d });
 }
 // ── Sync ALL data ──
-const SYNC_KEYS = ['sp_settings','sp_sets','tts_voice','study_log','word_notebook','grammar_srs','daily_progress','mock_exam_history','exam_date','base_level','goal_level','reading_done','reading_scores','listening_scores','listening_done','shadow_favs','wrong_questions','ls_done','jr_kana','jr_essentials','jr_phrases','jr_chat','jr_vb_seen','jr_gr_seen','path_progress','my_vocab','ess_progress','guide_steps','rate_prompt_v1'];
+const SYNC_KEYS = ['sp_settings','sp_sets','tts_voice','study_log','word_notebook','grammar_srs','daily_progress','mock_exam_history','exam_date','base_level','goal_level','reading_done','reading_scores','listening_scores','listening_done','shadow_favs','wrong_questions','ls_done','jr_kana','jr_essentials','jr_phrases','jr_chat','jr_vb_seen','jr_gr_seen','path_progress','my_vocab','ess_progress','guide_steps','rate_prompt_v1','skit_seen'];
 // 學習日曆逐日上傳:update('study_log.日期', 值) 只動那一天 → 雲端日曆只增不減,
 // 任何裝置的 stale 本機資料都毀不掉歷史(root cause 修:整包 set 會整欄覆蓋)。
 function saveStudyDayCloud(dates) {
@@ -2562,9 +2566,9 @@ window.stayjpAddWord = function(w, r, m, lv){
   if (typeof updateFavCount === 'function') { try { updateFavCount(); } catch(e){} }
   return 'added';
 };
-function toggleFav(id) {
+function toggleFav(id, vlv) {
   if (currentMode === 'vocab') {
-    const lv = currentLevel;
+    const lv = vlv || currentLevel;
     const entry = (getVocabData(lv) || []).find(d => d.w === id);
     let nb; try { nb = JSON.parse(localStorage.getItem('word_notebook')) || []; } catch(e) { nb = []; }
     const existsIdx = nb.findIndex(x => x.w === id && x.lv === lv);
@@ -2582,7 +2586,9 @@ function toggleFav(id) {
     track(adding ? 'fav_add' : 'fav_remove', { kind: 'v'+lv });
     return;
   }
-  const k = favKey();
+  // 文法:搜尋跨級時收藏要記到條目自己的級別(id 前綴 n5-…)
+  const k = (currentMode === 'grammar' && (String(id).match(/^(n\d)/) || [])[1]) || favKey();
+  if (!favorites[k]) favorites[k] = [];
   const idx = favorites[k].indexOf(id);
   const adding = idx === -1;
   if (idx > -1) favorites[k].splice(idx, 1); else favorites[k].push(id);
@@ -2876,6 +2882,13 @@ function hubSkitStripHtml(L) {
     '<a class="yt-strip-all" href="skits.html">' + L('全部集數', 'All episodes') + ' ›</a></div>' +
     '<div class="yt-strip-sc">' + cards + '</div></div>';
 }
+// 從 skits.html(或其他子頁)按返回,瀏覽器可能直接從 bfcache 還原這頁、不重跑載入:
+// 子頁寫進 localStorage 的進度(skit_seen 等 SYNC_KEYS)就不會上傳,面板橫條的「看過」也是舊的 → 還原時補一次
+window.addEventListener('pageshow', function (e) {
+  if (!e.persisted) return;
+  try { if (typeof saveAllCloud === 'function') saveAllCloud(); } catch (_) {}
+  try { if (typeof doRender === 'function') doRender(); } catch (_) {}
+});
 // ── 招呼卡:今日目標圓環 + 本週 7 天火焰(2026-10 改版;資料全沿用 _hubToday / study_log / 目前模式的 GOAL)──
 const _HUB_RING_C = 263.89;   // 2π × r42
 function _hubDayTotal(d) { return d ? ((d.vocab || 0) + (d.grammar || 0) + (d.quiz || 0)) : 0; }   // 跟 Calendar.getStreaks 判斷「有讀」同一套欄位
@@ -3106,6 +3119,28 @@ function toggleFavFilter() {
   showFavOnly = !showFavOnly;
   document.getElementById('favBtn').classList.toggle('fav-on', showFavOnly);
   doRender();
+}
+// 搜尋範圍:搜尋時可複選 N5–N1(預設全部),不用先切到對的級別才找得到(用戶回饋 2026-10)
+const ALL_LVS = ['n5','n4','n3','n2','n1'];
+let searchLvs = (function () {
+  try { const a = JSON.parse(localStorage.getItem('search_lvs')); if (Array.isArray(a)) { const v = a.filter(l => ALL_LVS.includes(l)); if (v.length) return v; } } catch (e) {}
+  return ALL_LVS.slice();
+})();
+function toggleSearchLv(lv) {
+  if (lv === 'all') searchLvs = ALL_LVS.slice();
+  else if (searchLvs.length === ALL_LVS.length) searchLvs = [lv];   // 全選狀態下點某級 → 只看該級
+  else if (searchLvs.includes(lv)) { if (searchLvs.length > 1) searchLvs = searchLvs.filter(l => l !== lv); }
+  else searchLvs = ALL_LVS.filter(l => l === lv || searchLvs.includes(l));
+  try { localStorage.setItem('search_lvs', JSON.stringify(searchLvs)); } catch (e) {}
+  doRender();
+}
+window.toggleSearchLv = toggleSearchLv;
+function searchScopeHTML(n) {
+  const all = searchLvs.length === ALL_LVS.length;
+  return `<div class="srch-scope"><span class="ss-lbl">${enOr('搜尋範圍','Search in')}</span>`
+    + `<button class="th-chip ${all?'on':''}" onclick="toggleSearchLv('all')">${enOr('全部','All')}</button>`
+    + ALL_LVS.map(l => `<button class="th-chip ${!all&&searchLvs.includes(l)?'on':''}" onclick="toggleSearchLv('${l}')">${l.toUpperCase()}</button>`).join('')
+    + `<span class="ss-lbl" style="margin-left:auto">${enOr(n+' 筆', n+' results')}</span></div>`;
 }
 let st; function onSearch(v) { clearTimeout(st); st = setTimeout(() => { searchTerm = v.trim().toLowerCase(); if (inHub && searchTerm) { inHub = false; document.body.classList.remove('hub-view'); } doRender(); }, 200); }
 window.doRender = doRender;   // 給 tool-quota:用完額度後即時重繪,<i data-ic=lock></i> 立刻顯示(免 reload)
@@ -4797,16 +4832,19 @@ function renderVocab() {
     window._vtRerender = true;
     window.ensureVocabThemes().then(function () { if (typeof doRender === 'function') doRender(); });
   }
-  const data = getVocabData(currentLevel);
-  const favSet = getVocabFavSet(currentLevel);
-  const favList = [...favSet];
+  const lf = searchTerm;
+  // 搜尋時跨級(searchLvs 複選);lvOf 記每筆屬於哪級,收藏/標籤用
+  const lvOf = new Map();
+  const srcLvs = lf ? searchLvs : [currentLevel];
+  const data = lf ? srcLvs.flatMap(l => { const a = getVocabData(l); a.forEach(d => lvOf.set(d, l)); return a; }) : getVocabData(currentLevel);
+  const favByLv = {}; srcLvs.forEach(l => favByLv[l] = getVocabFavSet(l));
+  const isFavV = d => { const s = favByLv[lvOf.get(d) || currentLevel]; return !!(s && s.has(d.w)); };
   const mn = document.getElementById('mn');
   const sd = document.getElementById('sd');
-  const lf = searchTerm;
 
   let filtered = data;
   if (lf) filtered = filtered.filter(d => d.w.includes(lf)||d.r.includes(lf)||d.m.includes(lf)||( /^[a-z0-9 \-']+$/.test(lf) && kanaToRomaji(d.r).includes(lf) ));
-  if (showFavOnly) filtered = filtered.filter(d => favList.includes(d.w));
+  if (showFavOnly) filtered = filtered.filter(isFavV);
   // 主題篩選(生活主題,vocab-themes.js):選了主題就看該主題全部,不受每日批次限制
   if (themeFilter && window.VOCAB_THEMES) filtered = filtered.filter(d => VOCAB_THEMES[d.w + '|' + (d.r || '')] === themeFilter);
 
@@ -4866,11 +4904,12 @@ function renderVocab() {
   // 例句一律可點(音檔已全生成,speak() 有 mp3 用 mp3、沒有退瀏覽器 TTS)。
   const esc1 = s => (''+s).replace(/'/g, "\\'");
   function vocabCardHTML(d, catName, isFav) {
+    const dlv = lvOf.get(d) || currentLevel;
     const verbBtn = d.c === '動' ? `<button class="verb-btn" onclick="event.stopPropagation();openVerbModal('${esc1(d.w)}','${esc1(d.r||'')}')" title="變化表">変</button>` : '';
     const ex = d.ex ? `<div class="vex" data-nolang data-j="${(''+d.ex.j).replace(/"/g,'&quot;')}" onclick="event.stopPropagation();speak(this.dataset.j)" title="${enOr('點例句聽發音','Tap to hear')}"><span class="exj">${window.furiganaHTML?window.furiganaHTML(d.ex.j):d.ex.j}<svg class="vex-spk" viewBox="0 0 24 24"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.54 8.46a5 5 0 010 7.07M19.07 4.93a10 10 0 010 14.14"/></svg></span><span class="exz">${enOr(d.ex.z,d.ex.e||'')}</span></div>` : '';
     return `<div class="vi" data-fid="${d.w}" data-w="${d.w}" data-r="${d.r||''}">`
-      + `<div class="vx-ctrl"><span class="vspd${getTtsSpeed() !== 1 ? ' on' : ''}" onclick="event.stopPropagation();cycleTtsSpeed()" title="${enOr('語音速度(點擊切換)', 'Audio speed (tap to cycle)')}">${getTtsSpeed() === 1 ? '1' : getTtsSpeed()}×</span>${spkSvg}${verbBtn}<span class="vp">${catLabel(catName)}</span><svg class="star ${isFav?'on':''}" onclick="event.stopPropagation();toggleFav('${esc1(d.w)}')" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>`
-      + `<div class="vw">${d.w}</div>${d.w!==d.r?`<div class="vr">${d.r}</div>`:''}<div class="vm">${cvt(d.m)}</div>`
+      + `<div class="vx-ctrl"><span class="vspd${getTtsSpeed() !== 1 ? ' on' : ''}" onclick="event.stopPropagation();cycleTtsSpeed()" title="${enOr('語音速度(點擊切換)', 'Audio speed (tap to cycle)')}">${getTtsSpeed() === 1 ? '1' : getTtsSpeed()}×</span>${spkSvg}${verbBtn}<span class="vp">${catLabel(catName)}</span><svg class="star ${isFav?'on':''}" onclick="event.stopPropagation();toggleFav('${esc1(d.w)}','${dlv}')" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>`
+      + `<div class="vw">${lf ? `<span class="lv-tag">${dlv.toUpperCase()}</span>` : ''}${d.w}</div>${d.w!==d.r?`<div class="vr">${d.r}</div>`:''}<div class="vm">${cvt(d.m)}</div>`
       + ex
       + `</div>`;
   }
@@ -4909,8 +4948,7 @@ function renderVocab() {
           return `<section class="cs"><h2><span class="ci2">${entry.cat.icon}</span>${catLabel(entry.cat.name)}<span style="font-size:12px;color:#999;font-weight:400;margin-left:auto">${t('cat_count_vocab', { n: entry.count })}</span></h2></section>`;
         }
         const d = entry.d;
-        const isFav = favList.includes(d.w);
-        return vocabCardHTML(d, entry.catName, isFav);
+        return vocabCardHTML(d, entry.catName, isFavV(d));
       }
     });
 
@@ -4922,6 +4960,7 @@ function renderVocab() {
     window._vlCatIndex = null;   // 非虛擬列表 → 側邊欄改走 #vcat anchor(區塊都在 DOM)
 
     let vc = 0;
+    if (lf) h += searchScopeHTML(filtered.length);
     VOCAB_CATS.forEach(cat => {
       const items = groups[cat.key];
       if (!items||!items.length) return;
@@ -4929,8 +4968,7 @@ function renderVocab() {
       h += `<section class="cs" id="vcat-${cat.key}"><h2><span class="ci2">${cat.icon}</span>${catLabel(cat.name)}<span style="font-size:12px;color:#999;font-weight:400;margin-left:auto">${t('cat_count_vocab', { n: items.length })}</span></h2>`;
       h += '<div class="vg">';
       items.forEach(d => {
-        const isFav = favList.includes(d.w);
-        h += vocabCardHTML(d, cat.name, isFav);
+        h += vocabCardHTML(d, cat.name, isFavV(d));
       });
       h += '</div></section>';
     });
@@ -5043,17 +5081,21 @@ function render() {
     window._gdRerender = true;
     window.ensureGrammarDetail().then(function () { if (typeof doRender === 'function') doRender(); });
   }
-  const gd = getGrammarData(currentLevel);
-  const data = gd.data;
-  const cats = gd.cats;
-  const favList = favorites[currentLevel] || [];
+  const lf = searchTerm;
+  // 搜尋時跨級(searchLvs 複選):資料串起來、分類取聯集;條目 id 自帶級別前綴(n5-…)
+  const srcLvs = lf ? searchLvs : [currentLevel];
+  const gds = srcLvs.map(l => getGrammarData(l));
+  const data = gds.flatMap(g => g.data);
+  const cats = []; const _seenCat = new Set();
+  gds.forEach(g => (g.cats || []).forEach(c => { if (!_seenCat.has(c.name)) { _seenCat.add(c.name); cats.push(c); } }));
+  const gLv = d => (String(d.id).match(/^(n\d)/) || [])[1] || currentLevel;
+  const isFavG = d => (favorites[gLv(d)] || []).includes(d.id);
   const mn = document.getElementById('mn');
   const sd = document.getElementById('sd');
-  const lf = searchTerm;
 
   let filtered = data;
   if (lf) filtered = filtered.filter(d => d.t.includes(lf)||d.ex.includes(lf)||(d.p&&d.p.includes(lf))||d.eg.some(e=>e.j.includes(lf)||e.z.includes(lf)));
-  if (showFavOnly) filtered = filtered.filter(d => favList.includes(d.id));
+  if (showFavOnly) filtered = filtered.filter(isFavG);
 
   // Grammar daily mode: limit to batch
   const gProg = getGrammarDailyProgress(currentLevel);
@@ -5097,14 +5139,16 @@ function render() {
   }
 
   let vc = 0;
+  if (lf) h += searchScopeHTML(filtered.length);
   cats.forEach(cat => {
     const items = groups[cat.name];
     if (!items||!items.length) return;
     vc += items.length;
     h += `<section class="cs" id="cat-${cat.name}"><h2><span class="ci2">${cat.icon}</span>${catLabel(cat.name)}<span style="font-size:12px;color:#999;font-weight:400;margin-left:auto">${t('cat_count_grammar', { n: items.length })}</span>${items.length?`<button class="unit-quiz-btn" onclick="GrammarDrill.startUnit(this.dataset.cat)" data-cat="${cat.name}"><i data-ic=edit></i> ${enOr(cvt('單元測驗'),'Unit quiz')}</button>`:''}</h2>`;
     items.forEach((d,i) => {
-      const isFav = favList.includes(d.id);
-      const idx = data.indexOf(d) + 1;
+      const isFav = isFavG(d);
+      const dlv = gLv(d);
+      const idx = lf ? getGrammarData(dlv).data.indexOf(d) + 1 : data.indexOf(d) + 1;
       const reportUrl = `mailto:stayjpplan@gmail.com?subject=${encodeURIComponent('[文法錯誤] ' + d.id + ' ' + d.t)}&body=${encodeURIComponent('文法 ID：' + d.id + '\n文法名：' + d.t + '\n\n錯誤描述：\n（請說明哪裡有錯，例如：接續格式、例句語感、中譯…）\n')}`;
       // 標題 🔊：播放第一個例句(已有 VOICEVOX 預錄,零讀音風險)。不用展開卡片就能先聽一次。
       const _gEx = (d.eg && d.eg[0]) ? d.eg[0].j.replace(/<[^>]+>/g, '').replace(/'/g, "\\'") : '';
@@ -5121,10 +5165,10 @@ function render() {
         } catch (e) { if (exText) speak(exText); }
       };
       const _gSpk = _gEx ? `<svg class="gt-spk" onclick="event.stopPropagation();playGrammarTitle('${d.id}','${_gEx}')" title="${enOr('唸文法+例句','Play pattern + example')}" aria-label="${enOr('唸文法+例句','Play pattern + example')}" viewBox="0 0 24 24"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.54 8.46a5 5 0 010 7.07M19.07 4.93a10 10 0 010 14.14"/></svg>` : '';
-      h += `<div class="gc" id="${d.id}"><div class="gh" onclick="toggleCard(this,event)"><span class="gn">${idx}</span><span class="gt">${d.t}</span>${_gSpk}${(currentLevel==='n5'&&d.n)?'<span class="gbadge-adv">'+enOr('進階','Advanced')+'</span>':''}<svg class="star ${isFav?'on':''}" onclick="event.stopPropagation();toggleFav('${d.id}')" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg class="arr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div><div class="gb"><div class="gx"><div class="pt">${window.linkGrammarTerms?window.linkGrammarTerms(d.p):d.p}</div><div class="ep">${(function(){var s=cvt(d.ex);return window.linkGrammarTerms?window.linkGrammarTerms(s):s;})()}</div>${(window.GRAMMAR_DETAIL&&window.GRAMMAR_DETAIL[d.id])?`<div class="gc-detail"><button type="button" class="gd-toggle" onclick="event.stopPropagation();toggleDetail(this)"><i data-ic=book></i> ${enOr('詳解','Deep dive')} ▾</button><div class="gd-body gd-hidden">${grammarDetailHTML(window.GRAMMAR_DETAIL[d.id])}</div></div>`:''}<div class="eg">${d.eg.map(e=>{
+      h += `<div class="gc" id="${d.id}"><div class="gh" onclick="toggleCard(this,event)"><span class="gn">${idx}</span>${lf ? `<span class="lv-tag">${dlv.toUpperCase()}</span>` : ''}<span class="gt">${d.t}</span>${_gSpk}${(dlv==='n5'&&d.n)?'<span class="gbadge-adv">'+enOr('進階','Advanced')+'</span>':''}<svg class="star ${isFav?'on':''}" onclick="event.stopPropagation();toggleFav('${d.id}')" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg class="arr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div><div class="gb"><div class="gx"><div class="pt">${window.linkGrammarTerms?window.linkGrammarTerms(d.p):d.p}</div><div class="ep">${(function(){var s=cvt(d.ex);return window.linkGrammarTerms?window.linkGrammarTerms(s):s;})()}</div>${(window.GRAMMAR_DETAIL&&window.GRAMMAR_DETAIL[d.id])?`<div class="gc-detail"><button type="button" class="gd-toggle" onclick="event.stopPropagation();toggleDetail(this)"><i data-ic=book></i> ${enOr('詳解','Deep dive')} ▾</button><div class="gd-body gd-hidden">${grammarDetailHTML(window.GRAMMAR_DETAIL[d.id])}</div></div>`:''}<div class="eg">${d.eg.map(e=>{
         const pureJ = e.j.replace(/<[^>]+>/g,'').replace(/'/g,"\\'");
         return `<div class="ex" onclick="speak('${pureJ}')" title="${enOr('點方框唸例句','Tap box to hear')}"><div class="j">${window.furiganaHTMLRich?window.furiganaHTMLRich(e.j):e.j}<svg class="ex-spk" onclick="event.stopPropagation();speak('${pureJ}')" viewBox="0 0 24 24"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.54 8.46a5 5 0 010 7.07M19.07 4.93a10 10 0 010 14.14"/></svg></div><div class="z">${e.g?'<span class="eg-g">'+e.g+'</span>':''}${cvt(e.z)}</div></div>`;
-      }).join('')}</div>${d.n?(currentLevel==='n5'?`<div class="nt-collapse"><button type="button" class="nt-toggle" onclick="event.stopPropagation();toggleNote(this)">展開說明 ▾</button><div class="nt nt-hidden">${cvt(d.n)}</div></div>`:`<div class="nt">${cvt(d.n)}</div>`):''}<a class="gc-report" href="${reportUrl}" target="_blank" rel="noopener">${t('report_error')}</a></div></div></div>`;
+      }).join('')}</div>${d.n?(dlv==='n5'?`<div class="nt-collapse"><button type="button" class="nt-toggle" onclick="event.stopPropagation();toggleNote(this)">展開說明 ▾</button><div class="nt nt-hidden">${cvt(d.n)}</div></div>`:`<div class="nt">${cvt(d.n)}</div>`):''}<a class="gc-report" href="${reportUrl}" target="_blank" rel="noopener">${t('report_error')}</a></div></div></div>`;
     });
     h += '</section>';
   });
