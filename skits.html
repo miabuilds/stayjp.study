@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<script src="campaign.js"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>小狸的日本生活 — 20 秒短劇學一句日文｜StayJP 日本再留計劃</title>
+<meta name="description" content="狸貓小狸在日本的出包日常:拉麵店、便利商店、電車、看醫生、宅配……每集 20 秒,學一句在日本馬上用得到的日文。">
+<link rel="canonical" href="https://stayjp.study/skits.html">
+<meta property="og:title" content="小狸的日本生活 — 20 秒短劇學一句日文">
+<meta property="og:image" content="https://stayjp.study/videos/skit/ep01.jpg">
+<script>try{var _th=localStorage.getItem('theme');if(_th)document.documentElement.setAttribute('data-theme',_th);}catch(e){}</script>
+<style>
+  :root{ --bg:#F6F4EF;--bg2:#FFFFFF;--bg3:#EFECE5;--tx:#2C2C2C;--tx2:#6B6B6B;--tx3:#9A9A9A;--ac:#C6553B;--ac2:#D4654A;--bd:#E7E3DC;--soft:#C6553B14;--serif:"Noto Serif TC","Songti TC",serif; }
+  @media (prefers-color-scheme:dark){ :root:not([data-theme=light]){ --bg:#161615;--bg2:#211F1D;--bg3:#2A2724;--tx:#EDEBE7;--tx2:#A7A29B;--tx3:#6E6A64;--ac:#E8734A;--ac2:#E8734A;--bd:#332F2B;--soft:#E8734A1c; }}
+  :root[data-theme=dark]{ --bg:#161615;--bg2:#211F1D;--bg3:#2A2724;--tx:#EDEBE7;--tx2:#A7A29B;--tx3:#6E6A64;--ac:#E8734A;--ac2:#E8734A;--bd:#332F2B;--soft:#E8734A1c; }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--tx);font-family:-apple-system,"PingFang TC","Noto Sans TC",sans-serif;line-height:1.7;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:760px;margin:0 auto;padding:0 16px 60px}
+  header{display:flex;align-items:center;gap:10px;padding:14px 0}
+  header .logo{font-family:var(--serif);font-weight:700;font-size:17px}
+  header .sp{flex:1}
+  header .lang{font:inherit;font-size:13px;font-weight:600;border:1px solid var(--bd);background:var(--bg2);color:var(--tx2);border-radius:9px;padding:6px 11px;cursor:pointer}
+  .hero{display:flex;align-items:center;gap:14px;padding:12px 0 4px}
+  .hero-tx{flex:1;min-width:0}
+  h1{font-family:var(--serif);font-size:clamp(24px,5.4vw,32px);line-height:1.25;margin:4px 0 8px;text-wrap:balance}
+  .lead{color:var(--tx2);font-size:14.5px}
+  .cast{display:flex;align-items:flex-end;flex-shrink:0}
+  .cast img{width:76px;height:auto;display:block}
+  .cast img + img{width:62px;margin-left:-8px}
+  .who{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0 4px}
+  .who span{font-size:12.5px;color:var(--tx2);background:var(--bg2);border:1px solid var(--bd);border-radius:20px;padding:4px 11px}
+  .who b{color:var(--tx)}
+  /* 集數格 */
+  .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:18px}
+  @media (min-width:600px){ .grid{grid-template-columns:repeat(3,1fr);gap:14px} }
+  .ep{background:var(--bg2);border:1px solid var(--bd);border-radius:16px;overflow:hidden;cursor:pointer;text-align:left;font:inherit;color:inherit;padding:0;display:block;width:100%;box-shadow:0 1px 3px rgba(0,0,0,.04);transition:transform .12s}
+  .ep:active{transform:scale(.98)}
+  .ep-img{position:relative;aspect-ratio:4/5;background:var(--bg3);overflow:hidden}
+  .ep-img img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 12%}
+  .ep-no{position:absolute;top:8px;left:8px;font-size:11.5px;font-weight:800;color:#fff;background:rgba(0,0,0,.55);border-radius:20px;padding:2px 9px;line-height:1.6}
+  .ep-play{position:absolute;right:8px;bottom:8px;width:32px;height:32px;border-radius:50%;background:rgba(0,0,0,.55);color:#fff;display:flex;align-items:center;justify-content:center}
+  .ep-play svg{width:15px;height:15px}
+  .ep-seen{position:absolute;top:8px;right:8px;font-size:11px;font-weight:700;color:#fff;background:var(--ac);border-radius:20px;padding:2px 8px;line-height:1.6;display:inline-flex;align-items:center;gap:3px}
+  .ep-seen svg{width:11px;height:11px}
+  .ep-b{padding:10px 12px 12px;border-top:1px solid var(--bd)}
+  .ep-t{font-size:12.5px;color:var(--tx2);font-weight:700}
+  .ep-p{font-size:16px;font-weight:800;color:var(--ac);line-height:1.35;margin-top:3px}
+  .ep-m{font-size:12.5px;color:var(--tx2);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .note{background:var(--soft);border-radius:12px;padding:13px 15px;margin-top:22px;font-size:13.5px;line-height:1.8}
+  footer{padding:30px 0 8px;text-align:center;color:var(--tx3);font-size:12px;line-height:1.8}
+  /* 播放層 */
+  .pl{position:fixed;inset:0;z-index:2147483000;background:#0d0d0d;display:none;flex-direction:column;align-items:center;overflow-y:auto;padding:max(12px,env(safe-area-inset-top)) 14px max(16px,env(safe-area-inset-bottom))}
+  .pl.on{display:flex}
+  .pl-top{width:100%;max-width:420px;display:flex;align-items:center;justify-content:space-between;color:#fff;margin-bottom:10px}
+  .pl-top b{font-size:15px}
+  .pl-x{width:40px;height:40px;border:none;border-radius:50%;background:rgba(255,255,255,.14);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer}
+  .pl-x svg{width:20px;height:20px}
+  .pl video{width:100%;max-width:420px;max-height:60vh;aspect-ratio:9/16;background:#000;border-radius:14px;object-fit:contain}
+  .pl-card{width:100%;max-width:420px;background:var(--bg2);color:var(--tx);border-radius:14px;padding:14px 16px;margin-top:12px}
+  .pl-lbl{font-size:11px;font-weight:800;letter-spacing:.06em;color:var(--ac)}
+  .pl-p{font-size:22px;font-weight:800;line-height:1.35;margin-top:2px}
+  .pl-r{font-size:13px;color:var(--tx2)}
+  .pl-m{font-size:15px;margin-top:4px}
+  .pl-nav{width:100%;max-width:420px;display:flex;gap:10px;margin-top:12px}
+  .pl-nav button{flex:1;min-height:46px;border-radius:12px;border:1px solid rgba(255,255,255,.25);background:transparent;color:#fff;font:inherit;font-size:14.5px;font-weight:700;cursor:pointer}
+  .pl-nav button.go{background:var(--ac);border-color:var(--ac)}
+  .pl-nav button:disabled{opacity:.35;cursor:default}
+  body.lock{overflow:hidden}
+</style>
+<script src="accent.js"></script>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <a class="backbtn" href="app.html" onclick="try{if(history.length>1){history.back();return false}}catch(e){}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg><span id="bkTx">返回</span></a>
+    <span class="logo">日本再留計劃</span>
+    <span class="sp"></span>
+    <button class="lang" id="langBtn" onclick="cycleLang()">EN</button>
+  </header>
+
+  <div class="hero">
+    <div class="hero-tx">
+      <h1 id="hT">小狸的日本生活</h1>
+      <p class="lead" id="hL">每集 20 秒,看小狸在日本出包,順便學一句馬上用得到的日文。</p>
+    </div>
+    <div class="cast" aria-hidden="true"><img src="images/mascot/tanuki-happy.png" alt=""><img src="images/mascot/fox-stand.png" alt=""></div>
+  </div>
+  <div class="who" id="who"></div>
+
+  <div class="grid" id="grid"></div>
+
+  <div class="note" id="note"></div>
+
+  <footer id="ft"></footer>
+</div>
+
+<div class="pl" id="pl" role="dialog" aria-modal="true">
+  <div class="pl-top"><b id="plT"></b><button class="pl-x" id="plX" aria-label="close"><i data-ic=x></i></button></div>
+  <video id="plV" controls playsinline preload="metadata"></video>
+  <div class="pl-card">
+    <div class="pl-lbl" id="plLbl"></div>
+    <div class="pl-p" id="plP"></div>
+    <div class="pl-r" id="plR"></div>
+    <div class="pl-m" id="plM"></div>
+  </div>
+  <div class="pl-nav"><button id="plPrev"></button><button id="plNext" class="go"></button></div>
+</div>
+
+<script src="icons.js"></script>
+<script src="i18n.js"></script>
+<script src="skits-data.js"></script>
+<script>
+// 繁→簡:跟其他頁一樣用 OpenCC 即時轉;英文走 L(中,英)
+let _tw2cn = null;
+function ensureOpenCC(){
+  if(_tw2cn) return Promise.resolve();
+  return new Promise(res=>{ const s=document.createElement('script'); s.src='https://cdn.jsdelivr.net/npm/opencc-js@1.0.5/dist/umd/full.js';
+    s.onload=()=>{ try{ _tw2cn=OpenCC.Converter({from:'tw',to:'cn'}); }catch(e){} res(); }; s.onerror=()=>res(); document.head.appendChild(s); });
+}
+function lang(){ try{ return I18n.getLang(); }catch(e){ return 'zh-TW'; } }
+function cvt(x){ return (!x||lang()!=='zh-CN'||!_tw2cn)?x:_tw2cn(x); }
+function L(zh,en){ return lang()==='en'?en:cvt(zh); }
+function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+// 看過哪幾集(只存在這台裝置)
+function seen(){ try{ return JSON.parse(localStorage.getItem('skit_seen')||'{}')||{}; }catch(e){ return {}; } }
+function markSeen(n){ try{ const s=seen(); s[n]=1; localStorage.setItem('skit_seen',JSON.stringify(s)); }catch(e){} }
+
+const EPS = window.SKITS || [];
+
+function render(){
+  document.documentElement.lang = lang()==='en'?'en':(lang()==='zh-CN'?'zh-Hans':'zh-Hant');
+  document.getElementById('langBtn').textContent = lang()==='en'?'中':'EN';
+  document.getElementById('bkTx').textContent = L('返回','Back');
+  document.getElementById('hT').textContent = L('小狸的日本生活','Tanuki in Japan');
+  document.getElementById('hL').textContent = L('每集 20 秒,看小狸在日本出包,順便學一句馬上用得到的日文。','20-second skits: Tanuki messes up in Japan — and you learn one phrase you can use right away.');
+  document.getElementById('who').innerHTML =
+    '<span><b>'+esc(L('小狸','Tanuki'))+'</b> · '+esc(L('剛到日本、一直出包','new in Japan, always in trouble'))+'</span>'+
+    '<span><b>コン</b> · '+esc(L('日本在地的狐狸朋友','a local fox friend'))+'</span>';
+  const s = seen();
+  document.getElementById('grid').innerHTML = EPS.map(e =>
+    '<button class="ep" data-n="'+e.n+'">'+
+      '<div class="ep-img"><img src="'+skitFile(e.n,'jpg')+'" alt="" loading="lazy" decoding="async">'+
+      '<span class="ep-no">#'+e.n+'</span>'+
+      (s[e.n] ? '<span class="ep-seen">'+icon('check')+esc(L('看過','Seen'))+'</span>' : '')+
+      '<span class="ep-play">'+icon('play')+'</span></div>'+
+      '<div class="ep-b"><div class="ep-t">'+esc(L(e.t,e.en))+'</div>'+
+      '<div class="ep-p" lang="ja">'+esc(e.p)+'</div>'+
+      '<div class="ep-m">'+esc(L(e.m,e.men))+'</div></div>'+
+    '</button>').join('');
+  document.getElementById('note').innerHTML = L(
+    '<b>怎麼用:</b>先看一次笑一下,再跟著影片裡的「小狸教你一句」唸兩三遍。下次真的在日本遇到,就說得出口了。',
+    '<b>How to use:</b> watch once for fun, then repeat the phrase from the lesson card two or three times. Next time it happens for real, you’ll have the words.');
+  document.getElementById('ft').innerHTML = 'StayJP 日本再留計劃 · <a href="app.html" style="color:var(--tx3)">'+esc(L('學習工具','Study tools'))+'</a><br>'+
+    esc(L('配音','Voices'))+':VOICEVOX(ずんだもん・猫使アル ほか)';
+  if(!_cur) return;
+  fillPlayer(_cur, false);
+}
+
+// ── 播放層:開啟時 pushState,手機/App 按返回鍵就是關掉播放而不是離開頁面 ──
+const pl=document.getElementById('pl'), V=document.getElementById('plV');
+let _cur=null, _pushed=false;   // _pushed:播放層是自己 pushState 開的(關閉時 back);從 ?ep= 直接進來的就不能 back,不然會離開頁面
+function fillPlayer(n, load){
+  const i=EPS.findIndex(e=>e.n===n); const e=EPS[i]; if(!e) return;
+  document.getElementById('plT').textContent = '#'+e.n+' '+L(e.t,e.en);
+  document.getElementById('plLbl').textContent = L('這集學到','Phrase of the episode');
+  document.getElementById('plP').textContent = e.p;
+  document.getElementById('plR').textContent = e.r!==e.p ? e.r : '';
+  document.getElementById('plM').textContent = L(e.m,e.men);
+  const pv=document.getElementById('plPrev'), nx=document.getElementById('plNext');
+  pv.textContent = '‹ '+L('上一集','Previous'); pv.disabled = i<=0;
+  nx.textContent = i<EPS.length-1 ? L('下一集','Next')+' ›' : L('看完了!','All done!'); nx.disabled = i>=EPS.length-1;
+  if(load){
+    V.poster = skitFile(e.n,'jpg'); V.src = skitFile(e.n,'mp4');
+    const p=V.play(); if(p&&p.catch) p.catch(()=>{});
+  }
+}
+function openEp(n, push){
+  if(push) _pushed=true;
+  _cur=n; fillPlayer(n,true); pl.classList.add('on'); document.body.classList.add('lock');
+  try{ const u=new URL(location.href); u.searchParams.set('ep',n); history[push?'pushState':'replaceState']({skit:n},'',u); }catch(e){}
+}
+function closePl(){
+  _cur=null; _pushed=false; V.pause(); V.removeAttribute('src'); V.load(); pl.classList.remove('on'); document.body.classList.remove('lock'); render();
+}
+function step(d){ const i=EPS.findIndex(e=>e.n===_cur); const e=EPS[i+d]; if(e) openEp(e.n,false); }
+V.addEventListener('ended',()=>{ if(_cur) markSeen(_cur); });
+V.addEventListener('timeupdate',()=>{ if(_cur && V.duration && V.currentTime/V.duration>.8) markSeen(_cur); });
+document.getElementById('plX').onclick=()=>{ if(_pushed) history.back(); else { closePl(); try{ const u=new URL(location.href); u.searchParams.delete('ep'); history.replaceState(null,'',u); }catch(e){} } };
+document.getElementById('plPrev').onclick=()=>step(-1);
+document.getElementById('plNext').onclick=()=>step(1);
+window.addEventListener('popstate',()=>{ const n=history.state&&history.state.skit; if(n) openEp(n,false); else if(_cur) closePl(); });
+document.addEventListener('keydown',ev=>{ if(ev.key==='Escape'&&_cur) document.getElementById('plX').click(); });
+document.getElementById('grid').addEventListener('click',ev=>{ const b=ev.target.closest('.ep'); if(b) openEp(+b.dataset.n,true); });
+
+function cycleLang(){
+  const next = lang()==='en' ? 'zh-TW' : 'en';
+  try{ I18n.setLang ? I18n.setLang(next) : localStorage.setItem('ui_lang',next); }catch(e){ try{ localStorage.setItem('ui_lang',next); }catch(_){} }
+  render();
+}
+
+render();
+if(lang()==='zh-CN') ensureOpenCC().then(render);
+// 分享連結 skits.html?ep=3 直接開那集
+try{ const q=+new URLSearchParams(location.search).get('ep'); if(q && EPS.some(e=>e.n===q)) openEp(q,false); }catch(e){}
+</script>
+<script src="font-scale.js"></script>
+<script src="back-to-top.js"></script>
+<script defer src="promo-banner.js"></script>
+</body>
+</html>

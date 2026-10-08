@@ -73,6 +73,12 @@
     <priority>0.4</priority>
   </url>
   <url>
+    <loc>https://stayjp.study/skits.html</loc>
+    <lastmod>2026-10-08</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://stayjp.study/phrases.html</loc>
     <lastmod>2026-07-11</lastmod>
     <changefreq>monthly</changefreq>

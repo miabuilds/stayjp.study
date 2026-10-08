@@ -483,6 +483,11 @@ select.lang-btn {
 .yt-sc-b { padding:9px 11px 11px; }
 .yt-sc-t { font-size:13.5px; font-weight:700; line-height:1.4; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; min-height:2.8em; }
 .yt-sc-m { font-size:11.5px; color:var(--tx2); margin-top:5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+/* 小狸短劇:直式影片卡(封面是 9:16,裁上半部標題+畫格) */
+.sk-sc { flex:0 0 128px; width:128px; }
+.sk-sc .yt-sc-img { aspect-ratio:4/5; }
+.sk-sc .yt-sc-img img { object-position:50% 12%; }
+.sk-sc .sk-p { font-size:13.5px; font-weight:800; color:var(--ac); line-height:1.35; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .hub-art .art-entry { margin: 0 !important; }
 .hub-wod { display: flex; align-items: center; gap: 12px; background: var(--bg2); border: 1px solid var(--bd); border-radius: 14px; padding: 11px 14px; margin-top: 14px; box-shadow: 0 1px 3px rgba(0,0,0,.04); }
 .hub-wod-main { flex: 1; min-width: 0; }
@@ -1902,6 +1907,7 @@ try {
   <a class="more-item" href="speak.html"><svg class="mi-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M6 11a6 6 0 0 0 12 0"/><path d="M12 17v4M9 21h6"/></svg><span>AI 跟讀練習</span><span class="mi-new">NEW</span></a>
   <a class="more-item" href="speak-chat.html"><svg class="mi-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-11.4 7.2L4 21l1.8-5.2A8 8 0 1 1 21 12z"/></svg><span>AI 情境對話</span><span class="mi-new">NEW</span></a>
   <a class="more-item yt-web-only" href="yt-shadow.html"><svg class="mi-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="6 4 20 12 6 20 6 4"/></svg><span>YouTube 跟讀</span><span class="mi-new">NEW</span></a>
+  <a class="more-item" href="skits.html"><svg class="mi-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="3" width="12" height="18" rx="2.5"/><polygon points="10.5 9 15 12 10.5 15 10.5 9"/></svg><span>小狸短劇</span><span class="mi-new">NEW</span></a>
   <a class="more-item" href="changelog.html"><svg class="mi-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8v5l3 2"/><circle cx="12" cy="12" r="9"/></svg><span>更新紀錄</span></a>
   </div>
   <div class="more-sec">練習</div>
@@ -2847,6 +2853,26 @@ function hubYtStripHtml(L) {
     '<a class="yt-strip-all" href="yt-shadow.html">' + L('顯示全部', 'See all') + ' ›</a></div>' +
     '<div class="yt-strip-sc">' + cards + '</div></div>';
 }
+// 面板「小狸的日本生活」短劇橫條:資料在 skits-data.js(skits.html 共用);沒看過的排前面
+function hubSkitStripHtml(L) {
+  var list = window.SKITS || [];
+  if (!list.length) return '';
+  var seen = {}; try { seen = JSON.parse(localStorage.getItem('skit_seen') || '{}') || {}; } catch (e) {}
+  var en = (typeof I18n !== 'undefined' && I18n.getLang && I18n.getLang() === 'en');
+  var CV = function (x) { return (typeof cvt === 'function') ? cvt(x) : x; };
+  var order = list.filter(function (x) { return !seen[x.n]; }).concat(list.filter(function (x) { return seen[x.n]; }));
+  var cards = order.slice(0, 8).map(function (x) {
+    return '<a class="yt-sc sk-sc" href="skits.html?ep=' + x.n + '">' +
+      '<div class="yt-sc-img"><img src="' + skitFile(x.n, 'jpg') + '" alt="" loading="lazy" decoding="async" onerror="this.remove()">' +
+      '<span class="yt-lvb">#' + x.n + '</span><span class="yt-play"><i data-ic=play></i></span></div>' +
+      '<div class="yt-sc-b"><div class="sk-p" lang="ja">' + _hubEsc(x.p) + '</div>' +
+      '<div class="yt-sc-m">' + _hubEsc(en ? x.men : CV(x.m)) + '</div></div></a>';
+  }).join('');
+  return '<div class="yt-strip">' +
+    '<div class="yt-strip-h"><span class="yt-strip-t"><i data-ic=play></i> ' + L('小狸的日本生活', 'Tanuki in Japan') + '<span class="yt-strip-new">NEW</span></span>' +
+    '<a class="yt-strip-all" href="skits.html">' + L('全部集數', 'All episodes') + ' ›</a></div>' +
+    '<div class="yt-strip-sc">' + cards + '</div></div>';
+}
 // ── 招呼卡:今日目標圓環 + 本週 7 天火焰(2026-10 改版;資料全沿用 _hubToday / study_log / 目前模式的 GOAL)──
 const _HUB_RING_C = 263.89;   // 2π × r42
 function _hubDayTotal(d) { return d ? ((d.vocab || 0) + (d.grammar || 0) + (d.quiz || 0)) : 0; }   // 跟 Calendar.getStreaks 判斷「有讀」同一套欄位
@@ -2971,6 +2997,7 @@ function renderHub() {
         + '<a class="hub-card" href="speak-chat.html"><i class="hc-wm" data-ic=speak></i><span class="hc-new">NEW</span><span class="hc-ic"><i data-ic=speak></i></span><span class="hc-t">' + L('AI 聊聊', 'AI Chat') + '</span><span class="hc-d">' + L('情境對話', 'Role-play chat') + '</span></a>'
       + '</div>'
       + hubYtStripHtml(L)
+      + hubSkitStripHtml(L)
       + ((window.Articles && Articles.entryCardHtml) ? '<div class="hub-art">' + Articles.entryCardHtml() + '</div>' : '')
       + '<div class="hub-sec">' + L('背 · 記', 'Study') + '</div>'
       + '<div class="hub-grid2">'
@@ -5642,6 +5669,7 @@ function toggleDetail(btn) {
 <script src="articles.js"></script>
 <script src="grammar-words.js"></script>
 <script src="articles-ui.js"></script>
+<script src="skits-data.js"></script>
 <script src="kana.js"></script>
 <script src="kana-strokes.js"></script>
 <script src="kana-ui.js"></script>
