@@ -266,7 +266,8 @@
   function mascotFor(tc, allDone) {
     if (allDone) return 'tanuki-yatta.png';
     if (tc > 0) return 'tanuki-ganbaro.png';
-    return new Date().getHours() >= 22 ? 'tanuki-sleep.png' : 'tanuki-hero.png';
+    // 還沒開始:綁頭巾準備開衝(原本 hero 抱書,跟右下角 AI 助教的抱書小狸太像 → 2026-10 Mia 要求換)
+    return new Date().getHours() >= 22 ? 'tanuki-sleep.png' : 'tanuki-headband.png';
   }
   function questCardHtml(lv, us) {
     const cur = currentIndex(lv), doneMap = lvProg(lv).done, doneN = Object.keys(doneMap).length, total = us.length;
