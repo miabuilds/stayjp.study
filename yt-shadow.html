@@ -214,6 +214,11 @@ body{margin:0;background:var(--bg);color:var(--tx);font-family:-apple-system,"Pi
 .thbtn{position:absolute;right:10px;top:10px;z-index:5;border:none;background:rgba(0,0,0,.55);color:#fff;border-radius:10px;padding:6px 11px;font:inherit;font-size:12px;font-weight:700;cursor:pointer;display:none}
 #playerWrap:hover .thbtn{display:block}
 @media(max-width:859px){ .thbtn{display:none!important} }
+.yt-loading{position:fixed;inset:0;z-index:9000;display:none;align-items:center;justify-content:center;background:rgba(18,18,26,.35);-webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px)}
+.yt-loading.show{display:flex}
+.yt-loading-box{display:flex;align-items:center;gap:12px;padding:16px 22px;border-radius:16px;background:var(--bg2);color:var(--tx);border:1px solid var(--bd);box-shadow:0 12px 32px -10px rgba(0,0,0,.35);font-size:15px;font-weight:600}
+.yt-spin{width:22px;height:22px;border-radius:50%;border:3px solid var(--bd);border-top-color:var(--ac);animation:ytspin .8s linear infinite}
+@keyframes ytspin{to{transform:rotate(360deg)}}
 </style>
 <script src="accent.js"></script>
 </head>
@@ -614,20 +619,45 @@ const YTS = (() => {
   }
 
   // ── 載入影片 ──
+  // 只載一次 iframe_api:以前連點兩下會蓋掉 onYouTubeIframeAPIReady,第一次的 promise 永遠不 resolve、script 也重複插
+  let apiP=null;
   function ensureApi(){
-    return new Promise(res=>{
-      if(apiReady) return res();
+    if(apiReady) return Promise.resolve();
+    if(!apiP) apiP=new Promise(res=>{
       window.onYouTubeIframeAPIReady=()=>{ apiReady=true; res(); };
       const s=document.createElement('script'); s.src='https://www.youtube.com/iframe_api'; document.head.appendChild(s);
     });
+    return apiP;
   }
+  // 字幕預抓:按下去(pointerdown)就先打,click 時通常已經在路上;同一支只打一次
+  const capP={};
+  function fetchCaps(v){
+    if(!capP[v]) capP[v]=fetch(FN,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({v})})
+      .then(r=>r.json()).catch(e=>{ delete capP[v]; throw e; });
+    return capP[v];
+  }
+  // 點下去到練習畫面出現要 1~3 秒,以前這段畫面完全沒反應(「讀取中」寫在藏起來的區塊裡)→ 用戶以為沒點到、再點一次
+  function busy(on){
+    let el=document.getElementById('ytLoading');
+    if(!el){
+      el=document.createElement('div'); el.id='ytLoading'; el.className='yt-loading';
+      el.innerHTML='<div class="yt-loading-box"><div class="yt-spin"></div><span>'+enOr('影片載入中…','Loading video…')+'</span></div>';
+      document.body.appendChild(el);
+    }
+    el.classList.toggle('show',!!on);
+  }
+  let loading=false;
   async function load(){
+    if(loading) return;   // 載入中再點 = 不理,以前會把播放器砍掉重建,反而更慢
     const v=parseVid(document.getElementById('urlIn').value);
     const errEl=document.getElementById('inErr'); errEl.style.display='none';
     if(!v){ errEl.textContent=enOr('看不懂這個連結,貼 YouTube 影片網址或 11 碼影片 ID。','Could not parse that link — paste a YouTube URL or 11-char video ID.'); errEl.style.display='block'; return; }
     vid=v;
+    loading=true; busy(true);
     document.getElementById('loadBtn').disabled=true;
     document.getElementById('inNote').textContent=enOr('讀取中…','Loading…');
+    const capsP=fetchCaps(v);   // 字幕跟播放器程式同時下載,不用等播放器好了才開始抓
+    capsP.catch(()=>{});
     await ensureApi();
     if(player){ try{player.destroy();}catch(e){} player=null; }
     document.getElementById('playerWrap').style.display='block';
@@ -655,8 +685,7 @@ const YTS = (() => {
       }
     } });
     try{
-      const r=await fetch(FN,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({v})});
-      const d=await r.json();
+      const d=await capsP;
       if(d && Array.isArray(d.lines) && d.lines.length){
         setLines(d.lines);
         vidTitle=d.title||'';
@@ -673,6 +702,7 @@ const YTS = (() => {
       er.style.display='block';
       document.getElementById('playerWrap').style.display='none';
     }finally{
+      loading=false; busy(false);
       document.getElementById('loadBtn').disabled=false;
     }
   }
@@ -1479,6 +1509,15 @@ const YTS = (() => {
   }
   document.addEventListener('DOMContentLoaded',()=>{
     _retext(); renderToday(); renderGallery();
+    // 預熱:頁面閒下來就先載 YouTube 播放器程式、叫醒字幕函式(冷啟動要 1 秒多),第一次點影片才不會卡
+    const warm=()=>{ ensureApi(); try{ const v0=(SAMPLES[0]&&SAMPLES[0].v)||'tLQLa6lM3Us'; fetchCaps(v0).catch(()=>{}); }catch(e){} };
+    if('requestIdleCallback' in window) requestIdleCallback(warm,{timeout:2500}); else setTimeout(warm,1200);
+    // 手指/滑鼠一按下就先抓那支的字幕(比 click 早 100ms 以上)
+    document.addEventListener('pointerdown',e=>{
+      const b=e.target&&e.target.closest&&e.target.closest('[onclick*="loadSample"]');
+      const m=b&&(b.getAttribute('onclick')||'').match(/loadSample\('([A-Za-z0-9_-]{11})'\)/);
+      if(m) fetchCaps(m[1]).catch(()=>{});
+    },{passive:true});
     // 從面板「今日推薦」點進來:?v=<id> 直接開那支影片
     try{
       const q=new URLSearchParams(location.search).get('v');
