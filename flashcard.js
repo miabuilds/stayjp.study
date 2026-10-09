@@ -349,7 +349,7 @@ const FlashCard = (() => {
         </div>
       </div>
       <div style="display:flex;justify-content:center;align-items:center;gap:14px;margin-top:10px">
-        <button onclick="event.stopPropagation();speak('${(item.r||item.w).replace(/'/g,"\\'")}')" style="background:var(--bg3);border:1px solid var(--bd);border-radius:22px;padding:0 18px;min-height:44px;display:inline-flex;align-items:center;gap:6px;cursor:pointer;color:var(--ac2);font-size:13px"><i data-ic=volume></i> ${_E('播音','Play')}</button>
+        <button onclick="event.stopPropagation();speak('${(window.wordSpeakKey?wordSpeakKey(item):(item.r||item.w)).replace(/'/g,"\\'")}')" style="background:var(--bg3);border:1px solid var(--bd);border-radius:22px;padding:0 18px;min-height:44px;display:inline-flex;align-items:center;gap:6px;cursor:pointer;color:var(--ac2);font-size:13px"><i data-ic=volume></i> ${_E('播音','Play')}</button>
         <a href="${window.stayjpReportHref?window.stayjpReportHref('單字卡',item.w,'單字：'+item.w+'\n讀音：'+item.r+'\n意思：'+(typeof cvt==='function'?cvt(item.m):item.m)):'#'}" target="_blank" rel="noopener" onclick="event.stopPropagation()" style="color:var(--tx3);font-size:12px;text-decoration:none"><i data-ic=flag></i> ${_E('回報錯誤','Report')}</a>
       </div>`;
     // 不自動播音，使用者要聽點 🔊 按鈕
@@ -384,7 +384,7 @@ const FlashCard = (() => {
         ? '<button class="qstart" style="margin-top:10px" id="fcTypeNext" onclick="event.stopPropagation();FlashCard.answer(\'known\')">' + _E('下一題 →', 'Next →') + '</button>'
         : '<div class="fc-btns" style="margin-top:10px"><button class="fc-btn fc-no" onclick="event.stopPropagation();FlashCard.answer(\'unknown\')"><i data-ic=x></i> ' + _E('不會', 'Don\'t know') + '</button><button class="fc-btn fc-soso" onclick="event.stopPropagation();FlashCard.answer(\'soso\')">◯ ' + _E('有點難', 'Almost') + '</button></div>');
     try { if (window.hydrateIcons) hydrateIcons(res); } catch (e) {}
-    try { if (typeof speak === 'function') speak(item.r || item.w); } catch (e) {}
+    try { if (typeof speak === 'function') speak(window.wordSpeakKey ? wordSpeakKey(item) : (item.r || item.w)); } catch (e) {}
     if (right) { const b = document.getElementById('fcTypeNext'); if (b) setTimeout(() => { try { b.focus(); } catch (e) {} }, 30); }
   }
   function checkTyped() { const inp = document.getElementById('fcTypeIn'); const val = inp ? inp.value : ''; if (!normJa(val)) { if (inp) inp.focus(); return; } revealTyped(typedRight(queue[cur], val), val); }

@@ -266,7 +266,7 @@ const SRS = (() => {
           '<div style="display:flex;gap:8px;margin-top:8px"><button class="qstart" style="margin:0;width:auto;flex:1 1 0" onclick="SRS.checkRetype()">' + _E('送出','Check') + '</button>' +
           '<button class="qstart" style="margin:0;width:auto;flex:0 0 92px;background:none;color:var(--tx2);border:1px solid var(--bd,#ddd)" onclick="SRS.nextTyped(false)">' + _E('跳過','Skip') + '</button></div>');
     if (!right) { const ri = document.getElementById('srsRetypeIn'); if (ri) setTimeout(() => { try { ri.focus(); } catch (e) {} }, 80); }
-    try { if (typeof speak === 'function') speak(item.r || item.w); } catch (e) {}
+    try { if (typeof speak === 'function') speak(window.wordSpeakKey ? wordSpeakKey(item) : (item.r || item.w)); } catch (e) {}
   }
   function checkTyped() {
     const inp = document.getElementById('srsTypeIn');
@@ -288,7 +288,7 @@ const SRS = (() => {
       retypeGot++;
       const prog = document.getElementById('srsRetypeProg');
       if (prog) prog.textContent = retypeGot + ' / ' + RETYPE_NEED;
-      try { if (typeof speak === 'function') speak(queue[cur].r || queue[cur].w); } catch (e) {}
+      try { if (typeof speak === 'function') speak(window.wordSpeakKey ? wordSpeakKey(queue[cur]) : (queue[cur].r || queue[cur].w)); } catch (e) {}
 
       if (retypeGot < RETYPE_NEED) {
         // 還沒打滿:清空重來,而且從第 2 次起把正解蓋掉 —— 照抄不算記住,要自己想得出來才算。
@@ -329,13 +329,13 @@ const SRS = (() => {
             ? `<div class="srs-meaning" style="font-size:24px;font-weight:800;margin-top:10px">${typeof cvt==='function'?cvt(item.m):item.m}</div>${item.c?'<div class="qsub">［'+item.c+'］</div>':''}<div class="srs-hint" style="margin-top:10px">${_E('回想日文怎麼說 → 點卡翻面','Recall the Japanese → tap to flip')}</div>`
             : `<div class="qmain">${item.w}</div>
           ${item.w!==item.r?'<div class="qsub">'+item.r+'</div>':''}
-          <div class="srs-spk-row">${spkBtn(item.r || item.w)}</div>
+          <div class="srs-spk-row">${spkBtn(window.wordSpeakKey ? wordSpeakKey(item) : (item.r || item.w))}</div>
           <div class="srs-hint">${t('srs_flip')}</div>`}
         </div>
         <div class="srs-back" id="srsBack" style="display:none">
           <div class="qmain">${item.w}${(window.StudyPlan&&StudyPlan.pitchMark)?StudyPlan.pitchMark(item):''}</div>
           ${item.w!==item.r?'<div class="qsub">'+item.r+'</div>':''}
-          <div class="srs-spk-row">${spkBtn(item.r || item.w)}</div>
+          <div class="srs-spk-row">${spkBtn(window.wordSpeakKey ? wordSpeakKey(item) : (item.r || item.w))}</div>
           ${item.m && item.m!==item.w ? '<div class="srs-meaning">'+(typeof cvt==='function'?cvt(item.m):item.m)+'</div>' : ''}
           ${cfHint?'<div class="confuse-hint">'+cfHint+'</div>':''}
           <div class="srs-btns">

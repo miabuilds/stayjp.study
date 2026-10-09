@@ -9,7 +9,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { execSync } from 'node:child_process';
-import { ROOT, OUT_DIR, ENGINE, SPEAKER, TEXTS_JSON, loadOverrides, applyOverrides, synthesis, checkEngine, wavToMp3 } from './_lib.mjs';
+import { ROOT, OUT_DIR, ENGINE, SPEAKER, TEXTS_JSON, loadOverrides, applyOverrides, synthesis, checkEngine, wavToMp3, pitchPattern as pattern, shapePitch } from './_lib.mjs';
 
 const WRITE = process.argv.includes('--write');
 const DROP = 0.12;    // 落差門檻(log-F0,約 2 半音);低於這個聽起來就是平的
@@ -39,7 +39,6 @@ for (const lv of ['n5', 'n4', 'n3', 'n2', 'n1']) {
 const post = async (u, body) => { const r = await fetch(u, body ? { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) } : { method: 'POST' }); if (!r.ok) throw new Error(r.status + ' ' + await r.text()); return r.json(); };
 const kata = s => s.replace(/[ぁ-ゖ]/g, c => String.fromCharCode(c.charCodeAt(0) + 0x60));
 // 期望 H/L:n=0 平板(LHHH),n=1 頭高(HLLL),n>=2 中高/尾高(LH..H L..)
-const pattern = (n, len) => Array.from({ length: len }, (_, i) => n === 0 ? i > 0 : n === 1 ? i === 0 : (i > 0 && i < n));
 function judge(q, n) {
   const ps = q.accent_phrases;
   if (ps.length !== 1) return { bad: 'multi' };
@@ -53,14 +52,7 @@ function judge(q, n) {
   if (gap < (n === 0 ? RISE : DROP)) return { bad: 'flat', gap };
   return { ok: true, gap };
 }
-function shape(q, n) {
-  const p = q.accent_phrases[0]; const len = p.moras.length;
-  p.accent = n === 0 ? len : n;
-  const pat = pattern(n, len);
-  const H = Math.max(...p.moras.map(m => m.pitch).filter(x => x > 0));
-  p.moras.forEach((m, i) => { if (m.pitch > 0) m.pitch = pat[i] ? H : H - (i === 0 && n !== 1 ? RISE_LOW : LOW); });
-  return q;
-}
+const shape = (q, n) => shapePitch(q, n, LOW, RISE_LOW);
 async function query(text, sp) {
   const t = applyOverrides(text, overrides);
   if (t.startsWith('kana:') || t === '__SKIP__') return null;   // 人工指定過的不動

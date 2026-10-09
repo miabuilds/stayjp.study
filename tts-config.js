@@ -12,3 +12,9 @@ window.ttsUrl = function (hash) {
   } catch (e) {}
   return (window.TTS_BASE || '') + 'audio/tts/' + hash + '.mp3';
 };
+// 同音不同重音(2026-10-09):先生③/宣誓⓪ 共用「せんせい」音檔會唸錯 → 這些字用漢字當 key 播自己的音檔
+// (audio/tts/homophones.js → __TTS_HW,由 scripts/tts/gen-homophones.mjs 產)。單字播音一律走這支取 key。
+window.wordSpeakKey = function (it) {
+  if (!it) return '';
+  return (window.__TTS_HW && window.__TTS_HW[it.w]) ? it.w : (it.r || it.w || '');
+};

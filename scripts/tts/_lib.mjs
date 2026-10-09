@@ -155,3 +155,16 @@ export function concatWavsToMp3(wavBufs, outPath) {
     execFileSync('ffmpeg', args, { timeout: 30000, killSignal: 'SIGKILL' });
   } finally { fs.rmSync(tmpDir, { recursive: true, force: true }); }
 }
+
+// ── 單字音高塑形(regen-pitch / gen-homophones 共用)──
+// 期望 H/L:n=0 平板(LHHH),n=1 頭高(HLLL),n>=2 中高/尾高(LH..H L..)
+export const pitchPattern = (n, len) => Array.from({ length: len }, (_, i) => n === 0 ? i > 0 : n === 1 ? i === 0 : (i > 0 && i < n));
+// 把單一 accent phrase 的 mora 音高直接壓成高低兩階(VOICEVOX 短單字常常落差太小,聽起來像平板)
+export function shapePitch(q, n, low = 0.25, riseLow = 0.15) {
+  const p = q.accent_phrases[0]; const len = p.moras.length;
+  p.accent = n === 0 ? len : n;
+  const pat = pitchPattern(n, len);
+  const H = Math.max(...p.moras.map(m => m.pitch).filter(x => x > 0));
+  p.moras.forEach((m, i) => { if (m.pitch > 0) m.pitch = pat[i] ? H : H - (i === 0 && n !== 1 ? riseLow : low); });
+  return q;
+}

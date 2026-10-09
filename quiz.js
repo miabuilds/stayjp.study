@@ -303,7 +303,7 @@ const Quiz = (() => {
 
   // 答題後自動播單詞讀音(對錯都播):字+聲同時再加深一次印象
   function _sayWord(w) {
-    try { if (w && typeof speak === 'function') speak(w.r || w.w); } catch (e) {}
+    try { if (w && typeof speak === 'function') speak(window.wordSpeakKey ? wordSpeakKey(w) : (w.r || w.w)); } catch (e) {}
   }
   function answer(idx) {
     const q = questions[current];

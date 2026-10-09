@@ -216,6 +216,8 @@ const OB=(()=>{
       // 起點 → base_level(全新/會五十音=none 從頭;學過=n5 起)
       localStorage.setItem('base_level', (A.level==='some'||A.level==='restart') ? 'n5' : 'none');
       if(A.mins) localStorage.setItem('daily_new', A.mins==='10'?'10':(A.mins==='40'?'30':'20'));
+      // 新用戶預設開「單字顯示音高」⓪①②(2026-10-09;老用戶維持原設定,不突然多符號)
+      try{ const sp=JSON.parse(localStorage.getItem('sp_settings')||'{}'); if(sp.pitch===undefined){ sp.pitch=true; localStorage.setItem('sp_settings', JSON.stringify(sp)); } }catch(e){}
       if(start) localStorage.setItem('ob_start_today','1');   // app 首頁自動捲到今日學習
       else localStorage.setItem('ob_start_tour','1');          // 先逛逛 → 首頁自動開功能導覽(可跳過)
     }catch(e){}

@@ -428,7 +428,7 @@
     }
     // 整張卡片點擊 = 發音(✕/發音/收藏 已各自 stopPropagation,不會誤觸)
     pop.style.cursor = 'pointer';
-    pop.addEventListener('click', function () { if (typeof speak === 'function') speak(data.r || data.w); });
+    pop.addEventListener('click', function () { if (typeof speak === 'function') speak(window.wordSpeakKey ? wordSpeakKey(data) : (data.r || data.w)); });
     _pop = pop;
   }
   // 捕獲階段:點到 .jlk → 查詢並阻止事件(不觸發例句框的播音/卡片收合)

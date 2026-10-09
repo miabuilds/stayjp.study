@@ -15,7 +15,7 @@
   function load() { try { return { ...DEF, ...(JSON.parse(localStorage.getItem(KEY)) || {}) }; } catch (e) { return { ...DEF }; } }
   function save() { try { localStorage.setItem(KEY, JSON.stringify(opts)); } catch (e) {} }
   function premium() { try { return !(root.ToolQuota && ToolQuota.shouldGate && ToolQuota.shouldGate()) || (root.ToolQuota && ToolQuota.isPremium && ToolQuota.isPremium()); } catch (e) { return true; } }
-  function tts(text) { const T = root.__TTS || {}; return text && T[text] ? T[text] : null; }
+  function tts(text) { const T = root.__TTS || {}, H = root.__TTS_HW || {}; return text && (H[text] || T[text]) || null; }   // __TTS_HW:同音不同重音的字自己的音檔
   function url(hash) { return root.ttsUrl ? root.ttsUrl(hash) : 'audio/tts/' + hash + '.mp3'; }
   function speed() { try { return (typeof getTtsSpeed === 'function') ? getTtsSpeed() : 1; } catch (e) { return 1; } }
   function srsData() { try { return JSON.parse(localStorage.getItem('srs_data')) || {}; } catch (e) { return {}; } }
@@ -33,7 +33,7 @@
     levels().forEach(lv => {
       vocab(lv).forEach(v => {
         if (sets && opts.scope === 'plan') { const th = root.VOCAB_THEMES && VOCAB_THEMES[v.w + '|' + (v.r || '')]; if (th && sets.themeOff[lv + '|' + th]) return; }
-        const key = v.r && tts(v.r) ? v.r : (tts(v.w) ? v.w : null);
+        const key = (root.__TTS_HW && root.__TTS_HW[v.w]) ? v.w : (v.r && tts(v.r) ? v.r : (tts(v.w) ? v.w : null));
         if (!key) return;
         const e = d[lv + ':' + v.w];
         if (opts.filter === 'new' && e) return;
