@@ -1,0 +1,80 @@
+<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mia 的開發筆記</title><meta name="description" content="一個人做 App 的開發紀錄、商業模式的實驗數字，還有到處旅居的生活。">
+<meta property="og:title" content="Mia 的開發筆記"><meta property="og:description" content="一個人做 App 的開發紀錄、商業模式的實驗數字，還有到處旅居的生活。">
+<meta property="og:url" content="https://stayjp.study/letters/"><meta property="og:type" content="article">
+<meta property="og:image" content="https://stayjp.study/stayjpplan.png"><meta name="twitter:card" content="summary">
+<link rel="canonical" href="https://stayjp.study/letters/"><link rel="alternate" type="application/json" href="https://stayjp.study/letters/feed.json">
+<style>:root{--bg:#F6F4EF;--bg2:#fff;--tx:#2C2C2C;--tx2:#6B6B6B;--tx3:#9A9A9A;--ac:#C6553B;--bd:#E7E3DC;--serif:"Noto Serif TC","Songti TC",serif}
+@media (prefers-color-scheme:dark){:root{--bg:#161615;--bg2:#211F1D;--tx:#EDEBE7;--tx2:#A7A29B;--tx3:#6E6A64;--ac:#E8734A;--bd:#332F2B}}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--tx);font-family:-apple-system,"PingFang TC","Noto Sans TC",sans-serif;line-height:1.85;-webkit-font-smoothing:antialiased}
+.wrap{max-width:680px;margin:0 auto;padding:0 22px}
+header{display:flex;align-items:center;gap:12px;padding:16px 0;border-bottom:1px solid var(--bd)}
+header a{color:var(--tx);text-decoration:none}
+header .logo{font-family:var(--serif);font-weight:700;font-size:17px}
+header .sp{flex:1}
+header .home{color:var(--tx2);font-size:14px}
+.eyebrow{color:var(--ac);font-weight:700;font-size:13px;letter-spacing:.12em}
+h1{font-family:var(--serif);font-size:clamp(26px,5.5vw,38px);line-height:1.3;margin:12px 0 12px;text-wrap:balance}
+.lead{color:var(--tx2);font-size:17px}
+.hero{padding:40px 0 28px}
+.sub{background:var(--bg2);border:1px solid var(--bd);border-radius:16px;padding:20px;margin:8px 0 34px}
+.sub b{display:block;font-size:16px;margin-bottom:4px}
+.sub p{color:var(--tx2);font-size:14px;margin-bottom:12px}
+.sub form{display:flex;gap:10px;flex-wrap:wrap}
+.sub input[type=email]{flex:1 1 220px;min-width:0;font:inherit;font-size:16px;padding:12px 16px;border:1px solid var(--bd);border-radius:999px;background:var(--bg);color:var(--tx)}
+.sub button{font:inherit;font-weight:600;font-size:15px;background:var(--ac);color:#fff;border:0;border-radius:999px;padding:12px 24px;cursor:pointer}
+.sub .msg{font-size:14px;margin-top:10px;color:var(--ac)}
+.hp{position:absolute;left:-9999px}
+.list{list-style:none;border-top:1px solid var(--bd)}
+.list li{border-bottom:1px solid var(--bd);padding:18px 0}
+.list a{color:var(--tx);text-decoration:none;font-family:var(--serif);font-size:19px;font-weight:700}
+.list .d{color:var(--tx3);font-size:13px}
+.list p{color:var(--tx2);font-size:15px;margin-top:4px}
+.empty{color:var(--tx3);padding:20px 0}
+article{padding:36px 0 10px}
+article .d{color:var(--tx3);font-size:14px}
+.body{font-size:17px}
+.body p,.body ul,.body ol,.body blockquote{margin:0 0 1.2em}
+.body h2,.body h3,.body h4{font-family:var(--serif);margin:1.8em 0 .6em;line-height:1.4}
+.body h2{font-size:23px}.body h3{font-size:20px}
+.body ul,.body ol{padding-left:1.4em}
+.body li{margin:.3em 0}
+.body blockquote{border-left:3px solid var(--ac);padding:2px 0 2px 16px;color:var(--tx2)}
+.body img{max-width:100%;border-radius:10px;display:block;margin:0 auto}
+.body hr{border:0;border-top:1px solid var(--bd);margin:2em 0}
+.body a{color:var(--ac)}
+.body code{background:var(--bd);padding:1px 6px;border-radius:5px;font-size:.9em}
+footer{padding:30px 0 40px;text-align:center;color:var(--tx3);font-size:13px;border-top:1px solid var(--bd);margin-top:20px}
+footer a{color:var(--tx2)}</style></head><body><div class="wrap"><header><a class="logo" href="/letters/">Mia 的開發筆記</a><span class="sp"></span><a class="home" href="/">StayJP</a></header><section class="hero"><div class="eyebrow">NEWSLETTER</div><h1>Mia 的開發筆記</h1><p class="lead">一個人做 App 的開發紀錄、商業模式的實驗數字，還有到處旅居的生活。</p></section>
+<div id="ok" class="sub" style="display:none"><b>訂閱完成 🎉</b><p style="margin:0">下一期出來就會寄給你。</p></div>
+<div class="sub">
+  <b>訂閱 Mia 的開發筆記</b>
+  <p>有新的一期就寄給你，大約兩週一封。隨時一鍵退訂。</p>
+  <form onsubmit="return nlSub(this)">
+    <input type="email" name="email" required placeholder="你的 Email" autocomplete="email">
+    <input type="text" name="website" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+    <input type="hidden" name="source" value="letters">
+    <button type="submit">訂閱</button>
+  </form>
+  <div class="msg" role="status"></div>
+</div>
+<ul class="list" id="list"><li class="empty">第一期準備中。</li></ul>
+<footer>Mia 的開發筆記・<a href="/">日本再留計劃 StayJP</a></footer></div><script>
+function nlSub(f){var m=f.parentNode.querySelector('.msg'),b=f.querySelector('button');b.disabled=true;m.textContent='送出中…';
+fetch('https://asia-east1-jpnote-1bdd6.cloudfunctions.net/newsletterSubscribe',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:f.email.value,website:f.website.value,source:f.source.value})})
+.then(function(r){return r.json()}).then(function(j){
+m.textContent=j.ok?(j.already?'你已經訂閱了，謝謝！':'確認信寄出了，去信箱按一下「確認訂閱」就完成。'):'Email 格式好像不對，再檢查一下。';
+if(j.ok)f.reset();}).catch(function(){m.textContent='送出失敗，稍後再試一次。'}).finally(function(){b.disabled=false});return false}
+</script>
+<script>
+if(/subscribed=1/.test(location.search))document.getElementById('ok').style.display='block';
+fetch('/letters/feed.json?_='+Date.now()).then(function(r){return r.json()}).then(function(f){
+var now=Date.now(),its=(f.issues||[]).filter(function(i){return Date.parse(i.send_at)<=now});
+if(!its.length)return;
+document.getElementById('list').innerHTML=its.map(function(i){
+var d=new Date(Date.parse(i.send_at)+8*36e5).toISOString().slice(0,10).replace(/-/g,'/');
+var e=function(s){return String(s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})};
+return '<li><div class="d">'+d+'</div><a href="/letters/'+e(i.slug)+'">'+e(i.title)+'</a>'+(i.summary?'<p>'+e(i.summary)+'</p>':'')+'</li>'}).join('')});
+</script></body></html>

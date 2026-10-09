@@ -65,3 +65,6 @@ export { sale1010Cron } from "./sale1010-cron";
 export { invoiceWordCron } from "./invoice-word-cron";
 // 每日對帳:收了幾筆錢 vs 開了幾張發票,漏開隔天就會被抓到
 export { invoiceAuditCron } from "./invoice-audit-cron";
+
+// Mia 的電子報(stayjp.study/letters):訂閱(雙重確認)/退訂/每小時照 feed.json 排寄
+export { newsletterSubscribe, newsletterConfirm, newsletterUnsub, newsletterCron } from "./newsletter";
