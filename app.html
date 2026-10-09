@@ -2878,7 +2878,9 @@ function hubSkitStripHtml(L) {
   var seen = {}; try { seen = JSON.parse(localStorage.getItem('skit_seen') || '{}') || {}; } catch (e) {}
   var en = (typeof I18n !== 'undefined' && I18n.getLang && I18n.getLang() === 'en');
   var CV = function (x) { return (typeof cvt === 'function') ? cvt(x) : x; };
-  var order = list.filter(function (x) { return !seen[x.n]; }).concat(list.filter(function (x) { return seen[x.n]; }));
+  // 只推還沒看過的;全部看完才改放看過的(2026-10-09 Mia)
+  var fresh = list.filter(function (x) { return !seen[x.n]; });
+  var order = fresh.length ? fresh : list.slice();
   var cards = order.slice(0, 20).map(function (x) {
     return '<a class="yt-sc sk-sc' + (seen[x.n] ? ' is-seen' : '') + '" href="skits.html?ep=' + x.n + '">' +
       '<div class="yt-sc-img"><img src="' + skitFile(x.n, 'jpg') + '" alt="" loading="lazy" decoding="async" onerror="this.remove()">' +
@@ -2888,7 +2890,7 @@ function hubSkitStripHtml(L) {
       '<div class="yt-sc-m">' + _hubEsc(en ? x.men : CV(x.m)) + '</div></div></a>';
   }).join('');
   return '<div class="yt-strip">' +
-    '<div class="yt-strip-h"><span class="yt-strip-t"><i data-ic=play></i> ' + L('小狸的日本生活', 'Tanuki in Japan') + '<span class="yt-strip-new">NEW</span></span>' +
+    '<div class="yt-strip-h"><span class="yt-strip-t"><i data-ic=play></i> ' + L('小狸的日本生活', 'Tanuki in Japan') + (fresh.length ? '<span class="yt-strip-new">' + L(fresh.length + ' 集沒看', fresh.length + ' new') + '</span>' : '') + '</span>' +
     '<a class="yt-strip-all" href="skits.html">' + L('全部集數', 'All episodes') + ' ›</a></div>' +
     '<div class="yt-strip-sc">' + cards + '</div></div>';
 }
@@ -2979,7 +2981,7 @@ function renderHub() {
   // 內容簽章:載入時 doRender 會被叫多次,資料相同就不重繪 → 只渲染一次,進場動畫不被打斷、不閃
   const _jrDone = (() => { try { return window.Journey ? Journey.stats().done : ''; } catch (e) { return ''; } })();
   const _showZero = _hubShowZero();
-  const _sig = [_showZero, (typeof I18n !== 'undefined' && I18n.getLang ? I18n.getLang() : ''), streak, done, wod ? wod.w : '', lm || '', ll || '', _jrDone, (window.StudyPlan ? StudyPlan.sig() : ''), (window.Path ? Path.sig() : ''), _gr ? _gr.slot : '', (window.MyVocab ? MyVocab.count() : 0), (window.Omikuji ? (Omikuji.drawnToday() ? 1 : 0) : ''), DayKey.today(), GOAL].join('|');
+  const _sig = [_showZero, (localStorage.getItem('skit_seen') || ''), (typeof I18n !== 'undefined' && I18n.getLang ? I18n.getLang() : ''), streak, done, wod ? wod.w : '', lm || '', ll || '', _jrDone, (window.StudyPlan ? StudyPlan.sig() : ''), (window.Path ? Path.sig() : ''), _gr ? _gr.slot : '', (window.MyVocab ? MyVocab.count() : 0), (window.Omikuji ? (Omikuji.drawnToday() ? 1 : 0) : ''), DayKey.today(), GOAL].join('|');
   if (_sig === _hubSig && mn.querySelector('.hub')) return;
   _hubSig = _sig;
   const blossom = c => '<svg class="bl ' + c + '" viewBox="0 0 40 40"><g><ellipse cx="20" cy="11" rx="4.6" ry="7.4"/><ellipse cx="20" cy="11" rx="4.6" ry="7.4" transform="rotate(72 20 20)"/><ellipse cx="20" cy="11" rx="4.6" ry="7.4" transform="rotate(144 20 20)"/><ellipse cx="20" cy="11" rx="4.6" ry="7.4" transform="rotate(216 20 20)"/><ellipse cx="20" cy="11" rx="4.6" ry="7.4" transform="rotate(288 20 20)"/></g><circle cx="20" cy="20" r="2.6" fill="#fff"/></svg>';
