@@ -1,10 +1,10 @@
 <!doctype html><html lang="zh-Hant"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>一人公司實驗室</title><meta name="description" content="Mia 一個人做 App 的實驗紀錄：開發、定價、營收數字，還有邊旅居邊工作的日子。">
-<meta property="og:title" content="一人公司實驗室"><meta property="og:description" content="Mia 一個人做 App 的實驗紀錄：開發、定價、營收數字，還有邊旅居邊工作的日子。">
-<meta property="og:url" content="https://stayjp.study/letters/"><meta property="og:type" content="article">
+<title>一個人做三個語言 App，靠的是同一副骨架｜一人公司實驗室</title><meta name="description" content="StayJP、StayTW、StayKR 怎麼共用同一套東西，還有哪些地方共用不了。">
+<meta property="og:title" content="一個人做三個語言 App，靠的是同一副骨架｜一人公司實驗室"><meta property="og:description" content="StayJP、StayTW、StayKR 怎麼共用同一套東西，還有哪些地方共用不了。">
+<meta property="og:url" content="https://stayjp.study/letters/three-apps"><meta property="og:type" content="article">
 <meta property="og:image" content="https://stayjp.study/stayjpplan.png"><meta name="twitter:card" content="summary">
-<link rel="canonical" href="https://stayjp.study/letters/"><link rel="alternate" type="application/json" href="https://stayjp.study/letters/feed.json">
+<link rel="canonical" href="https://stayjp.study/letters/three-apps"><link rel="alternate" type="application/json" href="https://stayjp.study/letters/feed.json">
 <style>:root{--bg:#F6F4EF;--bg2:#fff;--tx:#2C2C2C;--tx2:#6B6B6B;--tx3:#9A9A9A;--ac:#C6553B;--bd:#E7E3DC;--serif:"Noto Serif TC","Songti TC",serif}
 @media (prefers-color-scheme:dark){:root{--bg:#161615;--bg2:#211F1D;--tx:#EDEBE7;--tx2:#A7A29B;--tx3:#6E6A64;--ac:#E8734A;--bd:#332F2B}}
 *{box-sizing:border-box;margin:0;padding:0}
@@ -47,34 +47,32 @@ article .d{color:var(--tx3);font-size:14px}
 .body a{color:var(--ac)}
 .body code{background:var(--bd);padding:1px 6px;border-radius:5px;font-size:.9em}
 footer{padding:30px 0 40px;text-align:center;color:var(--tx3);font-size:13px;border-top:1px solid var(--bd);margin-top:20px}
-footer a{color:var(--tx2)}</style></head><body><div class="wrap"><header><a class="logo" href="/letters/">一人公司實驗室</a><span class="sp"></span><a class="home" href="/">StayJP</a></header><section class="hero"><div class="eyebrow">NEWSLETTER</div><h1>一人公司實驗室</h1><p class="lead">Mia 一個人做 App 的實驗紀錄：開發、定價、營收數字，還有邊旅居邊工作的日子。</p></section>
-<div id="ok" class="sub" style="display:none"><b>訂閱完成</b><p style="margin:0">下一期出來就會寄給你。</p></div>
+footer a{color:var(--tx2)}</style></head><body><div class="wrap"><header><a class="logo" href="/letters/">一人公司實驗室</a><span class="sp"></span><a class="home" href="/">StayJP</a></header><article><div class="d">2026/10/09</div><h1>一個人做三個語言 App，靠的是同一副骨架</h1><div class="body"><p>現在手上有三個 App。</p>
+<ul><li>StayJP：台灣人學日文</li><li>StayTW：外國人學台灣華語</li><li>StayKR：學韓文</li></ul>
+<p>很常被問一個人怎麼顧得過來。<br>老實說，因為它們其實是同一個東西換內容。</p>
+<h3>共用的部分</h3>
+<p>App 本身是一層殼，裡面跑的是網頁。<br>所以網站改一次，網頁版、iPhone、Android 三邊一起更新，不用每個平台各寫一次。</p>
+<p>單字卡、間隔複習、測驗、闖關地圖、付費牆、登入同步，這些在三個產品裡長得幾乎一樣。<br>做 StayTW 的時候是直接拿 StayJP 的架子來改，StayKR 又拿 StayTW 的來改。<br>所以第二個比第一個快很多，第三個又更快。</p>
+<h3>共用不了的部分</h3>
+<p>內容。</p>
+<p>日文要處理假名跟重音，台灣華語要處理注音跟聲調，韓文要處理連音跟硬音化。<br>每個語言都有自己的坑，這部分沒辦法複製貼上，只能一個一個查、一個一個修。</p>
+<p>還有受眾。<br>StayJP 的使用者是台灣人，StayTW 是日本人、韓國人、越南人、印尼人，介面要做好幾種語言，社群帳號也要分開經營。</p>
+<h3>一個小心得</h3>
+<p>第一個產品做得辛苦的地方，到第二個都會變成資產。<br>如果你也在做產品，可以想想看：你現在寫的東西，有哪些是下一個產品也用得到的。</p></div></article>
 <div class="sub">
   <b>訂閱 一人公司實驗室</b>
   <p>有新的一期就寄給你，大約兩週一封。隨時一鍵退訂。</p>
   <form onsubmit="return nlSub(this)">
     <input type="email" name="email" required placeholder="你的 Email" autocomplete="email">
     <input type="text" name="website" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
-    <input type="hidden" name="source" value="letters">
+    <input type="hidden" name="source" value="article_three-apps">
     <button type="submit">訂閱</button>
   </form>
   <div class="msg" role="status"></div>
-</div>
-<ul class="list" id="list"><li class="empty">第一期準備中。</li></ul>
-<footer>一人公司實驗室・<a href="/">日本再留計劃 StayJP</a></footer></div><script>
+</div><footer>一人公司實驗室・<a href="/">日本再留計劃 StayJP</a></footer></div><script>
 function nlSub(f){var m=f.parentNode.querySelector('.msg'),b=f.querySelector('button');b.disabled=true;m.textContent='送出中…';
 fetch('https://asia-east1-jpnote-1bdd6.cloudfunctions.net/newsletterSubscribe',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:f.email.value,website:f.website.value,source:f.source.value})})
 .then(function(r){return r.json()}).then(function(j){
 m.textContent=j.ok?(j.already?'你已經訂閱了，謝謝！':'確認信寄出了，去信箱按一下「確認訂閱」就完成。'):'Email 格式好像不對，再檢查一下。';
 if(j.ok)f.reset();}).catch(function(){m.textContent='送出失敗，稍後再試一次。'}).finally(function(){b.disabled=false});return false}
-</script>
-<script>
-if(/subscribed=1/.test(location.search))document.getElementById('ok').style.display='block';
-fetch('/letters/feed.json?_='+Date.now()).then(function(r){return r.json()}).then(function(f){
-var now=Date.now(),its=(f.issues||[]).filter(function(i){return Date.parse(i.send_at)<=now});
-if(!its.length)return;
-document.getElementById('list').innerHTML=its.map(function(i){
-var d=new Date(Date.parse(i.send_at)+8*36e5).toISOString().slice(0,10).replace(/-/g,'/');
-var e=function(s){return String(s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})};
-return '<li><div class="d">'+d+'</div><a href="/letters/'+e(i.slug)+'">'+e(i.title)+'</a>'+(i.summary?'<p>'+e(i.summary)+'</p>':'')+'</li>'}).join('')});
 </script></body></html>

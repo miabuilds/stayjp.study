@@ -7,6 +7,7 @@
 //   summary: 一句話摘要，列表跟分享預覽用
 //   send_at: 2026-10-13T20:00:00+08:00     ← 到這個時間才寄、列表才顯示
 //   draft: true                             ← 草稿：不進 feed，不會寄，網頁版仍會產出可預覽
+//   email: false                            ← 只放網頁不寄信（開站時補的舊文用）
 //   ---
 // 用法:node scripts/build-letters.mjs   產完 git push 就上線,寄送交給雲端排程。
 import fs from "fs";
@@ -68,7 +69,7 @@ function parse(file) {
   if (!/^[a-z0-9-]+$/.test(slug)) throw new Error(`${file}: 檔名只能用小寫英數跟 -`);
   for (const k of ["title", "send_at"]) if (!fm[k]) throw new Error(`${file}: front matter 缺 ${k}`);
   if (isNaN(Date.parse(fm.send_at))) throw new Error(`${file}: send_at 格式不對(例 2026-10-13T20:00:00+08:00)`);
-  return { slug, title: fm.title, summary: fm.summary || "", send_at: fm.send_at, draft: fm.draft === "true", body: m[2] };
+  return { slug, title: fm.title, summary: fm.summary || "", send_at: fm.send_at, draft: fm.draft === "true", email: fm.email !== "false", body: m[2] };
 }
 
 const twDate = (iso) => new Date(Date.parse(iso) + 8 * 3600e3).toISOString().slice(0, 10).replace(/-/g, "/");
@@ -181,7 +182,7 @@ ${body}
 function indexPage() {
   return head(NAME, TAGLINE, `${SITE}/letters/`) + HEADER +
     `<section class="hero"><div class="eyebrow">NEWSLETTER</div><h1>${esc(NAME)}</h1><p class="lead">${esc(TAGLINE)}</p></section>
-<div id="ok" class="sub" style="display:none"><b>訂閱完成 🎉</b><p style="margin:0">下一期出來就會寄給你。</p></div>
+<div id="ok" class="sub" style="display:none"><b>訂閱完成</b><p style="margin:0">下一期出來就會寄給你。</p></div>
 ${SUB_BOX("letters")}
 <ul class="list" id="list"><li class="empty">第一期準備中。</li></ul>
 ${FOOTER}${SUB_JS}
@@ -202,12 +203,14 @@ fs.mkdirSync(OUT, { recursive: true });
 const items = fs.readdirSync(SRC).filter((f) => f.endsWith(".md")).map((f) => parse(path.join(SRC, f)));
 for (const it of items) {
   fs.writeFileSync(path.join(OUT, `${it.slug}.html`), webPage(it));
-  fs.writeFileSync(path.join(OUT, `${it.slug}.email.html`), emailPage(it));
+  // 只放網頁的不產寄信版:線上 newsletterCron 抓不到信件 HTML 就不會寄(舊版 function 也安全)
+  const ef = path.join(OUT, `${it.slug}.email.html`);
+  if (it.email) fs.writeFileSync(ef, emailPage(it)); else if (fs.existsSync(ef)) fs.unlinkSync(ef);
 }
 const feed = items.filter((i) => !i.draft).sort((a, b) => Date.parse(b.send_at) - Date.parse(a.send_at))
   .map((i) => ({ slug: i.slug, title: i.title, summary: i.summary, send_at: new Date(Date.parse(i.send_at)).toISOString(),
-    url: `/letters/${i.slug}`, email_url: `/letters/${i.slug}.email.html` }));
+    url: `/letters/${i.slug}`, email_url: `/letters/${i.slug}.email.html`, ...(i.email ? {} : { email: false }) }));
 fs.writeFileSync(path.join(OUT, "feed.json"), JSON.stringify({ name: NAME, issues: feed }, null, 1));
 fs.writeFileSync(path.join(OUT, "index.html"), indexPage());
 console.log(`電子報:${items.length} 篇(${feed.length} 篇進 feed,${items.length - feed.length} 篇草稿)`);
-for (const i of feed) console.log(`  ${twDate(i.send_at)} ${Date.parse(i.send_at) > Date.now() ? "排程中" : "已到期"}  ${i.slug}  ${i.title}`);
+for (const i of feed) console.log(`  ${twDate(i.send_at)} ${i.email === false ? "只放網頁" : Date.parse(i.send_at) > Date.now() ? "排程寄信" : "已到期"}  ${i.slug}  ${i.title}`);

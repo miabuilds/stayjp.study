@@ -1,4 +1,41 @@
 {
  "name": "一人公司實驗室",
- "issues": []
+ "issues": [
+  {
+   "slug": "apple-promo-code",
+   "title": "一個「碼」字，讓 App 被 Apple 退了三次",
+   "summary": "App Store 審核規則 3.1.1 實際踩過一次之後的整理。",
+   "send_at": "2026-10-09T05:00:00.000Z",
+   "url": "/letters/apple-promo-code",
+   "email_url": "/letters/apple-promo-code.email.html",
+   "email": false
+  },
+  {
+   "slug": "paywall-exposure",
+   "title": "付費牆不是太硬，是根本沒人看到",
+   "summary": "StayTW 看到付費方案的人五個有一個會買，問題出在前面。",
+   "send_at": "2026-10-09T04:00:00.000Z",
+   "url": "/letters/paywall-exposure",
+   "email_url": "/letters/paywall-exposure.email.html",
+   "email": false
+  },
+  {
+   "slug": "app-vs-web",
+   "title": "同一個產品，App 的轉換率是網頁的二十倍",
+   "summary": "一樣的內容、一樣的價格，買不買差最多的竟然是在哪裡打開。",
+   "send_at": "2026-10-09T03:00:00.000Z",
+   "url": "/letters/app-vs-web",
+   "email_url": "/letters/app-vs-web.email.html",
+   "email": false
+  },
+  {
+   "slug": "three-apps",
+   "title": "一個人做三個語言 App，靠的是同一副骨架",
+   "summary": "StayJP、StayTW、StayKR 怎麼共用同一套東西，還有哪些地方共用不了。",
+   "send_at": "2026-10-09T02:00:00.000Z",
+   "url": "/letters/three-apps",
+   "email_url": "/letters/three-apps.email.html",
+   "email": false
+  }
+ ]
 }

@@ -105,12 +105,12 @@ export const newsletterUnsub = https.onRequest(
 );
 
 // ── 寄送 ──
-interface Issue { slug: string; title: string; send_at: string; email_url: string; }
+interface Issue { slug: string; title: string; send_at: string; email_url: string; email?: boolean; }
 
 export async function runNewsletter(): Promise<string> {
   const feed = await fetch(`${SITE}/letters/feed.json?_=${Date.now()}`).then((r) => r.ok ? r.json() : null).catch(() => null);
   const issues: Issue[] = (feed && Array.isArray(feed.issues)) ? feed.issues : [];
-  const due = issues.filter((i) => i.send_at && Date.parse(i.send_at) <= Date.now())
+  const due = issues.filter((i) => i.email !== false && i.send_at && Date.parse(i.send_at) <= Date.now())
     .sort((a, b) => Date.parse(a.send_at) - Date.parse(b.send_at));
 
   const capRef = db.doc(`newsletter_meta/cap_${twDay()}`);
