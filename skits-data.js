@@ -22,6 +22,11 @@ window.SKITS = [
   { n: 18, t: '公司聚會', en: 'Drinking party', p: 'お酒は弱いんです', r: 'おさけはよわいんです', m: '我酒量不好', men: "I can't drink much", hook: '不想喝要怎麼說？', hookEn: 'How to turn down a drink' },
   { n: 19, t: '趕電車', en: 'Rushing for a train', p: '駆け込み乗車', r: 'かけこみじょうしゃ', m: '衝進快關的車門', men: 'Rushing onto a train', hook: '車站一直廣播這句', hookEn: 'That station announcement' },
   { n: 20, t: '試穿', en: 'Trying on', p: '試着してもいいですか', r: 'しちゃくしてもいいですか', m: '可以試穿嗎？', men: 'May I try this on?', hook: '試穿前要先問這句', hookEn: 'Ask before trying on' },
-  { n: 21, t: '道歉', en: 'Apologizing', p: '申し訳ございません', r: 'もうしわけございません', m: '非常抱歉(正式)', men: 'I sincerely apologize', hook: '日文道歉有三種', hookEn: 'Three ways to say sorry' }
+  { n: 21, t: '道歉', en: 'Apologizing', p: '申し訳ございません', r: 'もうしわけございません', m: '非常抱歉(正式)', men: 'I sincerely apologize', hook: '日文道歉有三種', hookEn: 'Three ways to say sorry' },
+  { n: 22, t: '開動了', en: 'Itadakimasu', p: 'いただきます', r: 'いただきます', m: '開動了(吃之前)', men: 'Said before eating', hook: '吃飯前後要說什麼？', hookEn: 'Before & after meals' },
+  { n: 23, t: '快速車', en: 'Rapid train', p: '中野に止まりますか', r: 'なかのにとまりますか', m: '有停中野嗎？', men: 'Does it stop at Nakano?', hook: '電車一直不停？', hookEn: 'The train won\'t stop?' },
+  { n: 24, t: '半價貼紙', en: 'Half-price sticker', p: '半額', r: 'はんがく', m: '半價', men: 'Half price', hook: '超市晚上的搶購', hookEn: 'Evening supermarket rush' },
+  { n: 25, t: '帶傘', en: 'Bring an umbrella', p: '傘を持って行ったほうがいい', r: 'かさをもっていったほうがいい', m: '最好帶傘出門', men: 'Better take an umbrella', hook: '朋友叫你帶傘', hookEn: 'Listen to your friend' },
+  { n: 26, t: '被問路', en: 'Asked for directions', p: 'ちょっとわかりません', r: 'ちょっとわかりません', m: '我不太清楚', men: "I'm not really sure", hook: '在日本被問路了', hookEn: 'Asked the way in Japan' }
 ];
 window.skitFile = function (n, ext) { return 'videos/skit/ep' + (n < 10 ? '0' : '') + n + '.' + ext; };
