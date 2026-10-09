@@ -16,8 +16,8 @@ echo "   OK（格式錯的 email 正確被擋）"
 
 echo "③ 把頁面合併到 main 並推上線"
 git checkout main
-git pull --ff-only
+git pull --ff-only origin main
 git merge --no-edit newsletter
-git push
+git push origin main
 
 echo "完成。GitHub Pages 約 1～2 分鐘後生效：https://stayjp.study/letters/"
