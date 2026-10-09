@@ -66,8 +66,8 @@ export const newsletterSubscribe = https.onRequest(
       to: email,
       replyTo: REPLY_TO,
       message: {
-        subject: "確認訂閱 Mia 的電子報",
-        html: shell(`<p>嗨，謝謝你訂閱。</p><p>按下面的按鈕確認，之後有新的一期就會寄給你。</p>
+        subject: "確認訂閱「一人公司實驗室」",
+        html: shell(`<p>嗨，我是 Mia，謝謝你訂閱「一人公司實驗室」。</p><p>按下面的按鈕確認，之後有新的一期就會寄給你。</p>
 <p style="margin:28px 0"><a href="${link}" style="background:#c0392b;color:#fff;padding:12px 24px;border-radius:999px;text-decoration:none;font-weight:600">確認訂閱</a></p>
 <p style="color:#888;font-size:13px">不是你本人訂的話，忽略這封信就好，不會再收到任何東西。</p>`),
       },

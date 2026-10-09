@@ -1,7 +1,7 @@
 <!doctype html><html lang="zh-Hant"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Mia 的開發筆記</title><meta name="description" content="一個人做 App 的開發紀錄、商業模式的實驗數字，還有到處旅居的生活。">
-<meta property="og:title" content="Mia 的開發筆記"><meta property="og:description" content="一個人做 App 的開發紀錄、商業模式的實驗數字，還有到處旅居的生活。">
+<title>一人公司實驗室</title><meta name="description" content="Mia 一個人做 App 的實驗紀錄：開發、定價、營收數字，還有邊旅居邊工作的日子。">
+<meta property="og:title" content="一人公司實驗室"><meta property="og:description" content="Mia 一個人做 App 的實驗紀錄：開發、定價、營收數字，還有邊旅居邊工作的日子。">
 <meta property="og:url" content="https://stayjp.study/letters/"><meta property="og:type" content="article">
 <meta property="og:image" content="https://stayjp.study/stayjpplan.png"><meta name="twitter:card" content="summary">
 <link rel="canonical" href="https://stayjp.study/letters/"><link rel="alternate" type="application/json" href="https://stayjp.study/letters/feed.json">
@@ -47,10 +47,10 @@ article .d{color:var(--tx3);font-size:14px}
 .body a{color:var(--ac)}
 .body code{background:var(--bd);padding:1px 6px;border-radius:5px;font-size:.9em}
 footer{padding:30px 0 40px;text-align:center;color:var(--tx3);font-size:13px;border-top:1px solid var(--bd);margin-top:20px}
-footer a{color:var(--tx2)}</style></head><body><div class="wrap"><header><a class="logo" href="/letters/">Mia 的開發筆記</a><span class="sp"></span><a class="home" href="/">StayJP</a></header><section class="hero"><div class="eyebrow">NEWSLETTER</div><h1>Mia 的開發筆記</h1><p class="lead">一個人做 App 的開發紀錄、商業模式的實驗數字，還有到處旅居的生活。</p></section>
+footer a{color:var(--tx2)}</style></head><body><div class="wrap"><header><a class="logo" href="/letters/">一人公司實驗室</a><span class="sp"></span><a class="home" href="/">StayJP</a></header><section class="hero"><div class="eyebrow">NEWSLETTER</div><h1>一人公司實驗室</h1><p class="lead">Mia 一個人做 App 的實驗紀錄：開發、定價、營收數字，還有邊旅居邊工作的日子。</p></section>
 <div id="ok" class="sub" style="display:none"><b>訂閱完成 🎉</b><p style="margin:0">下一期出來就會寄給你。</p></div>
 <div class="sub">
-  <b>訂閱 Mia 的開發筆記</b>
+  <b>訂閱 一人公司實驗室</b>
   <p>有新的一期就寄給你，大約兩週一封。隨時一鍵退訂。</p>
   <form onsubmit="return nlSub(this)">
     <input type="email" name="email" required placeholder="你的 Email" autocomplete="email">
@@ -61,7 +61,7 @@ footer a{color:var(--tx2)}</style></head><body><div class="wrap"><header><a clas
   <div class="msg" role="status"></div>
 </div>
 <ul class="list" id="list"><li class="empty">第一期準備中。</li></ul>
-<footer>Mia 的開發筆記・<a href="/">日本再留計劃 StayJP</a></footer></div><script>
+<footer>一人公司實驗室・<a href="/">日本再留計劃 StayJP</a></footer></div><script>
 function nlSub(f){var m=f.parentNode.querySelector('.msg'),b=f.querySelector('button');b.disabled=true;m.textContent='送出中…';
 fetch('https://asia-east1-jpnote-1bdd6.cloudfunctions.net/newsletterSubscribe',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:f.email.value,website:f.website.value,source:f.source.value})})
 .then(function(r){return r.json()}).then(function(j){
