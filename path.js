@@ -497,7 +497,9 @@
     logAct('grammar');
     const egs = (g.eg || []).slice(0, 2).map(e => {
       const j = strip(e.j);
-      return '<div class="pt-eg"><div class="pt-eg-j">' + e.j.replace(/<em>/g, '<b>').replace(/<\/em>/g, '</b>') + ' <button type="button" class="pt-spk" onclick="speak(\'' + esc(j).replace(/'/g, "\\'") + '\')" aria-label="play"><i data-ic=volume></i></button></div><div class="pt-eg-z">' + esc(e.z || '') + '</div></div>';
+      // 例句漢字標平假名(用戶 2026-10-09 回饋;同 grammar-drill 用 Rich 版,保留 <em>)
+      const jh = root.furiganaHTMLRich ? (() => { try { return root.furiganaHTMLRich(e.j); } catch (x) { return e.j; } })() : e.j;
+      return '<div class="pt-eg"><div class="pt-eg-j">' + jh.replace(/<em>/g, '<b>').replace(/<\/em>/g, '</b>') + ' <button type="button" class="pt-spk" onclick="speak(\'' + esc(j).replace(/'/g, "\\'") + '\')" aria-label="play"><i data-ic=volume></i></button></div><div class="pt-eg-z">' + esc(e.z || '') + '</div></div>';
     }).join('');
     box().innerHTML = '<div class="pt-step">'
       + stepHead(L('文法', 'Grammar'), 2)

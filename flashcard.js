@@ -26,8 +26,15 @@
     // 排除自己與「純假名同形」(w===r)，只留下會混淆的不同漢字
     const others = [...set].filter(w => w !== item.w && w !== item.r);
     if (!others.length) return '';
-    const list = others.slice(0, 3).map(w => '「' + w + '（' + item.r + '）」').join('、');
-    return '<i data-ic=warning></i> 注意：與' + list + '讀音相同，注意漢字區別';
+    // 有音高資料就標 ⓪①②③(用戶 2026-10-09 回饋:先生③/宣誓⓪ 讀音同但重音不同),不受「單字顯示音高」設定影響
+    const CIRC = ['⓪','①','②','③','④','⑤','⑥','⑦','⑧','⑨','⑩'];
+    const pOf = w => { const P = window.PITCH, n = P && P[w + '|' + item.r]; return typeof n === 'number' ? n : null; };
+    const pm = n => n == null ? '' : (CIRC[n] || n);
+    const shown = others.slice(0, 3), me = pOf(item.w);
+    const list = shown.map(w => '「' + w + '（' + item.r + '）' + pm(pOf(w)) + '」').join('、');
+    const diff = me != null && shown.some(w => pOf(w) != null && pOf(w) !== me);
+    return '<i data-ic=warning></i> 注意：與' + list + '讀音相同，注意漢字區別'
+      + (diff ? '；重音不同，這個字是 ' + pm(me) : '');
   };
 })();
 
