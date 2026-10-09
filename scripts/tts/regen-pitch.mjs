@@ -4,10 +4,11 @@
 // 做法:以 pitch-accent.js(UniDic,NHK 抽查 28/29)為準,對每個單字音檔的文字(讀音/表記)跑 audio_query,
 //   量「該高的 mora 比該低的高多少」;落差不足或 accent 標錯 → 用正確 accent + 直接塑形 mora 音高重生。
 // 用法:node scripts/tts/regen-pitch.mjs            只稽核,印清單
-//       node scripts/tts/regen-pitch.mjs --write    重生 audio/tts + audio/tts-v(8,13) 對應檔,寫 pitch-fixed.json
+//       node scripts/tts/regen-pitch.mjs --write [--resume]   重生 audio/tts + audio/tts-v(8,13) 對應檔,寫 pitch-fixed.json
 // 需要 VOICEVOX 開著。同音字(せんせい=先生③/宣誓⓪)共用假名音檔 → 取級別最低那個字的音高。
 import fs from 'node:fs';
 import path from 'node:path';
+import { execSync } from 'node:child_process';
 import { ROOT, OUT_DIR, ENGINE, SPEAKER, TEXTS_JSON, loadOverrides, applyOverrides, synthesis, checkEngine, wavToMp3 } from './_lib.mjs';
 
 const WRITE = process.argv.includes('--write');
@@ -83,11 +84,15 @@ console.log('N5/N4 要修', show.length, '例:', show.slice(0, 40).map(b => `${b
 fs.writeFileSync(path.join(path.dirname(TEXTS_JSON), 'pitch-audit.json'), JSON.stringify(bad, null, 1));
 
 if (WRITE) {
+  // --resume:git 已顯示改過的檔(上次跑到一半)就跳過
+  const done = process.argv.includes('--resume')
+    ? new Set(execSync('git diff --name-only -- audio/tts audio/tts-v', { cwd: ROOT }).toString().split('\n').filter(Boolean)) : new Set();
   let made = 0;
   for (const b of bad) {
     const hash = byText.get(b.text).hash;
     for (const sp of [SPEAKER, ...Object.keys(VMAN).map(Number)]) {
       if (sp !== SPEAKER && !VMAN[sp][hash]) continue;
+      if (done.has(sp === SPEAKER ? `audio/tts/${hash}.mp3` : `audio/tts-v/${sp}/${hash}.mp3`)) continue;
       const q = await query(b.text, sp); if (!q || q.accent_phrases.length !== 1) continue;
       const wav = await synthesis(shape(q, b.n), sp);
       wavToMp3(wav, sp === SPEAKER ? path.join(OUT_DIR, hash + '.mp3') : path.join(ROOT, 'audio/tts-v', String(sp), hash + '.mp3'));
