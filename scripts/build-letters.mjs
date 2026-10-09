@@ -18,7 +18,7 @@ const SRC = path.join(ROOT, "letters-src");
 const OUT = path.join(ROOT, "letters");
 const SITE = "https://stayjp.study";
 const NAME = "一人公司實驗室";
-const TAGLINE = "Mia 一個人做 App 的實驗紀錄：開發、定價、營收數字，還有邊旅居邊工作的日子。";
+const TAGLINE = "大家好，我是再留計劃的 Mia。";
 const SUB_FN = "https://asia-east1-jpnote-1bdd6.cloudfunctions.net/newsletterSubscribe";
 
 const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
