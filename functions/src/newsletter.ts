@@ -24,6 +24,8 @@ const FN = "https://asia-east1-jpnote-1bdd6.cloudfunctions.net";
 const CORS = [/^https:\/\/stayjp\.study$/, /^http:\/\/localhost(:\d+)?$/, /^http:\/\/127\.0\.0\.1(:\d+)?$/];
 const DAILY_CAP = 200;                 // SMTP 每天 300,留 100 給試用信/系統信
 const REPLY_TO = "founder@stayjp.study";
+// 寄件人:founder@ 已在 Brevo 驗證(見 stayjp-domain-email)。SMTP 不認的話信會被退或改寫,上線後先用真信箱測一次確認信。
+const FROM = "Mia｜一人公司實驗室 <founder@stayjp.study>";
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
 const idOf = (email: string) => crypto.createHash("sha256").update(email).digest("hex").slice(0, 32);
@@ -64,6 +66,7 @@ export const newsletterSubscribe = https.onRequest(
     const link = `${FN}/newsletterConfirm?t=${token}`;
     await db.collection("mail").add({
       to: email,
+      from: FROM,
       replyTo: REPLY_TO,
       message: {
         subject: "確認訂閱「一人公司實驗室」",
@@ -135,6 +138,7 @@ export async function runNewsletter(): Promise<string> {
       const unsub = `${FN}/newsletterUnsub?t=${s.token}`;
       await db.collection("mail").add({
         to: s.email,
+        from: FROM,
         replyTo: REPLY_TO,
         message: {
           subject: it.title,
