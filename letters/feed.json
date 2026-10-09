@@ -2,6 +2,15 @@
  "name": "一人公司實驗室",
  "issues": [
   {
+   "slug": "why-stay-plan",
+   "title": "「再留計劃」這個名字是怎麼來的",
+   "summary": "從一份自己的筆記，變成現在的主業，還有接下來想做的事。",
+   "send_at": "2026-10-09T08:00:00.000Z",
+   "url": "/letters/why-stay-plan",
+   "email_url": "/letters/why-stay-plan.email.html",
+   "email": false
+  },
+  {
    "slug": "apple-promo-code",
    "title": "一個「碼」字，讓 App 被 Apple 退了三次",
    "summary": "App Store 審核規則 3.1.1 實際踩過一次之後的整理。",
