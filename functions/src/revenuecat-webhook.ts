@@ -123,7 +123,11 @@ export const revenuecatWebhook = functions.onRequest(
       // 一定要在下面 writeTransaction 之前算,否則會把這筆 RENEWAL 自己算成「之前付過」。
       const paidBefore = ((await getLatestSuccessChargeTwd(uid).catch(() => null)) || 0) > 0;
 
-      switch (type) {
+      // ⚠️ RevenueCat 沒有 REFUND 事件:Apple/Google 退款是 CANCELLATION + cancel_reason=CUSTOMER_SUPPORT(官方文件,
+      //    買斷 non-renewing 也一樣)。原本只認 "REFUND" → 退款戶只被標 willRenew=false、照樣 Premium(買斷退了永久可用)。
+      //    2026-10-10 用戶申請 Apple 退買斷時查到,改成導進下面的退款分支。
+      const isRefund = type === "CANCELLATION" && event.cancel_reason === "CUSTOMER_SUPPORT";
+      switch (isRefund ? "REFUND" : type) {
         case "INITIAL_PURCHASE":
         case "RENEWAL":
         case "NON_RENEWING_PURCHASE":   // 買斷(lifetime)是非續訂商品 → RC 發此事件,不是 INITIAL_PURCHASE。原本沒接 → 買斷付了 2990 卻寫不進訂閱
@@ -317,10 +321,10 @@ export const revenuecatWebhook = functions.onRequest(
             payment_method: event.store === "PLAY_STORE" ? "google_billing" : "apple_iap",
             external_id: event.transaction_id || event.original_transaction_id || "",
             status: "refunded",
-            note: `RevenueCat ${type} — access revoked`,
+            note: `RevenueCat ${type}${isRefund ? "/CUSTOMER_SUPPORT" : ""} — access revoked`,
           }, eventId);
           // KOL 分潤 clawback:退款/退單 → 該買家的分潤作廢(已付則後續扣回)
-          await voidKolCommission(uid, `rc_${type.toLowerCase()}`).catch(e => console.error("voidKolCommission(rc) 略過:", e));
+          await voidKolCommission(uid, `rc_${isRefund ? "refund" : type.toLowerCase()}`).catch(e => console.error("voidKolCommission(rc) 略過:", e));
           break;
         }
 
