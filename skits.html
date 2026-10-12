@@ -215,7 +215,7 @@ function fillPlayer(n, load){
   document.getElementById('plP').textContent = e.p;
   document.getElementById('plR').textContent = e.r!==e.p ? e.r : '';
   document.getElementById('plM').textContent = L(e.m,e.men);
-  const ps=document.getElementById('plSay'); ps.innerHTML = icon('mic')+esc(L('跟讀這句，AI 幫你打分','Shadow it — AI scores you')); ps.href = sayUrl(e.p, e.r, e.m);
+  const ps=document.getElementById('plSay'); ps.innerHTML = icon('mic')+esc(L('跟讀這句，AI 幫你打分','Shadow it — AI scores you')); ps.href = sayUrl(e.p, e.r, e.m, e.au);
   const pv=document.getElementById('plPrev'), nx=document.getElementById('plNext');
   pv.textContent = '‹ '+L('上一集','Previous'); pv.disabled = i<=0;
   nx.textContent = i<EPS.length-1 ? L('下一集','Next')+' ›' : L('看完了!','All done!'); nx.disabled = i>=EPS.length-1;
@@ -239,7 +239,7 @@ fetch('videos/skit/lines.json').then(r=>r.json()).then(d=>{ LINES=d; if(_cur) sh
 const $ = id => document.getElementById(id);
 function curLines(){ return (LINES && LINES[_cur]) || []; }
 function lineAt(t){ const ls=curLines(); let k=-1; for(let i=0;i<ls.length;i++){ if(ls[i].t0 <= t+0.15) k=i; else break; } return k; }   // 0.15 要大於 jump 往前退的 0.08,不然會判回上一句
-function sayUrl(ja, kana, zh){ return 'speak.html?say='+encodeURIComponent(ja)+'&kana='+encodeURIComponent(kana||ja)+'&zh='+encodeURIComponent(zh||''); }
+function sayUrl(ja, kana, zh, au){ return 'speak.html?say='+encodeURIComponent(ja)+'&kana='+encodeURIComponent(kana||ja)+'&zh='+encodeURIComponent(zh||'')+(au?'&au='+encodeURIComponent(au):''); }
 const plain = x => String(x||'').replace(/[、。！？!?…〜ー\s]/g,'');
 function showLine(k){
   li = k; const ls = curLines(), l = ls[k];
@@ -254,7 +254,7 @@ function showLine(k){
   $('lnJa').textContent = l.ja;
   $('lnKana').textContent = plain(l.kana)!==plain(l.ja) ? l.kana : '';
   $('lnZh').textContent = L(l.zh, '');
-  $('lnSay').style.visibility='visible'; $('lnSay').href = sayUrl(l.ja, l.kana, l.zh);
+  $('lnSay').style.visibility='visible'; $('lnSay').href = sayUrl(l.ja, l.kana, l.zh, l.au);
 }
 function jump(k){
   const l = curLines()[k]; if(!l) return;
