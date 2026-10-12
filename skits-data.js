@@ -27,6 +27,16 @@ window.SKITS = [
   { n: 23, t: '快速車', en: 'Rapid train', p: '中野に止まりますか', r: 'なかのにとまりますか', m: '有停中野嗎？', men: 'Does it stop at Nakano?', hook: '電車一直不停？', hookEn: 'The train won\'t stop?' },
   { n: 24, t: '半價貼紙', en: 'Half-price sticker', p: '半額', r: 'はんがく', m: '半價', men: 'Half price', hook: '超市晚上的搶購', hookEn: 'Evening supermarket rush' },
   { n: 25, t: '帶傘', en: 'Bring an umbrella', p: '傘を持って行ったほうがいい', r: 'かさをもっていったほうがいい', m: '最好帶傘出門', men: 'Better take an umbrella', hook: '朋友叫你帶傘', hookEn: 'Listen to your friend' },
-  { n: 26, t: '被問路', en: 'Asked for directions', p: 'ちょっとわかりません', r: 'ちょっとわかりません', m: '我不太清楚', men: "I'm not really sure", hook: '在日本被問路了', hookEn: 'Asked the way in Japan' }
+  { n: 26, t: '被問路', en: 'Asked for directions', p: 'ちょっとわかりません', r: 'ちょっとわかりません', m: '我不太清楚', men: "I'm not really sure", hook: '在日本被問路了', hookEn: 'Asked the way in Japan' },
+  { n: 27, t: '諺語・積沙成塔', en: 'Proverb: Every little bit', p: '塵も積もれば山となる', r: 'ちりもつもればやまとなる', m: '積沙成塔', men: 'Many a little makes a mickle', hook: '「積沙成塔」日文怎麼說？', hookEn: 'Proverb' },
+  { n: 28, t: '諺語・人有失手', en: 'Proverb: Even monkeys fall', p: '猿も木から落ちる', r: 'さるもきからおちる', m: '人有失手，馬有失蹄', men: 'Even experts make mistakes', hook: '「人有失手」日文怎麼說？', hookEn: 'Proverb' },
+  { n: 29, t: '諺語・花より団子', en: 'Proverb: Dumplings over flowers', p: '花より団子', r: 'はなよりだんご', m: '好看不如好吃', men: 'Substance over style', hook: '賞花只顧著吃？', hookEn: 'Proverb' },
+  { n: 30, t: '諺語・百折不撓', en: 'Proverb: Fall 7, rise 8', p: '七転び八起き', r: 'ななころびやおき', m: '百折不撓', men: 'Never give up', hook: '「百折不撓」日文怎麼說？', hookEn: 'Proverb' },
+  { n: 31, t: '諺語・欲速則不達', en: 'Proverb: Haste makes waste', p: '急がば回れ', r: 'いそがばまわれ', m: '欲速則不達', men: 'More haste, less speed', hook: '「欲速則不達」日文是？', hookEn: 'Proverb' },
+  { n: 32, t: '俚語・放鴿子', en: 'Slang: Bail last minute', p: 'ドタキャン', r: 'ドタキャン', m: '放鴿子(臨時取消)', men: 'Last-minute cancel', hook: '「放鴿子」日文怎麼說？', hookEn: 'Slang' },
+  { n: 33, t: '俚語・背黑鍋', en: 'Slang: Take the blame', p: '濡れ衣を着せられる', r: 'ぬれぎぬをきせられる', m: '背黑鍋、被冤枉', men: 'Be falsely accused', hook: '「背黑鍋」日文怎麼說？', hookEn: 'Slang' },
+  { n: 34, t: '俚語・吹牛', en: 'Slang: Exaggerate', p: '話を盛る', r: 'はなしをもる', m: '吹牛、講得很誇張', men: 'Exaggerate a story', hook: '「吹牛」日文怎麼說？', hookEn: 'Slang' },
+  { n: 35, t: '俚語・拍馬屁', en: 'Slang: Butter someone up', p: 'ごまをする', r: 'ごまをする', m: '拍馬屁', men: 'Flatter, suck up', hook: '「拍馬屁」日文怎麼說？', hookEn: 'Slang' },
+  { n: 36, t: '俚語・雞婆', en: 'Slang: Busybody', p: 'おせっかい', r: 'おせっかい', m: '雞婆、多管閒事', men: 'Meddlesome', hook: '「雞婆」日文怎麼說？', hookEn: 'Slang' }
 ];
 window.skitFile = function (n, ext) { return 'videos/skit/ep' + (n < 10 ? '0' : '') + n + '.' + ext; };
