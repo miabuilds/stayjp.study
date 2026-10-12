@@ -242,6 +242,7 @@
 <script src="icons.js"></script>
 <script src="ui-modal.js"></script>
 <script src="i18n.js"></script>
+<script src="skits-data.js"></script>
 <script src="audio/tts/manifest.js"></script>
 <script src="speak-ruby.js"></script>
 <script src="shadow-core.js"></script>
@@ -539,6 +540,23 @@ const LEVELS = ['N5','N4','N3','N2','N1'];
 let activeLv = (function(){ try{ return localStorage.getItem('sp_lv')||'N5'; }catch(e){ return 'N5'; } })();
 let activeCat = 'all';
 let idx = 0;
+// 小狸短劇:每集重點句做成「小狸短劇」分類;skits.html 的「跟讀這句」會帶 ?say=日文&kana=假名&zh=中文 直接跳到那句
+(function(){
+  try{
+    if(!window.SKITS) return;
+    CATS.push({ k:'skit', ic:'<i data-ic=play></i>', name:'小狸短劇', en:'Tanuki skits' });
+    SKITS.forEach(function(x){ if(!SENTS.some(function(s){ return s.jp===x.p; })) SENTS.push(S(x.p, x.r, x.m, 'N5', 'skit')); });
+    var q=new URLSearchParams(location.search), say=q.get('say');
+    if(!say) return;
+    if(!SENTS.some(function(s){ return s.jp===say; })) SENTS.push(S(say, q.get('kana')||say, q.get('zh')||'', 'N5', 'skit'));
+    activeLv='N5'; activeCat='skit';
+    idx=Math.max(0, list().findIndex(function(s){ return s.jp===say; }));
+    // 練習卡在頁面下方:等畫面出來(登入檢查完才顯示 #app)就捲到那句
+    var tries=0, iv=setInterval(function(){ var app=document.getElementById('app'), jp=document.getElementById('jp');
+      if(app && app.style.display==='block' && jp){ clearInterval(iv); setTimeout(function(){ jp.scrollIntoView({behavior:'smooth', block:'center'}); }, 150); }
+      else if(++tries>40) clearInterval(iv); }, 100);
+  }catch(e){}
+})();
 function list(){ return SENTS.filter(s=>s.lv===activeLv && (activeCat==='all' || s.cat===activeCat)); }
 function cur(){ return list()[idx] || list()[0]; }
 

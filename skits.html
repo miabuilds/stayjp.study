@@ -61,7 +61,7 @@
   .pl-top b{font-size:15px}
   .pl-x{width:40px;height:40px;border:none;border-radius:50%;background:rgba(255,255,255,.14);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer}
   .pl-x svg{width:20px;height:20px}
-  .pl video{width:100%;max-width:420px;max-height:60vh;aspect-ratio:9/16;background:#000;border-radius:14px;object-fit:contain}
+  .pl video{width:100%;max-width:420px;max-height:50vh;aspect-ratio:9/16;background:#000;border-radius:14px;object-fit:contain}
   .pl-card{width:100%;max-width:420px;background:var(--bg2);color:var(--tx);border-radius:14px;padding:14px 16px;margin-top:12px}
   .pl-lbl{font-size:11px;font-weight:800;letter-spacing:.06em;color:var(--ac)}
   .pl-p{font-size:22px;font-weight:800;line-height:1.35;margin-top:2px}
@@ -72,6 +72,28 @@
   .pl-nav button.go{background:var(--ac);border-color:var(--ac)}
   .pl-nav button:disabled{opacity:.35;cursor:default}
   body.lock{overflow:hidden}
+  /* 逐句:目前這句 + 上一句/重播/下一句 + 速度 + 每句停 + 跟讀 */
+  .ln{width:100%;max-width:420px;background:#1c1b1a;color:#fff;border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:12px 14px 12px;margin-top:10px}
+  .ln-top{display:flex;align-items:center;justify-content:space-between;font-size:12px;color:rgba(255,255,255,.55)}
+  .ln-who{background:rgba(255,255,255,.12);border-radius:20px;padding:1px 9px;font-weight:700;color:#fff}
+  .ln-who.t{background:var(--ac)}
+  .ln-ja{font-size:20px;font-weight:800;line-height:1.4;margin-top:6px;cursor:pointer;min-height:1.4em}
+  .ln-kana{font-size:13px;color:rgba(255,255,255,.6);margin-top:1px}
+  .ln-zh{font-size:14.5px;color:rgba(255,255,255,.88);margin-top:3px}
+  .ln-ctl{display:flex;gap:8px;margin-top:10px}
+  .ln-ctl button{flex:1;min-height:42px;border-radius:11px;border:1px solid rgba(255,255,255,.22);background:transparent;color:#fff;font:inherit;font-size:14px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:5px}
+  .ln-ctl button svg{width:15px;height:15px}
+  .ln-ctl button:disabled{opacity:.35}
+  .ln-opt{display:flex;align-items:center;gap:8px;margin-top:10px;flex-wrap:wrap}
+  .ln-spd{display:inline-flex;border:1px solid rgba(255,255,255,.22);border-radius:10px;overflow:hidden}
+  .ln-spd button{border:none;background:transparent;color:rgba(255,255,255,.7);font:inherit;font-size:13px;font-weight:700;padding:6px 10px;cursor:pointer}
+  .ln-spd button.on{background:#fff;color:#111}
+  .ln-stop{display:inline-flex;align-items:center;gap:5px;font-size:13px;color:rgba(255,255,255,.8);cursor:pointer;user-select:none}
+  .ln-stop input{width:16px;height:16px;accent-color:var(--ac)}
+  .ln-say{margin-left:auto;display:inline-flex;align-items:center;gap:5px;background:var(--ac);color:#fff;text-decoration:none;font-size:13.5px;font-weight:800;border-radius:10px;padding:7px 12px}
+  .ln-say svg{width:15px;height:15px}
+  .pl-say{display:inline-flex;align-items:center;gap:5px;margin-top:10px;background:var(--soft);color:var(--ac);text-decoration:none;font-size:13.5px;font-weight:800;border-radius:10px;padding:7px 12px}
+  .pl-say svg{width:15px;height:15px}
 </style>
 <script src="accent.js"></script>
 </head>
@@ -103,11 +125,24 @@
 <div class="pl" id="pl" role="dialog" aria-modal="true">
   <div class="pl-top"><b id="plT"></b><button class="pl-x" id="plX" aria-label="close"><i data-ic=x></i></button></div>
   <video id="plV" controls playsinline preload="metadata"></video>
+  <div class="ln" id="ln">
+    <div class="ln-top"><span class="ln-who" id="lnWho"></span><span id="lnPos"></span></div>
+    <div class="ln-ja" id="lnJa" lang="ja"></div>
+    <div class="ln-kana" id="lnKana" lang="ja"></div>
+    <div class="ln-zh" id="lnZh"></div>
+    <div class="ln-ctl"><button id="lnPrev"></button><button id="lnRe"></button><button id="lnNext"></button></div>
+    <div class="ln-opt">
+      <span class="ln-spd" id="lnSpd"><button data-r="1">1x</button><button data-r="0.75">0.75x</button><button data-r="0.5">0.5x</button></span>
+      <label class="ln-stop"><input type="checkbox" id="lnStop"><span id="lnStopTx"></span></label>
+      <a class="ln-say" id="lnSay" href="#"></a>
+    </div>
+  </div>
   <div class="pl-card">
     <div class="pl-lbl" id="plLbl"></div>
     <div class="pl-p" id="plP"></div>
     <div class="pl-r" id="plR"></div>
     <div class="pl-m" id="plM"></div>
+    <a class="pl-say" id="plSay" href="#"></a>
   </div>
   <div class="pl-nav"><button id="plPrev"></button><button id="plNext" class="go"></button></div>
 </div>
@@ -162,8 +197,8 @@ function render(){
     (fresh.length ? '<div class="grid">'+fresh.map(card).join('')+'</div>' : '')+
     (done.length ? '<div class="sec-h">'+esc(L('看過的','Watched'))+' <span class="cnt">'+done.length+'</span></div><div class="grid seen-grid">'+done.map(card).join('')+'</div>' : '');
   document.getElementById('note').innerHTML = L(
-    '<b>怎麼用:</b>先看一次笑一下,再跟著影片裡的「小狸教你一句」唸兩三遍。下次真的在日本遇到,就說得出口了。',
-    '<b>How to use:</b> watch once for fun, then repeat the phrase from the lesson card two or three times. Next time it happens for real, you’ll have the words.');
+    '<b>怎麼用:</b>先看一次笑一下,再用影片下面的「下一句」一句一句聽(可以調慢速度、勾「每句停」)。最後按「跟讀這句」,AI 會幫你的發音打分。',
+    '<b>How to use:</b> watch once for fun, then go line by line with “Next” (slow it down or pause after each line). Finally tap “Shadow” and AI scores your pronunciation.');
   document.getElementById('ft').innerHTML = 'StayJP 日本再留計劃 · <a href="app.html" style="color:var(--tx3)">'+esc(L('學習工具','Study tools'))+'</a><br>'+
     esc(L('配音','Voices'))+':VOICEVOX(ずんだもん・猫使アル ほか)';
   if(!_cur) return;
@@ -180,11 +215,12 @@ function fillPlayer(n, load){
   document.getElementById('plP').textContent = e.p;
   document.getElementById('plR').textContent = e.r!==e.p ? e.r : '';
   document.getElementById('plM').textContent = L(e.m,e.men);
+  const ps=document.getElementById('plSay'); ps.innerHTML = icon('mic')+esc(L('跟讀這句，AI 幫你打分','Shadow it — AI scores you')); ps.href = sayUrl(e.p, e.r, e.m);
   const pv=document.getElementById('plPrev'), nx=document.getElementById('plNext');
   pv.textContent = '‹ '+L('上一集','Previous'); pv.disabled = i<=0;
   nx.textContent = i<EPS.length-1 ? L('下一集','Next')+' ›' : L('看完了!','All done!'); nx.disabled = i>=EPS.length-1;
   if(load){
-    V.poster = skitFile(e.n,'jpg'); V.src = skitFile(e.n,'mp4');
+    V.poster = skitFile(e.n,'jpg'); V.src = skitFile(e.n,'mp4'); V.defaultPlaybackRate = V.playbackRate = rate; showLine(-1);
     const p=V.play(); if(p&&p.catch) p.catch(()=>{});
   }
 }
@@ -196,6 +232,67 @@ function openEp(n, push){
 function closePl(){
   _cur=null; _pushed=false; V.pause(); V.removeAttribute('src'); V.load(); pl.classList.remove('on'); document.body.classList.remove('lock'); render();
 }
+// ── 逐句播放:時間軸在 videos/skit/lines.json(~/stayjp-video 的 export-lines.ts 產) ──
+let LINES = null, li = -1, stopAt = null, rate = 1;
+try{ rate = +localStorage.getItem('skit_rate') || 1; }catch(e){}
+fetch('videos/skit/lines.json').then(r=>r.json()).then(d=>{ LINES=d; if(_cur) showLine(lineAt(V.currentTime||0)); }).catch(()=>{});
+const $ = id => document.getElementById(id);
+function curLines(){ return (LINES && LINES[_cur]) || []; }
+function lineAt(t){ const ls=curLines(); let k=-1; for(let i=0;i<ls.length;i++){ if(ls[i].t0 <= t+0.15) k=i; else break; } return k; }   // 0.15 要大於 jump 往前退的 0.08,不然會判回上一句
+function sayUrl(ja, kana, zh){ return 'speak.html?say='+encodeURIComponent(ja)+'&kana='+encodeURIComponent(kana||ja)+'&zh='+encodeURIComponent(zh||''); }
+const plain = x => String(x||'').replace(/[、。！？!?…〜ー\s]/g,'');
+function showLine(k){
+  li = k; const ls = curLines(), l = ls[k];
+  $('lnPos').textContent = ls.length ? (Math.max(k,0)+1)+' / '+ls.length : '';
+  $('lnPrev').disabled = k<=0; $('lnNext').disabled = k>=ls.length-1;
+  if(!l){
+    $('lnWho').textContent = L('逐句','Line by line'); $('lnWho').classList.remove('t');
+    $('lnJa').textContent = ls.length ? L('按「下一句」一句一句聽','Tap “Next” to go line by line') : '';
+    $('lnKana').textContent = ''; $('lnZh').textContent = ''; $('lnSay').style.visibility='hidden'; return;
+  }
+  $('lnWho').textContent = l.teach ? L('教學','Lesson') : l.who; $('lnWho').classList.toggle('t', !!l.teach);
+  $('lnJa').textContent = l.ja;
+  $('lnKana').textContent = plain(l.kana)!==plain(l.ja) ? l.kana : '';
+  $('lnZh').textContent = L(l.zh, '');
+  $('lnSay').style.visibility='visible'; $('lnSay').href = sayUrl(l.ja, l.kana, l.zh);
+}
+function jump(k){
+  const l = curLines()[k]; if(!l) return;
+  V.currentTime = Math.max(0, l.t0 - 0.08); showLine(k);
+  stopAt = $('lnStop').checked ? l.t1 + 0.25 : null;
+  const p=V.play(); if(p&&p.catch) p.catch(()=>{});
+}
+// 播放中用 rAF 盯時間:換句就更新字幕;勾「每句停」就在這句講完時暫停(timeupdate 一秒才 4 次,會停太晚)
+function tick(){
+  if(!V.paused && _cur){
+    const k = lineAt(V.currentTime);
+    if(k !== li){ showLine(k); const l=curLines()[k]; if(l && $('lnStop').checked) stopAt = l.t1 + 0.25; }
+    if(stopAt != null && V.currentTime >= stopAt){ V.pause(); stopAt = null; }
+  }
+  requestAnimationFrame(tick);
+}
+requestAnimationFrame(tick);
+V.addEventListener('seeked', ()=>{ if(V.paused) showLine(lineAt(V.currentTime)); });
+$('lnPrev').onclick = ()=> jump(Math.max(0, li-1));
+$('lnNext').onclick = ()=> jump(Math.min(curLines().length-1, li+1));
+$('lnRe').onclick = ()=> jump(Math.max(0, li));
+$('lnJa').onclick = ()=> jump(Math.max(0, li));
+function setRate(r){ rate=r; V.defaultPlaybackRate = V.playbackRate = r; try{ localStorage.setItem('skit_rate', r); }catch(e){} [...$('lnSpd').children].forEach(b=>b.classList.toggle('on', +b.dataset.r===r)); }
+$('lnSpd').addEventListener('click', ev=>{ const b=ev.target.closest('button'); if(b) setRate(+b.dataset.r); });
+try{ $('lnStop').checked = localStorage.getItem('skit_stop')==='1'; }catch(e){}
+$('lnStop').onchange = ()=>{ try{ localStorage.setItem('skit_stop', $('lnStop').checked?'1':'0'); }catch(e){} if(!$('lnStop').checked) stopAt=null; };
+// 去跟讀頁前先暫停影片
+['lnSay','plSay'].forEach(id=>$(id).addEventListener('click', ()=>V.pause()));
+function lineLabels(){
+  $('lnPrev').innerHTML = '‹ '+esc(L('上一句','Prev'));
+  $('lnRe').innerHTML = icon('refresh')+esc(L('重播','Replay'));
+  $('lnNext').innerHTML = esc(L('下一句','Next'))+' ›';
+  $('lnStopTx').textContent = L('每句停','Pause each line');
+  $('lnSay').innerHTML = icon('mic')+esc(L('跟讀這句','Shadow'));
+  setRate(rate);
+}
+lineLabels();
+
 function step(d){ const i=EPS.findIndex(e=>e.n===_cur); const e=EPS[i+d]; if(e) openEp(e.n,false); }
 V.addEventListener('ended',()=>{ if(_cur) markSeen(_cur); });
 V.addEventListener('timeupdate',()=>{ if(_cur && V.duration && V.currentTime/V.duration>.8) markSeen(_cur); });
@@ -209,7 +306,7 @@ document.getElementById('grid').addEventListener('click',ev=>{ const b=ev.target
 function cycleLang(){
   const next = lang()==='en' ? 'zh-TW' : 'en';
   try{ I18n.setLang ? I18n.setLang(next) : localStorage.setItem('ui_lang',next); }catch(e){ try{ localStorage.setItem('ui_lang',next); }catch(_){} }
-  render();
+  render(); lineLabels(); if(_cur) showLine(li);
 }
 
 render();
