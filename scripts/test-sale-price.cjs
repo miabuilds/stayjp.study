@@ -61,17 +61,17 @@ const LONG_AFTER = T(2027, 1, 1, 0, 0, 0);
 // 1. 檔期前:一切照舊
 check('檔期前 年費 無碼', 'yearly', BEFORE, false, false, 1990);
 check('檔期前 年費 KOL碼', 'yearly', BEFORE, true, false, 1790);
-check('檔期前 買斷 KOL碼', 'lifetime', BEFORE, true, false, 5390);
-check('檔期前 買斷 無碼', 'lifetime', BEFORE, false, false, 5990);
+check('檔期前 買斷 KOL碼', 'lifetime', BEFORE, true, false, 4490);
+check('檔期前 買斷 無碼', 'lifetime', BEFORE, false, false, 4990);
 
 // 2. KOL 搶先(10/7 20:00–23:59:59)
 for (const t of [EARLY, EARLY_LATE]) {
   check('搶先 年費 KOL碼', 'yearly', t, true, false, 1340);
   check('搶先 買斷 KOL碼', 'lifetime', t, true, false, 3590);
   check('搶先 年費 無碼(還沒開始)', 'yearly', t, false, false, 1990);
-  check('搶先 買斷 無碼(還沒開始)', 'lifetime', t, false, false, 5990);
+  check('搶先 買斷 無碼(還沒開始)', 'lifetime', t, false, false, 4990);
   check('搶先 年費 活動碼(沒有搶先資格,平時碼折)', 'yearly', t, true, true, 1790);
-  check('搶先 買斷 活動碼(沒有搶先資格,平時碼折)', 'lifetime', t, true, true, 5390);
+  check('搶先 買斷 活動碼(沒有搶先資格,平時碼折)', 'lifetime', t, true, true, 4490);
 }
 
 // 3. 檔期中
@@ -88,8 +88,8 @@ for (const t of [START, MID, LAST]) {
 for (const t of [AFTER, LONG_AFTER]) {
   check('結束後 年費 無碼', 'yearly', t, false, false, 1990);
   check('結束後 年費 KOL碼', 'yearly', t, true, false, 1790);
-  check('結束後 買斷 無碼', 'lifetime', t, false, false, 5990);
-  check('結束後 買斷 KOL碼', 'lifetime', t, true, false, 5390);
+  check('結束後 買斷 無碼', 'lifetime', t, false, false, 4990);
+  check('結束後 買斷 KOL碼', 'lifetime', t, true, false, 4490);
 }
 
 // 5. 月費、早鳥任何時候都不受影響

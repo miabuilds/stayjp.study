@@ -80,7 +80,7 @@ export const PLANS: Record<PlanKey, {
     display_name: "早鳥年費",
   },
   lifetime: {
-    price_twd: 5990,   // 2026-09-14 調漲(2990→5990,Mia 9/6 定案:3 倍年費,學習週期 1-2 年下買斷>期望LTV)
+    price_twd: 4990,   // 2026-10-13 5990→4990(Mia:5,990 三週只賣 1 張、雙十 3,990 四天 21 張);9/14 曾 2990→5990
     period_days: 365 * 100,    // 100 年 ~= 終身,實際 willRenew=false
     ecpay_period_type: "M",     // 不續扣
     ecpay_frequency: 1,
@@ -133,10 +133,10 @@ export const PAYPAL_PRICES_USD: Partial<Record<PlanKey, number>> = {
 // createPayment 建單時:users/{uid}.ref_code 存在且該碼有效(ref_codes 存在/active/非停權/非本人)
 // → 建單金額 = price_twd − 折價。定期定額 PeriodAmount 用折後價 → 折後價終身續扣(=「鎖 1,790」承諾)。
 // 年費走折價後,callback 不再另發 +30 天(避免雙重好康;月費 +7 天、買斷 AI 加量照舊)。
-// 話術=「推薦碼 9 折」,實際取整到十位(1,791→1,790、5,391→5,390,比 9 折再便宜一點)
+// 話術=「推薦碼 9 折」,實際取整到十位(1,791→1,790、4,491→4,490,比 9 折再便宜一點)
 export const WEB_CODE_DISCOUNT_TWD: Partial<Record<PlanKey, number>> = {
   yearly: 200,     // 折後 1,790,定期定額終身鎖
-  lifetime: 600,   // 折後 5,390,一次性;App 內碼折要等 1.0.8 雙 SKU(輸碼解鎖 5,390 商品)
+  lifetime: 500,   // 折後 4,490,一次性(2026-10-13 起;原 5,990−600=5,390);App 內=lifetime_ref 商品
 };
 
 // ── 雙十檔期(2026-10,Mia 定案)── 官網限定、不用輸碼、人人有;有效推薦碼再疊折。

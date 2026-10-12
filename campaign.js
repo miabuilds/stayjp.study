@@ -70,8 +70,8 @@
   // ⚠️ 數字與時間必須和後端 functions/src/utils/constants.ts 的 SALE + resolveWebPrice 一字不差:
   //    pricing.html 把這裡算出的金額當 expected_twd 送去 createPayment,兩邊不同就 409 擋單。
   //    scripts/test-sale-price.cjs 會把兩邊逐時間點對答案,改了就跑一次。
-  var LIST_PRICE = { monthly: 390, yearly: 1990, yearly_early_bird: 990, lifetime: 5990 };
-  var REF_OFF = { yearly: 200, lifetime: 600 };            // = 後端 WEB_CODE_DISCOUNT_TWD(檔期外)
+  var LIST_PRICE = { monthly: 390, yearly: 1990, yearly_early_bird: 990, lifetime: 4990 };
+  var REF_OFF = { yearly: 200, lifetime: 500 };            // = 後端 WEB_CODE_DISCOUNT_TWD(檔期外)
   var SALE = {
     id: 'double10_2026',
     start: Date.UTC(2026, 9, 7, 16, 0, 0),                 // 2026-10-08 00:00 台灣
