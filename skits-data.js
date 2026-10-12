@@ -37,6 +37,11 @@ window.SKITS = [
   { n: 33, t: '俚語・背黑鍋', en: 'Slang: Take the blame', p: '濡れ衣を着せられる', r: 'ぬれぎぬをきせられる', m: '背黑鍋、被冤枉', men: 'Be falsely accused', hook: '「背黑鍋」日文怎麼說？', hookEn: 'Slang' },
   { n: 34, t: '俚語・吹牛', en: 'Slang: Exaggerate', p: '話を盛る', r: 'はなしをもる', m: '吹牛、講得很誇張', men: 'Exaggerate a story', hook: '「吹牛」日文怎麼說？', hookEn: 'Slang' },
   { n: 35, t: '俚語・拍馬屁', en: 'Slang: Butter someone up', p: 'ごまをする', r: 'ごまをする', m: '拍馬屁', men: 'Flatter, suck up', hook: '「拍馬屁」日文怎麼說？', hookEn: 'Slang' },
-  { n: 36, t: '俚語・雞婆', en: 'Slang: Busybody', p: 'おせっかい', r: 'おせっかい', m: '雞婆、多管閒事', men: 'Meddlesome', hook: '「雞婆」日文怎麼說？', hookEn: 'Slang' }
+  { n: 36, t: '俚語・雞婆', en: 'Slang: Busybody', p: 'おせっかい', r: 'おせっかい', m: '雞婆、多管閒事', men: 'Meddlesome', hook: '「雞婆」日文怎麼說？', hookEn: 'Slang' },
+  { n: 37, t: '藥妝店', en: 'Drugstore', p: '目薬はありますか', r: 'めぐすりはありますか', m: '有眼藥水嗎？', men: 'Do you have eye drops?', hook: '找不到就問這句', hookEn: "Can't find it? Ask" },
+  { n: 38, t: '不要芥末', en: 'No wasabi', p: 'わさび抜きでお願いします', r: 'わさびぬきでおねがいします', m: '麻煩不要加芥末', men: 'No wasabi, please', hook: '壽司不要芥末', hookEn: 'Sushi without wasabi' },
+  { n: 39, t: '計程車', en: 'Taxi', p: 'ここまでお願いします', r: 'ここまでおねがいします', m: '麻煩到這裡', men: 'To here, please', hook: '計程車門別自己開', hookEn: "Don't open the taxi door" },
+  { n: 40, t: '丟垃圾', en: 'Trash day', p: '燃えるゴミ', r: 'もえるゴミ', m: '可燃垃圾', men: 'Burnable trash', hook: '丟錯天會被貼紙', hookEn: 'Wrong trash day' },
+  { n: 41, t: '拍照', en: 'Taking photos', p: '写真を撮ってもいいですか', r: 'しゃしんをとってもいいですか', m: '可以拍照嗎？', men: 'May I take a photo?', hook: '拍照前先問這句', hookEn: 'Ask before you shoot' }
 ];
 window.skitFile = function (n, ext) { return 'videos/skit/ep' + (n < 10 ? '0' : '') + n + '.' + ext; };
