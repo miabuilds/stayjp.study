@@ -13,10 +13,17 @@
 //    - 點下去走既有橋接 OPEN_PAYWALL 開「原生」Paywall(那邊賣的是 IAP 檔期商品)
 //    - App 版本要 ≥ APP_MIN_VER:原生 Paywall 的檔期模式是 runtime 1.0.12 的 OTA,舊版 Paywall 沒有特價 → 不掛,免得講了特價卻看不到
 //
+// 2026-10-13 加「新人限定 9 折」條(newbie-offer.js 拿到資格後發 newbie-offer 事件 → 這裡再判斷一次):
+//    沒有活動碼、不在檔期時才掛;App 內要 STAYJP_NATIVE.newbieOffer(原生 Paywall 有新人價的版本)才掛,一樣不寫 NT$。
 // 其他不顯示的情況:活動已結束(自動失效,不必手動拆)、已訂購、剛剛按過關閉。
 (function () {
   if (window.__stayjpPromoBanner) return;     // 防重複載入(重複掛兩條)
   window.__stayjpPromoBanner = true;
+  var booted = false;
+  // 新人價資格是非同步拿到的(newbie-offer.js 打 API)→ 頁面載入時還沒有活動的話,等它的事件再判斷一次
+  window.addEventListener('newbie-offer', function () { if (!booted) boot(); });
+  boot();
+  function boot() {
   // 活動內容統一由 campaign.js 提供(它同時負責把過期的碼從 localStorage 清掉)。
   // 拿不到就不顯示 —— 寧可不出現,也不要顯示一個對不上的活動。
   var CP = window.Campaign;
@@ -31,14 +38,25 @@
       zh: CP.tr(S.zh, S.en, S.cn) };
     SALE_BAR = true;
   }
+  // 新人限時 9 折(2026-10-15 起):沒有活動碼、也不在檔期時才掛;pricing 自己有新人卡,不重複掛
+  var NEWBIE_BAR = false, NO = window.NewbieOffer;
+  if (!C && CP && NO && NO.active && NO.active() && !/\/pricing(\.html)?$/.test(location.pathname)) {
+    C = { end: NO.until, code: '', link: '/pricing.html?utm_source=site&utm_campaign=newbie',
+      zh: CP.tr('新人限定 9 折', 'New member 10% off', '新人限定 9 折') };
+    NEWBIE_BAR = true;
+  }
   if (!C) return;
+  booted = true;
   var END = C.end, CODE = C.code, LINK = C.link;
-  var DISMISS_KEY = SALE_BAR ? 'promo_double10_off' : 'promo_tsukimi_off';
+  var DISMISS_KEY = SALE_BAR ? 'promo_double10_off' : NEWBIE_BAR ? 'promo_newbie_off' : 'promo_tsukimi_off';
+  var PRICED_BAR = SALE_BAR || NEWBIE_BAR;
   var NOW = function () { return (CP && CP.now) ? CP.now() : Date.now(); };
   var DISMISS_MS = 6 * 3600 * 1000;              // 網頁藥丸:關掉只安靜 6 小時,越接近截止越該看得到
   var APP_MIN_VER = '1.0.12';                    // App 內細條的最低版本(見檔頭)
 
-  function ended() { return NOW() > END; }
+  // 新人價:截止時間以 NewbieOffer 現值為準(剛付完款 → API 回 0 → 倒數條自己消失)
+  function endAt() { return NEWBIE_BAR ? ((window.NewbieOffer && NewbieOffer.until) || 0) : END; }
+  function ended() { return NOW() > endAt(); }
   function inApp() {
     try {
       if (document.documentElement.classList.contains('stayjp-native')) return true;
@@ -56,6 +74,8 @@
   }
   // App 內能不能掛:只有雙十檔期條、而且 App 版本夠新(Paywall 有檔期模式)
   function appOk() {
+    // 新人條:App 的原生 Paywall 要有新人價(OTA 後才有,會注入 STAYJP_NATIVE.newbieOffer)才掛
+    if (NEWBIE_BAR) { try { return !!(window.STAYJP_NATIVE && window.STAYJP_NATIVE.newbieOffer); } catch (e) { return false; } }
     if (!SALE_BAR) return false;
     try {
       var v = window.STAYJP_NATIVE && window.STAYJP_NATIVE.appVersion;
@@ -84,12 +104,12 @@
   // 這一頁要用哪種長相
   function kind() {
     if (inApp()) return appOk() ? 'strip' : null;
-    if (SALE_BAR && typeof window.fixHeaderHeight === 'function') return 'strip';   // 網頁 app.html(學習主畫面)
+    if ((SALE_BAR || NEWBIE_BAR) && typeof window.fixHeaderHeight === 'function') return 'strip';   // 網頁 app.html(學習主畫面)
     return 'pill';
   }
   if (ended()) return;
   // App 內的活動碼型倒數條一律不掛(Apple 3.1.1);App 判定在 Android 可能晚到,真正的把關在 decide()/tick
-  if (inApp() && !SALE_BAR) return;
+  if (inApp() && !SALE_BAR && !NEWBIE_BAR) return;
 
   var L = function (zh, en) { try { return (typeof enOr === 'function') ? enOr(zh, en) : zh; } catch (e) { return zh; } };
   var nf = function (n) { return Number(n).toLocaleString('en-US'); };
@@ -199,17 +219,18 @@
   function buildPill() {
     bar = document.createElement('div');
     bar.className = 'promo-bar';
-    var y = SALE_BAR ? CP.price('yearly', false, false) : null, lf = SALE_BAR ? CP.price('lifetime', false, false) : null;
+    var PRICED = SALE_BAR || NEWBIE_BAR;
+    var y = PRICED ? CP.price('yearly', NEWBIE_BAR, NEWBIE_BAR) : null, lf = PRICED ? CP.price('lifetime', NEWBIE_BAR, NEWBIE_BAR) : null;
     bar.innerHTML =
-      '<div class="promo-tx"><div><b>' + (SALE_BAR ? C.zh : L(C.zh, C.en)) + '</b> · ' +
+      '<div class="promo-tx"><div><b>' + (PRICED ? C.zh : L(C.zh, C.en)) + '</b> · ' +
         '<span id="promoCd">—</span></div>' +
-        (SALE_BAR
+        (PRICED
           ? '<div class="promo-t2">' + CP.tr('年費 NT$' + nf(y.twd) + ' 年年鎖・買斷 NT$' + nf(lf.twd) + '・不用輸碼',
               'Annual NT$' + nf(y.twd) + ' locked yearly · Lifetime NT$' + nf(lf.twd) + ' · no code needed',
               '年费 NT$' + nf(y.twd) + ' 年年锁・买断 NT$' + nf(lf.twd) + '・不用输码') + '</div></div>'
           : '<div class="promo-t2">' + L('折扣碼', 'Code') + ' <span class="promo-code" id="promoCode">' + CODE + '</span> ' +
             L('點一下複製', 'tap to copy') + '</div></div>') +
-      '<a class="promo-go" href="' + LINK + '">' + (SALE_BAR ? CP.tr('看方案', 'See plans', '看方案') : L('看方案', 'View')) + '</a>' +
+      '<a class="promo-go" href="' + LINK + '">' + (PRICED ? CP.tr('看方案', 'See plans', '看方案') : L('看方案', 'View')) + '</a>' +
       '<button class="promo-x" aria-label="' + L('關閉', 'Close') + '">×</button>';
     document.body.appendChild(bar);
 
@@ -217,7 +238,7 @@
       try { localStorage.setItem(DISMISS_KEY, String(NOW())); } catch (e) {}
       destroy();
     };
-    if (!SALE_BAR) bar.querySelector('#promoCode').onclick = function (e) {
+    if (!PRICED) bar.querySelector('#promoCode').onclick = function (e) {
       var el = e.currentTarget;
       try {
         navigator.clipboard.writeText(CODE);
@@ -234,17 +255,18 @@
     bar.className = 'promo-strip';
     bar.id = 'promoStrip';
     bar.setAttribute('role', 'region');
-    bar.setAttribute('aria-label', CP.tr('雙十限定', 'Double Ten Sale', '双十限定'));
+    bar.setAttribute('aria-label', NEWBIE_BAR ? C.zh : CP.tr('雙十限定', 'Double Ten Sale', '双十限定'));
     // 倒數用時鐘線條 icon 代替「倒數/ends in」字樣:英文介面一行才放得下,倒數數字不會被截掉
     var clock = ''; try { if (typeof window.icon === 'function') clock = window.icon('clock', { size: 13 }); } catch (e) {}
     var t1 = '<b class="promo-st-name">' + C.zh + '</b><span class="promo-st-cd" title="' + CP.tr('倒數', 'Ends in', '倒数') + '">' + clock + '<span id="promoCd">—</span></span>';
     var t2, go;
     if (isApp) {
       // App:不寫金額(商店各國價格不同)、不提碼與官網,點了開原生 Paywall
-      t2 = CP.tr('年費、買斷特價中', 'Annual & Lifetime on sale', '年费、买断特价中');
+      t2 = NEWBIE_BAR ? CP.tr('年費、買斷新人價', 'New-member price on Annual & Lifetime', '年费、买断新人价')
+        : CP.tr('年費、買斷特價中', 'Annual & Lifetime on sale', '年费、买断特价中');
       go = '<button type="button" class="promo-st-go">' + CP.tr('看方案', 'See plans', '看方案') + '</button>';
     } else {
-      var y = CP.price('yearly', false, false), lf = CP.price('lifetime', false, false);
+      var y = CP.price('yearly', NEWBIE_BAR, NEWBIE_BAR), lf = CP.price('lifetime', NEWBIE_BAR, NEWBIE_BAR);
       t2 = CP.tr('年費 NT$' + nf(y.twd) + ' 年年鎖・買斷 NT$' + nf(lf.twd),
         'Annual NT$' + nf(y.twd) + ' locked yearly · Lifetime NT$' + nf(lf.twd),
         '年费 NT$' + nf(y.twd) + ' 年年锁・买断 NT$' + nf(lf.twd));
@@ -277,13 +299,13 @@
     isApp = k === 'strip' && inApp();
     var cd = k === 'strip' ? buildStrip() : buildPill();
     var upd = function () {
-      var left = END - NOW();
+      var left = endAt() - NOW();
       if (left <= 0 || premium()) { destroy(); return; }          // 活動一結束 / 剛付完款 → 自己消失
       // Android App 判定可能晚到:先以網頁版掛上去的,認出是 App 後換成 App 版(不帶金額、開原生 Paywall)
       if (!isApp && inApp()) { destroy(); var nk = kind(); if (nk && !dismissed(nk)) build(nk); return; }
       cd.innerHTML = mode === 'strip'
         ? CP.fmtLeft(left)
-        : (SALE_BAR ? CP.tr('倒數 ', 'ends in ', '倒数 ') : L('倒數 ', 'ends in ')) + '<b>' + (SALE_BAR ? CP.fmtLeft(left) : fmt(left)) + '</b>';
+        : (PRICED_BAR ? CP.tr('倒數 ', 'ends in ', '倒数 ') : L('倒數 ', 'ends in ')) + '<b>' + (PRICED_BAR ? CP.fmtLeft(left) : fmt(left)) + '</b>';
     };
     upd();
     if (bar) tick = setInterval(upd, 1000);
@@ -304,4 +326,5 @@
   function start() { decide(10); }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start);
   else start();
+  }
 })();

@@ -240,6 +240,8 @@ a:hover{text-decoration:underline}
 
   <!-- === 雙十檔期(內容由 renderRefPricing 依 Campaign.price 產生;檔期外 hidden)=== -->
   <div id="saleHero" class="sale-hero" hidden></div>
+  <!-- === 新人限時 9 折(2026-10-15 起;內容由 renderNewbieHero 產生,沒資格就 hidden)=== -->
+  <div id="newbieHero" class="sale-hero" hidden></div>
 
   <!-- === 四付費方案 === -->
   <div class="plans" id="plans">
@@ -706,9 +708,18 @@ function checkRefType(code) {
 }
 function _fmt(n) { return Number(n).toLocaleString('en-US'); }
 function _T(zh, en, cn) { return (window.Campaign && Campaign.tr) ? Campaign.tr(zh, en, cn) : zh; }
+// 新人限時 9 折:登入中、newbie-offer.js 從後端拿到的截止時間還沒到、而且是同一個帳號。
+// 價錢比照「有碼 + 活動碼」(= createPayment 的算法);已經有推薦碼的人價錢一樣,就不另外算新人。
+function _newbieOn() {
+  try {
+    const u = _auth.currentUser;
+    return !!(u && window.NewbieOffer && NewbieOffer.active() && NewbieOffer.uid === u.uid);
+  } catch (e) { return false; }
+}
 function _price(plan) {
-  if (window.Campaign && Campaign.price) return Campaign.price(plan, window.__refActive, window.__refCampaign);
-  const list = (PLAN_TERMS[plan] || {}).twd || 0, off = window.__refActive ? (CODE_DISCOUNT[plan] || 0) : 0;
+  const nb = !window.__refActive && _newbieOn();
+  if (window.Campaign && Campaign.price) return Campaign.price(plan, window.__refActive || nb, window.__refActive ? window.__refCampaign : true);
+  const list = (PLAN_TERMS[plan] || {}).twd || 0, off = (window.__refActive || nb) ? (CODE_DISCOUNT[plan] || 0) : 0;
   return { twd: list - off, list, onSale: false, refOff: off, saleTwd: list };
 }
 function resolvedTerms(plan) {
@@ -718,7 +729,7 @@ function resolvedTerms(plan) {
   if (p.twd !== t.twd) {
     const why = p.onSale
       ? (p.refOff ? _T('雙十活動價＋推薦碼', 'Double Ten sale + referral code', '双十活动价＋推荐码') : _T('雙十活動價', 'Double Ten sale', '双十活动价'))
-      : '已套用推薦碼';
+      : (window.__refActive ? '已套用推薦碼' : '新人限定 9 折');
     t.twd = p.twd;
     t.price = 'NT$' + _fmt(p.twd) + '（' + why + ',原價 NT$' + _fmt(p.list) + '）';
   }
@@ -735,7 +746,7 @@ function refPerkText() {
       'Double Ten price, plus your code: annual NT$' + _fmt(y.twd) + ' (every renewal stays at this price), lifetime NT$' + _fmt(l.twd) + ', monthly +7 days',
       '双十活动价再折:年费 NT$' + _fmt(y.twd) + '(之后每年续订都是这个价)、买断 NT$' + _fmt(l.twd) + '、月费 +7 天');
   }
-  return '年費現折 NT$200、買斷現折 NT$600(9 折)、月費 +7 天';
+  return '年費現折 NT$200、買斷現折 NT$500(9 折)、月費 +7 天';
 }
 // 第一次改動前的原始 HTML,檔期一過(或還沒開始)就原樣放回去
 const _saleOrig = {};
@@ -748,8 +759,45 @@ function _saleRestore(id) {
   const el = document.getElementById(id); if (!el || !(id in _saleOrig)) return;
   el.innerHTML = _saleOrig[id]; delete _saleOrig[id]; delete el.dataset.saleHtml;
 }
+// 新人卡:有資格 → 價錢＋倒數;沒登入的訪客(上線後)→ 一行說明「註冊後 72 小時 9 折」。
+// App 內不顯示(Apple 3.1.1:App 裡不放官網價格),檔期中也不顯示(檔期卡已經講價錢)。
+function renderNewbieHero(onSale) {
+  const el = document.getElementById('newbieHero'); if (!el) return;
+  let html = '';
+  try {
+    const native = !!(window.STAYJP_NATIVE && STAYJP_NATIVE.isNativeApp) || document.documentElement.classList.contains('ios-app');
+    const launched = window.Campaign && Campaign.NEWBIE && Campaign.now() >= Campaign.NEWBIE.launch;
+    if (!native && launched && !onSale && !window.__refActive) {
+      if (_newbieOn()) {
+        const y = _price('yearly'), l = _price('lifetime');
+        html = '<div class="sh-top"><span class="sh-tag">' + _T('新人限定 9 折', 'New member 10% off', '新人限定 9 折') + '</span><span>'
+          + _T('不用輸碼 · 時間到恢復原價', 'No code needed · back to full price when time runs out', '不用输码 · 时间到恢复原价') + '</span></div>'
+          + '<div class="sh-main"><span class="sh-item">' + _T('年費', 'Annual', '年费') + ' NT$' + _fmt(y.twd) + '<s>' + _fmt(y.list) + '</s></span><span class="sh-sep">・</span>'
+          + '<span class="sh-item">' + _T('買斷', 'Lifetime', '买断') + ' NT$' + _fmt(l.twd) + '<s>' + _fmt(l.list) + '</s></span></div>'
+          + '<div class="sh-sub">' + _T('年費用新人價訂，之後每年續訂都是 NT$' + _fmt(y.twd), 'Subscribe annual at the new-member price and every renewal stays at NT$' + _fmt(y.twd), '年费用新人价订，之后每年续订都是 NT$' + _fmt(y.twd)) + '</div>'
+          + '<div class="sh-cd">' + _T('新人價倒數 ', 'Ends in ', '新人价倒数 ') + '<span data-newbie-cd>' + Campaign.fmtLeft(NewbieOffer.left()) + '</span></div>';
+      } else if (window.__authKnown && !_auth.currentUser) {   // 等 Firebase 判斷完登入狀態,免得已登入的人先閃一下訪客文案
+        html = '<div class="sh-top"><span class="sh-tag">' + _T('新人限定', 'New members', '新人限定') + '</span><span>'
+          + _T('註冊後 72 小時內，年費、買斷打 9 折', 'Annual & Lifetime are 10% off for 72 hours after you sign up', '注册后 72 小时内，年费、买断打 9 折') + '</span></div>';
+      }
+    }
+  } catch (e) { html = ''; }
+  if (el.dataset.html !== html) { el.innerHTML = html; el.dataset.html = html; }
+  // 跟檔期卡一樣放頁首(標題說明下面),一進來就看到
+  const lead = html && document.querySelector('main .lead');
+  if (lead && lead.nextElementSibling !== el) lead.after(el);
+  el.hidden = !html;
+}
+window.addEventListener('newbie-offer', () => renderRefPricing());
+_auth.onAuthStateChanged(() => { window.__authKnown = true; renderRefPricing(); });
+setInterval(() => {
+  const cd = document.querySelector('[data-newbie-cd]'); if (!cd || !window.NewbieOffer) return;
+  if (!NewbieOffer.active()) { renderRefPricing(); return; }   // 時間到 → 價錢、卡片一起退回原價
+  cd.textContent = Campaign.fmtLeft(NewbieOffer.left());
+}, 1000);
 function renderRefPricing() {
   const y = _price('yearly'), l = _price('lifetime');
+  renderNewbieHero(y.onSale);
   const was = (n) => '<span class="sale-was">NT$' + _fmt(n) + '</span>';
   const yEl = document.getElementById('yearlyPrice');
   if (yEl) yEl.innerHTML = (y.twd < y.list ? was(y.list) : '') + '<span class="currency">NT$</span>' + _fmt(y.twd) + '<span class="unit">/ 年</span>';
@@ -1122,6 +1170,7 @@ _auth.onAuthStateChanged(user => {
 </script>
 <script src="ui-map.js"></script>
 <script src="translate-layer.js"></script>
+<script defer src="newbie-offer.js"></script>
 <script defer src="promo-banner.js"></script>
 <script defer src="sale.js"></script>
 </body>

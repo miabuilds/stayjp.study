@@ -127,6 +127,14 @@
     off = hasRef ? (REF_OFF[plan] || 0) : 0;
     return { twd: list - off, list: list, onSale: false, refOff: off, saleTwd: list };
   }
+  // ── 新人限時 9 折(2026-10-13)── 與後端 constants.ts 的 NEWBIE / newbieUntil 一字不差。
+  //    資格(有沒有付過錢)只有後端知道 → 實際截止時間由 newbie-offer.js 打 newbieOffer API 拿;
+  //    這裡只放規則,讓測試能對答案、訪客畫面能先講「註冊後 72 小時」。
+  var NEWBIE = { launch: Date.UTC(2026, 9, 15, 12, 0, 0), hours: 72 };   // 2026-10-15 20:00 台灣
+  function newbieUntil(createdMs, now) {
+    if (!(now >= NEWBIE.launch) || !(createdMs > 0)) return 0;
+    return Math.max(createdMs, NEWBIE.launch) + NEWBIE.hours * 3600e3;
+  }
   /** 這個人「現在」看不看得到檔期價(決定要不要顯示倒數、劃線) */
   function saleOpenFor(hasRef, isCampaign, at) { return price('yearly', hasRef, isCampaign, at).onSale; }
   /** 倒數字串:「2 天 03:04:05」/ en「2d 03:04:05」 */
@@ -149,5 +157,6 @@
   }
 
   window.Campaign = { list: LIST, active: active, isExpired: isExpired, isCampaignCode: isCampaignCode, claim: claim, banner: banner,
-    SALE: SALE, LIST_PRICE: LIST_PRICE, REF_OFF: REF_OFF, now: saleNow, salePhase: salePhase, price: price, saleOpenFor: saleOpenFor, tr: tr, fmtLeft: fmtLeft };
+    SALE: SALE, LIST_PRICE: LIST_PRICE, REF_OFF: REF_OFF, now: saleNow, salePhase: salePhase, price: price, saleOpenFor: saleOpenFor, tr: tr, fmtLeft: fmtLeft,
+    NEWBIE: NEWBIE, newbieUntil: newbieUntil };
 })();

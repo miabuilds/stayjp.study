@@ -123,4 +123,28 @@ vm.createContext(sb2);
 vm.runInContext(fs.readFileSync(path.join(__dirname, '..', 'campaign.js'), 'utf8'), sb2);
 assert.ok(Math.abs(sb2.window.Campaign.now() - Date.now()) < 5000, '正式站不該吃 sale_now');
 
+// 9. 新人限時 9 折:規則兩邊一致 + 邊界
+assert.strictEqual(F.NEWBIE.launch, B.NEWBIE.launch, 'NEWBIE.launch 不一致');
+assert.strictEqual(F.NEWBIE.hours, B.NEWBIE.hours, 'NEWBIE.hours 不一致');
+assert.strictEqual(B.NEWBIE.launch, T(2026, 10, 15, 20, 0, 0));
+{
+  const L = B.NEWBIE.launch, H = 72 * 3600e3;
+  const cases = [
+    ['上線前查詢 → 沒有', T(2026, 10, 1, 0), L - 1, 0],
+    ['舊帳號 → 從上線起 72h', T(2026, 1, 1, 0), L, L + H],
+    ['上線後註冊 → 從註冊起 72h', L + 5 * 3600e3, L + 6 * 3600e3, L + 5 * 3600e3 + H],
+    ['沒有建立時間 → 沒有', 0, L + 1, 0],
+  ];
+  for (const [name, created, now, want] of cases) {
+    assert.strictEqual(B.newbieUntil(created, now), want, `[後端] ${name}`);
+    assert.strictEqual(F.newbieUntil(created, now), want, `[前端] ${name}`);
+    n++;
+  }
+}
+// 新人 = 「有碼 + 活動碼」的價錢:年費 1,790、買斷 4,490、月費不折
+assert.strictEqual(B.resolveWebPrice('yearly', B.NEWBIE.launch + 1, true, true).twd, 1790);
+assert.strictEqual(B.resolveWebPrice('lifetime', B.NEWBIE.launch + 1, true, true).twd, 4490);
+assert.strictEqual(B.resolveWebPrice('monthly', B.NEWBIE.launch + 1, true, true).twd, 390);
+n += 3;
+
 console.log(`✓ test-sale-price: ${n} 個情境 + ${sweep} 個掃描點全部通過`);

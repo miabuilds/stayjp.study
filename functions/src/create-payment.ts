@@ -15,6 +15,7 @@ import { isValidTaxId } from "./utils/ecpay-invoice";
 import {
   precheckSubscribe, writeTransaction, emailHash,
 } from "./utils/firestore";
+import { getNewbieOffer } from "./utils/newbie";
 
 if (admin.apps.length === 0) admin.initializeApp();
 
@@ -71,10 +72,15 @@ export const createPayment = functions.onRequest(
           }
         } catch (e) { console.warn("推薦碼折價解析失敗,以無碼價續行:", e); }
       }
-      const priced = resolveWebPrice(plan, Date.now(), hasValidRef, isCampaign);
+      // 新人限時 9 折:沒有有效碼的新人,價格比照「活動碼」(有碼折、沒有 KOL 搶先);不歸因任何碼、不產分潤
+      let newbie = false;
+      if (!hasValidRef && WEB_CODE_DISCOUNT_TWD[plan]) {
+        newbie = (await getNewbieOffer(uid)).until > Date.now();
+      }
+      const priced = resolveWebPrice(plan, Date.now(), hasValidRef || newbie, hasValidRef ? isCampaign : true);
       const priceTwd = priced.twd;
       const discount = priced.refOff;
-      if (!discount) codeApplied = "";
+      if (!discount || newbie) codeApplied = "";
 
       // ── 2.5 核對前端顯示的金額(防 service worker 舊快取頁:畫面寫舊價、實際扣新價,
       //        違反消保法「下單前明示金額」。前端從 resolvedTerms 帶 expected_twd,不一致就擋)──
@@ -114,7 +120,7 @@ export const createPayment = functions.onRequest(
         external_id: merchantTradeNo,
         status: "pending",
         email_hash: emailHash(email),
-        note: "等待 ECPay 扣款 callback" + (priced.onSale ? `(${SALE.id} 檔期價 ${SALE.prices[plan]})` : "") + (codeApplied ? `(推薦碼 ${codeApplied} 折 ${discount})` : "") + (taxId ? `(統編 ${taxId})` : ""),
+        note: "等待 ECPay 扣款 callback" + (priced.onSale ? `(${SALE.id} 檔期價 ${SALE.prices[plan]})` : "") + (codeApplied ? `(推薦碼 ${codeApplied} 折 ${discount})` : "") + (newbie && discount ? `(新人價 折 ${discount})` : "") + (taxId ? `(統編 ${taxId})` : ""),
       });
 
       // ── 4. 組綠界表單 ──

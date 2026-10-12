@@ -155,6 +155,21 @@ export const SALE = {
   refDiscount: { yearly: 150, lifetime: 400 } as Partial<Record<PlanKey, number>>,
 };
 
+// ── 新人限時 9 折(2026-10-13 Mia 定案)── 官網+App 都有,不用輸碼。
+//   對象:從沒成功付款過的帳號(退過費的也不算新人)。
+//   時間:帳號建立起 72 小時;上線前就註冊的現有免費用戶,從 launch 起算 72 小時(=統一給一次)。
+//   價格:等同推薦碼價(年費 1,790 年年鎖、買斷 4,490;月費不折、不送 +7 天)。檔期價比較低時照檔期價。
+//   前端 campaign.js 的 NEWBIE 必須跟這裡一致(scripts/test-sale-price.cjs 對答案)。
+export const NEWBIE = {
+  launch: Date.UTC(2026, 9, 15, 12, 0, 0),   // 2026-10-15 20:00 台灣
+  hours: 72,
+};
+/** 新人價的截止時間(ms);launch 前一律 0(還沒開始)。純函式,前後端同一個算法。 */
+export function newbieUntil(createdMs: number, now: number): number {
+  if (!(now >= NEWBIE.launch) || !(createdMs > 0)) return 0;
+  return Math.max(createdMs, NEWBIE.launch) + NEWBIE.hours * 3600e3;
+}
+
 /**
  * ref_codes 文件是不是「活動碼」(官方/限期碼,如 TSUKIMI、STAYJP200)。
  * 活動碼照樣可以拿推薦碼折價,但「沒有」KOL 搶先資格 —— 搶先是給 KOL/個人碼的粉絲的。
