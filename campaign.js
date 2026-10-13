@@ -160,3 +160,29 @@
     SALE: SALE, LIST_PRICE: LIST_PRICE, REF_OFF: REF_OFF, now: saleNow, salePhase: salePhase, price: price, saleOpenFor: saleOpenFor, tr: tr, fmtLeft: fmtLeft,
     NEWBIE: NEWBIE, newbieUntil: newbieUntil };
 })();
+
+// ── 來源追蹤(2026-10-13 Mia「流量好差」→ 先量得到才知道錢花哪)──
+// 一進站就記:first = 這台裝置第一次來的來源(之後不覆蓋);last = 最近一次「有來源」的造訪(帶 utm/ref 或從外站點進來)。
+// 登入後由 acq.js 寫進 users/{uid}.acq,scripts/acq-report.mjs 依來源算註冊/試用/付費。
+// 只記來源欄位,不記個資;拿不到 localStorage 就算了,不影響頁面。
+(function () {
+  try {
+    var q = new URLSearchParams(location.search || '');
+    var host = '';
+    try { if (document.referrer) { host = new URL(document.referrer).hostname.replace(/^www\./, ''); } } catch (e) {}
+    if (host === location.hostname.replace(/^www\./, '')) host = '';   // 站內換頁不算來源
+    var native = false;
+    try { native = !!(window.STAYJP_NATIVE && window.STAYJP_NATIVE.isNativeApp); } catch (e) {}
+    var cut = function (v) { return String(v || '').slice(0, 60); };
+    var t = {
+      src: cut(q.get('utm_source')), med: cut(q.get('utm_medium')), camp: cut(q.get('utm_campaign')),
+      cont: cut(q.get('utm_content')), ref: cut(q.get('ref')).toUpperCase(), host: cut(host),
+      land: cut(location.pathname), app: native ? 1 : 0, at: Date.now()
+    };
+    var has = !!(t.src || t.ref || t.host || q.get('fbclid') || q.get('gclid'));
+    if (!t.src && q.get('fbclid')) t.src = 'meta_ads';
+    if (!t.src && q.get('gclid')) t.src = 'google_ads';
+    if (!localStorage.getItem('stayjp_acq_first')) localStorage.setItem('stayjp_acq_first', JSON.stringify(t));
+    if (has) localStorage.setItem('stayjp_acq_last', JSON.stringify(t));
+  } catch (e) {}
+})();
