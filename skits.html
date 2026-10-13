@@ -208,25 +208,25 @@ function render(){
 // ── 播放層:開啟時 pushState,手機/App 按返回鍵就是關掉播放而不是離開頁面 ──
 const pl=document.getElementById('pl'), V=document.getElementById('plV');
 let _cur=null, _pushed=false;   // _pushed:播放層是自己 pushState 開的(關閉時 back);從 ?ep= 直接進來的就不能 back,不然會離開頁面
-function fillPlayer(n, load){
+function fillPlayer(n, load, noPlay){
   const i=EPS.findIndex(e=>e.n===n); const e=EPS[i]; if(!e) return;
   document.getElementById('plT').textContent = '#'+e.n+' '+L(e.t,e.en);
   document.getElementById('plLbl').textContent = L('這集學到','Phrase of the episode');
   document.getElementById('plP').textContent = e.p;
   document.getElementById('plR').textContent = e.r!==e.p ? e.r : '';
   document.getElementById('plM').textContent = L(e.m,e.men);
-  const ps=document.getElementById('plSay'); ps.innerHTML = icon('mic')+esc(L('跟讀這句，AI 幫你打分','Shadow it — AI scores you')); ps.href = sayUrl(e.p, e.r, e.m, e.au);
+  const ps=document.getElementById('plSay'); ps.innerHTML = icon('mic')+esc(L('跟讀這句，AI 幫你打分','Shadow it — AI scores you')); ps.href = sayUrl(e.p, e.r, e.m, e.au, -1);
   const pv=document.getElementById('plPrev'), nx=document.getElementById('plNext');
   pv.textContent = '‹ '+L('上一集','Previous'); pv.disabled = i<=0;
   nx.textContent = i<EPS.length-1 ? L('下一集','Next')+' ›' : L('看完了!','All done!'); nx.disabled = i>=EPS.length-1;
   if(load){
     V.poster = skitFile(e.n,'jpg'); V.src = skitFile(e.n,'mp4'); V.defaultPlaybackRate = V.playbackRate = rate; showLine(-1);
-    const p=V.play(); if(p&&p.catch) p.catch(()=>{});
+    if(!noPlay){ const p=V.play(); if(p&&p.catch) p.catch(()=>{}); }
   }
 }
-function openEp(n, push){
+function openEp(n, push, noPlay){
   if(push) _pushed=true;
-  _cur=n; fillPlayer(n,true); pl.classList.add('on'); document.body.classList.add('lock');
+  _cur=n; fillPlayer(n,true,noPlay); pl.classList.add('on'); document.body.classList.add('lock');
   try{ const u=new URL(location.href); u.searchParams.set('ep',n); history[push?'pushState':'replaceState']({skit:n},'',u); }catch(e){}
 }
 function closePl(){
@@ -235,11 +235,12 @@ function closePl(){
 // ── 逐句播放:時間軸在 videos/skit/lines.json(~/stayjp-video 的 export-lines.ts 產) ──
 let LINES = null, li = -1, stopAt = null, rate = 1;
 try{ rate = +localStorage.getItem('skit_rate') || 1; }catch(e){}
-fetch('videos/skit/lines.json').then(r=>r.json()).then(d=>{ LINES=d; if(_cur) showLine(lineAt(V.currentTime||0)); }).catch(()=>{});
+fetch('videos/skit/lines.json').then(r=>r.json()).then(d=>{ LINES=d; if(_pendRet){ const r=_pendRet; _pendRet=null; resumeAt(r); } else if(_cur) showLine(lineAt(V.currentTime||0)); }).catch(()=>{});
 const $ = id => document.getElementById(id);
 function curLines(){ return (LINES && LINES[_cur]) || []; }
 function lineAt(t){ const ls=curLines(); let k=-1; for(let i=0;i<ls.length;i++){ if(ls[i].t0 <= t+0.15) k=i; else break; } return k; }   // 0.15 要大於 jump 往前退的 0.08,不然會判回上一句
-function sayUrl(ja, kana, zh, au){ return 'speak.html?say='+encodeURIComponent(ja)+'&kana='+encodeURIComponent(kana||ja)+'&zh='+encodeURIComponent(zh||'')+(au?'&au='+encodeURIComponent(au):''); }
+// back=回來的位置:跟讀頁會直接開 Speak 式單句練習,練完按「回影片」回到這集這句
+function sayUrl(ja, kana, zh, au, line){ return 'speak.html?say='+encodeURIComponent(ja)+'&kana='+encodeURIComponent(kana||ja)+'&zh='+encodeURIComponent(zh||'')+(au?'&au='+encodeURIComponent(au):'')+(_cur?'&back='+encodeURIComponent('skits.html?ep='+_cur+'&line='+(line==null?-1:line)):''); }
 const plain = x => String(x||'').replace(/[、。！？!?…〜ー\s]/g,'');
 function showLine(k){
   li = k; const ls = curLines(), l = ls[k];
@@ -254,7 +255,7 @@ function showLine(k){
   $('lnJa').textContent = l.ja;
   $('lnKana').textContent = plain(l.kana)!==plain(l.ja) ? l.kana : '';
   $('lnZh').textContent = L(l.zh, '');
-  $('lnSay').style.visibility='visible'; $('lnSay').href = sayUrl(l.ja, l.kana, l.zh, l.au);
+  $('lnSay').style.visibility='visible'; $('lnSay').href = sayUrl(l.ja, l.kana, l.zh, l.au, k);
 }
 function jump(k){
   const l = curLines()[k]; if(!l) return;
@@ -281,8 +282,25 @@ function setRate(r){ rate=r; V.defaultPlaybackRate = V.playbackRate = r; try{ lo
 $('lnSpd').addEventListener('click', ev=>{ const b=ev.target.closest('button'); if(b) setRate(+b.dataset.r); });
 try{ $('lnStop').checked = localStorage.getItem('skit_stop')==='1'; }catch(e){}
 $('lnStop').onchange = ()=>{ try{ localStorage.setItem('skit_stop', $('lnStop').checked?'1':'0'); }catch(e){} if(!$('lnStop').checked) stopAt=null; };
-// 去跟讀頁前先暫停影片
-['lnSay','plSay'].forEach(id=>$(id).addEventListener('click', ()=>V.pause()));
+// 去跟讀頁前先暫停影片,並記下「回來要接哪」(跟讀頁按「回影片」或返回鍵回來時接著播下一句,Speak 式一來一回)
+$('lnSay').addEventListener('click', ()=>{ V.pause(); setRet(li); });
+$('plSay').addEventListener('click', ()=>{ V.pause(); setRet(-1); });
+let _pendRet=null;
+function setRet(line){ try{ sessionStorage.setItem('skit_ret', JSON.stringify({ ep:_cur, line:line, at:Date.now() })); }catch(e){} }
+function takeRet(){
+  let r=null; try{ r=JSON.parse(sessionStorage.getItem('skit_ret')); sessionStorage.removeItem('skit_ret'); }catch(e){}
+  return r && Date.now()-r.at < 30*60*1000 && EPS.some(e=>e.n===r.ep) ? r : null;
+}
+function resumeAt(r){
+  if(_cur!==r.ep) openEp(r.ep, false, true);
+  if(r.line<0) return;                       // 「這集學到」那句:回到這集就好,不自動播
+  if(!LINES){ _pendRet=r; return; }          // 時間軸還沒載到:載完再接
+  const ls=curLines(), l=ls[r.line]; if(!l) return;
+  if(r.line < ls.length-1) jump(r.line+1);   // 接著播下一句(瀏覽器擋自動播放的話就停在下一句,按播放即可)
+  else { V.currentTime = l.t0; showLine(r.line); }
+}
+// 從跟讀頁按返回:瀏覽器整頁快取還原(persisted)不會重跑程式,要在這裡接
+window.addEventListener('pageshow', ev=>{ if(ev.persisted){ const r=takeRet(); if(r) resumeAt(r); } });
 function lineLabels(){
   $('lnPrev').innerHTML = '‹ '+esc(L('上一句','Prev'));
   $('lnRe').innerHTML = icon('refresh')+esc(L('重播','Replay'));
@@ -312,7 +330,8 @@ function cycleLang(){
 render();
 if(lang()==='zh-CN') ensureOpenCC().then(render);
 // 分享連結 skits.html?ep=3 直接開那集
-try{ const q=+new URLSearchParams(location.search).get('ep'); if(q && EPS.some(e=>e.n===q)) openEp(q,false); }catch(e){}
+// 從跟讀頁回來(整頁重載的情況):接回那集那句
+try{ const r=takeRet(); if(r) resumeAt(r); else { const q=+new URLSearchParams(location.search).get('ep'); if(q && EPS.some(e=>e.n===q)) openEp(q,false); } }catch(e){}
 </script>
 <script src="font-scale.js"></script>
 <script src="back-to-top.js"></script>

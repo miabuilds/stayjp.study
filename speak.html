@@ -552,6 +552,9 @@ let idx = 0;
     var hit=SENTS.find(function(s){ return s.jp===say; });
     if(!hit){ hit=S(say, q.get('kana')||say, q.get('zh')||'', 'N5', 'skit'); SENTS.push(hit); }
     if(au && !hit.au) hit.au=au;
+    // 從短劇播放器來(?back=skits.html?ep=N&line=K):直接進 Speak 式單句跟讀,練完「回影片」(KOL 回饋:要一來一回,別丟到選項很多的列表頁)
+    var back=q.get('back')||'';
+    if(/^skits\.html\?ep=\d+(&line=-?\d+)?$/.test(back)) window._lsDeep={ it:hit, back:back };
     activeLv='N5'; activeCat='skit';
     idx=Math.max(0, list().findIndex(function(s){ return s.jp===say; }));
     // 練習卡在頁面下方:等畫面出來(登入檢查完才顯示 #app)就捲到那句
@@ -892,6 +895,7 @@ const Lesson=(()=>{
   const N=5, PASS=0.85;
   let seq=[], li=0, mode='shadow', units=[], saidRaw='', active=false, passed=false;
   let rec2=null, listening=false, savedNativeHandlers=null, autoTimer=null;
+  let backUrl='';   // 有值 = 從短劇來的單句跟讀,結束/叉叉/跳過都回影片
 
   const PUNCT=/[、。,.!?！？…・「」\s]/;
   // 比對前正規化(假名化、數字+量詞還原讀音)抽到 shadow-core.js,單字跟讀(日語從頭學)共用同一套
@@ -1028,7 +1032,7 @@ const Lesson=(()=>{
       +'<button onclick="Lesson.demo()" title="'+enOr('再聽一次','Replay')+'"><i data-ic=volume></i></button>'
       +'<button class="big" id="lsMic" onclick="Lesson.toggleMic()"><i data-ic=mic></i></button>'
       +'</div>'
-      +'<div id="lsFoot"><button class="ls-skip" onclick="Lesson.next()">'+enOr('跳過這句 →','Skip →')+'</button></div>'
+      +'<div id="lsFoot"><button class="ls-skip" onclick="Lesson.next()">'+(backUrl?enOr('先跳過,回影片 →','Skip — back to video →'):enOr('跳過這句 →','Skip →'))+'</button></div>'
       +'</div>';
     try{ if(window.Icons&&Icons.hydrate)Icons.hydrate(); }catch(e){}
     demo();
@@ -1077,7 +1081,9 @@ const Lesson=(()=>{
     if(foot){
       const isLast = li>=seq.length-1;
       foot.innerHTML='<img class="ls-tk" src="images/mascot/tanuki-p06.png" alt=""><br>'
-        +'<button class="ls-next" onclick="Lesson.next()">'+(isLast?enOr('看結果 →','Results →'):enOr('下一句 →','Next →'))+'</button>';
+        +(backUrl&&isLast
+          ? '<button class="ls-next" onclick="Lesson.back()">'+enOr('回影片 →','Back to video →')+'</button><br><button class="ls-skip" style="margin-top:14px" onclick="Lesson.again()">'+enOr('再唸一次','Try again')+'</button>'
+          : '<button class="ls-next" onclick="Lesson.next()">'+(isLast?enOr('看結果 →','Results →'):enOr('下一句 →','Next →'))+'</button>');
       const b=foot.querySelector('.ls-next'); try{ b.focus(); }catch(e){}
     } else {
       autoTimer=setTimeout(next, 1100);
@@ -1086,7 +1092,7 @@ const Lesson=(()=>{
   function nextS(){
     clearTimeout(autoTimer); stopListen();
     li++;
-    if(li>=seq.length) return finish();
+    if(li>=seq.length) return backUrl ? goBack() : finish();
     render();
   }
   let _lastSeq=[];
@@ -1127,8 +1133,9 @@ const Lesson=(()=>{
     if(out.length<N) out.push(...all.filter(s=>done[s.jp]).slice(0, N-out.length));
     return out;
   }
-  function start(m, seqOverride){
+  function start(m, seqOverride, opts){
     mode=m||'shadow';
+    backUrl=(opts&&opts.back)||'';
     const all=list();
     if(!all.length){ AppUI.alert(enOr('這個分類沒有句子','No sentences here')); return; }
     seq=seqOverride&&seqOverride.length?seqOverride.slice():pickSeq(all);
@@ -1140,6 +1147,7 @@ const Lesson=(()=>{
     render();
   }
   function exit(){
+    if(backUrl) return goBack();
     active=false; clearTimeout(autoTimer); stopListen();
     try{ if(_demo){ _demo.pause(); _demo=null; } }catch(e){}
     const m=document.getElementById('lsMask'); if(m) m.remove();
@@ -1181,7 +1189,16 @@ const Lesson=(()=>{
     } else { browserSpeak(it.jp); setTimeout(after, Math.max(2000, it.jp.length*220)+400); }
   }
   function demo(){ demoPlay(); }
-  return { start, startBlankSame, exit, next:nextS, demo, toggleMic, _feed:feed, _done:lsDone };
+  // 回影片:從短劇頁點過來的就 history.back()(瀏覽器可能整頁原樣還原,影片停在原處);
+  // 直接開連結進來的才換成短劇頁網址。短劇頁靠 sessionStorage skit_ret 接著播下一句
+  function goBack(){
+    active=false; clearTimeout(autoTimer); stopListen();
+    try{ if(_demo){ _demo.pause(); _demo=null; } }catch(e){}
+    let fromSkit=false; try{ const r=new URL(document.referrer); fromSkit=r.origin===location.origin && /\/skits(\.html)?$/.test(r.pathname); }catch(e){}
+    if(fromSkit && history.length>1) history.back(); else location.replace(backUrl);
+  }
+  function again(){ clearTimeout(autoTimer); stopListen(); render(); }
+  return { start, startBlankSame, exit, next:nextS, demo, toggleMic, back:goBack, again, _feed:feed, _done:lsDone };
 })();
 window.Lesson=Lesson;
 // 入口卡進度:目前等級+分類的已練句數
@@ -1199,6 +1216,7 @@ auth.onAuthStateChanged(u=>{
   try{var _b=document.getElementById("boot"); if(_b)_b.remove();}catch(e){}
   document.getElementById('app').style.display='block';
   renderLvTabs(); renderChips(); render(); renderRing();
+  if(window._lsDeep){ const d=window._lsDeep; window._lsDeep=null; Lesson.start('shadow',[d.it],{back:d.back}); }
 });
 
 // 收藏句:登入後預載清單,☆ 亮暗才正確;面板移除句子後同步當前 ☆

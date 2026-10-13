@@ -492,9 +492,14 @@ select.lang-btn {
 .sk-sc.is-seen .yt-sc-img img { opacity:.7; }
 .sk-sc .sk-p { font-size:13.5px; font-weight:800; color:var(--ac); line-height:1.35; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .hub-art .art-entry { margin: 0 !important; }
-.hub-wod { display: flex; align-items: center; gap: 12px; background: var(--bg2); border: 1px solid var(--bd); border-radius: 14px; padding: 11px 14px; margin-top: 14px; box-shadow: 0 1px 3px rgba(0,0,0,.04); }
+.hub-wod { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; background: var(--bg2); border: 1px solid var(--bd); border-radius: 14px; padding: 11px 14px; margin-top: 14px; box-shadow: 0 1px 3px rgba(0,0,0,.04); }
 .hub-wod-main { flex: 1; min-width: 0; }
-.hub-wod-lbl { font-size: 10px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--ac); }
+.hub-wod-lbl { font-size: 10px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--ac); background: none; border: 0; padding: 2px 0; margin: 0; font-family: inherit; cursor: pointer; }
+.hub-wod-car { font-size: 12px; opacity: .8; }
+.hub-wod-pick { flex-basis: 100%; display: flex; flex-wrap: wrap; gap: 6px; padding-top: 10px; border-top: 1px solid var(--bd); }
+.hub-wod-pick[hidden] { display: none; }
+.hub-wod-pick button { flex: 1; min-width: 44px; height: 32px; border: 1px solid var(--bd); border-radius: 9px; background: var(--bg); color: var(--tx2); font: inherit; font-size: 12.5px; font-weight: 700; cursor: pointer; }
+.hub-wod-pick button.on { background: var(--ac); border-color: var(--ac); color: #fff; }
 .hub-wod-w { font-size: 19px; font-weight: 800; line-height: 1.25; margin-top: 2px; }
 .hub-wod-sub { font-size: 12.5px; color: var(--tx2); margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .hub-wod-spk { flex-shrink: 0; width: 34px; height: 34px; border: none; border-radius: 50%; background: var(--soft, rgba(var(--ac-rgb),.10)); color: var(--ac); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; font-size: 16px; }
@@ -2504,7 +2509,7 @@ function saveSRSCloud() {
   saveProgressKeys({ srs_data: d });
 }
 // ── Sync ALL data ──
-const SYNC_KEYS = ['sp_settings','sp_sets','tts_voice','study_log','word_notebook','grammar_srs','daily_progress','mock_exam_history','exam_date','base_level','goal_level','reading_done','reading_scores','listening_scores','listening_done','shadow_favs','wrong_questions','ls_done','jr_kana','jr_essentials','jr_phrases','jr_chat','jr_vb_seen','jr_gr_seen','path_progress','my_vocab','ess_progress','guide_steps','rate_prompt_v1','skit_seen'];
+const SYNC_KEYS = ['sp_settings','sp_sets','tts_voice','study_log','word_notebook','grammar_srs','daily_progress','mock_exam_history','exam_date','base_level','goal_level','reading_done','reading_scores','listening_scores','listening_done','shadow_favs','wrong_questions','ls_done','jr_kana','jr_essentials','jr_phrases','jr_chat','jr_vb_seen','jr_gr_seen','path_progress','my_vocab','ess_progress','guide_steps','rate_prompt_v1','skit_seen','wod_lv'];
 // 學習日曆逐日上傳:update('study_log.日期', 值) 只動那一天 → 雲端日曆只增不減,
 // 任何裝置的 stale 本機資料都毀不掉歷史(root cause 修:整包 set 會整欄覆蓋)。
 function saveStudyDayCloud(dates) {
@@ -2522,7 +2527,7 @@ function saveStudyDayCloud(dates) {
     });
   } catch (e) {}
 }
-const SCALAR_SYNC_KEYS = new Set(['tts_voice','exam_date','base_level','goal_level','jr_kana','jr_essentials','jr_phrases','jr_chat','jr_vb_seen','jr_gr_seen']);   // 純字串值:不可 JSON.parse/stringify(JSON.parse('n3')會炸→之前這三個永遠沒同步到雲端,用戶回報「程度填過卻不記得」)
+const SCALAR_SYNC_KEYS = new Set(['tts_voice','exam_date','base_level','goal_level','jr_kana','jr_essentials','jr_phrases','jr_chat','jr_vb_seen','jr_gr_seen','wod_lv']);   // 純字串值:不可 JSON.parse/stringify(JSON.parse('n3')會炸→之前這三個永遠沒同步到雲端,用戶回報「程度填過卻不記得」)
 // 競態鎖:登入用戶「首次雲端下載合併」完成前,任何上傳都可能拿 stale/被清空的本機資料
 // 整欄覆蓋雲端(電腦清過快取 → 開頁瞬間學一下 → 27 天日曆被 1 天蓋掉,用戶多次實錘)。
 let _cloudSynced = false, _pendingSave = false;
@@ -2789,7 +2794,9 @@ function _hubEsc(s) { return ('' + (s == null ? '' : s)).replace(/&/g, '&amp;').
 // 每日一字:依日期挑一個字(同一天固定),勾起「這什麼意思?」的好奇心
 function _hubWordOfDay() {
   try {
-    const lv = ['n5', 'n4', 'n3', 'n2', 'n1'].includes(localStorage.getItem('lastLevel')) ? localStorage.getItem('lastLevel') : 'n3';
+    // 用戶可自選級別(wod_lv,KOL 回饋「能設定 N 幾嗎」);沒選 = 跟著最近學的級別
+    const LVS = ['n5', 'n4', 'n3', 'n2', 'n1'], pick = localStorage.getItem('wod_lv'), last = localStorage.getItem('lastLevel');
+    const lv = LVS.includes(pick) ? pick : (LVS.includes(last) ? last : 'n3');
     const data = (typeof getVocabData === 'function') ? getVocabData(lv) : [];
     if (!data || !data.length) return null;
     const today = DayKey.today();
@@ -2798,6 +2805,15 @@ function _hubWordOfDay() {
     return w ? { lv: lv.toUpperCase(), w: w.w, r: w.r, m: w.m } : null;
   } catch (e) { return null; }
 }
+window.hubWodPick = function (ev) {
+  if (ev) ev.stopPropagation();
+  const row = document.getElementById('hubWodPick'); if (row) row.hidden = !row.hidden;
+};
+window.hubWodSet = function (lv) {
+  try { localStorage.setItem('wod_lv', lv || 'auto'); } catch (e) {}   // 自動也存值('auto'),不然雲端舊的級別會被同步回來
+  try { if (typeof saveAllCloud === 'function') saveAllCloud(); } catch (e) {}
+  window.hubInvalidate(); renderHub();
+};
 window.hubSpeakWord = function () { const w = _hubWordOfDay(); if (w && typeof speak === 'function') speak(w.r || w.w); };
 // 達標小彩蛋:落下的花瓣 + 彩點,3.5 秒清掉。每天只放一次(第一次打開面板且已達標時)
 function hubConfetti() {
@@ -3008,11 +3024,19 @@ function renderHub() {
       + resume
       + (wod ? '<div class="hub-wod">'
         + '<div class="hub-wod-main">'
-          + '<div class="hub-wod-lbl">' + L('今日一字', 'Word of the day') + ' · ' + wod.lv + '</div>'
+          + '<button class="hub-wod-lbl" onclick="hubWodPick(event)" aria-label="' + L('選今日一字的級別', 'Pick level') + '">' + L('今日一字', 'Word of the day') + ' · ' + wod.lv + ' <span class="hub-wod-car">▾</span></button>'
           + '<div class="hub-wod-w">' + _hubEsc(wod.w) + '</div>'
           + '<div class="hub-wod-sub">' + _hubEsc(wod.r) + ' ・ ' + _hubEsc(wod.m) + '</div>'
         + '</div>'
         + '<button class="hub-wod-spk" onclick="hubSpeakWord()" aria-label="' + L('播放發音', 'Play') + '"><i data-ic=volume></i></button>'
+        + (function () {
+            let cur = ''; try { cur = localStorage.getItem('wod_lv') || ''; } catch (e) {}
+            return '<div class="hub-wod-pick" id="hubWodPick" hidden>'
+              + [['', L('自動', 'Auto')], ['n5', 'N5'], ['n4', 'N4'], ['n3', 'N3'], ['n2', 'N2'], ['n1', 'N1']].map(function (o) {
+                  return '<button class="' + (o[0] === (cur === 'auto' ? '' : cur) ? 'on' : '') + '" onclick="hubWodSet(\'' + o[0] + '\')">' + o[1] + '</button>';
+                }).join('')
+              + '</div>';
+          })()
       + '</div>' : '')
     + '</aside>'
     + '<div class="hub-right">'
