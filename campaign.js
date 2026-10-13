@@ -171,15 +171,21 @@
     var host = '';
     try { if (document.referrer) { host = new URL(document.referrer).hostname.replace(/^www\./, ''); } } catch (e) {}
     if (host === location.hostname.replace(/^www\./, '')) host = '';   // 站內換頁不算來源
+    // 從哪個 App 的內建瀏覽器點進來(主頁連結沒帶 utm 也分得出平台,Mia 不用每次去改主頁連結)
+    var ua = navigator.userAgent || '', inapp = '';
+    if (/Barcelona/i.test(ua)) inapp = 'threads';            // Threads App 內建瀏覽器
+    else if (/Instagram/i.test(ua)) inapp = 'instagram';
+    else if (/FBAN|FBAV|FB_IAB/i.test(ua)) inapp = 'facebook';
+    else if (/\bLine\//i.test(ua)) inapp = 'line';
     var native = false;
     try { native = !!(window.STAYJP_NATIVE && window.STAYJP_NATIVE.isNativeApp); } catch (e) {}
     var cut = function (v) { return String(v || '').slice(0, 60); };
     var t = {
       src: cut(q.get('utm_source')), med: cut(q.get('utm_medium')), camp: cut(q.get('utm_campaign')),
       cont: cut(q.get('utm_content')), ref: cut(q.get('ref')).toUpperCase(), host: cut(host),
-      land: cut(location.pathname), app: native ? 1 : 0, at: Date.now()
+      inapp: inapp, land: cut(location.pathname), app: native ? 1 : 0, at: Date.now()
     };
-    var has = !!(t.src || t.ref || t.host || q.get('fbclid') || q.get('gclid'));
+    var has = !!(t.src || t.ref || t.host || t.inapp || q.get('fbclid') || q.get('gclid'));
     if (!t.src && q.get('fbclid')) t.src = 'meta_ads';
     if (!t.src && q.get('gclid')) t.src = 'google_ads';
     if (!localStorage.getItem('stayjp_acq_first')) localStorage.setItem('stayjp_acq_first', JSON.stringify(t));

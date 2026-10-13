@@ -9,6 +9,7 @@ const label = (t, platform) => {
   if (!t) return platform !== 'web' ? `app(${platform})` : '(無紀錄)';
   if (t.src) return t.src + (t.camp ? ` / ${t.camp}` : '');
   if (t.ref) return `ref:${t.ref}`;
+  if (t.inapp) return `${t.inapp}(主頁或貼文,沒帶 utm)`;
   if (t.host) return `外站:${t.host}`;
   if (t.app || platform !== 'web') return `app(${platform})`;
   return '直接進站';
