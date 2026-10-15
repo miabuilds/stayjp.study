@@ -100,7 +100,7 @@
       if (root.STAYJP_NATIVE.canPlayB64) nPost({ type: 'STOP_PLAY' });   // 開麥前停掉原生播放
       root.stayjpSpeechResult = function (t, fin) { if (t == null || stopped) return; try { cb.onResult && cb.onResult(String(t), !!fin); } catch (e) {} };
       root.stayjpSpeechEnd = function (err) { if (stopped) return; stopped = true; restore(); try { cb.onEnd && cb.onEnd(err || null); } catch (e) {} };
-      nPost({ type: 'SPEECH_START', lang: 'ja-JP' });
+      nPost({ type: 'SPEECH_START', lang: 'ja-JP', hint: (cb.hint || []).filter(Boolean).slice(0, 6) });   // 目標詞給 iOS 當辨識提示(contextualStrings)
       return function stop() { if (stopped) return; stopped = true; restore(); nPost({ type: 'SPEECH_STOP' }); try { cb.onEnd && cb.onEnd(null); } catch (e) {} };
     }
     const SR = srClass();

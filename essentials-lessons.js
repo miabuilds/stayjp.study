@@ -670,6 +670,7 @@ body.ess-open #tutorFab,body.ess-open #tutorHint,body.ess-open #quotaBadge,body.
     const targets = { yomi: it.kind === 'pt' ? [it.exKana] : it.alts, forms: it.kind === 'pt' ? [String(it.ex).replace(/<[^>]+>/g, '')] : [it.form] };
     let heard = '';
     stopMic = ShadowCore.listen({
+      hint: targets.forms.concat(targets.yomi || []),
       onResult(t, fin) { heard = t; if (said) said.textContent = t; setShScore(ShadowCore.scoreWord(t, targets), fin); },
       onEnd(err) {
         stopMic = null;

@@ -292,6 +292,9 @@ const FN_SPEAK = 'https://asia-east1-jpnote-1bdd6.cloudfunctions.net/speakFeedba
 
 // jp=漢字句 / kana=假名讀音 / zh=中文 / lv=JLPT 等級 / cat=分類。內容由淺入深、都是真的用得到的完整句。
 const S = (jp,kana,zh,lv,cat)=>({jp,kana,zh,lv,cat});
+// 原生辨識的提示詞:把目標句(漢字+假名)交給 iOS contextualStrings,念對時比較不會被辨識成別的字
+// (用戶 2026-10-14「AI 評分好像無法準確偵測」;AI 只看得到辨識結果,辨識錯它就跟著判錯)。舊版 App 不認這欄,無害
+function sttHint(it){ return it ? [it.jp, it.kana].filter(Boolean).map(x=>String(x).replace(/[。、！？!?…「」\s]/g,'')).filter((x,i,a)=>x&&a.indexOf(x)===i) : []; }
 const CATS = [
   { k:'all',    ic:'<i data-ic=sparkle></i>', name:'全部',       en:'All' },
   { k:'daily',  ic:'<i data-ic=home></i>', name:'日常生活',   en:'Daily life' },
@@ -769,7 +772,7 @@ function startRec(){
       else if(err) document.getElementById('recNote').textContent=enOr('辨識出錯('+err+'),可直接打字。','Recognition error ('+err+') — you can just type instead.');
     };
     recording=true; _recBtnUI(true);
-    _nPost({type:'SPEECH_START',lang:'ja-JP'});
+    _nPost({type:'SPEECH_START',lang:'ja-JP',hint:sttHint(cur())});
     return;
   }
   if(!SR){ document.getElementById('recNote').textContent=enOr('這個瀏覽器不支援語音辨識,請直接打字你念的內容。',"This browser doesn't support speech recognition — just type what you said."); document.getElementById('said').focus(); return; }
@@ -1050,8 +1053,8 @@ const Lesson=(()=>{
       savedNativeHandlers={ r:window.stayjpSpeechResult, e:window.stayjpSpeechEnd };
       let base='';
       window.stayjpSpeechResult=function(t,fin){ if(t==null)return; feed(base+t, !!fin); if(fin&&t) base=base+t; };
-      window.stayjpSpeechEnd=function(){ if(active&&listening&&!passed) _nPost({type:'SPEECH_START',lang:'ja-JP',continuous:true}); };
-      _nPost({type:'SPEECH_START',lang:'ja-JP',continuous:true});
+      window.stayjpSpeechEnd=function(){ if(active&&listening&&!passed) _nPost({type:'SPEECH_START',lang:'ja-JP',continuous:true,hint:sttHint(curIt())}); };
+      _nPost({type:'SPEECH_START',lang:'ja-JP',continuous:true,hint:sttHint(curIt())});
       return;
     }
     if(!SR){ setHint(enOr('此瀏覽器不支援語音辨識','Speech recognition unsupported')); listening=false; return; }

@@ -258,7 +258,10 @@ const SRS = (() => {
       (!right && val ? '<div style="font-size:12.5px;color:var(--tx2)">' + _E('你打的:','You typed: ') + E(val) + '</div>' : '') +
       '<div class="srs-type-res" id="srsAnsBox"><div style="font-size:18px;font-weight:700">' + E(item.w) + (item.r && item.r !== item.w ? ' <span style="font-size:13px;color:var(--tx2)">' + E(item.r) + '</span>' : '') + '</div>' +
         (item.ex && item.ex.j ? '<div class="srs-ex-j" style="margin-top:4px">' + FR(item.ex.j) + '</div><div style="font-size:12.5px;color:var(--tx2)">' + C(E(item.ex.z || '')) + '</div>' : '') +
-        (cfHint ? '<div class="confuse-hint" style="margin-top:6px">' + cfHint + '</div>' : '') + '</div>' +
+        (cfHint ? '<div class="confuse-hint" style="margin-top:6px">' + cfHint + '</div>' : '') +
+        // 打字模式原本只在送出時自動念一次、沒有鈕可以重聽(用戶 2026-10-13 回饋「復習打字能增加聲音嗎」)→ 跟翻卡一樣放發音鈕,有例句再加例句鈕
+        '<div class="srs-spk-row" style="margin-top:8px;gap:8px">' + spkBtn(window.wordSpeakKey ? wordSpeakKey(item) : (item.r || item.w)) +
+          (item.ex && item.ex.j ? spkBtn(item.ex.j, _E('例句', 'Example')) : '') + '</div>' + '</div>' +
       (right
         ? '<button class="qstart" style="margin-top:10px" onclick="SRS.nextTyped(true)">' + (cur + 1 >= queue.length ? _E('看結果 →','Results →') : _E('下一題 →','Next →')) + '</button>'
         : '<div style="margin-top:10px;font-size:13px;font-weight:700;color:var(--ac)"><span id="srsRetypeTip">' + _E('照著打一次 ✍️','Type it once ✍️') + '</span> <span id="srsRetypeProg" style="color:var(--tx2);font-weight:600">0 / ' + RETYPE_NEED + '</span></div>' +
