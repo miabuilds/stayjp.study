@@ -287,13 +287,17 @@ function jaOr(ja_,en_){ return I18n.getLang()==='en'?en_:ja_; }
 // Premium 判斷同 tool-quota.js:users/{uid}.subscription + App 原生 STAYJP_NATIVE.isPremium。
 const JD_ADMIN = ['stayjpplan@gmail.com','abc83327@gmail.com'];
 let jdPremium = false, jdAdmin = false, jdTrialStart = null;   // jdTrialStart:3 天網頁試用起始(ms)
+// 登入用戶的白名單/訂閱還沒讀回前 = 未定案 → 先不擋也不扣次數(2026-10-16:新裝置一進來就開考,Premium 被扣次數/擋)
+let jdPending = true;
+setTimeout(()=>{ jdPending=false; },6000);   // firebase 初始化失敗等極端狀況:6 秒後一律恢復正常判斷
 (function initAuth(){
   try{
     const cfg = { apiKey:"AIzaSyDnmg2XOuvwgE8m8xCF5sS4o0nQYoUplPI", authDomain:"jpnote-1bdd6.firebaseapp.com", projectId:"jpnote-1bdd6" };
     if(!firebase.apps.length) firebase.initializeApp(cfg);
     firebase.auth().onAuthStateChanged(u=>{
       jdAdmin = !!(u && JD_ADMIN.includes((u.email||'').toLowerCase()));
-      if(!u){ jdPremium=false; jdUid=null; jdCloudReady=false; return; }
+      if(!u){ jdPremium=false; jdUid=null; jdCloudReady=false; jdPending=false; return; }
+      jdPending=true; setTimeout(()=>{ jdPending=false; },6000);   // 讀不回來最多等 6 秒就恢復正常判斷
       // 白名單(free_users)= Premium 等級。⚠️ 兩個讀取並行,訂閱檢查「只能往 true 推,不能覆寫」
       // (2026-08-23 修:原本無條件覆寫,白名單被訂閱檢查蓋回 false → 還是被當免費擋)
       try{ if(localStorage.getItem('jd_prem_'+u.uid)==='1') jdPremium=true; }catch(e){}   // 上次結果快取,秒判(樂觀先亮,下面權威覆核)
@@ -301,7 +305,7 @@ let jdPremium = false, jdAdmin = false, jdTrialStart = null;   // jdTrialStart:3
       // 做法:兩個來源「都有結論」後,以 (白名單 || 有效訂閱) 為準覆寫(含降到 false),並寫回快取。
       let _wl=null, _sub=null;   // null=還沒回來;查詢失敗保持 null(網路爛時不降級,寧可放行)
       const _sync=()=>{
-        if(_wl!==null && _sub!==null) jdPremium = _wl || _sub || jdAdmin;   // 兩邊都有權威結論 → 覆寫(可降級)
+        if(_wl!==null && _sub!==null){ jdPremium = _wl || _sub || jdAdmin; jdPending=false; }   // 兩邊都有權威結論 → 覆寫(可降級)
         else if(_wl===true || _sub===true) jdPremium=true;                   // 只有單邊回來 → 先推 true
         try{ if(_wl!==null&&_sub!==null) localStorage.setItem('jd_prem_'+u.uid, jdPremium?'1':'0'); }catch(e){}
         try{ renderHome(); updateExamNotes(); }catch(e){}
@@ -328,6 +332,7 @@ function jdInTrial(){   // 3 天網頁全功能試用中?(App 走 Apple 試用,�
 }
 function jdUnlimited(){
   if(jdPremium || jdAdmin) return true;
+  if(jdPending) return true;   // 登入狀態/訂閱讀回中:先放行(訪客 auth 一回來就定案;最多 6 秒)
   if(jdInTrial()) return true;   // 試用期間 = 全功能無限,不擋刷題/模考
   if(window.STAYJP_NATIVE && window.STAYJP_NATIVE.isNativeApp && window.STAYJP_NATIVE.isPremium) return true;
   return false;

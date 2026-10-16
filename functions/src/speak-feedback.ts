@@ -48,7 +48,7 @@ ENCOURAGE: 一句像真人教練的鼓勵(用${L}、口語)`;
 }
 
 export const speakFeedback = functions.onRequest(
-  { cors: true, region: "asia-east1", secrets: [ANTHROPIC_API_KEY] },
+  { cors: true, region: "asia-east1", secrets: [ANTHROPIC_API_KEY, "REVENUECAT_SECRET_KEY"] },
   async (req, res) => {
     try {
       if (req.method !== "POST") { res.status(405).json({ error: "method_not_allowed" }); return; }   // 爬蟲 GET 戳門 → 405,不進錯誤日誌

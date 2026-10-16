@@ -124,7 +124,7 @@ function systemPrompt(lang: string | undefined, mode: string, ctx: { type?: stri
 }
 
 export const askTutor = functions.onRequest(
-  { cors: true, region: "asia-east1", secrets: [ANTHROPIC_API_KEY], timeoutSeconds: 60, memory: "256MiB" },
+  { cors: true, region: "asia-east1", secrets: [ANTHROPIC_API_KEY, "REVENUECAT_SECRET_KEY"], timeoutSeconds: 60, memory: "256MiB" },
   async (req, res) => {
     try {
       if (req.method !== "POST") { res.status(405).json({ error: "method_not_allowed" }); return; }

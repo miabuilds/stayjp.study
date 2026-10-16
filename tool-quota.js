@@ -89,6 +89,7 @@
   let cachedFreeAccess = false;   // free_users/{uid} 存在 = 管理員授予免費(在 admin 後台加白名單)
   let authReady = false;
   let subLoaded = false;   // 登入用戶的訂閱 doc 是否已載入(避免載入空窗誤判免費 → 訂閱者跳額度 badge)
+  let freeLoaded = false;  // free_users 白名單是否已讀回(2026-10-16:訂閱先回、白名單還沒回的空窗會誤擋白名單用戶)
   let cachedTrialStart = null;   // 免費試用起始(ms);登入用戶享 TRIAL_DAYS 天全功能無限
   let trialWriteDone = false;    // 防呆:trial_started_at 一個 session 只寫一次(避免 serverTimestamp pending 期間重複寫)
   let trialResolved = false;     // 試用資格是否已「定案」(拿到 trial_started_at,或後端明確回 eligible:false)。
@@ -113,7 +114,7 @@
     // 純網頁沒有 window.STAYJP_NATIVE → 此判斷跳過,網頁行為完全不變。
     if (window.STAYJP_NATIVE && window.STAYJP_NATIVE.isNativeApp && window.STAYJP_NATIVE.isPremium) return false;
     if (!authReady) return false;     // 等 auth 狀態確定再決定,避免閃一下
-    if (cachedUserEmail && !subLoaded) return false;  // 登入用戶:訂閱狀態還沒載完前先不擋(訂閱者 doc 載入慢時不會誤跳額度 badge)
+    if (cachedUserEmail && (!subLoaded || !freeLoaded)) return false;  // 登入用戶:訂閱/白名單都讀回前先不擋(任一邊慢都不誤跳額度 badge)
     if (isPremium()) return false;     // 付費用戶(登入 + 有效訂閱)→ 不擋
     if (inTrial()) return false;       // 登入用戶 3 天全功能免費試用 → 不擋
     // 試用判定中(網頁剛登入,startTrial 還沒把 trial_started_at 寫回來)→ 先不擋,避免這個空窗
@@ -440,7 +441,7 @@
       authReady = true;
       cachedTrialStart = null; trialWriteDone = false; trialResolved = false;   // 換帳號/登出 → 重置試用狀態,重新依該 user 的 doc 評估
       cachedUserCreatedMs = null; rcSyncTried = false;
-      if (!user) { cachedUserEmail = null; cachedSub = null; cachedFreeAccess = false; subLoaded = true;
+      if (!user) { cachedUserEmail = null; cachedSub = null; cachedFreeAccess = false; subLoaded = true; freeLoaded = true;
         try { localStorage.setItem('premium_hint', '0'); } catch (e) {}
         refreshBadge(); rerenderTools(); return; }
       cachedUserEmail = user.email || null;
@@ -449,12 +450,20 @@
         if (user.metadata && user.metadata.creationTime) cachedUserCreatedMs = Date.parse(user.metadata.creationTime) || null;
       } catch (e) {}
       subLoaded = false;   // 換 user → 重新等這個 user 的訂閱載入
+      freeLoaded = false;
       // 兜底:萬一訂閱 onSnapshot 一直沒回(極端),8 秒後恢復 gating,避免免費登入用戶逃逸
-      setTimeout(() => { if (!subLoaded) { subLoaded = true; refreshBadge(); rerenderTools(); } }, 8000);
+      setTimeout(() => { if (!subLoaded || !freeLoaded) { subLoaded = true; freeLoaded = true; refreshBadge(); rerenderTools(); } }, 8000);
       // 管理員後台授予的免費白名單(free_users/{uid} 存在 = 免費)
-      firebase.firestore().doc('free_users/' + user.uid).get()
-        .then(d => { cachedFreeAccess = d.exists; refreshBadge(); rerenderTools(); })
-        .catch(() => {});
+      // 讀取失敗 → 2 秒後重試一次;再失敗就沿用本機上次結果(fa_<uid>),不再「失敗=非白名單」整個 session 誤擋
+      const faKey = 'fa_' + user.uid;
+      const readFree = (retry) => firebase.firestore().doc('free_users/' + user.uid).get()
+        .then(d => { cachedFreeAccess = d.exists; freeLoaded = true; try { localStorage.setItem(faKey, d.exists ? '1' : '0'); } catch (e) {} refreshBadge(); rerenderTools(); })
+        .catch(() => {
+          if (retry) { setTimeout(() => readFree(false), 2000); return; }
+          try { cachedFreeAccess = localStorage.getItem(faKey) === '1'; } catch (e) {}
+          freeLoaded = true; refreshBadge(); rerenderTools();
+        });
+      readFree(true);
       // 開閘版:所有登入用戶都監聽訂閱(才偵測得到 premium → 免擋)
       firebase.firestore().doc('users/' + user.uid).onSnapshot(snap => {
         const data = snap.data() || {};

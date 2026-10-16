@@ -68,6 +68,37 @@ async function isPremium(uid: string): Promise<boolean> {
   } catch { return false; }
 }
 
+// App 內購(RevenueCat)但 users/{uid}.subscription 還沒寫進來(未登入先買再登入、webhook 延遲、rc_sync_hold)
+// → 只看 Firestore 會把付費用戶當免費擋(2026-10-16 稽核)。只在「這次會被免費上限擋下」時才查 RC,不是每次都查。
+// 呼叫的 function 要在 secrets 宣告 REVENUECAT_SECRET_KEY,沒有就略過(維持原行為)。
+const RC_ENTITLEMENT = "StayJP Plan Premium";
+const rcCache = new Map<string, { v: boolean; t: number }>();
+async function rcEntitled(uid: string): Promise<boolean> {
+  const secret = process.env.REVENUECAT_SECRET_KEY || "";
+  if (!secret) return false;
+  const c = rcCache.get(uid);
+  if (c && Date.now() - c.t < 10 * 60_000) return c.v;
+  try {
+    const r = await fetch(`https://api.revenuecat.com/v1/subscribers/${encodeURIComponent(uid)}`, { headers: { Authorization: `Bearer ${secret}` } });
+    if (!r.ok) return false;
+    const d = await r.json() as { subscriber?: { entitlements?: Record<string, { expires_date?: string | null }> } };
+    const ent = d?.subscriber?.entitlements?.[RC_ENTITLEMENT];
+    const v = !!ent && (!ent.expires_date || new Date(ent.expires_date).getTime() > Date.now());
+    rcCache.set(uid, { v, t: Date.now() });
+    return v;
+  } catch { return false; }
+}
+// 免費用戶這次呼叫會不會撞到上限(跟 consumeQuota 的免費分支同口徑;bonus 也算進去)
+function wouldHitFreeLimit(u: any, kind: "eval" | "chat" | "ask", cfg: AiConfig, today: string): boolean {
+  if (kind === "ask") {
+    const n = (u.askDay && u.askDay.d === today) ? u.askDay.n : 0;
+    return n >= cfg.freeAskDaily && !(Number(u.bonusAsk || 0) > 0);
+  }
+  const n = Number(u[kind === "eval" ? "evalTotal" : "chatTotal"] || 0);
+  const limit = kind === "eval" ? cfg.freeEvalTotal : cfg.freeChatTotal;
+  return n >= limit && !(Number(u[kind === "eval" ? "bonusEval" : "bonusChat"] || 0) > 0);
+}
+
 function dayKey(): string {
   // 以日本時間切日(用戶在日本;跟站上其他每日 quota 一致)
   const d = new Date(Date.now() + 9 * 3600 * 1000);
@@ -77,9 +108,13 @@ function dayKey(): string {
 // 檢查並消耗一次額度。kind: 'eval'(評分一次)| 'chat'(對話開新一場)| 'tts'(合成一次,粗防線)
 // 回傳 null=放行;否則回傳給前端的擋下訊息。
 export async function consumeQuota(uid: string, kind: "eval" | "chat" | "ask" | "tts", cfg: AiConfig): Promise<string | null> {
-  const prem = await isPremium(uid);
+  let prem = await isPremium(uid);
   const ref = admin.firestore().doc("ai_usage/" + uid);
   const today = dayKey();
+  if (!prem && kind !== "tts") {
+    const pre = await ref.get();
+    if (wouldHitFreeLimit(pre.data() || {}, kind, cfg, today) && await rcEntitled(uid)) prem = true;
+  }
   return admin.firestore().runTransaction(async (tx) => {
     const snap = await tx.get(ref);
     const u: any = snap.exists ? snap.data() : {};
