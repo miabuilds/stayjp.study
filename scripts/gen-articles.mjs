@@ -1,7 +1,8 @@
 // 產新文章(claude-sonnet-5)→ JSON(scratch),再由人審 + merge 進 articles.js。
-// 用法: ANTHROPIC_API_KEY=… node scripts/gen-articles.mjs <level> <id> <topic 繁中> <topic_en> <題目提示> <out.json>
+// 用法(key 放專案根目錄 .env 的 PROJECT_ANTHROPIC_KEY): node scripts/gen-articles.mjs <level> <id> <topic 繁中> <topic_en> <題目提示> <out.json>
 import fs from 'node:fs';
-const KEY = process.env.ANTHROPIC_API_KEY; if (!KEY) { console.error('no key'); process.exit(1); }
+try { process.loadEnvFile(new URL('../.env', import.meta.url)); } catch {}  // 專案 .env(不用全域 ANTHROPIC_API_KEY)
+const KEY = process.env.PROJECT_ANTHROPIC_KEY; if (!KEY) { console.error('no key: 請在專案根目錄 .env 填 PROJECT_ANTHROPIC_KEY'); process.exit(1); }
 const [lv, id, topic, topicEn, hint, out] = process.argv.slice(2);
 const A = new Function('window', fs.readFileSync('articles.js', 'utf8') + ';return window.ARTICLES')({});
 const existingTitles = A.map(a => a.title).join(' / ');

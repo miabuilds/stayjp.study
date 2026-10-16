@@ -1,8 +1,9 @@
 // 產生 N5/N4 單字的標準語音高(アクセント核)資料 → pitch-accent.js(window.PITCH = {"字|讀音": 核位置}, 0=平板型)。
-// 用法: ANTHROPIC_API_KEY=... node scripts/gen-pitch.mjs [n5 n4]
+// 用法(key 放專案根目錄 .env 的 PROJECT_ANTHROPIC_KEY): node scripts/gen-pitch.mjs [n5 n4]
 // 模型:claude-sonnet-5。每批 40 字。輸出前會跟 SPOT(常見字已知答案)比對印出正確率,低於 90% 別上線。
 import fs from 'fs';
-const KEY = process.env.ANTHROPIC_API_KEY; if (!KEY) { console.error('no key'); process.exit(1); }
+try { process.loadEnvFile(new URL('../.env', import.meta.url)); } catch {}  // 專案 .env(不用全域 ANTHROPIC_API_KEY)
+const KEY = process.env.PROJECT_ANTHROPIC_KEY; if (!KEY) { console.error('no key: 請在專案根目錄 .env 填 PROJECT_ANTHROPIC_KEY'); process.exit(1); }
 const levels = process.argv.slice(2).length ? process.argv.slice(2) : ['n5', 'n4'];
 const out = fs.existsSync('pitch-accent.js') ? JSON.parse(fs.readFileSync('pitch-accent.js', 'utf8').replace(/^[^{]*/, '').replace(/;\s*$/, '')) : {};
 function loadVocab(lv) {

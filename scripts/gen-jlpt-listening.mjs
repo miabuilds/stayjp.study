@@ -1,9 +1,10 @@
 // 產 JLPT 聴解新題(claude-sonnet-5)→ 輸出 JSON 到 scratch,人工/腳本再併進 jlpt-questions.js + jlpt-q-trans.js。
-// 用法: ANTHROPIC_API_KEY=... node scripts/gen-jlpt-listening.mjs <level> <startNo> <count> <outfile>
+// 用法(key 放專案根目錄 .env 的 PROJECT_ANTHROPIC_KEY): node scripts/gen-jlpt-listening.mjs <level> <startNo> <count> <outfile>
 // 風格跟既有題一致:at=朗讀腳本(旁白式,對話用「女の人が言います。「…」男の人が答えます。「…」」),au 同 at,
 // q 以【問い】開頭,o 四個日文短選項,a 正解 index,x 詳解(繁中,可用 <b> 標關鍵句、<br> 換行),zh=腳本繁中翻譯。
 import fs from 'node:fs';
-const KEY = process.env.ANTHROPIC_API_KEY; if (!KEY) { console.error('no key'); process.exit(1); }
+try { process.loadEnvFile(new URL('../.env', import.meta.url)); } catch {}  // 專案 .env(不用全域 ANTHROPIC_API_KEY)
+const KEY = process.env.PROJECT_ANTHROPIC_KEY; if (!KEY) { console.error('no key: 請在專案根目錄 .env 填 PROJECT_ANTHROPIC_KEY'); process.exit(1); }
 const [lv, startNo, count, outfile] = process.argv.slice(2);
 const N = parseInt(count, 10) || 6, S = parseInt(startNo, 10) || 21;
 const src = fs.readFileSync('jlpt-questions.js', 'utf8');
