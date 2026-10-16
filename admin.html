@@ -607,7 +607,7 @@ async function renderPayouts() {
        <span style="color:var(--tx3);font-size:11px">· ${t}</span>
        ${done ? '<span style="color:var(--tx3);margin-left:auto"><i data-ic=check></i> 已處理</span>' : `<button class="btn" style="font-size:11px;padding:3px 9px;margin-left:auto" onclick="markPayoutDone('${d.id}')">標記已處理</button>`}
      </div>
-     <div style="margin-top:4px;color:var(--tx2)">已簽協議 PDF 見 stayjpplan@gmail.com 信箱。${mailWarn}</div>
+     <div style="margin-top:4px;color:var(--tx2)">${x.pending_snapshot == null ? '<span style="color:#EF4444"><i data-ic=warning></i> 舊版申請:金額含還在退款期的 pending,別照轉,以 admin-kol.html 的 locked 為準</span><br>' : (x.pending_snapshot ? `鎖定中 NT$${x.pending_snapshot}(${x.pending_count} 筆)還不能付,只轉上面的可領金額。<br>` : '')}已簽協議 PDF 見 stayjpplan@gmail.com 信箱。${mailWarn}</div>
    </div>`;
   }).join('');
  } catch (e) { box.innerHTML = '<span style="color:#EF4444">讀取失敗:' + e.message + '</span>'; }

@@ -62,14 +62,22 @@ export const kolRequestPayout = functions.onRequest(
       const pdfBuf = Buffer.from(pdfB64, "base64");
       if (pdfBuf.length < 1000 || pdfBuf.length > 8 * 1024 * 1024) { res.status(400).json({ error: "pdf_size" }); return; }
 
-      // ② 目前可領金額 = 非 void、非 paid 的 commissions 加總
+      // ② 可領金額 = 只算已過 30 天退款期的 locked,扣掉「已付款後被退款」未沖銷的 clawback(同 adminSettleKolPayout 口徑)。
+      //    pending 還可能被退款,不能領——2026-10 曾把 pending 一起列成可領,營運方照單全額轉帳變預付。
       const cs = await db.collection("commissions").where("code", "==", code).get();
-      let claimable = 0, count = 0;
+      let lockedAmt = 0, count = 0, pendingAmt = 0, pendingCount = 0, clawbackAmt = 0;
       cs.forEach((d) => {
         const x = d.data();
-        if (x.state !== "void" && x.state !== "paid") { claimable += Number(x.amount_twd) || 0; count++; }
+        const amt = Number(x.amount_twd) || 0;
+        if (x.state === "locked") { lockedAmt += amt; count++; }
+        else if (x.state === "pending") { pendingAmt += amt; pendingCount++; }
+        else if (x.state === "void" && x.payout_id && !x.clawback_settled) clawbackAmt += amt;
       });
-      claimable = Math.round(claimable);
+      const claimable = Math.round(lockedAmt - clawbackAmt);
+      pendingAmt = Math.round(pendingAmt);
+      if (claimable <= 0) {
+        res.status(400).json({ error: "nothing_claimable", pending: pendingAmt, pendingCount }); return;
+      }
 
       const kol = String(c.kol || code);
       const now = Date.now();
@@ -92,10 +100,12 @@ export const kolRequestPayout = functions.onRequest(
             `KOL：${kol}（推薦碼 ${code}）\n` +
             `法定姓名：${holderName}\n` +
             `收款帳戶：${account}\n` +
-            `目前可領：約 NT$${claimable}（${count} 筆未作廢分潤）\n` +
+            `本次可領：NT$${claimable}（${count} 筆已過 30 天退款期${clawbackAmt ? `，已扣退款沖銷 NT$${Math.round(clawbackAmt)}` : ""}）\n` +
+            `鎖定中（還不能付）：NT$${pendingAmt}（${pendingCount} 筆，過 30 天後下次再領）\n` +
             `簽署時間：${signedAtStr}\n\n` +
             `已簽署的佣金協議見附件 PDF（含身分證字號／戶籍地址，報稅開扣繳憑單用；請妥善保管、勿外流）。\n` +
-            `確認金額無誤後即可轉帳；記得單次撥款壓在 NT$20,000 以內免扣繳。`,
+            `只轉「本次可領」的金額；轉完到 admin-kol.html 按「標記已付款」，再到 admin.html 領款申請按「標記已處理」。\n` +
+            `記得單次撥款壓在 NT$20,000 以內免扣繳。`,
           attachments: [{ filename: `佣金協議_${code}_${now}.pdf`, content: pdfBuf, contentType: "application/pdf" }],
         });
         emailSent = true;
@@ -108,12 +118,13 @@ export const kolRequestPayout = functions.onRequest(
       await db.doc(`payout_requests/${code}_${now}`).set({
         code, kol, holder_name: holderName, account_masked: acctMask,
         amount_snapshot: claimable, commission_count: count,
+        pending_snapshot: pendingAmt, pending_count: pendingCount,
         signed_at: now, status: "requested",
         email_sent: emailSent, email_error: emailErr,
         created_at: admin.firestore.FieldValue.serverTimestamp(),
       });
 
-      res.json({ ok: true, emailSent, amount: claimable });
+      res.json({ ok: true, emailSent, amount: claimable, pending: pendingAmt });
     } catch (err) {
       console.error("kolRequestPayout error:", err);
       res.status(500).json({ error: "internal", message: String(err) });

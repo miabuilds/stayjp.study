@@ -105,7 +105,7 @@
     </div>
 
     <button class="btn primary" id="submit" disabled>確認簽署並申請領款</button>
-    <p class="muted" style="text-align:center;margin-top:10px">送出前請再確認金額與帳戶。實際可領金額由系統依你未結算的分潤計算。</p>
+    <p class="muted" style="text-align:center;margin-top:10px">送出前請再確認金額與帳戶。可領金額只含已過 30 天退款期的分潤。</p>
   </div>
 
   <div id="done" hidden>
@@ -139,7 +139,7 @@
       if(!d||!d.ok){ fail('連結失效或無權限，請回儀表板重新進入。'); return; }
       hide($('gate')); show($('app'));
       $('who').textContent = (d.kol||code)+'（推薦碼 '+code+'）';
-      $('claimhint').textContent = '簽署本協議後即申請領款；系統會依你目前未結算的分潤自動計算金額。';
+      $('claimhint').textContent = '簽署本協議後即申請領款；只會計算已過 30 天退款期的分潤，鎖定中的下次再領。';
       $('aCode').textContent = code;
       $('aPct').textContent = (d.commission_pct!=null? d.commission_pct : '（依合作約定）');
       initForm();
@@ -196,9 +196,10 @@
         return fetch(FN+'/kolRequestPayout',{method:'POST',headers:{'Content-Type':'application/json'},
           body:JSON.stringify({code:code,t:token,holder_name:$('fName').value.trim(),account:$('fAcct').value.trim(),pdf_b64:pdfB64})});
       }).then(function(r){return r.json();}).then(function(res){
+        if(res&&res.error==='nothing_claimable'){ throw new Error('目前沒有已過 30 天退款期的分潤可以領'+(res.pending?'（鎖定中 NT$'+res.pending+'，過期後就能領）':'')); }
         if(!res||!res.ok){ throw new Error((res&&res.reason)||(res&&res.error)||'送出失敗'); }
         hide($('app'));
-        $('doneMsg').textContent = '本次可領約 NT$'+ (res.amount||0) + '，協議已'+(res.emailSent?'寄給營運方':'記錄（信件稍後補寄）')+'。';
+        $('doneMsg').textContent = '本次可領 NT$'+ (res.amount||0) + '，協議已'+(res.emailSent?'寄給營運方':'記錄（信件稍後補寄）')+'。'+(res.pending?'另有 NT$'+res.pending+' 還在 30 天退款期內，過期後下次再領。':'');
         show($('done'));
       }).catch(function(e){
         btn.disabled=false; btn.textContent='確認簽署並申請領款';
