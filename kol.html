@@ -103,6 +103,22 @@
             '<div id="rResult" class="range-result">選好日期,查這段期間的<b style="font-size:14px">成交筆數</b>與<b style="font-size:14px">分潤金額</b>。</div>' +
           '</div>';
         document.getElementById('rBtn').onclick = queryRange;
+        // 撥款紀錄:只顯示日期/金額/筆數(此頁無登入,不放帳號姓名)
+        var pos = d.payouts || [];
+        if (pos.length) {
+          body.insertAdjacentHTML('beforeend',
+            '<div class="range-box"><div class="range-title"><i data-ic=coin></i> 撥款紀錄</div><div class="dlist">' +
+            pos.map(function (p) {
+              var w = new Date(p.at);
+              var ds = w.getFullYear() + '/' + (w.getMonth() + 1) + '/' + w.getDate();
+              var sub = p.count + ' 筆分潤' + (p.clawback_twd ? ' · 已扣退款 NT$' + p.clawback_twd.toLocaleString() : '');
+              var pre = p.prepaid_twd ? '<div class="note" style="margin-top:4px">其中 ' + p.prepaid_count + ' 筆(NT$' + p.prepaid_twd.toLocaleString() + ')撥款時還在 30 天退款期內,已提前支付;若之後有用戶退款,該筆會在下次撥款時扣除,不需要另外退回。</div>' : '';
+              return '<div style="padding:10px;background:var(--bg2);border-radius:8px">' +
+                '<div style="display:flex;align-items:center;gap:8px;font-size:13px"><span class="dp" style="font-weight:700">' + ds + ' 已匯款</span><span class="ds" style="color:var(--tx3);font-size:11px">' + sub + '</span>' +
+                '<span style="margin-left:auto;font-weight:700;color:#16A34A;font-variant-numeric:tabular-nums">NT$' + p.net_twd.toLocaleString() + '</span></div>' + pre + '</div>';
+            }).join('') +
+            '</div><div class="note" style="margin-top:8px">已匯入你在領款申請填寫的帳戶,請查收。之後的領款只計算已過 30 天退款期的分潤。</div></div>');
+        }
         body.insertAdjacentHTML('beforeend',
           '<a href="kol-payout.html?code=' + encodeURIComponent(d.code) + '&t=' + encodeURIComponent(t) + '" ' +
           'style="display:block;text-align:center;margin-top:18px;background:#C6553B;color:#fff;text-decoration:none;' +

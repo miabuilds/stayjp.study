@@ -85,8 +85,23 @@ export const kolStats = functions.onRequest(
         }
       }
 
+      // 撥款紀錄(payouts):KOL 不一定留 email,轉帳通知改放這頁。
+      // ⚠️ 此頁只靠連結 token、無登入 → 只回日期/金額/筆數,不回姓名、帳號、payout_request 等任何個資。
+      const psnap = await db.collection("payouts").where("code", "==", code).get();
+      const payouts = psnap.docs.map((d) => {
+        const p = d.data();
+        return {
+          at: Number(p.paid_at || p.created_at) || 0,
+          net_twd: Number(p.net_twd) || 0,
+          count: Array.isArray(p.commission_ids) ? p.commission_ids.length : 0,
+          prepaid_twd: Number(p.prepaid_twd) || 0,
+          prepaid_count: Array.isArray(p.prepaid_ids) ? p.prepaid_ids.length : 0,
+          clawback_twd: Number(p.clawback_twd) || 0,
+        };
+      }).sort((a, b) => b.at - a.at);
+
       res.json({
-        ok: true, code, kol: c.kol || "", total, paid, trialing, range,
+        ok: true, code, kol: c.kol || "", total, paid, trialing, range, payouts,
         commission_pct: typeof c.commission_pct === "number" ? c.commission_pct : null,
         // 連結點擊(refClick 寫;同 IP 30 分鐘內只算一次)。舊碼沒這欄 → 0
         clicks: Number(c.clicks) || 0,
