@@ -177,8 +177,12 @@ const SRS = (() => {
   // 看中文意思 → 打出日文;漢字或假名都算對。比對前正規化:全形→半形、片假名→平假名、去空白。
   const TYPE_KEY = 'srs_type_mode';
   const _E = (zh, en) => (typeof enOr === 'function' ? enOr(zh, en) : zh);
-  function typeMode() { try { return localStorage.getItem(TYPE_KEY) === '1'; } catch (e) { return false; } }
-  function setTypeMode(on) { try { localStorage.setItem(TYPE_KEY, on ? '1' : ''); } catch (e) {} if (queue[cur]) renderCard(); }
+  // 值:'' 翻卡 / '1' 打字(看中文打日文) / '2' 聽打(先聽發音再打出來;用戶 2026-10-15 回饋「發音應該在打字前面」)
+  function modeVal() { try { return localStorage.getItem(TYPE_KEY) || ''; } catch (e) { return ''; } }
+  function typeMode() { const v = modeVal(); return v === '1' || v === '2'; }
+  function listenMode() { return modeVal() === '2'; }
+  function setTypeMode(on) { try { localStorage.setItem(TYPE_KEY, on === 'listen' ? '2' : on ? '1' : ''); } catch (e) {} if (queue[cur]) renderCard(); }
+  function sayItem(item) { try { if (typeof speak === 'function') speak(window.wordSpeakKey ? wordSpeakKey(item) : (item.r || item.w)); } catch (e) {} }
   function normJa(x) {
     return String(x || '').normalize('NFKC').trim().replace(/[\s・･]/g, '')
       .replace(/[\u30a1-\u30f6]/g, ch => String.fromCharCode(ch.charCodeAt(0) - 0x60));
@@ -209,18 +213,26 @@ const SRS = (() => {
     e.preventDefault(); nextTyped(typedRight);
   });
   function headerHtml(item, itemLv) {
-    const on = typeMode();
+    const mv = modeVal();
     return `<div class="qhd"><span>${cur+1} / ${queue.length}<span style="color:var(--tx3);margin:0 6px">·</span>${itemLv.toUpperCase()} ${item.again?_E('錯題重考','Retry'):item.isNew?t('srs_new'):t('srs_review')}</span>` +
-      `<span class="srs-seg" role="tablist"><button type="button" class="${on?'':'on'}" onclick="event.stopPropagation();SRS.setTypeMode(false)"><i data-ic=refresh></i>${_E('翻卡','Flip')}</button><button type="button" class="${on?'on':''}" onclick="event.stopPropagation();SRS.setTypeMode(true)"><i data-ic=edit></i>${_E('打字','Type')}</button></span>` +
+      `<span class="srs-seg" role="tablist"><button type="button" class="${mv===''?'on':''}" onclick="event.stopPropagation();SRS.setTypeMode(false)"><i data-ic=refresh></i>${_E('翻卡','Flip')}</button><button type="button" class="${mv==='1'?'on':''}" onclick="event.stopPropagation();SRS.setTypeMode(true)"><i data-ic=edit></i>${_E('打字','Type')}</button><button type="button" class="${mv==='2'?'on':''}" onclick="event.stopPropagation();SRS.setTypeMode('listen')"><i data-ic=headphones></i>${_E('聽打','Listen')}</button></span>` +
       `<button class="qclose" style="width:auto;margin:0;padding:2px 10px" onclick="SRS.close()"><i data-ic=x></i></button></div>`;
   }
   function renderTyped(item, itemLv, st) {
     typedDone = false;
     const C = x => (typeof cvt === 'function' ? cvt(x) : x);
+    const L = listenMode();
+    const key = String(window.wordSpeakKey ? wordSpeakKey(item) : (item.r || item.w));
+    // 聽打:不給中文,大喇叭鈕+進卡自動念一次;打字:中文在上,另給「聽發音(提示)」小鈕,不自動念(念了就等於給答案)
+    const top = L
+      ? `<button type="button" class="srs-spk" style="margin:8px auto 0;padding:12px 22px;font-size:15px" onclick="event.stopPropagation();speak('${key.replace(/'/g, "\\'")}')"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.54 8.46a5 5 0 010 7.07M19.07 4.93a10 10 0 010 14.14"/></svg><span>${_E('再聽一次','Play again')}</span></button>
+        <div style="font-size:12px;color:var(--tx2);margin-top:8px">${_E('聽發音，打出日文（假名就可以）→ Enter','Listen, then type it — kana is fine → Enter')}</div>`
+      : `<div class="srs-meaning" style="font-size:22px;font-weight:800;margin-top:6px">${C(item.m)}</div>
+        <div style="font-size:12px;color:var(--tx2);margin-top:4px">${item.c ? '［' + item.c + '］ ' : ''}${_E('打出日文，漢字或假名都可以 → Enter','Type the Japanese — kanji or kana → Enter')}</div>
+        <div class="srs-spk-row" style="margin-top:8px">${spkBtn(key, _E('聽發音（提示）', 'Hint: listen'))}</div>`;
     document.getElementById('quizBox').innerHTML = headerHtml(item, itemLv) + `
       <div class="srs-card" id="srsCard" style="cursor:default">
-        <div class="srs-meaning" style="font-size:22px;font-weight:800;margin-top:6px">${C(item.m)}</div>
-        <div style="font-size:12px;color:var(--tx2);margin-top:4px">${item.c ? '［' + item.c + '］ ' : ''}${_E('打出日文，漢字或假名都可以 → Enter','Type the Japanese — kanji or kana → Enter')}</div>
+        ${top}
         <input id="srsTypeIn" class="srs-type-in" lang="ja" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="done" placeholder="…" onkeydown="if(event.key==='Enter'&&!event.isComposing&&event.keyCode!==229){event.preventDefault();SRS.checkTyped();}" oncompositionstart="this.dataset.c=1" oncompositionend="this.dataset.c=''">
         <div class="srs-btns" id="srsTypeBtns">
           <button class="srs-btn srs-hard" onclick="SRS.giveUp()">${_E('不會','Don\'t know')}</button>
@@ -231,6 +243,7 @@ const SRS = (() => {
       ${statsDonut(st)}`;
     const inp = document.getElementById('srsTypeIn');
     if (inp) setTimeout(() => { try { inp.focus(); } catch (e) {} }, 50);
+    if (L) setTimeout(() => sayItem(item), 250);
   }
   // 答錯 / 按不會之後,要照著打對幾次才放行。
   // 用戶回饋(2026-09-23):「按不會就讓我重打一次嗎?然後讓我可以一直打,直到程式覺得我記著了」
@@ -257,6 +270,7 @@ const SRS = (() => {
         (right ? _E('答對了!','Correct!') : _E('正解:','Answer: ') + E(item.w) + (item.r && item.r !== item.w ? '（' + E(item.r) + '）' : '')) + '</div>' +
       (!right && val ? '<div style="font-size:12.5px;color:var(--tx2)">' + _E('你打的:','You typed: ') + E(val) + '</div>' : '') +
       '<div class="srs-type-res" id="srsAnsBox"><div style="font-size:18px;font-weight:700">' + E(item.w) + (item.r && item.r !== item.w ? ' <span style="font-size:13px;color:var(--tx2)">' + E(item.r) + '</span>' : '') + '</div>' +
+        (listenMode() && item.m && item.m !== item.w ? '<div style="font-size:14px;font-weight:700;margin-top:2px">' + C(E(item.m)) + '</div>' : '') +   // 聽打一開始沒給中文,答完補上意思
         (item.ex && item.ex.j ? '<div class="srs-ex-j" style="margin-top:4px">' + FR(item.ex.j) + '</div><div style="font-size:12.5px;color:var(--tx2)">' + C(E(item.ex.z || '')) + '</div>' : '') +
         (cfHint ? '<div class="confuse-hint" style="margin-top:6px">' + cfHint + '</div>' : '') +
         // 打字模式原本只在送出時自動念一次、沒有鈕可以重聽(用戶 2026-10-13 回饋「復習打字能增加聲音嗎」)→ 跟翻卡一樣放發音鈕,有例句再加例句鈕
@@ -323,7 +337,7 @@ const SRS = (() => {
     const item = queue[cur];
     const itemLv = item.level || lvl;
     const st = getStats(itemLv);
-    if (typeMode() && item.m && item.m !== item.w) return renderTyped(item, itemLv, st);
+    if (listenMode() || (typeMode() && item.m && item.m !== item.w)) return renderTyped(item, itemLv, st);
     const cfHint = window.sameReadingHint ? window.sameReadingHint(item) : '';
     document.getElementById('quizBox').innerHTML = headerHtml(item, itemLv) + `
       <div class="srs-card" id="srsCard" onclick="SRS.flip()">
