@@ -17,7 +17,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { createRequire } from 'node:module';
-import { ROOT } from './_lib.mjs';
+import { ROOT, loadOverrides, applyOverrides } from './_lib.mjs';
 
 const require = createRequire(import.meta.url);
 const kuromoji = require('kuromoji');
@@ -30,9 +30,12 @@ const hasKanji = s => /[一-鿿々]/.test(s);
 const CONTENT = new Set(['名詞', '動詞', '形容詞', '副詞', '連体詞', '感動詞']);
 // kuromoji 同音字誤讀修正(furigana 顯示用;表層完全相符才套)。每輪對全表套用=冪等。
 // 「正しく」kuromoji 常誤判成 まさしく(誠然),文中幾乎都是 ただしく(正確地)。
-const READING_FIX = { '正しく': 'ただしく', '一目': 'ひとめ' };
+const READING_FIX = { '正しく': 'ただしく', '一目': 'ひとめ', '一言': 'ひとこと' };
 // 複合詞修正:kuromoji 會把這些詞切碎且末字注錯音(報/連/相→しょう)→ 合併成一個 token 並給正確讀音(冪等,修到新舊句)
-const COMPOUND_FIX = { '報連相': 'ほうれんそう' };
+// 大そうじ:kuromoji 切成 大(だい)/そう/じ;一九四八年:逐字念 いち/きゅう/よん/はち(年份要念 せんきゅうひゃく…)
+const COMPOUND_FIX = { '報連相': 'ほうれんそう', '大そうじ': 'おおそうじ', '一九四八年': 'せんきゅうひゃくよんじゅうはちねん', '一か所': 'いっかしょ', '七五三': 'しちごさん' };
+// 依前/後一個詞判讀音(冪等,修到新舊句):「〜ている間」kuromoji 給 ま→あいだ;「角が立つ」給 かく→かど
+const PREV_FIX = [{ s: '間', prev: ['いる', 'いた'], r: 'あいだ' }, { s: '角', next: ['が'], r: 'かど' }];
 function mergeCompounds(arr) {
   const out = [];
   for (let i = 0; i < arr.length; i++) {
@@ -88,8 +91,17 @@ for (const a of ARTICLES) {
 
 // 全表套用同音字修正(冪等;修到新舊句)
 let fixed = 0;
-for (const arr of Object.values(TOKENS)) for (const t of arr) {
+for (const arr of Object.values(TOKENS)) arr.forEach((t, i) => {
   if (t.r && READING_FIX[t.s] && t.r !== READING_FIX[t.s]) { t.r = READING_FIX[t.s]; fixed++; }
+  for (const f of PREV_FIX) if (t.s === f.s && t.r !== f.r && ((f.prev && i > 0 && f.prev.includes(arr[i - 1].s)) || (f.next && arr[i + 1] && f.next.includes(arr[i + 1].s)))) { t.r = f.r; fixed++; }
+});
+// 與語音 overrides 同步:VOICEVOX 預設把「日本」念 にっぽん,overrides.json 逐句改成 にほん 的句子,
+// token 讀音也要跟著改,否則逐詞時間軸拍數對不齊(沒被 override 的句子維持原樣=跟音檔一致)
+const OV = loadOverrides();
+const NIHON = { '日本': 'にほん', '日本人': 'にほんじん', '日本語': 'にほんご' };
+for (const [k, arr] of Object.entries(TOKENS)) {
+  if (!k.includes('日本') || applyOverrides(k, OV).includes('日本')) continue;
+  for (const t of arr) if (NIHON[t.s] && t.r !== NIHON[t.s]) { t.r = NIHON[t.s]; fixed++; }
 }
 if (fixed) console.log(`同音字修正套用 ${fixed} 處`);
 let merged = 0;

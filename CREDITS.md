@@ -37,3 +37,16 @@
 - `a-n4-12.jpg` Influenza Vaccine (51551576704)（Pete from Liverpool）— commons.wikimedia.org/wiki/File:Influenza_Vaccine_(51551576704).jpg（CC0）
 - `a-n3-13.jpg` Today's Favorite Color is UPS / B&H Brown!（cogdogblog）— flickr.com/photos/37996646802@N01/4267944720（CC0）
 - `a-n2-11.jpg` Ume suisho Japanese appetizer（Hanabishi）— commons.wikimedia.org/wiki/File:Ume_suisho_Japanese_appetizer.jpg（CC0）
+
+2026-10 第二批（11 篇排程文章，皆為 CC0，經 Openverse 授權篩選）：
+- `a-n3-14.jpg` Sogi Park Autumn Leaves（aimnotboy）— commons.wikimedia.org/wiki/File:Sogi_Park_Autumn_Leaves.jpg（CC0）
+- `a-n5-12.jpg` Sumpu-jou park Oden shop（Drivephotographer）— commons.wikimedia.org/wiki/File:Sumpu-jou_park_Oden_shop.jpg（CC0）
+- `a-n4-13.jpg` 2007-11-11 Shichi-Go-San ( 七五三 )（ruma views）— commons.wikimedia.org/wiki/File:2007-11-11_Shichi-Go-San_(_七五三_).jpg（CC0）
+- `a-n5-13.jpg` Scarf Gloves（Maciej Korsan）— stocksnap.io/photo/scarf-gloves-X5W1OFDDV9（CC0）
+- `a-n3-15.jpg` Accountant（rawpixel）— rawpixel.com/image/5913662（CC0）
+- `a-n4-14.jpg` White electric heater is currently turned on.（binitagothe）— wordpress.org/photos/photo/79065c2530/（CC0）
+- `a-n2-12.jpg` Nogyo Zensho rice harvest（《農業全書》插圖，WolfgangMichel 上傳）— commons.wikimedia.org/wiki/File:Nogyo_Zensho_rice_harvest.jpg（CC0）
+- `a-n5-14.jpg` hot-pot（hey Erin!）— flickr.com/photos/130391828@N03/16802032808（CC0）
+- `a-n3-16.jpg` POSTCARD STAMPS（John K Thorne）— flickr.com/photos/89918055@N05/14584896301（CC0）
+- `a-n4-15.jpg` Rubber gloves（rawpixel）— rawpixel.com/image/5940545（CC0）
+- `a-n2-13.jpg` Chikuwa-salad at izakaya in Kumamoto（妖精書士）— commons.wikimedia.org/wiki/File:Chikuwa-salad_at_izakaya_in_Kumamoto.jpg（CC0）

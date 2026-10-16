@@ -175,6 +175,13 @@
     ]
   },
   {
+    "text": "「だいこんとたまごをください」と言いました。",
+    "hash": "2f12c7dd4039",
+    "sources": [
+      "article#a-n5-12"
+    ]
+  },
+  {
     "text": "「でも、今ちょっと風邪気味で…」「お大事に」と返しました。",
     "hash": "cd2a0df371f7",
     "sources": [
@@ -2197,7 +2204,8 @@
     "hash": "748dc0639186",
     "sources": [
       "vocab-n4",
-      "vocab-n3"
+      "vocab-n3",
+      "article-vocab#a-n3-16"
     ]
   },
   {
@@ -2250,6 +2258,13 @@
     "sources": [
       "vocab-n2",
       "vocab-n1"
+    ]
+  },
+  {
+    "text": "あいにく先約がありまして」と断れば、角が立たない。",
+    "hash": "0ef95251d27f",
+    "sources": [
+      "article#a-n2-13"
     ]
   },
   {
@@ -2343,7 +2358,8 @@
     "text": "あかい",
     "hash": "dd450823cddf",
     "sources": [
-      "vocab-n5"
+      "vocab-n5",
+      "article-vocab#a-n5-13"
     ]
   },
   {
@@ -2841,7 +2857,9 @@
     "hash": "d13aa1e57ee3",
     "sources": [
       "vocab-n5",
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n5-12",
+      "article-vocab#a-n5-14"
     ]
   },
   {
@@ -2907,7 +2925,15 @@
     "hash": "f2bb1e2a7a1d",
     "sources": [
       "vocab-n5",
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n4-14"
+    ]
+  },
+  {
+    "text": "あついおでんで、からだがあたたかくなりました。",
+    "hash": "f7058ede7fe5",
+    "sources": [
+      "article#a-n5-12"
     ]
   },
   {
@@ -5193,6 +5219,13 @@
     ]
   },
   {
+    "text": "いいにおいがして、おなかがすきました。",
+    "hash": "af6037b6e834",
+    "sources": [
+      "article#a-n5-12"
+    ]
+  },
+  {
     "text": "いいわけ",
     "hash": "c23f7a10aa57",
     "sources": [
@@ -6185,7 +6218,8 @@
     "text": "いちどに",
     "hash": "2f24ddde3654",
     "sources": [
-      "vocab-n3"
+      "vocab-n3",
+      "article-vocab#a-n4-15"
     ]
   },
   {
@@ -7189,14 +7223,16 @@
     "text": "いれる",
     "hash": "9ebfcf3f2e60",
     "sources": [
-      "vocab-n5"
+      "vocab-n5",
+      "article-vocab#a-n5-14"
     ]
   },
   {
     "text": "いろ",
     "hash": "2b4861b6770c",
     "sources": [
-      "vocab-n5"
+      "vocab-n5",
+      "article-vocab#a-n5-13"
     ]
   },
   {
@@ -7221,11 +7257,19 @@
     ]
   },
   {
+    "text": "いろづく",
+    "hash": "84804f7899df",
+    "sources": [
+      "article-vocab#a-n3-14"
+    ]
+  },
+  {
     "text": "いわう",
     "hash": "78ecf87e6cd8",
     "sources": [
       "vocab-n4",
-      "article-vocab#a-n3-6"
+      "article-vocab#a-n3-6",
+      "article-vocab#a-n4-13"
     ]
   },
   {
@@ -7749,6 +7793,20 @@
     "sources": [
       "vocab-n3",
       "vocab-n2"
+    ]
+  },
+  {
+    "text": "うちでやさいを切って、なべに入れました。",
+    "hash": "0c6d1982013e",
+    "sources": [
+      "article#a-n5-14"
+    ]
+  },
+  {
+    "text": "うちにかえって、すぐ食べました。",
+    "hash": "0d51a8087671",
+    "sources": [
+      "article#a-n5-12"
     ]
   },
   {
@@ -8877,7 +8935,8 @@
     "hash": "031fb60e3abf",
     "sources": [
       "vocab-n3",
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n3-16"
     ]
   },
   {
@@ -9183,6 +9242,13 @@
     "hash": "a333d4ad13ab",
     "sources": [
       "article-vocab#a-n1-5"
+    ]
+  },
+  {
+    "text": "おおそうじ",
+    "hash": "473aa8f36a58",
+    "sources": [
+      "article-vocab#a-n4-15"
     ]
   },
   {
@@ -9841,6 +9907,13 @@
     "hash": "8b8ccdbe3855",
     "sources": [
       "vocab-n5"
+    ]
+  },
+  {
+    "text": "おでん",
+    "hash": "dc502de97b4d",
+    "sources": [
+      "article-vocab#a-n5-12"
     ]
   },
   {
@@ -12734,7 +12807,8 @@
     "hash": "d7ef1f662ca4",
     "sources": [
       "vocab-n3",
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n3-15"
     ]
   },
   {
@@ -13063,6 +13137,13 @@
     ]
   },
   {
+    "text": "かしつき",
+    "hash": "1d075cb7d281",
+    "sources": [
+      "article-vocab#a-n4-14"
+    ]
+  },
+  {
     "text": "かしましい",
     "hash": "c952b08b9e93",
     "sources": [
@@ -13371,6 +13452,13 @@
     "sources": [
       "vocab-n3",
       "vocab-n2"
+    ]
+  },
+  {
+    "text": "かちかん",
+    "hash": "2a93605ce051",
+    "sources": [
+      "article-vocab#a-n2-13"
     ]
   },
   {
@@ -14213,6 +14301,13 @@
     ]
   },
   {
+    "text": "からし",
+    "hash": "b631fd90b783",
+    "sources": [
+      "article-vocab#a-n5-12"
+    ]
+  },
+  {
     "text": "からだ",
     "hash": "f81ed7a6a985",
     "sources": [
@@ -14612,7 +14707,8 @@
     "sources": [
       "vocab-n5",
       "vocab-n4",
-      "vocab-n1"
+      "vocab-n1",
+      "article-vocab#a-n2-13"
     ]
   },
   {
@@ -14838,6 +14934,13 @@
     "hash": "55dd4344bf1d",
     "sources": [
       "vocab-n1"
+    ]
+  },
+  {
+    "text": "かんちゅうみまい",
+    "hash": "880a42286a64",
+    "sources": [
+      "article-vocab#a-n3-16"
     ]
   },
   {
@@ -15151,7 +15254,8 @@
       "vocab-n1",
       "article-vocab#a-n4-6",
       "article-vocab#a-n4-10",
-      "article-vocab#a-n5-11"
+      "article-vocab#a-n5-11",
+      "article-vocab#a-n3-14"
     ]
   },
   {
@@ -15241,6 +15345,13 @@
     "hash": "2ba74a8b80fa",
     "sources": [
       "vocab-n3"
+    ]
+  },
+  {
+    "text": "ききました",
+    "hash": "558eccfe463f",
+    "sources": [
+      "article-vocab#a-n5-13"
     ]
   },
   {
@@ -15661,6 +15772,13 @@
     ]
   },
   {
+    "text": "きづかう",
+    "hash": "be79dad22dda",
+    "sources": [
+      "article-vocab#a-n3-16"
+    ]
+  },
+  {
     "text": "きっかり",
     "hash": "dfb9810f8915",
     "sources": [
@@ -15847,6 +15965,13 @@
     "hash": "67c59b3479d6",
     "sources": [
       "vocab-n4"
+    ]
+  },
+  {
+    "text": "きにゅうれい",
+    "hash": "6b927086f984",
+    "sources": [
+      "article-vocab#a-n3-15"
     ]
   },
   {
@@ -16122,14 +16247,16 @@
     "text": "きもち",
     "hash": "6395a6c0efbf",
     "sources": [
-      "vocab-n4"
+      "vocab-n4",
+      "article-vocab#a-n4-15"
     ]
   },
   {
     "text": "きもの",
     "hash": "15394ff1896b",
     "sources": [
-      "vocab-n3"
+      "vocab-n3",
+      "article-vocab#a-n4-13"
     ]
   },
   {
@@ -16588,7 +16715,8 @@
     "hash": "0544bb1b1faa",
     "sources": [
       "vocab-n3",
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n3-15"
     ]
   },
   {
@@ -16766,7 +16894,8 @@
       "vocab-n3",
       "vocab-n2",
       "article-vocab#a-n3-6",
-      "article-vocab#a-n4-6"
+      "article-vocab#a-n4-6",
+      "article-vocab#a-n4-13"
     ]
   },
   {
@@ -16844,7 +16973,8 @@
     "hash": "6c32474ebc74",
     "sources": [
       "vocab-n2",
-      "article-vocab#a-n3-5"
+      "article-vocab#a-n3-5",
+      "article-vocab#a-n2-13"
     ]
   },
   {
@@ -18084,7 +18214,8 @@
     "text": "くふう",
     "hash": "cfe8ec6df159",
     "sources": [
-      "vocab-n3"
+      "vocab-n3",
+      "article-vocab#a-n4-14"
     ]
   },
   {
@@ -18135,7 +18266,8 @@
     "text": "くやくしょ",
     "hash": "8cac49648cc9",
     "sources": [
-      "article-vocab#a-n4-8"
+      "article-vocab#a-n4-8",
+      "article-vocab#a-n4-15"
     ]
   },
   {
@@ -18354,7 +18486,8 @@
     "text": "くろい",
     "hash": "5b0f8b645612",
     "sources": [
-      "vocab-n5"
+      "vocab-n5",
+      "article-vocab#a-n5-13"
     ]
   },
   {
@@ -18791,6 +18924,13 @@
     "hash": "f145a2849c83",
     "sources": [
       "vocab-n2"
+    ]
+  },
+  {
+    "text": "けいだい",
+    "hash": "467a34886a61",
+    "sources": [
+      "article-vocab#a-n4-13"
     ]
   },
   {
@@ -20956,6 +21096,13 @@
     ]
   },
   {
+    "text": "こうようじょうほう",
+    "hash": "a4b70737eaeb",
+    "sources": [
+      "article-vocab#a-n3-14"
+    ]
+  },
+  {
     "text": "こうり",
     "hash": "882afbc59767",
     "sources": [
@@ -21066,6 +21213,20 @@
     "hash": "954b687541ea",
     "sources": [
       "vocab-n5"
+    ]
+  },
+  {
+    "text": "コート",
+    "hash": "9cfa0ecabe92",
+    "sources": [
+      "article-vocab#a-n5-13"
+    ]
+  },
+  {
+    "text": "コートとてぶくろとマフラーを買いました。",
+    "hash": "35eea56c429a",
+    "sources": [
+      "article#a-n5-13"
     ]
   },
   {
@@ -21636,6 +21797,13 @@
     "hash": "f32de43608aa",
     "sources": [
       "article-vocab#a-n2-7"
+    ]
+  },
+  {
+    "text": "こころがけた",
+    "hash": "25103eb8e9d0",
+    "sources": [
+      "article-vocab#a-n3-16"
     ]
   },
   {
@@ -27365,6 +27533,13 @@
     ]
   },
   {
+    "text": "この方法なら、年末もゆっくり休めそうだと思います。",
+    "hash": "f12453ddb50e",
+    "sources": [
+      "article#a-n4-15"
+    ]
+  },
+  {
     "text": "この法案は野党の強い反対にあい、審議が難航している。",
     "hash": "844445ab698e",
     "sources": [
@@ -28441,6 +28616,13 @@
     ]
   },
   {
+    "text": "これは「喪中はがき」といって、家族に不幸があった人が年賀状を出さないことを知らせるものだ。",
+    "hash": "cd6ab053a9bd",
+    "sources": [
+      "article#a-n3-16"
+    ]
+  },
+  {
     "text": "これはあくまで個人の意見ですが、この計画には反対です。",
     "hash": "ed25b5389aa7",
     "sources": [
@@ -29234,6 +29416,13 @@
     ]
   },
   {
+    "text": "さいきんとてもさむくなりました。",
+    "hash": "6a492eb3967b",
+    "sources": [
+      "article#a-n5-13"
+    ]
+  },
+  {
     "text": "さいきんはパンやコーヒーの朝ごはんもおおいです。",
     "hash": "690e99521912",
     "sources": [
@@ -29633,6 +29822,13 @@
     ]
   },
   {
+    "text": "さきに",
+    "hash": "7dbea20963b5",
+    "sources": [
+      "article-vocab#a-n5-14"
+    ]
+  },
+  {
     "text": "さきほど",
     "hash": "94ba202b4412",
     "sources": [
@@ -29800,7 +29996,8 @@
     "hash": "d8d57142d368",
     "sources": [
       "vocab-n3",
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n3-14"
     ]
   },
   {
@@ -29830,7 +30027,8 @@
     "sources": [
       "vocab-n3",
       "vocab-n2",
-      "article-vocab#a-n3-4"
+      "article-vocab#a-n3-4",
+      "article-vocab#a-n2-12"
     ]
   },
   {
@@ -30311,6 +30509,13 @@
     "hash": "5ff1c21752cc",
     "sources": [
       "vocab-n5"
+    ]
+  },
+  {
+    "text": "さむいよるでしたが、たのしかったです。",
+    "hash": "e788010cce37",
+    "sources": [
+      "article#a-n5-14"
     ]
   },
   {
@@ -31072,6 +31277,13 @@
     ]
   },
   {
+    "text": "しかし佐藤さんは「初めてなら聞いて当然ですよ」と笑って答えてくれた。",
+    "hash": "192d18b6f6bf",
+    "sources": [
+      "article#a-n3-15"
+    ]
+  },
+  {
     "text": "しかし最近、その良さが見直されている。",
     "hash": "8d48d6dbb659",
     "sources": [
@@ -31113,6 +31325,13 @@
     "sources": [
       "vocab-n3",
       "vocab-n2"
+    ]
+  },
+  {
+    "text": "しかも、そうした仕事の中には、祝日であっても休むどころか、いつも以上に働かざるを得ないものもある。",
+    "hash": "9aafa507705d",
+    "sources": [
+      "article#a-n2-12"
     ]
   },
   {
@@ -32950,7 +33169,8 @@
     "hash": "446302c7ccab",
     "sources": [
       "vocab-n3",
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n2-12"
     ]
   },
   {
@@ -32967,7 +33187,8 @@
     "sources": [
       "vocab-n4",
       "vocab-n3",
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n3-16"
     ]
   },
   {
@@ -33501,7 +33722,8 @@
     "text": "しゅし",
     "hash": "ecfc7d6face7",
     "sources": [
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n2-12"
     ]
   },
   {
@@ -34553,6 +34775,13 @@
     ]
   },
   {
+    "text": "しょうめいしょ",
+    "hash": "3aecc23b4d33",
+    "sources": [
+      "article-vocab#a-n3-15"
+    ]
+  },
+  {
     "text": "しょうめいする",
     "hash": "65926c23515e",
     "sources": [
@@ -35311,12 +35540,20 @@
     ]
   },
   {
+    "text": "じんじぶ",
+    "hash": "68795f8b98bf",
+    "sources": [
+      "article-vocab#a-n3-15"
+    ]
+  },
+  {
     "text": "じんじゃ",
     "hash": "28770480597b",
     "sources": [
       "vocab-n4",
       "vocab-n3",
-      "article-vocab#a-n4-6"
+      "article-vocab#a-n4-6",
+      "article-vocab#a-n4-13"
     ]
   },
   {
@@ -35606,7 +35843,8 @@
     "text": "しんぼく",
     "hash": "874da97d2fcf",
     "sources": [
-      "vocab-n1"
+      "vocab-n1",
+      "article-vocab#a-n2-13"
     ]
   },
   {
@@ -36025,6 +36263,13 @@
     "hash": "d1b32d5fcbb4",
     "sources": [
       "vocab-n5"
+    ]
+  },
+  {
+    "text": "スーパー",
+    "hash": "39c9d3da59ba",
+    "sources": [
+      "article-vocab#a-n5-14"
     ]
   },
   {
@@ -37080,7 +37325,8 @@
     "text": "せいきゅうしょ",
     "hash": "a2b5c7b9d01a",
     "sources": [
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n4-14"
     ]
   },
   {
@@ -37400,7 +37646,8 @@
     "hash": "e28e1aa75f38",
     "sources": [
       "vocab-n3",
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n4-13"
     ]
   },
   {
@@ -37444,7 +37691,8 @@
     "sources": [
       "vocab-n3",
       "vocab-n2",
-      "vocab-n1"
+      "vocab-n1",
+      "article-vocab#a-n2-12"
     ]
   },
   {
@@ -37958,6 +38206,13 @@
     ]
   },
   {
+    "text": "せっていおんど",
+    "hash": "bfa3f59939f6",
+    "sources": [
+      "article-vocab#a-n4-14"
+    ]
+  },
+  {
     "text": "せっていする",
     "hash": "9b1010123b62",
     "sources": [
@@ -38056,7 +38311,8 @@
     "text": "せつやく",
     "hash": "5e93beffda1e",
     "sources": [
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n4-14"
     ]
   },
   {
@@ -38293,7 +38549,8 @@
     "text": "せんざい",
     "hash": "813b8baa58da",
     "sources": [
-      "vocab-n1"
+      "vocab-n1",
+      "article-vocab#a-n4-15"
     ]
   },
   {
@@ -38587,6 +38844,13 @@
     ]
   },
   {
+    "text": "ぜんぶわたしのすきな色です。",
+    "hash": "329c850945bb",
+    "sources": [
+      "article#a-n5-13"
+    ]
+  },
+  {
     "text": "せんぺんばんか",
     "hash": "1361f5769819",
     "sources": [
@@ -38634,6 +38898,13 @@
     "hash": "f66181f638fe",
     "sources": [
       "vocab-n3"
+    ]
+  },
+  {
+    "text": "せんやく",
+    "hash": "ff20b0a5896d",
+    "sources": [
+      "article-vocab#a-n2-13"
     ]
   },
   {
@@ -39280,6 +39551,13 @@
     ]
   },
   {
+    "text": "そこには「色づき始め」「見ごろ」などの言葉で、木の様子が分かりやすく書かれている。",
+    "hash": "c991f244d88e",
+    "sources": [
+      "article#a-n3-14"
+    ]
+  },
+  {
     "text": "そこに座ってください。",
     "hash": "74af0b7681de",
     "sources": [
@@ -39385,7 +39663,8 @@
     "sources": [
       "vocab-n4",
       "vocab-n3",
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n4-13"
     ]
   },
   {
@@ -40560,6 +40839,13 @@
     ]
   },
   {
+    "text": "それに伴って、夜の宴会をやめて昼のランチ会にしたり、参加を自由にしたりする会社も目立つようになった。",
+    "hash": "8dba86be1b33",
+    "sources": [
+      "article#a-n2-13"
+    ]
+  },
+  {
     "text": "それは、私たち一人ひとりに課された、重い宿題なのかもしれない。",
     "hash": "3e0747ff6cdc",
     "sources": [
@@ -40772,7 +41058,8 @@
     "text": "そんちょう",
     "hash": "59876051dfb8",
     "sources": [
-      "article-vocab#a-n2-4"
+      "article-vocab#a-n2-4",
+      "article-vocab#a-n2-13"
     ]
   },
   {
@@ -41153,6 +41440,13 @@
     ]
   },
   {
+    "text": "だいこん",
+    "hash": "b9882b071585",
+    "sources": [
+      "article-vocab#a-n5-12"
+    ]
+  },
+  {
     "text": "たいさく",
     "hash": "3a4a0a7dd530",
     "sources": [
@@ -41435,7 +41729,8 @@
     "text": "だいどころ",
     "hash": "4ab7e0a6330a",
     "sources": [
-      "vocab-n5"
+      "vocab-n5",
+      "article-vocab#a-n4-15"
     ]
   },
   {
@@ -42160,6 +42455,13 @@
     ]
   },
   {
+    "text": "ただし、書き方は会社で少し違うので、わからない点は人事に直接聞くように言われた。",
+    "hash": "53ce65ff6cff",
+    "sources": [
+      "article#a-n3-15"
+    ]
+  },
+  {
     "text": "ただし、不在票には保管期限も書いてある。",
     "hash": "4383cb6bd36f",
     "sources": [
@@ -42461,6 +42763,13 @@
     ]
   },
   {
+    "text": "たとえば「お誘いありがとうございます。",
+    "hash": "88bf05254dee",
+    "sources": [
+      "article#a-n2-13"
+    ]
+  },
+  {
     "text": "たとえベテランであれ、初心を忘れてはいけない。",
     "hash": "0528430a974c",
     "sources": [
@@ -42711,7 +43020,8 @@
     "text": "たまご",
     "hash": "7446c97eeae7",
     "sources": [
-      "vocab-n5"
+      "vocab-n5",
+      "article-vocab#a-n5-12"
     ]
   },
   {
@@ -42872,7 +43182,8 @@
     "hash": "fab75802c865",
     "sources": [
       "vocab-n2",
-      "article-vocab#a-n3-5"
+      "article-vocab#a-n3-5",
+      "article-vocab#a-n2-12"
     ]
   },
   {
@@ -43173,7 +43484,8 @@
     "text": "たんとう",
     "hash": "c86caa4dc1b9",
     "sources": [
-      "vocab-n3"
+      "vocab-n3",
+      "article-vocab#a-n4-15"
     ]
   },
   {
@@ -43245,7 +43557,8 @@
     "hash": "32ef80c4ef4b",
     "sources": [
       "vocab-n4",
-      "vocab-n3"
+      "vocab-n3",
+      "article-vocab#a-n4-14"
     ]
   },
   {
@@ -43641,6 +43954,13 @@
     "hash": "8ad8c33921a0",
     "sources": [
       "vocab-n2"
+    ]
+  },
+  {
+    "text": "ちとせあめ",
+    "hash": "fe174225e89c",
+    "sources": [
+      "article-vocab#a-n4-13"
     ]
   },
   {
@@ -45213,6 +45533,13 @@
     ]
   },
   {
+    "text": "つゆ",
+    "hash": "5d9c21da7698",
+    "sources": [
+      "article-vocab#a-n5-12"
+    ]
+  },
+  {
     "text": "つよい",
     "hash": "2a305bf2c671",
     "sources": [
@@ -45312,7 +45639,8 @@
     "hash": "fc596fd82a9e",
     "sources": [
       "vocab-n3",
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n3-14"
     ]
   },
   {
@@ -45503,7 +45831,8 @@
       "vocab-n5",
       "vocab-n4",
       "vocab-n3",
-      "article-vocab#a-n3-12"
+      "article-vocab#a-n3-12",
+      "article-vocab#a-n3-15"
     ]
   },
   {
@@ -46021,7 +46350,8 @@
       "vocab-n4",
       "vocab-n3",
       "vocab-n2",
-      "article-vocab#a-n4-8"
+      "article-vocab#a-n4-8",
+      "article-vocab#a-n3-15"
     ]
   },
   {
@@ -46146,6 +46476,13 @@
     ]
   },
   {
+    "text": "では、感謝を形にするには、どのような行動が考えられるのだろうか。",
+    "hash": "31ee8bbb7fed",
+    "sources": [
+      "article#a-n2-12"
+    ]
+  },
+  {
     "text": "では、準備も整いました。さて、そろそろ始めましょうか。",
     "hash": "fec9727f8578",
     "sources": [
@@ -46192,6 +46529,13 @@
     "hash": "967ab95ad3b2",
     "sources": [
       "vocab-n1#数え切れない"
+    ]
+  },
+  {
+    "text": "てぶくろ",
+    "hash": "69c7667f2997",
+    "sources": [
+      "article-vocab#a-n5-13"
     ]
   },
   {
@@ -46287,6 +46631,13 @@
     ]
   },
   {
+    "text": "てらす",
+    "hash": "51197b511a58",
+    "sources": [
+      "article-vocab#a-n3-14"
+    ]
+  },
+  {
     "text": "でる",
     "hash": "cc3a966fed1a",
     "sources": [
@@ -46376,7 +46727,8 @@
     "hash": "cc9caa983496",
     "sources": [
       "vocab-n5",
-      "article-vocab#a-n4-10"
+      "article-vocab#a-n4-10",
+      "article-vocab#a-n5-12"
     ]
   },
   {
@@ -46384,6 +46736,13 @@
     "hash": "9088acf1da63",
     "sources": [
       "article-vocab#a-n5-10"
+    ]
+  },
+  {
+    "text": "てんいんさんが「つゆとからしはいりますか」と聞きました。",
+    "hash": "adbe3279ec5e",
+    "sources": [
+      "article#a-n5-12"
     ]
   },
   {
@@ -46443,6 +46802,20 @@
     "hash": "e9247487df58",
     "sources": [
       "vocab-n5"
+    ]
+  },
+  {
+    "text": "でんきだい",
+    "hash": "1bade51cf722",
+    "sources": [
+      "article-vocab#a-n4-14"
+    ]
+  },
+  {
+    "text": "でんきもうふ",
+    "hash": "43b174efb2c3",
+    "sources": [
+      "article-vocab#a-n4-14"
     ]
   },
   {
@@ -47387,6 +47760,13 @@
     ]
   },
   {
+    "text": "とうふ",
+    "hash": "ce3b2d915838",
+    "sources": [
+      "article-vocab#a-n5-14"
+    ]
+  },
+  {
     "text": "どうぶつ",
     "hash": "13035a844ccc",
     "sources": [
@@ -47488,7 +47868,8 @@
       "vocab-n3",
       "vocab-n2",
       "article-vocab#a-n3-5",
-      "article-vocab#a-n3-11"
+      "article-vocab#a-n3-11",
+      "article-vocab#a-n3-14"
     ]
   },
   {
@@ -47934,6 +48315,13 @@
       "vocab-n3",
       "vocab-n2",
       "confusables-word"
+    ]
+  },
+  {
+    "text": "ところが近年、仕事のあとの時間を自分のために使いたいと考え、参加を望まない人が増えている。",
+    "hash": "1942c25649a9",
+    "sources": [
+      "article#a-n2-13"
     ]
   },
   {
@@ -48559,7 +48947,8 @@
     "hash": "fa04cb341f01",
     "sources": [
       "vocab-n5",
-      "article-vocab#a-n5-9"
+      "article-vocab#a-n5-9",
+      "article-vocab#a-n5-13"
     ]
   },
   {
@@ -48617,6 +49006,7 @@
     "sources": [
       "vocab-n5",
       "article-vocab#a-n5-9",
+      "article-vocab#a-n5-13",
       "essentials"
     ]
   },
@@ -49612,6 +50002,13 @@
     ]
   },
   {
+    "text": "なお、祝日の勤務や休みの扱いは会社ごとに異なるので、詳しくは会社の説明を確認してほしい。",
+    "hash": "6cd2eadf8267",
+    "sources": [
+      "article#a-n2-12"
+    ]
+  },
+  {
     "text": "なお、本番では落ち着いて。ちなみに、私の苦手は文法です。",
     "hash": "b6eae1d675b7",
     "sources": [
@@ -49654,6 +50051,13 @@
     "hash": "87154448a3f5",
     "sources": [
       "vocab-n5"
+    ]
+  },
+  {
+    "text": "ながいき",
+    "hash": "42207c2646b8",
+    "sources": [
+      "article-vocab#a-n4-13"
     ]
   },
   {
@@ -49770,6 +50174,13 @@
     "hash": "f85cf9291762",
     "sources": [
       "vocab-n5"
+    ]
+  },
+  {
+    "text": "なくなった",
+    "hash": "f6ec317bde8f",
+    "sources": [
+      "article-vocab#a-n3-16"
     ]
   },
   {
@@ -50083,6 +50494,13 @@
     ]
   },
   {
+    "text": "なべ",
+    "hash": "c6a40714dfa8",
+    "sources": [
+      "article-vocab#a-n5-14"
+    ]
+  },
+  {
     "text": "なべて",
     "hash": "15e70249d17e",
     "sources": [
@@ -50187,6 +50605,13 @@
       "vocab-n5",
       "vocab-n4",
       "vocab-n3"
+    ]
+  },
+  {
+    "text": "なりたつ",
+    "hash": "5e0775a4a506",
+    "sources": [
+      "article-vocab#a-n2-12"
     ]
   },
   {
@@ -50380,10 +50805,18 @@
     ]
   },
   {
+    "text": "にいなめさい",
+    "hash": "d4913096385e",
+    "sources": [
+      "article-vocab#a-n2-12"
+    ]
+  },
+  {
     "text": "におい",
     "hash": "8ddcec6f37fe",
     "sources": [
-      "vocab-n3"
+      "vocab-n3",
+      "article-vocab#a-n5-12"
     ]
   },
   {
@@ -50460,7 +50893,8 @@
     "text": "にく",
     "hash": "03fbadfbb041",
     "sources": [
-      "vocab-n5"
+      "vocab-n5",
+      "article-vocab#a-n5-14"
     ]
   },
   {
@@ -51058,6 +51492,13 @@
     ]
   },
   {
+    "text": "ねがい",
+    "hash": "2dc0f2ccfc16",
+    "sources": [
+      "article-vocab#a-n4-13"
+    ]
+  },
+  {
     "text": "ねがう",
     "hash": "a754172820a8",
     "sources": [
@@ -51263,6 +51704,13 @@
     ]
   },
   {
+    "text": "ねんがじょう",
+    "hash": "f9cf67e42259",
+    "sources": [
+      "article-vocab#a-n3-16"
+    ]
+  },
+  {
     "text": "ねんかん",
     "hash": "c202c9663838",
     "sources": [
@@ -51310,6 +51758,20 @@
     "hash": "3b589a8f5186",
     "sources": [
       "vocab-n1"
+    ]
+  },
+  {
+    "text": "ねんまつ",
+    "hash": "ccb351e8af2d",
+    "sources": [
+      "article-vocab#a-n4-15"
+    ]
+  },
+  {
+    "text": "ねんまつちょうせい",
+    "hash": "f29112faa883",
+    "sources": [
+      "article-vocab#a-n3-15"
     ]
   },
   {
@@ -52126,7 +52588,8 @@
     "hash": "d67da0645e7e",
     "sources": [
       "article-vocab#a-n2-5",
-      "article-vocab#a-n1-9"
+      "article-vocab#a-n1-9",
+      "article-vocab#a-n2-13"
     ]
   },
   {
@@ -52140,7 +52603,8 @@
     "text": "はいる",
     "hash": "78b67aa602bf",
     "sources": [
-      "vocab-n5"
+      "vocab-n5",
+      "article-vocab#a-n5-12"
     ]
   },
   {
@@ -52169,6 +52633,13 @@
     "hash": "d9fce18767bd",
     "sources": [
       "vocab-n5"
+    ]
+  },
+  {
+    "text": "はがきは年賀状の準備が始まる前に届くことが多く、相手に早めに知らせるためのものだ。",
+    "hash": "facfb5f19719",
+    "sources": [
+      "article#a-n3-16"
     ]
   },
   {
@@ -52283,6 +52754,20 @@
     "hash": "cf10c33048bf",
     "sources": [
       "vocab-n1"
+    ]
+  },
+  {
+    "text": "はくさい",
+    "hash": "3ccf928e7c34",
+    "sources": [
+      "article-vocab#a-n5-14"
+    ]
+  },
+  {
+    "text": "はくさいととうふと肉を買いました。",
+    "hash": "3a017f0bc6cd",
+    "sources": [
+      "article#a-n5-14"
     ]
   },
   {
@@ -53969,6 +54454,13 @@
     ]
   },
   {
+    "text": "ひかえる",
+    "hash": "f0d95aef4f1c",
+    "sources": [
+      "article-vocab#a-n3-16"
+    ]
+  },
+  {
     "text": "ひかく",
     "hash": "fb5aab1b80e2",
     "sources": [
@@ -54481,6 +54973,13 @@
     "hash": "4fa2d481d4f1",
     "sources": [
       "vocab-n1"
+    ]
+  },
+  {
+    "text": "ひとごみ",
+    "hash": "d84fa9ff2013",
+    "sources": [
+      "article-vocab#a-n3-14"
     ]
   },
   {
@@ -56110,7 +56609,8 @@
     "text": "ぶつりゅう",
     "hash": "d8bf894a0872",
     "sources": [
-      "vocab-n3"
+      "vocab-n3",
+      "article-vocab#a-n2-12"
     ]
   },
   {
@@ -56360,6 +56860,20 @@
     ]
   },
   {
+    "text": "ふゆ",
+    "hash": "f7e47c223ebd",
+    "sources": [
+      "article-vocab#a-n5-14"
+    ]
+  },
+  {
+    "text": "ふゆのよる、コンビニに入りました。",
+    "hash": "01898dd60484",
+    "sources": [
+      "article#a-n5-12"
+    ]
+  },
+  {
     "text": "ふゆは さむいです。なつは あついです。あきと はるは すずしいです。",
     "hash": "3f1e52a5ca08",
     "sources": [
@@ -56378,7 +56892,8 @@
     "hash": "fe3a8d83e19c",
     "sources": [
       "vocab-n4",
-      "vocab-n1"
+      "vocab-n1",
+      "article-vocab#a-n3-15"
     ]
   },
   {
@@ -57146,6 +57661,13 @@
     ]
   },
   {
+    "text": "へやがあたたかくなりました。",
+    "hash": "c3896265aa14",
+    "sources": [
+      "article#a-n5-14"
+    ]
+  },
+  {
     "text": "へやを きれいに 掃除しました。",
     "hash": "b9e573cc348b",
     "sources": [
@@ -57846,6 +58368,13 @@
     ]
   },
   {
+    "text": "ぼうねんかい",
+    "hash": "6c232690352a",
+    "sources": [
+      "article-vocab#a-n2-13"
+    ]
+  },
+  {
     "text": "ぼうはん",
     "hash": "a34a431517f7",
     "sources": [
@@ -58065,7 +58594,8 @@
     "text": "ほけんりょう",
     "hash": "3d3672d6c513",
     "sources": [
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n3-15"
     ]
   },
   {
@@ -58669,7 +59199,8 @@
     "text": "まいしゅう",
     "hash": "e11df8f7950a",
     "sources": [
-      "vocab-n5"
+      "vocab-n5",
+      "article-vocab#a-n4-15"
     ]
   },
   {
@@ -58944,6 +59475,13 @@
     ]
   },
   {
+    "text": "まず、みんなでスーパーへいきました。",
+    "hash": "a5c86f565cfd",
+    "sources": [
+      "article#a-n5-14"
+    ]
+  },
+  {
     "text": "まず、家庭でできることから始めましょう。",
     "hash": "d5ac2814f405",
     "sources": [
@@ -58955,6 +59493,13 @@
     "hash": "d98c01c64d09",
     "sources": [
       "article#a-n3-12"
+    ]
+  },
+  {
+    "text": "まず、電気毛布を使って、寝る前にふとんをあたためておきます。",
+    "hash": "6d78781907bc",
+    "sources": [
+      "article#a-n4-14"
     ]
   },
   {
@@ -59398,6 +59943,13 @@
     ]
   },
   {
+    "text": "マフラー",
+    "hash": "0e5c44b578d1",
+    "sources": [
+      "article-vocab#a-n5-13"
+    ]
+  },
+  {
     "text": "まもう",
     "hash": "1732823a7880",
     "sources": [
@@ -59736,6 +60288,13 @@
     ]
   },
   {
+    "text": "みごろ",
+    "hash": "e4be3d23e55a",
+    "sources": [
+      "article-vocab#a-n3-14"
+    ]
+  },
+  {
     "text": "みさき",
     "hash": "4cce894053b3",
     "sources": [
@@ -59824,7 +60383,8 @@
     "text": "みせ",
     "hash": "6b25a3bc2621",
     "sources": [
-      "vocab-n5"
+      "vocab-n5",
+      "article-vocab#a-n5-13"
     ]
   },
   {
@@ -60264,7 +60824,8 @@
     "text": "みんな",
     "hash": "a5686da371e8",
     "sources": [
-      "vocab-n5"
+      "vocab-n5",
+      "article-vocab#a-n5-14"
     ]
   },
   {
@@ -60314,6 +60875,13 @@
     "hash": "62887c8833ba",
     "sources": [
       "article#a-n5-9"
+    ]
+  },
+  {
+    "text": "みんなでいっしょにたべると、おいしいです。",
+    "hash": "d6456f54994f",
+    "sources": [
+      "article#a-n5-14"
     ]
   },
   {
@@ -61830,6 +62398,13 @@
     ]
   },
   {
+    "text": "もし将来子どもができたら、わたしも千歳あめを用意してお祝いしたいです。",
+    "hash": "8e4208c9b6ad",
+    "sources": [
+      "article#a-n4-13"
+    ]
+  },
+  {
     "text": "もし都合が悪ければ、遠慮なくおっしゃってください。",
     "hash": "a85317772829",
     "sources": [
@@ -61883,6 +62458,13 @@
     "hash": "abf83d9acbb8",
     "sources": [
       "vocab-n1"
+    ]
+  },
+  {
+    "text": "もちゅう",
+    "hash": "e23aa6b24b0d",
+    "sources": [
+      "article-vocab#a-n3-16"
     ]
   },
   {
@@ -62143,6 +62725,13 @@
     ]
   },
   {
+    "text": "もみじがり",
+    "hash": "3dad84cea2cf",
+    "sources": [
+      "article-vocab#a-n3-14"
+    ]
+  },
+  {
     "text": "もやす",
     "hash": "e0daa0e1b1d0",
     "sources": [
@@ -62362,6 +62951,13 @@
     "hash": "33fb5c3a814f",
     "sources": [
       "vocab-n5"
+    ]
+  },
+  {
+    "text": "やさいを先に、肉はあとで入れました。",
+    "hash": "03edc3152b5f",
+    "sources": [
+      "article#a-n5-14"
     ]
   },
   {
@@ -63271,7 +63867,8 @@
     "text": "ゆらい",
     "hash": "4b416558088e",
     "sources": [
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n2-12"
     ]
   },
   {
@@ -63308,6 +63905,13 @@
     "hash": "6f46f7d4a286",
     "sources": [
       "kana"
+    ]
+  },
+  {
+    "text": "よいお年を。",
+    "hash": "70ce5341459a",
+    "sources": [
+      "speak-test"
     ]
   },
   {
@@ -64820,7 +65424,8 @@
     "hash": "ced611a98172",
     "sources": [
       "article-vocab#a-n3-4",
-      "article-vocab#a-n1-3"
+      "article-vocab#a-n1-3",
+      "article-vocab#a-n2-13"
     ]
   },
   {
@@ -64989,6 +65594,13 @@
     ]
   },
   {
+    "text": "ルームメイトのリンさんにも話したら、いっしょにやると言ってくれました。",
+    "hash": "4e528fefcd7b",
+    "sources": [
+      "article#a-n4-15"
+    ]
+  },
+  {
     "text": "ルールというより、おたがいへの思いやりなのです。",
     "hash": "422e9c6d3f59",
     "sources": [
@@ -65042,6 +65654,13 @@
     "hash": "9cbc3284f79e",
     "sources": [
       "vocab-n2"
+    ]
+  },
+  {
+    "text": "れいき",
+    "hash": "b2105294d97d",
+    "sources": [
+      "article-vocab#a-n4-14"
     ]
   },
   {
@@ -65117,7 +65736,8 @@
     "text": "レジ",
     "hash": "77654f51d590",
     "sources": [
-      "article-vocab#a-n5-10"
+      "article-vocab#a-n5-10",
+      "article-vocab#a-n5-12"
     ]
   },
   {
@@ -65174,6 +65794,13 @@
     "hash": "eee6ee0f0342",
     "sources": [
       "article#a-n2-5"
+    ]
+  },
+  {
+    "text": "レジのよこにおでんがありました。",
+    "hash": "2da712b715fa",
+    "sources": [
+      "article#a-n5-12"
     ]
   },
   {
@@ -66296,6 +66923,13 @@
     ]
   },
   {
+    "text": "わたしは「つゆだけください」と言いました。",
+    "hash": "39b0c7553661",
+    "sources": [
+      "article#a-n5-12"
+    ]
+  },
+  {
     "text": "わたしはがくせいです",
     "hash": "15ed7e6f5756",
     "sources": [
@@ -66387,6 +67021,13 @@
     ]
   },
   {
+    "text": "わたしは黒いコートがほしかったです。",
+    "hash": "d0486029f7d6",
+    "sources": [
+      "article#a-n5-13"
+    ]
+  },
+  {
     "text": "わたしは自転車で学校へ行きます。",
     "hash": "caea900679a2",
     "sources": [
@@ -66412,6 +67053,13 @@
     "hash": "970ce3df158b",
     "sources": [
       "vocab-n5#青"
+    ]
+  },
+  {
+    "text": "わたしは台所とおふろ、リンさんはまどとげんかんを担当します。",
+    "hash": "a6efdd93c794",
+    "sources": [
+      "article#a-n4-15"
     ]
   },
   {
@@ -67218,6 +67866,13 @@
     ]
   },
   {
+    "text": "一九四八年に「国民の祝日に関する法律」が定められ、この日は「勤労感謝の日」として国民の祝日になった。",
+    "hash": "3c1591655c5a",
+    "sources": [
+      "article#a-n2-12"
+    ]
+  },
+  {
     "text": "一月、お正月は家族みんなで集まります。",
     "hash": "d047a823dc61",
     "sources": [
@@ -67519,6 +68174,13 @@
     ]
   },
   {
+    "text": "一度に全部やると疲れるので、毎週一か所だけそうじすることにしました。",
+    "hash": "ebdee9014664",
+    "sources": [
+      "article#a-n4-15"
+    ]
+  },
+  {
     "text": "一度ネットに拡散した情報を完全に消し去ることは、もはや不可能に近い。",
     "hash": "b525582da3e5",
     "sources": [
@@ -67729,6 +68391,13 @@
     ]
   },
   {
+    "text": "一年の苦労を忘れて親睦を深めるという意味があり、かつては参加するのが当然だと考えられていた。",
+    "hash": "ef0dbb4e7fa4",
+    "sources": [
+      "article#a-n2-13"
+    ]
+  },
+  {
     "text": "一年の成果を振り返ってみると、決して無駄な努力ではなかったと実感する。",
     "hash": "c30532784b1e",
     "sources": [
@@ -67890,6 +68559,13 @@
     ]
   },
   {
+    "text": "一方で、普段は話せない同僚と交流できる貴重な機会だと考え、開催を歓迎する人がいるのも事実だ。",
+    "hash": "81fbb1951c8e",
+    "sources": [
+      "article#a-n2-13"
+    ]
+  },
+  {
     "text": "一方的な決定は、現場で汗を流してきた者たちの誇りを踏み躙るものだった。",
     "hash": "ccaa22ca49a0",
     "sources": [
@@ -68002,6 +68678,13 @@
     ]
   },
   {
+    "text": "引っ越しが決まったら、早めに不動産屋さんに連絡したほうがいいですよ。",
+    "hash": "2a2d46e46811",
+    "sources": [
+      "speak-test"
+    ]
+  },
+  {
     "text": "引っ越したら、まず市役所でもらえる一覧表を確認したほうがいい。",
     "hash": "67803a3314b9",
     "sources": [
@@ -68058,6 +68741,13 @@
     ]
   },
   {
+    "text": "引っ越しに伴い、住所変更の手続きを済ませておかなければなりません。",
+    "hash": "0ce9801a840f",
+    "sources": [
+      "speak-test"
+    ]
+  },
+  {
     "text": "引っ越しのとき、荷物を全部この箱に詰めさせられて大変だった。",
     "hash": "a6f06b9a7129",
     "sources": [
@@ -68100,6 +68790,13 @@
     ]
   },
   {
+    "text": "引っ越しの前に、ガスと電気の連絡をしなければなりません。",
+    "hash": "94fc864729f6",
+    "sources": [
+      "speak-test"
+    ]
+  },
+  {
     "text": "引っ越しの前日は、荷物で部屋がすっかり散らかっていた。",
     "hash": "e5fb7b8b22c8",
     "sources": [
@@ -68118,6 +68815,13 @@
     "hash": "49201baa1a91",
     "sources": [
       "vocab-n3#めちゃくちゃ"
+    ]
+  },
+  {
+    "text": "引っ越しの日を決めました。",
+    "hash": "84974786c93e",
+    "sources": [
+      "speak-test"
     ]
   },
   {
@@ -69670,6 +70374,13 @@
     ]
   },
   {
+    "text": "温かいお茶をください。",
+    "hash": "1fc69f58932e",
+    "sources": [
+      "speak-test"
+    ]
+  },
+  {
     "text": "温かい牛乳にココアの粉をよく溶かして飲むと、体が温まる。",
     "hash": "4c8f077c6a76",
     "sources": [
@@ -70454,6 +71165,13 @@
     ]
   },
   {
+    "text": "加湿器をつけると、部屋の温度が同じでも、あたたかく感じられるそうです。",
+    "hash": "ed37ffee18f7",
+    "sources": [
+      "article#a-n4-14"
+    ]
+  },
+  {
     "text": "加齢とともに血管は硬くなり、さまざまな病気の原因となりうる。",
     "hash": "e499c1cec8ce",
     "sources": [
@@ -70986,6 +71704,13 @@
     ]
   },
   {
+    "text": "家族の状況や払った保険料によって税金が変わるため、正しく書くことが大切だという。",
+    "hash": "7bef28d3c9e0",
+    "sources": [
+      "article#a-n3-15"
+    ]
+  },
+  {
     "text": "家族の心配をよそに、彼は一人で海外に旅立った。",
     "hash": "0285dbee864b",
     "sources": [
@@ -71004,6 +71729,13 @@
     "hash": "fd7d2d6f2885",
     "sources": [
       "daily-story#n5_0"
+    ]
+  },
+  {
+    "text": "家族は神社でお祈りをしてもらって、元気に育つようにお願いします。",
+    "hash": "491080b32789",
+    "sources": [
+      "article#a-n4-13"
     ]
   },
   {
@@ -71417,6 +72149,13 @@
     "hash": "db19a4f636e4",
     "sources": [
       "vocab-n4#サイン"
+    ]
+  },
+  {
+    "text": "荷物を届けてくれた人や店員さんに、「ありがとうございます」と声をかけるだけでも、気持ちは十分に伝わる。",
+    "hash": "c1f0e466172c",
+    "sources": [
+      "article#a-n2-12"
     ]
   },
   {
@@ -72092,6 +72831,13 @@
     ]
   },
   {
+    "text": "会社としては、強制すれば不満が高まりかねないため、それぞれの事情に配慮した形を探さざるを得ない。",
+    "hash": "acc3aaa33019",
+    "sources": [
+      "article#a-n2-13"
+    ]
+  },
+  {
     "text": "会社には社長、部長、課長、それぞれの係の人がいます。",
     "hash": "bbb1321c59f3",
     "sources": [
@@ -72159,6 +72905,13 @@
     "hash": "63981e1b8490",
     "sources": [
       "daily-story#n5_36"
+    ]
+  },
+  {
+    "text": "会社の年賀状の扱いは職場によって違うので、詳しくは会社の説明を確認しておこう。",
+    "hash": "610a33e3a410",
+    "sources": [
+      "article#a-n3-16"
     ]
   },
   {
@@ -72502,6 +73255,13 @@
     "hash": "b6e1d05ad3c0",
     "sources": [
       "grammar-n1#n1-39"
+    ]
+  },
+  {
+    "text": "開けてみると、「喪中につき、年始のご挨拶をご遠慮申し上げます」と書いてあった。",
+    "hash": "dee05470cd4d",
+    "sources": [
+      "article#a-n3-16"
     ]
   },
   {
@@ -73345,6 +74105,20 @@
     ]
   },
   {
+    "text": "寒くなるにつれて、朝起きるのがつらくなってきました。",
+    "hash": "a63d9113ba56",
+    "sources": [
+      "speak-test"
+    ]
+  },
+  {
+    "text": "寒さが一段と厳しくなってまいりましたが、いかがお過ごしでしょうか。",
+    "hash": "69a072c0fce9",
+    "sources": [
+      "speak-test"
+    ]
+  },
+  {
     "text": "寒さで指先の毛細血管が収縮し、しびれるような冷たさを覚えた。",
     "hash": "85a1da8a4706",
     "sources": [
@@ -73363,6 +74137,13 @@
     "hash": "c17e3ad6bbce",
     "sources": [
       "vocab-n1#五臓六腑"
+    ]
+  },
+  {
+    "text": "寒中見舞いは、寒い季節に相手の体を気づかう挨拶状で、お祝いの言葉は書かない。",
+    "hash": "b3930ca00343",
+    "sources": [
+      "article#a-n3-16"
     ]
   },
   {
@@ -73443,6 +74224,13 @@
     ]
   },
   {
+    "text": "幹事の側も、案内を出す際に「参加は自由です」と一言添えれば、断る側の心理的な負担はずっと軽くなる。",
+    "hash": "6339b9368d3b",
+    "sources": [
+      "article#a-n2-13"
+    ]
+  },
+  {
     "text": "患者の質問に対して、医者は適切なアドバイスをしてくれた。",
     "hash": "e62a96629c2e",
     "sources": [
@@ -73461,6 +74249,13 @@
     "hash": "78a58a45a5c2",
     "sources": [
       "grammar-n2#n2-25"
+    ]
+  },
+  {
+    "text": "感謝の気持ちは、祝日の一日だけでなく、毎日の暮らしの中で言葉にしてこそ意味を持つのではないだろうか。",
+    "hash": "fa0df0758d1c",
+    "sources": [
+      "article#a-n2-12"
     ]
   },
   {
@@ -74495,6 +75290,13 @@
     ]
   },
   {
+    "text": "帰りに「誘ってくださって、ありがとうございました」とお礼を言った。",
+    "hash": "cdd74f738b34",
+    "sources": [
+      "article#a-n3-14"
+    ]
+  },
+  {
     "text": "帰りはタクシーとバスを使って、最後に飛行機で家へ。",
     "hash": "eac553012767",
     "sources": [
@@ -74527,6 +75329,13 @@
     "hash": "b0260e6befe1",
     "sources": [
       "grammar-n3#n3-11"
+    ]
+  },
+  {
+    "text": "帰宅してから、家にある保険の書類を探し、書く内容をゆっくり確認することにした。",
+    "hash": "29807244ea66",
+    "sources": [
+      "article#a-n3-15"
     ]
   },
   {
@@ -75213,6 +76022,13 @@
     "hash": "e109531ae23a",
     "sources": [
       "article#a-n2-3"
+    ]
+  },
+  {
+    "text": "逆に参加する場合も、飲めないときはウーロン茶で乾杯してよいし、早めに帰る旨を最初に伝えておくと気が楽だ。",
+    "hash": "e08599cd9d0a",
+    "sources": [
+      "article#a-n2-13"
     ]
   },
   {
@@ -76011,6 +76827,13 @@
     "hash": "dabe411b5153",
     "sources": [
       "vocab-n2#家事"
+    ]
+  },
+  {
+    "text": "境内には、きれいな着物を着た子どもたちと家族がたくさんいました。",
+    "hash": "bc7b0aaf0ca8",
+    "sources": [
+      "article#a-n4-13"
     ]
   },
   {
@@ -76943,6 +77766,13 @@
     "sources": [
       "vocab-n5#鳥",
       "vocab-n5#飛ぶ"
+    ]
+  },
+  {
+    "text": "空気が乾燥しているので、加湿器を買おうと思っています。",
+    "hash": "fdb23dbab0a8",
+    "sources": [
+      "speak-test"
     ]
   },
   {
@@ -78668,6 +79498,13 @@
     ]
   },
   {
+    "text": "見ごろは場所によって変わるので、出かける前に確認するように田中さんが教えてくれた。",
+    "hash": "6cddd024453b",
+    "sources": [
+      "article#a-n3-14"
+    ]
+  },
+  {
     "text": "見た目だけで人を判断してはいけないと母に教わりました。",
     "hash": "5d5d33e8eb0f",
     "sources": [
@@ -79279,6 +80116,13 @@
     ]
   },
   {
+    "text": "現代では、働き方が多様になるに伴って、「勤労」という言葉から思い浮かべる姿も変わってきた。",
+    "hash": "b0869bba224c",
+    "sources": [
+      "article#a-n2-12"
+    ]
+  },
+  {
     "text": "現代の社会では、スマホなしの生活は考えられない。",
     "hash": "79d865eab2d6",
     "sources": [
@@ -79692,10 +80536,24 @@
     ]
   },
   {
+    "text": "古い部屋は窓から冷気が入って、暖房をつけてもあたたまりにくいです。",
+    "hash": "f5866e8a0491",
+    "sources": [
+      "article#a-n4-14"
+    ]
+  },
+  {
     "text": "古い木の階段は、一歩踏むたびにギシギシと軋む。",
     "hash": "a7ee4d9129e4",
     "sources": [
       "vocab-n3#軋む"
+    ]
+  },
+  {
+    "text": "古くから日本では、秋にその年に取れた新しい穀物を神に供えて感謝する「新嘗祭」という儀式が行われてきた。",
+    "hash": "82cdae71303c",
+    "sources": [
+      "article#a-n2-12"
     ]
   },
   {
@@ -79927,6 +80785,13 @@
     "hash": "29e8b9cb34fe",
     "sources": [
       "vocab-n2#済ませる"
+    ]
+  },
+  {
+    "text": "午後の診察は何時からですか。",
+    "hash": "0b4a6a8e0dbf",
+    "sources": [
+      "speak-test"
     ]
   },
   {
@@ -80343,6 +81208,13 @@
     ]
   },
   {
+    "text": "厚いカーテンに換えたら、窓の近くの冷たさがかなり減りました。",
+    "hash": "91185757826e",
+    "sources": [
+      "article#a-n4-14"
+    ]
+  },
+  {
     "text": "厚い雲が視界を阻み、山頂からの景色は全く見えなかった。",
     "hash": "c9ef86255ce0",
     "sources": [
@@ -80560,6 +81432,13 @@
     ]
   },
   {
+    "text": "工場や田畑で働く人はもちろん、店、物流、医療、介護など、生活を支える仕事は数えきれない。",
+    "hash": "b0b6e0b6593a",
+    "sources": [
+      "article#a-n2-12"
+    ]
+  },
+  {
     "text": "巧妙に仕組まれた偽装を、彼女はいとも簡単に看破してみせた。",
     "hash": "b7e5fafc1ba7",
     "sources": [
@@ -80627,6 +81506,13 @@
     "hash": "8ab6d5a9eefa",
     "sources": [
       "grammar-n2#n2-22"
+    ]
+  },
+  {
+    "text": "慌ただしい年末だからこそ、一年を静かに振り返る時間を大切にしたいものです。",
+    "hash": "cc31a65217a7",
+    "sources": [
+      "speak-test"
     ]
   },
   {
@@ -81596,6 +82482,13 @@
     ]
   },
   {
+    "text": "今回の経験から、相手の状況を思いやって挨拶の形を変えることも、職場の大切なマナーだと学んだ。",
+    "hash": "79919f1f51bd",
+    "sources": [
+      "article#a-n3-16"
+    ]
+  },
+  {
     "text": "今回の決定は、社員に少なからず衝撃を与えた。",
     "hash": "0a8332948aa9",
     "sources": [
@@ -81957,6 +82850,13 @@
     "hash": "28efd4e3eb82",
     "sources": [
       "vocab-n5#忙しい"
+    ]
+  },
+  {
+    "text": "今週は台所、来週はおふろ、というように決めました。",
+    "hash": "f317d5197c0a",
+    "sources": [
+      "article#a-n4-15"
     ]
   },
   {
@@ -82557,6 +83457,13 @@
     ]
   },
   {
+    "text": "今年の夏に田中さんのお父さんが亡くなったことを、私はそのとき初めて知った。",
+    "hash": "39101ca3e4e3",
+    "sources": [
+      "article#a-n3-16"
+    ]
+  },
+  {
     "text": "今年の夏は異常な暑さが続き、各地で熱中症の患者が急増している。",
     "hash": "5cd4c5d99880",
     "sources": [
@@ -82655,6 +83562,13 @@
     ]
   },
   {
+    "text": "今年は十二月の前に、そうじする場所をリストに書いてみました。",
+    "hash": "50e909430c34",
+    "sources": [
+      "article#a-n4-15"
+    ]
+  },
+  {
     "text": "今年は祝日と日曜日が重なってしまい、少し損した気分だ。",
     "hash": "2bb070f316fd",
     "sources": [
@@ -82694,6 +83608,20 @@
     "hash": "fe4b1230138b",
     "sources": [
       "vocab-n3#赤字"
+    ]
+  },
+  {
+    "text": "今年もお世話になりました。",
+    "hash": "35ae44f14391",
+    "sources": [
+      "speak-test"
+    ]
+  },
+  {
+    "text": "今年一年、大変お世話になりました。来年もどうぞよろしくお願いいたします。",
+    "hash": "e3da4807714e",
+    "sources": [
+      "speak-test"
     ]
   },
   {
@@ -84776,6 +85704,13 @@
     ]
   },
   {
+    "text": "参加しない人を冷たいと見たり、参加する人を付き合いがいいだけだと決めつけたりするのは避けたい。",
+    "hash": "97663d5dfc21",
+    "sources": [
+      "article#a-n2-13"
+    ]
+  },
+  {
     "text": "参加できないことはないが、予定が少し厳しい。",
     "hash": "491984917cbf",
     "sources": [
@@ -86351,6 +87286,13 @@
     ]
   },
   {
+    "text": "私たちが当たり前のように使っている便利さは、そうした人たちの努力の上に成り立っているのだ。",
+    "hash": "5b970889f38b",
+    "sources": [
+      "article#a-n2-12"
+    ]
+  },
+  {
     "text": "私たちには音楽が好きだという共通の趣味があります。",
     "hash": "d359c06457c8",
     "sources": [
@@ -86645,6 +87587,13 @@
     ]
   },
   {
+    "text": "私は紅葉が好きだが、有名な場所は人が多いと聞いていたので、少し心配になった。",
+    "hash": "05a58de0a119",
+    "sources": [
+      "article#a-n3-14"
+    ]
+  },
+  {
     "text": "私は今、東京にいます。来年、新しい仕事を始めます。",
     "hash": "ac70c3ce3fb6",
     "sources": [
@@ -86663,6 +87612,13 @@
     "hash": "f23139552200",
     "sources": [
       "article#a-n4-10"
+    ]
+  },
+  {
+    "text": "私は少し迷ったが、同僚に聞いて、田中さんには年賀状を出さないことにした。",
+    "hash": "87b9495ca8d6",
+    "sources": [
+      "article#a-n3-16"
     ]
   },
   {
@@ -87940,6 +88896,13 @@
     ]
   },
   {
+    "text": "次に、ドラッグストアで洗剤やスポンジを買いました。",
+    "hash": "58822efc1ae3",
+    "sources": [
+      "article#a-n4-15"
+    ]
+  },
+  {
     "text": "次に、応用問題。最後に、過去問の練習。",
     "hash": "062d9fc1a053",
     "sources": [
@@ -87951,6 +88914,13 @@
     "hash": "9e3a9b4c5995",
     "sources": [
       "article#a-n4-10"
+    ]
+  },
+  {
+    "text": "次に、観光協会や天気のサイトで公開されている「紅葉情報」を調べることにした。",
+    "hash": "1ad43f4d8755",
+    "sources": [
+      "article#a-n3-14"
     ]
   },
   {
@@ -88199,6 +89169,13 @@
     ]
   },
   {
+    "text": "自分で払った保険がある場合は、保険会社から届く証明書が必要になることもあるそうだ。",
+    "hash": "7c72aedbadf1",
+    "sources": [
+      "article#a-n3-15"
+    ]
+  },
+  {
     "text": "自分で料理を作ってはじめて、母の苦労がわかった。",
     "hash": "7db3cbc16329",
     "sources": [
@@ -88402,6 +89379,13 @@
     ]
   },
   {
+    "text": "七五三は、三歳、五歳、七歳になった子どもの成長を祝う行事です。",
+    "hash": "53f1bbc279fb",
+    "sources": [
+      "article#a-n4-13"
+    ]
+  },
+  {
     "text": "七時に家を出ます。",
     "hash": "2ef050f748ac",
     "sources": [
@@ -88532,6 +89516,13 @@
     "hash": "4ac22b1585cc",
     "sources": [
       "vocab-n4#上げる"
+    ]
+  },
+  {
+    "text": "質問するのが嫌なわけではなかったが、忙しそうな人事に声をかけにくいと思っていた。",
+    "hash": "2849aaea2943",
+    "sources": [
+      "article#a-n3-15"
     ]
   },
   {
@@ -90853,10 +91844,38 @@
     ]
   },
   {
+    "text": "十一月のある土曜日、わたしは友だちと近くの神社へ散歩に行きました。",
+    "hash": "48912b0171b4",
+    "sources": [
+      "article#a-n4-13"
+    ]
+  },
+  {
+    "text": "十一月の初めに、会社の同僚の田中さんから一枚のはがきが届いた。",
+    "hash": "395211062b27",
+    "sources": [
+      "article#a-n3-16"
+    ]
+  },
+  {
+    "text": "十一月二十三日は「勤労感謝の日」で、毎年この日は多くの会社や学校が休みになる国民の祝日である。",
+    "hash": "70789e42ba13",
+    "sources": [
+      "article#a-n2-12"
+    ]
+  },
+  {
     "text": "十月になると、近くのクリニックに「インフルエンザ予防接種、始めました」という紙がはってありました。",
     "hash": "aa839c71769d",
     "sources": [
       "article#a-n4-12"
+    ]
+  },
+  {
+    "text": "十月の終わりに、同僚の田中さんから「今週末、紅葉を見に行きませんか」と誘われた。",
+    "hash": "cc049d8d6a44",
+    "sources": [
+      "article#a-n3-14"
     ]
   },
   {
@@ -92009,6 +93028,13 @@
     ]
   },
   {
+    "text": "書類には家族の扶養状況や保険料を書く欄があり、何から書けばいいのかわからなかった。",
+    "hash": "07ad4dd10008",
+    "sources": [
+      "article#a-n3-15"
+    ]
+  },
+  {
     "text": "書類に不備があった。したがって、申請は受理されなかった。",
     "hash": "cd80b09fc986",
     "sources": [
@@ -92401,6 +93427,13 @@
     ]
   },
   {
+    "text": "小さい女の子は赤い着物を着て、うれしそうに写真をとっていました。",
+    "hash": "e0c8975fb4ef",
+    "sources": [
+      "article#a-n4-13"
+    ]
+  },
+  {
     "text": "小さい店ですが、いろいろなことができて、日本のせいかつにかかせません。",
     "hash": "93d0c42198de",
     "sources": [
@@ -92510,6 +93543,13 @@
     "hash": "95a7d39086ee",
     "sources": [
       "vocab-n3#差し支える"
+    ]
+  },
+  {
+    "text": "少しの工夫を続ければ、寒い冬も電気代を気にしすぎずに過ごせそうです。",
+    "hash": "d70c0d5fbb63",
+    "sources": [
+      "article#a-n4-14"
     ]
   },
   {
@@ -93017,6 +94057,13 @@
     ]
   },
   {
+    "text": "詳しい手続きや提出の方法は会社によって違うので、必ず会社の説明を確認してほしい。",
+    "hash": "c89031c1f03e",
+    "sources": [
+      "article#a-n3-15"
+    ]
+  },
+  {
     "text": "詳しい説明は後でするので、取り敢えずこの書類にサインしてください。",
     "hash": "b13ddab234ad",
     "sources": [
@@ -93161,6 +94208,13 @@
     "hash": "91d8493410b8",
     "sources": [
       "vocab-n3#関係"
+    ]
+  },
+  {
+    "text": "上司との席は気楽に楽しめるどころか、気を使って疲れるだけだと感じる若手も少なくない。",
+    "hash": "35e48a97dec9",
+    "sources": [
+      "article#a-n2-13"
     ]
   },
   {
@@ -93539,6 +94593,13 @@
     "hash": "d637a74c9931",
     "sources": [
       "vocab-n2#吸収"
+    ]
+  },
+  {
+    "text": "職場でも、同僚の仕事ぶりを認めて礼を言うことは、この日をきっかけにすぐ始められる小さな習慣である。",
+    "hash": "34d7cea3d163",
+    "sources": [
+      "article#a-n2-12"
     ]
   },
   {
@@ -95034,6 +96095,13 @@
     ]
   },
   {
+    "text": "新嘗祭は、収穫を祝い自然の恵みに感謝するという、農業を大切にしてきた社会の考えを表す行事だった。",
+    "hash": "237abbfdcda9",
+    "sources": [
+      "article#a-n2-12"
+    ]
+  },
+  {
     "text": "新人だからといって遠慮せず、対等な立場で意見を言ってほしい。",
     "hash": "54e1e7c2c55a",
     "sources": [
@@ -95661,6 +96729,13 @@
     "hash": "9c305f80704a",
     "sources": [
       "grammar-n1#n1-23"
+    ]
+  },
+  {
+    "text": "神への感謝が、働くことや作ることそのものへの感謝へと広がった、と考えると分かりやすい。",
+    "hash": "15bfb0802f74",
+    "sources": [
+      "article#a-n2-12"
     ]
   },
   {
@@ -97338,6 +98413,13 @@
     ]
   },
   {
+    "text": "赤いコートはとてもきれいでした。",
+    "hash": "38cd72ad26eb",
+    "sources": [
+      "article#a-n5-13"
+    ]
+  },
+  {
     "text": "赤いペンを貸してください。",
     "hash": "7d047612eb4a",
     "sources": [
@@ -97391,6 +98473,13 @@
     "hash": "8b6074bb364a",
     "sources": [
       "daily-story#n4_23"
+    ]
+  },
+  {
+    "text": "赤や黄色の葉が朝の光に照らされて、まるで空気まで色づいているように見えた。",
+    "hash": "fa98bb153630",
+    "sources": [
+      "article#a-n3-14"
     ]
   },
   {
@@ -97597,6 +98686,20 @@
     ]
   },
   {
+    "text": "雪が降っていますね。",
+    "hash": "ecf2cb2b3ea3",
+    "sources": [
+      "speak-test"
+    ]
+  },
+  {
+    "text": "雪で電車が遅れているそうです。",
+    "hash": "62bdfa1619c3",
+    "sources": [
+      "speak-test"
+    ]
+  },
+  {
     "text": "雪道で足を滑らせて転んでしまい、恥ずかしい思いをした。",
     "hash": "aa4bb34559a3",
     "sources": [
@@ -97713,6 +98816,13 @@
     "hash": "7636363d8ae2",
     "sources": [
       "daily-story#n5_25"
+    ]
+  },
+  {
+    "text": "先月、請求書を見たら、電気代がいつもより高くてびっくりしました。",
+    "hash": "f2999246c0c9",
+    "sources": [
+      "article#a-n4-14"
     ]
   },
   {
@@ -98416,6 +99526,13 @@
     ]
   },
   {
+    "text": "千歳あめは和菓子屋さんなどでも買えると、田中さんは言いました。",
+    "hash": "5108bd070504",
+    "sources": [
+      "article#a-n4-13"
+    ]
+  },
+  {
     "text": "占領していた領土の返還をめぐって、両国は長年対立してきた。",
     "hash": "87ddb14f818d",
     "sources": [
@@ -98539,6 +99656,13 @@
     "hash": "acd95e3401d3",
     "sources": [
       "vocab-n1#天守閣"
+    ]
+  },
+  {
+    "text": "戦後、国の制度が大きく見直される中で、祝日のあり方も整理されることになった。",
+    "hash": "ecc7413f6dd5",
+    "sources": [
+      "article#a-n2-12"
     ]
   },
   {
@@ -99662,6 +100786,20 @@
     ]
   },
   {
+    "text": "喪に服している間はお祝いごとを控えるという考え方から、この習慣が生まれた。",
+    "hash": "8d60d79aa743",
+    "sources": [
+      "article#a-n3-16"
+    ]
+  },
+  {
+    "text": "喪中はがきは「私は年賀状を出せません」という知らせであって、返事を求めているわけではない。",
+    "hash": "d19dca2b6d86",
+    "sources": [
+      "article#a-n3-16"
+    ]
+  },
+  {
     "text": "喪服に身を包んだ未亡人は、涙を見せず凛として参列者に頭を下げた。",
     "hash": "adff88d64aae",
     "sources": [
@@ -99890,6 +101028,13 @@
     "hash": "3ee68cdd269e",
     "sources": [
       "article#a-n2-11"
+    ]
+  },
+  {
+    "text": "相談の結果、山に近い小さな公園を選び、朝一番の電車で行くことにした。",
+    "hash": "1c0b6b080207",
+    "sources": [
+      "article#a-n3-14"
     ]
   },
   {
@@ -100803,6 +101948,13 @@
     ]
   },
   {
+    "text": "代わりに、年が明けてしばらくしてから「寒中見舞い」を送ると、気持ちが伝わると教えてもらった。",
+    "hash": "436ea00a47ae",
+    "sources": [
+      "article#a-n3-16"
+    ]
+  },
+  {
     "text": "代われるものなら、その痛みを代わりたい。",
     "hash": "6079903eb893",
     "sources": [
@@ -100821,6 +101973,13 @@
     "hash": "f2500b8ccc4b",
     "sources": [
       "grammar-n1#n1-48"
+    ]
+  },
+  {
+    "text": "台所、おふろ、まど、げんかんなど、いくつもありました。",
+    "hash": "de53347defb2",
+    "sources": [
+      "article#a-n4-15"
     ]
   },
   {
@@ -101115,6 +102274,13 @@
     "hash": "f4d19e426da3",
     "sources": [
       "phrases"
+    ]
+  },
+  {
+    "text": "大きいごみは、出し方を区役所の案内で調べる必要があります。",
+    "hash": "81a1a825ad0a",
+    "sources": [
+      "article#a-n4-15"
     ]
   },
   {
@@ -101531,6 +102697,13 @@
     ]
   },
   {
+    "text": "大切なのは、形式そのものよりも、お互いの事情や気持ちを尊重しようとする姿勢ではないだろうか。",
+    "hash": "ccb0e1ea66c7",
+    "sources": [
+      "article#a-n2-13"
+    ]
+  },
+  {
     "text": "大切なのは、訪れる側が地元への敬意を忘れないことだろう。",
     "hash": "f15677ce8f3b",
     "sources": [
@@ -101871,6 +103044,20 @@
     "hash": "b32cf3a25e95",
     "sources": [
       "vocab-n1#海流"
+    ]
+  },
+  {
+    "text": "暖房の設定温度を少し低めにして、上着を着て過ごしています。",
+    "hash": "224552ce5f4a",
+    "sources": [
+      "article#a-n4-14"
+    ]
+  },
+  {
+    "text": "暖房をつけてもいいですか。",
+    "hash": "3b92106b941f",
+    "sources": [
+      "speak-test"
     ]
   },
   {
@@ -102700,6 +103887,13 @@
     ]
   },
   {
+    "text": "中には千歳あめという細長いあめが入っています。",
+    "hash": "8b286e7431b5",
+    "sources": [
+      "article#a-n4-13"
+    ]
+  },
+  {
     "text": "中央銀行が金利の引き上げに踏み切れば、住宅ローンの負担は一気に重くなる。",
     "hash": "f897b473a8aa",
     "sources": [
@@ -102788,6 +103982,13 @@
     "hash": "b7a7e5a534eb",
     "sources": [
       "vocab-n5#昼ご飯"
+    ]
+  },
+  {
+    "text": "昼になると駐車場も道路も混むので、午前のうちに着くようにすれば、ゆっくり歩けるそうだ。",
+    "hash": "97a01dc93439",
+    "sources": [
+      "article#a-n3-14"
     ]
   },
   {
@@ -103565,6 +104766,13 @@
     "hash": "8124b88795c2",
     "sources": [
       "vocab-n3#感覚"
+    ]
+  },
+  {
+    "text": "長生きしてほしいという家族の願いがこめられているそうです。",
+    "hash": "efb2538aa002",
+    "sources": [
+      "article#a-n4-13"
     ]
   },
   {
@@ -105150,6 +106358,20 @@
     ]
   },
   {
+    "text": "店の人が、おふろ用の洗剤はカビも落とせると教えてくれました。",
+    "hash": "4a9191f26d7b",
+    "sources": [
+      "article#a-n4-15"
+    ]
+  },
+  {
+    "text": "店の人に「きてもいいですか」と聞きました。",
+    "hash": "6a5632885ad7",
+    "sources": [
+      "article#a-n5-13"
+    ]
+  },
+  {
     "text": "店の前に車を止めてもいいですか。",
     "hash": "83facef8b501",
     "sources": [
@@ -105346,6 +106568,13 @@
     ]
   },
   {
+    "text": "転居に際しましては、諸手続きに漏れのないよう留意いたします。",
+    "hash": "f302f5c2d65d",
+    "sources": [
+      "speak-test"
+    ]
+  },
+  {
     "text": "転勤をきっかけに、地元の伝統文化を学び始めた。",
     "hash": "24aaa9f8c841",
     "sources": [
@@ -105507,10 +106736,38 @@
     ]
   },
   {
+    "text": "田中さんが「来年も行きましょう」と笑ったので、私は次の秋が今から楽しみになった。",
+    "hash": "5384374363a7",
+    "sources": [
+      "article#a-n3-14"
+    ]
+  },
+  {
     "text": "田中さんの奥さんは日本人です。",
     "hash": "7441afa06437",
     "sources": [
       "vocab-n5#奥さん"
+    ]
+  },
+  {
+    "text": "田中さんは、使わない部屋の暖房を消すといいと教えてくれました。",
+    "hash": "492438603b8e",
+    "sources": [
+      "article#a-n4-14"
+    ]
+  },
+  {
+    "text": "田中さんは、子どもたちが持っている長い紙のふくろを指さしました。",
+    "hash": "1bcf3b8ff7d2",
+    "sources": [
+      "article#a-n4-13"
+    ]
+  },
+  {
+    "text": "田中さんは「人込みを避けるために、朝早く出発するのはどうでしょうか」と提案してくれた。",
+    "hash": "4c9d2ebc4ff4",
+    "sources": [
+      "article#a-n3-14"
     ]
   },
   {
@@ -106326,6 +107583,13 @@
     ]
   },
   {
+    "text": "土曜日、友だちと店へ行きました。",
+    "hash": "f55d31cad62b",
+    "sources": [
+      "article#a-n5-13"
+    ]
+  },
+  {
     "text": "土曜日、郵便局はいつ開いていますか。",
     "hash": "44a39ecc6a31",
     "sources": [
@@ -106431,6 +107695,13 @@
     ]
   },
   {
+    "text": "冬の日、ともだちとうちでなべをしました。",
+    "hash": "515637712960",
+    "sources": [
+      "article#a-n5-14"
+    ]
+  },
+  {
     "text": "冬はセーターとコートとズボン、夏はTシャツとスカート。",
     "hash": "dde2acab1db0",
     "sources": [
@@ -106484,6 +107755,13 @@
     "hash": "22f46c5a8a92",
     "sources": [
       "grammar-n3#n3-34"
+    ]
+  },
+  {
+    "text": "冬休みは台湾に帰ります。",
+    "hash": "f49de344d4e2",
+    "sources": [
+      "speak-test"
     ]
   },
   {
@@ -106827,6 +108105,13 @@
     "hash": "5468759d8efe",
     "sources": [
       "conjunctions"
+    ]
+  },
+  {
+    "text": "当日は少し眠かったが、早起きしたかいがあって、道にはほとんど人がいなかった。",
+    "hash": "4f2129973f28",
+    "sources": [
+      "article#a-n3-14"
     ]
   },
   {
@@ -108140,6 +109425,13 @@
     ]
   },
   {
+    "text": "日本では秋に山や公園で色づいた葉を楽しむことを「紅葉狩り」と呼び、昔から親しまれてきた。",
+    "hash": "4829eb84a600",
+    "sources": [
+      "article#a-n3-14"
+    ]
+  },
+  {
     "text": "日本では小学校と中学校の九年間が義務教育とされている。",
     "hash": "c9d8bfce30a4",
     "sources": [
@@ -108179,6 +109471,13 @@
     "hash": "4f33db5f7aea",
     "sources": [
       "vocab-n4#ビザ"
+    ]
+  },
+  {
+    "text": "日本で働くのは初めてで、「年末調整」という言葉自体、聞いたことがなかったのである。",
+    "hash": "6905d908441f",
+    "sources": [
+      "article#a-n3-15"
     ]
   },
   {
@@ -108487,6 +109786,13 @@
     "hash": "042d7f63e13d",
     "sources": [
       "article#a-n4-2"
+    ]
+  },
+  {
+    "text": "日本の冬は、家の中でも思ったよりずっと寒いです。",
+    "hash": "c780ee31fd76",
+    "sources": [
+      "article#a-n4-14"
     ]
   },
   {
@@ -108809,6 +110115,13 @@
     "hash": "228f72432dd3",
     "sources": [
       "vocab-n1#美意識"
+    ]
+  },
+  {
+    "text": "日本人の友だちの田中さんが、これは七五三だと教えてくれました。",
+    "hash": "24d205cad45b",
+    "sources": [
+      "article#a-n4-13"
     ]
   },
   {
@@ -109183,6 +110496,13 @@
     ]
   },
   {
+    "text": "熱が下がらないようでしたら、もう一度受診してください。",
+    "hash": "1990ab12bd22",
+    "sources": [
+      "speak-test"
+    ]
+  },
+  {
     "text": "熱が高いのか、犬は苦しそうに低く唸っていた。",
     "hash": "a565283369dd",
     "sources": [
@@ -109218,6 +110538,13 @@
     ]
   },
   {
+    "text": "年の瀬も押し迫り、何かとご多忙のことと存じます。",
+    "hash": "ad0fa7b972d8",
+    "sources": [
+      "speak-test"
+    ]
+  },
+  {
     "text": "年をとってから、以前ほど体力が続かなくなったと感じています。",
     "hash": "9afc09d541c1",
     "sources": [
@@ -109229,6 +110556,13 @@
     "hash": "7f24d3e37ae2",
     "sources": [
       "vocab-n3#聴力"
+    ]
+  },
+  {
+    "text": "年賀状の習慣は少しずつ減っているが、季節の挨拶で気持ちを伝える文化は今も大切にされている。",
+    "hash": "7748466105d5",
+    "sources": [
+      "article#a-n3-16"
     ]
   },
   {
@@ -109246,10 +110580,38 @@
     ]
   },
   {
+    "text": "年内に終わらせなければならない仕事が、まだ残っています。",
+    "hash": "9ca36651e172",
+    "sources": [
+      "speak-test"
+    ]
+  },
+  {
     "text": "年配の方にとって、スマホ操作は難しいこともある。",
     "hash": "1610d38d275c",
     "sources": [
       "grammar-n3#n3-8"
+    ]
+  },
+  {
+    "text": "年末が近づいたころ、人事部から「年末調整のご案内」というメールと書類が届いた。",
+    "hash": "ca160691d26f",
+    "sources": [
+      "article#a-n3-15"
+    ]
+  },
+  {
+    "text": "年末が近づくと、日本の職場ではこれまで「忘年会」の話題が自然と出てきたものだ。",
+    "hash": "8053fb90f0db",
+    "sources": [
+      "article#a-n2-13"
+    ]
+  },
+  {
+    "text": "年末のご挨拶を兼ねて伺いたいのですが、ご都合はいかがでしょうか。",
+    "hash": "529ae6af5da9",
+    "sources": [
+      "speak-test"
     ]
   },
   {
@@ -109292,6 +110654,41 @@
     "hash": "16b2127d3d6f",
     "sources": [
       "vocab-n3#慌ただしい"
+    ]
+  },
+  {
+    "text": "年末調整は面倒に見えるが、一年分の税金を正しく合わせる大切な手続きなのだと分かった。",
+    "hash": "3fe223db518f",
+    "sources": [
+      "article#a-n3-15"
+    ]
+  },
+  {
+    "text": "年末年始の休業期間中は、メールの返信が遅れる場合がございます。",
+    "hash": "325b9f866576",
+    "sources": [
+      "speak-test"
+    ]
+  },
+  {
+    "text": "年末年始の診療体制につきましては、各医療機関にご確認ください。",
+    "hash": "bc7c055e080b",
+    "sources": [
+      "speak-test"
+    ]
+  },
+  {
+    "text": "年末年始はどのように過ごす予定ですか。",
+    "hash": "4746b4c33151",
+    "sources": [
+      "speak-test"
+    ]
+  },
+  {
+    "text": "年末年始は病院が休みになることが多いので、薬を多めにもらっておきました。",
+    "hash": "7fd85be78fd6",
+    "sources": [
+      "speak-test"
     ]
   },
   {
@@ -109558,6 +110955,13 @@
     "hash": "f0ad7fb03317",
     "sources": [
       "vocab-n1#悄然"
+    ]
+  },
+  {
+    "text": "背景には、価値観の多様化や、家庭や介護との両立を優先したいという事情がある。",
+    "hash": "60eb66177569",
+    "sources": [
+      "article#a-n2-13"
     ]
   },
   {
@@ -115506,6 +116910,13 @@
     ]
   },
   {
+    "text": "風邪をひいて、熱があります。",
+    "hash": "d93a635d0970",
+    "sources": [
+      "speak-test"
+    ]
+  },
+  {
     "text": "風邪をひかないように、ビタミンを多く含む果物を食べています。",
     "hash": "a1d6d9722f91",
     "sources": [
@@ -115926,6 +117337,13 @@
     ]
   },
   {
+    "text": "文面には、はがきを受け取ったお礼と、田中さんの家族を思う言葉を入れるように心がけた。",
+    "hash": "4f8550bb41c1",
+    "sources": [
+      "article#a-n3-16"
+    ]
+  },
+  {
     "text": "聞く",
     "hash": "abb639bc774f",
     "sources": [
@@ -115951,6 +117369,13 @@
     "hash": "cd1debcc2e79",
     "sources": [
       "grammar-n2#n2-10"
+    ]
+  },
+  {
+    "text": "平日のほうが空いていることが多いが、いつも静かなわけではないので、期待しすぎないほうがいい。",
+    "hash": "b636cbd03db2",
+    "sources": [
+      "article#a-n3-14"
     ]
   },
   {
@@ -116245,6 +117670,13 @@
     "hash": "ca3b87f0f85b",
     "sources": [
       "vocab-n1#転ばぬ先の杖"
+    ]
+  },
+  {
+    "text": "保険証を忘れてしまいました。",
+    "hash": "b1ea2444d2a8",
+    "sources": [
+      "speak-test"
     ]
   },
   {
@@ -116640,6 +118072,13 @@
     ]
   },
   {
+    "text": "法律には、勤労をたっとび、生産を祝い、国民がたがいに感謝し合う日という趣旨が示されている。",
+    "hash": "a42a73e75c27",
+    "sources": [
+      "article#a-n2-12"
+    ]
+  },
+  {
     "text": "法律に基づいて処理する。",
     "hash": "442893fbe00c",
     "sources": [
@@ -116752,6 +118191,20 @@
     ]
   },
   {
+    "text": "忘年会がランチ会に変わっても、人と人との信頼を育てる場であることに変わりはない。",
+    "hash": "759658d57d46",
+    "sources": [
+      "article#a-n2-13"
+    ]
+  },
+  {
+    "text": "忘年会の幹事を頼まれたんですが、お店選びに迷っています。",
+    "hash": "c4bef8a3b8b9",
+    "sources": [
+      "speak-test"
+    ]
+  },
+  {
     "text": "忙しいと、食事を抜きがちになる。",
     "hash": "a4cbbc4bbe9f",
     "sources": [
@@ -116805,6 +118258,13 @@
     "hash": "ad15113db03a",
     "sources": [
       "article#a-n2-6"
+    ]
+  },
+  {
+    "text": "忙しい毎日の中では、季節が変わるのをゆっくり感じる機会は多くない。",
+    "hash": "cae4ec99e191",
+    "sources": [
+      "article#a-n3-14"
     ]
   },
   {
@@ -117242,6 +118702,13 @@
     ]
   },
   {
+    "text": "本年中に賜りましたご厚情に、心よりお礼申し上げます。",
+    "hash": "8bc7af85970a",
+    "sources": [
+      "speak-test"
+    ]
+  },
+  {
     "text": "本番では緊張のあまり、練習の実力を十分に発揮できませんでした。",
     "hash": "186943936cf8",
     "sources": [
@@ -117330,6 +118797,13 @@
     "hash": "c1012ad2e7ce",
     "sources": [
       "vocab-n5#毎月"
+    ]
+  },
+  {
+    "text": "毎月の給料から引かれる税金は仮の計算で、年末に一年分を計算し直すのだそうだ。",
+    "hash": "4322485db440",
+    "sources": [
+      "article#a-n3-15"
     ]
   },
   {
@@ -117710,6 +119184,13 @@
     "hash": "6010b995eccc",
     "sources": [
       "listening-q"
+    ]
+  },
+  {
+    "text": "毎年十二月になると、大そうじが大変で、いつも疲れてしまいます。",
+    "hash": "82e50843d357",
+    "sources": [
+      "article#a-n4-15"
     ]
   },
   {
@@ -118312,6 +119793,13 @@
     "hash": "06984784dc83",
     "sources": [
       "grammar-n1#n1-81"
+    ]
+  },
+  {
+    "text": "名前だけを見ると働く人のための日だと思いがちだが、もともとの由来は少し違っている。",
+    "hash": "8460a924550f",
+    "sources": [
+      "article#a-n2-12"
     ]
   },
   {
@@ -120023,6 +121511,13 @@
     ]
   },
   {
+    "text": "友だちが「赤いのもいいよ」と言いました。",
+    "hash": "55efa2e02c4b",
+    "sources": [
+      "article#a-n5-13"
+    ]
+  },
+  {
     "text": "友だちがわたしにおみやげをくれました。",
     "hash": "9d4ca89d48ea",
     "sources": [
@@ -120079,6 +121574,13 @@
     ]
   },
   {
+    "text": "友だちに話すと、節約のコツをいろいろ教えてもらいました。",
+    "hash": "18cb0a93c760",
+    "sources": [
+      "article#a-n4-14"
+    ]
+  },
+  {
     "text": "友だちの心のこもった手紙を読んで、思わず感動した。",
     "hash": "b16cd3019b64",
     "sources": [
@@ -120090,6 +121592,13 @@
     "hash": "730fdf4c7e5e",
     "sources": [
       "vocab-n4#送る"
+    ]
+  },
+  {
+    "text": "友だちの話では、早く始めると気持ちも楽になるそうです。",
+    "hash": "c18f9e21ffb3",
+    "sources": [
+      "article#a-n4-15"
     ]
   },
   {
@@ -120440,6 +121949,13 @@
     "hash": "474d4057ee24",
     "sources": [
       "vocab-n2#裕福"
+    ]
+  },
+  {
+    "text": "誘われたときに断る場合は、まず誘ってくれたことへの感謝を伝えるのが基本である。",
+    "hash": "0fc22bb0f1c8",
+    "sources": [
+      "article#a-n2-13"
     ]
   },
   {
@@ -121140,6 +122656,13 @@
     "hash": "e9da0e6d7a0d",
     "sources": [
       "phrases"
+    ]
+  },
+  {
+    "text": "翌日、人事の佐藤さんに質問に行くと、記入例を見せながら一つずつ丁寧に説明してくれた。",
+    "hash": "b9b8124c1757",
+    "sources": [
+      "article#a-n3-15"
     ]
   },
   {
@@ -122319,6 +123842,13 @@
     ]
   },
   {
+    "text": "理由を細かく説明しすぎると言い訳に聞こえることもあるので、簡潔に伝えて「またの機会にぜひ」と添えるとよい。",
+    "hash": "6985fda8b75e",
+    "sources": [
+      "article#a-n2-13"
+    ]
+  },
+  {
     "text": "理論では正しくても、実際にやってみるとうまくいかないこともある。",
     "hash": "185c8700baa5",
     "sources": [
@@ -122935,6 +124465,13 @@
     ]
   },
   {
+    "text": "料金プランについては、詳しいことを電力会社に聞いてみるといいです。",
+    "hash": "bf3d23d6675e",
+    "sources": [
+      "article#a-n4-14"
+    ]
+  },
+  {
     "text": "料理ができないくせに、味付けに文句をつける。",
     "hash": "46e5d27156f7",
     "sources": [
@@ -123226,6 +124763,13 @@
     "hash": "d949a255f385",
     "sources": [
       "vocab-n2#しきりに"
+    ]
+  },
+  {
+    "text": "隣の席の田中さんに聞くと、「毎年の手続きですから、心配はいりませんよ」と言ってくれた。",
+    "hash": "1bbc0bb44031",
+    "sources": [
+      "article#a-n3-15"
     ]
   },
   {
