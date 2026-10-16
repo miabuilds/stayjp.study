@@ -245,7 +245,7 @@
 <script src="skits-data.js"></script>
 <script src="audio/tts/manifest.js"></script>
 <script src="speak-ruby.js"></script>
-<script src="shadow-core.js"></script>
+<script src="shadow-core.js?v=20261016"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
@@ -973,37 +973,38 @@ const Lesson=(()=>{
   // 不推指針,句子越長後面越搆不到,用戶實錘「ください 講三次都不亮」)。
   // UI 只加不減(interim 抖動不閃退);進度取歷史最高。
   let bestRatio=0;
-  // 從指定起點貪婪匹配一輪,回傳命中集合(供多起點嘗試取最優)
-  function greedyFrom(sN, startP){
-    let p=startP, hitChars=0;
-    const hit=new Set();
+  // 整句最佳對齊(取代舊的「多起點貪婪」):舊版一個字對不到就往後 10 字內找同一個假名,
+  // 抓到後面別處的「し」「は」把指針拉過頭,後面整串都不亮(用戶 2026-10-16「唸對但已唸過的部分
+  // 沒偵測到」;「私は台湾から来ました」只亮 8%)。改成 DP:每個 unit 可跳過或命中,命中位置
+  // 要接在上一個命中之後、間距有上限(單一假名 ≤3 字,其餘 ≤10 字,每跳過一字再放寬 2),取命中字數最多的對齊。
+  // 起點不限 = 重講時正確內容在字串尾部也對得到(原多起點錨定的用途)。
+  function align(sN){
+    let states=new Map([[-1,{sc:0,hit:[]}]]);   // key = 上一個命中的結束位置(-1 = 還沒命中)
+    let skipped=new Map([[-1,0]]);
     units.forEach((u,i)=>{
       if(u.pn) return;
-      const t=lnorm(u.t);
-      let found=-1, len=0;
-      const win=sN.slice(p, p+Math.max(10,(t.length||1)+8));
-      if(t && win.indexOf(t)>=0){ found=win.indexOf(t); len=t.length; }
-      else if(u.r && win.indexOf(u.r)>=0){ found=win.indexOf(u.r); len=u.r.length; }
-      if(found>=0){ p+=found+len; hit.add(i); hitChars+=t.length||1; }
+      const t=lnorm(u.t), L=t.length||1;
+      const keys=[t,u.r].filter(Boolean);
+      const single=!u.r && t.length<=1;
+      const next=new Map(), nskip=new Map();
+      const put=(k,st,sk)=>{ const o=next.get(k); if(!o||st.sc>o.sc||(st.sc===o.sc&&sk<nskip.get(k))){ next.set(k,st); nskip.set(k,sk); } };
+      states.forEach((st,end)=>{
+        const sk=skipped.get(end);
+        put(end, st, sk+L);   // 跳過這個 unit
+        const from=end<0?0:end, to=end<0?sN.length:Math.min(sN.length, end+(single?3:10)+sk*2);
+        keys.forEach(k=>{
+          let ix=sN.indexOf(k, from);
+          while(ix>=0 && ix<=to){ put(ix+k.length, {sc:st.sc+L, hit:st.hit.concat(i)}, 0); ix=sN.indexOf(k, ix+1); }
+        });
+      });
+      states=next; skipped=nskip;
     });
-    return { hit, hitChars };
+    let best={sc:0,hit:[]}; states.forEach(st=>{ if(st.sc>best.sc) best=st; });
+    return { hit:new Set(best.hit), hitChars:best.sc };
   }
   function paint(said, isFinal){
-    const sN=lnorm(said);
-    // 多起點錨定:用戶第一次講錯再重講時,正確內容在辨識字串「尾部」,從 0 開始的
-    // 窗口搆不到(實錘:有時很準有時一直過不了)。以「句首 unit 在 said 的每個出現位置」
-    // 當候選起點各跑一輪貪婪,取命中最多的結果。
-    const first=units.find(u=>!u.pn&&lnorm(u.t));
-    const starts=[0];
-    if(first){
-      [lnorm(first.t), first.r||''].forEach(k=>{
-        if(!k) return;
-        let ix=sN.indexOf(k);
-        while(ix>=0){ starts.push(ix); ix=sN.indexOf(k, ix+1); }
-      });
-    }
-    let best={hit:new Set(),hitChars:0};
-    [...new Set(starts)].slice(-8).forEach(st=>{ const r=greedyFrom(sN, st); if(r.hitChars>best.hitChars) best=r; });
+    const sN=lnorm(ShadowCore.sttKana?ShadowCore.sttKana(said):said);   // 舊快取的 shadow-core 沒有 sttKana 也不炸
+    let best=align(sN);
     // final 回撈:辨識輸出常亂序(重講時段落順序顛倒)。一段講完後,把「連續未命中的
     // unit 串」拼成整段(≥2字)在全文找,找到整段補亮——單字元不獨立撈(假名單字太氾濫會誤亮)
     if(isFinal){

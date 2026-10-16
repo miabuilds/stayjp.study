@@ -23,6 +23,27 @@
       .replace(/(10|[0-9])/g, (m, n) => NUM_ON[+n] || '');
   }
   function lnorm(t) { return kata2hira(numNorm(t)).replace(PUNCT_RE, ''); }
+  // iOS 辨識常把題目的平假名寫成漢字(ください→下さい、わたし→私),逐字比對就整段不亮
+  // (用戶 2026-10-16「唸對但已唸過的部分沒偵測到」;「私は台湾から来ました」只亮 8%)。
+  // 只套在「辨識結果」:題目的漢字都有 SPEAK_RUBY 讀音,轉成假名後走讀音也對得上,所以全域替換安全。
+  // 不收一字多讀的(良い=いい/よい、今日は=きょうは/こんにちは)。
+  const STT_KANA = [
+    ['御座います', 'ございます'], ['有り難う', 'ありがとう'], ['有難う', 'ありがとう'],
+    ['御馳走様', 'ごちそうさま'], ['ご馳走様', 'ごちそうさま'], ['ご馳走さま', 'ごちそうさま'], ['御馳走', 'ごちそう'], ['ご馳走', 'ごちそう'],
+    ['初めまして', 'はじめまして'], ['宜しく', 'よろしく'], ['済みません', 'すみません'], ['すいません', 'すみません'],
+    ['御免なさい', 'ごめんなさい'], ['御願い', 'お願い'], ['下さい', 'ください'],
+    ['分かり', 'わかり'], ['分から', 'わから'], ['分かる', 'わかる'], ['分かっ', 'わかっ'], ['分かれ', 'わかれ'],
+    ['美味しい', 'おいしい'], ['美味しかっ', 'おいしかっ'], ['美味しく', 'おいしく'],
+    ['頂きます', 'いただきます'], ['頂い', 'いただい'], ['頂け', 'いただけ'], ['出来ま', 'できま'], ['出来る', 'できる'], ['出来た', 'できた'], ['出来て', 'できて'], ['出来な', 'できな'],
+    ['一寸', 'ちょっと'], ['何処', 'どこ'], ['此処', 'ここ'], ['其処', 'そこ'], ['沢山', 'たくさん'],
+    ['綺麗', 'きれい'], ['素敵', 'すてき'], ['色々', 'いろいろ'], ['貴方', 'あなた'], ['お腹が空', 'おなかがす'],
+    ['僕', 'ぼく'], ['此れ', 'これ'], ['其れ', 'それ'], ['何時も', 'いつも'], ['又', 'また'], ['迄', 'まで'],
+  ];
+  function sttKana(t) {
+    let s = String(t || '');
+    for (const [a, b] of STT_KANA) s = s.split(a).join(b);
+    return s.replace(/私(?![見的立鉄服物生語用有設])/g, 'わたし');   // 私見(しけん)、私立(しりつ)這類不轉
+  }
 
   // ── 單字跟讀用:辨識結果可能是「1本」「一本」「いっぽん」「イッポン」任何一種 ──
   // 漢數字 → 阿拉伯數字(一本→1本、三百→300、一億→100000000),讓「寫法」比對也能命中
@@ -63,7 +84,7 @@
   function scoreWord(said, targets) {
     const yomi = (targets && targets.yomi || []).filter(Boolean);
     const forms = (targets && targets.forms || []).filter(Boolean);
-    const sL = lnorm(said), sR = rawNorm(said);
+    const sL = lnorm(sttKana(said)), sR = rawNorm(said);
     if (!sL && !sR) return 0;
     for (const y of yomi) { const n = lnorm(y); if (n && sL.indexOf(n) >= 0) return 100; }
     for (const f of forms) {
@@ -113,7 +134,7 @@
     return function stop() { if (stopped) return; try { rec.stop(); } catch (e) {} };
   }
 
-  const ShadowCore = { kata2hira, numNorm, lnorm, rawNorm, kanjiNum, scoreWord, passed, listen, supported, PASS, PASS_LENIENT };
+  const ShadowCore = { kata2hira, numNorm, lnorm, sttKana, rawNorm, kanjiNum, scoreWord, passed, listen, supported, PASS, PASS_LENIENT };
   root.ShadowCore = ShadowCore;
   if (typeof module !== 'undefined' && module.exports) module.exports = ShadowCore;
 })(typeof window !== 'undefined' ? window : globalThis);
