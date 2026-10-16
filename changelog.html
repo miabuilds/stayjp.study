@@ -39,6 +39,14 @@
   .stat b{display:block;font-family:var(--serif);font-size:24px;color:var(--ac);line-height:1.2}
   .stat span{font-size:12.5px;color:var(--tx2)}
   .asof{font-size:12px;color:var(--tx3);margin-top:10px}
+  .sched{display:flex;flex-direction:column;border:1px solid var(--bd);border-radius:12px;overflow:hidden}
+  .sched-row{display:flex;gap:12px;padding:12px 14px;font-size:14px;line-height:1.6;border-bottom:1px solid var(--bd)}
+  .sched-row:last-child{border-bottom:0}
+  .sched-row b{flex:none;min-width:118px;color:var(--tx)}
+  .sched-row span{color:var(--tx2)}
+  .next-drop{font-size:13px;color:var(--tx2);margin-top:10px}
+  .tl-item[data-pub]{display:none}
+  @media (max-width:520px){.sched-row{flex-direction:column;gap:2px}}
   /* 時間軸 */
   .tl{margin-top:6px;border-left:2px solid var(--bd);padding-left:18px}
   .tl-item{position:relative;padding:14px 0}
@@ -49,6 +57,8 @@
   .tag{display:inline-block;font-size:11px;font-weight:700;border-radius:6px;padding:1px 8px;margin-right:6px;vertical-align:1.5px}
   .tag.new{background:var(--soft);color:var(--ac)}
   .tag.fix{background:rgba(46,125,87,.12);color:var(--good)}
+  .tag[data-t]{display:none}
+  body[data-lang="zh"] .tag[data-t="zh"],body[data-lang="en"] .tag[data-t="en"]{display:inline-block}
   /* FAQ */
   .faq{background:var(--bg2);border:1px solid var(--bd);border-radius:16px;padding:6px 18px;margin-top:8px}
   .faq details{border-bottom:1px solid var(--bd)}
@@ -97,14 +107,26 @@
   <div class="stats">
     <div class="stat"><b>3,038</b><span data-t="zh">JLPT 題庫(附詳解)</span><span data-t="en">JLPT questions with explanations</span></div>
     <div class="stat"><b>7,730</b><span data-t="zh">單字(例句＋朗讀)</span><span data-t="en">words with examples &amp; audio</span></div>
-    <div class="stat"><b>52</b><span data-t="zh">篇分級文章</span><span data-t="en">graded reading articles</span></div>
+    <div class="stat"><b>53</b><span data-t="zh">篇分級文章</span><span data-t="en">graded reading articles</span></div>
     <div class="stat"><b>210</b><span data-t="zh">句跟讀練習</span><span data-t="en">shadowing lines</span></div>
-    <div class="stat"><b>38</b><span data-t="zh">支影片教材</span><span data-t="en">video lessons</span></div>
+    <div class="stat"><b>75</b><span data-t="zh">支 YouTube 跟讀影片</span><span data-t="en">YouTube shadowing videos</span></div>
+    <div class="stat"><b>41</b><span data-t="zh">集小狸日本生活短劇</span><span data-t="en">Tanuki life-in-Japan skits</span></div>
     <div class="stat"><b>170</b><span data-t="zh">句生活會話</span><span data-t="en">everyday phrases</span></div>
     <div class="stat"><b>18,161</b><span data-t="zh">段真人語速朗讀</span><span data-t="en">audio clips</span></div>
-    <div class="stat"><b>52</b><span data-t="zh">天有更新(近兩個月)</span><span data-t="en">days shipped (last 2 months)</span></div>
+    <div class="stat"><b>51</b><span data-t="zh">天有更新(近兩個月)</span><span data-t="en">days shipped (last 2 months)</span></div>
   </div>
   <div class="asof" id="asof"></div>
+
+  <h2 data-t="zh">固定更新時間表</h2>
+  <h2 data-t="en">Regular update schedule</h2>
+  <div class="sub" data-t="zh">內容照表上架,不用等改版。新內容上架那天,這頁下面也會自動多一筆。</div>
+  <div class="sub" data-t="en">New content ships on a fixed schedule. Each drop also shows up below on the day it goes live.</div>
+  <div class="sched">
+    <div class="sched-row"><b data-t="zh">每週一 08:00</b><b data-t="en">Every Monday 08:00</b><span data-t="zh">新文章 2 篇:入門(N5/N4)一篇＋進階(N3/N2)一篇,附朗讀、逐詞假名、單字</span><span data-t="en">2 new articles: one beginner (N5/N4) + one intermediate (N3/N2), with audio, furigana and vocab</span></div>
+    <div class="sched-row"><b data-t="zh">每月 1 號</b><b data-t="en">1st of every month</b><span data-t="zh">AI 跟讀句庫加 30 句(N5–N1 各 6 句),每月一個生活主題</span><span data-t="en">30 new AI shadowing lines (6 per level N5–N1), one life theme per month</span></div>
+    <div class="sched-row"><b data-t="zh">隨時</b><b data-t="en">Anytime</b><span data-t="zh">用戶回饋的改善、小狸短劇新集數、YouTube 跟讀新影片</span><span data-t="en">Fixes from your feedback, new Tanuki skits and YouTube shadowing videos</span></div>
+  </div>
+  <div class="next-drop" id="nextDrop"></div>
 
   <h2 data-t="zh">最近做了什麼</h2>
   <h2 data-t="en">Recent updates</h2>
@@ -112,6 +134,95 @@
   <div class="sub" data-t="en">User-facing changes only; bug-fix details omitted.</div>
 
   <div class="tl">
+    <!-- SCHEDULED-ENTRIES:每月內容批次在這裡加 data-pub 條目,時間到自動顯示 -->
+    <div class="tl-item">
+      <div class="tl-d">2026.10.16</div>
+      <div class="tl-t" data-t="zh">單字複習多了「聽打」模式,打字前也能先聽發音</div>
+      <div class="tl-t" data-t="en">Listen-and-type review mode, and audio before you type</div>
+      <div class="tl-x"><span class="tag new" data-t="zh">用戶回饋</span><span class="tag new" data-t="en">FEEDBACK</span>
+        <span data-t="zh">複習右上角現在有「翻卡/打字/聽打」三種。打字模式在中文意思下面多一顆「聽發音(提示)」,想先聽再打就按;新的聽打模式會先念給你聽、不給中文,聽完打出來(假名就算對),答完再顯示漢字、意思跟例句。另外從小狸短劇點進跟讀的句子,漢字上面也都標好假名了。</span>
+        <span data-t="en">Review now has three modes: Flip, Type and Listen. Type mode adds a “Hint: listen” button under the meaning; the new Listen mode plays the word first with no meaning shown, you type what you hear (kana is fine), then see the kanji, meaning and example. Lines opened from the Tanuki skits now show furigana too.</span></div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-d">2026.10.15</div>
+      <div class="tl-t" data-t="zh">AI 跟讀辨識更準、複習打字可以重聽</div>
+      <div class="tl-t" data-t="en">More accurate AI shadowing recognition; replay audio in typing review</div>
+      <div class="tl-x"><span class="tag fix" data-t="zh">改善</span><span class="tag fix" data-t="en">IMPROVED</span>
+        <span data-t="zh">開麥跟讀時會先告訴語音辨識「你要念的是哪一句」,辨識錯字少很多(很多人回報念對卻被判錯)。複習打字答完後也多了發音和例句鈕,可以一直重聽。</span>
+        <span data-t="en">When you start speaking, the recognizer is now told which line you are reading, so far fewer correct readings get marked wrong. Typing review also gets replay buttons for the word and example.</span></div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-d">2026.10.14</div>
+      <div class="tl-t" data-t="zh">看短劇跟讀變成一來一回</div>
+      <div class="tl-t" data-t="en">Skit shadowing is now back-and-forth</div>
+      <div class="tl-x"><span class="tag new" data-t="zh">用戶回饋</span><span class="tag new" data-t="en">FEEDBACK</span>
+        <span data-t="zh">短劇裡按「跟讀這句」會直接開全螢幕練那一句,過關按「回影片」就接著播下一句,不會被丟到一長串句子清單。面板的「今日一字」也可以自己選級別了。</span>
+        <span data-t="en">Tapping “Shadow this line” in a skit opens just that line full-screen; pass it and “Back to video” continues with the next line. The hub’s word of the day can now be set to a specific level.</span></div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-d">2026.10.12</div>
+      <div class="tl-t" data-t="zh">小狸短劇:逐句播放＋跟讀這句,新增 15 集</div>
+      <div class="tl-t" data-t="en">Tanuki skits: line-by-line playback, shadow any line, 15 new episodes</div>
+      <div class="tl-x"><span class="tag new" data-t="zh">新功能</span><span class="tag new" data-t="en">NEW</span>
+        <span data-t="zh">短劇播放器可以上一句/重播/下一句、0.75x/0.5x 慢速、每句自動停、每句顯示中文,任何一句都能按「跟讀這句」接 AI 評分,範例音就是短劇裡的配音。新增諺語篇(花より団子、急がば回れ…)、俚語篇(放鴿子、背黑鍋、拍馬屁…)跟藥妝店、計程車、丟垃圾等生活篇,共 41 集。</span>
+        <span data-t="en">The skit player now goes line by line — previous, replay, next, 0.75×/0.5×, auto-pause and a translation for every line — and any line can be shadowed with AI scoring using the skit’s own voice. New proverb, slang and everyday episodes bring the series to 41.</span></div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-d">2026.10.09</div>
+      <div class="tl-t" data-t="zh">單字發音重音大修、同音字各念各的</div>
+      <div class="tl-t" data-t="en">Pitch accent fixes for 1,964 words; homophones play their own audio</div>
+      <div class="tl-x"><span class="tag new" data-t="zh">用戶回饋</span><span class="tag new" data-t="en">FEEDBACK</span>
+        <span data-t="zh">用音高稽核把 VOICEVOX 念錯重音或起伏不夠的 1,964 個單字重新錄過。同音不同重音的字(例如 箸/橋)現在各自播自己的音檔,同音提醒也會標出重音號;闖關的文法例句漢字補上平假名。</span>
+        <span data-t="en">We re-recorded 1,964 words whose pitch accent was wrong or too flat. Homophones with different accents now each play their own audio, the same-reading hint shows the accent number, and grammar examples in the path now have furigana.</span></div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-d">2026.10.08</div>
+      <div class="tl-t" data-t="zh">新單元:小狸的日本生活</div>
+      <div class="tl-t" data-t="en">New: Tanuki’s life in Japan</div>
+      <div class="tl-x"><span class="tag new" data-t="zh">新功能</span><span class="tag new" data-t="en">NEW</span>
+        <span data-t="zh">20 秒一集的小短劇,小狸在拉麵店、便利商店、電車、區役所遇到的狀況,每集教一句真的用得到的日文。沒看過的排前面,看過紀錄跟帳號同步。</span>
+        <span data-t="en">Twenty-second skits of Tanuki at a ramen shop, a convenience store, on the train, at the ward office — each teaching one phrase you will actually use. Unwatched episodes come first and progress syncs to your account.</span></div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-d">2026.10.06</div>
+      <div class="tl-t" data-t="zh">闖關小測不再一直出同一題</div>
+      <div class="tl-t" data-t="en">Path quizzes stop repeating the same question</div>
+      <div class="tl-x"><span class="tag fix" data-t="zh">修正</span><span class="tag fix" data-t="en">FIX</span>
+        <span data-t="zh">小測只出剛教到的兩關和該段小考的題目,同一題最多出現 3 次(有人回報每關都考到「台風」那題)。手機上查詞彈窗的按鈕也不會再超出畫面。</span>
+        <span data-t="en">Quizzes now draw only from the two lessons just taught plus that section’s test, with each question appearing at most three times. The word popup’s buttons no longer overflow on phones.</span></div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-d">2026.10.05</div>
+      <div class="tl-t" data-t="zh">YouTube 跟讀:動漫分類 19 支、「解析這句」</div>
+      <div class="tl-t" data-t="en">YouTube shadowing: 19 anime videos and “Explain this line”</div>
+      <div class="tl-x"><span class="tag new" data-t="zh">新內容</span><span class="tag new" data-t="en">CONTENT</span>
+        <span data-t="zh">新增動漫分類(フリーレン、ハイキュー、鬼滅、SPY×FAMILY…的官方主題曲與預告),只收官方頻道、人工日文字幕的影片。YouTube 跟讀和 AI 聊聊的句子都可以按「解析這句」,小狸會拆成語意分段、重點單字、難點、整句意思。文章清單也改版成大封面卡片。</span>
+        <span data-t="en">A new anime category with official theme songs and trailers, limited to official channels with human-made Japanese subtitles. Any line in YouTube shadowing or AI chat can be explained by the tutor, broken into chunks, key words, tricky points and meaning. The article list was redesigned with large covers.</span></div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-d">2026.10.04</div>
+      <div class="tl-t" data-t="zh">日語從頭學:必學基礎詞變成 13 堂小課</div>
+      <div class="tl-t" data-t="en">Japanese from zero: essential words as 13 short lessons</div>
+      <div class="tl-x"><span class="tag new" data-t="zh">新功能</span><span class="tag new" data-t="en">NEW</span>
+        <span data-t="zh">必學基礎詞改成一課一課的小關卡,學完有綜合測驗,每個字都能跟讀。單字跟文法每日批次加了三步學習引導。文章開始固定每週一早上上架,YouTube 跟讀字幕每個詞都能點查。</span>
+        <span data-t="en">Essential words are now 13 bite-sized lessons with a final quiz and shadowing for every word, plus a three-step guide for daily words and grammar. Articles now go live every Monday morning, and every word in YouTube subtitles can be tapped.</span></div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-d">2026.10.02</div>
+      <div class="tl-t" data-t="zh">YouTube 跟讀:逐詞注音、只收人工字幕、N5 慢速影片</div>
+      <div class="tl-t" data-t="en">YouTube shadowing: per-word furigana, human subtitles only, slow N5 videos</div>
+      <div class="tl-x"><span class="tag fix" data-t="zh">改善</span><span class="tag fix" data-t="en">IMPROVED</span>
+        <span data-t="zh">字幕每個漢字都標假名、可以點查;自動字幕錯字太多,全部下架只留人工字幕影片。新增 Aki 先生講得很慢的 N5 影片 8 支,還有等級篩選和「繼續練」。</span>
+        <span data-t="en">Subtitles now carry per-word furigana and are tappable. Auto-generated subtitles were too error-prone, so only videos with human subtitles remain. Added eight slow N5 videos from Aki-sensei, level filters and “Continue”.</span></div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-d">2026.09.24</div>
+      <div class="tl-t" data-t="zh">闖關地圖改版,修好小測答案永遠在第四個</div>
+      <div class="tl-t" data-t="en">Redesigned path map; quiz answers no longer always in slot four</div>
+      <div class="tl-x"><span class="tag fix" data-t="zh">修正</span><span class="tag fix" data-t="en">FIX</span>
+        <span data-t="zh">闖關地圖重新設計。修了兩個小測 bug:正確答案永遠在第四個選項、題目一直重複。刷題詳解和整句翻譯也補上英文版。</span>
+        <span data-t="en">The path map was redesigned, and two quiz bugs were fixed: the right answer always being option four, and questions repeating. Drill explanations now have English versions too.</span></div>
+    </div>
     <div class="tl-item">
       <div class="tl-d">2026.09.21</div>
       <div class="tl-t" data-t="zh">今日運勢:搖籤筒抽おみくじ,順便學籤上的字</div>
@@ -510,6 +621,17 @@
   function setLang(l){ document.body.setAttribute('data-lang', l); document.documentElement.lang = l==='en'?'en':'zh-Hant'; try{ localStorage.setItem('stayjp_about_lang', l); }catch(e){} }
   function toggleLang(){ setLang(document.body.getAttribute('data-lang')==='zh'?'en':'zh'); }
   (function(){ var s; try{ s=localStorage.getItem('stayjp_about_lang'); }catch(e){} setLang(s || ((navigator.language||'').toLowerCase().indexOf('zh')===0?'zh':'en')); })();
+  // 排程條目:data-pub(ISO 時間)到了才顯示;下次更新時間依「每週一 08:00 / 每月 1 號」推算
+  (function(){
+    var now=Date.now();
+    document.querySelectorAll('.tl-item[data-pub]').forEach(function(el){ if(Date.parse(el.getAttribute('data-pub'))<=now) el.removeAttribute('data-pub'); });
+    var tw=new Date(now+8*3600e3), dow=tw.getUTCDay(), add=(8-dow)%7;
+    if(add===0 && tw.getUTCHours()>=8) add=7;
+    var mon=new Date(Date.UTC(tw.getUTCFullYear(),tw.getUTCMonth(),tw.getUTCDate()+add));
+    var md=(mon.getUTCMonth()+1)+'/'+mon.getUTCDate();
+    var el=document.getElementById('nextDrop');
+    if(el) el.innerHTML = '<span data-t="zh">下次新文章:'+md+'(一)08:00</span><span data-t="en">Next new articles: Monday '+md+' 08:00 (Taiwan time)</span>';
+  })();
   // 統計基準日:自動顯示,不用手改
   (function(){
     var d=new Date(), z=n=>String(n).padStart(2,'0');
