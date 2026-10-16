@@ -297,6 +297,7 @@ window.Articles = (function () {
       '.art-strip-h{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 2px 10px}',
       '.art-strip-t{display:inline-flex;align-items:center;gap:7px;font-size:15px;font-weight:800;color:var(--tx,#2c2c2c)}',
       '.art-strip-t i{color:var(--ac,#d4654a)}',
+      '.art-strip-sch{font-size:11px;font-weight:600;color:var(--tx3,#999)}',
       '.art-strip-new{font-size:11px;font-weight:800;color:#fff;background:#ef4444;border-radius:20px;padding:1px 8px;line-height:1.6}',
       '.art-strip-all{border:none;background:none;color:var(--ac,#d4654a);font-weight:700;font-size:13.5px;cursor:pointer;padding:6px 2px 6px 8px;font-family:inherit;white-space:nowrap}',
       '.art-strip-sc{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x proximity;padding:2px 2px 10px;margin:0 -2px;scrollbar-width:none;-webkit-overflow-scrolling:touch}',
@@ -336,9 +337,16 @@ window.Articles = (function () {
         '<div class="art-sc-m">' + esc(dt || Lc(a.title_zh, a.title_en)) + '</div></div></button>';
     }).join('');
     return '<div class="art-strip">' +
-      '<div class="art-strip-h"><span class="art-strip-t"><i data-ic=book></i> ' + enOr('文章', 'Articles') + badge + '</span>' +
+      '<div class="art-strip-h"><span class="art-strip-t"><i data-ic=book></i> ' + enOr('文章', 'Articles') + badge + '<span class="art-strip-sch">' + enOr('每週一更新', 'New every Mon') + '</span></span>' +
       '<button type="button" class="art-strip-all" onclick="Articles.open()">' + enOr('顯示全部', 'See all') + ' ›</button></div>' +
       '<div class="art-strip-sc">' + cards + '</div></div>';
+  }
+  // 固定更新:每週一 08:00(台灣時間)上架 2 篇。回傳下一個週一的 'M/D'
+  function nextDropLabel() {
+    var tw = new Date(Date.now() + 8 * 3600e3), add = (8 - tw.getUTCDay()) % 7;
+    if (add === 0 && tw.getUTCHours() >= 8) add = 7;
+    var d = new Date(Date.UTC(tw.getUTCFullYear(), tw.getUTCMonth(), tw.getUTCDate() + add));
+    return (d.getUTCMonth() + 1) + '/' + d.getUTCDate();
   }
   function imgUrl(id) { return 'images/articles/' + id + '.jpg'; }   // 封面圖(CC0/公共領域);載入失敗自動退回漸層＋emoji
   function hasTts(t) { return !!(window.__TTS && window.__TTS[t]); }
@@ -372,6 +380,9 @@ window.Articles = (function () {
       // list
       '.art-lwrap{padding:14px 16px}',
       '.art-sub{color:var(--tx2,#888);font-size:13.5px;margin:2px 0 6px;line-height:1.6}',
+      '.art-weekly{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--tx2,#666);background:var(--bg2,#f6f4ef);border:1px solid var(--bd,#e5e1d8);border-radius:10px;padding:9px 13px;margin:8px 0 10px}',
+      '.art-weekly b{color:var(--tx,#2c2c2c)}',
+      '.art-weekly i{flex:none}',
       '.art-trial{background:var(--brand-soft,#f6e3dd);color:var(--ac,#d4654a);font-weight:700;font-size:13px;border-radius:10px;padding:9px 13px;margin:8px 0 4px}',
       '.art-lv{font-size:12px;font-weight:800;color:var(--tx3,#aaa);letter-spacing:.1em;margin:22px 0 10px}',
       '.art-card{display:flex;gap:15px;align-items:center;background:var(--bg2,#fff);border:1px solid rgba(0,0,0,.04);border-radius:18px;padding:14px;margin-bottom:12px;cursor:pointer;transition:transform .12s ease,box-shadow .15s ease;box-shadow:0 1px 2px rgba(30,25,20,.04),0 6px 16px rgba(30,25,20,.05)}',
@@ -593,6 +604,7 @@ window.Articles = (function () {
       '<div class="art-top"><span class="tt"><i data-ic=book></i> ' + enOr('文章閱讀', 'Reading') + '</span><span class="art-top-n">' + readN + ' / ' + total + '</span><button class="art-ic" onclick="Articles.close()" aria-label="' + enOr('關閉', 'Close') + '"><i data-ic=x></i></button></div>' +
       '<div class="art-lwrap">';
     if (gated) h += '<div class="art-trial"><i data-ic=lock></i> ' + enOr('免費版每天可試讀 1 篇,升級後無限暢讀。', 'Free: 1 article/day. Upgrade for unlimited.') + '</div>';
+    h += '<div class="art-weekly"><i data-ic=calendar></i><span>' + enOr('每週一 08:00 上架 2 篇新文章(入門＋進階)· 下次 <b>' + nextDropLabel() + '(一)</b>', '2 new articles every Monday 08:00 (Taiwan) · next <b>Mon ' + nextDropLabel() + '</b>') + '</span></div>';
     h += heroHtml(all, read);
     h += '<div class="art-sec-row"><div class="art-sec"><i data-ic=grid></i> ' + enOr('分級閱讀', 'By level') + '</div>' +
       '<button type="button" class="art-hide' + (hideReadOn() ? ' on' : '') + '" id="artHideBtn" onclick="Articles.toggleHideRead()" aria-pressed="' + (hideReadOn() ? 'true' : 'false') + '"><i data-ic=eye></i> ' + enOr('隱藏已讀', 'Hide read') + '</button></div>' +
