@@ -159,6 +159,7 @@
   .today .td{color:var(--ink2);font-size:12.5px;margin-top:1px}
 </style>
 <script src="accent.js"></script>
+<script src="native-ui.js"></script>
 </head>
 <body>
 <div id="boot" style="min-height:60vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;color:var(--ink3)"><div style="width:34px;height:34px;border:3px solid var(--line);border-top-color:var(--accent);border-radius:50%;animation:bspin .8s linear infinite"></div><div style="font-size:14px">載入中…</div></div>
@@ -170,6 +171,18 @@
   <div style="margin-bottom:8px"><a href="#" class="backbtn" onclick="if(history.length>1){history.back()}else{location.href='app.html'};return false"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>返回</a></div>
   <h1>跟讀練習 <span class="muted" style="font-weight:400">Beta</span></h1>
   <div class="sub">選句子 → 聽範例 → 念一次(或直接打字)→ 送出,看 AI 回饋。　免費體驗 10 次 AI 評分,Premium 每天 30 次。想練「來回對話」試試 <a href="speak-chat.html" style="color:var(--accent);font-weight:600"><i data-ic=speak></i> 情境對話</a>。</div>
+  <!-- 下載 App 列:廣告/社群從網頁進來的人找得到 App(2026-10-18)。native-ui.js 依裝置只亮對的商店鈕,App 內 data-web-only 整條藏 -->
+  <div class="card sp-dl" data-web-only style="display:flex;align-items:center;gap:12px;padding:12px 14px;margin:14px 0">
+    <img src="stayjpplan-192.png" alt="" style="width:44px;height:44px;border-radius:11px;flex:none" onerror="this.remove()">
+    <div style="flex:1;min-width:0;line-height:1.45">
+      <div style="font-weight:700">日本再留計劃 App</div>
+      <div class="muted" style="font-size:.86em">跟讀・單字・文法・刷題一個搞定,免費下載</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:6px;flex:none">
+      <a class="btn pri app-ios" style="text-decoration:none;justify-content:center" href="https://apps.apple.com/app/id6778227353">App Store</a>
+      <a class="btn pri app-android" style="text-decoration:none;justify-content:center" href="https://play.google.com/store/apps/details?id=com.stayjp.app">Google Play</a>
+    </div>
+  </div>
 
   <div class="today" id="todayCard" style="display:none">
     <div class="dring" id="dring"></div>
@@ -300,6 +313,7 @@ const SP_PREVIEW = (function(){ try{ var h=location.hostname; if(h!=='localhost'
 function spLive(s){ if(!s || s.pub==null) return true; if(isNaN(s.pub)) return false; return SP_PREVIEW || Date.now()>=s.pub; }
 // 原生辨識的提示詞:把目標句(漢字+假名)交給 iOS contextualStrings,念對時比較不會被辨識成別的字
 // (用戶 2026-10-14「AI 評分好像無法準確偵測」;AI 只看得到辨識結果,辨識錯它就跟著判錯)。舊版 App 不認這欄,無害
+// 目前沒人用(10/18 跟讀與 AI 評分都拿掉 hint);留著以後要給單字級提示時用
 function sttHint(it){ return it ? [it.jp, it.kana].filter(Boolean).map(x=>String(x).replace(/[。、！？!?…「」\s]/g,'')).filter((x,i,a)=>x&&a.indexOf(x)===i) : []; }
 const CATS = [
   { k:'all',    ic:'<i data-ic=sparkle></i>', name:'全部',       en:'All' },
@@ -736,6 +750,43 @@ function next(){ if(idx<list().length-1){ idx++; stopRec(); render(); } }
 
 // 範例發音:優先播 VOICEVOX 預生 mp3(__TTS,好聽),沒有才退回瀏覽器 TTS。與主站一致。
 let _demo=null;
+// iOS 網頁(Safari/iOS Chrome 都是 WebKit):<audio> 播過之後,webkitSpeechRecognition 會「麥克風亮著
+// 但 onresult/onerror/onend 全都不來」——第一句能錄、之後每句都沒反應(Mia 2026-10-18 手機實測;社群回報同症狀,
+// 推測是 <audio> 佔住 audio session 沒還給錄音)。解法:iOS 網頁的範例改走 Web Audio API。
+// Web Audio 會被靜音鍵消音 → 播放時把 navigator.audioSession 設成 playback(iOS 16.4+),開麥前改回 auto。
+// App 內走原生播放、其他瀏覽器照舊 <audio>,都不受影響。
+// 範圍:iPhone/iPad 上所有瀏覽器(都是 WebKit)+ Mac Safari(同一套 WebKit 辨識;Mac 沒靜音鍵問題)。
+const IOS_WEB = !(window.STAYJP_NATIVE && window.STAYJP_NATIVE.isNativeApp)
+  && (/iPhone|iPad|iPod/.test(navigator.userAgent) || (/Macintosh/.test(navigator.userAgent) && (navigator.maxTouchPoints||0) > 1)
+      || (/Safari\//.test(navigator.userAgent) && !/Chrome|Chromium|CriOS|Edg|OPR|Firefox|FxiOS|Android/.test(navigator.userAgent)))
+  && !!(window.AudioContext || window.webkitAudioContext);
+let _actx=null; const _abuf={};
+function _aSession(t){ try{ if(navigator.audioSession) navigator.audioSession.type=t; }catch(e){} }
+// 介面跟 Audio 一樣(play() 回 Promise、pause()、onended、onplaying),呼叫端不用分兩套
+function _mkDemo(rel){
+  if(!IOS_WEB) return new Audio(rel);
+  const d={ onended:null, onplaying:null, _src:null, _stop:false };
+  d.pause=function(){ d._stop=true; try{ d._src&&d._src.stop(); }catch(e){} };
+  d.play=function(){
+    _aSession('playback');
+    if(!_actx) _actx=new (window.AudioContext||window.webkitAudioContext)();
+    const ready=_actx.state==='running'?Promise.resolve():_actx.resume();   // 要在點擊當下(同步)叫 resume
+    const buf=_abuf[rel] ? Promise.resolve(_abuf[rel])
+      : fetch(rel).then(r=>{ if(!r.ok) throw new Error(r.status); return r.arrayBuffer(); })
+          .then(ab=>new Promise((ok,ng)=>_actx.decodeAudioData(ab,ok,ng))).then(b=>(_abuf[rel]=b));
+    return Promise.all([ready,buf]).then(([,b])=>{
+      if(d._stop) return;
+      if(_actx.state!=='running') throw new Error('suspended');   // 沒有點擊(自動播放)被擋 → 交給呼叫端提示按喇叭
+      const src=_actx.createBufferSource(); src.buffer=b; src.connect(_actx.destination);
+      src.onended=()=>{ if(!d._stop && d.onended) d.onended(); };
+      d._src=src; src.start(0);
+      if(d.onplaying) d.onplaying();
+    });
+  };
+  return d;
+}
+// 錄音保險:按了 8 秒什麼事件都沒有 = 卡死(同上 iOS 症狀),主動收掉並提示,不讓使用者對著沒反應的麥克風一直講
+const REC_WATCHDOG_MS=8000;
 function browserSpeak(text){
   try{ const u=new SpeechSynthesisUtterance(text); u.lang='ja-JP'; u.rate=.9;
     const v=speechSynthesis.getVoices().find(x=>/ja/i.test(x.lang)); if(v)u.voice=v;
@@ -753,7 +804,7 @@ function speak(){
     const rel = skitAu || (window.ttsUrl ? window.ttsUrl(hash) : 'audio/tts/'+hash+'.mp3');
     // App 內(有 OTA 的版本)交給原生播,繞開 WKWebView 錄音後播放被悶的問題
     if(window.STAYJP_NATIVE && window.STAYJP_NATIVE.canPlayB64){ _nPost({type:'PLAY_URL', url:new URL(rel, location.href).href}); return; }
-    _demo = new Audio(rel);
+    _demo = _mkDemo(rel);
     _demo.play().catch(()=>{});   // 連點中斷屬正常;真失敗也不退瀏覽器機器音(全站政策)
   } else {
     document.getElementById('recNote').textContent = enOr('這句音檔暫缺,已記錄。可先自己念+送出評分。','Audio for this sentence is missing — you can still practice and submit.');
@@ -816,15 +867,27 @@ function startRec(){
       else if(err) document.getElementById('recNote').textContent=enOr('辨識出錯('+err+'),可直接打字。','Recognition error ('+err+') — you can just type instead.');
     };
     recording=true; _recBtnUI(true);
-    _nPost({type:'SPEECH_START',lang:'ja-JP',hint:sttHint(cur())});
+    // 不帶 hint(2026-10-18):整句當 contextualStrings 會讓 iOS 聽到開頭就補完整句、馬上結束 → 念三個字被判全對。
+    // 10/14 加 hint 是為了「念對卻被聽成同音別字」;那個要另外解,不能拿偏向答案的辨識去換(會變成念不完也全對)。
+    _nPost({type:'SPEECH_START',lang:'ja-JP'});
     return;
   }
   if(!SR){ document.getElementById('recNote').textContent=enOr('這個瀏覽器不支援語音辨識,請直接打字你念的內容。',"This browser doesn't support speech recognition — just type what you said."); document.getElementById('said').focus(); return; }
+  if(rec){ try{ rec.onend=null; rec.onerror=null; rec.onresult=null; rec.abort(); }catch(e){} }
+  try{ if(_demo){ _demo.pause(); _demo=null; } }catch(e){}
+  if(IOS_WEB) _aSession('auto');
   rec = new SR(); rec.lang='ja-JP'; rec.interimResults=true; rec.continuous=false;
   let finalTxt='';
-  rec.onresult = e=>{ let t=''; for(let i=0;i<e.results.length;i++) t+=e.results[i][0].transcript; const fin=e.results[e.results.length-1].isFinal; const merged=_joinSpeech(_recEditBase, t); const out=fin?dedupeSpeech(merged):merged; document.getElementById('said').value=out; if(fin){ finalTxt=out; _prevRawSpeech=(t||'').trim(); _recEditBase=out; } };
-  rec.onerror = e=>{ document.getElementById('recNote').textContent=enOr('辨識出錯('+e.error+'),可直接打字。','Recognition error ('+e.error+') — you can just type instead.'); stopRec(); };
-  rec.onend = ()=>{ recording=false; _recBtnUI(false); try{ document.getElementById('said').readOnly=false; }catch(e){} _postRestore(); };
+  const myRec=rec;
+  let wd=setTimeout(()=>{ if(rec!==myRec||!recording) return;
+    try{ myRec.onend=null; myRec.abort(); }catch(e){}
+    recording=false; _recBtnUI(false); try{ document.getElementById('said').readOnly=false; }catch(e){}
+    document.getElementById('recNote').textContent=enOr('沒收到聲音:再按一次「開始錄音」,還是不行就直接打字送出。','No audio picked up — tap Start recording again, or just type and submit.');
+  }, REC_WATCHDOG_MS);
+  const clearWd=()=>{ if(wd){ clearTimeout(wd); wd=null; } };
+  rec.onresult = e=>{ clearWd(); let t=''; for(let i=0;i<e.results.length;i++) t+=e.results[i][0].transcript; const fin=e.results[e.results.length-1].isFinal; const merged=_joinSpeech(_recEditBase, t); const out=fin?dedupeSpeech(merged):merged; document.getElementById('said').value=out; if(fin){ finalTxt=out; _prevRawSpeech=(t||'').trim(); _recEditBase=out; } };
+  rec.onerror = e=>{ clearWd(); document.getElementById('recNote').textContent=enOr('辨識出錯('+e.error+'),可直接打字。','Recognition error ('+e.error+') — you can just type instead.'); stopRec(); };
+  rec.onend = ()=>{ clearWd(); recording=false; _recBtnUI(false); try{ document.getElementById('said').readOnly=false; }catch(e){} _postRestore(); };
   try{ rec.start(); recording=true; _recBtnUI(true); }catch(e){}
 }
 function stopRec(){ if(NATIVE_STT){ _nPost({type:'SPEECH_STOP'}); } else if(rec&&recording){ try{rec.stop();}catch(e){} } recording=false; _recBtnUI(false); try{ document.getElementById('said').readOnly = false; }catch(e){} }
@@ -843,9 +906,39 @@ function loginWith(p){
       AppUI.alert(enOr('登入失敗:','Sign-in failed: ')+(e&&e.message||e));
     }).finally(function(){ _signingIn=false; });
 }
+// IG/FB/Line/Threads 等 App 內建瀏覽器:Google 會擋登入(disallowed_useragent),按了只會失敗。
+// Meta 廣告的人一定是從這裡進來 → 直接教他換外部瀏覽器(網址照帶,utm 不會掉)。同 app.html isInAppBrowser。
+function _spIsInApp(){ return /FBAN|FBAV|FB_IAB|Instagram|Line\/|MicroMessenger|Twitter|TikTok|KAKAOTALK|NAVER|Barcelona|BytedanceWebview/i.test(navigator.userAgent||''); }
+function _spInAppCard(fb){
+  const ua=navigator.userAgent||'', ios=/iPhone|iPad|iPod/i.test(ua), android=/Android/i.test(ua);
+  const isLine=/Line\//i.test(ua), isFB=/FBAN|FBAV|FB_IAB/i.test(ua)&&!/Instagram/i.test(ua);
+  const step = isLine ? (ios?'點右下角「⋯」→「在預設瀏覽器中開啟」':'點右上角「⋮」→「在其他瀏覽器中開啟」')
+    : isFB ? (ios?'點右下角「⋯」→「在 Safari 中開啟」':'點右上角「⋮」→「在外部瀏覽器中開啟」')
+    : (ios?'點右上角「⋯」→「在外部瀏覽器中開啟」':'點右上角「⋮」→「在 Chrome 中開啟」');
+  const intent = android ? '<a class="btn" style="text-decoration:none" href="intent://'+location.host+location.pathname+location.search+'#Intent;scheme=https;package=com.android.chrome;end">用 Chrome 開啟</a>' : '';
+  // 商店連結在 IG/FB 內建瀏覽器點得開,而且 App 內登入走原生、不會被擋 → 當主要按鈕
+  const store = ios ? '<a class="btn pri" style="text-decoration:none" href="https://apps.apple.com/app/id6778227353">下載 App(免費)</a>'
+    : android ? '<a class="btn pri" style="text-decoration:none" href="https://play.google.com/store/apps/details?id=com.stayjp.app">下載 App(免費)</a>' : '';
+  fb.innerHTML='<div style="text-align:center;padding:6px 0">'
+    +'<div style="font-weight:700;margin-bottom:6px">登入就能看 AI 評分</div>'
+    +'<div class="muted" style="margin-bottom:18px;line-height:1.7">你現在在 App 的內建瀏覽器裡,Google 不給這裡登入。<br>下載 App 直接練,或換到 Safari / Chrome 開這頁。</div>'
+    +(store?'<div style="margin-bottom:18px">'+store+'</div><div class="muted" style="font-size:.86em;margin-bottom:8px">或在外部瀏覽器開這頁:</div>':'')
+    +'<div style="border:1px solid var(--line,#e5e0d8);border-radius:12px;padding:10px 12px;margin-bottom:14px;font-weight:600">'+step+'</div>'
+    +'<div class="rowbtns" style="justify-content:center;flex-wrap:wrap">'+intent
+    +'<button class="btn'+(intent||store?'':' pri')+'" id="spCopyUrl">複製網址</button></div></div>';
+  document.getElementById('spCopyUrl').onclick=async function(){
+    const b=this, url=location.href; let ok=false;
+    try{ await navigator.clipboard.writeText(url); ok=true; }catch(e){
+      const ta=document.createElement('textarea'); ta.value=url; ta.style.position='fixed'; ta.style.opacity='0';
+      document.body.appendChild(ta); ta.select(); try{ ok=document.execCommand('copy'); }catch(_){} ta.remove();
+    }
+    b.textContent = ok ? '已複製,打開 Safari / Chrome 貼上' : '複製失敗,請長按網址列複製';
+  };
+}
 function showLoginCard(){
   const fb=document.getElementById('fbCard');
   fb.style.display='block';
+  if(_spIsInApp() && !(window.STAYJP_NATIVE && window.STAYJP_NATIVE.isNativeApp)){ _spInAppCard(fb); fb.scrollIntoView({behavior:'smooth',block:'center'}); return; }
   fb.innerHTML='<div style="text-align:center;padding:6px 0">'
     +'<div style="font-weight:700;margin-bottom:4px">'+enOr('登入就能用 AI 評分','Sign in to use AI feedback')+'</div>'
     +'<div class="muted" style="margin-bottom:14px">'+enOr('免費體驗 10 次,Premium 每天 30 次','Free trial: 10 reviews. Premium: 30 per day')+'</div>'
@@ -1098,14 +1191,21 @@ const Lesson=(()=>{
       savedNativeHandlers={ r:window.stayjpSpeechResult, e:window.stayjpSpeechEnd };
       let base='';
       window.stayjpSpeechResult=function(t,fin){ if(t==null)return; feed(base+t, !!fin); if(fin&&t) base=base+t; };
-      window.stayjpSpeechEnd=function(){ if(active&&listening&&!passed) _nPost({type:'SPEECH_START',lang:'ja-JP',continuous:true,hint:sttHint(curIt())}); };
-      _nPost({type:'SPEECH_START',lang:'ja-JP',continuous:true,hint:sttHint(curIt())});
+      window.stayjpSpeechEnd=function(){ if(active&&listening&&!passed) _nPost({type:'SPEECH_START',lang:'ja-JP',continuous:true}); };
+      // 不帶 hint:整句當 contextualStrings 會讓 iOS 聽到開頭就「補完」整句 → 念三個字全亮(Mia 2026-10-18 短劇跟讀實測)。
+      // 跟讀是逐字對齊、本來就有讀音比對,不需要偏向整句。
+      _nPost({type:'SPEECH_START',lang:'ja-JP',continuous:true});
       return;
     }
     if(!SR){ setHint(enOr('此瀏覽器不支援語音辨識','Speech recognition unsupported')); listening=false; return; }
     let base='';
+    if(IOS_WEB) _aSession('auto');
     rec2=new SR(); rec2.lang='ja-JP'; rec2.interimResults=true; rec2.continuous=true;
-    rec2.onresult=e=>{ let t=''; for(let i=0;i<e.results.length;i++) t+=e.results[i][0].transcript; feed(base+t, !!e.results[e.results.length-1].isFinal); };
+    const myRec2=rec2; let gotAny=false;
+    if(IOS_WEB) setTimeout(()=>{ if(rec2!==myRec2||gotAny||!listening||passed) return;
+      stopListen(); setHint(enOr('沒收到聲音,按麥克風再試一次','No audio — tap the mic to try again'));
+    }, REC_WATCHDOG_MS);
+    rec2.onresult=e=>{ gotAny=true; let t=''; for(let i=0;i<e.results.length;i++) t+=e.results[i][0].transcript; feed(base+t, !!e.results[e.results.length-1].isFinal); };
     rec2.onend=()=>{ if(active&&listening&&!passed){ base=saidRaw; try{rec2.start();}catch(e){} } };
     rec2.onerror=()=>{};
     try{ rec2.start(); }catch(e){}
@@ -1225,7 +1325,7 @@ const Lesson=(()=>{
         setTimeout(()=>go(Math.max(2200, it.jp.length*220)+700), 900);   // metadata 900ms 內沒到:退回加長估時
         return;
       }
-      _demo=new Audio(rel); _demo.onended=after;
+      _demo=_mkDemo(rel); _demo.onended=after;
       setHint(enOr('聽範例中…','Listen…'));
       _demo.play().catch(()=>{
         // 自動播放被瀏覽器擋下(常見於剛開頁):別靜默跳過(用戶會以為播放壞了),
