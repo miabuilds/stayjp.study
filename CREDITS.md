@@ -50,3 +50,8 @@
 - `a-n3-16.jpg` POSTCARD STAMPS（John K Thorne）— flickr.com/photos/89918055@N05/14584896301（CC0）
 - `a-n4-15.jpg` Rubber gloves（rawpixel）— rawpixel.com/image/5940545（CC0）
 - `a-n2-13.jpg` Chikuwa-salad at izakaya in Kumamoto（妖精書士）— commons.wikimedia.org/wiki/File:Chikuwa-salad_at_izakaya_in_Kumamoto.jpg（CC0）
+
+## 繪本故事插圖 — StayJP 自製
+
+`images/ehon/*.webp`（繪本每頁插圖）與繪本封面為 StayJP 自有角色素材（狸太郎、狐狸コン、柴犬店員，與小狸短劇同一批角色圖與場景圖）合成，非第三方素材：
+- `eh-n5-1.jpg` `eh-n5-2.jpg` `eh-n4-1.jpg` `eh-n4-2.jpg` `eh-n4-3.jpg` — 由各篇第 1 頁插圖縮製（StayJP 自製）

@@ -35,6 +35,13 @@
     ]
   },
   {
+    "text": "「あたためますか」は「あつくしますか」といういみです。",
+    "hash": "c191e2362e42",
+    "sources": [
+      "article#eh-n5-1"
+    ]
+  },
+  {
     "text": "「あのう、明日のミーティング、何時からですか?」と聞きました。",
     "hash": "74441326cb0b",
     "sources": [
@@ -63,10 +70,24 @@
     ]
   },
   {
+    "text": "「お誕生日おめでとう」と言ってプレゼントを渡すと、コンちゃんはとても驚きました。",
+    "hash": "b3a09fbde72e",
+    "sources": [
+      "article#eh-n4-3"
+    ]
+  },
+  {
     "text": "「お年玉」はいつ渡しますか。",
     "hash": "f5d50f5c3719",
     "sources": [
       "listening-q"
+    ]
+  },
+  {
+    "text": "「きのうの夜からで、せきも出ます」と答えました。",
+    "hash": "a3670c73c811",
+    "sources": [
+      "article#eh-n4-1"
     ]
   },
   {
@@ -182,6 +203,20 @@
     ]
   },
   {
+    "text": "「だいじょうぶです」とこたえました。",
+    "hash": "42b241aea28e",
+    "sources": [
+      "article#eh-n5-1"
+    ]
+  },
+  {
+    "text": "「ただのかぜですね、薬を飲んで、ゆっくり休んだほうがいいですよ」とお医者さんが言いました。",
+    "hash": "03ed3f9d3a1c",
+    "sources": [
+      "article#eh-n4-1"
+    ]
+  },
+  {
     "text": "「でも、今ちょっと風邪気味で…」「お大事に」と返しました。",
     "hash": "cd2a0df371f7",
     "sources": [
@@ -200,6 +235,13 @@
     "hash": "a49885dc9e44",
     "sources": [
       "daily-story#n5_31"
+    ]
+  },
+  {
+    "text": "「どうしましたか」とききました。",
+    "hash": "4d56a427b64c",
+    "sources": [
+      "article#eh-n5-2"
     ]
   },
   {
@@ -2863,6 +2905,13 @@
     ]
   },
   {
+    "text": "あたたかいおべんとうはとてもおいしかったです。",
+    "hash": "4e4014fe7df9",
+    "sources": [
+      "article#eh-n5-1"
+    ]
+  },
+  {
     "text": "あたたまる",
     "hash": "32d6f53d3e09",
     "sources": [
@@ -2873,7 +2922,8 @@
     "text": "あたためる",
     "hash": "b91eb7fd9ee6",
     "sources": [
-      "vocab-n3"
+      "vocab-n3",
+      "article-vocab#eh-n5-1"
     ]
   },
   {
@@ -7056,7 +7106,8 @@
     "sources": [
       "vocab-n5",
       "vocab-n4",
-      "vocab-n3"
+      "vocab-n3",
+      "article-vocab#eh-n5-1"
     ]
   },
   {
@@ -7194,7 +7245,8 @@
     "hash": "43c0172ad9a5",
     "sources": [
       "vocab-n5",
-      "vocab-n4"
+      "vocab-n4",
+      "article-vocab#eh-n4-2"
     ]
   },
   {
@@ -7593,7 +7645,8 @@
     "hash": "0a1544d65547",
     "sources": [
       "vocab-n4",
-      "article-vocab#a-n4-12"
+      "article-vocab#a-n4-12",
+      "article-vocab#eh-n4-1"
     ]
   },
   {
@@ -8198,6 +8251,13 @@
     ]
   },
   {
+    "text": "うみへ行くでんしゃは何ばんせんですか。",
+    "hash": "cc1abbba5093",
+    "sources": [
+      "article#eh-n5-2"
+    ]
+  },
+  {
     "text": "うめる",
     "hash": "16ae20e41507",
     "sources": [
@@ -8612,7 +8672,8 @@
     "hash": "1f819272ac2b",
     "sources": [
       "vocab-n5",
-      "article-vocab#a-n5-11"
+      "article-vocab#a-n5-11",
+      "article-vocab#eh-n5-2"
     ]
   },
   {
@@ -8634,6 +8695,13 @@
     "hash": "92ee2b866167",
     "sources": [
       "vocab-n2"
+    ]
+  },
+  {
+    "text": "えきはとても大きいです。",
+    "hash": "aa1f9c87668d",
+    "sources": [
+      "article#eh-n5-2"
     ]
   },
   {
@@ -8708,7 +8776,8 @@
     "hash": "20ffd578608e",
     "sources": [
       "vocab-n4",
-      "article-vocab#a-n4-10"
+      "article-vocab#a-n4-10",
+      "article-vocab#eh-n5-1"
     ]
   },
   {
@@ -9007,6 +9076,13 @@
     "hash": "712efd3caa7c",
     "sources": [
       "vocab-n5#ごちそうさまでした"
+    ]
+  },
+  {
+    "text": "おいしゃさん",
+    "hash": "8e0f64af23ae",
+    "sources": [
+      "article-vocab#eh-n4-1"
     ]
   },
   {
@@ -9354,6 +9430,13 @@
     ]
   },
   {
+    "text": "おかゆ",
+    "hash": "dd76ab1d2f66",
+    "sources": [
+      "article-vocab#eh-n4-1"
+    ]
+  },
+  {
     "text": "おぎなう",
     "hash": "5b43070a54d7",
     "sources": [
@@ -9580,7 +9663,8 @@
     "hash": "0fae16ccb30c",
     "sources": [
       "vocab-n5",
-      "article-vocab#a-n5-11"
+      "article-vocab#a-n5-11",
+      "article-vocab#eh-n5-2"
     ]
   },
   {
@@ -9681,7 +9765,8 @@
     "hash": "0f40454243d0",
     "sources": [
       "vocab-n5",
-      "vocab-n4"
+      "vocab-n4",
+      "article-vocab#eh-n4-2"
     ]
   },
   {
@@ -10066,7 +10151,8 @@
     "sources": [
       "vocab-n4",
       "vocab-n3",
-      "article-vocab#a-n4-7"
+      "article-vocab#a-n4-7",
+      "article-vocab#eh-n4-3"
     ]
   },
   {
@@ -10096,6 +10182,13 @@
     "hash": "634befb62a51",
     "sources": [
       "article-vocab#a-n5-9"
+    ]
+  },
+  {
+    "text": "おにぎりやパンやのみものがたくさんあります。",
+    "hash": "d79bebeb1553",
+    "sources": [
+      "article#eh-n5-1"
     ]
   },
   {
@@ -10233,7 +10326,8 @@
     "hash": "ca561a6e956c",
     "sources": [
       "vocab-n5",
-      "vocab-n4"
+      "vocab-n4",
+      "article-vocab#eh-n5-1"
     ]
   },
   {
@@ -10802,6 +10896,13 @@
     "hash": "fa38c491740e",
     "sources": [
       "vocab-n1"
+    ]
+  },
+  {
+    "text": "お医者さんに「いつからですか」と聞かれました。",
+    "hash": "088c14c69650",
+    "sources": [
+      "article#eh-n4-1"
     ]
   },
   {
@@ -12097,7 +12198,8 @@
     "hash": "0187ae27c711",
     "sources": [
       "vocab-n5",
-      "vocab-n4"
+      "vocab-n4",
+      "article-vocab#eh-n5-2"
     ]
   },
   {
@@ -12438,7 +12540,8 @@
     "text": "かかえる",
     "hash": "c446db6ad1b6",
     "sources": [
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#eh-n4-3"
     ]
   },
   {
@@ -13056,7 +13159,8 @@
     "text": "かさ",
     "hash": "4eb7b7e8dd3a",
     "sources": [
-      "vocab-n5"
+      "vocab-n5",
+      "article-vocab#eh-n4-3"
     ]
   },
   {
@@ -13407,6 +13511,13 @@
     "hash": "282e8b9e800e",
     "sources": [
       "vocab-n3"
+    ]
+  },
+  {
+    "text": "かためは、少しかたい麺のことです。",
+    "hash": "2fb630f1465c",
+    "sources": [
+      "article#eh-n4-2"
     ]
   },
   {
@@ -17142,6 +17253,13 @@
     ]
   },
   {
+    "text": "きょうはいいてんきです。",
+    "hash": "2e9f078da59d",
+    "sources": [
+      "article#eh-n5-2"
+    ]
+  },
+  {
     "text": "きょうはぎんこうへこうざをつくりにいきます。",
     "hash": "5d3af9cd1383",
     "sources": [
@@ -17153,6 +17271,13 @@
     "hash": "6fb12fcef15d",
     "sources": [
       "article#a-n5-10"
+    ]
+  },
+  {
+    "text": "きょうははじめてコンビニへ行きます。",
+    "hash": "38b24a0f9930",
+    "sources": [
+      "article#eh-n5-1"
     ]
   },
   {
@@ -18015,7 +18140,8 @@
     "hash": "8ab591415a2f",
     "sources": [
       "vocab-n5",
-      "vocab-n4"
+      "vocab-n4",
+      "article-vocab#eh-n4-1"
     ]
   },
   {
@@ -19580,7 +19706,8 @@
     "text": "げんき",
     "hash": "8ae359757660",
     "sources": [
-      "vocab-n5"
+      "vocab-n5",
+      "article-vocab#eh-n4-1"
     ]
   },
   {
@@ -20041,6 +20168,13 @@
     "hash": "bc489c636d21",
     "sources": [
       "vocab-n2"
+    ]
+  },
+  {
+    "text": "けんばいき",
+    "hash": "48d9cc0f024f",
+    "sources": [
+      "article-vocab#eh-n4-2"
     ]
   },
   {
@@ -22070,7 +22204,8 @@
     "sources": [
       "vocab-n5",
       "vocab-n4",
-      "vocab-n3"
+      "vocab-n3",
+      "article-vocab#eh-n5-1"
     ]
   },
   {
@@ -26609,6 +26744,13 @@
     ]
   },
   {
+    "text": "この店では、先に食券を買うそうです。",
+    "hash": "a1b805739b96",
+    "sources": [
+      "article#eh-n4-2"
+    ]
+  },
+  {
     "text": "この店では、代金は現金で払わなければなりません。",
     "hash": "c151a68bd646",
     "sources": [
@@ -28296,7 +28438,8 @@
     "sources": [
       "vocab-n5",
       "vocab-n4",
-      "article-vocab#a-n4-11"
+      "article-vocab#a-n4-11",
+      "article-vocab#eh-n5-2"
     ]
   },
   {
@@ -28972,6 +29115,27 @@
     ]
   },
   {
+    "text": "コンちゃんがいつもしている青いマフラーは、もうだいぶ古くなっています。",
+    "hash": "9fde19b6d8fb",
+    "sources": [
+      "article#eh-n4-3"
+    ]
+  },
+  {
+    "text": "コンちゃんは「3ばんせんですよ、あそこのかいだんをのぼってください」とおしえました。",
+    "hash": "a650068aadc9",
+    "sources": [
+      "article#eh-n5-2"
+    ]
+  },
+  {
+    "text": "こんどはわかります。",
+    "hash": "20fad80fe599",
+    "sources": [
+      "article#eh-n5-1"
+    ]
+  },
+  {
     "text": "こんとん",
     "hash": "b6fd1e19466a",
     "sources": [
@@ -29088,6 +29252,13 @@
     "hash": "de46e61b0017",
     "sources": [
       "vocab-n5#こんばんは"
+    ]
+  },
+  {
+    "text": "コンビニ",
+    "hash": "6dc0f603699b",
+    "sources": [
+      "article-vocab#eh-n5-1"
     ]
   },
   {
@@ -30241,6 +30412,13 @@
     "hash": "75dcac93e663",
     "sources": [
       "vocab-n2"
+    ]
+  },
+  {
+    "text": "ざっかや",
+    "hash": "b4ab7111518c",
+    "sources": [
+      "article-vocab#eh-n4-3"
     ]
   },
   {
@@ -35081,6 +35259,13 @@
     ]
   },
   {
+    "text": "しょっけん",
+    "hash": "e8c5a8256c42",
+    "sources": [
+      "article-vocab#eh-n4-2"
+    ]
+  },
+  {
     "text": "しょっちゅう",
     "hash": "f1aa4ca7e00e",
     "sources": [
@@ -36552,7 +36737,8 @@
     "sources": [
       "vocab-n4",
       "vocab-n2",
-      "confusables-word"
+      "confusables-word",
+      "article-vocab#eh-n4-1"
     ]
   },
   {
@@ -37155,6 +37341,13 @@
       "vocab-n4",
       "vocab-n2",
       "confusables-word"
+    ]
+  },
+  {
+    "text": "すると、後ろにいたコンちゃんが「いちばん左が普通のラーメンだよ」と教えてくれました。",
+    "hash": "2e05b98ac85f",
+    "sources": [
+      "article#eh-n4-2"
     ]
   },
   {
@@ -37882,7 +38075,8 @@
     "text": "せき",
     "hash": "29c26602d23e",
     "sources": [
-      "vocab-n4"
+      "vocab-n4",
+      "article-vocab#eh-n4-2"
     ]
   },
   {
@@ -38819,7 +39013,8 @@
     "text": "ぜんぶ",
     "hash": "dbcedef26053",
     "sources": [
-      "vocab-n5"
+      "vocab-n5",
+      "article-vocab#eh-n4-2"
     ]
   },
   {
@@ -39544,6 +39739,13 @@
     ]
   },
   {
+    "text": "そこで、きれいな青いマフラーを見つけました。",
+    "hash": "bd3beba22760",
+    "sources": [
+      "article#eh-n4-3"
+    ]
+  },
+  {
     "text": "そこで便利なのが「置き配」や宅配ボックスだ。",
     "hash": "7ed35df3f4dc",
     "sources": [
@@ -39562,6 +39764,13 @@
     "hash": "74af0b7681de",
     "sources": [
       "vocab-n5#そこ"
+    ]
+  },
+  {
+    "text": "そこへキツネのコンちゃんが来ました。",
+    "hash": "1bf68f127d18",
+    "sources": [
+      "article#eh-n5-2"
     ]
   },
   {
@@ -40571,6 +40780,13 @@
     ]
   },
   {
+    "text": "その夜、コンちゃんがおかゆを持ってきてくれました。",
+    "hash": "ad578cfd19c7",
+    "sources": [
+      "article#eh-n4-1"
+    ]
+  },
+  {
     "text": "その老編集者の炯眼は、原稿のわずかな綻びも見逃さなかった。",
     "hash": "23b5aec48a83",
     "sources": [
@@ -40721,6 +40937,13 @@
     "hash": "43fd70d51bf2",
     "sources": [
       "vocab-n5"
+    ]
+  },
+  {
+    "text": "それから、近くのクリニックへ行きました。",
+    "hash": "5656401b2776",
+    "sources": [
+      "article#eh-n4-1"
     ]
   },
   {
@@ -41615,7 +41838,8 @@
       "vocab-n5",
       "vocab-n4",
       "vocab-n3",
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#eh-n4-3"
     ]
   },
   {
@@ -42890,6 +43114,111 @@
     ]
   },
   {
+    "text": "たぬたろうは「ありがとうございます」といって、はしりました。",
+    "hash": "b19067ab8997",
+    "sources": [
+      "article#eh-n5-2"
+    ]
+  },
+  {
+    "text": "たぬたろうは「かためでお願いします」と答えました。",
+    "hash": "71613797bc2f",
+    "sources": [
+      "article#eh-n4-2"
+    ]
+  },
+  {
+    "text": "たぬたろうは「すみません、うみへ行くでんしゃはどこですか」とききました。",
+    "hash": "f40b0d2db37d",
+    "sources": [
+      "article#eh-n5-2"
+    ]
+  },
+  {
+    "text": "たぬたろうは「はい、おねがいします」といいました。",
+    "hash": "fbe469b23ae5",
+    "sources": [
+      "article#eh-n5-1"
+    ]
+  },
+  {
+    "text": "たぬたろうはいみがわかりません。",
+    "hash": "fa757db7a66f",
+    "sources": [
+      "article#eh-n5-1"
+    ]
+  },
+  {
+    "text": "たぬたろうはおべんとうを一つとおちゃを一つえらびました。",
+    "hash": "bd35eba779a3",
+    "sources": [
+      "article#eh-n5-1"
+    ]
+  },
+  {
+    "text": "たぬたろうはきのう日本に来ました。",
+    "hash": "5f36d74d4bc9",
+    "sources": [
+      "article#eh-n5-1"
+    ]
+  },
+  {
+    "text": "たぬたろうはこまりました。",
+    "hash": "22f87ed0e3f8",
+    "sources": [
+      "article#eh-n5-2"
+    ]
+  },
+  {
+    "text": "たぬたろうはスープを全部飲んでしまいました。",
+    "hash": "7338d7dcf63c",
+    "sources": [
+      "article#eh-n4-2"
+    ]
+  },
+  {
+    "text": "たぬたろうはでんしゃでうみへ行きます。",
+    "hash": "ef8535e4df8f",
+    "sources": [
+      "article#eh-n5-2"
+    ]
+  },
+  {
+    "text": "たぬたろうはまたコンビニに行きたいです。",
+    "hash": "6ee3f8344f7d",
+    "sources": [
+      "article#eh-n5-1"
+    ]
+  },
+  {
+    "text": "たぬたろうはわかりません。",
+    "hash": "f939b8e81f65",
+    "sources": [
+      "article#eh-n5-2"
+    ]
+  },
+  {
+    "text": "たぬたろうは会社に電話して、「すみません、かぜをひいたので、今日は休ませてください」と言いました。",
+    "hash": "baf49aa232ca",
+    "sources": [
+      "article#eh-n4-1"
+    ]
+  },
+  {
+    "text": "たぬたろうは傘をさして、町の雑貨屋さんへ行きました。",
+    "hash": "9f52161519cd",
+    "sources": [
+      "article#eh-n4-3"
+    ]
+  },
+  {
+    "text": "たぬたろうは新しいマフラーをプレゼントしようと思いました。",
+    "hash": "05544cab91c0",
+    "sources": [
+      "article#eh-n4-3"
+    ]
+  },
+  {
     "text": "たね",
     "hash": "e85cc5805573",
     "sources": [
@@ -43397,7 +43726,8 @@
     "hash": "099732e9eb0c",
     "sources": [
       "vocab-n5",
-      "vocab-n3"
+      "vocab-n3",
+      "article-vocab#eh-n4-3"
     ]
   },
   {
@@ -43874,7 +44204,15 @@
     "text": "ちず",
     "hash": "a12b39180817",
     "sources": [
-      "vocab-n5"
+      "vocab-n5",
+      "article-vocab#eh-n5-2"
+    ]
+  },
+  {
+    "text": "ちずを見ましたが、もっとわからなくなりました。",
+    "hash": "4c68eed3a707",
+    "sources": [
+      "article#eh-n5-2"
     ]
   },
   {
@@ -45160,6 +45498,13 @@
     ]
   },
   {
+    "text": "つぎにてんいんさんが「ふくろはいりますか」とききました。",
+    "hash": "962377d761f7",
+    "sources": [
+      "article#eh-n5-1"
+    ]
+  },
+  {
     "text": "つぎの えきは どこですか。",
     "hash": "dd80357e3f1b",
     "sources": [
@@ -45313,7 +45658,8 @@
     "hash": "9ab861c29325",
     "sources": [
       "vocab-n4",
-      "vocab-n3"
+      "vocab-n3",
+      "article-vocab#eh-n4-3"
     ]
   },
   {
@@ -46567,6 +46913,20 @@
     ]
   },
   {
+    "text": "でも、その日は朝から雨でした。",
+    "hash": "9210fc64842c",
+    "sources": [
+      "article#eh-n4-3"
+    ]
+  },
+  {
+    "text": "でも、ボタンがたくさんあって、どれを押せばいいかわかりません。",
+    "hash": "6f78bb978c61",
+    "sources": [
+      "article#eh-n4-2"
+    ]
+  },
+  {
     "text": "でも、ほとんどの単語は覚えられました。",
     "hash": "164921ce6da4",
     "sources": [
@@ -46728,7 +47088,8 @@
     "sources": [
       "vocab-n5",
       "article-vocab#a-n4-10",
-      "article-vocab#a-n5-12"
+      "article-vocab#a-n5-12",
+      "article-vocab#eh-n5-1"
     ]
   },
   {
@@ -46736,6 +47097,13 @@
     "hash": "9088acf1da63",
     "sources": [
       "article-vocab#a-n5-10"
+    ]
+  },
+  {
+    "text": "てんいんさんが「あたためますか」とききました。",
+    "hash": "c31889f1d2a5",
+    "sources": [
+      "article#eh-n5-1"
     ]
   },
   {
@@ -46897,7 +47265,8 @@
     "text": "でんしゃ",
     "hash": "c5b48d951de5",
     "sources": [
-      "vocab-n5"
+      "vocab-n5",
+      "article-vocab#eh-n5-2"
     ]
   },
   {
@@ -46912,6 +47281,13 @@
     "hash": "54382cc12e45",
     "sources": [
       "article#a-n5-11"
+    ]
+  },
+  {
+    "text": "でんしゃにまにあいました！",
+    "hash": "b4f4966f4b5f",
+    "sources": [
+      "article#eh-n5-2"
     ]
   },
   {
@@ -51314,7 +51690,8 @@
     "sources": [
       "vocab-n3",
       "article-vocab#a-n5-2",
-      "article-vocab#a-n5-4"
+      "article-vocab#a-n5-4",
+      "article-vocab#eh-n4-2"
     ]
   },
   {
@@ -51466,7 +51843,8 @@
     "hash": "afe7d68e6bbc",
     "sources": [
       "vocab-n3",
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#eh-n4-3"
     ]
   },
   {
@@ -51597,7 +51975,8 @@
     "text": "ねつ",
     "hash": "05dc55d6558c",
     "sources": [
-      "vocab-n4"
+      "vocab-n4",
+      "article-vocab#eh-n4-1"
     ]
   },
   {
@@ -52046,7 +52425,8 @@
     "text": "のぼる",
     "hash": "cbc9cf6d70bf",
     "sources": [
-      "vocab-n5"
+      "vocab-n5",
+      "article-vocab#eh-n5-2"
     ]
   },
   {
@@ -52994,7 +53374,8 @@
     "hash": "69873d7587ac",
     "sources": [
       "vocab-n5",
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#eh-n5-1"
     ]
   },
   {
@@ -54154,6 +54535,13 @@
     "hash": "bef74ce00cbf",
     "sources": [
       "vocab-n1"
+    ]
+  },
+  {
+    "text": "ばんせん",
+    "hash": "179d62170366",
+    "sources": [
+      "article-vocab#eh-n5-2"
     ]
   },
   {
@@ -56195,7 +56583,8 @@
     "text": "ふくろ",
     "hash": "639f01b729bd",
     "sources": [
-      "vocab-n3"
+      "vocab-n3",
+      "article-vocab#eh-n5-1"
     ]
   },
   {
@@ -56485,7 +56874,8 @@
     "sources": [
       "vocab-n5",
       "vocab-n4",
-      "vocab-n3"
+      "vocab-n3",
+      "article-vocab#eh-n4-2"
     ]
   },
   {
@@ -57067,6 +57457,13 @@
     "hash": "1271a2c163fd",
     "sources": [
       "vocab-n5"
+    ]
+  },
+  {
+    "text": "プレゼントがぬれないように、たぬたろうはかばんをしっかり抱えて走りました。",
+    "hash": "1335544dc6e3",
+    "sources": [
+      "article#eh-n4-3"
     ]
   },
   {
@@ -58587,7 +58984,8 @@
     "hash": "335f2870714c",
     "sources": [
       "article-vocab#a-n3-8",
-      "article-vocab#a-n4-9"
+      "article-vocab#a-n4-9",
+      "article-vocab#eh-n4-1"
     ]
   },
   {
@@ -59193,6 +59591,13 @@
     "hash": "060e4ff1772d",
     "sources": [
       "vocab-n5"
+    ]
+  },
+  {
+    "text": "まいご",
+    "hash": "933de11fe187",
+    "sources": [
+      "article-vocab#eh-n5-2"
     ]
   },
   {
@@ -59889,7 +60294,8 @@
     "hash": "ca36aeaa3856",
     "sources": [
       "vocab-n4",
-      "vocab-n3"
+      "vocab-n3",
+      "article-vocab#eh-n5-2"
     ]
   },
   {
@@ -59946,7 +60352,8 @@
     "text": "マフラー",
     "hash": "0e5c44b578d1",
     "sources": [
-      "article-vocab#a-n5-13"
+      "article-vocab#a-n5-13",
+      "article-vocab#eh-n4-3"
     ]
   },
   {
@@ -60388,6 +60795,13 @@
     ]
   },
   {
+    "text": "みせの中はとてもあかるいです。",
+    "hash": "c0e9e0f189ad",
+    "sources": [
+      "article#eh-n5-1"
+    ]
+  },
+  {
     "text": "みせる",
     "hash": "3cb94a8783c7",
     "sources": [
@@ -60494,7 +60908,8 @@
     "hash": "fd7f3bdccfec",
     "sources": [
       "vocab-n4",
-      "vocab-n3"
+      "vocab-n3",
+      "article-vocab#eh-n4-3"
     ]
   },
   {
@@ -61822,6 +62237,13 @@
     ]
   },
   {
+    "text": "めん",
+    "hash": "99d0596a0a67",
+    "sources": [
+      "article-vocab#eh-n4-2"
+    ]
+  },
+  {
     "text": "めんえき",
     "hash": "16e5c38e1838",
     "sources": [
@@ -62824,7 +63246,8 @@
     "text": "もんしんひょう",
     "hash": "c3c4b8911b74",
     "sources": [
-      "article-vocab#a-n4-9"
+      "article-vocab#a-n4-9",
+      "article-vocab#eh-n4-1"
     ]
   },
   {
@@ -63014,7 +63437,8 @@
     "text": "やすむ",
     "hash": "d1e61f2de960",
     "sources": [
-      "vocab-n5"
+      "vocab-n5",
+      "article-vocab#eh-n4-1"
     ]
   },
   {
@@ -65737,7 +66161,8 @@
     "hash": "77654f51d590",
     "sources": [
       "article-vocab#a-n5-10",
-      "article-vocab#a-n5-12"
+      "article-vocab#a-n5-12",
+      "article-vocab#eh-n5-1"
     ]
   },
   {
@@ -65794,6 +66219,13 @@
     "hash": "eee6ee0f0342",
     "sources": [
       "article#a-n2-5"
+    ]
+  },
+  {
+    "text": "レジにもっていきます。",
+    "hash": "3d7ebd746edc",
+    "sources": [
+      "article#eh-n5-1"
     ]
   },
   {
@@ -67195,7 +67627,8 @@
       "vocab-n5",
       "vocab-n3",
       "vocab-n2",
-      "article-vocab#a-n4-12"
+      "article-vocab#a-n4-12",
+      "article-vocab#eh-n4-2"
     ]
   },
   {
@@ -69645,6 +70078,13 @@
     ]
   },
   {
+    "text": "駅の近くに人気のラーメン屋があります。",
+    "hash": "df7f752a521b",
+    "sources": [
+      "article#eh-n4-2"
+    ]
+  },
+  {
     "text": "駅の近くに大きなショッピングモールが建設される予定です。",
     "hash": "e6a7417637c9",
     "sources": [
@@ -70385,6 +70825,13 @@
     "hash": "4c8f077c6a76",
     "sources": [
       "vocab-n3#溶かす"
+    ]
+  },
+  {
+    "text": "温かくて、とてもおいしかったです。",
+    "hash": "7a09834ae49c",
+    "sources": [
+      "article#eh-n4-1"
     ]
   },
   {
@@ -75301,6 +75748,13 @@
     "hash": "eac553012767",
     "sources": [
       "daily-story#n5_13"
+    ]
+  },
+  {
+    "text": "帰り道、雨はもっと強くなりました。",
+    "hash": "318e16f6ec3a",
+    "sources": [
+      "article#eh-n4-3"
     ]
   },
   {
@@ -82979,6 +83433,13 @@
     ]
   },
   {
+    "text": "今日、たぬたろうは初めてそこに入りました。",
+    "hash": "9f00aad76949",
+    "sources": [
+      "article#eh-n4-2"
+    ]
+  },
+  {
     "text": "今日、電車の中に傘を忘れてしまいました。",
     "hash": "31d5604570e3",
     "sources": [
@@ -85561,6 +86022,13 @@
     "hash": "a04c539c53b0",
     "sources": [
       "vocab-n3#状態"
+    ]
+  },
+  {
+    "text": "三日後、たぬたろうはすっかり元気になりました。",
+    "hash": "0f43fc1b7dfa",
+    "sources": [
+      "article#eh-n4-1"
     ]
   },
   {
@@ -91136,6 +91604,13 @@
     ]
   },
   {
+    "text": "受付で保険証を出して、問診票を書きました。",
+    "hash": "daf8ab1812f7",
+    "sources": [
+      "article#eh-n4-1"
+    ]
+  },
+  {
     "text": "受付で保険証を出すと、問診票を書くように言われました。",
     "hash": "473a377e1478",
     "sources": [
@@ -93553,6 +94028,13 @@
     ]
   },
   {
+    "text": "少し高かったけど、たぬたろうはそれを買うことにしました。",
+    "hash": "df74674b88dc",
+    "sources": [
+      "article#eh-n4-3"
+    ]
+  },
+  {
     "text": "少し声を下げてもらえますか。",
     "hash": "c04759238ece",
     "sources": [
@@ -95395,6 +95877,13 @@
     ]
   },
   {
+    "text": "新しいマフラーをしたコンちゃんは、「ありがとう、ずっと大切にするね」と笑いました。",
+    "hash": "06adff78ffa4",
+    "sources": [
+      "article#eh-n4-3"
+    ]
+  },
+  {
     "text": "新しい育児休業制度の導入により、働き方が大きく変わりつつある。",
     "hash": "4401eadae006",
     "sources": [
@@ -97026,6 +97515,13 @@
     ]
   },
   {
+    "text": "人もたくさんいます。",
+    "hash": "0267d9c164be",
+    "sources": [
+      "article#eh-n5-2"
+    ]
+  },
+  {
     "text": "人を哀れむだけでは、真の救いにはならない。",
     "hash": "65eecfd39351",
     "sources": [
@@ -98298,6 +98794,13 @@
     "hash": "ef2b2c307667",
     "sources": [
       "vocab-n1#不意に"
+    ]
+  },
+  {
+    "text": "席に座って食券を渡すと、店員さんに「麺のかたさはどうしますか」と聞かれました。",
+    "hash": "1295e48248e4",
+    "sources": [
+      "article#eh-n4-2"
     ]
   },
   {
@@ -104454,6 +104957,13 @@
     ]
   },
   {
+    "text": "朝起きると、頭が痛くて、のどもとても痛かったです。",
+    "hash": "540ab2743d6f",
+    "sources": [
+      "article#eh-n4-1"
+    ]
+  },
+  {
     "text": "朝食を食べ始めると、雨が降り始めて、続けて天気の悪い日が続きます。",
     "hash": "d6c087cac288",
     "sources": [
@@ -106411,6 +106921,13 @@
     "hash": "91b934f848f3",
     "sources": [
       "article#a-n4-10"
+    ]
+  },
+  {
+    "text": "店員さんがきれいに包んでくれました。",
+    "hash": "f640bab752fe",
+    "sources": [
+      "article#eh-n4-3"
     ]
   },
   {
@@ -109481,6 +109998,13 @@
     ]
   },
   {
+    "text": "日本で病院に行くのは少しこわかったけど、もう大丈夫です。",
+    "hash": "b36b1a71d1c5",
+    "sources": [
+      "article#eh-n4-1"
+    ]
+  },
+  {
     "text": "日本で部屋を借りるのは、思っていたより手間がかかる。",
     "hash": "c90163a7da23",
     "sources": [
@@ -110279,6 +110803,13 @@
     ]
   },
   {
+    "text": "入口に券売機がありました。",
+    "hash": "af5b163a77cc",
+    "sources": [
+      "article#eh-n4-2"
+    ]
+  },
+  {
     "text": "入口はあちらです。",
     "hash": "d5c247965b40",
     "sources": [
@@ -110426,6 +110957,13 @@
     ]
   },
   {
+    "text": "熱いスープとかための麺は最高でした。",
+    "hash": "f945f78e3ce9",
+    "sources": [
+      "article#eh-n4-2"
+    ]
+  },
+  {
     "text": "熱いものを一気に飲み込んだせいで、食道がひりひりと痛む。",
     "hash": "c7926201a8ef",
     "sources": [
@@ -110514,6 +111052,13 @@
     "hash": "eb6517c0d58c",
     "sources": [
       "phrases"
+    ]
+  },
+  {
+    "text": "熱もあるようです。",
+    "hash": "02edf8757342",
+    "sources": [
+      "article#eh-n4-1"
     ]
   },
   {
@@ -123293,6 +123838,13 @@
     "hash": "bf092d5df3f5",
     "sources": [
       "vocab-n4#約束する"
+    ]
+  },
+  {
+    "text": "来週の土曜日はコンちゃんの誕生日です。",
+    "hash": "cb42bc2b8fe9",
+    "sources": [
+      "article#eh-n4-3"
     ]
   },
   {

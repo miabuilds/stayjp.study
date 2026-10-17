@@ -402,7 +402,7 @@ window.Articles = (function () {
       '.art-next .art-next-l{font-size:11.5px;font-weight:800;color:var(--ac,var(--ac));letter-spacing:.06em;margin-bottom:2px}.art-next-go{margin-left:auto;font-size:22px;color:var(--tx3,#aaa)}',
       '.art-chips{display:flex;gap:6px;flex-wrap:wrap;margin:2px 0 6px;position:sticky;top:0;background:var(--bg,#faf9f6);padding:8px 0;z-index:2}',
       '.art-chip{border:1px solid var(--bd,#e5e5e5);background:var(--bg2,#fff);color:var(--tx,#333);border-radius:999px;padding:6px 12px;font-size:13px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:5px}.art-chip.on{background:var(--tx,#2C2C2C);color:var(--bg2,#fff);border-color:var(--tx,#2C2C2C)}',
-      '.art-chip small{font-size:11px;background:var(--ac,var(--ac));color:#fff;border-radius:999px;padding:1px 6px;font-weight:700}.art-chip.on small{background:var(--bg2,#fff);color:var(--tx,#2C2C2C)}.art-chip i{width:12px;height:12px;color:#16a34a}',
+      '.art-chip small{font-size:11px;background:var(--ac,var(--ac));color:#fff;border-radius:999px;padding:1px 6px;font-weight:700}.art-chip.on small{background:var(--bg2,#fff);color:var(--tx,#2C2C2C)}.art-chip i{width:12px;height:12px;color:#16a34a}.art-chip.eh i{color:inherit}',
       '.art-card.is-read{opacity:.72}',
       '.art-readfold{margin:4px 0 6px}.art-readfold summary{cursor:pointer;list-style:none;display:inline-flex;align-items:center;gap:6px;font-size:12.5px;color:var(--tx3,#aaa);padding:6px 10px;border:1px dashed var(--bd,#ddd);border-radius:999px;margin-bottom:10px}.art-readfold summary::-webkit-details-marker{display:none}.art-readfold summary i{width:12px;height:12px;color:#16a34a}',
       '.art-card-z{font-size:13px;color:var(--tx2,#888);margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
@@ -477,6 +477,11 @@ window.Articles = (function () {
       // 使用者回饋:單字都可點查字典,想「播這一句」反而沒地方點
       '.art-s{display:block;position:relative;border-radius:10px;padding:3px 6px 3px 38px;margin:0 0 14px;min-height:30px;line-height:2.05;letter-spacing:.012em}',
       '.art-para{margin-bottom:20px}',
+      // 繪本插圖:每段上方一張方圖,與上一段之間留白+細線分頁
+      '.art-pic{position:relative;max-width:380px;margin:8px auto 18px;border-radius:18px;overflow:hidden;aspect-ratio:1/1;background:var(--bg3,#efece5);box-shadow:0 2px 10px rgba(0,0,0,.08)}',
+      '.art-para + .art-pic,.art-tr + .art-pic{margin-top:30px}',
+      '.art-pic img{display:block;width:100%;height:100%;object-fit:cover}',
+      '.art-pic-n{position:absolute;right:10px;bottom:10px;font:700 11.5px/1.6 -apple-system,sans-serif;color:#fff;background:rgba(0,0,0,.45);border-radius:999px;padding:1px 9px}',
       '.art-sub{line-height:1.75}',
       '.art-sp{position:absolute;left:0;top:.45em;width:26px;height:26px;border-radius:50%;border:1.5px solid rgba(var(--ac-rgb),.45);background:none;color:#e8734a;font-size:11px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;padding:0 0 0 2px}',
       '.art-sp:hover{background:rgba(var(--ac-rgb),.12)}',
@@ -659,8 +664,11 @@ window.Articles = (function () {
     var all = list(), read = readSet(), prog = progSet(), hide = hideReadOn(), contId = inProgressId();
     var byLv = {}; all.forEach(function (a) { (byLv[a.level] = byLv[a.level] || []).push(a); });
     var filt = ''; try { filt = localStorage.getItem('art_filter') || ''; } catch (e) {}
-    if (filt && !byLv[filt]) filt = '';
+    var hasEhon = all.some(function (a) { return a.ehon; });
+    if (filt && !(filt === 'ehon' ? hasEhon : byLv[filt])) filt = '';
     var ch = '<button class="art-chip' + (filt ? '' : ' on') + '" onclick="Articles.filter(\'\')">' + enOr('全部', 'All') + '</button>';
+    // 繪本故事(2026-10 用戶建議):每頁一張插圖的短故事,放在等級前面
+    if (hasEhon) ch += '<button class="art-chip eh' + (filt === 'ehon' ? ' on' : '') + '" onclick="Articles.filter(\'ehon\')"><i data-ic=sparkle></i> ' + enOr('繪本', 'Picture books') + '</button>';
     LEVELS.forEach(function (lv) {
       var arr = byLv[lv] || []; if (!arr.length) return;
       var un = arr.filter(function (a) { return !read[a.id]; }).length;
@@ -669,8 +677,10 @@ window.Articles = (function () {
     });
     chips.innerHTML = ch;
     var hero = newest(all);
-    var rows = window.ArticleList.apply(window.ArticleList.sortNewest(all), { level: filt, hideRead: hide, read: read, keepId: contId })
-      .filter(function (a) { return !hero || a.id !== hero.id; });   // hero 已在上面,清單不重複
+    var rows = window.ArticleList.apply(window.ArticleList.sortNewest(all), { level: filt === 'ehon' ? '' : filt, hideRead: hide, read: read, keepId: contId })
+      .filter(function (a) { return filt !== 'ehon' || a.ehon; })
+      .filter(function (a) { return filt === 'ehon' || !hero || a.id !== hero.id; });   // hero 已在上面,清單不重複(繪本分頁不管 hero)
+    if (filt === 'ehon') rows.sort(function (x, y) { return (LEVELS.indexOf(x.level) - LEVELS.indexOf(y.level)) || (x.id < y.id ? -1 : 1); });   // 繪本:簡單的(N5)排前面   // hero 已在上面,清單不重複
     // 讀到一半的那篇排最前面(回來一眼看到接著讀)
     if (contId) { var ci = rows.findIndex(function (a) { return a.id === contId; }); if (ci > 0) rows.unshift(rows.splice(ci, 1)[0]); }
     var hb = document.getElementById('artHideBtn'); if (hb) { hb.classList.toggle('on', hide); hb.setAttribute('aria-pressed', hide ? 'true' : 'false'); }
@@ -705,7 +715,7 @@ window.Articles = (function () {
       '<span class="tt">' + esc(Lc(a.title_zh,a.title_en)) + '</span>' +
       '<button class="art-ic" onclick="Articles.close()"><i data-ic=x></i></button></div>' +
       '<div class="art-hero" style="background:linear-gradient(135deg,' + g[0] + ',' + g[1] + ')">' +
-      '<img class="art-hero-bg" src="' + imgUrl(a.id) + '" alt="" width="400" height="400" decoding="async" onerror="this.remove()">' +
+      (a.ehon ? '' : '<img class="art-hero-bg" src="' + imgUrl(a.id) + '" alt="" width="400" height="400" decoding="async" onerror="this.remove()">') +
       '<div class="art-hero-ov"></div>' +
       '<div class="art-hero-in">' +
       '<div class="hb">' + LVN[a.level] + '　' + esc(Lc(a.topic,a.topic_en)) + '</div>' +
@@ -765,7 +775,13 @@ window.Articles = (function () {
     mk.addEventListener('scroll', function () { if (!raf) raf = requestAnimationFrame(calc); }, { passive: true });
     setTimeout(calc, 300);
   }
-  function filter(lv) { try { if (lv) localStorage.setItem('art_filter', lv); else localStorage.removeItem('art_filter'); } catch (e) {} if (document.getElementById('artList')) renderList(); else open(); }
+  function filter(lv) {
+    try { if (lv) localStorage.setItem('art_filter', lv); else localStorage.removeItem('art_filter'); } catch (e) {}
+    if (document.getElementById('artList')) { renderList(); return; }
+    open();
+    // 從「繪本故事」入口進來:直接捲到分類列,不要停在最上面的最新文章
+    if (lv === 'ehon') setTimeout(function () { var c = document.getElementById('artChips'), m = document.getElementById('artMask'); if (c && m) m.scrollTop = Math.max(0, c.getBoundingClientRect().top - m.getBoundingClientRect().top + m.scrollTop - 56); }, 60);
+  }
   function tabBtn(k, label) { return '<button class="art-tab' + (curTab === k ? ' on' : '') + '" data-tab="' + k + '" onclick="Articles.tab(\'' + k + '\')">' + label + '</button>'; }
 
   function tab(k) {
@@ -842,7 +858,8 @@ window.Articles = (function () {
         return sp + rjS + trS;
       }).join('');
       var trHtml = (!trParts && trWhole) ? '<div class="art-tr" style="display:' + (zhOn ? 'block' : 'none') + '">' + esc(trWhole) + '</div>' : '';
-      return '<div class="art-para" style="font-size:' + FS[fsIdx] + '">' + inner + '</div>' + trHtml;
+      var pic = a.ehon ? '<figure class="art-pic"><img src="images/ehon/' + a.id + '-' + (pi + 1) + '.webp" alt="" width="600" height="600" decoding="async"' + (pi > 1 ? ' loading="lazy"' : '') + '><span class="art-pic-n">' + (pi + 1) + ' / ' + paras.length + '</span></figure>' : '';
+      return pic + '<div class="art-para" style="font-size:' + FS[fsIdx] + '">' + inner + '</div>' + trHtml;
     }).join('');
     // 讀完往下:重點單字(橘) + 本篇文法(藍),同一頁對照,不用切分頁
     if (a.vocab && a.vocab.length) {
