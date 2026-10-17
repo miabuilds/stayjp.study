@@ -160,6 +160,7 @@
 </style>
 <script src="accent.js"></script>
 <script src="native-ui.js"></script>
+<script src="safe-back.js"></script>
 </head>
 <body>
 <div id="boot" style="min-height:60vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;color:var(--ink3)"><div style="width:34px;height:34px;border:3px solid var(--line);border-top-color:var(--accent);border-radius:50%;animation:bspin .8s linear infinite"></div><div style="font-size:14px">載入中…</div></div>
@@ -168,7 +169,7 @@
 </div>
 
 <div id="app" class="wrap" style="display:none">
-  <div style="margin-bottom:8px"><a href="#" class="backbtn" onclick="if(history.length>1){history.back()}else{location.href='app.html'};return false"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>返回</a></div>
+  <div style="margin-bottom:8px"><a href="#" class="backbtn" onclick="safeBack('app.html');return false"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>返回</a></div>
   <h1>跟讀練習 <span class="muted" style="font-weight:400">Beta</span></h1>
   <div class="sub">選句子 → 聽範例 → 念一次(或直接打字)→ 送出,看 AI 回饋。　免費體驗 10 次 AI 評分,Premium 每天 30 次。想練「來回對話」試試 <a href="speak-chat.html" style="color:var(--accent);font-weight:600"><i data-ic=speak></i> 情境對話</a>。</div>
   <!-- 下載 App 列:廣告/社群從網頁進來的人找得到 App(2026-10-18)。native-ui.js 依裝置只亮對的商店鈕,App 內 data-web-only 整條藏 -->
@@ -1343,7 +1344,7 @@ const Lesson=(()=>{
     active=false; clearTimeout(autoTimer); stopListen();
     try{ if(_demo){ _demo.pause(); _demo=null; } }catch(e){}
     let fromSkit=false; try{ const r=new URL(document.referrer); fromSkit=r.origin===location.origin && /\/skits(\.html)?$/.test(r.pathname); }catch(e){}
-    if(fromSkit && history.length>1) history.back(); else location.replace(backUrl);
+    if(fromSkit) safeBack(backUrl, true); else location.replace(backUrl);
   }
   function again(){ clearTimeout(autoTimer); stopListen(); render(); }
   return { start, startBlankSame, exit, next:nextS, demo, toggleMic, back:goBack, again, _feed:feed, _done:lsDone };

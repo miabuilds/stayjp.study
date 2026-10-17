@@ -96,12 +96,13 @@
   .pl-say svg{width:15px;height:15px}
 </style>
 <script src="accent.js"></script>
+<script src="safe-back.js"></script>
 </head>
 <body>
 <div class="wrap">
   <header>
-    <a class="backbtn" href="app.html" onclick="try{if(history.length>1){history.back();return false}}catch(e){}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg><span id="bkTx">返回</span></a>
-    <span class="logo">日本再留計劃</span>
+    <a class="backbtn" href="app.html" onclick="if(window.safeBack){safeBack('app.html');return false}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg><span id="bkTx">返回</span></a>
+    <a class="logo" href="app.html" style="text-decoration:none;color:inherit">日本再留計劃</a>
     <span class="sp"></span>
     <button class="lang" id="langBtn" onclick="cycleLang()">EN</button>
   </header>
