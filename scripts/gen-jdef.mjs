@@ -13,7 +13,8 @@ const fileOf = lv => `jdef-${lv}.js`;
 function load(lv) {
   if (!fs.existsSync(fileOf(lv))) return {};
   const s = fs.readFileSync(fileOf(lv), 'utf8');
-  return JSON.parse(s.slice(s.indexOf('{', s.indexOf('(')), s.lastIndexOf('}') + 1));
+  const m = s.match(/\|\|\{\},(\{[\s\S]*\})\);\s*$/);   // 格式見 save():Object.assign(window.JDEF||{},{...});
+  return m ? JSON.parse(m[1]) : {};
 }
 function save(lv, obj) {
   fs.writeFileSync(fileOf(lv), `// 「看日文猜單字」${lv.toUpperCase()} 的簡單日文解釋(key = 字|讀音;d = 說明,k = 全假名版)。scripts/gen-jdef.mjs 產生,說明含答案者已自動排除。\nwindow.JDEF=Object.assign(window.JDEF||{},${JSON.stringify(obj)});\n`);

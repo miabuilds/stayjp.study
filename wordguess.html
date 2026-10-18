@@ -237,7 +237,7 @@ function hydrate(){ try{ if(window.Icons&&Icons.hydrate) Icons.hydrate(); }catch
 // ── 題庫 ──
 // 單字檔(N3 以上每級 600KB)+ 解釋檔都按級延遲載入:選哪級才抓哪級
 // 有解釋資料的等級才開放(jdef-<lv>.js 產完、上線後才加進來;app.html 單字區入口 WG_LEVELS 要同步)
-const LEVELS = ['n5','n4'];
+const LEVELS = ['n5','n4','n3','n2'];
 const VOC = {};
 let JD = window.JDEF || {};
 const _lvP = {};
