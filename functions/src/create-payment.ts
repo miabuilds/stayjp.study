@@ -155,7 +155,7 @@ export const createPayment = functions.onRequest(
         params.Frequency = 1;
         params.ExecTimes = 99;     // 上限 99 期月費(綠界限制)
         params.PeriodReturnURL = cfg.callbackUrl;
-      } else if (plan === "yearly" || plan === "yearly_early_bird" || plan === "group4_yearly" || plan === "group6_yearly") {
+      } else if (plan === "yearly" || plan === "yearly_early_bird" || plan === "group4_yearly") {
         params.PeriodAmount = priceTwd;   // 實扣價(檔期價/折後價)→ 定期定額之後每期都鎖這個金額
         params.PeriodType = "Y";
         params.Frequency = 1;

@@ -8,6 +8,8 @@
  *   remove {member_uid}     → 主揪移除成員
  *   regen                   → 主揪換新邀請連結(舊連結失效)
  *   invite {email}          → 主揪寄邀請信(只寄連結,不比對帳號;每團每天 10 封)
+ *   board                   → 本週團內排行(主揪+團員都看得到;讀 user_daily/{uid})
+ *   board_hide {hidden}     → 自己要不要出現在排行(關掉照樣算進團隊總數)
  * 資料:groups/{主揪 uid}(見 utils/firestore.ts 揪團段)。client 不能直接讀寫 groups(rules 預設拒絕)。
  *
  * 補位規則(防止把位子拆出去轉賣):前 (seats-1) 個加入是「首次湊團」不限;之後每次加入算「補位」——
@@ -60,6 +62,41 @@ async function findGroupOf(uid: string): Promise<{ id: string; g: any; role: "ow
 }
 
 const revokeMember = (ownerUid: string, memberUid: string) => revokeGroupSub(memberUid, ownerUid);
+
+// ── 團內排行 ──
+// 資料:user_daily/{uid} = { "YYYY-MM-DD": {vocab, grammar, quiz} }(daily-log.js,裝置本地日期;台灣用戶≈台灣日期)。
+// 一週 = 台灣時間週一~今天。團隊目標 = 每人每週 100 個動作(今日目標 30/天的三分之一,大家都碰得到)。
+const PER_PERSON_WEEKLY_GOAL = 100;
+const twDay = (ms: number) => new Date(ms + 8 * 3600e3).toISOString().slice(0, 10);
+async function buildBoard(ownerUid: string, g: any, me: string) {
+  const now = nowMs();
+  const tw = new Date(now + 8 * 3600e3);
+  const dow = (tw.getUTCDay() + 6) % 7;   // 週一=0
+  const weekDays = Array.from({ length: dow + 1 }, (_, i) => twDay(now - (dow - i) * DAY));
+  const today = twDay(now);
+  const uids = [ownerUid, ...((g.member_uids || []) as string[])];
+  const rows = await Promise.all(uids.map(async (u) => {
+    const [dSnap, uSnap] = await Promise.all([db.doc(`user_daily/${u}`).get(), db.doc(`users/${u}`).get()]);
+    const daily = dSnap.data() || {};
+    const sumOf = (d: string) => { const x = daily[d] || {}; return (x.vocab || 0) + (x.grammar || 0) + (x.quiz || 0); };
+    const week = weekDays.reduce((n, d) => n + sumOf(d), 0);
+    let streak = 0;
+    for (let i = sumOf(today) > 0 ? 0 : 1; i < 120; i++) { if (sumOf(twDay(now - i * DAY)) > 0) streak++; else break; }
+    return {
+      me: u === me, owner: u === ownerUid,
+      name: u === ownerUid ? await displayNameOf(u) : (g.members?.[u]?.name || "使用者"),
+      hidden: uSnap.data()?.group_board_hidden === true,
+      week, today: sumOf(today), days: weekDays.filter(d => sumOf(d) > 0).length, streak,
+    };
+  }));
+  const total = rows.reduce((n, r) => n + r.week, 0);
+  const goal = PER_PERSON_WEEKLY_GOAL * uids.length;
+  // 不公開的人:名次與數字都不給(自己看得到自己的),但照樣算進團隊總數
+  const out = rows.sort((a, b) => b.week - a.week).map(r => (r.hidden && !r.me)
+    ? { me: false, owner: r.owner, name: r.name, hidden: true }
+    : r);
+  return { week_start: weekDays[0], goal, total, members: out, my_hidden: rows.find(r => r.me)?.hidden || false };
+}
 
 export const groupApi = functions.onRequest(
   { region: "asia-east1", invoker: "public", cors: true, maxInstances: 10, memory: "256MiB" },
@@ -152,6 +189,19 @@ export const groupApi = functions.onRequest(
         if ((result as any).error) { res.status(409).json(result); return; }
         await syncGroupMembers(ownerUid);
         res.json({ ok: true, owner_name: await displayNameOf(ownerUid) });
+        return;
+      }
+
+      if (action === "board") {
+        const f = await findGroupOf(uid);
+        if (!f) { res.json({ ok: false }); return; }
+        res.json({ ok: true, ...(await buildBoard(f.id, f.g, uid)) });
+        return;
+      }
+
+      if (action === "board_hide") {
+        await db.doc(`users/${uid}`).set({ group_board_hidden: !!req.body?.hidden }, { merge: true });
+        res.json({ ok: true, hidden: !!req.body?.hidden });
         return;
       }
 

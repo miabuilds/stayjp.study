@@ -581,7 +581,7 @@ export async function precheckSubscribe(uid: string, email: string): Promise<Pre
     if (noRenew && !isLifetimePlan(sub.plan)) {
       // 不會再續扣 → 開放「買斷」升級(零重複收費風險)。
       // 訂閱類仍不賣:新訂單會蓋掉 subscription doc,把人家已付的剩餘天數吃掉。
-      return { ok: true, allowed_plans: ["lifetime", "group4_lifetime", "group6_lifetime"] };
+      return { ok: true, allowed_plans: ["lifetime", "group4_lifetime"] };
     }
     if (sub.status === "active" || (sub.status === "trialing" && sub.source === "app")) {
       // 仍在自動續訂(含 App 試用中未取消):直接再買會變成雙重扣款 → 擋+給升級路徑
@@ -627,7 +627,7 @@ export async function precheckSubscribe(uid: string, email: string): Promise<Pre
 
   // lifetime(買斷)= 一次性付款,只受「無 active 訂閱 + 非黑名單」限制(上面已擋),
   // 不受早鳥名額 / 退費資格影響 → 一律放行
-  const allowed: PlanKey[] = ["monthly", "yearly", "lifetime", "group4_yearly", "group6_yearly", "group4_lifetime", "group6_lifetime"];
+  const allowed: PlanKey[] = ["monthly", "yearly", "lifetime", "group4_yearly", "group4_lifetime"];
   if (earlyBirdOpen && !noEarlyBird) allowed.unshift("yearly_early_bird");
 
   return { ok: true, allowed_plans: allowed };

@@ -61,6 +61,44 @@
   .row{display:flex;gap:8px;flex-wrap:wrap}
   .msg{font-size:13.5px;margin-top:8px}
   .msg.ok{color:var(--ok)} .msg.bad{color:var(--bad)}
+  /* ── 團內排行(可愛版)── 小狸圖是白底 → 一律放在淺色圓底裡,深色模式不會出現白框 */
+  .bd-head{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+  .bd-head .tk{width:58px;height:58px;border-radius:50%;background:#FFF4EC;overflow:hidden;flex:none;display:flex;align-items:flex-end;justify-content:center}
+  .bd-head .tk img{width:52px}
+  .bd-head h2{margin:0}
+  .bd-head p{font-size:13px;color:var(--tx2)}
+  .goal{background:var(--bg3);border-radius:14px;padding:14px 14px 12px;margin-bottom:14px}
+  .goal .gt{display:flex;justify-content:space-between;font-size:13.5px;font-weight:700;margin-bottom:22px}
+  .goal .gt span:last-child{color:var(--ac)}
+  .track{position:relative;height:12px;background:var(--bg2);border-radius:99px;border:1px solid var(--bd)}
+  .track i{position:absolute;left:0;top:0;bottom:0;border-radius:99px;background:linear-gradient(90deg,#F6A23C,var(--ac));transition:width .6s}
+  .track .runner{position:absolute;top:-30px;width:40px;height:40px;margin-left:-20px;border-radius:50%;background:#FFF4EC;border:2px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.12);overflow:hidden;transition:left .6s}
+  .track .runner img{width:40px;display:block}
+  .goal .gs{font-size:12.5px;color:var(--tx2);margin-top:10px}
+  .goal.done{background:linear-gradient(135deg,#FFF4EC,#FFE7D6);color:#2C2C2C}
+  .goal.done .gs{color:var(--ac);font-weight:700}
+  .rk{list-style:none}
+  .rk li{display:flex;align-items:center;gap:10px;padding:12px 0;border-bottom:1px dashed var(--bd)}
+  .rk li:last-child{border-bottom:0}
+  .rk li.me{background:var(--soft);border-radius:12px;padding:12px 10px;border-bottom-color:transparent;margin:2px 0}
+  .rk .no{width:26px;text-align:center;font-weight:800;color:var(--tx3);flex:none}
+  .rk .no .medal{display:inline-flex;width:26px;height:26px;border-radius:50%;align-items:center;justify-content:center;color:#fff;font-size:13px}
+  .rk .no .m1{background:linear-gradient(135deg,#FCD34D,#F59E0B)} .rk .no .m2{background:linear-gradient(135deg,#CBD5E1,#64748B)} .rk .no .m3{background:linear-gradient(135deg,#F0A868,#B45309)}
+  .rk .av{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;flex:none;font-size:15px}
+  .rk .who{flex:1;min-width:0}
+  .rk .who b{display:block;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .rk .tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:3px}
+  .rk .tag{font-size:11.5px;font-weight:700;border-radius:99px;padding:1px 8px;display:inline-flex;align-items:center;gap:3px}
+  .rk .tag.fire{background:#FFEDD5;color:#C2410C} .rk .tag.td{background:#DCFCE7;color:#15803D} .rk .tag.zz{background:var(--bg3);color:var(--tx3)}
+  .rk .pts{text-align:right;flex:none}
+  .rk .pts b{font-size:20px;font-family:var(--serif);color:var(--ac);display:block;line-height:1.1}
+  .rk .pts span{font-size:11px;color:var(--tx3)}
+  .rk .zzz{width:34px;height:22px;border-radius:8px;background:#FFF4EC;overflow:hidden;flex:none}
+  .rk .zzz img{width:34px;margin-top:2px}
+  .cheer{margin-top:12px;font-size:13.5px;text-align:center;color:var(--tx2);background:var(--bg3);border-radius:12px;padding:10px}
+  .cheer b{color:var(--ac)}
+  .hidetog{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--tx3);margin-top:12px;cursor:pointer}
+  .hidetog input{accent-color:var(--ac)}
   .hidden{display:none!important}
   .mock{background:#7c3aed14;border:1px dashed #7c3aed;color:#7c3aed;border-radius:12px;padding:10px 12px;font-size:13px;margin-bottom:16px}
   .mock button{font:inherit;font-size:12.5px;margin:4px 4px 0 0;padding:4px 10px;border-radius:99px;border:1px solid #7c3aed;background:none;color:#7c3aed;cursor:pointer}
@@ -118,15 +156,14 @@
   <!-- 方案介紹 -->
   <section id="vPlans">
     <div class="beta">測試中・尚未公開</div>
-    <h1>揪團一起學,一人更省</h1>
-    <p class="sub">一個人付款、最多 6 個人一起用 Premium。湊滿 4 個人以上,一人平均比自己買便宜三成左右。網頁限定方案。</p>
+    <h1>揪 4 個朋友,一起讀日文</h1>
+    <p class="sub">一個人付款,4 個人一起用 Premium,一人平均比自己買便宜 25%。團裡有每週排行,看誰讀最多、互相督促。網頁限定方案。</p>
 
     <div class="card" id="refBox" style="padding:14px 16px">
       <div style="font-size:13.5px;color:var(--tx2);margin-bottom:8px">有 KOL 推薦碼?輸入後揪團價約 <b style="color:var(--tx)">9 折</b></div>
       <div class="link" style="margin:0"><input class="inp" id="refInput" placeholder="推薦碼" autocapitalize="characters" autocomplete="off"><button class="btn sm pri" id="refApply">套用</button><button class="btn sm hidden" id="refClear">清除</button></div>
       <div class="msg" id="refMsg"></div>
     </div>
-    <div class="seg" id="segKind"><button data-k="yearly" class="on">年費</button><button data-k="lifetime">買斷</button></div>
     <div class="plans" id="plans"></div>
     <p class="note" id="codeNote" style="margin-bottom:20px"></p>
 
@@ -137,6 +174,7 @@
         <li>付款完成後,這頁會出現一條邀請連結</li>
         <li>把連結丟到 LINE 群組,朋友點開、登入就加入了</li>
         <li>錢怎麼分,朋友之間自己算</li>
+        <li>每週一排行重新開始,看誰這週讀最多</li>
       </ol>
     </div>
 
@@ -148,7 +186,8 @@
 
     <div class="card faq">
       <h2>常見問題</h2>
-      <details><summary>2、3 個人可以買嗎?</summary><p>可以,但不划算:2 個人各買個人年費(1,990 × 2)比 4 人揪團還便宜。湊到 4 個人以上再揪最省。</p></details>
+      <details><summary>還沒湊滿 4 個人可以先開嗎?</summary><p>可以,先開團、之後再用同一條連結補人。不過 2 個人的話各買個人方案比較便宜,3 個人以上開團才划算。</p></details>
+      <details><summary>團內排行會公開什麼?</summary><p>只有團裡的人看得到:暱稱、這週練了幾題、連續讀了幾天。不會公開你的錯題或學了什麼。不想上榜可以隨時關掉(你的題數照樣算進團隊目標)。</p></details>
       <details><summary>已經付費的人可以加入嗎?</summary><p>可以,但要先把自己的自動續訂取消(剩下的天數照樣能用),才不會被重複扣款。買斷會員不需要加入。如果揪團的效期比你自己的方案長,加入後會改用揪團的;之後退出揪團,你原本還沒到期的方案會還給你。</p></details>
       <details><summary>可以換成員嗎?</summary><p>可以。主揪能移除成員,空出來的位子再用同一條連結補人。為了避免位子被轉賣,年費團一個月最多補位 1 次;買斷團開團 30 天內可以自由換,之後一年 1 次。</p></details>
       <details><summary>主揪退款或取消會怎樣?</summary><p>團員的 Premium 跟著主揪的方案走:主揪取消自動續扣,大家照用到這期結束;主揪退款,全團的 Premium 會一起停止。</p></details>
@@ -169,11 +208,9 @@
 // ?mock=1 = 不打後端,用假資料看各畫面(給 Mia 看版面)。
 const FN_CREATE_PAYMENT = 'https://createpayment-lsd7okt5qa-de.a.run.app';
 const FN_GROUP = 'https://groupapi-lsd7okt5qa-de.a.run.app';
-const PLANS = {
-  group4_yearly:   { name:'4 人揪團年費', seats:4, price:5590,  code:4990,  kind:'yearly' },
-  group6_yearly:   { name:'6 人揪團年費', seats:6, price:7490,  code:6790,  kind:'yearly', hot:true },
-  group4_lifetime: { name:'4 人揪團買斷', seats:4, price:13990, code:12590, kind:'lifetime' },
-  group6_lifetime: { name:'6 人揪團買斷', seats:6, price:18990, code:17090, kind:'lifetime', hot:true },
+const PLANS = {   // 個人價 × 4 × 75 折;KOL 碼再約 9 折(後端 constants.ts 同步)
+  group4_yearly:   { name:'揪團年費', seats:4, price:5990,  code:5390,  kind:'yearly', hot:true },
+  group4_lifetime: { name:'揪團買斷', seats:4, price:14990, code:13490, kind:'lifetime' },
 };
 const SOLO = { yearly:1990, lifetime:4990 };
 const $ = id => document.getElementById(id);
@@ -189,10 +226,9 @@ const isInApp = () => /FBAN|FBAV|FB_IAB|Instagram|Line\/|MicroMessenger|Twitter|
 
 // ── 方案卡 ──
 function renderPlans(){
-  document.querySelectorAll('#segKind button').forEach(b=>b.classList.toggle('on', b.dataset.k===kind));
-  $('plans').innerHTML = Object.entries(PLANS).filter(([,p])=>p.kind===kind).map(([k,p])=>{
+  $('plans').innerHTML = Object.entries(PLANS).map(([k,p])=>{
     const pay = hasCode ? p.code : p.price, per = Math.round(pay/p.seats), solo = SOLO[p.kind];
-    return '<div class="plan'+(p.hot?' hot':'')+'">'+(p.hot?'<span class="badge">最划算</span>':'')
+    return '<div class="plan'+(p.hot?' hot':'')+'">'+(p.hot?'<span class="badge">最多人選</span>':'')
       +'<div class="n">'+p.name+'</div>'
       +'<div class="p">'+(hasCode?'<small style="text-decoration:line-through;color:var(--tx3);margin-right:4px">'+fmt(p.price)+'</small>':'')+'<small>NT$</small>'+fmt(pay)+'</div>'
       +'<div class="per">一人約 NT$'+fmt(per)+'</div>'
@@ -201,10 +237,9 @@ function renderPlans(){
   }).join('');
   $('plans').querySelectorAll('[data-plan]').forEach(b=>b.onclick=()=>buy(b.dataset.plan, b));
   $('codeNote').textContent = hasCode ? '已套用推薦碼價(約 9 折),實際金額以付款頁為準。' : '新人 9 折不適用揪團方案。';
-  const p6 = PLANS[kind==='yearly'?'group6_yearly':'group6_lifetime'];
-  $('shareText').textContent = '要不要一起揪 StayJP 學日文?\n'+p6.name+' NT$'+fmt(p6.price)+',6 個人分一人只要 '+fmt(Math.round(p6.price/6))+'\n單字、文法、JLPT 刷題、AI 跟讀全部都有\n要的留言,湊滿我就開團';
+  const py = PLANS.group4_yearly;
+  $('shareText').textContent = '要不要一起用 StayJP 讀日文?\n4 個人一團,'+py.name+'一人只要 '+fmt(Math.round((hasCode?py.code:py.price)/4))+'\n團裡有每週排行,大家一起比誰讀最多\n單字、文法、JLPT 刷題、AI 跟讀全部都有\n還差 3 個人,要的留言!';
 }
-document.querySelectorAll('#segKind button').forEach(b=>b.onclick=()=>{ kind=b.dataset.k; renderPlans(); });
 $('btnCopyShare').onclick=()=>copy($('shareText').textContent, $('shareMsg'));
 
 async function copy(text, msgEl){
@@ -373,13 +408,56 @@ function renderMine(d){
   } else {
     html+='<div class="card"><p class="note" style="margin-bottom:10px">費用由主揪付款。網頁和 App 登入這個帳號就是 Premium。</p><button class="btn sm" id="btnLeave">退出揪團</button><span class="msg" id="leaveMsg"></span></div>';
   }
+  html='<div id="boardBox"></div>'+html;   // 排行放最上面:每天打開最想看的
   box.innerHTML=html;
+  loadBoard();
   const q=s=>box.querySelector(s);
   if(q('#btnCopyInv')) q('#btnCopyInv').onclick=()=>copy(d.invite_url, q('#invMsg'));
   if(q('#btnRegen')) q('#btnRegen').onclick=async()=>{ if(!await confirmBox('換一條新連結後,舊連結就不能用了(已經加入的人不受影響)。確定要換嗎?')) return; const r=await api({action:'regen'}); if(r.ok) loadMine(); };
   if(q('#btnInvite')) q('#btnInvite').onclick=async()=>{ const m=q('#mailMsg'); const r=await api({action:'invite', email:q('#invEmail').value}); m.className='msg '+(r.ok?'ok':'bad'); m.textContent=r.ok?'已寄出(今天還能寄 '+r.left_today+' 封)':(r.reason||'寄送失敗'); if(r.ok) q('#invEmail').value=''; };
   box.querySelectorAll('[data-rm]').forEach(b=>b.onclick=async()=>{ if(!await confirmBox('確定要把「'+b.dataset.nm+'」移出揪團嗎?他會馬上失去 Premium。')) return; const r=await api({action:'remove', member_uid:b.dataset.rm}); if(r.ok){ await loadMine(); if(r.fill_note) alertBox(r.fill_note); } else alertBox(r.reason||'移除失敗'); });
   if(q('#btnLeave')) q('#btnLeave').onclick=async()=>{ if(!await confirmBox('確定要退出揪團嗎?退出後會馬上失去揪團給的 Premium。')) return; const r=await api({action:'leave'}); if(r.ok) loadMine(); else alertBox(r.reason||'退出失敗'); };
+}
+// ── 團內排行 ──
+const AV_COLORS=['#F59E0B','#10B981','#6366F1','#EC4899','#0EA5E9','#EF4444'];
+async function loadBoard(){ try{ const b=await api({action:'board'}); if(b&&b.ok) renderBoard(b); }catch(e){} }
+function renderBoard(b){
+  const box=document.getElementById('boardBox'); if(!box) return;
+  const pct=Math.min(100, b.goal?Math.round(b.total/b.goal*100):0), done=b.total>=b.goal;
+  const shown=b.members.filter(m=>!m.hidden||m.me), ranked=shown.filter(m=>!m.hidden).sort((x,y)=>y.week-x.week);
+  const me=b.members.find(m=>m.me), myRank=ranked.findIndex(m=>m.me);
+  let cheer='';
+  if(ranked.length && ranked[0].week===0) cheer='這週還沒有人開始,<b>搶第一個上榜</b>吧!';
+  else if(myRank===0) cheer='你是<b>本週第一</b>,繼續保持!';
+  else if(myRank>0){ const ahead=ranked[myRank-1]; const gap=ahead.week-me.week+1; cheer='再 <b>'+gap+' 題</b>就追上 '+esc(ahead.name)+' 了!'; }
+  else if(me&&me.hidden) cheer='你目前沒有出現在排行上,題數照樣算進團隊目標。';
+  const runnerImg = done ? 'images/mascot/tanuki-happy.png' : 'images/mascot/tanuki-run.png';
+  const medal = i => i<3 ? '<span class="medal m'+(i+1)+'"><i data-ic=star></i></span>' : (i+1);
+  const row = (m, i) => {
+    const color = AV_COLORS[[...(m.name||'')].reduce((h,c)=>(h*31+c.charCodeAt(0))>>>0, 7)%AV_COLORS.length];
+    if(m.hidden && !m.me) return '<li><span class="no">–</span><span class="av" style="background:var(--bg3);color:var(--tx3)">?</span><span class="who"><b>'+esc(m.name)+'</b><span class="tags"><span class="tag zz">不公開</span></span></span></li>';
+    const tags=[];
+    if(m.streak>=2) tags.push('<span class="tag fire"><i data-ic=fire></i> 連續 '+m.streak+' 天</span>');
+    if(m.today>0) tags.push('<span class="tag td">今天 +'+m.today+'</span>');
+    else tags.push('<span class="tag zz">今天還沒讀</span>');
+    return '<li class="'+(m.me?'me':'')+'"><span class="no">'+(m.hidden?'–':medal(i))+'</span>'
+      +'<span class="av" style="background:'+color+'">'+esc((m.name||'?').slice(0,1))+'</span>'
+      +'<span class="who"><b>'+esc(m.name)+(m.me?'(你)':'')+(m.owner?' <small style="color:var(--tx3);font-weight:600">主揪</small>':'')+'</b><span class="tags">'+tags.join('')+'</span></span>'
+      +(m.today>0?'':'<span class="zzz"><img src="images/mascot/tanuki-sleep.png" alt=""></span>')
+      +'<span class="pts"><b>'+fmt(m.week||0)+'</b><span>題</span></span></li>';
+  };
+  const list = ranked.map(row).concat(shown.filter(m=>m.hidden).map(row)).concat(b.members.filter(m=>m.hidden&&!m.me).map(row));
+  box.innerHTML='<div class="card">'
+    +'<div class="bd-head"><span class="tk"><img src="images/mascot/tanuki-cheer.png" alt=""></span><div><h2>本週團內排行</h2><p>每週一重新開始・單字、文法、練習題都算</p></div></div>'
+    +'<div class="goal'+(done?' done':'')+'"><div class="gt"><span>團隊目標</span><span>'+fmt(b.total)+' / '+fmt(b.goal)+' 題</span></div>'
+    +'<div class="track"><i style="width:'+pct+'%"></i><span class="runner" style="left:'+Math.max(4,Math.min(96,pct))+'%"><img src="'+runnerImg+'" alt=""></span></div>'
+    +'<div class="gs">'+(done?'本週目標達成!全團都很棒':'全團一起再 '+fmt(b.goal-b.total)+' 題就達成')+'</div></div>'
+    +'<ul class="rk">'+list.join('')+'</ul>'
+    +(cheer?'<div class="cheer">'+cheer+'</div>':'')
+    +'<label class="hidetog"><input type="checkbox" id="bdHide"'+(b.my_hidden?' checked':'')+'> 不要把我放進排行(題數照樣算進團隊目標)</label>'
+    +'</div>';
+  hydrate();
+  box.querySelector('#bdHide').onchange=async e=>{ await api({action:'board_hide', hidden:e.target.checked}); loadBoard(); };
 }
 function confirmBox(text){
   return new Promise(res=>{ const wrap=document.createElement('div'); wrap.className='cs-backdrop';
@@ -432,6 +510,11 @@ function mockApi(b){
     if(MOCK_STATE.view==='member') return { ...base, role:'member', members:MOCK_STATE.members.map((m,i)=>({name:m.name,joined_at:m.joined_at,me:i===0})), can_fill:true };
     return { ...base, role:'owner', members:MOCK_STATE.members, invite_url:'https://stayjp.study/group-beta.html?join=DEMO&openExternalBrowser=1', can_fill:true };
   }
+  if(b.action==='board'){
+    const ms=[{name:'小美',week:86,today:12,days:4,streak:5},{name:'林小姐',owner:true,week:64,today:0,days:3,streak:3,me:MOCK_STATE.view==='owner'},{name:'Apple 使用者',week:31,today:5,days:2,streak:1,me:MOCK_STATE.view==='member'},{name:'阿明',hidden:true}];
+    const total=86+64+31+20; return { ok:true, goal:400, total:MOCK_STATE.goalDone?420:total, members:ms, my_hidden:false };
+  }
+  if(b.action==='board_hide') return { ok:true };
   if(b.action==='remove'){ MOCK_STATE.members=MOCK_STATE.members.filter(m=>m.uid!==b.member_uid); return { ok:true }; }
   if(b.action==='join') return { ok:true, owner_name:'林小姐' };
   if(b.action==='invite') return { ok:true, left_today:9 };
@@ -439,11 +522,12 @@ function mockApi(b){
 }
 if(MOCK){
   const bar=$('mockBar'); bar.classList.remove('hidden');
-  bar.innerHTML='模擬模式(假資料,不會付款):<br><button data-v="owner">主揪畫面</button><button data-v="member">團員畫面</button><button data-v="none">還沒開團</button><button data-v="join">邀請頁</button><button data-v="code">切換推薦碼價</button>';
+  bar.innerHTML='模擬模式(假資料,不會付款):<br><button data-v="owner">主揪畫面</button><button data-v="member">團員畫面</button><button data-v="none">還沒開團</button><button data-v="join">邀請頁</button><button data-v="code">切換推薦碼價</button><button data-v="goal">切換目標達成</button>';
   bar.querySelectorAll('button').forEach(b=>b.onclick=()=>{
     const v=b.dataset.v;
     if(v==='join'){ location.href=location.pathname+'?mock=1&join=DEMO'; return; }
     if(v==='code'){ hasCode=!hasCode; renderPlans(); return; }
+    if(v==='goal'){ MOCK_STATE.goalDone=!MOCK_STATE.goalDone; loadBoard(); return; }
     if(JOIN){ location.href=location.pathname+'?mock=1'; return; }
     MOCK_STATE.view=v; loadMine();
   });
