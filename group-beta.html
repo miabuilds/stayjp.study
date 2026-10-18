@@ -121,6 +121,11 @@
     <h1>揪團一起學,一人更省</h1>
     <p class="sub">一個人付款、最多 6 個人一起用 Premium。湊滿 4 個人以上,一人平均比自己買便宜三成左右。網頁限定方案。</p>
 
+    <div class="card" id="refBox" style="padding:14px 16px">
+      <div style="font-size:13.5px;color:var(--tx2);margin-bottom:8px">有 KOL 推薦碼?輸入後揪團價約 <b style="color:var(--tx)">9 折</b></div>
+      <div class="link" style="margin:0"><input class="inp" id="refInput" placeholder="推薦碼" autocapitalize="characters" autocomplete="off"><button class="btn sm pri" id="refApply">套用</button><button class="btn sm hidden" id="refClear">清除</button></div>
+      <div class="msg" id="refMsg"></div>
+    </div>
     <div class="seg" id="segKind"><button data-k="yearly" class="on">年費</button><button data-k="lifetime">買斷</button></div>
     <div class="plans" id="plans"></div>
     <p class="note" id="codeNote" style="margin-bottom:20px"></p>
@@ -195,7 +200,7 @@ function renderPlans(){
       +'<button class="btn pri wide" data-plan="'+k+'">開團</button></div>';
   }).join('');
   $('plans').querySelectorAll('[data-plan]').forEach(b=>b.onclick=()=>buy(b.dataset.plan, b));
-  $('codeNote').textContent = hasCode ? '已套用你的推薦碼價(約 9 折)。' : '有 KOL 推薦碼的話,先到帳號頁輸入,這裡就會顯示折扣價(約 9 折)。新人 9 折不適用揪團。';
+  $('codeNote').textContent = hasCode ? '已套用推薦碼價(約 9 折),實際金額以付款頁為準。' : '新人 9 折不適用揪團方案。';
   const p6 = PLANS[kind==='yearly'?'group6_yearly':'group6_lifetime'];
   $('shareText').textContent = '要不要一起揪 StayJP 學日文?\n'+p6.name+' NT$'+fmt(p6.price)+',6 個人分一人只要 '+fmt(Math.round(p6.price/6))+'\n單字、文法、JLPT 刷題、AI 跟讀全部都有\n要的留言,湊滿我就開團';
 }
@@ -293,6 +298,56 @@ function alertBox(text){
   document.body.appendChild(wrap); wrap.querySelector('button').onclick=()=>wrap.remove();
 }
 
+// ── 推薦碼(照 pricing.html:先驗證、登入寫帳號、沒登入記本機 stayjp_ref;好康發過就鎖)──
+const REF_VALIDATE_URL = 'https://asia-east1-jpnote-1bdd6.cloudfunctions.net/validateRefCode';
+const normCode = v => String(v||'').trim().toUpperCase().replace(/[^A-Z0-9_-]/g,'').slice(0,32);
+function refMsg(t, cls){ const m=$('refMsg'); m.className='msg'+(cls?' '+cls:''); m.textContent=t; }
+function setCode(on, code, locked){
+  hasCode=!!on; renderPlans();
+  $('refInput').value = on ? code : ''; $('refInput').disabled = !!locked;
+  $('refClear').classList.toggle('hidden', !on || !!locked);
+}
+async function validate(code){ try{ return await (await fetch(REF_VALIDATE_URL+'?code='+encodeURIComponent(code))).json(); }catch(e){ return { error:true }; } }
+$('refApply').onclick=async()=>{
+  const code=normCode($('refInput').value);
+  if(!code){ refMsg('請輸入推薦碼。'); return; }
+  if(MOCK){ setCode(true, code); refMsg('✓ 已套用 '+code+'(模擬)','ok'); return; }
+  refMsg('驗證中…');
+  const v=await validate(code);
+  if(v && v.self){ refMsg('這是你自己的推薦碼,請分享給別人。','bad'); return; }
+  if(v && !v.valid && !v.error){ refMsg('查無此推薦碼,請確認後再輸入。','bad'); return; }
+  try{ localStorage.setItem('stayjp_ref', code); }catch(e){}
+  if(!user){ setCode(true, code); refMsg('✓ 已記住 '+code+(v&&v.kol?'('+v.kol+')':'')+',登入付款時自動套用。','ok'); return; }
+  const ref=firebase.firestore().doc('users/'+user.uid);
+  const d=(await ref.get()).data()||{};
+  if(d.ref_code && d.ref_bonus_at){ setCode(true, d.ref_code, true); refMsg('已套用推薦碼:'+d.ref_code+'(好康已發放,不可更改)'); return; }
+  try{ await ref.set({ ref_code:code, ref_at:Date.now() }, { merge:true }); setCode(true, code); refMsg('✓ 已套用 '+code+(v&&v.kol?'('+v.kol+')':'')+',揪團價約 9 折。','ok'); }
+  catch(e){ refMsg('套用失敗,請稍後再試。','bad'); }
+};
+$('refClear').onclick=async()=>{
+  try{ localStorage.removeItem('stayjp_ref'); }catch(e){}
+  if(user && !MOCK){
+    const ref=firebase.firestore().doc('users/'+user.uid); const d=(await ref.get()).data()||{};
+    if(d.ref_bonus_at){ refMsg('好康已發放,無法清除。'); return; }
+    try{ await ref.update({ ref_code:firebase.firestore.FieldValue.delete(), ref_at:firebase.firestore.FieldValue.delete() }); }catch(e){ refMsg('清除失敗,請稍後再試。','bad'); return; }
+  }
+  setCode(false); refMsg('已清除,可以重新輸入。','ok');
+};
+// 進頁:登入了就以帳號上的碼為準;沒登入但帶過 ?ref=(campaign.js 存在 stayjp_ref)→ 先顯示碼價
+async function syncCode(){
+  let code='', locked=false;
+  if(user){
+    const ref=firebase.firestore().doc('users/'+user.uid); const d=(await ref.get()).data()||{};
+    code=d.ref_code||''; locked=!!d.ref_bonus_at;
+    const pending=(()=>{ try{ return localStorage.getItem('stayjp_ref')||''; }catch(e){ return ''; } })();
+    if(!code && pending && pending!==d.my_ref_code && pending!==d.kol_code){ code=pending; await ref.set({ ref_code:code, ref_at:Date.now() }, { merge:true }).catch(()=>{}); }
+  } else { try{ code=localStorage.getItem('stayjp_ref')||''; }catch(e){} }
+  if(!code){ setCode(false); return; }
+  const v=await validate(code);
+  if(v && (v.valid || v.error) && !v.self){ setCode(true, code, locked); refMsg(locked?('已套用推薦碼:'+code+'(好康已發放,不可更改)'):('目前推薦碼:'+code+(v.kol?'('+v.kol+')':'')+',揪團價約 9 折'), locked?'':'ok'); }
+  else { setCode(false); refMsg(''); }
+}
+
 // ── 我的揪團 ──
 function renderMine(d){
   const box=$('vMine');
@@ -312,7 +367,7 @@ function renderMine(d){
       +(left>0 ? '<p class="note">把連結丟到 LINE 群組,朋友點開、登入就加入了。</p><div class="link"><input readonly id="invUrl" value="'+esc(d.invite_url)+'"><button class="btn sm pri" id="btnCopyInv">複製</button></div>'
          +'<div class="row"><a class="btn sm" id="btnLine" target="_blank" rel="noopener" href="https://line.me/R/share?text='+encodeURIComponent('一起用 StayJP 學日文!點這裡加入我的揪團:'+d.invite_url)+'">分享到 LINE</a><button class="btn sm" id="btnRegen">換一條新連結</button></div><span class="msg" id="invMsg"></span>'
          +(d.can_fill?'':'<p class="msg bad">'+esc(d.fill_note||'')+'</p>')
-         +'<div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--bd)"><div class="lbl" style="font-size:13px;color:var(--tx2);margin-bottom:6px">或寄邀請信(只會寄連結過去)</div><div class="link"><input class="inp" id="invEmail" type="email" placeholder="朋友的 email"><button class="btn sm" id="btnInvite">寄出</button></div><span class="msg" id="mailMsg"></span></div>'
+         +'<div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--bd)"><div class="lbl" style="font-size:13px;color:var(--tx2);margin-bottom:6px">或寄邀請信(只會寄連結過去)</div><div class="link"><input class="inp" id="invEmail" type="email" placeholder="朋友的 email"><button class="btn sm" id="btnInvite">寄出</button></div><span class="msg" id="mailMsg"></span><p class="note" style="margin-top:6px">邀請信有時會被分到垃圾信件匣,朋友沒收到的話請他找一下,或直接用 LINE 傳連結最快。</p></div>'
         : '<p class="note">位子都滿了。要換人的話,先移除一位成員。</p>')
       +'</div>';
   } else {
@@ -395,6 +450,8 @@ if(MOCK){
 }
 
 // ── 啟動 ──
+// KOL 分享連結 group-beta.html?ref=CODE:先記進 stayjp_ref(同 pricing.html;Campaign.claim 不會讓活動碼蓋掉 KOL 碼)
+try{ const _r=normCode(new URLSearchParams(location.search).get('ref')); if(_r){ if(window.Campaign&&Campaign.claim) Campaign.claim(_r); else localStorage.setItem('stayjp_ref', _r); } }catch(e){}
 renderPlans();
 if(JOIN) renderJoin();
 if(MOCK){ if(!JOIN) loadMine(); }
@@ -402,11 +459,9 @@ else if(auth) auth.onAuthStateChanged(async u=>{
   user=u||null;
   if(!u) return;
   if(!JOIN) loadMine();   // 邀請模式只顯示邀請卡
-  try{   // 有效推薦碼 → 卡片顯示碼價(真正價格以後端為準,不一致時 409 會更正)
-    const d=(await firebase.firestore().doc('users/'+u.uid).get()).data()||{};
-    if(d.ref_code){ const c=(await firebase.firestore().doc('ref_codes/'+String(d.ref_code).toUpperCase()).get()).data(); hasCode=!!(c && c.active!==false && c.status!=='suspended' && c.owner_uid!==u.uid && !(typeof c.expires_at==='number' && c.expires_at<Date.now())); renderPlans(); }
-  }catch(e){}
+  syncCode().catch(()=>{});   // 真正價格以後端為準,不一致時 409 會更正
 });
+if(!MOCK) setTimeout(()=>{ if(!user) syncCode().catch(()=>{}); }, 1500);   // 沒登入:顯示 ?ref= 帶進來的碼價
 </script>
 </body>
 </html>
