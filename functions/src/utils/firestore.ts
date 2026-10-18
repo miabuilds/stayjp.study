@@ -13,6 +13,9 @@ import {
   Source,
   SubStatus,
   REFUND_POLICY,
+  isLifetimePlan,
+  isGroupPlan,
+  GROUP_SEATS,
 } from "./constants";
 
 if (admin.apps.length === 0) admin.initializeApp();
@@ -71,6 +74,7 @@ export async function getRefCode(uid: string): Promise<string> {
 
 export async function writeSubscription(uid: string, sub: SubscriptionDoc): Promise<void> {
   await db.doc(`users/${uid}`).set({ subscription: sub }, { merge: true });
+  await afterOwnerSubChange(uid, sub);
 }
 
 export async function patchSubscription(
@@ -83,6 +87,96 @@ export async function patchSubscription(
   const subPatch: Record<string, unknown> = {};
   for (const [k, v] of Object.entries(patch)) subPatch[k] = v;
   await db.doc(`users/${uid}`).set({ subscription: subPatch }, { merge: true });
+  if ("status" in patch || "expiresAt" in patch || "plan" in patch) await afterOwnerSubChange(uid, null);
+}
+
+// ───── 揪團(2026-10-18,官網限定)───────────────────────────────────
+// groups/{主揪 uid}:{ owner_uid, plan, seats, member_uids[], members{uid:{name,joined_at}}, invite_token,
+//   status:"active"|"ended", expiresAt, created_at, fills(累計加入人次), replacements[](補位時間) }
+// 主揪的權益 = users/{owner}.subscription,照一般網頁訂閱流程走(續扣/取消/退款/扣款失敗過期);
+// 這些流程都經過 writeSubscription / patchSubscription → 在這裡統一同步團員,新流程不會漏。
+// 團員的權益 = users/{member}.subscription { source:"group", group_id, ... },狀態與到期日一律跟主揪。
+const PREMIUM_STATUSES = ["active", "trialing", "cancelled"];
+const isPremiumSub = (s: any) => !!s && PREMIUM_STATUSES.includes(s.status) && (s.expiresAt || 0) > nowMs();
+
+async function afterOwnerSubChange(uid: string, written: SubscriptionDoc | null): Promise<void> {
+  // best-effort:同步失敗不能讓付款/退款主流程失敗(團員下次打開揪團頁也會再同步一次)
+  try {
+    const sub = written || await getSubscription(uid);
+    if (sub && isGroupPlan(sub.plan) && sub.source === "web") {
+      if (written && isPremiumSub(sub)) await ensureGroup(uid, sub);
+      await syncGroupMembers(uid);
+    } else if ((await db.doc(`groups/${uid}`).get()).exists) {
+      await syncGroupMembers(uid);   // 主揪改成別的方案 → 揪團結束,團員收回
+    }
+  } catch (e) { console.error("[group] 同步團員失敗(略過,不影響主流程):", uid, e); }
+}
+
+export function newInviteToken(): string { return crypto.randomBytes(12).toString("base64url"); }
+
+export async function ensureGroup(ownerUid: string, sub: SubscriptionDoc): Promise<void> {
+  const ref = db.doc(`groups/${ownerUid}`);
+  const snap = await ref.get();
+  const g = snap.data();
+  const seats = GROUP_SEATS[sub.plan] || 0;
+  if (!snap.exists || g?.status === "ended") {
+    await ref.set({
+      owner_uid: ownerUid, plan: sub.plan, seats, member_uids: [], members: {},
+      invite_token: newInviteToken(), status: "active", expiresAt: sub.expiresAt,
+      created_at: nowMs(), fills: 0, replacements: [],
+    });
+  } else {
+    await ref.set({ plan: sub.plan, seats, status: "active", expiresAt: sub.expiresAt }, { merge: true });
+  }
+}
+
+/** 團員權益跟著主揪走。團員自己有更好的 Premium(不是這團給的、而且還有效)就不動他的。 */
+/** 收回揪團給的權益:有備份(加入前自己的方案)且還在效期 → 還原;否則標 expired。 */
+export async function revokeGroupSub(memberUid: string, ownerUid: string): Promise<void> {
+  const ref = db.doc(`users/${memberUid}`);
+  const ud = (await ref.get()).data() || {};
+  const cur = ud.subscription;
+  if (!(cur?.source === "group" && cur?.group_id === ownerUid)) return;
+  const backup = ud.sub_before_group;
+  if (backup && (backup.expiresAt || 0) > nowMs()) {
+    await ref.update({ subscription: backup, sub_before_group: admin.firestore.FieldValue.delete() });
+  } else {
+    await ref.update({
+      "subscription.status": "expired", "subscription.expiresAt": Math.min(nowMs(), cur.expiresAt || nowMs()), "subscription.left_group_at": nowMs(),
+      ...(backup ? { sub_before_group: admin.firestore.FieldValue.delete() } : {}),
+    });
+  }
+}
+
+export async function syncGroupMembers(ownerUid: string): Promise<void> {
+  const gRef = db.doc(`groups/${ownerUid}`);
+  const g = (await gRef.get()).data();
+  if (!g) return;
+  const owner = await getSubscription(ownerUid);
+  const live = !!owner && isGroupPlan(owner.plan) && owner.source === "web" && isPremiumSub(owner);
+  const now = nowMs();
+  const memberSub = (o: SubscriptionDoc | null) => live && o
+    ? { source: "group", plan: o.plan, status: o.status === "cancelled" ? "cancelled" : "active", expiresAt: o.expiresAt, willRenew: false, group_id: ownerUid }
+    : { source: "group", plan: g.plan, status: "expired", expiresAt: Math.min(now, o?.expiresAt || now), willRenew: false, group_id: ownerUid };
+  for (const m of (g.member_uids || []) as string[]) {
+    const ud = (await db.doc(`users/${m}`).get()).data() || {};
+    const cur = ud.subscription;
+    const fromThisGroup = cur?.source === "group" && cur?.group_id === ownerUid;
+    if (!live) {   // 揪團失效 → 只收回這團給的;自己原本的方案還在效期就還給他
+      if (fromThisGroup) await revokeGroupSub(m, ownerUid);
+      continue;
+    }
+    const next: Record<string, unknown> = memberSub(owner);
+    const extra: Record<string, unknown> = {};
+    if (cur && !fromThisGroup && isPremiumSub(cur)) {
+      if ((cur.expiresAt || 0) >= (owner!.expiresAt || 0)) continue;   // 自己的方案撐得比較久 → 保留
+      extra.sub_before_group = cur;   // 揪團比較久 → 先備份自己付過錢的方案,退團時還原(不能讓剩餘天數消失)
+    }
+    next.startedAt = fromThisGroup && cur?.startedAt ? cur.startedAt : now;
+    // 整筆換掉(update 會覆蓋整個 subscription 欄位;set merge 會把舊訂閱的 ecpay_order/apple_txn 殘留下來,退款對帳會認錯)
+    await db.doc(`users/${m}`).update({ subscription: next, ...extra }).catch(() => db.doc(`users/${m}`).set({ subscription: next, ...extra }, { merge: true }));
+  }
+  await gRef.set({ status: live ? "active" : "ended", expiresAt: owner?.expiresAt || g.expiresAt }, { merge: true });
 }
 
 // ───── AI 加量包發放(推薦獎勵的「買斷戶貨幣」)─────────────────────
@@ -145,7 +239,7 @@ export async function rewardReferrerOnPayment(friendUid: string, isSandbox: bool
   }
   await ownerRef.set({ referral_reward_log: [...log, nowMs()] }, { merge: true });
   const ownerSub = await getSubscription(ownerUid);
-  if (ownerSub?.plan === "lifetime") {
+  if (ownerSub?.plan && isLifetimePlan(ownerSub.plan)) {
     await grantAiBonus(ownerUid, `推薦好友(${friendUid})付費 → 推薦人為買斷戶,發 AI 加量包(對話+${REF_AI_BONUS.chat}/評分+${REF_AI_BONUS.eval})`);
   } else {
     const bonusDays = REFERRER_REWARD_DAYS;   // 一律 +30 天(原本月費 7/年費 30)
@@ -484,10 +578,10 @@ export async function precheckSubscribe(uid: string, email: string): Promise<Pre
   if (sub && sub.expiresAt > nowMs()
       && (sub.status === "active" || sub.status === "trialing" || sub.status === "cancelled")) {
     const noRenew = (sub as any).willRenew === false || sub.status === "cancelled";
-    if (noRenew && sub.plan !== "lifetime") {
+    if (noRenew && !isLifetimePlan(sub.plan)) {
       // 不會再續扣 → 開放「買斷」升級(零重複收費風險)。
       // 訂閱類仍不賣:新訂單會蓋掉 subscription doc,把人家已付的剩餘天數吃掉。
-      return { ok: true, allowed_plans: ["lifetime"] };
+      return { ok: true, allowed_plans: ["lifetime", "group4_lifetime", "group6_lifetime"] };
     }
     if (sub.status === "active" || (sub.status === "trialing" && sub.source === "app")) {
       // 仍在自動續訂(含 App 試用中未取消):直接再買會變成雙重扣款 → 擋+給升級路徑
@@ -533,7 +627,7 @@ export async function precheckSubscribe(uid: string, email: string): Promise<Pre
 
   // lifetime(買斷)= 一次性付款,只受「無 active 訂閱 + 非黑名單」限制(上面已擋),
   // 不受早鳥名額 / 退費資格影響 → 一律放行
-  const allowed: PlanKey[] = ["monthly", "yearly", "lifetime"];
+  const allowed: PlanKey[] = ["monthly", "yearly", "lifetime", "group4_yearly", "group6_yearly", "group4_lifetime", "group6_lifetime"];
   if (earlyBirdOpen && !noEarlyBird) allowed.unshift("yearly_early_bird");
 
   return { ok: true, allowed_plans: allowed };

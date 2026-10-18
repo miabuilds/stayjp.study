@@ -10,6 +10,7 @@
 import * as functions from "firebase-functions/v2/scheduler";
 import * as admin from "firebase-admin";
 import { db, nowMs, patchSubscription } from "./utils/firestore";
+import { isLifetimePlan } from "./utils/constants";
 
 if (admin.apps.length === 0) admin.initializeApp();
 
@@ -66,13 +67,13 @@ export const dailySubAuditCron = functions.onSchedule(
         issues.push({ uid: d.id, type: "wrongly_expired", status, source: s.source || "", expiresAt: exp });
       }
       // 🟡 該過期卻還開通(到期日已過,非買斷)
-      if (["active", "trialing", "cancelled"].includes(status) && !future && plan !== "lifetime") {
+      if (["active", "trialing", "cancelled"].includes(status) && !future && !isLifetimePlan(plan)) {
         issues.push({ uid: d.id, type: "over_granted", status, source: s.source || "", expiresAt: exp });
       }
       // ⚪ 沒有到期日(資料異常,非買斷)
       // 已經是 expired/refunded 的沒到期日不影響任何人(不會多給權限),只是舊資料殘留 → 不算異常
       //(2026-10-06:7 筆全是這種,天天在報錯頁洗版)
-      if (!exp && plan !== "lifetime" && !["expired", "refunded"].includes(status)) {
+      if (!exp && !isLifetimePlan(plan) && !["expired", "refunded"].includes(status)) {
         issues.push({ uid: d.id, type: "no_expiry", status, source: s.source || "" });
       }
     });

@@ -8,7 +8,7 @@
 //      這裡不寫 Firestore,不做任何業務邏輯。
 
 import * as functions from "firebase-functions/v2/https";
-import { ecpayConfig, ECPAY_SECRETS } from "./utils/constants";
+import { ecpayConfig, ECPAY_SECRETS, isGroupPlan } from "./utils/constants";
 
 export const ecpayReturn = functions.onRequest(
   {
@@ -22,7 +22,9 @@ export const ecpayReturn = functions.onRequest(
   },
   async (req, res) => {
     const cfg = ecpayConfig();
-    // 不管 POST / GET 都統一 302 到 account.html
+    // 揪團方案(綠界 OrderResult POST 會帶回 CustomField2=plan)→ 回揪團頁拿邀請連結;其他一律 302 到 account.html
+    const plan = String((req.body && (req.body as Record<string, string>).CustomField2) || "");
+    if (isGroupPlan(plan)) { res.redirect(302, `${cfg.siteOrigin}/group-beta.html?from=ecpay`); return; }
     res.redirect(302, `${cfg.siteOrigin}/account.html?from=ecpay`);
   },
 );

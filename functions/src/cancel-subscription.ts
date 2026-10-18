@@ -8,7 +8,7 @@
 import * as functions from "firebase-functions/v2/https";
 import * as admin from "firebase-admin";
 import axios from "axios";
-import { ecpayConfig, ecpayPeriodActionEndpoint, ECPAY_SECRETS } from "./utils/constants";
+import { ecpayConfig, ecpayPeriodActionEndpoint, ECPAY_SECRETS, isLifetimePlan } from "./utils/constants";
 import { checkMacValue } from "./utils/ecpay";
 import { getSubscription, patchSubscription, writeTransaction } from "./utils/firestore";
 
@@ -57,7 +57,7 @@ export const cancelSubscription = functions.onRequest(
       }
 
       // lifetime:沒定期定額,跳過綠界,只更新 Firestore
-      const isRecurring = sub.plan !== "lifetime";
+      const isRecurring = !isLifetimePlan(sub.plan);
 
       let ecpayOk = true;
       let ecpayMsg = "";

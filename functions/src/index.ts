@@ -10,6 +10,7 @@
 //   firebase functions:secrets:set REVENUECAT_WEBHOOK_SECRET
 
 export { createPayment } from "./create-payment";
+export { groupApi } from "./group";   // 揪團(2026-10-18,測試中:前端只有 group-beta.html)
 export { ecpayCallback } from "./ecpay-callback";
 export { ecpayReturn } from "./ecpay-return";
 export { refund } from "./refund";

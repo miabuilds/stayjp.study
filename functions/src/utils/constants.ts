@@ -47,8 +47,9 @@ export const EARLY_BIRD_LIMIT = 100;
 // 早鳥收官:此刻起不再接受「新購」早鳥(既有早鳥續扣不受影響——續扣走 callback 沿用 is_early_bird 原價)
 export const EARLY_BIRD_END_MS = Date.UTC(2026, 7, 27, 3, 0, 0);   // 2026-08-27 12:00 JST
 
-export type PlanKey = "monthly" | "yearly" | "yearly_early_bird" | "lifetime";
-export type Source = "web" | "app";
+export type PlanKey = "monthly" | "yearly" | "yearly_early_bird" | "lifetime"
+  | "group4_yearly" | "group6_yearly" | "group4_lifetime" | "group6_lifetime";   // 揪團(2026-10-18,官網限定)
+export type Source = "web" | "app" | "group";   // group = 揪團團員(權益跟著主揪,自己沒有付款紀錄)
 export type SubStatus = "trialing" | "active" | "cancelled" | "expired" | "refunded" | "voided";
 
 export const PLANS: Record<PlanKey, {
@@ -86,7 +87,19 @@ export const PLANS: Record<PlanKey, {
     ecpay_frequency: 1,
     display_name: "終身方案",
   },
+  // ── 揪團方案(2026-10-18 Mia 定價,官網/綠界限定;App 內不賣、不提)──
+  // 主揪付全額,其他人用邀請連結加入(functions/src/group.ts)。一人平均約原價 7 折(4 人)/6.3 折(6 人)。
+  group4_yearly:   { price_twd: 5590,  period_days: 365,       ecpay_period_type: "Y", ecpay_frequency: 1, display_name: "揪團年費(4人)" },
+  group6_yearly:   { price_twd: 7490,  period_days: 365,       ecpay_period_type: "Y", ecpay_frequency: 1, display_name: "揪團年費(6人)" },
+  group4_lifetime: { price_twd: 13990, period_days: 365 * 100, ecpay_period_type: "M", ecpay_frequency: 1, display_name: "揪團買斷(4人)" },
+  group6_lifetime: { price_twd: 18990, period_days: 365 * 100, ecpay_period_type: "M", ecpay_frequency: 1, display_name: "揪團買斷(6人)" },
 };
+
+// 揪團:每個方案的座位數(含主揪本人)
+export const GROUP_SEATS: Partial<Record<PlanKey, number>> = { group4_yearly: 4, group6_yearly: 6, group4_lifetime: 4, group6_lifetime: 6 };
+export const isGroupPlan = (plan: string): boolean => plan in GROUP_SEATS;
+// 一次性買斷(不續扣、退款 7 天內)。⚠️ 新增買斷類方案一律走這個判斷,不要再寫 plan === "lifetime"
+export const isLifetimePlan = (plan: string): boolean => plan === "lifetime" || plan === "group4_lifetime" || plan === "group6_lifetime";
 
 // ───── PayPal(網頁海外用戶,一次性付款:早鳥年費 / 買斷)─────────────────
 // 設定:firebase functions:secrets:set PAYPAL_CLIENT_SECRET
@@ -137,6 +150,11 @@ export const PAYPAL_PRICES_USD: Partial<Record<PlanKey, number>> = {
 export const WEB_CODE_DISCOUNT_TWD: Partial<Record<PlanKey, number>> = {
   yearly: 200,     // 折後 1,790,定期定額終身鎖
   lifetime: 500,   // 折後 4,490,一次性(2026-10-13 起;原 5,990−600=5,390);App 內=lifetime_ref 商品
+  // 揪團 KOL 碼約 9 折(取整到尾數 90):4,990 / 6,790 / 12,590 / 17,090。新人 9 折不適用揪團(create-payment 擋)
+  group4_yearly: 600,
+  group6_yearly: 700,
+  group4_lifetime: 1400,
+  group6_lifetime: 1900,
 };
 
 // ── 雙十檔期(2026-10,Mia 定案)── 官網限定、不用輸碼、人人有;有效推薦碼再疊折。

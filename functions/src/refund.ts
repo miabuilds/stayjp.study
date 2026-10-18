@@ -16,7 +16,7 @@
 import * as functions from "firebase-functions/v2/https";
 import * as admin from "firebase-admin";
 import axios from "axios";
-import { PLANS, REFUND_POLICY, ecpayConfig, ecpayRefundEndpoint, ecpayPeriodQueryEndpoint, ecpayPeriodActionEndpoint, PAYMENT_AND_INVOICE_SECRETS } from "./utils/constants";
+import { PLANS, REFUND_POLICY, ecpayConfig, ecpayRefundEndpoint, ecpayPeriodQueryEndpoint, ecpayPeriodActionEndpoint, PAYMENT_AND_INVOICE_SECRETS, isLifetimePlan } from "./utils/constants";
 import { refundInvoice } from "./utils/invoice-flow";
 import { checkMacValue } from "./utils/ecpay";
 import {
@@ -150,7 +150,7 @@ export const refund = functions.onRequest(
       let refundAmount: number;
       let refundReason: string;
 
-      if (sub.plan === "lifetime") {
+      if (isLifetimePlan(sub.plan)) {
         // Lifetime 7 天內全退,7 天後拒絕(memory 規則)
         if (daysSinceStart <= REFUND_POLICY.full_refund_days) {
           refundAmount = paidTwd;
@@ -320,7 +320,7 @@ export const refund = functions.onRequest(
 
       // 退費成功 → 停掉定期定額後續授權(否則綠界照約定下期又扣款)。
       // 非 lifetime 才有定期定額;停扣失敗只 log 不擋(錢已退),可到綠界後台手動停用該筆。
-      if (sub.plan !== "lifetime") {
+      if (!isLifetimePlan(sub.plan)) {
         const stop = await stopPeriodOrder(sub.ecpay_order, cfg);
         console.log(`refund: stop period (order=${sub.ecpay_order}) ok=${stop.ok} msg=${stop.msg}`);
         if (!stop.ok) {

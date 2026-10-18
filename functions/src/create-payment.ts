@@ -9,7 +9,7 @@
 
 import * as functions from "firebase-functions/v2/https";
 import * as admin from "firebase-admin";
-import { PLANS, PlanKey, WEB_CODE_DISCOUNT_TWD, SALE, resolveWebPrice, isCampaignRefCode, ecpayConfig, ecpayEndpoint, ECPAY_SECRETS } from "./utils/constants";
+import { PLANS, PlanKey, WEB_CODE_DISCOUNT_TWD, SALE, resolveWebPrice, isCampaignRefCode, ecpayConfig, ecpayEndpoint, ECPAY_SECRETS, isGroupPlan } from "./utils/constants";
 import { checkMacValue, ecpayDateTimeTW, generateMerchantTradeNo } from "./utils/ecpay";
 import { isValidTaxId } from "./utils/ecpay-invoice";
 import {
@@ -74,7 +74,7 @@ export const createPayment = functions.onRequest(
       }
       // 新人限時 9 折:沒有有效碼的新人,價格比照「活動碼」(有碼折、沒有 KOL 搶先);不歸因任何碼、不產分潤
       let newbie = false;
-      if (!hasValidRef && WEB_CODE_DISCOUNT_TWD[plan]) {
+      if (!hasValidRef && WEB_CODE_DISCOUNT_TWD[plan] && !isGroupPlan(plan)) {   // 揪團不套新人價(只認 KOL/推薦碼)
         newbie = (await getNewbieOffer(uid)).until > Date.now();
       }
       const priced = resolveWebPrice(plan, Date.now(), hasValidRef || newbie, hasValidRef ? isCampaign : true);
@@ -155,7 +155,7 @@ export const createPayment = functions.onRequest(
         params.Frequency = 1;
         params.ExecTimes = 99;     // 上限 99 期月費(綠界限制)
         params.PeriodReturnURL = cfg.callbackUrl;
-      } else if (plan === "yearly" || plan === "yearly_early_bird") {
+      } else if (plan === "yearly" || plan === "yearly_early_bird" || plan === "group4_yearly" || plan === "group6_yearly") {
         params.PeriodAmount = priceTwd;   // 實扣價(檔期價/折後價)→ 定期定額之後每期都鎖這個金額
         params.PeriodType = "Y";
         params.Frequency = 1;

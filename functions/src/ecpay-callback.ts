@@ -16,7 +16,7 @@
 
 import * as functions from "firebase-functions/v2/https";
 import { issueForPayment, resolveEmail } from "./utils/invoice-flow";
-import { PLANS, PlanKey, PAYMENT_AND_INVOICE_SECRETS } from "./utils/constants";
+import { PLANS, PlanKey, PAYMENT_AND_INVOICE_SECRETS, isLifetimePlan, isGroupPlan } from "./utils/constants";
 import { verifyCheckMacValue } from "./utils/ecpay";
 import {
   writeTransaction, getSubscription, writeSubscription, patchSubscription, getRefCode,
@@ -151,10 +151,10 @@ export const ecpayCallback = functions.onRequest(
           source: "web",
           plan,
           status: "active",
-          expiresAt: plan === "lifetime"
+          expiresAt: isLifetimePlan(plan)
             ? plusDays(nowMs(), planInfo.period_days)   // lifetime 直接 now + 100 年
             : capExpiresAt,
-          willRenew: plan !== "lifetime" && payType === "credit",   // 只有信用卡定期定額會續扣;ATM/超商=一次性
+          willRenew: !isLifetimePlan(plan) && payType === "credit",   // 只有信用卡定期定額會續扣;ATM/超商=一次性
           pay_type: payType,
           startedAt: existingSub?.startedAt || nowMs(),
           ecpay_order: merchantTradeNo,
@@ -167,11 +167,11 @@ export const ecpayCallback = functions.onRequest(
           newSub.ref_bonus_at = existingSub.ref_bonus_at;
         } else {
           const refCode = await getRefCode(uid);
-          if (refCode && plan !== "lifetime") {
+          if (refCode && !isLifetimePlan(plan)) {
             // 年費若已享推薦碼「折價」(實付 < 現行牌價,2026-09-14 起)→ 好康=折價本身,不再另加天數
             // (避免折 200 又送 30 天雙重發放)。月費照舊 +7 天。
             // 注意:凍漲舊戶續扣(1490/990)也會 <牌價,但他們幾乎都已有 ref_bonus_at 或無 ref_code,不進此分支。
-            const discountedYearly = plan === "yearly" && amount < PLANS[plan].price_twd;
+            const discountedYearly = (plan === "yearly" || isGroupPlan(plan)) && amount < PLANS[plan].price_twd;   // 揪團年費用碼也一樣:折價就是好康
             if (!discountedYearly) {
               newSub.expiresAt = newSub.expiresAt + refBonusDays(plan) * 864e5;   // 依方案:月費+7
             }

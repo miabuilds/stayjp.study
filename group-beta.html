@@ -1,0 +1,412 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<script src="campaign.js"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>揪團方案(測試中)｜StayJP 日本再留計劃</title>
+<script>try{var _th=localStorage.getItem('theme');if(_th)document.documentElement.setAttribute('data-theme',_th);}catch(e){}</script>
+<style>
+  :root{ --bg:#F6F4EF;--bg2:#FFFFFF;--bg3:#EFECE5;--tx:#2C2C2C;--tx2:#6B6B6B;--tx3:#9A9A9A;--ac:#C6553B;--ac2:#D4654A;--bd:#E7E3DC;--ok:#15803d;--bad:#c2410c;--soft:#C6553B14;--serif:"Noto Serif TC","Songti TC",serif; }
+  @media (prefers-color-scheme:dark){ :root:not([data-theme=light]){ --bg:#161615;--bg2:#211F1D;--bg3:#2A2724;--tx:#EDEBE7;--tx2:#A7A29B;--tx3:#6E6A64;--ac:#E8734A;--ac2:#E8734A;--bd:#332F2B;--ok:#4ade80;--bad:#fb923c;--soft:#E8734A1c; }}
+  :root[data-theme=dark]{ --bg:#161615;--bg2:#211F1D;--bg3:#2A2724;--tx:#EDEBE7;--tx2:#A7A29B;--tx3:#6E6A64;--ac:#E8734A;--ac2:#E8734A;--bd:#332F2B;--ok:#4ade80;--bad:#fb923c;--soft:#E8734A1c; }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--tx);font-family:-apple-system,"PingFang TC","Noto Sans TC",sans-serif;line-height:1.7;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:620px;margin:0 auto;padding:16px 16px 48px}
+  header{display:flex;align-items:center;gap:12px;margin-bottom:18px}
+  .backbtn{display:inline-flex;align-items:center;gap:6px;min-height:40px;padding:8px 14px 8px 10px;border-radius:12px;background:var(--bg2);border:1px solid var(--bd);color:var(--tx2);text-decoration:none;font-size:14.5px;font-weight:600}
+  .logo{font-family:var(--serif);font-weight:700;font-size:17px;color:inherit;text-decoration:none}
+  .beta{display:inline-block;font-size:12px;font-weight:700;color:#fff;background:#7c3aed;border-radius:99px;padding:2px 10px;margin-bottom:10px}
+  h1{font-family:var(--serif);font-size:27px;line-height:1.3;margin-bottom:8px}
+  h2{font-size:17px;margin-bottom:12px}
+  .sub{color:var(--tx2);font-size:14.5px;margin-bottom:22px}
+  .card{background:var(--bg2);border:1px solid var(--bd);border-radius:16px;padding:18px;margin-bottom:16px}
+  .seg{display:flex;gap:8px;margin-bottom:16px}
+  .seg button{flex:1;font:inherit;font-weight:700;font-size:15px;padding:10px;border-radius:12px;border:1px solid var(--bd);background:var(--bg2);color:var(--tx);cursor:pointer}
+  .seg button.on{background:var(--ac);border-color:var(--ac);color:#fff}
+  .plans{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+  .plan{background:var(--bg2);border:1px solid var(--bd);border-radius:16px;padding:18px 14px;text-align:center;position:relative}
+  .plan.hot{border-color:var(--ac);box-shadow:0 0 0 2px var(--ac) inset}
+  .plan .badge{position:absolute;top:-11px;left:50%;transform:translateX(-50%);font-size:11.5px;font-weight:700;color:#fff;background:var(--ac);border-radius:99px;padding:2px 10px;white-space:nowrap}
+  .plan .n{font-weight:800;font-size:16px}
+  .plan .p{font-size:28px;font-weight:800;font-family:var(--serif);margin:6px 0 2px}
+  .plan .p small{font-size:13px;font-weight:600;color:var(--tx2)}
+  .plan .per{font-size:13.5px;color:var(--ac);font-weight:700}
+  .plan .save{font-size:12.5px;color:var(--tx3);margin-bottom:12px}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;font:inherit;font-weight:700;font-size:15px;padding:12px 16px;border-radius:12px;border:1px solid var(--bd);background:var(--bg2);color:var(--tx);cursor:pointer;text-decoration:none}
+  .btn.pri{background:var(--ac);border-color:var(--ac);color:#fff}
+  .btn.wide{width:100%}
+  .btn.sm{font-size:13.5px;padding:8px 12px}
+  .btn:disabled{opacity:.45;cursor:default}
+  .note{font-size:12.5px;color:var(--tx3);line-height:1.7}
+  .steps{list-style:none;counter-reset:s}
+  .steps li{counter-increment:s;display:flex;gap:12px;padding:10px 0;border-bottom:1px solid var(--bd);font-size:14.5px}
+  .steps li:last-child{border-bottom:0}
+  .steps li::before{content:counter(s);flex:none;width:26px;height:26px;border-radius:50%;background:var(--soft);color:var(--ac);font-weight:800;display:flex;align-items:center;justify-content:center;font-size:13px}
+  .faq details{border-bottom:1px solid var(--bd);padding:12px 0}
+  .faq details:last-child{border-bottom:0}
+  .faq summary{font-weight:700;font-size:14.5px;cursor:pointer}
+  .faq p{font-size:14px;color:var(--tx2);margin-top:8px}
+  .mem{list-style:none}
+  .mem li{display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid var(--bd)}
+  .mem li:last-child{border-bottom:0}
+  .mem .av{width:34px;height:34px;border-radius:50%;background:var(--soft);color:var(--ac);font-weight:800;display:flex;align-items:center;justify-content:center;flex:none}
+  .mem .nm{flex:1;min-width:0}
+  .mem .nm b{display:block;font-size:15px}
+  .mem .nm span{font-size:12.5px;color:var(--tx3)}
+  .mem .empty{color:var(--tx3)}
+  .link{display:flex;gap:8px;margin:10px 0}
+  .link input,.inp{flex:1;min-width:0;font:inherit;font-size:14px;padding:10px 12px;border-radius:10px;border:1px solid var(--bd);background:var(--bg3);color:var(--tx)}
+  .row{display:flex;gap:8px;flex-wrap:wrap}
+  .msg{font-size:13.5px;margin-top:8px}
+  .msg.ok{color:var(--ok)} .msg.bad{color:var(--bad)}
+  .hidden{display:none!important}
+  .mock{background:#7c3aed14;border:1px dashed #7c3aed;color:#7c3aed;border-radius:12px;padding:10px 12px;font-size:13px;margin-bottom:16px}
+  .mock button{font:inherit;font-size:12.5px;margin:4px 4px 0 0;padding:4px 10px;border-radius:99px;border:1px solid #7c3aed;background:none;color:#7c3aed;cursor:pointer}
+  /* 同意視窗 */
+  .cs-backdrop{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(18,18,26,.5)}
+  .cs-card{background:var(--bg2);color:var(--tx);max-width:450px;width:100%;border-radius:20px;border:1px solid var(--bd);max-height:90vh;overflow:auto}
+  .cs-head{padding:22px 22px 0}
+  .cs-title{font-size:18px;font-weight:700}
+  .cs-sub{font-size:12.5px;color:var(--tx2);margin-top:3px}
+  .cs-body{padding:16px 22px 6px}
+  .cs-terms{background:var(--bg3);border-radius:13px;padding:14px 16px;margin:0 0 12px;font-size:13.5px;line-height:1.7;list-style:none}
+  .cs-terms li{position:relative;padding-left:16px;margin-bottom:7px}
+  .cs-terms li:last-child{margin-bottom:0}
+  .cs-terms li::before{content:'';position:absolute;left:2px;top:8px;width:6px;height:6px;border-radius:50%;background:var(--ac)}
+  .cs-chk{display:flex;gap:10px;align-items:flex-start;font-size:13px;padding:8px 6px;cursor:pointer}
+  .cs-chk input{width:18px;height:18px;margin-top:1px;flex-shrink:0;accent-color:var(--ac)}
+  .cs-tax{margin:8px 0 4px;padding:12px 6px 4px;border-top:1px solid var(--bd)}
+  .cs-tax label{display:block;font-size:13px;color:var(--tx2);margin-bottom:6px}
+  .cs-tax input{width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--bd);background:var(--bg3);color:var(--tx);font-size:15px}
+  .cs-foot{display:flex;gap:10px;padding:14px 22px 20px}
+  .cs-foot .btn{flex:1}
+  .cs-card a{color:var(--ac2)}
+  footer{padding:24px 0 0;text-align:center;color:var(--tx3);font-size:12.5px}
+  footer a{color:var(--tx2)}
+</style>
+<script src="native-ui.js"></script>
+<script src="safe-back.js"></script>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <a class="backbtn" href="app.html" onclick="safeBack('app.html');return false"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>返回</a>
+    <a class="logo" href="app.html">日本再留計劃</a>
+  </header>
+  <div class="mock hidden" id="mockBar"></div>
+
+  <!-- 被邀請的人看到的 -->
+  <section id="vJoin" class="hidden">
+    <div class="card" style="text-align:center">
+      <div class="beta">揪團邀請</div>
+      <h1 id="jTitle"></h1>
+      <p class="sub" id="jSub" style="margin-bottom:16px"></p>
+      <button class="btn pri wide" id="jBtn"></button>
+      <div class="msg" id="jMsg"></div>
+    </div>
+    <div class="card">
+      <h2>加入後可以用</h2>
+      <p class="note" style="font-size:14px;color:var(--tx2)">全部 Premium 功能:N5–N1 單字與文法無限練習、JLPT 刷題與模擬考、AI 跟讀與情境對話、看日文猜單字……網頁和 App 都能用,登入同一個帳號就好。費用由主揪付款,你不用付錢。</p>
+    </div>
+  </section>
+
+  <!-- 我的揪團(主揪 / 團員) -->
+  <section id="vMine" class="hidden"></section>
+
+  <!-- 方案介紹 -->
+  <section id="vPlans">
+    <div class="beta">測試中・尚未公開</div>
+    <h1>揪團一起學,一人更省</h1>
+    <p class="sub">一個人付款、最多 6 個人一起用 Premium。湊滿 4 個人以上,一人平均比自己買便宜三成左右。網頁限定方案。</p>
+
+    <div class="seg" id="segKind"><button data-k="yearly" class="on">年費</button><button data-k="lifetime">買斷</button></div>
+    <div class="plans" id="plans"></div>
+    <p class="note" id="codeNote" style="margin-bottom:20px"></p>
+
+    <div class="card">
+      <h2>怎麼揪</h2>
+      <ol class="steps">
+        <li>主揪選方案付款(信用卡、ATM、超商都可以)</li>
+        <li>付款完成後,這頁會出現一條邀請連結</li>
+        <li>把連結丟到 LINE 群組,朋友點開、登入就加入了</li>
+        <li>錢怎麼分,朋友之間自己算</li>
+      </ol>
+    </div>
+
+    <div class="card">
+      <h2>揪團文案(複製貼到 LINE / Threads)</h2>
+      <p class="note" id="shareText" style="font-size:14px;color:var(--tx);white-space:pre-line;background:var(--bg3);border-radius:12px;padding:12px 14px;margin-bottom:10px"></p>
+      <button class="btn sm" id="btnCopyShare">複製文案</button><span class="msg" id="shareMsg"></span>
+    </div>
+
+    <div class="card faq">
+      <h2>常見問題</h2>
+      <details><summary>2、3 個人可以買嗎?</summary><p>可以,但不划算:2 個人各買個人年費(1,990 × 2)比 4 人揪團還便宜。湊到 4 個人以上再揪最省。</p></details>
+      <details><summary>已經付費的人可以加入嗎?</summary><p>可以,但要先把自己的自動續訂取消(剩下的天數照樣能用),才不會被重複扣款。買斷會員不需要加入。如果揪團的效期比你自己的方案長,加入後會改用揪團的;之後退出揪團,你原本還沒到期的方案會還給你。</p></details>
+      <details><summary>可以換成員嗎?</summary><p>可以。主揪能移除成員,空出來的位子再用同一條連結補人。為了避免位子被轉賣,年費團一個月最多補位 1 次;買斷團開團 30 天內可以自由換,之後一年 1 次。</p></details>
+      <details><summary>主揪退款或取消會怎樣?</summary><p>團員的 Premium 跟著主揪的方案走:主揪取消自動續扣,大家照用到這期結束;主揪退款,全團的 Premium 會一起停止。</p></details>
+      <details><summary>App 裡可以加入嗎?</summary><p>加入要在網頁完成(點邀請連結就會開網頁)。加入後打開 App、登入同一個帳號,就是 Premium 了。</p></details>
+    </div>
+  </section>
+
+  <footer>日本再留計劃 (StayJP) · <a href="terms.html">服務條款</a> · <a href="refund.html">退費政策</a></footer>
+</div>
+
+<script src="icons.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script>
+// 揪團方案測試頁(2026-10-18)。正式上線前:改名、加入口、把 functions/src/group.ts 的 GROUP_PAGE 一起改。
+// 價格必須跟 functions/src/utils/constants.ts 的 PLANS / WEB_CODE_DISCOUNT_TWD 一致(後端 expected_twd 會擋)。
+// ?mock=1 = 不打後端,用假資料看各畫面(給 Mia 看版面)。
+const FN_CREATE_PAYMENT = 'https://createpayment-lsd7okt5qa-de.a.run.app';
+const FN_GROUP = 'https://groupapi-lsd7okt5qa-de.a.run.app';
+const PLANS = {
+  group4_yearly:   { name:'4 人揪團年費', seats:4, price:5590,  code:4990,  kind:'yearly' },
+  group6_yearly:   { name:'6 人揪團年費', seats:6, price:7490,  code:6790,  kind:'yearly', hot:true },
+  group4_lifetime: { name:'4 人揪團買斷', seats:4, price:13990, code:12590, kind:'lifetime' },
+  group6_lifetime: { name:'6 人揪團買斷', seats:6, price:18990, code:17090, kind:'lifetime', hot:true },
+};
+const SOLO = { yearly:1990, lifetime:4990 };
+const $ = id => document.getElementById(id);
+const fmt = n => n.toLocaleString('en-US');
+const esc = s => String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const MOCK = /[?&]mock=1/.test(location.search);
+const JOIN = new URLSearchParams(location.search).get('join');
+let kind='yearly', hasCode=false, user=null;
+
+function isValidTaxId(n){ const d=String(n||'').replace(/\D/g,''); if(d.length!==8) return false; const w=[1,2,1,2,1,2,4,1]; let s=0; for(let i=0;i<8;i++){ const p=+d[i]*w[i]; s+=Math.floor(p/10)+p%10; } return s%5===0 || (d[6]==='7' && (s+1)%5===0); }
+function hydrate(){ try{ if(window.Icons&&Icons.hydrate) Icons.hydrate(); }catch(e){} }
+const isInApp = () => /FBAN|FBAV|FB_IAB|Instagram|Line\/|MicroMessenger|Twitter|TikTok|KAKAOTALK|NAVER|Barcelona|BytedanceWebview/i.test(navigator.userAgent||'') && !(window.STAYJP_NATIVE&&window.STAYJP_NATIVE.isNativeApp);
+
+// ── 方案卡 ──
+function renderPlans(){
+  document.querySelectorAll('#segKind button').forEach(b=>b.classList.toggle('on', b.dataset.k===kind));
+  $('plans').innerHTML = Object.entries(PLANS).filter(([,p])=>p.kind===kind).map(([k,p])=>{
+    const pay = hasCode ? p.code : p.price, per = Math.round(pay/p.seats), solo = SOLO[p.kind];
+    return '<div class="plan'+(p.hot?' hot':'')+'">'+(p.hot?'<span class="badge">最划算</span>':'')
+      +'<div class="n">'+p.name+'</div>'
+      +'<div class="p">'+(hasCode?'<small style="text-decoration:line-through;color:var(--tx3);margin-right:4px">'+fmt(p.price)+'</small>':'')+'<small>NT$</small>'+fmt(pay)+'</div>'
+      +'<div class="per">一人約 NT$'+fmt(per)+'</div>'
+      +'<div class="save">自己買一份 '+fmt(solo)+(p.kind==='yearly'?' / 年':'')+'<br>'+(p.kind==='yearly'?'每年自動續扣':'一次付清・不續扣')+'</div>'
+      +'<button class="btn pri wide" data-plan="'+k+'">開團</button></div>';
+  }).join('');
+  $('plans').querySelectorAll('[data-plan]').forEach(b=>b.onclick=()=>buy(b.dataset.plan, b));
+  $('codeNote').textContent = hasCode ? '已套用你的推薦碼價(約 9 折)。' : '有 KOL 推薦碼的話,先到帳號頁輸入,這裡就會顯示折扣價(約 9 折)。新人 9 折不適用揪團。';
+  const p6 = PLANS[kind==='yearly'?'group6_yearly':'group6_lifetime'];
+  $('shareText').textContent = '要不要一起揪 StayJP 學日文?\n'+p6.name+' NT$'+fmt(p6.price)+',6 個人分一人只要 '+fmt(Math.round(p6.price/6))+'\n單字、文法、JLPT 刷題、AI 跟讀全部都有\n要的留言,湊滿我就開團';
+}
+document.querySelectorAll('#segKind button').forEach(b=>b.onclick=()=>{ kind=b.dataset.k; renderPlans(); });
+$('btnCopyShare').onclick=()=>copy($('shareText').textContent, $('shareMsg'));
+
+async function copy(text, msgEl){
+  let ok=false; try{ await navigator.clipboard.writeText(text); ok=true; }catch(e){ const ta=document.createElement('textarea'); ta.value=text; ta.style.position='fixed'; ta.style.opacity='0'; document.body.appendChild(ta); ta.select(); try{ ok=document.execCommand('copy'); }catch(_){} ta.remove(); }
+  if(msgEl){ msgEl.className='msg '+(ok?'ok':'bad'); msgEl.textContent = ok?' 已複製':' 複製失敗,請長按手動複製'; setTimeout(()=>{ msgEl.textContent=''; },2500); }
+}
+
+// ── 登入 ──
+let auth=null;
+try{ firebase.initializeApp({ apiKey:"AIzaSyDnmg2XOuvwgE8m8xCF5sS4o0nQYoUplPI", authDomain:"jpnote-1bdd6.firebaseapp.com", projectId:"jpnote-1bdd6" }); auth=firebase.auth(); }catch(e){}
+function inAppHelp(){
+  const ua=navigator.userAgent||'', ios=/iPhone|iPad|iPod/i.test(ua);
+  const step = /Line\//i.test(ua) ? (ios?'點右下角「⋯」→「在預設瀏覽器中開啟」':'點右上角「⋮」→「在其他瀏覽器中開啟」')
+    : /FBAN|FBAV|FB_IAB/i.test(ua)&&!/Instagram/i.test(ua) ? (ios?'點右下角「⋯」→「在 Safari 中開啟」':'點右上角「⋮」→「在外部瀏覽器中開啟」')
+    : (ios?'點右上角「⋯」→「在外部瀏覽器中開啟」':'點右上角「⋮」→「在 Chrome 中開啟」');
+  return '你現在在 App 的內建瀏覽器裡,Google 不給這裡登入。'+step+',或複製網址貼到 Safari / Chrome。';
+}
+function login(){
+  if(MOCK){ user={uid:'mock', email:'me@gmail.com'}; return Promise.resolve(user); }
+  if(isInApp()) return Promise.reject(new Error(inAppHelp()));
+  return new Promise((ok,ng)=>{
+    const wrap=document.createElement('div'); wrap.className='cs-backdrop';
+    wrap.innerHTML='<div class="cs-card"><div class="cs-head"><div class="cs-title">先登入</div><div class="cs-sub">用你平常登入 StayJP 的方式,App 也要用同一個帳號</div></div>'
+      +'<div class="cs-foot" style="flex-direction:column"><button class="btn pri" data-p="google">用 Google 登入</button><button class="btn" data-p="apple">用 Apple 登入</button><button class="btn" data-x style="border:0;color:var(--tx3)">取消</button></div></div>';
+    document.body.appendChild(wrap);
+    wrap.querySelector('[data-x]').onclick=()=>{ wrap.remove(); ng(new Error('cancel')); };
+    wrap.querySelectorAll('[data-p]').forEach(b=>b.onclick=()=>{
+      const p=b.dataset.p; let prov;
+      if(p==='apple'){ prov=new firebase.auth.OAuthProvider('apple.com'); prov.addScope('email'); prov.addScope('name'); } else prov=new firebase.auth.GoogleAuthProvider();
+      auth.signInWithPopup(prov).then(r=>{ wrap.remove(); ok(r.user); }).catch(e=>{ if(e&&/popup-closed|cancelled-popup/.test(e.code||'')) return; wrap.remove(); ng(e); });
+    });
+  });
+}
+async function ensureUser(){ if(user) return user; user = await login(); return user; }
+
+// ── 後端 ──
+async function api(body, needAuth=true){
+  if(MOCK) return mockApi(body);
+  const headers={'content-type':'application/json'};
+  if(needAuth){ await ensureUser(); headers.authorization='Bearer '+await auth.currentUser.getIdToken(); }
+  const r=await fetch(FN_GROUP,{method:'POST',headers,body:JSON.stringify(body)});
+  return r.json();
+}
+
+// ── 購買 ──
+function consent(plan, pay){
+  const p=PLANS[plan], yearly=p.kind==='yearly';
+  return new Promise(resolve=>{
+    const wrap=document.createElement('div'); wrap.className='cs-backdrop';
+    wrap.innerHTML='<div class="cs-card" role="dialog" aria-modal="true"><div class="cs-head"><div class="cs-title">確認開團・'+p.name+'</div><div class="cs-sub">付款前請確認以下條款</div></div><div class="cs-body"><ul class="cs-terms">'
+      +(yearly?'<li>本方案為<strong>自動續扣</strong>:每年 <strong>NT$'+fmt(pay)+'</strong>,期滿自動扣款。可隨時在「帳號 → 訂閱管理」取消,取消後用到當期結束。</li>'
+              :'<li>本方案為<strong>一次付清 NT$'+fmt(pay)+'</strong>,不會自動續扣。買斷取得的是本服務存續期間內既有付費功能之使用權(詳見<a href="terms.html" target="_blank" rel="noopener">服務條款</a>第 8 條)。</li>')
+      +'<li>含你本人共 <strong>'+p.seats+' 個名額</strong>。付款後會得到邀請連結,其他人用連結登入加入。</li>'
+      +'<li>團員的 Premium 跟著你的方案:你取消續扣,大家用到當期結束;<strong>你退款,全團一起停止</strong>。</li>'
+      +'<li>名額不得轉售。'+(yearly?'補位一個月最多 1 次。':'開團 30 天內可自由換人,之後一年 1 次。')+'</li>'
+      +'<li>退費依<a href="refund.html" target="_blank" rel="noopener">退費政策</a>'+(yearly?':7 天內全額退,逾 7 天按未使用比例退。':':買斷 7 天內可全額退款。')+'</li>'
+      +'</ul><label class="cs-chk"><input type="checkbox" id="cAgree"><span>我已閱讀並同意上述條款與<a href="terms.html" target="_blank" rel="noopener">服務條款</a>。</span></label>'
+      +'<label class="cs-chk"><input type="checkbox" id="cAge"><span>我已年滿 18 歲,或已取得法定代理人同意。</span></label>'
+      +'<div class="cs-tax"><label for="cTax">公司統一編號(選填,報帳用)</label><input id="cTax" inputmode="numeric" maxlength="8" placeholder="8 碼數字,不需要可留空"></div>'
+      +'</div><div class="cs-foot"><button class="btn" id="cCancel">取消</button><button class="btn pri" id="cOk" disabled>確認付款</button></div></div>';
+    document.body.appendChild(wrap);
+    const a=wrap.querySelector('#cAgree'), g=wrap.querySelector('#cAge'), ok=wrap.querySelector('#cOk'), tax=wrap.querySelector('#cTax');
+    const sync=()=>{ const v=tax.value.trim(); ok.disabled=!(a.checked&&g.checked) || (!!v && !isValidTaxId(v)); };
+    a.onchange=sync; g.onchange=sync; tax.oninput=()=>{ tax.value=tax.value.replace(/\D/g,'').slice(0,8); sync(); };
+    wrap.querySelector('#cCancel').onclick=()=>{ wrap.remove(); resolve(null); };
+    ok.onclick=()=>{ wrap.remove(); resolve({ tax_id: tax.value.trim() }); };
+  });
+}
+async function buy(plan, btn){
+  try{
+    await ensureUser();
+    const pay = hasCode ? PLANS[plan].code : PLANS[plan].price;
+    const c = await consent(plan, pay); if(!c) return;
+    btn.disabled=true; btn.textContent='前往付款…';
+    if(MOCK){ alertBox('模擬模式:這裡會跳到綠界付款頁。'); btn.disabled=false; renderPlans(); return; }
+    const send = async (expected) => {
+      const r = await fetch(FN_CREATE_PAYMENT,{method:'POST',headers:{'content-type':'application/json',authorization:'Bearer '+await auth.currentUser.getIdToken()},body:JSON.stringify({plan, expected_twd:expected, tax_id:c.tax_id})});
+      return [r.status, await r.json()];
+    };
+    let [st, d] = await send(pay);
+    if(st===409 && d.error==='price_mismatch'){ hasCode = d.current_twd===PLANS[plan].code; renderPlans(); alertBox('價格是 NT$'+fmt(d.current_twd)+'(依你的推薦碼狀態),請再按一次開團。'); return; }
+    if(!d.endpoint){ alertBox(d.reason||'沒辦法建立訂單,請稍後再試。'); btn.disabled=false; renderPlans(); return; }
+    const f=document.createElement('form'); f.method='POST'; f.action=d.endpoint;
+    Object.entries(d.params).forEach(([k,v])=>{ const i=document.createElement('input'); i.type='hidden'; i.name=k; i.value=v; f.appendChild(i); });
+    document.body.appendChild(f); f.submit();
+  }catch(e){ if(e&&e.message!=='cancel') alertBox(e.message||'發生錯誤,請稍後再試。'); btn.disabled=false; renderPlans(); }
+}
+function alertBox(text){
+  const wrap=document.createElement('div'); wrap.className='cs-backdrop';
+  wrap.innerHTML='<div class="cs-card"><div class="cs-body" style="padding-top:22px;font-size:14.5px;white-space:pre-line">'+esc(text)+'</div><div class="cs-foot"><button class="btn pri">知道了</button></div></div>';
+  document.body.appendChild(wrap); wrap.querySelector('button').onclick=()=>wrap.remove();
+}
+
+// ── 我的揪團 ──
+function renderMine(d){
+  const box=$('vMine');
+  if(!d || !d.role){ box.classList.add('hidden'); return; }
+  box.classList.remove('hidden');
+  const exp = d.lifetime ? '買斷・不會到期' : '效期到 '+new Date(d.expiresAt).toLocaleDateString('zh-TW');
+  const used = 1 + d.members.length, left = d.seats - used;
+  let html='<div class="card"><div class="beta" style="background:var(--ac)">'+(d.role==='owner'?'你是主揪':'你在揪團裡')+'</div>'
+    +'<h2 style="margin-bottom:4px">'+esc(d.plan_name)+'</h2><p class="note" style="margin-bottom:12px">'+exp+(d.status!=='active'?'(已結束)':'')+'・已用 '+used+' / '+d.seats+' 位</p>'
+    +'<ul class="mem"><li><span class="av">主</span><span class="nm"><b>'+esc(d.owner_name)+(d.role==='owner'?'(你)':'')+'</b><span>主揪・付款人</span></span></li>'
+    +d.members.map(m=>'<li><span class="av">'+esc((m.name||'?').slice(0,1))+'</span><span class="nm"><b>'+esc(m.name)+(m.me?'(你)':'')+'</b><span>'+(m.joined_at?new Date(m.joined_at).toLocaleDateString('zh-TW')+' 加入':'')+'</span></span>'
+      +(d.role==='owner'&&m.uid?'<button class="btn sm" data-rm="'+esc(m.uid)+'" data-nm="'+esc(m.name)+'">移除</button>':'')+'</li>').join('')
+    +Array.from({length:Math.max(0,left)},()=> '<li><span class="av" style="background:var(--bg3);color:var(--tx3)">+</span><span class="nm empty">空位</span></li>').join('')
+    +'</ul></div>';
+  if(d.role==='owner'){
+    html+='<div class="card"><h2>邀請朋友</h2>'
+      +(left>0 ? '<p class="note">把連結丟到 LINE 群組,朋友點開、登入就加入了。</p><div class="link"><input readonly id="invUrl" value="'+esc(d.invite_url)+'"><button class="btn sm pri" id="btnCopyInv">複製</button></div>'
+         +'<div class="row"><a class="btn sm" id="btnLine" target="_blank" rel="noopener" href="https://line.me/R/share?text='+encodeURIComponent('一起用 StayJP 學日文!點這裡加入我的揪團:'+d.invite_url)+'">分享到 LINE</a><button class="btn sm" id="btnRegen">換一條新連結</button></div><span class="msg" id="invMsg"></span>'
+         +(d.can_fill?'':'<p class="msg bad">'+esc(d.fill_note||'')+'</p>')
+         +'<div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--bd)"><div class="lbl" style="font-size:13px;color:var(--tx2);margin-bottom:6px">或寄邀請信(只會寄連結過去)</div><div class="link"><input class="inp" id="invEmail" type="email" placeholder="朋友的 email"><button class="btn sm" id="btnInvite">寄出</button></div><span class="msg" id="mailMsg"></span></div>'
+        : '<p class="note">位子都滿了。要換人的話,先移除一位成員。</p>')
+      +'</div>';
+  } else {
+    html+='<div class="card"><p class="note" style="margin-bottom:10px">費用由主揪付款。網頁和 App 登入這個帳號就是 Premium。</p><button class="btn sm" id="btnLeave">退出揪團</button><span class="msg" id="leaveMsg"></span></div>';
+  }
+  box.innerHTML=html;
+  const q=s=>box.querySelector(s);
+  if(q('#btnCopyInv')) q('#btnCopyInv').onclick=()=>copy(d.invite_url, q('#invMsg'));
+  if(q('#btnRegen')) q('#btnRegen').onclick=async()=>{ if(!await confirmBox('換一條新連結後,舊連結就不能用了(已經加入的人不受影響)。確定要換嗎?')) return; const r=await api({action:'regen'}); if(r.ok) loadMine(); };
+  if(q('#btnInvite')) q('#btnInvite').onclick=async()=>{ const m=q('#mailMsg'); const r=await api({action:'invite', email:q('#invEmail').value}); m.className='msg '+(r.ok?'ok':'bad'); m.textContent=r.ok?'已寄出(今天還能寄 '+r.left_today+' 封)':(r.reason||'寄送失敗'); if(r.ok) q('#invEmail').value=''; };
+  box.querySelectorAll('[data-rm]').forEach(b=>b.onclick=async()=>{ if(!await confirmBox('確定要把「'+b.dataset.nm+'」移出揪團嗎?他會馬上失去 Premium。')) return; const r=await api({action:'remove', member_uid:b.dataset.rm}); if(r.ok){ await loadMine(); if(r.fill_note) alertBox(r.fill_note); } else alertBox(r.reason||'移除失敗'); });
+  if(q('#btnLeave')) q('#btnLeave').onclick=async()=>{ if(!await confirmBox('確定要退出揪團嗎?退出後會馬上失去揪團給的 Premium。')) return; const r=await api({action:'leave'}); if(r.ok) loadMine(); else alertBox(r.reason||'退出失敗'); };
+}
+function confirmBox(text){
+  return new Promise(res=>{ const wrap=document.createElement('div'); wrap.className='cs-backdrop';
+    wrap.innerHTML='<div class="cs-card"><div class="cs-body" style="padding-top:22px;font-size:14.5px">'+esc(text)+'</div><div class="cs-foot"><button class="btn" data-v="0">取消</button><button class="btn pri" data-v="1">確定</button></div></div>';
+    document.body.appendChild(wrap); wrap.querySelectorAll('button').forEach(b=>b.onclick=()=>{ wrap.remove(); res(b.dataset.v==='1'); }); });
+}
+const FROM_PAY = /[?&]from=ecpay/.test(location.search);
+let _payPoll = 0;
+async function loadMine(){
+  try{
+    const d=await api({action:'info'});
+    if(FROM_PAY && !d.role && _payPoll < 10){   // 綠界付款通知可能比人晚到幾秒 → 先顯示確認中,每 3 秒再查(最多 30 秒)
+      _payPoll++; const box=$('vMine'); box.classList.remove('hidden');
+      box.innerHTML='<div class="card" style="text-align:center"><h2>付款確認中…</h2><p class="note">綠界通知通常幾秒內就到,好了會自動出現邀請連結。ATM／超商付款要等你繳費後才會開團。</p></div>';
+      setTimeout(loadMine, 3000); return;
+    }
+    renderMine(d);
+  }catch(e){}
+}
+
+// ── 被邀請 ──
+async function renderJoin(){
+  $('vJoin').classList.remove('hidden'); $('vPlans').classList.add('hidden');
+  const p = await api({action:'preview', token:JOIN}, false);
+  if(!p.ok){ $('jTitle').textContent='這個邀請已經失效'; $('jSub').textContent=p.reason||'請主揪重新傳一次連結。'; $('jBtn').textContent='看揪團方案'; $('jBtn').onclick=()=>{ location.href=location.pathname+(MOCK?'?mock=1':''); }; return; }
+  $('jTitle').textContent = p.owner_name+' 邀請你一起學日文';
+  $('jSub').textContent = '加入「'+p.plan_name+'」,費用由主揪付款。目前還剩 '+p.left+' 個位子。';
+  $('jBtn').textContent = p.left>0 ? '登入並加入' : '位子已經滿了';
+  $('jBtn').disabled = !(p.left>0);
+  if(isInApp()){ $('jMsg').className='msg bad'; $('jMsg').textContent=inAppHelp(); }
+  $('jBtn').onclick=async()=>{
+    const m=$('jMsg'); m.className='msg'; m.textContent='';
+    try{
+      await ensureUser();
+      $('jBtn').disabled=true; $('jBtn').textContent='加入中…';
+      const r=await api({action:'join', token:JOIN});
+      if(r.ok){ $('jTitle').textContent='加入成功!'; $('jSub').textContent='你現在是 Premium 了。網頁和 App 用這個帳號登入就能用全部功能。'; $('jBtn').textContent='開始學習'; $('jBtn').disabled=false; $('jBtn').onclick=()=>{ location.href='app.html'; }; }
+      else { m.className='msg bad'; m.textContent=r.reason||'加入失敗,請稍後再試。'; $('jBtn').disabled=false; $('jBtn').textContent='登入並加入'; }
+    }catch(e){ if(e&&e.message!=='cancel'){ m.className='msg bad'; m.textContent=e.message; } }
+  };
+}
+
+// ── 模擬模式 ──
+const MOCK_STATE = { view:'owner', members:[{uid:'u1',name:'小美',joined_at:Date.now()-5*864e5},{uid:'u2',name:'Apple 使用者',joined_at:Date.now()-2*864e5}] };
+function mockApi(b){
+  const base={ plan:'group6_yearly', plan_name:'揪團年費(6人)', seats:6, expiresAt:Date.now()+300*864e5, status:'active', lifetime:false, owner_name:'林小姐' };
+  if(b.action==='preview') return { ok:true, owner_name:'林小姐', plan:'group6_yearly', plan_name:'揪團年費(6人)', seats:6, left:3 };
+  if(b.action==='info'){
+    if(MOCK_STATE.view==='none') return { role:null };
+    if(MOCK_STATE.view==='member') return { ...base, role:'member', members:MOCK_STATE.members.map((m,i)=>({name:m.name,joined_at:m.joined_at,me:i===0})), can_fill:true };
+    return { ...base, role:'owner', members:MOCK_STATE.members, invite_url:'https://stayjp.study/group-beta.html?join=DEMO&openExternalBrowser=1', can_fill:true };
+  }
+  if(b.action==='remove'){ MOCK_STATE.members=MOCK_STATE.members.filter(m=>m.uid!==b.member_uid); return { ok:true }; }
+  if(b.action==='join') return { ok:true, owner_name:'林小姐' };
+  if(b.action==='invite') return { ok:true, left_today:9 };
+  return { ok:true };
+}
+if(MOCK){
+  const bar=$('mockBar'); bar.classList.remove('hidden');
+  bar.innerHTML='模擬模式(假資料,不會付款):<br><button data-v="owner">主揪畫面</button><button data-v="member">團員畫面</button><button data-v="none">還沒開團</button><button data-v="join">邀請頁</button><button data-v="code">切換推薦碼價</button>';
+  bar.querySelectorAll('button').forEach(b=>b.onclick=()=>{
+    const v=b.dataset.v;
+    if(v==='join'){ location.href=location.pathname+'?mock=1&join=DEMO'; return; }
+    if(v==='code'){ hasCode=!hasCode; renderPlans(); return; }
+    if(JOIN){ location.href=location.pathname+'?mock=1'; return; }
+    MOCK_STATE.view=v; loadMine();
+  });
+}
+
+// ── 啟動 ──
+renderPlans();
+if(JOIN) renderJoin();
+if(MOCK){ if(!JOIN) loadMine(); }
+else if(auth) auth.onAuthStateChanged(async u=>{
+  user=u||null;
+  if(!u) return;
+  if(!JOIN) loadMine();   // 邀請模式只顯示邀請卡
+  try{   // 有效推薦碼 → 卡片顯示碼價(真正價格以後端為準,不一致時 409 會更正)
+    const d=(await firebase.firestore().doc('users/'+u.uid).get()).data()||{};
+    if(d.ref_code){ const c=(await firebase.firestore().doc('ref_codes/'+String(d.ref_code).toUpperCase()).get()).data(); hasCode=!!(c && c.active!==false && c.status!=='suspended' && c.owner_uid!==u.uid && !(typeof c.expires_at==='number' && c.expires_at<Date.now())); renderPlans(); }
+  }catch(e){}
+});
+</script>
+</body>
+</html>
