@@ -623,7 +623,7 @@ async function renderJoin(){
       const r=await api({action:'join', token:JOIN});
       if(r.ok){
         $('jTk').src='images/mascot/tanuki-happy.png';
-        $('jTitle').textContent='加入成功!'; $('jFree').classList.add('hidden'); $('jSeats').querySelector('.you')?.classList.remove('you');
+        $('jTitle').textContent='加入成功!'; $('jFree').classList.add('hidden'); { const you=$('jSeats').querySelector('.you'); if(you){ const cu0=auth&&auth.currentUser, nm=(cu0&&(cu0.displayName||cu0.email))||'你'; you.className='s'; you.style.background='var(--ac)'; you.textContent=nm.slice(0,1); } }   // 「你」的位子換成自己的頭像
         $('jSub').textContent='你現在是 Premium 了,全部功能都能用。';
         $('jBtn').textContent='在網頁開始學習'; $('jBtn').disabled=false; $('jBtn').onclick=()=>{ location.href='app.html'; };
         // 實走流程發現:手機用戶多半去用 App,常在 App 用別的帳號登入、以為沒加入成功 → 這裡直接講清楚要用哪個帳號
