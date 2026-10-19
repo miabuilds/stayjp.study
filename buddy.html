@@ -421,7 +421,7 @@ async function renderJoin(){
   const ini=p.initials||[];
   $('jSeats').innerHTML=Array.from({length:p.max},(_,i)=> i<ini.length ? '<span style="background:'+colorOf(ini[i]+i)+'">'+esc(ini[i])+'</span>' : i===ini.length ? '<span class="you">你</span>' : '<span class="e">+</span>').join('');
   $('jSub').textContent='加入讀書小屋,看誰今天讀了、誰還在睡。免費。';
-  $('jBtn').textContent='登入並加入';
+  $('jBtn').textContent= user ? '加入讀書小屋' : '登入並加入';
   if(isInApp()){ $('jMsg').className='msg bad'; $('jMsg').textContent=inAppHelp(); }
   $('jBtn').onclick=async()=>{
     const m=$('jMsg'); m.className='msg'; m.textContent='';
@@ -475,8 +475,9 @@ if(MOCK){
 }
 
 // ── 啟動 ──
-if(JOIN) renderJoin();
-else if(MOCK){ user={uid:'me'}; load(); }
+// 邀請頁也要先讀登入狀態:已經登入的人按「加入」不能再跳登入視窗(實測踩到)
+if(MOCK){ user={uid:'me'}; JOIN ? renderJoin() : load(); }
+else if(JOIN){ if(auth) auth.onAuthStateChanged(u=>{ user=u||null; if(u && $('jBtn').textContent==='登入並加入') $('jBtn').textContent='加入讀書小屋'; }); renderJoin(); }
 else if(auth){
   let done=false;
   auth.onAuthStateChanged(u=>{ user=u||null; done=true; if(u) load(); else show('vNone'); });
