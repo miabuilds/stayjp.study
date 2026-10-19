@@ -439,6 +439,7 @@ async function syncCode(){
 function renderMine(d){
   const box=$('vMine');
   if(!d || !d.role){ box.classList.add('hidden'); return; }
+  if(d.status==='active'){ try{ localStorage.setItem('premium_hint','1'); }catch(e){} }
   box.classList.remove('hidden');
   const exp = d.lifetime ? '買斷・不會到期' : '效期到 '+new Date(d.expiresAt).toLocaleDateString('zh-TW');
   const used = 1 + d.members.length, left = d.seats - used;
@@ -636,6 +637,7 @@ async function renderJoin(){
       $('jBtn').disabled=true; $('jBtn').textContent='加入中…';
       const r=await api({action:'join', token:JOIN});
       if(r.ok){
+        try{ localStorage.setItem('premium_hint','1'); }catch(e){}   // 加入就是 Premium → 各頁促銷條別再推銷
         $('jTk').src='images/mascot/tanuki-happy.png';
         $('jTitle').textContent='加入成功!'; $('jFree').classList.add('hidden'); { const you=$('jSeats').querySelector('.you'); if(you){ const cu0=auth&&auth.currentUser, nm=(cu0&&(cu0.displayName||cu0.email))||'你'; you.className='s'; you.style.background='var(--ac)'; you.textContent=nm.slice(0,1); } }   // 「你」的位子換成自己的頭像
         $('jSub').textContent='你現在是 Premium 了,全部功能都能用。';

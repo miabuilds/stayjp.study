@@ -202,7 +202,7 @@ document.addEventListener('DOMContentLoaded',function(){ function h(){ var n=win
  </div>
 
  <div id="premiumActions" style="display:none">
- <p style="font-size:13px;color:var(--tx2);margin-top:14px">
+ <p id="thanksLine" style="font-size:13px;color:var(--tx2);margin-top:14px">
  感謝你的支持!以下是訂閱管理選項。
  </p>
  <div class="actions">
@@ -661,6 +661,7 @@ function renderSubscription(sub) {
  return;
  }
 
+ try { localStorage.setItem('premium_hint', '1'); } catch (e) {}   // 揪團團員可能還沒開過 app.html(平常由 tool-quota 寫)→ 這裡補,促銷條才不會叫 Premium 用戶去買
  // Plan label(is_gift = 手動贈送:不顯示方案名,顯示「贈送」)
  const pl = sub.is_gift ? '<i data-ic=gift></i> 贈送' : (PLAN_LABELS[sub.plan] || sub.plan);
  const earlyBird = (!sub.is_gift && sub.is_early_bird) ? '<span class="badge b-early-bird">早鳥鎖價</span>' : '';
@@ -715,6 +716,7 @@ function renderSubscription(sub) {
  + (sub.source === 'group' ? '你的 Premium 來自<b>揪團</b>,由主揪付款,效期跟著主揪的方案。' : '你是揪團的<b>主揪</b>,團員的 Premium 跟著你的方案。')
  + (inApp ? '' : ' <a href="group.html" style="color:var(--ac,#C6553B)">看我的揪團 →</a>') + '</div>');
  }
+ { const tl = document.getElementById('thanksLine'); if (tl) tl.style.display = sub.source === 'group' ? 'none' : ''; }   // 團員沒有管理選項,這句會沒頭沒尾
  if (sub.source === 'group') {
  appNote.style.display = 'none';
  ['btnCancelRenew', 'btnResubscribe', 'btnRefund'].forEach(id => { const el = document.getElementById(id); if (el) el.style.display = 'none'; });
