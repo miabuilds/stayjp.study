@@ -503,16 +503,16 @@ async function renderJoin(){
 // ── 模擬模式 ──
 const MOCK_STATE = { view:'owner', members:[{uid:'u1',name:'小美',joined_at:Date.now()-5*864e5},{uid:'u2',name:'Apple 使用者',joined_at:Date.now()-2*864e5}] };
 function mockApi(b){
-  const base={ plan:'group6_yearly', plan_name:'揪團年費(6人)', seats:6, expiresAt:Date.now()+300*864e5, status:'active', lifetime:false, owner_name:'林小姐' };
-  if(b.action==='preview') return { ok:true, owner_name:'林小姐', plan:'group6_yearly', plan_name:'揪團年費(6人)', seats:6, left:3 };
+  const base={ plan:'group4_yearly', plan_name:'揪團年費(4人)', seats:4, expiresAt:Date.now()+300*864e5, status:'active', lifetime:false, owner_name:'林小姐' };
+  if(b.action==='preview') return { ok:true, owner_name:'林小姐', plan:'group4_yearly', plan_name:'揪團年費(4人)', seats:4, left:1 };
   if(b.action==='info'){
     if(MOCK_STATE.view==='none') return { role:null };
     if(MOCK_STATE.view==='member') return { ...base, role:'member', members:MOCK_STATE.members.map((m,i)=>({name:m.name,joined_at:m.joined_at,me:i===0})), can_fill:true };
     return { ...base, role:'owner', members:MOCK_STATE.members, invite_url:'https://stayjp.study/group-beta.html?join=DEMO&openExternalBrowser=1', can_fill:true };
   }
   if(b.action==='board'){
-    const ms=[{name:'小美',week:86,today:12,days:4,streak:5},{name:'林小姐',owner:true,week:64,today:0,days:3,streak:3,me:MOCK_STATE.view==='owner'},{name:'Apple 使用者',week:31,today:5,days:2,streak:1,me:MOCK_STATE.view==='member'},{name:'阿明',hidden:true}];
-    const total=86+64+31+20; return { ok:true, goal:400, total:MOCK_STATE.goalDone?420:total, members:ms, my_hidden:false };
+    const ms=[{name:'小美',week:86,today:12,days:4,streak:5},{name:'林小姐',owner:true,week:64,today:0,days:3,streak:3,me:MOCK_STATE.view==='owner'},{name:'Apple 使用者',week:31,today:5,days:2,streak:1,me:MOCK_STATE.view==='member'}];
+    const total=86+64+31; return { ok:true, goal:300, total:MOCK_STATE.goalDone?320:total, members:ms, my_hidden:false };
   }
   if(b.action==='board_hide') return { ok:true };
   if(b.action==='remove'){ MOCK_STATE.members=MOCK_STATE.members.filter(m=>m.uid!==b.member_uid); return { ok:true }; }
