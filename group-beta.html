@@ -117,13 +117,13 @@
   .rk2 .who{flex:1;min-width:0}
   .rk2 .who .nm{font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .rk2 .who .nm small{font-size:12px;color:#B08C7C;margin-left:4px}
-  .rk2 .who .sub{font-size:12.5px;color:#B08C7C;margin-top:1px}
+  .rk2 .who .sub{font-size:12.5px;color:#B08C7C;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .rk2 .who .sub .fire{color:#E8734A}
   .rk2 .who .sub .td{color:#3F9A6B}
   .rk2 .pts{flex:none;text-align:right;color:var(--ac);font-size:24px;line-height:1}
   .rk2 .pts small{font-size:12px;color:#B08C7C;margin-left:2px}
-  .rk2 .zz{width:40px;height:26px;flex:none;border-radius:10px;background:#fff;overflow:hidden}
-  .rk2 .zz img{width:40px}
+  .rk2 .zz{width:32px;height:21px;flex:none;border-radius:8px;background:#fff;overflow:hidden}
+  .rk2 .zz img{width:32px}
   .rk2 li.secret{background:#FBF6F2;color:#B08C7C}
   .cheer2{display:flex;align-items:center;gap:8px;margin-top:14px}
   .cheer2 .tk{width:42px;height:42px;border-radius:50%;background:#fff;border:2px solid #FFE3D1;overflow:hidden;flex:none;display:flex;align-items:flex-end;justify-content:center}
@@ -579,7 +579,7 @@ function renderBoard(b){
     sub.push(m.today>0?'<span class="td">今天 +'+m.today+'</span>':'今天還在睡');   // 旁邊有睡覺小狸,短一點才不會在手機擠成兩行
     return '<li class="'+(m.me?'me':'')+'">'
       +'<span class="av" style="background:'+pastelOf(m.name)+'">'+(i===0&&m.week>0?CROWN:'')+esc((m.name||'?').slice(0,1))+'<span class="no">'+(i+1)+'</span></span>'
-      +'<span class="who"><div class="nm">'+esc(m.name)+(m.me?'<small>(你)</small>':'')+(m.owner?'<small>主揪</small>':'')+'</div><div class="sub">'+sub.join(' ・ ')+'</div></span>'
+      +'<span class="who"><div class="nm">'+esc(m.name)+(m.me?'<small>(你)</small>':'')+(m.owner?'<small>主揪</small>':'')+'</div><div class="sub">'+sub.join('・')+'</div></span>'
       +(m.today>0?'':'<span class="zz"><img src="images/mascot/tanuki-sleep.png" alt=""></span>')
       +'<span class="pts">'+fmt(m.week||0)+'<small>題</small></span></li>';
   };
