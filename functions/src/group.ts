@@ -19,6 +19,7 @@ import * as functions from "firebase-functions/v2/https";
 import * as admin from "firebase-admin";
 import { db, nowMs, getSubscription, syncGroupMembers, newInviteToken, revokeGroupSub } from "./utils/firestore";
 import { PLANS, isLifetimePlan, ecpayConfig } from "./utils/constants";
+import { studyStats, weekDaysTW } from "./utils/study-stats";
 
 const DAY = 864e5;
 const GROUP_PAGE = "group.html";   // 改檔名時 ecpay-return.ts 也要改(group-beta.html 留著轉址)
@@ -29,7 +30,7 @@ const maskEmail = (e: string) => {
   if (!d) return "";
   return (u.length <= 2 ? u[0] + "*" : u.slice(0, 2) + "***") + "@" + d;
 };
-async function displayNameOf(uid: string): Promise<string> {
+export async function displayNameOf(uid: string): Promise<string> {
   try {
     const u = await admin.auth().getUser(uid);
     const relay = /privaterelay\.appleid\.com$/i.test(u.email || "");
@@ -63,30 +64,18 @@ async function findGroupOf(uid: string): Promise<{ id: string; g: any; role: "ow
 
 const revokeMember = (ownerUid: string, memberUid: string) => revokeGroupSub(memberUid, ownerUid);
 
-// ── 團內排行 ──
-// 資料:user_daily/{uid} = { "YYYY-MM-DD": {vocab, grammar, quiz} }(daily-log.js,裝置本地日期;台灣用戶≈台灣日期)。
-// 一週 = 台灣時間週一~今天。團隊目標 = 每人每週 100 個動作(今日目標 30/天的三分之一,大家都碰得到)。
+// ── 團內排行 ── 統計共用 utils/study-stats.ts(讀書夥伴也用同一份)。團隊目標 = 每人每週 100 個動作。
 const PER_PERSON_WEEKLY_GOAL = 100;
-const twDay = (ms: number) => new Date(ms + 8 * 3600e3).toISOString().slice(0, 10);
 async function buildBoard(ownerUid: string, g: any, me: string) {
   const now = nowMs();
-  const tw = new Date(now + 8 * 3600e3);
-  const dow = (tw.getUTCDay() + 6) % 7;   // 週一=0
-  const weekDays = Array.from({ length: dow + 1 }, (_, i) => twDay(now - (dow - i) * DAY));
-  const today = twDay(now);
   const uids = [ownerUid, ...((g.member_uids || []) as string[])];
   const rows = await Promise.all(uids.map(async (u) => {
-    const [dSnap, uSnap] = await Promise.all([db.doc(`user_daily/${u}`).get(), db.doc(`users/${u}`).get()]);
-    const daily = dSnap.data() || {};
-    const sumOf = (d: string) => { const x = daily[d] || {}; return (x.vocab || 0) + (x.grammar || 0) + (x.quiz || 0); };
-    const week = weekDays.reduce((n, d) => n + sumOf(d), 0);
-    let streak = 0;
-    for (let i = sumOf(today) > 0 ? 0 : 1; i < 120; i++) { if (sumOf(twDay(now - i * DAY)) > 0) streak++; else break; }
+    const [st, uSnap] = await Promise.all([studyStats(u, now), db.doc(`users/${u}`).get()]);
     return {
       me: u === me, owner: u === ownerUid,
       name: u === ownerUid ? await displayNameOf(u) : (g.members?.[u]?.name || "使用者"),
       hidden: uSnap.data()?.group_board_hidden === true,
-      week, today: sumOf(today), days: weekDays.filter(d => sumOf(d) > 0).length, streak,
+      week: st.week, today: st.today, days: st.days, streak: st.streak,
     };
   }));
   const total = rows.reduce((n, r) => n + r.week, 0);
@@ -95,7 +84,7 @@ async function buildBoard(ownerUid: string, g: any, me: string) {
   const out = rows.sort((a, b) => b.week - a.week).map(r => (r.hidden && !r.me)
     ? { me: false, owner: r.owner, name: r.name, hidden: true }
     : r);
-  return { week_start: weekDays[0], goal, total, members: out, my_hidden: rows.find(r => r.me)?.hidden || false };
+  return { week_start: weekDaysTW(now)[0], goal, total, members: out, my_hidden: rows.find(r => r.me)?.hidden || false };
 }
 
 export const groupApi = functions.onRequest(

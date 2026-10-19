@@ -11,6 +11,7 @@
 
 export { createPayment } from "./create-payment";
 export { groupApi } from "./group";   // 揪團(2026-10-18 做、10/19 上線,前端 group.html)
+export { buddyApi } from "./buddy";   // 讀書夥伴/讀書小屋(2026-10-20,免費;前端 buddy.html)
 export { ecpayCallback } from "./ecpay-callback";
 export { ecpayReturn } from "./ecpay-return";
 export { refund } from "./refund";

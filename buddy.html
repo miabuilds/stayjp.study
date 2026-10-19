@@ -1,0 +1,487 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<script src="campaign.js"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>讀書小屋:跟朋友一起讀日文｜StayJP 日本再留計劃</title>
+<meta name="description" content="StayJP 讀書小屋:最多 5 個朋友一起讀日文,看誰今天讀了、誰還在睡,幫朋友加油或叫他起來讀書。免費。">
+<link rel="canonical" href="https://stayjp.study/buddy.html">
+<meta property="og:title" content="來我的讀書小屋,一起讀日文吧!">
+<meta property="og:description" content="看誰今天讀了、誰還在睡,互相加油、叫對方起來讀書。StayJP 免費功能。">
+<meta property="og:image" content="https://stayjp.study/images/buddy/og.jpg">
+<meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<script>try{var _th=localStorage.getItem('theme');if(_th)document.documentElement.setAttribute('data-theme',_th);}catch(e){}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Huninn&display=swap">
+<link rel="preload" as="image" href="images/buddy/room.webp">
+<style>
+  :root{ --bg:#F6EFE8;--card:#FFFFFF;--soft:#FFF4EC;--line:#F1E2D6;--tx:#3A2A22;--tx2:#8A6A5C;--tx3:#B08C7C;--ac:#E8603F;--ac2:#FF9A6B;--ok:#3F9A6B; }
+  @media (prefers-color-scheme:dark){ :root:not([data-theme=light]){ --bg:#1B1613;--card:#26201C;--soft:#2E2622;--line:#3A2F28;--tx:#F1E6DD;--tx2:#C4A898;--tx3:#8F7466; }}
+  :root[data-theme=dark]{ --bg:#1B1613;--card:#26201C;--soft:#2E2622;--line:#3A2F28;--tx:#F1E6DD;--tx2:#C4A898;--tx3:#8F7466; }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--tx);font-family:"Huninn","PingFang TC","Noto Sans TC",sans-serif;font-synthesis:none;line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+  button,input{font-family:inherit}
+  .wrap{max-width:560px;margin:0 auto;padding:12px 14px 48px}
+  header{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+  .backbtn{display:inline-flex;align-items:center;gap:6px;min-height:38px;padding:7px 13px 7px 9px;border-radius:12px;background:var(--card);border:1px solid var(--line);color:var(--tx2);text-decoration:none;font-size:14.5px}
+  .logo{font-family:"Noto Serif TC","Songti TC",serif;font-weight:700;font-size:17px;color:inherit;text-decoration:none}
+  .hidden{display:none!important}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;font-size:16px;padding:13px 18px;border-radius:16px;border:2px solid var(--line);background:var(--card);color:var(--tx);cursor:pointer;text-decoration:none}
+  .btn.pri{background:var(--ac);border-color:var(--ac);color:#fff;box-shadow:0 5px 0 #C24A2E}
+  .btn.pri:active{transform:translateY(3px);box-shadow:0 2px 0 #C24A2E}
+  .btn.wide{width:100%}
+  .btn.sm{font-size:14px;padding:8px 13px;border-radius:12px}
+  .card{background:var(--card);border-radius:24px;padding:18px;margin-bottom:14px;border:2px solid var(--line)}
+  .muted{color:var(--tx2);font-size:14px}
+
+  /* ── 小屋場景 ── */
+  .room{position:relative;width:100%;aspect-ratio:1/1;border-radius:28px;overflow:hidden;background:#E9C9A6 url(images/buddy/room-sm.webp) center/cover;box-shadow:0 10px 30px rgba(120,60,20,.18);margin-bottom:14px;user-select:none;-webkit-user-select:none}
+  .room .bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 75%}
+  .room.dim::after{content:'';position:absolute;inset:0;background:rgba(40,20,60,.22);pointer-events:none;transition:opacity .6s}
+  .room-top{position:absolute;left:10px;right:10px;top:10px;display:flex;justify-content:space-between;align-items:flex-start;z-index:5;pointer-events:none}
+  .chip{background:rgba(255,255,255,.92);color:#5B3A2E;border-radius:99px;padding:5px 13px;font-size:14px;box-shadow:0 2px 8px rgba(0,0,0,.12);pointer-events:auto}
+  .chip b{font-weight:400;color:var(--ac)}
+  .spot{position:absolute;transform:translate(-50%,-100%);width:24%;display:flex;flex-direction:column;align-items:center;cursor:pointer;z-index:3;transition:transform .2s;-webkit-tap-highlight-color:transparent}
+  .spot:active{transform:translate(-50%,-100%) scale(.96)}
+  .spot img.sp{width:100%;filter:drop-shadow(0 6px 6px rgba(80,40,10,.25));pointer-events:none}
+  .spot.sleep img.sp{width:96%}
+  .tag{margin-top:-6px;display:flex;align-items:center;gap:4px;background:rgba(255,255,255,.95);border-radius:99px;padding:2px 9px 2px 3px;font-size:13px;color:#5B3A2E;box-shadow:0 2px 6px rgba(0,0,0,.15);white-space:nowrap;max-width:140%}
+  .tag .av{width:20px;height:20px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:11px;color:#5B3A2E;flex:none}
+  .tag .nm{overflow:hidden;text-overflow:ellipsis;max-width:70px}
+  .tag .lan{height:18px;margin-left:1px}
+  .tag .n{color:var(--ac)}
+  .tag.me{box-shadow:0 0 0 2px var(--ac),0 2px 6px rgba(0,0,0,.15)}
+  .zzz{position:absolute;top:2%;right:4%;font-size:18px;color:#7A8CC4;pointer-events:none}
+  .zzz span{position:absolute;opacity:0;animation:zz 2.6s infinite}
+  .zzz span:nth-child(2){animation-delay:.9s;font-size:14px;left:12px;top:-6px}
+  .zzz span:nth-child(3){animation-delay:1.8s;font-size:11px;left:22px;top:-14px}
+  @keyframes zz{0%{opacity:0;transform:translateY(8px)}30%{opacity:1}100%{opacity:0;transform:translateY(-18px)}}
+  .lampglow{position:absolute;top:12%;left:2%;width:55%;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle,rgba(255,220,140,.55),rgba(255,220,140,0) 70%);pointer-events:none;animation:glow 3s ease-in-out infinite}
+  @keyframes glow{50%{opacity:.6}}
+  .spot.empty{width:17%;transform:translate(-50%,-100%)}
+  .ring{width:100%;aspect-ratio:1;border-radius:50%;border:3px dashed rgba(255,255,255,.95);background:rgba(255,255,255,.28);display:flex;align-items:center;justify-content:center;color:#fff;font-size:34px;text-shadow:0 2px 4px rgba(0,0,0,.2);animation:breathe 2.4s ease-in-out infinite}
+  @keyframes breathe{50%{transform:scale(1.06)}}
+  .spot.empty .tag{margin-top:4px;padding:2px 10px}
+  .shake{animation:shake .5s 3}
+  @keyframes shake{25%{transform:translate(-52%,-100%) rotate(-5deg)}75%{transform:translate(-48%,-100%) rotate(5deg)}}
+  .fx{position:absolute;pointer-events:none;z-index:8}
+  .runner{width:24%;bottom:6%;left:-30%;transition:left 1.1s cubic-bezier(.5,0,.4,1)}
+  .popper{width:30%;transform:translate(-50%,-100%) scale(.3);opacity:0;transition:all .35s cubic-bezier(.3,1.6,.5,1)}
+  .popper.on{transform:translate(-50%,-110%) scale(1);opacity:1}
+  .heart{position:absolute;font-size:18px;color:#FF6B8B;animation:up 1.4s ease-out forwards;pointer-events:none;z-index:9}
+  @keyframes up{0%{opacity:1;transform:translate(0,0) scale(.6)}100%{opacity:0;transform:translate(var(--dx),-80px) scale(1.3)}}
+  .party{position:absolute;right:2%;bottom:1%;width:22%;z-index:6;animation:pop .6s cubic-bezier(.3,1.6,.5,1)}
+  @keyframes pop{from{transform:scale(0)}to{transform:scale(1)}}
+  .confetti{position:absolute;top:-10px;width:8px;height:14px;border-radius:2px;z-index:7;animation:fall linear forwards;pointer-events:none}
+  @keyframes fall{to{transform:translateY(560px) rotate(720deg);opacity:.2}}
+
+  /* ── 通知(有人叫你)── */
+  .toast{position:fixed;left:50%;top:-140px;transform:translateX(-50%);width:min(92vw,420px);background:var(--card);border:2px solid var(--line);border-radius:22px;padding:10px 14px 10px 10px;display:flex;align-items:center;gap:10px;box-shadow:0 12px 30px rgba(0,0,0,.18);z-index:50;transition:top .5s cubic-bezier(.3,1.4,.5,1)}
+  .toast.on{top:calc(12px + env(safe-area-inset-top))}
+  .toast img{width:62px;flex:none}
+  .toast b{font-weight:400;color:var(--ac)}
+  .toast .x{margin-left:auto;background:none;border:0;color:var(--tx3);font-size:20px;cursor:pointer}
+
+  /* ── 我的狀態 ── */
+  .me-card{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  .me-card img{width:84px;flex:none}
+  .me-card .t{flex:1;min-width:150px}
+  .me-card .btn{flex-basis:100%}
+  .me-card .t b{font-weight:400;font-size:18px;display:block}
+  .me-card.todo{background:linear-gradient(135deg,#FFF1E6,#FFE0CC);border-color:#FFD2B8}
+  :root[data-theme=dark] .me-card.todo{background:var(--soft);border-color:var(--line)}
+  @media (prefers-color-scheme:dark){ :root:not([data-theme=light]) .me-card.todo{background:var(--soft);border-color:var(--line)} }
+
+  /* ── 排行 ── */
+  .rk{list-style:none;display:flex;flex-direction:column;gap:8px}
+  .rk li{display:flex;align-items:center;gap:10px;background:var(--soft);border-radius:16px;padding:9px 12px}
+  .rk .no{width:22px;text-align:center;color:var(--tx3)}
+  .rk .no.n1{color:#E0A21B}
+  .rk .av{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#5B3A2E;flex:none}
+  .rk .who{flex:1;min-width:0}
+  .rk .who div{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .rk .who small{display:block;font-size:12px;color:var(--tx3)}
+  .rk .pts{color:var(--ac);font-size:20px}
+  .rk .pts small{font-size:12px;color:var(--tx3)}
+  .h2{font-size:17px;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+
+  /* ── 底部動作面板 ── */
+  .sheet-bg{position:fixed;inset:0;background:rgba(30,15,10,.35);z-index:40;opacity:0;transition:opacity .25s}
+  .sheet-bg.on{opacity:1}
+  .sheet{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-radius:28px 28px 0 0;padding:16px 18px calc(20px + env(safe-area-inset-bottom));z-index:41;transform:translateY(100%);transition:transform .3s cubic-bezier(.3,1.2,.5,1);max-width:560px;margin:0 auto}
+  .sheet.on{transform:none}
+  .sheet .grab{width:44px;height:5px;border-radius:9px;background:var(--line);margin:0 auto 12px}
+  .sheet .who{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+  .sheet .who img{width:76px}
+  .sheet .who b{font-weight:400;font-size:19px;display:block}
+  .acts{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .act{display:flex;flex-direction:column;align-items:center;gap:4px;padding:12px 8px;border-radius:20px;border:2px solid var(--line);background:var(--soft);color:var(--tx);cursor:pointer;font-size:15px}
+  .act img{height:70px}
+  .act small{font-size:12px;color:var(--tx3)}
+  .act:disabled{opacity:.45;cursor:default}
+
+  /* ── 沒有小屋 / 邀請頁 ── */
+  .hero{text-align:center;padding:10px 6px 4px}
+  .hero img{width:min(78%,300px)}
+  .hero h1{font-size:30px;font-weight:400;line-height:1.3;margin:6px 0 8px}
+  .hero h1 em{font-style:normal;color:var(--ac)}
+  .feat{list-style:none;text-align:left;margin:14px 0}
+  .feat li{display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px dashed var(--line);font-size:15px}
+  .feat li:last-child{border-bottom:0}
+  .feat img{width:46px;flex:none}
+  .seats{display:flex;justify-content:center;gap:8px;margin:12px 0}
+  .seats span{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#5B3A2E;font-size:16px}
+  .seats .e{border:2px dashed var(--line);color:var(--tx3)}
+  .seats .you{border:2px dashed var(--ac);color:var(--ac);font-size:12px}
+  .msg{font-size:13.5px;margin-top:8px;text-align:center}
+  .msg.bad{color:#C2410C} .msg.ok{color:var(--ok)}
+  .mock{background:#7c3aed14;border:1px dashed #7c3aed;color:#7c3aed;border-radius:12px;padding:8px 10px;font-size:12.5px;margin-bottom:12px}
+  .mock button{font:inherit;font-size:12px;margin:3px 3px 0 0;padding:3px 9px;border-radius:99px;border:1px solid #7c3aed;background:none;color:#7c3aed;cursor:pointer}
+  .cs-backdrop{position:fixed;inset:0;z-index:60;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(18,18,26,.5)}
+  .cs-card{background:var(--card);color:var(--tx);max-width:420px;width:100%;border-radius:24px;padding:20px}
+  .cs-card .t{font-size:18px;margin-bottom:4px}
+  .cs-card .row{display:flex;flex-direction:column;gap:10px;margin-top:14px}
+  .invite-row{display:flex;gap:8px;margin-top:10px}
+  .invite-row .btn{flex:1}
+  details summary{cursor:pointer;color:var(--tx3);font-size:13.5px;margin-top:12px}
+  .mem{list-style:none;margin-top:8px}
+  .mem li{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px dashed var(--line);font-size:14.5px}
+  .mem li:last-child{border-bottom:0}
+  footer{padding:20px 0 0;text-align:center;color:var(--tx3);font-size:12.5px}
+  footer a{color:var(--tx2)}
+</style>
+<script src="native-ui.js"></script>
+<script src="safe-back.js"></script>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <a class="backbtn" href="app.html" onclick="safeBack('app.html');return false"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>返回</a>
+    <a class="logo" href="app.html">日本再留計劃</a>
+  </header>
+  <div class="mock hidden" id="mockBar"></div>
+
+  <!-- 我的小屋 -->
+  <section id="vHouse" class="hidden">
+    <div class="room" id="room">
+      <img class="bg" src="images/buddy/room.webp" alt="" onload="this.parentNode.style.backgroundImage='none'">
+      <div class="room-top"><span class="chip" id="roomChip"></span><span class="chip" id="roomWeek"></span></div>
+    </div>
+    <div class="card me-card" id="meCard"></div>
+    <div class="card" id="inviteCard"></div>
+    <div class="card" id="rankCard"></div>
+    <div class="card" id="manageCard"></div>
+  </section>
+
+  <!-- 還沒有小屋 -->
+  <section id="vNone" class="hidden">
+    <div class="card hero">
+      <img src="images/buddy/highfive.webp" alt="">
+      <h1>找朋友<em>一起讀</em>,<br>比較不會放棄</h1>
+      <p class="muted">開一間讀書小屋,最多 5 個人。免費。</p>
+      <ul class="feat">
+        <li><img src="images/buddy/desk.webp" alt=""><span>誰今天讀了、誰還在睡,打開就知道</span></li>
+        <li><img src="images/buddy/alarm.webp" alt=""><span>朋友還沒讀?按一下叫他起來</span></li>
+        <li><img src="images/buddy/cheer.webp" alt=""><span>讀完的人,幫他加油</span></li>
+        <li><img src="images/buddy/lantern-3.webp" alt="" style="width:30px;margin:0 8px"><span>連續天數越多,燈籠越大</span></li>
+      </ul>
+      <button class="btn pri wide" id="btnCreate">開一間讀書小屋</button>
+      <div class="msg" id="createMsg"></div>
+    </div>
+  </section>
+
+  <!-- 被邀請 -->
+  <section id="vJoin" class="hidden">
+    <div class="card hero">
+      <img src="images/buddy/highfive.webp" alt="">
+      <h1 id="jTitle"></h1>
+      <div class="seats" id="jSeats"></div>
+      <p class="muted" id="jSub"></p>
+      <button class="btn pri wide" id="jBtn" style="margin-top:14px"></button>
+      <div class="msg" id="jMsg"></div>
+    </div>
+  </section>
+
+  <div id="vLoading" class="card" style="text-align:center;padding:40px 0"><img src="images/buddy/desk.webp" alt="" style="width:110px"><p class="muted">小屋準備中…</p></div>
+  <footer>日本再留計劃 (StayJP) · <a href="app.html">回學習首頁</a></footer>
+</div>
+
+<div class="sheet-bg hidden" id="sheetBg"></div>
+<div class="sheet" id="sheet"></div>
+<div class="toast" id="toast"></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script>
+// 讀書小屋(讀書夥伴,2026-10-20):免費、最多 5 人;後端 functions/src/buddy.ts。素材 images/buddy/(Gemini 3 Pro 生、綠幕去背)。
+// ?mock=1 = 假資料看版面;?join=TOKEN = 邀請頁。互動只有加油/叫醒,沒有自由文字(不用審核、不會被拿來騷擾)。
+const FN = 'https://buddyapi-lsd7okt5qa-de.a.run.app';
+const $ = id => document.getElementById(id);
+const esc = s => String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const fmt = n => Number(n||0).toLocaleString('en-US');
+const MOCK = /[?&]mock=1/.test(location.search);
+const JOIN = new URLSearchParams(location.search).get('join');
+const IMG = n => 'images/buddy/'+n+'.webp';
+const PASTEL=['#FFD9B8','#C9EBD8','#D6DEFF','#FFD1E3','#CDEBF7','#FFE7A8'];
+const colorOf = n => PASTEL[[...String(n||'')].reduce((h,c)=>(h*31+c.charCodeAt(0))>>>0,7)%PASTEL.length];
+const lantern = s => s>=7 ? 'lantern-3' : s>=3 ? 'lantern-2' : s>=2 ? 'lantern-1' : '';
+// 地毯上的五個位子(百分比,座標 = 小狸腳底中心)
+const SPOTS = [{x:20,y:57},{x:50,y:54},{x:80,y:57},{x:33,y:93},{x:67,y:93}];
+const isNative = () => !!(window.STAYJP_NATIVE && window.STAYJP_NATIVE.isNativeApp);
+const isInApp = () => /FBAN|FBAV|FB_IAB|Instagram|Line\/|MicroMessenger|Twitter|TikTok|KAKAOTALK|NAVER|Barcelona|BytedanceWebview/i.test(navigator.userAgent||'') && !isNative();
+let user=null, data=null;
+
+// ── 後端 ──
+let auth=null;
+try{ firebase.initializeApp({ apiKey:"AIzaSyDnmg2XOuvwgE8m8xCF5sS4o0nQYoUplPI", authDomain:"jpnote-1bdd6.firebaseapp.com", projectId:"jpnote-1bdd6" }); auth=firebase.auth(); }catch(e){}
+if(!MOCK){ try{ fetch(FN,{method:'POST',headers:{'content-type':'application/json'},body:'{"action":"warm"}',keepalive:true}).catch(()=>{}); }catch(e){} }   // 冷啟動先叫醒
+async function api(body, needAuth=true){
+  if(MOCK) return mockApi(body);
+  const h={'content-type':'application/json'};
+  if(needAuth){ await ensureUser(); h.authorization='Bearer '+await auth.currentUser.getIdToken(); }
+  return (await fetch(FN,{method:'POST',headers:h,body:JSON.stringify(body)})).json();
+}
+
+// ── 登入(同 group.html)──
+function inAppHelp(){
+  const ua=navigator.userAgent||'', ios=/iPhone|iPad|iPod/i.test(ua);
+  const step=/Line\//i.test(ua)?(ios?'點右下角「⋯」→「在預設瀏覽器中開啟」':'點右上角「⋮」→「在其他瀏覽器中開啟」'):(ios?'點右上角「⋯」→「在外部瀏覽器中開啟」':'點右上角「⋮」→「在 Chrome 中開啟」');
+  return '你現在在 App 的內建瀏覽器裡,Google 不給這裡登入。'+step+'。';
+}
+function login(){
+  if(MOCK){ user={uid:'me'}; return Promise.resolve(user); }
+  if(isNative()) return Promise.reject(new Error('請先回首頁登入,再打開讀書小屋。'));
+  if(isInApp()) return Promise.reject(new Error(inAppHelp()));
+  return new Promise((ok,ng)=>{
+    const w=document.createElement('div'); w.className='cs-backdrop';
+    w.innerHTML='<div class="cs-card"><div class="t">先登入</div><div class="muted">用你平常登入 StayJP 的方式</div><div class="row"><button class="btn pri" data-p="google">用 Google 登入</button><button class="btn" data-p="apple">用 Apple 登入</button><button class="btn" data-x style="border:0;color:var(--tx3)">取消</button></div></div>';
+    document.body.appendChild(w);
+    w.querySelector('[data-x]').onclick=()=>{ w.remove(); ng(new Error('cancel')); };
+    w.querySelectorAll('[data-p]').forEach(b=>b.onclick=()=>{
+      let p; if(b.dataset.p==='apple'){ p=new firebase.auth.OAuthProvider('apple.com'); p.addScope('email'); p.addScope('name'); } else p=new firebase.auth.GoogleAuthProvider();
+      auth.signInWithPopup(p).then(r=>{ w.remove(); ok(r.user); }).catch(e=>{ if(/popup-closed|cancelled-popup/.test(e&&e.code||'')) return; w.remove(); ng(e); });
+    });
+  });
+}
+async function ensureUser(){ if(user) return user; user=await login(); return user; }
+
+// ── 畫面切換 ──
+function show(id){ ['vHouse','vNone','vJoin','vLoading'].forEach(x=>$(x).classList.toggle('hidden', x!==id)); }
+
+// ── 小屋 ──
+function renderHouse(c){
+  data=c; show('vHouse');
+  const room=$('room'); room.querySelectorAll('.spot,.party,.confetti,.fx').forEach(e=>e.remove());
+  const ms=c.members.slice().sort((a,b)=>(b.me?1:0)-(a.me?1:0));   // 我站中間那格
+  const order=[1,0,2,3,4];
+  const read=c.members.filter(m=>m.today>0).length, all=read===c.members.length && c.members.length>1;
+  room.classList.toggle('dim', read===0);
+  $('roomChip').innerHTML = all ? '全員到齊!<b>今天大家都讀了</b>' : '今天 <b>'+read+'</b> / '+c.members.length+' 人讀過了';
+  $('roomWeek').innerHTML = '這週全屋 <b>'+fmt(c.members.reduce((n,m)=>n+(m.week||0),0))+'</b> 題';
+  ms.forEach((m,i)=>{
+    const s=SPOTS[order[i]], studied=m.today>0, lan=lantern(m.streak);
+    const el=document.createElement('div'); el.className='spot '+(studied?'desk':'sleep'); el.style.left=s.x+'%'; el.style.top=s.y+'%'; el.dataset.uid=m.uid;
+    el.innerHTML=(studied?'<span class="lampglow"></span>':'<span class="zzz"><span>Z</span><span>z</span><span>z</span></span>')
+      +'<img class="sp" src="'+IMG(studied?'desk':'sleep')+'" alt="">'
+      +'<span class="tag'+(m.me?' me':'')+'"><span class="av" style="background:'+colorOf(m.name)+'">'+esc(m.name.slice(0,1))+'</span><span class="nm">'+esc(m.me?'你':m.name)+'</span>'
+      +(lan?'<img class="lan" src="'+IMG(lan)+'" alt="">':'')+(studied?'<span class="n">+'+m.today+'</span>':'')+'</span>';
+    el.onclick=()=>openSheet(m, el);
+    room.appendChild(el);
+  });
+  for(let i=ms.length;i<c.max;i++){
+    const s=SPOTS[order[i]], el=document.createElement('div'); el.className='spot empty'; el.style.left=s.x+'%'; el.style.top=(s.y-2)+'%';
+    el.innerHTML='<div class="ring">+</div><span class="tag">邀請</span>'; el.onclick=()=>shareInvite(c);
+    room.appendChild(el);
+  }
+  if(all){ const p=document.createElement('img'); p.className='party'; p.src=IMG('party'); room.appendChild(p); confetti(room); }
+  // 我的狀態
+  const me=c.members.find(m=>m.me)||{};
+  $('meCard').className='card me-card'+(me.today>0?'':' todo');
+  $('meCard').innerHTML = me.today>0
+    ? '<img src="'+IMG('desk')+'" alt=""><div class="t"><b>你今天讀了 '+me.today+' 題</b><span class="muted">'+(me.streak>=2?'連續 '+me.streak+' 天,燈籠越來越亮了':'明天再來,就會有燈籠喔')+'</span></div>'
+    : '<img src="'+IMG('sleep')+'" alt=""><div class="t"><b>你還在沙發上睡覺</b><span class="muted">去讀幾題,就能坐上書桌</span></div><a class="btn pri sm" href="app.html">去讀書</a>';
+  // 邀請
+  const left=c.max-c.members.length;
+  $('inviteCard').classList.toggle('hidden', left<=0);
+  $('inviteCard').innerHTML='<div class="h2">還有 '+left+' 個位子</div><p class="muted">把小屋分享給朋友,點連結登入就進來了。</p>'
+    +'<div class="invite-row"><button class="btn pri" id="bShare">一鍵分享邀請</button><a class="btn" target="_blank" rel="noopener" href="https://line.me/R/share?text='+encodeURIComponent(shareText(c))+'">傳到 LINE</a></div><div class="msg" id="invMsg"></div>';
+  if($('bShare')) $('bShare').onclick=()=>shareInvite(c);
+  // 本週排行
+  const rk=c.members.slice().sort((a,b)=>b.week-a.week);
+  $('rankCard').innerHTML='<div class="h2">本週排行 <span class="muted" style="font-size:12px">每週一重新開始</span></div><ul class="rk">'
+    +rk.map((m,i)=>'<li><span class="no'+(i===0&&m.week>0?' n1':'')+'">'+(i+1)+'</span><span class="av" style="background:'+colorOf(m.name)+'">'+esc(m.name.slice(0,1))+'</span><span class="who"><div>'+esc(m.name)+(m.me?' (你)':'')+'</div><small>'+(m.streak>=2?'連續 '+m.streak+' 天':'')+'</small></span><span class="pts">'+fmt(m.week)+'<small> 題</small></span></li>').join('')+'</ul>';
+  // 管理
+  $('manageCard').innerHTML='<details><summary>小屋成員'+(c.owner?'與邀請連結':'')+'</summary><ul class="mem">'
+    +c.members.map(m=>'<li><span>'+esc(m.name)+(m.owner?' <small class="muted">屋主</small>':'')+(m.me?' (你)':'')+'</span>'+(c.owner&&!m.me?'<button class="btn sm" data-rm="'+esc(m.uid)+'" data-nm="'+esc(m.name)+'">移出</button>':'')+'</li>').join('')
+    +'</ul><div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">'+(c.owner?'<button class="btn sm" id="bRegen">換一條新邀請連結</button>':'')+'<button class="btn sm" id="bLeave">退出小屋</button></div></details>';
+  $('manageCard').querySelectorAll('[data-rm]').forEach(b=>b.onclick=async()=>{ if(!await confirmBox('要把「'+b.dataset.nm+'」移出小屋嗎?')) return; const r=await api({action:'remove',member_uid:b.dataset.rm}); r.ok?load():say(r.reason||'移出失敗'); });
+  if($('bRegen')) $('bRegen').onclick=async()=>{ if(!await confirmBox('換新連結後,舊連結就不能用了。確定嗎?')) return; const r=await api({action:'regen'}); if(r.ok){ say('換好了,用新的連結邀請吧'); load(); } };
+  $('bLeave').onclick=async()=>{ if(!await confirmBox('確定要退出讀書小屋嗎?')) return; const r=await api({action:'leave'}); r.ok?load():say(r.reason||'退出失敗'); };
+}
+
+// ── 點夥伴:動作面板 ──
+function openSheet(m, el){
+  const c=data, studied=m.today>0;
+  let html='<div class="grab"></div><div class="who"><img src="'+IMG(studied?'desk':'sleep')+'" alt=""><div><b>'+esc(m.me?'你':m.name)+'</b><span class="muted">'
+    +(studied?'今天讀了 '+m.today+' 題':'今天還沒讀')+(m.streak>=2?'・連續 '+m.streak+' 天':'')+'・這週 '+fmt(m.week)+' 題</span></div></div>';
+  if(m.me){
+    html+= studied ? '<p class="muted" style="text-align:center;padding:6px 0 4px">今天的你很棒!朋友看得到你坐在書桌前喔</p>' : '<a class="btn pri wide" href="app.html">去讀幾題,坐上書桌</a>';
+  } else {
+    const wakeUsed=(m.sent&&m.sent.wake)||0, cheerUsed=(m.sent&&m.sent.cheer)||0, L=c.limits||{cheer:3,wake:1};
+    html+='<div class="acts">'
+      +'<button class="act" id="aWake"'+(studied||wakeUsed>=L.wake?' disabled':'')+'><img src="'+IMG('alarm')+'" alt="">叫他起來讀書<small>'+(studied?'他今天讀過了':wakeUsed?'今天叫過了':'每天 1 次')+'</small></button>'
+      +'<button class="act" id="aCheer"'+(cheerUsed>=L.cheer?' disabled':'')+'><img src="'+IMG('cheer')+'" alt="">幫他加油<small>'+(cheerUsed>=L.cheer?'今天加油滿了':'今天還能 '+(L.cheer-cheerUsed)+' 次')+'</small></button>'
+      +'</div>';
+  }
+  $('sheet').innerHTML=html; $('sheetBg').classList.remove('hidden');
+  requestAnimationFrame(()=>{ $('sheetBg').classList.add('on'); $('sheet').classList.add('on'); });
+  if($('aWake')) $('aWake').onclick=()=>poke(m, el, 'wake');
+  if($('aCheer')) $('aCheer').onclick=()=>poke(m, el, 'cheer');
+}
+function closeSheet(){ $('sheet').classList.remove('on'); $('sheetBg').classList.remove('on'); setTimeout(()=>$('sheetBg').classList.add('hidden'),250); }
+$('sheetBg').onclick=closeSheet;
+
+async function poke(m, el, kind){
+  closeSheet();
+  const r=await api({action:'poke', to:m.uid, kind});
+  if(!r.ok){ say(r.reason||'沒有送出,稍後再試'); return; }
+  m.sent=m.sent||{}; m.sent[kind]=(m.sent[kind]||0)+1;
+  const room=$('room');
+  if(kind==='wake'){
+    const run=document.createElement('img'); run.className='fx runner'; run.src=IMG('alarm'); room.appendChild(run);
+    requestAnimationFrame(()=>{ run.style.left=(parseFloat(el.style.left)-24)+'%'; });
+    setTimeout(()=>{ el.classList.add('shake'); }, 1000);
+    setTimeout(()=>{ run.remove(); el.classList.remove('shake'); }, 2700);
+    say('已經叫 '+m.name+' 起來讀書了!他打開 StayJP 就會看到');
+  } else {
+    const p=document.createElement('img'); p.className='fx popper'; p.src=IMG('cheer'); p.style.left=el.style.left; p.style.top=(parseFloat(el.style.top)-18)+'%'; room.appendChild(p);
+    requestAnimationFrame(()=>p.classList.add('on'));
+    for(let i=0;i<7;i++){ const h=document.createElement('span'); h.className='heart'; h.textContent='♥'; h.style.left=(parseFloat(el.style.left)+(Math.random()*10-5))+'%'; h.style.top=(parseFloat(el.style.top)-20)+'%'; h.style.setProperty('--dx',(Math.random()*60-30)+'px'); h.style.animationDelay=(i*0.12)+'s'; room.appendChild(h); setTimeout(()=>h.remove(),2400); }
+    setTimeout(()=>p.remove(), 1900);
+    say('幫 '+m.name+' 加油了!');
+  }
+}
+function confetti(room){
+  const C=['#FF8A65','#FFC94D','#7FC8F8','#FF8FB1','#B39DFF'];
+  for(let i=0;i<36;i++){ const d=document.createElement('span'); d.className='confetti'; d.style.left=Math.random()*100+'%'; d.style.background=C[i%C.length]; d.style.animationDuration=(2.2+Math.random()*1.8)+'s'; d.style.animationDelay=(Math.random()*1.2)+'s'; room.appendChild(d); setTimeout(()=>d.remove(),5200); }
+}
+
+// ── 通知 ──
+let _tt=null;
+function toast(img, html, ms){
+  const t=$('toast'); t.innerHTML='<img src="'+IMG(img)+'" alt=""><div>'+html+'</div><button class="x" aria-label="關閉">×</button>';
+  t.querySelector('.x').onclick=()=>t.classList.remove('on');
+  t.classList.add('on'); clearTimeout(_tt); _tt=setTimeout(()=>t.classList.remove('on'), ms||3200);
+}
+function say(text){ toast('highfive', esc(text), 2800); }
+function showReceived(c){
+  // 今天收到的互動,沒看過的才跳(本機記已看時間)
+  let seen=0; try{ seen=+localStorage.getItem('buddy_seen_'+(user&&user.uid))||0; }catch(e){}
+  const fresh=(c.received||[]).filter(e=>e.at>seen);
+  if(!fresh.length) return;
+  const wake=fresh.filter(e=>e.kind==='wake'), cheer=fresh.filter(e=>e.kind==='cheer');
+  const names=a=>[...new Set(a.map(e=>e.from_name))].slice(0,2).map(esc).join('、');
+  setTimeout(()=>{
+    if(wake.length) toast('alarm','<b>'+names(wake)+'</b> 叫你起來讀書了!', 4200);
+    else toast('cheer','<b>'+names(cheer)+'</b> 幫你加油了 '+cheer.length+' 次!', 4200);
+  }, 600);
+  try{ localStorage.setItem('buddy_seen_'+(user&&user.uid), String(fresh[0].at)); }catch(e){}
+}
+
+// ── 分享 ──
+function shareText(c){ return '我開了一間 StayJP 讀書小屋,一起讀日文吧!\n誰今天沒讀,大家都看得到喔\n點這裡加入(免費):'+c.invite_url; }
+async function shareInvite(c){
+  const text=shareText(c);
+  if(navigator.share){ try{ await navigator.share({ title:'一起讀日文吧!', text }); return; }catch(e){ if(e&&e.name==='AbortError') return; } }
+  try{ await navigator.clipboard.writeText(text); say('邀請文字已複製,貼給朋友吧'); }
+  catch(e){ const w=document.createElement('div'); w.className='cs-backdrop'; w.innerHTML='<div class="cs-card"><div class="t">長按下面的文字複製</div><textarea readonly style="width:100%;height:130px;margin-top:10px;font:inherit;padding:10px;border-radius:12px;border:1px solid var(--line);background:var(--soft);color:var(--tx)"></textarea><div class="row"><button class="btn">關閉</button></div></div>'; w.querySelector('textarea').value=text; document.body.appendChild(w); w.querySelector('button').onclick=()=>w.remove(); }
+}
+function confirmBox(text){
+  return new Promise(res=>{ const w=document.createElement('div'); w.className='cs-backdrop';
+    w.innerHTML='<div class="cs-card"><div style="font-size:15.5px">'+esc(text)+'</div><div class="row" style="flex-direction:row"><button class="btn" style="flex:1" data-v="0">取消</button><button class="btn pri" style="flex:1" data-v="1">確定</button></div></div>';
+    document.body.appendChild(w); w.querySelectorAll('button').forEach(b=>b.onclick=()=>{ w.remove(); res(b.dataset.v==='1'); }); });
+}
+
+// ── 沒有小屋 ──
+$('btnCreate').onclick=async()=>{
+  const m=$('createMsg'); m.textContent='';
+  try{ await ensureUser(); $('btnCreate').disabled=true; $('btnCreate').textContent='小屋蓋好中…'; const r=await api({action:'create'}); if(r.ok) load(); else { m.className='msg bad'; m.textContent=r.reason||'沒有成功,稍後再試'; } }
+  catch(e){ if(e&&e.message!=='cancel'){ m.className='msg bad'; m.textContent=e.message; } }
+  finally{ $('btnCreate').disabled=false; $('btnCreate').textContent='開一間讀書小屋'; }
+};
+
+// ── 被邀請 ──
+async function renderJoin(){
+  show('vJoin');
+  const p=await api({action:'preview', token:JOIN}, false);
+  if(!p.ok){ $('jTitle').textContent='這個邀請已經失效'; $('jSub').textContent=p.reason||'請朋友重新傳一次連結。'; $('jBtn').textContent='自己開一間小屋'; $('jBtn').onclick=()=>{ location.href=location.pathname+(MOCK?'?mock=1':''); }; return; }
+  $('jTitle').innerHTML=esc(p.owner_name)+' 邀請你<br>一起讀日文';
+  const ini=p.initials||[];
+  $('jSeats').innerHTML=Array.from({length:p.max},(_,i)=> i<ini.length ? '<span style="background:'+colorOf(ini[i]+i)+'">'+esc(ini[i])+'</span>' : i===ini.length ? '<span class="you">你</span>' : '<span class="e">+</span>').join('');
+  $('jSub').textContent='加入讀書小屋,看誰今天讀了、誰還在睡。免費。';
+  $('jBtn').textContent='登入並加入';
+  if(isInApp()){ $('jMsg').className='msg bad'; $('jMsg').textContent=inAppHelp(); }
+  $('jBtn').onclick=async()=>{
+    const m=$('jMsg'); m.className='msg'; m.textContent='';
+    try{ await ensureUser(); $('jBtn').disabled=true; $('jBtn').textContent='加入中…';
+      const r=await api({action:'join', token:JOIN});
+      if(r.ok){ history.replaceState(null,'',location.pathname+(MOCK?'?mock=1':'')); load(); }
+      else { m.className='msg bad'; m.textContent=r.reason||'加入失敗'; $('jBtn').disabled=false; $('jBtn').textContent='登入並加入'; }
+    }catch(e){ if(e&&e.message!=='cancel'){ m.className='msg bad'; m.textContent=e.message; } }
+  };
+}
+
+async function load(){
+  try{
+    const d=await api({action:'info'});
+    if(d.circle){ renderHouse(d.circle); showReceived(d.circle); }
+    else show('vNone');
+  }catch(e){ show('vNone'); }
+}
+
+// ── 模擬模式 ──
+const MS={ state:'house', allDone:false };
+function mockApi(b){
+  const T=Date.now();
+  const base=[
+    {uid:'me',me:true,owner:true,name:'林小姐',today:12,week:64,streak:3,days:3,sent:{}},
+    {uid:'a',name:'小美',today:20,week:86,streak:8,days:4,sent:{cheer:1}},
+    {uid:'b',name:'阿明',today:0,week:31,streak:0,days:2,sent:{}},
+    {uid:'c',name:'Jen',today:0,week:12,streak:0,days:1,sent:{wake:1}},
+  ];
+  if(MS.allDone) base.forEach(m=>{ if(!m.today) m.today=5; });
+  if(MS.state==='sleepy') base[0].today=0;
+  if(b.action==='info'){
+    if(MS.state==='none') return { circle:null };
+    return { circle:{ id:'demo', owner:true, max:5, invite_url:'https://stayjp.study/buddy.html?mock=1&join=DEMO', limits:{cheer:3,wake:1}, members:base, received: MS.state==='sleepy'?[{from_name:'小美',kind:'wake',at:T-60000}]:[{from_name:'阿明',kind:'cheer',at:T-30000}] } };
+  }
+  if(b.action==='preview') return { ok:true, owner_name:'林小姐', initials:['林','美','明'], count:3, max:5 };
+  if(b.action==='poke') return { ok:true, left:1 };
+  if(b.action==='create'){ MS.state='house'; return { ok:true }; }
+  if(b.action==='join'){ MS.state='house'; return { ok:true, owner_name:'林小姐' }; }
+  return { ok:true };
+}
+if(MOCK){
+  const bar=$('mockBar'); bar.classList.remove('hidden');
+  bar.innerHTML='模擬模式(假資料):<br><button data-v="house">我讀過了</button><button data-v="sleepy">我還在睡(被叫醒)</button><button data-v="all">全員到齊</button><button data-v="none">還沒有小屋</button><button data-v="join">邀請頁</button>';
+  bar.querySelectorAll('button').forEach(b=>b.onclick=()=>{
+    const v=b.dataset.v;
+    if(v==='join'){ location.href=location.pathname+'?mock=1&join=DEMO'; return; }
+    if(JOIN){ location.href=location.pathname+'?mock=1'; return; }
+    MS.allDone = v==='all'; MS.state = v==='all'?'house':v; try{ localStorage.removeItem('buddy_seen_me'); }catch(e){} load();
+  });
+}
+
+// ── 啟動 ──
+if(JOIN) renderJoin();
+else if(MOCK){ user={uid:'me'}; load(); }
+else if(auth){
+  let done=false;
+  auth.onAuthStateChanged(u=>{ user=u||null; done=true; if(u) load(); else show('vNone'); });
+  setTimeout(()=>{ if(!done) show('vNone'); }, 5000);
+} else show('vNone');
+</script>
+</body>
+</html>
