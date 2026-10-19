@@ -415,13 +415,23 @@
       } catch (err) {}
     });
     // ☆ 收藏 → 生字本
+    // 頁面自己有 stayjpAddWord(app.html、speak-chat.html)就用它;沒有的獨立頁(YouTube 跟讀等)用同格式寫 word_notebook,
+    // app.html 開啟時會與雲端聯集合併。(2026-10-19 KOL 回饋:YouTube 跟讀點收藏跳「收藏功能未載入」)
+    var hasWord = window.stayjpHasWord || function (w) { try { return (JSON.parse(localStorage.getItem('word_notebook')) || []).some(function (x) { return x && x.w === w; }); } catch (err) { return false; } };
+    var addWord = window.stayjpAddWord || function (w, r, m) {
+      var nb; try { nb = JSON.parse(localStorage.getItem('word_notebook')) || []; } catch (err) { nb = []; }
+      if (nb.some(function (x) { return x && x.w === w; })) return 'exists';
+      nb.push({ w: w, r: r || w, m: m || '', lv: String(window.currentLevel || 'n5').toLowerCase(), added: new Date().toISOString() });
+      try { localStorage.setItem('word_notebook', JSON.stringify(nb)); } catch (err) { return 'fail'; }
+      return 'added';
+    };
     var fav = pop.querySelector('.jact-fav');
     if (fav) {
-      if (window.stayjpHasWord && window.stayjpHasWord(data.w)) { fav.textContent = '★ 已收藏'; fav.classList.add('on'); }
+      if (hasWord(data.w)) { fav.textContent = '★ 已收藏'; fav.classList.add('on'); }
       fav.addEventListener('click', function (e) {
         e.stopPropagation();
-        if (!window.stayjpAddWord) { showToast('收藏功能未載入'); return; }
-        var res = window.stayjpAddWord(data.w, data.r, data.m);
+        var res = addWord(data.w, data.r, data.m);
+        if (res === 'fail') { showToast('收藏失敗,請稍後再試'); return; }
         fav.textContent = '★ 已收藏'; fav.classList.add('on');
         showToast(res === 'exists' ? '已在生字本' : '已加入生字本 ✓');   // showToast 走 textContent:不能放 <i data-ic>(會印字面)
       });

@@ -191,6 +191,9 @@
   .ring{display:inline-flex;align-items:center;justify-content:center;width:64px;height:64px;border-radius:50%;font-size:22px;font-weight:800;color:#fff;flex-shrink:0}
   .rv-line{padding:8px 0;border-top:1px solid var(--line);font-size:14px}
   .rv-line .lb{font-weight:700;color:var(--accent);margin-right:6px}
+  .rv-actions{flex-direction:column;gap:10px;margin-top:16px}
+  .rv-actions .btn{width:100%;padding:13px 16px;font-size:15px}
+  .rv-actions .btn.pri{background:var(--accent);border-color:var(--accent);color:#fff}
 </style>
 <script src="accent.js"></script>
 </head>
@@ -268,8 +271,15 @@
       <span class="ttl" id="rvTtl"><i data-ic=clipboard></i> 對話點評</span>
       <button class="btn sm" id="resumeBtn" onclick="resumeChat()">回到對話</button>
       <button class="btn sm" id="topicBtn2" onclick="backToPick()">換主題</button>
+      <button class="btn sm" id="endBtn2" onclick="finishPractice()">結束</button>
     </div>
     <div class="review" id="reviewCard"></div>
+    <!-- 點評寫完才出現:KOL 回饋「看完點評不知道怎麼結束」(原本只有回到對話/換主題) -->
+    <div class="rv-actions" id="rvActions" style="display:none">
+      <button class="btn pri" onclick="finishPractice()">結束今天的練習</button>
+      <button class="btn" onclick="backToPick()">換個主題再練</button>
+      <button class="btn" onclick="resumeChat()">回到對話繼續聊</button>
+    </div>
   </div>
 
 </div>
@@ -758,11 +768,16 @@ function wordChips(words){
 function useHint(jp){ const el=document.getElementById('say'); el.value=jp; autoGrow(); el.focus(); }
 
 let _turnAbort=null;   // 換主題/離開時中止進行中的串流,避免舊場景台詞污染新場景+busy 卡死(審查實錘)
-async function turn(){
+// 卡住保險(2026-10-19 KOL 回饋:送出後一直「…」、要再送一次才回):沒有逾時 → 連線斷了就永遠等。
+// 25 秒沒收到任何資料就中斷;一個字都還沒收到 → 自動重試一次(不用使用者重送,對話紀錄也不會多一句重複的話)。
+const TURN_STALL_MS=25000;
+async function turn(isRetry){
   if(busy) return; busy=true; setBusy(true);
   const sc=scene;   // 快照:串流途中 scene 可能被 backToPick 清空
   _turnAbort=new AbortController();
   const _sig=_turnAbort.signal;
+  let lastData=Date.now(), stalled=false, gotAny=false;
+  const wd=setInterval(()=>{ if(Date.now()-lastData>TURN_STALL_MS){ stalled=true; try{ _turnAbort.abort(); }catch(e){} } }, 2000);
   renderMsgs({jp:'',kana:'',zh:''});   // 立刻顯示「對方正在輸入…」,冷啟動/慢網路不空白
   try{
     const t = await auth.currentUser.getIdToken();
@@ -776,19 +791,31 @@ async function turn(){
       appendErr(d.error||('HTTP '+r.status)); return;
     }
     const reader=r.body.getReader(); const dec=new TextDecoder(); let full=''; let spokenJp='';
-    while(true){ const {done,value}=await reader.read(); if(done)break; full+=dec.decode(value,{stream:true}); const p=parseTurn(full); renderMsgs(p);
+    while(true){ const {done,value}=await reader.read(); if(done)break; lastData=Date.now(); if(value&&value.length) gotAny=true; full+=dec.decode(value,{stream:true}); const p=parseTurn(full); renderMsgs(p);
       // JP 一講完(後面 KANA/ZH 開始出現代表那行結束)就立刻播,不等 HINT 生完
-      if(_sig.aborted) return;   // 換主題了:丟棄舊場景的殘餘串流
+      if(_sig.aborted){ if(stalled) throw new Error('stall'); return; }   // 換主題了:丟棄舊場景的殘餘串流;卡住則交給 catch 顯示重試
       if(!spokenJp && p.jp && !p._jpFromKana && (p.kana||p.zh)){ spokenJp=p.jp; playTTS(p.jp, sc.voice); } }
-    if(_sig.aborted) return;
+    if(_sig.aborted){ if(stalled) throw new Error('stall'); return; }
     const ai=parseTurn(full); ai.role='ai';
     history.push(ai);
     renderMsgs();
     renderHints(ai.hints);                    // 給「你可以這樣回」的建議
     // 沒提前播到就補播;提前播的跟最終顯示不同(模型偶爾多吐一行 JP,後蓋前)→ 以畫面為準重播正確的
     if(ai.jp && ai.jp!==spokenJp) playTTS(ai.jp, scene.voice);
-  }catch(e){ renderMsgs(); appendErr(e.message); }
-  finally{ busy=false; setBusy(false); }
+  }catch(e){
+    if(stalled){
+      renderMsgs();
+      if(!gotAny && !isRetry && scene===sc){ clearInterval(wd); busy=false; setBusy(false); return turn(true); }   // 自動重試一次
+      appendRetry(); return;
+    }
+    if(_sig.aborted) return;   // 換主題/離開造成的中止,不算錯
+    renderMsgs(); appendErr(e.message);
+  }
+  finally{ clearInterval(wd); busy=false; setBusy(false); }
+}
+function appendRetry(){
+  const box=document.getElementById('msgs');
+  box.insertAdjacentHTML('beforeend',`<div class="err" id="retryTurn">${enOr('連線有點慢,對方沒有回應。','The connection is slow — no reply came back.')} <button class="btn" style="margin-left:6px" onclick="this.parentNode.remove();turn()">${enOr('再試一次','Try again')}</button></div>`);
 }
 function appendErr(msg){ const box=document.getElementById('msgs'); box.insertAdjacentHTML('beforeend',`<div class="err">${enOr('出錯了:','Error: ')}${esc(msg)}</div>`); }
 function setBusy(b){ document.getElementById('sendBtn').disabled=b; }
@@ -980,8 +1007,11 @@ function renderReview(text, done){
     + (d.tip?`<div class="rv-line"><span class="lb">${enOr('小建議','Tip')}</span>${esc(cvt(d.tip))}</div>`:'')
     + (d.encourage?`<div class="rv-line" style="color:var(--ok);font-weight:600;border:0">${esc(cvt(d.encourage))}</div>`:'')
     + (!done && d.score!=null?'<div class="muted" style="margin-top:6px">…</div>':'');
+  const act=document.getElementById('rvActions'); if(act) act.style.display = done ? 'flex' : 'none';
 }
 function resumeChat(){ show('chat'); renderMsgs(); }
+// 結束:停掉錄音/串流,回學習面板(App 內也是 app.html)
+function finishPractice(){ hardStopRec(); try{ if(_turnAbort) _turnAbort.abort(); }catch(e){} busy=false; setBusy(false); location.href='app.html'; }
 
 // ── 雲端語音 TTS ──
 // 防重複疊播:每次呼叫拿一個序號,先停掉正在播的;fetch 回來後若期間又有新的播放請求就放棄自己。
@@ -1171,6 +1201,8 @@ document.addEventListener('keydown',e=>{ if(e.target && e.target.id==='say' && e
   set(q('#topicBtn'),'Change topic');
   set(q('#topicBtn2'),'Change topic');
   set(q('#resumeBtn'),'Back to chat');
+  set(q('#endBtn2'),'Done');
+  { const ra=q('#rvActions'); if(ra){ const bs=ra.querySelectorAll('button'); set(bs[0],'Done for today'); set(bs[1],'Try another topic'); set(bs[2],'Keep chatting'); } }
   set(q('#rvTtl'),'Chat review');
   const say=q('#say'); if(say) say.placeholder='Speak or type…';
   set(q('#sendBtn'),'Send');
