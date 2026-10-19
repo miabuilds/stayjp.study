@@ -6,6 +6,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex,nofollow">
 <title>揪團方案(測試中)｜StayJP 日本再留計劃</title>
+<meta property="og:title" content="一起讀日文吧!StayJP 揪團邀請">
+<meta property="og:description" content="點連結登入就加入,費用由主揪付款。團裡有每週排行,一起比誰讀最多。">
+<meta property="og:image" content="https://stayjp.study/images/social/group-invite-og.png">
+<meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
 <script>try{var _th=localStorage.getItem('theme');if(_th)document.documentElement.setAttribute('data-theme',_th);}catch(e){}</script>
 <style>
   :root{ --bg:#F6F4EF;--bg2:#FFFFFF;--bg3:#EFECE5;--tx:#2C2C2C;--tx2:#6B6B6B;--tx3:#9A9A9A;--ac:#C6553B;--ac2:#D4654A;--bd:#E7E3DC;--ok:#15803d;--bad:#c2410c;--soft:#C6553B14;--serif:"Noto Serif TC","Songti TC",serif; }
@@ -61,6 +67,26 @@
   .row{display:flex;gap:8px;flex-wrap:wrap}
   .msg{font-size:13.5px;margin-top:8px}
   .msg.ok{color:var(--ok)} .msg.bad{color:var(--bad)}
+  /* ── 邀請卡(可愛版)── */
+  .inv-tk{width:96px;height:96px;margin:0 auto 6px;border-radius:50%;background:#fff;border:4px solid #FFE8D9;overflow:hidden;display:flex;align-items:flex-end;justify-content:center}
+  .inv-tk img{width:84px}
+  .seats{display:flex;justify-content:center;gap:8px;margin:14px 0 6px}
+  .seats .s{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;font-size:15px}
+  .seats .s.empty{background:none;border:2px dashed var(--bd);color:var(--tx3)}
+  .seats .s.you{background:none;border:2px dashed var(--ac);color:var(--ac);font-size:12px}
+  .free{display:inline-block;background:#DCFCE7;color:#15803D;font-weight:800;font-size:13.5px;border-radius:99px;padding:3px 12px;margin:6px 0 14px}
+  .perks{list-style:none;text-align:left}
+  .perks li{display:flex;gap:10px;align-items:flex-start;padding:9px 0;border-bottom:1px solid var(--bd);font-size:14px}
+  .perks li:last-child{border-bottom:0}
+  .perks li i{color:var(--ac);margin-top:3px}
+  .ok-acct{background:var(--bg3);border-radius:12px;padding:12px 14px;font-size:13.5px;text-align:left;margin:12px 0}
+  .ok-acct b{color:var(--ac)}
+  .store{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:10px}
+  /* ── 分享 ── */
+  .share-main{width:100%;font-size:16px;padding:14px}
+  .share-sub{display:flex;gap:8px;margin-top:10px}
+  .share-sub .btn{flex:1}
+  .card-prev{max-width:100%;max-height:60vh;border-radius:14px;display:block;margin:0 auto 12px;box-shadow:0 8px 24px rgba(0,0,0,.18)}
   /* ── 團內排行(可愛版)── 小狸圖是白底 → 一律放在淺色圓底裡,深色模式不會出現白框 */
   .bd-head{display:flex;align-items:center;gap:12px;margin-bottom:14px}
   .bd-head .tk{width:58px;height:58px;border-radius:50%;background:#FFF4EC;overflow:hidden;flex:none;display:flex;align-items:flex-end;justify-content:center}
@@ -138,15 +164,23 @@
   <!-- 被邀請的人看到的 -->
   <section id="vJoin" class="hidden">
     <div class="card" style="text-align:center">
-      <div class="beta">揪團邀請</div>
-      <h1 id="jTitle"></h1>
-      <p class="sub" id="jSub" style="margin-bottom:16px"></p>
+      <div class="inv-tk"><img id="jTk" src="images/mascot/tanuki-cheer.png" alt=""></div>
+      <h1 id="jTitle" style="font-size:24px"></h1>
+      <div class="seats" id="jSeats"></div>
+      <div class="free" id="jFree">你不用付錢,費用由主揪付款</div>
+      <p class="sub" id="jSub" style="margin-bottom:14px"></p>
       <button class="btn pri wide" id="jBtn"></button>
       <div class="msg" id="jMsg"></div>
+      <div id="jAfter"></div>
     </div>
-    <div class="card">
-      <h2>加入後可以用</h2>
-      <p class="note" style="font-size:14px;color:var(--tx2)">全部 Premium 功能:N5–N1 單字與文法無限練習、JLPT 刷題與模擬考、AI 跟讀與情境對話、看日文猜單字……網頁和 App 都能用,登入同一個帳號就好。費用由主揪付款,你不用付錢。</p>
+    <div class="card" id="jPerks">
+      <h2>加入後全部都能用</h2>
+      <ul class="perks">
+        <li><i data-ic=book></i><span>N5–N1 單字、文法無限練習</span></li>
+        <li><i data-ic=target></i><span>JLPT 刷題與模擬考</span></li>
+        <li><i data-ic=mic></i><span>AI 跟讀、AI 情境對話</span></li>
+        <li><i data-ic=chart></i><span>團內每週排行,跟朋友比誰讀最多</span></li>
+      </ul>
     </div>
   </section>
 
@@ -244,7 +278,13 @@ $('btnCopyShare').onclick=()=>copy($('shareText').textContent, $('shareMsg'));
 
 async function copy(text, msgEl){
   let ok=false; try{ await navigator.clipboard.writeText(text); ok=true; }catch(e){ const ta=document.createElement('textarea'); ta.value=text; ta.style.position='fixed'; ta.style.opacity='0'; document.body.appendChild(ta); ta.select(); try{ ok=document.execCommand('copy'); }catch(_){} ta.remove(); }
-  if(msgEl){ msgEl.className='msg '+(ok?'ok':'bad'); msgEl.textContent = ok?' 已複製':' 複製失敗,請長按手動複製'; setTimeout(()=>{ msgEl.textContent=''; },2500); }
+  if(ok){ if(msgEl){ msgEl.className='msg ok'; msgEl.textContent=' 已複製'; setTimeout(()=>{ msgEl.textContent=''; },2500); } return; }
+  // 複製被瀏覽器擋(權限/內建瀏覽器)→ 把全文放在框裡讓人自己選取,不能只叫人「長按」一段看不到的字
+  const wrap=document.createElement('div'); wrap.className='cs-backdrop';
+  wrap.innerHTML='<div class="cs-card" style="padding:18px"><div class="cs-title" style="margin-bottom:8px">長按下面的文字,選「全選」再複製</div><textarea readonly style="width:100%;height:150px;font:inherit;font-size:14px;padding:10px;border-radius:10px;border:1px solid var(--bd);background:var(--bg3);color:var(--tx)"></textarea><button class="btn wide" style="margin-top:10px">關閉</button></div>';
+  wrap.querySelector('textarea').value=text; document.body.appendChild(wrap);
+  const ta=wrap.querySelector('textarea'); ta.focus(); ta.select();
+  wrap.querySelector('button').onclick=()=>wrap.remove();
 }
 
 // ── 登入 ──
@@ -399,8 +439,11 @@ function renderMine(d){
     +'</ul></div>';
   if(d.role==='owner'){
     html+='<div class="card"><h2>邀請朋友</h2>'
-      +(left>0 ? '<p class="note">把連結丟到 LINE 群組,朋友點開、登入就加入了。</p><div class="link"><input readonly id="invUrl" value="'+esc(d.invite_url)+'"><button class="btn sm pri" id="btnCopyInv">複製</button></div>'
-         +'<div class="row"><a class="btn sm" id="btnLine" target="_blank" rel="noopener" href="https://line.me/R/share?text='+encodeURIComponent('一起用 StayJP 學日文!點這裡加入我的揪團:'+d.invite_url)+'">分享到 LINE</a><button class="btn sm" id="btnRegen">換一條新連結</button></div><span class="msg" id="invMsg"></span>'
+      +(left>0 ? '<p class="note" style="margin-bottom:12px">還差 <b style="color:var(--ac)">'+left+' 位</b>。按一下就能把邀請傳給朋友,朋友點開、登入就加入了。</p>'
+         +'<button class="btn pri share-main" id="btnShare"><i data-ic=gift></i> 一鍵分享邀請</button>'
+         +'<div class="share-sub"><button class="btn sm" id="btnCard"><i data-ic=camera></i> 做成圖卡(IG 限動)</button><a class="btn sm" id="btnLine" target="_blank" rel="noopener" href="https://line.me/R/share?text='+encodeURIComponent(shareMsg(d))+'">傳到 LINE</a></div>'
+         +'<span class="msg" id="invMsg"></span>'
+         +'<details style="margin-top:14px"><summary class="note" style="cursor:pointer">只要連結 / 換一條新連結</summary><div class="link"><input readonly id="invUrl" value="'+esc(d.invite_url)+'"><button class="btn sm" id="btnCopyInv">複製</button></div><button class="btn sm" id="btnRegen">換一條新連結(舊的會失效)</button></details>'
          +(d.can_fill?'':'<p class="msg bad">'+esc(d.fill_note||'')+'</p>')
          +'<div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--bd)"><div class="lbl" style="font-size:13px;color:var(--tx2);margin-bottom:6px">或寄邀請信(只會寄連結過去)</div><div class="link"><input class="inp" id="invEmail" type="email" placeholder="朋友的 email"><button class="btn sm" id="btnInvite">寄出</button></div><span class="msg" id="mailMsg"></span><p class="note" style="margin-top:6px">邀請信有時會被分到垃圾信件匣,朋友沒收到的話請他找一下,或直接用 LINE 傳連結最快。</p></div>'
         : '<p class="note">位子都滿了。要換人的話,先移除一位成員。</p>')
@@ -410,14 +453,94 @@ function renderMine(d){
   }
   html='<div id="boardBox"></div>'+html;   // 排行放最上面:每天打開最想看的
   box.innerHTML=html;
-  loadBoard();
+  if(d.board) renderBoard(d.board); else loadBoard();   // info 已一起帶回排行(少一次來回)
+  // 已經在團裡 → 不再顯示「開團」介紹(實走流程發現:主揪往下滑還看得到開團鈕,按了也會被擋)
+  $('vPlans').classList.add('hidden');
+  if(!document.getElementById('showPlans')) box.insertAdjacentHTML('beforeend','<p style="text-align:center;margin-top:6px"><button class="btn sm" id="showPlans">看揪團方案與常見問題</button></p>');
+  document.getElementById('showPlans').onclick=()=>{ $('vPlans').classList.remove('hidden'); $('vPlans').scrollIntoView({behavior:'smooth'}); };
+  _mine=d;
   const q=s=>box.querySelector(s);
   if(q('#btnCopyInv')) q('#btnCopyInv').onclick=()=>copy(d.invite_url, q('#invMsg'));
+  if(q('#btnShare')) q('#btnShare').onclick=()=>shareInvite(d, q('#invMsg'));
+  if(q('#btnCard')) q('#btnCard').onclick=()=>openCard(d);
   if(q('#btnRegen')) q('#btnRegen').onclick=async()=>{ if(!await confirmBox('換一條新連結後,舊連結就不能用了(已經加入的人不受影響)。確定要換嗎?')) return; const r=await api({action:'regen'}); if(r.ok) loadMine(); };
   if(q('#btnInvite')) q('#btnInvite').onclick=async()=>{ const m=q('#mailMsg'); const r=await api({action:'invite', email:q('#invEmail').value}); m.className='msg '+(r.ok?'ok':'bad'); m.textContent=r.ok?'已寄出(今天還能寄 '+r.left_today+' 封)':(r.reason||'寄送失敗'); if(r.ok) q('#invEmail').value=''; };
   box.querySelectorAll('[data-rm]').forEach(b=>b.onclick=async()=>{ if(!await confirmBox('確定要把「'+b.dataset.nm+'」移出揪團嗎?他會馬上失去 Premium。')) return; const r=await api({action:'remove', member_uid:b.dataset.rm}); if(r.ok){ await loadMine(); if(r.fill_note) alertBox(r.fill_note); } else alertBox(r.reason||'移除失敗'); });
   if(q('#btnLeave')) q('#btnLeave').onclick=async()=>{ if(!await confirmBox('確定要退出揪團嗎?退出後會馬上失去揪團給的 Premium。')) return; const r=await api({action:'leave'}); if(r.ok) loadMine(); else alertBox(r.reason||'退出失敗'); };
 }
+// ── 分享(2026-10-19 Mia:一鍵、好看、不要慢、不要登入來登入去)──
+// 手機:系統分享選單(LINE/IG/Messenger 都在);電腦或不支援:複製文案+連結。圖卡按了才畫,平常不拖慢頁面。
+function shareMsg(d){
+  const left=d.seats-1-d.members.length;
+  return '我開了 StayJP 的日文揪團,還差 '+left+' 個位子~\n團裡有每週排行,一起比誰讀最多!\n點這裡登入就加入:'+d.invite_url;
+}
+async function shareInvite(d, msgEl){
+  const text=shareMsg(d);
+  if(navigator.share){
+    try{ await navigator.share({ title:'一起讀日文吧!', text }); return; }
+    catch(e){ if(e && e.name==='AbortError') return; }
+  }
+  copy(text, msgEl);   // 不支援系統分享:複製整段(文案+連結),貼到哪都行
+}
+const loadQR=()=>window.qrcode?Promise.resolve():new Promise((ok,ng)=>{ const s=document.createElement('script'); s.src='https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js'; s.onload=ok; s.onerror=ng; document.head.appendChild(s); });
+const loadImg=src=>new Promise((ok,ng)=>{ const i=new Image(); i.onload=()=>ok(i); i.onerror=ng; i.src=src; });
+async function drawCard(d){
+  const W=1080,H=1350, c=document.createElement('canvas'); c.width=W; c.height=H; const x=c.getContext('2d');
+  const F='"PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif';
+  const [tk]=await Promise.all([loadImg('images/mascot/tanuki-cheer.png'), loadQR().catch(()=>{})]);
+  // 背景
+  const g=x.createLinearGradient(0,0,0,H); g.addColorStop(0,'#FFF4EC'); g.addColorStop(1,'#FFE2CF'); x.fillStyle=g; x.fillRect(0,0,W,H);
+  const rr=(X,Y,w,h,r)=>{ x.beginPath(); x.moveTo(X+r,Y); x.arcTo(X+w,Y,X+w,Y+h,r); x.arcTo(X+w,Y+h,X,Y+h,r); x.arcTo(X,Y+h,X,Y,r); x.arcTo(X,Y,X+w,Y,r); x.closePath(); };
+  x.fillStyle='#fff'; rr(70,70,W-140,H-140,48); x.fill();
+  x.textAlign='center'; x.fillStyle='#C6553B'; x.font='800 40px '+F; x.fillText('StayJP 日文揪團',W/2,170);
+  x.fillStyle='#2C2C2C'; x.font='900 72px '+F; x.fillText(d.owner_name+' 邀請你',W/2,270); x.fillText('一起讀日文!',W/2,360);
+  // 小狸(白底圖 → 放淺色圓裡)
+  x.save(); x.beginPath(); x.arc(W/2,560,150,0,Math.PI*2); x.fillStyle='#fff'; x.fill(); x.clip();   // 小狸是白底圖 → 白圓+米色圈,不露硬邊
+  const th=280, tw=tk.width/tk.height*th; x.drawImage(tk,W/2-tw/2,440,tw,th); x.restore();
+  x.beginPath(); x.arc(W/2,560,156,0,Math.PI*2); x.lineWidth=14; x.strokeStyle='#FFE8D9'; x.stroke();
+  // 座位頭像
+  const seats=[d.owner_name].concat(d.members.map(m=>m.name)), n=d.seats, r=46, gap=26, total=n*r*2+(n-1)*gap; let sx=W/2-total/2+r;
+  const COL=['#F59E0B','#10B981','#6366F1','#EC4899','#0EA5E9','#EF4444'];
+  for(let i=0;i<n;i++){
+    x.beginPath(); x.arc(sx,790,r,0,Math.PI*2);
+    if(seats[i]){ x.fillStyle=COL[[...seats[i]].reduce((h,ch)=>(h*31+ch.charCodeAt(0))>>>0,7)%COL.length]; x.fill(); x.fillStyle='#fff'; x.font='800 40px '+F; x.fillText(seats[i].slice(0,1),sx,804); }
+    else { x.setLineDash([10,8]); x.lineWidth=5; x.strokeStyle='#C6553B'; x.stroke(); x.setLineDash([]); x.fillStyle='#C6553B'; x.font='800 44px '+F; x.fillText('+',sx,806); }
+    sx+=r*2+gap;
+  }
+  const left=n-seats.length;
+  x.fillStyle='#C6553B'; x.font='900 54px '+F; x.fillText(left>0?('還差 '+left+' 位!'):'已經滿團!',W/2,905);
+  x.fillStyle='#6B6B6B'; x.font='600 34px '+F; x.fillText('團內每週排行・一起比誰讀最多',W/2,962);
+  // QR
+  if(window.qrcode){
+    // 格子用整數像素(小數格會被四捨五入成粗細不一,掃描不穩)
+    const qr=qrcode(0,'M'); qr.addData(d.invite_url); qr.make(); const m=qr.getModuleCount(), cell=Math.floor(220/m), size=cell*m, qx=Math.round(W/2-size/2), qy=995;
+    x.fillStyle='#fff'; x.fillRect(qx-16,qy-16,size+32,size+32); x.fillStyle='#2C2C2C';
+    for(let r2=0;r2<m;r2++) for(let c2=0;c2<m;c2++) if(qr.isDark(r2,c2)) x.fillRect(qx+c2*cell,qy+r2*cell,cell,cell);
+  }
+  x.fillStyle='#9A9A9A'; x.font='600 28px '+F; x.fillText('掃 QR code 或點連結加入・費用由主揪付款',W/2,1245);
+  return c;
+}
+async function openCard(d){
+  const wrap=document.createElement('div'); wrap.className='cs-backdrop';
+  wrap.innerHTML='<div class="cs-card" style="padding:18px;text-align:center"><div class="note" id="cardLoading" style="padding:30px 0">圖卡製作中…</div></div>';
+  document.body.appendChild(wrap);
+  wrap.onclick=e=>{ if(e.target===wrap) wrap.remove(); };
+  try{
+    const c=await drawCard(d);
+    const blob=await new Promise(r=>c.toBlob(r,'image/png'));
+    const file=new File([blob],'stayjp-invite.png',{type:'image/png'});
+    const url=URL.createObjectURL(blob);
+    const canFile = navigator.canShare && navigator.canShare({ files:[file] });
+    wrap.querySelector('.cs-card').innerHTML='<img class="card-prev" src="'+url+'" alt="揪團邀請圖卡">'
+      +(canFile?'<button class="btn pri wide" id="cardShare">分享圖卡</button>':'')
+      +'<a class="btn wide" style="margin-top:8px" download="stayjp-invite.png" href="'+url+'">存圖片</a>'
+      +'<p class="note" style="margin-top:8px">發 IG 限動時,記得再貼上連結貼紙:'+esc(d.invite_url.replace(/^https?:\/\//,''))+'</p>'
+      +'<button class="btn wide" style="margin-top:8px;border:0;color:var(--tx3)" id="cardClose">關閉</button>';
+    if(canFile) wrap.querySelector('#cardShare').onclick=async()=>{ try{ await navigator.share({ files:[file], text:shareMsg(d) }); }catch(e){} };
+    wrap.querySelector('#cardClose').onclick=()=>{ wrap.remove(); URL.revokeObjectURL(url); };
+  }catch(e){ wrap.querySelector('.cs-card').innerHTML='<p class="note" style="padding:20px">圖卡做不出來,先用「一鍵分享」傳連結就好。</p><button class="btn wide" onclick="this.closest(\'.cs-backdrop\').remove()">關閉</button>'; }
+}
+
 // ── 團內排行 ──
 const AV_COLORS=['#F59E0B','#10B981','#6366F1','#EC4899','#0EA5E9','#EF4444'];
 async function loadBoard(){ try{ const b=await api({action:'board'}); if(b&&b.ok) renderBoard(b); }catch(e){} }
@@ -466,6 +589,7 @@ function confirmBox(text){
 }
 const FROM_PAY = /[?&]from=ecpay/.test(location.search);
 let _payPoll = 0;
+let _mine=null;
 async function loadMine(){
   try{
     const d=await api({action:'info'});
@@ -483,8 +607,11 @@ async function renderJoin(){
   $('vJoin').classList.remove('hidden'); $('vPlans').classList.add('hidden');
   const p = await api({action:'preview', token:JOIN}, false);
   if(!p.ok){ $('jTitle').textContent='這個邀請已經失效'; $('jSub').textContent=p.reason||'請主揪重新傳一次連結。'; $('jBtn').textContent='看揪團方案'; $('jBtn').onclick=()=>{ location.href=location.pathname+(MOCK?'?mock=1':''); }; return; }
-  $('jTitle').textContent = p.owner_name+' 邀請你一起學日文';
-  $('jSub').textContent = '加入「'+p.plan_name+'」,費用由主揪付款。目前還剩 '+p.left+' 個位子。';
+  $('jTitle').textContent = p.owner_name+' 邀請你一起讀日文';
+  const COL=['#F59E0B','#10B981','#6366F1','#EC4899','#0EA5E9','#EF4444'], colOf=n=>COL[[...String(n)].reduce((h,c)=>(h*31+c.charCodeAt(0))>>>0,7)%COL.length];
+  const ini=[p.owner_name.slice(0,1)].concat(p.member_initials||[]);
+  $('jSeats').innerHTML = Array.from({length:p.seats},(_,i)=> i<ini.length ? '<span class="s" style="background:'+colOf(i===0?p.owner_name:ini[i]+i)+'">'+esc(ini[i])+'</span>' : (i===ini.length&&p.left>0 ? '<span class="s you">你</span>' : '<span class="s empty">+</span>')).join('');
+  $('jSub').textContent = '「'+p.plan_name+'」還剩 '+p.left+' 個位子。';
   $('jBtn').textContent = p.left>0 ? '登入並加入' : '位子已經滿了';
   $('jBtn').disabled = !(p.left>0);
   if(isInApp()){ $('jMsg').className='msg bad'; $('jMsg').textContent=inAppHelp(); }
@@ -494,7 +621,19 @@ async function renderJoin(){
       await ensureUser();
       $('jBtn').disabled=true; $('jBtn').textContent='加入中…';
       const r=await api({action:'join', token:JOIN});
-      if(r.ok){ $('jTitle').textContent='加入成功!'; $('jSub').textContent='你現在是 Premium 了。網頁和 App 用這個帳號登入就能用全部功能。'; $('jBtn').textContent='開始學習'; $('jBtn').disabled=false; $('jBtn').onclick=()=>{ location.href='app.html'; }; }
+      if(r.ok){
+        $('jTk').src='images/mascot/tanuki-happy.png';
+        $('jTitle').textContent='加入成功!'; $('jFree').classList.add('hidden'); $('jSeats').querySelector('.you')?.classList.remove('you');
+        $('jSub').textContent='你現在是 Premium 了,全部功能都能用。';
+        $('jBtn').textContent='在網頁開始學習'; $('jBtn').disabled=false; $('jBtn').onclick=()=>{ location.href='app.html'; };
+        // 實走流程發現:手機用戶多半去用 App,常在 App 用別的帳號登入、以為沒加入成功 → 這裡直接講清楚要用哪個帳號
+        const cu=auth&&auth.currentUser, pid=(cu&&cu.providerData&&cu.providerData[0]&&cu.providerData[0].providerId)||'';
+        const prov = pid==='apple.com' ? 'Apple' : pid==='google.com' ? 'Google' : '';
+        const em = cu&&cu.email&&!/privaterelay/i.test(cu.email) ? '('+cu.email+')' : '';
+        const native = window.STAYJP_NATIVE&&window.STAYJP_NATIVE.isNativeApp;
+        $('jAfter').innerHTML = native ? '' : '<div class="ok-acct">用 App 學也可以:<b>App 請用同一個'+(prov?' '+prov+' ':'')+'帳號登入</b>'+esc(em)+',登入後就是 Premium。換別的帳號登入會看不到喔。</div>'
+          +'<div class="store"><a class="btn app-ios" href="https://apps.apple.com/app/id6778227353">App Store 下載</a><a class="btn app-android" href="https://play.google.com/store/apps/details?id=com.stayjp.app">Google Play 下載</a></div>';
+      }
       else { m.className='msg bad'; m.textContent=r.reason||'加入失敗,請稍後再試。'; $('jBtn').disabled=false; $('jBtn').textContent='登入並加入'; }
     }catch(e){ if(e&&e.message!=='cancel'){ m.className='msg bad'; m.textContent=e.message; } }
   };
@@ -504,7 +643,7 @@ async function renderJoin(){
 const MOCK_STATE = { view:'owner', members:[{uid:'u1',name:'小美',joined_at:Date.now()-5*864e5},{uid:'u2',name:'Apple 使用者',joined_at:Date.now()-2*864e5}] };
 function mockApi(b){
   const base={ plan:'group4_yearly', plan_name:'揪團年費(4人)', seats:4, expiresAt:Date.now()+300*864e5, status:'active', lifetime:false, owner_name:'林小姐' };
-  if(b.action==='preview') return { ok:true, owner_name:'林小姐', plan:'group4_yearly', plan_name:'揪團年費(4人)', seats:4, left:1 };
+  if(b.action==='preview') return { ok:true, owner_name:'林小姐', member_initials:['小','A'], plan:'group4_yearly', plan_name:'揪團年費(4人)', seats:4, left:1 };
   if(b.action==='info'){
     if(MOCK_STATE.view==='none') return { role:null };
     if(MOCK_STATE.view==='member') return { ...base, role:'member', members:MOCK_STATE.members.map((m,i)=>({name:m.name,joined_at:m.joined_at,me:i===0})), can_fill:true };
@@ -534,6 +673,8 @@ if(MOCK){
 }
 
 // ── 啟動 ──
+// 冷啟動要 ~6 秒(實測):一開頁就先叫醒,使用者看畫面/登入的同時暖機,不擋任何東西
+if(!MOCK){ try{ fetch(FN_GROUP,{method:'POST',headers:{'content-type':'application/json'},body:'{"action":"warm"}',keepalive:true}).catch(()=>{}); }catch(e){} }
 // KOL 分享連結 group-beta.html?ref=CODE:先記進 stayjp_ref(同 pricing.html;Campaign.claim 不會讓活動碼蓋掉 KOL 碼)
 try{ const _r=normCode(new URLSearchParams(location.search).get('ref')); if(_r){ if(window.Campaign&&Campaign.claim) Campaign.claim(_r); else localStorage.setItem('stayjp_ref', _r); } }catch(e){}
 renderPlans();

@@ -106,6 +106,8 @@ export const groupApi = functions.onRequest(
       const action = String(req.body?.action || "");
       const now = nowMs();
 
+      if (action === "warm") { res.json({ ok: true }); return; }   // 前端開頁先叫醒(冷啟動 ~6 秒),使用者登入/看畫面時同步暖機
+
       // ── preview:不用登入 ──
       if (action === "preview") {
         const token = String(req.body?.token || "");
@@ -114,9 +116,10 @@ export const groupApi = functions.onRequest(
         if (q.empty) { res.json({ ok: false, reason: "這個邀請連結已經失效了,請主揪重新傳一次。" }); return; }
         const g = q.docs[0].data();
         const used = 1 + (g.member_uids || []).length;
+        const initials = ((g.member_uids || []) as string[]).map(m => String(g.members?.[m]?.name || "?").slice(0, 1));   // 邀請卡頭像:只給第一個字,不給全名
         res.json({
           ok: g.status === "active" && g.expiresAt > now,
-          owner_name: await displayNameOf(g.owner_uid),
+          owner_name: await displayNameOf(g.owner_uid), member_initials: initials,
           plan: g.plan, plan_name: PLANS[g.plan as keyof typeof PLANS]?.display_name || g.plan,
           seats: g.seats, left: Math.max(0, g.seats - used), lifetime: isLifetimePlan(g.plan),
           reason: g.status === "active" ? undefined : "這個揪團已經結束了。",
@@ -141,7 +144,9 @@ export const groupApi = functions.onRequest(
           me: m === uid,
         })));
         const rp = replaceAllowed(g, now);
+        const board = await buildBoard(f.id, g, uid).catch(() => null);   // 一起帶回,少一次來回(冷啟動時差很多)
         res.json({
+          board,
           role: f.role, plan: g.plan, plan_name: PLANS[g.plan as keyof typeof PLANS]?.display_name || g.plan,
           seats: g.seats, expiresAt: g.expiresAt, status: g.status, lifetime: isLifetimePlan(g.plan),
           owner_name: await displayNameOf(f.id), members,
