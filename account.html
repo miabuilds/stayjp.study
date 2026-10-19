@@ -166,6 +166,11 @@ a:hover{text-decoration:underline}
 
 <!-- Apple 3.1.1(2026-09-15 退件):iOS App 內不得用兌換碼解鎖 Premium → iOS 原生 App 裡整塊藏掉(Web/Android 照常) -->
 <style>html.ios-app #redeemBox{display:none!important}</style>
+<script>
+// 網頁限定入口(揪團方案)在 App 內藏起來(Apple 3.1.1);Android 的 STAYJP_NATIVE 注入較晚 → DOM 好了再查、重試 5 秒
+document.addEventListener('DOMContentLoaded',function(){ function h(){ var n=window.STAYJP_NATIVE; if(n&&n.isNativeApp){ document.querySelectorAll('[data-web-only]').forEach(function(e){ e.style.display='none'; }); return true; } return false; }
+  if(!h()){ var t=0, i=setInterval(function(){ if(h()||++t>20) clearInterval(i); },250); } });
+</script>
 <script>try{if(window.STAYJP_NATIVE&&STAYJP_NATIVE.isNativeApp&&STAYJP_NATIVE.platform==='ios')document.documentElement.classList.add('ios-app');}catch(e){}</script>
  <div id="redeemBox" style="margin-top:14px;padding:12px;background:var(--bg3);border-radius:10px">
  <div style="font-size:13px;color:var(--tx2);margin-bottom:8px"><i data-ic=gift></i> 有兌換碼?輸入換取免費 Premium(測試者 / 活動):</div>
@@ -181,6 +186,7 @@ a:hover{text-decoration:underline}
  免費版能用所有內容瀏覽 + 每個練習工具每天免費 1 次(SRS / 跟讀 / 動詞變化練習等)+ 模考每等級 1 套。
  升級 Premium 解鎖無限次。
  </p>
+ <a href="group.html" data-web-only style="display:block;margin-top:12px;padding:12px 14px;border-radius:12px;background:#FFF4EC;color:#C6553B;text-decoration:none;font-size:14px">跟朋友一起讀?<b>4 人揪團</b>一人約 NT$1,498 起 →</a>
  <div id="refBox" style="margin-top:14px;padding:12px;background:var(--bg3);border-radius:10px">
  <div style="font-size:13px;color:var(--tx2);margin-bottom:8px">有 KOL／朋友的推薦碼?輸入後付費即享好康(月費多送 7 天・年費多送 1 個月・買斷送 AI 加量包:對話+5、評分+30):</div>
  <div style="display:flex;gap:8px;flex-wrap:wrap">
@@ -297,7 +303,10 @@ const PLAN_LABELS = {
  yearly: '年費訂閱',
  yearly_early_bird: ' 早鳥年費',
  lifetime: ' 買斷方案',
+ group4_yearly: '揪團年費(4人)',
+ group4_lifetime: '揪團買斷(4人)',
 };
+const isLifePlan = p => p === 'lifetime' || p === 'group4_lifetime';   // 揪團買斷也是一次性(不續扣、無到期日)
 
 const STATUS_LABELS = {
  trialing: { text: '<i data-ic=gift></i> 免費試用中', cls: 'b-active' },
@@ -664,7 +673,7 @@ function renderSubscription(sub) {
  rowStatus.style.display = 'flex';
 
  // Expiry(試用中額外標「試用至 … 剩 N 天」,讓人清楚現在是試用)
- if (sub.plan === 'lifetime') {
+ if (isLifePlan(sub.plan)) {
  document.getElementById('expiryDate').textContent = '無到期日(買斷方案)';
  } else if (sub.expiresAt) {
  const d = new Date(sub.expiresAt);
@@ -676,7 +685,7 @@ function renderSubscription(sub) {
  rowExpiry.style.display = 'flex';
 
  // Will renew
- if (sub.plan !== 'lifetime') {
+ if (!isLifePlan(sub.plan) && sub.source !== 'group') {
  document.getElementById('willRenew').innerHTML = sub.willRenew ? ' 開啟' : ' 關閉(到期不續扣)';
  rowRenew.style.display = 'flex';
  }
@@ -685,7 +694,8 @@ function renderSubscription(sub) {
  document.getElementById('sourceLabel').textContent =
  sub.source === 'app' ? ' App (Apple / Google)' :
  sub.paypal_capture ? ' 網頁' :
- sub.source === 'web' ? ' 網頁' : sub.source;
+ sub.source === 'web' ? ' 網頁' :
+ sub.source === 'group' ? ' 揪團(由主揪付款)' : sub.source;
  rowSource.style.display = 'flex';
 
  // Actions — cancelled 但仍在期間內也算 Premium(可退費 / 仍能用)
@@ -695,6 +705,21 @@ function renderSubscription(sub) {
  freeActions.style.display = 'none';
  premiumActions.style.display = 'block';
 
+ // 揪團團員:沒有自己的付款 → 不給取消/退款(按了只會出錯),改說明+連到揪團頁(App 內不放連結:Apple 3.1.1)
+ const gNote = document.getElementById('groupNote');
+ if (gNote) gNote.remove();
+ const isOwnerGroup = /^group4_/.test(sub.plan || '') && sub.source === 'web';
+ if (sub.source === 'group' || isOwnerGroup) {
+ const inApp = !!(window.STAYJP_NATIVE && window.STAYJP_NATIVE.isNativeApp);
+ premiumActions.insertAdjacentHTML('afterbegin', '<div id="groupNote" style="background:var(--bg3);border-radius:12px;padding:12px 14px;margin-bottom:12px;font-size:14px;line-height:1.7">'
+ + (sub.source === 'group' ? '你的 Premium 來自<b>揪團</b>,由主揪付款,效期跟著主揪的方案。' : '你是揪團的<b>主揪</b>,團員的 Premium 跟著你的方案。')
+ + (inApp ? '' : ' <a href="group.html" style="color:var(--ac,#C6553B)">看我的揪團 →</a>') + '</div>');
+ }
+ if (sub.source === 'group') {
+ appNote.style.display = 'none';
+ ['btnCancelRenew', 'btnResubscribe', 'btnRefund'].forEach(id => { const el = document.getElementById(id); if (el) el.style.display = 'none'; });
+ const ri = document.getElementById('resubscribeInfo'); if (ri) ri.style.display = 'none';
+ } else
  // App 訂戶不能在這取消
  if (sub.source === 'app') {
  appNote.style.display = 'block';
@@ -723,15 +748,15 @@ function renderSubscription(sub) {
  btnCancel.style.display = 'none';
  btnResub.style.display = 'none';
  resubInfo.style.display = 'none';
- } else if (!sub.willRenew && sub.plan !== 'lifetime') {
+ } else if (!sub.willRenew && !isLifePlan(sub.plan)) {
  btnCancel.style.display = 'none';
  btnResub.style.display = '';
  resubInfo.style.display = 'block';
  } else {
- btnCancel.disabled = sub.plan === 'lifetime';
+ btnCancel.disabled = isLifePlan(sub.plan);
  }
  // 買斷無自動續訂概念
- if (sub.plan === 'lifetime') {
+ if (isLifePlan(sub.plan)) {
  btnCancel.style.display = 'none';
  btnResub.style.display = 'none';
  resubInfo.style.display = 'none';
@@ -762,7 +787,7 @@ function checkRefundEligibility(sub) {
 
  const daysSinceStart = (Date.now() - sub.startedAt) / 86400000;
 
- if (sub.plan === 'lifetime') {
+ if (isLifePlan(sub.plan)) {
  if (daysSinceStart <= 7) {
  refundInfo.textContent = `買斷方案首購 7 天內可全額退費。剩 ${Math.ceil(7 - daysSinceStart)} 天可申請。`;
  refundInfo.style.display = 'block';
@@ -900,14 +925,19 @@ async function requestRefund() {
    ? (_en ? '\n• Early-bird is a one-time limited offer: after a refund you can no longer subscribe at the early-bird price; future subscriptions are at the current regular price.'
           : '\n• 早鳥為限量一次性優惠:退費後無法再以早鳥價訂閱,日後重新訂閱僅能用現行一般價。')
    : '';
+ // 揪團主揪:退費 = 全團一起停(團員權益跟著主揪),一定要先講
+ const grpWarn = (_sub && /^group4_/.test(_sub.plan || ''))
+   ? (_en ? '\n• This is a group plan: after the refund, Premium stops for everyone in your group.'
+          : '\n• 這是揪團方案:退費後,全團成員的 Premium 會一起停止。')
+   : '';
  const refundDesc = isPaypal
    ? (_en ? '• Funds are returned to your original payment method; timing depends on the payment provider / card issuer\n• First purchase only, within 7 days; contact support if past due'
           : '• 款項退回你的原付款方式,入帳時間依金流服務商 / 發卡行而定\n• 僅限首購 7 天內;逾期請來信客服')
    : (_en ? '• The refund goes back to your card via the issuing bank; timing depends on your billing cycle (if past the statement date, it may appear on the next statement)\n• Full unconditional refund within 7 days; after that, prorated by the unused portion'
           : '• 退款經發卡銀行退回原卡,入帳時間依你的信用卡結帳週期而定（若已過結帳日,可能顯示在下一期帳單）\n• 七天內為無條件全額退;逾七天按未使用比例退');
  const _refundMsg = _en
-   ? ('Request a refund?\n\nAfter you confirm:\n• Your subscription drops to the free plan immediately\n' + refundDesc + '\n• Your usage records during the subscription are kept' + ebWarn + '\n(We reserve the right to refuse future subscriptions only for accounts that clearly abuse refunds.)')
-   : ('確定要申請退費?\n\n按下確認後:\n• 訂閱立刻降級為免費版\n' + refundDesc + '\n• 已訂閱期間使用記錄會保留' + ebWarn + '\n（本站僅對明顯惡意濫用退費之帳號,保留拒絕未來新訂閱之權利）');
+   ? ('Request a refund?\n\nAfter you confirm:\n• Your subscription drops to the free plan immediately\n' + refundDesc + '\n• Your usage records during the subscription are kept' + ebWarn + grpWarn + '\n(We reserve the right to refuse future subscriptions only for accounts that clearly abuse refunds.)')
+   : ('確定要申請退費?\n\n按下確認後:\n• 訂閱立刻降級為免費版\n' + refundDesc + '\n• 已訂閱期間使用記錄會保留' + ebWarn + grpWarn + '\n（本站僅對明顯惡意濫用退費之帳號,保留拒絕未來新訂閱之權利）');
  if (!confirm(_refundMsg)) return;
  const btn = document.getElementById('btnRefund');
  if (btn) { btn.disabled = true; btn.textContent = '處理中…'; }

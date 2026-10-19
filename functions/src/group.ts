@@ -21,7 +21,7 @@ import { db, nowMs, getSubscription, syncGroupMembers, newInviteToken, revokeGro
 import { PLANS, isLifetimePlan, ecpayConfig } from "./utils/constants";
 
 const DAY = 864e5;
-const GROUP_PAGE = "group-beta.html";   // 測試頁;正式上線改名時一起改(前端邀請連結也用這個)
+const GROUP_PAGE = "group.html";   // 改檔名時 ecpay-return.ts 也要改(group-beta.html 留著轉址)
 const INVITES_PER_DAY = 10;
 
 const maskEmail = (e: string) => {
