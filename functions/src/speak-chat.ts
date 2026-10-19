@@ -322,7 +322,12 @@ export const speakChat = functions.onRequest(
       // 歷史截斷:只送最近 N 則(場景設定在 system 裡,舊對話對下一句影響小)→ input 不隨對話變長
       const kept = msgs.slice(-cfg.historyKeep);
       if (kept.length === 0 || kept[kept.length - 1].role !== "user") {
-        kept.push({ role: "user", content: "（請你先自然開口,帶起這個情境的對話）" });
+        kept.push({ role: "user", content: "（請你先自然開口,帶起這個情境的對話;最後一句用問句把話題交給對方）" });
+      } else {
+        // 貼在最新一句後面的提醒(只送給模型,不回前端、不進對話紀錄)。
+        // 只寫在 system 裡不夠:實測 3 次有 1 次 COACH 重提上一輪已糾正的錯、1 次只陳述就句點、1 次 COACH 講日文。
+        const last = kept[kept.length - 1];
+        last.content = String(last.content) + `\n\n〔給你的提醒,不是學生說的話:COACH 只評上面這一句、用${langName(lang)}寫,之前輪次的錯不要再提;JP 的最後一句必須是問句或邀請,把話題交回給學生(學生在道別時例外)〕`;
       }
       const system = [{ type: "text", text: chatSystem(sceneStr, level || "N4", lang, String(userRole || "").slice(0, 30)), cache_control: { type: "ephemeral" } }];
       const urStr = String(userRole || "").slice(0, 30);

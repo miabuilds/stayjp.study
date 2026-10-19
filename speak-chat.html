@@ -673,6 +673,19 @@ function aiBubble(m){
 }
 
 // 解析逐行輕結構
+// 教練重提舊錯的保險(2026-10-19 KOL 回饋:「ありがとうござい」少了「ます」連講兩輪)。
+// 教練引用的「…」片段,在學生最新這句裡找不到、卻出現在更早的句子 → 是在講舊帳,不顯示。
+function staleCoach(coach){
+  const mine=history.filter(h=>h.role==='me').map(h=>String(h.text||''));
+  if(mine.length<2) return false;
+  const norm=x=>String(x).replace(/[\s　、。,.!?！？「」]/g,'');
+  const latest=norm(mine[mine.length-1]), older=mine.slice(0,-1).map(norm);
+  const quotes=[...String(coach).matchAll(/「([^」]{2,})」/g)].map(m=>norm(m[1])).filter(q=>q.length>=2);
+  // 教練常引用「正確說法」(ありがとうございます)而不是學生原句(ありがとうござい)→ 用「最長共同片段 ≥4 字」比,不要求完全相同
+  const common=(a,b)=>{ let best=0; for(let i=0;i<a.length;i++) for(let j=0;j<b.length;j++){ let k=0; while(a[i+k]&&a[i+k]===b[j+k]) k++; if(k>best) best=k; } return best; };
+  const need=q=>Math.min(4,q.length);
+  return quotes.some(q=>common(latest,q)<need(q) && older.some(o=>common(o,q)>=need(q)));
+}
 function parseTurn(text){
   const o={jp:'',kana:'',zh:'',coach:'',hints:[]};
   const bare=[];   // 沒有任何欄位前綴的行(模型偶爾漏打 JP: 前綴,台詞變裸行)
@@ -687,6 +700,7 @@ function parseTurn(text){
   }
   // COACH 有時會吐 <blank>/空白/無 之類佔位字 → 當作沒有提點
   if(/^<?\s*(blank|空白?|無|なし|null|none|n\/a|[-—―])\s*>?$/i.test(o.coach)) o.coach='';
+  if(o.coach && staleCoach(o.coach)) o.coach='';   // 重提舊句的錯 → 不顯示(後端已提醒,這是保險)
   // 防呆:模型格式跑掉沒給 JP 行時,拿假名行當主行(至少看得到、也播得出來),別讓泡泡剩「…」卡死
   if(!o.jp && o.kana){ o.jp=o.kana; o._jpFromKana=true; }   // 代打標記:串流中假名是半句,不能拿去提前播
   // 最後一道救援:JP/KANA 都沒有,但有含日文的裸行 → 那就是漏了前綴的台詞(2026-08 Sonnet 實測踩到:
