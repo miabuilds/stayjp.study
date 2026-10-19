@@ -663,7 +663,7 @@ function mockApi(b){
   if(b.action==='info'){
     if(MOCK_STATE.view==='none') return { role:null };
     if(MOCK_STATE.view==='member') return { ...base, role:'member', members:MOCK_STATE.members.map((m,i)=>({name:m.name,joined_at:m.joined_at,me:i===0})), can_fill:true };
-    return { ...base, role:'owner', members:MOCK_STATE.members, invite_url:'https://stayjp.study/group.html?join=DEMO&openExternalBrowser=1', can_fill:true };
+    return { ...base, role:'owner', members:MOCK_STATE.members, invite_url:'https://stayjp.study/group.html?mock=1&join=DEMO', can_fill:true };
   }
   if(b.action==='board'){
     const ms=[{name:'小美',week:86,today:12,days:4,streak:5},{name:'林小姐',owner:true,week:64,today:0,days:3,streak:3,me:MOCK_STATE.view==='owner'},{name:'Apple 使用者',week:31,today:5,days:2,streak:1,me:MOCK_STATE.view==='member'}];

@@ -146,7 +146,7 @@
         btn.disabled = false;
         const rg = d && d.range;
         if (!rg) { res.innerHTML = '<span style="color:#EF4444">查詢失敗,請稍後再試。</span>'; return; }
-        var PLAN={lifetime:'買斷',yearly_early_bird:'早鳥年費',yearly:'年費',monthly:'月費',adjustment:'額外項目'};
+        var PLAN={lifetime:'買斷',yearly_early_bird:'早鳥年費',yearly:'年費',monthly:'月費',group4_yearly:'揪團年費',group4_lifetime:'揪團買斷',adjustment:'額外項目'};
         var SRC={web:'網頁·綠界',paypal:'網頁·PayPal',app:'App內購'};
         var list=(rg.rows||[]).map(function(r){
           var when=new Date(r.at); var ds=(when.getMonth()+1)+'/'+when.getDate();

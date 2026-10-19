@@ -177,8 +177,8 @@ const FN_LIST_SUBS = 'https://asia-east1-jpnote-1bdd6.cloudfunctions.net/adminLi
 const FN_SETTLE = 'https://asia-east1-jpnote-1bdd6.cloudfunctions.net/adminSettleKolPayout';
 const FN_GA_STATS = 'https://asia-east1-jpnote-1bdd6.cloudfunctions.net/adminGaStats';
 
-const PLAN_NAME = { monthly:'月費', yearly:'年費', yearly_early_bird:'早鳥年費', lifetime:'買斷' };
-const PLAN_ORDER = ['monthly','yearly','yearly_early_bird','lifetime'];
+const PLAN_NAME = { monthly:'月費', yearly:'年費', yearly_early_bird:'早鳥年費', lifetime:'買斷', group4_yearly:'揪團年費(4人)', group4_lifetime:'揪團買斷(4人)' };
+const PLAN_ORDER = ['monthly','yearly','yearly_early_bird','lifetime','group4_yearly','group4_lifetime'];
 const FEE_BY_SOURCE = { app:0.15, web:0.0275 };   // 用於缺 profit_twd 時回推(舊資料)
 // 全站對帳用:各管道真實手續費(對齊 functions/src/utils/firestore.ts 的 KOL_FEE)
 // key 要對上 transactions.payment_method:Android 是 google_billing(舊寫 google → Android 整批落未知管道、費率算 0%)
@@ -350,7 +350,7 @@ function renderTrials(){
   card.style.display='block';
   const willPay=list.filter(s=>s.willRenew).length;
   document.getElementById('trialsSum').textContent = list.length+' 筆 · '+willPay+' 筆試用到期會轉扣款、'+(list.length-willPay)+' 筆已取消(不會扣)';
-  const PLAN_S={monthly:'月費',yearly:'年費',yearly_early_bird:'早鳥年費',lifetime:'買斷'};
+  const PLAN_S={monthly:'月費',yearly:'年費',yearly_early_bird:'早鳥年費',lifetime:'買斷',group4_yearly:'揪團年費',group4_lifetime:'揪團買斷'};
   document.getElementById('trialsTable').innerHTML =
     '<table style="width:100%;border-collapse:collapse;font-size:13px">'
     +'<tr style="text-align:left;color:var(--ink3)"><th style="padding:4px 6px">用戶</th><th>方案</th><th>試用到</th><th>轉扣款</th><th>歸因</th></tr>'
@@ -424,8 +424,8 @@ function showMember(i){
     ['付款方式', esc(payMethod(s))],
     ['介紹碼', s.ref_code?('<code>'+esc(s.ref_code)+'</code>'+(rm&&rm.kol?' · '+esc(rm.kol):'')):'<span style="color:var(--ink3)">直接註冊(無介紹)</span>'],
     ['開始時間', dt(s.startedAt)],
-    ['到期時間', s.plan==='lifetime'?'買斷(無到期)':dt(s.expiresAt)],
-    ['是否續訂', s.plan==='lifetime'?'買斷':(s.willRenew?'會續訂':'不續訂')],
+    ['到期時間', (s.plan==='lifetime'||s.plan==='group4_lifetime')?'買斷(無到期)':dt(s.expiresAt)],
+    ['是否續訂', (s.plan==='lifetime'||s.plan==='group4_lifetime')?'買斷':s.source==='group'?'揪團成員(跟主揪)':(s.willRenew?'會續訂':'不續訂')],
     ['綠界單號', esc(s.ecpay_order||'—')],
     ['本人分潤', comm?('此人替 <code>'+esc(comm.code)+'</code> 帶來分潤 '+fmt(comm.amount)+' <span class="pill '+(comm.state==='paid'?'p-mute':comm.state==='locked'?'p-ok':'p-warn')+'">'+comm.state+'</span>'):'—'],
     ['UID', '<span style="font-size:11px;color:var(--ink3)">'+esc(s.uid||'—')+'</span>']

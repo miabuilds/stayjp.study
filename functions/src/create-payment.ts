@@ -140,7 +140,7 @@ export const createPayment = functions.onRequest(
         // ↑ ReturnURL 必須是 server-to-server callback,直接打 Cloud Function URL
         OrderResultURL: cfg.returnUrl,
         // ↑ user POST 過來,function 302 轉到 account.html (GitHub Pages 不接受 POST)
-        ClientBackURL: `${cfg.siteOrigin}/pricing.html`,
+        ClientBackURL: `${cfg.siteOrigin}/${isGroupPlan(plan) ? "group.html" : "pricing.html"}`,   // 綠界頁「返回商店」:揪團回揪團頁
         // ── 自訂帶回(callback 用來識別)──
         CustomField1: uid,
         CustomField2: plan,

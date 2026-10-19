@@ -18,7 +18,7 @@ for (const d of (await db.collection('trial_used').get()).docs) { const ms = toM
 const y = days[yday] || { n: 0, amt: 0, plans: {}, trials: 0 };
 const prev7 = [...Array(7)].map((_, i) => days[dayTW(now - (i + 2) * 864e5)] || { n: 0, amt: 0, trials: 0 });
 const avg = (k) => (prev7.reduce((a, x) => a + x[k], 0) / 7).toFixed(1);
-const planStr = (p) => Object.entries(p).map(([k, v]) => `${k.replace('yearly_early_bird', '早鳥年').replace('yearly', '年').replace('lifetime', '買斷').replace('monthly', '月')}×${v}`).join(' ') || '—';
+const planStr = (p) => Object.entries(p).map(([k, v]) => `${k.replace('group4_yearly', '揪團年').replace('group4_lifetime', '揪團買斷').replace('yearly_early_bird', '早鳥年').replace('yearly', '年').replace('lifetime', '買斷').replace('monthly', '月')}×${v}`).join(' ') || '—';
 
 // ── 回報
 const newReports = (await db.collection('reports').where('status', '==', 'new').get()).size;
