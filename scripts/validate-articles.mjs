@@ -42,6 +42,13 @@ const sentences = body => (body.match(/[^。！？]+[。！？]?/g) || []).map(s
 // ── 1. 重複 id
 const seen = new Set();
 for (const a of ALL) { if (seen.has(a.id)) err(a.id, '重複 id'); seen.add(a.id); }
+// ── 1b. 三種難度改寫版:原文要存在且本身不是改寫版、同一篇的等級不能重複
+for (const a of ALL.filter(x => x.variant_of)) {
+  const b = ALL.find(x => x.id === a.variant_of);
+  if (!b) err(a.id, `variant_of 找不到原文 ${a.variant_of}`);
+  else if (b.variant_of) err(a.id, `variant_of 指到另一篇改寫版 ${b.id}`);
+  else if (ALL.some(x => x !== a && (x.id === b.id || x.variant_of === b.id) && x.level === a.level)) err(a.id, `同一篇已有 ${a.level} 版本`);
+}
 
 // ── kuromoji(可選)
 let tokenizer = null;
@@ -104,11 +111,12 @@ for (const a of targets) {
     if (!/^\d{4}-\d\d-\d\dT\d\d:\d\d(:\d\d)?([+-]\d\d:\d\d|Z)$/.test(a.publish_at) || isNaN(Date.parse(a.publish_at))) err(id, `publish_at 格式錯:${a.publish_at}`);
   }
   // ── 6. 封面
-  const cover = path.join(ROOT, 'images/articles', id + '.jpg');
-  if (!fs.existsSync(cover)) err(id, `沒有封面 images/articles/${id}.jpg`);
+  const coverId = a.variant_of || id;   // 改寫版沿用原文封面
+  const cover = path.join(ROOT, 'images/articles', coverId + '.jpg');
+  if (!fs.existsSync(cover)) err(id, `沒有封面 images/articles/${coverId}.jpg`);
   else {
     const credits = fs.readFileSync(path.join(ROOT, 'CREDITS.md'), 'utf8');
-    if (!credits.includes('`' + id + '.jpg`')) err(id, `CREDITS.md 沒登記封面來源/授權(${id}.jpg)`);
+    if (!a.variant_of && !credits.includes('`' + coverId + '.jpg`')) err(id, `CREDITS.md 沒登記封面來源/授權(${coverId}.jpg)`);
   }
   // ── 7. 語音:每句 + 每個單字讀音
   const sents = sentences(a.body || '');

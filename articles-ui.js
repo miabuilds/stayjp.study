@@ -74,7 +74,7 @@ window.Articles = (function () {
   var LVN = { n5: 'N5', n4: 'N4', n3: 'N3', n2: 'N2', n1: 'N1' };
   // 分級主題色(hero 漸層)
   var LVC = { n5: ['#34d399', '#059669'], n4: ['#22d3ee', '#0891b2'], n3: ['#60a5fa', '#2563eb'], n2: ['#a78bfa', '#7c3aed'], n1: ['#fb7185', '#e11d48'] };
-  var furiOn = true, fsIdx = 1, curId = null, curTab = 'read';
+  var furiOn = true, fsIdx = 1, curId = null, curBase = null, curTab = 'read';
   function posOn(){ try{ return localStorage.getItem('art_pos_off')!=='1'; }catch(e){ return true; } }
   function togglePos(){
     try{ localStorage.setItem('art_pos_off', posOn()?'1':'0'); }catch(e){}
@@ -83,7 +83,19 @@ window.Articles = (function () {
     if(b) b.classList.toggle('on', posOn());
   }
   var FS = ['18px', '20px', '23px'];   // 字級三段
-  function list() { return window.ArticleSchedule.visible(window.ARTICLES || []); }   // 未到 publish_at 的不出現
+  function list(withVariants) { return window.ArticleSchedule.visible(window.ARTICLES || []).filter(function (a) { return withVariants || !a.variant_of; }); }   // 未到 publish_at 的不出現;改寫版(variant_of)不進清單,只在閱讀器切換
+  // ── 三種難度(2026-10-20):同一篇文章的改寫版 = articles.js 裡帶 variant_of:<原文 id> 的文章(scripts/gen-article-variants.mjs 產)。
+  // 已讀/額度/進度一律記在原文 id 上:免費版切難度不多扣額度、清單已讀勾勾也跟著原文走。
+  var BAND = { n5: 'easy', n4: 'easy', n3: 'mid', n2: 'hard', n1: 'hard' };
+  function bandName(lv) { var b = BAND[lv]; return b === 'easy' ? enOr('簡單', 'Easy') : b === 'mid' ? enOr('中等', 'Medium') : enOr('進階', 'Hard'); }
+  function baseOf(a) { return a ? (a.variant_of || a.id) : null; }
+  function family(a) {
+    var b = baseOf(a);
+    return list(true).filter(function (x) { return x.id === b || x.variant_of === b; })
+      .sort(function (x, y) { return LEVELS.indexOf(x.level) - LEVELS.indexOf(y.level); });
+  }
+  function famSize(a) { return family(a).length; }
+  function bandPref() { try { return localStorage.getItem('art_band') || ''; } catch (e) { return ''; } }
   // 三語:en→英文;zh-CN→OpenCC 轉簡(cvt);zh-TW→原樣繁體
   function enOr(zh, en) { try { var l = (typeof I18n !== 'undefined' && I18n.getLang) ? I18n.getLang() : (localStorage.getItem('ui_lang') || 'zh-TW'); if (l === 'en') return en; return (typeof cvt === 'function') ? cvt(zh) : zh; } catch (e) { return zh; } }
   function zc(s) { try { return (typeof cvt === 'function') ? cvt(s) : s; } catch (e) { return s; } }   // 中文內容(中譯/意思):簡中轉簡,其餘原樣
@@ -460,6 +472,13 @@ window.Articles = (function () {
       '.art-hero .hz{font-size:14px;opacity:.9;margin-top:4px}',
       // toolbar
       '.art-tools{display:flex;gap:8px;align-items:center;padding:10px 14px;border-bottom:1px solid var(--bd,#e8e5e0);flex-wrap:wrap}',
+      '.art-lvsw{display:flex;gap:6px;align-items:stretch;padding:12px 14px;border-bottom:1px solid var(--bd,#e8e5e0)}',
+      '.art-lvsw-l{align-self:center;font-size:12.5px;font-weight:700;color:var(--tx3,#999);margin-right:2px;white-space:nowrap}',
+      '.art-lvsw-b{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:1px;padding:7px 4px;border:1.5px solid var(--bd,#e8e5e0);border-radius:12px;background:var(--bg2,#fff);color:var(--tx2,#666);font:inherit;cursor:pointer}',
+      '.art-lvsw-b b{font-size:14px;font-weight:800}',
+      '.art-lvsw-b span{font-size:11px;opacity:.75}',
+      '.art-lvsw-b.on{border-color:var(--ac,#c6553b);background:var(--ac,#c6553b);color:#fff;cursor:default}',
+      '.art-lvsw-b:not(.on):active{transform:scale(.97)}',
       '.art-tbtn{border:1px solid var(--bd,#ddd);background:var(--bg2,#fff);color:var(--tx2,#666);border-radius:22px;padding:8px 15px;font-size:13.5px;font-weight:600;cursor:pointer;min-height:38px}',
       '.art-tbtn:active{transform:scale(.96)}',
       '.art-tbtn.on{background:var(--ac2,#e8734a);color:#fff;border-color:var(--ac2,#e8734a)}',
@@ -624,7 +643,8 @@ window.Articles = (function () {
   function newest(all) { return window.ArticleList.sortNewest(all)[0] || null; }
   function metaHtml(a) {
     var dt = window.ArticleList.dateLabel(a, isEn() ? 'en' : 'zh');
-    var parts = [LVN[a.level]];
+    var fs = famSize(a);
+    var parts = [fs > 1 ? LVN[a.level] + ' · ' + enOr(fs + ' 種難度', fs + ' levels') : LVN[a.level]];
     if (dt) parts.push(dt);
     parts.push(Lc(a.topic, a.topic_en));
     if (a.publish_at && !window.ArticleSchedule.isLive(a)) parts.push(enOr('預定 ', 'Scheduled ') + a.publish_at.slice(5, 10));   // 本機預覽才會看到
@@ -695,32 +715,36 @@ window.Articles = (function () {
   function toggleHideRead() { try { localStorage.setItem('art_hide_read', hideReadOn() ? '0' : '1'); } catch (e) {} renderList(); }
 
   // ─────────── 閱讀器 ───────────
-  function read(id) {
+  function read(id, opt) {
     ensureCss();
-    var a = list().find(function (x) { return x.id === id; }); if (!a) return;
+    var a = list(true).find(function (x) { return x.id === id; }); if (!a) return;
+    // 從清單點進來:有選過難度就直接開那個難度(切換鈕按的 opt.exact 不套)
+    if (!(opt && opt.exact)) { var pb = bandPref(); if (pb && BAND[a.level] !== pb) { var alt = family(a).find(function (x) { return BAND[x.level] === pb; }); if (alt) a = alt; } }
+    id = a.id; var bid = baseOf(a);
     // 逐詞/時間軸/字典是延後載入的(見 app.html 的大型資料檔載入器):還沒到就先等,
     // 不然這篇會變成沒有點字查詢、朗讀也對不齊。已載入時 Promise 立即 resolve,感覺不到延遲。
-    if (window.ensureArticleData && !window.ARTICLE_TOKENS) { window.ensureArticleData().then(function () { read(id); }); return; }
-    if (!readSet()[id] && window.ToolQuota && window.ToolQuota.shouldGate && window.ToolQuota.shouldGate()) {
+    if (window.ensureArticleData && !window.ARTICLE_TOKENS) { window.ensureArticleData().then(function () { read(id, { exact: true }); }); return; }
+    if (!readSet()[bid] && window.ToolQuota && window.ToolQuota.shouldGate && window.ToolQuota.shouldGate()) {
       if (!window.ToolQuota.canUse('article')) { window.ToolQuota.showPaywall('article'); return; }
       window.ToolQuota.consume('article');
     }
-    markRead(id);   // 進入即標記已讀(<i data-ic=check></i>);之後重看免計額度
+    markRead(bid);   // 進入即標記已讀(<i data-ic=check></i>);之後重看免計額度
     if (window.furiAddEntries) window.furiAddEntries(a.vocab);   // 讓本篇重點單字(含漢字者)在內文也可點查
     close();        // 先移除清單那層 overlay,避免兩層 artMask 疊著(內文被蓋成空白)
-    curId = id; curTab = 'read';
+    curId = id; curBase = bid; curTab = 'read';
     var g = LVC[a.level] || LVC.n5;
     var h = '<div class="art-mask" id="artMask"><div class="art-wrap">' +
       '<div class="art-top"><button class="art-back" onclick="Articles.open()"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>返回</button>' +
       '<span class="tt">' + esc(Lc(a.title_zh,a.title_en)) + '</span>' +
       '<button class="art-ic" onclick="Articles.close()"><i data-ic=x></i></button></div>' +
       '<div class="art-hero" style="background:linear-gradient(135deg,' + g[0] + ',' + g[1] + ')">' +
-      (a.ehon ? '' : '<img class="art-hero-bg" src="' + imgUrl(a.id) + '" alt="" width="400" height="400" decoding="async" onerror="this.remove()">') +
+      (a.ehon ? '' : '<img class="art-hero-bg" src="' + imgUrl(bid) + '" alt="" width="400" height="400" decoding="async" onerror="this.remove()">') +
       '<div class="art-hero-ov"></div>' +
       '<div class="art-hero-in">' +
       '<div class="hb">' + LVN[a.level] + '　' + esc(Lc(a.topic,a.topic_en)) + '</div>' +
       '<div class="ht">' + fr(a.title) + '</div>' +
       '<div class="hz">' + esc(Lc(a.title_zh,a.title_en)) + '</div></div></div>' +
+      lvSwitchHtml(a) +
       // toolbar
       '<div class="art-tools">' +
       '<button class="art-tbtn on" id="artFuriBtn" onclick="Articles.toggleFuri()">あ ' + enOr('假名', 'Kana') + '</button>' +
@@ -755,8 +779,8 @@ window.Articles = (function () {
     document.getElementById('artMask').scrollTop = 0;
     document.body.classList.add('art-reading');   // 讓額度小牌避開底部播放列
     renderTab('read');
-    setProg(id, 0); bindProgress(id);   // 進度:碰過就記時間;捲動更新(清單「繼續閱讀」用)
-    try { if (typeof track === 'function') track('article_read', { id: id, level: a.level }); } catch (e) {}
+    setProg(bid, 0); bindProgress(bid);   // 進度:碰過就記時間;捲動更新(清單「繼續閱讀」用)
+    try { if (typeof track === 'function') track('article_read', { id: bid, level: a.level, variant: a.variant_of ? 1 : 0 }); } catch (e) {}
     preloadSent(0); preloadSent(1);   // 開文章先載前兩句,按播放零等待
     var _mk=document.querySelector('.art-mask'); if(_mk) _mk.classList.toggle('pos-off', !posOn());
   }
@@ -766,7 +790,7 @@ window.Articles = (function () {
     var raf = 0;
     function calc() {
       raf = 0;
-      if (curId !== id || curTab !== 'read' || !document.body.contains(mk)) return;
+      if (curBase !== id || curTab !== 'read' || !document.body.contains(mk)) return;
       var ps = mk.querySelectorAll('#artContent .art-para'); if (!ps.length) return;
       var top = ps[0].getBoundingClientRect().top, bot = ps[ps.length - 1].getBoundingClientRect().bottom, vh = mk.clientHeight;
       var span = bot - top; if (span <= 0 || !vh) return;
@@ -794,7 +818,22 @@ window.Articles = (function () {
     document.getElementById('artMask').scrollTop = 0;
   }
 
-  function curArticle() { return list().find(function (x) { return x.id === curId; }); }
+  function curArticle() { return list(true).find(function (x) { return x.id === curId; }); }
+  // 難度切換列(只有一個版本的文章不顯示)
+  function lvSwitchHtml(a) {
+    var fam = family(a); if (fam.length < 2) return '';
+    return '<div class="art-lvsw" role="tablist" aria-label="' + enOr('難度', 'Level') + '"><span class="art-lvsw-l">' + enOr('難度', 'Level') + '</span>' + fam.map(function (x) {
+      var on = x.id === a.id;
+      return '<button type="button" role="tab" aria-selected="' + on + '" class="art-lvsw-b' + (on ? ' on' : '') + '"' + (on ? '' : ' onclick="Articles.switchLv(\'' + x.id + '\')"') + '><b>' + bandName(x.level) + '</b><span>' + LVN[x.level] + '</span></button>';
+    }).join('') + '</div>';
+  }
+  function switchLv(id) {
+    var from = curArticle(), to = list(true).find(function (x) { return x.id === id; }); if (!to) return;
+    stopPlay();
+    try { localStorage.setItem('art_band', BAND[to.level]); } catch (e) {}
+    try { if (typeof track === 'function') track('article_level_switch', { id: baseOf(to), from: from ? from.level : '', to: to.level }); } catch (e) {}
+    read(id, { exact: true });
+  }
 
   function renderTab(k) {
     var a = curArticle(), c = document.getElementById('artContent'); if (!a || !c) return;
@@ -824,7 +863,7 @@ window.Articles = (function () {
     return '<button type="button" class="art-sq" title="' + enOr('問小狸:拆解這句', 'Ask tutor: break down this sentence') + '" onclick="event.stopPropagation();Tutor.askSentence(this.getAttribute(\'data-s\'),this.getAttribute(\'data-t\'),this.getAttribute(\'data-l\'))" data-s="' + esc(sentence) + '" data-t="' + esc(a.title) + '" data-l="' + esc(a.level) + '"><img src="images/mascot/tanuki-think.png" alt=""></button>';
   }
   function renderRead(a, c) {
-    logArticleReadActivity(a.id);
+    logArticleReadActivity(baseOf(a));
     var paras = String(a.body).split('\n').filter(function (p) { return p.trim(); });
     var trans = a.trans || [];
     sentSeq = []; var si = 0;
@@ -1112,13 +1151,13 @@ window.Articles = (function () {
   function toggleRadio() { var on = !radioOn(); setRadio(on); if (on && !pl.playing) playFrom(pl.idx >= 0 ? pl.idx : 0); }
   function nextArticle() {
     var all = list(), read = readSet();
-    var i = all.findIndex(function (a) { return a.id === curId; });
+    var i = all.findIndex(function (a) { return a.id === curBase; });
     // 先找後面沒讀過的,沒有就順著往下,再沒有就回到第一篇
     var nx = null;
     for (var k = i + 1; k < all.length; k++) { if (!read[all[k].id]) { nx = all[k]; break; } }
     if (!nx && i + 1 < all.length) nx = all[i + 1];
     if (!nx) nx = all[0];
-    if (!nx || nx.id === curId) { pl.playing = false; pl.idx = -1; setBtn(); setPText(); return; }
+    if (!nx || nx.id === curBase) { pl.playing = false; pl.idx = -1; setBtn(); setPText(); return; }
     read2(nx.id, { autoplay: true });
   }
   // 開啟某篇並自動從第一句播(廣播模式用)
@@ -1248,11 +1287,11 @@ window.Articles = (function () {
     }
     btn.textContent = hidden ? '' + enOr('看完整詳解', 'Full explanation') + ' ▾' : enOr('收合', 'Hide') + ' ▴';
   }
-  function done() { if (curId) markRead(curId); }
+  function done() { if (curBase) markRead(curBase); }
 
   return {
     filter: filter, toggleHideRead: toggleHideRead,
-    open: open, close: close, read: read, tab: tab, entryCardHtml: entryCardHtml,
+    open: open, close: close, read: read, switchLv: switchLv, tab: tab, entryCardHtml: entryCardHtml,
     toggleFuri: toggleFuri, toggleZh: toggleZh, toggleRomaji: toggleRomaji, cycleFs: cycleFs,
     playFrom: playFrom, togglePlay: togglePlay, stepRate: stepRate, say: say, spTap: spTap, togglePos: togglePos,
     toggleRepeat: toggleRepeat, toggleSingle: toggleSingle, toggleRadio: toggleRadio,

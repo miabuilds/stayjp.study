@@ -63,6 +63,13 @@
     ]
   },
   {
+    "text": "「いつから痛いですか」や「アレルギーはありますか」と聞かれます。",
+    "hash": "9849fd354dd6",
+    "sources": [
+      "article#a-n3-8-n4"
+    ]
+  },
+  {
     "text": "「いつとどきますか」ときくと、「一週間ぐらいです」とおしえてくれました。",
     "hash": "76499e70e283",
     "sources": [
@@ -308,6 +315,13 @@
     ]
   },
   {
+    "text": "「駅から徒歩十分以内」という条件を加えると、それに伴って家賃は一気に高くなってしまう。",
+    "hash": "6746e4ad03c5",
+    "sources": [
+      "article#a-n3-9-n2"
+    ]
+  },
+  {
     "text": "「何時に開きますか?誰に聞けばいいですか?」",
     "hash": "3600374c0e6f",
     "sources": [
@@ -322,6 +336,20 @@
     ]
   },
   {
+    "text": "「会議の件」だけでは不十分で、「来週の会議の日程について」のように、具体的に書いたほうが伝わりやすくなります。",
+    "hash": "96d015959c8e",
+    "sources": [
+      "article#a-n3-12-n2"
+    ]
+  },
+  {
+    "text": "「会議の件」ではなく、「来週の会議の日程について」と書くといいです。",
+    "hash": "36efc914fbf6",
+    "sources": [
+      "article#a-n3-12-n4"
+    ]
+  },
+  {
     "text": "「学生ですか。」「はい、そうです。」",
     "hash": "8cd739099ea3",
     "sources": [
@@ -333,6 +361,20 @@
     "hash": "19643db5d821",
     "sources": [
       "article#a-n1-7"
+    ]
+  },
+  {
+    "text": "「黒くて、柄が少し曲がっている傘です」と、できるだけ詳しく話しました。",
+    "hash": "a8f9e0393dc6",
+    "sources": [
+      "article#a-n4-11-n3"
+    ]
+  },
+  {
+    "text": "「黒くて、柄が少し曲がっている傘です」と具体的に伝えました。",
+    "hash": "2fd8e31c9a90",
+    "sources": [
+      "article#a-n4-11-n2"
     ]
   },
   {
@@ -431,6 +473,13 @@
     "hash": "a339f6d46ca4",
     "sources": [
       "grammar-n5#n5-68"
+    ]
+  },
+  {
+    "text": "「特徴を教えてください」と言われたので、まず色と形を伝えることにしました。",
+    "hash": "5683562cd9e8",
+    "sources": [
+      "article#a-n4-11-n2"
     ]
   },
   {
@@ -2950,6 +2999,13 @@
     ]
   },
   {
+    "text": "あたりまえ",
+    "hash": "ccd55069f601",
+    "sources": [
+      "article-vocab#a-n3-1-n2"
+    ]
+  },
+  {
     "text": "あちこち探し回った鍵が、かばんの底から見つかりました。",
     "hash": "966d4fdcdbbf",
     "sources": [
@@ -4906,7 +4962,10 @@
     "text": "あわてる",
     "hash": "9ce96da897b2",
     "sources": [
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n3-8-n2",
+      "article-vocab#a-n4-9-n3",
+      "article-vocab#a-n4-11-n3"
     ]
   },
   {
@@ -5039,7 +5098,9 @@
     "text": "あんしん",
     "hash": "23f85837b56a",
     "sources": [
-      "article-vocab#a-n3-12"
+      "article-vocab#a-n3-12",
+      "article-vocab#a-n2-7-n4",
+      "article-vocab#a-n3-12-n4"
     ]
   },
   {
@@ -5308,6 +5369,13 @@
     "hash": "664a731d120f",
     "sources": [
       "conjunctions"
+    ]
+  },
+  {
+    "text": "いい部屋が見つかっても、すぐには決められない。",
+    "hash": "7c0fe39c0d13",
+    "sources": [
+      "article#a-n3-9-n4"
     ]
   },
   {
@@ -6148,6 +6216,14 @@
     ]
   },
   {
+    "text": "いためる",
+    "hash": "07a287d217a8",
+    "sources": [
+      "article-vocab#a-n4-9-n2",
+      "article-vocab#a-n4-9-n3"
+    ]
+  },
+  {
     "text": "いたる",
     "hash": "7a36664ce9da",
     "sources": [
@@ -6358,6 +6434,13 @@
     ]
   },
   {
+    "text": "いつ、いくら使ったか、記録も残ります。",
+    "hash": "058475afa133",
+    "sources": [
+      "article#a-n2-5-n4"
+    ]
+  },
+  {
     "text": "いつか",
     "hash": "325bbd592cf3",
     "sources": [
@@ -6391,6 +6474,13 @@
     "hash": "25bff7b35e1a",
     "sources": [
       "article#a-n4-9"
+    ]
+  },
+  {
+    "text": "いつから痛いのか、冷たい物がしみるのかといったことを書きました。",
+    "hash": "8759fa8fffaa",
+    "sources": [
+      "article#a-n4-9-n3"
     ]
   },
   {
@@ -6664,6 +6754,13 @@
     ]
   },
   {
+    "text": "いつでも店が開いているということは、夜間も誰かが働き続けなければならないということでもある。",
+    "hash": "c11ebf79aba8",
+    "sources": [
+      "article#a-n3-1-n2"
+    ]
+  },
+  {
     "text": "いつでも連絡してください。",
     "hash": "3afbe1914ddd",
     "sources": [
@@ -6830,6 +6927,13 @@
     ]
   },
   {
+    "text": "いつ起こるか分からない災害だからこそ、日ごろから備えておくことが大切です。",
+    "hash": "91fa3aeaee3d",
+    "sources": [
+      "article#a-n2-7-n3"
+    ]
+  },
+  {
     "text": "いつ起こるか分からない災害に、日ごろから備えておくことがとても大切です。",
     "hash": "0a95909e1600",
     "sources": [
@@ -6841,6 +6945,13 @@
     "hash": "8bdd99293105",
     "sources": [
       "listening-q"
+    ]
+  },
+  {
+    "text": "いつ来るか分からないので、ふだんから準備しておくことが大切です。",
+    "hash": "60dd3fc69078",
+    "sources": [
+      "article#a-n2-7-n4"
     ]
   },
   {
@@ -6876,7 +6987,8 @@
     "text": "いどう",
     "hash": "c5581473e978",
     "sources": [
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n4-8-n3"
     ]
   },
   {
@@ -6996,7 +7108,9 @@
     "hash": "67a2f70abe14",
     "sources": [
       "vocab-n2",
-      "article-vocab#a-n4-2"
+      "article-vocab#a-n4-2",
+      "article-vocab#a-n4-2-n2",
+      "article-vocab#a-n4-2-n3"
     ]
   },
   {
@@ -7257,6 +7371,13 @@
     ]
   },
   {
+    "text": "いりょうきき",
+    "hash": "96119a485afd",
+    "sources": [
+      "article-vocab#a-n4-2-n3"
+    ]
+  },
+  {
     "text": "いる",
     "hash": "c7d693c51cc1",
     "sources": [
@@ -7416,7 +7537,8 @@
     "hash": "89c38111e267",
     "sources": [
       "vocab-n3",
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n3-12-n2"
     ]
   },
   {
@@ -7646,7 +7768,8 @@
     "sources": [
       "vocab-n4",
       "article-vocab#a-n4-12",
-      "article-vocab#eh-n4-1"
+      "article-vocab#eh-n4-1",
+      "article-vocab#a-n4-9-n3"
     ]
   },
   {
@@ -7663,7 +7786,9 @@
       "vocab-n4",
       "vocab-n3",
       "article-vocab#a-n3-8",
-      "article-vocab#a-n4-11"
+      "article-vocab#a-n4-11",
+      "article-vocab#a-n3-8-n4",
+      "article-vocab#a-n4-11-n3"
     ]
   },
   {
@@ -8468,6 +8593,7 @@
     "hash": "a60311a2fc88",
     "sources": [
       "vocab-n4",
+      "article-vocab#a-n4-11-n3",
       "kana"
     ]
   },
@@ -8555,7 +8681,8 @@
     "sources": [
       "vocab-n3",
       "vocab-n2",
-      "article-vocab#a-n4-2"
+      "article-vocab#a-n4-2",
+      "article-vocab#a-n4-2-n3"
     ]
   },
   {
@@ -9005,7 +9132,8 @@
     "sources": [
       "vocab-n3",
       "vocab-n2",
-      "article-vocab#a-n3-16"
+      "article-vocab#a-n3-16",
+      "article-vocab#a-n4-8-n3"
     ]
   },
   {
@@ -9469,6 +9597,13 @@
     ]
   },
   {
+    "text": "おきわすれる",
+    "hash": "257d52179fe8",
+    "sources": [
+      "article-vocab#a-n4-11-n3"
+    ]
+  },
+  {
     "text": "おく",
     "hash": "b3d739ce4803",
     "sources": [
@@ -9577,7 +9712,8 @@
     "hash": "a7f5b2d2f141",
     "sources": [
       "vocab-n3",
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n4-11-n2"
     ]
   },
   {
@@ -9867,7 +10003,8 @@
     "text": "おそれ",
     "hash": "1fceb4517960",
     "sources": [
-      "article-vocab#a-n2-5"
+      "article-vocab#a-n2-5",
+      "article-vocab#a-n4-2-n2"
     ]
   },
   {
@@ -10078,6 +10215,13 @@
     "hash": "e6052775fdac",
     "sources": [
       "listening-q"
+    ]
+  },
+  {
+    "text": "おとしより",
+    "hash": "0ec63abe0eff",
+    "sources": [
+      "article-vocab#a-n2-5-n4"
     ]
   },
   {
@@ -10406,6 +10550,13 @@
     ]
   },
   {
+    "text": "おもいおもい",
+    "hash": "efd4470bfa2f",
+    "sources": [
+      "article-vocab#a-n4-2-n2"
+    ]
+  },
+  {
     "text": "おもいがけない",
     "hash": "c7ed8d044fa3",
     "sources": [
@@ -10469,7 +10620,8 @@
     "text": "おもいやり",
     "hash": "bc94d8cd3cfe",
     "sources": [
-      "article-vocab#a-n4-2"
+      "article-vocab#a-n4-2",
+      "article-vocab#a-n4-2-n3"
     ]
   },
   {
@@ -12220,7 +12372,8 @@
     "text": "かいちゅうでんとう",
     "hash": "0014b3929234",
     "sources": [
-      "article-vocab#a-n2-7"
+      "article-vocab#a-n2-7",
+      "article-vocab#a-n2-7-n3"
     ]
   },
   {
@@ -12249,7 +12402,8 @@
     "hash": "4d221fcdcdef",
     "sources": [
       "vocab-n3",
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n4-2-n3"
     ]
   },
   {
@@ -12572,7 +12726,10 @@
     "sources": [
       "article-vocab#a-n3-1",
       "article-vocab#a-n1-5",
-      "article-vocab#a-n2-6"
+      "article-vocab#a-n2-6",
+      "article-vocab#a-n3-1-n2",
+      "article-vocab#a-n3-12-n2",
+      "article-vocab#a-n4-2-n2"
     ]
   },
   {
@@ -12601,7 +12758,8 @@
     "hash": "3d98db4ac40e",
     "sources": [
       "vocab-n4",
-      "vocab-n3"
+      "vocab-n3",
+      "article-vocab#a-n4-11-n3"
     ]
   },
   {
@@ -12911,7 +13069,10 @@
     "sources": [
       "vocab-n3",
       "vocab-n2",
-      "article-vocab#a-n3-15"
+      "article-vocab#a-n3-15",
+      "article-vocab#a-n3-9-n4",
+      "article-vocab#a-n4-8-n3",
+      "article-vocab#a-n4-11-n3"
     ]
   },
   {
@@ -14063,6 +14224,13 @@
     ]
   },
   {
+    "text": "かにゅう",
+    "hash": "688558c26c75",
+    "sources": [
+      "article-vocab#a-n3-8-n2"
+    ]
+  },
+  {
     "text": "かにゅうする",
     "hash": "69dc9a318593",
     "sources": [
@@ -14727,7 +14895,8 @@
     "hash": "399a098f2ca9",
     "sources": [
       "vocab-n2",
-      "article-vocab#a-n3-12"
+      "article-vocab#a-n3-12",
+      "article-vocab#a-n3-12-n2"
     ]
   },
   {
@@ -14834,6 +15003,13 @@
     "hash": "9ba74641145d",
     "sources": [
       "vocab-n1"
+    ]
+  },
+  {
+    "text": "かんしゃ",
+    "hash": "d1575c806f70",
+    "sources": [
+      "article-vocab#a-n3-12-n4"
     ]
   },
   {
@@ -15158,7 +15334,8 @@
     "text": "かんぶ",
     "hash": "92860c71b70f",
     "sources": [
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n4-9-n2"
     ]
   },
   {
@@ -15215,7 +15392,9 @@
     "hash": "619ae52da6d9",
     "sources": [
       "vocab-n3",
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n2-5-n3",
+      "article-vocab#a-n2-5-n4"
     ]
   },
   {
@@ -15366,7 +15545,9 @@
       "article-vocab#a-n4-6",
       "article-vocab#a-n4-10",
       "article-vocab#a-n5-11",
-      "article-vocab#a-n3-14"
+      "article-vocab#a-n3-14",
+      "article-vocab#a-n2-5-n4",
+      "article-vocab#a-n3-1-n4"
     ]
   },
   {
@@ -15403,7 +15584,8 @@
     "hash": "7a13bda9f63c",
     "sources": [
       "vocab-n4",
-      "article-vocab#a-n4-11"
+      "article-vocab#a-n4-11",
+      "article-vocab#a-n4-11-n3"
     ]
   },
   {
@@ -15534,7 +15716,8 @@
     "text": "きけん",
     "hash": "07f0dc914ce2",
     "sources": [
-      "vocab-n3"
+      "vocab-n3",
+      "article-vocab#a-n2-7-n4"
     ]
   },
   {
@@ -15883,6 +16066,13 @@
     ]
   },
   {
+    "text": "きづかい",
+    "hash": "51a0c9acda56",
+    "sources": [
+      "article-vocab#a-n4-2-n3"
+    ]
+  },
+  {
     "text": "きづかう",
     "hash": "be79dad22dda",
     "sources": [
@@ -16076,6 +16266,14 @@
     "hash": "67c59b3479d6",
     "sources": [
       "vocab-n4"
+    ]
+  },
+  {
+    "text": "きにゅう",
+    "hash": "0b6f36d20cda",
+    "sources": [
+      "article-vocab#a-n4-8-n2",
+      "article-vocab#a-n4-9-n3"
     ]
   },
   {
@@ -16351,7 +16549,8 @@
     "text": "きめる",
     "hash": "d3fcc350a42c",
     "sources": [
-      "vocab-n4"
+      "vocab-n4",
+      "article-vocab#a-n2-7-n4"
     ]
   },
   {
@@ -16404,6 +16603,13 @@
     "hash": "8af746f8d18f",
     "sources": [
       "vocab-n1"
+    ]
+  },
+  {
+    "text": "ぎゃくこうか",
+    "hash": "3fda533839f5",
+    "sources": [
+      "article-vocab#a-n4-9-n2"
     ]
   },
   {
@@ -16492,10 +16698,24 @@
     ]
   },
   {
+    "text": "キャッシュレスは、払うのが早くて、お金の管理も簡単です。",
+    "hash": "3a0c69bafb6f",
+    "sources": [
+      "article#a-n2-5-n4"
+    ]
+  },
+  {
     "text": "キャッシュレス決済には、支払いが早く、お金の管理がしやすいという利点がある。",
     "hash": "f1f17c8e0763",
     "sources": [
       "article#a-n2-5"
+    ]
+  },
+  {
+    "text": "キャッシュレス決済には、支払いが早く、お金の管理がしやすいという良い点がある。",
+    "hash": "b3631d9e1add",
+    "sources": [
+      "article#a-n2-5-n3"
     ]
   },
   {
@@ -16741,7 +16961,8 @@
     "hash": "e265e59bb40e",
     "sources": [
       "vocab-n4",
-      "vocab-n3"
+      "vocab-n3",
+      "article-vocab#a-n2-5-n3"
     ]
   },
   {
@@ -17671,7 +17892,9 @@
     "sources": [
       "vocab-n3",
       "vocab-n2",
-      "article-vocab#a-n2-5"
+      "article-vocab#a-n2-5",
+      "article-vocab#a-n2-5-n3",
+      "article-vocab#a-n2-5-n4"
     ]
   },
   {
@@ -18341,7 +18564,8 @@
     "hash": "cfe8ec6df159",
     "sources": [
       "vocab-n3",
-      "article-vocab#a-n4-14"
+      "article-vocab#a-n4-14",
+      "article-vocab#a-n3-12-n2"
     ]
   },
   {
@@ -18791,7 +19015,8 @@
     "text": "けいい",
     "hash": "57ad3f239c30",
     "sources": [
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n4-11-n2"
     ]
   },
   {
@@ -19130,7 +19355,8 @@
     "hash": "ae1a99664188",
     "sources": [
       "vocab-n3",
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n3-9-n4"
     ]
   },
   {
@@ -19314,7 +19540,8 @@
     "hash": "4483b2d2a03c",
     "sources": [
       "vocab-n3",
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n4-9-n3"
     ]
   },
   {
@@ -19441,7 +19668,8 @@
     "hash": "4cba5085abe2",
     "sources": [
       "vocab-n1",
-      "article-vocab#a-n2-5"
+      "article-vocab#a-n2-5",
+      "article-vocab#a-n2-5-n3"
     ]
   },
   {
@@ -19748,7 +19976,8 @@
     "sources": [
       "vocab-n4",
       "article-vocab#a-n2-5",
-      "article-vocab#a-n4-10"
+      "article-vocab#a-n4-10",
+      "article-vocab#a-n2-5-n4"
     ]
   },
   {
@@ -19979,7 +20208,8 @@
     "text": "けんしん",
     "hash": "747a93a73519",
     "sources": [
-      "article-vocab#a-n4-9"
+      "article-vocab#a-n4-9",
+      "article-vocab#a-n4-9-n3"
     ]
   },
   {
@@ -20218,7 +20448,8 @@
     "text": "けんめい",
     "hash": "6bcd54ba980c",
     "sources": [
-      "article-vocab#a-n3-12"
+      "article-vocab#a-n3-12",
+      "article-vocab#a-n3-12-n4"
     ]
   },
   {
@@ -20583,6 +20814,14 @@
     ]
   },
   {
+    "text": "こうきょうりょうきん",
+    "hash": "af01bebf8b0d",
+    "sources": [
+      "article-vocab#a-n3-1-n2",
+      "article-vocab#a-n3-1-n4"
+    ]
+  },
+  {
     "text": "こうくうびん",
     "hash": "337b7a3e9f3d",
     "sources": [
@@ -20751,6 +20990,13 @@
     ]
   },
   {
+    "text": "こうしたサービスが充実したおかげで、コンビニは私たちの生活に欠かせない存在になった。",
+    "hash": "7c38cb63c813",
+    "sources": [
+      "article#a-n3-1-n2"
+    ]
+  },
+  {
     "text": "こうしたサービスのおかげで、コンビニは私たちの生活にかかせない存在になりました。",
     "hash": "4ddcd96961fb",
     "sources": [
@@ -20765,6 +21011,20 @@
     ]
   },
   {
+    "text": "こうしたマナーの背景には、「周りの人に迷惑をかけない」という日本の考え方があります。",
+    "hash": "391d22a34385",
+    "sources": [
+      "article#a-n4-2-n3"
+    ]
+  },
+  {
+    "text": "こうしたマナーの背景には、「周りの人に迷惑をかけない」という日本人の考え方があります。",
+    "hash": "f8329b7abba5",
+    "sources": [
+      "article#a-n4-2-n2"
+    ]
+  },
+  {
     "text": "こうしたマナーは、たくさんの人が気もちよく電車を使うためのものです。",
     "hash": "c6370c12b070",
     "sources": [
@@ -20772,10 +21032,31 @@
     ]
   },
   {
+    "text": "こうしたマナーは、たくさんの人が気持ちよく電車を利用するためのものです。",
+    "hash": "acd11196074d",
+    "sources": [
+      "article#a-n4-2-n3"
+    ]
+  },
+  {
+    "text": "こうしたマナーは、多くの人が気持ちよく電車を利用するために欠かせないものです。",
+    "hash": "23904313d303",
+    "sources": [
+      "article#a-n4-2-n2"
+    ]
+  },
+  {
     "text": "こうした行事は、季節の変化を感じ、家族や地域の人とのつながりを確かめる機会になっている。",
     "hash": "4296a228644a",
     "sources": [
       "article#a-n3-6"
+    ]
+  },
+  {
+    "text": "こうした手順は、初めて経験する人にとっては面倒に感じられるかもしれない。",
+    "hash": "648f84a7835e",
+    "sources": [
+      "article#a-n3-9-n2"
     ]
   },
   {
@@ -21302,6 +21583,13 @@
     "hash": "c2f2a9e55ada",
     "sources": [
       "vocab-n1"
+    ]
+  },
+  {
+    "text": "こうれいしゃ",
+    "hash": "edd8d06061cc",
+    "sources": [
+      "article-vocab#a-n2-5-n3"
     ]
   },
   {
@@ -21930,7 +22218,8 @@
     "text": "こころがけ",
     "hash": "f32de43608aa",
     "sources": [
-      "article-vocab#a-n2-7"
+      "article-vocab#a-n2-7",
+      "article-vocab#a-n2-7-n3"
     ]
   },
   {
@@ -21938,6 +22227,13 @@
     "hash": "25103eb8e9d0",
     "sources": [
       "article-vocab#a-n3-16"
+    ]
+  },
+  {
+    "text": "こころがける",
+    "hash": "1f2903a11f66",
+    "sources": [
+      "article-vocab#a-n4-11-n2"
     ]
   },
   {
@@ -21967,7 +22263,8 @@
     "hash": "e2768a853128",
     "sources": [
       "vocab-n3",
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n3-8-n2"
     ]
   },
   {
@@ -22017,6 +22314,13 @@
     "hash": "5cf13d3b6e14",
     "sources": [
       "article#a-n2-5"
+    ]
+  },
+  {
+    "text": "ここ数年、日本でもキャッシュレス決済を使う人が急に増えてきた。",
+    "hash": "7b218df57681",
+    "sources": [
+      "article#a-n2-5-n3"
     ]
   },
   {
@@ -22160,7 +22464,9 @@
     "hash": "0689343d5fea",
     "sources": [
       "vocab-n4",
-      "article-vocab#a-n2-5"
+      "article-vocab#a-n2-5",
+      "article-vocab#a-n2-5-n3",
+      "article-vocab#a-n2-5-n4"
     ]
   },
   {
@@ -22502,7 +22808,8 @@
     "hash": "c48376f23eeb",
     "sources": [
       "vocab-n3",
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n4-8-n2"
     ]
   },
   {
@@ -22925,6 +23232,13 @@
     "hash": "2c4b709fe4b4",
     "sources": [
       "jlpt-listening"
+    ]
+  },
+  {
+    "text": "このサービスのおかげで、コンビニは生活に大切な存在になりました。",
+    "hash": "e314b6bace3e",
+    "sources": [
+      "article#a-n3-1-n4"
     ]
   },
   {
@@ -23412,6 +23726,13 @@
     ]
   },
   {
+    "text": "このように、静かな車内は、周りへの気づかいによって作られているのです。",
+    "hash": "abab80a5061c",
+    "sources": [
+      "article#a-n4-2-n3"
+    ]
+  },
+  {
     "text": "このラーメンは美味しいです。",
     "hash": "0c018ac09866",
     "sources": [
@@ -23521,6 +23842,13 @@
     "hash": "1f9b43c92abc",
     "sources": [
       "vocab-n1#断面"
+    ]
+  },
+  {
+    "text": "この一言があるだけで、文章全体が丁寧な印象になり、相手も気持ちよく読み進められます。",
+    "hash": "95587604a2b2",
+    "sources": [
+      "article#a-n3-12-n2"
     ]
   },
   {
@@ -28359,7 +28687,15 @@
     "text": "コピーやチケットの予約ができる機械もあります。",
     "hash": "b172c7d8d016",
     "sources": [
-      "article#a-n3-1"
+      "article#a-n3-1",
+      "article#a-n3-1-n4"
+    ]
+  },
+  {
+    "text": "コピーやチケットの予約ができる機械も置かれており、店の役割は買い物だけにとどまらない。",
+    "hash": "8275a5bd3b4b",
+    "sources": [
+      "article#a-n3-1-n2"
     ]
   },
   {
@@ -28682,6 +29018,27 @@
     ]
   },
   {
+    "text": "これからは、電車を降りるとき忘れ物がないか確認するようにしようと思います。",
+    "hash": "ca59516e87db",
+    "sources": [
+      "article#a-n4-11-n3"
+    ]
+  },
+  {
+    "text": "これからは、電車を降りる際に忘れ物がないかどうかを必ず確認するよう心がけるつもりです。",
+    "hash": "f8864b74c2cd",
+    "sources": [
+      "article#a-n4-11-n2"
+    ]
+  },
+  {
+    "text": "これからは早めに歯医者へ行くことにします。",
+    "hash": "2f1995bb1228",
+    "sources": [
+      "article#a-n4-9-n3"
+    ]
+  },
+  {
     "text": "これからもっと難しくなっていくだろう。",
     "hash": "b58677c0ab26",
     "sources": [
@@ -28829,6 +29186,13 @@
     ]
   },
   {
+    "text": "これは感謝の気持ちを伝える言葉で、社外の人にも社内の人にも使えます。",
+    "hash": "811368470289",
+    "sources": [
+      "article#a-n3-12-n4"
+    ]
+  },
+  {
     "text": "これは個人的な見解にすぎない。",
     "hash": "206182a07d10",
     "sources": [
@@ -28840,6 +29204,13 @@
     "hash": "fb6aff024db1",
     "sources": [
       "vocab-n5#これ"
+    ]
+  },
+  {
+    "text": "これは相手との関係に対する感謝を表す表現で、社外の人にも社内の人にも使うことができます。",
+    "hash": "0952583a8949",
+    "sources": [
+      "article#a-n3-12-n2"
     ]
   },
   {
@@ -29885,7 +30256,8 @@
     "text": "ざいりゅうカード",
     "hash": "c91f9174845f",
     "sources": [
-      "article-vocab#a-n4-8"
+      "article-vocab#a-n4-8",
+      "article-vocab#a-n4-8-n3"
     ]
   },
   {
@@ -30199,7 +30571,8 @@
       "vocab-n3",
       "vocab-n2",
       "article-vocab#a-n3-4",
-      "article-vocab#a-n2-12"
+      "article-vocab#a-n2-12",
+      "article-vocab#a-n3-1-n2"
     ]
   },
   {
@@ -30497,7 +30870,8 @@
     "hash": "597e19a6ad28",
     "sources": [
       "vocab-n5",
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n3-1-n4"
     ]
   },
   {
@@ -30758,6 +31132,13 @@
     "sources": [
       "vocab-n3",
       "vocab-n2"
+    ]
+  },
+  {
+    "text": "さらに、公共料金の支払いや荷物の発送など、生活に欠かせない手続きまで済ませることができる。",
+    "hash": "69e4129b93be",
+    "sources": [
+      "article#a-n3-1-n2"
     ]
   },
   {
@@ -31357,10 +31738,31 @@
     ]
   },
   {
+    "text": "しかし、あらかじめ流れを知っているだけで、準備の負担は大きく変わってくる。",
+    "hash": "688eac678204",
+    "sources": [
+      "article#a-n3-9-n2"
+    ]
+  },
+  {
     "text": "しかし、いずれも一朝一夕に解決できる問題ではない。",
     "hash": "d4d7b9abddbc",
     "sources": [
       "article#a-n1-3"
+    ]
+  },
+  {
+    "text": "しかし、そのぶん一回ずつ丁寧に治療してくれるので、安心できます。",
+    "hash": "19d342f3411a",
+    "sources": [
+      "article#a-n4-9-n3"
+    ]
+  },
+  {
+    "text": "しかし、その便利さの裏には、二十四時間働く人々の苦労や食品ロスといった問題が隠れている。",
+    "hash": "6b8bbfe758ef",
+    "sources": [
+      "article#a-n3-1-n2"
     ]
   },
   {
@@ -31581,7 +31983,8 @@
     "text": "しききん",
     "hash": "4ce4e4315884",
     "sources": [
-      "article-vocab#a-n3-9"
+      "article-vocab#a-n3-9",
+      "article-vocab#a-n3-9-n2"
     ]
   },
   {
@@ -31675,7 +32078,8 @@
     "hash": "6d5c468ac38b",
     "sources": [
       "vocab-n3",
-      "article-vocab#a-n2-10"
+      "article-vocab#a-n2-10",
+      "article-vocab#a-n4-8-n2"
     ]
   },
   {
@@ -31783,6 +32187,13 @@
     "hash": "c4460f161a74",
     "sources": [
       "article#a-n5-1"
+    ]
+  },
+  {
+    "text": "じこふたん",
+    "hash": "7cea2c8375eb",
+    "sources": [
+      "article-vocab#a-n3-8-n2"
     ]
   },
   {
@@ -31929,7 +32340,9 @@
       "vocab-n4",
       "vocab-n3",
       "vocab-n2",
-      "article-vocab#a-n4-4"
+      "article-vocab#a-n4-4",
+      "article-vocab#a-n2-7-n4",
+      "article-vocab#a-n4-8-n3"
     ]
   },
   {
@@ -32041,7 +32454,8 @@
     "text": "しぜんさいがい",
     "hash": "349d6857c45c",
     "sources": [
-      "vocab-n3"
+      "vocab-n3",
+      "article-vocab#a-n2-7-n3"
     ]
   },
   {
@@ -32554,6 +32968,13 @@
     ]
   },
   {
+    "text": "しつれい",
+    "hash": "132538fefa9e",
+    "sources": [
+      "article-vocab#a-n3-12-n4"
+    ]
+  },
+  {
     "text": "じつれい",
     "hash": "af1a28a216e3",
     "sources": [
@@ -32611,7 +33032,8 @@
     "hash": "64d385421238",
     "sources": [
       "vocab-n3",
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n4-9-n2"
     ]
   },
   {
@@ -32778,6 +33200,20 @@
     "hash": "6dec70253c1c",
     "sources": [
       "daily-story#n4_33"
+    ]
+  },
+  {
+    "text": "しばらく待っていると、似たような傘が見つかりそうだという知らせがありました。",
+    "hash": "4797e05cfc5b",
+    "sources": [
+      "article#a-n4-11-n2"
+    ]
+  },
+  {
+    "text": "しばらく待っていると、似ている傘が見つかったようだと教えてもらいました。",
+    "hash": "a0bf78b02008",
+    "sources": [
+      "article#a-n4-11-n3"
     ]
   },
   {
@@ -32993,6 +33429,13 @@
     ]
   },
   {
+    "text": "しめくくる",
+    "hash": "8ab011e320de",
+    "sources": [
+      "article-vocab#a-n3-12-n2"
+    ]
+  },
+  {
     "text": "しめす",
     "hash": "83ad463433f8",
     "sources": [
@@ -33053,7 +33496,15 @@
       "vocab-n5",
       "vocab-n4",
       "vocab-n3",
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n2-5-n4"
+    ]
+  },
+  {
+    "text": "しゃがい",
+    "hash": "f69965cf6ede",
+    "sources": [
+      "article-vocab#a-n3-12-n4"
     ]
   },
   {
@@ -33307,6 +33758,13 @@
     ]
   },
   {
+    "text": "しゅうい",
+    "hash": "c5b84f1f176b",
+    "sources": [
+      "article-vocab#a-n4-2-n2"
+    ]
+  },
+  {
     "text": "じゅういちがつ",
     "hash": "c9f52fe37008",
     "sources": [
@@ -33439,6 +33897,13 @@
     "hash": "a63124f069d4",
     "sources": [
       "vocab-n2"
+    ]
+  },
+  {
+    "text": "じゅうじつ",
+    "hash": "b6bc96c6308b",
+    "sources": [
+      "article-vocab#a-n3-1-n2"
     ]
   },
   {
@@ -33946,7 +34411,8 @@
     "hash": "db70083ce634",
     "sources": [
       "vocab-n3",
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n3-8-n2"
     ]
   },
   {
@@ -34349,7 +34815,9 @@
     "hash": "3cbcddb86b15",
     "sources": [
       "vocab-n4",
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n2-7-n4",
+      "article-vocab#a-n3-9-n4"
     ]
   },
   {
@@ -34389,6 +34857,13 @@
     ]
   },
   {
+    "text": "じゅんをおって",
+    "hash": "3d7b09f029dd",
+    "sources": [
+      "article-vocab#a-n4-11-n2"
+    ]
+  },
+  {
     "text": "しょ",
     "hash": "7a5aea55155b",
     "sources": [
@@ -34422,6 +34897,13 @@
     "hash": "3dc5af1818e1",
     "sources": [
       "vocab-n4"
+    ]
+  },
+  {
+    "text": "しょうがい",
+    "hash": "f023adb040dd",
+    "sources": [
+      "article-vocab#a-n2-5-n3"
     ]
   },
   {
@@ -34615,7 +35097,9 @@
     "sources": [
       "vocab-n3",
       "vocab-n2",
-      "article-vocab#a-n3-8"
+      "article-vocab#a-n3-8",
+      "article-vocab#a-n3-8-n2",
+      "article-vocab#a-n3-8-n4"
     ]
   },
   {
@@ -34949,7 +35433,8 @@
     "text": "しょうめい",
     "hash": "b22580dc65b8",
     "sources": [
-      "vocab-n3"
+      "vocab-n3",
+      "article-vocab#a-n4-8-n2"
     ]
   },
   {
@@ -35157,6 +35642,14 @@
     ]
   },
   {
+    "text": "しょくひんロス",
+    "hash": "f7941215fafe",
+    "sources": [
+      "article-vocab#a-n3-1-n2",
+      "article-vocab#a-n3-1-n4"
+    ]
+  },
+  {
     "text": "しょくぶつ",
     "hash": "f7f8a53bfcdc",
     "sources": [
@@ -35343,7 +35836,8 @@
     "hash": "1a5a3bc266a9",
     "sources": [
       "vocab-n3",
-      "article-vocab#a-n3-8"
+      "article-vocab#a-n3-8",
+      "article-vocab#a-n3-8-n2"
     ]
   },
   {
@@ -35379,7 +35873,9 @@
     "hash": "a2996497f650",
     "sources": [
       "vocab-n3",
-      "article-vocab#a-n4-8"
+      "article-vocab#a-n4-8",
+      "article-vocab#a-n3-9-n4",
+      "article-vocab#a-n4-8-n3"
     ]
   },
   {
@@ -35663,7 +36159,8 @@
     "hash": "6f78fecd5d92",
     "sources": [
       "vocab-n2",
-      "article-vocab#a-n3-9"
+      "article-vocab#a-n3-9",
+      "article-vocab#a-n3-9-n2"
     ]
   },
   {
@@ -35686,7 +36183,8 @@
     "sources": [
       "vocab-n3",
       "vocab-n2",
-      "article-vocab#a-n3-8"
+      "article-vocab#a-n3-8",
+      "article-vocab#a-n3-8-n4"
     ]
   },
   {
@@ -35955,7 +36453,8 @@
     "text": "しんにゅうしゃいん",
     "hash": "2c57e53dc82b",
     "sources": [
-      "article-vocab#a-n3-12"
+      "article-vocab#a-n3-12",
+      "article-vocab#a-n3-12-n4"
     ]
   },
   {
@@ -36580,6 +37079,13 @@
     ]
   },
   {
+    "text": "すぐに受け取ることができて、本当にほっとしました。",
+    "hash": "08be5647364e",
+    "sources": [
+      "article#a-n4-11-n3"
+    ]
+  },
+  {
     "text": "すぐに受け取れて、本当にほっとしました。",
     "hash": "ce9bd2f0dd62",
     "sources": [
@@ -36594,10 +37100,31 @@
     ]
   },
   {
+    "text": "すぐに答えが出せない場合でも、「確認して後日ご連絡します」と一言送っておけば、相手は安心できるでしょう。",
+    "hash": "d12869655b49",
+    "sources": [
+      "article#a-n3-12-n2"
+    ]
+  },
+  {
+    "text": "すぐに答えられないときも、「確認してあとで連絡します」と送ると安心です。",
+    "hash": "abe31c7d6fb0",
+    "sources": [
+      "article#a-n3-12-n4"
+    ]
+  },
+  {
     "text": "すぐ行きますから、待ってください。",
     "hash": "f2b056b81cfb",
     "sources": [
       "vocab-n5#すぐ"
+    ]
+  },
+  {
+    "text": "すぐ持って出られる所に置いておきましょう。",
+    "hash": "a9b906237591",
+    "sources": [
+      "article#a-n2-7-n4"
     ]
   },
   {
@@ -37358,12 +37885,26 @@
     ]
   },
   {
+    "text": "すると「傘の特徴を教えていただけますか」と聞かれたので、色と形を伝えました。",
+    "hash": "41bb5dbc8115",
+    "sources": [
+      "article#a-n4-11-n3"
+    ]
+  },
+  {
     "text": "するどい",
     "hash": "afa6284a9732",
     "sources": [
       "vocab-n4",
       "vocab-n3",
       "vocab-n2"
+    ]
+  },
+  {
+    "text": "すると係の人は「少し待ってください、探してみます」と言って、すぐに探しに行ってくれました。",
+    "hash": "27acb12573a8",
+    "sources": [
+      "article#a-n4-11-n2"
     ]
   },
   {
@@ -38393,6 +38934,13 @@
     ]
   },
   {
+    "text": "せっち",
+    "hash": "400374c5d314",
+    "sources": [
+      "article-vocab#a-n3-1-n2"
+    ]
+  },
+  {
     "text": "せっちゅうてき",
     "hash": "9b49126f0fa5",
     "sources": [
@@ -39185,7 +39733,8 @@
     "text": "そうおん",
     "hash": "94a53ded2a2c",
     "sources": [
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n3-9-n2"
     ]
   },
   {
@@ -39286,7 +39835,8 @@
     "hash": "3966bed49087",
     "sources": [
       "vocab-n2",
-      "vocab-n1"
+      "vocab-n1",
+      "article-vocab#a-n2-5-n3"
     ]
   },
   {
@@ -39351,6 +39901,13 @@
     "hash": "bb9d7432d5aa",
     "sources": [
       "vocab-n1"
+    ]
+  },
+  {
+    "text": "そうすれば、みんなが快適に過ごせる空間が保たれるのです。",
+    "hash": "2c2b42721ef6",
+    "sources": [
+      "article#a-n4-2-n2"
     ]
   },
   {
@@ -39455,7 +40012,8 @@
       "vocab-n4",
       "vocab-n3",
       "article-vocab#a-n3-8",
-      "article-vocab#a-n3-11"
+      "article-vocab#a-n3-11",
+      "article-vocab#a-n4-11-n3"
     ]
   },
   {
@@ -40006,7 +40564,8 @@
     "hash": "46d30d3f9f47",
     "sources": [
       "vocab-n3",
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n2-7-n3"
     ]
   },
   {
@@ -40100,10 +40659,31 @@
     ]
   },
   {
+    "text": "そのため、こうした人たちへの配慮も忘れてはいけない。",
+    "hash": "c67a39a15f36",
+    "sources": [
+      "article#a-n2-5-n3"
+    ]
+  },
+  {
     "text": "そのため、計画表を作りました。そのうえ、宿題もあります。",
     "hash": "99bfb23a9713",
     "sources": [
       "daily-story#n4_36"
+    ]
+  },
+  {
+    "text": "そのため、次に引っ越すときには、今回よりもずっと楽に部屋探しを進められるはずだ。",
+    "hash": "e075874da217",
+    "sources": [
+      "article#a-n3-9-n2"
+    ]
+  },
+  {
+    "text": "そのため、新入社員は先輩の書き方をよく見て、少しずつ身につけていくのが一般的です。",
+    "hash": "acbdab388847",
+    "sources": [
+      "article#a-n3-12-n2"
     ]
   },
   {
@@ -40451,6 +41031,13 @@
     ]
   },
   {
+    "text": "その紙を持って薬局へ行き、薬を受け取ります。",
+    "hash": "23f8a6d07d2c",
+    "sources": [
+      "article#a-n3-8-n4"
+    ]
+  },
+  {
     "text": "その試験は難しかろうが、準備を重ねれば突破できるはずだ。",
     "hash": "533b78e59874",
     "sources": [
@@ -40581,6 +41168,13 @@
     "hash": "de039c978ac6",
     "sources": [
       "vocab-n2#宣伝"
+    ]
+  },
+  {
+    "text": "その場ですぐに傘を受け取ることができ、心の底からほっとしました。",
+    "hash": "126590e03ceb",
+    "sources": [
+      "article#a-n4-11-n2"
     ]
   },
   {
@@ -40986,6 +41580,13 @@
     ]
   },
   {
+    "text": "それでも日本語だけで手続きができたため、少し自信がつきました。",
+    "hash": "0351c1b1d4ba",
+    "sources": [
+      "article#a-n4-8-n3"
+    ]
+  },
+  {
     "text": "それとも",
     "hash": "b0982dfd2971",
     "sources": [
@@ -41030,6 +41631,20 @@
     "hash": "da4faa182409",
     "sources": [
       "article#a-n3-1"
+    ]
+  },
+  {
+    "text": "それに、公共料金をはらったり、荷物を送ったりもできます。",
+    "hash": "32f5e687de9b",
+    "sources": [
+      "article#a-n3-1-n4"
+    ]
+  },
+  {
+    "text": "それに、日本語だけで手続きを終えられたことで、今後も生活していけるという自信が少しついてきました。",
+    "hash": "e49262925b56",
+    "sources": [
+      "article#a-n4-8-n2"
     ]
   },
   {
@@ -41118,6 +41733,13 @@
     "hash": "5b3ed9036b69",
     "sources": [
       "vocab-n2"
+    ]
+  },
+  {
+    "text": "それらはすぐに持ち出せる場所に置いておくようにしましょう。",
+    "hash": "0818f3848745",
+    "sources": [
+      "article#a-n2-7-n3"
     ]
   },
   {
@@ -41748,7 +42370,8 @@
     "text": "たいしょ",
     "hash": "2b1dde8ade09",
     "sources": [
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n3-8-n2"
     ]
   },
   {
@@ -41839,7 +42462,10 @@
       "vocab-n4",
       "vocab-n3",
       "vocab-n2",
-      "article-vocab#eh-n4-3"
+      "article-vocab#eh-n4-3",
+      "article-vocab#a-n2-7-n4",
+      "article-vocab#a-n3-1-n4",
+      "article-vocab#a-n3-12-n4"
     ]
   },
   {
@@ -41914,6 +42540,13 @@
     "hash": "aa69aefacc25",
     "sources": [
       "vocab-n1"
+    ]
+  },
+  {
+    "text": "たいちょうをくずす",
+    "hash": "19ca88f0bd36",
+    "sources": [
+      "article-vocab#a-n3-8-n2"
     ]
   },
   {
@@ -41999,7 +42632,8 @@
     "hash": "e0c90900fc75",
     "sources": [
       "vocab-n4",
-      "vocab-n3"
+      "vocab-n3",
+      "article-vocab#a-n2-7-n4"
     ]
   },
   {
@@ -42608,6 +43242,13 @@
     "hash": "18d64af588f5",
     "sources": [
       "article#a-n4-10"
+    ]
+  },
+  {
+    "text": "ただ、窓口が違うため、一階から二階へ移動しなければなりませんでした。",
+    "hash": "8c34bdba86e5",
+    "sources": [
+      "article#a-n4-8-n3"
     ]
   },
   {
@@ -43492,6 +44133,13 @@
     ]
   },
   {
+    "text": "ためらう",
+    "hash": "7dfe02165532",
+    "sources": [
+      "article-vocab#a-n4-8-n2"
+    ]
+  },
+  {
     "text": "ためる",
     "hash": "fb5cc59643f7",
     "sources": [
@@ -43815,7 +44463,8 @@
     "hash": "c86caa4dc1b9",
     "sources": [
       "vocab-n3",
-      "article-vocab#a-n4-15"
+      "article-vocab#a-n4-15",
+      "article-vocab#a-n4-8-n2"
     ]
   },
   {
@@ -44452,7 +45101,8 @@
     "text": "ちゅうかいてすうりょう",
     "hash": "664591c33744",
     "sources": [
-      "article-vocab#a-n3-9"
+      "article-vocab#a-n3-9",
+      "article-vocab#a-n3-9-n2"
     ]
   },
   {
@@ -45270,7 +45920,8 @@
     "text": "つういん",
     "hash": "2a5494830fdc",
     "sources": [
-      "vocab-n3"
+      "vocab-n3",
+      "article-vocab#a-n4-9-n2"
     ]
   },
   {
@@ -45285,6 +45936,14 @@
     "hash": "a9ff5fa7ed80",
     "sources": [
       "vocab-n3"
+    ]
+  },
+  {
+    "text": "つうかん",
+    "hash": "ec97876e14bd",
+    "sources": [
+      "article-vocab#a-n4-9-n2",
+      "article-vocab#a-n4-11-n2"
     ]
   },
   {
@@ -45597,7 +46256,9 @@
     "text": "つごう",
     "hash": "f5a6ca0abe70",
     "sources": [
-      "vocab-n3"
+      "vocab-n3",
+      "article-vocab#a-n3-12-n2",
+      "article-vocab#a-n3-12-n4"
     ]
   },
   {
@@ -45605,7 +46266,8 @@
     "hash": "91b7dd7c067a",
     "sources": [
       "vocab-n4",
-      "vocab-n3"
+      "vocab-n3",
+      "article-vocab#a-n3-8-n4"
     ]
   },
   {
@@ -46062,6 +46724,13 @@
     ]
   },
   {
+    "text": "ていじ",
+    "hash": "4dd8f0619e70",
+    "sources": [
+      "article-vocab#a-n4-9-n2"
+    ]
+  },
+  {
     "text": "ていじゅうする",
     "hash": "de9d5fcb4b9a",
     "sources": [
@@ -46152,7 +46821,9 @@
     "text": "ていでん",
     "hash": "323e91322872",
     "sources": [
-      "article-vocab#a-n2-5"
+      "article-vocab#a-n2-5",
+      "article-vocab#a-n2-5-n3",
+      "article-vocab#a-n2-5-n4"
     ]
   },
   {
@@ -46178,7 +46849,8 @@
       "vocab-n4",
       "vocab-n3",
       "article-vocab#a-n3-12",
-      "article-vocab#a-n3-15"
+      "article-vocab#a-n3-15",
+      "article-vocab#a-n4-9-n3"
     ]
   },
   {
@@ -46378,6 +47050,13 @@
     "sources": [
       "vocab-n3",
       "vocab-n2"
+    ]
+  },
+  {
+    "text": "てがるさ",
+    "hash": "95905e1be3f6",
+    "sources": [
+      "article-vocab#a-n3-1-n2"
     ]
   },
   {
@@ -46697,7 +47376,9 @@
       "vocab-n3",
       "vocab-n2",
       "article-vocab#a-n4-8",
-      "article-vocab#a-n3-15"
+      "article-vocab#a-n3-15",
+      "article-vocab#a-n3-1-n2",
+      "article-vocab#a-n4-8-n3"
     ]
   },
   {
@@ -46888,7 +47569,8 @@
     "text": "てま",
     "hash": "e5b83516e6d6",
     "sources": [
-      "vocab-n3"
+      "vocab-n3",
+      "article-vocab#a-n3-9-n4"
     ]
   },
   {
@@ -46920,6 +47602,13 @@
     ]
   },
   {
+    "text": "でも、べんりさのうらには、問題もあります。",
+    "hash": "e5ac916798dc",
+    "sources": [
+      "article#a-n3-1-n4"
+    ]
+  },
+  {
     "text": "でも、ボタンがたくさんあって、どれを押せばいいかわかりません。",
     "hash": "6f78bb978c61",
     "sources": [
@@ -46931,6 +47620,13 @@
     "hash": "164921ce6da4",
     "sources": [
       "daily-story#n4_32"
+    ]
+  },
+  {
+    "text": "でも、まだ問題になることもあります。",
+    "hash": "8c9842bf652a",
+    "sources": [
+      "article#a-n2-5-n4"
     ]
   },
   {
@@ -46973,6 +47669,13 @@
     "hash": "14737270d71c",
     "sources": [
       "article-vocab#a-n2-11"
+    ]
+  },
+  {
+    "text": "てもと",
+    "hash": "9cccca36381f",
+    "sources": [
+      "article-vocab#a-n4-11-n2"
     ]
   },
   {
@@ -47225,6 +47928,14 @@
     ]
   },
   {
+    "text": "でんげん",
+    "hash": "f49b37e09802",
+    "sources": [
+      "article-vocab#a-n4-2-n2",
+      "article-vocab#a-n4-2-n3"
+    ]
+  },
+  {
     "text": "てんこう",
     "hash": "5a9b2e2ce944",
     "sources": [
@@ -47414,7 +48125,8 @@
     "text": "てんにゅうとどけ",
     "hash": "2b7173123c65",
     "sources": [
-      "article-vocab#a-n4-8"
+      "article-vocab#a-n4-8",
+      "article-vocab#a-n4-8-n3"
     ]
   },
   {
@@ -47847,6 +48559,20 @@
     ]
   },
   {
+    "text": "どうしても話したいときは、いったん電車を降りてからかけざるを得ません。",
+    "hash": "1512495aa1a7",
+    "sources": [
+      "article#a-n4-2-n2"
+    ]
+  },
+  {
+    "text": "どうしても話したいときは、駅で電車を降りてからかけるのが普通です。",
+    "hash": "47653f90056c",
+    "sources": [
+      "article#a-n4-2-n3"
+    ]
+  },
+  {
     "text": "どうして泣いているんですか。",
     "hash": "d6439ac5658e",
     "sources": [
@@ -47879,6 +48605,13 @@
     "hash": "f52cc0c92de6",
     "sources": [
       "vocab-n1"
+    ]
+  },
+  {
+    "text": "どうしようかと迷いましたが、駅の忘れ物センターへ行って相談することにしました。",
+    "hash": "cfb090a9e928",
+    "sources": [
+      "article#a-n4-11-n3"
     ]
   },
   {
@@ -48029,7 +48762,8 @@
     "hash": "fcbbd4cf8cec",
     "sources": [
       "vocab-n4",
-      "vocab-n3"
+      "vocab-n3",
+      "article-vocab#a-n4-11-n2"
     ]
   },
   {
@@ -48523,7 +49257,8 @@
       "vocab-n3",
       "vocab-n2",
       "article-vocab#a-n2-2",
-      "article-vocab#a-n4-11"
+      "article-vocab#a-n4-11",
+      "article-vocab#a-n4-11-n3"
     ]
   },
   {
@@ -48660,6 +49395,13 @@
     "hash": "9851798d4fab",
     "sources": [
       "grammar-n4#n4-67"
+    ]
+  },
+  {
+    "text": "どこで集まるかを決めておけば、あわてずに行動することができます。",
+    "hash": "7b9453279b48",
+    "sources": [
+      "article#a-n2-7-n3"
     ]
   },
   {
@@ -49007,7 +49749,8 @@
     "hash": "b3ccf9177e0c",
     "sources": [
       "vocab-n4",
-      "vocab-n3"
+      "vocab-n3",
+      "article-vocab#a-n4-8-n2"
     ]
   },
   {
@@ -49194,6 +49937,13 @@
     ]
   },
   {
+    "text": "とはいえ、件名は長ければ長いほどよいとは限らず、短くまとめる工夫も必要です。",
+    "hash": "7ae7a106ee23",
+    "sources": [
+      "article#a-n3-12-n2"
+    ]
+  },
+  {
     "text": "とはいえ、断れるかどうかは店の方針次第であり、最近はお通しを出さない店も増えつつある。",
     "hash": "c540c863349c",
     "sources": [
@@ -49254,6 +50004,13 @@
     "hash": "2c146f8eb29f",
     "sources": [
       "vocab-n1"
+    ]
+  },
+  {
+    "text": "とほうにくれる",
+    "hash": "aee16f06eabc",
+    "sources": [
+      "article-vocab#a-n4-11-n2"
     ]
   },
   {
@@ -50254,6 +51011,13 @@
     ]
   },
   {
+    "text": "ないか",
+    "hash": "8834872006a4",
+    "sources": [
+      "article-vocab#a-n3-8-n4"
+    ]
+  },
+  {
     "text": "ないかく",
     "hash": "ecab394d0fdb",
     "sources": [
@@ -50271,7 +51035,8 @@
     "text": "ないけん",
     "hash": "69247896996a",
     "sources": [
-      "article-vocab#a-n3-9"
+      "article-vocab#a-n3-9",
+      "article-vocab#a-n3-9-n2"
     ]
   },
   {
@@ -51371,6 +52136,13 @@
     ]
   },
   {
+    "text": "にちようひん",
+    "hash": "701a2ce08fc1",
+    "sources": [
+      "article-vocab#a-n3-1-n4"
+    ]
+  },
+  {
     "text": "にっき",
     "hash": "a0f3d8b3b731",
     "sources": [
@@ -51390,7 +52162,8 @@
     "hash": "148dfdeb537f",
     "sources": [
       "vocab-n3",
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n3-12-n4"
     ]
   },
   {
@@ -51494,7 +52267,8 @@
     "sources": [
       "vocab-n5",
       "vocab-n4",
-      "article-vocab#a-n5-7"
+      "article-vocab#a-n5-7",
+      "article-vocab#a-n3-1-n4"
     ]
   },
   {
@@ -51976,7 +52750,8 @@
     "hash": "05dc55d6558c",
     "sources": [
       "vocab-n4",
-      "article-vocab#eh-n4-1"
+      "article-vocab#eh-n4-1",
+      "article-vocab#a-n3-8-n4"
     ]
   },
   {
@@ -52726,7 +53501,9 @@
     "hash": "661e3df073f2",
     "sources": [
       "vocab-n3",
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n4-2-n2",
+      "article-vocab#a-n4-2-n3"
     ]
   },
   {
@@ -52969,7 +53746,8 @@
     "sources": [
       "article-vocab#a-n2-5",
       "article-vocab#a-n1-9",
-      "article-vocab#a-n2-13"
+      "article-vocab#a-n2-13",
+      "article-vocab#a-n2-5-n3"
     ]
   },
   {
@@ -53241,6 +54019,13 @@
     "hash": "9685eada1060",
     "sources": [
       "vocab-n1"
+    ]
+  },
+  {
+    "text": "はぐれる",
+    "hash": "f42762f9c766",
+    "sources": [
+      "article-vocab#a-n2-7-n3"
     ]
   },
   {
@@ -53906,7 +54691,8 @@
     "hash": "0b25c90ec021",
     "sources": [
       "vocab-n2",
-      "article-vocab#a-n3-1"
+      "article-vocab#a-n3-1",
+      "article-vocab#a-n3-1-n2"
     ]
   },
   {
@@ -54073,7 +54859,8 @@
     "text": "はなしあう",
     "hash": "18f686410a9c",
     "sources": [
-      "vocab-n4"
+      "vocab-n4",
+      "article-vocab#a-n2-7-n4"
     ]
   },
   {
@@ -54290,7 +55077,8 @@
     "hash": "30a0f08a89c3",
     "sources": [
       "vocab-n3",
-      "article-vocab#a-n5-4"
+      "article-vocab#a-n5-4",
+      "article-vocab#a-n2-5-n4"
     ]
   },
   {
@@ -54462,7 +55250,9 @@
     "text": "ばんごうふだ",
     "hash": "264c485580cf",
     "sources": [
-      "article-vocab#a-n4-8"
+      "article-vocab#a-n4-8",
+      "article-vocab#a-n4-8-n2",
+      "article-vocab#a-n4-8-n3"
     ]
   },
   {
@@ -54771,7 +55561,8 @@
     "text": "ひあたり",
     "hash": "fadaed3fd0b7",
     "sources": [
-      "article-vocab#a-n3-9"
+      "article-vocab#a-n3-9",
+      "article-vocab#a-n3-9-n2"
     ]
   },
   {
@@ -54824,7 +55615,8 @@
       "vocab-n3",
       "vocab-n2",
       "article-vocab#a-n1-1",
-      "article-vocab#a-n2-7"
+      "article-vocab#a-n2-7",
+      "article-vocab#a-n2-7-n3"
     ]
   },
   {
@@ -55023,6 +55815,13 @@
     "hash": "8c269940ee96",
     "sources": [
       "vocab-n2"
+    ]
+  },
+  {
+    "text": "ひごろ",
+    "hash": "2c3e868e09de",
+    "sources": [
+      "article-vocab#a-n2-7-n3"
     ]
   },
   {
@@ -55380,6 +56179,13 @@
     ]
   },
   {
+    "text": "ひとしお",
+    "hash": "fd40d5b7aec7",
+    "sources": [
+      "article-vocab#a-n4-11-n2"
+    ]
+  },
+  {
     "text": "ひとつ",
     "hash": "b9a975d70cb6",
     "sources": [
@@ -55455,7 +56261,9 @@
     "text": "ひなんじょ",
     "hash": "92f06ebbdf49",
     "sources": [
-      "article-vocab#a-n2-7"
+      "article-vocab#a-n2-7",
+      "article-vocab#a-n2-7-n3",
+      "article-vocab#a-n2-7-n4"
     ]
   },
   {
@@ -56159,7 +56967,8 @@
     "sources": [
       "vocab-n3",
       "vocab-n2",
-      "article-vocab#a-n3-8"
+      "article-vocab#a-n3-8",
+      "article-vocab#a-n3-8-n4"
     ]
   },
   {
@@ -56280,7 +57089,8 @@
     "hash": "b7f49d6fba60",
     "sources": [
       "vocab-n4",
-      "vocab-n3"
+      "vocab-n3",
+      "article-vocab#a-n2-5-n4"
     ]
   },
   {
@@ -56855,6 +57665,20 @@
     ]
   },
   {
+    "text": "ふだんのちょっとした心がけによって、いざというときに自分や家族を守ることができるのです。",
+    "hash": "0e39817b5a8b",
+    "sources": [
+      "article#a-n2-7-n3"
+    ]
+  },
+  {
+    "text": "ふだんの小さな心がけが、自分や家族を守ってくれます。",
+    "hash": "2105aeb14e76",
+    "sources": [
+      "article#a-n2-7-n4"
+    ]
+  },
+  {
     "text": "ふちょう",
     "hash": "bd432c6b0c6c",
     "sources": [
@@ -57050,7 +57874,9 @@
     "text": "ふどうさんや",
     "hash": "f97db8117ef8",
     "sources": [
-      "article-vocab#a-n3-9"
+      "article-vocab#a-n3-9",
+      "article-vocab#a-n3-9-n2",
+      "article-vocab#a-n3-9-n4"
     ]
   },
   {
@@ -57931,6 +58757,20 @@
     ]
   },
   {
+    "text": "ペースメーカーなどの医療機器に影響を与えるおそれがあるからです。",
+    "hash": "429b53e81be1",
+    "sources": [
+      "article#a-n4-2-n2"
+    ]
+  },
+  {
+    "text": "ペースメーカーなどの医療機器に影響を与えるかもしれないからです。",
+    "hash": "77723bc1ea37",
+    "sources": [
+      "article#a-n4-2-n3"
+    ]
+  },
+  {
     "text": "へきち",
     "hash": "74d844a40dc1",
     "sources": [
@@ -58054,7 +58894,8 @@
     "text": "へや",
     "hash": "3cf1c4713c0d",
     "sources": [
-      "vocab-n5"
+      "vocab-n5",
+      "article-vocab#a-n3-9-n4"
     ]
   },
   {
@@ -58231,7 +59072,8 @@
     "sources": [
       "vocab-n4",
       "vocab-n3",
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n3-12-n4"
     ]
   },
   {
@@ -58259,7 +59101,8 @@
     "text": "へんしん",
     "hash": "8d298362c744",
     "sources": [
-      "article-vocab#a-n3-12"
+      "article-vocab#a-n3-12",
+      "article-vocab#a-n3-12-n2"
     ]
   },
   {
@@ -58363,7 +59206,15 @@
       "article-vocab#a-n3-1",
       "article-vocab#a-n5-4",
       "article-vocab#a-n5-10",
-      "article-vocab#a-n5-11"
+      "article-vocab#a-n5-11",
+      "article-vocab#a-n3-1-n4"
+    ]
+  },
+  {
+    "text": "べんりさを当たり前だと思わないで、はたらく人のことも考えたいです。",
+    "hash": "a385a7215323",
+    "sources": [
+      "article#a-n3-1-n4"
     ]
   },
   {
@@ -58737,6 +59588,13 @@
     ]
   },
   {
+    "text": "ほうっておく",
+    "hash": "2ad9241c8355",
+    "sources": [
+      "article-vocab#a-n4-9-n2"
+    ]
+  },
+  {
     "text": "ほうてい",
     "hash": "ab102d5d2bcf",
     "sources": [
@@ -58985,7 +59843,9 @@
     "sources": [
       "article-vocab#a-n3-8",
       "article-vocab#a-n4-9",
-      "article-vocab#eh-n4-1"
+      "article-vocab#eh-n4-1",
+      "article-vocab#a-n3-8-n4",
+      "article-vocab#a-n4-9-n2"
     ]
   },
   {
@@ -59101,7 +59961,9 @@
     "text": "ほしょうにん",
     "hash": "90aae07504fe",
     "sources": [
-      "article-vocab#a-n3-9"
+      "article-vocab#a-n3-9",
+      "article-vocab#a-n3-9-n2",
+      "article-vocab#a-n3-9-n4"
     ]
   },
   {
@@ -59685,7 +60547,8 @@
       "vocab-n5",
       "vocab-n3",
       "article-vocab#a-n4-3",
-      "article-vocab#a-n4-11"
+      "article-vocab#a-n4-11",
+      "article-vocab#a-n4-11-n3"
     ]
   },
   {
@@ -59700,7 +60563,8 @@
     "text": "まぎれもなく",
     "hash": "9ec1feac4883",
     "sources": [
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n4-11-n2"
     ]
   },
   {
@@ -59887,6 +60751,20 @@
     ]
   },
   {
+    "text": "まず、家でできることから始めましょう。",
+    "hash": "2bb5f97a5a63",
+    "sources": [
+      "article#a-n2-7-n4"
+    ]
+  },
+  {
+    "text": "まず、家庭でできることから始めてみましょう。",
+    "hash": "acbe7d46f68c",
+    "sources": [
+      "article#a-n2-7-n3"
+    ]
+  },
+  {
     "text": "まず、家庭でできることから始めましょう。",
     "hash": "d5ac2814f405",
     "sources": [
@@ -59898,6 +60776,13 @@
     "hash": "d98c01c64d09",
     "sources": [
       "article#a-n3-12"
+    ]
+  },
+  {
+    "text": "まず、件名は一目で内容がわかるように、短く書くことが大切です。",
+    "hash": "94c932ac688b",
+    "sources": [
+      "article#a-n3-12-n4"
     ]
   },
   {
@@ -59968,6 +60853,13 @@
     ]
   },
   {
+    "text": "まず件名は、一目で内容がわかるように簡潔に書くことが大切です。",
+    "hash": "e9c717591ba3",
+    "sources": [
+      "article#a-n3-12-n2"
+    ]
+  },
+  {
     "text": "まず手を洗ってください。",
     "hash": "cd37dea9e32b",
     "sources": [
@@ -59979,6 +60871,20 @@
     "hash": "a41f0a5cda88",
     "sources": [
       "article#a-n3-9"
+    ]
+  },
+  {
+    "text": "まず不動産屋に行って、家賃の予算と希望の場所を話す。",
+    "hash": "c665411613b5",
+    "sources": [
+      "article#a-n3-9-n4"
+    ]
+  },
+  {
+    "text": "まず不動産屋を訪ねて、家賃の予算と希望する地域を担当者に伝えるところから手続きが始まる。",
+    "hash": "334196099914",
+    "sources": [
+      "article#a-n3-9-n2"
     ]
   },
   {
@@ -60012,6 +60918,20 @@
     ]
   },
   {
+    "text": "また、いつ、いくら使ったかが記録として残るので、後で確認しやすい。",
+    "hash": "b41f1a9a82b6",
+    "sources": [
+      "article#a-n2-5-n3"
+    ]
+  },
+  {
+    "text": "また、メールを受け取ったら、できるだけ早く返信することも重要なマナーの一つです。",
+    "hash": "2d944cc4f5b3",
+    "sources": [
+      "article#a-n3-12-n2"
+    ]
+  },
+  {
     "text": "また、メールを受け取ったら、できるだけ早く返信することも大切なマナーの一つです。",
     "hash": "8ef76625365f",
     "sources": [
@@ -60029,7 +60949,8 @@
     "text": "また、住んでいる地域の危険な場所を知っておくことも役に立ちます。",
     "hash": "ffe57ce4138c",
     "sources": [
-      "article#a-n2-7"
+      "article#a-n2-7",
+      "article#a-n2-7-n3"
     ]
   },
   {
@@ -60040,10 +60961,24 @@
     ]
   },
   {
+    "text": "また、優先席の近くでは、携帯電話の電源を切るようにお願いされる場合もあります。",
+    "hash": "453a5df993f8",
+    "sources": [
+      "article#a-n4-2-n3"
+    ]
+  },
+  {
     "text": "また、優先席の近くでは、携帯電話の電源を切るように言われることもあります。",
     "hash": "c38afe54e052",
     "sources": [
       "article#a-n4-2"
+    ]
+  },
+  {
+    "text": "また、優先席の近くでは、携帯電話の電源を切るよう求められる場合もあります。",
+    "hash": "833a293540c4",
+    "sources": [
+      "article#a-n4-2-n2"
     ]
   },
   {
@@ -60250,7 +61185,9 @@
     "hash": "f9b6eb58970d",
     "sources": [
       "vocab-n2",
-      "article-vocab#a-n5-7"
+      "article-vocab#a-n5-7",
+      "article-vocab#a-n4-8-n2",
+      "article-vocab#a-n4-8-n3"
     ]
   },
   {
@@ -60578,7 +61515,8 @@
     "sources": [
       "vocab-n3",
       "vocab-n2",
-      "article-vocab#a-n3-12"
+      "article-vocab#a-n3-12",
+      "article-vocab#a-n3-12-n2"
     ]
   },
   {
@@ -60979,6 +61917,13 @@
       "vocab-n3",
       "vocab-n2",
       "article-vocab#a-n3-3"
+    ]
+  },
+  {
+    "text": "みなされる",
+    "hash": "25bd58cbfa2e",
+    "sources": [
+      "article-vocab#a-n4-2-n2"
     ]
   },
   {
@@ -61546,7 +62491,8 @@
     "text": "むしば",
     "hash": "d85cd9ae389a",
     "sources": [
-      "article-vocab#a-n4-9"
+      "article-vocab#a-n4-9",
+      "article-vocab#a-n4-9-n3"
     ]
   },
   {
@@ -61888,6 +62834,13 @@
     ]
   },
   {
+    "text": "めいぶんか",
+    "hash": "8dc8b83e1ab8",
+    "sources": [
+      "article-vocab#a-n4-2-n2"
+    ]
+  },
+  {
     "text": "めいもく",
     "hash": "f1afb43b86ec",
     "sources": [
@@ -61941,7 +62894,9 @@
     "text": "めいわく",
     "hash": "df3d5ea61887",
     "sources": [
-      "vocab-n3"
+      "vocab-n3",
+      "article-vocab#a-n4-2-n2",
+      "article-vocab#a-n4-2-n3"
     ]
   },
   {
@@ -61980,6 +62935,20 @@
     ]
   },
   {
+    "text": "メールの最後は、「よろしくお願いいたします」で終わる人が多いです。",
+    "hash": "91a51e50dd69",
+    "sources": [
+      "article#a-n3-12-n4"
+    ]
+  },
+  {
+    "text": "メールの初めには、「お世話になっております」という言葉をよく使います。",
+    "hash": "e63cadec444d",
+    "sources": [
+      "article#a-n3-12-n4"
+    ]
+  },
+  {
     "text": "メールの書き出しには、「お世話になっております」という言葉がよく使われます。",
     "hash": "8280eb104d3e",
     "sources": [
@@ -61994,6 +62963,13 @@
     ]
   },
   {
+    "text": "メールは、相手が都合のいい時間に読めるので便利です。",
+    "hash": "2e51773bc6fc",
+    "sources": [
+      "article#a-n3-12-n4"
+    ]
+  },
+  {
     "text": "メールは電話と違って、相手の都合のよい時間に読んでもらえるという利点があります。",
     "hash": "d85d1bc2dc52",
     "sources": [
@@ -62001,10 +62977,24 @@
     ]
   },
   {
+    "text": "メールは電話と違って、相手の都合のよい時間に読んでもらえる反面、書き方次第では失礼な印象を与えかねません。",
+    "hash": "b587b06c3074",
+    "sources": [
+      "article#a-n3-12-n2"
+    ]
+  },
+  {
     "text": "メールは届いたはずです。",
     "hash": "7bff1d0144b7",
     "sources": [
       "confusables-eg"
+    ]
+  },
+  {
+    "text": "メールをもらったら、できるだけ早く返事をするのも大切なマナーです。",
+    "hash": "9145e9cbcfe5",
+    "sources": [
+      "article#a-n3-12-n4"
     ]
   },
   {
@@ -62869,6 +63859,13 @@
     ]
   },
   {
+    "text": "もちだす",
+    "hash": "3a83bc1bae1a",
+    "sources": [
+      "article-vocab#a-n2-7-n3"
+    ]
+  },
+  {
     "text": "もちだせる",
     "hash": "d416f6b90fcc",
     "sources": [
@@ -63025,6 +64022,13 @@
     "sources": [
       "vocab-n3",
       "vocab-n2"
+    ]
+  },
+  {
+    "text": "もとめられる",
+    "hash": "b52a5f803d66",
+    "sources": [
+      "article-vocab#a-n3-12-n2"
     ]
   },
   {
@@ -63247,7 +64251,10 @@
     "hash": "c3c4b8911b74",
     "sources": [
       "article-vocab#a-n4-9",
-      "article-vocab#eh-n4-1"
+      "article-vocab#eh-n4-1",
+      "article-vocab#a-n3-8-n2",
+      "article-vocab#a-n4-9-n2",
+      "article-vocab#a-n4-9-n3"
     ]
   },
   {
@@ -63256,7 +64263,8 @@
     "sources": [
       "vocab-n5",
       "vocab-n3",
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n3-1-n4"
     ]
   },
   {
@@ -63461,7 +64469,9 @@
     "sources": [
       "vocab-n3",
       "article-vocab#a-n2-8",
-      "article-vocab#a-n3-9"
+      "article-vocab#a-n3-9",
+      "article-vocab#a-n3-9-n2",
+      "article-vocab#a-n3-9-n4"
     ]
   },
   {
@@ -63484,7 +64494,8 @@
     "hash": "92a3ac94cc37",
     "sources": [
       "vocab-n3",
-      "article-vocab#a-n3-8"
+      "article-vocab#a-n3-8",
+      "article-vocab#a-n3-8-n4"
     ]
   },
   {
@@ -63937,7 +64948,8 @@
     "text": "ゆうせんせき",
     "hash": "b539d8e8de82",
     "sources": [
-      "article-vocab#a-n4-2"
+      "article-vocab#a-n4-2",
+      "article-vocab#a-n4-2-n3"
     ]
   },
   {
@@ -64349,7 +65361,9 @@
     "text": "ようい",
     "hash": "4c6ff1f5fd80",
     "sources": [
-      "vocab-n1"
+      "vocab-n1",
+      "article-vocab#a-n2-7-n3",
+      "article-vocab#a-n2-7-n4"
     ]
   },
   {
@@ -64431,6 +65445,13 @@
     "sources": [
       "vocab-n3",
       "vocab-n2"
+    ]
+  },
+  {
+    "text": "ようけん",
+    "hash": "207eab05d895",
+    "sources": [
+      "article-vocab#a-n3-12-n2"
     ]
   },
   {
@@ -64705,7 +65726,8 @@
     "hash": "286492670363",
     "sources": [
       "vocab-n3",
-      "vocab-n2"
+      "vocab-n2",
+      "article-vocab#a-n3-9-n4"
     ]
   },
   {
@@ -64944,7 +65966,9 @@
     "hash": "ec696f59ddd9",
     "sources": [
       "vocab-n4",
-      "article-vocab#a-n4-9"
+      "article-vocab#a-n4-9",
+      "article-vocab#a-n3-1-n4",
+      "article-vocab#a-n4-9-n3"
     ]
   },
   {
@@ -65561,7 +66585,8 @@
     "text": "りめん",
     "hash": "ff1a66932d91",
     "sources": [
-      "vocab-n1"
+      "vocab-n1",
+      "article-vocab#a-n4-8-n2"
     ]
   },
   {
@@ -65737,6 +66762,13 @@
     "hash": "4aceee15865c",
     "sources": [
       "vocab-n2"
+    ]
+  },
+  {
+    "text": "りょうきん",
+    "hash": "bf763a499a10",
+    "sources": [
+      "article-vocab#a-n3-8-n4"
     ]
   },
   {
@@ -66025,6 +67057,13 @@
     ]
   },
   {
+    "text": "ルールだからというより、お互いへの思いやりから守られているのです。",
+    "hash": "b637e8850cd3",
+    "sources": [
+      "article#a-n4-2-n3"
+    ]
+  },
+  {
     "text": "ルールというより、おたがいへの思いやりなのです。",
     "hash": "422e9c6d3f59",
     "sources": [
@@ -66099,7 +67138,8 @@
     "text": "れいきん",
     "hash": "866fc097b033",
     "sources": [
-      "article-vocab#a-n3-9"
+      "article-vocab#a-n3-9",
+      "article-vocab#a-n3-9-n2"
     ]
   },
   {
@@ -66212,6 +67252,20 @@
     "hash": "f67d51ef0789",
     "sources": [
       "vocab-n2#伝票"
+    ]
+  },
+  {
+    "text": "レジで小銭を探さなくてもいいからです。",
+    "hash": "e96332f3813e",
+    "sources": [
+      "article#a-n2-5-n4"
+    ]
+  },
+  {
+    "text": "レジで小銭を探す必要がないため、買い物の時間が短くなる。",
+    "hash": "3af3a001e507",
+    "sources": [
+      "article#a-n2-5-n3"
     ]
   },
   {
@@ -67907,6 +68961,13 @@
     ]
   },
   {
+    "text": "以前は現金だけの店が多かったが、今はスマートフォンやカードで払える店が増えている。",
+    "hash": "a52657db0ed5",
+    "sources": [
+      "article#a-n2-5-n3"
+    ]
+  },
+  {
     "text": "以前は紙に書かれた番号に電話をするのが普通だったが、今はスマホで簡単に申し込める。",
     "hash": "f7966158ed38",
     "sources": [
@@ -67960,6 +69021,13 @@
     "hash": "3bc5c222e8ba",
     "sources": [
       "vocab-n2#譲る"
+    ]
+  },
+  {
+    "text": "意思を伝える手段は、話すことだけとは限らない。",
+    "hash": "7339463cf83d",
+    "sources": [
+      "article#a-n3-8-n2"
     ]
   },
   {
@@ -68278,6 +69346,13 @@
     ]
   },
   {
+    "text": "一つずつ確認しながら進めれば、必要な手続きは落ち着いて終えられるはずです。",
+    "hash": "a681686ad235",
+    "sources": [
+      "article#a-n4-8-n2"
+    ]
+  },
+  {
     "text": "一つの銀行の破綻が引き金となって、瞬く間に金融恐慌が世界中に波及した。",
     "hash": "2f624c280f3c",
     "sources": [
@@ -68359,6 +69434,13 @@
     "hash": "b267b7d54e93",
     "sources": [
       "vocab-n1#器量"
+    ]
+  },
+  {
+    "text": "一時はあきらめかけていただけに、安心感はひとしおでした。",
+    "hash": "7b6e1aec59a7",
+    "sources": [
+      "article#a-n4-11-n2"
     ]
   },
   {
@@ -68887,6 +69969,13 @@
     ]
   },
   {
+    "text": "一番気になっていた料金も、予想していたよりずっと安く済んだ。",
+    "hash": "84b4b9eda144",
+    "sources": [
+      "article#a-n3-8-n2"
+    ]
+  },
+  {
     "text": "一番早いのでお願いします。",
     "hash": "c5c2de988649",
     "sources": [
@@ -68968,6 +70057,13 @@
     "hash": "c143ff0dcb5c",
     "sources": [
       "daily-story#n4_36"
+    ]
+  },
+  {
+    "text": "一方で、まだ解決しなければならない問題もある。",
+    "hash": "dd60f83fa6bf",
+    "sources": [
+      "article#a-n2-5-n3"
     ]
   },
   {
@@ -69262,6 +70358,13 @@
     "hash": "46fd68c5e9af",
     "sources": [
       "article#a-n4-8"
+    ]
+  },
+  {
+    "text": "引っ越しをしたら、十四日以内に区役所へ行って、住所を変える手続きをしなければなりません。",
+    "hash": "6384c32fd6cd",
+    "sources": [
+      "article#a-n4-8-n3"
     ]
   },
   {
@@ -69944,6 +71047,13 @@
     ]
   },
   {
+    "text": "駅から歩いて十分以内にすると、家賃はずいぶん高くなる。",
+    "hash": "f2dc59007e7c",
+    "sources": [
+      "article#a-n3-9-n4"
+    ]
+  },
+  {
     "text": "駅から歩いて十分程のところに新しいカフェができた。",
     "hash": "698498bab816",
     "sources": [
@@ -70608,6 +71718,20 @@
     "hash": "92303ddd7d37",
     "sources": [
       "article#a-n4-11"
+    ]
+  },
+  {
+    "text": "奥から傘を持ってきてもらって確認したところ、それはまぎれもなく私の傘でした。",
+    "hash": "c3252a928f42",
+    "sources": [
+      "article#a-n4-11-n2"
+    ]
+  },
+  {
+    "text": "奥から持ってきてもらった傘を見ると、それは確かに私の傘でした。",
+    "hash": "4dd16ce64f91",
+    "sources": [
+      "article#a-n4-11-n3"
     ]
   },
   {
@@ -72102,10 +73226,18 @@
     ]
   },
   {
+    "text": "家族と話し合って、はぐれたときに集まる場所を決めておきましょう。",
+    "hash": "87fddf95808d",
+    "sources": [
+      "article#a-n2-7-n4"
+    ]
+  },
+  {
     "text": "家族と話し合っておくことも忘れてはいけません。",
     "hash": "c8745c724365",
     "sources": [
-      "article#a-n2-7"
+      "article#a-n2-7",
+      "article#a-n2-7-n3"
     ]
   },
   {
@@ -73985,6 +75117,13 @@
     ]
   },
   {
+    "text": "外国人の場合、契約にあたって保証人を求められることが少なくない。",
+    "hash": "dfe590d92463",
+    "sources": [
+      "article#a-n3-9-n2"
+    ]
+  },
+  {
     "text": "外国人の場合、保証人を求められることが多い。",
     "hash": "39ef59cb51a0",
     "sources": [
@@ -73996,6 +75135,20 @@
     "hash": "ec6f1252a357",
     "sources": [
       "vocab-n3#茶道"
+    ]
+  },
+  {
+    "text": "外国人の利用者に対しても、係の人はゆっくり丁寧に話してくれるので、聞き返すことをためらう必要はありません。",
+    "hash": "ae7571a05f1c",
+    "sources": [
+      "article#a-n4-8-n2"
+    ]
+  },
+  {
+    "text": "外国人は保証人が必要だと言われることが多い。",
+    "hash": "341997b4fec0",
+    "sources": [
+      "article#a-n3-9-n4"
     ]
   },
   {
@@ -74864,6 +76017,13 @@
     "hash": "794049bc6bb1",
     "sources": [
       "vocab-n3#辛い"
+    ]
+  },
+  {
+    "text": "慣れない土地で体調を崩すと、病気そのもの以上に心細さが大きくなりがちだ。",
+    "hash": "9c36d959e2f3",
+    "sources": [
+      "article#a-n3-8-n2"
     ]
   },
   {
@@ -75793,6 +76953,13 @@
     ]
   },
   {
+    "text": "気がついたときには、電車はすでに次の駅に到着しており、傘はもう手元にありませんでした。",
+    "hash": "631f8513c95c",
+    "sources": [
+      "article#a-n4-11-n2"
+    ]
+  },
+  {
     "text": "気がついたら、もう電車は次の駅に着いていました。",
     "hash": "3b9e75ca1337",
     "sources": [
@@ -75825,6 +76992,13 @@
     "hash": "20e82639ea63",
     "sources": [
       "article#a-n2-11"
+    ]
+  },
+  {
+    "text": "気に入った部屋が見つかったとしても、その場ですぐに契約を決めるわけにはいかない。",
+    "hash": "cd44b377a3b5",
+    "sources": [
+      "article#a-n3-9-n2"
     ]
   },
   {
@@ -78019,10 +79193,18 @@
     ]
   },
   {
+    "text": "銀行のATMが設置されているので、必要なときにはいつでもお金をおろすことが可能だ。",
+    "hash": "1f973ea5bfa4",
+    "sources": [
+      "article#a-n3-1-n2"
+    ]
+  },
+  {
     "text": "銀行のATMもあるので、いつでもお金をおろせます。",
     "hash": "2e497f54d3d6",
     "sources": [
-      "article#a-n3-1"
+      "article#a-n3-1",
+      "article#a-n3-1-n4"
     ]
   },
   {
@@ -78367,6 +79549,27 @@
     "hash": "7edf73ab57bc",
     "sources": [
       "article#a-n4-11"
+    ]
+  },
+  {
+    "text": "係の人に、電車の中で傘をなくしてしまったことを説明しました。",
+    "hash": "546bf27a0ff3",
+    "sources": [
+      "article#a-n4-11-n3"
+    ]
+  },
+  {
+    "text": "係の人は、こちらが分かるようにゆっくり話してくれるからです。",
+    "hash": "aa36c907b299",
+    "sources": [
+      "article#a-n4-8-n3"
+    ]
+  },
+  {
+    "text": "係の人は「少しお待ちください、探してみます」と言って、奥へ探しに行ってくれました。",
+    "hash": "b10552a48804",
+    "sources": [
+      "article#a-n4-11-n3"
     ]
   },
   {
@@ -79560,6 +80763,20 @@
     ]
   },
   {
+    "text": "件名がわかりにくいと、忙しい相手はメールを読まないかもしれません。",
+    "hash": "7652612743d4",
+    "sources": [
+      "article#a-n3-12-n4"
+    ]
+  },
+  {
+    "text": "件名が分かりにくいと、相手が忙しいときにメールを見落とされてしまうおそれがあります。",
+    "hash": "50a163959036",
+    "sources": [
+      "article#a-n3-12-n2"
+    ]
+  },
+  {
     "text": "件名が分かりにくいと、相手が忙しいときにメールを見落としてしまうかもしれません。",
     "hash": "9c0ecc4b19c9",
     "sources": [
@@ -80156,6 +81373,13 @@
     ]
   },
   {
+    "text": "原因がわかってほっとしたものの、一度では治療が終わらないと聞いて、少し残念な気持ちになりました。",
+    "hash": "10805880916c",
+    "sources": [
+      "article#a-n4-9-n2"
+    ]
+  },
+  {
     "text": "原因が分かるまで、徹底的に調べさせていただきます。",
     "hash": "397aa4afcc06",
     "sources": [
@@ -80465,6 +81689,20 @@
     ]
   },
   {
+    "text": "現金とキャッシュレスの両方がうまく使われる社会が求められている。",
+    "hash": "2a4c849b760c",
+    "sources": [
+      "article#a-n2-5-n3"
+    ]
+  },
+  {
+    "text": "現金とキャッシュレスを両方使える社会が大切です。",
+    "hash": "0f709c44b533",
+    "sources": [
+      "article#a-n2-5-n4"
+    ]
+  },
+  {
     "text": "現金の場合は、お金を入れるところに入れます。",
     "hash": "d7b3965f9ee3",
     "sources": [
@@ -80710,6 +81948,13 @@
     ]
   },
   {
+    "text": "言葉が心配な人は、症状を紙に書いて見せるといいです。",
+    "hash": "04714a0fab3c",
+    "sources": [
+      "article#a-n3-8-n4"
+    ]
+  },
+  {
     "text": "言葉が足りなかったせいで、彼女に誤解されてしまったようです。",
     "hash": "ab37f0117990",
     "sources": [
@@ -80728,6 +81973,13 @@
     "hash": "4d9d4ab51b0f",
     "sources": [
       "vocab-n3#図"
+    ]
+  },
+  {
+    "text": "言葉に自信がない人は、症状を紙に書いて医師に見せるとよい。",
+    "hash": "c2090e3479bf",
+    "sources": [
+      "article#a-n3-8-n2"
     ]
   },
   {
@@ -82775,6 +84027,13 @@
     ]
   },
   {
+    "text": "今では、コンビニのない暮らしを想像することさえ難しいと感じる人も少なくないだろう。",
+    "hash": "f29e36209d44",
+    "sources": [
+      "article#a-n3-1-n2"
+    ]
+  },
+  {
     "text": "今でも、古いお寺や神社がたくさん残っています。",
     "hash": "038b7bb82682",
     "sources": [
@@ -82803,6 +84062,13 @@
     ]
   },
   {
+    "text": "今はスマートフォンやカードで払える店が増えています。",
+    "hash": "ff257d50e74f",
+    "sources": [
+      "article#a-n2-5-n4"
+    ]
+  },
+  {
     "text": "今は寒い冬。朝は暖かいお茶、夜は冷たい牛乳。",
     "hash": "e767d723806e",
     "sources": [
@@ -82814,6 +84080,13 @@
     "hash": "a73a69be1bd2",
     "sources": [
       "vocab-n3#時期"
+    ]
+  },
+  {
+    "text": "今は保証会社を使う人が多く、家賃の半分ぐらいを払って契約する。",
+    "hash": "23bdc69865f4",
+    "sources": [
+      "article#a-n3-9-n4"
     ]
   },
   {
@@ -82940,6 +84213,20 @@
     "hash": "79919f1f51bd",
     "sources": [
       "article#a-n3-16"
+    ]
+  },
+  {
+    "text": "今回の経験から、痛くなってから慌てて駆け込むのではなく、症状が出る前に行動すべきだと痛感しました。",
+    "hash": "c645b474a429",
+    "sources": [
+      "article#a-n4-9-n2"
+    ]
+  },
+  {
+    "text": "今回の経験を通じて、忘れ物は気をつけていても起こり得ることだと痛感しました。",
+    "hash": "88acc22da215",
+    "sources": [
+      "article#a-n4-11-n2"
     ]
   },
   {
@@ -83433,6 +84720,13 @@
     ]
   },
   {
+    "text": "今日、うっかり電車の中に傘を置き忘れてしまうという失敗をしてしまいました。",
+    "hash": "ee1b073b8662",
+    "sources": [
+      "article#a-n4-11-n2"
+    ]
+  },
+  {
     "text": "今日、たぬたろうは初めてそこに入りました。",
     "hash": "9f00aad76949",
     "sources": [
@@ -83440,10 +84734,24 @@
     ]
   },
   {
+    "text": "今日、電車の中に傘を置き忘れてしまい、とても慌ててしまいました。",
+    "hash": "1ffe1985d41b",
+    "sources": [
+      "article#a-n4-11-n3"
+    ]
+  },
+  {
     "text": "今日、電車の中に傘を忘れてしまいました。",
     "hash": "31d5604570e3",
     "sources": [
       "article#a-n4-11"
+    ]
+  },
+  {
+    "text": "今日のところは患部を削って薬を入れるだけにとどめ、来週もう一度来院するよう指示されました。",
+    "hash": "e2b512e52d1d",
+    "sources": [
+      "article#a-n4-9-n2"
     ]
   },
   {
@@ -83739,6 +85047,13 @@
     "hash": "59c30e078108",
     "sources": [
       "vocab-n4#まるで"
+    ]
+  },
+  {
+    "text": "今日は虫歯を削って薬を入れるだけで、来週もう一度来るように言われました。",
+    "hash": "889f42e7c37b",
+    "sources": [
+      "article#a-n4-9-n3"
     ]
   },
   {
@@ -84576,6 +85891,13 @@
     ]
   },
   {
+    "text": "最近、日本でもキャッシュレスで払う人が急に増えました。",
+    "hash": "085557e6aeb2",
+    "sources": [
+      "article#a-n2-5-n4"
+    ]
+  },
+  {
     "text": "最近、日本のドラマに夢中になっていて、新鮮な気持ちで有名な歌も歌ったりします。",
     "hash": "138466adb756",
     "sources": [
@@ -84835,6 +86157,13 @@
     ]
   },
   {
+    "text": "最近は保証人の代わりに保証会社を利用するのが一般的になっており、家賃の半分ほどを払って契約する。",
+    "hash": "7babeb6a41b6",
+    "sources": [
+      "article#a-n3-9-n2"
+    ]
+  },
+  {
     "text": "最近運動していないので、体重が増えてしまいました。",
     "hash": "4330c7d178c7",
     "sources": [
@@ -84916,6 +86245,13 @@
     "hash": "c598a3c76d67",
     "sources": [
       "daily-story#n4_27"
+    ]
+  },
+  {
+    "text": "最後は「よろしくお願いいたします」という言葉で締めくくる人が多いです。",
+    "hash": "6f5005c3f754",
+    "sources": [
+      "article#a-n3-12-n2"
     ]
   },
   {
@@ -85028,6 +86364,13 @@
     "hash": "508977595ca2",
     "sources": [
       "daily-story#n4_6"
+    ]
+  },
+  {
+    "text": "最初は手順が多く感じられるかもしれないが、一度経験すれば難しくはない。",
+    "hash": "43028464ace9",
+    "sources": [
+      "article#a-n3-8-n2"
     ]
   },
   {
@@ -85241,6 +86584,13 @@
     ]
   },
   {
+    "text": "災害そのものを防ぐことはできなくても、被害を減らすことはできます。",
+    "hash": "dd6f3cac0bc6",
+    "sources": [
+      "article#a-n2-7-n3"
+    ]
+  },
+  {
     "text": "災害に備え、各家庭では一週間分の水や食料を備蓄することが推奨されている。",
     "hash": "4807e97356b2",
     "sources": [
@@ -85262,6 +86612,13 @@
     ]
   },
   {
+    "text": "災害のときに家族がはぐれてしまうこともあるからです。",
+    "hash": "cb48960a0987",
+    "sources": [
+      "article#a-n2-7-n3"
+    ]
+  },
+  {
     "text": "災害の映像を見るたびに、自分の無力さを感じさせられる。",
     "hash": "e9cf60e22241",
     "sources": [
@@ -85280,6 +86637,13 @@
     "hash": "3822f88477be",
     "sources": [
       "article#a-n2-7"
+    ]
+  },
+  {
+    "text": "災害は防げなくても、被害を少なくすることはできます。",
+    "hash": "a425d5593d46",
+    "sources": [
+      "article#a-n2-7-n4"
     ]
   },
   {
@@ -85462,6 +86826,13 @@
     "hash": "77345e586b11",
     "sources": [
       "speak-test"
+    ]
+  },
+  {
+    "text": "在留カードは身分を証明する大切なものなので、新しい住所が正しく記載されていることが重要です。",
+    "hash": "c76eff7901ca",
+    "sources": [
+      "article#a-n4-8-n2"
     ]
   },
   {
@@ -86043,6 +87414,20 @@
     "hash": "19239d93532c",
     "sources": [
       "article#a-n4-9"
+    ]
+  },
+  {
+    "text": "三日前から歯が痛み始めたので、家の近くの歯医者に予約を入れました。",
+    "hash": "8e35b8a56808",
+    "sources": [
+      "article#a-n4-9-n3"
+    ]
+  },
+  {
+    "text": "三日前から歯が痛み始めたものの、放っておくわけにもいかず、近所の歯医者に予約を入れました。",
+    "hash": "4f14fc1491db",
+    "sources": [
+      "article#a-n4-9-n2"
     ]
   },
   {
@@ -86753,10 +88138,24 @@
     ]
   },
   {
+    "text": "使いすぎてしまう人もいるし、機械の操作が苦手な高齢者もいる。",
+    "hash": "34a4e4aca25b",
+    "sources": [
+      "article#a-n2-5-n3"
+    ]
+  },
+  {
     "text": "使いすぎてしまう人や、機械の操作が苦手な高齢者への配慮も欠かせない。",
     "hash": "a6e00f406348",
     "sources": [
       "article#a-n2-5"
+    ]
+  },
+  {
+    "text": "使いすぎる人や、機械が苦手なお年寄りのことも考えなければなりません。",
+    "hash": "475803194615",
+    "sources": [
+      "article#a-n2-5-n4"
     ]
   },
   {
@@ -87547,7 +88946,15 @@
     "text": "市役所などが配る地図を見て、避難所までの道を確認しておきましょう。",
     "hash": "f8bbf0b8f12d",
     "sources": [
-      "article#a-n2-7"
+      "article#a-n2-7",
+      "article#a-n2-7-n3"
+    ]
+  },
+  {
+    "text": "市役所の地図を見て、避難所までの道を確認しておきましょう。",
+    "hash": "124c3037d36b",
+    "sources": [
+      "article#a-n2-7-n4"
     ]
   },
   {
@@ -87740,6 +89147,13 @@
     ]
   },
   {
+    "text": "私が窓口で「転入届を出したいのですが」と言うと、番号札を渡されました。",
+    "hash": "52895fc1fa11",
+    "sources": [
+      "article#a-n4-8-n3"
+    ]
+  },
+  {
     "text": "私だけが心配しているように見えるかもしれない。しかし、合格するためには努力しなければならない。",
     "hash": "10d3097228aa",
     "sources": [
@@ -87772,6 +89186,13 @@
     "hash": "a5151a9ea080",
     "sources": [
       "vocab-n1#遺志"
+    ]
+  },
+  {
+    "text": "私たちは便利さを当たり前のものと考えがちだが、それは多くの人の努力があって初めて成り立っている。",
+    "hash": "71f9d87c7441",
+    "sources": [
+      "article#a-n3-1-n2"
     ]
   },
   {
@@ -88094,6 +89515,13 @@
     "hash": "80e6c082b0bd",
     "sources": [
       "vocab-n3#苦手"
+    ]
+  },
+  {
+    "text": "私は窓口で「転入届を出したいのですが」と伝え、番号札を受け取りました。",
+    "hash": "bfeca95befdd",
+    "sources": [
+      "article#a-n4-8-n2"
     ]
   },
   {
@@ -89518,6 +90946,20 @@
     ]
   },
   {
+    "text": "治療が終わったあと、歯みがきの仕方についても教えてもらいました。",
+    "hash": "e6bc977bda72",
+    "sources": [
+      "article#a-n4-9-n3"
+    ]
+  },
+  {
+    "text": "治療が終わると、歯みがきの仕方についても指導を受けました。",
+    "hash": "68a5303af1e3",
+    "sources": [
+      "article#a-n4-9-n2"
+    ]
+  },
+  {
     "text": "治療のあと、歯みがきの仕方も教えてもらいました。",
     "hash": "8896dc457d22",
     "sources": [
@@ -89651,6 +91093,13 @@
     ]
   },
   {
+    "text": "自分のことだけでなく、周りの人のことも考えて行動すれば、みんなが快適に過ごせるでしょう。",
+    "hash": "e5dbfe04b1c0",
+    "sources": [
+      "article#a-n4-2-n3"
+    ]
+  },
+  {
     "text": "自分のミスをきちんと反省して、同じ失敗を繰り返さないようにした。",
     "hash": "c86c0b73149c",
     "sources": [
@@ -89700,6 +91149,13 @@
     ]
   },
   {
+    "text": "自分の行動が周囲にどう影響するかを想像することが、この考え方の出発点です。",
+    "hash": "555e29d80b4c",
+    "sources": [
+      "article#a-n4-2-n2"
+    ]
+  },
+  {
     "text": "自分の国では、自分で判断して進めることが評価される場合もあるからです。",
     "hash": "cca0effa1bdc",
     "sources": [
@@ -89725,6 +91181,13 @@
     "hash": "f8536b8c46f9",
     "sources": [
       "vocab-n2#正義"
+    ]
+  },
+  {
+    "text": "自分の都合だけを優先するのではなく、周りの人のことも考えて行動することが大切です。",
+    "hash": "9b685ffb6e3a",
+    "sources": [
+      "article#a-n4-2-n2"
     ]
   },
   {
@@ -90197,10 +91660,24 @@
     ]
   },
   {
+    "text": "写真ではわからないので、日当たりや音を実際に見て確認するといい。",
+    "hash": "1b79495e6858",
+    "sources": [
+      "article#a-n3-9-n4"
+    ]
+  },
+  {
     "text": "写真ではわからない部分こそ、実際に見る意味がある。",
     "hash": "c59935896fea",
     "sources": [
       "article#a-n3-9"
+    ]
+  },
+  {
+    "text": "写真ではわからない部分こそ、実際に足を運んで見る意味があるといえる。",
+    "hash": "8b0d5873ffd5",
+    "sources": [
+      "article#a-n3-9-n2"
     ]
   },
   {
@@ -91485,6 +92962,13 @@
     ]
   },
   {
+    "text": "手続きの種類によって窓口が分かれているのは、慣れないうちは少し面倒に感じられるかもしれません。",
+    "hash": "54a3623178fe",
+    "sources": [
+      "article#a-n4-8-n2"
+    ]
+  },
+  {
     "text": "手段が目的にすり替わってしまっては、本末転倒だ。",
     "hash": "d930c0475069",
     "sources": [
@@ -91611,10 +93095,24 @@
     ]
   },
   {
+    "text": "受付で保険証を出すと、問診票に記入するように言われました。",
+    "hash": "2277fcac1d72",
+    "sources": [
+      "article#a-n4-9-n3"
+    ]
+  },
+  {
     "text": "受付で保険証を出すと、問診票を書くように言われました。",
     "hash": "473a377e1478",
     "sources": [
       "article#a-n4-9"
+    ]
+  },
+  {
+    "text": "受付で保険証を提示すると、まず問診票に記入するよう求められました。",
+    "hash": "c9f7b901ab38",
+    "sources": [
+      "article#a-n4-9-n2"
     ]
   },
   {
@@ -91875,6 +93373,13 @@
     "hash": "798df4005afd",
     "sources": [
       "vocab-n1#泰然"
+    ]
+  },
+  {
+    "text": "周囲に気を配りながら、それぞれが自分の時間を静かに楽しんでいるわけです。",
+    "hash": "3120db7c09f8",
+    "sources": [
+      "article#a-n4-2-n2"
     ]
   },
   {
@@ -92246,6 +93751,13 @@
     "hash": "02d431c54368",
     "sources": [
       "article#a-n1-9"
+    ]
+  },
+  {
+    "text": "住んでいる町の危険な場所を知っておくことも大切です。",
+    "hash": "50a22a0eb394",
+    "sources": [
+      "article#a-n2-7-n4"
     ]
   },
   {
@@ -93104,6 +94616,20 @@
     ]
   },
   {
+    "text": "順番が来て窓口へ行くと、係の人は在留カードを確認し、その裏面に新しい住所を書き込んでくれました。",
+    "hash": "e53c8f1c268d",
+    "sources": [
+      "article#a-n4-8-n2"
+    ]
+  },
+  {
+    "text": "順番が来ると、係の人は私の在留カードを確認してから、裏に新しい住所を書いてくれました。",
+    "hash": "44c9a14230e8",
+    "sources": [
+      "article#a-n4-8-n3"
+    ]
+  },
+  {
     "text": "順番を抜かした男を、後ろの人が黙って睨んでいた。",
     "hash": "823ec3a6b461",
     "sources": [
@@ -93213,6 +94739,13 @@
     "hash": "724c77b41c39",
     "sources": [
       "article#a-n3-12"
+    ]
+  },
+  {
+    "text": "初めて連絡する相手には、「はじめてご連絡いたします」のような表現を使う場合もあります。",
+    "hash": "c92a5603ed02",
+    "sources": [
+      "article#a-n3-12-n2"
     ]
   },
   {
@@ -93482,10 +95015,24 @@
     ]
   },
   {
+    "text": "書き出しには、「お世話になっております」という挨拶がよく使われます。",
+    "hash": "56a6b6583193",
+    "sources": [
+      "article#a-n3-12-n2"
+    ]
+  },
+  {
     "text": "書き方を間違えると失礼な印象を与えてしまうこともあるので、新入社員は先輩からよく学びます。",
     "hash": "1ee4e467f9fb",
     "sources": [
       "article#a-n3-12"
+    ]
+  },
+  {
+    "text": "書き方を間違えると失礼に思われるので、新入社員は先輩から学びます。",
+    "hash": "35c52e657f91",
+    "sources": [
+      "article#a-n3-12-n4"
     ]
   },
   {
@@ -93965,6 +95512,13 @@
     ]
   },
   {
+    "text": "小さな習慣ではありますが、それを怠らないことが、同じ失敗を防ぐ一番の方法だと思います。",
+    "hash": "9bb555ef9c98",
+    "sources": [
+      "article#a-n4-11-n2"
+    ]
+  },
+  {
     "text": "小口現金の管理を任された以上、出納帳への記入は一円たりともおろそかにできない。",
     "hash": "e2c8170bd3be",
     "sources": [
@@ -94046,6 +95600,13 @@
     "hash": "8f053e271a7e",
     "sources": [
       "vocab-n3#休憩する"
+    ]
+  },
+  {
+    "text": "少なくとも半年に一度は検診を受けるようにするのが、痛い思いをしないための最善策だと思います。",
+    "hash": "c905f6600d24",
+    "sources": [
+      "article#a-n4-9-n2"
     ]
   },
   {
@@ -94896,6 +96457,13 @@
     ]
   },
   {
+    "text": "乗客の多くは、本を読んだりスマホを見たり、目を閉じて休んだりして、思い思いに過ごしています。",
+    "hash": "61853d94c7ce",
+    "sources": [
+      "article#a-n4-2-n2"
+    ]
+  },
+  {
     "text": "乗組員の見送りを受け、調査船は予定通り早朝に出航した。",
     "hash": "aa22ff4cda15",
     "sources": [
@@ -95246,6 +96814,13 @@
     ]
   },
   {
+    "text": "食べ物がむだになってしまう食品ロスの問題もあります。",
+    "hash": "0c208f47ec45",
+    "sources": [
+      "article#a-n3-1-n4"
+    ]
+  },
+  {
     "text": "食べ物と飲み物はいつも台所に置いてあります。",
     "hash": "9cafc004506d",
     "sources": [
@@ -95291,7 +96866,15 @@
     "text": "食べ物や飲み物だけでなく、雑誌や日用品も買えます。",
     "hash": "092f0e843634",
     "sources": [
-      "article#a-n3-1"
+      "article#a-n3-1",
+      "article#a-n3-1-n4"
+    ]
+  },
+  {
+    "text": "食べ物や飲み物はもちろん、雑誌や日用品まで買えるため、生活に必要なものがほぼ一か所でそろう。",
+    "hash": "2d21ee2b79f8",
+    "sources": [
+      "article#a-n3-1-n2"
     ]
   },
   {
@@ -95646,10 +97229,24 @@
     ]
   },
   {
+    "text": "審査に通るためには、勤務先や収入が確認できる書類をあらかじめそろえておいたほうがよい。",
+    "hash": "948223e96da6",
+    "sources": [
+      "article#a-n3-9-n2"
+    ]
+  },
+  {
     "text": "審査に通るように、勤務先や収入がわかる書類をそろえておいたほうがいい。",
     "hash": "2ecdb2112700",
     "sources": [
       "article#a-n3-9"
+    ]
+  },
+  {
+    "text": "審査に通るように、仕事と収入がわかる書類を準備しておくといい。",
+    "hash": "28e9b5648e84",
+    "sources": [
+      "article#a-n3-9-n4"
     ]
   },
   {
@@ -97291,10 +98888,38 @@
     ]
   },
   {
+    "text": "診察が終わったら、処方箋という紙をもらいます。",
+    "hash": "ca3356c3e5c0",
+    "sources": [
+      "article#a-n3-8-n4"
+    ]
+  },
+  {
     "text": "診察が終わると、処方箋をもらって、薬局で薬を受け取る。",
     "hash": "19fc7236fb53",
     "sources": [
       "article#a-n3-8"
+    ]
+  },
+  {
+    "text": "診察が終わると処方箋をもらい、それを持って薬局へ行き、薬を受け取る。",
+    "hash": "8535fc4b88b3",
+    "sources": [
+      "article#a-n3-8-n2"
+    ]
+  },
+  {
+    "text": "診察では「いつから痛いですか」「アレルギーはありますか」といった質問をされる。",
+    "hash": "31a4fe7d66cf",
+    "sources": [
+      "article#a-n3-8-n2"
+    ]
+  },
+  {
+    "text": "診察の結果、先生は「虫歯が一本ありますね」と告げ、レントゲン写真を見せながら状態を説明してくれました。",
+    "hash": "b7b3673d7eca",
+    "sources": [
+      "article#a-n4-9-n2"
     ]
   },
   {
@@ -97880,10 +99505,24 @@
     ]
   },
   {
+    "text": "水や食べ物、懐中電灯を用意しておくと安心です。",
+    "hash": "7a701c0e57f1",
+    "sources": [
+      "article#a-n2-7-n4"
+    ]
+  },
+  {
     "text": "水や食料、懐中電灯などを用意して、すぐに持ち出せる場所に置いておくと安心です。",
     "hash": "5d82c4893c6a",
     "sources": [
       "article#a-n2-7"
+    ]
+  },
+  {
+    "text": "水や食料、懐中電灯などを用意しておくと、いざというときに安心です。",
+    "hash": "e778f3ae5bbe",
+    "sources": [
+      "article#a-n2-7-n3"
     ]
   },
   {
@@ -99805,6 +101444,13 @@
     ]
   },
   {
+    "text": "先生は「虫歯が一本ありますね」と言って、レントゲン写真を見せてくれました。",
+    "hash": "03f86eeb6513",
+    "sources": [
+      "article#a-n4-9-n3"
+    ]
+  },
+  {
     "text": "先生は『必ず合格できる』と言いますが、絶対というものはないと思います。",
     "hash": "b45b1b470d8d",
     "sources": [
@@ -100323,6 +101969,13 @@
     ]
   },
   {
+    "text": "洗濯機を置く場所やコンセントの数も、見ておいたほうがいい。",
+    "hash": "38c0500af8ae",
+    "sources": [
+      "article#a-n3-9-n4"
+    ]
+  },
+  {
     "text": "洗濯物が乾いたら、きれいに畳んでください。",
     "hash": "d338ec6dc58b",
     "sources": [
@@ -100439,6 +102092,13 @@
     "hash": "26ef41e7f064",
     "sources": [
       "article#a-n3-10"
+    ]
+  },
+  {
+    "text": "前は現金だけの店が多かったです。",
+    "hash": "04a169418fd4",
+    "sources": [
+      "article#a-n2-5-n4"
     ]
   },
   {
@@ -100593,6 +102253,20 @@
     "hash": "1a7a5202da5c",
     "sources": [
       "daily-story#n5_17"
+    ]
+  },
+  {
+    "text": "全部終わるまでに、一時間ぐらいかかりました。",
+    "hash": "8fe14e5371fa",
+    "sources": [
+      "article#a-n4-8-n3"
+    ]
+  },
+  {
+    "text": "全部終わるまでに一時間ほどかかりましたが、思っていたより順調に進んだ印象です。",
+    "hash": "67b89ef4aefc",
+    "sources": [
+      "article#a-n4-8-n2"
     ]
   },
   {
@@ -101632,6 +103306,13 @@
     ]
   },
   {
+    "text": "窓口の係の人に、傘をなくした経緯を順を追って説明しました。",
+    "hash": "d60df7acfb81",
+    "sources": [
+      "article#a-n4-11-n2"
+    ]
+  },
+  {
     "text": "総会では、加盟国の賛成多数によってその決議案が採択された。",
     "hash": "997da6a355a0",
     "sources": [
@@ -101979,6 +103660,13 @@
     "hash": "0cf2426fd41b",
     "sources": [
       "article#a-n4-2"
+    ]
+  },
+  {
+    "text": "多くの人は、本を読んだり、スマートフォンを見たり、目を閉じて休んだりして過ごしています。",
+    "hash": "1cd71ba9f210",
+    "sources": [
+      "article#a-n4-2-n3"
     ]
   },
   {
@@ -103270,6 +104958,13 @@
     ]
   },
   {
+    "text": "大変そうだが、この流れを知っていれば、次の引っ越しは楽になる。",
+    "hash": "77c3e0d73df4",
+    "sources": [
+      "article#a-n3-9-n4"
+    ]
+  },
+  {
     "text": "大変な時もあるけど、あまり心配していません。",
     "hash": "7812ef30937c",
     "sources": [
@@ -103428,6 +105123,13 @@
     "hash": "960402fc1ec4",
     "sources": [
       "vocab-n1#無残"
+    ]
+  },
+  {
+    "text": "単なる食料品店というより、暮らしを支える身近な施設と言えるだろう。",
+    "hash": "4d1235859394",
+    "sources": [
+      "article#a-n3-1-n2"
     ]
   },
   {
@@ -105818,6 +107520,13 @@
     ]
   },
   {
+    "text": "痛くなってから慌てるより、半年に一度は検診に行くようにしたほうがいいと思いました。",
+    "hash": "ffd2eb79bf24",
+    "sources": [
+      "article#a-n4-9-n3"
+    ]
+  },
+  {
     "text": "痛くなる前に、半年に一度は検診に行ったほうがいいと思いました。",
     "hash": "4a9ada13672a",
     "sources": [
@@ -105825,10 +107534,24 @@
     ]
   },
   {
+    "text": "痛みがいつ始まったのか、冷たい物がしみるかどうかといった項目に、順番に答えていきます。",
+    "hash": "0027de32678a",
+    "sources": [
+      "article#a-n4-9-n2"
+    ]
+  },
+  {
     "text": "痛みを我慢せず、早めに医者に診てもらったほうがいい。",
     "hash": "210c874647c9",
     "sources": [
       "vocab-n2#我慢"
+    ]
+  },
+  {
+    "text": "通う手間は確かに大きいとはいえ、丁寧な治療には代えがたい価値があると感じました。",
+    "hash": "f308dbac0b69",
+    "sources": [
+      "article#a-n4-9-n2"
     ]
   },
   {
@@ -105920,6 +107643,20 @@
     "hash": "5fcb428418a3",
     "sources": [
       "vocab-n1#武装"
+    ]
+  },
+  {
+    "text": "停電や通信のトラブルがあると、払えなくなるかもしれません。",
+    "hash": "373a52603a5e",
+    "sources": [
+      "article#a-n2-5-n4"
+    ]
+  },
+  {
+    "text": "停電や通信の障害が起きると、支払いができなくなるおそれがある。",
+    "hash": "65eef8b8a63b",
+    "sources": [
+      "article#a-n2-5-n3"
     ]
   },
   {
@@ -107183,6 +108920,13 @@
     ]
   },
   {
+    "text": "伝える方法はたくさんあるので、心配しなくても大丈夫です。",
+    "hash": "6da683111ae8",
+    "sources": [
+      "article#a-n3-8-n4"
+    ]
+  },
+  {
     "text": "伝わる",
     "hash": "9dbe3d942628",
     "sources": [
@@ -107470,6 +109214,13 @@
     ]
   },
   {
+    "text": "電車が次の駅に着いたとき、ようやく傘がないことに気がつきました。",
+    "hash": "3892b3f5fda8",
+    "sources": [
+      "article#a-n4-11-n3"
+    ]
+  },
+  {
     "text": "電車が遅れたが、ぎりぎり始業時間に間に合った。",
     "hash": "7d614fe27fd7",
     "sources": [
@@ -107666,6 +109417,13 @@
     ]
   },
   {
+    "text": "電車の中で電話をかけることは、マナー違反だと考えられています。",
+    "hash": "fcab75c77705",
+    "sources": [
+      "article#a-n4-2-n3"
+    ]
+  },
+  {
     "text": "電車の中で電話をかけるのは、マナー違反だと考えられています。",
     "hash": "32d94f7b5f01",
     "sources": [
@@ -107782,6 +109540,13 @@
     "hash": "ebe8e13c5bf0",
     "sources": [
       "daily-story#n5_23"
+    ]
+  },
+  {
+    "text": "途方に暮れましたが、とにかく駅の忘れ物センターへ行って相談してみることにしました。",
+    "hash": "f698f73395eb",
+    "sources": [
+      "article#a-n4-11-n2"
     ]
   },
   {
@@ -108969,6 +110734,20 @@
     ]
   },
   {
+    "text": "同じ日に国民健康保険の手続きもできるので、続けて行うことにしました。",
+    "hash": "eef3fb609296",
+    "sources": [
+      "article#a-n4-8-n3"
+    ]
+  },
+  {
+    "text": "同じ日に国民健康保険の手続きも済ませることができますが、担当の窓口が異なるため、一階から二階へ移動しました。",
+    "hash": "db93539de03a",
+    "sources": [
+      "article#a-n4-8-n2"
+    ]
+  },
+  {
     "text": "同じ目標に向かって努力する仲間がいると、苦労も乗り越えられる。",
     "hash": "405ff789a9db",
     "sources": [
@@ -109228,6 +111007,13 @@
     ]
   },
   {
+    "text": "特に、電車の中で電話をかける行為は、マナー違反だと見なされるのが一般的です。",
+    "hash": "96385a807777",
+    "sources": [
+      "article#a-n4-2-n2"
+    ]
+  },
+  {
     "text": "特に七月から八月にかけて、気温が三十五度を超える日も珍しくない。",
     "hash": "0602235e44e6",
     "sources": [
@@ -109407,6 +111193,13 @@
     "hash": "d5d18a63c829",
     "sources": [
       "vocab-n1#否決"
+    ]
+  },
+  {
+    "text": "内見のときは、日当たりや騒音だけでなく、洗濯機を置く場所やコンセントの数まで確認しておきたい。",
+    "hash": "8016a6833283",
+    "sources": [
+      "article#a-n3-9-n2"
     ]
   },
   {
@@ -109624,6 +111417,13 @@
     "hash": "91eaa0cd1ede",
     "sources": [
       "vocab-n1#温室効果"
+    ]
+  },
+  {
+    "text": "二十四時間はたらく人は、とてもたいへんです。",
+    "hash": "95fffa89c422",
+    "sources": [
+      "article#a-n3-1-n4"
     ]
   },
   {
@@ -109928,6 +111728,13 @@
     ]
   },
   {
+    "text": "日本では引っ越しに伴って、十四日以内に区役所へ行き、住所に関する届け出をしなければなりません。",
+    "hash": "2e3a189fcd2b",
+    "sources": [
+      "article#a-n4-8-n2"
+    ]
+  },
+  {
     "text": "日本では建前と本音を使い分けることが、時に必要だと言われています。",
     "hash": "385f7a8251da",
     "sources": [
@@ -109970,6 +111777,13 @@
     ]
   },
   {
+    "text": "日本で初めて熱が出たとき、どうしたらいいか分からなくて不安でした。",
+    "hash": "f4453a041369",
+    "sources": [
+      "article#a-n3-8-n4"
+    ]
+  },
+  {
     "text": "日本で初めて熱を出したとき、どうすればいいか分からなくて、とても不安だった。",
     "hash": "a87d88ebcee9",
     "sources": [
@@ -110005,10 +111819,24 @@
     ]
   },
   {
+    "text": "日本で部屋を借りるのは、思ったより手間がかかる。",
+    "hash": "3c36daa55b3d",
+    "sources": [
+      "article#a-n3-9-n4"
+    ]
+  },
+  {
     "text": "日本で部屋を借りるのは、思っていたより手間がかかる。",
     "hash": "c90163a7da23",
     "sources": [
       "article#a-n3-9"
+    ]
+  },
+  {
+    "text": "日本で部屋を借りるのは、多くの外国人が思っているよりずっと手間がかかる作業である。",
+    "hash": "2a581077daa8",
+    "sources": [
+      "article#a-n3-9-n2"
     ]
   },
   {
@@ -110110,10 +111938,31 @@
     ]
   },
   {
+    "text": "日本に来て初めて熱を出したとき、どう対処すればいいのか分からず、私は強い不安を感じた。",
+    "hash": "a22b301bac4d",
+    "sources": [
+      "article#a-n3-8-n2"
+    ]
+  },
+  {
     "text": "日本のコンビニは、二十四時間あいていて、とてもべんりです。",
     "hash": "f09468343dab",
     "sources": [
       "article#a-n3-1"
+    ]
+  },
+  {
+    "text": "日本のコンビニは二十四時間あいていて、とてもべんりです。",
+    "hash": "3c8eef2e6f1a",
+    "sources": [
+      "article#a-n3-1-n4"
+    ]
+  },
+  {
+    "text": "日本のコンビニは二十四時間営業しており、いつでも利用できる手軽さが大きな魅力である。",
+    "hash": "3726b279115f",
+    "sources": [
+      "article#a-n3-1-n2"
     ]
   },
   {
@@ -110156,6 +112005,20 @@
     "hash": "80aac44c5432",
     "sources": [
       "article#a-n3-5"
+    ]
+  },
+  {
+    "text": "日本の会社で働くうえで、メールの書き方の基本的なルールを知っておくことは欠かせません。",
+    "hash": "fff4dab39893",
+    "sources": [
+      "article#a-n3-12-n2"
+    ]
+  },
+  {
+    "text": "日本の会社で働くとき、メールの書き方にはいくつかの基本ルールがあります。",
+    "hash": "a48112971454",
+    "sources": [
+      "article#a-n3-12-n4"
     ]
   },
   {
@@ -110219,6 +112082,20 @@
     "hash": "7c6b06a5c721",
     "sources": [
       "daily-story#n4_5"
+    ]
+  },
+  {
+    "text": "日本の歯医者では何度も通院せざるを得ませんが、その分、一回ごとの治療が丁寧に行われます。",
+    "hash": "09a0ac4a00a8",
+    "sources": [
+      "article#a-n4-9-n2"
+    ]
+  },
+  {
+    "text": "日本の歯医者は何回も通わなければなりません。",
+    "hash": "b4d7e80dfadd",
+    "sources": [
+      "article#a-n4-9-n3"
     ]
   },
   {
@@ -110310,6 +112187,20 @@
     "hash": "042d7f63e13d",
     "sources": [
       "article#a-n4-2"
+    ]
+  },
+  {
+    "text": "日本の電車の中は、会話の声がほとんど聞こえないほど静かな空間になっています。",
+    "hash": "17e465711289",
+    "sources": [
+      "article#a-n4-2-n2"
+    ]
+  },
+  {
+    "text": "日本の電車の中は、他の国と比べると、とても静かだと言われています。",
+    "hash": "1cf76f41c0f1",
+    "sources": [
+      "article#a-n4-2-n3"
     ]
   },
   {
@@ -110414,7 +112305,15 @@
     "text": "日本は地震や台風などの自然災害が多い国です。",
     "hash": "bb6fa6cfc066",
     "sources": [
-      "article#a-n2-7"
+      "article#a-n2-7",
+      "article#a-n2-7-n4"
+    ]
+  },
+  {
+    "text": "日本は地震や台風などの自然災害が多い国として知られています。",
+    "hash": "c7d8fd0e9434",
+    "sources": [
+      "article#a-n2-7-n3"
     ]
   },
   {
@@ -110506,6 +112405,13 @@
     "hash": "94f2fef88de0",
     "sources": [
       "article#a-n2-2"
+    ]
+  },
+  {
+    "text": "日本語に自信がないからといって、窓口での手続きが難しいとは限りません。",
+    "hash": "066b869c163d",
+    "sources": [
+      "article#a-n4-8-n2"
     ]
   },
   {
@@ -111970,6 +113876,13 @@
     "hash": "d8d8b764281b",
     "sources": [
       "phrases"
+    ]
+  },
+  {
+    "text": "番号札を渡されるのは、順番に対応するための仕組みで、利用者が多い時間帯でも混乱しにくいようになっています。",
+    "hash": "b3cd9f1f41bb",
+    "sources": [
+      "article#a-n4-8-n2"
     ]
   },
   {
@@ -116342,6 +118255,20 @@
     ]
   },
   {
+    "text": "病院では、まず受付で保険証を出し、問診票に症状を書くのが一般的な流れだ。",
+    "hash": "c82fb6e51352",
+    "sources": [
+      "article#a-n3-8-n2"
+    ]
+  },
+  {
+    "text": "病院では、まず保険証を出して、紙に症状を書きます。",
+    "hash": "d833a458f3ad",
+    "sources": [
+      "article#a-n3-8-n4"
+    ]
+  },
+  {
     "text": "病院では、最初に保険証を出して、問診票に症状を書く。",
     "hash": "6e8ff47c4d79",
     "sources": [
@@ -116374,6 +118301,13 @@
     "hash": "f0514ae3806c",
     "sources": [
       "jlpt-listening"
+    ]
+  },
+  {
+    "text": "病院の料金は思ったより安かったです。",
+    "hash": "a4fbb2785979",
+    "sources": [
+      "article#a-n3-8-n4"
     ]
   },
   {
@@ -116573,10 +118507,24 @@
     ]
   },
   {
+    "text": "敷金・礼金・仲介手数料など、入居の時点でまとまったお金を用意しなければならないからだ。",
+    "hash": "a3abbcaaa7c9",
+    "sources": [
+      "article#a-n3-9-n2"
+    ]
+  },
+  {
     "text": "敷金と礼金がそれぞれ一か月分かかります。",
     "hash": "a274c547d69f",
     "sources": [
       "phrases"
+    ]
+  },
+  {
+    "text": "敷金や礼金、仲介手数料など、最初にたくさんお金がいるからだ。",
+    "hash": "2bfc77a75c2b",
+    "sources": [
+      "article#a-n3-9-n4"
     ]
   },
   {
@@ -117742,10 +119690,24 @@
     ]
   },
   {
+    "text": "分からないことがあれば、遠慮しないで係の人に聞いたほうがいいと思います。",
+    "hash": "ab2259549e4e",
+    "sources": [
+      "article#a-n4-8-n3"
+    ]
+  },
+  {
     "text": "分からないことがあれば、遠慮しないで聞いたほうがいいです。",
     "hash": "7e070e5e50b8",
     "sources": [
       "article#a-n4-8"
+    ]
+  },
+  {
+    "text": "分からないことがあれば、遠慮せずに質問したほうがいいと思います。",
+    "hash": "95ed5b574b71",
+    "sources": [
+      "article#a-n4-8-n2"
     ]
   },
   {
@@ -117886,6 +119848,13 @@
     "hash": "4f8550bb41c1",
     "sources": [
       "article#a-n3-16"
+    ]
+  },
+  {
+    "text": "聞かれる内容は大体決まっているので、事前に答えを考えておけば慌てずに済む。",
+    "hash": "c3284d2a2f98",
+    "sources": [
+      "article#a-n3-8-n2"
     ]
   },
   {
@@ -118092,6 +120061,13 @@
     ]
   },
   {
+    "text": "便利さと安心のバランスを、どのように取ればいいのだろうか。",
+    "hash": "00d00084aade",
+    "sources": [
+      "article#a-n2-5-n3"
+    ]
+  },
+  {
     "text": "便利さと安心のバランスをどう取るか。",
     "hash": "a069cd80cb52",
     "sources": [
@@ -118110,6 +120086,13 @@
     "hash": "be32a6898b47",
     "sources": [
       "article#a-n3-3"
+    ]
+  },
+  {
+    "text": "便利さを受け取るだけでなく、その仕組みを支える人々のことにも目を向けていきたい。",
+    "hash": "cc3484327847",
+    "sources": [
+      "article#a-n3-1-n2"
     ]
   },
   {
@@ -118204,10 +120187,24 @@
     ]
   },
   {
+    "text": "保険に加入していれば、病院で自分が支払う自己負担は三割で済むからである。",
+    "hash": "ea878e402faf",
+    "sources": [
+      "article#a-n3-8-n2"
+    ]
+  },
+  {
     "text": "保険に入っていれば、自分で払うのは三割だけだからだ。",
     "hash": "6cd557b5bc6f",
     "sources": [
       "article#a-n3-8"
+    ]
+  },
+  {
+    "text": "保険に入っていれば、自分で払うのは三割だけだからです。",
+    "hash": "a17602638270",
+    "sources": [
+      "article#a-n3-8-n4"
     ]
   },
   {
@@ -118862,6 +120859,13 @@
     ]
   },
   {
+    "text": "忙しくて時間がない人にとって、短時間で用事を済ませられる場所があることは大きな助けである。",
+    "hash": "0606a6771e9d",
+    "sources": [
+      "article#a-n3-1-n2"
+    ]
+  },
+  {
     "text": "忙しさに追われると、ともすれば健康管理をおろそかにしてしまう。",
     "hash": "bed6f48a5390",
     "sources": [
@@ -119268,6 +121272,13 @@
     ]
   },
   {
+    "text": "本文では、用件が正確に伝わるように、短い文で丁寧に書くことが求められます。",
+    "hash": "93a41773a8fe",
+    "sources": [
+      "article#a-n3-12-n2"
+    ]
+  },
+  {
     "text": "本文では、用件を分かりやすく伝えるように、短い文で丁寧に書くことが求められます。",
     "hash": "4bfc0ad85615",
     "sources": [
@@ -119529,6 +121540,13 @@
     ]
   },
   {
+    "text": "毎日している歯みがきにも、正しい方法があることを知りました。",
+    "hash": "8a6805ff99bc",
+    "sources": [
+      "article#a-n4-9-n3"
+    ]
+  },
+  {
     "text": "毎日たった十分の練習でも、雨垂れ石を穿つで、一年後には見違えるほど上達していた。",
     "hash": "32397af7b81b",
     "sources": [
@@ -119603,6 +121621,13 @@
     "hash": "d109d887902a",
     "sources": [
       "vocab-n3#筋肉"
+    ]
+  },
+  {
+    "text": "毎日何気なく行っている習慣が、実は逆効果になりかねないと知り、驚きました。",
+    "hash": "739637e60a45",
+    "sources": [
+      "article#a-n4-9-n2"
     ]
   },
   {
@@ -120390,6 +122415,20 @@
     ]
   },
   {
+    "text": "名前を呼ばれるまでは椅子に座って待たざるを得ませんが、その間に書類へ住所と生年月日を記入しておきました。",
+    "hash": "1cfed4469ac5",
+    "sources": [
+      "article#a-n4-8-n2"
+    ]
+  },
+  {
+    "text": "名前を呼ばれるまで椅子に座って待ち、その間に書類に住所と生年月日を書いておきました。",
+    "hash": "29ed2723ed2b",
+    "sources": [
+      "article#a-n4-8-n3"
+    ]
+  },
+  {
     "text": "明るいうちに、山から下山しましょう。",
     "hash": "400e1a90ec32",
     "sources": [
@@ -120765,6 +122804,13 @@
     "hash": "057f173e1e61",
     "sources": [
       "grammar-n3#n3-18"
+    ]
+  },
+  {
+    "text": "明文化されたルールというより、お互いへの思いやりに基づいた習慣だと言えます。",
+    "hash": "e49a467d4e92",
+    "sources": [
+      "article#a-n4-2-n2"
     ]
   },
   {
@@ -122350,6 +124396,13 @@
     ]
   },
   {
+    "text": "友達に相談したところ、「まず近くの内科に行ったほうがいいよ」とアドバイスをもらった。",
+    "hash": "a0655c483cb2",
+    "sources": [
+      "article#a-n3-8-n2"
+    ]
+  },
+  {
     "text": "友達に相談すると、「まず近くの内科に行ったほうがいいよ」と教えてくれた。",
     "hash": "e1604aba78a0",
     "sources": [
@@ -122361,6 +124414,13 @@
     "hash": "eab30e4bada1",
     "sources": [
       "daily-story#n5_20"
+    ]
+  },
+  {
+    "text": "友達に聞くと、「近くの内科に行ったほうがいいよ」と言われました。",
+    "hash": "0e1ee09b998a",
+    "sources": [
+      "article#a-n3-8-n4"
     ]
   },
   {
@@ -124471,6 +126531,13 @@
     ]
   },
   {
+    "text": "流暢に話せなくても、伝える方法はいくらでもあるので、過度に心配する必要はない。",
+    "hash": "aeabd141e136",
+    "sources": [
+      "article#a-n3-8-n2"
+    ]
+  },
+  {
     "text": "留学から帰ってきた彼女は、以前より一段と大人っぽくなっていた。",
     "hash": "22e8ad2472f9",
     "sources": [
@@ -125224,6 +127291,20 @@
     "hash": "c00712506774",
     "sources": [
       "vocab-n1#主権"
+    ]
+  },
+  {
+    "text": "力を入れて強く磨きすぎると、かえって歯ぐきを傷めてしまうおそれがあるそうです。",
+    "hash": "d91b5e79dab1",
+    "sources": [
+      "article#a-n4-9-n2"
+    ]
+  },
+  {
+    "text": "力を入れて強く磨きすぎると、歯ぐきを傷めてしまうことがあるそうです。",
+    "hash": "4d6fb9e985e1",
+    "sources": [
+      "article#a-n4-9-n3"
     ]
   },
   {

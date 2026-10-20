@@ -2,6 +2,8 @@
 <html lang="zh-Hant">
 <head>
 <script src="campaign.js"></script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-2WP4D34LE3"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());/* App(WebView)也載入本站→GA4 會混到網頁流量;用原生注入的 STAYJP_NATIVE 標 app/web,之後 GA4 可分開分析(需在 GA4 後台把 app_platform 註冊為自訂維度)*/gtag('set','user_properties',{app_platform:(window.STAYJP_NATIVE&&window.STAYJP_NATIVE.isNativeApp)?'app':'web'});gtag('config','G-2WP4D34LE3');</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>YouTube 跟讀 — 用任何日文影片練口說｜StayJP 日本再留計劃</title>
@@ -648,6 +650,8 @@ const YTS = (() => {
     }
     el.classList.toggle('show',!!on);
   }
+  // GA 事件(2026-10-20 補:之前這頁完全沒埋點,影片 vs 文章比不出來)
+  function track(ev,p){ try{ if(typeof gtag==='function') gtag('event',ev,p||{}); }catch(e){} }
   let loading=false;
   async function load(){
     if(loading) return;   // 載入中再點 = 不理,以前會把播放器砍掉重建,反而更慢
@@ -655,6 +659,7 @@ const YTS = (() => {
     const errEl=document.getElementById('inErr'); errEl.style.display='none';
     if(!v){ errEl.textContent=enOr('看不懂這個連結,貼 YouTube 影片網址或 11 碼影片 ID。','Could not parse that link — paste a YouTube URL or 11-char video ID.'); errEl.style.display='block'; return; }
     vid=v;
+    track('yt_video_load',{ v:v, sample: SAMPLES.some(x=>x.v===v) ? 1 : 0 });
     loading=true; busy(true);
     document.getElementById('loadBtn').disabled=true;
     document.getElementById('inNote').textContent=enOr('讀取中…','Loading…');
@@ -1004,6 +1009,7 @@ const YTS = (() => {
   function showResult(ratio, diffHtml){
     _settled=true;
     const pct=Math.round(ratio*100), pass=ratio>=0.7;
+    track('yt_shadow_result',{ v:vid, mode:mode, pct:pct });
     const res=document.getElementById('pcRes');
     res.className='pc-result '+(pass?'pass':'fail');
     const l=lines[cur];
@@ -1325,6 +1331,7 @@ const YTS = (() => {
   }
   function qzResult(){
     const pct=Math.round(qz.score/qz.list.length*100);
+    track('yt_quiz_done',{ v:vid, pct:pct });
     let h='<div class="qz-res"><div class="qz-score">'+qz.score+' / '+qz.list.length+'</div>'
       + '<div style="color:var(--tx2);font-size:13px">'+(pct>=80?enOr('聽力很穩!','Sharp ears!'):pct>=50?enOr('抓到一半,再聽一輪會更好','Halfway there — one more round helps'):enOr('先用跟播多聽幾次再回來','Try Follow mode a few times first'))+'</div></div>'
       + '<div class="qz-rv">';
@@ -1377,7 +1384,7 @@ const YTS = (() => {
 
   // ── 模式/換影片/範例 ──
   function setMode(m){
-    stopRec(); mode=m;
+    stopRec(); if(m!==mode) track('yt_mode',{ mode:m }); mode=m;
     ['ktv','shadow','dict','quiz'].forEach(x=>{ const b=document.getElementById('m'+x.charAt(0).toUpperCase()+x.slice(1)); if(b) b.classList.toggle('on',m===x); });
     lines.forEach(l=>{ l._rev=false; });
     const qb=document.getElementById('quizBox');

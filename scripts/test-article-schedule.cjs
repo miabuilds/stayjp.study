@@ -65,9 +65,9 @@ ok('localhost 沒開關 → 照常過濾', () => {
   assert.strictEqual(load('localhost', '?artpreview=10').ArticleSchedule.isPreview(), false);
 });
 ok('list() 走 ArticleSchedule', () => {
-  assert.ok(/function list\(\)\s*\{\s*return window\.ArticleSchedule\.visible\(window\.ARTICLES/.test(UI_SRC));
+  assert.ok(/function list\(\w*\)\s*\{\s*return window\.ArticleSchedule\.visible\(window\.ARTICLES/.test(UI_SRC));
   // 其他地方不准繞過 list() 直接讀 window.ARTICLES(否則未上架文章會漏出來)
-  const direct = UI_SRC.split('\n').filter(l => /window\.ARTICLES/.test(l) && !/function list\(\)/.test(l));
+  const direct = UI_SRC.split('\n').filter(l => /window\.ARTICLES/.test(l) && !/function list\(\w*\)/.test(l));
   assert.deepStrictEqual(direct, []);
 });
 ok('articles.js 的 publish_at 都合法且帶時區', () => {
