@@ -62,6 +62,7 @@
   .st{display:inline-block;font-size:12px;font-weight:600;border-radius:999px;padding:2px 9px;white-space:nowrap}
   .st.active{color:#0A0F08;background:var(--lime)}
   .st.pending{color:var(--warn);border:1px solid rgba(245,196,81,.4)}
+  .st.bounced{color:var(--bad);border:1px solid rgba(255,122,89,.4)}
   .st.unsubscribed{color:var(--tx3);border:1px solid var(--line2)}
   .scroll{overflow-x:auto}
   .gate{min-height:80vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;text-align:center;position:relative;z-index:1}
@@ -92,7 +93,7 @@
   <div class="kpis">
     <div class="kpi hl"><span>有效訂閱</span><b class="num" id="kActive">—</b><small id="kActiveSub"></small></div>
     <div class="kpi"><span>近 7 天新增</span><b class="num" id="k7">—</b><small>已確認的</small></div>
-    <div class="kpi"><span>待確認(沒點確認信)</span><b class="num" id="kPending">—</b><small>不會收到信</small></div>
+    <div class="kpi"><span>待確認(舊制沒點確認信)</span><b class="num" id="kPending">—</b><small>不會收到信</small></div>
     <div class="kpi"><span>已退訂</span><b class="num" id="kUnsub">—</b><small id="kUnsubSub"></small></div>
   </div>
 
@@ -111,7 +112,7 @@
     <div class="ph"><h3>訂閱名單</h3><span class="sp"></span>
       <div class="tools">
         <input type="search" id="q" placeholder="搜尋 Email / 來源" oninput="renderSubs()">
-        <select id="fStatus" onchange="renderSubs()"><option value="">全部狀態</option><option value="active" selected>有效</option><option value="pending">待確認</option><option value="unsubscribed">已退訂</option></select>
+        <select id="fStatus" onchange="renderSubs()"><option value="">全部狀態</option><option value="active" selected>有效</option><option value="pending">待確認</option><option value="unsubscribed">已退訂</option><option value="bounced">信箱無效</option></select>
         <button class="btn" onclick="exportCsv()">匯出 CSV</button>
       </div>
     </div>
@@ -134,7 +135,7 @@ const auth = firebase.auth();
 const FN = 'https://asia-east1-jpnote-1bdd6.cloudfunctions.net/newsletterAdmin';
 // key 要跟 scripts/build-letters.mjs 的 TOPICS、functions/src/newsletter.ts 的 NL_TOPICS 一致
 const TOPICS = { dev:'App 開發實戰', pricing:'定價與營收', marketing:'行銷、社群、KOL', review:'上架與審核', ai:'用 AI 做產品', nomad:'旅居生活', solo:'一人公司的日常' };
-const ST = { active:'有效', pending:'待確認', unsubscribed:'已退訂' };
+const ST = { active:'有效', pending:'待確認', unsubscribed:'已退訂', bounced:'信箱無效' };
 const esc = s => String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 const dt = ms => { if(!ms) return '—'; const d=new Date(ms+8*36e5); return d.toISOString().slice(0,10).replace(/-/g,'/'); };
 const dtm = ms => { if(!ms) return '—'; const d=new Date(ms+8*36e5); return d.toISOString().slice(5,16).replace('-','/').replace('T',' '); };

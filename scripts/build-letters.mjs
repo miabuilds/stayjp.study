@@ -242,11 +242,21 @@ const SUB_JS = `<script>
 var nlWarmed=0;document.addEventListener('focusin',function(e){if(nlWarmed||!e.target.closest||!e.target.closest('#sub'))return;nlWarmed=1;fetch('${SUB_FN}',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'}).catch(function(){})});
 function nlPost(body,n){return fetch('${SUB_FN}',{method:'POST',headers:{'Content-Type':'application/json'},body:body}).then(function(r){if(r.status>=500||r.status===429)throw new Error('busy');return r.json()})
 .catch(function(e){if(n>0)return new Promise(function(ok){setTimeout(ok,1800)}).then(function(){return nlPost(body,n-1)});throw e})}
-function nlSub(f){var m=f.parentNode.querySelector('.msg'),b=f.querySelector('button');b.disabled=true;m.style.color='';m.textContent='送出中…';
-nlPost(JSON.stringify({email:f.email.value,website:f.website.value,source:f.source.value}),2)
+// 常見打錯字網域 → 先問一次「是不是要打 xxx」(單一確認沒有確認信把關,打錯的信箱寄出去會退信、拖累寄信信譽)
+var NL_FIX={'gmial.com':'gmail.com','gamil.com':'gmail.com','gmai.com':'gmail.com','gmal.com':'gmail.com','gmail.co':'gmail.com','gmail.con':'gmail.com','gmail.cm':'gmail.com','gnail.com':'gmail.com','gmaill.com':'gmail.com','hotmial.com':'hotmail.com','hotmai.com':'hotmail.com','hotmail.con':'hotmail.com','yahooo.com.tw':'yahoo.com.tw','yaho.com.tw':'yahoo.com.tw','yahoo.com.t':'yahoo.com.tw','yahoo.con':'yahoo.com','outlok.com':'outlook.com','outlook.con':'outlook.com','icloud.co':'icloud.com','iclod.com':'icloud.com','icloud.con':'icloud.com'};
+function nlSub(f){var m=f.parentNode.querySelector('.msg'),b=f.querySelector('button'),em=f.email.value.trim().toLowerCase(),dm=em.split('@')[1]||'';
+if(NL_FIX[dm]&&f.getAttribute('data-ok')!==em){var fx=em.split('@')[0]+'@'+NL_FIX[dm];m.style.color='#F5C451';
+m.innerHTML='你是不是要打 <b>'+fx+'</b>？ <a href="#" style="color:var(--lime-t)">改成這個</a> · <a href="#" style="color:var(--tx2)">沒打錯，就這樣送</a>';
+var as=m.querySelectorAll('a');as[0].onclick=function(e){e.preventDefault();f.email.value=fx;m.textContent='';nlSub(f)};as[1].onclick=function(e){e.preventDefault();f.setAttribute('data-ok',em);nlSub(f)};return false}
+b.disabled=true;m.style.color='';m.textContent='送出中…';
+nlPost(JSON.stringify({email:em,website:f.website.value,source:f.source.value}),2)
 .then(function(j){
 if(!j.ok){m.style.color='#FF7A59';m.textContent='Email 格式好像不對，再檢查一下。';return}
-m.textContent=j.already?'你已經訂閱了，謝謝。':'確認信寄出了，去信箱按「確認訂閱」就完成（沒看到的話看一下垃圾信件匣）。';f.reset();})
+if(j.already){m.textContent='你已經訂閱了，謝謝。';return}
+f.reset();
+var ok=document.getElementById('ok');
+if(ok&&j.t&&typeof nlPrefs==='function'){document.getElementById('sub').hidden=true;ok.hidden=false;if(nlPrefs(j.t))document.getElementById('okPrefs').hidden=false;ok.scrollIntoView({behavior:'smooth',block:'center'});return}
+m.innerHTML='訂閱成功！歡迎信寄出了。'+(j.t?' <a href="/letters/prefs.html?t='+encodeURIComponent(j.t)+'" style="color:var(--lime-t)">告訴我你想看什麼 →</a>':'');})
 .catch(function(){m.style.color='#FF7A59';m.textContent='送出失敗，等幾秒再按一次。'}).finally(function(){b.disabled=false});return false}
 </script>`;
 
@@ -358,7 +368,7 @@ ${body}
 function indexPage() {
   return head(NAME, TAGLINE, `${SITE}/letters/`) + HEADER +
     `<section class="hero"><div class="kick">${esc(NAME)}</div><h1>One person. Building in public.</h1><p id="tl">${esc(TAGLINE)}</p>
-<div class="prompt" id="ok" hidden><div class="top"><div class="tile">${IC.mail}</div><div class="txt"><b>訂閱完成</b><p>下一份紀錄出來就會寄給你。</p></div></div><div id="okPrefs" hidden style="margin-top:22px;padding-top:22px;border-top:1px solid var(--line)">${PREFS_BOX("最後一個問題：你最想看哪些內容？", "可以複選，我會照大家選的多寫。")}</div></div>
+<div class="prompt" id="ok" hidden><div class="top"><div class="tile">${IC.mail}</div><div class="txt"><b>訂閱成功</b><p>歡迎信寄出了，下一份紀錄出來也會寄給你。</p></div></div><div id="okPrefs" hidden style="margin-top:22px;padding-top:22px;border-top:1px solid var(--line)">${PREFS_BOX("最後一個問題：你最想看哪些內容？", "可以複選，我會照大家選的多寫。")}</div></div>
 ${SUB_BOX("letters")}</section>
 <div class="seg"><div class="tabs"><span class="on">實驗紀錄</span></div><span class="n" id="expN"></span></div>
 <ul class="grid" id="list"><li class="empty">第一份紀錄準備中</li></ul>

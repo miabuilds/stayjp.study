@@ -1,7 +1,7 @@
 // Mia 的電子報(stayjp.study/letters):App 開發、商業模式、旅居生活。2026-10 起。
 //
-//   newsletterSubscribe — 官網表單 POST {email} → newsletter_subs/{sha256(email)} 存 pending,寄確認信(雙重確認)
-//   newsletterConfirm   — 確認信裡的連結 ?t=token → active,導回 letters?subscribed=1
+//   newsletterSubscribe — 官網表單 POST {email} → newsletter_subs/{sha256(email)} 直接 active,寄歡迎信(10/20 起單一確認)
+//   newsletterConfirm   — (舊)確認信裡的連結 ?t=token → active,導回 letters?subscribed=1;舊信還在別人信箱裡,保留
 //   newsletterUnsub     — 每封信底部的退訂連結 ?t=token → unsubscribed(一鍵,不用登入)
 //   newsletterCron      — 每小時:讀線上的 /letters/feed.json,send_at 已過、還沒寄完的那期 → 排進 mail 集合
 //
@@ -51,32 +51,40 @@ export const newsletterSubscribe = https.onRequest(
     if (body.website) { res.json({ ok: true }); return; }          // 蜜罐欄位:機器人填了就假裝成功
     if (!EMAIL_RE.test(email) || email.length > 200) { res.status(400).json({ ok: false, err: "email" }); return; }
 
-    const ref = db.doc(`newsletter_subs/${idOf(email)}`);
+    const id = idOf(email), ref = db.doc(`newsletter_subs/${id}`);
     const snap = await ref.get();
     const cur = snap.data() || {};
     if (cur.status === "active") { res.json({ ok: true, already: true }); return; }
-    // 同一信箱 10 分鐘內只寄一次確認信(防灌)
+    // 同一信箱 10 分鐘內只寄一次歡迎信(防灌)
     if (cur.confirmSentAt && Date.now() - cur.confirmSentAt.toMillis() < 10 * 60e3) { res.json({ ok: true }); return; }
 
+    // 2026-10-20 Mia:改單一確認 —— 填完就訂閱成功(雙重確認會流失兩三成)。
+    // 保護:歡迎信底部一鍵退訂(被亂填的人退得掉)、前端擋常見打錯字網域、歡迎信寄失敗就標 bounced 不再寄(runNewsletter 開頭處理)。
     const token = cur.token || newToken();
     await ref.set({
-      email, token, status: "pending", source: String(body.source || "letters").slice(0, 40),
-      createdAt: cur.createdAt || FieldValue.serverTimestamp(), confirmSentAt: FieldValue.serverTimestamp(),
+      email, token, status: "active", source: String(body.source || "letters").slice(0, 40),
+      createdAt: cur.createdAt || FieldValue.serverTimestamp(), confirmedAt: FieldValue.serverTimestamp(), confirmSentAt: FieldValue.serverTimestamp(),
     }, { merge: true });
-    const link = `${FN}/newsletterConfirm?t=${token}`;
+    const unsub = `${FN}/newsletterUnsub?t=${token}`, prefs = `${SITE}/letters/prefs.html?t=${encodeURIComponent(token)}`;
+    const feed = await fetch(`${SITE}/letters/feed.json`).then((r) => r.ok ? r.json() : null).catch(() => null);
+    const latest = ((feed && feed.issues) || []).filter((i: any) => Date.parse(i.send_at) <= Date.now()).slice(0, 3);
+    const list = latest.length ? `<p style="margin:22px 0 6px;font-weight:600">先看看最近寫了什麼：</p><ul style="margin:0 0 8px;padding-left:1.2em">${latest.map((i: any) =>
+      `<li style="margin:6px 0"><a href="${SITE}${i.url}" style="color:#2F9A35">${String(i.title).replace(/</g, "&lt;")}</a></li>`).join("")}</ul>` : "";
     await db.collection("mail").add({
       to: email,
       from: FROM,
       replyTo: REPLY_TO,
       message: {
-        subject: "確認訂閱「一人公司實驗室」",
-        html: shell(`<p>嗨，我是 Mia，謝謝你訂閱「一人公司實驗室」。</p><p>按下面的按鈕確認，之後有新的一期就會寄給你。</p>
-<p style="margin:28px 0"><a href="${link}" style="background:#c0392b;color:#fff;padding:12px 24px;border-radius:999px;text-decoration:none;font-weight:600">確認訂閱</a></p>
-<p style="color:#888;font-size:13px">不是你本人訂的話，忽略這封信就好，不會再收到任何東西。</p>`),
+        subject: "歡迎訂閱「一人公司實驗室」",
+        html: shell(`<p>嗨，我是 Mia，謝謝你訂閱「一人公司實驗室」。</p><p>這裡會寫我一個人做 App 的實驗紀錄：開發、定價、營收變化，還有邊旅居邊工作的日子。大約兩週一封。</p>${list}
+<p style="margin:26px 0"><a href="${prefs}" style="background:#0D0F13;color:#fff;padding:12px 22px;border-radius:999px;text-decoration:none;font-weight:600">告訴我你想看什麼</a></p>
+<p>有任何想法，直接回這封信就會寄到我信箱。</p>
+<p style="color:#999;font-size:13px;margin-top:28px">不是你本人訂的？<a href="${unsub}" style="color:#999">按這裡退訂</a>，之後就不會再收到。</p>`),
+        headers: { "List-Unsubscribe": `<${unsub}>`, "List-Unsubscribe-Post": "List-Unsubscribe=One-Click" },
       },
-      _campaign: "newsletter_confirm", _createdAt: FieldValue.serverTimestamp(),
+      _campaign: "newsletter_welcome", _nlSub: id, _createdAt: FieldValue.serverTimestamp(),
     });
-    res.json({ ok: true });
+    res.json({ ok: true, t: token });
   },
 );
 
@@ -110,6 +118,13 @@ interface Issue { slug: string; title: string; send_at: string; email_url: strin
 export async function runNewsletter(): Promise<string> {
   const feed = await fetch(`${SITE}/letters/feed.json?_=${Date.now()}`).then((r) => r.ok ? r.json() : null).catch(() => null);
   const issues: Issue[] = (feed && Array.isArray(feed.issues)) ? feed.issues : [];
+  // 歡迎信寄失敗(信箱不存在/打錯字)→ 標 bounced,之後不寄(這種退信多了會拖垮整個寄信信譽)
+  const bad = await db.collection("mail").where("_campaign", "==", "newsletter_welcome").where("delivery.state", "==", "ERROR").get().catch(() => null);
+  for (const m of bad?.docs || []) {
+    const sid = m.data()._nlSub; if (!sid) continue;
+    const sr = db.doc(`newsletter_subs/${sid}`), sd = (await sr.get()).data();
+    if (sd && sd.status === "active") await sr.set({ status: "bounced", bouncedAt: FieldValue.serverTimestamp() }, { merge: true });
+  }
   const due = issues.filter((i) => i.email !== false && i.send_at && Date.parse(i.send_at) <= Date.now())
     .sort((a, b) => Date.parse(a.send_at) - Date.parse(b.send_at));
 
