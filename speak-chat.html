@@ -1089,7 +1089,10 @@ function _nPost(o){ try{ window.ReactNativeWebView.postMessage(JSON.stringify(o)
 const IN_APP = _IN_APP0;
 function _postRestore(){ if(IN_APP && !NATIVE_STT) _nPost({type:'AUDIO_RESTORE'}); }
 if(IN_APP){ var _nv0=document.getElementById('inNote'); if(_nv0) _nv0.textContent=noteIdle(); }
+// 「到底有沒有在收音?」(KOL 回饋):第一個字回來時提示一下「聽到了」
+function _heard(){ if(!(recording||_wantRec)) return; const n=document.getElementById('inNote'); if(n && !n._heard){ n._heard=1; n.textContent=enOr('聽到了,繼續講…講完按送出。','Got it — keep going, then tap send.'); } }
 function _nStart(){
+  { const n=document.getElementById('inNote'); if(n) n._heard=0; }
   // 原生辨識從按下到真的收音有半秒延遲,太早講開頭會被吃掉。新版 App 會回報 audiostart:
   // 先顯示「準備中」,收到事件才切「開講」;舊版沒事件就照舊直接顯示錄音中。
   if(window.STAYJP_NATIVE.hasSpeechStartEvt){
@@ -1100,16 +1103,22 @@ function _nStart(){
   // → 每段定案就直接接進 base,下一段的 interim 接在後面(不能當整段累積全文覆蓋,會把前一段吃掉)
   const SEG=!!window.STAYJP_NATIVE.speechSegments;
   _nStart._soft=0;
+  // Android 回傳有兩種:真的分段(每段只有新字)、或「整句累積+順手修正前面」(探長J 實測:はい車窓 → はいはい車窓を探しています)。
+  // 舊版一律接在後面 → 同一句出現兩次。現在看新字的開頭是否涵蓋已定案的字(字元重疊≥60%):是=累積版,整句替換;否=新的一段,接上去。
+  let segAcc='', sessBase=_recBase;
+  _nStart._segReset=function(){ sessBase=_recBase; segAcc=''; };
+  const _ovl=function(a,b){ const pool={}; for(const c of b) pool[c]=(pool[c]||0)+1; let n=0; for(const c of a){ if(pool[c]>0){ pool[c]--; n++; } } return a.length?n/a.length:0; };
   if(SEG){
     window.stayjpSpeechResult=function(t,fin){
-      if(t==null) return; _nStart._soft=0;
-      const el=document.getElementById('say');
-      if(fin){ if(t) _recBase+=t; el.value=_recBase; }
-      else el.value=_recBase+t;
-      autoGrow();
+      if(t==null) return; _nStart._soft=0; _heard();
+      t=String(t).replace(/\s+/g,'');   // 日文不需要空格,Android 會在詞間插空白,拿掉才好比對
+      const cum = segAcc && t.length>=segAcc.length && _ovl(segAcc, t.slice(0, segAcc.length+3))>=0.6;
+      const cur = cum ? t : segAcc+t;
+      if(fin){ segAcc=cur; _recBase=sessBase+segAcc; }
+      const el=document.getElementById('say'); el.value=sessBase+cur; autoGrow();
     };
   } else window.stayjpSpeechResult=function(t,fin){
-    if(t==null) return; _nStart._soft=0;
+    if(t==null) return; _nStart._soft=0; _heard();
     // 原生(iOS)偶發跨 session 累積:新一段的 transcript 以上一段整串開頭 → 剝掉舊前綴只取新增
     // (用戶實錘:刪掉辨識文字重講,上一段內容跟著一起回來)
     const rawT=t;
@@ -1123,9 +1132,9 @@ function _nStart(){
     recording=false;
     if(_sessFin){ if(!(_sessFin.trim()===_lastFin.trim()&&(Date.now()-_lastFinAt)<1000)) _recBase+=_sessFin; _lastFin=_sessFin; _lastFinAt=Date.now(); _sessFin=''; }   // 防 double-final 疊加(限 1 秒內)
     if(err==='not-allowed'){ _wantRec=false; updateRecBtn(); document.getElementById('inNote').textContent=enOr('麥克風權限被關了:請到 iPhone 設定 → StayJP 允許麥克風。','Microphone access is off: allow it in iPhone Settings → StayJP.'); return; }
-    if(err && _wantRec && /no-speech|speech-timeout|nomatch/.test(err) && (_nStart._soft=(_nStart._soft||0)+1)<=3){ setTimeout(function(){ if(_wantRec){ _sessFin=''; recording=true; _nPost({type:'SPEECH_START',lang:'ja-JP',continuous:true,androidSegments:SEG}); } },200); return; }   // 只是太久沒講話:繼續聽,不報錯
+    if(err && _wantRec && /no-speech|speech-timeout|nomatch/.test(err) && (_nStart._soft=(_nStart._soft||0)+1)<=3){ setTimeout(function(){ if(_wantRec){ _sessFin=''; _nStart._segReset(); recording=true; _nPost({type:'SPEECH_START',lang:'ja-JP',continuous:true,androidSegments:SEG}); } },200); return; }   // 只是太久沒講話:繼續聽,不報錯
     if(err){ _wantRec=false; updateRecBtn(); document.getElementById('inNote').textContent=enOr('辨識中斷('+err+'),再按一次麥克風重試。','Recognition stopped ('+err+') — tap the mic to retry.'); return; }
-    if(_wantRec){ setTimeout(function(){ if(_wantRec){ _sessFin=''; recording=true; _nPost({type:'SPEECH_START',lang:'ja-JP',continuous:true,androidSegments:SEG}); } },200); return; }   // 停頓自動續錄(舊版 App 無 continuous 時的後備路徑)
+    if(_wantRec){ setTimeout(function(){ if(_wantRec){ _sessFin=''; _nStart._segReset(); recording=true; _nPost({type:'SPEECH_START',lang:'ja-JP',continuous:true,androidSegments:SEG}); } },200); return; }   // 停頓自動續錄(舊版 App 無 continuous 時的後備路徑)
     updateRecBtn();
   };
   _sessFin=''; recording=true; updateRecBtn();
@@ -1149,7 +1158,7 @@ function _newRec(){
     const el=document.getElementById('say');
     // fin 是「這個實例至今全部」的確定段落(每次事件整批重算),所以只暫存、不累加進 base——
     // 之前邊播邊累加會讓同一段被算兩次(base 已含 + fin 再含一次 → 文字出現兩次)
-    _sessFin=fin;
+    _sessFin=fin; if(fin||interim) _heard();
     el.value=_recBase+fin+interim;   // 接在已輸入內容後面,不覆蓋
     autoGrow();
   };
