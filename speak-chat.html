@@ -31,17 +31,20 @@
   .lvtab.on{background:var(--accent);color:#fff;border-color:var(--accent)}
   .lvtab small{display:block;font-size:10px;font-weight:500;opacity:.8;margin-top:1px}
   .scenes{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-top:6px}
-  .scene{background:var(--panel);border:1px solid var(--line);border-radius:14px;box-shadow:var(--sh);padding:14px;cursor:pointer;transition:border-color .12s,transform .08s}
-  .scene:hover{border-color:var(--accent)}
+  /* 情境卡改版(2026-10-20 Mia:小圖 AI 感重)—— 換成同一套手繪小狸場景插畫當卡片主圖,文字在下 */
+  .scene{background:var(--panel);border:1px solid var(--line);border-radius:16px;box-shadow:var(--sh);padding:0;cursor:pointer;overflow:hidden;position:relative;transition:border-color .15s,transform .12s,box-shadow .15s;display:flex;flex-direction:column}
+  .scene:hover{border-color:var(--accent);transform:translateY(-2px)}
   .scene:active{transform:scale(.98)}
-  /* JLPT 風格圓形圖示徽章:資料本來就有 ic emoji,原本沒渲染出來 */
-  .scene .sc-ic{width:44px;height:44px;border-radius:50%;background:var(--soft);display:flex;align-items:center;justify-content:center;font-size:21px;margin-bottom:9px}
-  .sc-ic img{width:44px;height:44px;display:block;border-radius:50%}
-  .sc-ic:has(img){background:none}
-  .scene .sc-done{float:right;font-size:11px;font-weight:700;color:var(--accent);background:var(--soft);border-radius:20px;padding:2px 8px;margin-top:2px}
-  .scene .jpw{color:var(--accent);font-weight:800;font-size:20px;line-height:1.3;letter-spacing:.01em;font-family:-apple-system,"Hiragino Sans","PingFang TC",sans-serif}
+  .scene .sc-img{aspect-ratio:4/3;background:var(--bg3);overflow:hidden;position:relative}
+  .scene .sc-img img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .35s}
+  .scene:hover .sc-img img{transform:scale(1.05)}
+  .scene .sc-img .sc-emo{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:34px}
+  .scene .sc-body{padding:10px 13px 13px}
+  .scene .sc-done{position:absolute;top:8px;right:8px;z-index:1;font-size:11px;font-weight:700;color:var(--accent);background:rgba(255,255,255,.92);border-radius:20px;padding:3px 9px;box-shadow:0 1px 4px rgba(0,0,0,.12)}
+  .scene .jpw{color:var(--accent);font-weight:800;font-size:19px;line-height:1.3;letter-spacing:.01em;font-family:-apple-system,"Hiragino Sans","PingFang TC",sans-serif}
   .scene .jpw rt{font-size:9px;font-weight:500;color:var(--accent2);letter-spacing:0}
-  .scene .t{font-weight:700;margin-top:6px} .scene .d{color:var(--ink2);font-size:12px;margin-top:2px;line-height:1.5}
+  .scene .t{font-weight:700;margin-top:4px;font-size:14.5px} .scene .d{color:var(--ink2);font-size:12px;margin-top:2px;line-height:1.5}
+  .sc-thumb{object-fit:cover;border-radius:50%}
   .sc-sec{grid-column:1/-1;font-size:12.5px;font-weight:800;color:var(--ink3);letter-spacing:.06em;margin:10px 0 -4px;display:flex;align-items:center;gap:8px}
   .sc-sec::after{content:'';flex:1;height:1px;background:var(--line)}
   .sc-resume{grid-column:1/-1;display:flex;align-items:center;gap:12px;background:var(--soft);border:1.5px solid var(--accent);border-radius:14px;padding:12px 14px;cursor:pointer}
@@ -434,7 +437,7 @@ function renderScenes(){
   const cnt = scCounts();
   const sceneCard = s => {
     const done = cnt[s.k] ? `<span class="sc-done">✓ ${enOr('練過','×')}${cnt[s.k]}${enOr('次','')}</span>` : '';
-    return `<div class="scene" onclick="startChat('${s.k}')">${done}<div class="sc-ic"><img src="images/scenes/${s.k}.png" alt="" onerror="this.parentNode.textContent='${esc(s.ic||'💬')}'"></div><div class="jpw">${s.yomi?`<ruby>${esc(s.jp)}<rt>${esc(s.yomi)}</rt></ruby>`:esc(s.jp)}</div><div class="t">${esc(sceneTitle(s))}</div><div class="d">${esc(s.dE?enOr(s.d,s.dE):s.d)}</div></div>`;
+    return `<div class="scene" onclick="startChat('${s.k}')">${done}<div class="sc-img"><img src="images/scenes/card/${sceneImgK(s.k)}.webp" alt="" loading="lazy" onerror="this.outerHTML='<span class=sc-emo>${esc(s.ic||'💬')}</span>'"></div><div class="sc-body"><div class="jpw">${s.yomi?`<ruby>${esc(s.jp)}<rt>${esc(s.yomi)}</rt></ruby>`:esc(s.jp)}</div><div class="t">${esc(sceneTitle(s))}</div><div class="d">${esc(s.dE?enOr(s.d,s.dE):s.d)}</div></div></div>`;
   };
   let h = '';
   // 繼續上次:一鍵回到上次的場景+難度(降低「今天練什麼」的選擇門檻)
@@ -442,7 +445,7 @@ function renderScenes(){
     const last = JSON.parse(localStorage.getItem('sc_last')||'null');
     const ls = last && SCENES.find(x=>x.k===last.k && x.k!=='custom');
     if (ls) h += `<div class="sc-resume" onclick="activeLv='${esc(last.lv||'N4')}';renderLvTabs&&renderLvTabs();startChat('${ls.k}')">
-      <img src="images/scenes/${ls.img||ls.k}.png" alt="">
+      <img class="sc-thumb" src="images/scenes/card/${ls.img||ls.k}.webp" alt="">
       <span><span class="rt1">${enOr('繼續上次','Continue')}</span><br><span class="rt2">${esc(ls.jp)}(${esc(sceneTitle(ls))}) · ${esc(last.lv||'N4')}</span></span>
       <span class="go">→</span></div>`;
   } catch(e) {}
@@ -472,7 +475,7 @@ function renderTop(){
       <button class="hr-go" onclick="openCreate()"><i data-ic=edit></i> ${enOr('建立','Create')}</button>
     </div>`
     + (f ? `<div class="sc-feat" onclick="startChat('daily5')">
-      <span class="ft-ic"><img src="images/scenes/${f.img}.png" alt="" onerror="this.outerHTML='<i data-ic=sun></i>'"></span>
+      <span class="ft-ic"><img class="sc-thumb" src="images/scenes/card/${f.img}.webp" alt="" onerror="this.outerHTML='<i data-ic=sun></i>'"></span>
       <span class="ft-body"><span class="ft-lb"><i data-ic=star></i> ${enOr('每日推薦','Daily pick')}</span>
         <div class="ft-t">${esc(enOr(f.t,f.tE))}</div>
         <div class="ft-d">${esc(enOr(f.d,f.dE))} · <span id="featLv">${esc(activeLv)}</span></div></span>
@@ -594,7 +597,7 @@ function startChat(k, customScene){
   try { if (scene.k!=='custom') localStorage.setItem('sc_last', JSON.stringify({ k: scene.k, lv: activeLv })); } catch(e) {}
   // 場景背景圖(有切好的才掛;veil 由 CSS 蓋淡)
   const chatEl=document.getElementById('chat');
-  const bgOk=['conbini','resto','station','clinic','shop','interview','house','coworker','cityhall','phone','salon','izakaya','delivery','smalltalk','custom'];
+  const bgOk=['conbini','resto','station','clinic','shop','interview','house','coworker','cityhall','phone','salon','izakaya','delivery','smalltalk','custom','bank','post','moving','dentist','gym','school','trouble','ticket','meeting','friend'];
   const bgK=scene.img||scene.k;
   if(bgOk.includes(bgK)){ chatEl.style.setProperty('--chatbg','url(images/scenes/bg/'+bgK+'.jpg)'); chatEl.classList.add('has-bg'); }
   else { chatEl.classList.remove('has-bg'); }
@@ -981,7 +984,7 @@ async function openLogs(){
     box.innerHTML=snap.docs.map(d=>{ const v=d.data(); window.__logs[d.id]=v;
       const dt=new Date(v.ts); const ds=(dt.getMonth()+1)+'/'+dt.getDate()+' '+String(dt.getHours()).padStart(2,'0')+':'+String(dt.getMinutes()).padStart(2,'0');
       return '<div class="hist-row" style="display:flex;gap:10px;align-items:center;padding:12px 4px;border-bottom:1px solid var(--line);cursor:pointer" onclick="viewLog(\''+d.id+'\')">'
-        +(v.sceneK?'<img src="images/scenes/'+esc(sceneImgK(v.sceneK))+'.png" alt="" style="width:26px;height:26px;border-radius:50%" onerror="this.style.display=\'none\'">':'<span style="font-size:20px">'+esc(v.sceneIc||'💬')+'</span>')
+        +(v.sceneK?'<img src="images/scenes/card/'+esc(sceneImgK(v.sceneK))+'.webp" alt="" style="width:26px;height:26px;border-radius:50%;object-fit:cover" onerror="this.style.display=\'none\'">':'<span style="font-size:20px">'+esc(v.sceneIc||'💬')+'</span>')
         +'<span style="flex:1"><b>'+esc(cvt(v.sceneT||''))+'</b> <span class="muted">· '+esc(v.lv||'')+' · '+ds+'</span></span>'
         +(v.score!=null?'<span style="font-weight:700;color:'+(v.score>=85?'var(--ok)':v.score>=60?'var(--warn)':'var(--bad)')+'">'+v.score+'</span>':'')
         +'<span class="muted">›</span></div>'; }).join('');
@@ -990,7 +993,7 @@ async function openLogs(){
 function viewLog(id){
   const v=(window.__logs||{})[id]; if(!v) return;
   show('logview');
-  document.getElementById('lvTtl').innerHTML=(v.sceneK?'<img src="images/scenes/'+esc(sceneImgK(v.sceneK))+'.png" alt="" style="width:22px;height:22px;border-radius:50%;vertical-align:-4px" onerror="this.style.display=\'none\'"> ':esc(v.sceneIc||'💬')+' ')+esc(cvt(v.sceneT||''))+' · '+esc(v.lv||'');
+  document.getElementById('lvTtl').innerHTML=(v.sceneK?'<img src="images/scenes/card/'+esc(sceneImgK(v.sceneK))+'.webp" alt="" style="width:22px;height:22px;border-radius:50%;object-fit:cover;vertical-align:-4px" onerror="this.style.display=\'none\'"> ':esc(v.sceneIc||'💬')+' ')+esc(cvt(v.sceneT||''))+' · '+esc(v.lv||'');
   const wrap=document.getElementById('logMsgs');
   wrap.innerHTML=(v.msgs||[]).map(function(m,i){
     if(m.r==='m') return '<div class="msg me"><div class="bubble me"><div class="bjp">'+esc(m.jp)+'</div></div></div>';
