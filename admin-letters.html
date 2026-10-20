@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>電子報後台 — 一人公司實驗室</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;1,300&display=swap" rel="stylesheet">
+<style>
+  /* 跟電子報網頁同一套 Kling 風:黑底、玻璃面板、螢光綠 */
+  :root{--bg:#050608;--panel:rgba(20,22,27,.82);--panel2:#121418;--line:rgba(255,255,255,.07);--line2:rgba(255,255,255,.13);--tx:#F3F5F8;--tx2:#A3AAB6;--tx3:#686F7B;--lime:#A6F26E;--btn:linear-gradient(90deg,#BDF56E,#66E07E);--bad:#FF7A59;--warn:#F5C451;color-scheme:dark}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--tx);font-family:"Inter",-apple-system,"PingFang TC","Noto Sans TC",sans-serif;font-size:14px;-webkit-font-smoothing:antialiased;min-height:100vh}
+  body::before{content:"";position:fixed;left:50%;top:-30vh;width:min(620px,80vw);height:80vh;transform:translateX(-50%);background:radial-gradient(ellipse 50% 50% at 50% 40%,rgba(150,185,255,.35),transparent 70%);filter:blur(50px);pointer-events:none;z-index:0}
+  .num{font-variant-numeric:tabular-nums}
+  .wrap{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:0 18px 60px}
+  header{display:flex;align-items:center;gap:12px;padding:18px 0 8px;flex-wrap:wrap}
+  header h1{font-size:15px;font-weight:700}
+  header .sp{flex:1}
+  header a,header button{font:inherit;font-size:13px;color:var(--tx2);text-decoration:none;border:1px solid var(--line2);background:var(--panel);padding:7px 14px;border-radius:999px;cursor:pointer}
+  header a:hover,header button:hover{color:var(--tx)}
+  .hero{padding:28px 0 22px}
+  .hero .k{color:var(--tx2);letter-spacing:.12em;font-size:14px}
+  .hero h2{font-size:clamp(28px,5vw,44px);font-weight:300;font-style:italic;margin-top:4px}
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+  .kpi{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:16px 18px}
+  .kpi span{display:block;font-size:12.5px;color:var(--tx3)}
+  .kpi b{display:block;font-size:30px;font-weight:600;margin-top:4px}
+  .kpi.hl b{color:var(--lime)}
+  .kpi small{font-size:12px;color:var(--tx3)}
+  @media(max-width:720px){.kpis{grid-template-columns:1fr 1fr}}
+  .cols{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
+  @media(max-width:820px){.cols{grid-template-columns:1fr}}
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:18px;overflow:hidden;margin-top:12px}
+  .cols .panel{margin-top:0}
+  .ph{display:flex;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+  .ph h3{font-size:15px;font-weight:600}
+  .ph .hint{font-size:12px;color:var(--tx3)}
+  .ph .sp{flex:1}
+  .pb{padding:14px 18px}
+  .bar{display:grid;grid-template-columns:120px 1fr 44px;align-items:center;gap:10px;margin:9px 0}
+  .bar .l{font-size:13.5px;color:var(--tx)}
+  .bar .t{height:10px;border-radius:999px;background:var(--line);overflow:hidden}
+  .bar .t i{display:block;height:100%;border-radius:999px;background:var(--btn)}
+  .bar .n{text-align:right;color:var(--tx2);font-size:13px}
+  .fb{padding:12px 0;border-bottom:1px solid var(--line)}
+  .fb:last-child{border-bottom:0}
+  .fb .m{font-size:12px;color:var(--tx3)}
+  .fb .x{margin-top:4px;line-height:1.7;white-space:pre-wrap;word-break:break-word}
+  .tg{display:inline-block;font-size:11.5px;color:var(--tx2);border:1px solid var(--line2);border-radius:999px;padding:1px 8px;margin:4px 4px 0 0}
+  .empty{color:var(--tx3);font-size:13px;padding:6px 0}
+  .tools{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  input[type=search],select{font:inherit;font-size:13.5px;color:var(--tx);background:var(--panel2);border:1px solid var(--line2);border-radius:10px;padding:7px 11px;outline:0}
+  input[type=search]{width:200px}
+  .btn{font:inherit;font-size:13px;font-weight:600;color:#0A0F08;background:var(--btn);border:0;border-radius:10px;padding:8px 14px;cursor:pointer}
+  .tbl{width:100%;border-collapse:collapse}
+  .tbl th{text-align:left;font-weight:500;font-size:12px;color:var(--tx3);padding:10px 12px;border-bottom:1px solid var(--line);white-space:nowrap}
+  .tbl td{padding:11px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+  .tbl tr:last-child td{border-bottom:0}
+  .tbl .em{font-weight:500;word-break:break-all}
+  .st{display:inline-block;font-size:12px;font-weight:600;border-radius:999px;padding:2px 9px;white-space:nowrap}
+  .st.active{color:#0A0F08;background:var(--lime)}
+  .st.pending{color:var(--warn);border:1px solid rgba(245,196,81,.4)}
+  .st.unsubscribed{color:var(--tx3);border:1px solid var(--line2)}
+  .scroll{overflow-x:auto}
+  .gate{min-height:80vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;text-align:center;position:relative;z-index:1}
+  .gate h2{font-size:34px;font-weight:300;font-style:italic}
+  .gate p{color:var(--tx2)}
+  .err{color:var(--bad);font-size:13px;min-height:1em}
+  .muted{color:var(--tx3)}
+</style>
+</head>
+<body>
+<div class="gate" id="gate">
+  <h2>Newsletter admin</h2>
+  <p>一人公司實驗室・訂閱者後台</p>
+  <button class="btn" id="loginBtn" style="padding:12px 28px;font-size:15px">用 Google 登入</button>
+  <div class="err" id="errMsg"></div>
+</div>
+
+<div class="wrap" id="app" style="display:none">
+  <header>
+    <h1>一人公司實驗室 · 後台</h1><span class="sp"></span>
+    <a href="/letters/" target="_blank">看電子報 ↗</a>
+    <a href="admin-dash.html">StayJP 後台</a>
+    <button onclick="load()">重新整理</button>
+    <button onclick="auth.signOut();location.reload()">登出</button>
+  </header>
+  <div class="hero"><div class="k">SUBSCRIBERS</div><h2 id="heroN">—</h2></div>
+
+  <div class="kpis">
+    <div class="kpi hl"><span>有效訂閱</span><b class="num" id="kActive">—</b><small id="kActiveSub"></small></div>
+    <div class="kpi"><span>近 7 天新增</span><b class="num" id="k7">—</b><small>已確認的</small></div>
+    <div class="kpi"><span>待確認(沒點確認信)</span><b class="num" id="kPending">—</b><small>不會收到信</small></div>
+    <div class="kpi"><span>已退訂</span><b class="num" id="kUnsub">—</b><small id="kUnsubSub"></small></div>
+  </div>
+
+  <div class="cols" style="margin-top:12px">
+    <div class="panel">
+      <div class="ph"><h3>大家想看什麼</h3><span class="sp"></span><span class="hint" id="topicHint"></span></div>
+      <div class="pb" id="topics"></div>
+    </div>
+    <div class="panel">
+      <div class="ph"><h3>讀者留言</h3><span class="sp"></span><span class="hint">最新在上</span></div>
+      <div class="pb" id="notes" style="max-height:360px;overflow:auto"></div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="ph"><h3>訂閱名單</h3><span class="sp"></span>
+      <div class="tools">
+        <input type="search" id="q" placeholder="搜尋 Email / 來源" oninput="renderSubs()">
+        <select id="fStatus" onchange="renderSubs()"><option value="">全部狀態</option><option value="active" selected>有效</option><option value="pending">待確認</option><option value="unsubscribed">已退訂</option></select>
+        <button class="btn" onclick="exportCsv()">匯出 CSV</button>
+      </div>
+    </div>
+    <div class="scroll"><table class="tbl"><thead><tr><th>Email</th><th>狀態</th><th>來源</th><th>訂閱日</th><th>收過</th><th>想看</th></tr></thead><tbody id="subRows"></tbody></table></div>
+  </div>
+
+  <div class="panel">
+    <div class="ph"><h3>各期寄送</h3><span class="sp"></span><span class="hint">只放網頁的期數不會出現在這裡</span></div>
+    <div class="scroll"><table class="tbl"><thead><tr><th>期數</th><th>已寄</th><th>狀態</th><th>最後更新</th></tr></thead><tbody id="issRows"></tbody></table></div>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script>
+const ADMIN_EMAILS = ['stayjpplan@gmail.com', 'abc83327@gmail.com'];
+const fbConfig = { apiKey:"AIzaSyDnmg2XOuvwgE8m8xCF5sS4o0nQYoUplPI", authDomain:"jpnote-1bdd6.firebaseapp.com", projectId:"jpnote-1bdd6", storageBucket:"jpnote-1bdd6.firebasestorage.app", messagingSenderId:"666368174384" };
+if (!firebase.apps.length) firebase.initializeApp(fbConfig);
+const auth = firebase.auth();
+const FN = 'https://asia-east1-jpnote-1bdd6.cloudfunctions.net/newsletterAdmin';
+// key 要跟 scripts/build-letters.mjs 的 TOPICS、functions/src/newsletter.ts 的 NL_TOPICS 一致
+const TOPICS = { dev:'App 開發實戰', pricing:'定價與營收', marketing:'行銷、社群、KOL', review:'上架與審核', ai:'用 AI 做產品', nomad:'旅居生活', solo:'一人公司的日常' };
+const ST = { active:'有效', pending:'待確認', unsubscribed:'已退訂' };
+const esc = s => String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+const dt = ms => { if(!ms) return '—'; const d=new Date(ms+8*36e5); return d.toISOString().slice(0,10).replace(/-/g,'/'); };
+const dtm = ms => { if(!ms) return '—'; const d=new Date(ms+8*36e5); return d.toISOString().slice(5,16).replace('-','/').replace('T',' '); };
+let D = { subs:[], feedback:[], issues:[] };
+
+auth.onAuthStateChanged(u => {
+  const ok = u && ADMIN_EMAILS.includes((u.email||'').toLowerCase());
+  document.getElementById('gate').style.display = ok ? 'none' : 'flex';
+  document.getElementById('app').style.display = ok ? 'block' : 'none';
+  if (u && !ok) { document.getElementById('errMsg').textContent = u.email + ' 不是管理員帳號'; auth.signOut(); }
+  if (ok) load();
+});
+document.getElementById('loginBtn').onclick = () => {
+  const p = new firebase.auth.GoogleAuthProvider(); p.setCustomParameters({ prompt:'select_account' });
+  auth.signInWithPopup(p).catch(e => { if(!/popup-closed|cancelled-popup/.test(e.code||'')) document.getElementById('errMsg').textContent = '登入失敗:' + e.message; });
+};
+
+async function load(){
+  try {
+    const t = await auth.currentUser.getIdToken();
+    const r = await fetch(FN, { method:'POST', headers:{ Authorization:'Bearer '+t } });
+    if (!r.ok) throw new Error('HTTP '+r.status);
+    D = await r.json();
+  } catch(e) { document.getElementById('heroN').textContent = '讀取失敗(' + e.message + ')'; return; }
+  render();
+}
+
+function render(){
+  const subs = D.subs || [], act = subs.filter(s=>s.status==='active'), pen = subs.filter(s=>s.status==='pending'), un = subs.filter(s=>s.status==='unsubscribed');
+  const wk = Date.now() - 7*864e5;
+  document.getElementById('heroN').textContent = act.length + ' 位讀者在等下一封';
+  document.getElementById('kActive').textContent = act.length;
+  document.getElementById('kActiveSub').textContent = '共 ' + subs.length + ' 人填過 Email';
+  document.getElementById('k7').textContent = act.filter(s=>(s.confirmed||s.created)>=wk).length;
+  document.getElementById('kPending').textContent = pen.length;
+  document.getElementById('kUnsub').textContent = un.length;
+  document.getElementById('kUnsubSub').textContent = subs.length ? '退訂率 ' + Math.round(un.length/Math.max(1,act.length+un.length)*100) + '%' : '';
+
+  // 想看什麼:只算還在訂閱的人目前的選擇(退訂的不算)
+  const cnt = {}; let voters = 0;
+  act.forEach(s => { if ((s.topics||[]).length) voters++; (s.topics||[]).forEach(k => cnt[k]=(cnt[k]||0)+1); });
+  const max = Math.max(1, ...Object.values(cnt));
+  document.getElementById('topicHint').textContent = voters + ' / ' + act.length + ' 位有回答';
+  document.getElementById('topics').innerHTML = voters ? Object.keys(TOPICS).sort((a,b)=>(cnt[b]||0)-(cnt[a]||0)).map(k =>
+    '<div class="bar"><span class="l">'+TOPICS[k]+'</span><span class="t"><i style="width:'+((cnt[k]||0)/max*100)+'%"></i></span><span class="n num">'+(cnt[k]||0)+'</span></div>').join('')
+    : '<div class="empty">還沒有人回答。訂閱完成畫面跟每封信底部都會問。</div>';
+
+  const notes = (D.feedback||[]).filter(f => f.note);
+  document.getElementById('notes').innerHTML = notes.length ? notes.map(f =>
+    '<div class="fb"><div class="m">'+esc(f.email)+' · '+dtm(f.at)+'</div><div class="x">'+esc(f.note)+'</div>'+(f.topics||[]).map(k=>'<span class="tg">'+esc(TOPICS[k]||k)+'</span>').join('')+'</div>').join('')
+    : '<div class="empty">還沒有留言。</div>';
+
+  renderSubs();
+  const iss = (D.issues||[]).slice().sort((a,b)=>(b.updated||0)-(a.updated||0));
+  document.getElementById('issRows').innerHTML = iss.length ? iss.map(i =>
+    '<tr><td><a href="/letters/'+esc(i.slug)+'" target="_blank" style="color:var(--tx)">'+esc(i.slug)+'</a></td><td class="num">'+i.sent+'</td><td>'+(i.skipped?'<span class="muted">太舊沒寄</span>':i.done?'寄完了':'<span style="color:var(--warn)">寄送中(每天上限 200)</span>')+'</td><td class="muted">'+dtm(i.updated)+'</td></tr>').join('')
+    : '<tr><td colspan="4" class="empty">還沒有寄過信的期數。</td></tr>';
+}
+
+function filtered(){
+  const q = document.getElementById('q').value.trim().toLowerCase(), f = document.getElementById('fStatus').value;
+  return (D.subs||[]).filter(s => (!f || s.status===f) && (!q || (s.email||'').includes(q) || (s.source||'').toLowerCase().includes(q)))
+    .sort((a,b)=>(b.confirmed||b.created)-(a.confirmed||a.created));
+}
+function renderSubs(){
+  const rows = filtered();
+  document.getElementById('subRows').innerHTML = rows.length ? rows.map(s =>
+    '<tr><td class="em">'+esc(s.email)+'</td><td><span class="st '+esc(s.status)+'">'+(ST[s.status]||esc(s.status))+'</span></td><td class="muted">'+esc(s.source)+'</td><td class="num">'+dt(s.confirmed||s.created)+'</td><td class="num">'+s.got+' 封</td><td>'+((s.topics||[]).map(k=>'<span class="tg">'+esc(TOPICS[k]||k)+'</span>').join('')||'<span class="muted">—</span>')+'</td></tr>').join('')
+    : '<tr><td colspan="6" class="empty">沒有符合的訂閱者。</td></tr>';
+}
+function exportCsv(){
+  const rows = filtered(), q = v => '"' + String(v==null?'':v).replace(/"/g,'""') + '"';
+  const csv = '﻿' + [['email','狀態','來源','訂閱日','收過幾封','想看','留言'].map(q).join(',')].concat(rows.map(s =>
+    [s.email, ST[s.status]||s.status, s.source, dt(s.confirmed||s.created), s.got, (s.topics||[]).map(k=>TOPICS[k]||k).join('、'), s.note].map(q).join(','))).join('\n');
+  const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv], { type:'text/csv' })); a.download = 'newsletter-subs-' + new Date().toISOString().slice(0,10) + '.csv'; a.click();
+}
+</script>
+</body>
+</html>

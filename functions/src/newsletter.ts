@@ -89,7 +89,7 @@ export const newsletterConfirm = https.onRequest(
     if (!q || q.empty) { res.status(404).send(page("連結失效", "這個確認連結找不到了，可以回電子報頁面重新訂閱一次。")); return; }
     const doc = q.docs[0];
     if (doc.data().status !== "active") await doc.ref.set({ status: "active", confirmedAt: FieldValue.serverTimestamp() }, { merge: true });
-    res.redirect(302, `${SITE}/letters/?subscribed=1`);
+    res.redirect(302, `${SITE}/letters/?subscribed=1&t=${encodeURIComponent(t)}`);   // 帶 token:訂閱完成畫面直接問「想看什麼」
   },
 );
 
@@ -142,7 +142,7 @@ export async function runNewsletter(): Promise<string> {
         replyTo: REPLY_TO,
         message: {
           subject: it.title,
-          html: html.split("{{UNSUB}}").join(unsub),
+          html: html.split("{{UNSUB}}").join(unsub).split("{{TOKEN}}").join(encodeURIComponent(s.token)),   // {{TOKEN}}=「想看什麼」回饋頁
           headers: { "List-Unsubscribe": `<${unsub}>`, "List-Unsubscribe-Post": "List-Unsubscribe=One-Click" },
         },
         _campaign: `newsletter_${it.slug}`, _createdAt: FieldValue.serverTimestamp(),
@@ -162,4 +162,60 @@ export async function runNewsletter(): Promise<string> {
 export const newsletterCron = scheduler.onSchedule(
   { schedule: "every 60 minutes", timeZone: "Asia/Taipei", region: "asia-east1", maxInstances: 1, timeoutSeconds: 300, memory: "256MiB" },
   async () => { await runNewsletter(); },
+);
+
+// ── 讀者回饋:想看哪類內容(2026-10-20 Mia)──
+// 用訂閱 token 認人(不用登入):訂閱完成畫面、每封信底部「想看什麼」連結都帶 t。
+// POST {t, action:"get"} → 目前選的;{t, action:"save", topics[], note} → 存 subs.prefs,並留一筆 newsletter_feedback 歷史。
+export const NL_TOPICS = ["dev", "pricing", "marketing", "review", "ai", "nomad", "solo"];
+export const newsletterPrefs = https.onRequest(
+  { cors: CORS, region: "asia-east1", invoker: "public", maxInstances: 3, timeoutSeconds: 15, memory: "256MiB" },
+  async (req, res) => {
+    if (req.method !== "POST") { res.status(405).json({ ok: false }); return; }
+    const body = typeof req.body === "string" ? (() => { try { return JSON.parse(req.body); } catch { return {}; } })() : (req.body || {});
+    const t = String(body.t || "");
+    const q = t ? await db.collection("newsletter_subs").where("token", "==", t).limit(1).get() : null;
+    if (!q || q.empty) { res.status(404).json({ ok: false, err: "token" }); return; }
+    const doc = q.docs[0], cur = doc.data();
+    if (body.action === "save") {
+      const topics = Array.isArray(body.topics) ? [...new Set<string>(body.topics.map(String))].filter((x) => NL_TOPICS.includes(x)) : [];
+      const note = String(body.note || "").trim().slice(0, 500);
+      if (!topics.length && !note) { res.status(400).json({ ok: false, err: "empty" }); return; }
+      // 同一人 1 分鐘內只記一筆歷史(防連點灌資料),prefs 本身照存
+      const last = cur.prefs?.at?.toMillis?.() || 0;
+      await doc.ref.set({ prefs: { topics, note, at: FieldValue.serverTimestamp() } }, { merge: true });
+      if (Date.now() - last > 60e3) await db.collection("newsletter_feedback").add({ sub: doc.id, email: cur.email, topics, note, at: FieldValue.serverTimestamp() });
+      res.json({ ok: true });
+      return;
+    }
+    const e = String(cur.email || "");
+    res.json({ ok: true, topics: cur.prefs?.topics || [], note: cur.prefs?.note || "", email: e.replace(/^(.).*(@.*)$/, "$1***$2") });
+  },
+);
+
+// ── 後台:訂閱名單+回饋+各期寄送(admin-letters.html 用;限 admin 信箱)──
+const ADMIN_EMAILS = ["stayjpplan@gmail.com", "abc83327@gmail.com"];
+const ms = (v: any) => (v && typeof v.toMillis === "function" ? v.toMillis() : 0);
+export const newsletterAdmin = https.onRequest(
+  { cors: CORS, region: "asia-east1", invoker: "public", maxInstances: 2, timeoutSeconds: 30, memory: "256MiB" },
+  async (req, res) => {
+    try {
+      const tok = (req.headers.authorization || "").replace(/^Bearer\s+/i, "");
+      if (!tok) { res.status(401).json({ error: "auth" }); return; }
+      const dec = await admin.auth().verifyIdToken(tok);
+      if (!ADMIN_EMAILS.includes((dec.email || "").toLowerCase()) || dec.email_verified !== true) { res.status(403).json({ error: "forbidden" }); return; }
+      const [subs, fb, iss] = await Promise.all([
+        db.collection("newsletter_subs").get(),
+        db.collection("newsletter_feedback").orderBy("at", "desc").limit(300).get(),
+        db.collection("newsletter_issues").get(),
+      ]);
+      res.json({
+        subs: subs.docs.map((d) => { const x = d.data(); const got = x.got || {};
+          return { id: d.id, email: x.email, status: x.status, source: x.source || "", created: ms(x.createdAt), confirmed: ms(x.confirmedAt), unsub: ms(x.unsubAt),
+            got: Object.keys(got).length, topics: x.prefs?.topics || [], note: x.prefs?.note || "", prefsAt: ms(x.prefs?.at) }; }),
+        feedback: fb.docs.map((d) => { const x = d.data(); return { email: x.email, topics: x.topics || [], note: x.note || "", at: ms(x.at) }; }),
+        issues: iss.docs.map((d) => { const x = d.data(); return { slug: d.id, sent: x.sent || 0, done: !!x.done, skipped: x.skipped || "", updated: ms(x.updatedAt) }; }),
+      });
+    } catch (e) { console.error("newsletterAdmin", e); res.status(500).json({ error: "internal" }); }
+  },
 );

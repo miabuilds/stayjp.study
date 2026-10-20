@@ -200,6 +200,18 @@ footer{display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px;paddin
 footer a{color:var(--tx2);text-decoration:none}
 footer a:hover{color:var(--tx)}
 @media(max-width:520px){header .logo{font-size:14px}.pill .txt{display:none}.pill{padding:7px 10px}.hero{padding:44px 0 24px}.hero .kick{font-size:16px}}
+.tps{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.tp{font:inherit;font-size:14px;color:var(--tx2);border:1px solid var(--line2);background:var(--panel2);border-radius:12px;padding:9px 14px;cursor:pointer;transition:border-color .2s,color .2s,background .2s;line-height:1.3}
+.tp:hover{color:var(--tx)}
+.tp.on{border-color:var(--lime-t);color:var(--tx);background:var(--hl)}
+.tp.on::before{content:"✓ ";color:var(--lime-t);font-weight:700}
+.prefs textarea{display:block;width:100%;margin-top:14px;font:inherit;font-size:15px;line-height:1.6;min-height:84px;resize:vertical;padding:12px 14px;border-radius:12px;border:1px solid var(--line2);background:var(--panel2);color:var(--tx);outline:0}
+.prefs textarea:focus{border-color:var(--lime-t)}
+.prefs textarea::placeholder{color:var(--tx3)}
+.prefs .bot{display:flex;align-items:center;gap:10px;margin-top:16px}
+.prefs .who{font-size:13px;color:var(--tx3)}
+.prefs .msg{font-size:14px;margin-top:10px;color:var(--lime-t)}
+.prefs .msg:empty{display:none}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}.rv{opacity:1;transform:none}}`;
 
 const FONTS = `<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -226,12 +238,40 @@ const SUB_BOX = (source) => `<div class="prompt" id="sub">
 </div>`;
 
 const SUB_JS = `<script>
+// 雲端函式冷啟動偶爾會直接拒絕(no available instance,10/20 Mia 自己訂就中)→ 點進輸入框先叫醒,送出失敗自動重試 2 次
+var nlWarmed=0;document.addEventListener('focusin',function(e){if(nlWarmed||!e.target.closest||!e.target.closest('#sub'))return;nlWarmed=1;fetch('${SUB_FN}',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'}).catch(function(){})});
+function nlPost(body,n){return fetch('${SUB_FN}',{method:'POST',headers:{'Content-Type':'application/json'},body:body}).then(function(r){if(r.status>=500||r.status===429)throw new Error('busy');return r.json()})
+.catch(function(e){if(n>0)return new Promise(function(ok){setTimeout(ok,1800)}).then(function(){return nlPost(body,n-1)});throw e})}
 function nlSub(f){var m=f.parentNode.querySelector('.msg'),b=f.querySelector('button');b.disabled=true;m.style.color='';m.textContent='送出中…';
-fetch('${SUB_FN}',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:f.email.value,website:f.website.value,source:f.source.value})})
-.then(function(r){return r.json()}).then(function(j){
+nlPost(JSON.stringify({email:f.email.value,website:f.website.value,source:f.source.value}),2)
+.then(function(j){
 if(!j.ok){m.style.color='#FF7A59';m.textContent='Email 格式好像不對，再檢查一下。';return}
-m.textContent=j.already?'你已經訂閱了，謝謝。':'確認信寄出了，去信箱按「確認訂閱」就完成。';f.reset();})
-.catch(function(){m.style.color='#FF7A59';m.textContent='送出失敗，稍後再試一次。'}).finally(function(){b.disabled=false});return false}
+m.textContent=j.already?'你已經訂閱了，謝謝。':'確認信寄出了，去信箱按「確認訂閱」就完成（沒看到的話看一下垃圾信件匣）。';f.reset();})
+.catch(function(){m.style.color='#FF7A59';m.textContent='送出失敗，等幾秒再按一次。'}).finally(function(){b.disabled=false});return false}
+</script>`;
+
+// 讀者回饋:想看哪類內容(key 要跟 functions/src/newsletter.ts 的 NL_TOPICS 一致)
+const TOPICS = [["dev", "App 開發實戰"], ["pricing", "定價與營收"], ["marketing", "行銷、社群、KOL"], ["review", "上架與審核"], ["ai", "用 AI 做產品"], ["nomad", "旅居生活"], ["solo", "一人公司的日常"]];
+const PREFS_FN = SUB_FN.replace("newsletterSubscribe", "newsletterPrefs");
+const PREFS_BOX = (title, sub) => `<div class="prefs" id="prefs">
+  <div class="top"><div class="tile">${IC.spark}</div><div class="txt"><b>${esc(title)}</b><p>${esc(sub)}</p></div></div>
+  <div class="tps">${TOPICS.map(([k, l]) => `<button type="button" class="tp" data-k="${k}">${esc(l)}</button>`).join("")}</div>
+  <textarea maxlength="500" placeholder="還想看什麼？或有什麼想問我的（選填）"></textarea>
+  <div class="bot"><span class="who"></span><span class="sp" style="flex:1"></span><button class="go-btn" type="button">送出</button></div>
+  <div class="msg" role="status"></div>
+</div>`;
+const PREFS_JS = `<script>
+function nlPrefs(t){var box=document.getElementById('prefs');if(!box||!t)return false;
+var tps=box.querySelectorAll('.tp'),ta=box.querySelector('textarea'),btn=box.querySelector('.go-btn'),m=box.querySelector('.msg');
+tps.forEach(function(b){b.onclick=function(){b.classList.toggle('on')}});
+var call=function(o){o.t=t;return fetch('${PREFS_FN}',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(o)}).then(function(r){return r.json()})};
+call({action:'get'}).then(function(j){if(!j.ok){m.style.color='#FF7A59';m.textContent='這個連結失效了，從最新一封信底下的連結再點一次。';btn.disabled=true;return}
+(j.topics||[]).forEach(function(k){var b=box.querySelector('.tp[data-k="'+k+'"]');if(b)b.classList.add('on')});ta.value=j.note||'';box.querySelector('.who').textContent=j.email||''}).catch(function(){});
+btn.onclick=function(){var ks=[].slice.call(box.querySelectorAll('.tp.on')).map(function(b){return b.getAttribute('data-k')});
+if(!ks.length&&!ta.value.trim()){m.style.color='#FF7A59';m.textContent='至少選一個，或寫一句話。';return}
+btn.disabled=true;m.style.color='';m.textContent='送出中…';
+call({action:'save',topics:ks,note:ta.value}).then(function(j){m.textContent=j.ok?'收到了，謝謝！之後會照這個方向多寫。':'送出失敗，稍後再試一次。'}).catch(function(){m.textContent='送出失敗，稍後再試一次。'}).finally(function(){btn.disabled=false})};
+return true}
 </script>`;
 
 // 主題在 <head> 先設好，避免先閃一下錯的顏色
@@ -311,25 +351,36 @@ function emailPage(it) {
 ${body}
 <hr style="border:0;border-top:1px solid #e5e1da;margin:2em 0">
 <p style="color:#999;font-size:13px;margin:0">直接回這封信就會寄到我信箱，我都會看。<br>
-<a style="color:#999" href="${SITE}/letters/${it.slug}">在網頁上看這一期</a>・<a style="color:#999" href="{{UNSUB}}">退訂</a></p>
+<a style="color:#999" href="${SITE}/letters/prefs.html?t={{TOKEN}}">想看什麼內容？告訴我</a>・<a style="color:#999" href="${SITE}/letters/${it.slug}">在網頁上看這一期</a>・<a style="color:#999" href="{{UNSUB}}">退訂</a></p>
 </div></div>`;
 }
 
 function indexPage() {
   return head(NAME, TAGLINE, `${SITE}/letters/`) + HEADER +
     `<section class="hero"><div class="kick">${esc(NAME)}</div><h1>One person. Building in public.</h1><p id="tl">${esc(TAGLINE)}</p>
-<div class="prompt" id="ok" hidden><div class="top"><div class="tile">${IC.mail}</div><div class="txt"><b>訂閱完成</b><p>下一份紀錄出來就會寄給你。</p></div></div></div>
+<div class="prompt" id="ok" hidden><div class="top"><div class="tile">${IC.mail}</div><div class="txt"><b>訂閱完成</b><p>下一份紀錄出來就會寄給你。</p></div></div><div id="okPrefs" hidden style="margin-top:22px;padding-top:22px;border-top:1px solid var(--line)">${PREFS_BOX("最後一個問題：你最想看哪些內容？", "可以複選，我會照大家選的多寫。")}</div></div>
 ${SUB_BOX("letters")}</section>
 <div class="seg"><div class="tabs"><span class="on">實驗紀錄</span></div><span class="n" id="expN"></span></div>
 <ul class="grid" id="list"><li class="empty">第一份紀錄準備中</li></ul>
-${FOOTER}${SUB_JS}${FX_JS}<script>
+${FOOTER}${SUB_JS}${PREFS_JS}${FX_JS}<script>
 ${CARD_JS}
-if(/subscribed=1/.test(location.search)){document.getElementById('ok').hidden=false;document.getElementById('sub').hidden=true}
+if(/subscribed=1/.test(location.search)){document.getElementById('ok').hidden=false;document.getElementById('sub').hidden=true;var tk=new URLSearchParams(location.search).get('t');if(tk&&nlPrefs(tk))document.getElementById('okPrefs').hidden=false}
 fxType(document.getElementById('tl'));
 fetch('/letters/feed.json?_='+Date.now()).then(function(r){return r.json()}).then(function(f){
 var now=Date.now(),its=(f.issues||[]).filter(function(i){return Date.parse(i.send_at)<=now});
 document.getElementById('expN').textContent=its.length+' 篇';fxNotice(its,'');
 if(its.length){var L=document.getElementById('list');L.classList.toggle('has-feat',its.length>=3);L.innerHTML=nlCards(its,its,its.length>=3);fxReveal(L)}});
+</script></body></html>`;
+}
+
+function prefsPage() {
+  return head(`想看什麼內容｜${NAME}`, TAGLINE, `${SITE}/letters/prefs.html`).replace("<head>", '<head><meta name="robots" content="noindex">') + HEADER +
+    `<section class="hero"><div class="kick">${esc(NAME)}</div><h1>What should I write next?</h1><p>告訴我你最想看哪些內容，我會照大家選的多寫。</p>
+<div class="prompt" style="max-width:720px">${PREFS_BOX("你最想看哪些內容？", "可以複選，也可以直接寫一句話給我。")}</div>
+<p id="noT" hidden style="margin-top:22px">這個頁面要從電子報信件底下的「想看什麼內容」連結進來喔。還沒訂閱的話，<a href="/letters/#sub" style="color:var(--lime-t)">先到這裡訂閱</a>。</p></section>
+${FOOTER}${PREFS_JS}${FX_JS}<script>
+var tk=new URLSearchParams(location.search).get('t');if(!nlPrefs(tk)){document.getElementById('prefs').parentNode.hidden=true;document.getElementById('noT').hidden=false}
+fetch('/letters/feed.json').then(function(r){return r.json()}).then(function(f){var now=Date.now();fxNotice((f.issues||[]).filter(function(i){return Date.parse(i.send_at)<=now}),'')}).catch(function(){});
 </script></body></html>`;
 }
 
@@ -348,5 +399,6 @@ const feed = items.filter((i) => !i.draft).sort((a, b) => Date.parse(b.send_at) 
     url: `/letters/${i.slug}`, email_url: `/letters/${i.slug}.email.html`, ...(i.email ? {} : { email: false }) }));
 fs.writeFileSync(path.join(OUT, "feed.json"), JSON.stringify({ name: NAME, issues: feed }, null, 1));
 fs.writeFileSync(path.join(OUT, "index.html"), indexPage());
+fs.writeFileSync(path.join(OUT, "prefs.html"), prefsPage());
 console.log(`電子報:${items.length} 篇(${feed.length} 篇進 feed,${items.length - feed.length} 篇草稿)`);
 for (const i of feed) console.log(`  ${twDate(i.send_at)} ${i.email === false ? "只放網頁" : Date.parse(i.send_at) > Date.now() ? "排程寄信" : "已到期"}  ${i.slug}  ${i.title}`);
