@@ -389,7 +389,7 @@ const YTS = (() => {
   //   (2026-10 用戶回饋 すずめ PV 聽寫/填空對不上 → 連同 4 支動漫預告、3 支 ANN 新聞一起下架;
   //    下架前先 node scripts/yt-seed.mjs probe <id> 看 manual:true 才放回來)
   // lv = 等級標籤(卡片角標 + 等級篩選);沒寫的用 LV_BY_CAT 推
-  const LV_BY_CAT = { '入門':'N5', '故事':'N5', 'Vlog':'N4', '新聞':'N4', '會話':'N4', '動漫':'N3', '歌':'N3' };
+  const LV_BY_CAT = { '入門':'N5', '故事':'N5', 'Vlog':'N4', '新聞':'N4', '會話':'N4', '動漫':'N3', '歌':'N3', '搞笑':'N3' };
   const SAMPLES = [
     // ── 2026-10-02 Aki 先生(Akiko_Japanese_Conversations)N5 慢速聽力 8 支:用戶推薦「講得很慢、生字只有幾個」。
     //    全頻道 30 支都是人工日文字幕+開放嵌入(probe 過),要再加就從 scripts/yt-seed.mjs probe 開始 ──
@@ -462,6 +462,34 @@ const YTS = (() => {
     { v:'Nw_XzGZ35As', cat:'動漫', lv:'N2', t:'ダンダダン OP映像 Creepy Nuts「オトノケ」', tag:'膽大黨 · 中日字幕' },
     { v:'H6FUBWGSOIc', cat:'動漫', lv:'N2', t:'Creepy Nuts「Bling-Bang-Bang-Born」THE FIRST TAKE', tag:'肌肉魔法使 MASHLE · 中日字幕' },
     { v:'A7cp6OVa0Qc', cat:'動漫', lv:'N2', t:'Official髭男dism「Same Blue」MV', tag:'藍色監獄 BLUE LOCK · 中日字幕' },
+    // ── 搞笑(2026-10-16 Mia:「多放一些好笑的影片」):只收官方頻道+人工日文字幕;Shorts 分頁幾乎都是自動字幕所以沒收 ──
+    { v:'iRjoBWRWGfE', cat:'搞笑', lv:'N4', t:'貓咪短劇:電熱毯沙龍', tag:'もしぬこ · 39 秒 · 中日字幕' },
+    { v:'qkKIJKcVX14', cat:'搞笑', lv:'N4', t:'表演鮪魚解體秀的貓', tag:'もしぬこ · 33 秒 · 中日字幕' },
+    { v:'prBoaC0JfY4', cat:'搞笑', lv:'N4', t:'懶得動,用手比劃指揮的貓', tag:'もしぬこ · 32 秒 · 中日字幕' },
+    { v:'1lzzF5PK4XI', cat:'搞笑', lv:'N4', t:'戴上白蘿蔔頭套就入戲的貓', tag:'もしぬこ · 56 秒 · 中日字幕' },
+    { v:'8GqlXP550JE', cat:'搞笑', lv:'N4', t:'如果貓會說話:婚禮貓的悲劇', tag:'もしぬこ · 1 分鐘 · 中日字幕' },
+    { v:'I-zND_Drn6s', cat:'搞笑', lv:'N4', t:'如果貓會說話:絕對不會舒服的貓', tag:'もしぬこ · 1.5 分鐘 · 中日字幕' },
+    { v:'xE5-s7lhNlA', cat:'搞笑', lv:'N3', t:'貓超人 VS 貓舌星人', tag:'もしぬこ · 超人力霸王惡搞 · 中日字幕' },
+    { v:'iQ3BKq6WvlY', cat:'搞笑', lv:'N3', t:'貓忍者 VS 惡貓代官', tag:'もしぬこ · 時代劇口吻 · 中日字幕' },
+    { v:'U-k5uVjEFMQ', cat:'搞笑', lv:'N4', t:'au 三太郎「新的英雄」', tag:'廣告 · 30 秒 · 中日字幕' },
+    { v:'pqD01lVbBOg', cat:'搞笑', lv:'N4', t:'au 三太郎・桃太郎篇', tag:'廣告 · 1 分鐘 · 中日字幕' },
+    { v:'8IQWpubZFi8', cat:'搞笑', lv:'N4', t:'au 三太郎・金太郎篇', tag:'廣告 · 1 分鐘 · 中日字幕' },
+    { v:'aoJY7RZOlp8', cat:'搞笑', lv:'N4', t:'au 三太郎・浦島太郎篇', tag:'廣告 · 1 分鐘 · 中日字幕' },
+    { v:'Ilu7PRMxv0c', cat:'搞笑', lv:'N4', t:'日本生命「戀愛不確定也沒關係」', tag:'廣告 · 30 秒 · 中日字幕' },
+    { v:'tTVAaW_S_YQ', cat:'搞笑', lv:'N4', t:'奇異果廣告「好康的事」', tag:'Zespri · 廣告 · 1 分鐘 · 中日字幕' },
+    { v:'y8TTcMhwj-4', cat:'搞笑', lv:'N3', t:'かまいたち 除毛廣告', tag:'搞笑藝人 · 15 秒 · 中日字幕' },
+    { v:'JfjD7FtUCdM', cat:'搞笑', lv:'N3', t:'上班族日常動畫合集', tag:'モモウメ · 職場 · 中日字幕' },
+    { v:'30uhHm_ROCo', cat:'搞笑', lv:'N3', t:'開會時肚子叫了怎麼辦', tag:'モモウメ · 職場 · 中日字幕' },
+    { v:'jX4taGEZz2o', cat:'搞笑', lv:'N3', t:'狂敲鍵盤裝忙,能擊退上司嗎', tag:'モモウメ · 職場 · 中日字幕' },
+    { v:'fZ3qpRXNEAE', cat:'搞笑', lv:'N3', t:'公司裡的綽號太有個性', tag:'モモウメ · 職場 · 中日字幕' },
+    { v:'2Ht9DE57GY0', cat:'搞笑', lv:'N3', t:'短劇「口譯」', tag:'パップコーン · 1.5 分鐘 · 中日字幕' },
+    { v:'gEXRP1PdKWA', cat:'搞笑', lv:'N3', t:'短劇「新幹線」', tag:'パップコーン · 1.5 分鐘 · 中日字幕' },
+    { v:'chrPkriHPRE', cat:'搞笑', lv:'N3', t:'短劇「賓果大會」', tag:'奈良原 · 2 分鐘 · 中日字幕' },
+    { v:'gmcmbqT74J4', cat:'搞笑', lv:'N3', t:'動畫漫才「得來速」', tag:'漫才 · 講得慢 · 中日字幕' },
+    { v:'x8pmqDzZ3R8', cat:'搞笑', lv:'N2', t:'東京03「家庭會議」', tag:'搞笑藝人 · 4 分鐘 · 中日字幕' },
+    { v:'qoslE8d5PrE', cat:'搞笑', lv:'N2', t:'かもめんたる「隱形眼鏡」', tag:'KOC 2012 決賽 · 3.5 分鐘 · 中日字幕' },
+    { v:'2fuKvKLPIDk', cat:'搞笑', lv:'N2', t:'ジャルジャル「選錯人質的傢伙」', tag:'關西腔 · 3.5 分鐘 · 中日字幕' },
+    { v:'2L2zZ0NPh6Q', cat:'搞笑', lv:'N2', t:'新しいカギ 未公開短劇「フィフティーン」', tag:'富士電視台 · 4 分鐘 · 中日字幕' },
     { v:'NyUTYwZe_l4', cat:'歌', t:'YOASOBI「群青」THE FIRST TAKE', tag:'歌詞字幕' },
     { v:'MpYy6wwqxoo', cat:'歌', t:'LiSA「紅蓮華」THE FIRST TAKE', tag:'鬼滅 · 中日字幕' },
     { v:'4Q9DWZLaY2U', cat:'歌', t:'LiSA「炎」THE FIRST TAKE', tag:'鬼滅 · 中日字幕' },
@@ -1435,7 +1463,7 @@ const YTS = (() => {
     const g=document.getElementById('gal'); if(!g) return;
     const cats=['全部',...new Set(SAMPLES.map(x=>x.cat))];
     const en=I18n.getLang()==='en';
-    const catTx=c=>c==='全部'?(en?'All':cvt('全部')):(en?({'入門':'Beginner','故事':'Stories','Vlog':'Vlog','新聞':'News','會話':'Conversation','動漫':'Anime','歌':'Songs'}[c]||c):cvt(c));
+    const catTx=c=>c==='全部'?(en?'All':cvt('全部')):(en?({'入門':'Beginner','故事':'Stories','Vlog':'Vlog','新聞':'News','會話':'Conversation','動漫':'Anime','歌':'Songs','搞笑':'Comedy'}[c]||c):cvt(c));
     document.getElementById('galCats').innerHTML=cats.map(c=>`<button class="${c===galCat?'on':''}" onclick="YTS.setCat('${c}')">${esc(catTx(c))}</button>`).join('');
     const lvEl=document.getElementById('galLvs');
     if(lvEl) lvEl.innerHTML='<span class="lv-lb">'+enOr('程度','Level')+'</span>'+LVS.map(c=>`<button class="${c===galLv?'on':''}" onclick="YTS.setLv('${c}')">${esc(c==='全部'?(en?'All':cvt('全部')):c)}</button>`).join('');
