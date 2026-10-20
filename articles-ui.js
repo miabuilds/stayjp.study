@@ -724,6 +724,9 @@ window.Articles = (function () {
     // 逐詞/時間軸/字典是延後載入的(見 app.html 的大型資料檔載入器):還沒到就先等,
     // 不然這篇會變成沒有點字查詢、朗讀也對不齊。已載入時 Promise 立即 resolve,感覺不到延遲。
     if (window.ensureArticleData && !window.ARTICLE_TOKENS) { window.ensureArticleData().then(function () { read(id, { exact: true }); }); return; }
+    // 語音對照表也是 load 後才抓(app.html ensureTTS):deep link/剛開 App 就點文章時還沒到 → 句子對不到音檔、播放鈕沒反應(「— / —」)。
+    // 先等它;只等一次(載入失敗就照常開,不無限重試)
+    if (window.ensureTTS && !window.__TTS_READY && !(opt && opt.ttsWaited)) { window.ensureTTS().then(function () { read(id, { exact: true, ttsWaited: true }); }); return; }
     if (!readSet()[bid] && window.ToolQuota && window.ToolQuota.shouldGate && window.ToolQuota.shouldGate()) {
       if (!window.ToolQuota.canUse('article')) { window.ToolQuota.showPaywall('article'); return; }
       window.ToolQuota.consume('article');
