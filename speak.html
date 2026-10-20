@@ -119,6 +119,10 @@
   .ls-ctl{display:flex;gap:12px;align-items:center;justify-content:center}
   .ls-ctl button{font:inherit;width:52px;height:52px;border-radius:50%;border:1px solid var(--line);background:var(--panel);color:var(--ink);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:20px}
   .ls-ctl button.big{width:64px;height:64px;background:var(--accent);border-color:var(--accent);color:#fff}
+  .ls-ctl button#lsFav.on{color:var(--accent);border-color:var(--accent)}
+  .ls-ctl button#lsFav.on svg{fill:currentColor}
+  .ls-toast{position:fixed;left:50%;bottom:calc(28px + env(safe-area-inset-bottom));transform:translate(-50%,20px);opacity:0;pointer-events:none;z-index:3000;background:rgba(40,36,32,.92);color:#fff;font-size:14px;padding:10px 16px;border-radius:999px;transition:opacity .2s,transform .2s;white-space:nowrap}
+  .ls-toast.show{opacity:1;transform:translate(-50%,0)}
   .ls-ctl button.big.on{background:var(--bad);border-color:var(--bad);animation:recPulse 1.6s ease-out infinite}
   .ls-skip{font:inherit;border:none;background:none;color:var(--ink3);font-size:13px;cursor:pointer;text-decoration:underline}
   .ls-said{min-height:1.4em;font-size:13px;color:var(--ink3);max-width:520px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -1173,6 +1177,7 @@ const Lesson=(()=>{
       +'<div class="ls-ctl">'
       +'<button onclick="Lesson.demo()" title="'+enOr('再聽一次','Replay')+'"><i data-ic=volume></i></button>'
       +'<button class="big" id="lsMic" onclick="Lesson.toggleMic()"><i data-ic=mic></i></button>'
+      +'<button id="lsFav" class="'+(lsIsFav(it)?'on':'')+'" onclick="Lesson.fav()" title="'+enOr('收藏這句','Save this sentence')+'"><i data-ic=bookmark></i></button>'
       +'</div>'
       +'<div id="lsFoot"><button class="ls-skip" onclick="Lesson.next()">'+(backUrl?enOr('先跳過,回影片 →','Skip — back to video →'):enOr('跳過這句 →','Skip →'))+'</button></div>'
       +'</div>';
@@ -1347,7 +1352,22 @@ const Lesson=(()=>{
     if(fromSkit) safeBack(backUrl, true); else location.replace(backUrl);
   }
   function again(){ clearTimeout(autoTimer); stopListen(); render(); }
-  return { start, startBlankSame, exit, next:nextS, demo, toggleMic, back:goBack, again, _feed:feed, _done:lsDone };
+  // 收藏這句(KOL 回饋:練完想存起來):存進「我的收藏」(fav-sents.js,跟帳號走)
+  function lsIsFav(it){ try{ return !!(window.FavSents&&FavSents.isFav(it.jp)); }catch(e){ return false; } }
+  async function fav(){
+    const it=curIt(); if(!it||!window.FavSents) return;
+    const kana=it.kana||units.map(u=>u.pn?'':(u.r||u.t)).join('');
+    const r=await FavSents.toggle({jp:it.jp,kana,zh:it.zh||'',src:'speak',v:'f'});
+    if(r===null) return;
+    const b=document.getElementById('lsFav'); if(b) b.classList.toggle('on',r);
+    _favToast(r?enOr('收好了,在「我的收藏」可以複習','Saved — find it in My saved'):enOr('已取消收藏','Removed from saved'));
+  }
+  function _favToast(msg){
+    let t=document.getElementById('lsToast');
+    if(!t){ t=document.createElement('div'); t.id='lsToast'; t.className='ls-toast'; document.body.appendChild(t); }
+    t.textContent=msg; t.classList.add('show'); clearTimeout(_favToast._t); _favToast._t=setTimeout(()=>t.classList.remove('show'),1800);
+  }
+  return { start, startBlankSame, exit, next:nextS, demo, toggleMic, back:goBack, again, fav, _feed:feed, _done:lsDone };
 })();
 window.Lesson=Lesson;
 // 入口卡進度:目前等級+分類的已練句數

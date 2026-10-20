@@ -28,7 +28,7 @@ window.FavSents = (function () {
   function isFav(jp) { return !!(cache && cache.some(function (s) { return s.jp === jp; })); }
   async function toggle(sent) {
     var u = user();
-    if (!u) { alert(T('登入後才能收藏句子(收藏會跟著帳號走)。', 'Sign in to save sentences — they sync with your account.')); return null; }
+    if (!u) { (window.AppUI ? AppUI.alert : alert)(T('登入後才能收藏句子(收藏會跟著帳號走)。', 'Sign in to save sentences — they sync with your account.')); return null; }
     var list = (await load()).slice();
     var i = list.findIndex(function (s) { return s.jp === sent.jp; });
     if (i > -1) { list.splice(i, 1); await save(list); return false; }
