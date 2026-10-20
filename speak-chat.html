@@ -1096,8 +1096,20 @@ function _nStart(){
     document.getElementById('inNote').textContent=enOr('準備中…等一下再開口。','Getting ready… wait a moment before speaking.');
     window.stayjpSpeechStarted=function(){ if(_wantRec) document.getElementById('inNote').textContent=enOr('開講!講完按停或直接按送出。','Go ahead! Tap stop or just send when done.'); };
   }
-  window.stayjpSpeechResult=function(t,fin){
-    if(t==null) return;
+  // Android 13+ 新版 App(speechSegments):連續收音走 segmented session,每段 final 只含「這一段」
+  // → 每段定案就直接接進 base,下一段的 interim 接在後面(不能當整段累積全文覆蓋,會把前一段吃掉)
+  const SEG=!!window.STAYJP_NATIVE.speechSegments;
+  _nStart._soft=0;
+  if(SEG){
+    window.stayjpSpeechResult=function(t,fin){
+      if(t==null) return; _nStart._soft=0;
+      const el=document.getElementById('say');
+      if(fin){ if(t) _recBase+=t; el.value=_recBase; }
+      else el.value=_recBase+t;
+      autoGrow();
+    };
+  } else window.stayjpSpeechResult=function(t,fin){
+    if(t==null) return; _nStart._soft=0;
     // 原生(iOS)偶發跨 session 累積:新一段的 transcript 以上一段整串開頭 → 剝掉舊前綴只取新增
     // (用戶實錘:刪掉辨識文字重講,上一段內容跟著一起回來)
     const rawT=t;
@@ -1111,12 +1123,13 @@ function _nStart(){
     recording=false;
     if(_sessFin){ if(!(_sessFin.trim()===_lastFin.trim()&&(Date.now()-_lastFinAt)<1000)) _recBase+=_sessFin; _lastFin=_sessFin; _lastFinAt=Date.now(); _sessFin=''; }   // 防 double-final 疊加(限 1 秒內)
     if(err==='not-allowed'){ _wantRec=false; updateRecBtn(); document.getElementById('inNote').textContent=enOr('麥克風權限被關了:請到 iPhone 設定 → StayJP 允許麥克風。','Microphone access is off: allow it in iPhone Settings → StayJP.'); return; }
+    if(err && _wantRec && /no-speech|speech-timeout|nomatch/.test(err) && (_nStart._soft=(_nStart._soft||0)+1)<=3){ setTimeout(function(){ if(_wantRec){ _sessFin=''; recording=true; _nPost({type:'SPEECH_START',lang:'ja-JP',continuous:true,androidSegments:SEG}); } },200); return; }   // 只是太久沒講話:繼續聽,不報錯
     if(err){ _wantRec=false; updateRecBtn(); document.getElementById('inNote').textContent=enOr('辨識中斷('+err+'),再按一次麥克風重試。','Recognition stopped ('+err+') — tap the mic to retry.'); return; }
-    if(_wantRec){ setTimeout(function(){ if(_wantRec){ _sessFin=''; recording=true; _nPost({type:'SPEECH_START',lang:'ja-JP',continuous:true}); } },200); return; }   // 停頓自動續錄(舊版 App 無 continuous 時的後備路徑)
+    if(_wantRec){ setTimeout(function(){ if(_wantRec){ _sessFin=''; recording=true; _nPost({type:'SPEECH_START',lang:'ja-JP',continuous:true,androidSegments:SEG}); } },200); return; }   // 停頓自動續錄(舊版 App 無 continuous 時的後備路徑)
     updateRecBtn();
   };
   _sessFin=''; recording=true; updateRecBtn();
-  _nPost({type:'SPEECH_START',lang:'ja-JP',continuous:true});   // 情境對話:連續辨識,停頓不斷線(單句頁不帶此旗標)
+  _nPost({type:'SPEECH_START',lang:'ja-JP',continuous:true,androidSegments:SEG});   // 情境對話:連續辨識,停頓不斷線(單句頁不帶此旗標)
 }
 function toggleRec(){ recording||_wantRec ? stopRec() : startRec(); }
 function _newRec(){
