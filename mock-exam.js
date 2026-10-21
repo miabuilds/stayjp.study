@@ -251,9 +251,12 @@ const MockExam = (() => {
     // 與本檔 Type 4 註解同理(模板題不可靠)→ 該 7 題改分配到資料驅動的 Type 1(讀音)+ Type 3(言い換え)。
 
     // Type 3: 言い換え (6 questions)
-    const t3words = shuffle(allWords).slice(0, 9);   // 文脈規定移除後,言い換え補到 9
+    // 2026-10-21:意思題優先出「中文意思跟漢字不同字」的字(命題=命題 看字就知道答案);干擾項改 VocabDistract(同詞性/長度相近/排除近義)
+    const VD = window.VocabDistract;
+    const t3words = (VD ? VD.preferOpaque(shuffle(allWords), 9) : shuffle(allWords)).slice(0, 9);   // 文脈規定移除後,言い換え補到 9
     t3words.forEach(word => {
-      const wrongs = shuffle(vocab.filter(w => w.m !== word.m))
+      let wrongs = VD ? VD.meanings(word, vocab, 3).map(w => w.m) : [];
+      if (wrongs.length < 3) wrongs = shuffle(vocab.filter(w => w.m !== word.m))
         .slice(0, 3).map(w => w.m);
       const opts = shuffle([word.m, ...wrongs]);
       questions.push({
@@ -271,10 +274,11 @@ const MockExam = (() => {
     // Type 4: 中→日 詞彙選擇 (5 questions)
     // 原本 用法 題型靠模板套句子，沒有 curated 內容容易產出 4 個一樣的選項，
     // 改成 Type 3 的反向：給中譯選對應日文，純資料驅動可靠。
-    const t4words = shuffle(allWords).slice(0, 5);
+    const t4words = (VD ? VD.preferOpaque(shuffle(allWords).filter(w => !t3words.includes(w)), 5) : shuffle(allWords)).slice(0, 5);
     t4words.forEach(word => {
-      const wrongs = shuffle(vocab.filter(w => w.w !== word.w && w.m !== word.m))
-        .slice(0, 3).map(w => word.w !== word.r ? (w.w + '（' + w.r + '）') : w.w);
+      let wl = VD ? VD.words(word, vocab, 3) : [];
+      if (wl.length < 3) wl = shuffle(vocab.filter(w => w.w !== word.w && w.m !== word.m)).slice(0, 3);
+      const wrongs = wl.map(w => word.w !== word.r ? (w.w + '（' + w.r + '）') : w.w);
       const correct = word.w !== word.r ? (word.w + '（' + word.r + '）') : word.w;
       const opts = shuffle([correct, ...wrongs]);
       questions.push({

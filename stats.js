@@ -264,6 +264,17 @@ const Stats = (() => {
   }
 
   // 錯題重考 — 從 SRS 中找答錯最多的
+  // 「看字選意思」干擾項:同等級字庫 + VocabDistract(同詞性/長度相近/排除近義)。
+  // 以前從 N5~N1 全部字純隨機抽 → N5 名詞配 N1 動詞的意思,一眼就刪掉(2026-10-21 用戶回饋「答案太明顯」)
+  function wrongMeanings(vocab, lv, allVocab) {
+    const same = (lv && typeof getVocabData === 'function') ? (getVocabData(lv) || []) : [];
+    const pool = same.length >= 20 ? same : allVocab;
+    if (window.VocabDistract) {
+      const hit = !vocab.c && pool.find(d => d.w === vocab.w);   // 單字本的字沒帶詞性 → 從字庫補,才吃得到「同詞性」
+      const r = VocabDistract.meanings(hit ? Object.assign({}, vocab, { c: hit.c }) : vocab, pool, 3); if (r.length === 3) return r;
+    }
+    return pool.filter(d => d.m !== vocab.m).sort(() => Math.random() - 0.5).slice(0, 3);
+  }
   function retryWrong() {
     const srs = getSRS();
     const wrong = [];
@@ -281,7 +292,7 @@ const Stats = (() => {
     const picked = wrong.slice(0, 20);
     const allVocab = [...getVocabData('n5'), ...getVocabData('n4'), ...getVocabData('n3'), ...getVocabData('n2'), ...getVocabData('n1')];
     const qs = picked.map(({ vocab, lv }) => {
-      const pool = allVocab.filter(d => d.m !== vocab.m).sort(() => Math.random() - 0.5).slice(0, 3);
+      const pool = wrongMeanings(vocab, lv, allVocab);
       const options = [vocab, ...pool].sort(() => Math.random() - 0.5);
       return { word: vocab, options, correctIdx: options.indexOf(vocab), level: lv };
     });
@@ -344,7 +355,7 @@ const Stats = (() => {
     const picked = [...nb].sort(() => Math.random() - 0.5).slice(0, 20);
     const qs = picked.map(item => {
       const vocab = { w: item.w, r: item.r, m: item.m, c: '' };
-      const pool = allVocab.filter(d => d.m !== vocab.m).sort(() => Math.random() - 0.5).slice(0, 3);
+      const pool = wrongMeanings(vocab, item.lv, allVocab);
       const options = [vocab, ...pool].sort(() => Math.random() - 0.5);
       return { word: vocab, options, correctIdx: options.indexOf(vocab), level: item.lv };
     });
@@ -547,7 +558,7 @@ const Stats = (() => {
     const picked = weak.sort(() => Math.random() - 0.5).slice(0, count);
     const allVocab = [...getVocabData('n5'), ...getVocabData('n4'), ...getVocabData('n3'), ...getVocabData('n2'), ...getVocabData('n1')];
     const qs = picked.map(({ vocab, lv }) => {
-      const pool = allVocab.filter(d => d.m !== vocab.m).sort(() => Math.random() - 0.5).slice(0, 3);
+      const pool = wrongMeanings(vocab, lv, allVocab);
       const options = [vocab, ...pool].sort(() => Math.random() - 0.5);
       return { word: vocab, options, correctIdx: options.indexOf(vocab), level: lv };
     });

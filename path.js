@@ -125,6 +125,11 @@
   //    原因是整數溢位:舊版算 s * 1103515245,s 可到 2^31,乘完 ≈ 2.4e18,
   //    遠超過 JS 安全整數 9e15 → 低位被精度吃掉,LCG 退化成幾乎固定的序列,等於沒洗。
   //    改用 Math.imul 做 32 位元乘法(不會溢位),並取高位元當亂數來源(LCG 低位品質差)。
+  // 固定亂數(0~1):同一關每次出一樣的題,給 VocabDistract 用
+  function seededRand(seed) {
+    let s = (Math.imul(seed | 0, 2654435761) >>> 0) || 1;
+    return function () { s = (Math.imul(s, 1664525) + 1013904223) >>> 0; return (s >>> 8) / 16777216; };
+  }
   function seededPick(arr, n, seed) {
     const a = arr.slice();
     let s = (Math.imul(seed | 0, 2654435761) >>> 0) || 1;
@@ -174,24 +179,37 @@
     for (let i = 0; i < src.length && out.length < n; i++) {
       const w = src[i]; if (!w || !w.w) continue;
       const hasKanji = !!(w.r && w.w !== w.r);
-      const kind = hasKanji ? (i % 3) : (i % 2 === 0 ? 1 : 2);   // 沒漢字的字不出讀音題
+      const VD = root.VocabDistract;
+      // 中文意思跟漢字同字(命題=命題、論拠=論據)→ 考意思/中→日 等於對字,一律考讀音(2026-10-21 用戶回饋「答案太明顯」)
+      const kind = (hasKanji && VD && VD.isTransparent(w)) ? 0 : hasKanji ? (i % 3) : (i % 2 === 0 ? 1 : 2);   // 沒漢字的字不出讀音題
       if (kind === 0) {
         let wrongs = [];
         try { if (root.Quiz && Quiz.genPhoneticConfusables) wrongs = seededPick(Quiz.genPhoneticConfusables(w.r) || [], 3, seed + i); } catch (e) {}
         const seen = {}; seen[w.r] = 1; wrongs.forEach(function (x) { seen[x] = 1; });
-        if (wrongs.length < 3) wrongs = wrongs.concat(seededPick(bank.filter(x => x.r && !seen[x.r]), 3 - wrongs.length, seed + i + 7).map(x => x.r));
+        // 混淆項不夠 → 用同等級「長度相近」的真讀音補(以前隨便拿,しべん/じべん/しぺん/ていせつ 長度一看就知道)
+        // 優先:共用漢字的字的讀音(来年→来月/今年);再來:有漢字、讀音長度相近的字
+        if (wrongs.length < 3) {
+          const lvAll = (all.length ? all : bank).filter(x => x.r && !seen[x.r] && x.w !== x.r && /[一-鿿々]/.test(x.w));
+          const kin = VD ? lvAll.filter(x => VD.sharesKanji(w.w, x.w) && Math.abs(x.r.length - w.r.length) <= 1) : [];
+          const near = lvAll.filter(x => Math.abs(x.r.length - w.r.length) <= 1 && kin.indexOf(x) < 0);
+          const fill = seededPick(kin, 3 - wrongs.length, seed + i + 7).map(x => x.r);
+          fill.forEach(function (r) { seen[r] = 1; });
+          wrongs = wrongs.concat(fill);
+          if (wrongs.length < 3) wrongs = wrongs.concat(seededPick(near.filter(x => !seen[x.r]).length >= 3 - wrongs.length ? near.filter(x => !seen[x.r]) : bank.filter(x => x.r && !seen[x.r]), 3 - wrongs.length, seed + i + 9).map(x => x.r));
+        }
         if (wrongs.length < 3) continue;
         out.push({ lv: lv, t: 'kanji', a: 0, o: [w.r].concat(wrongs),
           q: L('「' + w.w + '」的讀音是?', 'How do you read 「' + w.w + '」?'),
           x: '<b>' + w.w + '＝' + w.r + '</b>' + (w.m ? '（' + w.m + '）' : '') });
       } else if (kind === 1) {
-        const wrongs = seededPick(bank.filter(x => x.m && x.m !== w.m), 3, seed + i + 11).map(x => x.m);
+        // 干擾項從整個等級挑(以前只從這一關剛背的字抽 → 刪去法就能選)
+        const wrongs = (VD ? VD.meanings(w, all.length ? all : bank, 3, seededRand(seed + i + 11)) : seededPick(bank.filter(x => x.m && x.m !== w.m), 3, seed + i + 11)).map(x => x.m);
         if (wrongs.length < 3) continue;
         out.push({ lv: lv, t: 'para', a: 0, o: [w.m].concat(wrongs),
           q: L('「' + w.w + '」' + (hasKanji ? '（' + w.r + '）' : '') + '的意思是?', 'What does 「' + w.w + '」 mean?'),
           x: '<b>' + w.w + (hasKanji ? '（' + w.r + '）' : '') + '＝' + w.m + '</b>' });
       } else {
-        const wrongs = seededPick(bank.filter(x => x.w !== w.w && x.m !== w.m), 3, seed + i + 13).map(x => x.w);
+        const wrongs = (VD ? VD.words(w, all.length ? all : bank, 3, seededRand(seed + i + 13)) : seededPick(bank.filter(x => x.w !== w.w && x.m !== w.m), 3, seed + i + 13)).map(x => x.w);
         if (wrongs.length < 3) continue;
         out.push({ lv: lv, t: 'para', a: 0, o: [w.w].concat(wrongs),
           q: L('「' + w.m + '」的日文是?', 'Which is Japanese for 「' + w.m + '」?'),

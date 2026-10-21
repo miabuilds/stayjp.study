@@ -99,7 +99,10 @@ const Quiz = (() => {
     // 兼容舊呼叫：如果只傳 1~2 個參數，補成同個 pool
     if (count === undefined) { count = distractorPool; distractorPool = source; }
     // 選讀音題型：排除純假名詞（w === r），否則題目和正解同形沒意義
-    const filtered = quizType === 'reading' ? source.filter(d => d.w !== d.r) : source;
+    // 意思題:優先出「中文意思跟漢字不同字」的字(命題=命題 這種看字就知道答案,只有讀音題才考得到)
+    const VD = window.VocabDistract;
+    const filtered = quizType === 'reading' ? source.filter(d => d.w !== d.r)
+      : (VD ? VD.preferOpaque(source, Math.min(count, source.length)) : source);
     const shuffled = (typeof shuf === 'function' ? shuf(filtered) : [...filtered]);
     const picked = shuffled.slice(0, Math.min(count, shuffled.length));
     return picked.map(word => {
@@ -119,7 +122,9 @@ const Quiz = (() => {
         // 同詞性不足 3 個才用其他詞性補。比原本純隨機難、但仍是合理迷惑項。
         const diff = d => quizType === 'word2meaning' ? d.m !== word.m : d.w !== word.w;
         const rnd = arr => arr.sort(() => Math.random() - 0.5);
-        let pool = rnd(distractorPool.filter(d => diff(d) && d.c && d.c === word.c)).slice(0, 3);
+        // 2026-10-21:改用 VocabDistract(同詞性+長度相近+形近字,排除近義);沒載到才走舊的同詞性隨機
+        let pool = VD ? (quizType === 'word2meaning' ? VD.meanings(word, distractorPool, 3) : VD.words(word, distractorPool, 3)) : [];
+        if (!pool.length) pool = rnd(distractorPool.filter(d => diff(d) && d.c && d.c === word.c)).slice(0, 3);
         if (pool.length < 3) {
           const seen = new Set([word.w, ...pool.map(o => o.w)]);
           pool = pool.concat(rnd(distractorPool.filter(d => diff(d) && !seen.has(d.w))).slice(0, 3 - pool.length));
@@ -384,3 +389,4 @@ const Quiz = (() => {
 
   return { start, begin, answer, close, toggleKanji, retrySame, submitTyping, genPhoneticConfusables, markUnknown, sayExample };
 })();
+window.Quiz = Quiz;   // const 不會上 window:path.js 用 root.Quiz.genPhoneticConfusables 拿讀音混淆項,以前一直拿不到
