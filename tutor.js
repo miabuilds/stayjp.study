@@ -9,6 +9,12 @@
   var IMG = 'images/mascot/tanuki-think.png';
   var ctx = null, hist = [], busy = false, isOpen = false, remain = null, built = false;
 
+  // 例句 🔊:AI 當下生成的句子不會有預錄音檔,speak() 只播預錄 → 主頁面按了沒聲音(探長J 回饋)。
+  // 改走 MyVocab.say:有預錄播預錄,沒有就雲端合成(有快取、登入/同意處理);AI 聊聊頁的 speak 本來就是雲端,一樣適用
+  function sayJp(jp, ev) {
+    try { if (root.MyVocab && root.MyVocab.say) { root.MyVocab.say(jp, ev); return; } } catch (e) {}
+    try { root.speak(jp); } catch (e) {}
+  }
   function lang() { try { return (typeof I18n !== 'undefined' && I18n.getLang) ? I18n.getLang() : (localStorage.getItem('ui_lang') || 'zh-TW'); } catch (e) { return 'zh-TW'; } }
   function L(zh, en) { var l = lang(); if (l === 'en') return en; try { return (l === 'zh-CN' && typeof cvt === 'function') ? cvt(zh) : zh; } catch (e) { return zh; } }
   function esc(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
@@ -160,7 +166,7 @@
     renderChips();
     var t = cannedText(key);
     var d = addMsg('ai', render(t) || esc(t));
-    d.querySelectorAll('.tt-spk').forEach(function (b) { b.onclick = function () { try { root.speak(b.getAttribute('data-jp')); } catch (e) {} }; });
+    d.querySelectorAll('.tt-spk').forEach(function (b) { b.onclick = function (ev) { sayJp(b.getAttribute('data-jp'), ev); }; });
     hist.push({ role: 'ai', text: t });
     try { if (typeof track === 'function') track('tutor_ask', { mode: 'canned', ctx: 'none' }); } catch (e) {}
     try { if (root.StayDaily && root.StayDaily.log) root.StayDaily.log('tutor'); } catch (e) {}
@@ -234,7 +240,7 @@
   }
   function addMsg(role, html, cls) {
     var box = $('tutorMsgs'); var d = document.createElement('div'); d.className = 'tt-m ' + role + (cls ? ' ' + cls : ''); d.innerHTML = html; box.appendChild(d);
-    d.querySelectorAll('.tt-spk').forEach(function (b) { b.onclick = function () { try { root.speak(b.getAttribute('data-jp')); } catch (e) {} }; });
+    d.querySelectorAll('.tt-spk').forEach(function (b) { b.onclick = function (ev) { sayJp(b.getAttribute('data-jp'), ev); }; });
     box.scrollTop = box.scrollHeight; return d;
   }
 
@@ -299,7 +305,7 @@
         th.className = 'tt-m ai err'; th.innerHTML = esc(msg) + extra; hist.pop(); busy = false; $('tutorSend').disabled = false; $('tutorParse').disabled = false; setSub(); return;
       }
       th.innerHTML = render(d.text) || esc(d.text || '');
-      th.querySelectorAll('.tt-spk').forEach(function (b) { b.onclick = function () { try { root.speak(b.getAttribute('data-jp')); } catch (e) {} }; });
+      th.querySelectorAll('.tt-spk').forEach(function (b) { b.onclick = function (ev) { sayJp(b.getAttribute('data-jp'), ev); }; });
       hist.push({ role: 'ai', text: d.text || '' }); if (hist.length > 8) hist = hist.slice(-8);
       if (typeof d.remain === 'number') { remain = d.remain; } setSub();
       try { if (typeof track === 'function') track('tutor_ask', { mode: mode || 'ask', ctx: ctx ? ctx.type : 'none', src: (ctx && ctx.source) || '' }); } catch (e) {}

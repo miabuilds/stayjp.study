@@ -756,6 +756,9 @@ function cleanHints(arr){
         h=body;
       }
     }
+    // 裡面還有一層標記:模型把角色名翻成日文自己標(剪髪の客»),後端審核又在外面包一層中文的 → 「剪髮的客人»剪髪の客»5センチ…」
+    // 外層對過了,裡層一律剝掉(不然會顯示出來,喇叭也會把「剪髮的客人」唸出來 — 探長J 回饋)
+    for(let k=0;k<2;k++){ const j=h.indexOf('»'); if(j>-1&&j<=12){ const tg=h.slice(0,j).trim(); if(tg.length<=8&&!/[「」。、,.!?！?？\s｜|]/.test(tg)) h=h.slice(j+1).trim(); else break; } else break; }
     if(h) out.push(h);
   }
   return out;
@@ -1098,9 +1101,11 @@ function _nStart(){
   { const n=document.getElementById('inNote'); if(n) n._heard=0; }
   // 原生辨識從按下到真的收音有半秒延遲,太早講開頭會被吃掉。新版 App 會回報 audiostart:
   // 先顯示「準備中」,收到事件才切「開講」;舊版沒事件就照舊直接顯示錄音中。
+  _nStart._live=true;
   if(window.STAYJP_NATIVE.hasSpeechStartEvt){
     document.getElementById('inNote').textContent=enOr('準備中…等一下再開口。','Getting ready… wait a moment before speaking.');
-    window.stayjpSpeechStarted=function(){ if(_wantRec) document.getElementById('inNote').textContent=enOr('開講!講完按停或直接按送出。','Go ahead! Tap stop or just send when done.'); };
+    _nStart._live=false;   // 收音真的開始(audiostart)前送來的結果 = 上一次錄音晚到的(刪字重唸時會把舊字塞回來),不收
+    window.stayjpSpeechStarted=function(){ _nStart._live=true; if(_wantRec) document.getElementById('inNote').textContent=enOr('開講!講完按停或直接按送出。','Go ahead! Tap stop or just send when done.'); };
   }
   // Android 13+ 新版 App(speechSegments):連續收音走 segmented session,每段 final 只含「這一段」
   // → 每段定案就直接接進 base,下一段的 interim 接在後面(不能當整段累積全文覆蓋,會把前一段吃掉)
@@ -1108,20 +1113,23 @@ function _nStart(){
   _nStart._soft=0;
   // Android 回傳有兩種:真的分段(每段只有新字)、或「整句累積+順手修正前面」(探長J 實測:はい車窓 → はいはい車窓を探しています)。
   // 舊版一律接在後面 → 同一句出現兩次。現在看新字的開頭是否涵蓋已定案的字(字元重疊≥60%):是=累積版,整句替換;否=新的一段,接上去。
-  let segAcc='', sessBase=_recBase;
-  _nStart._segReset=function(){ sessBase=_recBase; segAcc=''; };
+  // 停頓自動續錄時,有些 Android 新一段會把上一段的字再送一次(探長J 實測:少し → 少し少し短くしたいです)
+  // → 記住上一段(prevSeg),新一段開頭跟它一樣就剝掉;只在「自動續錄」生效,使用者自己重按麥克風不算
+  let segAcc='', sessBase=_recBase, prevSeg='';
+  _nStart._segReset=function(){ if(segAcc) prevSeg=segAcc; sessBase=_recBase; segAcc=''; };
   const _ovl=function(a,b){ const pool={}; for(const c of b) pool[c]=(pool[c]||0)+1; let n=0; for(const c of a){ if(pool[c]>0){ pool[c]--; n++; } } return a.length?n/a.length:0; };
   if(SEG){
     window.stayjpSpeechResult=function(t,fin){
-      if(t==null) return; _nStart._soft=0; _heard();
+      if(t==null || !_nStart._live) return; _nStart._soft=0; _heard();
       t=String(t).replace(/\s+/g,'');   // 日文不需要空格,Android 會在詞間插空白,拿掉才好比對
+      if(!segAcc && prevSeg && t.length>prevSeg.length && _ovl(prevSeg, t.slice(0, prevSeg.length))>=0.8) t=t.slice(prevSeg.length);
       const cum = segAcc && t.length>=segAcc.length && _ovl(segAcc, t.slice(0, segAcc.length+3))>=0.6;
       const cur = cum ? t : segAcc+t;
       if(fin){ segAcc=cur; _recBase=sessBase+segAcc; }
       const el=document.getElementById('say'); el.value=sessBase+cur; autoGrow();
     };
   } else window.stayjpSpeechResult=function(t,fin){
-    if(t==null) return; _nStart._soft=0; _heard();
+    if(t==null || !_nStart._live) return; _nStart._soft=0; _heard();
     // 原生(iOS)偶發跨 session 累積:新一段的 transcript 以上一段整串開頭 → 剝掉舊前綴只取新增
     // (用戶實錘:刪掉辨識文字重講,上一段內容跟著一起回來)
     const rawT=t;
@@ -1154,15 +1162,19 @@ function _newRec(){
     for(let i=0;i<e.results.length;i++){ const t=e.results[i][0].transcript;
       if(e.results[i].isFinal){
         if(t.trim()&&t.trim()===prevSeg.trim()) continue;   // Android Chrome 災情:同一段 final 會重複出現在 results → 去重(使用者回饋:講一個字重複出現好幾次)
+        const nt=t.replace(/\s+/g,''), nf=fin.replace(/\s+/g,'');
+        if(nf && nt.length>nf.length && nt.indexOf(nf)===0){ fin=t; prevSeg=t; continue; }   // 後一筆是累積版(少し → 少し短く…)→ 取代,不接成「少し少し」
         fin+=t; prevSeg=t;
       } else interim+=t;
     }
-    if(interim.trim()&&(prevSeg.trim()===interim.trim()||fin.trim().endsWith(interim.trim()))) interim='';   // 定案後同一段又被當 interim 重播 → 不重複顯示
+    if(interim.trim()&&(prevSeg.trim()===interim.trim()||fin.trim().endsWith(interim.trim()))) interim='';
+    let showFin=fin;   // 顯示用;fin 本身要留給 onend 併進 base
+    { const ni=interim.replace(/\s+/g,''), nf=fin.replace(/\s+/g,''); if(nf && ni.length>nf.length && ni.indexOf(nf)===0) showFin=''; }   // interim 是含已定案字的累積版 → 只顯示 interim   // 定案後同一段又被當 interim 重播 → 不重複顯示
     const el=document.getElementById('say');
     // fin 是「這個實例至今全部」的確定段落(每次事件整批重算),所以只暫存、不累加進 base——
     // 之前邊播邊累加會讓同一段被算兩次(base 已含 + fin 再含一次 → 文字出現兩次)
     _sessFin=fin; if(fin||interim) _heard();
-    el.value=_recBase+fin+interim;   // 接在已輸入內容後面,不覆蓋
+    el.value=_recBase+showFin+interim;   // 接在已輸入內容後面,不覆蓋
     autoGrow();
   };
   r.onerror=e=>{
