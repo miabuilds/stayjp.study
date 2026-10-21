@@ -735,6 +735,7 @@ window.Articles = (function () {
     if (window.furiAddEntries) window.furiAddEntries(a.vocab);   // 讓本篇重點單字(含漢字者)在內文也可點查
     close();        // 先移除清單那層 overlay,避免兩層 artMask 疊著(內文被蓋成空白)
     curId = id; curBase = bid; curTab = 'read';
+    pl.idx = -1;   // 換文章/換難度一律從第 1 句開始(以前會沿用上一篇停下的句數,切難度時聽起來像還在播舊版)
     var g = LVC[a.level] || LVC.n5;
     var h = '<div class="art-mask" id="artMask"><div class="art-wrap">' +
       '<div class="art-top"><button class="art-back" onclick="Articles.open()"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>返回</button>' +
@@ -832,10 +833,12 @@ window.Articles = (function () {
   }
   function switchLv(id) {
     var from = curArticle(), to = list(true).find(function (x) { return x.id === id; }); if (!to) return;
+    var wasPlaying = pl.playing;
     stopPlay();
     try { localStorage.setItem('art_band', BAND[to.level]); } catch (e) {}
     try { if (typeof track === 'function') track('article_level_switch', { id: baseOf(to), from: from ? from.level : '', to: to.level }); } catch (e) {}
     read(id, { exact: true });
+    if (wasPlaying) setTimeout(function () { try { if (curId === id) playFrom(0); } catch (e) {} }, 300);   // 切換前在播 → 新難度從頭播
   }
 
   function renderTab(k) {
