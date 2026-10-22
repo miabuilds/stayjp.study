@@ -2952,6 +2952,48 @@ function hubYtStripHtml(L) {
 function _hubSimpleOn() {
   try { return localStorage.getItem('ui_simple') === '1'; } catch (e) { return false; }
 }
+// 簡易版=「選項少」不是「內容簡單」(Mia 2026-10-22):三格=複習(固定)+ 這個人在面板最常點的 2 個功能。
+// 面板任何入口被點就記一次(hub_use,只存本機);還沒紀錄時照程度給預設:N5/N4=單字+繪本、N3 以上=JLPT 刷題+文章。
+// match 依序比對入口的 onclick/href(speak-chat 要排在 speak 前、繪本排在文章前)
+const _HUB_FEATS = [
+  ['jlpt',    /jlpt-drill\.html/,           "location.href='jlpt-drill.html'", 'target',    '刷題特區',   'JLPT Drills', 'JLPT 真題・模考',    'Past-paper drills'],
+  ['vocab',   /switchMode\('vocab'\)/,      "switchMode('vocab')",             'book',      '單字',       'Vocabulary',  '照程度一個個背',     'By level'],
+  ['grammar', /switchMode\('grammar'\)/,    "switchMode('grammar')",           'edit',      '文法',       'Grammar',     '文法點+例句',        'Grammar points'],
+  ['myvocab', /MyVocab\.open/,              'MyVocab.open()',                  'bookmark',  '我的單字本', 'My words',    '自己加的字',         'Words you added'],
+  ['chat',    /speak-chat\.html/,           "location.href='speak-chat.html'", 'speak',     'AI 聊聊',    'AI Chat',     '情境對話',           'Role-play'],
+  ['speak',   /speak\.html/,                "location.href='speak.html'",      'mic',       'AI 跟讀',    'AI Shadowing','跟著唸・評分',       'Repeat & score'],
+  ['buddy',   /buddy\.html/,                "location.href='buddy.html'",      'user',      '讀書小屋',   'Study Room',  '找朋友一起讀',       'Study with friends'],
+  ['ehon',    /Articles\.filter\('ehon'\)/, "Articles.filter('ehon')",         'book',      '繪本故事',   'Picture books','小狸的故事',        'Short stories'],
+  ['articles',/Articles\./,                 'Articles.open()',                 'news',      '文章閱讀',   'Reading',     '分級文章',           'Graded articles'],
+  ['skits',   /skits\.html/,                "location.href='skits.html'",      'play',      '小狸短劇',   'Skits',       '看短劇學日文',       'Short skits'],
+  ['yt',      /yt-shadow\.html/,            "location.href='yt-shadow.html'",  'play',      'YouTube 跟讀','YouTube',    '用影片練聽說',       'Learn with videos'],
+  ['kana',    /Kana\.open/,                 'Kana.open()',                     'grid',      '五十音表',   'Kana chart',  '查・聽・練',         'Look up & listen'],
+  ['mock',    /MockExam\.start/,            'MockExam.start()',                'clipboard', '快速小考',   'Quick test',  '測一下程度',         'Check your level'],
+  ['flash',   /FlashCard\.start/,           'FlashCard.start()',               'bolt',      '快速背單字', 'Flashcards',  '一張張翻',           'Flip cards'],
+  ['listen',  /VocabListen\.open/,          'VocabListen.open()',              'headphones','用聽的背',   'Listen',      '通勤也能背',         'Learn by ear'],
+];
+function _hubUse() { try { return JSON.parse(localStorage.getItem('hub_use') || '{}') || {}; } catch (e) { return {}; } }
+// 面板點擊 → 記是哪個功能(委派在 document,面板重畫也不用重綁)
+document.addEventListener('click', function (e) {
+  try {
+    const el = e.target && e.target.closest && e.target.closest('.hub [onclick], .hub a[href]'); if (!el) return;
+    const sig = (el.getAttribute('onclick') || '') + ' ' + (el.getAttribute('href') || '');
+    const f = _HUB_FEATS.find(x => x[1].test(sig)); if (!f) return;
+    const u = _hubUse(); const o = u[f[0]] || { n: 0, t: 0 }; o.n++; o.t = Date.now(); u[f[0]] = o;
+    localStorage.setItem('hub_use', JSON.stringify(u));
+  } catch (err) {}
+}, true);
+// 簡易版的 2 格:最常用(次數多→最近用的優先);不足照程度補
+function _hubSimplePicks(zero) {
+  const u = _hubUse();
+  const used = Object.keys(u).filter(k => _HUB_FEATS.some(f => f[0] === k) && u[k].n > 0)
+    .sort((a, b) => (u[b].n - u[a].n) || (u[b].t - u[a].t));
+  let lv = ''; try { lv = (window.Path && Path.level) ? Path.level() : (localStorage.getItem('base_level') || ''); } catch (e) {}
+  const def = zero ? ['kana', 'ehon'] : (/^n[123]$/.test(lv) ? ['jlpt', 'articles'] : ['vocab', 'ehon']);
+  const out = [];
+  used.concat(def).forEach(k => { if (out.length < 2 && out.indexOf(k) < 0) out.push(k); });
+  return out;
+}
 function hubSetSimple(on) { try { localStorage.setItem('ui_simple', on ? '1' : '0'); } catch (e) {} try { track('hub_simple_toggle', { on: on ? 1 : 0 }); } catch (e) {} _hubSig = ''; renderHub(); try { window.scrollTo(0, 0); } catch (e) {} }
 function hubToggleMore() {
   const hub = document.querySelector('.hub-simple'); if (!hub) return;
@@ -2969,12 +3011,10 @@ function _hubSimpleHtml(L, greet, streak, done, GOAL, zero) {
       + '<img class="hs-mascot" src="images/mascot/tanuki-p08.png" alt=""></div>'
     + '<div class="hs-lb">' + L('今天從這裡開始', 'Start here today') + '</div>'
     + main
-    + '<div class="hs-lb">' + L('也可以', 'Or try') + '</div>'
+    + '<div class="hs-lb">' + L('你常用的', 'Your shortcuts') + '</div>'
     + '<div class="hs-tiles">'
       + tile('SRS.start()', 'refresh', L('複習', 'Review'), L('學過的字再看一次', 'Words you learned'))
-      + (zero ? tile('Kana.open()', 'grid', L('五十音表', 'Kana chart'), L('查・聽・練', 'Look up & listen'))
-              : tile("switchMode('vocab')", 'book', L('單字', 'Vocabulary'), L('照程度一個個背', 'By level')))
-      + tile("Articles.filter('ehon')", 'book', L('繪本故事', 'Picture books'), L('看小狸的故事學日文', 'Short stories'))
+      + _hubSimplePicks(zero).map(k => { const f = _HUB_FEATS.find(x => x[0] === k); return tile(f[2], f[3], L(f[4], f[5]), L(f[6], f[7])); }).join('')
     + '</div>'
     + '<button class="hs-more" id="hsMoreBtn" onclick="hubToggleMore()">' + L('更多功能 ▾', 'More ▾') + '</button>'
     + '<button class="hub-mode-sw" onclick="hubSetSimple(false)">' + L('想一次看到全部功能?切換完整版', 'Show everything — switch to full view') + '</button>'
@@ -3099,7 +3139,7 @@ function renderHub() {
   const _jrDone = (() => { try { return window.Journey ? Journey.stats().done : ''; } catch (e) { return ''; } })();
   const _showZero = _hubShowZero();
   const _simple = _hubSimpleOn();
-  const _sig = [_simple, _showZero, (localStorage.getItem('skit_seen') || ''), (typeof I18n !== 'undefined' && I18n.getLang ? I18n.getLang() : ''), streak, done, wod ? wod.w : '', lm || '', ll || '', _jrDone, (window.StudyPlan ? StudyPlan.sig() : ''), (window.Path ? Path.sig() : ''), _gr ? _gr.slot : '', (window.MyVocab ? MyVocab.count() : 0), (window.Omikuji ? (Omikuji.drawnToday() ? 1 : 0) : ''), DayKey.today(), GOAL].join('|');
+  const _sig = [_simple, (_simple ? _hubSimplePicks(_showZero).join('+') : ''), _showZero, (localStorage.getItem('skit_seen') || ''), (typeof I18n !== 'undefined' && I18n.getLang ? I18n.getLang() : ''), streak, done, wod ? wod.w : '', lm || '', ll || '', _jrDone, (window.StudyPlan ? StudyPlan.sig() : ''), (window.Path ? Path.sig() : ''), _gr ? _gr.slot : '', (window.MyVocab ? MyVocab.count() : 0), (window.Omikuji ? (Omikuji.drawnToday() ? 1 : 0) : ''), DayKey.today(), GOAL].join('|');
   if (_sig === _hubSig && mn.querySelector('.hub')) return;
   _hubSig = _sig;
   const blossom = c => '<svg class="bl ' + c + '" viewBox="0 0 40 40"><g><ellipse cx="20" cy="11" rx="4.6" ry="7.4"/><ellipse cx="20" cy="11" rx="4.6" ry="7.4" transform="rotate(72 20 20)"/><ellipse cx="20" cy="11" rx="4.6" ry="7.4" transform="rotate(144 20 20)"/><ellipse cx="20" cy="11" rx="4.6" ry="7.4" transform="rotate(216 20 20)"/><ellipse cx="20" cy="11" rx="4.6" ry="7.4" transform="rotate(288 20 20)"/></g><circle cx="20" cy="20" r="2.6" fill="#fff"/></svg>';
