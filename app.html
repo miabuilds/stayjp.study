@@ -308,6 +308,40 @@ select.lang-btn {
 .hs-tile small { font-size: 11.5px; color: var(--tx2); line-height: 1.4; }
 .hs-tic { width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center; background: var(--soft, rgba(var(--ac-rgb),.10)); color: var(--ac); margin-bottom: 4px; }
 .hs-more { display: block; width: 100%; margin-top: 22px; padding: 13px; border-radius: 14px; border: 1px dashed var(--bd); background: transparent; color: var(--tx2); font: inherit; font-weight: 700; cursor: pointer; }
+.hs-lb-row { display: flex; align-items: center; justify-content: space-between; }
+.hs-lb-row .hm-edit { font-weight: 600; padding: 5px 11px; font-size: 12.5px; }
+.hs-empty { width: 100%; padding: 22px 14px; border-radius: 16px; border: 1px dashed var(--bd); background: transparent; color: var(--tx2); font: inherit; cursor: pointer; }
+.hub-modebar { display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap; margin: 18px auto 4px; font-size: 13px; color: var(--tx2); }
+.hm-seg { display: inline-flex; border: 1px solid var(--bd); border-radius: 12px; overflow: hidden; background: var(--bg2); }
+.hm-seg button { border: none; background: none; padding: 8px 14px; font: inherit; font-size: 13px; color: var(--tx2); cursor: pointer; }
+.hm-seg button + button { border-left: 1px solid var(--bd); }
+.hm-seg button.on { background: var(--ac); color: #fff; font-weight: 700; cursor: default; }
+.hm-edit { border: 1px solid var(--bd); background: var(--bg2); color: var(--tx); border-radius: 12px; padding: 7px 12px; font: inherit; font-size: 13px; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; }
+.hub-ed-mask { position: fixed; inset: 0; z-index: 9500; background: rgba(0,0,0,.45); display: flex; align-items: flex-end; justify-content: center; }
+@media (min-width: 600px) { .hub-ed-mask { align-items: center; } }
+.hub-ed { width: 100%; max-width: 480px; max-height: 86vh; display: flex; flex-direction: column; background: var(--bg); border-radius: 20px 20px 0 0; padding: 16px 16px calc(14px + env(safe-area-inset-bottom)); }
+@media (min-width: 600px) { .hub-ed { border-radius: 20px; } }
+.he-top { display: flex; align-items: baseline; justify-content: space-between; }
+.he-top b { font-size: 17px; }
+.he-top span, .he-tip { font-size: 12.5px; color: var(--tx2); }
+.he-tip { margin: 4px 0 10px; }
+.he-list { overflow-y: auto; -webkit-overflow-scrolling: touch; border-top: 1px solid var(--bd); flex: 1; }
+.he-row { display: flex; align-items: center; gap: 6px; border-bottom: 1px solid var(--bd); padding: 6px 0; }
+.he-chk { flex: 1; min-width: 0; display: flex; align-items: center; gap: 10px; border: none; background: none; text-align: left; padding: 6px 2px; font: inherit; color: var(--tx); cursor: pointer; }
+.he-box { width: 22px; height: 22px; flex: none; border-radius: 7px; border: 2px solid var(--bd); display: grid; place-items: center; color: #fff; }
+.he-row.on .he-box { background: var(--ac); border-color: var(--ac); }
+.he-ic { width: 32px; height: 32px; flex: none; border-radius: 10px; display: grid; place-items: center; background: var(--soft, rgba(var(--ac-rgb),.10)); color: var(--ac); }
+.he-tx { min-width: 0; }
+.he-tx b { display: block; font-size: 14.5px; }
+.he-tx small { display: block; font-size: 12px; color: var(--tx2); }
+.he-row:not(.on) .he-tx, .he-row:not(.on) .he-ic { opacity: .55; }
+.he-mv { display: flex; gap: 4px; flex: none; }
+.he-mv button { width: 34px; height: 34px; border-radius: 10px; border: 1px solid var(--bd); background: var(--bg2); color: var(--tx2); font-size: 12px; cursor: pointer; }
+.he-mv button:disabled { opacity: .3; cursor: default; }
+.he-btns { display: flex; gap: 10px; margin-top: 12px; }
+.he-btns button { flex: 1; padding: 13px; border-radius: 14px; font: inherit; font-weight: 700; cursor: pointer; }
+.he-cancel { border: 1px solid var(--bd); background: var(--bg2); color: var(--tx); }
+.he-save { border: none; background: var(--ac); color: #fff; }
 .hub-mode-sw { display: block; margin: 6px auto 0; padding: 10px 14px; border: none; background: none; color: var(--ac); font: inherit; font-size: 13px; text-decoration: underline; cursor: pointer; }
 @media (max-width: 380px) { .hs-tiles { grid-template-columns: 1fr 1fr; } }
 @media (min-width: 860px) {
@@ -2949,13 +2983,20 @@ function hubYtStripHtml(L) {
 // 簡易版面板(2026-10-21):初學者回饋「功能太多、一進來很亂、不知道從哪開始」。
 // 首頁只留:今天從這裡開始(1 張大卡)+ 3 個入口 + 更多功能(展開=原本整個面板)+ 切換完整版。
 // Mia 定案:預設一律完整版,面板最下面自己來回切換;ui_simple='1' 才是簡易版(只存本機)
-function _hubSimpleOn() {
-  try { return localStorage.getItem('ui_simple') === '1'; } catch (e) { return false; }
+// 面板三種模式(2026-10-22 Mia):完整(預設)/ 簡易 / 自訂,面板最下面三顆按鈕切換,存本機 ui_hub。
+// 簡易版=「選項少」不是「內容簡單」:今天的闖關卡 + 複習 + 這個人最常點的 2 個功能(hub_use 計數,沒紀錄照程度給)。
+// 自訂版:闖關卡(可關)+ 自己勾選、排序的功能(hub_custom);第一次切過來直接開編輯器,先勾好常用的。
+function _hubMode() {
+  try {
+    const v = localStorage.getItem('ui_hub');
+    if (v === 'simple' || v === 'full' || v === 'custom') return v;
+    return localStorage.getItem('ui_simple') === '1' ? 'simple' : 'full';   // 相容 10/21 版的開關
+  } catch (e) { return 'full'; }
 }
-// 簡易版=「選項少」不是「內容簡單」(Mia 2026-10-22):三格=複習(固定)+ 這個人在面板最常點的 2 個功能。
-// 面板任何入口被點就記一次(hub_use,只存本機);還沒紀錄時照程度給預設:N5/N4=單字+繪本、N3 以上=JLPT 刷題+文章。
-// match 依序比對入口的 onclick/href(speak-chat 要排在 speak 前、繪本排在文章前)
+function _hubSimpleOn() { return _hubMode() !== 'full'; }
+// [key, 比對入口 onclick/href, 動作, 圖示, 名稱, 名稱EN, 說明, 說明EN];speak-chat 要排在 speak 前、繪本排在文章前
 const _HUB_FEATS = [
+  ['srs',     /SRS\.start/,                 'SRS.start()',                     'refresh',   '複習',       'Review',      '學過的字再看一次',   'Words you learned'],
   ['jlpt',    /jlpt-drill\.html/,           "location.href='jlpt-drill.html'", 'target',    '刷題特區',   'JLPT Drills', 'JLPT 真題・模考',    'Past-paper drills'],
   ['vocab',   /switchMode\('vocab'\)/,      "switchMode('vocab')",             'book',      '單字',       'Vocabulary',  '照程度一個個背',     'By level'],
   ['grammar', /switchMode\('grammar'\)/,    "switchMode('grammar')",           'edit',      '文法',       'Grammar',     '文法點+例句',        'Grammar points'],
@@ -2972,6 +3013,7 @@ const _HUB_FEATS = [
   ['flash',   /FlashCard\.start/,           'FlashCard.start()',               'bolt',      '快速背單字', 'Flashcards',  '一張張翻',           'Flip cards'],
   ['listen',  /VocabListen\.open/,          'VocabListen.open()',              'headphones','用聽的背',   'Listen',      '通勤也能背',         'Learn by ear'],
 ];
+function _hubFeat(k) { return _HUB_FEATS.find(x => x[0] === k); }
 function _hubUse() { try { return JSON.parse(localStorage.getItem('hub_use') || '{}') || {}; } catch (e) { return {}; } }
 // 面板點擊 → 記是哪個功能(委派在 document,面板重畫也不用重綁)
 document.addEventListener('click', function (e) {
@@ -2983,10 +3025,10 @@ document.addEventListener('click', function (e) {
     localStorage.setItem('hub_use', JSON.stringify(u));
   } catch (err) {}
 }, true);
-// 簡易版的 2 格:最常用(次數多→最近用的優先);不足照程度補
+// 簡易版的 2 格:最常用(次數多→最近用的優先;複習固定在第一格不算);不足照程度補
 function _hubSimplePicks(zero) {
   const u = _hubUse();
-  const used = Object.keys(u).filter(k => _HUB_FEATS.some(f => f[0] === k) && u[k].n > 0)
+  const used = Object.keys(u).filter(k => k !== 'srs' && _hubFeat(k) && u[k].n > 0)
     .sort((a, b) => (u[b].n - u[a].n) || (u[b].t - u[a].t));
   let lv = ''; try { lv = (window.Path && Path.level) ? Path.level() : (localStorage.getItem('base_level') || ''); } catch (e) {}
   const def = zero ? ['kana', 'ehon'] : (/^n[123]$/.test(lv) ? ['jlpt', 'articles'] : ['vocab', 'ehon']);
@@ -2994,31 +3036,115 @@ function _hubSimplePicks(zero) {
   used.concat(def).forEach(k => { if (out.length < 2 && out.indexOf(k) < 0) out.push(k); });
   return out;
 }
-function hubSetSimple(on) { try { localStorage.setItem('ui_simple', on ? '1' : '0'); } catch (e) {} try { track('hub_simple_toggle', { on: on ? 1 : 0 }); } catch (e) {} _hubSig = ''; renderHub(); try { window.scrollTo(0, 0); } catch (e) {} }
+// 自訂版:'path' = 今天的闖關卡;其餘是 _HUB_FEATS 的 key
+function _hubCustom() {
+  try { const a = JSON.parse(localStorage.getItem('hub_custom') || 'null'); if (Array.isArray(a)) return a.filter(k => k === 'path' || _hubFeat(k)); } catch (e) {}
+  return null;
+}
+function _hubCustomDefault(zero) {
+  const out = ['path', 'srs'];
+  _hubSimplePicks(zero).concat(['vocab', 'grammar', 'articles', 'chat']).forEach(k => { if (out.length < 7 && out.indexOf(k) < 0) out.push(k); });
+  return out;
+}
+function hubSetMode(m) {
+  try { localStorage.setItem('ui_hub', m); localStorage.removeItem('ui_simple'); } catch (e) {}
+  try { track('hub_mode', { mode: m }); } catch (e) {}
+  const first = m === 'custom' && !_hubCustom();
+  if (first) { try { localStorage.setItem('hub_custom', JSON.stringify(_hubCustomDefault(_hubShowZero()))); } catch (e) {} }
+  _hubSig = ''; renderHub(); try { window.scrollTo(0, 0); } catch (e) {}
+  if (first) setTimeout(hubEditOpen, 250);   // 第一次進自訂:直接開編輯器
+}
+function hubSetSimple(on) { hubSetMode(on ? 'simple' : 'full'); }   // 舊呼叫相容
 function hubToggleMore() {
   const hub = document.querySelector('.hub-simple'); if (!hub) return;
   const open = hub.classList.toggle('more');
   const b = document.getElementById('hsMoreBtn'); if (b) b.innerHTML = open ? '收起 ▴' : '更多功能 ▾';
-  try { track('hub_simple_more', { open: open ? 1 : 0 }); } catch (e) {}
+  try { track('hub_simple_more', { open: open ? 1 : 0, mode: _hubMode() }); } catch (e) {}
+}
+// 模式切換列(三種模式的面板最下面都有)
+function _hubModeBar(L) {
+  const m = _hubMode();
+  const b = (k, t) => '<button class="' + (m === k ? 'on' : '') + '"' + (m === k ? ' aria-pressed="true"' : ' onclick="hubSetMode(\'' + k + '\')"') + '>' + t + '</button>';
+  return '<div class="hub-modebar"><span>' + L('面板顯示', 'Home view') + '</span><div class="hm-seg">'
+    + b('simple', L('簡易', 'Simple')) + b('full', L('完整', 'Full')) + b('custom', L('自訂', 'Custom')) + '</div></div>';
 }
 function _hubSimpleHtml(L, greet, streak, done, GOAL, zero) {
+  const mode = _hubMode();
   const tile = (oc, ic, t, d) => '<button class="hs-tile" onclick="' + oc + '"><span class="hs-tic"><i data-ic=' + ic + '></i></span><b>' + t + '</b><small>' + d + '</small></button>';
+  const ftile = k => { const f = _hubFeat(k); return f ? tile(f[2], f[3], L(f[4], f[5]), L(f[6], f[7])) : ''; };
   const main = zero
     ? '<button class="hs-zero" onclick="Journey.open()"><img src="images/mascot/tanuki-p08.png" alt=""><span><b>' + L('從五十音開始', 'Start with kana') + '</b><small>' + L('五十音 → 開口說 → N5,一步一步帶你走', 'Kana → first words → N5, step by step') + '</small></span><span class="hs-go">' + L('開始', 'Go') + ' →</span></button>'
     : (window.Path ? Path.hubCardHtml() : '');
+  let body;
+  if (mode === 'custom') {
+    const keys = _hubCustom() || _hubCustomDefault(zero);
+    const feats = keys.filter(k => k !== 'path');
+    body = (keys.indexOf('path') >= 0 ? '<div class="hs-lb">' + L('今天從這裡開始', 'Start here today') + '</div>' + main : '')
+      + '<div class="hs-lb hs-lb-row"><span>' + L('我的面板', 'My home') + '</span><button class="hm-edit" onclick="hubEditOpen()"><i data-ic=edit></i> ' + L('編輯', 'Edit') + '</button></div>'
+      + (feats.length ? '<div class="hs-tiles">' + feats.map(ftile).join('') + '</div>'
+        : '<button class="hs-empty" onclick="hubEditOpen()">' + L('還沒選任何功能,點這裡挑幾個放上來', 'Nothing here yet — tap to pick some') + '</button>');
+  } else {
+    body = '<div class="hs-lb">' + L('今天從這裡開始', 'Start here today') + '</div>' + main
+      + '<div class="hs-lb">' + L('你常用的', 'Your shortcuts') + '</div>'
+      + '<div class="hs-tiles">' + ftile('srs') + _hubSimplePicks(zero).map(ftile).join('') + '</div>';
+  }
   return '<div class="hs">'
     + '<div class="hs-hello"><div><h2>' + greet + '</h2><div class="hs-sub">' + (streak > 0 ? '<i data-ic=fire></i> ' + L('連續 ' + streak + ' 天 · ', streak + '-day streak · ') : '') + L('今天 ' + done + ' / ' + GOAL, 'Today ' + done + ' / ' + GOAL) + '</div></div>'
       + '<img class="hs-mascot" src="images/mascot/tanuki-p08.png" alt=""></div>'
-    + '<div class="hs-lb">' + L('今天從這裡開始', 'Start here today') + '</div>'
-    + main
-    + '<div class="hs-lb">' + L('你常用的', 'Your shortcuts') + '</div>'
-    + '<div class="hs-tiles">'
-      + tile('SRS.start()', 'refresh', L('複習', 'Review'), L('學過的字再看一次', 'Words you learned'))
-      + _hubSimplePicks(zero).map(k => { const f = _HUB_FEATS.find(x => x[0] === k); return tile(f[2], f[3], L(f[4], f[5]), L(f[6], f[7])); }).join('')
-    + '</div>'
+    + body
     + '<button class="hs-more" id="hsMoreBtn" onclick="hubToggleMore()">' + L('更多功能 ▾', 'More ▾') + '</button>'
-    + '<button class="hub-mode-sw" onclick="hubSetSimple(false)">' + L('想一次看到全部功能?切換完整版', 'Show everything — switch to full view') + '</button>'
+    + _hubModeBar(L)
     + '</div>';
+}
+// ── 自訂面板編輯器(自訂視窗,不用原生 confirm/prompt)──
+let _hubEd = null;   // 編輯中的 [{k, on}],順序=顯示順序
+function _hubEdName(k) {
+  const L = (zh, en) => (typeof enOr === 'function' ? enOr(cvt(zh), en) : zh);
+  if (k === 'path') return { ic: 'flag', t: L('今天的闖關卡', 'Today’s path card'), d: L('放在最上面的大卡', 'Big card at the top') };
+  const f = _hubFeat(k); return { ic: f[3], t: L(f[4], f[5]), d: L(f[6], f[7]) };
+}
+function hubEditOpen() {
+  const cur = _hubCustom() || _hubCustomDefault(_hubShowZero());
+  const all = ['path'].concat(_HUB_FEATS.map(f => f[0]));
+  _hubEd = cur.map(k => ({ k, on: true })).concat(all.filter(k => cur.indexOf(k) < 0).map(k => ({ k, on: false })));
+  let m = document.getElementById('hubEdMask');
+  if (!m) { m = document.createElement('div'); m.id = 'hubEdMask'; m.className = 'hub-ed-mask'; m.onclick = e => { if (e.target === m) hubEditClose(); }; document.body.appendChild(m); }
+  _hubEdRender();
+  try { track('hub_custom_edit', {}); } catch (e) {}
+}
+function _hubEdRender() {
+  const m = document.getElementById('hubEdMask'); if (!m || !_hubEd) return;
+  const L = (zh, en) => (typeof enOr === 'function' ? enOr(cvt(zh), en) : zh);
+  const n = _hubEd.filter(x => x.on).length;
+  m.innerHTML = '<div class="hub-ed" role="dialog" aria-modal="true">'
+    + '<div class="he-top"><b>' + L('編輯我的面板', 'Edit my home') + '</b><span>' + L('已選 ' + n + ' 個', n + ' selected') + '</span></div>'
+    + '<div class="he-tip">' + L('勾選要放在面板的功能,用 ▲▼ 調整順序', 'Tick what to show; reorder with ▲▼') + '</div>'
+    + '<div class="he-list">' + _hubEd.map((x, i) => {
+        const nm = _hubEdName(x.k);
+        return '<div class="he-row' + (x.on ? ' on' : '') + '">'
+          + '<button class="he-chk" onclick="hubEdToggle(' + i + ')" aria-pressed="' + x.on + '"><span class="he-box">' + (x.on ? '<i data-ic=check></i>' : '') + '</span>'
+          + '<span class="he-ic"><i data-ic=' + nm.ic + '></i></span><span class="he-tx"><b>' + nm.t + '</b><small>' + nm.d + '</small></span></button>'
+          + '<span class="he-mv"><button onclick="hubEdMove(' + i + ',-1)"' + (i === 0 ? ' disabled' : '') + ' aria-label="up">▲</button>'
+          + '<button onclick="hubEdMove(' + i + ',1)"' + (i === _hubEd.length - 1 ? ' disabled' : '') + ' aria-label="down">▼</button></span></div>';
+      }).join('') + '</div>'
+    + '<div class="he-btns"><button class="he-cancel" onclick="hubEditClose()">' + L('取消', 'Cancel') + '</button>'
+    + '<button class="he-save" onclick="hubEditSave()">' + L('完成', 'Done') + '</button></div></div>';
+  try { if (window.Icons && Icons.hydrate) Icons.hydrate(m); } catch (e) {}
+}
+function hubEdToggle(i) { if (_hubEd && _hubEd[i]) { _hubEd[i].on = !_hubEd[i].on; _hubEdRender(); } }
+function hubEdMove(i, d) {
+  if (!_hubEd) return; const j = i + d; if (j < 0 || j >= _hubEd.length) return;
+  const t = _hubEd[i]; _hubEd[i] = _hubEd[j]; _hubEd[j] = t;
+  const st = document.querySelector('#hubEdMask .he-list'); const top = st ? st.scrollTop : 0;
+  _hubEdRender(); const st2 = document.querySelector('#hubEdMask .he-list'); if (st2) st2.scrollTop = top;   // 重畫後清單位置不跳
+}
+function hubEditClose() { const m = document.getElementById('hubEdMask'); if (m) m.remove(); _hubEd = null; }
+function hubEditSave() {
+  if (!_hubEd) return;
+  const keys = _hubEd.filter(x => x.on).map(x => x.k);
+  try { localStorage.setItem('hub_custom', JSON.stringify(keys)); localStorage.setItem('ui_hub', 'custom'); } catch (e) {}
+  try { track('hub_custom_save', { n: keys.length }); } catch (e) {}
+  hubEditClose(); _hubSig = ''; renderHub();
 }
 function _hubShowZero() {
   try {
@@ -3139,7 +3265,7 @@ function renderHub() {
   const _jrDone = (() => { try { return window.Journey ? Journey.stats().done : ''; } catch (e) { return ''; } })();
   const _showZero = _hubShowZero();
   const _simple = _hubSimpleOn();
-  const _sig = [_simple, (_simple ? _hubSimplePicks(_showZero).join('+') : ''), _showZero, (localStorage.getItem('skit_seen') || ''), (typeof I18n !== 'undefined' && I18n.getLang ? I18n.getLang() : ''), streak, done, wod ? wod.w : '', lm || '', ll || '', _jrDone, (window.StudyPlan ? StudyPlan.sig() : ''), (window.Path ? Path.sig() : ''), _gr ? _gr.slot : '', (window.MyVocab ? MyVocab.count() : 0), (window.Omikuji ? (Omikuji.drawnToday() ? 1 : 0) : ''), DayKey.today(), GOAL].join('|');
+  const _sig = [_hubMode(), (_simple ? _hubSimplePicks(_showZero).join('+') + '|' + (localStorage.getItem('hub_custom') || '') : ''), _showZero, (localStorage.getItem('skit_seen') || ''), (typeof I18n !== 'undefined' && I18n.getLang ? I18n.getLang() : ''), streak, done, wod ? wod.w : '', lm || '', ll || '', _jrDone, (window.StudyPlan ? StudyPlan.sig() : ''), (window.Path ? Path.sig() : ''), _gr ? _gr.slot : '', (window.MyVocab ? MyVocab.count() : 0), (window.Omikuji ? (Omikuji.drawnToday() ? 1 : 0) : ''), DayKey.today(), GOAL].join('|');
   if (_sig === _hubSig && mn.querySelector('.hub')) return;
   _hubSig = _sig;
   const blossom = c => '<svg class="bl ' + c + '" viewBox="0 0 40 40"><g><ellipse cx="20" cy="11" rx="4.6" ry="7.4"/><ellipse cx="20" cy="11" rx="4.6" ry="7.4" transform="rotate(72 20 20)"/><ellipse cx="20" cy="11" rx="4.6" ry="7.4" transform="rotate(144 20 20)"/><ellipse cx="20" cy="11" rx="4.6" ry="7.4" transform="rotate(216 20 20)"/><ellipse cx="20" cy="11" rx="4.6" ry="7.4" transform="rotate(288 20 20)"/></g><circle cx="20" cy="20" r="2.6" fill="#fff"/></svg>';
@@ -3218,7 +3344,7 @@ function renderHub() {
         + '<button onclick="Omikuji.open()" class="hq-omk' + ((window.Omikuji && Omikuji.drawnToday()) ? '' : ' hq-new') + '"><span class="hq-ic"><i data-ic=sparkle></i></span>' + L('今日運勢', 'Fortune') + '</button>'
       + '</div>'
       + '<div class="hub-foot"><img src="images/mascot/fox-highfive.png" alt=""><span>' + L('今天也一起加油！', 'Let’s study today!') + '</span></div>'
-      + (_simple ? '' : '<button class="hub-mode-sw" onclick="hubSetSimple(true)">' + L('覺得功能太多?切換簡易版', 'Too much? Switch to simple view') + '</button>')
+      + (_simple ? '' : _hubModeBar(L))
     + '</div>'
     + '</div>';
   const _updHzProg = () => { try { const el=document.getElementById('hzProg'); if(el && window.Journey){ const st=Journey.stats(); el.textContent = st.done ? (st.done+' / '+st.tot+' '+L('步完成','steps done')) : L('約 15 分鐘走完第一章','~15 min for chapter one'); } } catch (e) {} };
