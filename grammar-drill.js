@@ -188,6 +188,7 @@ const GrammarDrill = (() => {
   // 正確做法：給例句挖空，選項是 4 個「真的可以填空的日文表達」，不是文法點名稱。
   // 正解取自當題文法例句的 <em>…</em>；誤答從同級別其他文法的 <em>…</em> 抽 3 個。
   let gqScore = 0, gqResults = [], gqWrong = [];
+  let _curEg = null;   // 這題用的例句(題目、詳解、喇叭共用)
   function extractEm(j) {
     const m = j.match(/<em>(.*?)<\/em>/);
     return m ? m[1] : null;
@@ -212,13 +213,18 @@ const GrammarDrill = (() => {
     const wrong = distractPool.sort(() => Math.random() - 0.5).slice(0, 3);
     const options = (typeof shuf === 'function' ? shuf([answer, ...wrong]) : [answer, ...wrong]);
     const correctIdx = options.indexOf(answer);
-    const blanked = eg.j.replace(/<em>(.*?)<\/em>/, '＿＿＿＿');
-    const pureJ = blanked.replace(/<[^>]+>/g, '').replace(/'/g, "\\'");
-    const spk = `<svg class="spk-inline" style="width:18px;height:18px;cursor:pointer;vertical-align:middle;margin-left:6px;stroke:var(--ac2);fill:none;stroke-width:2" onclick="speak('${pureJ}')" viewBox="0 0 24 24"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.54 8.46a5 5 0 010 7.07M19.07 4.93a10 10 0 010 14.14"/></svg>`;
+    // 題目句加振假名(使用者回饋:想知道ゲーム機怎麼唸);挖空前後分開轉,挖空本身不給讀音
+    const FR = x => (window.furiganaHTMLRich ? window.furiganaHTMLRich(x) : x);
+    const segs = String(eg.j).split(/<em>.*?<\/em>/);
+    const blanked = FR(segs[0].replace(/<[^>]+>/g, '')) + '＿＿＿＿' + FR((segs[1] || '').replace(/<[^>]+>/g, ''));
+    // 喇叭:作答前不能聽(會洩漏答案)→ 灰掉;答完 answerQuiz 會改成唸完整例句。
+    // 以前唸的是挖空後的句子(含＿＿＿＿),不會有預錄音檔 → 答完也一直沒聲音
+    _curEg = eg;
+    const spk = `<svg id="gqSpk" class="spk-inline" style="width:18px;height:18px;vertical-align:middle;margin-left:6px;stroke:var(--ac2);fill:none;stroke-width:2;opacity:.3;cursor:not-allowed" viewBox="0 0 24 24"><title>${_E('答完才能聽', 'Answer first to listen')}</title><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.54 8.46a5 5 0 010 7.07M19.07 4.93a10 10 0 010 14.14"/></svg>`;
     document.getElementById('quizBox').innerHTML = `
       <div class="qhd"><span>${t('gd_quiz_mode')} ${cur+1} / ${queue.length}</span><span>${t('quiz_score', { n: gqScore })}</span><button class="qclose" style="width:auto;margin:0;padding:2px 10px" onclick="GrammarDrill.close()"><i data-ic=x></i></button></div>
       <div class="qprompt"><div style="font-size:16px;line-height:1.8;color:var(--tx)">${blanked}${spk}</div><div style="font-size:12px;color:var(--tx2);margin-top:4px">${typeof cvt==='function'?cvt(eg.z):eg.z}</div></div>
-      <div class="qopts">${options.map((o, i) => '<button class="qopt" onclick="GrammarDrill.answerQuiz('+i+','+correctIdx+')">'+o+'</button>').join('')}</div>`;
+      <div class="qopts">${options.map((o, i) => '<button class="qopt" data-a="'+String(o).replace(/"/g,'&quot;')+'" onclick="GrammarDrill.answerQuiz('+i+','+correctIdx+')">'+FR(o)+'</button>').join('')}</div>`;
   }
   // 備援題型:例句沒有 <em> 可挖空時,改問「這句用了哪個文法」,選項是同級其他文法名
   function renderTitleQ(g, eg) {
@@ -228,21 +234,24 @@ const GrammarDrill = (() => {
     const correctIdx = options.indexOf(g.t);
     const sent = eg ? String(eg.j).replace(/<[^>]+>/g, '') : '';
     const C = x => (typeof cvt === 'function' ? cvt(x) : x);
+    _curEg = eg;
     document.getElementById('quizBox').innerHTML = `
       <div class="qhd"><span>${t('gd_quiz_mode')} ${cur+1} / ${queue.length}</span><span>${t('quiz_score', { n: gqScore })}</span><button class="qclose" style="width:auto;margin:0;padding:2px 10px" onclick="GrammarDrill.close()"><i data-ic=x></i></button></div>
       <div class="qprompt"><div style="font-size:13px;color:var(--tx2);margin-bottom:6px">${typeof enOr === 'function' ? enOr(C('這句用了哪個文法?'), 'Which grammar point does this sentence use?') : '這句用了哪個文法?'}</div>
-        ${sent ? '<div style="font-size:16px;line-height:1.8;color:var(--tx)">' + sent + '</div>' : ''}
+        ${sent ? '<div style="font-size:16px;line-height:1.8;color:var(--tx)">' + (window.furiganaHTMLRich ? window.furiganaHTMLRich(sent) : sent) + '</div>' : ''}
         ${eg && eg.z ? '<div style="font-size:12px;color:var(--tx2);margin-top:4px">' + C(eg.z) + '</div>' : ''}
         ${!sent && g.ex ? '<div style="font-size:14px;color:var(--tx)">' + C(g.ex) + '</div>' : ''}</div>
-      <div class="qopts">${options.map((o, i) => '<button class="qopt" onclick="GrammarDrill.answerQuiz('+i+','+correctIdx+')">'+o+'</button>').join('')}</div>`;
+      <div class="qopts">${options.map((o, i) => '<button class="qopt" data-a="'+String(o).replace(/"/g,'&quot;')+'" onclick="GrammarDrill.answerQuiz('+i+','+correctIdx+')">'+o+'</button>').join('')}</div>`;
   }
   // 詳解卡:答完顯示「為什麼是這個答案」(文法名+接續+語感+完整例句),不自動跳題——
   // 使用者回饋:測驗只變色就跳掉,看不到解說。
   function explainHtml(g, myAnswer, correctAns) {
     const E = x => String(x == null ? '' : x).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     const C = x => (typeof cvt === 'function' ? cvt(x) : x);
-    const eg = g.eg && g.eg[0];
-    const full = eg ? String(eg.j).replace(/<em>(.*?)<\/em>/, '<b style="color:var(--ac)">$1</b>') : '';
+    const eg = _curEg || (g.eg && g.eg[0]);   // 跟題目同一句(以前固定拿第一句,題目挑的是有挖空的那句,會對不上)
+    const FR = x => (window.furiganaHTMLRich ? window.furiganaHTMLRich(x) : E(x));
+    const full = eg ? String(eg.j).split(/(<em>.*?<\/em>)/).map(x => /^<em>/.test(x) ? '<b style="color:var(--ac)">' + FR(x.replace(/<[^>]+>/g, '')) + '</b>' : FR(x.replace(/<[^>]+>/g, ''))).join('')
+      + '<button type="button" onclick="GrammarDrill.sayEg()" style="border:none;background:none;cursor:pointer;padding:0 0 0 6px;vertical-align:middle;color:var(--ac2)" aria-label="' + _E('播放例句', 'Play') + '"><i data-ic=volume></i></button>' : '';
     let h = '<div style="background:var(--bg3);border-radius:12px;padding:12px 14px;margin-top:12px;font-size:13.5px;line-height:1.9;text-align:left">';
     h += '<div style="font-weight:800;font-size:15px">' + E(g.t) + '</div>';
     if (g.p) h += '<div style="color:var(--ac);font-size:12.5px;margin-top:2px">' + E(g.p) + '</div>';
@@ -263,8 +272,11 @@ const GrammarDrill = (() => {
     record(g.id, correct);
     if (typeof Calendar !== 'undefined') Calendar.logActivity('grammar');
     const opts = document.querySelectorAll('.qopt');
-    const myAns = opts[idx] ? opts[idx].textContent : null;
-    const okAns = opts[correctIdx] ? opts[correctIdx].textContent : null;
+    const ans = b => b ? (b.getAttribute('data-a') || b.textContent) : null;   // 選項有振假名,textContent 會混進讀音
+    const myAns = ans(opts[idx]);
+    const okAns = ans(opts[correctIdx]);
+    const sp = document.getElementById('gqSpk');   // 答完 → 題目喇叭解鎖,唸完整例句
+    if (sp) { sp.style.opacity = '.85'; sp.style.cursor = 'pointer'; sp.onclick = sayEg; const tt = sp.querySelector('title'); if (tt) tt.textContent = _E('播放例句', 'Play'); }
     opts.forEach((b, i) => { b.disabled = true; if (i === correctIdx) b.classList.add('qcorrect'); if (i === idx && !correct) b.classList.add('qwrong'); });
     if (!correct) gqWrong.push({ g: g, mine: myAns, ans: okAns });
     // 詳解 + 手動前進(不再 0.5 秒跳掉)
@@ -277,8 +289,11 @@ const GrammarDrill = (() => {
       + '<button class="qstart" style="margin-top:12px" onclick="GrammarDrill.nextQuiz()">'
       + (last ? _E('看結果 →', 'Results →') : (typeof t === 'function' ? t('rd_next') : _E('下一題', 'Next')) + ' →') + '</button>';
     box.appendChild(wrap);
+    try { if (window.Icons && Icons.hydrate) Icons.hydrate(wrap); } catch (e) {}
     wrap.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
   }
+  // 唸這題的完整例句(預錄音檔 key = 去掉標記的原句)
+  function sayEg() { try { if (_curEg && typeof speak === 'function') speak(String(_curEg.j).replace(/<[^>]+>/g, '')); } catch (e) {} }
   function nextQuiz() { cur++; cur >= queue.length ? showQuizResults() : renderQuizQ(); }
   function showQuizResults() {
     const pct = Math.round(gqScore / queue.length * 100);
@@ -298,5 +313,5 @@ const GrammarDrill = (() => {
 
   function close() { document.getElementById('quizBg').classList.remove('show'); }
 
-  return { start, begin, flip, rate, answerQuiz, nextQuiz, close, startUnit };
+  return { start, begin, flip, rate, answerQuiz, nextQuiz, close, startUnit, sayEg };
 })();
