@@ -151,6 +151,14 @@
   .bkana{color:var(--accent2);font-size:12.5px;margin-top:3px}
   .bzh{color:var(--ink2);font-size:12.5px;margin-top:3px}
   .msg.me .bkana,.msg.me .bzh{color:#ffffffcc}
+  .fixbox{margin-top:8px;padding:8px 10px;border-radius:10px;background:rgba(255,255,255,.16);font-size:14px}
+  .fixbox small{display:flex;align-items:center;gap:4px;font-size:11.5px;font-weight:700;color:#fff;opacity:.9}
+  .fixbox .fixjp{display:flex;align-items:center;gap:6px;margin-top:3px;font-size:15px}
+  .fixbox .fixjp rt{color:#ffffffcc}
+  .fixbox .spk{color:#fff;border-color:rgba(255,255,255,.5);background:transparent}
+  .fixbox em{display:block;font-style:normal;font-size:12.5px;color:#ffffffd9;margin-top:4px}
+  .fixgood{margin-top:6px;font-size:12.5px;color:#ffffffe6;display:flex;gap:4px;align-items:baseline;flex-wrap:wrap}
+  .fixgood span{flex:1;min-width:0}
   .coach{align-self:flex-start;max-width:86%;background:var(--panel);border:1px solid var(--accent);border-radius:12px;padding:8px 12px;font-size:13px;box-shadow:0 1px 4px rgba(0,0,0,.06);color:var(--ink)}
   .coach b{color:var(--accent)}
   .typing{color:var(--ink3);font-size:13px;padding:4px 2px;animation:tpulse 1.2s ease-in-out infinite}
@@ -612,13 +620,14 @@ function renderMsgs(streamingAi){
   for(let hi=0; hi<history.length; hi++){
     const m=history[hi];
     if(m.role==='me'){
-      html += `<div class="msg me"><div class="bubble me"><div class="bjp">${esc(m.text)}</div>${m.orig?`<div class="bzh">${esc(m.orig)}</div>`:''}</div></div>`;
+      const fb = history[hi+1] || (hi===history.length-1 ? streamingAi : null);
+      html += `<div class="msg me"><div class="bubble me"><div class="bjp">${esc(m.text)}</div>${m.orig?`<div class="bzh">${esc(m.orig)}</div>`:''}${fixBlock(fb && fb.fix, fb && fb.fixOk, fb && fb.coach, m.text)}</div></div>`;
     } else {
       const ab = aiBubble(m);
       html += ab;
       if(_lkHintIdx===-1 && !lkHintSeen() && ab.indexOf('class="jlk')>-1){ _lkHintIdx=hi; try{ localStorage.setItem('sc_lk_hint','1'); }catch(e){} }   // 出現即記一次,之後的場不再出
       if(hi===_lkHintIdx) html += lkHintHTML();
-      if(m.coach) html += `<div class="coach"><b>${enOr('教練','Coach')}</b>:${esc(cvt(m.coach))}</div>`;
+      if(m.coach && !m.fix && !m.fixOk) html += `<div class="coach"><b>${enOr('教練','Coach')}</b>:${esc(cvt(m.coach))}</div>`;   // 有 FIX 的回合,回饋已顯示在使用者泡泡裡
     }
   }
   if(streamingAi!=null) html += aiBubble(streamingAi) + '<div class="typing">相手が入力中…</div>';
@@ -697,11 +706,30 @@ function staleCoach(coach){
   const need=q=>Math.min(4,q.length);
   return quotes.some(q=>common(latest,q)<need(q) && older.some(o=>common(o,q)>=need(q)));
 }
+// 跟 PollyTalk 一樣把「更自然的說法」放在使用者自己的泡泡裡(2026-10-24 探長J 回饋):改好的句子可播放,下面一行講原因;講對了就顯示「很好」
+function fixBlock(fix, ok, why, said){
+  // 模型(Haiku)實測會:①只改標點(語音辨識本來就沒標點)②把原句原封不動抄回 FIX。去掉標點/空白後跟原句一樣 → 不算修正:
+  // 有說明就只顯示說明(不給可播放的假修正句),只差標點就當講對了
+  const nz=t=>String(t||'').replace(/[\s、。,.!?！？「」『』…~〜ー]/g,'');
+  if(fix && said!=null && nz(said).indexOf(nz(fix))>=0){   // 修正句整句都在原句裡 = 根本沒改(只改標點、或只抄了原句一段)
+    const real=[...String(why||'').matchAll(/「([^」]+)」/g)].map(x=>nz(x[1])).some(q=>q && nz(said).indexOf(q)<0);   // 說明裡引用了原句沒有的日文 = 真的有改法
+    if(real) return '<div class="fixbox"><small><i data-ic=bulb></i> '+enOr('小提醒','Tip')+'</small><em>'+esc(cvt(why))+'</em></div>';
+    fix=''; ok=true; why='';   // 只差標點 → 當作講對了,不顯示標點說教
+  }
+  if(fix){
+    const jp=window.furiganaHTMLRich?furiganaHTMLRich(fix):esc(fix);
+    return '<div class="fixbox"><small><i data-ic=bulb></i> '+enOr('更自然的說法','More natural')+'</small>'
+      +'<div class="fixjp"><span>'+jp+'</span><button class="spk" onclick="playTTS(this.dataset.t,scene&&scene.voice)" data-t="'+esc(fix)+'" aria-label="'+enOr('播放','Play')+'"><i data-ic=volume></i></button></div>'
+      +(why?'<em>'+esc(cvt(why))+'</em>':'')+'</div>';
+  }
+  if(ok) return '<div class="fixgood"><i data-ic=check></i> '+enOr('很好','Nice')+(why?'<span>'+esc(cvt(why))+'</span>':'')+'</div>';
+  return '';
+}
 function parseTurn(text){
-  const o={jp:'',kana:'',zh:'',coach:'',hints:[]};
+  const o={jp:'',kana:'',zh:'',coach:'',fix:'',hints:[]};
   const bare=[];   // 沒有任何欄位前綴的行(模型偶爾漏打 JP: 前綴,台詞變裸行)
   for(const line of String(text).split('\n')){
-    let m=line.match(/^\s*(JP|KANA|ZH|COACH)[::]\s?(.*)$/);   // 全形冒號也收:模型偶爾打成「JP:」
+    let m=line.match(/^\s*(JP|KANA|ZH|COACH|FIX)[::]\s?(.*)$/);   // 全形冒號也收:模型偶爾打成「JP:」
     if(m){ const v=(m[2]||'').trim(); if(m[1]==='JP'){ if(v) o.jp=v; } else o[m[1].toLowerCase()]=v; continue; }   // JP 只收非空行:模型偶爾多吐一行空 JP,別把正文蓋掉
     m=line.match(/^\s*HINT[::]\s?(.*)$/);
     if(m){ const v=(m[1]||'').trim(); if(v) o.hints.push(v); continue; }
@@ -711,7 +739,11 @@ function parseTurn(text){
   }
   // COACH 有時會吐 <blank>/空白/無 之類佔位字 → 當作沒有提點
   if(/^<?\s*(blank|空白?|無|なし|null|none|n\/a|[-—―])\s*>?$/i.test(o.coach)) o.coach='';
-  if(o.coach && staleCoach(o.coach)) o.coach='';   // 重提舊句的錯 → 不顯示(後端已提醒,這是保險)
+  if(o.coach && staleCoach(o.coach)) o.coach='';
+  // FIX:對方最新那句的改好版本;OK=講對了。佔位字或沒有日文的當作沒給(舊模型/格式跑掉 → 退回舊的教練顯示)
+  if(/^(ok|ＯＫ|ｏｋ)[。.!！]?$/i.test(o.fix.trim())){ o.fix=''; o.fixOk=true; }
+  else if(!/[ぁ-ゖァ-ヺ一-鿿]/.test(o.fix)) o.fix='';
+  else o.fix=o.fix.replace(/^[「『"]|[」』"]$/g,'');   // 重提舊句的錯 → 不顯示(後端已提醒,這是保險)
   // 防呆:模型格式跑掉沒給 JP 行時,拿假名行當主行(至少看得到、也播得出來),別讓泡泡剩「…」卡死
   if(!o.jp && o.kana){ o.jp=o.kana; o._jpFromKana=true; }   // 代打標記:串流中假名是半句,不能拿去提前播
   // 最後一道救援:JP/KANA 都沒有,但有含日文的裸行 → 那就是漏了前綴的台詞(2026-08 Sonnet 實測踩到:
@@ -957,7 +989,7 @@ async function saveChatLog(rv){
     const u=auth.currentUser; if(!u) return;
     const msgs=history.map(h=>h.role==='me'
       ? {r:'m', jp:h.text||''}
-      : {r:'a', jp:h.jp||h.text||'', zh:h.zh||'', k:h.kana||'', c:h.coach||''}).filter(m=>m.jp).slice(0,30);
+      : {r:'a', jp:h.jp||h.text||'', zh:h.zh||'', k:h.kana||'', c:h.coach||'', f:h.fix||'', o:h.fixOk?1:0}).filter(m=>m.jp).slice(0,30);
     if(!msgs.length) return;
     const col=db.collection('users/'+u.uid+'/chat_logs');
     rv=rv||{};
@@ -999,13 +1031,13 @@ function viewLog(id){
   document.getElementById('lvTtl').innerHTML=(v.sceneK?'<img src="images/scenes/card/'+esc(sceneImgK(v.sceneK))+'.webp" alt="" style="width:22px;height:22px;border-radius:50%;object-fit:cover;vertical-align:-4px" onerror="this.style.display=\'none\'"> ':esc(v.sceneIc||'💬')+' ')+esc(cvt(v.sceneT||''))+' · '+esc(v.lv||'');
   const wrap=document.getElementById('logMsgs');
   wrap.innerHTML=(v.msgs||[]).map(function(m,i){
-    if(m.r==='m') return '<div class="msg me"><div class="bubble me"><div class="bjp">'+esc(m.jp)+'</div></div></div>';
+    if(m.r==='m'){ const n=(v.msgs||[])[i+1]||{}; return '<div class="msg me"><div class="bubble me"><div class="bjp">'+esc(m.jp)+'</div>'+fixBlock(n.f,n.o,n.c,m.jp)+'</div></div>'; }
     // furigana 必須包在單一 <span> 裡:.bubble.ai .bjp 是 flex,裸放會讓每個 ruby 變獨立 flex item 排成直欄(跑版實錘)
     return '<div class="msg ai"><div class="bubble ai">'
       +'<div class="bjp"><span>'+(window.furiganaHTMLRich?furiganaHTMLRich(m.jp, kanaOpts()):esc(m.jp))+'</span><button class="spk" onclick="playTTS(window.__logs[\''+id+'\'].msgs['+i+'].jp,\''+(v.voice||'f')+'\')"><i data-ic=volume></i></button><button class="spk" onclick="favFromBubble(this)" data-jp="'+esc(m.jp)+'" data-kana="'+esc(m.k||'')+'" data-zh="'+esc(m.zh||'')+'">'+((window.FavSents&&FavSents.isFav(m.jp))?'★':'☆')+'</button><button class="spk parse" onclick="parseFromBubble(this)" data-jp="'+esc(m.jp)+'"><i data-ic=sparkle></i>'+enOr('解析','Analyze')+'</button></div>'
       +(m.zh?'<div class="bzh">'+esc(cvt(m.zh))+'</div>':'')
       +'</div></div>'
-      +(m.c?'<div class="coach"><b>'+enOr('教練','Coach')+'</b>:'+esc(cvt(m.c))+'</div>':''); }).join('')
+      +(m.c&&!m.f&&!m.o?'<div class="coach"><b>'+enOr('教練','Coach')+'</b>:'+esc(cvt(m.c))+'</div>':''); }).join('')
     +((v.score!=null||v.good||v.improve||v.tip)
       ? '<div class="coach" style="margin-top:14px;max-width:100%">'
         +(v.score!=null?'<div style="font-weight:700;margin-bottom:6px">'+enOr('這場得分:','Score: ')+v.score+'</div>':'')
