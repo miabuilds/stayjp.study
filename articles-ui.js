@@ -494,7 +494,11 @@ window.Articles = (function () {
       '.art-para .jlk rt{color:var(--tx2,#8a8a8a)}',
       // 每句一個區塊(句子+羅馬拼音+中譯一組),句首有明確的 ▶ 播放鈕——
       // 使用者回饋:單字都可點查字典,想「播這一句」反而沒地方點
-      '.art-s{display:block;position:relative;border-radius:10px;padding:3px 6px 3px 38px;margin:0 0 14px;min-height:30px;line-height:2.05;letter-spacing:.012em}',
+      '.art-s{display:block;position:relative;border-radius:10px;padding:4px 8px;margin:0 0 14px;min-height:30px;line-height:2.05;letter-spacing:.012em;cursor:pointer;transition:background .2s,box-shadow .2s}',
+      // 正在唸的那句整句框起來(2026-10-24 探長J 回饋:照 PollyTalk,不要每行一顆 ▶,框起來比較直覺);
+      // 問小狸的小圖示也只在這句出現,其他行保持乾淨
+      '.art-s.on{background:rgba(var(--ac-rgb),.07);box-shadow:0 0 0 1.5px rgba(var(--ac-rgb),.42)}',
+      '.art-s .art-sq{display:none}.art-s.on .art-sq{display:inline-flex}',
       '.art-para{margin-bottom:20px}',
       // 繪本插圖:每段上方一張方圖,與上一段之間留白+細線分頁
       '.art-pic{position:relative;max-width:380px;margin:8px auto 18px;border-radius:18px;overflow:hidden;aspect-ratio:1/1;background:var(--bg3,#efece5);box-shadow:0 2px 10px rgba(0,0,0,.08)}',
@@ -502,9 +506,6 @@ window.Articles = (function () {
       '.art-pic img{display:block;width:100%;height:100%;object-fit:cover}',
       '.art-pic-n{position:absolute;right:10px;bottom:10px;font:700 11.5px/1.6 -apple-system,sans-serif;color:#fff;background:rgba(0,0,0,.45);border-radius:999px;padding:1px 9px}',
       '.art-sub{line-height:1.75}',
-      '.art-sp{position:absolute;left:0;top:.45em;width:26px;height:26px;border-radius:50%;border:1.5px solid rgba(var(--ac-rgb),.45);background:none;color:#e8734a;font-size:11px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;padding:0 0 0 2px}',
-      '.art-sp:hover{background:rgba(var(--ac-rgb),.12)}',
-      '.art-s.on .art-sp,.art-s.flat .art-sp{background:#e8734a;border-color:#e8734a;color:#fff}',
       // 詞性淡底(可關):動詞=暖橘、形容詞=淡綠、副詞=淡紫;名詞不上色,保持乾淨
       '.art-mask .pos-v{background:rgba(var(--ac-rgb),.16);border-radius:4px}',
       '.art-mask .pos-a{background:rgba(64,160,90,.17);border-radius:4px}',
@@ -890,12 +891,11 @@ window.Articles = (function () {
         var sp;
         if (hasTts(clean)) {
           var idx = si++; sentSeq.push({ text: clean, i: idx });
-          // 句首 ▶:明確的「播這一句」目標(單字都被字典點擊佔用,句子本身難點到)
-          sp = '<span class="art-s" id="artS' + idx + '" onclick="Articles.playFrom(' + idx + ')">' +
-            '<button class="art-sp" title="' + enOr('播放/暫停這句', 'Play / pause sentence') + '" onclick="event.stopPropagation();Articles.spTap(' + idx + ')">▶</button>' +
+          // 點句子(單字以外的地方)= 從這句播、再點一次暫停;正在唸的句子整句框起來。原本句首的 ▶ 拿掉(畫面太多按鈕)
+          sp = '<span class="art-s" id="artS' + idx + '" onclick="Articles.spTap(' + idx + ')">' +
             frFn(s) + askBtn(clean, a) + '</span>';
         } else {
-          sp = '<span class="art-s" style="padding-left:6px">' + frFn(s) + askBtn(clean, a) + '</span>';
+          sp = '<span class="art-s">' + frFn(s) + askBtn(clean, a) + '</span>';
         }
         var rj = romajiForSentence(clean);
         var rjS = rj ? '<span class="art-romaji" style="display:' + (romaOn ? 'block' : 'none') + '">' + esc(rj) + '</span>' : '';
