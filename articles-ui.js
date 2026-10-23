@@ -935,7 +935,7 @@ window.Articles = (function () {
 
   function grammarCardsHtml(a) {
     return (a.grammar || []).map(function (gm) {
-      var deep = (gm.id && window.GRAMMAR_DETAIL && window.GRAMMAR_DETAIL[gm.id]) ?
+      var deep = (gm.id && (/^n[1-5]-\d+$/.test(gm.id) || (window.GRAMMAR_DETAIL && window.GRAMMAR_DETAIL[gm.id]))) ?   // 382 筆都有詳解;還沒載到的級別,點開時再載
         '<button class="art-gd-btn" onclick="Articles.gd(this,\'' + gm.id + '\')"><i data-ic=book></i> ' + enOr('看完整詳解', 'Full explanation') + ' ▾</button><div class="art-gd-body art-hidden"></div>' : '';
       return '<div class="art-g"><div class="art-g-t"><b>' + esc(Lc(gm.t,gm.t_en)) + '</b></div><div class="art-g-n">' + esc(Lc(gm.note,gm.note_en)) + '</div>' + deep + '</div>';
     }).join('');
@@ -1278,8 +1278,8 @@ window.Articles = (function () {
   function gd(btn, id) {
     var body = btn.nextElementSibling; var hidden = body.classList.toggle('art-hidden');
     // 詳解檔是延後載入的(app.html 大型資料檔載入器):還沒到就先載,載完再把內容填進已展開的區塊
-    if (!hidden && !body.innerHTML && !window.GRAMMAR_DETAIL && window.ensureGrammarDetail) {
-      window.ensureGrammarDetail().then(function () {
+    if (!hidden && !body.innerHTML && !(window.GRAMMAR_DETAIL && window.GRAMMAR_DETAIL[id]) && window.ensureGrammarDetail) {
+      window.ensureGrammarDetail(String(id).split('-')[0]).then(function () {   // 詳解每級一檔,依 id 的級別載
         if (body.classList.contains('art-hidden') || body.innerHTML) return;   // 使用者已收合/內容已填 → 不動
         var d = window.GRAMMAR_DETAIL && window.GRAMMAR_DETAIL[id];
         if (!d) return;

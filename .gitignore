@@ -60,3 +60,4 @@ scripts/daily-sales.mjs
 scripts/kol-commission-audit.mjs
 scripts/plan-mix.mjs
 scripts/tts/pitch-audit.json
+scripts/out/

@@ -5392,13 +5392,18 @@ function getGrammarData(lv) {
 }
 function render() {
   // 文法詳解檔(224KB)是延後載入的:還沒到就先照常畫(卡片只是少了「詳解」鈕),載完再重畫一次補上
-  if (!window.GRAMMAR_DETAIL && window.ensureGrammarDetail && !window._gdRerender) {
-    window._gdRerender = true;
-    window.ensureGrammarDetail().then(function () { if (typeof doRender === 'function') doRender(); });
-  }
   const lf = searchTerm;
   // 搜尋時跨級(searchLvs 複選):資料串起來、分類取聯集;條目 id 自帶級別前綴(n5-…)
   const srcLvs = lf ? searchLvs : [currentLevel];
+  // 文法詳解每級一檔、延後載入:這次要畫的級別還沒載到就先照常畫(卡片少了「詳解」鈕),載完再重畫一次補上
+  (function () {
+    var got = window.GRAMMAR_DETAIL_LV || {}, pend = window._gdPending || (window._gdPending = {});
+    srcLvs.forEach(function (l) {
+      if (got[l] || pend[l] || !window.ensureGrammarDetail) return;
+      pend[l] = 1;
+      window.ensureGrammarDetail(l).then(function () { if (typeof doRender === 'function') doRender(); });
+    });
+  })();
   const gds = srcLvs.map(l => getGrammarData(l));
   const data = gds.flatMap(g => g.data);
   const cats = []; const _seenCat = new Set();
@@ -6016,10 +6021,14 @@ function toggleDetail(btn) {
   }
   var ARTICLE_SET = ['article-tokens.js', 'article-dict.js', 'article-timings.js'];
   window.ensureArticleData = function () { return Promise.all(ARTICLE_SET.map(one)); };
-  window.ensureGrammarDetail = function () { return one('grammar-detail.js'); };
+  // 文法詳解 2026-10-24 改寫後變 1.8MB → 拆成每級一檔(grammar-detail-n5.js…),只載正在看的級別;不給級別 = 全部
+  window.ensureGrammarDetail = function (lv) {
+    var lvs = lv ? [String(lv).toLowerCase()] : ['n5', 'n4', 'n3', 'n2', 'n1'];
+    return Promise.all(lvs.map(function (l) { return one('grammar-detail-' + l + '.js'); }));
+  };
   window.ensureVocabThemes = function () { return one('vocab-themes.js'); };
   // 背景預載:等頁面真的閒下來(或 6 秒後)再補,讓首次可互動時間不受影響
-  function warm() { window.ensureGrammarDetail(); window.ensureArticleData(); window.ensureVocabThemes(); }
+  function warm() { window.ensureGrammarDetail(typeof currentLevel === 'string' && /^n[1-5]$/.test(currentLevel) ? currentLevel : 'n5'); window.ensureArticleData(); window.ensureVocabThemes(); }
   window.addEventListener('load', function () {
     if ('requestIdleCallback' in window) requestIdleCallback(warm, { timeout: 6000 });
     else setTimeout(warm, 2500);

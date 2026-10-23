@@ -1,0 +1,63 @@
+// 文法詳解「老師口吻」風格樣本(2026-10-24 Mia 核可):gen-grammar-detail.mjs 拿來當寫作範本。改風格先改這裡。
+window.GD_SAMPLES = {
+  "n4-51":
+    "<div class='gd-h'>一句話先懂</div>"
+  + "<div class='gd-sec'>意向形就是「〜ましょう」的<b>朋友版</b>。跟同事說「一緒に行きましょう」，跟朋友就說「一緒に行こう」，意思一樣是「～吧」，只是比較隨興。</div>"
+  + "<div class='gd-h'>什麼時候用</div>"
+  + "<div class='gd-sec'><span class='gd-tag'>揪人</span>約朋友一起做某件事。</div>"
+  + "<div class='gd-ex-line'>・<span class='gd-jp'>一緒に行こう。</span>（一起去吧）</div>"
+  + "<div class='gd-sec'><span class='gd-tag'>給自己打氣</span>心裡下決定、自言自語，旁邊沒人也可以用。</div>"
+  + "<div class='gd-ex-line'>・<span class='gd-jp'>よし、明日から早く起きよう。</span>（好，明天開始早點起床）</div>"
+  + "<div class='gd-h'>怎麼變：先看動詞是哪一類</div>"
+  + "<div class='gd-sec'><b>第一類（五段動詞）</b>：最後一個音換成同一行的「お」段音，再加「う」。<br>"
+  + "<span class='gd-pair'><span class='gd-jp'>行く</span> → く換成こ → <span class='gd-jp'>行こう</span></span><br>"
+  + "<span class='gd-pair'><span class='gd-jp'>飲む</span> → <span class='gd-jp'>飲もう</span></span><span class='gd-pair'><span class='gd-jp'>帰る</span> → <span class='gd-jp'>帰ろう</span></span><span class='gd-pair'><span class='gd-jp'>会う</span> → <span class='gd-jp'>会おう</span></span><br>"
+  + "從ます形想也可以：<span class='gd-jp'>行きます</span>的「き」換成「こ」，再加「う」。</div>"
+  + "<div class='gd-sec'><b>第二類（一段動詞）</b>：把最後的「る」拿掉，加「よう」。<br>"
+  + "<span class='gd-pair'><span class='gd-jp'>食べる</span> → <span class='gd-jp'>食べよう</span></span><span class='gd-pair'><span class='gd-jp'>起きる</span> → <span class='gd-jp'>起きよう</span></span><span class='gd-pair'><span class='gd-jp'>見る</span> → <span class='gd-jp'>見よう</span></span></div>"
+  + "<div class='gd-sec'><b>第三類（只有兩個，直接背）</b>：<span class='gd-pair'><span class='gd-jp'>する</span> → <span class='gd-jp'>しよう</span></span>、<span class='gd-pair'><span class='gd-jp'>来る</span> → <span class='gd-jp'>来よう</span>（こよう）</span></div>"
+  + "<div class='gd-h'>容易搞錯的地方</div>"
+  + "<div class='gd-warn'>・「行こう」要念長音いこー，念成短短的「いこ」會變成另一種口氣。<br>"
+  + "・来る的意向形念<b>こよう</b>，不是きよう。<br>"
+  + "・意向形是朋友之間講的，對老師、客人要換回「〜ましょう」。<br>"
+  + "・它只能講<b>自己</b>要做、或<b>揪對方一起</b>做，不能拿來說別人要做什麼。</div>"
+  + "<div class='gd-h'>學會之後可以接著學</div>"
+  + "<div class='gd-sec'>後面加「と思います」＝我打算～：<span class='gd-jp'>来年、日本へ行こうと思います。</span>（我打算明年去日本）</div>",
+
+  "n5-2":
+    "<div class='gd-h'>一句話先懂</div>"
+  + "<div class='gd-sec'>「〜ます」是日文的<b>禮貌模式</b>。對老師、店員、剛認識的人都用它；跟家人、好朋友才會用沒有ます的說法。剛開始學，<b>全部先用ます最安全</b>，不會失禮。</div>"
+  + "<div class='gd-h'>一個形，管現在也管未來</div>"
+  + "<div class='gd-sec'>日文沒有另外的「未來式」，習慣跟未來都用「〜ます」，時間靠「毎日」「明日」這種詞來交代。</div>"
+  + "<div class='gd-ex-line'>・<span class='gd-jp'>毎日コーヒーを飲みます。</span>（我每天喝咖啡：習慣）</div>"
+  + "<div class='gd-ex-line'>・<span class='gd-jp'>明日、東京へ行きます。</span>（我明天去東京：未來）</div>"
+  + "<div class='gd-sec'>要說「不」就把ます換成<b>ません</b>：<span class='gd-pair'><span class='gd-jp'>飲みます</span> → <span class='gd-jp'>飲みません</span></span></div>"
+  + "<div class='gd-h'>怎麼變：先看動詞是哪一類</div>"
+  + "<div class='gd-sec'><b>第一類（五段動詞）</b>：最後一個音換成同一行的「い」段音，加ます。<br>"
+  + "<span class='gd-pair'><span class='gd-jp'>飲む</span> → <span class='gd-jp'>飲みます</span></span><span class='gd-pair'><span class='gd-jp'>行く</span> → <span class='gd-jp'>行きます</span></span><span class='gd-pair'><span class='gd-jp'>買う</span> → <span class='gd-jp'>買います</span></span></div>"
+  + "<div class='gd-sec'><b>第二類（一段動詞）</b>：把「る」拿掉，加ます。<br>"
+  + "<span class='gd-pair'><span class='gd-jp'>食べる</span> → <span class='gd-jp'>食べます</span></span><span class='gd-pair'><span class='gd-jp'>見る</span> → <span class='gd-jp'>見ます</span></span></div>"
+  + "<div class='gd-sec'><b>第三類（只有兩個，直接背）</b>：<span class='gd-pair'><span class='gd-jp'>する</span> → <span class='gd-jp'>します</span></span>、<span class='gd-pair'><span class='gd-jp'>来る</span> → <span class='gd-jp'>来ます</span>（きます）</span></div>"
+  + "<div class='gd-h'>容易搞錯的地方</div>"
+  + "<div class='gd-warn'>・<span class='gd-jp'>帰る</span>、<span class='gd-jp'>入る</span>、<span class='gd-jp'>走る</span>、<span class='gd-jp'>知る</span>長得像第二類，其實是第一類：是<span class='gd-jp'>帰ります</span>，不是帰ます。<br>"
+  + "・「ません」是「不（做）」，不是「不能」：<span class='gd-jp'>お酒を飲みません</span>是「我不喝酒」，不是「我不能喝」。</div>",
+
+  "n3-39":
+    "<div class='gd-h'>一句話先懂</div>"
+  + "<div class='gd-sec'>「〜ようにする」就是<b>「我盡量～」「我有在注意～」</b>。重點是你有在努力、刻意在做，不保證每次都成功。</div>"
+  + "<div class='gd-h'>怎麼接</div>"
+  + "<div class='gd-sec'>要做的事：辭書形＋ようにする　<span class='gd-pair'><span class='gd-jp'>早く寝る</span> → <span class='gd-jp'>早く寝るようにする</span>（盡量早睡）</span><br>"
+  + "不要做的事：ない形＋ようにする　<span class='gd-pair'><span class='gd-jp'>忘れない</span> → <span class='gd-jp'>忘れないようにする</span>（盡量不要忘記）</span></div>"
+  + "<div class='gd-h'>最常聽到的三種樣子</div>"
+  + "<div class='gd-sec'><span class='gd-tag'>ようにしている</span>最近一直在保持的習慣，日常最常用。</div>"
+  + "<div class='gd-ex-line'>・<span class='gd-jp'>毎晩10時までに寝るようにしている。</span>（我都盡量 10 點前睡）</div>"
+  + "<div class='gd-sec'><span class='gd-tag'>ようにする</span>從現在開始要注意。</div>"
+  + "<div class='gd-ex-line'>・<span class='gd-jp'>これからは遅刻しないようにします。</span>（以後我會注意不遲到）</div>"
+  + "<div class='gd-sec'><span class='gd-tag'>ようにしてください</span>請對方盡量做到，醫生、老師、主管很常講。</div>"
+  + "<div class='gd-ex-line'>・<span class='gd-jp'>水をたくさん飲むようにしてください。</span>（請盡量多喝水）</div>"
+  + "<div class='gd-h'>跟長得很像的分清楚</div>"
+  + "<div class='gd-sec'><b>ようになる</b>＝不知不覺<b>變成</b>那樣（結果）：<span class='gd-jp'>日本語が話せるようになった。</span>（我變得會講日文了）<br>"
+  + "<b>ようにする</b>＝自己<b>刻意去做</b>（努力）：<span class='gd-jp'>毎日日本語を話すようにしている。</span>（我每天都盡量講日文）<br>"
+  + "<b>ことにする</b>＝<b>下了一個決定</b>：<span class='gd-jp'>来年留学することにした。</span>（我決定明年去留學）</div>"
+  + "<div class='gd-warn'>判斷小訣竅：「變成～了」是なる，「盡量～」是ようにする，「決定～」是ことにする。</div>",
+};
