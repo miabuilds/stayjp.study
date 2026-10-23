@@ -58,3 +58,5 @@ scripts/.fireauth.json
 # 營運分析腳本(會吐營收/分潤數字)— 同 funnel-cohort/revenue-reconcile,只留本機
 scripts/daily-sales.mjs
 scripts/kol-commission-audit.mjs
+scripts/plan-mix.mjs
+scripts/tts/pitch-audit.json
