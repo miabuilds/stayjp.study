@@ -8,6 +8,8 @@
 //   word  查一個字/片語 → 回字典 JSON(存進「我的單字本」;my-vocab.js)
 //   quiz  給目標詞 → 回造句情境 JSON(一次出一整輪,省額度)
 //   grade 批改使用者造的句子 → 回 JSON(有沒有真的用到目標詞、對不對、修正句)
+//   batch 一次貼一串筆記(可附原文段落)→ 回 items[](同 word 的形狀 + orig/typo),整批只扣 1 次額度
+//   scan  截圖/照片抓字(Premium 限定,後端擋)→ 回 items[] 同 batch;圖片前端先縮成 JPEG 再送
 // word/quiz/grade 一律回 JSON,前端拿 d.data。
 // ⚠️ assistant prefill "{" 只有 Haiku 吃得下:Sonnet 會回 400
 //    "This model does not support assistant message prefill"(2026-09-20 實測踩到)→ 依模型決定要不要 prefill。
@@ -15,7 +17,7 @@
 import * as functions from "firebase-functions/v2/https";
 import { defineSecret } from "firebase-functions/params";
 import * as admin from "firebase-admin";
-import { getAiConfig, consumeQuota, recordAiUse, trackAiCost } from "./ai-quota";
+import { getAiConfig, consumeQuota, recordAiUse, trackAiCost, isPremiumUser } from "./ai-quota";
 
 const ANTHROPIC_API_KEY = defineSecret("ANTHROPIC_API_KEY");
 const ADMIN_EMAILS = ["stayjpplan@gmail.com", "abc83327@gmail.com"];
@@ -29,7 +31,7 @@ function langName(lang?: string): string {
 // ── 我的單字本:三個 JSON 模式 ──────────────────────────────
 // 為什麼不用 output_config/tool 強制 schema:這支 function 直接打 REST(anthropic-version 2023-06-01),
 // 用 assistant prefill "{" 是這版最穩的作法,回來自己補回開頭的大括號再 parse。
-const JSON_MODES = ["word", "quiz", "grade"];
+const JSON_MODES = ["word", "quiz", "grade", "batch", "scan"];
 
 function wordSystem(lang: string | undefined, lv: string): string {
   const L = langName(lang);
@@ -48,6 +50,37 @@ function wordSystem(lang: string | undefined, lv: string): string {
 - 使用者程度約 ${lv || "N4"},例句用詞別超出太多。
 - 敬體/常體選這個詞最自然的那個;敬語、口語、男女用語差異寫進 note。
 - 不確定就據實在 note 說明,不要編造不存在的用法。`;
+}
+
+// batch/scan 共用的輸出規格(跟 word 同欄位,前端 my-vocab.js 直接吃)
+function bulkSpec(L: string, lv: string): string {
+  return `只輸出一個 JSON 物件,不要任何說明文字、不要 markdown 圍欄:
+{"items":[{"orig":"使用者原本寫的樣子(照抄)","typo":false,"w":"正確的日文(漢字優先,動詞給辭書形,片語照原樣)","r":"平假名讀音","m":"${L}意思,30字內,多個意思用;分隔","c":"名/動/形/副/慣用句/表現 其中一個","lv":"n5~n1","note":"用法提醒或易混淆的字,40字內,沒有就空字串","ex":[{"j":"例句","z":"${L}翻譯"}]}],"skip":["看不懂、不是日文學習內容而略過的項目"]}
+
+規則:
+- 拼錯、漢字寫錯、送假名錯、平假名寫成片假名這類筆誤要改正:w 放正確的,orig 放原本的,typo 設 true。
+- 動詞/形容詞的活用形還原成辭書形(例:食べました→食べる),orig 保留原樣、typo 維持 false。
+- 重複的只留一筆。中文寫的項目(想知道日文怎麼講)就給最自然的日文說法。
+- 例句 1 句、20 字內、不標假名(前端會自動標);有附原文且原文裡有這個詞時,優先直接用原文那句。
+- 使用者程度約 ${lv || "N4"}。不確定的用法寫進 note,不要編造。`;
+}
+
+function batchSystem(lang: string | undefined, lv: string, passage: string): string {
+  const L = langName(lang);
+  return `你是日語字典。使用者讀書時隨手記了一串不會的日文單字/片語(一行一個,或用頓號逗號分開),請整理成單字卡。
+${passage ? "使用者附上了原文段落:意思要以「在這段文章裡」的意思為主。\n原文:\n\"\"\"\n" + passage + "\n\"\"\"\n" : ""}
+${bulkSpec(L, lv)}`;
+}
+
+function scanSystem(lang: string | undefined, lv: string): string {
+  const L = langName(lang);
+  return `你是日語老師。使用者傳了一張讀書時的截圖或照片(課本、題目、文章、手機備忘錄、手寫筆記)。
+抓字規則:
+- 圖裡如果有使用者自己的筆記(備忘錄清單、手寫、螢光筆畫線、圈起來的字),就只抓那些。
+- 沒有筆記的話,從圖中挑出程度約 ${lv || "N4"} 的人最可能不會、而且值得背的單字或片語,最多 12 個;助詞、太簡單的字不要。
+- 圖中的句子可以當例句(有用到這個詞就直接用原句)。
+- 圖裡完全沒有日文,items 給空陣列,skip 寫一句${L}說明。
+${bulkSpec(L, lv)}`;
 }
 
 function quizSystem(lang: string | undefined, lv: string): string {
@@ -124,7 +157,7 @@ function systemPrompt(lang: string | undefined, mode: string, ctx: { type?: stri
 }
 
 export const askTutor = functions.onRequest(
-  { cors: true, region: "asia-east1", secrets: [ANTHROPIC_API_KEY, "REVENUECAT_SECRET_KEY"], timeoutSeconds: 60, memory: "256MiB" },
+  { cors: true, region: "asia-east1", secrets: [ANTHROPIC_API_KEY, "REVENUECAT_SECRET_KEY"], timeoutSeconds: 90, memory: "256MiB" },
   async (req, res) => {
     try {
       if (req.method !== "POST") { res.status(405).json({ error: "method_not_allowed" }); return; }
@@ -141,12 +174,14 @@ export const askTutor = functions.onRequest(
         ctx?: { type?: string; title?: string; body?: string; level?: string };
         history?: Array<{ role?: string; text?: string }>;
         items?: Array<{ w?: string; scene?: string; answer?: string }>;
+        image?: string; imageType?: string;
       };
       const rawMode = String(body.mode || "ask");
       const mode = (rawMode === "parse" || JSON_MODES.includes(rawMode)) ? rawMode : "ask";
       const isJson = JSON_MODES.includes(mode);
       // JSON 模式的題目由 items 帶(q 可空);一般問答還是看 q
-      const q = String(body.q || "").trim().slice(0, isJson ? 200 : 600);
+      const isBulk = mode === "batch" || mode === "scan";
+      const q = String(body.q || "").trim().slice(0, isBulk ? 1500 : isJson ? 200 : 600);
       const items = (Array.isArray(body.items) ? body.items : [])
         .filter(x => x && x.w)
         .slice(0, 8)
@@ -158,6 +193,19 @@ export const askTutor = functions.onRequest(
       if (mode === "word" && !q) { res.status(400).json({ error: "empty" }); return; }
       if ((mode === "quiz" || mode === "grade") && !items.length) { res.status(400).json({ error: "empty" }); return; }
       if (!isJson && !q) { res.status(400).json({ error: "empty" }); return; }
+      if (mode === "batch" && !q) { res.status(400).json({ error: "empty" }); return; }
+      const image = mode === "scan" ? String(body.image || "") : "";
+      const imageType = ["image/jpeg", "image/png", "image/webp"].includes(String(body.imageType)) ? String(body.imageType) : "image/jpeg";
+      if (mode === "scan") {
+        // 前端縮到長邊 1568 的 JPEG,正常 300KB 內;base64 超過 ~3MB 一律擋
+        if (!image || image.length > 3_000_000 || !/^[A-Za-z0-9+/=]+$/.test(image.slice(0, 200))) {
+          res.status(400).json({ error: "image", message: "圖片讀不了,換一張再試" }); return;
+        }
+        // 截圖抓字 = Premium 限定(2026-10-20 Mia 定案:批次免費、截圖付費)
+        if (!isAdmin && !(await isPremiumUser(decoded.uid))) {
+          res.status(403).json({ error: "premium", message: "截圖抓字是 Premium 功能" }); return;
+        }
+      }
       const ctx = body.ctx || {};
       // 歷史只留最近 6 則(3 輪),input 不隨對話無限長。
       // 句子解析的回覆(五段+兩張表)約 1500~2200 字,追問時要整份帶回去模型才知道「第二點」是哪點 → assistant 側放寬到 2400。
@@ -174,12 +222,14 @@ export const askTutor = functions.onRequest(
       }
 
       // 查詞/出題便宜(Haiku 夠用),批改要準(跟問答同一顆 tutorModel)
+      // 一次貼一串/截圖也走 tutorModel:2026-10-23 實測 Haiku 4.5 會把易誤用慣用句翻反(役不足→力量不夠、気が置けない→無法放鬆),
+      // 整批存進單字本、用戶不會逐個查證,錯了等於教錯;Sonnet 同一批全對,一批 20 字約 US$0.03。
       const cheap = (cfg as any).wordModel || "claude-haiku-4-5-20251001";
       const model = (mode === "word" || mode === "quiz") ? cheap : ((cfg as any).tutorModel || "claude-sonnet-5");
       const lvUp = ctx.level ? String(ctx.level).toUpperCase() : "";
       const canPrefill = /haiku/i.test(model);   // Sonnet 不支援 assistant prefill
       const pre = canPrefill ? [{ role: "assistant", content: "{" }] : [];
-      let system: string, messages: Array<{ role: string; content: string }>, maxTokens = mode === "parse" ? 1200 : 900;   // 解析五段+兩張表,900 會被截在整句意思前
+      let system: string, messages: Array<{ role: string; content: any }>, maxTokens = mode === "parse" ? 1200 : 900;   // 解析五段+兩張表,900 會被截在整句意思前
       if (mode === "word") {
         system = wordSystem(body.lang, lvUp);
         messages = [{ role: "user", content: `要查的:${q}` }, ...pre];
@@ -188,6 +238,18 @@ export const askTutor = functions.onRequest(
         system = quizSystem(body.lang, lvUp);
         messages = [{ role: "user", content: "這些是學生要練的詞:\n" + items.map((x, i) => `${i + 1}. ${x.w}`).join("\n") }, ...pre];
         maxTokens = 200 + items.length * 120;
+      } else if (mode === "batch") {
+        const lines = q.split(/\n+/).map(s => s.trim()).filter(Boolean).slice(0, 20);
+        system = batchSystem(body.lang, lvUp, String(ctx.body || "").slice(0, 3000));
+        messages = [{ role: "user", content: "我的筆記:\n" + lines.join("\n") }, ...pre];
+        maxTokens = Math.min(9000, 1200 + lines.length * 300);   // Sonnet 會先思考(7 字實測吃掉 ~700),上限要留給思考
+      } else if (mode === "scan") {
+        system = scanSystem(body.lang, lvUp);
+        messages = [{ role: "user", content: [
+          { type: "image", source: { type: "base64", media_type: imageType, data: image } },
+          { type: "text", text: q ? "我另外補充:" + q : "請從這張圖抓出要背的字。" },
+        ] }, ...pre];
+        maxTokens = 8000;
       } else if (mode === "grade") {
         system = gradeSystem(body.lang, lvUp);
         messages = [{
@@ -203,7 +265,7 @@ export const askTutor = functions.onRequest(
       const up = await fetch("https://api.anthropic.com/v1/messages", {
         method: "POST",
         headers: { "content-type": "application/json", "x-api-key": ANTHROPIC_API_KEY.value(), "anthropic-version": "2023-06-01" },
-        signal: (AbortSignal as any).timeout ? (AbortSignal as any).timeout(45000) : undefined,
+        signal: (AbortSignal as any).timeout ? (AbortSignal as any).timeout(isBulk ? 80000 : 45000) : undefined,
         body: JSON.stringify({ model, max_tokens: maxTokens, system, messages }),
       });
       if (!up.ok) {

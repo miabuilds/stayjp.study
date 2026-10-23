@@ -73,20 +73,34 @@ async function isPremium(uid: string): Promise<boolean> {
 // 呼叫的 function 要在 secrets 宣告 REVENUECAT_SECRET_KEY,沒有就略過(維持原行為)。
 const RC_ENTITLEMENT = "StayJP Plan Premium";
 const rcCache = new Map<string, { v: boolean; t: number }>();
-async function rcEntitled(uid: string): Promise<boolean> {
+// 通用版:查同一個 RC 專案裡任一 entitlement(熟記本用 "Shuji Premium")。快取 key 帶 entitlement 名,互不干擾。
+// opts.timeoutMs:呼叫端要控時間就給(熟記本 /me 用);不給 = 跟原本一樣不設逾時。
+export async function rcEntitlementActive(uid: string, entitlement: string, opts: { timeoutMs?: number } = {}): Promise<boolean> {
   const secret = process.env.REVENUECAT_SECRET_KEY || "";
   if (!secret) return false;
-  const c = rcCache.get(uid);
+  const key = entitlement + "|" + uid;
+  const c = rcCache.get(key);
   if (c && Date.now() - c.t < 10 * 60_000) return c.v;
   try {
-    const r = await fetch(`https://api.revenuecat.com/v1/subscribers/${encodeURIComponent(uid)}`, { headers: { Authorization: `Bearer ${secret}` } });
+    const r = await fetch(`https://api.revenuecat.com/v1/subscribers/${encodeURIComponent(uid)}`, {
+      headers: { Authorization: `Bearer ${secret}` },
+      signal: opts.timeoutMs ? AbortSignal.timeout(opts.timeoutMs) : undefined,
+    });
     if (!r.ok) return false;
     const d = await r.json() as { subscriber?: { entitlements?: Record<string, { expires_date?: string | null }> } };
-    const ent = d?.subscriber?.entitlements?.[RC_ENTITLEMENT];
+    const ent = d?.subscriber?.entitlements?.[entitlement];
     const v = !!ent && (!ent.expires_date || new Date(ent.expires_date).getTime() > Date.now());
-    rcCache.set(uid, { v, t: Date.now() });
+    rcCache.set(key, { v, t: Date.now() });
     return v;
   } catch { return false; }
+}
+async function rcEntitled(uid: string): Promise<boolean> {
+  return rcEntitlementActive(uid, RC_ENTITLEMENT);
+}
+// 付費功能開關用(截圖抓字等 Premium 限定):Firestore 判定 + RC 補判,口徑跟 consumeQuota 一致。
+export async function isPremiumUser(uid: string): Promise<boolean> {
+  if (await isPremium(uid)) return true;
+  return rcEntitled(uid);
 }
 // 免費用戶這次呼叫會不會撞到上限(跟 consumeQuota 的免費分支同口徑;bonus 也算進去)
 function wouldHitFreeLimit(u: any, kind: "eval" | "chat" | "ask", cfg: AiConfig, today: string): boolean {

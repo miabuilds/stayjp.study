@@ -297,6 +297,12 @@ service cloud.firestore {
       allow read, write: if false;
     }
 
+    // 熟記本(Shuji,2026-10-21):卡片/設定只有本人可讀寫(shuji/{uid}/cards/*、shuji/{uid}/meta/main)
+    // shuji_usage/{uid}(AI 額度)、shuji_ent/{uid}(方案快取)只給 shujiApi(Admin SDK),落到下面的預設拒絕
+    match /shuji/{uid}/{document=**} {
+      allow read, write: if request.auth != null && request.auth.uid == uid;
+    }
+
     // 預設拒絕：未明確允許的所有路徑皆擋
     match /{document=**} {
       allow read, write: if false;

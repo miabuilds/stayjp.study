@@ -6,6 +6,7 @@
 //      AI 判斷跟本地比對不一致時以本地為準 —— 社群抱怨的正是「AI 會改寫或認錯,練了存不起來」。
 // 資料:localStorage my_vocab(進 SYNC_KEYS 跨裝置;刪除用 del 墓碑,合併才不會復活)。
 // 額度:查詞 1 次、出題 1 次、批改 1 次(一輪最多 5 個字共 2 次),後端 kind 'ask'。
+// 2026-10-21 加:一次貼一串(mode batch,可附原文,整批 1 次額度)、截圖抓字(mode scan,Premium 限定,後端也擋)。
 (function (root) {
   var KEY = 'my_vocab';
   var FN = 'https://asia-east1-jpnote-1bdd6.cloudfunctions.net/askTutor';
@@ -197,10 +198,10 @@
       var r = await fetch(FN, {
         method: 'POST',
         headers: { 'content-type': 'application/json', authorization: 'Bearer ' + tok },
-        body: JSON.stringify(Object.assign({ lang: lang(), ctx: { level: lv } }, payload)),
+        body: JSON.stringify(Object.assign({ lang: lang() }, payload, { ctx: Object.assign({ level: lv }, payload.ctx || {}) })),
       });
       var d = null; try { d = await r.json(); } catch (e) {}
-      if (!r.ok) return { err: (r.status === 429 || r.status === 402) ? 'quota' : 'fail', msg: (d && d.message) || '' };
+      if (!r.ok) return { err: (r.status === 429 || r.status === 402) ? 'quota' : (d && d.error === 'premium') ? 'premium' : 'fail', msg: (d && d.message) || '' };
       return { data: d && d.data, remain: d && d.remain };
     } catch (e) { return { err: 'net' }; }
   }
@@ -214,6 +215,7 @@
     }
     if (err === 'quota') return '<div class="mv-err">' + esc(msg || L('今天的 AI 額度用完了。', 'Out of AI credits today.')) + ' <a href="pricing.html">' + L('看 Premium', 'See Premium') + '</a>'
       + '<div class="mv-err-sub">' + L('額度用完還是可以手動加字、自己複習。', 'You can still add words manually and review them.') + '</div></div>';
+    if (err === 'premium') return premiumHtml();
     if (err === 'cancel') return '';
     return '<div class="mv-err">' + L('小狸暫時連不上，等一下再試。', 'The tutor is unavailable, try again shortly.') + '</div>';
   }
@@ -295,6 +297,24 @@
       '@keyframes mvB{0%,80%,100%{opacity:.3}40%{opacity:1}}',
       '.mv-score{background:var(--bg3);border-radius:14px;padding:15px;margin-bottom:16px;font-size:14px;line-height:1.7}',
       '.mv-score b{font-size:16px}',
+      // 一次加很多 / 截圖抓字
+      '.mv-more{display:flex;gap:18px;flex-wrap:wrap;margin-top:12px;padding-top:12px;border-top:1px solid var(--bd)}',
+      '.mv-pro{font-size:10.5px;font-weight:800;color:#fff;background:var(--ac);border-radius:999px;padding:1px 7px;margin-left:2px}',
+      '.mv-bulk{display:flex;flex-direction:column;gap:12px;margin-top:14px;padding-top:14px;border-top:1px solid var(--bd)}',
+      '.mv-bulk details summary{font-size:12.5px;color:var(--tx2);cursor:pointer;font-weight:700}',
+      '.mv-bulk details textarea{margin-top:8px}',
+      '.mv-bl{margin-top:14px;padding-top:14px;border-top:1px solid var(--bd)}',
+      '.mv-bl-hd{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:6px}',
+      '.mv-bl-row{display:flex;gap:12px;align-items:flex-start;padding:12px 0;border-bottom:1px solid var(--bd)}',
+      '.mv-bl-row:last-child{border-bottom:0}',
+      '.mv-bl-row input{width:18px;height:18px;margin-top:4px;flex:none;accent-color:var(--ac)}',
+      '.mv-bl-row.off .mv-bl-b{opacity:.5}',
+      '.mv-bl-b{flex:1;min-width:0;display:flex;flex-direction:column;gap:5px}',
+      '.mv-bl-w{font-size:16px;font-weight:800}.mv-bl-w small{font-size:12px;font-weight:400;color:var(--tx2);margin-left:8px}',
+      '.mv-bl-m{font-size:13.5px;line-height:1.6}',
+      '.mv-bl-ex{font-size:12.5px;color:var(--tx2);line-height:1.8}',
+      '.mv-flag{align-self:flex-start;font-size:11.5px;font-weight:700;color:var(--ac);background:var(--bg3);border-radius:8px;padding:2px 8px}',
+      '.mv-bl-foot{display:flex;gap:10px;margin-top:12px}.mv-bl-foot .mv-btn{flex:1}',
       '@media(min-width:900px){.mv-body{max-width:720px;margin:0 auto;width:100%}.mv-foot{max-width:720px;left:50%;transform:translateX(-50%)}}',
     ].join('\n');
     document.head.appendChild(s);
@@ -309,7 +329,7 @@
     var m = mask();
     if (!m) { m = document.createElement('div'); m.id = 'mvMask'; m.className = 'mv-mask'; document.body.appendChild(m); }
     document.body.classList.add('mv-open');
-    state.view = 'list'; state.preview = null; state.manual = false; state.results = null; state.quiz = null;
+    state.view = 'list'; state.preview = null; state.manual = false; state.results = null; state.quiz = null; state.bulkOpen = false; bulk.items = null;
     render();
     try { if (typeof track === 'function') track('myvocab_open', { n: count() }); } catch (e) {}
   }
@@ -372,6 +392,13 @@
       + '<div class="mv-hintline">' + L('也可以打中文，例如「不用客氣」，小狸會給你日文說法。', 'You can also type your own language, e.g. “no need to be formal”.') + '</div>'
       + '<div id="mvAddOut"></div>'
       + (state.manual ? manualHtml() : '<div class="mv-hintline"><button type="button" class="mv-ibtn" onclick="MyVocab.toggleManual()"><i data-ic=edit></i> ' + L('不用小狸，我自己填意思', 'Skip the tutor — I’ll fill it in myself') + '</button></div>')
+      + '<div class="mv-more">'
+        + '<button type="button" class="mv-ibtn" onclick="MyVocab.toggleBulk()"><i data-ic=clipboard></i> ' + L('一次貼一串', 'Paste a list') + '</button>'
+        + (scanAllowedHere() ? '<button type="button" class="mv-ibtn" onclick="MyVocab.pickScan()"><i data-ic=camera></i> ' + L('截圖抓字', 'Words from a screenshot') + ' <span class="mv-pro">Premium</span></button>' : '')
+        + '<input type="file" id="mvScanIn" accept="image/*" hidden onchange="MyVocab.scanFile(this)">'
+      + '</div>'
+      + (state.bulkOpen ? bulkHtml() : '')
+      + '<div id="mvBulkOut">' + (bulk.items ? bulkListHtml() : '') + '</div>'
       + '</div>';
 
     if (!items.length) {
@@ -495,6 +522,133 @@
   function del(w) {
     remove(w);
     render();
+  }
+
+  // ── 一次貼一串 / 截圖抓字 ──────────────────────────────
+  // 兩條路回來的形狀一樣(items[]),共用同一個預覽清單:可勾選、標出筆誤改正、已存過的預設不勾。
+  var bulk = { items: null, on: [], remain: null };
+  function premiumHtml() {
+    return '<div class="mv-err">' + L('截圖抓字是 Premium 功能：課本、題目、備忘錄截圖丟進來，小狸自動挑出要背的字。', 'Words-from-screenshot is a Premium feature.')
+      + ' <a href="pricing.html">' + L('看 Premium', 'See Premium') + '</a>'
+      + '<div class="mv-err-sub">' + L('免費也可以用「一次貼一串」：把字打成一行一個貼進來，一樣整批整理。', 'Free tip: use “Paste a list” — one word per line, sorted in one go.') + '</div></div>';
+  }
+  // App(WKWebView)裡 <input type=file accept=image/*> 會給「拍照」選項,
+  // 1.0.11 以前的 build 沒宣告 NSCameraUsageDescription → 點拍照直接閃退。
+  // 等帶相機權限的新 build 上架,原生端注入 STAYJP_NATIVE.canPickImage=true 才開。
+  function scanAllowedHere() {
+    try { if (root.STAYJP_NATIVE && root.STAYJP_NATIVE.isNativeApp) return !!root.STAYJP_NATIVE.canPickImage; } catch (e) {}
+    return true;
+  }
+  function canScan() {
+    try { if (root.STAYJP_NATIVE && root.STAYJP_NATIVE.isNativeApp && root.STAYJP_NATIVE.isPremium) return true; } catch (e) {}
+    try { return !!(root.ToolQuota && root.ToolQuota.shouldGate && !root.ToolQuota.shouldGate()); } catch (e) { return false; }
+  }
+  function bulkHtml() {
+    return '<div class="mv-bulk">'
+      + '<div class="mv-hintline" style="margin:0">' + L('一行一個，打錯字也沒關係，小狸會幫你改（最多 20 個）', 'One per line, typos are fine (up to 20)') + '</div>'
+      + '<textarea id="mvBulk" rows="6" placeholder="' + attr(L('気が置けない\n申し込む\nけっこう\n締め切り', '気が置けない\n申し込む\nけっこう')) + '">' + esc(state.bulkText || '') + '</textarea>'
+      + '<details' + (state.bulkCtx ? ' open' : '') + '><summary>' + L('附上原文段落（選填，意思會照上下文翻）', 'Add the source passage (optional)') + '</summary>'
+        + '<textarea id="mvBulkCtx" rows="4" placeholder="' + attr(L('把你在讀的那段日文貼這裡', 'Paste the passage you were reading')) + '">' + esc(state.bulkCtx || '') + '</textarea></details>'
+      + '<button type="button" class="mv-btn" id="mvBulkGo" onclick="MyVocab.runBulk()">' + L('小狸一次整理（1 次額度）', 'Sort them all (1 credit)') + '</button>'
+      + '</div>';
+  }
+  function toggleBulk() { keepBulkText(); state.bulkOpen = !state.bulkOpen; paint(); if (state.bulkOpen) { var t = $('mvBulk'); if (t) t.focus(); } }
+  function keepBulkText() { var a = $('mvBulk'), b = $('mvBulkCtx'); if (a) state.bulkText = a.value; if (b) state.bulkCtx = b.value; }
+  function loadingInto(msg) { var o = $('mvBulkOut'); if (o) o.innerHTML = '<div class="mv-load"><i></i><i></i><i></i><span>' + msg + '</span></div>'; }
+  function showBulk(r) {
+    state.busy = false;
+    var o = $('mvBulkOut'); if (!o) return;
+    if (r.err) { bulk.items = null; o.innerHTML = aiErrHtml(r.err, r.msg); hydrate(); return; }
+    var got = ((r.data && r.data.items) || []).filter(function (x) { return x && x.w; });
+    var seen = {};
+    bulk.items = got.map(function (d) {
+      var k = norm(d.w), dup = has(d.w) ? 'saved' : (seen[k] ? 'repeat' : '');
+      seen[k] = 1;
+      return { dup: dup, typo: !!d.typo && d.orig && d.orig !== d.w, orig: d.orig || '', p: {
+        w: d.w, r: d.r || '', m: d.m || '', c: d.c || '', lv: d.lv || '', note: d.note || '',
+        ex: (d.ex && d.ex[0] && d.ex[0].j) ? { j: d.ex[0].j, z: d.ex[0].z || '' } : null, src: 'ai' } };
+    });
+    bulk.on = bulk.items.map(function (x) { return !x.dup; });
+    bulk.remain = r.remain; bulk.skip = (r.data && r.data.skip) || [];
+    if (!bulk.items.length) {
+      o.innerHTML = '<div class="mv-err">' + esc(bulk.skip[0] || L('沒抓到可以背的字，換個寫法或換一張圖試試。', 'Nothing to add — try different text or another image.')) + '</div>';
+      bulk.items = null; return;
+    }
+    o.innerHTML = bulkListHtml(); hydrate();
+  }
+  function bulkListHtml() {
+    var n = bulk.on.filter(Boolean).length;
+    var h = '<div class="mv-bl"><div class="mv-bl-hd"><span class="mv-sec" style="margin:0">' + L('整理好 ' + bulk.items.length + ' 個', bulk.items.length + ' ready') + '</span>'
+      + '<button type="button" class="mv-ibtn" onclick="MyVocab.bulkAll()">' + L('全選 / 全不選', 'Toggle all') + '</button></div>';
+    bulk.items.forEach(function (x, i) {
+      var p = x.p;
+      h += '<div class="mv-bl-row' + (bulk.on[i] ? '' : ' off') + '"><input type="checkbox"' + (bulk.on[i] ? ' checked' : '') + ' onchange="MyVocab.bulkPick(' + i + ',this.checked)" aria-label="' + attr(p.w) + '">'
+        + '<div class="mv-bl-b"><div class="mv-bl-w">' + esc(p.w) + (p.r && p.r !== p.w ? '<small>' + esc(p.r) + '</small>' : '') + (p.lv ? '<small>' + esc(String(p.lv).toUpperCase()) + '</small>' : '') + '</div>'
+        + (x.typo ? '<span class="mv-flag">' + L('你原本寫「' + esc(x.orig) + '」，幫你改好了', 'You wrote “' + esc(x.orig) + '” — fixed') + '</span>' : '')
+        + (x.dup === 'saved' ? '<span class="mv-flag">' + L('已經在單字本裡了', 'Already in your list') + '</span>' : '')
+        + '<div class="mv-bl-m">' + esc(p.m) + '</div>'
+        + (p.ex ? '<div class="mv-bl-ex">' + fr(p.ex.j) + (p.ex.z ? '<br>' + esc(p.ex.z) : '') + '</div>' : '')
+        + '</div></div>';
+    });
+    h += '<div class="mv-bl-foot"><button type="button" class="mv-btn" onclick="MyVocab.bulkSave()"' + (n ? '' : ' disabled') + '><i data-ic=check></i> ' + L('存 ' + n + ' 個字', 'Add ' + n) + '</button>'
+      + '<button type="button" class="mv-btn mv-btn2" onclick="MyVocab.bulkClear()">' + L('不要了', 'Discard') + '</button></div>';
+    if (typeof bulk.remain === 'number' && bulk.remain < 999) h += '<div class="mv-hintline">' + L('今天還可以問小狸 ' + bulk.remain + ' 次', bulk.remain + ' tutor credits left today') + '</div>';
+    return h + '</div>';
+  }
+  async function runBulk() {
+    if (state.busy) return;
+    keepBulkText();
+    var lines = String(state.bulkText || '').split(/\n|、|,|，/).map(function (s) { return s.replace(/^[\s\-・•*\d.)）]+/, '').trim(); }).filter(Boolean);
+    if (!lines.length) { var t = $('mvBulk'); if (t) t.focus(); return; }
+    if (lines.length > 20) { toast(L('一次最多 20 個，先整理前 20 個', 'Up to 20 at a time — sorting the first 20')); lines = lines.slice(0, 20); }
+    state.busy = true; var go = $('mvBulkGo'); if (go) go.disabled = true;
+    loadingInto(L('小狸整理中，' + lines.length + ' 個字大概 15～40 秒…', 'Sorting ' + lines.length + ' words…'));
+    var r = await callAI({ mode: 'batch', q: lines.join('\n'), ctx: { body: String(state.bulkCtx || '').slice(0, 3000) } });
+    go = $('mvBulkGo'); if (go) go.disabled = false;
+    showBulk(r);
+    try { if (typeof track === 'function') track('myvocab_bulk', { n: lines.length, ok: !r.err }); } catch (e) {}
+  }
+  function pickScan() {
+    if (!canScan()) { var o = $('mvBulkOut'); if (o) { bulk.items = null; o.innerHTML = premiumHtml(); hydrate(); } try { if (typeof track === 'function') track('myvocab_scan_gate', {}); } catch (e) {} return; }
+    var f = $('mvScanIn'); if (f) f.click();
+  }
+  // 長邊縮到 1568(Claude 看圖的甜蜜點)、轉 JPEG,手機原圖 5MB 也只剩幾百 KB
+  function shrink(file) {
+    return new Promise(function (res, rej) {
+      var img = new Image(), url = URL.createObjectURL(file);
+      img.onload = function () {
+        var M = 1568, s = Math.min(1, M / Math.max(img.naturalWidth, img.naturalHeight));
+        var c = document.createElement('canvas'); c.width = Math.round(img.naturalWidth * s); c.height = Math.round(img.naturalHeight * s);
+        var g = c.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, c.width, c.height); g.drawImage(img, 0, 0, c.width, c.height);
+        URL.revokeObjectURL(url); res(c.toDataURL('image/jpeg', 0.85).split(',')[1]);
+      };
+      img.onerror = function () { URL.revokeObjectURL(url); rej(new Error('img')); };
+      img.src = url;
+    });
+  }
+  async function scanFile(input) {
+    var f = input && input.files && input.files[0]; if (input) input.value = '';
+    if (!f || state.busy) return;
+    state.busy = true;
+    loadingInto(L('小狸看圖抓字中，大概 20～40 秒…', 'Reading your screenshot…'));
+    var b64 = null; try { b64 = await shrink(f); } catch (e) {}
+    if (!b64) { state.busy = false; var o = $('mvBulkOut'); if (o) o.innerHTML = '<div class="mv-err">' + L('這張圖讀不了，換一張 JPG 或 PNG 試試。', 'Couldn’t read that image — try a JPG or PNG.') + '</div>'; return; }
+    var r = await callAI({ mode: 'scan', image: b64, imageType: 'image/jpeg' });
+    showBulk(r);
+    try { if (typeof track === 'function') track('myvocab_scan', { ok: !r.err, n: r.data && r.data.items ? r.data.items.length : 0 }); } catch (e) {}
+  }
+  function bulkPick(i, v) { bulk.on[i] = !!v; var o = $('mvBulkOut'); if (o) { o.innerHTML = bulkListHtml(); hydrate(); } }
+  function bulkAll() { var all = bulk.on.every(Boolean); bulk.on = bulk.on.map(function () { return !all; }); var o = $('mvBulkOut'); if (o) { o.innerHTML = bulkListHtml(); hydrate(); } }
+  function bulkClear() { bulk.items = null; var o = $('mvBulkOut'); if (o) o.innerHTML = ''; }
+  function bulkSave() {
+    if (!bulk.items) return;
+    var n = 0;
+    bulk.items.forEach(function (x, i) { if (bulk.on[i]) { add(x.p); n++; } });
+    try { if (typeof track === 'function') track('myvocab_add', { src: 'bulk', n: n }); } catch (e) {}
+    bulk.items = null; state.bulkText = ''; state.bulkCtx = ''; state.bulkOpen = false;
+    render();
+    var b = $('mvBody'); if (b) b.scrollTop = 0;
+    toast(L('加好 ' + n + ' 個字，明天開始排進複習', n + ' words added to your review'));
   }
 
   // 馬上背一輪:走站上既有的字卡(SRS level 'my'),不另做一套
@@ -651,6 +805,8 @@
     lookup: lookup, savePreview: savePreview, toggleManual: toggleManual, saveManual: saveManual,
     practice: practice, toggle: toggle, startQuiz: startQuiz, submit: submit, keep: keep,
     reviewNow: reviewNow, say: say, owns: owns,
+    toggleBulk: toggleBulk, runBulk: runBulk, pickScan: pickScan, scanFile: scanFile,
+    bulkPick: bulkPick, bulkAll: bulkAll, bulkSave: bulkSave, bulkClear: bulkClear,
   };
   try { if (root.NavBack) NavBack.register('myvocab', function () { open(); }); } catch (e) {}
 })(window);
