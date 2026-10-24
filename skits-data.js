@@ -42,7 +42,12 @@ window.SKITS = [
   { n: 38, t: '不要芥末', en: 'No wasabi', p: 'わさび抜きでお願いします', r: 'わさびぬきでおねがいします', m: '麻煩不要加芥末', men: 'No wasabi, please', hook: '壽司不要芥末', hookEn: 'Sushi without wasabi' , au: 'e38_teach' },
   { n: 39, t: '計程車', en: 'Taxi', p: 'ここまでお願いします', r: 'ここまでおねがいします', m: '麻煩到這裡', men: 'To here, please', hook: '計程車門別自己開', hookEn: "Don't open the taxi door" , au: 'e39_teach' },
   { n: 40, t: '丟垃圾', en: 'Trash day', p: '燃えるゴミ', r: 'もえるゴミ', m: '可燃垃圾', men: 'Burnable trash', hook: '丟錯天會被貼紙', hookEn: 'Wrong trash day' , au: 'e40_teach1' },
-  { n: 41, t: '拍照', en: 'Taking photos', p: '写真を撮ってもいいですか', r: 'しゃしんをとってもいいですか', m: '可以拍照嗎？', men: 'May I take a photo?', hook: '拍照前先問這句', hookEn: 'Ask before you shoot' , au: 'e41_teach' }
+  { n: 41, t: '拍照', en: 'Taking photos', p: '写真を撮ってもいいですか', r: 'しゃしんをとってもいいですか', m: '可以拍照嗎？', men: 'May I take a photo?', hook: '拍照前先問這句', hookEn: 'Ask before you shoot' , au: 'e41_teach' },
+  { n: 42, t: '錢湯', en: 'Public bath', p: 'タオルは湯船に入れないでね', r: 'タオルはゆぶねにいれないでね', m: '毛巾不要放進浴池喔', men: "Don't put your towel in the bath", hook: '毛巾不能放這裡', hookEn: 'Not in the bath!' , au: 'e42_teach' },
+  { n: 43, t: '神社參拜', en: 'Shrine visit', p: '二礼二拍手一礼', r: 'にれいにはくしゅいちれい', m: '兩鞠躬、兩拍手、一鞠躬', men: 'Bow twice, clap twice, bow once', hook: '搖鈴搖太多次了', hookEn: 'Too much bell ringing' , au: 'e43_teach' },
+  { n: 44, t: '迴轉壽司', en: 'Sushi train', p: '粉茶を入れてから', r: 'こなちゃをいれてから', m: '先放茶粉再加熱水', men: 'Put in the tea powder first', hook: '熱茶怎麼沒味道', hookEn: 'Why is my tea just water?' , au: 'e44_teach' },
+  { n: 45, t: '投幣洗衣', en: 'Laundromat', p: 'これは洗濯機ですか', r: 'これはせんたくきですか', m: '這是洗衣機嗎？', men: 'Is this a washing machine?', hook: '衣服洗到縮水', hookEn: 'My clothes shrank' , au: 'e45_teach' },
+  { n: 46, t: '搭公車', en: 'Taking the bus', p: '次、降ります', r: 'つぎ、おります', m: '下一站我要下車', men: "I'm getting off at the next stop", hook: '下車要怎麼說', hookEn: 'How to get off the bus' , au: 'e46_teach' }
 ];
 window.skitAudio = function (au) { return au ? 'videos/skit/audio/' + au + '.mp3' : ''; };
 window.skitFile = function (n, ext) { return 'videos/skit/ep' + (n < 10 ? '0' : '') + n + '.' + ext; };
