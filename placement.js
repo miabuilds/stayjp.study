@@ -93,7 +93,7 @@
       + '<div class="pl-res-lv">' + base.toUpperCase() + '</div>'
       + '<div class="pl-res-sub">' + (base === 'n1' ? L('已經是最高級了,直接衝 N1 題庫吧', 'Top level — go straight for N1 practice') : L('建議目標 ' + goal.toUpperCase() + ':先把 ' + base.toUpperCase() + ' 補穩,再往 ' + goal.toUpperCase() + ' 前進', 'Suggested goal: ' + goal.toUpperCase())) + '</div>'
       + '<div class="pl-hist">' + rows + '</div>'
-      + '<button type="button" class="pl-cta" onclick="Placement._apply(\'' + base + '\',\'' + goal + '\')">' + L('設為我的程度,開始闖關', 'Set my level and start the path') + ' →</button>'
+      + '<button type="button" class="pl-cta" onclick="Placement._apply(\'' + base + '\',\'' + goal + '\')">' + L('設為我的程度,從 ' + base.toUpperCase() + ' 第 1 關開始闖關', 'Set my level & start the ' + base.toUpperCase() + ' path') + ' →</button>'
       + '<button type="button" class="pl-cta pl-cta-sub" onclick="Placement.close()">' + L('先不要', 'Not now') + '</button>'
       + '</div>';
     show(); hydrate();

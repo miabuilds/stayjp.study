@@ -329,8 +329,17 @@
         ? (cur < total ? '<button type="button" class="pt-cta pt-cta-sub pq-go" onclick="Path.startUnit(' + cur + ')">' + L('再多一關', 'One more') + ' · ' + nameOf(us[cur]) + '</button>' : '')
         : '<button type="button" class="pt-cta pq-go" onclick="Path.startUnit(' + cur + ')"><i data-ic=play></i> ' + L('開始', 'Start') + '</button>')
       + '<div class="pq-foot"><span class="pq-lvn">' + L(lv.toUpperCase() + ' ' + doneN + ' / ' + total + ' 關', lv.toUpperCase() + ' ' + doneN + ' / ' + total) + '</span><i class="pq-minibar"><b style="width:' + Math.round(doneN / total * 100) + '%"></b></i><button type="button" class="pt-link" onclick="StudyPlan.setRhythm(\'free\')">' + L('改成自由節奏', 'Free pace') + '</button></div>'
+      + (doneN < 5 ? plcBtn() : '')
       + '</div>';
   }
+
+  // ── 程度測驗入口(2026-10-24 Mia:像 StayKR 一樣讓人測程度、知道從哪關開始)。placement.js 9/20 就有,但入口只在 onboarding,舊用戶看不到 ──
+  function plcBtn() {
+    if (!root.Placement) return '';
+    return '<button type="button" class="pt-plc" onclick="Path.testLevel()"><i data-ic=target></i><span>' + L('學過一點日文?3 分鐘測程度,從適合的關卡開始', 'Know some Japanese? 3-min test to find your starting level') + '</span></button>';
+  }
+  /** 從地圖開測驗要先收地圖:測驗開在 .quiz-bg(z 300),會被 .pt-mask(z 9200)整個蓋住 */
+  function testLevel() { if (!root.Placement) return; closeMap(); var m = document.getElementById('pathMenu'); if (m) m.remove(); Placement.start(); }
 
   // ── 面板卡 ──
   function hubCardHtml() {
@@ -363,6 +372,7 @@
       + '<div class="pt-bar"><i style="width:' + pct + '%"></i></div>'
       + '<div class="pt-prog">' + L('已完成 ' + doneN + ' / ' + total + ' 關', doneN + ' / ' + total + ' done') + ' · <button type="button" class="pt-link" onclick="StudyPlan.setRhythm(\'path\')">' + L('改成每日關卡任務', 'Switch to daily quests') + '</button></div>'
       + '<button type="button" class="pt-cta" onclick="Path.startUnit(' + cur + ')">' + L('開始第 ' + (cur + 1) + ' 關', 'Start level ' + (cur + 1)) + ' →</button>'
+      + (doneN < 5 ? plcBtn() : '')
       + '</div>';
   }
 
@@ -421,6 +431,7 @@
       + '<div class="pt-mapbody">'
       + nextCard(lv, us, cur)
       + '<div class="pt-map-sub">' + L('每關:10 個單字 → 1 個文法 → 5 題,每 5 關一次小考。<b>點還沒解鎖的關</b>可以直接從那裡開始;右上角 ⋯ 可以清空重刷。', 'Each level: 10 words → 1 grammar → 5 questions; checkpoint every 5. <b>Tap a locked level</b> to start there; ⋯ to reset.') + '</div>'
+      + (doneN < 5 ? plcBtn() : '')
       + body + '</div>';
     document.body.classList.add('pt-open');
     hydrate();
@@ -464,6 +475,7 @@
     if (m) { m.remove(); return; }
     m = document.createElement('div'); m.id = 'pathMenu'; m.className = 'pt-menu';
     m.innerHTML = '<button type="button" onclick="Path.confirmReset()"><b>' + L('清空 ' + lv.toUpperCase() + ' 進度', 'Reset ' + lv.toUpperCase()) + '</b><small>' + L('全部關卡回到未完成,從第 1 關重刷(單字複習紀錄不受影響)', 'All levels back to not-done; your SRS reviews are untouched') + '</small></button>'
+      + (root.Placement ? '<button type="button" onclick="Path.testLevel()"><b>' + L('測一下程度', 'Placement test') + '</b><small>' + L('3 分鐘、最多 24 題,測完直接切到適合的級別', '3 min, up to 24 questions; jumps you to the right level') + '</small></button>' : '')
       + '<button type="button" onclick="Path.menu()"><b>' + L('取消', 'Cancel') + '</b></button>';
     document.getElementById('pathMask').appendChild(m);
   }
@@ -599,6 +611,7 @@
       '.pt-tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}.pt-tx b{font-size:15px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.pt-tx small{font-size:12px;color:var(--tx2)}',
       '.pt-arrow{color:var(--tx3);font-size:20px}',
       '.pt-bar{height:6px;border-radius:999px;background:var(--prog-empty,#e5e7eb);margin:14px 0 6px;overflow:hidden}.pt-bar i{display:block;height:100%;background:var(--ac);border-radius:999px}',
+      '.pt-plc{display:flex;align-items:center;gap:8px;width:100%;margin-top:12px;padding:11px 12px;border:1.5px dashed var(--bd);border-radius:12px;background:none;color:var(--ac);font:inherit;font-size:13.5px;font-weight:700;text-align:left;cursor:pointer;line-height:1.4}.pt-plc svg{flex:none;width:16px;height:16px}.pt-mapbody>.pt-plc{margin:0 0 12px}',
       '.pt-prog{font-size:12px;color:var(--tx2)}',
       '.pt-cta{display:block;width:100%;margin-top:14px;background:var(--ac);color:#fff;border:0;border-radius:12px;padding:13px 14px;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit}',
       '.pt-cta-sub{background:var(--bg3);color:var(--tx);margin-top:8px}',
@@ -696,5 +709,5 @@
     document.head.appendChild(st);
   }
 
-  root.Path = { hubCardHtml, openMap, close, startUnit, setLevel, level, units, sig, resetLevel, dismissPlaced, startFrom, askStartFrom, menu, confirmReset, _quiz: () => quizStep(QUIZ_N), _ans, _next, _qFor: questionsFor };
+  root.Path = { hubCardHtml, openMap, close, startUnit, setLevel, level, units, sig, resetLevel, dismissPlaced, startFrom, askStartFrom, menu, confirmReset, testLevel, _quiz: () => quizStep(QUIZ_N), _ans, _next, _qFor: questionsFor };
 })(window);

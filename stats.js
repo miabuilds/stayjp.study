@@ -648,7 +648,7 @@ const Stats = (() => {
       </div>
       <div style="${box}">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><span style="font-size:16px"><i data-ic=target></i></span><span style="font-weight:600;color:var(--tx)">我的程度</span></div>
-        <div style="font-size:12px;color:var(--tx2);margin-bottom:10px">背單字會跳過你已學完的級數</div>
+        <div style="font-size:12px;color:var(--tx2);margin-bottom:10px">背單字會跳過你已學完的級數 · <button type="button" style="font:inherit;font-size:12px;font-weight:700;color:var(--ac);background:none;border:0;padding:0;cursor:pointer;text-decoration:underline" onclick="if(window.Placement)Placement.start()">不確定?3 分鐘測一下</button></div>
         <div style="${seg}">${LVN.map(k=>`<button style="${chip(base===k)}" onclick="Stats._setLevel('base','${k}',this)">${LVL[k]}</button>`).join('')}</div>
         <div style="display:flex;align-items:center;gap:8px;margin:14px 0 10px"><span style="font-size:16px">🏁</span><span style="font-weight:600;color:var(--tx)">目標考級</span></div>
         <div style="${seg}">${GLN.map(k=>`<button style="${chip(goal===k)}" onclick="Stats._setLevel('goal','${k}',this)">${k.toUpperCase()}</button>`).join('')}</div>
