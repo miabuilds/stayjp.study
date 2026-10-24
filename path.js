@@ -30,9 +30,12 @@
     return (typeof currentLevel !== 'undefined' && LEVELS.includes(currentLevel)) ? currentLevel : 'n5';
   }
   function setLevel(lv) { if (!LEVELS.includes(lv)) return; const p = prog(); p.level = lv; save(p); try { if (root.hubInvalidate) root.hubInvalidate(); if (typeof doRender === 'function') doRender(); } catch (e) {} }
+  /** Premium(網頁訂閱/試用,或 App 內原生已購買)→ 全部關卡解鎖,想從哪關開始都行(2026-10-24 Mia)。沒有 ToolQuota 一律當免費,閘門留著比較安全 */
+  function premium() { try { return !!(root.ToolQuota && ((ToolQuota.isPremium && ToolQuota.isPremium()) || (ToolQuota.shouldGate && !ToolQuota.shouldGate()))); } catch (e) { return false; } }
   function markDone(lv, k, stars) {
     const p = prog(); p[lv] = p[lv] || {}; p[lv].done = p[lv].done || {}; p[lv].days = p[lv].days || {};
     p[lv].done[k] = Math.max(p[lv].done[k] || 0, stars);
+    p[lv].last = k;   // 最近過的關:Premium 自由跳關後,「下一關」接在它後面而不是跳回第 1 關
     p[lv].days[today()] = (p[lv].days[today()] || 0) + 1;
     save(p);
   }
@@ -107,8 +110,13 @@
     }
     return out;
   }
-  function currentIndex(lv) { const d = lvProg(lv).done; const us = units(lv); for (let k = 0; k < us.length; k++) if (d[k] == null) return k; return us.length; }
-  function sig() { try { const lv = level(); return lv + '/' + Object.keys(lvProg(lv).done).length + '/' + todayCount(lv) + '/' + units(lv).length + '/' + ((root.StudyPlan && StudyPlan.rhythm) ? StudyPlan.rhythm() : ''); } catch (e) { return ''; } }
+  function currentIndex(lv) {
+    const d = lvProg(lv).done; const us = units(lv);
+    // Premium 跳著玩:先找最近過的那關之後第一個沒過的,後面都過了才回頭補前面
+    if (premium()) { const last = (prog()[lv] || {}).last; if (last != null) { for (let k = last + 1; k < us.length; k++) if (d[k] == null) return k; } }
+    for (let k = 0; k < us.length; k++) if (d[k] == null) return k; return us.length;
+  }
+  function sig() { try { const lv = level(); return lv + '/' + Object.keys(lvProg(lv).done).length + '/' + currentIndex(lv) + '/' + todayCount(lv) + '/' + units(lv).length + '/' + ((root.StudyPlan && StudyPlan.rhythm) ? StudyPlan.rhythm() : ''); } catch (e) { return ''; } }
 
   // ── JLPT 精編題(app.html 不預載 447KB,要用才抓)──
   let _qP = null;
@@ -405,7 +413,7 @@
           + '<span class="pt-ch-bar"><i style="width:' + pct + '%"></i></span>'
           + '</div>';
       }
-      var st = (d[k] != null) ? 'done' : (k === cur ? 'cur' : 'lock');
+      var st = (d[k] != null) ? 'done' : (k === cur ? 'cur' : (premium() ? 'open' : 'lock'));
       // 卡片副標:優先給「這關學完你會講的句子」而不是四個單字。
       // 文法資料本來就有例句(g.eg),原本沒用到 —— 看到整句比看到文法名稱具體得多。
       var sub = isSkipped(lv, k) ? L('已學過', 'Already known')
@@ -430,7 +438,9 @@
       + '</div>'
       + '<div class="pt-mapbody">'
       + nextCard(lv, us, cur)
-      + '<div class="pt-map-sub">' + L('每關:10 個單字 → 1 個文法 → 5 題,每 5 關一次小考。<b>點還沒解鎖的關</b>可以直接從那裡開始;右上角 ⋯ 可以清空重刷。', 'Each level: 10 words → 1 grammar → 5 questions; checkpoint every 5. <b>Tap a locked level</b> to start there; ⋯ to reset.') + '</div>'
+      + '<div class="pt-map-sub">' + (premium()
+        ? L('每關:10 個單字 → 1 個文法 → 5 題,每 5 關一次小考。Premium <b>全部關卡都解鎖</b>,點任何一關都能直接開始;右上角 ⋯ 可以清空重刷。', 'Each level: 10 words → 1 grammar → 5 questions; checkpoint every 5. Premium: <b>every level is unlocked</b> — tap any to start; ⋯ to reset.')
+        : L('每關:10 個單字 → 1 個文法 → 5 題,每 5 關一次小考。<b>點還沒解鎖的關</b>可以直接從那裡開始;右上角 ⋯ 可以清空重刷。', 'Each level: 10 words → 1 grammar → 5 questions; checkpoint every 5. <b>Tap a locked level</b> to start there; ⋯ to reset.')) + '</div>'
       + (doneN < 5 ? plcBtn() : '')
       + body + '</div>';
     document.body.classList.add('pt-open');
@@ -665,7 +675,7 @@
       '.pt-placed{display:flex;flex-direction:column;gap:6px;background:var(--bg3);border-radius:12px;padding:10px 12px;margin:-2px 0 10px;font-size:12.5px;color:var(--tx);line-height:1.5}.pt-placed-btns{display:flex;gap:14px}.pt-placed .pt-link{font-size:12.5px;color:var(--ac);text-decoration:none;font-weight:700}',
       '.pt-arrow-sm{color:var(--tx3);font-weight:400}.pt-link{font:inherit;font-size:12px;color:var(--tx3);background:none;border:0;padding:0;cursor:pointer;text-decoration:underline}',
       '.pt-row{display:flex;align-items:center;gap:12px;width:100%;text-align:left;font:inherit;color:var(--tx);background:var(--bg);border:1.5px solid var(--bd);border-radius:14px;padding:10px 12px;margin-bottom:8px;cursor:pointer}',
-      '.pt-row.cur{border-color:var(--ac);background:var(--soft,rgba(var(--ac-rgb),.08))}.pt-row.lock{opacity:.6}.pt-row.lock .pt-node{background:var(--bg3);color:var(--tx3);box-shadow:none}.pt-row.done .pt-node{background:var(--correct-bd,#16a34a)}',
+      '.pt-row.cur{border-color:var(--ac);background:var(--soft,rgba(var(--ac-rgb),.08))}.pt-row.lock{opacity:.6}.pt-row.open .pt-node{background:var(--bg3);color:var(--tx2);box-shadow:none}.pt-row.lock .pt-node{background:var(--bg3);color:var(--tx3);box-shadow:none}.pt-row.done .pt-node{background:var(--correct-bd,#16a34a)}',
       '.pt-row .pt-node{width:36px;height:36px;font-size:14px}.pt-row .pt-tx b{font-size:14px}.pt-row .pt-tx small{font-size:11.5px}.pt-row small .dim,.pt-stars .dim{opacity:.25}',
       '.pt-go{font-size:12px;font-weight:800;color:#fff;background:var(--ac);border-radius:999px;padding:4px 10px}',
       '.pt-step{padding-bottom:4px}.pt-g-t{font-size:20px;font-weight:900;margin:14px 0 6px;line-height:1.3}.pt-g-p{font-size:14px;color:var(--ac);font-weight:700;margin-bottom:8px}.pt-g-ex{font-size:13.5px;color:var(--tx2);line-height:1.6;margin-bottom:12px}',
@@ -709,5 +719,5 @@
     document.head.appendChild(st);
   }
 
-  root.Path = { hubCardHtml, openMap, close, startUnit, setLevel, level, units, sig, resetLevel, dismissPlaced, startFrom, askStartFrom, menu, confirmReset, testLevel, _quiz: () => quizStep(QUIZ_N), _ans, _next, _qFor: questionsFor };
+  root.Path = { hubCardHtml, openMap, close, startUnit, setLevel, level, units, sig, resetLevel, dismissPlaced, startFrom, askStartFrom, menu, confirmReset, testLevel, premium, _quiz: () => quizStep(QUIZ_N), _ans, _next, _qFor: questionsFor };
 })(window);
