@@ -141,7 +141,7 @@ const Stats = (() => {
     if (!c) return;
     if (tab === 'stats') c.innerHTML = buildStatsCombined();
     else if (tab === 'collection') c.innerHTML = buildCollectionCombined();
-    else if (tab === 'settings') c.innerHTML = buildSettings();
+    else if (tab === 'settings') { c.innerHTML = buildSettings(); if (typeof window.renderSisterApps === 'function') window.renderSisterApps(); }
     try { window.scrollTo(0, 0); } catch (e) {}   // 換子分頁也回頂部,不停在上一個分頁的捲動位置
   }
 
@@ -664,6 +664,7 @@ const Stats = (() => {
       <a href="account.html" style="display:flex;align-items:center;gap:12px;padding:14px 16px;background:var(--bg2);border-radius:12px;color:var(--tx);text-decoration:none;margin-bottom:12px">
         <span style="font-size:20px"><i data-ic=user></i></span><div style="flex:1"><div style="font-weight:600">我的帳號</div><div style="font-size:12px;color:var(--tx2);margin-top:2px">訂閱・登入・推薦碼</div></div><span style="color:var(--tx3)">›</span>
       </a>
+      <div id="sisterSet" class="sis-set" hidden></div>
       ${_OLD_SETTINGS_TAIL}`;
   }
   const FS_OPTS = [{k:'normal',n:'標準 A'},{k:'large',n:'大 A+'},{k:'xlarge',n:'特大 A++'}];

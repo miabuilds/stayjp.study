@@ -1010,6 +1010,11 @@ body.hub-view .mn { margin-left: 0; max-width: none; }
   line-height: 1.9;
 }
 .ft a { color: var(--ac2); text-decoration: none; }
+/* 姊妹 App 互推(sister-apps.js):頁尾置中排版裡放一塊靠左清單,跟版權文字之間留間距+分隔線 */
+.sis-ft { max-width: 440px; margin: 0 auto 22px; padding-bottom: 18px; border-bottom: 1px solid var(--bd); text-align: left; color: var(--tx); }
+.sis-ft[hidden], .sis-set[hidden] { display: none !important; }
+.ft .sis-a, .sis-set .sis-a { color: inherit; }
+.sis-set { background: var(--bg2); border-radius: 12px; padding: 14px 16px 6px; margin-bottom: 12px; color: var(--tx); }
 .ft a:hover { text-decoration: underline; }
 
 /* == Modal == */
@@ -2059,6 +2064,7 @@ try {
 <div class="overlay" id="overlay" onclick="toggleSd()"></div>
 <main class="mn" id="mn"></main>
 <footer class="ft">
+  <div id="sisterFt" class="sis-ft" hidden></div>
   <div data-i18n="copyright">&copy; 2026 再留計劃 — All rights reserved.</div>
   <div style="margin-top:4px" data-i18n="disclaimer">本站內容為原創整理，不隸屬於 JLPT 官方或任何教育機構。</div>
   <div style="margin-top:4px;font-size:12px;opacity:.7">語音：VOICEVOX:四国めたん</div>
@@ -5730,6 +5736,7 @@ function applyI18n() {
   const _cl = I18n.getLang();
   const ls = document.getElementById('langSel'); if (ls) ls.value = _cl;
   const mls = document.getElementById('moreLangSel'); if (mls) mls.value = _cl;
+  if (typeof window.renderSisterApps === 'function') window.renderSisterApps();   // 切語言重畫姊妹 App
 }
 
 // 用 select 直接指定語言（取代循環按鈕）。en 涉及 translate-layer 就地改寫 → reload 最乾淨；
@@ -6102,6 +6109,37 @@ function toggleDetail(btn) {
 <script src="tutor.js"></script>
 <!-- Cloudflare Web Analytics --><script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon="{&quot;token&quot;: &quot;0a94a20c2737440a86f55c4241011f68&quot;}"></script><!-- End Cloudflare Web Analytics -->
 <script src="back-to-top.js"></script>
+<!-- 姊妹 App 互推(頁尾 + 設定頁)。元件正本在 stayhq/shared,不要改 sister-apps.js 本身。
+     App 殼內:連商店頁(元件 native 參數),點擊走原生 OPEN_STORE 橋開系統 App Store / Play。 -->
+<script src="sister-apps.js"></script>
+<script>
+(function () {
+  function plat() {
+    var n = window.STAYJP_NATIVE;
+    if (!n || !n.isNativeApp) return undefined;
+    return n.platform === 'android' ? 'android' : 'ios';
+  }
+  function curLang() { try { return (typeof I18n !== 'undefined' && I18n.getLang) ? I18n.getLang() : 'zh-TW'; } catch (e) { return 'zh-TW'; } }
+  function bindNative(el) {
+    if (!plat() || !window.ReactNativeWebView) return;
+    el.querySelectorAll('a[data-sister]').forEach(function (a) {
+      a.addEventListener('click', function (ev) {
+        ev.preventDefault();
+        try { window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'OPEN_STORE', url: a.href })); } catch (e) {}
+      });
+    });
+  }
+  function one(id) {
+    var el = document.getElementById(id);
+    if (!el || !window.SisterApps) return;
+    if (window.SisterApps.render(el, { from: 'stayjp', lang: curLang(), native: plat() })) bindNative(el);
+  }
+  window.renderSisterApps = function () { one('sisterFt'); one('sisterSet'); };
+  window.renderSisterApps();
+  // Android 的 STAYJP_NATIVE 注入較晚 → 等到它出現再重畫一次(改成商店連結),最多等 5 秒
+  if (!plat()) { var t = 0, i = setInterval(function () { if (plat()) { clearInterval(i); window.renderSisterApps(); } else if (++t > 20) clearInterval(i); }, 250); }
+})();
+</script>
 <!-- 活動/深連結直開功能:?open=tutor | listen | article:<id>(tsukimi.html 等活動頁用;等模組與內容載好再開,最多等 12 秒) -->
 <script>(function(){try{var o=new URLSearchParams(location.search).get('open');if(!o)return;var tries=0;(function go(){tries++;
   if(o==='tutor'&&window.Tutor){Tutor.open();return}
