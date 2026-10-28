@@ -96,7 +96,8 @@
     // 單字總量變了 → 下次呼叫時重建(惰性,最多重建幾次,成本可接受)。
     var n = 0;
     ['VOCAB_N5','VOCAB_N4','VOCAB_N3','VOCAB_N2','VOCAB_N1'].forEach(function (k) { var v = window[k]; if (v && v.length) n += v.length; });
-    if (!_d || _d._srcCount !== n || Object.keys(_d.READ).length === 0) { _d = buildDict(); _d._srcCount = n; }
+    // 空字典判斷只在建完當下算一次(之前每次標音都 Object.keys 整本字典,字卡每張都跑好幾次)
+    if (!_d || _d._srcCount !== n || _d._empty) { _d = buildDict(); _d._srcCount = n; _d._empty = Object.keys(_d.READ).length === 0; }
     return _d;
   }
   // 動態併入額外詞條(如文章的重點單字),讓它們在內文也能 ruby+即點即查。

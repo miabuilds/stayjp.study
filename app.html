@@ -2297,6 +2297,7 @@ function handleAuth() {
   if (window.STAYJP_NATIVE && window.STAYJP_NATIVE.isNativeApp) {
     if (_authUser()) {
       // 已登入(含樂觀快取)→ 這次點擊是「登出」:網頁登出 + 通知原生也登出(原生 Firebase + RevenueCat),否則狀態卡住要重開 app
+      try { flushCloudSaves(); } catch (e) {}
       try { auth.signOut(); } catch (e) {}
       currentUser = null; _writeAuthCache(null); updateAuthUI();
       try { if (window.ReactNativeWebView && window.ReactNativeWebView.postMessage) window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'NATIVE_LOGOUT' })); } catch (e) {}
@@ -2307,7 +2308,7 @@ function handleAuth() {
   }
   // 以下為一般網頁路徑:登入狀態還沒還原完 → 忽略點擊,避免誤判未登入而重複登入
   if (!_authResolved) return;
-  if (currentUser) { auth.signOut(); currentUser = null; _writeAuthCache(null); updateAuthUI(); return; }
+  if (currentUser) { try { flushCloudSaves(); } catch (e) {} auth.signOut(); currentUser = null; _writeAuthCache(null); updateAuthUI(); return; }
   if (isInAppBrowser()) { showInAppHelp(); return; }
   // web 未登入 → 開 Google/Apple 選單(iOS 用 Apple 付費者要用 Apple 登入才對得到同一 uid)
   toggleLoginMenu();
@@ -2610,7 +2611,19 @@ function saveQuizCloud() {
   db.collection('users').doc(currentUser.uid).set({ quiz_history: h }, { merge: true });
   saveProgressKeys({ quiz_history: h });
 }
-function saveSRSCloud() {
+// 雲端寫入防抖(用戶回饋 2026-10-28「快速背本批超級卡」):字卡每按一張都整包 parse+gzip+Firestore set
+// srs_data 與 ~30 個 key,老用戶資料大時每張卡卡一下。改成停手 2 秒才寫一次;切背景/關頁/登出前立刻補寫。
+const _cloudTimers = {};
+function _cloudDebounce(name, fn) { clearTimeout(_cloudTimers[name]); _cloudTimers[name] = setTimeout(() => { delete _cloudTimers[name]; try { fn(); } catch (e) {} }, 2000); }
+function flushCloudSaves() {
+  if (_cloudTimers.srs) { clearTimeout(_cloudTimers.srs); delete _cloudTimers.srs; try { _saveSRSCloudNow(); } catch (e) {} }
+  if (_cloudTimers.all) { clearTimeout(_cloudTimers.all); delete _cloudTimers.all; try { _saveAllCloudNow(); } catch (e) {} }
+}
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') flushCloudSaves(); });
+window.addEventListener('pagehide', flushCloudSaves);
+function saveSRSCloud() { if (currentUser && db) _cloudDebounce('srs', _saveSRSCloudNow); }
+function saveAllCloud() { if (currentUser && db) _cloudDebounce('all', _saveAllCloudNow); }
+function _saveSRSCloudNow() {
   if (!currentUser || !db) return;
   const d = JSON.parse(localStorage.getItem('srs_data') || '{}');
   db.collection('users').doc(currentUser.uid).set({ srs_data: d }, { merge: true });
@@ -2639,7 +2652,7 @@ const SCALAR_SYNC_KEYS = new Set(['tts_voice','exam_date','base_level','goal_lev
 // 競態鎖:登入用戶「首次雲端下載合併」完成前,任何上傳都可能拿 stale/被清空的本機資料
 // 整欄覆蓋雲端(電腦清過快取 → 開頁瞬間學一下 → 27 天日曆被 1 天蓋掉,用戶多次實錘)。
 let _cloudSynced = false, _pendingSave = false;
-function saveAllCloud() {
+function _saveAllCloudNow() {
   if (!currentUser || !db) return;
   if (!_cloudSynced) { _pendingSave = true; return; }   // 合併完成後由 loadCloudData flush
   const payload = {};
