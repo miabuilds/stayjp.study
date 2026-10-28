@@ -63,6 +63,7 @@ const I18n = (() => {
   if (CODES.indexOf(lang) < 0) lang = 'zh-TW';   // 存了未知值(舊版/手改)→ 回繁
   try { localStorage.setItem(LANG_KEY, lang); } catch (_) {}
   writeCookieLang(lang);                // 一律鏡射到 cookie，之後被清也救得回
+  try { if (window.ReactNativeWebView) window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'LANG', lang: lang })); } catch (_) {}   // 每次載頁同步給原生殼
   try { document.documentElement.lang = lang; } catch (_) {}
 
   // ko/vi/id/th:字典+UI 對照在 lang/<code>.js。用 document.write 同步載入,讓後面的 script 一執行就查得到
@@ -657,12 +658,17 @@ const I18n = (() => {
 
   function getLang() { return lang; }
 
+  // App 內:把語言送給原生殼(web.tsx LANG)→ 原生存起來,冷啟動排推播/付費牆就用對的語言
+  function postLangToNative(l) {
+    try { if (window.ReactNativeWebView) window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'LANG', lang: l })); } catch (_) {}
+  }
   function setLang(l) {
     if (CODES.indexOf(l) < 0) return;
     lang = l;
     try { localStorage.setItem(LANG_KEY, l); } catch (_) {}
     writeCookieLang(l);   // 同步寫 cookie，跨啟動保存（修 iOS 重開變英文）
     try { document.documentElement.lang = l; } catch (_) {}
+    postLangToNative(l);
   }
 
   function getMonths() { return dictFor(lang).months || dict.en.months; }
