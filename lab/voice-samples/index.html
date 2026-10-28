@@ -1,0 +1,105 @@
+<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="robots" content="noindex,nofollow">
+<title>StayJP 日文語音試聽</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* 版面:一句話說明 → 現在的聲音一張卡 → 8 個候選聲音卡片格,每張卡四段音檔直排 */
+:root {
+  --bg: #faf8f4;
+  --fg: #2b2622;
+  --muted: #6f655c;
+  --card: #ffffff;
+  --line: #e4ddd3;
+  --accent: #b8362a;
+  --accent-soft: #fbeae6;
+  --font-body: "Noto Sans TC", -apple-system, "PingFang TC", "Hiragino Sans", sans-serif;
+  --font-ja: "Hiragino Sans", "Noto Sans JP", "Yu Gothic", sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #1b1917; --fg: #ece6df; --muted: #a79d93; --card: #262220; --line: #3a3430;
+    --accent: #e8745f; --accent-soft: #3a2420; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #1b1917; --fg: #ece6df; --muted: #a79d93; --card: #262220; --line: #3a3430;
+  --accent: #e8745f; --accent-soft: #3a2420; color-scheme: dark;
+}
+body {
+  background: var(--bg); color: var(--fg); font-family: var(--font-body);
+  padding-block: 28px 48px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  line-height: 1.6;
+}
+.wrap { max-width: 980px; margin: 0 auto; display: grid; gap: 22px; }
+h1 { font-size: 22px; margin: 0; text-wrap: balance; }
+.lead { color: var(--muted); font-size: 14px; margin: 0; max-width: 60ch; }
+.lead b { color: var(--fg); }
+.texts { display: grid; gap: 6px; font-size: 13.5px; }
+.texts li { display: flex; gap: 10px; align-items: baseline; min-width: 0; }
+.tag { flex: none; font-size: 11px; letter-spacing: .06em; color: var(--muted); width: 5.5em; }
+.ja { font-family: var(--font-ja); min-width: 0; overflow-wrap: anywhere; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; }
+.card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 14px 14px 12px; display: grid; gap: 8px; min-width: 0; }
+.card.current { border-color: var(--accent); background: var(--accent-soft); grid-column: 1 / -1; }
+.card h2 { font-size: 16px; margin: 0; display: flex; align-items: baseline; gap: 8px; }
+.card h2 .sex { font-size: 12px; color: var(--muted); font-weight: 400; }
+.row { display: grid; grid-template-columns: 5.5em 1fr; align-items: center; gap: 8px; min-width: 0; }
+.row span { font-size: 12px; color: var(--muted); }
+audio { width: 100%; height: 34px; min-width: 0; }
+.card.current .rows { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 8px 16px; }
+h3 { font-size: 13px; letter-spacing: .08em; color: var(--muted); margin: 6px 0 0; text-transform: uppercase; }
+</style>
+</head><body>
+<div class="wrap">
+  <h1>StayJP 日文語音試聽</h1>
+  <p class="lead">黃框是 <b>現在線上的聲音</b>(VOICEVOX)。下面 8 個是候選的 Google Chirp 3 HD 日文聲音,每個聲音都念同樣四句,方便直接比。聽完告訴我們最喜歡哪一個就好。</p>
+  <ul class="texts">
+    <li><span class="tag">單字例句</span><span class="ja">この まちは 人が 多いです。</span></li>
+    <li><span class="tag">文法例句</span><span class="ja">安ければ買います。</span></li>
+    <li><span class="tag">聽解對話</span><span class="ja">A:いっしょに カフェに いきませんか。 B:すみません、いま いそがしいです。あした なら いいですよ。</span></li>
+    <li><span class="tag">N1 長文</span><span class="ja">オンライン教育の普及により、地方に住んでいる学生でも、都市部の有名講師の授業を受けられるようになりました。教育格差の解消に貢献するものとして注目されています。</span></li>
+  </ul>
+
+  <div class="card current">
+    <h2>現在線上的聲音 <span class="sex">VOICEVOX</span></h2>
+    <div class="rows">
+      <div class="row"><span>單字例句</span><audio controls preload="none" src="current-vocab.mp3"></audio></div>
+      <div class="row"><span>文法例句</span><audio controls preload="none" src="current-grammar.mp3"></audio></div>
+      <div class="row"><span>聽解對話</span><audio controls preload="none" src="current-listen.mp3"></audio></div>
+      <div class="row"><span>N1 長文</span><audio controls preload="none" src="current-article.mp3"></audio></div>
+    </div>
+  </div>
+
+  <h3>女聲</h3>
+  <div class="grid" id="female"></div>
+  <h3>男聲</h3>
+  <div class="grid" id="male"></div>
+</div>
+<script>
+(function () {
+  var texts = [['vocab', '單字例句'], ['grammar', '文法例句'], ['listen', '聽解對話'], ['article', 'N1 長文']];
+  var voices = { female: ['Kore', 'Aoede', 'Leda', 'Zephyr'], male: ['Puck', 'Charon', 'Fenrir', 'Orus'] };
+  Object.keys(voices).forEach(function (sex) {
+    var grid = document.getElementById(sex);
+    voices[sex].forEach(function (v) {
+      var card = document.createElement('div'); card.className = 'card';
+      var h = document.createElement('h2'); h.textContent = v;
+      var s = document.createElement('span'); s.className = 'sex'; s.textContent = sex === 'female' ? '女聲' : '男聲'; h.appendChild(s);
+      card.appendChild(h);
+      texts.forEach(function (t) {
+        var row = document.createElement('div'); row.className = 'row';
+        var lbl = document.createElement('span'); lbl.textContent = t[1];
+        var a = document.createElement('audio'); a.controls = true; a.preload = 'none'; a.src = v + '-' + t[0] + '.mp3';
+        row.appendChild(lbl); row.appendChild(a); card.appendChild(row);
+      });
+      grid.appendChild(card);
+    });
+  });
+  // 一次只播一個,免得兩段疊在一起
+  document.addEventListener('play', function (e) {
+    document.querySelectorAll('audio').forEach(function (a) { if (a !== e.target) a.pause(); });
+  }, true);
+})();
+</script>
+</body></html>
