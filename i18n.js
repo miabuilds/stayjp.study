@@ -705,6 +705,8 @@ const I18n = (() => {
       const r2 = tryMask(/\d+(?:[.,]\d+)?/g); if (r2 != null) return r2;
     }
     for (const p of uiPatterns()) { try { const re = new RegExp(p.pattern); if (re.test(k)) { const o = k.replace(re, p.to); if (o !== k) return o; } } catch (_) {} }
+    // 漏翻偵測:localStorage.l10n_debug=1 時把查不到的繁中記進 window.__L10N_MISS,抓完丟 scripts/out/l10n/ui-extra.json 再跑 ui
+    try { if (/[一-鿿]/.test(k) && localStorage.getItem('l10n_debug')) (window.__L10N_MISS = window.__L10N_MISS || new Set()).add(k); } catch (_) {}
     return en != null ? en : zh;
   }
   function langName(l) { const o = LANGS.filter(x => x.code === (l || lang))[0]; return o ? o.name : (l || lang); }

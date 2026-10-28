@@ -1484,7 +1484,7 @@ const YTS = (() => {
     g.innerHTML=list.map(x=>`<button class="gal-c" onclick="YTS.loadSample('${x.v}')">
       <img src="https://i.ytimg.com/vi/${x.v}/maxresdefault.jpg" alt="" loading="lazy" data-v="${x.v}" data-step="0" onerror="YTS.thumbFallback(this)" onload="YTS.thumbCheck(this)">
       ${lvOf(x)?'<span class="glv">'+esc(lvOf(x))+'</span>':''}
-      <div class="gt">${esc(x.t)}</div><span class="gtag">${esc(x.tag)}</span>
+      <div class="gt">${esc(enOr(x.t,x.t))}</div><span class="gtag">${esc(x.tag)}</span>
     </button>`).join('') || '<div class="gal-empty">'+enOr('這個組合沒有影片,換個分類或程度試試。','No videos match — try another category or level.')+'</div>';
     renderRecent();
   }
@@ -1510,7 +1510,7 @@ const YTS = (() => {
       return `<button class="rc" onclick="YTS.loadSample('${x.v}')">
         <img src="https://i.ytimg.com/vi/${x.v}/mqdefault.jpg" alt="" loading="lazy" data-v="${x.v}" data-step="2" onerror="YTS.thumbFallback(this)">
         ${x.lv?'<span class="glv">'+esc(x.lv)+'</span>':''}
-        <div class="gt">${esc(x.t)}</div>
+        <div class="gt">${esc(enOr(x.t,x.t))}</div>
         <div class="rc-p"><span style="width:${pct}%"></span></div>
         <div class="rc-n">${n?(dn+' / '+n+' '+enOr('句','lines')):enOr('接著練','Resume')}</div>
       </button>`; }).join('')+'</div>';

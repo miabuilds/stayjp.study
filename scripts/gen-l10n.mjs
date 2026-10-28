@@ -460,7 +460,7 @@ const KO_NUM_SPACE = /(^|[^A-Za-z0-9])(#|\$\d|\d[\d,]*) (일|개|단계|분|회|
 function fixNames(lang, obj) {
   const fixes = MASCOT_FIX[lang] || [];
   const fx = v => {
-    if (typeof v === 'string') { for (const re of fixes) v = v.replace(re, MASCOT[lang]); if (lang === 'ko') v = v.replace(KO_NUM_SPACE, '$1$2$3').replace(/한일 자막|중일 자막/g, '일본어 자막·번역');   // 外語用戶的 YT 字幕是日文+英文軌,不是韓文 return v; }
+    if (typeof v === 'string') { for (const re of fixes) v = v.replace(re, MASCOT[lang]); if (lang === 'ko') v = v.replace(KO_NUM_SPACE, '$1$2$3').replace(/(?:한일|중일|한·일|중·일|(?:한국어|중국어)[·/・ ]?일본어) ?자막/g, '일본어 자막·번역').replace(/Aki (?:씨|先生|센세)/g, 'Aki 선생님'); return v; }   // 일본어 자막·번역:外語用戶的 YT 字幕是日文+英文軌,不是韓文
     if (Array.isArray(v)) return v.map(fx);
     if (v && typeof v === 'object') { const o = {}; for (const k of Object.keys(v)) o[k] = fx(v[k]); return o; }
     return v;
