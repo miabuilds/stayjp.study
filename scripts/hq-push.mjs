@@ -23,13 +23,14 @@ for (const d of (await db.collection('transactions').get()).docs) {
 for (const d of (await db.collection('trial_used').get()).docs) { const ms = toMs(d.data().started_at); if (ms >= since) D(dayTW(ms)).trial_n++; }
 // 新帳號:users 文件沒有建立時間,改讀 Firebase Auth 的 creationTime(分頁 1000 筆,最多 30 頁);順便建 uid→信箱 給家族價名單用
 const emailOf = {};
+let authOk = true;   // listUsers 沒權限時 → 新帳號/家族價不送(null),總部保留上次的值,不會被 0 蓋掉
 try {
   let token; for (let i = 0; i < 30; i++) {
     const page = await admin.auth().listUsers(1000, token);
     for (const u of page.users) { const ms = Date.parse(u.metadata.creationTime || ''); if (ms >= since) D(dayTW(ms)).new_users++; if (u.email) emailOf[u.uid] = u.email; }
     token = page.pageToken; if (!token) break;
   }
-} catch (e) { console.error('listUsers 失敗(新帳號數會是 0):', e.message); }
+} catch (e) { authOk = false; console.error('listUsers 失敗(新帳號/家族價這次不送,保留總部舊值):', e.message.slice(0, 160)); }
 // 家族價名單:真的付過錢的用戶(subscription 有效或買斷、非贈送、非沙盒)→ sha256(小寫信箱)。其他 App 登入時查總部給家族價
 const family = [];
 const now = Date.now();
@@ -47,6 +48,7 @@ for (const d of (await db.collection('ref_codes').get()).docs) {
   partners.push({ code: d.id, name: c.kol || c.display_name || '', email: c.email || c.payout_email || '', rate_pct: typeof c.commission_pct === 'number' ? c.commission_pct : 20, active: c.active !== false });
 }
 // 流量:GA4 每日活躍用戶/工作階段/瀏覽(需要 Actions 的 OAUTH_* + GA4_PROPERTY_ID;本機沒有就略過,欄位維持上次的值)
+let gaOk = false;
 try {
   if (process.env.OAUTH_REFRESH_TOKEN && process.env.GA4_PROPERTY_ID) {
     const tk = await (await fetch('https://oauth2.googleapis.com/token', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -58,6 +60,7 @@ try {
       const d = row.dimensionValues[0].value; const k = `${d.slice(0, 4)}-${d.slice(4, 6)}-${d.slice(6, 8)}`;
       const x = D(k); x.visitors = Number(row.metricValues[0].value) || 0; x.pageviews = Number(row.metricValues[1].value) || 0;
     }
+    gaOk = true;
   }
 } catch (e) { console.error('GA 抓失敗(流量欄位略過):', e.message); }
 // 未處理回饋(reports status=new、近 30 天),不帶信箱
@@ -69,10 +72,14 @@ try {
     feedback.push({ ext_id: d.id, ts: ms ? new Date(ms).toISOString().slice(0, 19).replace('T', ' ') : '', type: r.kind || '', message: [r.detail, r.desc].filter(Boolean).join(':').slice(0, 240), page: String(r.page || '').slice(0, 200) });
   }
 } catch (e) { console.error('reports 讀取失敗:', e.message); }
-const rows = Object.values(days).sort((a, b) => (a.day < b.day ? -1 : 1));
+const rows = Object.values(days).sort((a, b) => (a.day < b.day ? -1 : 1)).map((r) => ({
+  ...r,
+  new_users: authOk ? r.new_users : null,
+  visitors: gaOk ? (r.visitors || 0) : null, pageviews: gaOk ? (r.pageviews || 0) : null,
+}));
 console.log(`StayJP 近 ${DAYS} 天:${rows.length} 天有資料,夥伴碼 ${partners.length} 組,家族價名單 ${family.length} 人,未處理回饋 ${feedback.length} 則`);
 for (const r of rows.slice(-7)) console.log(`  ${r.day}  ${r.paid_n} 筆  毛 NT$${r.gross_twd}  淨≈NT$${Math.round(r.net_twd)}  退 ${r.refund_n}  試用 ${r.trial_n}  新帳號 ${r.new_users}`);
 if (process.env.DRY) process.exit(0);
-const res = await fetch(HQ_URL + '/api/ingest/daily', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + HQ_TOKEN }, body: JSON.stringify({ product: 'stayjp', rows, partners, family, feedback }) });
+const res = await fetch(HQ_URL + '/api/ingest/daily', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + HQ_TOKEN }, body: JSON.stringify({ product: 'stayjp', rows, partners, family: authOk ? family : undefined, feedback }) });
 const out = await res.text(); console.log('HQ 回應', res.status, out.slice(0, 200));
 if (!res.ok) process.exit(1);
