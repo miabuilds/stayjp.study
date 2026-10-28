@@ -20,6 +20,9 @@
 
   // 初始 ui_lang 是简中的話,頁內切回中文時保留简中(不降回繁)
   var _zhFlavor = siteLang() === 'zh-CN' ? 'zh-CN' : 'zh-TW';
+  // 外語(en/ko/vi/id/th)都套英文層(這幾頁只有 zh/en 雙寫);切回英文層時保留使用者原本的外語
+  function _isForeign(l) { try { if (typeof I18n !== 'undefined' && I18n.isForeign) return I18n.isForeign(); } catch (e) {} return ['en', 'ko', 'vi', 'id', 'th'].indexOf(l) >= 0; }
+  var _enFlavor = _isForeign(siteLang()) ? siteLang() : 'en';
 
   function toSimplified() {
     var run = function (conv) {
@@ -51,12 +54,12 @@
   // 覆寫頁內切換鈕:寫回全站語言 → reload(還原簡中轉換過的文字最乾淨)
   window.toggleLang = function () {
     var next = document.body.getAttribute('data-lang') === 'zh' ? 'en' : 'zh';
-    try { if (typeof I18n !== 'undefined') I18n.setLang(next === 'en' ? 'en' : _zhFlavor); } catch (e) {}
+    try { if (typeof I18n !== 'undefined') I18n.setLang(next === 'en' ? _enFlavor : _zhFlavor); } catch (e) {}
     location.reload();
   };
 
   var l = siteLang();
   if (!l) return;                      // 拿不到全站語言 → 維持頁面原本的偵測結果
-  setLang(l === 'en' ? 'en' : 'zh');
+  setLang(_isForeign(l) ? 'en' : 'zh');
   if (l === 'zh-CN') toSimplified();
 })();

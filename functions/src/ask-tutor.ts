@@ -23,9 +23,9 @@ const ANTHROPIC_API_KEY = defineSecret("ANTHROPIC_API_KEY");
 const ADMIN_EMAILS = ["stayjpplan@gmail.com", "abc83327@gmail.com"];
 
 function langName(lang?: string): string {
-  if (lang === "zh-CN") return "簡體中文";
-  if (lang === "en") return "English";
-  return "繁體中文(台灣用語)";
+  // 前端 ui_lang 七碼(正本 i18n.js LANGS):zh-TW / zh-CN / en / ko / vi / id / th
+  const MAP: Record<string, string> = { "zh-CN": "簡體中文", en: "English", ko: "한국어(Korean)", vi: "Tiếng Việt(Vietnamese)", id: "Bahasa Indonesia(Indonesian)", th: "ภาษาไทย(Thai)" };
+  return (lang && MAP[lang]) || "繁體中文(台灣用語)";
 }
 
 // ── 我的單字本:三個 JSON 模式 ──────────────────────────────

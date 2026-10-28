@@ -150,6 +150,7 @@
 
 <script src="icons.js"></script>
 <script src="i18n.js"></script>
+<script src="translate-layer.js"></script>
 <script src="skits-data.js"></script>
 <script>
 // 繁→簡:跟其他頁一樣用 OpenCC 即時轉;英文走 L(中,英)
@@ -160,8 +161,9 @@ function ensureOpenCC(){
     s.onload=()=>{ try{ _tw2cn=OpenCC.Converter({from:'tw',to:'cn'}); }catch(e){} res(); }; s.onerror=()=>res(); document.head.appendChild(s); });
 }
 function lang(){ try{ return I18n.getLang(); }catch(e){ return 'zh-TW'; } }
+function isF(){ try{ return I18n.isForeign(); }catch(e){ return lang()==='en'; } }   // en/ko/vi/id/th
 function cvt(x){ return (!x||lang()!=='zh-CN'||!_tw2cn)?x:_tw2cn(x); }
-function L(zh,en){ return lang()==='en'?en:cvt(zh); }
+function L(zh,en){ return isF() ? I18n.pick(zh,en) : cvt(zh); }
 function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
 
 // 看過哪幾集:localStorage skit_seen {"3":1};已加進 app.html SYNC_KEYS,登入後回到面板就會跟帳號同步(聯集合併)
@@ -171,8 +173,8 @@ function markSeen(n){ try{ const s=seen(); s[n]=1; localStorage.setItem('skit_se
 const EPS = window.SKITS || [];
 
 function render(){
-  document.documentElement.lang = lang()==='en'?'en':(lang()==='zh-CN'?'zh-Hans':'zh-Hant');
-  document.getElementById('langBtn').textContent = lang()==='en'?'中':'EN';
+  document.documentElement.lang = isF()?lang():(lang()==='zh-CN'?'zh-Hans':'zh-Hant');
+  document.getElementById('langBtn').textContent = isF()?'中':'EN';
   document.getElementById('bkTx').textContent = L('返回','Back');
   document.getElementById('hT').textContent = L('小狸的日本生活','Tanuki in Japan');
   document.getElementById('hL').textContent = L('每集 20 秒,看小狸在日本出包,順便學一句馬上用得到的日文。','20-second skits: Tanuki messes up in Japan — and you learn one phrase you can use right away.');
@@ -323,9 +325,10 @@ document.addEventListener('keydown',ev=>{ if(ev.key==='Escape'&&_cur) document.g
 document.getElementById('grid').addEventListener('click',ev=>{ const b=ev.target.closest('.ep'); if(b) openEp(+b.dataset.n,true); });
 
 function cycleLang(){
-  const next = lang()==='en' ? 'zh-TW' : 'en';
+  // 外語 ⇄ 繁中:任一邊是外語就整頁重載(對照表/字典由 i18n.js 依 ui_lang 載入,translate-layer 才會換語言)
+  const next = isF() ? 'zh-TW' : 'en';
   try{ I18n.setLang ? I18n.setLang(next) : localStorage.setItem('ui_lang',next); }catch(e){ try{ localStorage.setItem('ui_lang',next); }catch(_){} }
-  render(); lineLabels(); if(_cur) showLine(li);
+  location.reload();
 }
 
 render();

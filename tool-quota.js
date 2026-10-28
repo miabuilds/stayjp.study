@@ -69,7 +69,11 @@
     return n;
   }
   function packLeft() { return Math.max(0, packTotal() - packUsed()); }
-  function uiLang() { try { return localStorage.getItem('ui_lang') || 'zh-TW'; } catch (e) { return 'zh-TW'; } }
+  function uiLang() { try { return (typeof I18n !== 'undefined' && I18n.getLang) ? I18n.getLang() : (localStorage.getItem('ui_lang') || 'zh-TW'); } catch (e) { return 'zh-TW'; } }
+  // 外語(en/ko/vi/id/th):帶動態數字的字串用 {n} 模板查 I18n.pick(對照表才對得到),查不到退英文,再填數字
+  function isFg() { try { return (typeof I18n !== 'undefined' && I18n.isForeign) ? I18n.isForeign() : ['en', 'ko', 'vi', 'id', 'th'].indexOf(uiLang()) >= 0; } catch (e) { return false; } }
+  function pk(zh, en) { try { return (typeof I18n !== 'undefined' && I18n.pick) ? I18n.pick(zh, en) : en; } catch (e) { return en; } }
+  function fill(s, vars) { return String(s).replace(/\{(\w+)\}/g, (m, k) => (vars[k] !== undefined ? vars[k] : m)); }
 
   function dateKey() {
     const d = new Date();
@@ -242,14 +246,14 @@
     if (document.getElementById('pwBackdrop')) return;   // 已開著就不疊
     ensurePaywallStyles();
     const isMock = tool && tool.startsWith('mock_exam_');
-    const name = TOOL_NAMES[tool] || '這個工具';
+    const name = isFg() ? pk(TOOL_NAMES[tool] || '這個工具', TOOL_NAMES[tool] || 'this tool') : (TOOL_NAMES[tool] || '這個工具');
     // 區分:此工具已試過 vs 今天免費試用工具數已達全站上限(挡到沒試過的新工具)
     const usedThis = !isMock && tool && (loadCount()[tool] || 0) >= PER_TOOL_LIMIT;
     // 總次數包世代:文案帶動態數字(packTotal 可遠端調),exact-match 翻譯層吃不到 → 手動三語
     const packMsg = (function () {
       const l = uiLang(), n = packTotal();
-      return l === 'en' ? `You've used all <strong>${n} free practice credits</strong>.`
-        : l === 'zh-CN' ? `免费体验共 <strong>${n} 次练习</strong>，你的次数已全部用完。`
+      if (isFg()) return fill(pk('免費體驗共 <strong>{n} 次練習</strong>，你的次數已全部用完。', "You've used all <strong>{n} free practice credits</strong>."), { n });
+      return l === 'zh-CN' ? `免费体验共 <strong>${n} 次练习</strong>，你的次数已全部用完。`
           : `免費體驗共 <strong>${n} 次練習</strong>，你的次數已全部用完。`;
     })();
     const msg = isMock
@@ -340,7 +344,7 @@
   function goToPlans() {
     try {
       if (window.STAYJP_NATIVE && window.STAYJP_NATIVE.isNativeApp && window.ReactNativeWebView && window.ReactNativeWebView.postMessage) {
-        const lng = (window.localStorage && localStorage.getItem('ui_lang')) || 'zh-TW';
+        const lng = uiLang();
         // 看方案不用登入 → 一律開 paywall;訂閱才要求登入(paywall 內處理)
         window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'OPEN_PAYWALL', lang: lng }));
         return;
@@ -411,9 +415,10 @@
     if (usesPack()) {
       // 總次數包世代:數字動態(遠端可調)→ 手動三語,不走翻譯層
       const l = uiLang(), left = packLeft(), total = packTotal();
-      const t1 = l === 'en' ? 'Free credits' : (l === 'zh-CN' ? '免费体验次数' : '免費體驗次數');
-      const t2 = l === 'en' ? `${left} / ${total} left` : (l === 'zh-CN' ? `还剩 ${left} / ${total} 次` : `還剩 ${left} / ${total} 次`);
-      badge.title = l === 'en' ? 'Free credits. Tap to see plans.' : '免費體驗次數。點擊查看訂閱方案。';
+      const fg = isFg();
+      const t1 = fg ? pk('免費體驗次數', 'Free credits') : (l === 'zh-CN' ? '免费体验次数' : '免費體驗次數');
+      const t2 = fg ? fill(pk('還剩 {left} / {total} 次', '{left} / {total} left'), { left, total }) : (l === 'zh-CN' ? `还剩 ${left} / ${total} 次` : `還剩 ${left} / ${total} 次`);
+      badge.title = fg ? pk('免費體驗次數。點擊查看訂閱方案。', 'Free credits. Tap to see plans.') : '免費體驗次數。點擊查看訂閱方案。';
       badge.innerHTML = `
         <div style="font-weight:700;margin-bottom:2px">${t1}</div>
         <div style="color:${left <= 5 ? '#F59E0B' : '#fff'}">${t2}</div>
@@ -541,20 +546,20 @@
   // 扣款當下的透明提示:講清楚用了什麼、還剩幾個 → 消除「偷扣」感
   function consumeToast(tool) {
     try {
-      const lang = localStorage.getItem('ui_lang') || 'zh-TW';
+      const lang = uiLang();
       const c = loadCount();
       const usedCount = Object.keys(TOOL_NAMES).filter(k => (c[k] || 0) >= PER_TOOL_LIMIT).length;
       const leftTools = Math.max(0, GLOBAL_DAILY_LIMIT - usedCount);
-      const name = TOOL_NAMES[tool] || tool;
-      const msg = usesPack()
-        ? (lang === 'en'
-          ? `Free credit used: ${name} · ${packLeft()} left`
-          : (lang === 'zh-CN'
+      const name = isFg() ? pk(TOOL_NAMES[tool] || tool, TOOL_NAMES[tool] || tool) : (TOOL_NAMES[tool] || tool);
+      const msg = isFg()
+        ? (usesPack()
+          ? fill(pk('已使用免費體驗次數:{name}・還剩 {left} 次', 'Free credit used: {name} · {left} left'), { name, left: packLeft() })
+          : fill(pk('已使用今日免費額度:{name}・今天還可試 {n} 個工具', 'Free trial used: {name} · {n} more tool(s) today'), { name, n: leftTools }))
+        : usesPack()
+        ? (lang === 'zh-CN'
             ? `已使用免费体验次数:${name} · 还剩 ${packLeft()} 次`
-            : `已使用免費體驗次數:${name}・還剩 ${packLeft()} 次`))
-        : lang === 'en'
-          ? `Free trial used: ${name} · ${leftTools} more tool${leftTools === 1 ? '' : 's'} today`
-          : (lang === 'zh-CN'
+            : `已使用免費體驗次數:${name}・還剩 ${packLeft()} 次`)
+        : (lang === 'zh-CN'
             ? `已使用今日免费额度:${name} · 今天还可试 ${leftTools} 个工具`
             : `已使用今日免費額度:${name}・今天還可試 ${leftTools} 個工具`);
       let el = document.getElementById('tqToast');

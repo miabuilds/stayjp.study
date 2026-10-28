@@ -61,3 +61,10 @@ scripts/kol-commission-audit.mjs
 scripts/plan-mix.mjs
 scripts/tts/pitch-audit.json
 scripts/out/
+
+# 多語翻譯快取(正本,改翻譯改這裡再 build);logs/失敗紀錄不進版控
+!scripts/out/
+scripts/out/*
+!scripts/out/l10n/
+scripts/out/l10n/logs/
+scripts/out/l10n/*/_fail-*.log

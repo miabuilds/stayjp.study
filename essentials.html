@@ -116,15 +116,16 @@
 <script src="essentials-data.js"></script>
 <script src="audio/tts/manifest.js"></script>
 <script src="i18n.js"></script>
+<script src="translate-layer.js"></script>
 <script>
 // ── i18n shim(照 speak.html):簡中 OpenCC 即時轉換 + 英文 enOr() ──
 let _tw2cn=null;
 function ensureOpenCC(){ return new Promise(function(res){ if(_tw2cn)return res(_tw2cn); if(window.OpenCC){ _tw2cn=OpenCC.Converter({from:'tw',to:'cn'}); if(I18n.setConverter)I18n.setConverter(_tw2cn); return res(_tw2cn);} var s=document.createElement('script'); s.src='https://cdn.jsdelivr.net/npm/opencc-js@1.0.5/dist/umd/full.js'; s.onload=function(){ _tw2cn=OpenCC.Converter({from:'tw',to:'cn'}); if(I18n.setConverter)I18n.setConverter(_tw2cn); res(_tw2cn); }; s.onerror=function(){res(null)}; document.head.appendChild(s); }); }
 function cvt(x){ return (!x||I18n.getLang()!=='zh-CN'||!_tw2cn)?x:_tw2cn(x); }
-function enOr(zh,en){ return I18n.getLang()==='en'?en:cvt(zh); }
-// 本頁翻譯:T(繁中) → EN 查表 / 簡中 cvt / 繁中原樣。日文字串一律不進 T(查不到表就原樣,cvt 只動中文)。
+function enOr(zh,en){ return I18n.isForeign() ? I18n.pick(zh,en) : cvt(zh); }
+// 本頁翻譯:T(繁中) → 外語查對照表(查不到退 EN_T 英文) / 簡中 cvt / 繁中原樣。日文字串一律不進 T(查不到表就原樣,cvt 只動中文)。
 const EN_T = window.ESS.EN_T;
-function T(zh){ return I18n.getLang()==='en' ? (EN_T[zh]||zh) : cvt(zh); }
+function T(zh){ return I18n.isForeign() ? I18n.pick(zh, EN_T[zh]||zh) : cvt(zh); }
 if(I18n.getLang()==='zh-CN') ensureOpenCC();
 </script>
 <script src="ux-extras.js"></script>
@@ -212,14 +213,14 @@ const ILLUS = {
   </svg>`,
 };
 function catBanner(c, illus){
-  const en = I18n.getLang()==='en';
-  return `<div class="cat-banner"><div class="cb-txt"><div class="cat-tt">${en?c.en:cvt(c.tt)}<small>${en?'':c.en}</small></div></div><div class="cb-illus">${illus}</div></div>`;
+  const en = I18n.isForeign();
+  return `<div class="cat-banner"><div class="cb-txt"><div class="cat-tt">${enOr(c.tt,c.en)}<small>${en?'':c.en}</small></div></div><div class="cb-illus">${illus}</div></div>`;
 }
 
 function grid(rows, cls){ return `<div class="grid ${cls||'g5'}">`+rows.map(r=>cell(r[0], r[1], r[2], r[3] ? T(r[3]) : r[3])).join('')+`</div>`; }
 
 function render(){
-  document.getElementById('toc').innerHTML = CATS.map(c=>`<a href="#${c.k}">${I18n.getLang()==='en'?c.en:cvt(c.tt)}</a>`).join('');
+  document.getElementById('toc').innerHTML = CATS.map(c=>`<a href="#${c.k}">${enOr(c.tt,c.en)}</a>`).join('');
   let h='';
   // 1) 數字與量詞
   h+=`<section class="cat" id="num">`+catBanner(CATS[0], ILLUS.num);

@@ -3,7 +3,9 @@
 (function (root) {
   var KEY = 'ai_consent_v1';
   function lang() { try { return (root.I18n && I18n.getLang) ? I18n.getLang() : (localStorage.getItem('ui_lang') || 'zh-TW'); } catch (e) { return 'zh-TW'; } }
-  function T(zh, en) { var l = lang(); if (l === 'en') return en; return (typeof cvt === 'function') ? cvt(zh) : zh; }
+  // 外語(en/ko/vi/id/th)走 I18n.pick;中文走 cvt(繁/簡)
+  function isForeign() { try { return (root.I18n && I18n.isForeign) ? I18n.isForeign() : ['en', 'ko', 'vi', 'id', 'th'].indexOf(lang()) >= 0; } catch (e) { return false; } }
+  function T(zh, en) { if (isForeign()) return (root.I18n && I18n.pick) ? I18n.pick(zh, en) : en; return (typeof cvt === 'function') ? cvt(zh) : zh; }
   function has() { try { return localStorage.getItem(KEY) === '1'; } catch (e) { return false; } }
   function remember() {
     try { localStorage.setItem(KEY, '1'); } catch (e) {}

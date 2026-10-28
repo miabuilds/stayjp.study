@@ -143,9 +143,12 @@
 <script>
   function setLang(l){ document.body.setAttribute('data-lang', l); document.documentElement.lang = l==='en'?'en':'zh-Hant'; try{ localStorage.setItem('stayjp_about_lang', l); }catch(e){} }
   function toggleLang(){ setLang(document.body.getAttribute('data-lang')==='zh'?'en':'zh'); }
-  (function(){ var s; try{ s=localStorage.getItem('stayjp_about_lang'); }catch(e){} setLang(s || ((navigator.language||'').toLowerCase().indexOf('zh')===0?'zh':'en')); })();
+  (function(){ var u=null, s=null; try{ u=localStorage.getItem('ui_lang'); s=localStorage.getItem('stayjp_about_lang'); }catch(e){}
+    // 以全站 ui_lang 為準:en → 英文層;zh-*/ko/vi/id/th → 繁中層(外語由 translate-layer 換字);沒設過才退回舊 key / 瀏覽器語言
+    if(u) setLang(u==='en'?'en':'zh'); else setLang(s || ((navigator.language||'').toLowerCase().indexOf('zh')===0?'zh':'en')); })();
 </script>
 <script src="i18n.js"></script>
+<script src="translate-layer.js"></script>
 <script src="bilingual-sync.js"></script>
 <script defer src="newbie-offer.js"></script>
 <script defer src="acq.js"></script>

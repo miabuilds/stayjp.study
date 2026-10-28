@@ -145,6 +145,8 @@ const Quiz = (() => {
   // ── 詳解卡：答錯 / 我不會 時顯示，讓使用者看懂而非只有對錯 ──
   const _POS = { '名': '名詞', '動': '動詞', 'い形': 'い形容詞', 'な形': 'な形容詞', '副': '副詞', '他': '其他' };
   function _uiLang() { try { return localStorage.getItem('ui_lang') || 'zh-TW'; } catch (e) { return 'zh-TW'; } }
+  // 外語(en/ko/vi/id/th)→ I18n.pick(zh,en);中文原樣。例句翻譯(ex.e)是英文專有資料,仍用 _uiLang()==='en' 判斷;其他外語的 ex.z 已由 app.html 疊層覆蓋
+  function _pk(zh, en) { try { return (typeof I18n !== 'undefined' && I18n.isForeign && I18n.isForeign()) ? I18n.pick(zh, en) : zh; } catch (e) { return zh; } }
   function explainCardHtml(word) {
     const m = typeof cvt === 'function' ? cvt(word.m) : word.m;
     const wFull = word.w + (word.w !== word.r ? '（' + word.r + '）' : '');
@@ -154,7 +156,7 @@ const Quiz = (() => {
     if (ex && ex.j) {
       const tr = _uiLang() === 'en' ? (ex.e || '') : (typeof cvt === 'function' ? cvt(ex.z || '') : (ex.z || ''));
       exHtml = `<div style="margin-top:8px;padding-top:8px;border-top:1px dashed var(--bd)">
-        <div style="font-size:14px;line-height:1.7;color:var(--tx)">${ex.j} <button onclick="Quiz.sayExample()" style="border:none;background:none;cursor:pointer;font-size:14px;padding:0" title="${_uiLang()==='en'?'Play':'播放'}"></button></div>
+        <div style="font-size:14px;line-height:1.7;color:var(--tx)">${ex.j} <button onclick="Quiz.sayExample()" style="border:none;background:none;cursor:pointer;font-size:14px;padding:0" title="${_pk('播放', 'Play')}"></button></div>
         ${tr ? `<div style="font-size:12px;color:var(--tx2);margin-top:3px">${tr}</div>` : ''}</div>`;
     }
     return `<div style="margin-top:12px;padding:12px 14px;background:var(--bg3);border-radius:10px;border:1px solid var(--bd);text-align:left">
@@ -167,7 +169,7 @@ const Quiz = (() => {
     if (!box) return;
     const d = document.getElementById('qDunno'); if (d) { d.disabled = true; d.style.opacity = '.5'; d.style.cursor = 'default'; }
     const wrap = document.createElement('div');
-    const nextLabel = _uiLang() === 'en' ? 'Next →' : '下一題 →';
+    const nextLabel = _pk('下一題 →', 'Next →');
     wrap.innerHTML = explainCardHtml(word) + `<button class="qstart" style="margin-top:10px">${nextLabel}</button>`;
     box.appendChild(wrap);
     // 防呆：作答那次 Enter/click 別順勢按到剛出現的按鈕（沿用 typing 的延遲綁定手法）

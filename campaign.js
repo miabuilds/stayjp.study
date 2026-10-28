@@ -146,11 +146,12 @@
     var p = function (n) { return (n < 10 ? '0' : '') + n; };
     return (d > 0 ? d + tr(' 天 ', 'd ', ' 天 ') : '') + p(h) + ':' + p(m) + ':' + p(s);
   }
-  /** 檔期文案用的三語挑字:en 介面 → en;簡中 → cn(沒給就用 cvt 轉);其餘 → 繁中 */
+  /** 檔期文案挑字:外語(en/ko/vi/id/th)→ I18n.pick(zh,en);簡中 → cn(沒給就用 cvt 轉);其餘 → 繁中 */
   function tr(zh, en, cn) {
     try {
       var l = (typeof I18n !== 'undefined' && I18n.getLang) ? I18n.getLang() : (localStorage.getItem('ui_lang') || 'zh-TW');
-      if (l === 'en') return en;
+      var fg = (typeof I18n !== 'undefined' && I18n.isForeign) ? I18n.isForeign() : ['en', 'ko', 'vi', 'id', 'th'].indexOf(l) >= 0;
+      if (fg) return (typeof I18n !== 'undefined' && I18n.pick) ? I18n.pick(zh, en) : en;
       if (l === 'zh-CN') return cn || (typeof cvt === 'function' ? cvt(zh) : zh);
     } catch (e) {}
     return zh;

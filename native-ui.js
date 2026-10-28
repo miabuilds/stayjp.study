@@ -129,13 +129,15 @@
         .catch(function () {});
     } catch (e) {}
   }
+  // 外語(en/ko/vi/id/th)→ I18n.pick(zh,en);中文原樣(這些字串本來就沒走 cvt)
+  function _fg() { try { return (typeof I18n !== 'undefined' && I18n.isForeign) ? I18n.isForeign() : ['en', 'ko', 'vi', 'id', 'th'].indexOf(localStorage.getItem('ui_lang')) >= 0; } catch (e) { return false; } }
+  function _T(zh, en) { try { return _fg() ? ((typeof I18n !== 'undefined' && I18n.pick) ? I18n.pick(zh, en) : en) : zh; } catch (e) { return zh; } }
   // 強制更新:全畫面擋住,只留「前往更新」(舊版有無法從網頁修的原生問題時使用)
   function showForceUpdate(platform, ver) {
     if (document.getElementById('stayjpForceUpd')) return;
     var storeUrl = platform === 'ios'
       ? 'https://apps.apple.com/app/id6778227353'
       : 'https://play.google.com/store/apps/details?id=com.stayjp.app';
-    var en = /^en/.test(localStorage.getItem('ui_lang') || '');
     var m = document.createElement('div');
     m.id = 'stayjpForceUpd';
     m.style.cssText = 'position:fixed;inset:0;z-index:2147483600;background:rgba(24,20,17,.94);display:flex;align-items:center;justify-content:center;padding:24px;font:500 15px/1.7 -apple-system,BlinkMacSystemFont,"Noto Sans TC","PingFang TC",sans-serif';
@@ -146,14 +148,12 @@
     img.style.cssText = 'width:84px;height:auto;margin-bottom:10px';
     var h = document.createElement('div');
     h.style.cssText = 'font-size:17px;font-weight:800;margin-bottom:6px';
-    h.textContent = en ? 'Update required' : '請更新到最新版';
+    h.textContent = _T('請更新到最新版', 'Update required');
     var p = document.createElement('div');
     p.style.cssText = 'font-size:13.5px;color:#6f6a61;margin-bottom:16px';
-    p.textContent = en
-      ? 'This version has a playback issue that can only be fixed by updating (videos force fullscreen). It takes about 30 seconds.'
-      : '這個版本有影片會強制全螢幕的問題,更新後才能修好,大約 30 秒就好。';
+    p.textContent = _T('這個版本有影片會強制全螢幕的問題,更新後才能修好,大約 30 秒就好。', 'This version has a playback issue that can only be fixed by updating (videos force fullscreen). It takes about 30 seconds.');
     var b = document.createElement('button');
-    b.textContent = en ? 'Update now' : '前往更新';
+    b.textContent = _T('前往更新', 'Update now');
     b.style.cssText = 'width:100%;background:#C6553B;color:#fff;border:0;padding:13px;border-radius:12px;font-weight:800;font-size:15px;cursor:pointer';
     b.onclick = function () {
       try { if (window.ReactNativeWebView) { window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'OPEN_STORE', url: storeUrl })); return; } } catch (e) {}
@@ -168,15 +168,14 @@
     var storeUrl = platform === 'ios'
       ? 'https://apps.apple.com/app/id6778227353'
       : 'https://play.google.com/store/apps/details?id=com.stayjp.app';
-    var en = /^en/.test(localStorage.getItem('ui_lang') || '');
     var bar = document.createElement('div');
     bar.setAttribute('role', 'dialog');
     bar.style.cssText = 'position:fixed;left:12px;right:12px;bottom:calc(14px + env(safe-area-inset-bottom));z-index:2147483000;background:#213A54;color:#fff;border-radius:14px;padding:12px 14px;display:flex;align-items:center;gap:10px;box-shadow:0 8px 30px rgba(0,0,0,.28);font:500 15px/1.4 -apple-system,BlinkMacSystemFont,"Noto Sans TC","PingFang TC",sans-serif';
     var msg = document.createElement('div');
     msg.style.cssText = 'flex:1;min-width:0';
-    msg.textContent = en ? 'A new version is available' : '有新版本可以更新囉';
+    msg.textContent = _T('有新版本可以更新囉', 'A new version is available');
     var up = document.createElement('button');
-    up.textContent = en ? 'Update' : '更新';
+    up.textContent = _T('更新', 'Update');
     up.style.cssText = 'flex:none;background:#C6553B;color:#fff;border:0;padding:9px 18px;border-radius:999px;font-weight:700;font-size:14px;cursor:pointer';
     up.onclick = function () {
       // 有原生橋 → 請原生開商店(最可靠);沒有就退而求其次直接導頁
@@ -186,7 +185,7 @@
       try { window.location.href = storeUrl; } catch (e) {}
     };
     var later = document.createElement('button');
-    later.textContent = en ? 'Later' : '稍後';
+    later.textContent = _T('稍後', 'Later');
     later.style.cssText = 'flex:none;background:transparent;color:#cdd6e0;border:0;padding:9px 8px;font:inherit;cursor:pointer';
     later.onclick = function () { try { localStorage.setItem('stayjp_update_dismissed', latest); } catch (e) {} bar.remove(); };
     bar.appendChild(msg); bar.appendChild(up); bar.appendChild(later);
@@ -235,28 +234,25 @@
 
     function hint(url) {
       if (document.getElementById('storeHint')) return;
-      var en = false;
-      try { en = localStorage.getItem('ui_lang') === 'en'; } catch (e) {}
       var box = document.createElement('div');
       box.id = 'storeHint';
       box.style.cssText = 'position:fixed;left:50%;transform:translateX(-50%);bottom:18px;z-index:99999;' +
         'width:min(92vw,420px);box-sizing:border-box;background:#1f2937;color:#fff;border-radius:14px;' +
         'padding:13px 14px;box-shadow:0 8px 28px rgba(0,0,0,.35);font-size:13px;line-height:1.55';
       box.innerHTML = '<div style="font-weight:700;margin-bottom:4px">' +
-          (en ? 'Can\'t open the App Store here' : '這個瀏覽器開不了 App Store') + '</div>' +
+          _T('這個瀏覽器開不了 App Store', 'Can\'t open the App Store here') + '</div>' +
         '<div style="margin-bottom:10px;opacity:.9">' +
-          (en ? 'You\'re in an app\'s built-in browser. Tap ••• (top right) → "Open in Safari", or copy the link and paste it in Safari.'
-              : '你現在在 App 的內建瀏覽器裡。請點右上角 ••• → 「在 Safari 開啟」,或複製連結貼到 Safari。') +
+          _T('你現在在 App 的內建瀏覽器裡。請點右上角 ••• → 「在 Safari 開啟」,或複製連結貼到 Safari。', 'You\'re in an app\'s built-in browser. Tap ••• (top right) → "Open in Safari", or copy the link and paste it in Safari.') +
         '</div><div style="display:flex;gap:8px">' +
         '<button id="storeHintCopy" style="flex:1;background:#fff;color:#1f2937;border:0;border-radius:9px;padding:9px;font-weight:700;font-size:13px">' +
-          (en ? 'Copy link' : '複製連結') + '</button>' +
+          _T('複製連結', 'Copy link') + '</button>' +
         '<button id="storeHintX" style="flex:0 0 66px;background:transparent;color:#cbd5e1;border:1px solid #475569;border-radius:9px;padding:9px;font-size:13px">' +
-          (en ? 'Close' : '關閉') + '</button></div>';
+          _T('關閉', 'Close') + '</button></div>';
       (document.body || document.documentElement).appendChild(box);
       box.querySelector('#storeHintX').onclick = function () { box.remove(); };
       box.querySelector('#storeHintCopy').onclick = function (ev) {
         var btn = ev.currentTarget;
-        var done = function () { btn.textContent = en ? 'Copied!' : '已複製!'; };
+        var done = function () { btn.textContent = _T('已複製!', 'Copied!'); };
         try { navigator.clipboard.writeText(url).then(done, fallback); }
         catch (e) { fallback(); }
         function fallback() {

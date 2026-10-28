@@ -84,6 +84,7 @@
 
 <script src="icons.js"></script>
 <script src="i18n.js"></script>
+<script src="translate-layer.js"></script>
 <script src="grammar-kanji-readings.js"></script>
 <script src="vocab-n5.js"></script>
 <script src="vocab-n4.js"></script>
@@ -185,15 +186,19 @@ function render(){
 }
 
 // i18n 輕量:繁/英切換(語感 nu 保持中文,英模式僅切標題/lead/目錄)
-function enOr(zh,en){ return (document.body.getAttribute('data-lang')==='en') ? en : zh; }
+// 外語(en/ko/vi/id/th)走 I18n.pick(查不到對照表退英文);中文回繁中原樣
+function enOr(zh,en){ return I18n.isForeign() ? I18n.pick(zh,en) : zh; }
 function cycleLang(){
-  const cur=document.body.getAttribute('data-lang')==='en'?'zh':'en';
-  document.body.setAttribute('data-lang',cur);
-  document.getElementById('langBtn').textContent = cur==='en'?'中':'EN';
-  try{ localStorage.setItem('ui_lang', cur==='en'?'en':'zh-TW'); }catch(e){}
-  render();
+  // 外語 ⇄ 繁中:任一邊是外語就整頁重載(對照表由 i18n.js 依 ui_lang 載入)
+  const next = I18n.isForeign() ? 'zh-TW' : 'en';
+  try{ I18n.setLang(next); }catch(e){ try{ localStorage.setItem('ui_lang', next); }catch(_){} }
+  location.reload();
 }
-try{ var _l=localStorage.getItem('ui_lang'); if(_l==='en'){ document.body.setAttribute('data-lang','en'); document.getElementById('langBtn').textContent='中'; } }catch(e){}
+// 初始:只有 en 才切到 .ens 英文層;ko/vi/id/th 留在 .zhs 繁中層,由 translate-layer 換字
+try{
+  if(I18n.getLang()==='en') document.body.setAttribute('data-lang','en');
+  if(I18n.isForeign()) document.getElementById('langBtn').textContent='中';
+}catch(e){}
 render();
 </script>
 <script src="font-scale.js"></script>

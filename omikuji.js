@@ -16,6 +16,7 @@
   function T(zhText, enText) {
     var l = lang();
     if (l === 'en') return enText || zhText;
+    if (typeof I18n !== 'undefined' && I18n.isForeign && I18n.isForeign()) return enText || zhText;   // ko/vi/id/th:呼叫端先把 enText 換成目標語(見 T2),沒有就退英文
     if (l === 'zh-CN') { try { return (typeof cvt === 'function') ? cvt(zhText) : zhText; } catch (e) { return zhText; } }
     return zhText;
   }
@@ -173,6 +174,18 @@
   function renderSlip(i, again) {
     var m = mask(); if (!m) return;
     var e = pool()[i]; if (!e) { close(); return; }
+    // ko/vi/id/th:misc-<code>.js(MISC_L10N[code].omikuji[原始索引] = {zh, w:[意思], tip})→ 疊到英文欄位上,T() 就會拿到目標語
+    try {
+      if (typeof I18n !== 'undefined' && I18n.isPacked && I18n.isPacked()) {
+        var ML = window.MISC_L10N && window.MISC_L10N[I18n.getLang()]; var all = window.OMIKUJI || [];
+        var oi = all.indexOf(e); var tr = ML && ML.omikuji && oi >= 0 ? ML.omikuji[oi] : null;
+        if (tr && e.__l10n !== I18n.getLang()) {
+          e.__l10n = I18n.getLang();
+          if (tr.zh) e.zhE = tr.zh; if (tr.tip) e.tipE = tr.tip;
+          (e.w || []).forEach(function (w, k) { if (tr.w && tr.w[k]) w[3] = tr.w[k]; });
+        }
+      }
+    } catch (_) {}
     var poem = e.jp.map(function (x) { return fr(x); }).join('<br>');
     var words = e.w.map(function (w) {
       return '<div class="omk-w"><b>' + esc(w[0]) + '</b><i>' + esc(w[1]) + '</i>'

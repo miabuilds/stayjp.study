@@ -18,9 +18,9 @@ const MODEL = "claude-haiku-4-5-20251001";   // 便宜快,對「比對兩句+中
 
 // 使用者介面語言 → 回饋語言(繁中預設;簡中/英文跟著 UI)
 function langName(lang?: string): string {
-  if (lang === "zh-CN") return "簡體中文";
-  if (lang === "en") return "English";
-  return "繁體中文";
+  // 前端 ui_lang 七碼(正本 i18n.js LANGS):zh-TW / zh-CN / en / ko / vi / id / th
+  const MAP: Record<string, string> = { "zh-CN": "簡體中文", en: "English", ko: "한국어(Korean)", vi: "Tiếng Việt(Vietnamese)", id: "Bahasa Indonesia(Indonesian)", th: "ภาษาไทย(Thai)" };
+  return (lang && MAP[lang]) || "繁體中文";
 }
 
 function buildSystem(lang?: string): string {

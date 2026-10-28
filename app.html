@@ -2959,7 +2959,7 @@ var HUB_YT_PICKS = [
   { v: 'MpYy6wwqxoo', lv: 'N3', t: 'LiSA「紅蓮華」THE FIRST TAKE', en: 'LiSA “Gurenge” THE FIRST TAKE', tag: '鬼滅 · 中日字幕', tagEn: 'Demon Slayer · subs' }
 ];
 function hubYtStripHtml(L) {
-  var en = (typeof I18n !== 'undefined' && I18n.getLang && I18n.getLang() === 'en');
+  var en = (typeof I18n !== 'undefined' && I18n.isForeign && I18n.isForeign());   // 外語:x.en 當退路,再過 pick 查對照表
   var CV = function (x) { return (typeof cvt === 'function') ? cvt(x) : x; };
   var list = HUB_YT_PICKS.slice();
   // 最近練過 → 排第一張,標「繼續練」+ 進度條
@@ -2978,8 +2978,8 @@ function hubYtStripHtml(L) {
       (x.lv ? '<span class="yt-lvb">' + _hubEsc(x.lv) + '</span>' : '') +
       '<span class="yt-play"><i data-ic=play></i></span>' +
       (x.resume ? '<span class="yt-prog"><span style="width:' + x.pct + '%"></span></span>' : '') + '</div>' +
-      '<div class="yt-sc-b"><div class="yt-sc-t">' + _hubEsc(en ? (x.en || x.t) : CV(x.t)) + '</div>' +
-      '<div class="yt-sc-m">' + _hubEsc(x.resume ? x.tag : (en ? (x.tagEn || x.tag) : CV(x.tag))) + '</div></div></a>';
+      '<div class="yt-sc-b"><div class="yt-sc-t">' + _hubEsc(en ? I18n.pick(x.t, x.en || x.t) : CV(x.t)) + '</div>' +
+      '<div class="yt-sc-m">' + _hubEsc(x.resume ? x.tag : (en ? I18n.pick(x.tag, x.tagEn || x.tag) : CV(x.tag))) + '</div></div></a>';
   }).join('');
   return '<div class="yt-strip yt-web-only">' +
     '<div class="yt-strip-h"><span class="yt-strip-t"><i data-ic=play></i> ' + L('YouTube 跟讀', 'YouTube Shadowing') + '</span>' +
@@ -3166,8 +3166,9 @@ function hubSkitStripHtml(L) {
   var list = window.SKITS || [];
   if (!list.length) return '';
   var seen = {}; try { seen = JSON.parse(localStorage.getItem('skit_seen') || '{}') || {}; } catch (e) {}
-  var en = (typeof I18n !== 'undefined' && I18n.getLang && I18n.getLang() === 'en');
+  var en = (typeof I18n !== 'undefined' && I18n.isForeign && I18n.isForeign());
   var CV = function (x) { return (typeof cvt === 'function') ? cvt(x) : x; };
+  var MK = function (x) { try { var M = window.MISC_L10N && window.MISC_L10N[I18n.getLang()]; return (M && M.skits && M.skits[x.n]) || null; } catch (e) { return null; } };   // 短劇標題/意思的外語版(misc-<code>.js)
   // 只推還沒看過的;全部看完才改放看過的(2026-10-09 Mia)
   var fresh = list.filter(function (x) { return !seen[x.n]; });
   var order = fresh.length ? fresh : list.slice();
@@ -3177,7 +3178,7 @@ function hubSkitStripHtml(L) {
       '<span class="yt-lvb">#' + x.n + '</span>' + (seen[x.n] ? '<span class="sk-seen">' + L('看過', 'Seen') + '</span>' : '') +
       '<span class="yt-play"><i data-ic=play></i></span></div>' +
       '<div class="yt-sc-b"><div class="sk-p" lang="ja">' + _hubEsc(x.p) + '</div>' +
-      '<div class="yt-sc-m">' + _hubEsc(en ? x.men : CV(x.m)) + '</div></div></a>';
+      '<div class="yt-sc-m">' + _hubEsc(en ? ((MK(x) && MK(x).m) || x.men) : CV(x.m)) + '</div></div></a>';
   }).join('');
   return '<div class="yt-strip">' +
     '<div class="yt-strip-h"><span class="yt-strip-t"><i data-ic=play></i> ' + L('小狸的日本生活', 'Tanuki in Japan') + (fresh.length ? '<span class="yt-strip-new">' + L(fresh.length + ' 集沒看', fresh.length + ' new') + '</span>' : '') + '</span>' +
@@ -5491,7 +5492,7 @@ function render() {
         } catch (e) { if (exText) speak(exText); }
       };
       const _gSpk = _gEx ? `<svg class="gt-spk" onclick="event.stopPropagation();playGrammarTitle('${d.id}','${_gEx}')" title="${enOr('唸文法+例句','Play pattern + example')}" aria-label="${enOr('唸文法+例句','Play pattern + example')}" viewBox="0 0 24 24"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.54 8.46a5 5 0 010 7.07M19.07 4.93a10 10 0 010 14.14"/></svg>` : '';
-      h += `<div class="gc" id="${d.id}"><div class="gh" onclick="toggleCard(this,event)"><span class="gn">${idx}</span>${lf ? `<span class="lv-tag">${dlv.toUpperCase()}</span>` : ''}<span class="gt">${d.t}</span>${_gSpk}${(dlv==='n5'&&d.n)?'<span class="gbadge-adv">'+enOr('進階','Advanced')+'</span>':''}<svg class="star ${isFav?'on':''}" onclick="event.stopPropagation();toggleFav('${d.id}')" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg class="arr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div><div class="gb"><div class="gx"><div class="pt">${window.linkGrammarTerms?window.linkGrammarTerms(d.p):d.p}</div><div class="ep">${(function(){var s=cvt(d.ex);return window.linkGrammarTerms?window.linkGrammarTerms(s):s;})()}</div>${(window.GRAMMAR_DETAIL&&window.GRAMMAR_DETAIL[d.id])?`<div class="gc-detail"><button type="button" class="gd-toggle" onclick="event.stopPropagation();toggleDetail(this)"><i data-ic=book></i> ${enOr('詳解','Deep dive')} ▾</button><div class="gd-body gd-hidden">${grammarDetailHTML(window.GRAMMAR_DETAIL[d.id])}</div></div>`:''}<div class="eg">${d.eg.map(e=>{
+      h += `<div class="gc" id="${d.id}"><div class="gh" onclick="toggleCard(this,event)"><span class="gn">${idx}</span>${lf ? `<span class="lv-tag">${dlv.toUpperCase()}</span>` : ''}<span class="gt">${d.t}</span>${_gSpk}${(dlv==='n5'&&d.n)?'<span class="gbadge-adv">'+enOr('進階','Advanced')+'</span>':''}<svg class="star ${isFav?'on':''}" onclick="event.stopPropagation();toggleFav('${d.id}')" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg class="arr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div><div class="gb"><div class="gx"><div class="pt">${window.linkGrammarTerms?window.linkGrammarTerms(d.p):d.p}</div><div class="ep">${(function(){var s=cvt(d.ex);return window.linkGrammarTerms?window.linkGrammarTerms(s):s;})()}</div>${gdFor(d.id)?`<div class="gc-detail"><button type="button" class="gd-toggle" onclick="event.stopPropagation();toggleDetail(this)"><i data-ic=book></i> ${enOr('詳解','Deep dive')} ▾</button><div class="gd-body gd-hidden">${grammarDetailHTML(gdFor(d.id))}</div></div>`:''}<div class="eg">${d.eg.map(e=>{
         const pureJ = e.j.replace(/<[^>]+>/g,'').replace(/'/g,"\\'");
         return `<div class="ex" onclick="speak('${pureJ}')" title="${enOr('點方框唸例句','Tap box to hear')}"><div class="j">${window.furiganaHTMLRich?window.furiganaHTMLRich(e.j):e.j}<svg class="ex-spk" onclick="event.stopPropagation();speak('${pureJ}')" viewBox="0 0 24 24"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.54 8.46a5 5 0 010 7.07M19.07 4.93a10 10 0 010 14.14"/></svg></div><div class="z">${e.g?'<span class="eg-g">'+e.g+'</span>':''}${cvt(e.z)}</div></div>`;
       }).join('')}</div>${d.n?(dlv==='n5'?`<div class="nt-collapse"><button type="button" class="nt-toggle" onclick="event.stopPropagation();toggleNote(this)">展開說明 ▾</button><div class="nt nt-hidden">${cvt(d.n)}</div></div>`:`<div class="nt">${cvt(d.n)}</div>`):''}<a class="gc-report" href="${reportUrl}" target="_blank" rel="noopener">${t('report_error')}</a></div></div></div>`;
@@ -5602,7 +5603,8 @@ if (false && 'serviceWorker' in navigator) {
 }
 
 // ========== I18N ==========
-const LANG_CYCLE = ['zh-TW', 'zh-CN', 'en'];
+const LANG_CYCLE = I18n.LANGS.map(l => l.code);   // 語言清單正本在 i18n.js
+const _isForeignCode = c => c !== 'zh-TW' && c !== 'zh-CN';
 const LANG_LABEL = { 'zh-TW': '繁', 'zh-CN': '简', 'en': 'EN' };
 
 // OpenCC 繁→簡 runtime 轉換（保留單一資料來源）
@@ -5660,37 +5662,62 @@ const CAT_EN = {
   '助詞':'Particles','動詞活用':'Verb Conjugation','基本句型':'Basic Sentence Patterns','て形用法':'Te-form Usage','形容詞・修飾':'Adjectives & Modifiers','存在・授受':'Existence & Giving/Receiving','表現・文型':'Expressions & Patterns','詞彙・其他':'Vocabulary & Others','條件表現':'Conditional Expressions','接続・原因':'Conjunctions & Cause','授受表現':'Giving & Receiving','推量・様態':'Conjecture & Appearance','アスペクト':'Aspect','敬語':'Honorifics','義務・許可':'Obligation & Permission','比較':'Comparison','引用・思考':'Quotation & Thought','口語・助詞':'Colloquial & Particles','時間':'Time','条件・仮定':'Conditionals','範囲・限定':'Scope & Limitation','比較・程度':'Comparison & Degree','様態・傾向':'Appearance & Tendency','主張・強調':'Assertion & Emphasis','その他':'Others','時間・変化':'Time & Change','原因・理由':'Cause & Reason','逆接・対比':'Contrast & Concession','程度・強調':'Degree & Emphasis','話題・評価':'Topic & Evaluation','文末表現':'Sentence-ending Expressions','限定・強調':'Limitation & Emphasis','逆接・譲歩':'Concession','程度・比較':'Degree & Comparison','文末・書き言葉':'Sentence-ending & Written',
   '名詞':'Nouns','動詞':'Verbs','い形容詞':'I-adjectives','な形容詞':'Na-adjectives','副詞':'Adverbs'
 };
-function catLabel(name) { return (I18n.getLang() === 'en') ? (CAT_EN[name] || name) : cvt(name); }
-// 硬編 UI 字串:lang=en 給英文,否則沿用 cvt(繁/簡不變)。
-function enOr(zh, en) { return (I18n.getLang() === 'en') ? en : cvt(zh); }
+function catLabel(name) { return I18n.isForeign() ? I18n.pick(name, CAT_EN[name] || name) : cvt(name); }
+// 硬編 UI 字串:外語(en/ko/vi/id/th)走 I18n.pick(en 直接回英文;其他查 lang/<code>.js 對照表,查不到退英文),中文沿用 cvt(繁/簡不變)。
+function enOr(zh, en) { return I18n.isForeign() ? I18n.pick(zh, en) : cvt(zh); }
 
-// ── English content overlay ──
-// lang=en 時把英文疊進 window.N5..N1 / VOCAB_N5..N1(存原中文供切回),渲染碼照舊讀欄位,無需改。
-let _enLoading = null;
-function loadContentEn() {
-  if (window.STAYJP_EN) return Promise.resolve();
-  if (_enLoading) return _enLoading;
-  _enLoading = new Promise((resolve) => {
+// ── 外語內容疊層(en/ko/vi/id/th)──
+// 外語時把翻譯疊進 window.N5..N1 / VOCAB_N5..N1 / CONFUSABLES(存原中文供切回),渲染碼照舊讀欄位,無需改。
+//   en:content-en.js(window.STAYJP_EN:N5_EN… / VOCAB_N5_EN… / CONFUSABLES_EN)
+//   其他:content-<code>.js(window.STAYJP_L10N[code] = {grammar:{id:{t,p,ex,n,eg}}, vocab:{n5:[{m,z}|null]…}, confusables:{id:{words,tip,eg}}})
+// 兩種格式在 contentProvider() 統一成同一個介面,下面的 overlay 不分語言。
+let _contentLoading = {};
+function loadContentLang(lang) {
+  const file = lang === 'en' ? 'content-en.js' : ('content-' + lang + '.js');
+  if (lang === 'en' ? window.STAYJP_EN : (window.STAYJP_L10N && window.STAYJP_L10N[lang])) return Promise.resolve();
+  if (_contentLoading[lang]) return _contentLoading[lang];
+  _contentLoading[lang] = new Promise((resolve) => {
     const s = document.createElement('script');
-    s.src = 'content-en.js';
+    s.src = file;
     s.onload = () => resolve();
     s.onerror = () => resolve();   // 失敗則靜默退回中文
     document.head.appendChild(s);
   });
-  return _enLoading;
+  return _contentLoading[lang];
 }
-function overlayEnglishContent(on) {
-  const EN = window.STAYJP_EN || {};
+function loadContentEn() { return loadContentLang('en'); }   // 相容舊呼叫
+function contentProvider(lang) {
+  if (lang === 'en') {
+    const EN = window.STAYJP_EN || {};
+    return {
+      grammar: (lv, id) => (EN[lv.toUpperCase() + '_EN'] || {})[id] || null,
+      vocab: (lv, i) => { const a = EN['VOCAB_' + lv.toUpperCase() + '_EN']; return (Array.isArray(a) && a[i]) ? { m: a[i].m } : null; },
+      vocabCount: lv => { const a = EN['VOCAB_' + lv.toUpperCase() + '_EN']; return Array.isArray(a) ? a.length : -1; },
+      confusable: id => (EN.CONFUSABLES_EN || {})[id] || null,
+    };
+  }
+  const P = (window.STAYJP_L10N && window.STAYJP_L10N[lang]) || {};
+  return {
+    grammar: (lv, id) => (P.grammar || {})[id] || null,
+    vocab: (lv, i) => { const a = (P.vocab || {})[lv]; return (Array.isArray(a) && a[i]) ? a[i] : null; },
+    vocabCount: lv => { const a = (P.vocab || {})[lv]; return Array.isArray(a) ? a.length : -1; },
+    confusable: id => (P.confusables || {})[id] || null,
+  };
+}
+function overlayForeignContent(on) {
+  const lang = I18n.getLang();
+  const PV = contentProvider(lang);
   // 文法:by id
-  [['N5','N5_EN'],['N4','N4_EN'],['N3','N3_EN'],['N2','N2_EN'],['N1','N1_EN']].forEach(([b, e]) => {
-    const arr = window[b]; const map = EN[e]; if (!Array.isArray(arr)) return;
+  ['n5', 'n4', 'n3', 'n2', 'n1'].forEach(lv => {
+    const arr = window[lv.toUpperCase()]; if (!Array.isArray(arr)) return;
     arr.forEach(it => {
-      // 注意:不疊 cat(它是分組鍵,見 CATS_*),分類標題另用 catLabel() 譯。只疊顯示欄位 ex/eg/n。
+      // 注意:不疊 cat(它是分組鍵,見 CATS_*),分類標題另用 catLabel() 譯。只疊顯示欄位 t/p/ex/n/eg.z。
       if (on) {
         if (!it.__zh) it.__zh = { t: it.t, p: it.p, ex: it.ex, n: it.n, eg: (it.eg || []).map(x => x.z) };
-        const en = map && map[it.id];
+        else { it.t = it.__zh.t; it.p = it.__zh.p; it.ex = it.__zh.ex; it.n = it.__zh.n; (it.eg || []).forEach((x, k) => { if (it.__zh.eg[k] != null) x.z = it.__zh.eg[k]; }); }
+        const en = PV.grammar(lv, it.id);
         if (en) {
-          if (en.t != null) it.t = en.t;   // 標題:日文保留、中文標註英譯
+          if (en.t != null) it.t = en.t;   // 標題:日文保留、中文標註譯出
           if (en.p != null) it.p = en.p;   // 結構
           if (en.ex != null) it.ex = en.ex;
           if (en.n != null) it.n = en.n;
@@ -5702,25 +5729,84 @@ function overlayEnglishContent(on) {
       }
     });
   });
-  // 單字:by index(僅在數量一致時才疊,防錯位)
-  [['VOCAB_N5','VOCAB_N5_EN'],['VOCAB_N4','VOCAB_N4_EN'],['VOCAB_N3','VOCAB_N3_EN'],['VOCAB_N2','VOCAB_N2_EN'],['VOCAB_N1','VOCAB_N1_EN']].forEach(([b, e]) => {
-    const arr = window[b]; const em = EN[e]; if (!Array.isArray(arr) || !Array.isArray(em) || arr.length !== em.length) return;
+  // 單字:by index(僅在數量一致時才疊,防錯位)。疊詞義 m;非英文也疊例句翻譯 ex.z(英文介面的例句走 ex.e)。
+  ['n5', 'n4', 'n3', 'n2', 'n1'].forEach(lv => {
+    const arr = window['VOCAB_' + lv.toUpperCase()]; if (!Array.isArray(arr)) return;
+    const okLen = PV.vocabCount(lv) === arr.length;
     arr.forEach((it, i) => {
-      // 不疊 c(詞性,是 VOCAB_CATS 分組鍵),只疊詞義 m;詞性標籤由 catLabel() 譯。
-      if (on) { if (!it.__zh) it.__zh = { m: it.m }; if (em[i]) { it.m = em[i].m; } }
-      else if (it.__zh) { it.m = it.__zh.m; }
+      // 不疊 c(詞性,是 VOCAB_CATS 分組鍵),詞性標籤由 catLabel() 譯。
+      if (on) {
+        if (!it.__zh) it.__zh = { m: it.m, z: it.ex && it.ex.z };
+        else { it.m = it.__zh.m; if (it.ex) it.ex.z = it.__zh.z; }
+        const e = okLen ? PV.vocab(lv, i) : null;
+        if (e) { if (e.m) it.m = e.m; if (e.z && it.ex) it.ex.z = e.z; }
+      } else if (it.__zh) { it.m = it.__zh.m; if (it.ex) it.ex.z = it.__zh.z; }
     });
   });
+  // 易混淆:by id(words[].m/note、tip、eg[].z)
+  const cfs = (typeof CONFUSABLES !== 'undefined') ? CONFUSABLES : [];
+  (cfs || []).forEach(cf => {
+    if (on) {
+      if (!cf.__zh) cf.__zh = { words: cf.words.map(w => ({ m: w.m, note: w.note })), tip: cf.tip, eg: (cf.eg || []).map(x => x.z) };
+      else { cf.words.forEach((w, k) => { w.m = cf.__zh.words[k].m; w.note = cf.__zh.words[k].note; }); cf.tip = cf.__zh.tip; (cf.eg || []).forEach((x, k) => { x.z = cf.__zh.eg[k]; }); }
+      const e = PV.confusable(cf.id);
+      if (e) {
+        (e.words || []).forEach((w, k) => { if (cf.words[k]) { if (w.m) cf.words[k].m = w.m; if (w.note) cf.words[k].note = w.note; } });
+        if (e.tip) cf.tip = e.tip;
+        (cf.eg || []).forEach((x, k) => { if (e.eg && e.eg[k]) x.z = e.eg[k]; });
+      }
+    } else if (cf.__zh) {
+      cf.words.forEach((w, k) => { w.m = cf.__zh.words[k].m; w.note = cf.__zh.words[k].note; }); cf.tip = cf.__zh.tip; (cf.eg || []).forEach((x, k) => { x.z = cf.__zh.eg[k]; });
+    }
+  });
 }
+function overlayEnglishContent(on) { return overlayForeignContent(on); }   // 相容舊名
 async function applyContentLang() {
-  const on = I18n.getLang() === 'en';
-  if (on) await loadContentEn();
-  overlayEnglishContent(on);
+  const on = I18n.isForeign();
+  if (on) await loadContentLang(I18n.getLang());
+  overlayForeignContent(on);
 }
-
+// 讀解/聽解題目(q/options/解說)依語言就地換(日文文章/音檔腳本不動)。
+//   en:reading-listening-en.js(RL_EN,鍵名 q_en/options_en/explanation_en);其他:reading-listening-<code>.js(RL_L10N[code],鍵名 q/options/explanation)
+function rlProvider() {
+  const lang = I18n.getLang();
+  if (lang === 'en') {
+    const E = window.RL_EN; if (!E) return null;
+    return { reading: id => (E.reading[id] || []).map(q => ({ q: q.q_en, options: q.options_en, explanation: q.explanation_en })), listening: id => { const e = E.listening[id]; return e ? { q: e.q_en, options: e.options_en } : null; } };
+  }
+  const P = window.RL_L10N && window.RL_L10N[lang]; if (!P) return null;
+  return { reading: id => P.reading[id] || [], listening: id => P.listening[id] || null };
+}
+function overlayReadingListening() {
+  const PV = rlProvider(); if (!PV) return;
+  try {
+    (window.READING_PASSAGES || []).forEach(function (p) {
+      var e = PV.reading(p.id);
+      if (e && e.length && p.questions) p.questions.forEach(function (q, i) { if (e[i] && e[i].q) { q.q = e[i].q; if (e[i].options) q.options = e[i].options; if (e[i].explanation) q.explanation = e[i].explanation; } });
+    });
+    (window.LISTENING_ITEMS || []).forEach(function (x) {
+      var e = PV.listening(x.id);
+      if (e && e.q) { x.q = e.q; if (e.options) x.options = e.options; }
+    });
+  } catch (_) {}
+}
+// 文法詳解依語言:外語時優先給 grammar-detail-<code>.js(GRAMMAR_DETAIL_L10N[code][id]),沒有就退回中文版(總比空白好)。
+function gdFor(id) {
+  try {
+    if (I18n.isForeign()) { const L = window.GRAMMAR_DETAIL_L10N && window.GRAMMAR_DETAIL_L10N[I18n.getLang()]; if (L && L[id]) return L[id]; }
+  } catch (_) {}
+  return window.GRAMMAR_DETAIL && window.GRAMMAR_DETAIL[id];
+}
+window.gdFor = gdFor;
 function applyI18n() {
   // 移除 EN 支援：若 localStorage 存的是 'en'，強制切回繁中
   if (!LANG_CYCLE.includes(I18n.getLang())) I18n.setLang('zh-TW');
+  // 語言下拉的選項由 I18n.LANGS 產(正本在 i18n.js,新增語言這裡不用動)
+  ['langSel', 'moreLangSel'].forEach(id => {
+    const sel = document.getElementById(id); if (!sel || sel.dataset.filled) return;
+    sel.innerHTML = I18n.LANGS.map(l => `<option value="${l.code}">${l.label}</option>`).join('');
+    sel.dataset.filled = '1';
+  });
   document.querySelectorAll('[data-i18n]').forEach(el => {
     el.textContent = t(el.dataset.i18n);
   });
@@ -5745,7 +5831,7 @@ async function setLangSel(next) {
   if (!next) return;
   const cur = I18n.getLang();
   if (next === cur) return;
-  if (next === 'en' || cur === 'en') { I18n.setLang(next); location.reload(); return; }
+  if (_isForeignCode(next) || _isForeignCode(cur)) { I18n.setLang(next); location.reload(); return; }
   if (next === 'zh-CN' && typeof ensureOpenCC === 'function' && !_tw2cn) { await ensureOpenCC(); }
   I18n.setLang(next);
   applyI18n();
@@ -5757,8 +5843,8 @@ async function cycleLang() {
   const cur = I18n.getLang();
   const idx = LANG_CYCLE.indexOf(cur);
   const next = LANG_CYCLE[(idx + 1) % LANG_CYCLE.length];
-  // 涉及 en 的切換:translate-layer 已就地改寫 DOM(不可逆),直接 reload 讓整頁以新語言重繪最乾淨。
-  if (next === 'en' || cur === 'en') { I18n.setLang(next); location.reload(); return; }
+  // 涉及外語的切換:translate-layer 已就地改寫 DOM(不可逆),直接 reload 讓整頁以新語言重繪最乾淨。
+  if (_isForeignCode(next) || _isForeignCode(cur)) { I18n.setLang(next); location.reload(); return; }
   const btn = document.getElementById('langBtn');
   if (next === 'zh-CN' && !_tw2cn) {
     if (btn) { btn.disabled = true; btn.textContent = '…'; }
@@ -5871,7 +5957,7 @@ initTheme();
 applyI18n();
 // 語言就緒旗標:zh-TW 立即可渲染;en/zh-CN 等英文疊層 / OpenCC 就緒(見下方 ready 區塊)。
 // fallback:萬一準備失敗,3 秒後強制放行,內容一定會出來(不會空白卡死)。
-window._langReady = (typeof I18n === 'undefined') || (I18n.getLang() !== 'en' && I18n.getLang() !== 'zh-CN');
+window._langReady = (typeof I18n === 'undefined') || (!I18n.isForeign() && I18n.getLang() !== 'zh-CN');
 setTimeout(function () { if (!window._langReady) { window._langReady = true; if (typeof doRender === 'function') doRender(); } }, 3000);
 
 // 一次性清理：舊版 cloud merge bug 造成 word_notebook 同 (w, lv) 累積重複
@@ -5907,20 +5993,9 @@ if(location.hash){const el=document.querySelector(location.hash);if(el&&el.class
 // 等內容資料就位（重訪通常立刻 resolve，首訪等 Firestore fetch）→ 餵 Listening/Reading items + 跑需要 vocab data 的遷移 + 重 render
 (typeof ContentLoader !== 'undefined' ? ContentLoader.ready() : Promise.resolve()).then(async () => {
   // lang=en:內容就位後先疊英文,再重繪讓文法/單字卡呈現英文(例句/解說)
-  if (I18n.getLang() === 'en') { try { await applyContentLang(); } catch (_) {} window._langReady = true; if (typeof doRender === 'function') doRender(); }
-  // lang=en:把 reading/listening 題目(q/options/解說)就地換成英文(日文文章/音檔腳本不動);由 reading-listening-en.js 提供
-  if (I18n.getLang() === 'en' && window.RL_EN) {
-    try {
-      (window.READING_PASSAGES || []).forEach(function (p) {
-        var e = window.RL_EN.reading[p.id];
-        if (e && p.questions) p.questions.forEach(function (q, i) { if (e[i]) { q.q = e[i].q_en; q.options = e[i].options_en; if (e[i].explanation_en) q.explanation = e[i].explanation_en; } });
-      });
-      (window.LISTENING_ITEMS || []).forEach(function (x) {
-        var e = window.RL_EN.listening[x.id];
-        if (e) { x.q = e.q_en; x.options = e.options_en; }
-      });
-    } catch (_) {}
-  }
+  if (I18n.isForeign()) { try { await applyContentLang(); } catch (_) {} window._langReady = true; if (typeof doRender === 'function') doRender(); }
+  // 外語:把 reading/listening 題目(q/options/解說)就地換成目標語(日文文章/音檔腳本不動)
+  if (I18n.isForeign()) overlayReadingListening();
   if (typeof Listening !== 'undefined' && Listening.setItems) Listening.setItems(window.LISTENING_ITEMS || []);
   if (typeof Reading !== 'undefined' && Reading.setPassages) Reading.setPassages((window.READING_PASSAGES || []).concat(window.READING_EXTRA || []));
 
@@ -5992,8 +6067,7 @@ function grammarDetailHTML(html) {
 function toggleDetail(btn) {
   var body = btn.nextElementSibling;
   var nowHidden = body.classList.toggle('gd-hidden');
-  var en = (typeof I18n !== 'undefined' && I18n.lang && I18n.lang() === 'en');
-  btn.textContent = (nowHidden ? '' + (en ? 'Deep dive' : '詳解') + ' ▾' : '' + (en ? 'Hide' : '收合詳解') + ' ▴');
+  btn.textContent = (nowHidden ? '' + enOr('詳解', 'Deep dive') + ' ▾' : '' + enOr('收合詳解', 'Hide') + ' ▴');
 }
 </script>
 <script src="vocab-distract.js"></script>
@@ -6031,7 +6105,10 @@ function toggleDetail(btn) {
   // 文法詳解 2026-10-24 改寫後變 1.8MB → 拆成每級一檔(grammar-detail-n5.js…),只載正在看的級別;不給級別 = 全部
   window.ensureGrammarDetail = function (lv) {
     var lvs = lv ? [String(lv).toLowerCase()] : ['n5', 'n4', 'n3', 'n2', 'n1'];
-    return Promise.all(lvs.map(function (l) { return one('grammar-detail-' + l + '.js'); }));
+    var jobs = lvs.map(function (l) { return one('grammar-detail-' + l + '.js'); });
+    // 外語:同時抓翻譯版(grammar-detail-<code>-<級>.js,每級一檔);沒有這檔就靜默退回中文(one() 失敗不 reject)
+    try { if (typeof I18n !== 'undefined' && I18n.isForeign()) lvs.forEach(function (l) { jobs.push(one('grammar-detail-' + I18n.getLang() + '-' + l + '.js')); }); } catch (e) {}
+    return Promise.all(jobs);
   };
   window.ensureVocabThemes = function () { return one('vocab-themes.js'); };
   // 背景預載:等頁面真的閒下來(或 6 秒後)再補,讓首次可互動時間不受影響
@@ -6042,10 +6119,18 @@ function toggleDetail(btn) {
   });
 })();
 </script>
-<script src="reading-listening-en.js"></script>
+<script>
+// 讀解/聽解翻譯檔依語言載(en → reading-listening-en.js;ko/vi/id/th → reading-listening-<code>.js);中文不載。
+// 同步寫入是為了保證在下方 reading.js / ContentLoader.ready 之前就位。
+(function(){ try { if (typeof I18n !== 'undefined' && I18n.isForeign()) document.write('<script src="reading-listening-' + I18n.getLang() + '.js"><\/script>'); } catch (e) {} })();
+</script>
 <script src="reading.js"></script>
 <script src="reading-extra.js"></script>
 <script src="articles.js"></script>
+<script>
+// ko/vi/id/th:短劇/おみくじ/敬語的翻譯(misc-<code>.js)與文章翻譯(articles-<code>.js)同步載入;英文資料本來就在各資料檔的 _en 欄
+(function(){ try { if (typeof I18n !== 'undefined' && I18n.isPacked()) { var c = I18n.getLang(); document.write('<script src="misc-' + c + '.js"><\/script><script src="articles-' + c + '.js"><\/script>'); } } catch (e) {} })();
+</script>
 <script src="grammar-words.js"></script>
 <script src="articles-ui.js"></script>
 <script src="skits-data.js"></script>
@@ -6090,8 +6175,8 @@ function toggleDetail(btn) {
     bar.id='iosAppBar';
     bar.style.cssText='position:sticky;top:0;z-index:390;background:#1D3557;color:#fff;font-size:13px;padding:9px 40px 9px 14px;text-align:center;line-height:1.5';
     var _ib=(function(){ try{ var l=localStorage.getItem('ui_lang')||'zh-TW';
-      if(l==='en') return ['<i data-ic=phone></i> iPhone users: <b>7-day free trial</b> of everything in the app (web offers only 3) ','Get the app →'];
       if(l==='zh-CN') return ['<i data-ic=phone></i> iPhone 用户:App 内<b>免费试用 7 天</b>全功能(网页只有 3 天) ','下载 App →'];
+      if(l!=='zh-TW') return ['<i data-ic=phone></i> '+I18n.pick('iPhone 用戶:App 內免費試用 7 天全功能(網頁只有 3 天)','iPhone users: 7-day free trial of everything in the app (web offers only 3)')+' ', I18n.pick('下載 App →','Get the app →')];
     }catch(e){} return ['<i data-ic=phone></i> iPhone 用戶:App 內<b>免費試用 7 天</b>全功能(網頁只有 3 天) ','下載 App →']; })();
     bar.innerHTML=_ib[0]
       +'<a href="https://apps.apple.com/app/id6778227353" style="color:#A8DADC;font-weight:700;text-decoration:underline">'+_ib[1]+'</a>'

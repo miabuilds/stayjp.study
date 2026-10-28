@@ -260,6 +260,7 @@
 <script src="icons.js"></script>
 <script src="ui-modal.js"></script>
 <script src="i18n.js"></script>
+<script src="translate-layer.js"></script>
 <script src="skits-data.js"></script>
 <script src="audio/tts/manifest.js"></script>
 <script src="speak-ruby.js"></script>
@@ -273,11 +274,11 @@
 let _tw2cn=null;
 function ensureOpenCC(){ return new Promise(function(res){ if(_tw2cn)return res(_tw2cn); if(window.OpenCC){ _tw2cn=OpenCC.Converter({from:'tw',to:'cn'}); if(I18n.setConverter)I18n.setConverter(_tw2cn); return res(_tw2cn);} var s=document.createElement('script'); s.src='https://cdn.jsdelivr.net/npm/opencc-js@1.0.5/dist/umd/full.js'; s.onload=function(){ _tw2cn=OpenCC.Converter({from:'tw',to:'cn'}); if(I18n.setConverter)I18n.setConverter(_tw2cn); res(_tw2cn); }; s.onerror=function(){res(null)}; document.head.appendChild(s); }); }
 function cvt(x){ return (!x||I18n.getLang()!=='zh-CN'||!_tw2cn)?x:_tw2cn(x); }
-function enOr(zh,en){ return I18n.getLang()==='en'?en:cvt(zh); }
+function enOr(zh,en){ return I18n.isForeign()?I18n.pick(zh,en):cvt(zh); }   // en 回英文;ko/vi/id/th 查語言包、查不到退英文
 function cvtStaticUI(root){ if(I18n.getLang()!=='zh-CN')return; var el=typeof root==='string'?document.getElementById(root):root; if(!el)return; if(!_tw2cn){ ensureOpenCC().then(function(){cvtStaticUI(el)}); return; } var kana=/[ぁ-ゖァ-ヺー]/; var w=document.createTreeWalker(el,NodeFilter.SHOW_TEXT); var list=[],n; while((n=w.nextNode()))list.push(n); list.forEach(function(node){ if(kana.test(node.nodeValue))return; var c=_tw2cn(node.nodeValue); if(c!==node.nodeValue)node.nodeValue=c; }); }
 if(I18n.getLang()==='zh-CN') ensureOpenCC();
 
-// 靜態 UI 三語:en 直接換字;zh-CN 等 OpenCC 載好後整頁轉簡(kana 內容跳過)
+// 靜態 UI 多語:en 直接換字;zh-CN 等 OpenCC 載好後整頁轉簡(kana 內容跳過);ko/vi/id/th 靜態繁中交給 translate-layer.js,這裡只換 title
 (function initUILang(){
   var L = I18n.getLang();
   if(L==='en'){
@@ -299,6 +300,8 @@ if(I18n.getLang()==='zh-CN') ensureOpenCC();
   } else if(L==='zh-CN'){
     var _cvT=setInterval(function(){ if(_tw2cn){ clearInterval(_cvT); document.title=_tw2cn(document.title); cvtStaticUI(document.body); } },120);
     setTimeout(function(){ clearInterval(_cvT); },15000);
+  } else if(I18n.isPacked()){
+    document.title = I18n.pick('AI 跟讀練習','AI Speaking Practice') + ' | StayJP';
   }
 })();
 

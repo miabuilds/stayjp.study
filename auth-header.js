@@ -158,10 +158,11 @@
       sel.className = 'ahx-btn';
       sel.style.padding = '5px 22px 5px 10px';
       sel.setAttribute('aria-label', '切換語言 / Language');
-      [['zh-TW', '繁體'], ['zh-CN', '简体'], ['en', 'EN']].forEach(function (o) {
+      // 選項正本在 i18n.js 的 I18n.LANGS(繁/简/EN/한국어/Tiếng Việt/Indonesia/ไทย)
+      (I18n.LANGS || [{ code: 'zh-TW', label: '繁體' }, { code: 'zh-CN', label: '简体' }, { code: 'en', label: 'EN' }]).forEach(function (o) {
         var op = document.createElement('option');
-        op.value = o[0]; op.textContent = o[1];
-        if (o[0] === cur) op.selected = true;
+        op.value = o.code; op.textContent = o.label;
+        if (o.code === cur) op.selected = true;
         sel.appendChild(op);
       });
       // 選了就 reload：讓 dict 字串與 translate-layer(en) 重新套用（en/zh-TW 全頁生效）。
@@ -223,7 +224,7 @@
         }
       } catch (e) {}
       var upLink = (!_wl && !_prem && !(window.STAYJP_NATIVE && window.STAYJP_NATIVE.isNativeApp))
-        ? '<a id="ahxUpLink" href="pricing.html" style="font-size:12px;font-weight:700;color:var(--ac,#d4654a);text-decoration:none;margin-right:8px;border:1px solid var(--ac,#d4654a);border-radius:20px;padding:4px 10px;white-space:nowrap">' + (function(){ try{ var l=localStorage.getItem('ui_lang')||'zh-TW'; return l==='en'?'Upgrade':(l==='zh-CN'?'升级':'升級'); }catch(e){ return '升級'; } })() + '</a>' : '';
+        ? '<a id="ahxUpLink" href="pricing.html" style="font-size:12px;font-weight:700;color:var(--ac,#d4654a);text-decoration:none;margin-right:8px;border:1px solid var(--ac,#d4654a);border-radius:20px;padding:4px 10px;white-space:nowrap">' + (function(){ try{ var l=localStorage.getItem('ui_lang')||'zh-TW'; return (typeof I18n!=='undefined'&&I18n.isForeign&&I18n.isForeign())?I18n.pick('升級','Upgrade'):(l==='zh-CN'?'升级':'升級'); }catch(e){ return '升級'; } })() + '</a>' : '';
       area.innerHTML = upLink +
         '<button class="ahx-btn" id="ahxMenuBtn" type="button">' + img + '<span class="ahx-name">' + name + '</span> ▾</button>' +
         '<div class="ahx-menu" id="ahxMenu">' +

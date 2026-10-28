@@ -42,9 +42,11 @@
     st.id = 'auiStyle'; st.textContent = CSS;
     document.head.appendChild(st);
   }
-  function isEn() {
-    try { return (window.I18n && I18n.getLang && I18n.getLang() === 'en'); } catch (e) { return false; }
+  // 外語(en/ko/vi/id/th)→ I18n.pick(zh,en);中文原樣(簡中由 cvtStaticUI 轉)
+  function isFg() {
+    try { return !!(window.I18n && I18n.isForeign && I18n.isForeign()); } catch (e) { return false; }
   }
+  function pk(zh, en) { try { return isFg() ? ((window.I18n && I18n.pick) ? I18n.pick(zh, en) : en) : zh; } catch (e) { return zh; } }
   const MASCOT = { info: 'images/mascot/tanuki-p07.png', warn: 'images/mascot/tanuki-p12.png', cheer: 'images/mascot/tanuki-p06.png' };
 
   // opts: { title, tone: 'info'|'warn'|'cheer', okText, cancelText, mascot:boolean }
@@ -82,12 +84,12 @@
       const done = (v) => { try { document.removeEventListener('keydown', onKey); } catch (e) {} mask.remove(); resolve(v); };
       if (withCancel) {
         const c = document.createElement('button'); c.className = 'aui-btn';
-        c.textContent = opts.cancelText || (isEn() ? 'Cancel' : '取消');
+        c.textContent = opts.cancelText || pk('取消', 'Cancel');
         c.onclick = () => done(false);
         btns.appendChild(c);
       }
       const ok = document.createElement('button'); ok.className = 'aui-btn pri';
-      ok.textContent = opts.okText || (withCancel ? (isEn() ? 'OK' : '確定') : (isEn() ? 'OK' : '知道了'));
+      ok.textContent = opts.okText || (withCancel ? pk('確定', 'OK') : pk('知道了', 'OK'));
       ok.onclick = () => done(true);
       btns.appendChild(ok);
       card.appendChild(btns);

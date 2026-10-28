@@ -684,7 +684,9 @@
 <script>
   function setLang(l){ document.body.setAttribute('data-lang', l); document.documentElement.lang = l==='en'?'en':'zh-Hant'; try{ localStorage.setItem('stayjp_about_lang', l); }catch(e){} }
   function toggleLang(){ setLang(document.body.getAttribute('data-lang')==='zh'?'en':'zh'); }
-  (function(){ var s; try{ s=localStorage.getItem('stayjp_about_lang'); }catch(e){} setLang(s || ((navigator.language||'').toLowerCase().indexOf('zh')===0?'zh':'en')); })();
+  (function(){ var u=null, s=null; try{ u=localStorage.getItem('ui_lang'); s=localStorage.getItem('stayjp_about_lang'); }catch(e){}
+    // 以全站 ui_lang 為準:en → 英文層;zh-*/ko/vi/id/th → 繁中層(外語由 translate-layer 換字);沒設過才退回舊 key / 瀏覽器語言
+    if(u) setLang(u==='en'?'en':'zh'); else setLang(s || ((navigator.language||'').toLowerCase().indexOf('zh')===0?'zh':'en')); })();
   // 排程條目:data-pub(ISO 時間)到了才顯示;下次更新時間依「每週一 08:00 / 每月 1 號」推算
   (function(){
     var now=Date.now();
@@ -706,5 +708,6 @@
   })();
 </script>
 <script src="i18n.js"></script>
+<script src="translate-layer.js"></script>
 </body>
 </html>

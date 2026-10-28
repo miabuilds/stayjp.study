@@ -27,6 +27,8 @@ const KeigoQuiz = (() => {
   let mode = "plain2keigo", kind = "both";
   const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
   const eo = (zh, en) => (typeof enOr === "function" ? enOr(zh, en) : zh);
+  // 動詞意思:ko/vi/id/th 由 misc-<code>.js(MISC_L10N[lang].keigo[動詞])覆蓋英文欄,查不到退英文;en 直接用 e
+  const meanOf = en => { try { if (typeof I18n !== "undefined" && I18n.isPacked && I18n.isPacked() && window.MISC_L10N) { const k = MISC_L10N[I18n.getLang()]; const m = k && k.keigo && k.keigo[en.p]; if (m) return m; } } catch (e) {} return en.e; };
   const typeZhEn = ty => ty === "sonkei" ? ["尊敬語", "Respectful"] : ["謙譲語", "Humble"];
 
   function start() {
@@ -76,13 +78,13 @@ const KeigoQuiz = (() => {
       KEIGO.forEach(o => { if (o !== en && o[ty]) o[ty].forEach(f => others.push(f)); });
       const distractors = shuffle(others).filter(f => f[0] !== correct[0]).slice(0, 3);
       const options = shuffle([correct, ...distractors]);
-      return { jp: en.p, meanZh: en.z, meanEn: en.e, tyZh, tyEn, dir: "toKeigo", options, correctIdx: options.indexOf(correct), answer: correct };
+      return { jp: en.p, meanZh: en.z, meanEn: meanOf(en), tyZh, tyEn, dir: "toKeigo", options, correctIdx: options.indexOf(correct), answer: correct };
     } else {
       const kf = en[ty][0];
       const correct = [en.p, en.pr];
       const others = KEIGO.filter(o => o !== en).map(o => [o.p, o.pr]);
       const options = shuffle([correct, ...shuffle(others).slice(0, 3)]);
-      return { jp: kf[0], meanZh: en.z, meanEn: en.e, tyZh, tyEn, dir: "toPlain", options, correctIdx: options.indexOf(correct), answer: correct };
+      return { jp: kf[0], meanZh: en.z, meanEn: meanOf(en), tyZh, tyEn, dir: "toPlain", options, correctIdx: options.indexOf(correct), answer: correct };
     }
   }
 

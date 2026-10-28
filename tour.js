@@ -4,7 +4,8 @@
 // 觸發:新手選完程度後;重看:更多選單「🧭 功能導覽」、? 快速上手裡的按鈕。
 (function () {
   if (window.Tour) return;
-  function _en(zh, en) { try { var l = (typeof I18n !== 'undefined' && I18n.getLang) ? I18n.getLang() : (localStorage.getItem('ui_lang') || 'zh-TW'); if (l === 'en') return en; return (typeof cvt === 'function') ? cvt(zh) : zh; } catch (e) { return zh; } }
+  // 外語(en/ko/vi/id/th)→ I18n.pick(zh,en);中文 → cvt(繁/簡)
+  function _en(zh, en) { try { var fg = (typeof I18n !== 'undefined' && I18n.isForeign) ? I18n.isForeign() : ['en', 'ko', 'vi', 'id', 'th'].indexOf(localStorage.getItem('ui_lang')) >= 0; if (fg) return (typeof I18n !== 'undefined' && I18n.pick) ? I18n.pick(zh, en) : en; return (typeof cvt === 'function') ? cvt(zh) : zh; } catch (e) { return zh; } }
   var DONE_KEY = 'tour_done_v1';
   var steps = [
     { sel: '#hdBar',      t: _en('切級別・切內容','Level & content'), d: _en('這裡選 N5–N1 程度,切換「文法 / 單字」。點 ★ 只看收藏。','Pick your N5–N1 level and switch between Grammar / Vocabulary. Tap ★ to see favorites only.'), pos: 'below' },

@@ -97,10 +97,31 @@ window.Articles = (function () {
   function famSize(a) { return family(a).length; }
   function bandPref() { try { return localStorage.getItem('art_band') || ''; } catch (e) { return ''; } }
   // 三語:en→英文;zh-CN→OpenCC 轉簡(cvt);zh-TW→原樣繁體
-  function enOr(zh, en) { try { var l = (typeof I18n !== 'undefined' && I18n.getLang) ? I18n.getLang() : (localStorage.getItem('ui_lang') || 'zh-TW'); if (l === 'en') return en; return (typeof cvt === 'function') ? cvt(zh) : zh; } catch (e) { return zh; } }
+  // 多語(見 docs/i18n-multilang.md):外語(en/ko/vi/id/th)硬編字串走 I18n.pick;中文走 cvt
+  function enOr(zh, en) { try { if (typeof I18n !== 'undefined' && I18n.isForeign && I18n.isForeign()) return I18n.pick(zh, en); return (typeof cvt === 'function') ? cvt(zh) : zh; } catch (e) { return zh; } }
   function zc(s) { try { return (typeof cvt === 'function') ? cvt(s) : s; } catch (e) { return s; } }   // 中文內容(中譯/意思):簡中轉簡,其餘原樣
-  function isEn() { try { return ((typeof I18n !== 'undefined' && I18n.getLang) ? I18n.getLang() : localStorage.getItem('ui_lang')) === 'en'; } catch (e) { return false; } }
-  function Lc(zh, en) { return isEn() ? (en || zh) : zc(zh); }   // 內容三語:en→英文;繁→原樣;簡→cvt
+  // isEn = 「外語介面」:en 讀資料的 _en 欄;ko/vi/id/th 由下方 overlayArticlesL10n() 把 _en 欄就地覆蓋成目標語,所以同樣讀 _en 欄
+  function isEn() { try { return !!((typeof I18n !== 'undefined' && I18n.isForeign) ? I18n.isForeign() : (['en', 'ko', 'vi', 'id', 'th'].indexOf(localStorage.getItem('ui_lang')) >= 0)); } catch (e) { return false; } }
+  function Lc(zh, en) { return isEn() ? (en || zh) : zc(zh); }   // 內容多語:外語→_en 欄(ko 等已覆蓋成目標語);繁→原樣;簡→cvt
+  // ko/vi/id/th:articles-<code>.js(window.ARTICLES_L10N[code] = {id:{title,topic,trans,vocab:[m],grammar:[{t,note}]}})
+  // 把每篇的 title_en/topic_en/trans_en/vocab[].m_en/grammar[].t_en/note_en 覆蓋成目標語,渲染碼不用分語言。沒翻到的篇保留英文。
+  function overlayArticlesL10n() {
+    try {
+      if (!(typeof I18n !== 'undefined' && I18n.isPacked && I18n.isPacked())) return;
+      var L = window.ARTICLES_L10N && window.ARTICLES_L10N[I18n.getLang()]; if (!L) return;
+      (window.ARTICLES || []).forEach(function (a) {
+        var o = L[a.id]; if (!o || a.__l10n === I18n.getLang()) return;
+        a.__l10n = I18n.getLang();
+        if (o.title) a.title_en = o.title;
+        if (o.topic) a.topic_en = o.topic;
+        if (Array.isArray(o.trans) && o.trans.length === (a.trans || []).length) a.trans_en = o.trans;
+        (a.vocab || []).forEach(function (v, i) { if (o.vocab && o.vocab[i]) v.m_en = o.vocab[i]; });
+        (a.grammar || []).forEach(function (g, i) { var t = o.grammar && o.grammar[i]; if (t) { if (t.t) g.t_en = t.t; if (t.note) g.note_en = t.note; } });
+      });
+    } catch (e) {}
+  }
+  overlayArticlesL10n();
+  window.overlayArticlesL10n = overlayArticlesL10n;
   function esc(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
   function readSet() { try { return JSON.parse(localStorage.getItem('article_read')) || {}; } catch (e) { return {}; } }
   function markRead(id) { var s = readSet(); s[id] = Date.now(); localStorage.setItem('article_read', JSON.stringify(s)); if (typeof saveAllCloud === 'function') try { saveAllCloud(); } catch (e) {} }
@@ -1281,14 +1302,15 @@ window.Articles = (function () {
     if (!hidden && !body.innerHTML && !(window.GRAMMAR_DETAIL && window.GRAMMAR_DETAIL[id]) && window.ensureGrammarDetail) {
       window.ensureGrammarDetail(String(id).split('-')[0]).then(function () {   // 詳解每級一檔,依 id 的級別載
         if (body.classList.contains('art-hidden') || body.innerHTML) return;   // 使用者已收合/內容已填 → 不動
-        var d = window.GRAMMAR_DETAIL && window.GRAMMAR_DETAIL[id];
+        var d = window.gdFor ? window.gdFor(id) : (window.GRAMMAR_DETAIL && window.GRAMMAR_DETAIL[id]);
         if (!d) return;
         var inner2 = (typeof grammarDetailHTML === 'function') ? grammarDetailHTML(d) : d;
         body.innerHTML = '<div class="gd-body" style="display:block;margin-top:10px">' + inner2 + '</div>';
       });
     }
     if (!hidden && !body.innerHTML && window.GRAMMAR_DETAIL && window.GRAMMAR_DETAIL[id]) {
-      var inner = (typeof grammarDetailHTML === 'function') ? grammarDetailHTML(window.GRAMMAR_DETAIL[id]) : window.GRAMMAR_DETAIL[id];
+      var _gd = window.gdFor ? window.gdFor(id) : window.GRAMMAR_DETAIL[id];   // 外語優先給翻譯版(app.html gdFor)
+      var inner = (typeof grammarDetailHTML === 'function') ? grammarDetailHTML(_gd) : _gd;
       body.innerHTML = '<div class="gd-body" style="display:block;margin-top:10px">' + inner + '</div>';
     }
     btn.textContent = hidden ? '' + enOr('看完整詳解', 'Full explanation') + ' ▾' : enOr('收合', 'Hide') + ' ▴';

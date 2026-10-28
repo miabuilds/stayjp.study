@@ -155,11 +155,12 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <script src="i18n.js"></script>
+<script src="translate-layer.js"></script>
 <script>
 // 看日文猜單字(2026-10-18,用戶回饋:想要「簡單日文解釋 → 填上對應單字」,可手打/選項/拆字選填)。
 // 解釋資料 jdef-n5.js…jdef-n1.js 由 scripts/gen-jdef.mjs 產(N5/N4 只用 N5–N4 字,N3 以上放寬到 N3 程度)。照做題規則:作答→送出→詳解→自己按下一題。
 // 付費牆同 jlpt-drill.html:免費每日 1 輪(錯題本不算),Premium/試用/白名單無限。
-function enOr(zh,en){ try{ return I18n.getLang()==='en'?en:zh; }catch(e){ return zh; } }
+function enOr(zh,en){ try{ return I18n.isForeign()?I18n.pick(zh,en):zh; }catch(e){ return zh; } }   // en 英文;ko/vi/id/th 查語言包、查不到退英文;中文原樣(本頁無 OpenCC)
 function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
 const hira = s => String(s||'').replace(/[ァ-ヶ]/g, c => String.fromCharCode(c.charCodeAt(0)-0x60));
 const clean = s => String(s||'').replace(/[〜～\s　]/g,'');
@@ -444,7 +445,9 @@ $('btnRetryWrong').onclick=()=>{ show('vHome'); renderHome(); $('btnWrong').oncl
 $('btnHome').onclick=()=>{ show('vHome'); renderHome(); };
 
 function applyStatic(){
-  if(enOr(0,1)!==1) return;
+  // 靜態繁中:en 在這裡逐項換字;ko/vi/id/th 交給 translate-layer.js,只換 title
+  if(I18n.isPacked()){ document.title=I18n.pick('看日文猜單字','Guess the Word')+' | StayJP'; return; }
+  if(I18n.getLang()!=='en') return;
   $('tBack').textContent='Back'; $('tTitle').textContent='Guess the Word'; $('tSub').textContent='Read a short definition in easy Japanese and guess the word. Switch to all-kana if the kanji are hard.';
   $('tLv').textContent='Level'; $('tMode').textContent='Answer mode'; $('tFoot').textContent='Study tools';
   const m={ '選擇':'Choice','四選一':'Pick 1 of 4','拼字':'Tiles','點假名拼出來':'Tap the kana','打字':'Type','自己打出讀音':'Type the reading' };

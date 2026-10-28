@@ -17,7 +17,11 @@ const Listening = (() => {
   // ── item bank ──
   let items = window.LISTENING_ITEMS || [];
   // lang=en:題目/選項就地換英文(reading-listening-en.js;日文音檔腳本不動)
+  // _rlEn:只有 en 才有 RL_EN(q_en/options_en)疊層;ko/vi/id/th 的 q/options 已由 app.html 在 setItems 前就地覆蓋
   function _rlEn() { try { return localStorage.getItem('ui_lang') === 'en'; } catch (e) { return false; } }
+  // _fg:任一外語(en/ko/vi/id/th)→ 類型標籤走 I18n.pick、停用日文題幹模式
+  function _fg() { try { return (typeof I18n !== 'undefined' && I18n.isForeign) ? I18n.isForeign() : ['en', 'ko', 'vi', 'id', 'th'].indexOf(localStorage.getItem('ui_lang')) >= 0; } catch (e) { return false; } }
+  function _typeLabel(t) { try { return (_fg() && typeof I18n !== 'undefined' && I18n.pick) ? I18n.pick(t, _TYPE_EN[t] || t) : t; } catch (e) { return t; } }
   var _TYPE_EN = { '日常会話': 'Everyday conversation', 'お知らせ': 'Announcement', 'メール': 'Email', '説明文': 'Explanatory text', '新聞記事風': 'News-style article', 'エッセイ': 'Essay', '短い会話': 'Short conversation', '説明を聞く': 'Listen to an explanation', '単語聞き取り': 'Word listening' };
   function setItems(arr) {
     items = arr || [];
@@ -60,7 +64,7 @@ const Listening = (() => {
     }
   }
   function _en(zh, en) { try { return (typeof enOr === 'function') ? enOr(zh, en) : zh; } catch (e) { return zh; } }
-  function _useJp(item) { return jpMode && !_rlEn() && item && item.qj && Array.isArray(item.oj) && item.oj.length === 4; }
+  function _useJp(item) { return jpMode && !_fg() && item && item.qj && Array.isArray(item.oj) && item.oj.length === 4; }
   function _fr(t) { try { return (window.furiganaHTMLRich || window.furiganaHTML) ? (window.furiganaHTMLRich || window.furiganaHTML)(t) : t; } catch (e) { return t; } }
   function _qText(item) { return _useJp(item) ? _fr(item.qj) : item.q; }
   function _optList(item) { return _useJp(item) ? item.oj.map(_fr) : item.options; }
@@ -222,7 +226,7 @@ const Listening = (() => {
       <div class="qhd">
         <span style="display:flex;align-items:center;gap:6px">
           <span class="cf-lv">${currentItem.level.toUpperCase()}</span>
-          <span style="font-size:12px">${currentItem.type}</span>
+          <span style="font-size:12px">${_typeLabel(currentItem.type)}</span>
           <span style="font-size:11px;color:var(--tx3)">${idx + 1} / ${queue.length}</span>
         </span>
         <span style="display:flex;align-items:center;gap:6px">
@@ -350,7 +354,7 @@ const Listening = (() => {
       <div class="qscore ${cls}">${score} / ${total} (${pct}%)</div>
       <div style="font-size:13px;color:var(--tx2);margin-bottom:8px">${selectedLevel.toUpperCase()} | ${practiceMode ? t('ls_mode_practice') : t('ls_mode_test')}</div>
       <div class="qresults">${answered.map(a =>
-        '<div class="qr ' + (a.correct ? 'ok' : 'ng') + '"><span class="qrc">' + (a.correct ? '<i data-ic=check></i>' : '<i data-ic=x></i>') + '</span><span>' + a.q + '</span><span style="font-size:11px;color:var(--tx3);margin-left:auto">' + a.type + '</span></div>'
+        '<div class="qr ' + (a.correct ? 'ok' : 'ng') + '"><span class="qrc">' + (a.correct ? '<i data-ic=check></i>' : '<i data-ic=x></i>') + '</span><span>' + a.q + '</span><span style="font-size:11px;color:var(--tx3);margin-left:auto">' + _typeLabel(a.type) + '</span></div>'
       ).join('')}</div>
       <div class="qactions">
         <button class="qstart" onclick="Listening.begin()">下一組</button>

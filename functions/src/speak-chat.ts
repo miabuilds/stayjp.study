@@ -26,9 +26,9 @@ const LEVEL_DESC: Record<string, string> = {
 
 // 使用者介面語言 → 給模型的譯文/提點語言指示(繁中預設;簡中/英文跟著 UI)
 function langName(lang?: string): string {
-  if (lang === "zh-CN") return "簡體中文";
-  if (lang === "en") return "English";
-  return "繁體中文";
+  // 前端 ui_lang 七碼(正本 i18n.js LANGS):zh-TW / zh-CN / en / ko / vi / id / th
+  const MAP: Record<string, string> = { "zh-CN": "簡體中文", en: "English", ko: "한국어(Korean)", vi: "Tiếng Việt(Vietnamese)", id: "Bahasa Indonesia(Indonesian)", th: "ภาษาไทย(Thai)" };
+  return (lang && MAP[lang]) || "繁體中文";
 }
 
 function chatSystem(sceneDesc: string, level: string, lang?: string, userRole?: string): string {

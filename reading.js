@@ -16,7 +16,11 @@ const Reading = (() => {
   // ── passage bank ──
   let passages = window.READING_PASSAGES || [];
   // lang=en:題目/選項/解說就地換英文(reading-listening-en.js 提供;日文文章不動)。放在資料必經漏斗,免受載入時機影響。
+  // _rlEn:只有 en 才有 RL_EN(q_en/options_en/explanation_en)疊層;ko/vi/id/th 的題目已由 app.html 在 setPassages 前就地覆蓋
   function _rlEn() { try { return localStorage.getItem('ui_lang') === 'en'; } catch (e) { return false; } }
+  // _fg:任一外語(en/ko/vi/id/th)→ 類型標籤走 I18n.pick
+  function _fg() { try { return (typeof I18n !== 'undefined' && I18n.isForeign) ? I18n.isForeign() : ['en', 'ko', 'vi', 'id', 'th'].indexOf(localStorage.getItem('ui_lang')) >= 0; } catch (e) { return false; } }
+  function _typeLabel(t) { try { return (_fg() && typeof I18n !== 'undefined' && I18n.pick) ? I18n.pick(t, _TYPE_EN[t] || t) : t; } catch (e) { return t; } }
   var _TYPE_EN = { '日常会話': 'Everyday conversation', 'お知らせ': 'Announcement', 'メール': 'Email', '説明文': 'Explanatory text', '新聞記事風': 'News-style article', 'エッセイ': 'Essay', '短い会話': 'Short conversation', '説明を聞く': 'Listen to an explanation', '単語聞き取り': 'Word listening' };
   function setPassages(arr) {
     passages = arr || [];
@@ -182,7 +186,7 @@ const Reading = (() => {
       <div class="qhd">
         <span style="display:flex;align-items:center;gap:6px">
           <span class="cf-lv">${p.level.toUpperCase()}</span>
-          <span>${p.type}</span>
+          <span>${_typeLabel(p.type)}</span>
         </span>
         <span style="display:flex;align-items:center;gap:8px">
           ${timerEnabled ? '<span id="rdTimer" style="font-variant-numeric:tabular-nums">0:00</span>' : ''}

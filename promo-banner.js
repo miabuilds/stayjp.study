@@ -173,7 +173,7 @@
   function openNativePaywall() {
     try {
       if (window.ReactNativeWebView && window.ReactNativeWebView.postMessage) {
-        var lng = (window.localStorage && localStorage.getItem('ui_lang')) || 'zh-TW';
+        var lng = (typeof I18n !== 'undefined' && I18n.getLang) ? I18n.getLang() : ((window.localStorage && localStorage.getItem('ui_lang')) || 'zh-TW');
         window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'OPEN_PAYWALL', lang: lng }));
       }
     } catch (e) {}

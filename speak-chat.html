@@ -309,6 +309,7 @@
 <script src="icons.js"></script>
 <script src="ui-modal.js"></script>
 <script src="i18n.js"></script>
+<script src="translate-layer.js"></script>
 <script src="conjugate.js" defer></script>
 <script src="grammar-kanji-readings.js" defer></script>
 <script src="vocab-n5.js" defer></script>
@@ -328,11 +329,11 @@ document.addEventListener('DOMContentLoaded', function () {
 <script src="fav-sents.js"></script>
 <script src="tutor.js"></script>
 <script>
-// ── 三語 shim:cvt(OpenCC 繁→簡)+ enOr(en 用英文,否則 cvt)──
+// ── 多語 shim:cvt(OpenCC 繁→簡)+ enOr(外語用 I18n.pick:en 英文、ko/vi/id/th 查語言包退英文;中文 cvt)──
 let _tw2cn=null;
 function ensureOpenCC(){ return new Promise(function(res){ if(_tw2cn)return res(_tw2cn); if(window.OpenCC){ _tw2cn=OpenCC.Converter({from:'tw',to:'cn'}); if(I18n.setConverter)I18n.setConverter(_tw2cn); return res(_tw2cn);} var s=document.createElement('script'); s.src='https://cdn.jsdelivr.net/npm/opencc-js@1.0.5/dist/umd/full.js'; s.onload=function(){ _tw2cn=OpenCC.Converter({from:'tw',to:'cn'}); if(I18n.setConverter)I18n.setConverter(_tw2cn); res(_tw2cn); }; s.onerror=function(){res(null)}; document.head.appendChild(s); }); }
 function cvt(x){ return (!x||I18n.getLang()!=='zh-CN'||!_tw2cn)?x:_tw2cn(x); }
-function enOr(zh,en){ return I18n.getLang()==='en'?en:cvt(zh); }
+function enOr(zh,en){ return I18n.isForeign()?I18n.pick(zh,en):cvt(zh); }
 function cvtStaticUI(root){ if(I18n.getLang()!=='zh-CN')return; var el=typeof root==='string'?document.getElementById(root):root; if(!el)return; if(!_tw2cn){ ensureOpenCC().then(function(){cvtStaticUI(el)}); return; } var kana=/[ぁ-ゖァ-ヺー]/; var w=document.createTreeWalker(el,NodeFilter.SHOW_TEXT); var list=[],n; while((n=w.nextNode()))list.push(n); list.forEach(function(node){ if(kana.test(node.nodeValue))return; var c=_tw2cn(node.nodeValue); if(c!==node.nodeValue)node.nodeValue=c; }); }
 if(I18n.getLang()==='zh-CN') ensureOpenCC();
 
@@ -523,8 +524,7 @@ function openCreate(){
 }
 function cfFill(i,btn){
   const x=CF_EX[i]; if(!x) return;
-  const en=I18n.getLang()==='en';
-  const set=(id,zh,e)=>{ const el=document.getElementById(id); if(el) el.value=en?e:cvt(zh); };
+  const set=(id,zh,e)=>{ const el=document.getElementById(id); if(el) el.value=enOr(zh,e); };   // 外語:語言包有就用、沒有退英文範例
   set('cfPlace',x.place,x.placeE); set('cfMe',x.me,x.meE); set('cfThem',x.them,x.themE); set('cfFocus',x.focus,x.focusE);
   document.querySelectorAll('.cf-chip').forEach(b=>b.classList.toggle('on',b===btn));
   const pf=document.getElementById('cfPlaceF'); if(pf) pf.classList.remove('bad');
@@ -1283,10 +1283,11 @@ document.addEventListener('input',e=>{
 });
 document.addEventListener('keydown',e=>{ if(e.target && e.target.id==='say' && e.key==='Enter' && !e.shiftKey){ e.preventDefault(); sendMine(); } });
 
-// ── 靜態 UI 三語:en 逐項換字、zh-CN 走 OpenCC 整頁轉(非同步,自帶重試)──
+// ── 靜態 UI 多語:en 逐項換字、zh-CN 走 OpenCC 整頁轉(非同步,自帶重試);ko/vi/id/th 靜態繁中交給 translate-layer.js,這裡只換 title ──
 (function initStaticI18n(){
   const L=I18n.getLang();
   if(L==='zh-CN'){ document.title='AI 情境对话｜StayJP 日本再留计划'; cvtStaticUI(document.body); return; }
+  if(I18n.isPacked()){ document.title=I18n.pick('AI 情境對話','AI Conversation')+' | StayJP'; return; }
   if(L!=='en') return;
   document.title='AI Conversation | StayJP';
   const q=s=>document.querySelector(s);

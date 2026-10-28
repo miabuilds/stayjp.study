@@ -16,7 +16,9 @@
     try { root.speak(jp); } catch (e) {}
   }
   function lang() { try { return (typeof I18n !== 'undefined' && I18n.getLang) ? I18n.getLang() : (localStorage.getItem('ui_lang') || 'zh-TW'); } catch (e) { return 'zh-TW'; } }
-  function L(zh, en) { var l = lang(); if (l === 'en') return en; try { return (l === 'zh-CN' && typeof cvt === 'function') ? cvt(zh) : zh; } catch (e) { return zh; } }
+  function isFg() { try { return (typeof I18n !== 'undefined' && I18n.isForeign) ? I18n.isForeign() : ['en', 'ko', 'vi', 'id', 'th'].indexOf(lang()) >= 0; } catch (e) { return false; } }
+  // 外語(en/ko/vi/id/th)→ I18n.pick(zh,en);簡中 → cvt;繁中原樣
+  function L(zh, en) { if (isFg()) { try { return (typeof I18n !== 'undefined' && I18n.pick) ? I18n.pick(zh, en) : en; } catch (e) { return en; } } var l = lang(); try { return (l === 'zh-CN' && typeof cvt === 'function') ? cvt(zh) : zh; } catch (e) { return zh; } }
   function esc(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
   function $(id) { return document.getElementById(id); }
   function cleanText(el) {
@@ -153,7 +155,7 @@
   function cannedText(key) {
     var o = CANNED[key]; if (!o) return '';
     var l = lang();
-    if (l === 'en') return o.en;
+    if (isFg()) { try { return (typeof I18n !== 'undefined' && I18n.pick) ? I18n.pick(o.zh, o.en) : o.en; } catch (e) { return o.en; } }   // 外語:對照表沒整段 → 退英文
     if (l !== 'zh-CN' || typeof cvt !== 'function') return o.zh;
     return o.zh.split('\n').map(function (ln) {
       return /[\u3041-\u3096\u30a1-\u30fa\u30fc]/.test(ln) ? ln : cvt(ln);
@@ -263,7 +265,7 @@
   function isNative() { try { return !!(root.STAYJP_NATIVE && root.STAYJP_NATIVE.isNativeApp && root.ReactNativeWebView); } catch (e) { return false; } }
   // App 內:交給原生登入選單(Google / Apple 都有;WebView 裡網頁 OAuth 會被擋)
   root.__tutorNativeLogin = function () {
-    try { root.ReactNativeWebView.postMessage(JSON.stringify({ type: 'OPEN_LOGIN', lang: (localStorage.getItem('ui_lang') || 'zh-TW') })); } catch (e) {}
+    try { root.ReactNativeWebView.postMessage(JSON.stringify({ type: 'OPEN_LOGIN', lang: lang() })); } catch (e) {}
   };
   function needLogin() {
     var html = L('先登入,就能請小狸解析這句。', 'Sign in to ask the tutor about this sentence.') + ' ';

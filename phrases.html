@@ -562,10 +562,13 @@ function setLang(l){ document.body.setAttribute('data-lang', l); document.docume
 function toggleLang(){ setLang(document.body.getAttribute('data-lang')==='zh'?'en':'zh'); }
 render();
 (function(){ try{ var anyA=SCENES.some(function(sc){return sc.lines.some(function(l){return window.__TTS&&window.__TTS[l.jp];});}); var h=document.querySelector(".hint"); if(h&&!anyA) h.style.display="none"; }catch(e){} })();
-(function(){ var s; try{s=localStorage.getItem('stayjp_about_lang');}catch(e){} setLang(s || ((navigator.language||'').toLowerCase().indexOf('zh')===0?'zh':'en')); })();
+(function(){ var u=null, s=null; try{ u=localStorage.getItem('ui_lang'); s=localStorage.getItem('stayjp_about_lang'); }catch(e){}
+// 以全站 ui_lang 為準:en → 英文層;zh-*/ko/vi/id/th → 繁中層(句子翻譯只有中/英,外語介面字由 translate-layer 換);沒設過才退回舊 key / 瀏覽器語言
+if(u) setLang(u==='en'?'en':'zh'); else setLang(s || ((navigator.language||'').toLowerCase().indexOf('zh')===0?'zh':'en')); })();
 if(window.speechSynthesis) speechSynthesis.getVoices();
 </script>
 <script src="i18n.js"></script>
+<script src="translate-layer.js"></script>
 <script src="bilingual-sync.js"></script>
 <script src="font-scale.js"></script>
 <script src="back-to-top.js"></script>

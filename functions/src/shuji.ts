@@ -268,13 +268,20 @@ function cleanItems(raw: any, fixedTopic: string): any[] {
   return out;
 }
 
+// 前端送的是 ui_lang 代碼(zh-TW/zh-CN/en/ko/vi/id/th,正本 i18n.js LANGS)→ 轉成 prompt 用的語言名;非代碼就當已是語言名原樣用
+function uiLangName(v: string): string {
+  const MAP: Record<string, string> = { "zh-TW": "繁體中文（台灣用語）", "zh-CN": "簡體中文", en: "English", ko: "한국어(Korean)", vi: "Tiếng Việt(Vietnamese)", id: "Bahasa Indonesia(Indonesian)", th: "ภาษาไทย(Thai)" };
+  if (!v) return MAP["zh-TW"];
+  return MAP[v] || v;
+}
+
 async function organize(uid: string, ent: Ent, body: any): Promise<any> {
   const lines = (Array.isArray(body.lines) ? body.lines : [])
     .map((s: unknown) => str(s, 300))
     .filter(Boolean);
   if (lines.length > 20) throw new ApiError(400, "bad_request", "一次最多 20 行，分批整理");
   const context = str(body.context, 6000);
-  const lang = str(body.lang, 40) || "繁體中文（台灣用語）";
+  const lang = uiLangName(str(body.lang, 40));
   const fixed = str(body.topic, 30);
   const topics = (Array.isArray(body.topics) ? body.topics : []).map((t: unknown) => str(t, 30)).filter(Boolean).slice(0, 60);
   const image = typeof body.image === "string" ? body.image.replace(/^data:[^,]*,/, "") : "";
@@ -327,7 +334,7 @@ async function tutor(uid: string, ent: Ent, body: any): Promise<any> {
     term: str(c.term, 200), reading: str(c.reading, 100), pos: str(c.pos, 30),
     meaning: str(c.meaning, 300), example: str(c.example, 400), detail: str(c.detail, 500),
   };
-  const lang = str(body.lang, 40) || "繁體中文（台灣用語）";
+  const lang = uiLangName(str(body.lang, 40));
 
   const limit = limitOf(ent, "tutor");
   const used = await consume(uid, "tutor", limit);

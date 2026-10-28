@@ -1,6 +1,26 @@
-// ========== i18n — 繁中(預設) / 简中 / English ==========
+// ========== i18n — 繁中(預設) / 简中 / English / 한국어 / Tiếng Việt / Bahasa Indonesia / ไทย ==========
+// 架構(2026-10 多語化):
+//   zh-TW 是正本;zh-CN 用 OpenCC 即時轉;其餘語言都走同一條「外語層」:
+//   ① 字典 t(key)      → zh-TW/zh-CN/en 內建在這檔;ko/vi/id/th 在 lang/<code>.js(window.__L10N[code].dict),本檔依 ui_lang 同步載入
+//   ② UI 對照 pick(zh,en) → 硬編字串用 I18n.pick(繁中, 英文):en 回英文;ko 等查 __L10N[code].ui[繁中],查不到退英文
+//   ③ translate-layer.js  → 渲染後把殘留的繁中 DOM 文字換成目標語(en 用 ui-map.js,其他用 __L10N[code].ui)
+//   ④ 內容疊層           → content-<code>.js / reading-listening-<code>.js / jlpt-questions-<code>.js … 由各頁按需載入
+//   新增語言:LANGS 加一列 + 跑 scripts/gen-l10n.mjs all <code> && build <code> 即可。
 const I18n = (() => {
   const LANG_KEY = 'ui_lang';
+  // 語言登錄表(順序 = 選單順序)。label 用該語言自己的寫法。
+  const LANGS = [
+    { code: 'zh-TW', label: '繁體', name: '繁體中文' },
+    { code: 'zh-CN', label: '简体', name: '简体中文' },
+    { code: 'en', label: 'EN', name: 'English' },
+    { code: 'ko', label: '한국어', name: '한국어' },
+    { code: 'vi', label: 'Tiếng Việt', name: 'Tiếng Việt' },
+    { code: 'id', label: 'Indonesia', name: 'Bahasa Indonesia' },
+    { code: 'th', label: 'ไทย', name: 'ภาษาไทย' },
+  ];
+  const CODES = LANGS.map(l => l.code);
+  const FOREIGN = CODES.filter(c => c.indexOf('zh') !== 0);   // 非中文 = 走外語層
+  const PACKED = FOREIGN.filter(c => c !== 'en');              // 字典在 lang/<code>.js 的語言
 
   // 首次造訪(localStorage 尚無 ui_lang)→ 依系統語言決定:簡體→zh-CN、繁體/其他→zh-TW。
   // 偵測後「寫回 localStorage」,這樣 App 端 bridge 讀 ui_lang 也會拿到同一值(繁簡一致)。
@@ -15,6 +35,10 @@ const I18n = (() => {
           return 'zh-TW';                                           // 其他中文(繁/TW/HK/MO)→ 繁
         }
         if (l.indexOf('en') === 0) return 'en';                  // 英文系統 → 英文(依語言優先序)
+        if (l.indexOf('ko') === 0) return 'ko';
+        if (l.indexOf('vi') === 0) return 'vi';
+        if (l.indexOf('id') === 0 || l.indexOf('in') === 0) return 'id';   // 舊 Android 把印尼文報成 in
+        if (l.indexOf('th') === 0) return 'th';
         // 其他語言 → 看下一個;全非中英則默認繁(保守,不驚動中文為主的既有客群)
       }
     } catch (_) { /* 偵測失敗 → 默認繁 */ }
@@ -36,8 +60,24 @@ const I18n = (() => {
   let lang = localStorage.getItem(LANG_KEY);
   if (!lang) lang = readCookieLang();   // localStorage 被清 → 先試 cookie 還原
   if (!lang) lang = detectLang();       // 都沒有 → 首次造訪，偵測系統語言
+  if (CODES.indexOf(lang) < 0) lang = 'zh-TW';   // 存了未知值(舊版/手改)→ 回繁
   try { localStorage.setItem(LANG_KEY, lang); } catch (_) {}
   writeCookieLang(lang);                // 一律鏡射到 cookie，之後被清也救得回
+  try { document.documentElement.lang = lang; } catch (_) {}
+
+  // ko/vi/id/th:字典+UI 對照在 lang/<code>.js。用 document.write 同步載入,讓後面的 script 一執行就查得到
+  // (改成 async 注入會有一瞬間先畫繁中再換字,而且 enOr/pick 在首繪時查不到會退成英文)。
+  // 路徑以本檔的 src 為基準,子目錄頁(grammar/*.html)也能對。
+  (function loadPack() {
+    if (PACKED.indexOf(lang) < 0) return;
+    if (window.__L10N && window.__L10N[lang]) return;
+    try {
+      var me = document.currentScript && document.currentScript.src;
+      var base = me ? me.replace(/[^/]*(\?.*)?$/, '') : '';
+      var ver = me && /[?&]v=([^&]+)/.test(me) ? '?v=' + RegExp.$1 : '';
+      document.write('<script src="' + base + 'lang/' + lang + '.js' + ver + '"><\/script>');
+    } catch (_) {}
+  })();
 
   // ── Translation dictionaries ──
   const dict = {
@@ -600,8 +640,11 @@ const I18n = (() => {
   function setConverter(fn) { _conv = fn; }
 
   // ── Template engine: t('key', {n: 5, lv: 'N5'}) ──
+  function pack() { return (window.__L10N && window.__L10N[lang]) || null; }
+  function dictFor(l) { if (dict[l]) return dict[l]; const p = (window.__L10N && window.__L10N[l]); return (p && p.dict) || {}; }
   function t(key, params) {
-    let s = dict[lang] && dict[lang][key];
+    let s = dictFor(lang)[key];
+    if (s == null && PACKED.indexOf(lang) >= 0) s = dict.en[key];   // 外語缺 key → 先退英文(對外國人比繁中有用)
     if (s == null) {
       const tw = dict['zh-TW'][key];
       if (tw == null) s = key;
@@ -615,16 +658,58 @@ const I18n = (() => {
   function getLang() { return lang; }
 
   function setLang(l) {
-    if (!dict[l]) return;
+    if (CODES.indexOf(l) < 0) return;
     lang = l;
     try { localStorage.setItem(LANG_KEY, l); } catch (_) {}
     writeCookieLang(l);   // 同步寫 cookie，跨啟動保存（修 iOS 重開變英文）
+    try { document.documentElement.lang = l; } catch (_) {}
   }
 
-  function getMonths() { return dict[lang].months || dict['zh-TW'].months; }
-  function getWeekdays() { return dict[lang].weekdays || dict['zh-TW'].weekdays; }
+  function getMonths() { return dictFor(lang).months || dict.en.months; }
+  function getWeekdays() { return dictFor(lang).weekdays || dict.en.weekdays; }
 
-  return { t, getLang, setLang, getMonths, getWeekdays, setConverter };
+  // ── 外語層 API ──
+  function isForeign() { return FOREIGN.indexOf(lang) >= 0; }        // en/ko/vi/id/th:非中文
+  function isPacked() { return PACKED.indexOf(lang) >= 0; }          // ko/vi/id/th
+  function uiMap() {                                                   // 目前語言的「繁中 → 目標語」對照表
+    if (lang === 'en') return window.__UI_MAP || {};
+    const p = pack(); return (p && p.ui) || {};
+  }
+  function uiPatterns() {
+    if (lang === 'en') return (window.__UI_PATTERNS || []).map(p => ({ pattern: p.pattern, to: p.en }));
+    const p = pack(); return (p && p.patterns) || [];
+  }
+  // 硬編字串三選一:中文 → 回繁中(呼叫端自己 cvt);en → 英文;其他外語 → 查對照表,查不到退英文。
+  function pick(zh, en) {
+    if (!isForeign()) return zh;
+    if (lang === 'en') return (en != null ? en : zh);
+    const m = uiMap(); const k = String(zh == null ? '' : zh).trim();
+    if (Object.prototype.hasOwnProperty.call(m, k)) return m[k];
+    // 動態字串(含數字):把數字 token 換成 # 再查(gen-l10n 把 '已切換到 ' + lv 這類串接/樣板字串存成「已切換到 #」)。
+    // key 裡可能有保留的字面數字(「要不要 30 秒導覽」的 30),所以每個 token 都試「換/不換」的組合(最多 5 個 token = 31 種),命中就把換掉的依序填回。
+    // 先用「整個含數字的 token」(N2、12/6、1,990),再用「純數字」(N2 → N#)。
+    if (/\d/.test(k)) {
+      const tryMask = (re) => {
+        const toks = []; let mm; re.lastIndex = 0;
+        while ((mm = re.exec(k))) toks.push({ s: mm.index, e: mm.index + mm[0].length, v: mm[0] });
+        if (!toks.length || toks.length > 5) return null;
+        for (let mask = (1 << toks.length) - 1; mask >= 1; mask--) {
+          let out = '', pos = 0; const fill = [];
+          toks.forEach((t, i) => { out += k.slice(pos, t.s); if (mask & (1 << i)) { out += '#'; fill.push(t.v); } else out += t.v; pos = t.e; });
+          out += k.slice(pos);
+          if (Object.prototype.hasOwnProperty.call(m, out)) { let i = 0; return m[out].replace(/#/g, () => (i < fill.length ? fill[i++] : '')); }
+        }
+        return null;
+      };
+      const r1 = tryMask(/[A-Za-z]*\d[\w.,:/-]*/g); if (r1 != null) return r1;
+      const r2 = tryMask(/\d+(?:[.,]\d+)?/g); if (r2 != null) return r2;
+    }
+    for (const p of uiPatterns()) { try { const re = new RegExp(p.pattern); if (re.test(k)) { const o = k.replace(re, p.to); if (o !== k) return o; } } catch (_) {} }
+    return en != null ? en : zh;
+  }
+  function langName(l) { const o = LANGS.filter(x => x.code === (l || lang))[0]; return o ? o.name : (l || lang); }
+
+  return { t, getLang, setLang, getMonths, getWeekdays, setConverter, LANGS, isForeign, isPacked, uiMap, uiPatterns, pick, langName };
 })();
 
 // Global shortcut

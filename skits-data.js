@@ -51,3 +51,21 @@ window.SKITS = [
 ];
 window.skitAudio = function (au) { return au ? 'videos/skit/audio/' + au + '.mp3' : ''; };
 window.skitFile = function (n, ext) { return 'videos/skit/ep' + (n < 10 ? '0' : '') + n + '.' + ext; };
+
+// ko/vi/id/th:短劇標題/句意/懸念的翻譯在 misc-<code>.js(MISC_L10N[code].skits[n] = {t,m,hook}),疊到英文欄位(en/men/hookEn)上,
+// 渲染端用 enOr/I18n.pick(zh, en) 時就會拿到目標語(pick 查不到繁中 key 會退 en 欄 → 即目標語)。
+// app.html 已先載 misc-<code>.js;skits.html 沒有 → 這裡用 document.write 同步補載(本檔是同步 script,合法)。
+window.applySkitsL10n = function () {
+  try {
+    if (typeof I18n === 'undefined' || !I18n.isPacked || !I18n.isPacked()) return;
+    var M = window.MISC_L10N && window.MISC_L10N[I18n.getLang()]; if (!M || !M.skits) return;
+    (window.SKITS || []).forEach(function (e) { var o = M.skits[e.n]; if (!o) return; if (o.t) e.en = o.t; if (o.m) e.men = o.m; if (o.hook) e.hookEn = o.hook; });
+  } catch (e) {}
+};
+(function () {
+  try {
+    if (typeof I18n === 'undefined' || !I18n.isPacked || !I18n.isPacked()) return;
+    if (window.MISC_L10N && window.MISC_L10N[I18n.getLang()]) { window.applySkitsL10n(); return; }
+    document.write('<script src="misc-' + I18n.getLang() + '.js"><\/script><script>window.applySkitsL10n()<\/script>');
+  } catch (e) {}
+})();

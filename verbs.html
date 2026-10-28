@@ -159,6 +159,8 @@ body {
   transition: color .2s var(--ease), background .2s var(--ease), border-color .2s var(--ease);
 }
 .lang-btn:hover { color: var(--ac); border-color: var(--ac); }
+select.lang-btn { -webkit-appearance: none; appearance: none; padding-right: 8px; max-width: 110px; }
+select.lang-btn option { color: var(--tx); background: var(--bg); }
 
 /* == Main == */
 .mn { max-width: 760px; margin: 0 auto; padding: calc(var(--hh) + 20px) 20px 60px; }
@@ -447,7 +449,7 @@ td.hl { color: var(--em-color); font-weight: 600; }
       <a href="#pairs">自他動詞</a>
       <a href="#pairs-quiz">自他練習</a>
     </nav>
-    <button class="lang-btn" id="langBtn" onclick="cycleLang()">繁</button>
+    <select class="lang-btn" id="langBtn" onchange="switchLang(this.value)" aria-label="Language" data-nolang><option value="zh-TW">繁體</option></select>
     <button class="theme-btn" id="themeBtn" onclick="toggleTheme()" aria-label="切換深色模式"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79z"/></svg></button>
   </div>
 </header>
@@ -1321,9 +1323,20 @@ document.addEventListener('DOMContentLoaded', () => PTQuiz.render());
 <script src="audio/tts/manifest.js"></script>
 <script>
 // ========== I18N (繁/簡切換 via OpenCC runtime 轉換) ==========
-const LANG_CYCLE = ['zh-TW', 'zh-CN', 'en'];
-const LANG_LABEL = { 'zh-TW': '繁', 'zh-CN': '简', 'en': 'EN' };
-if (typeof I18n !== 'undefined' && !LANG_CYCLE.includes(I18n.getLang())) I18n.setLang('zh-TW');
+// 語言清單以 i18n.js 的 I18n.LANGS 為正本(繁/简/EN/ko/vi/id/th);外語(非 zh-*)一律 reload 交給 translate-layer
+const LANG_CYCLE = I18n.LANGS.map(l => l.code);
+const LANG_LABEL = {}; I18n.LANGS.forEach(l => { LANG_LABEL[l.code] = l.label; });
+function _isForeignCode(l) { return l !== 'zh-TW' && l !== 'zh-CN'; }
+// 語言選單:options 由 I18n.LANGS 產生
+function fillLangSelect() {
+  const sel = document.getElementById('langBtn');
+  if (!sel || sel.tagName !== 'SELECT') return;
+  const cur = I18n.getLang();
+  sel.innerHTML = I18n.LANGS.map(l => '<option value="' + l.code + '"' + (l.code === cur ? ' selected' : '') + '>' + l.label + '</option>').join('');
+  sel.value = cur;
+}
+// 防呆:localStorage 存了不在清單的語言碼 → 退回繁中
+if (!LANG_CYCLE.includes(I18n.getLang())) I18n.setLang('zh-TW');
 
 let _tw2cn = null;
 function ensureOpenCC() {
@@ -1362,10 +1375,10 @@ function collectTextNodes() {
 function applyPageLang() {
   const lang = I18n.getLang();
   const btn = document.getElementById('langBtn');
-  if (btn) btn.textContent = LANG_LABEL[lang] || '繁';
+  if (btn) { if (btn.tagName === 'SELECT') { fillLangSelect(); } else btn.textContent = LANG_LABEL[lang] || '繁'; }
   document.documentElement.lang = lang;
 
-  // 先套 i18n chrome（title / nav）
+  // 先套 i18n chrome（title / nav）:字典 t() 七語都有
   document.querySelectorAll('[data-i18n]').forEach(el => {
     if (!_origText.has(el)) _origText.set(el, el.textContent);
     el.textContent = t(el.dataset.i18n);
@@ -1374,6 +1387,8 @@ function applyPageLang() {
     el.setAttribute('aria-label', t(el.dataset.i18nAria));
   });
   document.title = t('verbs_page_title');
+  // 外語(en/ko/vi/id/th):其餘 DOM 文字交給 translate-layer.js,這裡不動
+  if (I18n.isForeign()) return;
 
   // 再 OpenCC 全頁中文 text node 轉繁↔簡
   const nodes = collectTextNodes();
@@ -1387,19 +1402,25 @@ function applyPageLang() {
   }
 }
 
-async function cycleLang() {
+async function switchLang(next) {
   const cur = I18n.getLang();
-  const idx = LANG_CYCLE.indexOf(cur);
-  const next = LANG_CYCLE[(idx + 1) % LANG_CYCLE.length];
-  if (next === 'en' || cur === 'en') { I18n.setLang(next); location.reload(); return; }
+  if (!LANG_CYCLE.includes(next) || next === cur) return;
+  // 任一邊是外語 → 存好語言整頁重載(字典/對照表由 i18n.js 依 ui_lang 載入)
+  if (_isForeignCode(next) || _isForeignCode(cur)) { I18n.setLang(next); location.reload(); return; }
   const btn = document.getElementById('langBtn');
   if (next === 'zh-CN' && !_tw2cn) {
-    if (btn) { btn.disabled = true; btn.textContent = '…'; }
+    if (btn) { btn.disabled = true; if (btn.tagName !== 'SELECT') btn.textContent = '…'; }
     await ensureOpenCC();
     if (btn) btn.disabled = false;
   }
   I18n.setLang(next);
   applyPageLang();
+}
+// 舊介面:輪到下一個語言(其他程式可能還會叫)
+function cycleLang() {
+  const cur = I18n.getLang();
+  const idx = LANG_CYCLE.indexOf(cur);
+  return switchLang(LANG_CYCLE[(idx + 1) % LANG_CYCLE.length]);
 }
 
 const applyI18n = applyPageLang;

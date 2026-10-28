@@ -204,12 +204,14 @@
 
   // ══════════ 瀏覽器 UI ══════════
   const lang = () => { try { return (root.I18n && I18n.getLang && I18n.getLang()) || localStorage.getItem('ui_lang') || 'zh-TW'; } catch (e) { return 'zh-TW'; } };
-  const isEn = () => lang() === 'en';
+  // 外語(en/ko/vi/id/th)走 I18n.pick(en 直接回英文;其他查對照表,查不到退英文)
+  const isFg = () => { try { return (root.I18n && I18n.isForeign) ? I18n.isForeign() : ['en', 'ko', 'vi', 'id', 'th'].includes(lang()); } catch (e) { return false; } };
+  const pk = (zh, en) => (root.I18n && I18n.pick) ? I18n.pick(zh, en) : en;
   const cv = s => (typeof root.cvt === 'function' ? root.cvt(s) : s);
   // 介面字串:英文用 en、簡中 cvt(這些字串不含日文)
-  const L = (zh, en) => isEn() ? en : cv(zh);
+  const L = (zh, en) => isFg() ? pk(zh, en) : cv(zh);
   // 內容字串(中文意思/提示,可能夾日文):英文查 EN_T;簡中只轉「不含假名」的字串,避免日文漢字被誤轉(聞→闻)
-  const T = zh => { if (zh == null) return ''; if (isEn()) return (ESS.EN_T[zh] || TIP_EN[zh] || zh); return hasKana(zh) ? zh : cv(zh); };
+  const T = zh => { if (zh == null) return ''; if (isFg()) return pk(zh, ESS.EN_T[zh] || TIP_EN[zh] || zh); return hasKana(zh) ? zh : cv(zh); };
   const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const fr = t => { try { return root.furiganaHTMLRich ? root.furiganaHTMLRich(t) : t; } catch (e) { return t; } };
   const say = t => { try { if (t && typeof root.speak === 'function') root.speak(t); } catch (e) {} };
@@ -428,7 +430,7 @@ body.ess-open #tutorFab,body.ess-open #tutorHint,body.ess-open #quotaBadge,body.
   function lessonTitle(id) {
     if (id === 'final') return L('綜合測驗', 'Final review quiz');
     if (id === 'all') return L('隨堂測驗', 'Mini quiz');
-    const l = lessonById(id); return isEn() ? l.en : cv(l.zh);
+    const l = lessonById(id); return isFg() ? pk(l.zh, l.en) : cv(l.zh);
   }
   function lessonNo(id) { const i = lessonIdx(id); return id === 'final' || id === 'all' ? '' : L('第 ' + (i + 1) + ' 課', 'Lesson ' + (i + 1)); }
   function topHtml() {

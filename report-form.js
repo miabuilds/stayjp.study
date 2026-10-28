@@ -4,8 +4,10 @@
 (function () {
   var MAIL_RE = /^mailto:(stayjpplan@gmail\.com|support@stayjp\.study)\?/i;
   function q(s) { var m = /[?&]subject=([^&]*)/.exec(s), b = /[?&]body=([^&]*)/.exec(s); var subj = m ? decodeURIComponent(m[1].replace(/\+/g, ' ')) : '', body = b ? decodeURIComponent(b[1].replace(/\+/g, ' ')) : ''; var k = /^\[(?:回報·)?([^\]]+)\]\s*(.*)$/.exec(subj) || []; return { kind: (k[1] || 'other').slice(0, 40), id: (k[2] || '').slice(0, 80), detail: body.split('錯誤描述')[0].trim().slice(0, 2000) }; }
-  function en() { try { return (localStorage.getItem('lang') || document.documentElement.lang || '').toLowerCase().indexOf('en') === 0; } catch (e) { return false; } }
-  function L(zh, e) { return en() ? e : (window.cvt ? window.cvt(zh) : zh); }
+  // 外語(en/ko/vi/id/th)→ I18n.pick(zh,en);中文 → cvt(繁/簡)
+  function siteLang() { try { return (window.I18n && I18n.getLang) ? I18n.getLang() : (localStorage.getItem('ui_lang') || localStorage.getItem('lang') || document.documentElement.lang || 'zh-TW'); } catch (e) { return 'zh-TW'; } }
+  function fg() { try { return (window.I18n && I18n.isForeign) ? I18n.isForeign() : ['en', 'ko', 'vi', 'id', 'th'].indexOf(String(siteLang()).toLowerCase().slice(0, 2)) >= 0; } catch (e) { return false; } }
+  function L(zh, e) { return fg() ? ((window.I18n && I18n.pick) ? I18n.pick(zh, e) : e) : (window.cvt ? window.cvt(zh) : zh); }
   function css() {
     if (document.getElementById('rpfCss')) return;
     var st = document.createElement('style'); st.id = 'rpfCss';
@@ -38,7 +40,7 @@
       var desc = ta.value.trim(); if (desc.length < 2) { ta.focus(); return; }
       var btn = this; btn.disabled = true; btn.textContent = L('送出中…', 'Sending…');
       var doc = { kind: meta.kind, id: meta.id, detail: meta.detail, desc: desc.slice(0, 3000), email: (mask.querySelector('input').value || '').trim().slice(0, 120),
-        uid: '', page: String(location.href).slice(0, 500), ua: String(navigator.userAgent).slice(0, 300), lang: (function () { try { return (localStorage.getItem('lang') || 'zh-TW').slice(0, 10); } catch (e) { return ''; } })(),
+        uid: '', page: String(location.href).slice(0, 500), ua: String(navigator.userAgent).slice(0, 300), lang: (function () { try { return String(siteLang() || 'zh-TW').slice(0, 10); } catch (e) { return ''; } })(),
         platform: (window.STAYJP_NATIVE && STAYJP_NATIVE.isNativeApp) ? ('app-' + (STAYJP_NATIVE.platform || '')) : 'web', status: 'new' };
       try { var u = firebase.auth && firebase.auth().currentUser; if (u) doc.uid = u.uid; } catch (e) {}
       var p;

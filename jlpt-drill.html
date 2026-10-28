@@ -253,15 +253,20 @@ window.addEventListener('load',function(){ setTimeout(ensureTTS,1000); });
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <script src="i18n.js"></script>
+<script src="translate-layer.js"></script>
 <script>
-// 英文版詳解(262KB)+整句翻譯(59KB)只有英文介面用得到,中文使用者佔絕大多數,不該白抓 320KB。
-// 判準只有一個:I18n.getLang() —— 不要自己再寫一套語言偵測,兩套規則遲早會走鐘,
+// 外語版詳解(en 262KB)+整句翻譯(59KB)只有外語介面用得到,中文使用者佔絕大多數,不該白抓 320KB。
+// 判準只有一個:I18n.isForeign() —— 不要自己再寫一套語言偵測,兩套規則遲早會走鐘,
 //   結果就是「介面英文、詳解中文」,正是這次要修掉的那個回饋。所以要等 i18n.js 載完才問。
+// 檔名:en → jlpt-questions-en.js / jlpt-q-trans-en.js(window.JLPT_Q_EN / JLPT_Q_TRANS_EN);
+//   ko/vi/id/th → jlpt-questions-<code>.js / jlpt-q-trans-<code>.js(window.JLPT_Q_L10N[code] / JLPT_Q_TRANS_L10N[code])。
 // 非同步載入不擋畫面:從進頁、挑分類、讀完題目到按送出至少好幾秒,資料早就到了;
-//   萬一真的還沒到,xText() 本來就會退回中文,不會空白。
+//   萬一真的還沒到(或該語言還沒產檔),qTextL10n()/qTransL10n() 回 null → 退回中文,不會空白。
 (function () {
-  try { if (typeof I18n === 'undefined' || I18n.getLang() !== 'en') return; } catch (e) { return; }
-  ['jlpt-questions-en.js', 'jlpt-q-trans-en.js'].forEach(function (f) {
+  var L;
+  try { if (typeof I18n === 'undefined' || !I18n.isForeign()) return; L = I18n.getLang(); } catch (e) { return; }
+  if (I18n.isPacked && I18n.isPacked()) document.documentElement.lang = L;   // en 由 applyStaticEn() 設
+  ['jlpt-questions-' + L + '.js', 'jlpt-q-trans-' + L + '.js'].forEach(function (f) {
     var s = document.createElement('script'); s.src = f; s.async = false; document.head.appendChild(s);
   });
 })();
@@ -270,16 +275,16 @@ window.addEventListener('load',function(){ setTimeout(ensureTTS,1000); });
 // ========== JLPT 刷題特區 ==========
 // 題庫在 jlpt-questions.js(window.JLPT_Q):精編靜態題,每題附詳解。
 
-// ── i18n:繁中預設;zh-CN 靠 OpenCC 繁→簡、en 靠 enOr()。 ──
+// ── i18n:繁中預設;zh-CN 靠 OpenCC 繁→簡、外語(en/ko/vi/id/th)靠 enOr() → I18n.pick(繁中,英文):en 回英文,其他查 lang/<code>.js 對照表、查不到退英文。 ──
 // ⚠️ 題目內容(題幹/選項/詳解 x/音檔文本 au)是學習內容,一律不動不翻;詳解含日文詞,連 cvt 都不做,保持繁體。
 let _tw2cn=null;
 function ensureOpenCC(){ return new Promise(function(res){ if(_tw2cn)return res(_tw2cn); if(window.OpenCC){ _tw2cn=OpenCC.Converter({from:'tw',to:'cn'}); if(I18n.setConverter)I18n.setConverter(_tw2cn); return res(_tw2cn);} var s=document.createElement('script'); s.src='https://cdn.jsdelivr.net/npm/opencc-js@1.0.5/dist/umd/full.js'; s.onload=function(){ _tw2cn=OpenCC.Converter({from:'tw',to:'cn'}); if(I18n.setConverter)I18n.setConverter(_tw2cn); res(_tw2cn); }; s.onerror=function(){res(null)}; document.head.appendChild(s); }); }
 function cvt(x){ return (!x||I18n.getLang()!=='zh-CN'||!_tw2cn)?x:_tw2cn(x); }
-function enOr(zh,en){ return I18n.getLang()==='en'?en:cvt(zh); }
+function enOr(zh,en){ return I18n.isForeign()?I18n.pick(zh,en):cvt(zh); }
 function cvtStaticUI(root){ if(I18n.getLang()!=='zh-CN')return; var el=typeof root==='string'?document.getElementById(root):root; if(!el)return; if(!_tw2cn){ ensureOpenCC().then(function(){cvtStaticUI(el)}); return; } var kana=/[ぁ-ゖァ-ヺー]/; var w=document.createTreeWalker(el,NodeFilter.SHOW_TEXT); var list=[],n; while((n=w.nextNode()))list.push(n); list.forEach(function(node){ if(kana.test(node.nodeValue))return; var c=_tw2cn(node.nodeValue); if(c!==node.nodeValue)node.nodeValue=c; }); }
 // zh-CN:OpenCC 載好後轉靜態 UI + <title>,再重畫首頁(題型名是日文術語,重畫還原、不被誤轉)
 if(I18n.getLang()==='zh-CN'){ document.documentElement.lang='zh-Hans'; ensureOpenCC().then(function(cv){ if(!cv)return; document.title=cv(document.title); cvtStaticUI(document.body); renderHome(); var es=document.getElementById('examSet'); if(es&&es.classList.contains('show'))updateExamNotes(); }); }
-// 日文術語/含假名字串:zh 繁簡都不轉(cvt 會把日文漢字誤轉,如 聞→闻),只有 en 換英文
+// 日文術語/含假名字串:zh 繁簡都不轉(cvt 會把日文漢字誤轉,如 聞→闻),只有 en 換英文;ko/vi/id/th 也看日文原文(刻意 === 'en',不是 isForeign)
 function jaOr(ja_,en_){ return I18n.getLang()==='en'?en_:ja_; }
 
 // ── 付費牆(2026-08 定案):免費=刷題每日 1 輪+模擬考總共 2 次;Premium/買斷=無限 ──
@@ -381,19 +386,19 @@ const SKILLS = [
   { k:'read',   ic:'<i data-ic=book></i>', tt:'読解',       en:'Reading',    sub:'短文閱讀理解',     sube:'Reading comprehension', types:['reading'] },
   { k:'listen', ic:'<i data-ic=headphones></i>', tt:'聴解',       en:'Listening',  sub:'聽力理解',         sube:'Listening comprehension', types:['listening'] },
 ];
-function skName(sk){ return I18n.getLang()==='en' ? sk.en : sk.tt; }
-function skSub(sk){ return I18n.getLang()==='en' ? sk.sube : sk.sub; }
+function skName(sk){ return I18n.isForeign() ? I18n.pick(sk.tt, sk.en) : sk.tt; }
+function skSub(sk){ return I18n.isForeign() ? I18n.pick(sk.sub, sk.sube) : sk.sub; }
 
-// 題型顯示名是日文術語:zh(繁簡)一律用 tt 原樣不轉,en 用英文
-function tyName(ty){ return I18n.getLang()==='en' ? (ty.en||ty.tt) : ty.tt; }
+// 題型顯示名是日文術語:zh(繁簡)一律用 tt 原樣不轉,外語用 pick(tt→目標語,退英文)
+function tyName(ty){ return I18n.isForeign() ? I18n.pick(ty.tt, ty.en||ty.tt) : ty.tt; }
 function tyLabel(k){ const y=TYPES.find(x=>x.k===k); return y? tyName(y):''; }
-function tyDesc(ty){ return I18n.getLang()==='en' ? (ty.tde||ty.td) : cvt(ty.td); }
+function tyDesc(ty){ return I18n.isForeign() ? I18n.pick(ty.td, ty.tde||ty.td) : cvt(ty.td); }
 // 場次歷史存繁體原字(跨語言共用),顯示時再映射
 function histLabel(s){
   const ty=TYPES.find(x=>x.tt===s); if(ty) return tyName(ty);
   if(s==='錯題本') return enOr('錯題本','Wrong answers');
   if(s && s.indexOf('模擬試験')>=0) return jaOr('<i data-ic=edit></i> 模擬試験','<i data-ic=edit></i> Mock exam')+(s.indexOf('時間到')>-1?enOr('(時間到)',' (time up)'):'');
-  return cvt(s);
+  return enOr(s,s);
 }
 const LEVELS = ['n5','n4','n3','n2','n1'];
 let lv = localStorage.getItem('jd_lv') || 'n5';
@@ -466,24 +471,40 @@ function stemFilled(q, picked, ok){
 }
 // 詳解裡的「答案①〜④」指的是資料原序,但選項在畫面上是亂序 → 換成正解文字,才不會對不上。
 // 編號與 q.a 不符時原樣保留(那代表該題資料有誤,不該被蓋掉)。
+// 目前語言的詳解/整句翻譯(以題目 id 對照),沒有就 null → 呼叫端退回中文。
+//   en:jlpt-questions-en.js(window.JLPT_Q_EN)/ jlpt-q-trans-en.js(window.JLPT_Q_TRANS_EN)
+//   ko/vi/id/th:jlpt-questions-<code>.js(window.JLPT_Q_L10N[code])/ jlpt-q-trans-<code>.js(window.JLPT_Q_TRANS_L10N[code])
+function _l10nLang(){ try{ return (typeof I18n!=='undefined' && I18n.isForeign && I18n.isForeign()) ? I18n.getLang() : null; }catch(e){ return null; } }
+function qTextL10n(id){
+  var L=_l10nLang(); if(!L||id==null) return null;
+  var m = L==='en' ? window.JLPT_Q_EN : (window.JLPT_Q_L10N && window.JLPT_Q_L10N[L]);
+  return (m && m[id]) || null;
+}
+function qTransL10n(id){
+  var L=_l10nLang(); if(!L||id==null) return null;
+  var m = L==='en' ? window.JLPT_Q_TRANS_EN : (window.JLPT_Q_TRANS_L10N && window.JLPT_Q_TRANS_L10N[L]);
+  return (m && m[id]) || null;
+}
 function xText(q){
   if(!q || !q.x) return '';
   // 詳解原本只有中文,英文介面的人會看到整段中文(chowe77 2026-09-21 回報)。
-  // jlpt-questions-en.js 是 scripts/gen-drill-en.mjs 批次翻出來的英文版,以 id 對照。
+  // jlpt-questions-<code>.js 是 gen 腳本批次翻出來的外語版,以 id 對照。
   // 翻譯檔是衍生檔,萬一沒載入或某題漏翻 → 退回中文,不會空白。
-  var en = (typeof I18n !== 'undefined' && I18n.getLang && I18n.getLang() === 'en')
-    && window.JLPT_Q_EN && window.JLPT_Q_EN[q.id];
-  var txt = en || q.x;
+  var txt = qTextL10n(q.id) || q.x;
   // 詳解裡的「答案①〜④」指的是資料原序,但選項在畫面上是亂序 → 換成正解文字,才不會對不上。
   // 編號與 q.a 不符時原樣保留(那代表該題資料有誤,不該被蓋掉)。
-  // 英文版的寫法不只一種:Answer ②、Answer: ③、answer ② 都有 → 冒號前後都容許,大小寫原樣保留。
-  return txt.replace(/(\u7b54\u6848|Answer)([:\uff1a]?\s*)([\u2460-\u2463])(\s*[:\uff1a])?/gi, function(m, word, mid, n, colon){
+  // 寫法不只一種:答案①、Answer ②、Answer: ③、answer ②、정답 ②、Jawaban ② … → 圈號前抓「任一個詞 + 可有冒號」,語言不限。
+  //   中日文(無空格)抓到的是整串,只有以「答案」結尾才改(保持原本 zh 行為);英文介面只認 answer;其他語言任何詞都接受。
+  var isCjkWord = function(w){ return /[\u3040-\u30ff\u3400-\u9fff]/.test(w); };
+  var uiEn = _l10nLang() === 'en';
+  return txt.replace(/([^\s<>()\uff08\uff09\u3001\u3002\uff0c,.:\uff1a\u300c\u300d\u2460-\u2463]+)([:\uff1a]?\s*)([\u2460-\u2463])(\s*[:\uff1a])?/g, function(m, word, mid, n, colon){
     if('\u2460\u2461\u2462\u2463'.indexOf(n) !== q.a) return m;
-    var isEn = word.toLowerCase() === 'answer';
-    var lead = isEn ? word : '\u7b54\u6848';
-    if(colon) return lead + ':';
-    return isEn ? lead + ' \u201c' + esc(q.o[q.a]) + '\u201d'
-                : lead + '\u300c' + esc(q.o[q.a]) + '\u300d';
+    var cjk = isCjkWord(word);
+    if(cjk){ if(word.slice(-2) !== '\u7b54\u6848') return m; }          // zh:只認「…答案①」
+    else if(uiEn && word.toLowerCase() !== 'answer') return m;           // en:只認 Answer ②(Option ② 之類不動)
+    if(colon) return word + ':';
+    return cjk ? word + '\u300c' + esc(q.o[q.a]) + '\u300d'
+               : word + ' \u201c' + esc(q.o[q.a]) + '\u201d';
   });
 }
 function shuffle(a){ const x=a.slice(); for(let i=x.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [x[i],x[j]]=[x[j],x[i]]; } return x; }
@@ -668,10 +689,8 @@ function answer(el, ok){
   // 詳解(題庫內含 <b> 標記,自行控管內容安全);聴解附上音檔原文
   document.getElementById('xp').classList.toggle('good', ok);   // 答對綠底、答錯橘底(固定橘會讓答對的人以為錯了)
   const _rep = window.stayjpReportHref ? window.stayjpReportHref('刷題 '+(q.id||''), q.id||'', '題目 ID：'+(q.id||'')+'\n題幹：'+((q.q||q.at||'').slice(0,80))+'\n正解：'+esc(q.o[q.a]||'')) : '';
-  // 整句翻譯:英文介面優先給英文版(jlpt-q-trans-en.js),沒有才退回中文 —— 總比空白好
-  const _trEn = (typeof I18n !== 'undefined' && I18n.getLang && I18n.getLang() === 'en')
-    && window.JLPT_Q_TRANS_EN && JLPT_Q_TRANS_EN[q.id];
-  const _tr = _trEn || ((window.JLPT_Q_TRANS && JLPT_Q_TRANS[q.id]) ? JLPT_Q_TRANS[q.id] : '');
+  // 整句翻譯:外語介面優先給該語言版(jlpt-q-trans-<code>.js),沒有才退回中文 —— 總比空白好
+  const _tr = qTransL10n(q.id) || ((window.JLPT_Q_TRANS && JLPT_Q_TRANS[q.id]) ? JLPT_Q_TRANS[q.id] : '');
   document.getElementById('xp').innerHTML =
     (q.au ? '<div style="margin-bottom:8px;padding-bottom:8px;border-bottom:1px dashed var(--bd)"><b>スクリプト:</b>'+esc(q.au)+'</div>' : '') + xText(q)
     + (_tr ? '<div style="margin-top:10px;padding-top:9px;border-top:1px dashed var(--bd)"><button type="button" onclick="var d=this.nextElementSibling;d.hidden=!d.hidden;this.textContent=d.hidden?'+"'"+'▸ '+enOr('顯示整句翻譯','Show translation')+"'"+':'+"'"+'▾ '+enOr('整句翻譯','Translation')+"'"+'" style="background:none;border:0;color:var(--ac);font:inherit;font-size:13px;font-weight:700;cursor:pointer;padding:0">▸ '+enOr('顯示整句翻譯','Show translation')+'</button><div hidden style="color:var(--tx2);font-size:13.5px;line-height:1.75;margin-top:6px">'+esc(_tr)+'</div></div>' : '')
@@ -891,7 +910,7 @@ function finishExam(timeout){
     context:['刷「語彙填空」+讀單字卡例句','jlpt-drill.html','Drill Context + read example sentences'], para:['刷「近義替換」+易混淆詞比較','compare/index.html','Drill Paraphrase + confusable-word comparisons'],
     grammar:['刷「文法形式」+文法練習','app.html','Drill Grammar + grammar practice'], order:['刷「句子重組」抓語順感','jlpt-drill.html','Drill Word Order to build a feel for it'],
     reading:['刷「読解」+每天讀一篇文章閱讀','app.html','Drill Reading + one article a day'], listening:['刷「聴解」+聽力練習跟讀','app.html','Drill Listening + shadowing practice'] };
-  const adviceTxt = ad => I18n.getLang()==='en'? ad[2] : cvt(ad[0]);
+  const adviceTxt = ad => I18n.isForeign()? I18n.pick(ad[0], ad[2]) : cvt(ad[0]);
   const weak = Object.entries(secStat).map(([t,s])=>({t, r:s.n?s.c/s.n:1, n:s.n}))
     .filter(x=>x.n>0 && x.r<1).sort((a,b)=>a.r-b.r).slice(0,2);
   // ── 畫面 ──
@@ -959,7 +978,7 @@ function finishExam(timeout){
   show('examResult');
 }
 
-// ── en:靜態 HTML 文字直接替換(zh-CN 走上面的 cvtStaticUI) ──
+// ── en:靜態 HTML 文字直接替換(zh-CN 走上面的 cvtStaticUI;ko/vi/id/th 交給 translate-layer.js,這裡刻意只做 en) ──
 function applyStaticEn(){
   if(I18n.getLang()!=='en') return;
   document.documentElement.lang='en';

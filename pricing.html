@@ -1169,8 +1169,10 @@ _auth.onAuthStateChanged(user => {
 <script src="i18n.js"></script>
 <script>
 // CSS ::before 徽章(彈性月付/最多人選…)translate-layer 碰不到 → 依語言蓋一段 style
-(function(){ try{ var l=(localStorage.getItem('ui_lang')||'zh-TW'); if(l==='zh-TW')return;
-  var css = l==='en' ? '.plan.entry::before{content:"Flexible monthly"}' : '.plan.entry::before{content:"弹性月付"}';
+(function(){ try{ var l=I18n.getLang(); if(l==='zh-TW')return;
+  // 外語(en/ko/vi/id/th)→ I18n.pick 查對照表(查不到退英文);简中手寫
+  var txt = I18n.isForeign() ? I18n.pick('彈性月付', 'Flexible monthly') : '弹性月付';
+  var css = '.plan.entry::before{content:"' + String(txt).replace(/\\/g, '\\\\').replace(/"/g, '\\"') + '"}';
   var st=document.createElement('style'); st.textContent=css; document.head.appendChild(st);
 }catch(e){} })();
 </script>

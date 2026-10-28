@@ -149,7 +149,9 @@
   }
   function lang() { try { return (typeof I18n !== 'undefined' && I18n.getLang) ? I18n.getLang() : (localStorage.getItem('ui_lang') || 'zh-TW'); } catch (e) { return 'zh-TW'; } }
   function L(zh, en) {
-    var l = lang(); if (l === 'en') return en;
+    var l = lang();
+    var fg = (typeof I18n !== 'undefined' && I18n.isForeign) ? I18n.isForeign() : ['en', 'ko', 'vi', 'id', 'th'].indexOf(l) >= 0;
+    if (fg) return (typeof I18n !== 'undefined' && I18n.pick) ? I18n.pick(zh, en) : en;   // 外語(en/ko/vi/id/th)
     if (l === 'zh-CN') { try { if (typeof root.cvt === 'function') return root.cvt(zh); } catch (e) {} }
     return zh;
   }

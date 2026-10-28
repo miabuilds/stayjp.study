@@ -556,8 +556,9 @@ async function renderQuotaBox(user, sub) {
   try {
     const box = document.getElementById('quotaBox'); const rows = document.getElementById('quotaRows');
     if (!box || !rows || !user) return;
-    const L = localStorage.getItem('ui_lang') || 'zh-TW';
-    const T = (tw, cn, en) => L === 'en' ? en : (L === 'zh-CN' ? cn : tw);
+    const L = (typeof I18n !== 'undefined') ? I18n.getLang() : (localStorage.getItem('ui_lang') || 'zh-TW');
+    // 外語(en/ko/vi/id/th)→ I18n.pick(繁中,英文);简中用手寫简中;繁中原樣
+    const T = (tw, cn, en) => (typeof I18n !== 'undefined' && I18n.isForeign()) ? I18n.pick(tw, en) : (L === 'zh-CN' ? cn : tw);
     const now = Date.now();
     const isPrem = !!(sub && (sub.status === 'active' || sub.status === 'trialing' || sub.status === 'cancelled') && sub.expiresAt > now);
     let isFree = false;
@@ -891,16 +892,16 @@ async function cancelRenew() {
 
 // ATM／超商付款 → 人工退款(不能信用卡退刷):說明 + 手續費由用戶負擔 + 填原因(留存分析)
 async function requestRefundAtm() {
- const en = (function(){ try { return localStorage.getItem('ui_lang') === 'en'; } catch(e){ return false; } })();
- const intro = en
-   ? 'You paid by ATM / convenience store, so it can\'t be auto-refunded to a card — our team will transfer it back manually.\n\nA NT$15 bank-transfer fee is deducted from your refund (you cover it). We\'ll email you within 3 business days to confirm your bank account.\n\nContinue?'
-   : '你是 ATM／超商付款,無法自動退刷到信用卡——將由客服人工匯回。\n\n轉帳手續費 NT$15 由您負擔(從退款金額扣除)。我們會在 3 個工作天內以 email 與你聯繫、確認你的匯款帳戶。\n\n要繼續嗎?';
+ // 外語介面 → I18n.pick(繁中, 英文)(ko/vi/id/th 查對照表,查不到退英文);中文照繁中
+ const P = (zh, en) => (typeof I18n !== 'undefined' && I18n.isForeign()) ? I18n.pick(zh, en) : zh;
+ const intro = P('你是 ATM／超商付款,無法自動退刷到信用卡——將由客服人工匯回。\n\n轉帳手續費 NT$15 由您負擔(從退款金額扣除)。我們會在 3 個工作天內以 email 與你聯繫、確認你的匯款帳戶。\n\n要繼續嗎?',
+   'You paid by ATM / convenience store, so it can\'t be auto-refunded to a card — our team will transfer it back manually.\n\nA NT$15 bank-transfer fee is deducted from your refund (you cover it). We\'ll email you within 3 business days to confirm your bank account.\n\nContinue?');
  if (!confirm(intro)) return;
- const reason = prompt(en ? 'Please tell us why you\'re requesting a refund (required — we keep it to improve):' : '請填寫退款原因(必填,我們會據此改善):', '');
+ const reason = prompt(P('請填寫退款原因(必填,我們會據此改善):', 'Please tell us why you\'re requesting a refund (required — we keep it to improve):'), '');
  if (reason == null) return;
- if (!reason.trim()) { alert(en ? 'A reason is required.' : '請填寫退款原因。'); return; }
+ if (!reason.trim()) { alert(P('請填寫退款原因。', 'A reason is required.')); return; }
  const btn = document.getElementById('btnRefund');
- if (btn) { btn.disabled = true; btn.textContent = en ? 'Submitting…' : '處理中…'; }
+ if (btn) { btn.disabled = true; btn.textContent = P('處理中…', 'Submitting…'); }
  try {
   const idToken = await currentUser.getIdToken();
   const res = await fetch(FN_REFUND, {
@@ -909,12 +910,12 @@ async function requestRefundAtm() {
    body: JSON.stringify({ reason: reason.trim() }),
   });
   const data = await res.json();
-  if (!res.ok) { alert(data.reason || data.error || (en ? 'Request failed' : '申請失敗')); return; }
-  alert(data.message || (en ? 'Refund request received; support will contact you.' : '已收到你的退款申請,客服會與你聯繫。'));
+  if (!res.ok) { alert(data.reason || data.error || P('申請失敗', 'Request failed')); return; }
+  alert(data.message || P('已收到你的退款申請,客服會與你聯繫。', 'Refund request received; support will contact you.'));
  } catch (err) {
-  alert((en ? 'Refund request failed: ' : '退款申請失敗:') + err.message);
+  alert(P('退款申請失敗:', 'Refund request failed: ') + err.message);
  } finally {
-  if (btn) { btn.disabled = false; btn.textContent = en ? 'Request a refund' : '申請退費'; }
+  if (btn) { btn.disabled = false; btn.textContent = P('申請退費', 'Request a refund'); }
  }
 }
 
@@ -922,24 +923,25 @@ async function requestRefund() {
  // ATM／超商付款走人工退款(信用卡退刷會回「訂單不存在」)
  if (_sub && (_sub.pay_type === 'atm' || _sub.pay_type === 'cvs')) return requestRefundAtm();
  const isPaypal = !!(_sub && _sub.paypal_capture);
- const _en = (function(){ try { return localStorage.getItem('ui_lang') === 'en'; } catch(e){ return false; } })();
+ // 外語介面 → I18n.pick(繁中, 英文)(ko/vi/id/th 查對照表,查不到退英文);中文照繁中
+ const P = (zh, en) => (typeof I18n !== 'undefined' && I18n.isForeign()) ? I18n.pick(zh, en) : zh;
  const ebWarn = (_sub && _sub.is_early_bird)
-   ? (_en ? '\n• Early-bird is a one-time limited offer: after a refund you can no longer subscribe at the early-bird price; future subscriptions are at the current regular price.'
-          : '\n• 早鳥為限量一次性優惠:退費後無法再以早鳥價訂閱,日後重新訂閱僅能用現行一般價。')
+   ? P('\n• 早鳥為限量一次性優惠:退費後無法再以早鳥價訂閱,日後重新訂閱僅能用現行一般價。',
+       '\n• Early-bird is a one-time limited offer: after a refund you can no longer subscribe at the early-bird price; future subscriptions are at the current regular price.')
    : '';
  // 揪團主揪:退費 = 全團一起停(團員權益跟著主揪),一定要先講
  const grpWarn = (_sub && /^group4_/.test(_sub.plan || ''))
-   ? (_en ? '\n• This is a group plan: after the refund, Premium stops for everyone in your group.'
-          : '\n• 這是揪團方案:退費後,全團成員的 Premium 會一起停止。')
+   ? P('\n• 這是揪團方案:退費後,全團成員的 Premium 會一起停止。',
+       '\n• This is a group plan: after the refund, Premium stops for everyone in your group.')
    : '';
  const refundDesc = isPaypal
-   ? (_en ? '• Funds are returned to your original payment method; timing depends on the payment provider / card issuer\n• First purchase only, within 7 days; contact support if past due'
-          : '• 款項退回你的原付款方式,入帳時間依金流服務商 / 發卡行而定\n• 僅限首購 7 天內;逾期請來信客服')
-   : (_en ? '• The refund goes back to your card via the issuing bank; timing depends on your billing cycle (if past the statement date, it may appear on the next statement)\n• Full unconditional refund within 7 days; after that, prorated by the unused portion'
-          : '• 退款經發卡銀行退回原卡,入帳時間依你的信用卡結帳週期而定（若已過結帳日,可能顯示在下一期帳單）\n• 七天內為無條件全額退;逾七天按未使用比例退');
- const _refundMsg = _en
-   ? ('Request a refund?\n\nAfter you confirm:\n• Your subscription drops to the free plan immediately\n' + refundDesc + '\n• Your usage records during the subscription are kept' + ebWarn + grpWarn + '\n(We reserve the right to refuse future subscriptions only for accounts that clearly abuse refunds.)')
-   : ('確定要申請退費?\n\n按下確認後:\n• 訂閱立刻降級為免費版\n' + refundDesc + '\n• 已訂閱期間使用記錄會保留' + ebWarn + grpWarn + '\n（本站僅對明顯惡意濫用退費之帳號,保留拒絕未來新訂閱之權利）');
+   ? P('• 款項退回你的原付款方式,入帳時間依金流服務商 / 發卡行而定\n• 僅限首購 7 天內;逾期請來信客服',
+       '• Funds are returned to your original payment method; timing depends on the payment provider / card issuer\n• First purchase only, within 7 days; contact support if past due')
+   : P('• 退款經發卡銀行退回原卡,入帳時間依你的信用卡結帳週期而定（若已過結帳日,可能顯示在下一期帳單）\n• 七天內為無條件全額退;逾七天按未使用比例退',
+       '• The refund goes back to your card via the issuing bank; timing depends on your billing cycle (if past the statement date, it may appear on the next statement)\n• Full unconditional refund within 7 days; after that, prorated by the unused portion');
+ const _refundMsg = P('確定要申請退費?\n\n按下確認後:\n• 訂閱立刻降級為免費版\n', 'Request a refund?\n\nAfter you confirm:\n• Your subscription drops to the free plan immediately\n')
+   + refundDesc + P('\n• 已訂閱期間使用記錄會保留', '\n• Your usage records during the subscription are kept') + ebWarn + grpWarn
+   + P('\n（本站僅對明顯惡意濫用退費之帳號,保留拒絕未來新訂閱之權利）', '\n(We reserve the right to refuse future subscriptions only for accounts that clearly abuse refunds.)');
  if (!confirm(_refundMsg)) return;
  const btn = document.getElementById('btnRefund');
  if (btn) { btn.disabled = true; btn.textContent = '處理中…'; }

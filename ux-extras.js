@@ -407,10 +407,11 @@
       e.stopPropagation(); closePop();
       try {
         var ctxType = /助詞|助動詞|語尾|接続/.test(data.c || '') ? 'grammar' : 'vocab';
-        var isEn = (typeof I18n !== 'undefined' && I18n.getLang && I18n.getLang() === 'en');
+        var isFg = !!(typeof I18n !== 'undefined' && I18n.isForeign && I18n.isForeign());
         window.Tutor.open({ type: ctxType, title: data.w + (data.r && data.r !== data.w ? '(' + data.r + ')' : ''), body: [data.c, data.m].filter(Boolean).join(' / '), level: window.currentLevel || '' });
-        window.Tutor.ask(isEn
-          ? 'How is 「' + data.w + '」 used? Give 3 example sentences from everyday life, and note any similar words and how they differ.'
+        // 外語(en/ko/vi/id/th):以模板查 pick(不帶單字,對照表才對得到),再填回單字
+        window.Tutor.ask(isFg
+          ? I18n.pick('「{w}」怎麼用?給我 3 個生活例句,並說明跟相似的字差在哪。', 'How is 「{w}」 used? Give 3 example sentences from everyday life, and note any similar words and how they differ.').replace('{w}', data.w)
           : '「' + data.w + '」怎麼用?給我 3 個生活例句,並說明跟相似的字差在哪。', 'ask');
       } catch (err) {}
     });
