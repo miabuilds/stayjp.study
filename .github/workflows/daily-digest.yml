@@ -35,3 +35,10 @@ jobs:
           if [ "$THREADS_SUMMARY" = "null" ]; then THREADS_SUMMARY=""; fi
           export THREADS_SUMMARY
           node scripts/daily-digest.mjs
+      - name: Push daily summary to StayHQ
+        if: always()
+        env:
+          GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
+          HQ_URL: ${{ secrets.HQ_URL }}
+          HQ_TOKEN: ${{ secrets.HQ_TOKEN }}
+        run: node scripts/hq-push.mjs 14
