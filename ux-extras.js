@@ -152,11 +152,29 @@
       return at;
     } catch (e) { return null; }
   }
+  // 例句補讀音表(ex-furigana.js,離線用 kuromoji+VOICEVOX 交叉驗證產生):key=整句,value=[[裸漢字段, 讀音],…] 依出現順序。
+  // 只在這句本來會「留白」的段落才用,字典有的詞照舊;表裡沒這句就跟以前一樣。
+  function exHash(t) {   // 跟 scripts/gen-ex-furigana.mjs 同一條 djb2(8 hex)
+    var h = 5381; for (var q = 0; q < t.length; q++) { var cp = t.codePointAt(q); if (cp > 0xffff) q++; h = ((Math.imul(h, 33) ^ cp) >>> 0); }
+    return ('0000000' + h.toString(16)).slice(-8);
+  }
+  function exFuriFor(text) {
+    var m = (typeof window !== 'undefined' && window.EX_FURI) ? window.EX_FURI[exHash(text)] : null;
+    if (!m || !m.length) return null;
+    var pairs = m.slice(), pos = 0;
+    return { take: function (i, t) {   // 位置 i 起若正好是下一個裸段 → 回讀音並消耗掉
+      if (!pairs.length) return null;
+      var run = pairs[0][0];
+      if (t.substr(i, run.length) !== run) return null;
+      var r = pairs.shift()[1]; return { run: run, reading: r };
+    } };
+  }
   function furiganaHTML(text, opts) {
     if (text == null) return '';
     text = String(text);
     var dc = dict();
     var kAt = kanaMatchesAt(text, opts);
+    var exf = exFuriFor(text);
     var out = '', i = 0;
     while (i < text.length) {
       if (!isKanji(text[i])) {
@@ -205,6 +223,8 @@
       if (matched && matched.sub.length === 1 && !matched.conj &&
           ((i + 1 < text.length && isKanji(text[i + 1])) || (i > 0 && isKanji(text[i - 1]))
            || (dc.NOBARE && dc.NOBARE[matched.sub]))) {   // 多音字/活用語干 裸出現 → 不標(語境不定,標了常錯)
+        var ef1 = exf && exf.take(i, text);
+        if (ef1) { out += '<ruby>' + escapeHtml(ef1.run) + '<rt>' + escapeHtml(ef1.reading) + '</rt></ruby>'; i += ef1.run.length; continue; }
         out += escapeHtml(text[i]); i++; continue;
       }
       // 單漢字 + 剩餘文字是某個長詞條的「前綴」→ 這個詞被截斷了(最常見成因:
@@ -231,7 +251,11 @@
             }
           }
         }
-        if (!matched) { out += escapeHtml(text[i]); i++; continue; }
+        if (!matched) {
+          var ef2 = exf && exf.take(i, text);
+          if (ef2) { out += '<ruby>' + escapeHtml(ef2.run) + '<rt>' + escapeHtml(ef2.reading) + '</rt></ruby>'; i += ef2.run.length; continue; }
+          out += escapeHtml(text[i]); i++; continue;
+        }
       }
       if (matched) {
         var inner = rubyOf(matched.sub, matched.reading);
@@ -240,7 +264,11 @@
         else if (matched.entry && matched.entry.m) data = { w: matched.sub, r: matched.entry.r, m: matched.entry.m, c: matched.entry.c, f: '' };
         out += data ? tapSpan(inner, data) : inner;
         i += matched.sub.length;
-      } else { out += escapeHtml(text[i]); i++; }
+      } else {
+        var ef3 = exf && exf.take(i, text);   // 字典完全沒有這個詞 → 補讀音表有就標
+        if (ef3) { out += '<ruby>' + escapeHtml(ef3.run) + '<rt>' + escapeHtml(ef3.reading) + '</rt></ruby>'; i += ef3.run.length; }
+        else { out += escapeHtml(text[i]); i++; }
+      }
     }
     return out;
   }

@@ -250,7 +250,11 @@ service cloud.firestore {
         && (!('ua' in request.resource.data) || (request.resource.data.ua is string && request.resource.data.ua.size() <= 300))
         && (!('lang' in request.resource.data) || (request.resource.data.lang is string && request.resource.data.lang.size() <= 10))
         && (!('platform' in request.resource.data) || (request.resource.data.platform is string && request.resource.data.platform.size() <= 20));
-      allow read, update, delete: if false;
+      // admin 後台「回報」分頁:讀全部、只能改 status / note / handled_at(2026-10-28 起;之前只有 CLI 看得到)
+      allow read: if request.auth != null && isAdmin();
+      allow update: if request.auth != null && isAdmin()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'note', 'handled_at']);
+      allow delete: if false;
     }
 
     // 寄信 queue(Trigger Email 擴充套件用)— cron/擴充套件寫,admin 讀(看板統計今日寄信量)

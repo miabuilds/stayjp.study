@@ -95,6 +95,21 @@ const Quiz = (() => {
     return [...base].filter(s => s.length >= 2 && !/っっ|っ$|^っ|うう/.test(s));
   }
 
+  // 「已經會的字」= SRS 裡 interval ≥ 3 天且最近一次答對(correct 累計 ≥ 2);讀不到 SRS 就回空集合(行為同以前)
+  function _knownSet() {
+    const set = new Set();
+    try {
+      const d = JSON.parse(localStorage.getItem('srs_data') || '{}');
+      const pre = quizLevel + ':';
+      for (const k of Object.keys(d)) {
+        if (!k.startsWith(pre)) continue;
+        const e = d[k]; if (!e) continue;
+        if ((e.interval || 0) >= 3 && (e.correct || 0) >= 2) set.add(k.slice(pre.length));
+      }
+    } catch (e) {}
+    return set;
+  }
+
   function generate(source, distractorPool, count) {
     // 兼容舊呼叫：如果只傳 1~2 個參數，補成同個 pool
     if (count === undefined) { count = distractorPool; distractorPool = source; }
@@ -103,7 +118,11 @@ const Quiz = (() => {
     const VD = window.VocabDistract;
     const filtered = quizType === 'reading' ? source.filter(d => d.w !== d.r)
       : (VD ? VD.preferOpaque(source, Math.min(count, source.length)) : source);
-    const shuffled = (typeof shuf === 'function' ? shuf(filtered) : [...filtered]);
+    // 已經會的字少出:用 SRS 紀錄(每題答完 SRS.record 會寫)把「連續答對、間隔已拉長」的字排到後面,
+    // 先出沒考過/答錯過/剛學的字;池子不夠才輪到會的字。(用戶 2026-10-07 回饋:答對的字在之後的測驗一直重複出現)
+    const shuffled0 = (typeof shuf === 'function' ? shuf(filtered) : [...filtered]);
+    const known = _knownSet();
+    const shuffled = known.size ? shuffled0.filter(d => !known.has(d.w)).concat(shuffled0.filter(d => known.has(d.w))) : shuffled0;
     const picked = shuffled.slice(0, Math.min(count, shuffled.length));
     return picked.map(word => {
       let distractors;

@@ -68,3 +68,6 @@ scripts/out/*
 !scripts/out/l10n/
 scripts/out/l10n/logs/
 scripts/out/l10n/*/_fail-*.log
+
+# 含用戶信箱/憑證的本機腳本,不進公開 repo
+scripts/private/

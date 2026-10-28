@@ -435,7 +435,7 @@ const VOCAB_N4 = [
 {w:"入院する",r:"にゅういんする",m:"住院",c:"動",t:"自",ex:{j:"祖父は病気で先週から入院しています。",z:"祖父因為生病,從上週開始住院。",e:"My grandfather has been in the hospital since last week because of illness."}},
 {w:"退院する",r:"たいいんする",m:"出院",c:"動",t:"自",ex:{j:"手術がうまくいって、来週退院できるそうです。",z:"聽說手術很順利,下週就能出院了。",e:"The surgery went well, and I hear I can leave the hospital next week."}},
 {w:"翻訳する",r:"ほんやくする",m:"翻譯",c:"動",t:"他",ex:{j:"この英語の手紙を日本語に翻訳してもらえますか。",z:"可以幫我把這封英文信翻譯成日文嗎?",e:"Could you translate this English letter into Japanese for me?"}},
-{w:"輸出する",r:"ゆしゅつする",m:"出口",c:"動",t:"両",ex:{j:"日本は車をたくさん外国に輸出しています。",z:"日本向國外出口大量的汽車。",e:"Japan exports a lot of cars to foreign countries."}},
+{w:"輸出する",r:"ゆしゅつする",m:"輸出、出口(貨物)",c:"動",t:"両",ex:{j:"日本は車をたくさん外国に輸出しています。",z:"日本向國外出口大量的汽車。",e:"Japan exports a lot of cars to foreign countries."}},
 {w:"輸入する",r:"ゆにゅうする",m:"進口",c:"動",t:"両",ex:{j:"この店はイタリアからチーズを輸入しています。",z:"這家店從義大利進口起司。",e:"This shop imports cheese from Italy."}},
 {w:"利用する",r:"りようする",m:"利用",c:"動",t:"他",ex:{j:"駅前の図書館は誰でも自由に利用できます。",z:"車站前的圖書館任何人都能自由利用。",e:"Anyone can freely use the library in front of the station."}},
 {w:"確認する",r:"かくにんする",m:"確認",c:"動",t:"他",ex:{j:"出かける前に、電気を消したかどうか確認しました。",z:"出門前,我確認了電燈有沒有關。",e:"Before going out, I checked whether I had turned off the lights."}},

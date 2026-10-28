@@ -607,7 +607,7 @@ const VOCAB_N3 = [
 {w:"放送する",r:"ほうそうする",m:"播放",c:"動",t:"両",ex:{j:"その試合は今夜九時から全国に放送されるそうです。",z:"聽說那場比賽今晚九點起將向全國播放。",e:"I hear that match will be broadcast nationwide starting at nine o'clock tonight."}},
 {w:"出版する",r:"しゅっぱんする",m:"出版",c:"動",t:"両",ex:{j:"先生が長年書きためた研究を、ついに一冊の本として出版することになった。",z:"老師多年累積書寫的研究,終於要以一本書的形式出版了。",e:"The research the professor spent years writing is finally going to be published as a book."}},
 {w:"印刷する",r:"いんさつする",m:"印刷",c:"動",t:"両",ex:{j:"会議で配る資料を、念のため多めに印刷しておきました。",z:"要在會議上發的資料,我為了保險起見多印了一些。",e:"Just to be safe, I printed extra copies of the materials to hand out at the meeting."}},
-{w:"輸出する",r:"ゆしゅつする",m:"出口",c:"動",t:"両",ex:{j:"この工場で作られた自動車は、世界中の国々に輸出されている。",z:"這間工廠製造的汽車出口到世界各國。",e:"The cars made in this factory are exported to countries all over the world."}},
+{w:"輸出する",r:"ゆしゅつする",m:"輸出、出口(貨物)",c:"動",t:"両",ex:{j:"この工場で作られた自動車は、世界中の国々に輸出されている。",z:"這間工廠製造的汽車出口到世界各國。",e:"The cars made in this factory are exported to countries all over the world."}},
 {w:"輸入する",r:"ゆにゅうする",m:"進口",c:"動",t:"両",ex:{j:"日本はエネルギー資源の多くを海外から輸入しています。",z:"日本的能源資源大多從國外進口。",e:"Japan imports most of its energy resources from abroad."}},
 {w:"出発する",r:"しゅっぱつする",m:"出發",c:"動",t:"自",ex:{j:"渋滞を避けるため、明日は朝六時に出発しようと思っています。",z:"為了避開塞車,我打算明天早上六點出發。",e:"To avoid the traffic jams, I'm planning to set off at six tomorrow morning."}},
 {w:"到着する",r:"とうちゃくする",m:"到達",c:"動",t:"自",ex:{j:"飛行機は予定より三十分遅れて空港に到着した。",z:"飛機比預定時間晚了三十分鐘抵達機場。",e:"The plane arrived at the airport thirty minutes later than scheduled."}},

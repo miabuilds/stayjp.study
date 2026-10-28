@@ -164,6 +164,7 @@ textarea.note:focus{outline:none;border-color:var(--ac)}
  <button id="tabRefunds"> 退款申請</button>
  <button id="tabPayouts"> 領款申請</button>
  <button id="tabErrLog"> 報錯</button>
+ <button id="tabReports"> 回報 <span id="rpBadge" style="display:none;background:#EF4444;color:#fff;border-radius:999px;padding:0 6px;font-size:11px"></span></button>
  </div>
  <div class="me" id="meInfo"></div>
  <button class="btn" onclick="logout()" style="font-size:11px;padding:4px 10px">登出</button>
@@ -404,6 +405,22 @@ textarea.note:focus{outline:none;border-color:var(--ac)}
  <div id="elList" style="font-size:12px;color:var(--tx2)">點「重新整理」載入。</div>
  </div>
 
+ <!-- App 內「回報」按鈕(刷題/文法/單字卡/評分留言)→ Firestore reports。跟 feedback 集合是兩條線,之前只有 CLI 看得到 -->
+ <div id="wrapReports" class="stats">
+ <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:14px">
+ <h2 style="font-size:14px;color:var(--tx2);text-transform:uppercase;letter-spacing:.5px;margin:0">App 內回報(題目／文法／單字／評分留言)</h2>
+ <select id="rpStatus" onchange="renderReports()" style="min-height:36px;padding:4px 8px;border:1px solid var(--bd);border-radius:8px;background:var(--bg2);color:var(--tx);font-size:13px">
+ <option value="new" selected>未處理</option>
+ <option value="resolved">已處理</option>
+ <option value="wontfix">不處理</option>
+ <option value="all">全部</option>
+ </select>
+ <button class="btn" onclick="renderReports()" style="font-size:11px;padding:4px 10px"><i data-ic=refresh></i> 重新整理</button>
+ <span id="rpCount" style="font-size:12px;color:var(--tx2)"></span>
+ </div>
+ <div id="rpList" style="font-size:13px"></div>
+ </div>
+
  <!-- ATM 退款申請 -->
  <div id="wrapRefunds" class="stats">
  <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:14px">
@@ -516,7 +533,10 @@ document.getElementById('tabSetSub').onclick = () => switchTab('setsub');
 document.getElementById('tabRefunds').onclick = () => switchTab('refunds');
 document.getElementById('tabPayouts').onclick = () => switchTab('payouts');
 document.getElementById('tabErrLog').onclick = () => switchTab('errlog');
+document.getElementById('tabReports').onclick = () => switchTab('reports');
 function switchTab(tab) {
+ document.getElementById('tabReports').classList.toggle('on', tab === 'reports');
+ document.getElementById('wrapReports').classList.toggle('on', tab === 'reports');
  document.getElementById('tabRefunds').classList.toggle('on', tab === 'refunds');
  document.getElementById('wrapRefunds').classList.toggle('on', tab === 'refunds');
  document.getElementById('tabPayouts').classList.toggle('on', tab === 'payouts');
@@ -537,6 +557,7 @@ function switchTab(tab) {
  if (tab === 'subs') renderSubs();
  if (tab === 'ledger') renderLedger();
  if (tab === 'errlog') renderErrLog();
+ if (tab === 'reports') renderReports();
  if (tab === 'setsub') loadPaypalPending();
  if (tab === 'refunds') renderRefunds();
  if (tab === 'payouts') renderPayouts();
@@ -814,6 +835,59 @@ const FN_USER_STATS = 'https://asia-east1-jpnote-1bdd6.cloudfunctions.net/adminU
 const FN_CLEANUP_PENDING = 'https://asia-east1-jpnote-1bdd6.cloudfunctions.net/adminCleanupPending';
 const FN_RECOMPUTE_EB = 'https://asia-east1-jpnote-1bdd6.cloudfunctions.net/adminRecomputeEarlyBird';
 const FN_SET_SUB = 'https://asia-east1-jpnote-1bdd6.cloudfunctions.net/adminSetSubscription';
+// ── App 內回報(reports 集合):列出、標記處理、回信(Gmail 撰寫視窗,同 feedback 的做法) ──
+let _rpCache = [];
+async function renderReports() {
+ const el = document.getElementById('rpList'); const st = document.getElementById('rpStatus').value;
+ el.innerHTML = '<div style="padding:20px;color:var(--tx2)">載入中…</div>';
+ try {
+ const snap = await db.collection('reports').orderBy('created_at', 'desc').limit(300).get();
+ _rpCache = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+ } catch (e) { el.innerHTML = '<div style="padding:20px;color:#EF4444">讀取失敗:' + escapeHtml(e.message) + '<br>firestore.rules 的 reports 要開 admin 讀寫。</div>'; return; }
+ const open = _rpCache.filter(r => (r.status || 'new') === 'new').length;
+ const badge = document.getElementById('rpBadge'); badge.textContent = open; badge.style.display = open ? '' : 'none';
+ const rows = _rpCache.filter(r => st === 'all' || (r.status || 'new') === st);
+ document.getElementById('rpCount').textContent = `${rows.length} 筆(未處理 ${open})`;
+ if (!rows.length) { el.innerHTML = '<div style="padding:30px;text-align:center;color:var(--tx3)">沒有符合條件的回報</div>'; return; }
+ const fmt = (t) => t && t.toDate ? t.toDate().toLocaleString('zh-TW', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }) : '-';
+ const age = (t) => t && t.toDate ? Math.floor((Date.now() - t.toDate()) / 864e5) : null;
+ el.innerHTML = rows.map(r => {
+ const s = r.status || 'new'; const d = age(r.created_at);
+ const mail = r.email && !/@privaterelay\.appleid\.com$/i.test(r.email) ? r.email : '';
+ return `<div style="padding:12px 0;border-bottom:1px solid var(--bd)">
+ <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:12px;color:var(--tx2)">
+ <span class="badge b-${s === 'new' ? 'new' : s === 'resolved' ? 'resolved' : 'ignored'}">${s === 'new' ? '未處理' : s === 'resolved' ? '已處理' : s}</span>
+ <b style="color:var(--tx)">${escapeHtml(r.kind || '')}</b>${r.id ? ' <span>' + escapeHtml(r.id) + '</span>' : ''}
+ <span>${fmt(r.created_at)}${d != null && s === 'new' && d > 7 ? ' <span style="color:#EF4444">(' + d + ' 天)</span>' : ''}</span>
+ <span>${escapeHtml(r.platform || '')}</span>
+ <span>${escapeHtml(r.email || '匿名')}</span>
+ </div>
+ ${r.detail ? `<div style="margin-top:6px;font-size:12px;color:var(--tx2);white-space:pre-wrap">${escapeHtml(r.detail)}</div>` : ''}
+ <div style="margin-top:6px;white-space:pre-wrap">${escapeHtml(r.desc || '')}</div>
+ ${r.note ? `<div style="margin-top:6px;font-size:12px;color:var(--ok,#15803d)">處理備註:${escapeHtml(r.note)}</div>` : ''}
+ <div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap">
+ ${s === 'new' ? `<button class="btn" style="font-size:11px;padding:4px 10px" onclick="rpSet('${r.id}','resolved')">標記已處理</button>
+ <button class="btn" style="font-size:11px;padding:4px 10px" onclick="rpSet('${r.id}','wontfix')">不處理</button>` : `<button class="btn" style="font-size:11px;padding:4px 10px" onclick="rpSet('${r.id}','new')">退回未處理</button>`}
+ ${mail ? `<button class="btn" style="font-size:11px;padding:4px 10px" onclick="rpMail('${r.id}')"><i data-ic=mail></i> 回信</button>` : ''}
+ ${r.page ? `<a class="btn" style="font-size:11px;padding:4px 10px" href="${escapeHtml(r.page)}" target="_blank" rel="noopener">開啟頁面</a>` : ''}
+ </div></div>`;
+ }).join('');
+ if (window.StayIcons && StayIcons.render) try { StayIcons.render(el); } catch (e) {}
+}
+async function rpSet(id, status) {
+ try {
+ const upd = { status };
+ if (status === 'resolved' || status === 'wontfix') { upd.handled_at = firebase.firestore.FieldValue.serverTimestamp(); }
+ await db.collection('reports').doc(id).update(upd);
+ renderReports();
+ } catch (e) { if (typeof showToast === 'function') showToast('更新失敗:' + e.message); else console.error(e); }
+}
+function rpMail(id) {
+ const r = _rpCache.find(x => x.id === id); if (!r || !r.email) return;
+ const subject = 'StayJP 回報已處理:' + (r.kind || '') + (r.id ? ' ' + r.id : '');
+ const body = `您好，\n\n謝謝您的回報（${(r.desc || '').slice(0, 80).replace(/\n/g, ' ')}），我們已經修正了。App 不用更新，重新打開就會看到。\n\n如果還有任何問題，歡迎再告訴我們。\n\nStayJP`;
+ window.open(`https://mail.google.com/mail/?authuser=stayjpplan%40gmail.com&view=cm&fs=1&to=${encodeURIComponent(r.email)}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`, '_blank');
+}
 const FN_ERR_LOG = 'https://asia-east1-jpnote-1bdd6.cloudfunctions.net/adminErrorLog';
 const FN_PURGE_TEST = 'https://asia-east1-jpnote-1bdd6.cloudfunctions.net/adminPurgeTest';
 
