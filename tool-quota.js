@@ -471,6 +471,8 @@
       readFree(true);
       // 開閘版:所有登入用戶都監聽訂閱(才偵測得到 premium → 免擋)
       firebase.firestore().doc('users/' + user.uid).onSnapshot(snap => {
+        // 自己存進度(saveAllCloud/saveSRSCloud)也會觸發;訂閱欄位只有後端會改 → 已載入後忽略本機待寫入的事件,免得每答一題重畫工具列
+        if (subLoaded && snap.metadata && snap.metadata.hasPendingWrites) return;
         const data = snap.data() || {};
         cachedSub = data.subscription || null;
         // App 內:原生說已購買(RevenueCat 裝置權益)但帳號 doc 沒訂閱 → 多半是「未登入先買、之後才登入」,

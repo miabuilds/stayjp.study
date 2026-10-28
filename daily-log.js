@@ -69,7 +69,8 @@
     var f = db(); if (!f || !u) return;
     if (unsub) { try { unsub(); } catch (e) {} unsub = null; }
     flush();
-    unsub = f.doc('user_daily/' + u).onSnapshot(function (snap) { applyCloud(snap.exists ? snap.data() : null, onUpdate); }, function () {});
+    // 自己剛寫的(本機延遲補償,待補還沒扣)不處理:否則每答一題都會觸發 → 待補被重複加一次 + 首頁 doRender 整頁重畫(字卡卡頓 2026-10-28)
+    unsub = f.doc('user_daily/' + u).onSnapshot(function (snap) { if (snap.metadata && snap.metadata.hasPendingWrites) return; applyCloud(snap.exists ? snap.data() : null, onUpdate); }, function () {});
     // 回到分頁/App 回前景時補送一次(離線期間的動作)
     if (!attach._vis) { attach._vis = true; document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'visible') flush(); }); }
   }
