@@ -25,6 +25,8 @@
   }
   // 泰文有上下疊的聲調/母音符號,原本為中文設計的緊湊行高(標題 1.1~1.2)會上下互疊 → 全站標題行高放寬
   if (LANG === 'th') { try { const st = document.createElement('style'); st.textContent = 'html[lang="th"] h1,html[lang="th"] h2,html[lang="th"] h3,html[lang="th"] .hs-hello h2,html[lang="th"] .hero h1{line-height:1.45 !important}html[lang="th"] body{line-height:1.7}'; (document.head || document.documentElement).appendChild(st); } catch (_) {} }
+  // 韓文用空格分詞,CJK 預設會在詞中間斷行(「것/과」)→ 照詞斷;日文例句沒空格,長串照樣能斷
+  if (LANG === 'ko') { try { const st = document.createElement('style'); st.textContent = 'html[lang="ko"] body{word-break:keep-all;overflow-wrap:anywhere}'; (document.head || document.documentElement).appendChild(st); } catch (_) {} }
   // 對照表延後到真正要翻時才讀(上面補載的 ui-map.js 要等本檔跑完才會執行)
   let MAP = null, PATTERNS = null, SUBS = null;
   function ensureMap() {
@@ -50,6 +52,9 @@
     if (!key) return text;
     ensureMap();
     if (Object.prototype.hasOwnProperty.call(MAP, key)) return text.replace(key, MAP[key]);
+    // gen-l10n 抽字時把連續空白(含全形「　」、跨行換行)收成一個半形空白,查不到就照同規則再查一次
+    const nk = key.replace(/\s+/g, ' ');
+    if (nk !== key && Object.prototype.hasOwnProperty.call(MAP, nk)) return text.replace(key, MAP[nk]);
     for (const p of PATTERNS) { p.re.lastIndex = 0; if (p.re.test(key)) { const o = key.replace(p.re, p.to); if (o !== key) return text.replace(key, o); } }
     // 子字串:僅對「短節點」(<40 字)做,避免把長 prose 譯成中英混雜的半殘;長句沒 exact 命中就整段保留。
     if (text.length < 40 && /[一-鿿]/.test(text)) {

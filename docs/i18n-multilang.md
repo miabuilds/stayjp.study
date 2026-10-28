@@ -55,4 +55,5 @@ Key 用專案 `.env` 的 `PROJECT_ANTHROPIC_KEY`(新創組織,腳本會驗組織
 
 ## 已知限制
 - 單一 URL、語言存在 localStorage/cookie,沒有 hreflang;SEO 仍以繁中為主。
-- 文法詳解(gdetail)量大,翻完前外語介面會退回中文詳解。
+- 文法詳解(gdetail)五語 382 篇已全部翻完(2026-10-28);之後新增文法卡要再跑 `gdetail <code>` + `build <code>`。
+- 網頁付款只收台幣(綠界);外語介面(en/ko/vi/id/th)在 pricing.html 方案上方會自動顯示「請到 App Store / Google Play 購買」提醒卡(`#storeNotice`,App 內不顯示)。

@@ -30,7 +30,7 @@ const LANGS = {
 };
 const MASCOT = { en: 'Tanuki', ko: '타누키', vi: 'Tanuki', id: 'Tanuki', th: 'ทานูกิ' };
 // build 時把各批次不一致的吉祥物譯名統一
-const MASCOT_FIX = { ko: [/샤오리|너구리|小狸/g], vi: [/Tiểu Ly|tanuki|小狸/g], id: [/tanuki|小狸/g], th: [/แรคคูน|小狸/g] };
+const MASCOT_FIX = { ko: [/샤오리|너구리|小狸/g, /(?:타누키 )?(?<!카테)고리(?=에게|가 |의 |는 |한테|를 )/g], vi: [/Tiểu Ly|tanuki|小狸/g], id: [/tanuki|小狸/g], th: [/แรคคูน|小狸/g] };
 const PARTS = ['i18n', 'ui', 'content', 'rl', 'drill', 'drilltrans', 'articles', 'misc', 'native', 'gdetail'];
 
 // ── key / API ──
@@ -81,7 +81,26 @@ function parseJSON(text) {
   s = s.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '');
   const a = s.indexOf('{'), b = s.lastIndexOf('}');
   if (a < 0 || b < 0) throw new Error('回覆沒有 JSON');
-  return JSON.parse(s.slice(a, b + 1));
+  const body = s.slice(a, b + 1);
+  try { return JSON.parse(body); } catch (e) { return JSON.parse(repairQuotes(body)); }
+}
+// 模型偶爾在字串值裡放未跳脫的 "(例如印尼文/泰文詳解裡的引號)→ 逐字掃:字串內的 " 若後面(略過空白)不是 , } ] : 就當成內文引號跳脫
+function repairQuotes(src) {
+  let out = '', inStr = false;
+  for (let i = 0; i < src.length; i++) {
+    const ch = src[i];
+    if (!inStr) { if (ch === '"') inStr = true; out += ch; continue; }
+    if (ch === '\\') { out += ch + (src[i + 1] || ''); i++; continue; }
+    if (ch === '"') {
+      let j = i + 1; while (j < src.length && /\s/.test(src[j])) j++;
+      const nx = src[j];
+      if (nx === ',' || nx === '}' || nx === ']' || nx === ':' || j >= src.length) { inStr = false; out += ch; }
+      else out += '\\"';
+      continue;
+    }
+    out += ch;
+  }
+  return out;
 }
 
 // ── helpers:載入前端 JS 資料檔 ──
@@ -174,14 +193,14 @@ function unitsI18n() {
 // UI 對照表:ui-map 鍵 + enOr(zh,en) 字串 + 頁面靜態文字 + 分類/主題名
 function extractPairs() {
   const files = fs.readdirSync(ROOT).filter(f => /\.(js|html)$/.test(f) && !/^(ui-map|content-|jlpt-questions-|reading-listening-|jlpt-q-trans-|articles-|misc-|grammar-detail-)/.test(f) && !/^(sw|i18n)\.js$/.test(f));
-  const re = /\b(?:enOr|L|eo|Lc|E|pick)\(\s*('(?:[^'\\]|\\.)*'|"(?:[^"\\]|\\.)*"|`[^`$]*`)\s*,\s*('(?:[^'\\]|\\.)*'|"(?:[^"\\]|\\.)*"|`[^`$]*`)\s*\)/g;
+  const re = /\b(?:enOr|L|eo|Lc|E|pick|_en|tr|_T)\(\s*('(?:[^'\\]|\\.)*'|"(?:[^"\\]|\\.)*"|`[^`$]*`)\s*,\s*('(?:[^'\\]|\\.)*'|"(?:[^"\\]|\\.)*"|`[^`$]*`)(?:\s*,\s*('(?:[^'\\]|\\.)*'|"(?:[^"\\]|\\.)*"|`[^`$]*`))?\s*\)/g;   // 第三參數 = Campaign.tr / _T 的簡中,忽略
   // 含 ${…} 的樣板字串:把每個 ${…} 換成 #(執行期 I18n.pick 會把數字正規化成 # 再查,見 i18n.js)
-  const reT = /\b(?:enOr|L|eo|Lc|E|pick)\(\s*(`(?:[^`\\]|\\.)*`)\s*,\s*(`(?:[^`\\]|\\.)*`)\s*\)/g;
+  const reT = /\b(?:enOr|L|eo|Lc|E|pick|_en|tr|_T)\(\s*(`(?:[^`\\]|\\.)*`)\s*,\s*(`(?:[^`\\]|\\.)*`)\s*\)/g;
   const tpl = s => s.slice(1, -1).replace(/\$\{[^}]*\}/g, '#').replace(/\\`/g, '`');
   const pairs = {};
   // 字串串接(L('連續 ' + n + ' 天', n + '-day streak')):手動掃括號,頂層逗號切兩個參數,每段以頂層 + 切開,非字面值的段落換成 #
   function concatPairs(s, out) {
-    const call = /\b(?:enOr|L|eo|Lc|E|pick)\(/g; let m;
+    const call = /\b(?:enOr|L|eo|Lc|E|pick|_en|tr|_T)\(/g; let m;
     while ((m = call.exec(s))) {
       let i = m.index + m[0].length, depth = 1, q = null, args = [], cur = '';
       for (; i < s.length && depth > 0; i++) {
@@ -193,6 +212,7 @@ function extractPairs() {
         cur += ch;
       }
       args.push(cur);
+      if (args.length === 3 && /(?:tr|_T)\($/.test(m[0])) args.length = 2;   // Campaign.tr / _T(zh, en, cn)
       if (args.length !== 2) continue;
       if (!args.some(a => a.includes('+'))) continue;   // 單一字面值的上面 regex 已處理
       const piece = a => {
@@ -435,10 +455,12 @@ async function runPart(part, lang, limit) {
 
 // ═══════════════ build:組前端檔 ═══════════════
 // 只動「值」不動 key(key 是繁中原文,用來查表;改了就查不到 —— 「小狸短劇」曾因此變成「타누키短劇」而失效)
+// 韓文數字+量詞要黏著寫(「1 일」→「1일」);N5 這類代號後面的數字不動,量詞後面只接空白/標點/助詞,避開 일본・번역・명사 這種詞
+const KO_NUM_SPACE = /(^|[^A-Za-z0-9])(#|\$\d|\d[\d,]*) (일|개|단계|분|회|번|명|주|초|점|문항|문제|시간|개월|년|살|원|배|장|편|줄|글자)(?=$|[\s.,·…)\]/:!?」』~]|은|는|이|가|을|를|의|에|째|씩|만|도|로|까지|부터|동안|짜리|예요|이에요)/g;
 function fixNames(lang, obj) {
   const fixes = MASCOT_FIX[lang] || [];
   const fx = v => {
-    if (typeof v === 'string') { for (const re of fixes) v = v.replace(re, MASCOT[lang]); return v; }
+    if (typeof v === 'string') { for (const re of fixes) v = v.replace(re, MASCOT[lang]); if (lang === 'ko') v = v.replace(KO_NUM_SPACE, '$1$2$3').replace(/한일 자막|중일 자막/g, '일본어 자막·번역');   // 外語用戶的 YT 字幕是日文+英文軌,不是韓文 return v; }
     if (Array.isArray(v)) return v.map(fx);
     if (v && typeof v === 'object') { const o = {}; for (const k of Object.keys(v)) o[k] = fx(v[k]); return o; }
     return v;
