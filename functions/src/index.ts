@@ -72,3 +72,4 @@ export { invoiceAuditCron } from "./invoice-audit-cron";
 
 // Mia 的電子報(stayjp.study/letters):訂閱(雙重確認)/退訂/每小時照 feed.json 排寄
 export { newsletterSubscribe, newsletterConfirm, newsletterUnsub, newsletterCron, newsletterPrefs, newsletterAdmin } from "./newsletter";
+export { adminEcpayPeriodLog } from "./admin-ecpay-period-log";

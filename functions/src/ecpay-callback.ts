@@ -99,16 +99,27 @@ export const ecpayCallback = functions.onRequest(
       }
 
       // ── Idempotency check ──
-      // ECPay 在 sandbox / 定期定額 偶會重發 callback;同個 TradeNo 已成功寫過就 skip
-      // 用 external_id + status=success 當 dedupe key
-      const idempotencyKey = tradeNo || merchantTradeNo;
+      // ECPay 在 sandbox / 定期定額 偶會重發 callback;同一期已成功寫過就 skip
+      // ⚠️ 必須用 invoiceKey(每期不同),不能用 tradeNo || merchantTradeNo:
+      // 續扣沒有 TradeNo → 退成 MerchantTradeNo(每期一樣)→ 第二期寫進帳本後,
+      // 第三期起全被當成重送吃掉(2026-10-29 三筆 150 續扣沒入帳、沒延長、沒開發票)。
+      const idempotencyKey = invoiceKey;
       if (idempotencyKey) {
+        // 只用單一欄位查(自動索引),uid/status 在程式裡過濾 → 不用另建複合索引
         const dupSnap = await db.collection("transactions")
-          .where("uid", "==", uid)
-          .where("external_id", "==", idempotencyKey)
-          .where("status", "==", "success")
-          .limit(1).get();
-        if (!dupSnap.empty) {
+          .where("invoice_key", "==", idempotencyKey)
+          .limit(10).get();
+        let isDup = dupSnap.docs.some(d => d.get("uid") === uid && d.get("status") === "success");
+        // 2026-09-23 前的舊紀錄沒有 invoice_key,首購(有 TradeNo)改用 external_id 備查(既有複合索引)
+        if (!isDup && tradeNo) {
+          const oldSnap = await db.collection("transactions")
+            .where("uid", "==", uid)
+            .where("external_id", "==", String(tradeNo))
+            .where("status", "==", "success")
+            .limit(1).get();
+          isDup = !oldSnap.empty;
+        }
+        if (isDup) {
           console.log("Idempotency: callback already processed for", { uid, idempotencyKey });
           res.status(200).send("1|OK");
           return;
