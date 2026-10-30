@@ -2430,7 +2430,7 @@ function loadCloudData() {
     db.collection('users').doc(currentUser.uid).get(),
     db.collection('user_progress').doc(currentUser.uid).get().catch(() => null),
   ]).then(async ([doc, pdoc]) => {
-    if (!doc.exists && !(pdoc && pdoc.exists)) return;
+    if (!doc.exists && !(pdoc && pdoc.exists)) { _cloudSynced = true; if (_pendingSave) { _pendingSave = false; try { saveAllCloud(); } catch (e) {} } return; }   // 全新用戶:雲端沒東西,直接放行上傳(之前這裡 return 掉 → 第一次登入整個 session 都不上傳)
     const d = doc.exists ? doc.data() : {};
     if (pdoc && pdoc.exists && window.ProgressCodec) {
       const pd = pdoc.data() || {};
@@ -2685,19 +2685,30 @@ const SCALAR_SYNC_KEYS = new Set(['tts_voice','exam_date','base_level','goal_lev
 // 競態鎖:登入用戶「首次雲端下載合併」完成前,任何上傳都可能拿 stale/被清空的本機資料
 // 整欄覆蓋雲端(電腦清過快取 → 開頁瞬間學一下 → 27 天日曆被 1 天蓋掉,用戶多次實錘)。
 let _cloudSynced = false, _pendingSave = false;
+// 只傳「這次有改到」的 key(2026-10-30):之前每次都把 30 個 key 整包上傳(word_notebook/grammar_srs/quiz_history…
+// 老用戶幾十 KB 起跳),收藏一個字就整包傳一次。改成記住上次送出的字串,沒變的 key 不送。
+const _allSent = {};
+let _allSentUid = '';
 function _saveAllCloudNow() {
   if (!currentUser || !db) return;
   if (!_cloudSynced) { _pendingSave = true; return; }   // 合併完成後由 loadCloudData flush
-  const payload = {};
+  if (_allSentUid !== currentUser.uid) { Object.keys(_allSent).forEach(k => delete _allSent[k]); _allSentUid = currentUser.uid; }   // 換帳號 → 基準歸零
+  const payload = {}, sentNow = {};
   SYNC_KEYS.forEach(k => {
     if (k === 'study_log') return;   // 學習日曆改走 saveStudyDayCloud 逐日寫入,永不整欄覆蓋
     try {
       const v = localStorage.getItem(k); if (v == null || v === '') return;
+      if (_allSent[k] === v) return;   // 跟上次送的一樣 → 不送
       payload[k] = SCALAR_SYNC_KEYS.has(k) ? v : JSON.parse(v);   // 純字串直接存,別 JSON.parse
+      sentNow[k] = v;
     } catch(e) {}
   });
   saveStudyDayCloud();   // 今天的日曆格照常上傳(dot-path,只動當天)
-  if (Object.keys(payload).length) db.collection('users').doc(currentUser.uid).set(payload, { merge: true });
+  if (Object.keys(payload).length) {
+    Object.assign(_allSent, sentNow);
+    db.collection('users').doc(currentUser.uid).set(payload, { merge: true })
+      .catch(() => { Object.keys(sentNow).forEach(k => { if (_allSent[k] === sentNow[k]) delete _allSent[k]; }); });   // 被拒(規則/離線逾時)→ 下次再送
+  }
   // 大 key 另壓縮雙寫 user_progress(小純量 exam_date/base_level/goal_level/daily_progress 續留 users)
   if (window.ProgressCodec) {
     const big = {};
