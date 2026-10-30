@@ -50,7 +50,7 @@
   }
   // 聲音跟「用聽的背」設定一致:13=男 → m、8=柔女 → f2、其他 → f
   function voiceCode() {
-    try { var v = localStorage.getItem('tts_voice') || '2'; return v === '13' ? 'm' : (v === '8' ? 'f2' : 'f'); } catch (e) { return 'f'; }
+    try { var v = localStorage.getItem('tts_voice') || '2'; return (v === '13' || v === 'charon') ? 'm' : (v === '8' ? 'f2' : 'f'); } catch (e) { return 'f'; }
   }
   function playB64(b64, seq) {
     if (seq !== _seq) return;

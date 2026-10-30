@@ -350,8 +350,9 @@
         '<label class="sp-switch"><input type="checkbox" ' + (cfg.again ? 'checked' : '') + ' onchange="StudyPlan.set({again:this.checked})"><span></span></label>')
       + (root.PITCH_VERIFIED ? row(L('單字顯示音高', 'Show pitch accent'), L('翻面後在單字後加 ⓪①②③ 標示東京標準語的音調（目前 N5・N4）', 'Adds ⓪①②③ after the word on the back (N5・N4 for now)'),
         '<label class="sp-switch"><input type="checkbox" ' + (cfg.pitch ? 'checked' : '') + ' onchange="StudyPlan.set({pitch:this.checked})"><span></span></label>') : '')   // 音高資料(LLM 產)NHK 抽查只有 ~80%,資料換成 UniDic 驗證過再開(PITCH_VERIFIED)
-      + row(L('語音', 'Voice'), L('單字與例句的聲音（N5・N4 單字＋例句、N3～N1 單字可切換；N3 以上例句與文章為標準聲）', 'Voice for words and sentences (N5・N4 words + sentences, N3–N1 words; N3+ sentences and articles use the standard voice)'),
-        '<select onchange="StudyPlan.setVoice(this.value)">' + VOICES.map(v => '<option value="' + v[0] + '"' + (voice() === v[0] ? ' selected' : '') + '>' + L(v[1], v[2]) + '</option>').join('') + '</select>')
+      + '<div class="sp-sec">' + L('語音', 'Voice') + '</div>'
+      + '<div class="sp-hint">' + L('單字、例句、聽力、文章全站一起換。Premium 可用自然語音；免費版每天可試聽 ' + (root.TTS_G_FREE_PER_DAY || 20) + ' 句，之後自動回到標準聲。', 'Applies to words, sentences, listening and articles. Premium unlocks the natural voices; free users get ' + (root.TTS_G_FREE_PER_DAY || 20) + ' clips a day, then it falls back to the standard voice.') + '</div>'
+      + voiceRows()
       + '<div class="sp-sec">' + L('單字集', 'Word sets') + '</div>'
       + '<div class="sp-hint">' + L('勾選想背的等級、用 ↑↓ 排序：靠前的先抽新字。點 ▾ 可關掉某級裡不想背的主題。', 'Tick the levels to study and order them with ↑↓ — new words come from the top first. Tap ▾ to switch off themes within a level.') + '</div>'
       + lvRows
@@ -393,9 +394,51 @@
     return '<span class="sp-pitch" title="' + L('音高:アクセント核位置(0=平板型)', 'Pitch accent: nucleus position (0 = flat)') + '">' + (CIRC[n] || n) + '</span>';
   }
   // B9 多人聲:tts_voice(2 めたん預設 / 8 つむぎ / 13 龍星)。2026-09-18 起 N5・N4 單字+例句、N3~N1 單字有替代聲(audio/tts-v),其餘(N3+ 例句/文章)自動退回預設
-  const VOICES = [['2', '四国めたん（女・標準）', 'Metan (female, standard)'], ['8', '春日部つむぎ（女・柔）', 'Tsumugi (female, soft)'], ['13', '青山龍星（男）', 'Ryusei (male)']];
+  // 2026-10-30 起:標準聲(VOICEVOX,免費)+ Premium 自然語音 leda/charon(Google Chirp 3 HD,全站 R2 預生成,tts-config.js)。
+  // 舊 8/13(VOICEVOX 替代聲,只有 N5/N4)不再列出,還設著的人 ttsUrl 照舊。
+  const VOICES = [['2', '標準（四国めたん・女）', 'Standard (Metan, female)', ''], ['leda', 'Leda（女・自然語音）', 'Leda (female, natural)', 'premium'], ['charon', 'Charon（男・自然語音）', 'Charon (male, natural)', 'premium']];
+  // 試聽句(hash 來自 audio/tts/manifest.js,三種聲音都有):單字 / 句子 / A・B 對話
+  const VOICE_SAMPLES = ['20427a708c3f', 'abc98d724a26', 'e2699b27128a'];
   function voice() { try { return localStorage.getItem('tts_voice') || '2'; } catch (e) { return '2'; } }
-  function setVoice(v) { try { localStorage.setItem('tts_voice', String(v)); } catch (e) {} cloud(); try { if (root.__ttsCacheClear) root.__ttsCacheClear(); } catch (e) {} try { if (typeof speak === 'function') speak('こんにちは'); } catch (e) {} }
+  function setVoice(v) {
+    try { localStorage.setItem('tts_voice', String(v)); } catch (e) {} cloud();
+    try { if (root.__ttsCacheClear) root.__ttsCacheClear(); } catch (e) {}
+    try { document.querySelectorAll('.sp-voice').forEach(el => el.classList.toggle('on', el.dataset.v === String(v))); } catch (e) {}
+    try { if (typeof speak === 'function') speak('こんにちは'); } catch (e) {}
+  }
+  let _pv = null, _pvIdx = {};
+  // 試聽鈕:每按一次換下一句(單字→句子→對話),不看 Premium
+  function previewVoice(v, btn) {
+    try { if (_pv) { _pv.pause(); } } catch (e) {}
+    try { if (root._ttsNow) root._ttsNow.pause(); } catch (e) {}
+    const i = (_pvIdx[v] = ((_pvIdx[v] || 0) + 1) % VOICE_SAMPLES.length);
+    const h = VOICE_SAMPLES[i];
+    const url = root.TTS_G_VOICES && root.TTS_G_VOICES[v] ? root.ttsGSampleUrl(v, h) : ((root.TTS_BASE || '') + 'audio/tts/' + h + '.mp3');
+    _pv = new Audio(url);
+    try { document.querySelectorAll('.sp-voice-play.playing').forEach(b => b.classList.remove('playing')); if (btn) btn.classList.add('playing'); } catch (e) {}
+    _pv.onended = _pv.onerror = function () { try { if (btn) btn.classList.remove('playing'); } catch (e) {} };
+    _pv.play().catch(function () { try { if (btn) btn.classList.remove('playing'); } catch (e) {} });
+  }
+  function voiceRows() {
+    const prem = !!(root.ttsHasPremium && root.ttsHasPremium());
+    const cur = voice();
+    return '<div class="sp-voices">' + VOICES.map(v => {
+      const n = String(root.TTS_G_FREE_PER_DAY || 20);
+      const tag = v[3] === 'premium' ? (prem ? 'Premium' : 'Premium · ' + L('免費每天試聽 ' + n + ' 句', n + ' free clips a day')) : L('免費', 'Free');
+      return '<label class="sp-voice' + (cur === v[0] ? ' on' : '') + '" data-v="' + v[0] + '">'
+        + '<input type="radio" name="spVoice" value="' + v[0] + '"' + (cur === v[0] ? ' checked' : '') + ' onchange="StudyPlan.setVoice(this.value)">'
+        + '<span class="sp-voice-t"><b>' + L(v[1], v[2]) + '</b><small>' + tag + '</small></span>'
+        + '<button type="button" class="sp-voice-play" onclick="event.preventDefault();StudyPlan.previewVoice(\'' + v[0] + '\',this)"><i data-ic=volume></i>' + L('試聽', 'Preview') + '</button>'
+        + '</label>';
+    }).join('') + '</div>';
+  }
+  // 免費版今天 20 句試聽用完(tts-config.js ttsGAllowed 叫一次/天):提示 + 看方案
+  function voiceTrialEnded() {
+    try {
+      const msg = L('今天的自然語音試聽（' + (root.TTS_G_FREE_PER_DAY || 20) + ' 句）用完了，已切回標準聲。Premium 全站都能用。', 'Today\'s ' + (root.TTS_G_FREE_PER_DAY || 20) + ' natural-voice clips are used up; back to the standard voice. Premium unlocks it everywhere.');
+      if (typeof root.showToast === 'function') root.showToast(msg);
+    } catch (e) {}
+  }
 
   function ensureCss() {
     if (document.getElementById('spCss')) return;
@@ -421,11 +464,12 @@
       '.sp-lv-btns{display:flex;gap:4px}.sp-lv-btns button{width:30px;height:30px;border:1px solid var(--bd);background:var(--bg);color:var(--tx);border-radius:8px;cursor:pointer;font-size:13px}.sp-lv-btns button:disabled{opacity:.3}',
       '.sp-themes{display:none;flex-wrap:wrap;gap:6px;margin-top:8px}.sp-lv.open .sp-themes{display:flex}.sp-lv.open .sp-exp{transform:rotate(180deg)}',
       '.sp-pitch{font-size:.55em;color:var(--ac2);vertical-align:super;margin-left:3px;font-weight:600}',
+      '.sp-voices{display:grid;gap:8px}.sp-voice{display:flex;align-items:center;gap:10px;padding:11px 12px;border:1px solid var(--bd);border-radius:12px;background:var(--bg);cursor:pointer}.sp-voice.on{border-color:var(--ac);box-shadow:0 0 0 2px color-mix(in srgb,var(--ac) 25%,transparent)}.sp-voice input{width:18px;height:18px;accent-color:var(--ac);flex:none}.sp-voice-t{flex:1;min-width:0}.sp-voice-t b{display:block;font-size:14px}.sp-voice-t small{display:block;font-size:11.5px;color:var(--tx3);margin-top:2px}.sp-voice-play{flex:none;display:inline-flex;align-items:center;gap:4px;border:1px solid var(--bd);background:var(--bg2);color:var(--tx);border-radius:999px;padding:6px 11px;font-size:12.5px;font-weight:700;cursor:pointer}.sp-voice-play i{width:14px;height:14px}.sp-voice-play.playing{border-color:var(--ac);color:var(--ac)}',
       '.sp-chip{border:1px solid var(--ac);background:var(--bg2);color:var(--ac);border-radius:999px;padding:4px 10px;font-size:12px;cursor:pointer}.sp-chip small{opacity:.7}.sp-chip.off{border-color:var(--bd);color:var(--tx3);text-decoration:line-through}'
     ].join('\n');
     document.head.appendChild(st);
   }
   if (document.head) ensureCss();
 
-  root.StudyPlan = { get, set, mode, modeInfo, MODES, goal, setMode, setMinTarget, rhythm, setRhythm, minutesToday, nagLine, sets, plan, buildQueue, sig, greeting, hubCardHtml, dueTomorrow, openSettings, closeSettings, toggleLevel, moveLevel, toggleTheme, newToday, enabledLevels, LEVELS, pitchOf, pitchMark, voice, setVoice, VOICES };
+  root.StudyPlan = { get, set, mode, modeInfo, MODES, goal, setMode, setMinTarget, rhythm, setRhythm, minutesToday, nagLine, sets, plan, buildQueue, sig, greeting, hubCardHtml, dueTomorrow, openSettings, closeSettings, toggleLevel, moveLevel, toggleTheme, newToday, enabledLevels, LEVELS, pitchOf, pitchMark, voice, setVoice, VOICES, previewVoice, voiceTrialEnded };
 })(window);

@@ -83,3 +83,18 @@ if (process.env.DRY) process.exit(0);
 const res = await fetch(HQ_URL + '/api/ingest/daily', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + HQ_TOKEN }, body: JSON.stringify({ product: 'stayjp', rows, partners, family: authOk ? family : undefined, feedback }) });
 const out = await res.text(); console.log('HQ 回應', res.status, out.slice(0, 200));
 if (!res.ok) process.exit(1);
+
+// ── 反向同步(2026-10-30):總部有、StayJP 沒有的聯盟碼 → 補進 Firestore ref_codes(type:kol),
+//    讓別站/總部新增的 KOL 碼在 StayJP 網頁+App 也能用。只新增不覆蓋(既有碼的抽成/狀態以 StayJP 為準)
+try {
+  const ex = await (await fetch(HQ_URL + '/api/partners/export', { headers: { Authorization: 'Bearer ' + HQ_TOKEN } })).json();
+  const mine = new Set((await db.collection('ref_codes').get()).docs.map((d) => d.id));
+  const ov = {}; for (const r of ex.rates || []) if (r.product === 'stayjp') ov[r.code] = r.rate_pct;
+  let added = 0;
+  for (const p of ex.partners || []) {
+    if (!p.active || mine.has(p.code) || !/^[A-Z0-9_-]{3,32}$/.test(p.code)) continue;
+    await db.doc('ref_codes/' + p.code).create({ type: 'kol', kol: p.name || p.code, email: p.email || '', active: true,
+      commission_pct: ov[p.code] ?? p.rate_pct ?? 10, source: 'stayhq', created_at: new Date() }).then(() => added++).catch((e) => console.error('補碼失敗', p.code, e.message));
+  }
+  console.log(`聯盟碼反向同步:總部 ${(ex.partners || []).length} 組,StayJP 新增 ${added} 組`);
+} catch (e) { console.error('聯盟碼反向同步失敗:', e.message); }

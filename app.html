@@ -3666,9 +3666,10 @@ let _spkSeq = 0;   // 連點防護:只有「最新一次」的錯誤才有意義
 // 換 src 會中斷前一個下載;分開快取後各自載各自的,慢網路下最後點的那個載好就播,重訪秒響。
 const _ttsCache = {};
 const _ttsOrder = [];
-function _ttsAudioFor(hash) {
+function _ttsAudioFor(hash, forceMain) {
   if (_ttsCache[hash]) return _ttsCache[hash];
-  const au = new Audio(window.ttsUrl ? window.ttsUrl(hash) : 'audio/tts/' + hash + '.mp3');
+  // forceMain:Premium 聲音(R2)那顆播不出來(新內容還沒產檔/斷網)→ 退回主音檔,不要沒聲音
+  const au = new Audio(forceMain ? ((window.TTS_BASE || '') + 'audio/tts/' + hash + '.mp3') : (window.ttsUrl ? window.ttsUrl(hash) : 'audio/tts/' + hash + '.mp3'));
   au.preload = 'auto';
   _ttsCache[hash] = au; _ttsOrder.push(hash);
   if (_ttsOrder.length > 60) { const old = _ttsOrder.shift(); try { _ttsCache[old].src = ''; } catch (e) {} delete _ttsCache[old]; }
@@ -3712,7 +3713,7 @@ function speak(text) {
     // 快取的 Audio 元素偶爾會壞掉(iOS WebView 切過麥克風/背景後 play() 一直 reject,用戶回饋「前幾張有聲音後面沒有」)
     // → 丟掉快取、新建一顆再試一次;還是不行才記 log。
     try { delete _ttsCache[hash]; const i = _ttsOrder.indexOf(hash); if (i >= 0) _ttsOrder.splice(i, 1); } catch (e) {}
-    const au2 = _ttsAudioFor(hash); au2.playbackRate = getTtsSpeed(); window._ttsNow = au2;
+    const au2 = _ttsAudioFor(hash, !!(window.ttsIsG && window.ttsIsG())); au2.playbackRate = getTtsSpeed(); window._ttsNow = au2;
     au2.play().catch(() => { if (seq === _spkSeq) track('audio_play_fail', { text: t.slice(0, 40) }); });
   });
 }

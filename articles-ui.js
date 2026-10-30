@@ -1213,6 +1213,7 @@ window.Articles = (function () {
       // 逐詞高亮:依 VOICEVOX 時間軸,把 .cur 框移到目前唸到的詞(對齊實際發音);無時間軸則整句淡底即可
       var el = document.getElementById('artS' + n);
       var tm = window.ARTICLE_TIMINGS && window.ARTICLE_TIMINGS[sentSeq[n].text];
+      if (window.ttsIsG && window.ttsIsG()) tm = null;   // Premium 自然語音(Google)沒有 VOICEVOX 的逐詞時間軸 → 整句淡底
       var aws = el ? el.querySelectorAll('.aw') : [];
       var useWord = tm && aws.length === tm.length;
       if (!useWord && el) el.classList.add('flat');   // 無逐詞時間軸 → 整句淡底(有指示、不會誤導)
