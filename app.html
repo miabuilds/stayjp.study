@@ -2437,7 +2437,11 @@ function loadCloudData() {
       for (const k of ProgressCodec.PROGRESS_BIG_KEYS) {
         const v = pd[k];
         if (v == null) continue;
-        try { d[k] = await ProgressCodec.gunzipJSON(v.toUint8Array ? v.toUint8Array() : v); }
+        try {
+          const pv = await ProgressCodec.gunzipJSON(v.toUint8Array ? v.toUint8Array() : v);
+          // srs_data 兩邊都看:users 舊欄位現在逐筆即時寫、壓縮整包最多 60 秒一次 → 逐筆比誰新,別讓較舊的壓縮版蓋掉
+          d[k] = (k === 'srs_data' && d[k] && pv) ? mergeSRS(pv, d[k]) : pv;
+        }
         catch (e) { /* 壞資料 → 保留 legacy d[k] */ }
       }
     }
@@ -2588,9 +2592,12 @@ function mergeHistory(local, cloud) {
 function mergeSRS(local, cloud) {
   const merged = { ...cloud };
   Object.entries(local).forEach(([k, v]) => {
-    if (!merged[k] || (v.lastReview && (!merged[k].lastReview || v.lastReview > merged[k].lastReview))) {
-      merged[k] = v;
-    }
+    const m = merged[k];
+    if (!m) { merged[k] = v; return; }
+    // 兩邊都有時間戳就比時間戳(同一天多次複習也分得出新舊);沒有才退回比日期字串
+    const newer = (v && v.lastReviewTs && m.lastReviewTs) ? v.lastReviewTs > m.lastReviewTs
+      : !!(v && v.lastReview && (!m.lastReview || v.lastReview > m.lastReview));
+    if (newer) merged[k] = v;
   });
   return merged;
 }
@@ -2615,20 +2622,44 @@ function saveQuizCloud() {
 }
 // 雲端寫入防抖(用戶回饋 2026-10-28「快速背本批超級卡」):字卡每按一張都整包 parse+gzip+Firestore set
 // srs_data 與 ~30 個 key,老用戶資料大時每張卡卡一下。改成停手 2 秒才寫一次;切背景/關頁/登出前立刻補寫。
-const _cloudTimers = {};
-function _cloudDebounce(name, fn) { clearTimeout(_cloudTimers[name]); _cloudTimers[name] = setTimeout(() => { delete _cloudTimers[name]; try { fn(); } catch (e) {} }, 2000); }
+const _cloudTimers = {};   // name → { t, fn }:flushCloudSaves 會把所有排隊中的寫入一次做完
+function _cloudDebounce(name, fn, ms) { if (_cloudTimers[name]) clearTimeout(_cloudTimers[name].t); _cloudTimers[name] = { fn, t: setTimeout(() => { delete _cloudTimers[name]; try { fn(); } catch (e) {} }, ms == null ? 2000 : ms) }; }
 function flushCloudSaves() {
-  if (_cloudTimers.srs) { clearTimeout(_cloudTimers.srs); delete _cloudTimers.srs; try { _saveSRSCloudNow(); } catch (e) {} }
-  if (_cloudTimers.all) { clearTimeout(_cloudTimers.all); delete _cloudTimers.all; try { _saveAllCloudNow(); } catch (e) {} }
+  Object.keys(_cloudTimers).forEach(n => { const e = _cloudTimers[n]; delete _cloudTimers[n]; clearTimeout(e.t); try { e.fn(); } catch (err) {} });
 }
 document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') flushCloudSaves(); });
 window.addEventListener('pagehide', flushCloudSaves);
-function saveSRSCloud() { if (currentUser && db) _cloudDebounce('srs', _saveSRSCloudNow); }
+// SRS 雲端寫入(2026-10-30 第二次回報「快速背本批依舊卡、按下一批整個卡死」的根因):
+// 之前每評一張卡就整包 srs_data 上傳——老用戶 3,000+ 筆、600KB+,一批 30 張 = 20MB 上傳,
+// Firestore 序列化在主執行緒、寫入排隊佔記憶體,iOS WebView 吃滿就凍住/被砍。2 秒防抖救不了(作答間隔本來就 >2 秒)。
+// 改法:評分只把「那一筆」用 set merge 深合併上去(幾百 bytes);壓縮整包(user_progress)最多每 60 秒一次,
+// 切背景/關頁才立刻補。重置/匯入等整體變動仍走無參數 saveSRSCloud() 整包寫。
+const _srsDirty = {};
+let _srsProgAt = 0;
+const SRS_PROG_EVERY = 60000;
+function saveSRSCloud(key, entry) {
+  if (!currentUser || !db) return;
+  if (key) { _srsDirty[key] = entry; _cloudDebounce('srs', _flushSRSDirty); }
+  else _cloudDebounce('srsfull', _saveSRSCloudNow);
+}
+function _flushSRSDirty() {
+  if (!currentUser || !db) return;
+  const keys = Object.keys(_srsDirty); if (!keys.length) return;
+  const part = {}; keys.forEach(k => { part[k] = _srsDirty[k]; delete _srsDirty[k]; });
+  db.collection('users').doc(currentUser.uid).set({ srs_data: part }, { merge: true })
+    .catch(() => { keys.forEach(k => { if (!(k in _srsDirty)) _srsDirty[k] = part[k]; }); });   // 失敗留著下次再送
+  if (!_cloudTimers.srsprog) _cloudDebounce('srsprog', _saveSRSProgressNow, Math.max(0, SRS_PROG_EVERY - (Date.now() - _srsProgAt)));
+}
+function _saveSRSProgressNow() {
+  _srsProgAt = Date.now();
+  try { saveProgressKeys({ srs_data: JSON.parse(localStorage.getItem('srs_data') || '{}') }); } catch (e) {}
+}
 function saveAllCloud() { if (currentUser && db) _cloudDebounce('all', _saveAllCloudNow); }
 function _saveSRSCloudNow() {
   if (!currentUser || !db) return;
   const d = JSON.parse(localStorage.getItem('srs_data') || '{}');
   db.collection('users').doc(currentUser.uid).set({ srs_data: d }, { merge: true });
+  _srsProgAt = Date.now();
   saveProgressKeys({ srs_data: d });
 }
 // ── Sync ALL data ──
@@ -4803,10 +4834,11 @@ function enableDailyReminder(time) {
 }
 // 重試直到不在測驗/引導畫面才彈(測驗結果頁還開著時 maybePromptReminder 會自我跳過)。成功設 flag、自停。
 function startReminderPrompt() {
+  if (startReminderPrompt._iv) return;   // 字卡每評一張都會呼叫:只留一個計時器,別一張疊一個
   var tries = 0;
-  var iv = setInterval(function () {
+  startReminderPrompt._iv = setInterval(function () {
     tries++;
-    if (localStorage.getItem('reminder_prompted_v1') || tries > 20) { clearInterval(iv); return; }
+    if (localStorage.getItem('reminder_prompted_v1') || tries > 20) { clearInterval(startReminderPrompt._iv); startReminderPrompt._iv = 0; return; }
     maybePromptReminder();
   }, 1500);
 }

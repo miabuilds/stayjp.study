@@ -45,7 +45,7 @@ const SRS = (() => {
     e.lastReviewTs = now;
     d[key] = e;
     save(d);
-    if (typeof saveSRSCloud === 'function') saveSRSCloud();
+    if (typeof saveSRSCloud === 'function') saveSRSCloud(key, e);   // 只上傳這一筆(整包 600KB+ 每題傳一次會卡死 App)
   }
 
   // FlashCard 的三評分統一走這裡（不會再繞過 SRS 直寫 localStorage）
@@ -73,7 +73,7 @@ const SRS = (() => {
     e.nextReview = dayOf(nextTs);
     d[key] = e;
     save(d);
-    if (typeof saveSRSCloud === 'function') saveSRSCloud();
+    if (typeof saveSRSCloud === 'function') saveSRSCloud(key, e);
   }
 
   function getDue(level) {

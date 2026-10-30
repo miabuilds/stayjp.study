@@ -39,6 +39,7 @@
 })();
 
 const FlashCard = (() => {
+  const _alert = (m) => { try { if (window.AppUI && AppUI.alert) return AppUI.alert(m); } catch (e) {} };   // 站內彈窗,不用原生 alert
   const _E = (zh, en) => (typeof enOr === 'function' ? enOr(zh, en) : zh);   // EN 介面(用戶回饋 2026-09-17)
   // 打字模式(用戶回饋:背單字也想打字):看中文打日文;漢字/假名皆可;IME 組字中的 Enter 不送出
   const FC_TYPE_KEY = 'fc_type_mode';
@@ -272,7 +273,7 @@ const FlashCard = (() => {
     const count = ctEl ? parseInt(ctEl.dataset.v) : 20;
     const range = rgEl ? rgEl.dataset.v : 'new';
     const data = getData(level);
-    if (!data || !data.length) { alert(_E('此級別無單字資料','No vocabulary for this level')); return; }
+    if (!data || !data.length) { _alert(_E('此級別無單字資料','No vocabulary for this level')); return; }
     const srs = typeof SRS !== 'undefined' ? JSON.parse(localStorage.getItem('srs_data') || '{}') : {};
     const pf = level + ':';
     // 「已學」= 至少一次記得；只打過不熟/不會的不算，新詞模式仍會出現
@@ -542,15 +543,15 @@ const FlashCard = (() => {
     ensureStyles();
     const lv = typeof currentLevel !== 'undefined' ? currentLevel : 'n5';
     const data = getData(lv);
-    if (!data || !data.length) { alert(_E('此級別無單字資料','No vocabulary for this level')); return; }
+    if (!data || !data.length) { _alert(_E('此級別無單字資料','No vocabulary for this level')); return; }
     if (typeof getDailyProgress !== 'function' || typeof DAILY_NEW === 'undefined') {
-      alert('今日批次功能未就緒'); return;
+      _alert('今日批次功能未就緒'); return;
     }
     const prog = getDailyProgress(lv);
     const start = prog.totalOffset || 0;
     const end = Math.min(start + DAILY_NEW, data.length);
     const batch = data.slice(start, end);
-    if (!batch.length) { alert('今日批次無單字'); return; }
+    if (!batch.length) { _alert('今日批次無單字'); return; }
     level = lv;
     queue = [...batch].sort(() => Math.random() - 0.5);
     cur = 0;
