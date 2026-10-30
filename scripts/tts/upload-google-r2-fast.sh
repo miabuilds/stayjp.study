@@ -23,7 +23,7 @@ for part in "$TODO".part.*; do
   refresh_if_needed
   TOK="$(grep -o 'oauth_token = "[^"]*"' "$CFG" | cut -d'"' -f2)"
   export TOK DIR ST V ACCT BUCKET
-  xargs -P "$P" -n 1 sh -c 'f="$1"; code="$(curl -s -o /dev/null -w "%{http_code}" --max-time 60 --connect-timeout 15 -X PUT "https://api.cloudflare.com/client/v4/accounts/$ACCT/r2/buckets/$BUCKET/objects/tts-g%2F$V%2F$f" -H "Authorization: Bearer $TOK" -H "Content-Type: audio/mpeg" -H "Cache-Control: public, max-age=31536000, immutable" --data-binary "@$DIR/$f")"; [ "$code" = "200" ] && echo "$f" >> "$ST" || echo "FAIL $f $code" >&2' _ < "$part"
+  xargs -P "$P" -n 1 sh -c 'f="$1"; code="$(curl -s -o /dev/null -w "%{http_code}" --max-time 60 --connect-timeout 15 --retry 4 --retry-delay 8 --retry-all-errors -X PUT "https://api.cloudflare.com/client/v4/accounts/$ACCT/r2/buckets/$BUCKET/objects/tts-g%2F$V%2F$f" -H "Authorization: Bearer $TOK" -H "Content-Type: audio/mpeg" -H "Cache-Control: public, max-age=31536000, immutable" --data-binary "@$DIR/$f")"; [ "$code" = "200" ] && echo "$f" >> "$ST" || echo "FAIL $f $code" >&2' _ < "$part"
   echo "[$V] uploaded so far: $(wc -l < "$ST" | tr -d ' ')"
 done
 rm -f "$TODO" "$TODO".part.*

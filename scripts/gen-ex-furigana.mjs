@@ -48,7 +48,9 @@ function readingOfRun(tokens, text, run, fromIdx) {
   }
   return null;
 }
-const out = {}; let ok = 0, dis = 0, nomap = 0, done = 0;
+// 併入既有的 ex-furigana.js(只補新句,舊句保留;要整個重算就先刪掉該檔)
+const out = (() => { try { const t = fs.readFileSync(OUT, 'utf8'); return JSON.parse(t.slice(t.indexOf('{'), t.lastIndexOf('}') + 1)); } catch (e) { return {}; } })();
+const before = Object.keys(out).length; let ok = 0, dis = 0, nomap = 0, done = 0;
 for (const [lv, w, text, runs] of rows) {
   done++;
   const tokens = kuro(text);
@@ -65,4 +67,4 @@ for (const [lv, w, text, runs] of rows) {
   if (done % 300 === 0) console.error(`${done}/${rows.length} 採用 ${ok} 不一致 ${dis}`);
 }
 fs.writeFileSync(OUT, '// 由 scripts/gen-ex-furigana.mjs 產生:例句裸漢字段的讀音(kuromoji 與 VOICEVOX 整句一致才收)。key=整句的 djb2 雜湊(8 hex),別手改,改 overrides 後重跑。\nwindow.EX_FURI = ' + JSON.stringify(out) + ';\n');
-console.log(`句數 ${rows.length} 採用 ${ok} 兩引擎不一致 ${dis} 對不到token ${nomap} → ${OUT} ${(fs.statSync(OUT).size / 1024).toFixed(0)}KB`);
+console.log(`既有 ${before} → ${Object.keys(out).length};句數 ${rows.length} 採用 ${ok} 兩引擎不一致 ${dis} 對不到token ${nomap} → ${OUT} ${(fs.statSync(OUT).size / 1024).toFixed(0)}KB`);
