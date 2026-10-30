@@ -12,7 +12,7 @@
 export { createPayment } from "./create-payment";
 export { groupApi } from "./group";   // 揪團(2026-10-18 做、10/19 上線,前端 group.html)
 export { buddyApi } from "./buddy";   // 讀書夥伴/讀書小屋(2026-10-20,免費;前端 buddy.html)
-export { shujiApi } from "./shuji";   // 熟記本(Shuji,2026-10-21):/me /organize /tutor,契約在 ~/Documents/GitHub/shuji/CONTRACT.md
+export { shujiApi } from "./shuji";   // 熟記本互查:這個 Google/Apple 帳號是不是 StayJP 付費會員(2026-10-30 熟記本已獨立,只剩這支)
 export { ecpayCallback } from "./ecpay-callback";
 export { ecpayReturn } from "./ecpay-return";
 export { refund } from "./refund";
