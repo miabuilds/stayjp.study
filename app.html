@@ -1013,6 +1013,8 @@ body.hub-view .mn { margin-left: 0; max-width: none; }
 /* 姊妹 App 互推(sister-apps.js):頁尾置中排版裡放一塊靠左清單,跟版權文字之間留間距+分隔線 */
 .sis-ft { max-width: 440px; margin: 0 auto 22px; padding-bottom: 18px; border-bottom: 1px solid var(--bd); text-align: left; color: var(--tx); }
 .sis-ft[hidden], .sis-set[hidden] { display: none !important; }
+/* 2026-10-30 Mia:設定頁已有一份,頁尾再一份=同頁出現兩次 → 設定頁開著時藏頁尾那份 */
+body:has(#mn #sisterSet:not([hidden])) #sisterFt { display: none !important; }
 .ft .sis-a, .sis-set .sis-a { color: inherit; }
 .sis-set { background: var(--bg2); border-radius: 12px; padding: 14px 16px 6px; margin-bottom: 12px; color: var(--tx); }
 .ft a:hover { text-decoration: underline; }
