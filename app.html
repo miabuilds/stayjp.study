@@ -3714,7 +3714,12 @@ function speak(text) {
     // → 丟掉快取、新建一顆再試一次;還是不行才記 log。
     try { delete _ttsCache[hash]; const i = _ttsOrder.indexOf(hash); if (i >= 0) _ttsOrder.splice(i, 1); } catch (e) {}
     const au2 = _ttsAudioFor(hash, !!(window.ttsIsG && window.ttsIsG())); au2.playbackRate = getTtsSpeed(); window._ttsNow = au2;
-    au2.play().catch(() => { if (seq === _spkSeq) track('audio_play_fail', { text: t.slice(0, 40) }); });
+    au2.play().catch(() => {
+      if (seq !== _spkSeq) return;
+      track('audio_play_fail', { text: t.slice(0, 40) });
+      // 兩次都播不出來(多半是那一下音檔沒載到/瀏覽器擋了):給一句提示,不然用戶只看到「沒聲音」以為音檔壞了(2026-10-30 回報「先月 音檔無聲」)
+      try { if (window.showToast) showToast(enOr('音檔沒載到，請再點一次喇叭', 'Audio didn’t load, tap the speaker again')); } catch (e) {}
+    });
   });
 }
 if (window.speechSynthesis) speechSynthesis.getVoices();
