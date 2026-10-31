@@ -104,6 +104,16 @@ async function check(name, promise) {
   await check('一般寫入 srs_data 允許（無回歸）', assertSucceeds(
     setDoc(doc(alice, 'users/' + ALICE), { srs_data: { x: 1 }, favorites: ['n5-1'] }, { merge: true })));
 
+  // 10) 背單字進度分級文件 users/{uid}/srs/{shard}(2026-10-31):本人可寫可讀、別人不行、admin 可讀
+  await check('本人寫自己的 srs/n5 允許', assertSucceeds(
+    setDoc(doc(alice, 'users/' + ALICE + '/srs/n5'), { d: { 'n5:私': { interval: 1 } } }, { merge: true })));
+  await check('本人讀自己的 srs/n5 允許', assertSucceeds(getDoc(doc(alice, 'users/' + ALICE + '/srs/n5'))));
+  await check('別人寫我的 srs/n5 被擋', assertFails(
+    setDoc(doc(bob, 'users/' + ALICE + '/srs/n5'), { d: { x: 1 } }, { merge: true })));
+  await check('別人讀我的 srs/n5 被擋', assertFails(getDoc(doc(bob, 'users/' + ALICE + '/srs/n5'))));
+  await check('刪掉舊欄位 srs_data 允許(搬家最後一步)', assertSucceeds(
+    updateDoc(doc(alice, 'users/' + ALICE), { srs_data: deleteField() })));
+
   await env.cleanup();
   console.log(`\n結果：${pass} 通過 / ${fail} 失敗\n`);
   process.exit(fail ? 1 : 0);

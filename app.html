@@ -2427,12 +2427,16 @@ function loadCloudData() {
   if (!currentUser || !db) return;
   // 雙讀:進度大 key 優先讀 user_progress/{uid}(壓縮),缺則退回 users/{uid} 舊欄位。
   // 未遷移用戶無 user_progress doc → 全走 legacy,行為零改變。
+  // 三讀(2026-10-31):背單字進度正本改在 users/{uid}/srs/{級}(srsShardOf),users.srs_data 舊欄位與 user_progress 壓縮包仍讀(舊裝置/回滾),逐筆比誰新。
   Promise.all([
     db.collection('users').doc(currentUser.uid).get(),
     db.collection('user_progress').doc(currentUser.uid).get().catch(() => null),
-  ]).then(async ([doc, pdoc]) => {
-    if (!doc.exists && !(pdoc && pdoc.exists)) { _cloudSynced = true; if (_pendingSave) { _pendingSave = false; try { saveAllCloud(); } catch (e) {} } return; }   // 全新用戶:雲端沒東西,直接放行上傳(之前這裡 return 掉 → 第一次登入整個 session 都不上傳)
+    db.collection('users').doc(currentUser.uid).collection('srs').get().catch(e => { if (e && e.code === 'permission-denied') _srsShardsOk = false; return null; }),
+  ]).then(async ([doc, pdoc, sdocs]) => {
+    const shardSrs = (sdocs && !sdocs.empty) ? (() => { const o = {}; sdocs.forEach(sd => { try { Object.assign(o, (sd.data() || {}).d || {}); } catch (e) {} }); return o; })() : null;
+    if (!doc.exists && !(pdoc && pdoc.exists) && !shardSrs) { _cloudSynced = true; if (_pendingSave) { _pendingSave = false; try { saveAllCloud(); } catch (e) {} } return; }   // 全新用戶:雲端沒東西,直接放行上傳(之前這裡 return 掉 → 第一次登入整個 session 都不上傳)
     const d = doc.exists ? doc.data() : {};
+    const legacySrs = doc.exists && Object.prototype.hasOwnProperty.call(d, 'srs_data');   // 舊欄位還在 → 這次合併完搬家+刪欄位
     if (pdoc && pdoc.exists && window.ProgressCodec) {
       const pd = pdoc.data() || {};
       for (const k of ProgressCodec.PROGRESS_BIG_KEYS) {
@@ -2452,11 +2456,14 @@ function loadCloudData() {
       const merged = mergeHistory(local, d.quiz_history || []);
       localStorage.setItem('quiz_history', JSON.stringify(merged));
     }
-    // Merge SRS data
+    // Merge SRS data:舊欄位⊕壓縮包(d.srs_data)再⊕分級正本(shards 放第二參數:時間戳相同時以正本為準),最後跟本機合併
+    if (shardSrs) d.srs_data = d.srs_data ? mergeSRS(d.srs_data, shardSrs) : shardSrs;
     if (d.srs_data) {
       const local = JSON.parse(localStorage.getItem('srs_data') || '{}');
       const merged = mergeSRS(local, d.srs_data || {});
       localStorage.setItem('srs_data', JSON.stringify(merged));
+      // 搬家:舊欄位還在 → 把合併後整份寫進分級文件(merge,不會蓋掉期間新評的卡),成功才刪 users.srs_data
+      if (legacySrs && _srsShardsOk) _migrateSRSShards(merged);
     }
     // Merge all other synced data (study_log, word_notebook, grammar_srs, daily_progress, mock_exam_history)
     SYNC_KEYS.forEach(k => {
@@ -2638,6 +2645,14 @@ window.addEventListener('pagehide', flushCloudSaves);
 // Firestore 序列化在主執行緒、寫入排隊佔記憶體,iOS WebView 吃滿就凍住/被砍。2 秒防抖救不了(作答間隔本來就 >2 秒)。
 // 改法:評分只把「那一筆」用 set merge 深合併上去(幾百 bytes);壓縮整包(user_progress)最多每 60 秒一次,
 // 切背景/關頁才立刻補。重置/匯入等整體變動仍走無參數 saveSRSCloud() 整包寫。
+// 2026-10-31 第二步:正本從 users/{uid}.srs_data 搬到 users/{uid}/srs/{級}(users doc 最胖的就是它,576KB,背完全級會頂到 1MiB)。
+// key 是「級:字」→ 用級當分片(n5/n4/n3/n2/n1/my/other),每片最多一級的字(~2,150 字 ≈ 300KB)。
+// 規則還沒部署時(permission-denied)自動退回舊欄位寫法,順序不會互卡;壓縮包 user_progress 照寫當備援。
+const SRS_SHARDS = ['n5', 'n4', 'n3', 'n2', 'n1', 'my', 'other'];
+let _srsShardsOk = true;
+function srsShardOf(key) { const i = key.indexOf(':'); const p = i > 0 ? key.slice(0, i) : ''; return SRS_SHARDS.indexOf(p) >= 0 && p !== 'other' ? p : 'other'; }
+function _srsShardRef(sh) { return db.collection('users').doc(currentUser.uid).collection('srs').doc(sh); }
+function _splitSRS(data) { const out = {}; Object.keys(data || {}).forEach(k => { const sh = srsShardOf(k); (out[sh] = out[sh] || {})[k] = data[k]; }); return out; }
 const _srsDirty = {};
 let _srsProgAt = 0;
 const SRS_PROG_EVERY = 60000;
@@ -2650,19 +2665,46 @@ function _flushSRSDirty() {
   if (!currentUser || !db) return;
   const keys = Object.keys(_srsDirty); if (!keys.length) return;
   const part = {}; keys.forEach(k => { part[k] = _srsDirty[k]; delete _srsDirty[k]; });
-  db.collection('users').doc(currentUser.uid).set({ srs_data: part }, { merge: true })
-    .catch(() => { keys.forEach(k => { if (!(k in _srsDirty)) _srsDirty[k] = part[k]; }); });   // 失敗留著下次再送
+  const requeue = (ks) => { ks.forEach(k => { if (!(k in _srsDirty)) _srsDirty[k] = part[k]; }); };   // 失敗留著下次再送
+  if (_srsShardsOk) {
+    const by = _splitSRS(part);
+    Object.keys(by).forEach(sh => {
+      _srsShardRef(sh).set({ d: by[sh] }, { merge: true }).catch(e => {
+        if (e && e.code === 'permission-denied') { _srsShardsOk = false; db.collection('users').doc(currentUser.uid).set({ srs_data: by[sh] }, { merge: true }).catch(() => requeue(Object.keys(by[sh]))); }
+        else requeue(Object.keys(by[sh]));
+      });
+    });
+  } else {
+    db.collection('users').doc(currentUser.uid).set({ srs_data: part }, { merge: true }).catch(() => requeue(keys));
+  }
   if (!_cloudTimers.srsprog) _cloudDebounce('srsprog', _saveSRSProgressNow, Math.max(0, SRS_PROG_EVERY - (Date.now() - _srsProgAt)));
+}
+// 搬家(loadCloudData 合併完叫):整份 merge 進分級文件 → 全部成功才刪舊欄位。失敗就留著,下次登入再試。
+let _srsMigrating = false;
+function _migrateSRSShards(all) {
+  if (_srsMigrating || !currentUser || !db) return;
+  _srsMigrating = true;
+  const uid = currentUser.uid, by = _splitSRS(all);
+  Promise.all(SRS_SHARDS.filter(sh => by[sh]).map(sh => _srsShardRef(sh).set({ d: by[sh] }, { merge: true })))
+    .then(() => db.collection('users').doc(uid).update({ srs_data: firebase.firestore.FieldValue.delete() }))
+    .then(() => { try { track('srs_shard_migrated', { n: Object.keys(all).length }); } catch (e) {} })
+    .catch(e => { if (e && e.code === 'permission-denied') _srsShardsOk = false; })
+    .then(() => { _srsMigrating = false; });
 }
 function _saveSRSProgressNow() {
   _srsProgAt = Date.now();
   try { saveProgressKeys({ srs_data: JSON.parse(localStorage.getItem('srs_data') || '{}') }); } catch (e) {}
 }
 function saveAllCloud() { if (currentUser && db) _cloudDebounce('all', _saveAllCloudNow); }
-function _saveSRSCloudNow() {
+function _saveSRSCloudNow() {   // 整包寫(重置/匯入):分級文件整份覆蓋(不 merge,刪掉的字才會真的消失)
   if (!currentUser || !db) return;
   const d = JSON.parse(localStorage.getItem('srs_data') || '{}');
-  db.collection('users').doc(currentUser.uid).set({ srs_data: d }, { merge: true });
+  if (_srsShardsOk) {
+    const by = _splitSRS(d);
+    SRS_SHARDS.forEach(sh => { _srsShardRef(sh).set({ d: by[sh] || {} }).catch(e => { if (e && e.code === 'permission-denied') { _srsShardsOk = false; db.collection('users').doc(currentUser.uid).set({ srs_data: d }, { merge: true }); } }); });
+  } else {
+    db.collection('users').doc(currentUser.uid).set({ srs_data: d }, { merge: true });
+  }
   _srsProgAt = Date.now();
   saveProgressKeys({ srs_data: d });
 }

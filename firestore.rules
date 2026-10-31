@@ -71,6 +71,12 @@ service cloud.firestore {
       match /chat_logs/{logId} {
         allow read, write, delete: if request.auth != null && request.auth.uid == userId;
       }
+      // 背單字進度(2026-10-31 從 users/{uid}.srs_data 搬出,避免撞 1MiB):每級一份 users/{uid}/srs/{n5|n4|n3|n2|n1|my|other} → { d: { 'n5:単語': {...} } }
+      // 純學習資料無金流欄位:本人讀寫,admin 可讀(debug)
+      match /srs/{shard} {
+        allow read: if request.auth != null && (request.auth.uid == userId || isAdmin());
+        allow write: if request.auth != null && request.auth.uid == userId;
+      }
     }
 
     // 用過試用的 email 記錄(startTrial 後端寫)— client 完全碰不到,防鑽試用。
