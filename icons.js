@@ -37,6 +37,7 @@
     check:    '<path d="M20 6 9 17l-5-5"/>',
     x:        '<path d="M18 6 6 18"/><path d="M6 6l12 12"/>',
     flag:     '<path d="M4 22V3"/><path d="M4 3h14l-2.5 4L18 11H4"/>',
+    shield:   '<path d="M12 2.5 19.5 5v6.2c0 4.9-3.2 8.6-7.5 10.3C7.7 19.8 4.5 16.1 4.5 11.2V5z"/><path d="m9 12 2 2 4-4"/>',
     lock:     '<rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>',
     refresh:  '<path d="M20 11a8 8 0 1 0-1.7 5"/><path d="M20 4v5h-5"/>',
     target:   '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none"/>',

@@ -34,11 +34,14 @@ const Calendar = (() => {
     let longest = 0;
     let streak = 0;
     // Walk backwards from today
+    // 連勝救星(2026-10-31):漏掉的那天 log[key].freeze=1 → 連勝不斷,但那天不算一天(跟 Streak.markToday 的計數一致)
     const d = new Date();
     for (let i = 0; i < 365; i++) {
       const key = DayKey.of(d);
-      if (log[key] && (log[key].vocab > 0 || log[key].grammar > 0 || log[key].quiz > 0)) {
+      if (isActive(log[key])) {
         streak++;
+      } else if (log[key] && log[key].freeze) {
+        /* 救星擋住的日子:連勝延續、不加天數 */
       } else {
         if (i === 0) { /* today has no activity yet, continue checking */ }
         else break;
@@ -47,24 +50,35 @@ const Calendar = (() => {
     }
     current = streak;
 
-    // Longest streak: scan all dates
-    const dates = Object.keys(log).filter(k =>
-      log[k].vocab > 0 || log[k].grammar > 0 || log[k].quiz > 0
-    ).sort();
+    // Longest streak: scan all dates(救星日只當連結,不計天)
+    const dates = Object.keys(log).filter(k => isActive(log[k]) || (log[k] && log[k].freeze)).sort();
     longest = 0;
     let run = 0;
     for (let i = 0; i < dates.length; i++) {
-      if (i === 0) { run = 1; }
+      const cnt = isActive(log[dates[i]]) ? 1 : 0;
+      if (i === 0) { run = cnt; }
       else {
         const prev = new Date(dates[i - 1]);
         const curr = new Date(dates[i]);
         const diff = (curr - prev) / (1000 * 60 * 60 * 24);
-        run = diff === 1 ? run + 1 : 1;
+        run = diff === 1 ? run + cnt : cnt;
       }
       if (run > longest) longest = run;
     }
 
     return { current, longest };
+  }
+  function isActive(x) { return !!(x && (x.vocab > 0 || x.grammar > 0 || x.quiz > 0)); }
+  // 連勝救星把漏掉的日期標成 freeze(有活動的日子不動);回傳真的標了的日期,給 Streak 上傳雲端用
+  function freezeDays(dates) {
+    const log = getLog(); const done = [];
+    (dates || []).forEach(d => {
+      if (isActive(log[d])) return;
+      log[d] = Object.assign({ vocab: 0, grammar: 0, quiz: 0, minutes: 0 }, log[d] || {}, { freeze: 1 });
+      done.push(d);
+    });
+    if (done.length) saveLog(log);
+    return done;
   }
 
   // Get activity level for a date (0-3)
@@ -153,6 +167,9 @@ const Calendar = (() => {
         const isFuture = d > endDate;
         if (isFuture) {
           gridHTML += '<span class="cal-cell" data-level="empty"></span>';
+        } else if (log[key] && log[key].freeze && !isActive(log[key])) {   // 連勝救星擋住的那天
+          const tipF = key + (typeof I18n !== 'undefined' && I18n.isForeign && I18n.isForeign() ? ': streak saver used' : '：連勝救星擋住');
+          gridHTML += `<span class="cal-cell" data-level="freeze" title="${tipF}"></span>`;
         } else {
           const level = getLevel(log[key]);
           const dayData = log[key];
@@ -249,7 +266,7 @@ const Calendar = (() => {
     panel.innerHTML = getPanelHTML();
   }
 
-  return { logActivity, renderPanel, getStreaks, getTodaySummary, heatmapHTML: buildHeatmap, getLog };
+  return { logActivity, renderPanel, getStreaks, getTodaySummary, heatmapHTML: buildHeatmap, getLog, freezeDays };
 })();
 // const 不上 window 的坑:讓 window.Calendar 也拿得到(供防衛式判斷)
 try { window.Calendar = Calendar; } catch (e) {}
