@@ -471,5 +471,5 @@
   }
   if (document.head) ensureCss();
 
-  root.StudyPlan = { get, set, mode, modeInfo, MODES, goal, setMode, setMinTarget, rhythm, setRhythm, minutesToday, nagLine, sets, plan, buildQueue, sig, greeting, hubCardHtml, dueTomorrow, openSettings, closeSettings, toggleLevel, moveLevel, toggleTheme, newToday, enabledLevels, LEVELS, pitchOf, pitchMark, voice, setVoice, VOICES, previewVoice, voiceTrialEnded };
+  root.StudyPlan = { get, set, mode, modeInfo, MODES, goal, setMode, setMinTarget, rhythm, setRhythm, minutesToday, nagLine, sets, plan, buildQueue, sig, greeting, hubCardHtml, dueTomorrow, openSettings, closeSettings, toggleLevel, moveLevel, toggleTheme, newToday, enabledLevels, LEVELS, pitchOf, pitchMark, voice, setVoice, VOICES, previewVoice, voiceRows, voiceTrialEnded };
 })(window);

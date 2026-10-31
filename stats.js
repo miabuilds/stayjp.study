@@ -638,6 +638,11 @@ const Stats = (() => {
           <button style="${chip(isDark)}" onclick="Stats._setTheme('dark',this)"><i data-ic=moon></i> 深色</button>
         </div>
       </div>
+      ${(window.StudyPlan && StudyPlan.voiceRows) ? `<div style="${box}">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><span style="font-size:16px"><i data-ic=headphones></i></span><span style="font-weight:600;color:var(--tx)">朗讀聲音</span></div>
+        <div style="font-size:12px;color:var(--tx2);margin-bottom:10px">單字、例句、聽力、文章全站一起換。Premium 可用自然語音；免費版每天可試聽 ${window.TTS_G_FREE_PER_DAY || 20} 句。</div>
+        ${StudyPlan.voiceRows()}
+      </div>` : ''}
       <div style="${box}">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
           <span style="font-size:16px"><i data-ic=volume></i></span><span style="font-weight:600;color:var(--tx)">語速</span>

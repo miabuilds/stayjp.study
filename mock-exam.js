@@ -882,9 +882,11 @@ const MockExam = (() => {
   }
 
   function saveHistory(result) {
-    const h = getHistory();
+    let h = getHistory();
     h.push(result);
-    if (h.length > 100) h.splice(0, h.length - 100);
+    // 同 date 去重+只留最近 200 筆(app.html capExamHistory;雲端合併同一套規則,見 2026-10-31 翻倍事故)
+    if (typeof window.capExamHistory === 'function') h = window.capExamHistory(h);
+    else if (h.length > 200) h.splice(0, h.length - 200);
     localStorage.setItem('mock_exam_history', JSON.stringify(h));
   }
 

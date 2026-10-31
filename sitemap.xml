@@ -25,6 +25,12 @@
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://stayjp.study/typing.html</loc>
+    <lastmod>2026-10-31</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://stayjp.study/contact.html</loc>
     <lastmod>2026-06-04</lastmod>
     <changefreq>yearly</changefreq>
