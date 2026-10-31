@@ -124,6 +124,11 @@
       "collectionGroup": "users",
       "fieldPath": "listening_scores",
       "indexes": []
+    },
+    {
+      "collectionGroup": "srs",
+      "fieldPath": "d",
+      "indexes": []
     }
   ]
 }
