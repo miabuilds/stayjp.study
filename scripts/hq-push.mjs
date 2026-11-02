@@ -98,3 +98,19 @@ try {
   }
   console.log(`聯盟碼反向同步:總部 ${(ex.partners || []).length} 組,StayJP 新增 ${added} 組`);
 } catch (e) { console.error('聯盟碼反向同步失敗:', e.message); }
+
+// ── StayJP 分潤明細 → 總部 attributions(2026-11-02):夥伴共用成績頁要看到 StayJP 的成交。
+//    StayJP 自己算好的金額/費率/狀態為準(upsert,作廢會蓋過去);只送 KOL 碼(type:kol)、不送買家資料
+try {
+  const kolCodes = new Set(partners.map((p) => p.code));
+  let sent = 0, fail = 0;
+  for (const d of (await db.collection('commissions').get()).docs) {
+    const c = d.data(); if (!kolCodes.has(c.code)) continue;
+    const ts = new Date((Number(c.paid_at) || Date.now()) + 8 * 3600e3).toISOString().slice(0, 19).replace('T', ' ');
+    const r = await fetch(HQ_URL + '/api/ingest/attribution', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + HQ_TOKEN },
+      body: JSON.stringify({ product: 'stayjp', code: c.code, event_type: c.state === 'void' ? 'void' : 'paid', gross_twd: c.gross_twd || 0, net_twd: c.profit_twd || 0,
+        rate_pct: c.rate, commission_twd: c.state === 'void' ? 0 : (c.amount_twd || 0), ext_id: 'stayjp:' + d.id, ts, upsert: true }) });
+    r.ok ? sent++ : fail++;
+  }
+  console.log(`StayJP 分潤明細推總部:${sent} 筆${fail ? `,失敗 ${fail}` : ''}`);
+} catch (e) { console.error('分潤明細推送失敗:', e.message); }
