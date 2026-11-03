@@ -857,13 +857,13 @@ try {
         if (!y.onSale) return;
         var nf = function (n) { return Number(n).toLocaleString('en-US'); };
         var $ = function (id) { return document.getElementById(id); };
-        $('ptYBadge').textContent = C.tr('雙十限定 · 10/11 截止', 'Double Ten Sale · ends Oct 11', '双十限定 · 10/11 截止');
+        $('ptYBadge').textContent = C.tr('雙11 限定 · 11/11 截止', 'Double 11 Sale · ends Nov 11', '双11 限定 · 11/11 截止');
         $('ptYWas').innerHTML = '<s>NT$' + nf(y.list) + '</s> ' + C.tr('省 ', 'save ', '省 ') + nf(y.list - y.twd); $('ptYWas').hidden = false;
         $('ptYPrice').innerHTML = '<span>NT$</span>' + nf(y.twd) + '<small>/ 年</small>';
         $('ptYDesc').textContent = C.tr('活動期間訂閱，之後每年續訂都是 NT$' + nf(y.twd), 'Subscribe during the sale — every renewal stays at NT$' + nf(y.twd), '活动期间订阅，之后每年续订都是 NT$' + nf(y.twd));
         $('ptLWas').innerHTML = '<s>NT$' + nf(l.list) + '</s> ' + C.tr('省 ', 'save ', '省 ') + nf(l.list - l.twd); $('ptLWas').hidden = false;
         $('ptLPrice').innerHTML = '<span>NT$</span>' + nf(l.twd);
-        $('ptLDesc').textContent = C.tr('一次付清 · 不再扣款 · 10/11 過後回到 5,990', 'Pay once · never billed again · back to 5,990 after Oct 11', '一次付清 · 不再扣款 · 10/11 过后回到 5,990');
+        $('ptLDesc').textContent = C.tr('一次付清 · 不再扣款 · 11/11 過後回到 4,990', 'Pay once · never billed again · back to 4,990 after Nov 11', '一次付清 · 不再扣款 · 11/11 过后回到 4,990');
       } catch (e) {}
     })();
     </script>

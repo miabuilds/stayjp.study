@@ -48,7 +48,7 @@
   if (!C) return;
   booted = true;
   var END = C.end, CODE = C.code, LINK = C.link;
-  var DISMISS_KEY = SALE_BAR ? 'promo_double10_off' : NEWBIE_BAR ? 'promo_newbie_off' : 'promo_tsukimi_off';
+  var DISMISS_KEY = SALE_BAR ? 'promo_double11_off' : NEWBIE_BAR ? 'promo_newbie_off' : 'promo_tsukimi_off';
   var PRICED_BAR = SALE_BAR || NEWBIE_BAR;
   var NOW = function () { return (CP && CP.now) ? CP.now() : Date.now(); };
   var DISMISS_MS = 6 * 3600 * 1000;              // 網頁藥丸:關掉只安靜 6 小時,越接近截止越該看得到
@@ -255,7 +255,7 @@
     bar.className = 'promo-strip';
     bar.id = 'promoStrip';
     bar.setAttribute('role', 'region');
-    bar.setAttribute('aria-label', NEWBIE_BAR ? C.zh : CP.tr('雙十限定', 'Double Ten Sale', '双十限定'));
+    bar.setAttribute('aria-label', NEWBIE_BAR ? C.zh : CP.tr(CP.SALE.zh, CP.SALE.en, CP.SALE.cn));
     // 倒數用時鐘線條 icon 代替「倒數/ends in」字樣:英文介面一行才放得下,倒數數字不會被截掉
     var clock = ''; try { if (typeof window.icon === 'function') clock = window.icon('clock', { size: 13 }); } catch (e) {}
     var t1 = '<b class="promo-st-name">' + C.zh + '</b><span class="promo-st-cd" title="' + CP.tr('倒數', 'Ends in', '倒数') + '">' + clock + '<span id="promoCd">—</span></span>';

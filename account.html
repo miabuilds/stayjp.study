@@ -248,9 +248,9 @@ document.addEventListener('DOMContentLoaded',function(){ function h(){ var n=win
    var C = window.Campaign; if (!C || !C.price || C.salePhase() !== 'on') return;
    var y = C.price('yearly', true, false), l = C.price('lifetime', true, false), nf = function (n) { return Number(n).toLocaleString('en-US'); };
    var el = document.getElementById('inviteSaleNote');
-   el.innerHTML = C.tr('<b>雙十限定(10/8–10/11)</b>:全站年費 1,490、買斷 3,990,朋友用你的碼再折一次 → 年費 <b>' + nf(y.twd) + '</b>(之後每年續訂都是這個價)、買斷 <b>' + nf(l.twd) + '</b>。',
-     '<b>Double Ten Sale (Oct 8–11)</b>: annual 1,490 and lifetime 3,990 for everyone; with your code your friend gets annual <b>' + nf(y.twd) + '</b> (every renewal stays at this price) and lifetime <b>' + nf(l.twd) + '</b>.',
-     '<b>双十限定(10/8–10/11)</b>:全站年费 1,490、买断 3,990,朋友用你的码再折一次 → 年费 <b>' + nf(y.twd) + '</b>(之后每年续订都是这个价)、买断 <b>' + nf(l.twd) + '</b>。');
+   el.innerHTML = C.tr('<b>雙11 限定(11/9–11/11)</b>:全站年費 1,490、買斷 3,990,朋友用你的碼再折一次 → 年費 <b>' + nf(y.twd) + '</b>(之後每年續訂都是這個價)、買斷 <b>' + nf(l.twd) + '</b>。',
+     '<b>Double 11 Sale (Nov 9–11)</b>: annual 1,490 and lifetime 3,990 for everyone; with your code your friend gets annual <b>' + nf(y.twd) + '</b> (every renewal stays at this price) and lifetime <b>' + nf(l.twd) + '</b>.',
+     '<b>双11 限定(11/9–11/11)</b>:全站年费 1,490、买断 3,990,朋友用你的码再折一次 → 年费 <b>' + nf(y.twd) + '</b>(之后每年续订都是这个价)、买断 <b>' + nf(l.twd) + '</b>。');
    el.hidden = false;
  } catch (e) {} })();
  </script>
@@ -452,7 +452,7 @@ function applyRefCode() {
      headers: { 'Authorization': 'Bearer ' + idToken },
    })).then(r => r.json()).then(v => {
      if (v && v.self) { msg.style.color = '#EF4444'; msg.textContent = '這是你自己的推薦碼,請把它分享給朋友 '; return; }
-     if (v && v.valid) store('✓ 已套用 ' + raw + (v.kol ? '(' + v.kol + ')' : '') + ((window.Campaign && Campaign.salePhase && Campaign.salePhase() === 'on') ? ':雙十活動價再折一次(年費 ' + Campaign.price('yearly', true, false).twd.toLocaleString('en-US') + '／買斷 ' + Campaign.price('lifetime', true, false).twd.toLocaleString('en-US') + '),月費多 7 天!' : ':年費、買斷打 9 折(1,790／5,390),月費多 7 天!'));
+     if (v && v.valid) store('✓ 已套用 ' + raw + (v.kol ? '(' + v.kol + ')' : '') + ((window.Campaign && Campaign.salePhase && Campaign.salePhase() === 'on') ? ':雙11 活動價再折一次(年費 ' + Campaign.price('yearly', true, false).twd.toLocaleString('en-US') + '／買斷 ' + Campaign.price('lifetime', true, false).twd.toLocaleString('en-US') + '),月費多 7 天!' : ':年費、買斷打 9 折(1,790／5,390),月費多 7 天!'));
      else if (v && v.error) store('已套用 ' + raw + '(暫時無法即時驗證)');
      else { msg.style.color = '#EF4444'; msg.textContent = '查無此推薦碼,請確認後再輸入。'; }
    }).catch(() => store('已套用 ' + raw + '(暫時無法驗證)'));

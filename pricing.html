@@ -308,7 +308,7 @@ a:hover{text-decoration:underline}
   <!-- 揪團方案入口(網頁限定;native-ui.js 在 App 內藏 data-web-only)-->
   <a href="group.html" data-web-only style="display:flex;align-items:center;gap:14px;max-width:560px;margin:18px auto 0;padding:14px 18px;border-radius:16px;background:#FFF4EC;border:2px solid #FFE3D1;text-decoration:none;color:var(--tx)">
     <img src="images/mascot/tanuki-cheer.png" alt="" style="width:48px;height:48px;border-radius:50%;background:#fff;object-fit:cover;object-position:top;flex:none">
-    <span style="flex:1;font-size:14.5px;line-height:1.6"><b style="color:#C6553B">4 人揪團方案</b>:一個人付款、4 個人一起用,一人約 NT$1,498 起<br><span style="font-size:12.5px;color:var(--tx2)">團內每週排行,跟朋友一起比誰讀最多</span></span>
+    <span style="flex:1;font-size:14.5px;line-height:1.6"><b style="color:#C6553B">4 人揪團方案</b>:一個人付款、4 個人一起用,一人約 NT$1,498 起<span id="groupSaleTag" hidden style="display:inline-block;margin-left:6px;padding:2px 8px;border-radius:999px;background:#C6553B;color:#fff;font-size:11.5px;font-weight:700;vertical-align:middle">雙11 開團每人多送一個月</span><br><span style="font-size:12.5px;color:var(--tx2)">團內每週排行,跟朋友一起比誰讀最多</span></span>
     <span style="color:#C6553B;font-size:18px">→</span>
   </a>
 
@@ -747,7 +747,7 @@ function resolvedTerms(plan) {
   const p = _price(plan);
   if (p.twd !== t.twd) {
     const why = p.onSale
-      ? (p.refOff ? _T('雙十活動價＋推薦碼', 'Double Ten sale + referral code', '双十活动价＋推荐码') : _T('雙十活動價', 'Double Ten sale', '双十活动价'))
+      ? (p.refOff ? _T('雙11 活動價＋推薦碼', 'Double 11 sale + referral code', '双11 活动价＋推荐码') : _T('雙11 活動價', 'Double 11 sale', '双11 活动价'))
       : (window.__refActive ? '已套用推薦碼' : '新人限定 9 折');
     t.twd = p.twd;
     t.price = 'NT$' + _fmt(p.twd) + '（' + why + ',原價 NT$' + _fmt(p.list) + '）';
@@ -761,9 +761,9 @@ function refPerkText() {
   const y = phase === 'on' ? Campaign.price('yearly', true, false) : null;
   if (y && y.onSale) {
     const l = Campaign.price('lifetime', true, false);
-    return _T('雙十活動價再折:年費 NT$' + _fmt(y.twd) + '(之後每年續訂都是這個價)、買斷 NT$' + _fmt(l.twd) + '、月費 +7 天',
-      'Double Ten price, plus your code: annual NT$' + _fmt(y.twd) + ' (every renewal stays at this price), lifetime NT$' + _fmt(l.twd) + ', monthly +7 days',
-      '双十活动价再折:年费 NT$' + _fmt(y.twd) + '(之后每年续订都是这个价)、买断 NT$' + _fmt(l.twd) + '、月费 +7 天');
+    return _T('雙11 活動價再折:年費 NT$' + _fmt(y.twd) + '(之後每年續訂都是這個價)、買斷 NT$' + _fmt(l.twd) + '、月費 +7 天',
+      'Double 11 price, plus your code: annual NT$' + _fmt(y.twd) + ' (every renewal stays at this price), lifetime NT$' + _fmt(l.twd) + ', monthly +7 days',
+      '双11 活动价再折:年费 NT$' + _fmt(y.twd) + '(之后每年续订都是这个价)、买断 NT$' + _fmt(l.twd) + '、月费 +7 天');
   }
   return '年費現折 NT$200、買斷現折 NT$500(9 折)、月費 +7 天';
 }
@@ -842,9 +842,9 @@ function renderRefPricing() {
   if (hero) {
     const top = phase === 'early'
       ? '<span class="sh-tag">' + _T('KOL 粉絲搶先', 'Early access', 'KOL 粉丝抢先') + '</span><span>'
-        + _T('你的推薦碼已解鎖搶先價 · 10/8 00:00 全面開放', 'Your referral code unlocked early access · opens to everyone Oct 8, 00:00 (Taiwan)', '你的推荐码已解锁抢先价 · 10/8 00:00 全面开放') + '</span>'
-      : '<span class="sh-tag">' + _T('雙十限定', 'Double Ten Sale', '双十限定') + '</span><span>'
-        + _T('10/8–10/11 · 不用輸碼', 'Oct 8–11 · no code needed', '10/8–10/11 · 不用输码') + '</span>';
+        + _T('你的推薦碼已解鎖搶先價 · 11/9 00:00 全面開放', 'Your referral code unlocked early access · opens to everyone Nov 9, 00:00 (Taiwan)', '你的推荐码已解锁抢先价 · 11/9 00:00 全面开放') + '</span>'
+      : '<span class="sh-tag">' + _T('雙11 限定', 'Double 11 Sale', '双11 限定') + '</span><span>'
+        + _T('11/9–11/11 · 不用輸碼', 'Nov 9–11 · no code needed', '11/9–11/11 · 不用输码') + '</span>';
     const main = '<span class="sh-item">' + _T('年費', 'Annual', '年费') + ' NT$' + _fmt(y.twd) + '<s>' + _fmt(y.list) + '</s></span><span class="sh-sep">・</span>'
       + '<span class="sh-item">' + _T('買斷', 'Lifetime', '买断') + ' NT$' + _fmt(l.twd) + '<s>' + _fmt(l.list) + '</s></span>';
     const sub = _T('年費在活動期間訂閱，之後每年續訂都是 NT$' + _fmt(y.twd) + '，不會漲回 1,990',
@@ -873,8 +873,8 @@ function renderRefPricing() {
     yNote.hidden = false;
   }
   _saleSet('yearlySaveBadge', _T('省 ', 'Save ', '省 ') + Math.round((1 - y.twd / (390 * 12)) * 100) + '%');
-  _saleSet('yearlyTag', ref ? _T('雙十活動價 · 已疊推薦碼', 'Double Ten price · referral code stacked', '双十活动价 · 已叠推荐码')
-    : _T('雙十活動價 · 有推薦碼再折 ' + yOff, 'Double Ten price · referral code takes another ' + yOff + ' off', '双十活动价 · 有推荐码再折 ' + yOff));
+  _saleSet('yearlyTag', ref ? _T('雙11 活動價 · 已疊推薦碼', 'Double 11 price · referral code stacked', '双11 活动价 · 已叠推荐码')
+    : _T('雙11 活動價 · 有推薦碼再折 ' + yOff, 'Double 11 price · referral code takes another ' + yOff + ' off', '双11 活动价 · 有推荐码再折 ' + yOff));
   _saleSet('yearlyCycle', _T('平均 NT$' + Math.round(y.twd / 12) + ' / 月 · 自動續扣', 'About NT$' + Math.round(y.twd / 12) + ' / month · auto-renews', '平均 NT$' + Math.round(y.twd / 12) + ' / 月 · 自动续扣'));
   _saleSet('yearlyRefLi', ref ? _T('已套用推薦碼：活動價再折 ' + yOff + '，一樣年年鎖', 'Referral code applied: another ' + yOff + ' off, still locked every year', '已套用推荐码：活动价再折 ' + yOff + '，一样年年锁')
     : _T('有推薦碼再折 ' + yOff + ' → ' + _fmt(ySale - yOff) + '，一樣年年鎖', 'Referral code: another ' + yOff + ' off → ' + _fmt(ySale - yOff) + ', locked every year', '有推荐码再折 ' + yOff + ' → ' + _fmt(ySale - yOff) + '，一样年年锁'));
@@ -882,18 +882,26 @@ function renderRefPricing() {
   if (lNote) {
     _saleSet('lifetimeSaleNote', '<span class="sn-row"><span class="sn-save">' + _T('省 NT$', 'Save NT$', '省 NT$') + _fmt(lSave) + '</span>'
       + (l.refOff ? '<span class="sn-break">' + _T('活動 ' + _fmt(l.list - lSale) + ' ＋ 推薦碼 ' + _fmt(l.refOff), 'sale ' + _fmt(l.list - lSale) + ' + code ' + _fmt(l.refOff), '活动 ' + _fmt(l.list - lSale) + ' ＋ 推荐码 ' + _fmt(l.refOff)) + '</span>' : '')
-      + '</span><span class="sn-lock">' + _T('活動價只到 10/11，之後回到 NT$5,990', 'Sale price ends Oct 11 — back to NT$5,990 after that', '活动价只到 10/11，之后回到 NT$5,990') + '</span>');
+      + '</span><span class="sn-lock">' + _T('活動價只到 11/11，之後回到 NT$4,990', 'Sale price ends Nov 11 — back to NT$4,990 after that', '活动价只到 11/11，之后回到 NT$4,990') + '</span>');
     lNote.hidden = false;
   }
   _saleSet('lifetimeCycle', ref ? _T('一次付清，之後不再扣款* · 已疊推薦碼', 'One payment, never billed again* · referral code stacked', '一次付清，之后不再扣款* · 已叠推荐码')
     : _T('一次付清，之後不再扣款* · 有推薦碼再折 ' + lOff, 'One payment, never billed again* · referral code takes another ' + lOff + ' off', '一次付清，之后不再扣款* · 有推荐码再折 ' + lOff));
   // 推薦碼輸入框標題
-  _saleSet('refHead', '<i data-ic=ticket></i> ' + _T('有推薦碼?雙十活動價再折一次:年費 <b style="color:var(--tx)">' + _fmt(ySale - yOff) + '</b>(之後每年續訂都鎖 ' + _fmt(ySale - yOff) + ')、買斷 <b style="color:var(--tx)">' + _fmt(lSale - lOff) + '</b>、月費多 <b style="color:var(--tx)">7 天</b>(選填):',
+  _saleSet('refHead', '<i data-ic=ticket></i> ' + _T('有推薦碼?雙11 活動價再折一次:年費 <b style="color:var(--tx)">' + _fmt(ySale - yOff) + '</b>(之後每年續訂都鎖 ' + _fmt(ySale - yOff) + ')、買斷 <b style="color:var(--tx)">' + _fmt(lSale - lOff) + '</b>、月費多 <b style="color:var(--tx)">7 天</b>(選填):',
     'Have a referral code? It stacks on the sale: annual <b style="color:var(--tx)">' + _fmt(ySale - yOff) + '</b> (every renewal locked at ' + _fmt(ySale - yOff) + '), lifetime <b style="color:var(--tx)">' + _fmt(lSale - lOff) + '</b>, monthly <b style="color:var(--tx)">+7 days</b> (optional):',
-    '有推荐码?双十活动价再折一次:年费 <b style="color:var(--tx)">' + _fmt(ySale - yOff) + '</b>(之后每年续订都锁 ' + _fmt(ySale - yOff) + ')、买断 <b style="color:var(--tx)">' + _fmt(lSale - lOff) + '</b>、月费多 <b style="color:var(--tx)">7 天</b>(选填):'));
+    '有推荐码?双11 活动价再折一次:年费 <b style="color:var(--tx)">' + _fmt(ySale - yOff) + '</b>(之后每年续订都锁 ' + _fmt(ySale - yOff) + ')、买断 <b style="color:var(--tx)">' + _fmt(lSale - lOff) + '</b>、月费多 <b style="color:var(--tx)">7 天</b>(选填):'));
 }
-window.renderSalePrices = renderRefPricing;   // sale.js 在檔期開始/結束那一秒會叫它重畫
-renderRefPricing();
+// 揪團入口的檔期標籤(雙11:開團每人多送一個月):檔期中顯示;KOL 搶先時段要有碼才顯示
+function renderGroupSaleTag() {
+  try {
+    const el = document.getElementById('groupSaleTag'); if (!el || !window.Campaign) return;
+    const ph = Campaign.salePhase(), days = (Campaign.SALE.groupBonusDays || {}).group4_yearly || 0;
+    el.hidden = !(days && (ph === 'on' || (ph === 'early' && window.__refActive)));
+  } catch (e) {}
+}
+window.renderSalePrices = function () { renderRefPricing(); renderGroupSaleTag(); };   // sale.js 在檔期開始/結束那一秒會叫它重畫
+renderRefPricing(); renderGroupSaleTag();
 
 // 下單前確認框:強制勾選「同意續扣條款」+「已滿18歲」才可付款
 // 台灣統編檢查碼(跟後端 functions/src/utils/ecpay-invoice.ts isValidTaxId 同一套規則)

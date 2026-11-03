@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * test-sale-price.cjs — 雙十檔期價格:後端 resolveWebPrice 與前端 Campaign.price 對答案
+ * test-sale-price.cjs — 檔期價格(雙十 → 雙11 沿用):後端 resolveWebPrice 與前端 Campaign.price 對答案
  *
  * 為什麼要兩邊一起測:pricing.html 把前端算出的金額當 expected_twd 送 createPayment,
  * 後端自己再算一次,不一樣就 409 擋單。只要兩邊差 1 塊,檔期當天所有人都買不了。
@@ -44,17 +44,20 @@ for (const p of ['yearly', 'lifetime']) {
   assert.strictEqual(F.SALE.refDiscount[p], B.SALE.refDiscount[p], `${p} 檔期碼折不一致`);
   assert.strictEqual(F.REF_OFF[p], B.WEB_CODE_DISCOUNT_TWD[p], `${p} 平時碼折不一致`);
 }
-for (const p of Object.keys(B.PLANS)) assert.strictEqual(F.LIST_PRICE[p], B.PLANS[p].price_twd, `${p} 牌價不一致`);
-assert.strictEqual(B.SALE.start, T(2026, 10, 8, 0, 0, 0));
-assert.strictEqual(B.SALE.kolEarlyStart, T(2026, 10, 7, 20, 0, 0));
-assert.strictEqual(B.SALE.end, T(2026, 10, 11, 23, 59, 59));
+// 揪團方案(group4_*)不走 Campaign.price(群組頁自己有價目,檔期只送天數不改價)→ 不比牌價
+const SOLO_PLANS = Object.keys(B.PLANS).filter(p => !B.isGroupPlan(p));
+for (const p of SOLO_PLANS) assert.strictEqual(F.LIST_PRICE[p], B.PLANS[p].price_twd, `${p} 牌價不一致`);
+assert.strictEqual(B.SALE.id, 'double11_2026');
+assert.strictEqual(B.SALE.start, T(2026, 11, 9, 0, 0, 0));
+assert.strictEqual(B.SALE.kolEarlyStart, T(2026, 11, 8, 20, 0, 0));
+assert.strictEqual(B.SALE.end, T(2026, 11, 11, 23, 59, 59));
 
-const BEFORE = T(2026, 10, 7, 19, 59, 59);
-const EARLY = T(2026, 10, 7, 20, 0, 0);
-const EARLY_LATE = T(2026, 10, 7, 23, 59, 59);
-const START = T(2026, 10, 8, 0, 0, 0);
-const MID = T(2026, 10, 10, 12, 0, 0);
-const LAST = T(2026, 10, 11, 23, 59, 59);
+const BEFORE = T(2026, 11, 8, 19, 59, 59);
+const EARLY = T(2026, 11, 8, 20, 0, 0);
+const EARLY_LATE = T(2026, 11, 8, 23, 59, 59);
+const START = T(2026, 11, 9, 0, 0, 0);
+const MID = T(2026, 11, 10, 12, 0, 0);
+const LAST = T(2026, 11, 11, 23, 59, 59);
 const AFTER = LAST + 1000;
 const LONG_AFTER = T(2027, 1, 1, 0, 0, 0);
 
@@ -64,7 +67,7 @@ check('檔期前 年費 KOL碼', 'yearly', BEFORE, true, false, 1790);
 check('檔期前 買斷 KOL碼', 'lifetime', BEFORE, true, false, 4490);
 check('檔期前 買斷 無碼', 'lifetime', BEFORE, false, false, 4990);
 
-// 2. KOL 搶先(10/7 20:00–23:59:59)
+// 2. KOL 搶先(11/8 20:00–23:59:59)
 for (const t of [EARLY, EARLY_LATE]) {
   check('搶先 年費 KOL碼', 'yearly', t, true, false, 1340);
   check('搶先 買斷 KOL碼', 'lifetime', t, true, false, 3590);
@@ -100,10 +103,19 @@ for (const t of [BEFORE, EARLY, START, MID, LAST, AFTER]) {
   }
 }
 
-// 6. 每 10 分鐘掃一遍 10/6–10/13,兩邊逐點一致(抓邊界差一秒的那種錯)
+// 5b. 揪團送天數(雙11):檔期內(含 KOL 搶先)揪團年費 +30、買斷團 0、檔期外 0;前後端設定一致
+for (const p of ['group4_yearly', 'group4_lifetime']) assert.strictEqual(F.SALE.groupBonusDays[p], B.SALE.groupBonusDays[p], `${p} 送天數不一致`);
+for (const t of [EARLY, START, MID, LAST]) {
+  assert.strictEqual(B.saleGroupBonusDays('group4_yearly', t), 30, '檔期內揪團年費應送 30 天');
+  assert.strictEqual(B.saleGroupBonusDays('group4_lifetime', t), 0, '買斷團不送');
+  assert.strictEqual(B.saleGroupBonusDays('yearly', t), 0, '個人年費不送天數');
+}
+for (const t of [BEFORE, AFTER, LONG_AFTER]) assert.strictEqual(B.saleGroupBonusDays('group4_yearly', t), 0, '檔期外不送');
+
+// 6. 每 10 分鐘掃一遍 11/6–11/13,兩邊逐點一致(抓邊界差一秒的那種錯)
 let sweep = 0;
-for (let t = T(2026, 10, 6, 0); t <= T(2026, 10, 13, 0); t += 600e3) {
-  for (const p of Object.keys(B.PLANS)) for (const r of [false, true]) for (const c of [false, true]) {
+for (let t = T(2026, 11, 6, 0); t <= T(2026, 11, 13, 0); t += 600e3) {
+  for (const p of SOLO_PLANS) for (const r of [false, true]) for (const c of [false, true]) {
     assert.strictEqual(F.price(p, r, c, t).twd, B.resolveWebPrice(p, t, r, c).twd, `sweep 不一致 ${p} ${t} ${r} ${c}`);
     sweep++;
   }

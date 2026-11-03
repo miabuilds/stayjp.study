@@ -16,7 +16,7 @@
 
 import * as functions from "firebase-functions/v2/https";
 import { issueForPayment, resolveEmail } from "./utils/invoice-flow";
-import { PLANS, PlanKey, PAYMENT_AND_INVOICE_SECRETS, isLifetimePlan, isGroupPlan } from "./utils/constants";
+import { PLANS, PlanKey, PAYMENT_AND_INVOICE_SECRETS, isLifetimePlan, isGroupPlan, SALE, saleGroupBonusDays } from "./utils/constants";
 import { verifyCheckMacValue } from "./utils/ecpay";
 import {
   writeTransaction, getSubscription, writeSubscription, patchSubscription, getRefCode,
@@ -195,6 +195,20 @@ export const ecpayCallback = functions.onRequest(
           } else if (refCode) {
             newSub.ref_bonus_at = nowMs();   // 折價買斷:折 200 即好康,不再發 AI 加量包
           }
+        }
+        // 檔期送天數(雙11 2026-11:檔期內新開的揪團年費,四個人每人多送一個月)。
+        // 只加主揪的到期日 → ensureGroup / syncGroupMembers 讓團員跟著主揪,不用另外處理團員。
+        // 只在第一次付款發一次(續扣從既有到期日往後加,那 30 天已經含在裡面);買斷團不送(Mia 11/4:已經打折了)。
+        if (isFirstPayment && !existingSub?.sale_bonus_at) {
+          const bonusDays = saleGroupBonusDays(plan, nowMs());
+          if (bonusDays > 0) {
+            newSub.expiresAt = newSub.expiresAt + bonusDays * 864e5;
+            newSub.sale_bonus_at = nowMs();
+            newSub.sale_bonus_id = SALE.id;
+          }
+        } else if (existingSub?.sale_bonus_at) {
+          newSub.sale_bonus_at = existingSub.sale_bonus_at;
+          if (existingSub.sale_bonus_id) newSub.sale_bonus_id = existingSub.sale_bonus_id;
         }
         try {
           await writeSubscription(uid, newSub);

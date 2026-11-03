@@ -44,6 +44,7 @@
   .plan .p small{font-size:13px;font-weight:600;color:var(--tx2)}
   .plan .per{font-size:13.5px;color:var(--ac);font-weight:700}
   .plan .save{font-size:12.5px;color:var(--tx3);margin-bottom:12px}
+  .plan .sale-tag{display:inline-block;margin:0 0 8px;font-size:12px;font-weight:700;color:#C6553B;background:#FFF4EC;border:1px solid #FFE3D1;border-radius:99px;padding:3px 10px;line-height:1.5}
   .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;font:inherit;font-weight:700;font-size:15px;padding:12px 16px;border-radius:12px;border:1px solid var(--bd);background:var(--bg2);color:var(--tx);cursor:pointer;text-decoration:none}
   .btn.pri{background:var(--ac);border-color:var(--ac);color:#fff}
   .btn.wide{width:100%}
@@ -274,11 +275,19 @@ function hydrate(){ try{ if(window.Icons&&Icons.hydrate) Icons.hydrate(); }catch
 const isInApp = () => /FBAN|FBAV|FB_IAB|Instagram|Line\/|MicroMessenger|Twitter|TikTok|KAKAOTALK|NAVER|Barcelona|BytedanceWebview/i.test(navigator.userAgent||'') && !(window.STAYJP_NATIVE&&window.STAYJP_NATIVE.isNativeApp);
 
 // ── 方案卡 ──
+// 檔期送天數(雙11):campaign.js 的 SALE.groupBonusDays;檔期中人人有,KOL 搶先時段要有碼
+function saleBonusDays(kind){
+  try{ const C=window.Campaign; if(!C||!C.SALE||!C.SALE.groupBonusDays) return 0;
+    const ph=C.salePhase(); if(!(ph==='on'||(ph==='early'&&hasCode))) return 0;
+    return C.SALE.groupBonusDays['group4_'+kind]||0; }catch(e){ return 0; }
+}
 function renderPlans(){
   $('plans').innerHTML = Object.entries(PLANS).map(([k,p])=>{
     const pay = hasCode ? p.code : p.price, per = Math.round(pay/p.seats), solo = SOLO[p.kind];
+    const bonus = saleBonusDays(p.kind);
     return '<div class="plan'+(p.hot?' hot':'')+'">'+(p.hot?'<span class="badge">最多人選</span>':'')
       +'<div class="n">'+p.name+'</div>'
+      +(bonus?'<div class="sale-tag">'+(window.Campaign?Campaign.SALE.zh:'限時')+':開團四個人每人多送 '+bonus+' 天</div>':'')
       +'<div class="p">'+(hasCode?'<small style="text-decoration:line-through;color:var(--tx3);margin-right:4px">'+fmt(p.price)+'</small>':'')+'<small>NT$</small>'+fmt(pay)+'</div>'
       +'<div class="per">一人約 NT$'+fmt(per)+'</div>'
       +'<div class="save">自己買一份 '+fmt(solo)+(p.kind==='yearly'?' / 年':'')+'<br>'+(p.kind==='yearly'?'每年自動續扣':'一次付清・不續扣')+'</div>'
@@ -287,7 +296,8 @@ function renderPlans(){
   $('plans').querySelectorAll('[data-plan]').forEach(b=>b.onclick=()=>buy(b.dataset.plan, b));
   $('codeNote').textContent = hasCode ? '已套用推薦碼優惠,實際金額以付款頁為準。' : '';
   const py = PLANS.group4_yearly;
-  $('shareText').textContent = '要不要一起用 StayJP 讀日文?\n4 個人一團,'+py.name+'一人只要 '+fmt(Math.round((hasCode?py.code:py.price)/4))+'\n團裡有每週排行,大家一起比誰讀最多\n單字、文法、JLPT 刷題、AI 跟讀全部都有\n還差 3 個人,要的留言!';
+  const yb = saleBonusDays('yearly');
+  $('shareText').textContent = '要不要一起用 StayJP 讀日文?\n4 個人一團,'+py.name+'一人只要 '+fmt(Math.round((hasCode?py.code:py.price)/4))+(yb?'\n雙11 開團每人多送 '+yb+' 天':'')+'\n團裡有每週排行,大家一起比誰讀最多\n單字、文法、JLPT 刷題、AI 跟讀全部都有\n還差 3 個人,要的留言!';
 }
 $('btnCopyShare').onclick=()=>copy($('shareText').textContent, $('shareMsg'));
 

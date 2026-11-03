@@ -161,14 +161,23 @@ export const WEB_CODE_DISCOUNT_TWD: Partial<Record<PlanKey, number>> = {
 //   KOL 搶先:2026-10-07 20:00 起,帳上有有效 KOL/個人碼(非活動碼)的人先享檔期價
 //   年費 1,990→1,490(定期定額 PeriodAmount=實扣價 → 之後每年續扣都鎖 1,490)、買斷 5,990→3,990;月費不動
 //   檔期內有效推薦碼再折:年費 −150(=1,340)、買斷 −400(=3,590);檔期外照舊 WEB_CODE_DISCOUNT_TWD
+// ── 雙11 檔期(2026-11-04 Mia 定案)── 同一套機制,只換時間與活動名;價格沿用雙十(商店商品不用重送審)。
+//   檔期:2026-11-09 00:00 ~ 2026-11-11 23:59:59(台灣時間,三天);KOL 搶先 2026-11-08 20:00
+//   揪團:價格不變、檔期內新開的「揪團年費」四個人每人多送一個月(saleGroupBonusDays);買斷團不送
 export const SALE = {
-  id: "double10_2026",
-  start: Date.UTC(2026, 9, 7, 16, 0, 0),           // 2026-10-08 00:00 台灣
-  kolEarlyStart: Date.UTC(2026, 9, 7, 12, 0, 0),   // 2026-10-07 20:00 台灣
-  end: Date.UTC(2026, 9, 11, 15, 59, 59),          // 2026-10-11 23:59:59 台灣(含)
+  id: "double11_2026",
+  start: Date.UTC(2026, 10, 8, 16, 0, 0),          // 2026-11-09 00:00 台灣
+  kolEarlyStart: Date.UTC(2026, 10, 8, 12, 0, 0),  // 2026-11-08 20:00 台灣
+  end: Date.UTC(2026, 10, 11, 15, 59, 59),         // 2026-11-11 23:59:59 台灣(含)
   prices: { yearly: 1490, lifetime: 3990 } as Partial<Record<PlanKey, number>>,
   refDiscount: { yearly: 150, lifetime: 400 } as Partial<Record<PlanKey, number>>,
+  groupBonusDays: { group4_yearly: 30 } as Partial<Record<PlanKey, number>>,
 };
+/** 檔期內(含 KOL 搶先)新開的揪團送幾天;不在檔期或不是送天數的方案 → 0。前端 campaign.js 的 SALE.groupBonusDays 要一致。 */
+export function saleGroupBonusDays(plan: PlanKey, now: number): number {
+  if (!(now >= SALE.kolEarlyStart && now <= SALE.end)) return 0;
+  return SALE.groupBonusDays[plan] || 0;
+}
 
 // ── 新人限時 9 折(2026-10-13 Mia 定案)── 官網+App 都有,不用輸碼。
 //   對象:從沒成功付款過的帳號(退過費的也不算新人)。

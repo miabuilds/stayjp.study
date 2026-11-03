@@ -59,6 +59,8 @@ export interface SubscriptionDoc {
   failed_retries?: number;
   last_retry_at?: number;
   ref_bonus_at?: number;       // KOL 推薦碼好康:確認真實付款後發過 7 天的時戳(一次性,防重複/疊加)
+  sale_bonus_at?: number;      // 檔期送天數(雙11 揪團年費 +30 天)發過的時戳(一次性)
+  sale_bonus_id?: string;      // 哪一檔送的(SALE.id)
 }
 
 export async function getSubscription(uid: string): Promise<SubscriptionDoc | null> {
