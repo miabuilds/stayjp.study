@@ -13,13 +13,16 @@ import { spawnSync } from 'node:child_process';
 import {
   ROOT, OUT_DIR, MANIFEST_JS, TEXTS_JSON,
   loadOverrides, applyOverrides,
-  audioQuery, synthesis, checkEngine, wavToMp3, splitDialogue, concatWavsToMp3, DIALOG_SPEAKERS,
+  audioQuery, synthesis, checkEngine, wavToMp3, splitDialogue, concatWavsToMp3, DIALOG_SPEAKERS, fixShu,
 } from './_lib.mjs';
 
 const args = process.argv.slice(2);
 const force = args.includes('--force');
 const onlyIdx = args.indexOf('--only');
 const onlyFilter = onlyIdx >= 0 ? new Set(args[onlyIdx + 1].split(',')) : null;
+// --match <子字串,逗號分隔>:只做「文字含這些子字串」的條目(配 --force 重產特定字/句,如 --force --match 宿題,しゅくだい)
+const matchIdx = args.indexOf('--match');
+const matchList = matchIdx >= 0 ? args[matchIdx + 1].split(',') : null;
 
 fs.mkdirSync(OUT_DIR, { recursive: true });
 
@@ -30,9 +33,10 @@ const texts = JSON.parse(fs.readFileSync(TEXTS_JSON, 'utf8'));
 const overrides = loadOverrides();
 
 // Filter texts to generate this run.
-const work = onlyFilter
+let work = onlyFilter
   ? texts.filter(t => t.sources.some(s => onlyFilter.has(s.split('#')[0])))
   : texts;
+if (matchList) work = work.filter(t => matchList.some(m => t.text.includes(m)));
 console.log(`Targets: ${work.length}/${texts.length}${onlyFilter ? ' (filtered: --only ' + [...onlyFilter].join(',') + ')' : ''}`);
 
 function writeManifest() {
@@ -65,13 +69,13 @@ for (let i = 0; i < work.length; i++) {
       const wavs = [];
       for (const t of turns) {
         const sp = DIALOG_SPEAKERS[t.who];
-        const q = await audioQuery(t.line, sp);
+        const q = fixShu(await audioQuery(t.line, sp), sp);
         q.postPhonemeLength = 0.35;
         wavs.push(await synthesis(q, sp));
       }
       concatWavsToMp3(wavs, mp3);
     } else {
-      const q = await audioQuery(fed);
+      const q = fixShu(await audioQuery(fed));
       const wav = await synthesis(q);
       wavToMp3(wav, mp3);
     }

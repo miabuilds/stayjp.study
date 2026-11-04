@@ -217,6 +217,13 @@
         if (pv === 'を') { if (r0.indexOf('い') === 0) matched.reading = 'おこな' + r0.slice(1); }
         else { if (r0.indexOf('おこな') === 0) matched.reading = 'い' + r0.slice(3); }
       }
+      // 降り/降っ:降る(ふる,雨雪)與 降りる(おりる,下車)活用同字面(用戶回饋 2026-11-03:「雪が降ります」標成おります)。
+      // 語境判讀:前文 8 字內有 雨/雪/雹/霜/みぞれ/あられ → ふ;有 電車/バス/車/駅/飛行機/船/タクシー/階段/山/坂 → お;都沒有就維持字典結果。
+      if (matched && matched.sub.charAt(0) === '降' && matched.reading) {
+        var pre = text.slice(Math.max(0, i - 8), i), rd = matched.reading;
+        if (/[雨雪雹霜]|みぞれ|あられ/.test(pre)) { if (rd.charAt(0) === 'お') matched.reading = 'ふ' + rd.slice(1); }
+        else if (/電車|バス|車|駅|飛行機|船|タクシー|階段|山|坂|エレベーター/.test(pre)) { if (rd.charAt(0) === 'ふ') matched.reading = 'お' + rd.slice(1); }
+      }
       // 單漢字「貼著別的漢字」(前或後任一側)→ 這是漢語複合詞的一部分,單字讀音多半是錯的
       //   後接漢字:新○(新提案的新→しん 非あたら)  前接漢字:○者(離職者的者→しゃ 非もの)
       // 複合詞不一定用哪個音(者接漢字可しゃ可もの:離職者/若者),無法靠規則猜 → 一律不標,寧缺勿錯。
@@ -522,6 +529,7 @@
   // 依詞查 VOCAB 釋義(供文章逐詞可點用):回 {r,m,c} 或 null。ENTRY 以含漢字的詞為 key。
   window.furiganaAddEntries = addEntries;   // 晚載詞庫(對話頁按需載 N3↑)併入字典
   window.furiLookup = function (w) { try { return dict().ENTRY[w] || null; } catch (e) { return null; } };
+  window.furiRead = function (w) { try { return dict().READ[w] || null; } catch (e) { return null; } };   // 只要讀音(含文法讀音表的詞,如 今週末)
   // ── 假名查詢:以「讀音/純假名表記」為 key(ENTRY 只收含漢字詞,假名詞查不到 → 初學者讀 N5 假名文全點不了)。
   // 同音詞(かみ=紙/神/髪)列前三個讓學習者自己對上下文。lazy build,vocab 檔載完後第一次查才建索引。
   var __kanaDict = null;

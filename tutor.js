@@ -79,6 +79,10 @@
       '@keyframes ttB{0%,80%,100%{opacity:.3}40%{opacity:1}}',
       '#tutorPanel .tt-chips{display:flex;gap:6px;flex-wrap:wrap;padding:0 12px 6px}',
       '#tutorPanel .tt-chip{border:1px solid var(--bd,#E8E5E0);background:var(--bg2,#fff);color:var(--tx,#2C2C2C);border-radius:999px;padding:5px 11px;font-size:12.5px;cursor:pointer}',
+      '#tutorPanel .tt-addv{margin-top:10px;padding-top:10px;border-top:1px solid var(--bd,#E8E5E0)}#tutorPanel .tt-addv-btn i,#tutorPanel .tt-addv-done i{width:14px;height:14px;vertical-align:-2px}',
+      '#tutorPanel .tt-addv-list{display:flex;flex-direction:column;gap:6px;margin-bottom:8px}#tutorPanel .tt-addv-row{display:flex;align-items:center;gap:8px;font-size:13.5px;padding:6px 8px;border:1px solid var(--bd,#E8E5E0);border-radius:10px;background:var(--bg2,#fff);cursor:pointer}',
+      '#tutorPanel .tt-addv-row b{font-size:15px}#tutorPanel .tt-addv-row small{color:var(--tx3,#ACACAC)}#tutorPanel .tt-addv-row span{flex:1;color:var(--tx2,#7A7A7A);font-size:12.5px;text-align:right}#tutorPanel .tt-addv-row.had{opacity:.6}',
+      '#tutorPanel .tt-addv-acts{display:flex;gap:8px}#tutorPanel .tt-addv-done{font-size:13px;color:var(--tx2,#7A7A7A);display:flex;align-items:center;gap:8px;flex-wrap:wrap}',
       '#tutorPanel .tt-chip:active{background:var(--bg3,#F3F1ED)}',
       '#tutorPanel .tt-in{display:flex;gap:8px;align-items:flex-end;padding:8px 12px calc(10px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--bd,#E8E5E0)}',
       '#tutorPanel textarea{flex:1;resize:none;border:1px solid var(--bd,#E8E5E0);background:var(--bg,#FAF9F6);color:var(--tx,#2C2C2C);border-radius:12px;padding:9px 11px;font-size:14px;line-height:1.4;max-height:110px;min-height:40px;font-family:inherit;outline:none}',
@@ -240,6 +244,39 @@
     flush();
     return out.join('');
   }
+  // 回答裡的單字一鍵進「我的單字本」(2026-11-01 用戶:問小狸超市會遇到的單字後,想直接加進單字本)。
+  // 不另外打 API:回答經 furiganaHTMLRich 後字典詞已是 .jlk(帶 data-w/r/m/c),收齊去重 → 勾選 → MyVocab.add(進 SRS)。
+  function attachAddVocab(th) {
+    try {
+      if (!root.MyVocab || !root.MyVocab.add) return;
+      var seen = {}, words = [];
+      th.querySelectorAll('.jlk[data-w]').forEach(function (el) {
+        var w = el.getAttribute('data-w') || '', m = el.getAttribute('data-m') || '', c = el.getAttribute('data-c') || '';
+        if (!w || !m || seen[w] || /助詞|助動詞|接尾|接頭|記号/.test(c) || w.length < 2 && !/[一-鿿]/.test(w)) return;
+        seen[w] = 1; words.push({ w: w, r: el.getAttribute('data-r') || '', m: m, c: c });
+      });
+      if (!words.length) return;
+      var bar = document.createElement('div'); bar.className = 'tt-addv';
+      bar.innerHTML = '<button type="button" class="tt-chip tt-addv-btn"><i data-ic=bookmark></i> ' + L('把這則的單字加進我的單字本', 'Add these words to My words') + ' (' + words.length + ')</button>';
+      th.appendChild(bar);
+      try { if (root.hydrateIcons) root.hydrateIcons(bar); } catch (e) {}
+      bar.querySelector('.tt-addv-btn').onclick = function () {
+        bar.innerHTML = '<div class="tt-addv-list">' + words.map(function (x, i) {
+          var has = root.MyVocab.has && root.MyVocab.has(x.w);
+          return '<label class="tt-addv-row' + (has ? ' had' : '') + '"><input type="checkbox" data-i="' + i + '"' + (has ? '' : ' checked') + '><b>' + esc(x.w) + '</b>' + (x.r && x.r !== x.w ? '<small>' + esc(x.r) + '</small>' : '') + '<span>' + esc(x.m) + (has ? ' · ' + L('已在單字本', 'already saved') : '') + '</span></label>';
+        }).join('') + '</div><div class="tt-addv-acts"><button type="button" class="tt-chip tt-addv-ok">' + L('加入勾選的', 'Add selected') + '</button><button type="button" class="tt-chip tt-addv-x">' + L('取消', 'Cancel') + '</button></div>';
+        bar.querySelector('.tt-addv-x').onclick = function () { bar.remove(); attachAddVocab(th); };
+        bar.querySelector('.tt-addv-ok').onclick = function () {
+          var n = 0;
+          bar.querySelectorAll('input[type=checkbox]:checked').forEach(function (cb) { var x = words[parseInt(cb.getAttribute('data-i'), 10)]; if (x && root.MyVocab.add({ w: x.w, r: x.r, m: x.m, c: x.c, src: 'tutor' })) n++; });
+          try { if (typeof saveAllCloud === 'function') saveAllCloud(); } catch (e) {}
+          try { if (typeof track === 'function') track('tutor_add_vocab', { n: n }); } catch (e) {}
+          bar.innerHTML = '<div class="tt-addv-done"><i data-ic=check></i> ' + (n ? L('已加入 ' + n + ' 個到我的單字本,會排進複習', 'Added ' + n + ' to My words; they will come up in review') : L('沒有勾選任何字', 'Nothing selected')) + (n ? ' <button type="button" class="tt-chip" onclick="MyVocab.open()">' + L('去看看', 'Open') + '</button>' : '') + '</div>';
+          try { if (root.hydrateIcons) root.hydrateIcons(bar); } catch (e) {}
+        };
+      };
+    } catch (e) {}
+  }
   function addMsg(role, html, cls) {
     var box = $('tutorMsgs'); var d = document.createElement('div'); d.className = 'tt-m ' + role + (cls ? ' ' + cls : ''); d.innerHTML = html; box.appendChild(d);
     d.querySelectorAll('.tt-spk').forEach(function (b) { b.onclick = function (ev) { sayJp(b.getAttribute('data-jp'), ev); }; });
@@ -308,6 +345,7 @@
       }
       th.innerHTML = render(d.text) || esc(d.text || '');
       th.querySelectorAll('.tt-spk').forEach(function (b) { b.onclick = function (ev) { sayJp(b.getAttribute('data-jp'), ev); }; });
+      attachAddVocab(th);
       hist.push({ role: 'ai', text: d.text || '' }); if (hist.length > 8) hist = hist.slice(-8);
       if (typeof d.remain === 'number') { remain = d.remain; } setSub();
       try { if (typeof track === 'function') track('tutor_ask', { mode: mode || 'ask', ctx: ctx ? ctx.type : 'none', src: (ctx && ctx.source) || '' }); } catch (e) {}
@@ -401,6 +439,6 @@
   }
   function init() { if (document.body) build(); else document.addEventListener('DOMContentLoaded', build); }
 
-  root.Tutor = { open: open, fullParse: fullParse, toggleBig: toggleBig, close: close, send: send, sendParse: sendParse, ask: ask, setCtx: setCtx, clearCtx: clearCtx, ctxFromCard: ctxFromCard, askSentence: askSentence, render: render, init: init, isOpen: function () { return isOpen; } };
+  root.Tutor = { _attachAddVocab: attachAddVocab, open: open, fullParse: fullParse, toggleBig: toggleBig, close: close, send: send, sendParse: sendParse, ask: ask, setCtx: setCtx, clearCtx: clearCtx, ctxFromCard: ctxFromCard, askSentence: askSentence, render: render, init: init, isOpen: function () { return isOpen; } };
   init();
 })(window);

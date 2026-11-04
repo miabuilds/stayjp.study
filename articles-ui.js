@@ -170,6 +170,24 @@ window.Articles = (function () {
     if (!toks) return fr(s);                        // 無斷詞資料 → 退回既有引擎
     var look = window.furiLookup || function () { return null; };
     var NUMK = /^[一二三四五六七八九十百千万]+$/;   // 純數字漢字 token
+    // 斷詞把複合名詞切開(駐車|場 → ちゅうしゃ+ば、今週|末 → こんしゅう+すえ;用戶回饋 2026-11-04):
+    // 相鄰 2~3 個 token 接起來是字典裡的詞 → 合成一個 token,用字典讀音與釋義(駐車場=ちゅうしゃじょう)。
+    var KJ = /[一-鿿々]/;
+    var merged = [];
+    for (var mi = 0; mi < toks.length; mi++) {
+      var took = false;
+      for (var ln = 3; ln >= 2; ln--) {
+        if (mi + ln > toks.length) continue;
+        var parts = toks.slice(mi, mi + ln);
+        if (parts.some(function (p) { return p.b && p.b !== p.s; })) continue;   // 活用中的詞別併(降りて+…)
+        var joined = parts.map(function (p) { return p.s; }).join('');
+        if (!KJ.test(joined) || NUMK.test(joined)) continue;
+        var je = look(joined), jr = (je && je.r) || (window.furiRead ? window.furiRead(joined) : null);
+        if (jr) { merged.push({ s: joined, r: jr, k: true, merged: true }); mi += ln - 1; took = true; break; }
+      }
+      if (!took) merged.push(toks[mi]);
+    }
+    toks = merged;
     return toks.map(function (t, ti) {
       var surf = t.s, base = t.b || surf;
       var eSurf = look(surf);

@@ -99,6 +99,15 @@ export async function audioQuery(text, speaker = SPEAKER) {
   return res.json();
 }
 
+// 四国めたん(speaker 2)的字首「シュ」子音只有 0.03s,聽起來像つ/す(2026-11-03 用戶回報 宿題 句子發音怪、whisper 也聽成つくだい;趣味→すみ 同病)。
+// 把 sh 子音拉到 0.12s、母音 0.10s 就正常(whisper 聽回 宿題)。只動 speaker 2、只動太短的 シュ。
+export function fixShu(query, speaker = SPEAKER) {
+  if (speaker !== 2 || !query || !query.accent_phrases) return query;
+  for (const ap of query.accent_phrases) for (const m of (ap.moras || [])) {
+    if (m.text === 'シュ' && m.consonant === 'sh' && (m.consonant_length || 0) < 0.1) { m.consonant_length = 0.12; if (m.vowel_length < 0.1) m.vowel_length = 0.1; }
+  }
+  return query;
+}
 export async function synthesis(query, speaker = SPEAKER) {
   const url = `${ENGINE}/synthesis?speaker=${speaker}`;
   const res = await fetchT(url, {
