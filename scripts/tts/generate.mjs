@@ -23,6 +23,9 @@ const onlyFilter = onlyIdx >= 0 ? new Set(args[onlyIdx + 1].split(',')) : null;
 // --match <子字串,逗號分隔>:只做「文字含這些子字串」的條目(配 --force 重產特定字/句,如 --force --match 宿題,しゅくだい)
 const matchIdx = args.indexOf('--match');
 const matchList = matchIdx >= 0 ? args[matchIdx + 1].split(',') : null;
+// --list <檔>:只做檔裡列的句子(一行一句,完全相符;配 --force 批次重產)
+const listIdx = args.indexOf('--list');
+const listSet = listIdx >= 0 ? new Set(fs.readFileSync(args[listIdx + 1], 'utf8').split('\n').map(x => x.trim()).filter(Boolean)) : null;
 
 fs.mkdirSync(OUT_DIR, { recursive: true });
 
@@ -37,6 +40,7 @@ let work = onlyFilter
   ? texts.filter(t => t.sources.some(s => onlyFilter.has(s.split('#')[0])))
   : texts;
 if (matchList) work = work.filter(t => matchList.some(m => t.text.includes(m)));
+if (listSet) work = work.filter(t => listSet.has(t.text));
 console.log(`Targets: ${work.length}/${texts.length}${onlyFilter ? ' (filtered: --only ' + [...onlyFilter].join(',') + ')' : ''}`);
 
 function writeManifest() {
