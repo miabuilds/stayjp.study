@@ -71,3 +71,4 @@ scripts/out/l10n/*/_fail-*.log
 
 # 含用戶信箱/憑證的本機腳本,不進公開 repo
 scripts/private/
+scratch-variants/
