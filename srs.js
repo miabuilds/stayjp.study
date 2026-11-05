@@ -275,7 +275,7 @@ const SRS = (() => {
         (cfHint ? '<div class="confuse-hint" style="margin-top:6px">' + cfHint + '</div>' : '') +
         // 打字模式原本只在送出時自動念一次、沒有鈕可以重聽(用戶 2026-10-13 回饋「復習打字能增加聲音嗎」)→ 跟翻卡一樣放發音鈕,有例句再加例句鈕
         '<div class="srs-spk-row" style="margin-top:8px;gap:8px">' + spkBtn(window.wordSpeakKey ? wordSpeakKey(item) : (item.r || item.w)) +
-          (item.ex && item.ex.j ? spkBtn(item.ex.j, _E('例句', 'Example')) : '') + '</div>' + '</div>' +
+          (item.ex && item.ex.j ? spkBtn(item.ex.j, _E('例句', 'Example')) + shBtn(item) : '') + '</div>' + '</div>' +
       (right
         ? '<button class="qstart" style="margin-top:10px" onclick="SRS.nextTyped(true)">' + (cur + 1 >= queue.length ? _E('看結果 →','Results →') : _E('下一題 →','Next →')) + '</button>'
         : '<div style="margin-top:10px;font-size:13px;font-weight:700;color:var(--ac)"><span id="srsRetypeTip">' + _E('照著打一次 ✍️','Type it once ✍️') + '</span> <span id="srsRetypeProg" style="color:var(--tx2);font-weight:600">0 / ' + RETYPE_NEED + '</span></div>' +
@@ -354,6 +354,7 @@ const SRS = (() => {
           ${item.w!==item.r?'<div class="qsub">'+item.r+'</div>':''}
           <div class="srs-spk-row">${spkBtn(window.wordSpeakKey ? wordSpeakKey(item) : (item.r || item.w))}</div>
           ${item.m && item.m!==item.w ? '<div class="srs-meaning">'+(typeof cvt==='function'?cvt(item.m):item.m)+'</div>' : ''}
+          ${item.ex && item.ex.j ? '<div class="srs-back-ex" lang="ja" onclick="event.stopPropagation();speak(\'' + String(item.ex.j).replace(/'/g, "\\'") + '\')">' + FR(item.ex.j) + '<div class="srs-back-exz">' + (typeof cvt==='function'?cvt(item.ex.z||''):(item.ex.z||'')) + '</div></div><div class="srs-spk-row" style="margin:6px 0 0">' + shBtn(item) + '</div>' : ''}
           ${cfHint?'<div class="confuse-hint">'+cfHint+'</div>':''}
           <div class="srs-btns">
             <button class="srs-btn srs-hard" onclick="event.stopPropagation();SRS.rate(false)">${t('srs_hard')}</button>
@@ -374,6 +375,15 @@ const SRS = (() => {
     return '<button type="button" class="srs-spk" onclick="event.stopPropagation();speak(\'' + t + '\')">'
       + '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.54 8.46a5 5 0 010 7.07M19.07 4.93a10 10 0 010 14.14"/></svg>'
       + '<span>' + (label || _E('發音', 'Play')) + '</span></button>';
+  }
+
+  // 例句跟讀鈕(2026-11-05 競品巡禮建議 3):進 app.html 的 Shadow overlay(免費、瀏覽器辨識)
+  function shBtn(item) {
+    if (!item || !item.ex || !item.ex.j) return '';
+    var q = s => String(s || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+    return '<button type="button" class="srs-spk srs-sh" onclick="event.stopPropagation();shadowEx(\'' + q(item.ex.j) + '\',\'' + q(item.ex.z) + '\',\'' + q(item.w) + '\')">'
+      + '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15a3 3 0 003-3V6a3 3 0 00-6 0v6a3 3 0 003 3z"/><path d="M19 11a7 7 0 01-14 0M12 18v3"/></svg>'
+      + '<span>' + _E('跟讀', 'Shadow') + '</span></button>';
   }
 
   function flip() {

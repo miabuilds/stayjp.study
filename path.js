@@ -719,5 +719,5 @@
     document.head.appendChild(st);
   }
 
-  root.Path = { hubCardHtml, openMap, close, startUnit, setLevel, level, units, sig, resetLevel, dismissPlaced, startFrom, askStartFrom, menu, confirmReset, testLevel, premium, _quiz: () => quizStep(QUIZ_N), _ans, _next, _qFor: questionsFor };
+  root.Path = { hubCardHtml, openMap, close, startUnit, setLevel, level, units, currentIndex, sig, resetLevel, dismissPlaced, startFrom, askStartFrom, menu, confirmReset, testLevel, premium, _quiz: () => quizStep(QUIZ_N), _ans, _next, _qFor: questionsFor };
 })(window);

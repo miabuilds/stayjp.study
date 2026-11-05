@@ -226,7 +226,14 @@
   // 出題順序:交錯(每 2 張複習插 1 張新字,比例不夠就照剩的排)或先複習
   function buildQueue(extraNew, opts) {
     const p = plan(extraNew);
-    if (opts && opts.reviewOnly) return p.due.slice();   // 關卡節奏:新字由關卡帶,這裡只清到期複習
+    if (opts && opts.reviewOnly) {   // 關卡節奏:新字由關卡帶,這裡只清到期複習
+      let q = p.due.slice();
+      if (opts.limit > 0 && q.length > opts.limit) {   // 補洞包:只先補最弱的(間隔最短),同間隔照到期先後
+        const d = srsData(); const iv = x => ((d[x.level + ':' + x.w] || {}).interval || 0);
+        q = q.map((x, i) => [x, i]).sort((a, b) => iv(a[0]) - iv(b[0]) || a[1] - b[1]).map(a => a[0]).slice(0, opts.limit);
+      }
+      return q;
+    }
     if (p.cfg.order === 'reviewFirst' || !p.due.length || !p.fresh.length) return p.due.concat(p.fresh);
     const q = []; let di = 0, ni = 0;
     const ratio = Math.max(1, Math.round(p.due.length / p.fresh.length));
@@ -236,7 +243,47 @@
     }
     return q;
   }
-  function sig() { try { const p = plan(), c = get(); return p.due.length + '/' + p.fresh.length + '/' + newToday() + '/' + c.mode + '/' + c.rhythm + '/' + c.modeChosen + '/' + Math.floor(minutesToday()); } catch (e) { return ''; } }
+  function sig() { try { const p = plan(), c = get(); return p.due.length + '/' + p.fresh.length + '/' + newToday() + '/' + c.mode + '/' + c.rhythm + '/' + c.modeChosen + '/' + Math.floor(minutesToday()) + '/' + daysAway() + '/' + (catchUpToday() ? 1 : 0); } catch (e) { return ''; } }
+
+  // ── 「今天先做這個」+ 補洞包(2026-11-05 競品巡禮:學 Bunpro Your Path 的下一步提示、Duolingo 改版後的補課)──
+  // 純規則、不打 AI。優先序:離開 ≥3 天且到期一大堆 → 只先補最弱的 20 張;到期複習;今日關卡;新字;文章。達標就不提示(招呼卡維持達標句)。
+  const CATCH_N = 20, CATCH_GAP = 3, CATCH_MIN_DUE = 30, CATCH_KEY = 'catchup_v1';
+  function daysAway() {   // 距離上一個「有讀」的日子幾天(study_log;今天不算)
+    try {
+      const sl = JSON.parse(localStorage.getItem('study_log') || '{}') || {};
+      const t = today(); let last = null;
+      Object.keys(sl).forEach(k => { const x = sl[k]; if (!x || k >= t) return; if (((x.vocab || 0) + (x.grammar || 0) + (x.quiz || 0)) > 0 && (!last || k > last)) last = k; });
+      if (!last) return 0;
+      return Math.max(0, Math.round((DayKey.parse(t) - DayKey.parse(last)) / 86400000));
+    } catch (e) { return 0; }
+  }
+  function catchUpToday() { try { return localStorage.getItem(CATCH_KEY) === today(); } catch (e) { return false; } }
+  function nextStep() {
+    const p = plan(); const due = p.due.length, gap = daysAway();
+    const doneN = (typeof root._hubToday === 'function') ? root._hubToday() : 0;
+    const n = Math.min(CATCH_N, due);
+    if (due > 0 && gap >= CATCH_GAP && p.dueTotal >= CATCH_MIN_DUE && !catchUpToday())
+      return { kind: 'catchup', label: L('離開 ' + gap + ' 天了，先補最重要的 ' + n + ' 張就好', 'Away ' + gap + ' days — just catch up on the top ' + n) };
+    if (due > 0 && catchUpToday() && p.dueTotal >= CATCH_MIN_DUE)
+      return { kind: 'catchup', label: L('補了一輪，還有 ' + p.dueTotal + ' 張；想再補 ' + n + ' 張也可以', 'One round done, ' + p.dueTotal + ' left — ' + n + ' more?') };
+    if (due > 0) return { kind: 'review', label: L('先複習 ' + due + ' 張到期單字', 'Review ' + due + ' due cards first') };
+    if (doneN >= goal()) return null;
+    if (get().rhythm === 'path' && root.Path && root.Path.currentIndex) {
+      const lv = Path.level(), k = Path.currentIndex(lv);
+      if (k < Path.units(lv).length) return { kind: 'path', k, label: L('接著做第 ' + (k + 1) + ' 關', 'Next: level ' + (k + 1)) };
+    }
+    if (p.fresh.length) return { kind: 'new', label: L('學 ' + p.fresh.length + ' 個新單字', 'Learn ' + p.fresh.length + ' new words') };
+    if (root.Articles && root.Articles.open) return { kind: 'article', label: L('單字做完了，讀一篇文章', 'Words done — read an article') };
+    return null;
+  }
+  function go(kind, k) {
+    try { track('next_step', { kind: kind }); } catch (e) {}
+    if (kind === 'catchup') { try { localStorage.setItem(CATCH_KEY, today()); } catch (e) {} root.SRS && SRS.start(null, { reviewOnly: true, limit: CATCH_N }); }
+    else if (kind === 'review') root.SRS && SRS.start(null, { reviewOnly: true });
+    else if (kind === 'path') root.Path && Path.startUnit(k);
+    else if (kind === 'new') root.SRS && SRS.start();
+    else if (kind === 'article') root.Articles && Articles.open();
+  }
 
   // ── A3 時段問候 ──
   function greeting() {
@@ -471,5 +518,5 @@
   }
   if (document.head) ensureCss();
 
-  root.StudyPlan = { get, set, mode, modeInfo, MODES, goal, setMode, setMinTarget, rhythm, setRhythm, minutesToday, nagLine, sets, plan, buildQueue, sig, greeting, hubCardHtml, dueTomorrow, openSettings, closeSettings, toggleLevel, moveLevel, toggleTheme, newToday, enabledLevels, LEVELS, pitchOf, pitchMark, voice, setVoice, VOICES, previewVoice, voiceRows, voiceTrialEnded };
+  root.StudyPlan = { get, set, mode, modeInfo, MODES, goal, setMode, setMinTarget, rhythm, setRhythm, minutesToday, nagLine, sets, plan, buildQueue, sig, greeting, hubCardHtml, dueTomorrow, nextStep, go, daysAway, openSettings, closeSettings, toggleLevel, moveLevel, toggleTheme, newToday, enabledLevels, LEVELS, pitchOf, pitchMark, voice, setVoice, VOICES, previewVoice, voiceRows, voiceTrialEnded };
 })(window);

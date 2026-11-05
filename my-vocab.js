@@ -420,6 +420,7 @@
         + '<div class="mv-item-btm">'
           + '<button type="button" class="mv-ibtn" onclick="MyVocab.say(\'' + attr(it.r || it.w) + '\', event)"><i data-ic=volume></i> ' + L('發音', 'Play') + '</button>'
           + (it.ex && it.ex.j ? '<button type="button" class="mv-ibtn" onclick="MyVocab.say(\'' + attr(it.ex.j) + '\', event)"><i data-ic=speak></i> ' + L('唸例句', 'Example') + '</button>' : '')
+          + (it.ex && it.ex.j ? '<button type="button" class="mv-ibtn" onclick="shadowEx(\'' + attr(it.ex.j) + '\',\'' + attr(it.ex.z || '') + '\',\'' + attr(it.w) + '\')"><i data-ic=mic></i> ' + L('跟讀', 'Shadow') + '</button>' : '')
           + (pr.n ? '<span class="mv-pr">' + L('練過 ' + pr.n + ' 次 · 對 ' + (pr.ok || 0), 'practiced ' + pr.n + ' · ' + (pr.ok || 0) + ' right') + '</span>' : '')
           + '<button type="button" class="mv-ibtn del" onclick="MyVocab.del(\'' + attr(it.w) + '\')"><i data-ic=trash></i> ' + L('移除', 'Remove') + '</button>'
         + '</div>'
