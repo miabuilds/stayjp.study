@@ -3,11 +3,8 @@ name: Daily digest
 # 每天早上寄一封 5 行 digest 給 Mia:昨天付款/試用/回報 + GA 流量 + Threads 成效。
 # 主要由 stayjp-autopost 的 digest-threads workflow 在 00:50 UTC(台灣 08:50)算完 Threads 成效後 repository_dispatch 觸發;
 # 01:30 UTC 的 cron 是保險(autopost 那邊掛了也會寄,只是少 Threads 那段);同一天不會寄兩次(digests/{date} 判重)。
+# 2026-11-05 Mia:停掉這封,改由本機 ~/stayjp-autopilot/daily-ops.mjs 寄「六產品每日營運＋回饋＋今日改動」一封。留 workflow_dispatch 手動用。
 on:
-  repository_dispatch:
-    types: [threads-insights]
-  schedule:
-    - cron: '30 1 * * *'
   workflow_dispatch:
     inputs:
       force: { description: '1=同日重寄', default: '' }
