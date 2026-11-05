@@ -137,7 +137,9 @@ Hard rules:
 // ── 通用批次翻譯:units = {key: srcObj} → 回 {key: outObj} ──
 async function runBatches({ lang, part, units, batchSize, par, system, maxTokens, validate, limit, render, norm }) {
   const done = loadCache(lang, part);
-  const keys = Object.keys(units).filter(k => !done[k]);
+  // 單字是按位置(v:lv:i)快取;單字表原位換字後舊翻譯會錯位 → 快取記 w,對不上就當沒翻(2026-11-05 去重後韓越印泰包全錯位的教訓)
+  const stale = k => done[k] && units[k].kind === 'vocab' && done[k].w && done[k].w !== units[k].w;
+  const keys = Object.keys(units).filter(k => !done[k] || stale(k));
   const todo = limit ? keys.slice(0, limit) : keys;
   console.log(`[${lang}/${part}] 單位 ${Object.keys(units).length},已翻 ${Object.keys(done).length},這次 ${todo.length}`);
   if (!todo.length) return done;
@@ -311,7 +313,7 @@ function renderContent(u) {
 }
 function validateContent(u, out) {
   if (u.kind === 'grammar') return out && typeof out.ex === 'string' && Array.isArray(out.eg) && out.eg.length === u.eg.length;
-  if (u.kind === 'vocab') return out && typeof out.m === 'string' && out.m.length > 0;
+  if (u.kind === 'vocab') { const ok = out && typeof out.m === 'string' && out.m.length > 0; if (ok) out.w = u.w; return ok; }
   return out && Array.isArray(out.words) && out.words.length === u.words.length && Array.isArray(out.eg) && out.eg.length === u.eg.length;
 }
 const CONTENT_SYS = lang => baseRules(lang) + `
@@ -489,7 +491,7 @@ function build(lang) {
     const grammar = {}, vocab = {}, confusables = {};
     for (const lv of ['n5', 'n4', 'n3', 'n2', 'n1']) {
       for (const g of d.grammar[lv]) { const o = c['g:' + g.id]; if (o) grammar[g.id] = { t: o.t, p: o.p, ex: o.ex, n: o.n, eg: o.eg }; }
-      vocab[lv] = d.vocab[lv].map((v, i) => { const o = c['v:' + lv + ':' + i]; return o ? { m: o.m, z: o.z } : null; });
+      vocab[lv] = d.vocab[lv].map((v, i) => { const o = c['v:' + lv + ':' + i]; return (o && (!o.w || o.w === v.w)) ? { m: o.m, z: o.z } : null; });
     }
     for (const cf of d.confusables) { const o = c['c:' + cf.id]; if (o) confusables[cf.id] = o; }
     w(`content-${lang}.js`, HEAD(lang, 'content') + `window.STAYJP_L10N=window.STAYJP_L10N||{};window.STAYJP_L10N[${JSON.stringify(lang)}]=${JSON.stringify({ grammar, vocab, confusables })};\n`);
