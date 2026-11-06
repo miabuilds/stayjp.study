@@ -17,7 +17,7 @@
     { id: "staykr", url: "https://staykr.pages.dev/", ios: "https://apps.apple.com/app/id6815542159", android: "com.miabuilds.staykr",
       name: { "zh-Hant": "StayKR 韓文", "zh-Hans": "StayKR 韩语", ja: "StayKR 韓国語", en: "StayKR Korean" },
       desc: { "zh-Hant": "韓文字母・TOPIK・追星韓文", "zh-Hans": "韩文字母・TOPIK・追星韩语", ja: "ハングルから TOPIK・推し活韓国語まで", en: "Hangul, TOPIK & K-pop fan Korean" } },
-    { id: "stayth", url: "https://stayth.pages.dev/", ios: "", android: "",
+    { id: "stayth", url: "https://stayth.pages.dev/", ios: "https://apps.apple.com/app/id6822020239", android: "",
       name: { "zh-Hant": "StayTH 泰文", "zh-Hans": "StayTH 泰语", ja: "StayTH タイ語", en: "StayTH Thai" },
       desc: { "zh-Hant": "泰文字母・聲調・旅遊會話", "zh-Hans": "泰文字母・声调・旅游会话", ja: "タイ文字・声調・旅行会話", en: "Thai script, tones & travel phrases" } },
     { id: "staytw", url: "https://staytw.pages.dev/home", ios: "https://apps.apple.com/app/id6794272037", android: "com.staytw.app",
