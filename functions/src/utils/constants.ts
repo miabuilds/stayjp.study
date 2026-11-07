@@ -290,3 +290,6 @@ export function ecpayPeriodQueryEndpoint() {
     ? "https://payment.ecpay.com.tw/Cashier/QueryCreditCardPeriodInfo"
     : "https://payment-stage.ecpay.com.tw/Cashier/QueryCreditCardPeriodInfo";
 }
+
+// 2026-11-07 資安稽核:admin-* 函式的 CORS 只開給官網(以前 cors:true 全開;Bearer 不會自動帶所以沒 CSRF,但沒必要全開)
+export const ADMIN_CORS = [/^https:\/\/stayjp\.study$/, /^http:\/\/localhost(:\d+)?$/, /^http:\/\/127\.0\.0\.1(:\d+)?$/];

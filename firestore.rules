@@ -56,15 +56,15 @@ service cloud.firestore {
 
       // 本人可寫自己的 doc(srs_data/收藏/streak…),但「subscription」「trial_started_at」禁止 client 寫
       // —— 訂閱與試用起始只准 Cloud Function (Admin SDK 繞過規則) 寫,防止有人改 console 自己白嫖 / 重發試用。
+      // 2026-11-07 資安稽核:kol_code / my_ref_code / referrer_paid_at / referral_reward_log / rc_sync_hold_until
+      // 也只准 Cloud Function 寫(kol_code 可自寫 → 寫別人的碼就能拿到人家的 KOL token;referrer_paid_at 可刪 → 每次續扣重領推薦獎勵)
       allow create: if request.auth != null && request.auth.uid == userId
-                    && !('subscription' in request.resource.data)
-                    && !('trial_started_at' in request.resource.data)
-                    && !('ref_bonus_at' in request.resource.data)
+                    && !request.resource.data.keys().hasAny(['subscription', 'trial_started_at', 'ref_bonus_at', 'kol_code', 'my_ref_code', 'referrer_paid_at', 'referral_reward_log', 'rc_sync_hold_until'])
                     && ( !('ref_code' in request.resource.data)
                          || request.resource.data.ref_code == null
                          || refCodeValidOnSet(request.resource.data.ref_code) );
       allow update: if request.auth != null && request.auth.uid == userId
-                    && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['subscription', 'trial_started_at'])
+                    && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['subscription', 'trial_started_at', 'kol_code', 'my_ref_code', 'referrer_paid_at', 'referral_reward_log', 'rc_sync_hold_until'])
                     && refCodeUpdateOk();
 
       // AI 情境對話紀錄(speak-chat 保存的逐場對話)— 純學習資料,本人讀寫刪
@@ -89,7 +89,9 @@ service cloud.firestore {
       allow read: if request.auth != null &&
         isAdmin();
       allow create, update: if request.auth != null && request.auth.uid == uid
-        && request.resource.data.uid == uid;
+        && request.resource.data.uid == uid
+        && request.resource.data.keys().hasOnly(['uid', 'email', 'name', 'level', 'plan', 'note', 'createdAt', 'created_at', 'updatedAt', 'source'])
+        && (!('note' in request.resource.data) || (request.resource.data.note is string && request.resource.data.note.size() <= 1000));
       allow delete: if false;
     }
 
@@ -224,6 +226,7 @@ service cloud.firestore {
         request.auth != null &&
         request.resource.data.uid == request.auth.uid &&
         request.resource.data.keys().hasAll(['type', 'message', 'uid', 'createdAt']) &&
+        request.resource.data.keys().hasOnly(['type', 'message', 'uid', 'createdAt', 'email', 'contact_email', 'displayName', 'ua', 'appVer', 'updateId', 'updateChannel', 'kol_payout_request', 'code']) &&
         request.resource.data.type in ['bug', 'feature', 'content', 'other'] &&
         request.resource.data.message is string &&
         request.resource.data.message.size() > 0 &&
@@ -248,11 +251,11 @@ service cloud.firestore {
         && request.resource.data.created_at == request.time
         && request.resource.data.kind is string && request.resource.data.kind.size() <= 40
         && request.resource.data.desc is string && request.resource.data.desc.size() >= 2 && request.resource.data.desc.size() <= 3000
-        && (!('id' in request.resource.data) || (request.resource.data.id is string && request.resource.data.id.size() <= 80))
+        && (!('id' in request.resource.data) || (request.resource.data.id is string && request.resource.data.id.size() <= 80 && !request.resource.data.id.matches('.*[<>"\'\\\\].*')))
         && (!('detail' in request.resource.data) || (request.resource.data.detail is string && request.resource.data.detail.size() <= 2000))
         && (!('email' in request.resource.data) || (request.resource.data.email is string && request.resource.data.email.size() <= 120))
         && (!('uid' in request.resource.data) || (request.resource.data.uid is string && request.resource.data.uid.size() <= 128))
-        && (!('page' in request.resource.data) || (request.resource.data.page is string && request.resource.data.page.size() <= 500))
+        && (!('page' in request.resource.data) || (request.resource.data.page is string && request.resource.data.page.size() <= 500 && (request.resource.data.page == '' || request.resource.data.page.matches('https://stayjp\\.study/.*'))))
         && (!('ua' in request.resource.data) || (request.resource.data.ua is string && request.resource.data.ua.size() <= 300))
         && (!('lang' in request.resource.data) || (request.resource.data.lang is string && request.resource.data.lang.size() <= 10))
         && (!('platform' in request.resource.data) || (request.resource.data.platform is string && request.resource.data.platform.size() <= 20));

@@ -7,6 +7,7 @@
 //   唯讀:只呼叫 GA Data API runReport / runRealtimeReport。
 import * as functions from "firebase-functions/v2/https";
 import * as admin from "firebase-admin";
+import { ADMIN_CORS } from "./utils/constants";
 import { GoogleAuth } from "google-auth-library";
 
 if (admin.apps.length === 0) admin.initializeApp();
@@ -28,7 +29,7 @@ async function gaCall(path: string, payload: unknown): Promise<any> {
 }
 
 export const adminGaStats = functions.onRequest(
-  { cors: true, region: "asia-east1" },
+  { cors: ADMIN_CORS, region: "asia-east1" },
   async (req, res) => {
     try {
       const idToken = (req.headers.authorization || "").replace(/^Bearer\s+/i, "");

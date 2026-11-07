@@ -11,7 +11,8 @@
 //   6. 轉大寫
 
 import crypto from "crypto";
-import { ecpayConfig } from "./constants";
+import axios from "axios";
+import { ecpayConfig, ecpayPeriodActionEndpoint } from "./constants";
 
 /** ECPay 的 URL encode 規則,跟 JS 內建的有幾個差異 */
 function ecpayUrlEncode(str: string): string {
@@ -49,7 +50,8 @@ export function verifyCheckMacValue(params: Record<string, string>): boolean {
   const provided = params.CheckMacValue;
   if (!provided) return false;
   const computed = checkMacValue(params);
-  return provided.toUpperCase() === computed;
+  const a = Buffer.from(provided.toUpperCase()), b = Buffer.from(computed);
+  return a.length === b.length && crypto.timingSafeEqual(a, b);
 }
 
 /** 生成綠界 timestamp 格式:YYYY/MM/DD HH:mm:ss(台北時區) */
@@ -64,4 +66,33 @@ export function generateMerchantTradeNo(): string {
   const ts = Date.now().toString().slice(-10);
   const rand = Math.random().toString(36).slice(2, 8);
   return `s${ts}${rand}`.slice(0, 20);
+}
+
+/** 停止綠界定期定額(CreditCardPeriodAction Action=Cancel)。cancel-subscription / delete-account 共用。
+ *  回 { ok, msg, orderNotFound }:orderNotFound = 綠界查無此定期約定(RtnCode=90100150)。 */
+export async function ecpayPeriodCancel(merchantTradeNo: string): Promise<{ ok: boolean; msg: string; orderNotFound: boolean }> {
+  const cfg = ecpayConfig();
+  const params: Record<string, string | number> = {
+    MerchantID: cfg.merchantId,
+    MerchantTradeNo: merchantTradeNo,
+    Action: "Cancel",
+    TimeStamp: Math.floor(Date.now() / 1000),
+  };
+  params.CheckMacValue = checkMacValue(params);
+  let msg = "", ok = false;
+  try {
+    const r = await axios.post(
+      ecpayPeriodActionEndpoint(),
+      new URLSearchParams(params as Record<string, string>).toString(),
+      { headers: { "Content-Type": "application/x-www-form-urlencoded" }, timeout: 15000 },
+    );
+    msg = String(r.data);
+    console.log("ECPay PeriodAction Cancel response:", msg);
+    ok = /RtnCode=1\b/.test(msg);
+  } catch (e) {
+    msg = String(e);
+    console.error("ECPay PeriodAction call failed:", e);
+  }
+  const orderNotFound = /RtnCode=90100150\b/.test(msg) || msg.includes("不存在的訂單");
+  return { ok, msg, orderNotFound };
 }

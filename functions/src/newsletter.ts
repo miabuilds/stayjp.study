@@ -50,6 +50,19 @@ export const newsletterSubscribe = https.onRequest(
     const email = String(body.email || "").trim().toLowerCase();
     if (body.website) { res.json({ ok: true }); return; }          // 蜜罐欄位:機器人填了就假裝成功
     if (!EMAIL_RE.test(email) || email.length > 200) { res.status(400).json({ ok: false, err: "email" }); return; }
+    // 2026-11-07 資安稽核:同 IP 每日最多 5 次訂閱(防拿別人信箱亂灌歡迎信);IP 只存雜湊
+    const ip = String(req.headers["x-forwarded-for"] || "").split(",")[0].trim() || String(req.ip || "");
+    if (ip) {
+      const ipKey = crypto.createHash("sha256").update("nl:" + twDay() + ":" + ip).digest("hex").slice(0, 32);
+      const ipRef = db.doc(`newsletter_meta/ip_${twDay()}_${ipKey}`);
+      const allowed = await db.runTransaction(async (tx) => {
+        const n = Number((await tx.get(ipRef)).data()?.n || 0);
+        if (n >= 5) return false;
+        tx.set(ipRef, { n: n + 1, expires_at: Date.now() + 2 * 86400e3 }, { merge: true });
+        return true;
+      }).catch(() => true);
+      if (!allowed) { res.status(429).json({ ok: false, err: "rate_limited" }); return; }
+    }
 
     const id = idOf(email), ref = db.doc(`newsletter_subs/${id}`);
     const snap = await ref.get();
@@ -58,6 +71,15 @@ export const newsletterSubscribe = https.onRequest(
     // 同一信箱 10 分鐘內只寄一次歡迎信(防灌)
     if (cur.confirmSentAt && Date.now() - cur.confirmSentAt.toMillis() < 10 * 60e3) { res.json({ ok: true }); return; }
 
+    // 歡迎信也算進每日 SMTP 額度(以前只算期刊信,歡迎信無上限)
+    const capRef = db.doc(`newsletter_meta/cap_${twDay()}`);
+    const capOk = await db.runTransaction(async (tx) => {
+      const used = Number((await tx.get(capRef)).data()?.sent || 0);
+      if (used >= DAILY_CAP) return false;
+      tx.set(capRef, { sent: used + 1 }, { merge: true });
+      return true;
+    }).catch(() => true);
+    if (!capOk) { res.status(429).json({ ok: false, err: "daily_cap" }); return; }
     // 2026-10-20 Mia:改單一確認 —— 填完就訂閱成功(雙重確認會流失兩三成)。
     // 保護:歡迎信底部一鍵退訂(被亂填的人退得掉)、前端擋常見打錯字網域、歡迎信寄失敗就標 bounced 不再寄(runNewsletter 開頭處理)。
     const token = cur.token || newToken();

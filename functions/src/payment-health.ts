@@ -26,7 +26,9 @@ export const paymentHealth = functions.onRequest(
     // (maxInstances 已擋住成本濫用)。要開強認證:把 HEALTH_CHECK_KEY 加進上面 secrets 陣列 +
     // `firebase functions:secrets:set HEALTH_CHECK_KEY` + GitHub repo secret 同名同值 + 部署。
     const expectedKey = process.env.HEALTH_CHECK_KEY;
-    if (expectedKey && req.query.key !== expectedKey) {
+    // 2026-11-07 資安稽核:沒設 key 就不對外(以前沒設=公開,會漏 production 旗標/金流失敗數)
+    if (!expectedKey) { res.status(404).json({ ok: false, error: "not_found" }); return; }
+    if (req.query.key !== expectedKey) {
       res.status(403).json({ ok: false, error: "forbidden" });
       return;
     }

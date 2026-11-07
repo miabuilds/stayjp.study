@@ -4,6 +4,7 @@
 // owner only。實際匯款是線下手動;這支只做記帳與狀態流轉。
 import * as functions from "firebase-functions/v2/https";
 import * as admin from "firebase-admin";
+import { ADMIN_CORS } from "./utils/constants";
 import { db, nowMs } from "./utils/firestore";
 
 if (admin.apps.length === 0) admin.initializeApp();
@@ -11,7 +12,7 @@ if (admin.apps.length === 0) admin.initializeApp();
 const OWNER_EMAILS = new Set(["stayjpplan@gmail.com", "abc83327@gmail.com"]);
 
 export const adminSettleKolPayout = functions.onRequest(
-  { cors: true, region: "asia-east1", invoker: "public", maxInstances: 2, timeoutSeconds: 60, memory: "256MiB", concurrency: 5 },
+  { cors: ADMIN_CORS, region: "asia-east1", invoker: "public", maxInstances: 2, timeoutSeconds: 60, memory: "256MiB", concurrency: 5 },
   async (req, res) => {
     try {
       const idToken = (req.headers.authorization || "").replace(/^Bearer\s+/i, "");

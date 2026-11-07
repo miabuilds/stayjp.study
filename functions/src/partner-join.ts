@@ -9,6 +9,7 @@
 //     以免既有連結失效;舊碼保留設 active:false + renamed_to(不刪,零資料遺失風險)。
 import * as functions from "firebase-functions/v2/https";
 import * as admin from "firebase-admin";
+import crypto from "crypto";
 
 if (admin.apps.length === 0) admin.initializeApp();
 const db = admin.firestore();
@@ -34,9 +35,7 @@ function genCode(): string {
   return s;
 }
 function genToken(): string {
-  let s = "";
-  for (let i = 0; i < 20; i++) s += Math.floor(Math.random() * 36).toString(36);
-  return s;
+  return crypto.randomBytes(18).toString("base64url");   // 2026-11-07 資安稽核:Math.random 不是 CSPRNG
 }
 // 統一大寫、只留英數,最多 16 碼(好記但不至於太短撞光)
 function normalizeCode(raw: unknown): string {
@@ -91,9 +90,17 @@ export const partnerJoin = functions.onRequest(
       const u = (await userRef.get()).data() || {};
 
       // ── 已有 KOL 碼 ──
+      // 2026-11-07 資安稽核:users/{uid}.kol_code 以前 client 可自寫,寫別人的碼就能拿到別人的 token
+      //(查成效/請款)。現在 rules 已鎖 kol_code,這裡再驗 owner_uid 雙保險:不是自己的碼 → 403。
+      if (u.kol_code && !/^[A-Z0-9]{1,16}$/.test(String(u.kol_code))) { res.status(403).json({ error: "not_owner" }); return; }
       if (u.kol_code) {
         const exRef = db.doc(`ref_codes/${u.kol_code}`);
         const ex = (await exRef.get()).data() || {};
+        if (!ex || ex.owner_uid !== uid) {
+          console.warn("[partnerJoin] kol_code owner mismatch", { uid, code: u.kol_code, owner: ex?.owner_uid });
+          res.status(403).json({ error: "not_owner", reason: "這個推薦碼不屬於這個帳號。" });
+          return;
+        }
         if (ex.status === "suspended") { res.status(403).json({ error: "suspended", reason: "你的合作資格已被暫停,請聯絡我們。" }); return; }
 
         // 想改成新的自訂碼(且與現有不同)→ 只在「舊碼從未被使用」時允許

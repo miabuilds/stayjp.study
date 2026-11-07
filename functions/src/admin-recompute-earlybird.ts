@@ -10,6 +10,7 @@
 
 import * as functions from "firebase-functions/v2/https";
 import * as admin from "firebase-admin";
+import { ADMIN_CORS } from "./utils/constants";
 import { db } from "./utils/firestore";
 
 if (admin.apps.length === 0) admin.initializeApp();
@@ -19,7 +20,7 @@ const EARLY_BIRD_LIMIT = 100;
 
 export const adminRecomputeEarlyBird = functions.onRequest(
   {
-    cors: true,
+    cors: ADMIN_CORS,
     region: "asia-east1",
     invoker: "public",
     maxInstances: 2,

@@ -7,9 +7,8 @@
 
 import * as functions from "firebase-functions/v2/https";
 import * as admin from "firebase-admin";
-import axios from "axios";
-import { ecpayConfig, ecpayPeriodActionEndpoint, ECPAY_SECRETS, isLifetimePlan } from "./utils/constants";
-import { checkMacValue } from "./utils/ecpay";
+import { ECPAY_SECRETS, isLifetimePlan } from "./utils/constants";
+import { ecpayPeriodCancel } from "./utils/ecpay";
 import { getSubscription, patchSubscription, writeTransaction } from "./utils/firestore";
 
 if (admin.apps.length === 0) admin.initializeApp();
@@ -63,36 +62,9 @@ export const cancelSubscription = functions.onRequest(
       let ecpayMsg = "";
 
       if (isRecurring && sub.ecpay_order) {
-        // 停止定期定額:CreditCardPeriodAction Action=Cancel
-        // 用 MerchantTradeNo(原訂單號,不是 TradeNo)
-        const cfg = ecpayConfig();
-        // ECPay CreditCardPeriodAction 只支援兩個 Action:
-        //   "Cancel" = 停用後續授權(終止訂閱)、"ReAuth" = 前期授權失敗時重新授權。
-        //   ★ 沒有退款 Action。退定期定額某一期的錢要走 refund.ts(查該期 TradeNo → DoAction 退刷)。
-        // 「終止訂閱」用 "Cancel"
-        const params: Record<string, string | number> = {
-          MerchantID: cfg.merchantId,
-          MerchantTradeNo: sub.ecpay_order,
-          Action: "Cancel",
-          TimeStamp: Math.floor(Date.now() / 1000),
-        };
-        params.CheckMacValue = checkMacValue(params);
-
-        try {
-          const ecpayRes = await axios.post(
-            ecpayPeriodActionEndpoint(),
-            new URLSearchParams(params as Record<string, string>).toString(),
-            { headers: { "Content-Type": "application/x-www-form-urlencoded" }, timeout: 15000 },
-          );
-          ecpayMsg = String(ecpayRes.data);
-          console.log("ECPay PeriodAction CancelRevoke response:", ecpayMsg);
-          // 綠界回應格式:RtnCode=1 為成功
-          ecpayOk = /RtnCode=1\b/.test(ecpayMsg);
-        } catch (e) {
-          ecpayOk = false;
-          ecpayMsg = String(e);
-          console.error("ECPay PeriodAction call failed:", e);
-        }
+        // 停止定期定額:CreditCardPeriodAction Action=Cancel(共用 utils/ecpay.ecpayPeriodCancel,delete-account 也用)
+        const r = await ecpayPeriodCancel(sub.ecpay_order);
+        ecpayOk = r.ok; ecpayMsg = r.msg;
       }
 
       if (isRecurring && !ecpayOk) {

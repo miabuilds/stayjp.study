@@ -789,7 +789,7 @@ const YTS = (() => {
     document.getElementById('pasteBox').style.display='none';
     // 眾包:貼過的逐字稿回傳共用快取,下一個開同影片的人直接能練(fire-and-forget)
     if(vid && out.length>=5){
-      try{ fetch(FN_SEED,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({v:vid,lines:out.map(l=>({t:l.t,d:l.d,ja:l.ja}))})}).catch(()=>{}); }catch(e){}
+      try{ var _su=firebase.auth().currentUser; if(_su){ _su.getIdToken().then(function(t){ return fetch(FN_SEED,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+t},body:JSON.stringify({v:vid,lines:out.map(l=>({t:l.t,d:l.d,ja:l.ja}))})}); }).catch(()=>{}); } }catch(e){}   // 2026-11-07 種字幕要登入(防匿名灌)
     }
   }
 

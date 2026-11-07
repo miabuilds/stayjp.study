@@ -117,6 +117,10 @@
 </div>
 
 <script src="icons.js"></script>
+<!-- 2026-11-07 資安稽核:自助申請的推薦碼請款要本人登入(token 外洩也改不了收款帳戶) -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script>try{ if(!firebase.apps.length) firebase.initializeApp({ apiKey:"AIzaSyDnmg2XOuvwgE8m8xCF5sS4o0nQYoUplPI", authDomain:"jpnote-1bdd6.firebaseapp.com", projectId:"jpnote-1bdd6", storageBucket:"jpnote-1bdd6.firebasestorage.app", messagingSenderId:"666368174384" }); }catch(e){}</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
@@ -137,8 +141,10 @@
     .then(function(r){return r.json();})
     .then(function(d){
       if(!d||!d.ok){ fail('連結失效或無權限，請回儀表板重新進入。'); return; }
+      needsLogin = !!d.needs_login;
       hide($('gate')); show($('app'));
       $('who').textContent = (d.kol||code)+'（推薦碼 '+code+'）';
+      if(needsLogin){ showLoginNote(); }
       $('claimhint').textContent = '簽署本協議後即申請領款；只會計算已過 30 天退款期的分潤，鎖定中的下次再領。';
       $('aCode').textContent = code;
       $('aPct').textContent = (d.commission_pct!=null? d.commission_pct : '（依合作約定）');
@@ -146,6 +152,18 @@
     })
     .catch(function(){ fail('連線失敗，請稍後再試。'); });
 
+  var needsLogin=false;
+  function curUser(){ try{ return firebase.auth().currentUser; }catch(e){ return null; } }
+  function showLoginNote(){
+    var n=$('loginNote'); if(!n){ n=document.createElement('div'); n.id='loginNote'; n.style.cssText='margin:12px 0;padding:12px 14px;border:1px solid #e5c07b;background:#fff8e6;border-radius:10px;font-size:14px'; $('app').insertBefore(n,$('app').firstChild); }
+    function render(){
+      var u=curUser();
+      if(u){ n.innerHTML='已登入：<b></b>'; n.querySelector('b').textContent=u.email||u.uid; return; }
+      n.innerHTML='這個推薦碼是線上申請的，請款前請先用<b>申請時的 Google 帳號</b>登入。 <button type="button" id="loginBtn" style="margin-left:8px;padding:6px 14px;border-radius:999px;border:none;background:#12233a;color:#fff;cursor:pointer">用 Google 登入</button>';
+      n.querySelector('#loginBtn').onclick=function(){ var p=new firebase.auth.GoogleAuthProvider(); p.setCustomParameters({prompt:'select_account'}); firebase.auth().signInWithPopup(p).catch(function(e){ if(e&&(e.code==='auth/popup-closed-by-user'||e.code==='auth/cancelled-popup-request')) return; n.insertAdjacentHTML('beforeend','<div style="color:#b91c1c;margin-top:6px"></div>'); n.lastChild.textContent='登入失敗：'+(e&&e.message||e); }); };
+    }
+    render(); try{ firebase.auth().onAuthStateChanged(render); }catch(e){}
+  }
   function initForm(){
     // 輸入即時同步到協議預覽
     var map = {fName:'aName',fId:'aId',fAddr:'aAddr',fAcct:'aAcct'};
@@ -193,8 +211,14 @@
         }
         var pdfB64=pdf.output('datauristring').split(',')[1];
         btn.textContent='送出中…';
-        return fetch(FN+'/kolRequestPayout',{method:'POST',headers:{'Content-Type':'application/json'},
-          body:JSON.stringify({code:code,t:token,holder_name:$('fName').value.trim(),account:$('fAcct').value.trim(),pdf_b64:pdfB64})});
+        var u=curUser();
+        if(needsLogin && !u){ showLoginNote(); throw new Error('請先用申請推薦碼的 Google 帳號登入，再按一次送出。'); }
+        var tokP = u ? u.getIdToken() : Promise.resolve('');
+        return tokP.then(function(idt){
+          var h={'Content-Type':'application/json'}; if(idt) h['Authorization']='Bearer '+idt;
+          return fetch(FN+'/kolRequestPayout',{method:'POST',headers:h,
+            body:JSON.stringify({code:code,t:token,holder_name:$('fName').value.trim(),account:$('fAcct').value.trim(),pdf_b64:pdfB64})});
+        });
       }).then(function(r){return r.json();}).then(function(res){
         if(res&&res.error==='nothing_claimable'){ throw new Error('目前沒有已過 30 天退款期的分潤可以領'+(res.pending?'（鎖定中 NT$'+res.pending+'，過期後就能領）':'')); }
         if(!res||!res.ok){ throw new Error((res&&res.reason)||(res&&res.error)||'送出失敗'); }

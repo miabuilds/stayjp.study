@@ -6,12 +6,35 @@
 // - 免登入(此功能依 YouTube 條款必須留在免費區),用 videoId 白名單格式 + 迷你記憶體快取擋濫用。
 import * as functions from "firebase-functions/v2/https";
 import * as admin from "firebase-admin";
+import crypto from "crypto";
 
 if (admin.apps.length === 0) admin.initializeApp();
 
 const INNERTUBE_KEY = "AIzaSyA8eiZmM1FaDVjRy-df2KTyQ_vz_yYM39w";   // YouTube 網頁版公開 key(非機密,寫死在 youtube.com 前端)
 const CACHE = new Map<string, { at: number; data: unknown }>();     // instance 內快取,15 分鐘
 const CACHE_MS = 60 * 1000;   // 記憶體快取只擋瞬間重複請求;Firestore 才是主快取(更新字幕/翻譯後要馬上看得到)
+
+// 2026-11-07 資安稽核:免登入端點加每 IP 每日上限(只算「真的去抓 YouTube」那種,快取命中不算),
+// 種字幕改成要登入 + 只能補空位。IP 只存 sha256(鹽+ip) 的前 32 碼,不存明碼。
+const IP_DAILY_LIVE_FETCH = 30;
+function clientIpOf(req: functions.Request): string {
+  const xff = String(req.headers["x-forwarded-for"] || "").split(",").map((x) => x.trim()).filter(Boolean);
+  return (xff[0] || req.ip || "").replace(/^::ffff:/, "");
+}
+async function ipAllow(kind: string, ip: string, limit: number): Promise<boolean> {
+  if (!ip) return true;
+  try {
+    const day = new Date(Date.now() + 8 * 3600e3).toISOString().slice(0, 10);
+    const key = crypto.createHash("sha256").update("yt:" + day + ":" + ip).digest("hex").slice(0, 32);
+    const ref = admin.firestore().doc(`rate_limits/${kind}_${day}_${key}`);
+    return await admin.firestore().runTransaction(async (tx) => {
+      const n = Number((await tx.get(ref)).data()?.n || 0);
+      if (n >= limit) return false;
+      tx.set(ref, { n: n + 1, day, kind, expires_at: Date.now() + 2 * 86400e3 }, { merge: true });
+      return true;
+    });
+  } catch { return true; }   // 保險絲壞了不擋正常人
+}
 
 type CapTrack = { baseUrl: string; languageCode: string; kind?: string; name?: { runs?: { text: string }[] } };
 
@@ -70,6 +93,12 @@ export const ytCaptionsSeed = functions.onRequest(
   async (req, res) => {
     try {
       if (req.method !== "POST") { res.status(405).json({ error: "method_not_allowed" }); return; }
+      // 要登入(匿名也可,但要有 Firebase 身分)+ 每 IP 每日 20 次,防匿名灌字幕
+      const idToken = (req.headers.authorization || "").replace(/^Bearer\s+/i, "");
+      if (!idToken) { res.status(401).json({ error: "login_required" }); return; }
+      let seedUid = "";
+      try { seedUid = (await admin.auth().verifyIdToken(idToken)).uid; } catch { res.status(401).json({ error: "bad_token" }); return; }
+      if (!(await ipAllow("seed", clientIpOf(req), 20))) { res.status(429).json({ error: "rate_limited" }); return; }
       const b = req.body || {};
       const v = String(b.v || "");
       if (!/^[A-Za-z0-9_-]{11}$/.test(v)) { res.status(400).json({ error: "bad_video_id" }); return; }
@@ -86,11 +115,15 @@ export const ytCaptionsSeed = functions.onRequest(
       }
       const ref = admin.firestore().collection("yt_captions_cache").doc(v);
       const doc = await ref.get();
-      if (doc.exists && (doc.data() as any)?.track !== "user") { res.json({ ok: true, kept: "existing" }); return; }   // 官方字幕優先,不覆蓋
-      await ref.set({ title: String(b.title || "").slice(0, 120), author: "", seconds: 0, track: "user", lang: "ja", lines: clean });
+      if (doc.exists) {
+        const ex = doc.data() as any;
+        // 官方字幕優先不覆蓋;別人種的也不覆蓋(只能補空位,或改自己種的那份)
+        if (ex?.track !== "user" || (ex?.seeded_by && ex.seeded_by !== seedUid)) { res.json({ ok: true, kept: "existing" }); return; }
+      }
+      await ref.set({ title: String(b.title || "").slice(0, 120), author: "", seconds: 0, track: "user", lang: "ja", lines: clean, seeded_by: seedUid, seeded_at: Date.now() });
       res.json({ ok: true });
     } catch (e: any) {
-      res.status(500).json({ error: "seed_failed", message: String(e?.message || e) });
+      console.error("ytCaptionsSeed", e); res.status(500).json({ error: "seed_failed" });
     }
   }
 );
@@ -118,6 +151,8 @@ export const ytCaptions = functions.onRequest(
         }
       } catch (e) { /* 快取失敗照走即時抓 */ }
 
+      // 快取沒有 → 要真的去抓 YouTube:每 IP 每日上限
+      if (!(await ipAllow("fetch", clientIpOf(req), IP_DAILY_LIVE_FETCH))) { res.status(429).json({ error: "rate_limited", reason: "今天查太多新影片了,明天再來。" }); return; }
       const p = await innertubePlayer(v);
       const status = p?.playabilityStatus?.status;
       if (status && status !== "OK") { res.json({ error: "unplayable", reason: p?.playabilityStatus?.reason || status }); return; }
@@ -156,7 +191,7 @@ export const ytCaptions = functions.onRequest(
       try { await admin.firestore().collection("yt_captions_cache").doc(v).set(data); } catch (e) { /* 寫不進快取不影響回應 */ }
       res.json(data);
     } catch (e: any) {
-      res.status(500).json({ error: "fetch_failed", message: String(e?.message || e) });
+      console.error("ytCaptions", e); res.status(500).json({ error: "fetch_failed" });
     }
   }
 );

@@ -6,7 +6,7 @@
 
 import * as functions from "firebase-functions/v2/https";
 import * as admin from "firebase-admin";
-import { PLANS, PlanKey } from "./utils/constants";
+import { PLANS, PlanKey, ADMIN_CORS } from "./utils/constants";
 import {
   getSubscription, writeSubscription, patchSubscription, writeTransaction,
   nowMs, SubscriptionDoc, voidKolCommission,
@@ -18,7 +18,7 @@ const OWNER_EMAILS = new Set(["stayjpplan@gmail.com", "abc83327@gmail.com"]);
 
 export const adminSetSubscription = functions.onRequest(
   {
-    cors: true,
+    cors: ADMIN_CORS,
     region: "asia-east1",
     invoker: "public",
     maxInstances: 2,

@@ -2,6 +2,7 @@
 <html lang="zh-Hant">
 <head>
 <meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="base-uri 'self'; object-src 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Admin · 日本再留計劃</title>
 <meta name="robots" content="noindex,nofollow">
@@ -842,7 +843,7 @@ async function renderReports() {
  el.innerHTML = '<div style="padding:20px;color:var(--tx2)">載入中…</div>';
  try {
  const snap = await db.collection('reports').orderBy('created_at', 'desc').limit(300).get();
- _rpCache = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+ _rpCache = snap.docs.map(d => { const x = d.data(); return { ...x, item_id: typeof x.id === 'string' ? x.id : '', id: d.id }; });   // 2026-11-07 資安稽核:使用者寫的 id 欄位不能蓋掉 doc id(會進 onclick)
  } catch (e) { el.innerHTML = '<div style="padding:20px;color:#EF4444">讀取失敗:' + escapeHtml(e.message) + '<br>firestore.rules 的 reports 要開 admin 讀寫。</div>'; return; }
  const open = _rpCache.filter(r => (r.status || 'new') === 'new').length;
  const badge = document.getElementById('rpBadge'); badge.textContent = open; badge.style.display = open ? '' : 'none';
@@ -857,7 +858,7 @@ async function renderReports() {
  return `<div style="padding:12px 0;border-bottom:1px solid var(--bd)">
  <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:12px;color:var(--tx2)">
  <span class="badge b-${s === 'new' ? 'new' : s === 'resolved' ? 'resolved' : 'ignored'}">${s === 'new' ? '未處理' : s === 'resolved' ? '已處理' : s}</span>
- <b style="color:var(--tx)">${escapeHtml(r.kind || '')}</b>${r.id ? ' <span>' + escapeHtml(r.id) + '</span>' : ''}
+ <b style="color:var(--tx)">${escapeHtml(r.kind || '')}</b>${r.item_id ? ' <span>' + escapeHtml(r.item_id) + '</span>' : ''}
  <span>${fmt(r.created_at)}${d != null && s === 'new' && d > 7 ? ' <span style="color:#EF4444">(' + d + ' 天)</span>' : ''}</span>
  <span>${escapeHtml(r.platform || '')}</span>
  <span>${escapeHtml(r.email || '匿名')}</span>
@@ -869,7 +870,7 @@ async function renderReports() {
  ${s === 'new' ? `<button class="btn" style="font-size:11px;padding:4px 10px" onclick="rpSet('${r.id}','resolved')">標記已處理</button>
  <button class="btn" style="font-size:11px;padding:4px 10px" onclick="rpSet('${r.id}','wontfix')">不處理</button>` : `<button class="btn" style="font-size:11px;padding:4px 10px" onclick="rpSet('${r.id}','new')">退回未處理</button>`}
  ${mail ? `<button class="btn" style="font-size:11px;padding:4px 10px" onclick="rpMail('${r.id}')"><i data-ic=mail></i> 回信</button>` : ''}
- ${r.page ? `<a class="btn" style="font-size:11px;padding:4px 10px" href="${escapeHtml(r.page)}" target="_blank" rel="noopener">開啟頁面</a>` : ''}
+ ${/^https:\/\/stayjp\.study\//.test(r.page || '') ? `<a class="btn" style="font-size:11px;padding:4px 10px" href="${escapeHtml(r.page)}" target="_blank" rel="noopener">開啟頁面</a>` : ''}
  </div></div>`;
  }).join('');
  if (window.StayIcons && StayIcons.render) try { StayIcons.render(el); } catch (e) {}
@@ -884,7 +885,7 @@ async function rpSet(id, status) {
 }
 function rpMail(id) {
  const r = _rpCache.find(x => x.id === id); if (!r || !r.email) return;
- const subject = 'StayJP 回報已處理:' + (r.kind || '') + (r.id ? ' ' + r.id : '');
+ const subject = 'StayJP 回報已處理:' + (r.kind || '') + (r.item_id ? ' ' + r.item_id : '');
  const body = `您好，\n\n謝謝您的回報（${(r.desc || '').slice(0, 80).replace(/\n/g, ' ')}），我們已經修正了。App 不用更新，重新打開就會看到。\n\n如果還有任何問題，歡迎再告訴我們。\n\nStayJP`;
  window.open(`https://mail.google.com/mail/?authuser=stayjpplan%40gmail.com&view=cm&fs=1&to=${encodeURIComponent(r.email)}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`, '_blank');
 }

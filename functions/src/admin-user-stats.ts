@@ -8,6 +8,7 @@
 
 import * as functions from "firebase-functions/v2/https";
 import * as admin from "firebase-admin";
+import { ADMIN_CORS } from "./utils/constants";
 import { db } from "./utils/firestore";
 
 if (admin.apps.length === 0) admin.initializeApp();
@@ -16,7 +17,7 @@ const OWNER_EMAILS = new Set(["stayjpplan@gmail.com", "abc83327@gmail.com"]);
 
 export const adminUserStats = functions.onRequest(
   {
-    cors: true,
+    cors: ADMIN_CORS,
     region: "asia-east1",
     invoker: "public",
     maxInstances: 2,

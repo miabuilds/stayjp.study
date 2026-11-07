@@ -15,6 +15,7 @@
 
 import * as functions from "firebase-functions/v2/https";
 import * as admin from "firebase-admin";
+import { ADMIN_CORS } from "./utils/constants";
 import { db, FieldValue, emailHash } from "./utils/firestore";
 
 if (admin.apps.length === 0) admin.initializeApp();
@@ -23,7 +24,7 @@ const OWNER_EMAILS = new Set(["stayjpplan@gmail.com", "abc83327@gmail.com"]);
 
 export const adminResetBilling = functions.onRequest(
   {
-    cors: true,
+    cors: ADMIN_CORS,
     region: "asia-east1",
     invoker: "public",
     maxInstances: 2,
@@ -39,7 +40,7 @@ export const adminResetBilling = functions.onRequest(
       const email = decoded.email || "";
       const uid = decoded.uid;
 
-      if (!OWNER_EMAILS.has(email)) {
+      if (!OWNER_EMAILS.has(email) || decoded.email_verified !== true) {
         res.status(403).json({ error: "not_owner" });
         return;
       }

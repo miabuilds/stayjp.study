@@ -15,10 +15,18 @@
 import * as functions from "firebase-functions/v2/https";
 import { defineSecret } from "firebase-functions/params";
 import * as admin from "firebase-admin";
+import crypto from "crypto";
 import { db } from "./utils/firestore";
 import * as nodemailer from "nodemailer";
 
 if (admin.apps.length === 0) admin.initializeApp();
+
+// 2026-11-07 資安稽核:token 比對改常數時間(長度不同直接 false)
+function tokenEq(a: unknown, b: unknown): boolean {
+  const x = Buffer.from(String(a || "")), y = Buffer.from(String(b || ""));
+  return x.length > 0 && x.length === y.length && crypto.timingSafeEqual(x, y);
+}
+
 
 // 寄件帳號 = app 密碼所屬的 Gmail(stayjpplan 無法產 app 密碼 → 改用 abc83327 寄件);
 // 收件 = 實際看信的信箱(stayjpplan)。兩者可不同:SMTP 驗證看寄件帳號,信寄到收件帳號。
@@ -52,8 +60,17 @@ export const kolRequestPayout = functions.onRequest(
       // ① token 驗證(沿用 kolStats 同一套)
       const codeDoc = await db.doc(`ref_codes/${code}`).get();
       const c = codeDoc.data();
-      if (!codeDoc.exists || !c || c.token !== token || c.active === false) {
+      if (!codeDoc.exists || !c || !tokenEq(c.token, token) || c.active === false) {
         res.status(403).json({ error: "invalid_code_or_token" }); return;
+      }
+      // 2026-11-07 資安稽核:自助申請的碼(有 owner_uid)請款時必須本人登入,token 外洩也改不了收款帳戶。
+      // 手動建的老碼(無 owner_uid,如探長J)維持 token 制。
+      if (c.owner_uid) {
+        const idToken = (req.headers.authorization || "").replace(/^Bearer\s+/i, "");
+        if (!idToken) { res.status(401).json({ error: "login_required", reason: "請先用申請推薦碼的 Google 帳號登入。" }); return; }
+        let decodedUid = "";
+        try { decodedUid = (await admin.auth().verifyIdToken(idToken)).uid; } catch { /* 下面統一 403 */ }
+        if (!decodedUid || decodedUid !== c.owner_uid) { res.status(403).json({ error: "not_owner", reason: "請用申請推薦碼的帳號登入。" }); return; }
       }
 
       // PDF 檢查:去掉 data URI 前綴、確認是 PDF(%PDF- 的 base64 = JVBERi0)、大小上限

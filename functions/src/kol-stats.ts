@@ -4,10 +4,18 @@
 
 import * as functions from "firebase-functions/v2/https";
 import * as admin from "firebase-admin";
+import crypto from "crypto";
 import { db } from "./utils/firestore";
 import { sumClicksDays } from "./utils/ref-attrib";
 
 if (admin.apps.length === 0) admin.initializeApp();
+
+// 2026-11-07 資安稽核:token 比對改常數時間(長度不同直接 false)
+function tokenEq(a: unknown, b: unknown): boolean {
+  const x = Buffer.from(String(a || "")), y = Buffer.from(String(b || ""));
+  return x.length > 0 && x.length === y.length && crypto.timingSafeEqual(x, y);
+}
+
 
 export const kolStats = functions.onRequest(
   {
@@ -28,7 +36,7 @@ export const kolStats = functions.onRequest(
 
       const codeDoc = await db.doc(`ref_codes/${code}`).get();
       const c = codeDoc.data();
-      if (!codeDoc.exists || !c || c.token !== token || c.active === false) {
+      if (!codeDoc.exists || !c || !tokenEq(c.token, token) || c.active === false) {
         res.status(403).json({ error: "invalid_code_or_token" });
         return;
       }
@@ -101,7 +109,7 @@ export const kolStats = functions.onRequest(
       }).sort((a, b) => b.at - a.at);
 
       res.json({
-        ok: true, code, kol: c.kol || "", total, paid, trialing, range, payouts,
+        ok: true, code, kol: c.kol || "", needs_login: !!c.owner_uid, total, paid, trialing, range, payouts,
         commission_pct: typeof c.commission_pct === "number" ? c.commission_pct : null,
         // 連結點擊(refClick 寫;同 IP 30 分鐘內只算一次)。舊碼沒這欄 → 0
         clicks: Number(c.clicks) || 0,
