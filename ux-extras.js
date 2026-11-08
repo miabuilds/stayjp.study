@@ -162,20 +162,29 @@
   function exFuriFor(text) {
     var m = (typeof window !== 'undefined' && window.EX_FURI) ? window.EX_FURI[exHash(text)] : null;
     if (!m || !m.length) return null;
-    var pairs = m.slice(), pos = 0;
-    return { take: function (i, t) {   // 位置 i 起若正好是下一個裸段 → 回讀音並消耗掉
-      if (!pairs.length) return null;
-      var run = pairs[0][0];
-      if (t.substr(i, run.length) !== run) return null;
-      var r = pairs.shift()[1]; return { run: run, reading: r };
+    var pairs = m.slice();
+    return { take: function (i, t) {   // 位置 i 起若正好是表裡某個裸段 → 回讀音並消耗掉(含它前面的)
+      // 以前只看 pairs[0]:字典後來長大、表裡排前面的段(如「字」)現在已由字典標到、永遠不會被消耗,
+      // 後面真正留白的段(「消」)就被卡死不標(2026-11-08 KOL 回報漏讀音,全掃 1,677 句中招)。改成往後找第一個對得上的。
+      for (var k = 0; k < pairs.length; k++) {
+        var run = pairs[k][0];
+        if (t.substr(i, run.length) === run) { var r = pairs[k][1]; pairs.splice(0, k + 1); return { run: run, reading: r }; }
+      }
+      return null;
     } };
+  }
+  // 整句表 + 位移:furiganaHTMLRich 把 <em> 切成多段各自呼叫 furiganaHTML,段落 hash 查不到整句的表;
+  // 改由 Rich 端用「去標籤的整句」查一次,各段帶位移共用同一個消耗游標。
+  function exFuriShift(exf, plain, off) {
+    if (!exf) return null;
+    return { take: function (i) { return exf.take(i + off, plain); } };
   }
   function furiganaHTML(text, opts) {
     if (text == null) return '';
     text = String(text);
     var dc = dict();
     var kAt = kanaMatchesAt(text, opts);
-    var exf = exFuriFor(text);
+    var exf = (opts && opts._exf) ? opts._exf : exFuriFor(text);
     var out = '', i = 0;
     while (i < text.length) {
       if (!isKanji(text[i])) {
@@ -192,7 +201,7 @@
       }
       if (i > 0) {
         var _pc = text[i - 1];
-        if (COUNTER_READ[text[i]] && /[0-9０-９]/.test(_pc)) {   // 數字+計數字:10月→がつ、3年→ねん
+        if (COUNTER_READ[text[i]] && /[0-9０-９]/.test(_pc) && !(isKanji(text[i + 1] || '') && dc.READ[text.substr(i, 2)])) {   // 數字+計數字:10月→がつ、3年→ねん;但 2時間/3年間/年度 走整詞(不然 時 標 じ、間 留白)
           out += '<ruby>' + escapeHtml(text[i]) + '<rt>' + COUNTER_READ[text[i]] + '</rt></ruby>'; i++; continue;
         }
         if (text[i] === '月' && /[かヶヵ]/.test(_pc)) {          // か月/ヶ月 → げつ(いっかげつ)
@@ -287,9 +296,18 @@
     // 其他一律轉義——AI 生成的台詞會經過這裡進 innerHTML,模型被誘導輸出 <img onerror=…> 這類
     // 標籤時不轉義就是 stored XSS(對話紀錄回放同路徑,審查實錘)。
     var SAFE_TAG = /^<\/?(em|b|i|u|strong|br|ruby|rt|rp|span)((\s+(class|style)="[^"<>]*")*\s*\/?)>$/i;   // 屬性只准 class/style(雙引號):span onclick=… 這種一律轉義
-    return String(html).split(/(<[^>]+>)/).map(function (seg) {
+    var segs = String(html).split(/(<[^>]+>)/);
+    // 文法例句帶 <em>(お客様<em>に対して</em>…心がける):各段分開 hash 查不到 EX_FURI,留白的「心」就一直沒讀音。
+    // 用去標籤整句查表,各段帶位移;整句查不到才退回舊的逐段查(純文字例句兩者相同)。
+    var plain = segs.filter(function (sg) { return sg.charAt(0) !== '<'; }).join('');
+    var full = plain !== html ? exFuriFor(plain) : null;
+    var off = 0;
+    return segs.map(function (seg) {
       if (seg.charAt(0) === '<') return SAFE_TAG.test(seg) ? seg : escapeHtml(seg);
-      return furiganaHTML(seg, opts);
+      var o = opts;
+      if (full) { o = Object.assign({}, opts || {}, { _exf: exFuriShift(full, plain, off) }); }
+      off += seg.length;
+      return furiganaHTML(seg, o);
     }).join('');
   }
 

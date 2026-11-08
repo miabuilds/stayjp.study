@@ -949,6 +949,8 @@ body.hub-view .mn { margin-left: 0; max-width: none; }
 .gc .ex:active { background: var(--bg3); }
 .gc .ex:last-child { margin-bottom: 0; }
 .gc .ex .j { font-size:15px; color: var(--ac2); font-weight: 500; line-height: 1.7; }
+/* 讀音比漢字寬時(客様→きゃくさま)瀏覽器預設把漢字拉開成「客 様」,看起來像後一字沒標音(2026-11-08 KOL 回報);改置中讓漢字黏在一起 */
+ruby { ruby-align: center; }
 /* 文法/易混淆例句的 furigana：小、灰、行高留白，與單字卡 .exj 一致 */
 .gc .ex .j:has(rt), .cf-eg .ex .j:has(rt) { line-height: 2.1; }
 .gc .ex .j rt, .cf-eg .ex .j rt { font-size: .58em; color: var(--tx2); font-weight: 400; letter-spacing: 0; }
