@@ -63,8 +63,13 @@ try {
     gaOk = true;
   }
 } catch (e) { console.error('GA 抓失敗(流量欄位略過):', e.message); }
-// 未處理回饋(reports status=new、近 30 天),不帶信箱
+// 未處理回饋,不帶信箱。兩條線都要送:
+//   reports = App 內回報(status=new、近 30 天)
+//   feedback = 意見表單(還沒結案的:不是 resolved/replied/wontfix/spam/done)。
+// 2026-11-09 Mia 發現 feedback 兩則 in_progress 一直沒修、總覽卻看不到 → 以前只送 reports。
+// in_progress 不看天數:回了「已記下」但還沒修的,不能因為過 30 天就從總覽消失。
 const feedback = [];
+const CLOSED = new Set(['resolved', 'replied', 'wontfix', 'spam', 'done']);
 try {
   const cut = Date.now() - 30 * 864e5;
   for (const d of (await db.collection('reports').where('status', '==', 'new').get()).docs) {
@@ -72,6 +77,15 @@ try {
     feedback.push({ ext_id: d.id, ts: ms ? new Date(ms).toISOString().slice(0, 19).replace('T', ' ') : '', type: r.kind || '', message: [r.detail, r.desc].filter(Boolean).join(':').slice(0, 240), page: String(r.page || '').slice(0, 200) });
   }
 } catch (e) { console.error('reports 讀取失敗:', e.message); }
+try {
+  const cut = Date.now() - 30 * 864e5;
+  for (const d of (await db.collection('feedback').orderBy('createdAt', 'desc').limit(300).get()).docs) {
+    const f = d.data(); const st = f.status || 'new';
+    if (CLOSED.has(st)) continue;
+    const ms = toMs(f.createdAt); if (st === 'new' && ms && ms < cut) continue;
+    feedback.push({ ext_id: 'fb:' + d.id, ts: ms ? new Date(ms).toISOString().slice(0, 19).replace('T', ' ') : '', type: (f.type || '') + (st !== 'new' ? '·' + st : ''), message: String(f.message || '').slice(0, 240), page: '意見表單' });
+  }
+} catch (e) { console.error('feedback 讀取失敗:', e.message); }
 const rows = Object.values(days).sort((a, b) => (a.day < b.day ? -1 : 1)).map((r) => ({
   ...r,
   new_users: authOk ? r.new_users : null,
