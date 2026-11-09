@@ -39,6 +39,7 @@ export { validateRefCode } from "./validate-ref-code";
 export { newbieOffer } from "./newbie-offer";
 export { getMyRefCode } from "./get-my-ref-code";
 export { partnerJoin } from "./partner-join";
+export { partnerUpdatePayout } from "./partner-update-payout";
 export { commissionLockCron } from "./commission-lock-cron";
 export { adminSettleKolPayout } from "./admin-settle-kol-payout";
 export { kolRequestPayout } from "./kol-request-payout";

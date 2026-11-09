@@ -138,12 +138,13 @@ export const partnerJoin = functions.onRequest(
           // 舊碼不刪:標記停用 + 指向新碼(萬一有殘留連結不會 orphan)
           await exRef.set({ active: false, renamed_to: desired, renamed_at: admin.firestore.FieldValue.serverTimestamp() }, { merge: true });
           await userRef.set({ kol_code: desired }, { merge: true });
-          res.json({ code: desired, token: newData.token, commission_pct: newData.commission_pct, renamed: true });
+          res.json({ code: desired, token: newData.token, commission_pct: newData.commission_pct, renamed: true, payout: ex.payout || null });
           return;
         }
 
         // 否則冪等:回既有碼
-        res.json({ code: u.kol_code, token: ex.token || "", commission_pct: ex.commission_pct ?? DEFAULT_COMMISSION_PCT });
+        // payout 帶回去給 partner.html 預填(2026-11-09 補,之前前端 setupPayout(d.payout) 永遠拿到 undefined)
+        res.json({ code: u.kol_code, token: ex.token || "", commission_pct: ex.commission_pct ?? DEFAULT_COMMISSION_PCT, payout: ex.payout || null });
         return;
       }
 
