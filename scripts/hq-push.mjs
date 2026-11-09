@@ -69,7 +69,7 @@ try {
 // 2026-11-09 Mia 發現 feedback 兩則 in_progress 一直沒修、總覽卻看不到 → 以前只送 reports。
 // in_progress 不看天數:回了「已記下」但還沒修的,不能因為過 30 天就從總覽消失。
 const feedback = [];
-const CLOSED = new Set(['resolved', 'replied', 'wontfix', 'spam', 'done']);
+const CLOSED = new Set(['resolved', 'replied', 'wontfix', 'spam', 'done', 'ignored']);
 try {
   const cut = Date.now() - 30 * 864e5;
   for (const d of (await db.collection('reports').where('status', '==', 'new').get()).docs) {
