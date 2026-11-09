@@ -4,6 +4,10 @@ const TW = (m: number, d: number, h: number, mi = 0) => Math.floor(Date.UTC(2026
 const U = (c: string) => `https://stayjp.study/pricing.html?utm_source=threads&utm_medium=social&utm_campaign=sale1111&utm_content=${c}`;
 const G = (c: string) => `https://stayjp.study/group.html?utm_source=threads&utm_medium=social&utm_campaign=sale1111&utm_content=${c}`;
 const CARD = "https://stayjp.study/images/social/sale1111/sale-card.jpg";
+const CARD_1DAY = "https://stayjp.study/images/social/sale1111/sale-card-1day.jpg";
+const CARD_LAST = "https://stayjp.study/images/social/sale1111/sale-card-last.jpg";
+const PANEL = "https://stayjp.study/images/social/m-panel.png";
+// 11/9 Mia:brand 早晚都要發、每篇附圖 → 加 b2e/b3m/b4m,b3/b4 補圖。
 
 const K1 = "11월 9일~11일, StayJP 앱 연간권·평생권 할인\n\n연간권: 지금 구독하면 매년 갱신도 같은 가격\n평생권: 한 번 결제, 이후 결제 없음\n월간권: 변동 없음\n\n한국어 UI 지원\nN5~N1 단어·문법·JLPT 문제·AI 따라 읽기 전부 포함\n11월 11일 23:59 (대만 시간) 까지";
 const K2 = "StayJP 할인 오늘 23:59 (대만 시간) 마감\n\n연간권 지금 구독하면 매년 같은 가격\n평생권 한 번 결제로 끝\n\n앱에서 바로 보여요";
@@ -31,9 +35,28 @@ export const SALE1111_POSTS: { id: string; account: string; at: number; tw: stri
     images: CARD,
   },
   {
+    id: "b2e", account: "brand", at: TW(11, 9, 21), tw: "11/9 21:00",
+    text: "先講清楚一件事\n年費 1,490 不是只有第一年\n\n這三天訂的，之後每年續訂都 1,490\n以後漲價也跟你無關\n\n買斷 3,990 一次付清\n11/11 23:59 結束",
+    reply: `方案頁\n${U("b2e")}\n官網有推薦碼的話年費 1,340、買斷 3,590`,
+    images: CARD,
+  },
+  {
+    id: "b3m", account: "brand", at: TW(11, 10, 9), tw: "11/10 09:00",
+    text: "還沒用過的\n先用免費版，每天都有試用次數\n單字、文法直接看到飽\n\n順手再升級\n雙11 年費 1,490、買斷 3,990\n到 11/11 23:59",
+    reply: `方案頁（免費版能做什麼也寫在裡面）\n${U("b3m")}`,
+    images: PANEL + "," + CARD,
+  },
+  {
     id: "b3", account: "brand", at: TW(11, 10, 21), tw: "11/10 21:00",
     text: "揪團被問最多的三題，一次回\n\nQ 一定要 4 個人嗎\n對，4 人一團，少一個人也可以先開，位子留著\n\nQ 團員要自己付錢嗎\n不用，主揪付 5,990，團員點連結登入就開通\n\nQ 多送的一個月怎麼算\n11/9～11/11 開的團，四個人都是 395 天，不用申請\n\n活動倒數 1 天",
     reply: `揪團頁\n${G("b3")}`,
+    images: CARD_1DAY,
+  },
+  {
+    id: "b4m", account: "brand", at: TW(11, 11, 9), tw: "11/11 09:00",
+    text: "雙11 最後一天\n今晚 23:59 回原價\n\n年費 1,490（之後每年都這個價）\n買斷 3,990\n4 人揪團每人多送一個月\n\n還在想的今天想完 🙈",
+    reply: U("b4m"),
+    images: CARD_LAST,
   },
   {
     id: "p2", account: "personal", at: TW(11, 11, 12), tw: "11/11 12:00",
@@ -46,6 +69,6 @@ export const SALE1111_POSTS: { id: string; account: string; at: number; tw: stri
     id: "b4", account: "brand", at: TW(11, 11, 20, 30), tw: "11/11 20:30",
     text: "雙11 今晚 23:59 結束\n\n年費 1,490（之後每年都是這個價）\n買斷 3,990\n4 人揪團每人多送一個月\n\n過了今晚就回 1,990 / 4,990",
     reply: U("b4"),
-    images: CARD,
+    images: CARD_LAST,
   },
 ];
