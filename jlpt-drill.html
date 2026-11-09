@@ -426,6 +426,7 @@ function pushHist(h){ const a=getHist(); a.unshift(h); localStorage.setItem(HKEY
 // (競態鎖,同 app.html:避免清過快取的裝置用空資料整欄蓋掉雲端)。合併規則:rec 逐題取做過次數多的、wrong 聯集、hist 去重取近 100 場。
 let jdUid=null, jdCloudReady=false, _jdSaveT=null;
 function jdHistTime(h){ try{ const m=String(h&&h.d||'').match(/^(\d{4})\/(\d{1,2})\/(\d{1,2})$/); return m?new Date(+m[1],+m[2]-1,+m[3]).getTime():0; }catch(e){ return 0; } }
+function jdStable(v){ if(Array.isArray(v)) return '['+v.map(jdStable).join(',')+']'; if(v&&typeof v==='object') return '{'+Object.keys(v).sort().map(k=>JSON.stringify(k)+':'+jdStable(v[k])).join(',')+'}'; return JSON.stringify(v); }
 function jdMergeCloud(d){
   let changed=false;
   if(d.jd_rec && typeof d.jd_rec==='object'){
@@ -439,10 +440,14 @@ function jdMergeCloud(d){
     if(JSON.stringify(out)!==JSON.stringify(loc)) localStorage.setItem(WKEY, JSON.stringify(out));
   } else if(Object.keys(getWrong()).length) changed=true;
   if(Array.isArray(d.jd_hist)){
-    const loc=getHist(); const seen=new Set(); const all=[...loc, ...d.jd_hist].filter(x=>{ if(!x) return false; const k=JSON.stringify(x); if(seen.has(k)) return false; seen.add(k); return true; });
+    // ⚠️ 2026-11-09 事故(同 app.html mock_exam_history 10/31):Firestore 回來的物件 key 順序跟本機不同,
+    // 用 JSON.stringify 去重永遠不相等 → 每次登入場次紀錄整包翻倍,同一場重複幾十筆,再被 100 筆上限把九月的舊場次擠掉。
+    // 改用 key 排序的穩定字串比;雲端若有重複(舊事故殘留)也算 changed → 補上傳乾淨版。
+    const loc=getHist(); const seen=new Set(); const all=[...loc, ...d.jd_hist].filter(x=>{ if(!x) return false; const k=jdStable(x); if(seen.has(k)) return false; seen.add(k); return true; });
     all.sort((a,b)=>jdHistTime(b)-jdHistTime(a));
     const out=all.slice(0,100);
-    if(loc.some(x=>!d.jd_hist.some(y=>JSON.stringify(x)===JSON.stringify(y)))) changed=true;
+    const cloudKeys=d.jd_hist.map(jdStable);
+    if(out.length!==cloudKeys.length || out.some((x,i)=>jdStable(x)!==cloudKeys[i])) changed=true;
     if(JSON.stringify(out)!==JSON.stringify(loc)) localStorage.setItem(HKEY, JSON.stringify(out));
   } else if(getHist().length) changed=true;
   return changed;   // 本機有雲端沒有的 → 呼叫端補上傳一次
