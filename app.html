@@ -2173,7 +2173,11 @@ const fbConfig = {
 };
 
 let db = null, auth = null, currentUser = null, _authResolved = false;
-if (fbConfig) {
+// ⚠️ 2026-11-09 用戶回報(簡中、iPhone):「面板內容經常無法顯示」。Firebase SDK 從 www.gstatic.com 載,
+// 中國大陸等網路常抓不到 → firebase 未定義 → 這裡丟 ReferenceError,整支主程式(面板/語言/渲染)全部沒跑,面板整片空白。
+// 抓不到就當離線模式:db/auth 留 null,本機學習照常可用(雲端同步各處本來就有 !db 防護)。
+if (fbConfig && typeof firebase === 'undefined') { _authResolved = true; try { console.warn('[stayjp] Firebase SDK 載入失敗,改離線模式'); } catch (e) {} }
+if (fbConfig && typeof firebase !== 'undefined') {
   firebase.initializeApp(fbConfig);
   // Safari ITP 會擋 Firestore 預設的 fetch streams + WebChannel,改長輪詢 + 禁 fetch streams
   // 必須在 firebase.firestore() 第一次取用之前設,否則無效
