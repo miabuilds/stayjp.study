@@ -62,7 +62,7 @@ export const SALE1111_POSTS: { id: string; account: string; at: number; tw: stri
   },
   {
     id: "p1e", account: "personal", at: TW(11, 10, 21), tw: "11/10 21:00",
-    text: "StayJP 雙11 剩最後一天\n年費 1,490 買斷 3,990\n11/11 23:59 結束 🙈",
+    text: "做 App 辦第二次檔期\n結果最多人問的不是價格\n是「年費之後會不會漲」\n\n不會 這三天訂的之後每年都 1,490 🥳", // 11/10 Mia 選 social-post 試寫第 1 版取代原文
     reply: U("p1e"),
     images: CARD_1DAY,
   },
