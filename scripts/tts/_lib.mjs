@@ -174,6 +174,10 @@ export function shapePitch(q, n, low = 0.25, riseLow = 0.15) {
   p.accent = n === 0 ? len : n;
   const pat = pitchPattern(n, len);
   const H = Math.max(...p.moras.map(m => m.pitch).filter(x => x > 0));
+  // 2026-11-11 用戶回報「規則 きそく 發音怪怪」:き 被念成氣音(無聲化,pitch=0、母音大寫 I/U),
+  //   頭高型唯一的高拍沒聲音 → 整個字聽起來平平低低。該高的拍全被無聲化時,把它們改回有聲再給高音。
+  if (!p.moras.some((m, i) => pat[i] && m.pitch > 0))
+    p.moras.forEach((m, i) => { if (pat[i] && m.pitch === 0 && /^[AIUEO]$/.test(m.vowel)) { m.vowel = m.vowel.toLowerCase(); m.pitch = H; m.vowel_length = Math.max(m.vowel_length || 0, 0.05); } });
   p.moras.forEach((m, i) => { if (m.pitch > 0) m.pitch = pat[i] ? H : H - (i === 0 && n !== 1 ? riseLow : low); });
   return q;
 }

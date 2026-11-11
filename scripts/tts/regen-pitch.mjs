@@ -68,7 +68,11 @@ for (const [text, info] of want) {
   if (!q) { stat.manual = (stat.manual || 0) + 1; continue; }
   const j = judge(q, info.n);
   const k = j.ok ? 'ok' : j.bad; stat[k] = (stat[k] || 0) + 1;
-  if (j.bad === 'accent' || j.bad === 'flat') bad.push({ text, ...info, ...j });
+  // 該高的拍全被無聲化(きそく 的 き)→ 聽起來沒有高音;10/9 那批照樣重生還是壞的(shapePitch 跳過 pitch 0),所以另外標 dv
+  const pat = q.accent_phrases.length === 1 ? pattern(info.n, q.accent_phrases[0].moras.length) : null;
+  const dv = !!pat && pat.some(Boolean) && !q.accent_phrases[0].moras.some((m, i) => pat[i] && m.pitch > 0);
+  if (dv) stat.devoiced = (stat.devoiced || 0) + 1;
+  if (j.bad === 'accent' || j.bad === 'flat' || dv) bad.push({ text, ...info, ...j, dv });
 }
 console.log(stat);
 const show = bad.filter(b => b.lv === 'n5' || b.lv === 'n4');
@@ -80,7 +84,9 @@ if (WRITE) {
   const done = process.argv.includes('--resume')
     ? new Set(execSync('git diff --name-only -- audio/tts audio/tts-v', { cwd: ROOT }).toString().split('\n').filter(Boolean)) : new Set();
   let made = 0;
+  const ONLY_DV = process.argv.includes('--only-devoiced');
   for (const b of bad) {
+    if (ONLY_DV && !b.dv) continue;
     const hash = byText.get(b.text).hash;
     for (const sp of [SPEAKER, ...Object.keys(VMAN).map(Number)]) {
       if (sp !== SPEAKER && !VMAN[sp][hash]) continue;
