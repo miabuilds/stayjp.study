@@ -62,7 +62,8 @@
   .row2 .z{color:var(--tx2);font-size:13px;min-width:76px;text-align:right;flex-shrink:0}
   .ptc{background:var(--bg2);border:1px solid var(--bd);border-radius:12px;padding:12px 14px;margin-top:8px;cursor:pointer;transition:border-color .12s}
   .ptc:hover{border-color:var(--ac)}
-  .ptc .ph{display:flex;align-items:baseline;gap:9px}
+  .ptc .ph{display:inline-flex;align-items:baseline;gap:9px;padding:2px 8px 2px 0}
+  .ptc .ph i,.ptc .pe i{color:var(--ac);font-size:14px;align-self:center;margin-left:4px;vertical-align:-2px}
   .ptc .p{font-weight:800;font-size:19px;color:var(--ac)}
   .ptc .pu{font-weight:700;font-size:14px}
   .ptc .pd{color:var(--tx2);font-size:13px;margin-top:3px;line-height:1.7}
@@ -249,10 +250,11 @@ function render(){
   h+=`<section class="cat" id="qp">`+catBanner(CATS[3], ILLUS.qp);
   h+=`<div class="sub">${T('疑問詞')} <small>${T('問句必備')}</small></div>`+grid(GIMON, 'g3');
   h+=`<div class="sub">${T('基本助詞')} <small>${T('句子的關節')}</small></div><div class="tip">${T('<b>は</b>讀「わ」、<b>へ</b>讀「え」、<b>を</b>讀「お」——寫法和讀音不同,先記住。')}</div>`;
+  // 助詞本身可單獨聽(2026-11-11 用戶回饋);點卡片其他地方念例句
   h+=JOSHI.map(j=>`<div class="ptc" onclick="speak('${esc(j[4])}')">
-      <div class="ph"><span class="p">${esc(j[0])}</span><span class="pu">${T('讀')} ${esc(j[1])}</span></div>
+      <div class="ph" onclick="event.stopPropagation();speak('${esc(j[1])}')"><span class="p">${esc(j[0])}</span><span class="pu">${T('讀')} ${esc(j[1])}</span><i data-ic=volume></i></div>
       <div class="pd">${T(j[2])}</div>
-      <div class="pe">${fr(j[3])}<div class="z">${esc(T(j[5]))}</div></div></div>`).join('');
+      <div class="pe">${fr(j[3])}<i data-ic=volume></i><div class="z">${esc(T(j[5]))}</div></div></div>`).join('');
   h+=`</section>`;
   document.getElementById('list').innerHTML = h;
 }

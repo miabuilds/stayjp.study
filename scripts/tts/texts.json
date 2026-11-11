@@ -9752,6 +9752,7 @@
     "sources": [
       "vocab-n4",
       "article-vocab#a-n4-11-n3",
+      "essentials",
       "kana"
     ]
   },
@@ -10415,6 +10416,7 @@
     "text": "お",
     "hash": "ac6bc7de7112",
     "sources": [
+      "essentials",
       "kana"
     ]
   },
@@ -13787,6 +13789,7 @@
     "text": "が",
     "hash": "a142816563b3",
     "sources": [
+      "essentials",
       "kana"
     ]
   },
@@ -16932,7 +16935,8 @@
     "text": "から",
     "hash": "32c7a85f193a",
     "sources": [
-      "vocab-n5"
+      "vocab-n5",
+      "essentials"
     ]
   },
   {
@@ -55314,6 +55318,7 @@
     "text": "で",
     "hash": "7350618fcec3",
     "sources": [
+      "essentials",
       "kana"
     ]
   },
@@ -57374,6 +57379,7 @@
     "hash": "a986a7bc9e03",
     "sources": [
       "vocab-n5",
+      "essentials",
       "kana"
     ]
   },
@@ -62877,6 +62883,7 @@
     "text": "の",
     "hash": "56377d14d4ef",
     "sources": [
+      "essentials",
       "kana"
     ]
   },
@@ -73051,7 +73058,8 @@
     "text": "まで",
     "hash": "50bd04b02e14",
     "sources": [
-      "vocab-n5"
+      "vocab-n5",
+      "essentials"
     ]
   },
   {
@@ -75767,6 +75775,7 @@
     "text": "も",
     "hash": "3c6945772d72",
     "sources": [
+      "essentials",
       "kana"
     ]
   },
@@ -79039,6 +79048,13 @@
     ]
   },
   {
+    "text": "より",
+    "hash": "93cbe1a63be8",
+    "sources": [
+      "essentials"
+    ]
+  },
+  {
     "text": "よる",
     "hash": "fdf618195ba6",
     "sources": [
@@ -81026,6 +81042,7 @@
     "text": "わ",
     "hash": "dedb707d8398",
     "sources": [
+      "essentials",
       "kana"
     ]
   },

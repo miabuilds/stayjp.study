@@ -314,8 +314,10 @@ body.ess-open #tutorFab,body.ess-open #tutorHint,body.ess-open #quotaBadge,body.
 .ess-fam-row span.y{display:block;color:var(--ac);font-size:12.5px;font-weight:700;line-height:1.4}
 .ess-fam-row .z{color:var(--tx2);font-size:12.5px;min-width:64px;text-align:right;flex-shrink:0}
 .ess-fam-row .ar{color:var(--tx3);flex-shrink:0}
-.ess-pt{font:inherit;display:block;width:100%;text-align:left;background:var(--bg2);border:1px solid var(--bd);border-radius:12px;padding:12px 14px;margin-bottom:10px;cursor:pointer;color:var(--tx)}
-.ess-pt .ph{display:flex;align-items:baseline;gap:9px}
+.ess-pt{font:inherit;display:block;width:100%;text-align:left;background:var(--bg2);border:1px solid var(--bd);border-radius:12px;padding:12px 14px;margin-bottom:10px;color:var(--tx)}
+.ess-pt .ph{display:flex;align-items:baseline;gap:9px;font:inherit;color:inherit;background:none;border:0;padding:2px 0;cursor:pointer;text-align:left}
+.ess-pt .ph i,.ess-pt .pe i{color:var(--ac);margin-left:4px;font-size:14px;vertical-align:-2px}
+.ess-pt button.pe{font:inherit;color:inherit;display:block;width:100%;text-align:left;border:0;cursor:pointer}
 .ess-pt .p{font-weight:800;font-size:19px;color:var(--ac)}
 .ess-pt .pu{font-weight:700;font-size:13.5px}
 .ess-pt .pd{color:var(--tx2);font-size:13px;margin-top:3px}
@@ -497,8 +499,9 @@ body.ess-open #tutorFab,body.ess-open #tutorHint,body.ess-open #quotaBadge,body.
         + '<button data-say="' + esc(prim(k[3])) + '"><b>' + esc(k[2]) + '</b><span class="y">' + (k[2] !== k[3] ? esc(k[3]) : '') + '</span></button>'
         + '<span class="z">' + esc(T(k[4])) + '</span></div>').join('') + '</div>';
     } else if (l.kind === 'pt') {
-      h += l.items.map(it => '<button class="ess-pt" data-say="' + esc(it.exKana) + '"><div class="ph"><span class="p">' + esc(it.form) + '</span><span class="pu">' + L('讀', 'read') + ' ' + esc(it.yomi) + '</span></div>'
-        + '<div class="pd">' + esc(T(it.mean)) + '</div><div class="pe">' + fr(it.ex) + '<div class="z">' + esc(T(it.exZh)) + '</div></div></button>').join('');
+      // 2026-11-11 用戶回饋:助詞本身也要能聽(以前整張卡只念例句)→ 助詞那一行獨立一顆鈕念讀音(は→わ),點例句念整句
+      h += l.items.map(it => '<div class="ess-pt"><button class="ph" data-say="' + esc(it.yomi) + '"><span class="p">' + esc(it.form) + '</span><span class="pu">' + L('讀', 'read') + ' ' + esc(it.yomi) + '</span><i data-ic=volume></i></button>'
+        + '<div class="pd">' + esc(T(it.mean)) + '</div><button class="pe" data-say="' + esc(it.exKana) + '">' + fr(it.ex) + '<i data-ic=volume></i><div class="z">' + esc(T(it.exZh)) + '</div></button></div>').join('');
     } else {
       l.tables.forEach(tb => {
         h += '<div class="ess-sub">' + esc(T(tb.t)) + (tb.d ? '<small>' + esc(T(tb.d)) + '</small>' : '') + '</div>';

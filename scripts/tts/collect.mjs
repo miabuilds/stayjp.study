@@ -174,7 +174,7 @@ try {
   }
   for (const c of arrs.COUNTERS) for (const r of c.rows) add(say(r[1]), 'essentials');
   for (const k of arrs.KAZOKU) { add(say(k[1]), 'essentials'); add(say(k[3]), 'essentials'); }
-  for (const j of arrs.JOSHI) add(j[4], 'essentials');   // 助詞例句(kana 整句)
+  for (const j of arrs.JOSHI) { add(j[4], 'essentials'); add(j[1], 'essentials'); }   // 助詞例句(kana 整句)+助詞本身讀音(は→わ)
 } catch (e) { console.error('essentials collect fail:', e.message); }
 
 // AI 口說練習 — speak.html 的 SENTS（S('jp','kana','zh') 硬編）。
