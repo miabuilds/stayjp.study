@@ -166,6 +166,16 @@ const Quiz = (() => {
   function _uiLang() { try { return localStorage.getItem('ui_lang') || 'zh-TW'; } catch (e) { return 'zh-TW'; } }
   // 外語(en/ko/vi/id/th)→ I18n.pick(zh,en);中文原樣。例句翻譯(ex.e)是英文專有資料,仍用 _uiLang()==='en' 判斷;其他外語的 ex.z 已由 app.html 疊層覆蓋
   function _pk(zh, en) { try { return (typeof I18n !== 'undefined' && I18n.isForeign && I18n.isForeign()) ? I18n.pick(zh, en) : zh; } catch (e) { return zh; } }
+  // 「這題有誤?回報」:用戶 2026-11 回饋測驗遇到怪題沒地方回報(原本只有刷題特區/單字卡有)
+  function _repLink(word) {
+    try {
+      if (!window.stayjpReportHref) return '';
+      const q = questions[current];
+      const opts = (q && q.word === word && q.options) ? '\n選項：' + q.options.map(o => String(disp(o)).replace(/<[^>]+>/g, '')).join(' / ') : '';
+      const rep = window.stayjpReportHref('單字測驗', word.w, '級別：' + quizLevel + '　題型：' + quizType + '\n單字：' + word.w + '\n讀音：' + word.r + '\n意思：' + word.m + opts);
+      return `<a href="${rep}" target="_blank" rel="noopener" style="display:block;text-align:right;margin-top:10px;font-size:12px;color:var(--tx3);text-decoration:none"><i data-ic=flag></i> ${_pk('這題有誤?回報', 'Report this question')}</a>`;
+    } catch (e) { return ''; }
+  }
   function explainCardHtml(word) {
     const m = typeof cvt === 'function' ? cvt(word.m) : word.m;
     const wFull = word.w + (word.w !== word.r ? '（' + word.r + '）' : '');
@@ -180,7 +190,7 @@ const Quiz = (() => {
     }
     return `<div style="margin-top:12px;padding:12px 14px;background:var(--bg3);border-radius:10px;border:1px solid var(--bd);text-align:left">
       <div style="font-size:15px;font-weight:700;color:var(--tx)">${wFull}${pos}</div>
-      <div style="font-size:13px;color:var(--tx2);margin-top:3px">${m}</div>${exHtml}</div>`;
+      <div style="font-size:13px;color:var(--tx2);margin-top:3px">${m}</div>${exHtml}${_repLink(word)}</div>`;
   }
   // 把詳解卡 + 「下一題」注入題目框（不自動跳，讓使用者讀完再前進）
   function _injectExplainNext(word) {

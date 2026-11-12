@@ -582,8 +582,18 @@
     logAct('quiz');
     const ex = document.getElementById('ptExplain');
     ex.innerHTML = '<div class="pt-verdict ' + (ok ? 'ok' : 'ng') + '">' + (ok ? L('答對了!', 'Correct!') : L('答錯了', 'Not quite')) + '</div>' + (q.x ? '<div class="pt-x">' + q.x + '</div>' : '')
+      + _repLink(q, i)
       + '<button type="button" class="pt-cta" onclick="Path._next()">' + (qi + 1 >= qs.length ? L('看結果 →', 'Results →') : L('下一題 →', 'Next →')) + '</button>';
     ex.style.display = 'block';
+  }
+  // 「這題有誤?回報」:用戶 2026-11 回饋小測遇到怪題沒地方回報(原本只有刷題特區有)
+  function _repLink(q, i) {
+    try {
+      if (!root.stayjpReportHref) return '';
+      const plain = s => String(s == null ? '' : s).replace(/<[^>]+>/g, '');
+      const rep = root.stayjpReportHref('關卡小測', q.id || plain(q.q).slice(0, 24), (q.id ? '題目 ID：' + q.id + '\n' : '') + '題幹：' + plain(q.q).slice(0, 80) + '\n選項：' + (q.o || []).map(plain).join(' / ') + '\n正解：' + plain((q.o || [])[q.a]) + '\n我選的：' + plain((q.o || [])[i]));
+      return '<a href="' + rep + '" target="_blank" rel="noopener" style="display:block;text-align:right;margin-top:10px;font-size:12px;color:var(--tx3);text-decoration:none"><i data-ic=flag></i> ' + L('這題有誤?回報', 'Report this question') + '</a>';
+    } catch (e) { return ''; }
   }
   function _next() { qi++; if (qi >= qs.length) finish(); else renderQ(); }
   function finish() {

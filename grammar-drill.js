@@ -197,17 +197,30 @@ const GrammarDrill = (() => {
     const g = queue[cur];
     // 挑第一個有 <em> 標記的例句;都沒有(目前只有 n4-75)就改考「這句用了哪個文法」——
     // 以前直接跳過不出題,那個文法點就永遠記不到 SRS、進度條差一格灌不滿。
-    const eg = (g.eg || []).find(e => e && /<em>/.test(e.j)) || (g.eg && g.eg[0]);
-    const answer = eg && /<em>/.test(eg.j) ? extractEm(eg.j) : null;
-    if (!answer) return renderTitleQ(g, eg);
+    // 2026-11-12 用戶回報「好幾次沒有答案可以選」:例句有兩段 <em>(〜ば〜ほど、〜から〜にかけて)時,
+    //   舊寫法只留第一段前後 → 題目句被截斷(「練習すれ＿＿する」後面整個不見),正解又只取第一段,怎麼選都怪。
+    //   現在:①優先挑「只有一段挖空、而且是真句子」的例句 ②多段的:每段都一樣(〜し〜し)就全挖、
+    //   不一樣就只挖最後一段(關鍵詞),前面幾段照原文顯示 ③只有變化表(話す→話して)可用就改考文法名。
+    const plainOf = e => String(e.j).replace(/<[^>]+>/g, '');
+    const emsOf = e => (String(e.j).match(/<em>.*?<\/em>/g) || []).map(x => x.replace(/<[^>]+>/g, ''));
+    const isTable = e => /[→＝=／\/：]/.test(plainOf(e));   // 變化對照表,不是句子
+    const cands = (g.eg || []).filter(e => e && /<em>/.test(e.j) && emsOf(e).every(x => x));
+    const eg = cands.find(e => emsOf(e).length === 1 && !isTable(e))
+      || cands.find(e => !isTable(e))
+      || cands.find(e => emsOf(e).length === 1)
+      || null;
+    if (!eg) return renderTitleQ(g, (g.eg && g.eg[0]) || null);
+    const ems = emsOf(eg);
+    const allSame = ems.every(x => x === ems[0]);
+    const answer = allSame ? ems[0] : ems[ems.length - 1];
     const allGrammar = getData(lvl);
-    // 蒐集同級別其他文法的 <em> 片段，當誤答候選
+    // 蒐集同級別其他文法的 <em> 片段，當誤答候選(這句自己出現過的片段不能當誤答)
     const distractPool = [];
     allGrammar.forEach(x => {
       if (x.id === g.id) return;
       x.eg && x.eg.forEach(e => {
         const s = extractEm(e.j);
-        if (s && s !== answer && !distractPool.includes(s)) distractPool.push(s);
+        if (s && s !== answer && ems.indexOf(s) < 0 && !distractPool.includes(s)) distractPool.push(s);
       });
     });
     const wrong = distractPool.sort(() => Math.random() - 0.5).slice(0, 3);
@@ -215,8 +228,13 @@ const GrammarDrill = (() => {
     const correctIdx = options.indexOf(answer);
     // 題目句加振假名(使用者回饋:想知道ゲーム機怎麼唸);挖空前後分開轉,挖空本身不給讀音
     const FR = x => (window.furiganaHTMLRich ? window.furiganaHTMLRich(x) : x);
-    const segs = String(eg.j).split(/<em>.*?<\/em>/);
-    const blanked = FR(segs[0].replace(/<[^>]+>/g, '')) + '＿＿＿＿' + FR((segs[1] || '').replace(/<[^>]+>/g, ''));
+    let emSeen = 0;
+    const blanked = String(eg.j).split(/(<em>.*?<\/em>)/).map(seg => {
+      const txt = seg.replace(/<[^>]+>/g, '');
+      if (!/^<em>/.test(seg)) return txt ? FR(txt) : '';
+      emSeen++;
+      return (allSame || emSeen === ems.length) ? '＿＿＿＿' : FR(txt);
+    }).join('');
     // 喇叭:作答前不能聽(會洩漏答案)→ 灰掉;答完 answerQuiz 會改成唸完整例句。
     // 以前唸的是挖空後的句子(含＿＿＿＿),不會有預錄音檔 → 答完也一直沒聲音
     _curEg = eg;
@@ -262,6 +280,13 @@ const GrammarDrill = (() => {
       h += '<div style="color:var(--tx2);font-size:12.5px;margin-top:8px;padding-top:8px;border-top:1px solid var(--bd)">'
         + _E('你選的「', 'You picked 「') + E(myAnswer) + _E('」是別的文法的用法,套在這句接不上。', '」, which is a different grammar point and does not fit this sentence.') + '</div>';
     }
+    // 「這題有誤?回報」:用戶 2026-11 回饋做題時遇到怪題卻沒地方回報(原本只有刷題特區有)
+    try {
+      if (window.stayjpReportHref) {
+        const rep = window.stayjpReportHref('文法測驗 ' + (g.id || ''), g.id || '', '文法：' + g.t + '\n題目句：' + (eg ? String(eg.j).replace(/<[^>]+>/g, '') : '') + '\n正解：' + (correctAns || '') + (myAnswer != null ? '\n我選的：' + myAnswer : ''));
+        h += '<a href="' + rep + '" target="_blank" rel="noopener" style="display:block;text-align:right;margin-top:10px;font-size:12px;color:var(--tx3);text-decoration:none"><i data-ic=flag></i> ' + _E('這題有誤?回報', 'Report this question') + '</a>';
+      }
+    } catch (e) {}
     h += '</div>';
     return h;
   }
