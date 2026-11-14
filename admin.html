@@ -207,6 +207,7 @@ textarea.note:focus{outline:none;border-color:var(--ac)}
  <div class="det-section">
  <h3>原文</h3>
  <div class="det-msg" id="dMsg"></div>
+ <div id="dShots" style="display:flex;flex-wrap:wrap;gap:10px;margin:-6px 0 18px"></div>
  </div>
 
  <div class="det-section">
@@ -762,6 +763,22 @@ function openDetail(id) {
  document.getElementById('dBadge').className = `badge b-${status}`;
  document.getElementById('dBadge').textContent = ({ new: ' 新', in_progress: ' 處理中', resolved: ' 已解決', ignored: ' 忽略' })[status] || status;
  document.getElementById('dMsg').textContent = f.message || '';
+ // 用戶附的截圖(feedback_shots,fid 指回這筆);點一下放大/縮回
+ (function () {
+   const box = document.getElementById('dShots'); if (!box) return;
+   box.innerHTML = ''; if (!f.shots) return;
+   const fid = f.id;
+   db.collection('feedback_shots').where('fid', '==', fid).get().then(snap => {
+     if (!currentFeedback || currentFeedback.id !== fid) return;
+     snap.docs.map(d => d.data()).sort((a, b) => (a.i || 0) - (b.i || 0)).forEach(x => {
+       if (!/^data:image\/jpeg;base64,/.test(x.data || '')) return;
+       const im = document.createElement('img'); im.src = x.data; im.alt = '';
+       im.style.cssText = 'max-width:160px;max-height:220px;border:1px solid var(--bd);border-radius:8px;cursor:zoom-in';
+       im.onclick = () => { const big = im.style.maxWidth === '100%'; im.style.maxWidth = big ? '160px' : '100%'; im.style.maxHeight = big ? '220px' : 'none'; im.style.cursor = big ? 'zoom-in' : 'zoom-out'; };
+       box.appendChild(im);
+     });
+   }).catch(err => { box.textContent = '截圖讀取失敗:' + err.message; });
+ })();
  document.getElementById('dNote').value = f.resolution_note || '';
  document.getElementById('dRaw').textContent = JSON.stringify({ ...f, createdAt: date }, null, 2);
 

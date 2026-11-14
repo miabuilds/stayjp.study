@@ -226,11 +226,27 @@ service cloud.firestore {
         request.auth != null &&
         request.resource.data.uid == request.auth.uid &&
         request.resource.data.keys().hasAll(['type', 'message', 'uid', 'createdAt']) &&
-        request.resource.data.keys().hasOnly(['type', 'message', 'uid', 'createdAt', 'email', 'contact_email', 'displayName', 'ua', 'appVer', 'updateId', 'updateChannel', 'kol_payout_request', 'code']) &&
+        request.resource.data.keys().hasOnly(['type', 'message', 'uid', 'createdAt', 'email', 'contact_email', 'displayName', 'ua', 'appVer', 'updateId', 'updateChannel', 'kol_payout_request', 'code', 'shots']) &&
+        (!('shots' in request.resource.data) || (request.resource.data.shots is int && request.resource.data.shots >= 1 && request.resource.data.shots <= 3)) &&
         request.resource.data.type in ['bug', 'feature', 'content', 'other'] &&
         request.resource.data.message is string &&
         request.resource.data.message.size() > 0 &&
         request.resource.data.message.size() <= 5000;
+    }
+
+    // 回饋附的截圖(2026-11-14):瀏覽器壓成 JPEG dataURL,一張一筆;fid 指回 feedback。只有本人能建、只有管理員能看/刪,不能改。
+    match /feedback_shots/{docId} {
+      allow read, delete: if request.auth != null && isAdmin();
+      allow create: if
+        request.auth != null &&
+        request.resource.data.uid == request.auth.uid &&
+        request.resource.data.keys().hasOnly(['fid', 'uid', 'i', 'data', 'createdAt']) &&
+        request.resource.data.keys().hasAll(['fid', 'uid', 'i', 'data', 'createdAt']) &&
+        request.resource.data.fid is string && request.resource.data.fid.size() <= 40 &&
+        request.resource.data.i is int && request.resource.data.i >= 0 && request.resource.data.i <= 2 &&
+        request.resource.data.data is string &&
+        request.resource.data.data.size() <= 950000 &&
+        request.resource.data.data.matches('^data:image/jpeg;base64,[A-Za-z0-9+/=]+$');
     }
 
     // 訪客 streak 雲端備份（已登入用戶）— 結構併入 users/{uid}.streak，不需要獨立規則

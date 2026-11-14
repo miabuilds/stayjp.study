@@ -167,6 +167,17 @@ select.lang-btn option { color: var(--tx); background: var(--bg); }
   outline: none; border-color: var(--ac2);
 }
 .form-group textarea { resize: vertical; min-height: 120px; }
+/* 截圖附件(2026-11-14 用戶建議:附截圖比較好說明) */
+.shot-add { display: inline-flex; align-items: center; gap: 6px; padding: 9px 14px; border: 1px dashed var(--bd); border-radius: 10px; background: var(--bg); color: var(--tx2); font-size: 14px; font-family: inherit; cursor: pointer; }
+.shot-add:hover { border-color: var(--ac2); color: var(--tx); }
+.shot-add[disabled] { opacity: .5; cursor: not-allowed; }
+.shot-list { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; }
+.shot-list:empty { display: none; }
+.shot-item { position: relative; width: 84px; height: 84px; border: 1px solid var(--bd); border-radius: 10px; overflow: hidden; background: var(--bg); }
+.shot-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.shot-item button { position: absolute; top: 4px; right: 4px; width: 24px; height: 24px; border: none; border-radius: 50%; background: rgba(0,0,0,.6); color: #fff; font-size: 15px; line-height: 24px; padding: 0; cursor: pointer; }
+.shot-note { font-size: 12.5px; color: var(--tx2); margin-top: 8px; min-height: 0; }
+.shot-note:empty { display: none; }
 .form-group select { cursor: pointer; -webkit-appearance: none; appearance: none;
   background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%237A7A7A' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
   background-repeat: no-repeat; background-position: right 14px center;
@@ -290,6 +301,13 @@ select.lang-btn option { color: var(--tx); background: var(--bg); }
       <div class="form-group">
         <label for="fmsg">內容</label>
         <textarea id="fmsg" name="message" placeholder="描述你遇到的問題或想要的功能…" required></textarea>
+      </div>
+      <div class="form-group">
+        <label>截圖（選填，最多 3 張）</label>
+        <button type="button" class="shot-add" id="shotAdd" onclick="document.getElementById('shotFile').click()">＋ 加入圖片</button>
+        <input type="file" id="shotFile" accept="image/*" multiple style="display:none" onchange="shotPick(this)">
+        <div class="shot-list" id="shotList"></div>
+        <div class="shot-note" id="shotNote"></div>
       </div>
       <div id="relayBox" style="display:none;background:var(--soft,#C6553B14);border:1px solid var(--ac,#d4654a);border-radius:10px;padding:10px 12px;margin:10px 0;font-size:13px;line-height:1.7;color:var(--tx,#333)">
         <i data-ic=warning></i> 你用的是 Apple「隱藏郵件」信箱,我們的回覆<b>很可能寄不到你手上</b>。<br>
@@ -544,6 +562,60 @@ function signIn() {
 
 function signOut() { auth.signOut(); }
 
+// ========== 截圖附件 ==========
+// 不用 Firebase Storage(要另外開、要錢):圖片在瀏覽器壓成 JPEG,一張一筆存進 Firestore 的 feedback_shots
+// (fid 指回 feedback;單筆文件上限 1MB,所以壓到 ~900KB 以內)。主文件只記張數 shots,後台清單不會被圖拖慢。
+const SHOT_MAX = 3, SHOT_LIMIT = 900000;
+let shots = [];   // dataURL
+function shotNote(t) { const n = document.getElementById('shotNote'); if (n) n.textContent = t || ''; }
+function shotRender() {
+  const box = document.getElementById('shotList'); if (!box) return;
+  box.innerHTML = '';
+  shots.forEach((d, i) => {
+    const it = document.createElement('div'); it.className = 'shot-item';
+    const im = document.createElement('img'); im.src = d; im.alt = '';
+    const b = document.createElement('button'); b.type = 'button'; b.textContent = '×'; b.setAttribute('aria-label', '移除');
+    b.onclick = () => { shots.splice(i, 1); shotNote(''); shotRender(); };
+    it.appendChild(im); it.appendChild(b); box.appendChild(it);
+  });
+  const add = document.getElementById('shotAdd'); if (add) add.disabled = shots.length >= SHOT_MAX;
+}
+function shotCompress(file) {
+  return new Promise((res, rej) => {
+    const url = URL.createObjectURL(file), im = new Image();
+    im.onload = () => {
+      try {
+        let side = 1600, q = 0.78, out = '';
+        for (let k = 0; k < 6; k++) {
+          const r = Math.min(1, side / Math.max(im.naturalWidth, im.naturalHeight));
+          const c = document.createElement('canvas');
+          c.width = Math.max(1, Math.round(im.naturalWidth * r)); c.height = Math.max(1, Math.round(im.naturalHeight * r));
+          const g = c.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, c.width, c.height); g.drawImage(im, 0, 0, c.width, c.height);
+          out = c.toDataURL('image/jpeg', q);
+          if (out.length <= SHOT_LIMIT) break;
+          side = Math.round(side * 0.8); q = Math.max(0.5, q - 0.08);
+        }
+        URL.revokeObjectURL(url);
+        out.length <= SHOT_LIMIT ? res(out) : rej(new Error('too big'));
+      } catch (e) { URL.revokeObjectURL(url); rej(e); }
+    };
+    im.onerror = () => { URL.revokeObjectURL(url); rej(new Error('not image')); };
+    im.src = url;
+  });
+}
+async function shotPick(inp) {
+  const files = Array.from(inp.files || []); inp.value = '';
+  if (!files.length) return;
+  shotNote('圖片處理中…');
+  let bad = 0, over = 0;
+  for (const f of files) {
+    if (shots.length >= SHOT_MAX) { over++; continue; }
+    try { shots.push(await shotCompress(f)); } catch (e) { bad++; }
+    shotRender();
+  }
+  shotNote(bad ? '有檔案不是圖片或讀不到，已略過' : over ? '最多 3 張，多的已略過' : '');
+}
+
 // ========== FORM → Firestore ==========
 async function submitForm(e) {
   e.preventDefault();
@@ -556,7 +628,16 @@ async function submitForm(e) {
   const msg = document.getElementById('fmsg').value;
 
   try {
-    await db.collection('feedback').add({
+    // 先傳截圖(各自一筆),成功幾張就在主文件記幾張;圖傳不上去不擋文字回饋
+    const ref = db.collection('feedback').doc();
+    let shotOk = 0;
+    for (let i = 0; i < shots.length; i++) {
+      try {
+        await db.collection('feedback_shots').add({ fid: ref.id, uid: currentUser.uid, i: i, data: shots[i], createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+        shotOk++;
+      } catch (err) { console.warn('shot upload failed', err && err.code); }
+    }
+    await ref.set(Object.assign(shotOk ? { shots: shotOk } : {}, {
       type,
       message: msg,
       uid: currentUser.uid,
@@ -571,8 +652,9 @@ async function submitForm(e) {
       updateId: (window.STAYJP_NATIVE && window.STAYJP_NATIVE.updateId) || null,
       updateChannel: (window.STAYJP_NATIVE && window.STAYJP_NATIVE.updateChannel) || null,
       createdAt: firebase.firestore.FieldValue.serverTimestamp()
-    });
+    }));
     document.getElementById('contactForm').style.display = 'none';
+    if (shotOk < shots.length) document.getElementById('successMsg').textContent = '文字已成功送出，但有圖片沒傳上去。需要的話可以再送一次。';
     document.getElementById('successMsg').style.display = 'block';
   } catch (err) {
     btn.disabled = false;

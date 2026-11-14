@@ -6,6 +6,6 @@ for (const d of s.docs) {
   const x = d.data();
   const t = x.createdAt?.toDate?.()?.toISOString?.().slice(0,16) || '';
   const st = x.status || x.state || (x.resolved ? 'resolved' : 'open');
-  console.log(`${t}  ${String(x.type||x.kind||'?').padEnd(8)} ${String(st).padEnd(10)} ${String(x.email||'').slice(0,28).padEnd(28)} ${String(x.text||x.message||x.desc||'').replace(/\s+/g,' ').slice(0,46)}`);
+  console.log(`${t}  ${String(x.type||x.kind||'?').padEnd(8)} ${String(st).padEnd(10)} ${String(x.email||'').slice(0,28).padEnd(28)} ${(x.shots ? `[圖${x.shots}] ` : '') + String(x.text||x.message||x.desc||'').replace(/\s+/g,' ').slice(0,46)}  ${x.shots ? d.id : ''}`);
 }
 process.exit(0);
