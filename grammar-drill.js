@@ -263,13 +263,15 @@ const GrammarDrill = (() => {
   }
   // 詳解卡:答完顯示「為什麼是這個答案」(文法名+接續+語感+完整例句),不自動跳題——
   // 使用者回饋:測驗只變色就跳掉,看不到解說。
-  function explainHtml(g, myAnswer, correctAns) {
+  // egOverride/wi:結果頁「錯題回顧」用。以前回顧每一題都拿 _curEg(=最後一題的例句),
+  // 所以錯三題就三張卡都顯示同一句不相干的例句(2026-11-13 兩位用戶回報「例句不對/題目句裡沒有該文法」)。
+  function explainHtml(g, myAnswer, correctAns, egOverride, wi) {
     const E = x => String(x == null ? '' : x).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     const C = x => (typeof cvt === 'function' ? cvt(x) : x);
-    const eg = _curEg || (g.eg && g.eg[0]);   // 跟題目同一句(以前固定拿第一句,題目挑的是有挖空的那句,會對不上)
+    const eg = egOverride || (egOverride === undefined ? _curEg : null) || (g.eg && g.eg[0]);   // 跟題目同一句(以前固定拿第一句,題目挑的是有挖空的那句,會對不上)
     const FR = x => (window.furiganaHTMLRich ? window.furiganaHTMLRich(x) : E(x));
     const full = eg ? String(eg.j).split(/(<em>.*?<\/em>)/).map(x => /^<em>/.test(x) ? '<b style="color:var(--ac)">' + FR(x.replace(/<[^>]+>/g, '')) + '</b>' : FR(x.replace(/<[^>]+>/g, ''))).join('')
-      + '<button type="button" onclick="GrammarDrill.sayEg()" style="border:none;background:none;cursor:pointer;padding:0 0 0 6px;vertical-align:middle;color:var(--ac2)" aria-label="' + _E('播放例句', 'Play') + '"><i data-ic=volume></i></button>' : '';
+      + '<button type="button" onclick="GrammarDrill.sayEg(' + (wi == null ? '' : wi) + ')" style="border:none;background:none;cursor:pointer;padding:0 0 0 6px;vertical-align:middle;color:var(--ac2)" aria-label="' + _E('播放例句', 'Play') + '"><i data-ic=volume></i></button>' : '';
     let h = '<div style="background:var(--bg3);border-radius:12px;padding:12px 14px;margin-top:12px;font-size:13.5px;line-height:1.9;text-align:left">';
     h += '<div style="font-weight:800;font-size:15px">' + E(g.t) + '</div>';
     if (g.p) h += '<div style="color:var(--ac);font-size:12.5px;margin-top:2px">' + E(g.p) + '</div>';
@@ -303,7 +305,7 @@ const GrammarDrill = (() => {
     const sp = document.getElementById('gqSpk');   // 答完 → 題目喇叭解鎖,唸完整例句
     if (sp) { sp.style.opacity = '.85'; sp.style.cursor = 'pointer'; sp.onclick = sayEg; const tt = sp.querySelector('title'); if (tt) tt.textContent = _E('播放例句', 'Play'); }
     opts.forEach((b, i) => { b.disabled = true; if (i === correctIdx) b.classList.add('qcorrect'); if (i === idx && !correct) b.classList.add('qwrong'); });
-    if (!correct) gqWrong.push({ g: g, mine: myAns, ans: okAns });
+    if (!correct) gqWrong.push({ g: g, mine: myAns, ans: okAns, eg: _curEg || null });
     // 詳解 + 手動前進(不再 0.5 秒跳掉)
     const box = document.getElementById('quizBox');
     const wrap = document.createElement('div');
@@ -318,7 +320,7 @@ const GrammarDrill = (() => {
     wrap.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
   }
   // 唸這題的完整例句(預錄音檔 key = 去掉標記的原句)
-  function sayEg() { try { if (_curEg && typeof speak === 'function') speak(String(_curEg.j).replace(/<[^>]+>/g, '')); } catch (e) {} }
+  function sayEg(wi) { try { const e = (wi != null && gqWrong[wi]) ? (gqWrong[wi].eg || (gqWrong[wi].g.eg && gqWrong[wi].g.eg[0])) : _curEg; if (e && typeof speak === 'function') speak(String(e.j).replace(/<[^>]+>/g, '')); } catch (e2) {} }
   function nextQuiz() { cur++; cur >= queue.length ? showQuizResults() : renderQuizQ(); }
   function showQuizResults() {
     const pct = Math.round(gqScore / queue.length * 100);
@@ -326,7 +328,7 @@ const GrammarDrill = (() => {
     if (gqWrong.length) {
       review = '<details style="margin:14px 0;border:1px solid var(--bd);border-radius:10px;padding:10px 14px;text-align:left">'
         + '<summary style="cursor:pointer;font-size:13.5px;font-weight:700">' + _E('錯題回顧(', 'Missed questions (') + gqWrong.length + ')</summary>'
-        + gqWrong.map(w => explainHtml(w.g, w.mine, w.ans)).join('')
+        + gqWrong.map((w, i) => explainHtml(w.g, w.mine, w.ans, w.eg || null, i)).join('')
         + '</details>';
     }
     document.getElementById('quizBox').innerHTML = `
