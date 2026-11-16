@@ -2588,6 +2588,25 @@ function loadCloudData() {
         }
       }
     });
+    // 清除學習紀錄的第二道防線(2026-11-16 實測抓到):別台裝置沒重新整理就繼續用,會把它手上整包舊進度再寫回雲端
+    // (壓縮包/整個陣列),上面的聯集合併就把舊資料帶回來。→ 合併完把「清除時間點之前」的紀錄一律丟掉,有丟就整包覆蓋回雲端。
+    let _resetPurged = false;
+    try {
+      const cr = +(d.progress_reset_at || 0);
+      if (cr) {
+        const tsOf = (e) => (e && (e.lastReviewTs || e.created || e.ts)) || (e && e.date ? (Date.parse(e.date) || 0) : 0) || (e && e.lastReview ? (Date.parse(e.lastReview + 'T23:59:59') || 0) : 0);
+        ['srs_data', 'grammar_srs'].forEach(k => {
+          const o = JSON.parse(localStorage.getItem(k) || '{}'); let n = 0;
+          Object.keys(o).forEach(key => { const t = tsOf(o[key]); if (k === 'srs_data' ? t < cr : (t && t < cr)) { delete o[key]; n++; } });
+          if (n) { localStorage.setItem(k, JSON.stringify(o)); _resetPurged = true; }
+        });
+        ['wrong_questions', 'quiz_history', 'mock_exam_history'].forEach(k => {
+          const a = JSON.parse(localStorage.getItem(k) || '[]'); if (!Array.isArray(a)) return;
+          const b = a.filter(x => { const t = tsOf(x); return !(t && t < cr); });
+          if (b.length !== a.length) { localStorage.setItem(k, JSON.stringify(b)); _resetPurged = true; }
+        });
+      }
+    } catch (e) {}
     // Backfill study_log from quiz_history for dates missing from calendar
     const qh = JSON.parse(localStorage.getItem('quiz_history') || '[]');
     if (qh.length) {
@@ -2612,6 +2631,7 @@ function loadCloudData() {
     // 合併完成:解除競態鎖 → 之後的上傳才被允許;把合併後的聯集推上雲端
     _cloudSynced = true; _pendingSave = false;
     if (typeof saveAllCloud === 'function') saveAllCloud();
+    if (_resetPurged) { try { _saveSRSCloudNow(); saveQuizCloud(); } catch (e) {} }   // 丟掉的舊紀錄要從雲端真的消失:分片整份覆蓋+壓縮包重寫
     // 連續天數計數器跟雲端對齊(markToday 的 syncUp 常在 auth 完成前就跑掉,雲端會停在舊值)
     try { if (typeof Streak !== 'undefined' && Streak.syncDown) Streak.syncDown(); } catch (e) {}
     if (typeof SRS !== 'undefined') SRS.updateReviewCount();
