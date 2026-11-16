@@ -670,7 +670,15 @@ const Stats = (() => {
         <span style="font-size:20px"><i data-ic=user></i></span><div style="flex:1"><div style="font-weight:600">我的帳號</div><div style="font-size:12px;color:var(--tx2);margin-top:2px">訂閱・登入・推薦碼</div></div><span style="color:var(--tx3)">›</span>
       </a>
       <div id="sisterSet" class="sis-set" hidden></div>
-      ${_OLD_SETTINGS_TAIL}`;
+      ${_OLD_SETTINGS_TAIL}
+      <a href="howto.html" style="display:flex;align-items:center;gap:12px;padding:14px 16px;background:var(--bg2);border-radius:12px;color:var(--tx);text-decoration:none;margin-top:12px">
+        <span style="font-size:20px"><i data-ic=book></i></span>
+        <div style="flex:1"><div style="font-weight:600">使用教學</div><div style="font-size:12px;color:var(--tx2);margin-top:2px">全部功能怎麼用，一頁看完</div></div><span style="color:var(--tx3)">›</span>
+      </a>
+      <button type="button" onclick="if(window.resetAllProgress)resetAllProgress()" style="display:flex;align-items:center;gap:12px;width:100%;text-align:left;font:inherit;padding:14px 16px;background:var(--bg2);border:0;border-radius:12px;color:var(--tx);cursor:pointer;margin-top:12px">
+        <span style="font-size:20px;color:var(--wrong,#dc2626)"><i data-ic=refresh></i></span>
+        <div style="flex:1"><div style="font-weight:600;color:var(--wrong,#dc2626)">清除學習紀錄</div><div style="font-size:12px;color:var(--tx2);margin-top:2px">進度全部歸零、從頭開始（設定與訂閱會保留）</div></div><span style="color:var(--tx3)">›</span>
+      </button>`;
   }
   const FS_OPTS = [{k:'normal',n:'標準 A'},{k:'large',n:'大 A+'},{k:'xlarge',n:'特大 A++'}];
   const _OLD_SETTINGS_TAIL = `
@@ -711,10 +719,25 @@ const Stats = (() => {
     switchTab('collection');
   }
 
+  // 錯題回顧可依題型篩選(用戶 2026-11-15:錯題複習可以選題型嗎?)。清單跟重考都只看選中的題型
+  let _wqFilter = 'all';
+  function setWrongFilter(m) { _wqFilter = m || 'all'; switchTab('collection'); }
+  function _wqFiltered(all) { return _wqFilter === 'all' ? all : all.filter(x => x.mode === _wqFilter); }
   function buildWrongQuestions() {
-    const arr = getWrongQuestions().slice().sort((a,b) => (b.ts||0) - (a.ts||0));
-    let h = `<div class="st-section"><div class="st-title">錯題回顧 <span style="font-weight:400;font-size:12px;color:var(--tx2)">（${arr.length} 題）</span></div>`;
-    if (!arr.length) {
+    const all = getWrongQuestions().slice().sort((a,b) => (b.ts||0) - (a.ts||0));
+    if (_wqFilter !== 'all' && !all.some(x => x.mode === _wqFilter)) _wqFilter = 'all';   // 那個題型清空了 → 回全部
+    const arr = _wqFiltered(all);
+    let h = `<div class="st-section"><div class="st-title">錯題回顧 <span style="font-weight:400;font-size:12px;color:var(--tx2)">（${all.length} 題）</span></div>`;
+    const _cnt = {}; all.forEach(x => { _cnt[x.mode] = (_cnt[x.mode] || 0) + 1; });
+    const _modes = ['listening', 'reading', 'mock', 'basics'].filter(m => _cnt[m]);
+    if (_modes.length > 1) {
+      const _fl = { listening: '聽力', reading: '閱讀', mock: '模考', basics: '基礎詞' };
+      h += '<div class="qo" style="margin:0 0 12px;flex-wrap:wrap">'
+        + `<button class="${_wqFilter === 'all' ? 'on' : ''}" onclick="Stats.setWrongFilter('all')">全部 ${all.length}</button>`
+        + _modes.map(m => `<button class="${_wqFilter === m ? 'on' : ''}" onclick="Stats.setWrongFilter('${m}')">${_fl[m]} ${_cnt[m]}</button>`).join('')
+        + '</div>';
+    }
+    if (!all.length) {
       h += `<div class="st-empty">還沒有錯題。<br>聽力、閱讀、模考答錯時會自動收進這裡。</div>`;
     } else {
       const modeLbl = { listening: '<i data-ic=headphones></i> 聽力', reading: '<i data-ic=book></i> 閱讀', mock: '<i data-ic=edit></i> 模考', basics: '<i data-ic=grid></i> 基礎詞' };
@@ -748,7 +771,7 @@ const Stats = (() => {
       });
       h += '</div>';
       h += `<div style="display:flex;gap:8px;margin-top:12px">
-        <button class="qstart" style="flex:1" onclick="Stats.quizWrongQuestions()"><i data-ic=refresh></i> 重考全部 (${arr.length})</button>
+        <button class="qstart" style="flex:1" onclick="Stats.quizWrongQuestions()"><i data-ic=refresh></i> ${_wqFilter === 'all' ? '重考全部' : '重考這類'} (${arr.length})</button>
       </div>`;
       h += `<div style="margin-top:10px;font-size:11px;color:var(--tx3)">提示：聽力/閱讀/模考/基礎詞小課非單字題答錯會自動加入這裡。單字答錯仍會進「生詞本」。</div>`;
     }
@@ -759,8 +782,8 @@ const Stats = (() => {
   // ── 錯題重考 ──
   let _wq = null;  // {arr, cur, correct}
   function quizWrongQuestions() {
-    const arr = getWrongQuestions().slice().sort(() => Math.random() - 0.5);
-    if (!arr.length) { alert('沒有錯題可考'); return; }
+    const arr = _wqFiltered(getWrongQuestions()).slice().sort(() => Math.random() - 0.5);
+    if (!arr.length) { if (window.AppUI && AppUI.alert) AppUI.alert('沒有錯題可考'); return; }
     _wq = { arr, cur: 0, correct: 0 };
     document.getElementById('quizBg').classList.add('show');
     _renderWrongQ();
@@ -900,6 +923,6 @@ const Stats = (() => {
     _renderFL();
   }
 
-  return { open, openProfile, close, switchTab, _setFont, _setTheme, _setLevel, _setReminder, _clearReminder, _toggleQh, quizWeak, retryWrong, _answerWeak, addToNotebook, removeFromNotebook, quizNotebook, reviewNotebook, addWrongQuestion, getWrongQuestions, removeWrongQuestion, quizWrongQuestions, _wqAnswer, _wqNext, _wqRemoveAndNext, quizFavListening, _flReplay, _flAnswer, _flNext };
+  return { open, openProfile, close, switchTab, _setFont, _setTheme, _setLevel, _setReminder, _clearReminder, _toggleQh, quizWeak, retryWrong, _answerWeak, addToNotebook, removeFromNotebook, quizNotebook, reviewNotebook, addWrongQuestion, getWrongQuestions, removeWrongQuestion, setWrongFilter, quizWrongQuestions, _wqAnswer, _wqNext, _wqRemoveAndNext, quizFavListening, _flReplay, _flAnswer, _flNext };
 })();
 try { window.Stats = Stats; } catch (e) {}

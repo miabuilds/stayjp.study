@@ -26,6 +26,7 @@ const Quiz = (() => {
       <div class="qf"><label>範圍</label><div class="qo" id="qRange">
         <button class="on" data-v="all">全部</button>
         <button data-v="today"><i data-ic=book></i> 今日學習</button>
+        <button data-v="new">還沒學過</button>
       </div></div>
       <div class="qf"><label>${t('quiz_count')}</label><div class="qo" id="qCount">
         <button data-v="10">10</button><button class="on" data-v="20">20</button><button data-v="50">50</button>
@@ -63,6 +64,17 @@ const Quiz = (() => {
       source = data.slice(prog.totalOffset, prog.totalOffset + DAILY_NEW);
       if (!source.length) {
         alert('今日還沒學任何單字，請先到單字模式開始學習，或選「全部」範圍。');
+        return;
+      }
+    }
+    // 「還沒學過」= 這一級 SRS 裡還沒出現過的字 → 專門把總進度條補滿(用戶 2026-11-15:同一批刷再多次進度條也不動)
+    if (quizRange === 'new') {
+      let seen = {};
+      try { seen = JSON.parse(localStorage.getItem('srs_data') || '{}') || {}; } catch (e) {}
+      source = data.filter(d => !seen[quizLevel + ':' + d.w]);
+      if (!source.length) {
+        const msg = _pk('這一級的單字你都學過了，改用「全部」範圍複習吧。', 'You have already studied every word in this level. Use "All" to review.');
+        if (window.AppUI && AppUI.alert) AppUI.alert(msg); else if (typeof showToast === 'function') showToast(msg);
         return;
       }
     }
@@ -266,16 +278,15 @@ const Quiz = (() => {
     if (ok) {
       inp.style.borderColor = 'var(--ac)';
       if (fb) fb.innerHTML = `<span style="color:var(--ac)"><i data-ic=check></i> ${q.word.r}</span>`;
+      if (fb) fb.insertAdjacentHTML('afterend', explainCardHtml(q.word));   // 答對也給詳解卡
     } else {
       inp.style.borderColor = '#EF4444';
       if (fb) fb.innerHTML = `<span style="color:#EF4444"><i data-ic=x></i> ${t('ty_correct_is')}：<b>${q.word.r}</b></span>　<span style="color:var(--tx2)">${typingDiffHint(typed, q.word.r)}</span>`;
       if (fb) fb.insertAdjacentHTML('afterend', explainCardHtml(q.word));   // 例句詳解卡
     }
     const advance = () => { current++; current >= questions.length ? showResults() : renderQ(); };
-    if (ok) {
-      setTimeout(advance, 700);   // 答對 → 自動跳下一題(順、不用多按)
-    } else {
-      // 答錯 → 不自動跳,讓使用者看清正解(含假名讀音)後再前進。
+    {
+      // 對錯都不自動跳,讓使用者看清正解(含假名讀音)後再前進。
       // 防呆:剛剛「送出」用的那次 Enter(尤其長按 auto-repeat)會順勢按下這顆剛聚焦的按鈕,
       // 害正解一閃即過(harry 回饋:enter 出現錯誤時間過短)。先把 onclick 設 null,延遲後才綁定
       // 前進 + 聚焦,讓那次按鍵先結束;之後再按 Enter / 點按鈕才會前進 → 與滑鼠操作一致。
@@ -351,11 +362,9 @@ const Quiz = (() => {
     if (!correct && typeof Stats !== 'undefined' && Stats.addToNotebook) Stats.addToNotebook(q.word.w, q.word.r, q.word.m, quizLevel);
     const opts = document.querySelectorAll('.qopt');
     opts.forEach((b, i) => { b.disabled = true; if (i === q.correctIdx) b.classList.add('qcorrect'); if (i === idx && !correct) b.classList.add('qwrong'); });
-    if (correct) {
-      setTimeout(() => { current++; current >= questions.length ? showResults() : renderQ(); }, 500);
-    } else {
-      _injectExplainNext(q.word);   // 答錯 → 顯示例句詳解卡，讀完再手動前進
-    }
+    // 對錯都顯示詳解卡(漢字、讀音、意思、例句),自己按「下一題」才前進,不自動跳
+    // (用戶 2026-11-15:有時是碰巧答對,答對也想看讀音、漢字和意思)
+    _injectExplainNext(q.word);
   }
 
   function showResults() {

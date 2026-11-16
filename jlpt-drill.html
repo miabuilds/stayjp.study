@@ -319,7 +319,10 @@ setTimeout(()=>{ jdPending=false; },6000);   // firebase 初始化失敗等極�
       firebase.firestore().doc('users/'+u.uid).get().then(s=>{
         const d=s.data()||{};
         // 刷題進度:雲端→本機合併後才開放上傳;本機有雲端缺的就補傳一次
-        try{ jdUid=u.uid; const need=jdMergeCloud(d); jdCloudReady=true; if(need) jdSaveCloud(); }catch(e){}
+        try{ jdUid=u.uid;
+          // 主頁「清除學習紀錄」後(progress_reset_at 較新)→ 合併前先清這台的刷題紀錄,否則聯集合併會把舊的推回雲端
+          try{ const cr=+(d.progress_reset_at||0), lr=+(localStorage.getItem('jd_reset_at')||0); if(cr>lr){ [RKEY,WKEY,HKEY].forEach(k=>localStorage.removeItem(k)); localStorage.setItem('jd_reset_at', String(cr)); } }catch(e){}
+          const need=jdMergeCloud(d); jdCloudReady=true; if(need) jdSaveCloud(); }catch(e){}
         const sub=d.subscription;
         _sub=!!(sub && (sub.status==='active'||sub.status==='trialing'||sub.status==='cancelled') && (sub.expiresAt||0)>Date.now());
         // 3 天網頁試用(同 tool-quota.js):讀 trial_started_at。之前這頁漏認 → 試用者仍被當免費、每天只能刷 1 輪(用戶回報)

@@ -2458,6 +2458,11 @@ function loadCloudData() {
     const shardSrs = (sdocs && !sdocs.empty) ? (() => { const o = {}; sdocs.forEach(sd => { try { Object.assign(o, (sd.data() || {}).d || {}); } catch (e) {} }); return o; })() : null;
     if (!doc.exists && !(pdoc && pdoc.exists) && !shardSrs) { _cloudSynced = true; if (_pendingSave) { _pendingSave = false; try { saveAllCloud(); } catch (e) {} } return; }   // 全新用戶:雲端沒東西,直接放行上傳(之前這裡 return 掉 → 第一次登入整個 session 都不上傳)
     const d = doc.exists ? doc.data() : {};
+    // 別台裝置清除過學習紀錄(progress_reset_at 比這台記的新)→ 合併前先把這台的舊進度清掉,否則下面的聯集合併會把它推回雲端
+    try {
+      const cr = +(d.progress_reset_at || 0), lr = +(localStorage.getItem('progress_reset_at') || 0);
+      if (cr > lr) { RESET_KEYS.forEach(k => { try { localStorage.removeItem(k); } catch (e) {} }); Object.keys(_srsDirty).forEach(k => delete _srsDirty[k]); localStorage.setItem('progress_reset_at', String(cr)); }
+    } catch (e) {}
     const legacySrs = doc.exists && Object.prototype.hasOwnProperty.call(d, 'srs_data');   // 舊欄位還在 → 這次合併完搬家+刪欄位
     if (pdoc && pdoc.exists && window.ProgressCodec) {
       const pd = pdoc.data() || {};
@@ -2719,6 +2724,43 @@ function _saveSRSProgressNow() {
   try { saveProgressKeys({ srs_data: JSON.parse(localStorage.getItem('srs_data') || '{}') }); } catch (e) {}
 }
 function saveAllCloud() { if (currentUser && db) _cloudDebounce('all', _saveAllCloudNow); }
+// ── 清除學習紀錄、從頭開始(用戶 2026-11-15 回饋)──
+// 清:背單字/文法 SRS、每日批次、闖關、測驗/模考/閱讀/聽力/刷題紀錄、錯題。留:設定、訂閱、學習日曆(連勝)、生詞本、我的單字、收藏。
+// 雲端合併全是「聯集、只增不減」→ 只清本機會被合併回來。所以:先清雲端(成功才繼續)+ 寫 progress_reset_at,
+// 其他裝置下次同步看到較新的 progress_reset_at 會先清自己的本機(loadCloudData / jlpt-drill.html)。
+const RESET_KEYS = ['srs_data','quiz_history','grammar_srs','daily_progress','mock_exam_history','reading_done','reading_scores','listening_scores','listening_done','ls_done','wrong_questions','path_progress','ess_progress','jr_vb_seen','jr_gr_seen','jd_rec','jd_wrong','jd_hist'];
+async function resetAllProgress() {
+  const T = (zh, en) => (typeof enOr === 'function' ? enOr(zh, en) : zh);
+  const ask = (m, o) => (window.AppUI && AppUI.confirm) ? AppUI.confirm(m, o) : Promise.resolve(false);
+  const say = (m) => { if (window.AppUI && AppUI.alert) AppUI.alert(m); };
+  if (!await ask(T('要清除全部學習紀錄、從頭開始嗎？\n\n會清掉：背單字與文法的複習進度、每日進度、闖關、測驗／模考／閱讀／聽力／刷題紀錄、錯題。\n會保留：設定、訂閱、學習日曆、生詞本、我的單字、收藏。',
+    'Clear all learning records and start over?\n\nCleared: vocab & grammar review progress, daily progress, path, quiz / mock exam / reading / listening / drill records, wrong answers.\nKept: settings, subscription, study calendar, notebook, my words, favorites.'))) return;
+  if (!await ask(T('清掉之後救不回來，確定要清除嗎？', 'This cannot be undone. Clear everything?'))) return;
+  const now = Date.now();
+  // 排隊中的上傳全部作廢(不然清完之後舊資料又被寫上去)
+  Object.keys(_cloudTimers).forEach(n => { clearTimeout(_cloudTimers[n].t); delete _cloudTimers[n]; });
+  Object.keys(_srsDirty).forEach(k => delete _srsDirty[k]);
+  if (currentUser && db) {
+    try {
+      const del = firebase.firestore.FieldValue.delete();
+      const u = { progress_reset_at: now }; RESET_KEYS.forEach(k => { u[k] = del; });
+      const big = {}; ((window.ProgressCodec && ProgressCodec.PROGRESS_BIG_KEYS) || []).forEach(k => { if (RESET_KEYS.indexOf(k) >= 0) big[k] = del; });
+      const uref = db.collection('users').doc(currentUser.uid);
+      const jobs = [uref.set(u, { merge: true })];
+      if (Object.keys(big).length) jobs.push(db.collection('user_progress').doc(currentUser.uid).set(big, { merge: true }));
+      if (_srsShardsOk) SRS_SHARDS.forEach(sh => jobs.push(_srsShardRef(sh).set({ d: {} })));
+      await Promise.race([Promise.all(jobs), new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 20000))]);
+    } catch (e) {
+      say(T('清除失敗：連不上雲端。請確認網路後再試一次（這次什麼都沒有清掉）。', 'Could not reach the cloud. Check your connection and try again (nothing was cleared).'));
+      return;
+    }
+  }
+  _cloudSynced = false;   // 重新載入前不准再上傳
+  RESET_KEYS.forEach(k => { try { localStorage.removeItem(k); } catch (e) {} });
+  try { localStorage.setItem('progress_reset_at', String(now)); localStorage.setItem('jd_reset_at', String(now)); } catch (e) {}
+  location.reload();
+}
+window.resetAllProgress = resetAllProgress;
 function _saveSRSCloudNow() {   // 整包寫(重置/匯入):分級文件整份覆蓋(不 merge,刪掉的字才會真的消失)
   if (!currentUser || !db) return;
   const d = JSON.parse(localStorage.getItem('srs_data') || '{}');
