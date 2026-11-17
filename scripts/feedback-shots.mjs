@@ -9,7 +9,7 @@ const s = await db.collection('feedback_shots').where('fid', '==', fid).get();
 fs.mkdirSync(out, { recursive: true });
 for (const d of s.docs) {
   const x = d.data(); const m = /^data:image\/jpeg;base64,(.+)$/.exec(x.data || ''); if (!m) continue;
-  const p = path.join(out, `${fid}-${x.i || 0}.jpg`); fs.writeFileSync(p, Buffer.from(m[1], 'base64')); console.log(p);
+  const p = path.join(out, `${String(fid).replace(/[^A-Za-z0-9_-]/g, "_")}-${x.i || 0}.jpg`); fs.writeFileSync(p, Buffer.from(m[1], 'base64')); console.log(p);
 }
 console.log(`${s.size} 張`);
 process.exit(0);
