@@ -120,6 +120,7 @@ try {
   let sent = 0, fail = 0;
   for (const d of (await db.collection('commissions').get()).docs) {
     const c = d.data(); if (!kolCodes.has(c.code)) continue;
+    if (c.origin === 'hq') continue;   // 這筆本來就是從總部拉回來的其他 App 分潤(見下一段),不能再當成 StayJP 的推回去
     const ts = new Date((Number(c.paid_at) || Date.now()) + 8 * 3600e3).toISOString().slice(0, 19).replace('T', ' ');
     const r = await fetch(HQ_URL + '/api/ingest/attribution', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + HQ_TOKEN },
       body: JSON.stringify({ product: 'stayjp', code: c.code, event_type: c.state === 'void' ? 'void' : 'paid', gross_twd: c.gross_twd || 0, net_twd: c.profit_twd || 0,
@@ -128,3 +129,38 @@ try {
   }
   console.log(`StayJP 分潤明細推總部:${sent} 筆${fail ? `,失敗 ${fail}` : ''}`);
 } catch (e) { console.error('分潤明細推送失敗:', e.message); }
+
+// ── 其他 App 的分潤 → StayJP commissions(2026-11-17 Mia:KOL 領款併進同一個流程)。
+//    總部 attributions 裡 StayTW/KR/TH/BirdSpeak/Ajolito 的成交,寫成 commissions/hq_<ext_id>(origin:'hq'),
+//    之後 30 天鎖定(commissionLockCron)→ 可領(kolRequestPayout)→ 結算(adminSettleKolPayout)→ 退款扣回 全走 StayJP 既有流程。
+//    金額/費率照總部算好的,建立後不再改;只有「後來退款」會把它翻成 void(已付過的由下次結算扣回,同 voidKolCommission)。
+//    DRY=1 只印不寫。
+try {
+  const ex = await (await fetch(HQ_URL + '/api/attributions/export', { headers: { Authorization: 'Bearer ' + HQ_TOKEN } })).json();
+  const codes = {}; for (const d of (await db.collection('ref_codes').get()).docs) codes[d.id] = d.data();
+  let made = 0, voided = 0, skip = 0;
+  for (const r of ex.rows || []) {
+    const rc = codes[r.code];
+    if (!rc || rc.type === 'user') { skip++; continue; }                     // StayJP 沒這組 KOL 碼(或是個人碼)→ 不入帳
+    const id = 'hq_' + String(r.ext_id).replace(/[^A-Za-z0-9_.-]/g, '_').slice(0, 120);
+    const ref = db.doc('commissions/' + id);
+    const cur = await ref.get();
+    if (!cur.exists) {
+      const paidAt = Date.parse(String(r.ts).replace(' ', 'T').replace(/Z?$/, 'Z')) || Date.now();
+      const gross = Math.round(Number(r.gross_twd) || 0), profit = Math.round(Number(r.net_twd) || 0), amount = Math.max(0, Math.round(Number(r.commission_twd) || 0));
+      if (!(amount > 0)) { skip++; continue; }
+      const doc = { code: r.code, owner_uid: rc.owner_uid || '', buyer_uid: 'hq:' + r.product + ':' + (r.buyer_ref || id),
+        plan: r.name || r.product, product: r.product, gross_twd: gross, fee_twd: gross - profit, profit_twd: profit, rate: Number(r.rate_pct) || 0, amount_twd: amount,
+        paid_at: paidAt, lock_at: paidAt + 30 * 864e5, state: r.refunded ? 'void' : 'pending', ...(r.refunded ? { void_reason: 'refund', voided_at: Date.now() } : {}),
+        source: /^staypay:/.test(String(r.ext_id)) ? 'web' : 'app', origin: 'hq', txn_id: String(r.ext_id), created_at: paidAt };
+      if (process.env.DRY) console.log('  [DRY] 會新增', id, doc.code, doc.plan, 'NT$' + doc.amount_twd, doc.state, new Date(paidAt).toISOString().slice(0, 10));
+      else await ref.create(doc);
+      made++;
+    } else if (r.refunded && ['pending', 'locked', 'paid'].includes(cur.data().state)) {
+      if (process.env.DRY) console.log('  [DRY] 會作廢', id);
+      else await ref.set({ state: 'void', void_reason: 'refund', voided_at: Date.now() }, { merge: true });
+      voided++;
+    }
+  }
+  console.log(`其他 App 分潤併入 StayJP 領款:總部 ${(ex.rows || []).length} 筆,新增 ${made}、作廢 ${voided}、略過 ${skip}`);
+} catch (e) { console.error('其他 App 分潤併入失敗:', e.message); }

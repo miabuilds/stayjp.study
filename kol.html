@@ -162,7 +162,7 @@ function loadOtherApps() {
           ? '<div class="note" style="margin:14px 0 6px">最近成交</div><div class="dlist">' + d.recent.filter(function (e) { return e.product !== 'StayJP'; }).slice(0, 10).map(function (e) {
               return '<div class="drow"><span>' + esc(e.ts) + '</span><span style="color:var(--tx2)">' + esc(e.product) + (e.type === 'refund' ? '（退款）' : '') + '</span><span style="margin-left:auto;font-weight:700;font-variant-numeric:tabular-nums">' + nt(e.commission) + '</span></div>';
             }).join('') + '</div>' : '') +
-        '<div class="note" style="margin-top:10px">分潤以扣掉平台手續費後的金額計算；付款後 30 天內退款會作廢。這一區的數字每筆成交後即時更新。</div></div>';
+        '<div class="note" style="margin-top:10px">分潤以扣掉平台手續費後的金額計算；付款後 30 天內退款會作廢。這些 App 的分潤會跟 StayJP 的一起領：過了 30 天退款期，就會算進下面「我要領款」的可領金額，不用另外申請。</div></div>';
       box.querySelectorAll('button[data-oa]').forEach(function (b) {
         b.onclick = function () {
           var link = apps[+b.getAttribute('data-oa')].link;
