@@ -103,6 +103,8 @@
             '<div id="rResult" class="range-result">選好日期,查這段期間的<b style="font-size:14px">成交筆數</b>與<b style="font-size:14px">分潤金額</b>。</div>' +
           '</div>';
         document.getElementById('rBtn').onclick = queryRange;
+        body.insertAdjacentHTML('beforeend', '<div id="otherApps"></div>');
+        loadOtherApps();
         // 撥款紀錄:只顯示日期/金額/筆數(此頁無登入,不放帳號姓名)
         var pos = d.payouts || [];
         if (pos.length) {
@@ -131,7 +133,46 @@
       });
   }
 
-  function esc(x){return String(x==null?"":x).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+  // 其他 App 的成效(2026-11-17):同一組推薦碼在 StayTW / StayKR / StayTH / BirdSpeak / Ajolito 也有效,
+// 成交與分潤由總部統計。用這頁原本的 code+t 去問總部(總部會回頭向 StayJP 驗這條連結),KOL 不用多拿一條連結。
+function loadOtherApps() {
+  var box = document.getElementById('otherApps'); if (!box) return;
+  fetch('https://stayhq.getclockin.workers.dev/api/partner/stats?c=' + encodeURIComponent(code) + '&t=' + encodeURIComponent(t))
+    .then(function (r) { return r.ok ? r.json() : null; })
+    .then(function (d) {
+      if (!d || !d.products) return;
+      var apps = d.products.filter(function (p) { return p.key !== 'stayjp'; });
+      if (!apps.length) return;
+      var nt = function (n) { return 'NT$' + (Number(n) || 0).toLocaleString(); };
+      var orders = apps.reduce(function (a, p) { return a + (p.orders || 0); }, 0);
+      var comm = apps.reduce(function (a, p) { return a + (p.commission || 0); }, 0);
+      var month = apps.reduce(function (a, p) { return a + (p.commission_month || 0); }, 0);
+      box.innerHTML = '<div class="range-box"><div class="range-title">其他 App 的成效</div>' +
+        '<div class="note" style="margin-bottom:12px">你的推薦碼 <b>' + esc(d.code) + '</b> 在下面這些 App 也有效。把各自的連結放進貼文，成交一樣會算給你。</div>' +
+        '<div class="stats two"><div class="stat paid"><div class="v">' + orders + '</div><div class="l">成交筆數</div></div>' +
+        '<div class="stat"><div class="v" style="font-size:22px">' + nt(comm) + '</div><div class="l">累計分潤</div><div class="s">本月 ' + nt(month) + '</div></div></div>' +
+        '<div class="dlist">' + apps.map(function (p, i) {
+          return '<div style="padding:12px;background:var(--bg);border:1px solid var(--bd);border-radius:10px">' +
+            '<div style="display:flex;align-items:baseline;gap:8px"><b style="font-size:14px">' + esc(p.name) + '</b>' +
+            '<span style="margin-left:auto;font-size:12.5px;color:var(--tx2);font-variant-numeric:tabular-nums">' + (p.orders || 0) + ' 筆 · ' + nt(p.commission) + '</span></div>' +
+            '<div style="display:flex;align-items:center;gap:8px;margin-top:8px"><span style="flex:1;min-width:0;font-size:12px;color:var(--tx2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + esc(p.link) + '</span>' +
+            '<button type="button" data-oa="' + i + '" style="flex:none;font:inherit;font-size:12px;font-weight:700;padding:6px 12px;border:1px solid var(--bd);border-radius:8px;background:var(--bg2);color:var(--tx);cursor:pointer">複製連結</button></div></div>';
+        }).join('') + '</div>' +
+        ((d.recent || []).filter(function (e) { return e.product !== 'StayJP'; }).length
+          ? '<div class="note" style="margin:14px 0 6px">最近成交</div><div class="dlist">' + d.recent.filter(function (e) { return e.product !== 'StayJP'; }).slice(0, 10).map(function (e) {
+              return '<div class="drow"><span>' + esc(e.ts) + '</span><span style="color:var(--tx2)">' + esc(e.product) + (e.type === 'refund' ? '（退款）' : '') + '</span><span style="margin-left:auto;font-weight:700;font-variant-numeric:tabular-nums">' + nt(e.commission) + '</span></div>';
+            }).join('') + '</div>' : '') +
+        '<div class="note" style="margin-top:10px">分潤以扣掉平台手續費後的金額計算；付款後 30 天內退款會作廢。這一區的數字每筆成交後即時更新。</div></div>';
+      box.querySelectorAll('button[data-oa]').forEach(function (b) {
+        b.onclick = function () {
+          var link = apps[+b.getAttribute('data-oa')].link;
+          var done = function () { b.textContent = '已複製'; setTimeout(function () { b.textContent = '複製連結'; }, 1500); };
+          if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(link).then(done).catch(function () {});
+        };
+      });
+    }).catch(function () {});
+}
+function esc(x){return String(x==null?"":x).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
   function queryRange() {
     const btn = document.getElementById('rBtn');
     const res = document.getElementById('rResult');
