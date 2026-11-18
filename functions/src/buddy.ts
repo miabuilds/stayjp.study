@@ -3,7 +3,7 @@
  * 不涉及付款 → App 內也能用。互動只有固定的兩種(加油/叫醒),沒有自由文字 → 不會有騷擾內容、不用審核。
  * POST JSON { action, ... }(warm / preview 不用登入):
  *   preview {token}          → 邀請頁:誰的小屋、已經有誰(只給名字第一個字)、還有幾個位子
- *   info                     → 我的小屋 + 每個人今天/本週/連續天數 + 我今天對誰做過什麼 + 我收到的互動
+ *   info                     → 我的小屋 + 每個人今天/本週/上週/連續天數(本週排行用,週一歸零) + 我今天對誰做過什麼 + 我收到的互動
  *   create                   → 開一間小屋(每人只能在一間)
  *   join {token} / leave     → 加入 / 退出(屋主退出就交給下一個人;沒人就刪掉)
  *   remove {member_uid}      → 屋主移除成員
@@ -18,7 +18,7 @@ import * as functions from "firebase-functions/v2/https";
 import * as admin from "firebase-admin";
 import { db, nowMs, newInviteToken } from "./utils/firestore";
 import { ecpayConfig } from "./utils/constants";
-import { studyStats, twDay } from "./utils/study-stats";
+import { studyStats, twDay, weekDaysTW } from "./utils/study-stats";
 import { displayNameOf } from "./group";
 
 const MAX = 5;
@@ -102,7 +102,7 @@ export const buddyApi = functions.onRequest(
         }));
         const received = recv.docs.map(d => d.data()).sort((a, b) => b.at - a.at).slice(0, 20)
           .map(e => ({ from_name: c.members?.[e.from]?.name || "夥伴", kind: e.kind, at: e.at }));
-        res.json({ circle: { id, owner: c.owner_uid === uid, max: MAX, invite_url: inviteUrl(c.invite_token), members, received, limits: LIMIT } });
+        res.json({ circle: { id, owner: c.owner_uid === uid, max: MAX, week_start: weekDaysTW(now)[0], invite_url: inviteUrl(c.invite_token), members, received, limits: LIMIT } });
         return;
       }
 

@@ -10,7 +10,8 @@ export function weekDaysTW(now: number): string[] {
   return Array.from({ length: dow + 1 }, (_, i) => twDay(now - (dow - i) * DAY));
 }
 
-export interface StudyStats { today: number; week: number; days: number; streak: number }
+// last_week = 上週一~上週日合計(讀書小屋排行週一歸零時,顯示「上週冠軍」用;同一份 user_daily,不多讀)
+export interface StudyStats { today: number; week: number; days: number; streak: number; last_week: number }
 
 export async function studyStats(uid: string, now: number): Promise<StudyStats> {
   const daily = (await db.doc(`user_daily/${uid}`).get()).data() || {};
@@ -19,5 +20,8 @@ export async function studyStats(uid: string, now: number): Promise<StudyStats> 
   const today = sumOf(twDay(now));
   let streak = 0;
   for (let i = today > 0 ? 0 : 1; i < 400; i++) { if (sumOf(twDay(now - i * DAY)) > 0) streak++; else break; }
-  return { today, week: weekDays.reduce((n, d) => n + sumOf(d), 0), days: weekDays.filter(d => sumOf(d) > 0).length, streak };
+  const lastMon = now - (weekDays.length + 6) * DAY;
+  let lastWeek = 0;
+  for (let i = 0; i < 7; i++) lastWeek += sumOf(twDay(lastMon + i * DAY));
+  return { today, week: weekDays.reduce((n, d) => n + sumOf(d), 0), days: weekDays.filter(d => sumOf(d) > 0).length, streak, last_week: lastWeek };
 }

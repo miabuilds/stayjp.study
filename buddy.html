@@ -94,17 +94,35 @@
   :root[data-theme=dark] .me-card.todo{background:var(--soft);border-color:var(--line)}
   @media (prefers-color-scheme:dark){ :root:not([data-theme=light]) .me-card.todo{background:var(--soft);border-color:var(--line)} }
 
-  /* ── 排行 ── */
-  .rk{list-style:none;display:flex;flex-direction:column;gap:8px}
-  .rk li{display:flex;align-items:center;gap:10px;background:var(--soft);border-radius:16px;padding:9px 12px}
-  .rk .no{width:22px;text-align:center;color:var(--tx3)}
-  .rk .no.n1{color:#E0A21B}
+  /* ── 本週排行(2026-11-18:長條 + 你這列標色 + 追趕提示,不點名最後一名)── */
+  .rk-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
+  .rk-head .h2{margin-bottom:0}
+  .rk-head .h2 .ic{color:#E0A21B}
+  .rk-left{flex:none;font-size:12.5px;color:var(--tx2);background:var(--soft);border:1px solid var(--line);border-radius:99px;padding:3px 11px;white-space:nowrap}
+  .rk-tip{display:flex;align-items:center;flex-wrap:wrap;gap:6px 8px;background:var(--soft);border:1px dashed var(--line);border-radius:16px;padding:11px 14px;margin-bottom:14px;font-size:14.5px;line-height:1.5}
+  .rk-tip .ic{color:var(--ac)}
+  .rk-tip b{font-weight:400;color:var(--ac)}
+  .rk-tip .pill{display:inline-flex;align-items:center;gap:5px;background:var(--card);border:1px solid var(--line);border-radius:99px;padding:1px 9px 1px 2px}
+  .rk-tip .pill i{width:20px;height:20px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-style:normal;font-size:11px;color:#5B3A2E}
+  .rk{list-style:none;display:flex;flex-direction:column;gap:10px}
+  .rk li{display:flex;align-items:center;gap:11px;background:var(--soft);border:2px solid transparent;border-radius:16px;padding:10px 13px}
+  .rk li.me{border-color:var(--ac);background:linear-gradient(135deg,rgba(232,96,63,.10),rgba(255,154,107,.07)),var(--card)}
+  .rk .no{width:22px;flex:none;text-align:center;color:var(--tx3);font-size:15px}
+  .rk .no.n1{color:#E0A21B;font-size:18px}
   .rk .av{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#5B3A2E;flex:none}
   .rk .who{flex:1;min-width:0}
-  .rk .who div{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .rk .who small{display:block;font-size:12px;color:var(--tx3)}
-  .rk .pts{color:var(--ac);font-size:20px}
-  .rk .pts small{font-size:12px;color:var(--tx3)}
+  .rk .who .nmrow{display:flex;align-items:baseline;gap:6px;min-width:0}
+  .rk .who .nm{flex:0 0 auto;max-width:62%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .rk .who .you{flex:none;font-size:11.5px;color:#fff;background:var(--ac);border-radius:99px;padding:0 7px;line-height:18px}
+  .rk .who small{flex:0 50 auto;min-width:0;font-size:12px;color:var(--tx3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}   /* 擠的時候先縮連續天數,名字優先 */
+  .rk .bar{height:7px;border-radius:9px;background:var(--line);margin-top:6px;overflow:hidden}
+  .rk .bar span{display:block;height:100%;border-radius:9px;background:linear-gradient(90deg,var(--ac2),var(--ac));transition:width .8s cubic-bezier(.3,1,.4,1)}
+  .rk li:not(.me) .bar span{background:var(--tx3);opacity:.55}
+  .rk li.top:not(.me) .bar span{background:#E0A21B;opacity:.85}
+  .rk .pts{flex:none;text-align:right;color:var(--ac);font-size:20px;line-height:1.2;min-width:48px}
+  .rk .pts small{display:block;font-size:11.5px;color:var(--tx3)}
+  .rk .pts.zero{color:var(--tx3)}
+  .rk-foot{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:14px;padding-top:12px;border-top:1px dashed var(--line);font-size:12.5px;color:var(--tx3)}
   .h2{font-size:17px;margin-bottom:10px;display:flex;align-items:center;gap:8px}
 
   /* ── 底部動作面板 ── */
@@ -215,6 +233,7 @@
 <div class="sheet" id="sheet"></div>
 <div class="toast" id="toast"></div>
 
+<script src="icons.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script>
@@ -228,6 +247,17 @@ const MOCK = /[?&]mock=1/.test(location.search);
 const JOIN = new URLSearchParams(location.search).get('join');
 const IMG = n => 'images/buddy/'+n+'.webp';
 const PASTEL=['#FFD9B8','#C9EBD8','#D6DEFF','#FFD1E3','#CDEBF7','#FFE7A8'];
+// ── 多語(排行用;key = 繁中原文,gen-l10n.mjs 會抽 L(繁中,英文)):外語查 lang 包、簡中整頁 OpenCC 轉 ──
+const UL=(()=>{ try{ return I18n.getLang(); }catch(e){ return 'zh-TW'; } })();
+const L=(zh,en)=>{ try{ return I18n.isForeign()?I18n.pick(zh,en):zh; }catch(e){ return zh; } };
+const fill=(s,...v)=>{ let i=0; return s.replace(/#/g,()=>i<v.length?v[i++]:''); };
+if(UL==='zh-CN'){
+  // 簡中:載 OpenCC,之後每次重繪都把 .wrap/面板/通知裡的中文字轉簡(跟 speak.html 同一套)
+  let cv=null; const run=root=>{ if(!cv||!root) return; const w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT); let n; while((n=w.nextNode())){ const c=cv(n.nodeValue); if(c!==n.nodeValue) n.nodeValue=c; } };
+  const s=document.createElement('script'); s.src='https://cdn.jsdelivr.net/npm/opencc-js@1.0.5/dist/umd/full.js';
+  s.onload=()=>{ cv=OpenCC.Converter({from:'tw',to:'cn'}); try{ I18n.setConverter&&I18n.setConverter(cv); }catch(e){} const all=()=>['.wrap','#sheet','#toast'].forEach(q=>run(document.querySelector(q))); all(); let p=false; new MutationObserver(()=>{ if(p) return; p=true; requestAnimationFrame(()=>{ p=false; all(); }); }).observe(document.body,{childList:true,subtree:true,characterData:true}); };
+  document.head.appendChild(s);
+}
 const colorOf = n => PASTEL[[...String(n||'')].reduce((h,c)=>(h*31+c.charCodeAt(0))>>>0,7)%PASTEL.length];
 const lantern = s => s>=7 ? 'lantern-3' : s>=3 ? 'lantern-2' : s>=2 ? 'lantern-1' : '';
 // 地毯上的五個位子(百分比,座標 = 小狸腳底中心)
@@ -312,9 +342,7 @@ function renderHouse(c){
     +'<div class="invite-row"><button class="btn pri" id="bShare">一鍵分享邀請</button><a class="btn" target="_blank" rel="noopener" href="https://line.me/R/share?text='+encodeURIComponent(shareText(c))+'">傳到 LINE</a></div><div class="msg" id="invMsg"></div>';
   if($('bShare')) $('bShare').onclick=()=>shareInvite(c);
   // 本週排行
-  const rk=c.members.slice().sort((a,b)=>b.week-a.week);
-  $('rankCard').innerHTML='<div class="h2">本週排行 <span class="muted" style="font-size:12px">每週一重新開始</span></div><ul class="rk">'
-    +rk.map((m,i)=>'<li><span class="no'+(i===0&&m.week>0?' n1':'')+'">'+(i+1)+'</span><span class="av" style="background:'+colorOf(m.name)+'">'+esc(m.name.slice(0,1))+'</span><span class="who"><div>'+esc(m.name)+(m.me?' (你)':'')+'</div><small>'+(m.streak>=2?'連續 '+m.streak+' 天':'')+'</small></span><span class="pts">'+fmt(m.week)+'<small> 題</small></span></li>').join('')+'</ul>';
+  renderRank(c);
   // 管理
   $('manageCard').innerHTML='<details><summary>小屋成員'+(c.owner?'與邀請連結':'')+'</summary><ul class="mem">'
     +c.members.map(m=>'<li><span>'+esc(m.name)+(m.owner?' <small class="muted">屋主</small>':'')+(m.me?' (你)':'')+'</span>'+(c.owner&&!m.me?'<button class="btn sm" data-rm="'+esc(m.uid)+'" data-nm="'+esc(m.name)+'">移出</button>':'')+'</li>').join('')
@@ -322,6 +350,43 @@ function renderHouse(c){
   $('manageCard').querySelectorAll('[data-rm]').forEach(b=>b.onclick=async()=>{ if(!await confirmBox('要把「'+b.dataset.nm+'」移出小屋嗎?')) return; const r=await api({action:'remove',member_uid:b.dataset.rm}); r.ok?load():say(r.reason||'移出失敗'); });
   if($('bRegen')) $('bRegen').onclick=async()=>{ if(!await confirmBox('換新連結後,舊連結就不能用了。確定嗎?')) return; const r=await api({action:'regen'}); if(r.ok){ say('換好了,用新的連結邀請吧'); load(); } };
   $('bLeave').onclick=async()=>{ if(!await confirmBox('確定要退出讀書小屋嗎?')) return; const r=await api({action:'leave'}); r.ok?load():say(r.reason||'退出失敗'); };
+}
+
+// ── 本週排行(2026-11-18):週一~週日,後端 user_daily 加總(utils/study-stats.ts,台灣時間週一歸零)──
+// 只鼓勵不羞辱:不標最後一名;提示框只講「你」跟正上方那位的距離,沒人開始時講「先讀先上榜」。
+function renderRank(c){
+  const rk=c.members.slice().sort((a,b)=>(b.week||0)-(a.week||0) || (b.me?1:0)-(a.me?1:0));
+  const top=rk.length?(rk[0].week||0):0;
+  const rankOf=m=>1+rk.filter(x=>(x.week||0)>(m.week||0)).length;   // 同分同名次
+  const me=rk.find(m=>m.me);
+  // 週日 = 最後一天(含今天算;以裝置本地日期算,跟後端台灣時間只差時區)
+  const dow=(new Date().getDay()+6)%7, left=7-dow;   // 含今天
+  const leftTxt = left>1 ? fill(L('還有 # 天','# days left'), left) : L('今天最後一天','Last day');
+  const pill=m=>'<span class="pill"><i style="background:'+colorOf(m.name)+'">'+esc(m.name.slice(0,1))+'</i>'+esc(m.name)+'</span>';
+  let tip='';
+  if(me){
+    const mw=me.week||0, ahead=rk.filter(x=>!x.me && (x.week||0)>mw), tied=rk.filter(x=>!x.me && (x.week||0)===mw);
+    if(top===0) tip='<i data-ic=sparkle></i><span>'+L('這週還沒有人開始,先讀的人先上榜','No one has started this week yet. First to study takes the lead')+'</span>';
+    else if(rk.length===1) tip='<i data-ic=sparkle></i><span>'+fill(L('這週你讀了 # 題,找朋友來一起比吧','You did # this week. Invite friends to join in'), fmt(mw))+'</span>';
+    else if(!ahead.length && tied.length) tip='<i data-ic=fire></i><span>'+L('並列第一','Tied for 1st')+'</span>'+pill(tied[0])+'<span>'+L('再讀 1 題就領先','1 more to take the lead')+'</span>';
+    else if(!ahead.length){ const second=rk.find(x=>!x.me); tip='<i data-ic=trophy></i><span>'+fill(L('你暫時第一,領先 # 題','You\'re in the lead by #'), '<b>'+fmt(mw-(second.week||0))+'</b>')+'</span>'; }
+    else { const tgt=ahead[ahead.length-1]; tip='<i data-ic=target></i><span>'+L('下一個目標','Next up')+'</span>'+pill(tgt)+'<span>'+fill(L('還差 # 題','# to go'), '<b>'+fmt((tgt.week||0)-mw)+'</b>')+'</span>'; }
+  }
+  // 上週冠軍(週一大家都是 0 時特別有用;沒人讀就不顯示)
+  const lw=c.members.slice().sort((a,b)=>(b.last_week||0)-(a.last_week||0))[0];
+  const champ = lw && lw.last_week>0 ? '<span>·</span><i data-ic=trophy></i><span>'+L('上週冠軍','Last week\'s top')+'</span><span>'+esc(lw.me?L('你','You'):lw.name)+'</span><span>'+fill(L('# 題','#'), fmt(lw.last_week))+'</span>' : '';
+  $('rankCard').innerHTML='<div class="rk-head"><div class="h2"><i data-ic=trophy></i>'+L('本週排行','This week')+'</div><span class="rk-left">'+leftTxt+'</span></div>'
+    +(tip?'<div class="rk-tip">'+tip+'</div>':'')
+    +'<ul class="rk">'+rk.map(m=>{
+      const n=rankOf(m), w=m.week||0, pct = top>0 ? Math.max(w>0?6:0, Math.round(w/top*100)) : 0;
+      return '<li class="'+(m.me?'me ':'')+(n===1&&w>0?'top':'')+'"><span class="no'+(n===1&&w>0?' n1':'')+'">'+(w<=0?'–':n===1?'<i data-ic=trophy></i>':n)+'</span>'
+        +'<span class="av" style="background:'+colorOf(m.name)+'">'+esc(m.name.slice(0,1))+'</span>'
+        +'<span class="who"><span class="nmrow"><span class="nm">'+esc(m.name)+'</span>'+(m.me?'<span class="you">'+L('你','You')+'</span>':'')+(m.streak>=2?'<small>'+fill(L('連續 # 天','# day streak'), m.streak)+'</small>':'')+'</span>'
+        +'<div class="bar"><span style="width:0" data-w="'+pct+'"></span></div></span>'
+        +'<span class="pts'+(w>0?'':' zero')+'">'+fmt(w)+'<small>'+L('題','done')+'</small></span></li>';
+    }).join('')+'</ul>'
+    +'<div class="rk-foot"><i data-ic=refresh></i><span>'+L('每週一重新開始','Resets every Monday')+'</span>'+champ+'</div>';
+  requestAnimationFrame(()=>requestAnimationFrame(()=>$('rankCard').querySelectorAll('.bar span').forEach(b=>b.style.width=b.dataset.w+'%')));
 }
 
 // ── 點夥伴:動作面板 ──
@@ -449,13 +514,15 @@ const MS={ state:'house', allDone:false };
 function mockApi(b){
   const T=Date.now();
   const base=[
-    {uid:'me',me:true,owner:true,name:'林小姐',today:12,week:64,streak:3,days:3,sent:{}},
-    {uid:'a',name:'小美',today:20,week:86,streak:8,days:4,sent:{cheer:1}},
-    {uid:'b',name:'阿明',today:0,week:31,streak:0,days:2,sent:{}},
-    {uid:'c',name:'Jen',today:0,week:12,streak:0,days:1,sent:{wake:1}},
+    {uid:'me',me:true,owner:true,name:'林小姐',today:12,week:64,last_week:120,streak:3,days:3,sent:{}},
+    {uid:'a',name:'小美',today:20,week:86,last_week:142,streak:8,days:4,sent:{cheer:1}},
+    {uid:'b',name:'阿明',today:0,week:31,last_week:58,streak:0,days:2,sent:{}},
+    {uid:'c',name:'Jen',today:0,week:12,last_week:0,streak:0,days:1,sent:{wake:1}},
   ];
   if(MS.allDone) base.forEach(m=>{ if(!m.today) m.today=5; });
   if(MS.state==='sleepy') base[0].today=0;
+  if(MS.state==='lead'){ base[0].week=104; base[0].today=40; }
+  if(MS.state==='monday') base.forEach(m=>{ m.week=0; m.today=0; });
   if(b.action==='info'){
     if(MS.state==='none') return { circle:null };
     return { circle:{ id:'demo', owner:true, max:5, invite_url:'https://stayjp.study/buddy.html?mock=1&join=DEMO', limits:{cheer:3,wake:1}, members:base, received: MS.state==='sleepy'?[{from_name:'小美',kind:'wake',at:T-60000}]:[{from_name:'阿明',kind:'cheer',at:T-30000}] } };
@@ -468,7 +535,7 @@ function mockApi(b){
 }
 if(MOCK){
   const bar=$('mockBar'); bar.classList.remove('hidden');
-  bar.innerHTML='模擬模式(假資料):<br><button data-v="house">我讀過了</button><button data-v="sleepy">我還在睡(被叫醒)</button><button data-v="all">全員到齊</button><button data-v="none">還沒有小屋</button><button data-v="join">邀請頁</button>';
+  bar.innerHTML='模擬模式(假資料):<br><button data-v="house">我讀過了</button><button data-v="sleepy">我還在睡(被叫醒)</button><button data-v="all">全員到齊</button><button data-v="lead">我排第一</button><button data-v="monday">週一歸零</button><button data-v="none">還沒有小屋</button><button data-v="join">邀請頁</button>';
   bar.querySelectorAll('button').forEach(b=>b.onclick=()=>{
     const v=b.dataset.v;
     if(v==='join'){ location.href=location.pathname+'?mock=1&join=DEMO'; return; }
