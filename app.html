@@ -3781,18 +3781,22 @@ function getTtsAudio() {
   return __ttsAudio;
 }
 // 首次使用者手勢先播一段極短靜音,喚醒手機音訊系統 → 之後第一次真的播放不會卡。
+// 2026-11-18(回饋:iOS App 點單字/例句要多按幾次才有聲音):
+//  - iOS 的 touchstart 不算「使用者手勢」,在那裡 play() 會被擋 → 以前其實沒解鎖成功卻把旗標設成已解鎖。
+//    改成 touchend/click 都試,真的播成功才算解鎖。
+//  - 解鎖成功的這顆共用元件,之後不在手勢裡也能播 → speak() 被 iOS 擋掉時拿它當最後退路(見 speak)。
 function unlockTtsAudio() {
   if (__ttsUnlocked) return;
-  __ttsUnlocked = true;
   const a = getTtsAudio();
+  if (window._ttsNow === a && !a.paused) { __ttsUnlocked = true; return; }   // 正在用它播真的音檔:別用靜音蓋掉
   try {
     a.src = 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAESsAAABAAgAZGF0YQAAAAA=';
     const p = a.play();
-    if (p && p.then) p.then(() => { try { a.pause(); a.currentTime = 0; } catch (e) {} }).catch(() => {});
+    if (p && p.then) p.then(() => { __ttsUnlocked = true; try { a.pause(); a.currentTime = 0; } catch (e) {} }).catch(() => {});
+    else __ttsUnlocked = true;
   } catch (e) {}
 }
-document.addEventListener('touchstart', unlockTtsAudio, { once: true, passive: true, capture: true });
-document.addEventListener('mousedown', unlockTtsAudio, { once: true, capture: true });
+['touchend', 'click', 'mousedown'].forEach(function (ev) { document.addEventListener(ev, unlockTtsAudio, { passive: true, capture: true }); });
 
 // SpeechSynthesis 備援:語音清單非同步載入,先快取+監聽,避免第一次抓不到日文語音而無聲。
 let __jaVoice = null;
@@ -3875,9 +3879,19 @@ function speak(text) {
     const au2 = _ttsAudioFor(hash, !!(window.ttsIsG && window.ttsIsG())); au2.playbackRate = getTtsSpeed(); window._ttsNow = au2;
     au2.play().catch(() => {
       if (seq !== _spkSeq) return;
-      track('audio_play_fail', { text: t.slice(0, 40) });
-      // 兩次都播不出來(多半是那一下音檔沒載到/瀏覽器擋了):給一句提示,不然用戶只看到「沒聲音」以為音檔壞了(2026-10-30 回報「先月 音檔無聲」)
-      try { if (window.showToast) showToast(enOr('音檔沒載到，請再點一次喇叭', 'Audio didn’t load, tap the speaker again')); } catch (e) {}
+      // 第三條路:共用那顆(使用者第一次點畫面時解鎖過)。iOS 會擋「不在點擊當下」的 play()——
+      // 對照表還沒載完就點(等載完才播)、翻卡自動播都屬於這種;新建的元件一樣被擋,只有解鎖過的這顆播得出來。
+      const sh = getTtsAudio(), url = au2.src;
+      const giveUp = () => {
+        if (seq !== _spkSeq) return;
+        track('audio_play_fail', { text: t.slice(0, 40) });
+        try { if (window.showToast) showToast(enOr('音檔沒載到，請再點一次喇叭', 'Audio didn’t load, tap the speaker again')); } catch (e) {}
+      };
+      if (!url || !__ttsUnlocked) return giveUp();
+      try {
+        sh.src = url; sh.playbackRate = getTtsSpeed(); window._ttsNow = sh;
+        sh.play().then(() => { track('audio_play_shared', {}); if (seq !== _spkSeq) { try { sh.pause(); } catch (e) {} } }).catch(giveUp);
+      } catch (e) { giveUp(); }
     });
   });
 }
