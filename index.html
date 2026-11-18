@@ -207,6 +207,12 @@ select.lang-btn option { color: var(--tx); background: var(--bg); }
   position: relative; overflow: hidden;
 }
 .hero-inner { max-width: 1100px; margin: 0 auto; }
+.hero-rank {
+  display: flex; width: fit-content; align-items: center; gap: 6px; margin: 0 0 16px;
+  font-size: 12.5px; font-weight: 700; color: var(--tx2);
+  border: 1px solid var(--line, rgba(0,0,0,.12)); border-radius: 99px; padding: 4px 12px;
+}
+.hero-rank b { color: var(--ac); }
 .hero-eyebrow {
   font-size: 11px; letter-spacing: .28em; color: var(--ac);
   font-weight: 700; margin-bottom: 18px;
@@ -734,6 +740,7 @@ try {
 <section class="hero">
   <div class="hero-inner">
     <div class="hero-eyebrow reveal">STAYJP · STUDY</div>
+    <div class="hero-rank reveal">App Store 台灣・教育類免費榜 <b>第 6 名</b></div>
     <h2 class="hero-kana reveal reveal-d1">日々是学習。</h2>
     <h1 class="hero-title reveal reveal-d2">N5 到 N1，<br><em>陪你考過每一關。</em></h1>
     <p class="hero-desc reveal reveal-d3"><strong>7,710 個單字・382 個文法・模擬考・SRS 間隔複習。</strong><br>免費就能用大部分功能，全面備考再升級。</p>
