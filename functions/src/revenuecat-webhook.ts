@@ -250,7 +250,11 @@ export const revenuecatWebhook = functions.onRequest(
 
         case "CANCELLATION": {
           if (existingSub) {
-            await patchSubscription(uid, { willRenew: false });
+            // 自己取消(或韓國「未同意漲價」被商店取消)才標記問卷;扣款失敗等不問
+            const ask = ["UNSUBSCRIBE", "PRICE_INCREASE"].includes(String(event.cancel_reason || ""));
+            await patchSubscription(uid, ask
+              ? { willRenew: false, cancelAskAt: nowMs(), cancelAskTrial: event.period_type === "TRIAL", cancelAskWhy: String(event.cancel_reason) }
+              : { willRenew: false });
           }
           await writeTransaction({
             uid,

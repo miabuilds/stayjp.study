@@ -216,6 +216,14 @@
           }).catch(function () {});
           firebase.firestore().doc('users/' + user.uid).get().then(function (s) {
             var sub = (s.data() || {}).subscription || null;
+            // 取消問卷(2026-11-19):後端標了「自己取消」才載入 cancelsurvey.js 問一次。只在主程式頁和帳號頁問。
+            try {
+              if (sub && sub.cancelAskAt && sub.willRenew === false && /(app|account)\.html$/.test(location.pathname)) {
+                var _cs = document.createElement('script'); _cs.src = 'cancelsurvey.js?v=1';
+                _cs.onload = function () { try { window.CancelSurvey && CancelSurvey.maybe(sub, user); } catch (e3) {} };
+                document.head.appendChild(_cs);
+              }
+            } catch (e3) {}
             var ok = !!sub && (sub.status === 'active' || sub.status === 'trialing' || sub.status === 'cancelled')
               && Number(sub.expiresAt || 0) > Date.now();
             try { localStorage.setItem('ahx_prem_' + user.uid, ok ? '1' : '0'); } catch (e2) {}

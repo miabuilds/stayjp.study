@@ -105,6 +105,7 @@ export const cancelSubscription = functions.onRequest(
       await patchSubscription(uid, {
         willRenew: false,
         status: "cancelled",
+        cancelAskAt: Date.now(), cancelAskTrial: false, cancelAskWhy: "web",   // 取消問卷(cancelsurvey.js)
       });
 
       await writeTransaction({

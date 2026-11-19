@@ -61,6 +61,11 @@ export interface SubscriptionDoc {
   ref_bonus_at?: number;       // KOL 推薦碼好康:確認真實付款後發過 7 天的時戳(一次性,防重複/疊加)
   sale_bonus_at?: number;      // 檔期送天數(雙11 揪團年費 +30 天)發過的時戳(一次性)
   sale_bonus_id?: string;      // 哪一檔送的(SALE.id)
+  // 取消問卷(2026-11-19):用戶「自己取消續訂」的時戳。前端 cancelsurvey.js 看到就問一次原因。
+  // 不能只看 willRenew=false —— ATM/超商、兌換碼、PayPal、贈送本來就是 false,會問錯人。
+  cancelAskAt?: number;
+  cancelAskTrial?: boolean;    // 試用期內取消
+  cancelAskWhy?: string;       // RevenueCat cancel_reason(UNSUBSCRIBE / PRICE_INCREASE)或 "web"
 }
 
 export async function getSubscription(uid: string): Promise<SubscriptionDoc | null> {
