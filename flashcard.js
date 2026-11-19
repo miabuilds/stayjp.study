@@ -431,14 +431,17 @@ const FlashCard = (() => {
     const item = queue[cur];
     score[grade]++;
     // 單一寫入點：走 SRS 模組，不再繞過直寫 localStorage
-    if (typeof SRS !== 'undefined' && SRS.recordGrade) SRS.recordGrade(level, item.w, grade);
-    if (typeof Calendar !== 'undefined') Calendar.logActivity('vocab');
+    // 記錄失敗(例:本機儲存滿)也要讓卡片前進,不能整個按鈕沒反應
+    try { if (typeof SRS !== 'undefined' && SRS.recordGrade) SRS.recordGrade(level, item.w, grade); } catch (e) {}
+    try { if (typeof Calendar !== 'undefined') Calendar.logActivity('vocab'); } catch (e) {}
 
     // 「不會」→ 自動收進單字本（含左滑）。去重、靜默(不彈 alert 打斷)，用 toast 提示。
     // 使用者回饋：不會的字要能進單字本，不然常常猜中就漏掉了。
     if (grade === 'unknown' && typeof Stats !== 'undefined' && Stats.addToNotebook) {
-      const added = Stats.addToNotebook(item.w, item.r, item.m, level, true);
-      if (added && typeof showToast === 'function') showToast('<i data-ic=bookmark></i> 已加入單字本：' + item.w);
+      try {
+        const added = Stats.addToNotebook(item.w, item.r, item.m, level, true);
+        if (added && typeof showToast === 'function') showToast('<i data-ic=bookmark></i> 已加入單字本：' + item.w);
+      } catch (e) {}
     }
 
     // 本輪內重現（不熟/不會）→ 排到「本輪佇列尾端」,等這批跑完再回來。

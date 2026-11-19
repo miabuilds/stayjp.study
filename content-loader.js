@@ -56,6 +56,8 @@ window.ContentLoader = (function () {
     } catch (e) { return null; }
   }
   function saveCache(version, data) {
+    // 學習紀錄很多的裝置放不下內容快取(app.html 的儲存防呆會標記)→ 不再存,每次開啟改讀瀏覽器 HTTP 快取
+    try { if (localStorage.getItem('stayjp_content_nocache')) return; } catch (e) {}
     try { localStorage.setItem(CACHE_KEY, JSON.stringify({ version, data })); } catch (e) {}
   }
 

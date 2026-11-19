@@ -8,7 +8,7 @@ const SRS = (() => {
     unknown: { ms: 10 * 60 * 1000,   label: '10 分鐘後' }
   };
   function getData() { try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch(e) { return {}; } }
-  function save(d) { localStorage.setItem(KEY, JSON.stringify(d)); }
+  function save(d) { try { localStorage.setItem(KEY, JSON.stringify(d)); } catch (e) { try { if (typeof track === 'function') track('storage_full', { key: KEY }); } catch (e2) {} } }   // 空間滿也不能丟錯:丟了字卡會卡死不前進(雲端那筆照傳)
   function today() { return DayKey.today(); }   // 本地日曆日(day-key.js),與 calendar.js/study_log 同一套日界
   function dayOf(ts) { return DayKey.of(ts); }
   function k(lv, w) { return lv + ':' + w; }

@@ -5,7 +5,7 @@ const Calendar = (() => {
   function getLog() {
     try { return JSON.parse(localStorage.getItem(SKEY)) || {}; } catch(e) { return {}; }
   }
-  function saveLog(log) { localStorage.setItem(SKEY, JSON.stringify(log)); }
+  function saveLog(log) { try { localStorage.setItem(SKEY, JSON.stringify(log)); } catch (e) {} }
   function today() { return DayKey.today(); }   // 本地日曆日(day-key.js)。之前是 UTC → 台灣 08:00、日本 09:00 前的動作算成昨天(用戶實錘)
 
   // Record an activity: type = 'vocab' | 'grammar' | 'quiz'

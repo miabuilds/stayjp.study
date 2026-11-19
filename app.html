@@ -2118,6 +2118,24 @@ try {
 <script src="accent.js"></script>
 <script src="icons.js"></script>
 <script src="ui-modal.js"></script>
+<script>
+// 本機儲存滿了的防呆(2026-11-19 回報:背了四千多字的人,字卡按「記得/不熟/不會」完全沒反應)。
+// 原因:內容快取(約 170 萬字)跟學習紀錄共用同一塊約 5MB 的空間,紀錄一多就寫不進去,評分那行直接丟錯、卡片不會前進。
+// 做法:寫入失敗時先丟掉內容快取(可重抓,學習紀錄不可丟)再寫一次,並記下「這台不要再快取內容」。
+(function () {
+  try {
+    var P = Storage.prototype, orig = P.setItem, CK = 'stayjp_content_v1';
+    P.setItem = function (k, v) {
+      try { return orig.call(this, k, v); }
+      catch (e) {
+        if (k === CK || this !== window.localStorage) throw e;
+        try { this.removeItem(CK); orig.call(this, 'stayjp_content_nocache', '1'); } catch (e2) {}
+        return orig.call(this, k, v);
+      }
+    };
+  } catch (e) {}
+})();
+</script>
 <script src="content-loader.js"></script>
 <script src="progress-codec.js"></script>
 <script src="path-merge.js"></script>
