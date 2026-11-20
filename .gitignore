@@ -77,3 +77,7 @@ scratch-variants/
 scripts/send-*repl*.mjs
 scripts/feedback-reply.mjs
 scripts/check-user-sub.cjs
+
+# Cloudflare 部署產物
+dist/
+.wrangler/

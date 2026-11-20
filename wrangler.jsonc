@@ -1,0 +1,15 @@
+{
+  // StayJP 網站（Cloudflare Workers 靜態資產）。部署：sh scripts/build-dist.sh && npx wrangler deploy
+  // 只部署 dist/（由 build-dist.sh 從 git 追蹤的檔案產生，不含 scripts/functions/docs/*.md）
+  "name": "stayjp-site",
+  "main": "cf/worker.js",
+  "compatibility_date": "2026-11-01",
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS",
+    "html_handling": "none",
+    "not_found_handling": "none",
+    // 影音檔要先經過 Worker 才能支援分段讀取（iPhone 播放需要）
+    "run_worker_first": ["/audio/*", "/videos/*", "/images/social/*", "/lab/voice-samples/*"]
+  }
+}
