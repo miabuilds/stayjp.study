@@ -72,3 +72,8 @@ scripts/out/l10n/*/_fail-*.log
 # 含用戶信箱/憑證的本機腳本,不進公開 repo
 scripts/private/
 scratch-variants/
+
+# 含真實用戶信箱/回信內容的腳本:只留本機,絕不進 git(公開 repo,2026-11-20)
+scripts/send-*repl*.mjs
+scripts/feedback-reply.mjs
+scripts/check-user-sub.cjs
