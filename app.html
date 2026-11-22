@@ -6215,6 +6215,21 @@ function toggleTheme() {
   updateThemeIcon();
 }
 
+// ========== 右下角浮動按鈕(小狸助教 / 回頂端)可收起 ==========
+// 2026-11-23 用戶回饋:浮動鈕會擋到清單右側的收藏星星。只存在這台裝置(每台螢幕大小不同,不同步雲端)。
+function applyFabMode() {
+  let m = 'all';
+  try { m = localStorage.getItem('fab_mode') || 'all'; } catch (e) {}
+  if (m !== 'top' && m !== 'none') m = 'all';
+  document.documentElement.setAttribute('data-fab', m);
+  if (!document.getElementById('fabModeCss')) {
+    const st = document.createElement('style'); st.id = 'fabModeCss';
+    st.textContent = 'html[data-fab="top"] #tutorFab,html[data-fab="top"] #tutorHint,html[data-fab="none"] #tutorFab,html[data-fab="none"] #tutorHint,html[data-fab="none"] #bt,html[data-fab="none"] #backToTop{display:none!important}';
+    document.head.appendChild(st);
+  }
+}
+applyFabMode();
+
 // ========== 文字大小(標準 / 大 / 特大)==========
 // 只放大「學習內容」文字(單字/文法/文章),頂欄與導覽不動 → 不跑版。
 // 單字列表是變動高度虛擬列表:字變大→卡片變高→自動重量測,不會重疊。

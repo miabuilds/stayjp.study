@@ -27,7 +27,7 @@
     if (!s) return [];
     var T = root.ARTICLE_TOKENS && root.ARTICLE_TOKENS[s];
     if (T && T.length) {
-      return T.map(function (t) {
+      var items = T.map(function (t) {
         if (isPunct(t.s)) return { s: t.s, punct: true };
         // 相信斷詞器的判斷:k=1 是內容詞 → 查單字庫;沒有 k 才查機能語字典。
         // ⚠️ 機能語只比對「表層」,不可用原形 b:斷詞器把「おきます」的原形猜成「おく」,
@@ -40,6 +40,18 @@
         var e = word(t.b || t.s) || word(t.s);
         return { s: t.s, r: (e && e.r) || t.r || '', m: e ? Lc(e.m, e.m_en || e.m) : '', c: (e && e.c) || '', fn: false, unknown: !e };
       });
+      // 動詞變化、句型合成一塊(誘わ+れ+た → 誘われた;ほう+が+いい → ほうがいい)。2026-11-23 用戶回饋:拆太細很難讀
+      if (!root.JP_CHUNK) return items;
+      var out2 = [];
+      root.JP_CHUNK(T).forEach(function (c) {
+        if (c.n === 1) { out2.push(items[c.i]); return; }
+        var surf = '', rd = '';
+        for (var k = c.i; k < c.i + c.n; k++) { surf += T[k].s; rd += T[k].r || T[k].s; }
+        if (c.type === 'phrase') { out2.push({ s: surf, r: '', m: c.label, c: Lc('句型', 'pattern'), fn: true }); return; }
+        var head = items[c.i];
+        out2.push({ s: surf, r: rd, m: (head.m ? head.m + '｜' : '') + c.label, c: c.noun ? Lc('動詞', 'verb') : (head.c || ''), fn: false, unknown: false });
+      });
+      return out2;
     }
     // 最長匹配(貪婪):先找機能語/單字庫最長的詞,找不到就吃一個字
     var out = [], i = 0;
@@ -102,7 +114,7 @@
     }).join('');
     var fnN = ts.filter(function (t) { return t.fn; }).length;
     return '<div class="qp">'
-      + '<div class="qp-hd">' + Lc('斷句', 'Segments') + '<small>' + Lc('橘色是助詞/語尾 · ' + fnN + ' 個', 'orange = particles/endings · ' + fnN) + '</small></div>'
+      + '<div class="qp-hd">' + Lc('斷句', 'Segments') + '<small>' + Lc('有底色的是助詞/語尾/句型 · ' + fnN + ' 個', 'shaded = particles/endings/patterns · ' + fnN) + '</small></div>'
       + '<div class="qp-line">' + chips + '</div>'
       + (rows ? '<div class="qp-list">' + rows + '</div>' : '')
       + '</div>';

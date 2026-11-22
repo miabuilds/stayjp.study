@@ -432,6 +432,7 @@
       + (tags ? '<div class="jtags">' + tags + '</div>' : '')
       + '<div class="jm">' + escapeHtml(data.m || (data.u ? '外來語・字典沒有收錄' : '（本站未收錄，可查辭典 ↓）')) + '</div>'
       + (data.f && data.f !== '依讀音推測' ? '<div class="jbase">辭書形（原形）：<b>' + escapeHtml(data.w) + '</b></div>' : '')
+      + (data.x ? '<div class="jbase jcomp">' + escapeHtml(data.x) + '</div>' : '')   // 這一塊是怎麼變化來的(誘われた＝誘う＋れる(被動)＋た(過去))
       + (_nudge ? '<div class="jfreq"><i data-ic=refresh></i> 你查過這個字 ' + _ln + ' 次，收藏起來複習吧</div>'
         : (_ln >= 2 ? '<div class="jfreq jfreq-dim"><i data-ic=search></i> 查過 ' + _ln + ' 次</div>' : ''))
       + '<div class="jacts"><button class="jact jact-spk" type="button"><i data-ic=volume></i> 發音</button><button class="jact jact-fav' + (_nudge ? ' jact-pulse' : '') + '" type="button">' + (_nudge ? '<i data-ic=star></i> 收藏複習' : '☆ 收藏') + '</button>'
@@ -506,7 +507,7 @@
     var sp = e.target.closest && e.target.closest('.jlk');
     if (sp) {
       e.stopPropagation();
-      showLookup({ w: sp.dataset.w, r: sp.dataset.r, m: sp.dataset.m, c: sp.dataset.c, f: sp.dataset.f, u: sp.dataset.u === '1' }, sp);
+      showLookup({ w: sp.dataset.w, r: sp.dataset.r, m: sp.dataset.m, c: sp.dataset.c, f: sp.dataset.f, x: sp.dataset.x || '', u: sp.dataset.u === '1' }, sp);
     }
   }, true);
   // 冒泡階段:點彈窗以外的地方 → 關閉

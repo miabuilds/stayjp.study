@@ -188,7 +188,13 @@ window.Articles = (function () {
       if (!took) merged.push(toks[mi]);
     }
     toks = merged;
-    return toks.map(function (t, ti) {
+    function rubyOf(t, ti) {                        // 單一 token 的讀音標註(合併塊裡的每個小段也用這個)
+      var surf = t.s, eSurf = look(surf), isNum = NUMK.test(surf);
+      var prevNum = ti > 0 && NUMK.test(toks[ti - 1].s), nextNum = ti + 1 < toks.length && NUMK.test(toks[ti + 1].s);
+      var frd = isNum ? ((prevNum || nextNum) ? '' : (t.r || '')) : ((eSurf && eSurf.r) || t.r || '');
+      return rubyToken(surf, frd);
+    }
+    function one(t, ti) {
       var surf = t.s, base = t.b || surf;
       var eSurf = look(surf);
       var isNum = NUMK.test(surf);
@@ -217,6 +223,27 @@ window.Articles = (function () {
       var posCls = /動/.test(c) ? ' pos-v' : (/形/.test(c) ? ' pos-a' : (/副/.test(c) ? ' pos-adv' : ''));
       return '<span class="aw jlk' + posCls + '" role="button" tabindex="0" data-w="' + esc(w) + '" data-r="' + esc(r)
         + '" data-m="' + esc(m) + '" data-c="' + esc(c) + '"' + (f ? ' data-f="' + esc(f) + '"' : '') + '>' + inner + '</span>';
+    }
+    // 動詞變化/句型合成一塊可點(誘わ+れ+た → 誘われた;ほう+が+いい → ほうがいい;分かり+やすく → 不再把やすい當「便宜」)。
+    // 2026-11-23 用戶回饋。外層 .awg 是可點單位;裡面每個小段仍是 .aw —— 朗讀逐詞高亮靠 .aw 的數量對時間軸,不能少。
+    if (!window.JP_CHUNK) return toks.map(one).join('');
+    return window.JP_CHUNK(toks).map(function (c) {
+      if (c.n === 1) return one(toks[c.i], c.i);
+      var inner = '', surf = '';
+      for (var k = c.i; k < c.i + c.n; k++) { inner += '<span class="aw">' + rubyOf(toks[k], k) + '</span>'; surf += toks[k].s; }
+      if (c.type === 'phrase') {
+        return '<span class="awg jlk" role="button" tabindex="0" data-w="' + esc(surf) + '" data-r="" data-m="' + esc(c.label)
+          + '" data-c="' + esc(enOr('句型', 'pattern')) + '">' + inner + '</span>';
+      }
+      var h = toks[c.i], hb = h.b || h.s;
+      var e = look(hb) || look(h.s);
+      if (!e && window.kanaLookup) e = window.kanaLookup(hb) || window.kanaLookup(h.s);
+      if (!e && window.dictExtra) e = window.dictExtra(hb) || window.dictExtra(h.s);
+      var w = c.noun ? c.noun : hb, cc = c.noun ? enOr('動詞', 'verb') : ((e && e.c) || '');
+      var pc = c.noun || /動/.test(cc) ? ' pos-v' : (/形/.test(cc) ? ' pos-a' : '');
+      return '<span class="awg jlk' + pc + '" role="button" tabindex="0" data-w="' + esc(w) + '" data-r="' + esc((e && e.r) || h.r || '')
+        + '" data-m="' + esc(e ? Lc(e.m, e.m_en) : '') + '" data-c="' + esc(cc) + '" data-f="' + esc(enOr('活用形', 'conj.'))
+        + '" data-x="' + esc(surf + '＝' + c.label) + '">' + inner + '</span>';
     }).join('');
   }
   // N5:用課文原有的空格切詞塊(人工分詞)當高亮單位,塊內沿用既有引擎(furigana+可點),保留可讀空格

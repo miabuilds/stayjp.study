@@ -619,6 +619,7 @@ const Stats = (() => {
     const base = _lsGet('base_level','none'), goal = _lsGet('goal_level','');
     const isApp = !!(window.STAYJP_NATIVE && window.STAYJP_NATIVE.isNativeApp);
     const rmOn = _lsGet('reminder_time_pref','');
+    const fab = _lsGet('fab_mode','all');   // 右下角浮動按鈕:all / top(只留回頂端)/ none
     const box = 'background:var(--bg2);border-radius:12px;padding:16px;margin-bottom:12px';
     const seg = 'display:flex;gap:6px;flex-wrap:wrap';
     const chip = (on)=>'flex:1;min-width:72px;text-align:center;padding:9px 6px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;border:1px solid '+(on?'var(--ac)':'var(--bd)')+';background:'+(on?'var(--ac)':'transparent')+';color:'+(on?'#fff':'var(--tx)');
@@ -636,6 +637,15 @@ const Stats = (() => {
         <div style="${seg}">
           <button style="${chip(!isDark)}" onclick="Stats._setTheme('light',this)"><i data-ic=sun></i> 淺色</button>
           <button style="${chip(isDark)}" onclick="Stats._setTheme('dark',this)"><i data-ic=moon></i> 深色</button>
+        </div>
+      </div>
+      <div style="${box}">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><span style="font-size:16px"><i data-ic=chat></i></span><span style="font-weight:600;color:var(--tx)">右下角浮動按鈕</span></div>
+        <div style="font-size:12px;color:var(--tx2);margin-bottom:10px">擋到畫面的話可以收起來。收起後，點單字或例句旁的「問小狸」、「更多」選單一樣能找到小狸助教。</div>
+        <div style="${seg}">
+          <button style="${chip(fab==='all')}" onclick="Stats._setFab('all',this)">全部顯示</button>
+          <button style="${chip(fab==='top')}" onclick="Stats._setFab('top',this)">只留回頂端</button>
+          <button style="${chip(fab==='none')}" onclick="Stats._setFab('none',this)">全部收起</button>
         </div>
       </div>
       ${(window.StudyPlan && StudyPlan.voiceRows) ? `<div style="${box}">
@@ -690,6 +700,7 @@ const Stats = (() => {
   // 就地把選取樣式套到這顆、同組其他顆還原(不整頁重畫→不跳走、不丟捲動位置,可連續設定多項)
   function _markChip(el){ if(!el||!el.parentNode)return; [...el.parentNode.children].forEach(b=>{ b.style.border='1px solid var(--bd)'; b.style.background='transparent'; b.style.color='var(--tx)'; }); el.style.border='1px solid var(--ac)'; el.style.background='var(--ac)'; el.style.color='#fff'; }
   function _setFont(k,el){ try{ localStorage.setItem('fontSize',k); }catch(e){} if(typeof applyFontSize==='function')applyFontSize(); _markChip(el); if(typeof showToast==='function')showToast('文字大小已更新'); }
+  function _setFab(k,el){ try{ localStorage.setItem('fab_mode',k); }catch(e){} if(typeof applyFabMode==='function')applyFabMode(); _markChip(el); if(typeof showToast==='function')showToast('已更新'); }
   function _setTheme(mode,el){ const isDark=document.documentElement.getAttribute('data-theme')==='dark'; if((mode==='dark')!==isDark && typeof toggleTheme==='function') toggleTheme(); _markChip(el); if(typeof showToast==='function')showToast('主題已切換'); }
   function _setLevel(kind,v,el){ try{ localStorage.setItem(kind==='base'?'base_level':'goal_level', v); }catch(e){} if(typeof saveAllCloud==='function')saveAllCloud(); _markChip(el); if(typeof showToast==='function')showToast(kind==='base'?'程度已更新':'目標考級已更新'); }
   function _setReminder(){ const t=document.getElementById('setRmTime'); if(!t)return; if(typeof enableDailyReminder==='function')enableDailyReminder(t.value); else { try{ localStorage.setItem('reminder_time_pref',t.value); }catch(e){} } if(typeof showToast==='function')showToast('提醒已設 '+t.value); }
@@ -923,6 +934,6 @@ const Stats = (() => {
     _renderFL();
   }
 
-  return { open, openProfile, close, switchTab, _setFont, _setTheme, _setLevel, _setReminder, _clearReminder, _toggleQh, quizWeak, retryWrong, _answerWeak, addToNotebook, removeFromNotebook, quizNotebook, reviewNotebook, addWrongQuestion, getWrongQuestions, removeWrongQuestion, setWrongFilter, quizWrongQuestions, _wqAnswer, _wqNext, _wqRemoveAndNext, quizFavListening, _flReplay, _flAnswer, _flNext };
+  return { open, openProfile, close, switchTab, _setFont, _setFab, _setTheme, _setLevel, _setReminder, _clearReminder, _toggleQh, quizWeak, retryWrong, _answerWeak, addToNotebook, removeFromNotebook, quizNotebook, reviewNotebook, addWrongQuestion, getWrongQuestions, removeWrongQuestion, setWrongFilter, quizWrongQuestions, _wqAnswer, _wqNext, _wqRemoveAndNext, quizFavListening, _flReplay, _flAnswer, _flNext };
 })();
 try { window.Stats = Stats; } catch (e) {}

@@ -153,3 +153,112 @@ window.JP_FUNC = {
   "ただ": { m: "只是、不過(補充轉折)", e: "just; however", c: "接続詞" },
   "べ": { m: "「べき」的語幹：應該～。するべきだ＝應該做", e: "should (→べき)", c: "助動詞" }
 };
+
+// ── 詞塊合併(2026-11-23 用戶回饋:「誘わ れ た」被拆成三塊很難讀、「ほう が いい」這種句型被拆開、
+//    動詞後面的「やすい」被當成「便宜的」)。斷詞器切得很細,這裡把
+//      1. 活用中的動詞/形容詞 + 後面的助動詞、語尾 → 一塊(誘わ+れ+た → 誘われた)
+//      2. 常見句型 → 一塊(ほう+が+いい → ほうがいい)
+//    回傳 [{ i: 起點, n: 幾個 token, type: 'conj'|'phrase'|'', label: 說明 }];只決定「哪幾個要黏在一起」,
+//    讀音/意思由呼叫端照舊查。token 形狀同 article-tokens.js:{ s, r, b, k }。
+(function (root) {
+  function L(zh, en) { try { return (typeof enOr === 'function') ? enOr(zh, en || zh) : zh; } catch (e) { return zh; } }
+  // 語尾 → [原形, 中文, 英文]
+  var AUX = {
+    'れ': ['れる', '被動・可能', 'passive/potential'], 'れる': ['れる', '被動・可能', 'passive/potential'],
+    'られ': ['られる', '被動・可能', 'passive/potential'], 'られる': ['られる', '被動・可能', 'passive/potential'],
+    'せ': ['せる', '使役', 'causative'], 'せる': ['せる', '使役', 'causative'], 'させ': ['させる', '使役', 'causative'], 'させる': ['させる', '使役', 'causative'],
+    'た': ['た', '過去', 'past'], 'だ': ['た', '過去', 'past'], 'て': ['て', 'て形', 'te-form'], 'で': ['て', 'て形', 'te-form'],
+    'ます': ['ます', '禮貌', 'polite'], 'まし': ['ます', '禮貌', 'polite'], 'ませ': ['ます', '禮貌', 'polite'], 'ましょ': ['ます', '禮貌', 'polite'],
+    'ん': ['ん', '否定', 'negative'], 'う': ['う', '意志・邀約', 'volitional'],
+    'ない': ['ない', '否定', 'negative'], 'なかっ': ['ない', '否定', 'negative'], 'なく': ['ない', '否定', 'negative'], 'なけれ': ['ない', '否定', 'negative'],
+    'ず': ['ず', '否定', 'negative'], 'ぬ': ['ぬ', '否定', 'negative'], 'ば': ['ば', '假定', 'if'],
+    'たい': ['たい', '想要', 'want to'], 'たく': ['たい', '想要', 'want to'], 'たかっ': ['たい', '想要', 'want to'],
+    'たり': ['たり', '列舉', 'and so on'], 'だり': ['たり', '列舉', 'and so on'], 'たら': ['たら', '如果・之後', 'if/when'], 'だら': ['たら', '如果・之後', 'if/when'],
+    'ながら': ['ながら', '一邊', 'while'], 'つつ': ['つつ', '一邊', 'while'],
+    'やすい': ['やすい', '容易', 'easy to'], 'やすく': ['やすい', '容易', 'easy to'], 'やすかっ': ['やすい', '容易', 'easy to'],
+    'にくい': ['にくい', '很難', 'hard to'], 'にくく': ['にくい', '很難', 'hard to'], 'にくかっ': ['にくい', '很難', 'hard to'],
+    'すぎ': ['すぎる', '過度', 'too much'], 'すぎる': ['すぎる', '過度', 'too much'], 'そう': ['そう', '看起來', 'looks like']
+  };
+  // 只能接在 て/で 後面的補助動詞
+  var TE_AUX = {
+    'い': ['いる', '進行・狀態', 'ongoing/state'], 'いる': ['いる', '進行・狀態', 'ongoing/state'], 'いれ': ['いる', '進行・狀態', 'ongoing/state'], 'おり': ['おる', '進行・狀態', 'ongoing/state'],
+    'しまう': ['しまう', '做完・遺憾', 'completely/regret'], 'しまっ': ['しまう', '做完・遺憾', 'completely/regret'], 'しまい': ['しまう', '做完・遺憾', 'completely/regret'],
+    'ください': ['ください', '請', 'please'], 'おく': ['おく', '事先做好', 'in advance'], 'おい': ['おく', '事先做好', 'in advance'], 'おき': ['おく', '事先做好', 'in advance']
+  };
+  // 句型:整段(數個 token 接起來)完全符合才算
+  var PHRASES = [
+    [/^(ほう|方)が(いい|よい|良い)$/, '句型「～ほうがいい」：～比較好(給建議)', 'pattern: had better / should'],
+    [/^かもしれ(ない|ません|ず|なかった)$/, '句型「～かもしれない」：也許、說不定', 'pattern: might / maybe'],
+    [/^(なければ|なくては|なきゃ|なくちゃ)(ならない|なりません|いけない|いけません)$/, '句型「～なければならない」：必須、一定要', 'pattern: must / have to'],
+    [/^ことができ(る|ます|ない|ません|た|ました|なかった)$/, '句型「～ことができる」：能夠、可以', 'pattern: can / be able to'],
+    [/^ことがあ(る|ります|った|りました)$/, '句型「～ことがある」：有過(經驗)／有時會', 'pattern: have done / sometimes'],
+    [/^ことにな(る|ります|った|りました|っている|っています)$/, '句型「～ことになる」：決定、變成(不是自己決定的)', 'pattern: it has been decided that'],
+    [/^ことに(する|します|した|しました|している|しています)$/, '句型「～ことにする」：(自己)決定要', 'pattern: decide to'],
+    [/^ようにな(る|ります|った|りました|っている|っています)$/, '句型「～ようになる」：變得會、開始能', 'pattern: come to / become able to'],
+    [/^ように(する|します|した|しました|している|しています)$/, '句型「～ようにする」：盡量、設法做到', 'pattern: make sure to / try to'],
+    [/^わけ(では|じゃ)(ない|ありません)$/, '句型「～わけではない」：並不是說', 'pattern: it does not mean that'],
+    [/^わけにはいか(ない|なかった)$/, '句型「～わけにはいかない」：不能(情理上)', 'pattern: cannot afford to'],
+    [/^に(違い|ちがい)(ない|ありません)$/, '句型「～に違いない」：一定是', 'pattern: must be / no doubt'],
+    [/^について$/, '句型「～について」：關於', 'pattern: about / regarding'],
+    [/^に(対して|たいして)$/, '句型「～に対して」：對於、相對於', 'pattern: toward / in contrast to'],
+    [/^に(関して|かんして)$/, '句型「～に関して」：關於(較正式)', 'pattern: concerning'],
+    [/^によると$/, '句型「～によると」：根據', 'pattern: according to'],
+    [/^(だけ|ばかり)でなく$/, '句型「～だけでなく」：不只', 'pattern: not only'],
+    [/^を(通して|通じて)$/, '句型「～を通して」：透過', 'pattern: through / via']
+  ];
+  var PUNCT = /^[、。「」『』（）()？！?!・…,.　]+$/;
+  function phraseAt(toks, i) {
+    for (var n = Math.min(6, toks.length - i); n >= 2; n--) {
+      var j = '', bad = false;
+      for (var k = 0; k < n; k++) { var s = toks[i + k].s; if (PUNCT.test(s)) { bad = true; break; } j += s; }
+      if (bad || j.length > 12) continue;
+      for (var p = 0; p < PHRASES.length; p++) if (PHRASES[p][0].test(j)) return { n: n, label: L(PHRASES[p][1], PHRASES[p][2]) };
+    }
+    return null;
+  }
+  function inflected(t) { return !!(t && t.k && t.b && t.b !== t.s); }
+  function chunk(toks) {
+    var out = [], i = 0;
+    while (i < toks.length) {
+      var t = toks[i];
+      if (PUNCT.test(t.s)) { out.push({ i: i, n: 1, type: '' }); i++; continue; }
+      var ph = phraseAt(toks, i);
+      if (ph) { out.push({ i: i, n: ph.n, type: 'phrase', label: ph.label }); i += ph.n; continue; }
+      if (inflected(t)) {
+        var j = i + 1, notes = [], afterTe = /[てで]$/.test(t.s) && t.b !== t.s;
+        while (j < toks.length) {
+          var a = toks[j], s = a.s, prev = toks[j - 1].s;
+          if (phraseAt(toks, j)) break;
+          var hit = null;
+          if (afterTe && TE_AUX[s]) hit = TE_AUX[s];
+          else if (AUX[s]) {
+            // で/だ 只在音便後(読ん+で、泳い+だ)才是活用語尾,否則是助詞/斷定
+            if ((s === 'で' || s === 'だ' || s === 'だり' || s === 'だら') && !/[んい]$/.test(prev)) break;
+            if (s === 'ん' && !/ませ$/.test(prev)) break;
+            if (s === 'う' && !/[おこごそぞとどのほぼぽもよろ]$|ましょ$/.test(prev)) break;
+            if (s === 'そう' && j + 1 < toks.length && /^(です|だ|な|に)$/.test(toks[j + 1].s) === false && !PUNCT.test(toks[j + 1].s)) break;
+            hit = AUX[s];
+          }
+          if (!hit) break;
+          notes.push(hit);
+          afterTe = (s === 'て' || s === 'で');
+          j++;
+        }
+        if (j > i + 1) {
+          var seen = {}, parts = [];
+          notes.forEach(function (h) { var key = h[0] + h[1]; if (seen[key]) return; seen[key] = 1; parts.push(h[0] + '(' + L(h[1], h[2]) + ')'); });
+          // 名詞＋する(説明+さ+れ+て+いる):名詞一起併進來,意思查名詞
+          var lastC = out[out.length - 1], pt = i > 0 ? toks[i - 1] : null, st = i, base = t.b, noun = '';
+          if (t.b === 'する' && lastC && lastC.n === 1 && !lastC.type && pt && pt.k && !pt.b && pt.s.length >= 2 && /^[一-鿿々ァ-ヶー]+$/.test(pt.s)) {
+            out.pop(); st = i - 1; base = pt.s + 'する'; noun = pt.s;
+          }
+          out.push({ i: st, n: j - st, type: 'conj', label: base + '＋' + parts.join('＋'), noun: noun });
+          i = j; continue;
+        }
+      }
+      out.push({ i: i, n: 1, type: '' }); i++;
+    }
+    return out;
+  }
+  root.JP_CHUNK = chunk;
+})(window);
