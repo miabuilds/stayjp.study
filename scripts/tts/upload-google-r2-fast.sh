@@ -9,7 +9,10 @@ ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 DIR="${STAYJP_AUDIO_DIR:-$HOME/Documents/GitHub/stay-jp-audio}/tts-g/$V"
 ST="$ROOT/scripts/out/tts-g/$V/uploaded.txt"; mkdir -p "$(dirname "$ST")"; touch "$ST"
 CFG="$HOME/.wrangler/config/default.toml"
-ACCT="cbd5f1853670279112bc9aae44c4c4a4"; BUCKET="stayjp-audio"
+[ -n "$CLOUDFLARE_ACCOUNT_ID" ] || { [ -f "$HOME/.config/stay/cf.env" ] && . "$HOME/.config/stay/cf.env"; }
+: "${CLOUDFLARE_ACCOUNT_ID:?需要環境變數 CLOUDFLARE_ACCOUNT_ID(或 ~/.config/stay/cf.env)}"
+export CLOUDFLARE_ACCOUNT_ID
+ACCT="$CLOUDFLARE_ACCOUNT_ID"; BUCKET="stayjp-audio"
 cd "$ROOT" || exit 1
 refresh_if_needed() {
   exp="$(grep -o 'expiration_time = "[^"]*"' "$CFG" | cut -d'"' -f2)"
