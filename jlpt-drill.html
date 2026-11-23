@@ -91,6 +91,11 @@
   .muted{color:var(--tx3);font-size:12.5px}
   .playbtn{display:block;font:inherit;font-size:15px;font-weight:700;background:var(--soft);color:var(--ac);border:1.5px solid var(--ac);border-radius:12px;padding:10px 18px;cursor:pointer;margin-bottom:12px}
   .playbtn:hover{background:var(--ac);color:#fff}
+  .aubar{display:flex;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:12px}
+  .aubar .playbtn{margin-bottom:0}
+  .aurate{display:flex;gap:6px}
+  .aurate button{font:inherit;font-size:13px;font-weight:600;min-height:36px;padding:6px 12px;border:1px solid var(--bd);border-radius:999px;background:transparent;color:var(--tx2);cursor:pointer}
+  .aurate button.on{background:var(--ac);border-color:var(--ac);color:#fff}
   .exambtn{margin-top:14px;width:100%;background:var(--ac);border:0;border-radius:14px;padding:15px;font:inherit;font-size:15.5px;font-weight:700;color:#fff;cursor:pointer}
   .exambtn:hover{background:var(--ac2)}
   .exam-set{background:var(--bg2);border:1px solid var(--bd);border-radius:14px;padding:16px;margin-top:10px;display:none}
@@ -635,7 +640,23 @@ function playAu(){
   if(!window.__TTS){ ensureTTS().then(function(){ if(window.__TTS && queue[qi]===q) playAu(); }); return; }
   try{ if(_au){ _au.pause(); _au=null; } }catch(e){}
   const hash = window.__TTS && window.__TTS[q.at];
-  if(hash){ _au = new Audio('audio/tts/'+hash+'.mp3'); _au.play().catch(()=>{}); }
+  if(hash){ _au = new Audio('audio/tts/'+hash+'.mp3'); _applyRate(); _au.play().catch(()=>{}); }
+}
+// 播放速度(0.7 / 正常 / 1.2),只存本機,下一題沿用
+function auRate(){ try{ const r=parseFloat(localStorage.getItem('jd_au_rate')); return (r===0.7||r===1.2)?r:1; }catch(e){ return 1; } }
+function _applyRate(){ try{ if(_au){ const r=auRate(); _au.defaultPlaybackRate=r; _au.playbackRate=r; _au.preservesPitch=true; } }catch(e){} }
+function setAuRate(r){
+  try{ localStorage.setItem('jd_au_rate', String(r)); }catch(e){}
+  _applyRate();
+  const bs=document.querySelectorAll('.aurate button');
+  for(let i=0;i<bs.length;i++) bs[i].classList.toggle('on', parseFloat(bs[i].dataset.r)===r);
+}
+function auRateHTML(){
+  const cur=auRate();
+  return '<span class="aurate" role="group" aria-label="'+enOr('播放速度','Playback speed')+'">'+
+    [[0.7,'0.7x'],[1,enOr('正常','Normal')],[1.2,'1.2x']].map(function(x){
+      return '<button type="button" data-r="'+x[0]+'" class="'+(cur===x[0]?'on':'')+'" onclick="setAuRate('+x[0]+')">'+x[1]+'</button>';
+    }).join('')+'</span>';
 }
 function stopAu(){ try{ if(_au){ _au.pause(); _au=null; } }catch(e){} }
 function renderQ(){
@@ -644,7 +665,7 @@ function renderQ(){
   document.getElementById('qnum').textContent = (qi+1)+' / '+queue.length;
   // 聴解:題面只有問題+播放鈕,不顯示原文(答完才在詳解看 script)
   document.getElementById('qstem').innerHTML =
-    (q.t==='listening' ? '<button class="playbtn" onclick="playAu()">'+jaOr('▶ 音声を聞く','▶ Play audio')+'</button>' : '') + stem(q);
+    (q.t==='listening' ? '<div class="aubar"><button class="playbtn" onclick="playAu()">'+jaOr('▶ 音声を聞く','▶ Play audio')+'</button>'+auRateHTML()+'</div>' : '') + stem(q);
   document.getElementById('qhint').textContent = q.h || (q.t==='listening' ? enOr('可以重複播放','You can replay the audio') : '');
   // 選項固定亂序,但記住正確答案文字
   const opts = shuffle(q.o.map((t,i)=>({t,ok:i===q.a})));
