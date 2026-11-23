@@ -270,7 +270,7 @@ const SRS = (() => {
         (right ? _E('答對了!','Correct!') : _E('正解:','Answer: ') + E(item.w) + (item.r && item.r !== item.w ? '（' + E(item.r) + '）' : '')) + '</div>' +
       (!right && val ? '<div style="font-size:12.5px;color:var(--tx2)">' + _E('你打的:','You typed: ') + E(val) + '</div>' : '') +
       '<div class="srs-type-res" id="srsAnsBox"><div style="font-size:18px;font-weight:700">' + E(item.w) + (item.r && item.r !== item.w ? ' <span style="font-size:13px;color:var(--tx2)">' + E(item.r) + '</span>' : '') + '</div>' +
-        (listenMode() && item.m && item.m !== item.w ? '<div style="font-size:14px;font-weight:700;margin-top:2px">' + C(E(item.m)) + '</div>' : '') +   // 聽打一開始沒給中文,答完補上意思
+        (listenMode() && item.m ? '<div style="font-size:14px;font-weight:700;margin-top:2px">' + C(E(item.m)) + '</div>' : '') +   // 聽打一開始沒給中文,答完補上意思
         (item.ex && item.ex.j ? '<div class="srs-ex-j" style="margin-top:4px">' + FR(item.ex.j) + '</div><div style="font-size:12.5px;color:var(--tx2)">' + C(E(item.ex.z || '')) + '</div>' : '') +
         (cfHint ? '<div class="confuse-hint" style="margin-top:6px">' + cfHint + '</div>' : '') +
         // 打字模式原本只在送出時自動念一次、沒有鈕可以重聽(用戶 2026-10-13 回饋「復習打字能增加聲音嗎」)→ 跟翻卡一樣放發音鈕,有例句再加例句鈕
@@ -353,7 +353,7 @@ const SRS = (() => {
           <div class="qmain">${item.w}${(window.StudyPlan&&StudyPlan.pitchMark)?StudyPlan.pitchMark(item):''}</div>
           ${item.w!==item.r?'<div class="qsub">'+item.r+'</div>':''}
           <div class="srs-spk-row">${spkBtn(window.wordSpeakKey ? wordSpeakKey(item) : (item.r || item.w))}</div>
-          ${item.m && item.m!==item.w ? '<div class="srs-meaning">'+(typeof cvt==='function'?cvt(item.m):item.m)+'</div>' : ''}
+          ${item.m ? '<div class="srs-meaning">'+(typeof cvt==='function'?cvt(item.m):item.m)+(item.m===item.w?'<div class="srs-same">'+_E('和中文同字同義','Same word in Chinese')+'</div>':'')+'</div>' : ''}
           ${item.ex && item.ex.j ? '<div class="srs-back-ex" lang="ja" onclick="event.stopPropagation();speak(\'' + String(item.ex.j).replace(/'/g, "\\'") + '\')">' + FR(item.ex.j) + '<div class="srs-back-exz">' + (typeof cvt==='function'?cvt(item.ex.z||''):(item.ex.z||'')) + '</div></div><div class="srs-spk-row" style="margin:6px 0 0">' + shBtn(item) + '</div>' : ''}
           ${cfHint?'<div class="confuse-hint">'+cfHint+'</div>':''}
           <div class="srs-btns">
