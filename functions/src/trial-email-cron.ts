@@ -16,18 +16,18 @@
 import * as functions from "firebase-functions/v2/scheduler";
 import * as admin from "firebase-admin";
 import { db, nowMs } from "./utils/firestore";
-import { EARLY_BIRD_END_MS, SALE } from "./utils/constants";
+import { EARLY_BIRD_END_MS, PLANS, SALE } from "./utils/constants";
 
 if (admin.apps.length === 0) admin.initializeApp();
 
 const TRIAL_DAYS = 3;
 const SITE = "https://stayjp.study";
 
-// 雙十檔期:檔期開始前一天(10/7 那封)起到檔期結束,改推檔期價。檔期一過自動回原文案。
+// 檔期(目前:聖誕 12/24–12/27):檔期開始前一天起到檔期結束,改推檔期價。⚠️ 換檔期要改下面的名稱與日期字樣(雙11 那次沒改,信裡還寫雙十)。檔期一過自動回原文案。
 function saleLine(): string {
   const now = nowMs();
   if (now < SALE.start - 864e5 || now > SALE.end) return "";
-  return `<p style="margin:0 0 16px"><strong style="color:#B8362A">雙十限定 10/8–10/11:年費 NT$${SALE.prices.yearly!.toLocaleString("en-US")}/年</strong>(原價 1,990),活動期間訂閱,之後每年續訂都是 NT$${SALE.prices.yearly!.toLocaleString("en-US")}。<br>買斷 <strong>NT$${SALE.prices.lifetime!.toLocaleString("en-US")}</strong>(原價 5,990)。有推薦碼再折一次。</p>`;
+  return `<p style="margin:0 0 16px"><strong style="color:#B8362A">聖誕限定 12/24–12/27:年費 NT$${SALE.prices.yearly!.toLocaleString("en-US")}/年</strong>(原價 1,990),活動期間訂閱,之後每年續訂都是 NT$${SALE.prices.yearly!.toLocaleString("en-US")}。<br>買斷 <strong>NT$${SALE.prices.lifetime!.toLocaleString("en-US")}</strong>(原價 ${PLANS.lifetime.price_twd.toLocaleString("en-US")})。有推薦碼再折一次。</p>`;
 }
 
 function buildHtml(name: string, ebLeft: number | null): { subject: string; html: string } {

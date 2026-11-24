@@ -164,12 +164,14 @@ export const WEB_CODE_DISCOUNT_TWD: Partial<Record<PlanKey, number>> = {
 // ── 雙11 檔期(2026-11-04 Mia 定案)── 同一套機制,只換時間與活動名;價格沿用雙十(商店商品不用重送審)。
 //   檔期:2026-11-09 00:00 ~ 2026-11-11 23:59:59(台灣時間,三天);KOL 搶先 2026-11-08 20:00
 //   揪團:價格不變、檔期內新開的「揪團年費」四個人每人多送一個月(saleGroupBonusDays);買斷團不送
+// ── 聖誕檔期(2026-11-24 Mia 定案)── 同一套機制;年費照舊 1,490,買斷調高到 4,190(有碼 3,790);揪團年費一樣每人多送一個月。
+//   檔期:2026-12-24 00:00 ~ 2026-12-27 23:59:59(台灣時間,四天);KOL 搶先 2026-12-23 20:00
 export const SALE = {
-  id: "double11_2026",
-  start: Date.UTC(2026, 10, 8, 16, 0, 0),          // 2026-11-09 00:00 台灣
-  kolEarlyStart: Date.UTC(2026, 10, 8, 12, 0, 0),  // 2026-11-08 20:00 台灣
-  end: Date.UTC(2026, 10, 11, 15, 59, 59),         // 2026-11-11 23:59:59 台灣(含)
-  prices: { yearly: 1490, lifetime: 3990 } as Partial<Record<PlanKey, number>>,
+  id: "xmas_2026",
+  start: Date.UTC(2026, 11, 23, 16, 0, 0),         // 2026-12-24 00:00 台灣
+  kolEarlyStart: Date.UTC(2026, 11, 23, 12, 0, 0), // 2026-12-23 20:00 台灣
+  end: Date.UTC(2026, 11, 27, 15, 59, 59),         // 2026-12-27 23:59:59 台灣(含)
+  prices: { yearly: 1490, lifetime: 4190 } as Partial<Record<PlanKey, number>>,
   refDiscount: { yearly: 150, lifetime: 400 } as Partial<Record<PlanKey, number>>,
   groupBonusDays: { group4_yearly: 30 } as Partial<Record<PlanKey, number>>,
 };

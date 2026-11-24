@@ -65,7 +65,7 @@
     } catch (e) { return false; }
   }
 
-  // ───── 檔期特價(2026-10 雙十首用;2026-11 雙11 沿用同一套,只換時間與名稱)──────────────
+  // ───── 檔期特價(2026-10 雙十首用;2026-11 雙11、2026-12 聖誕沿用同一套,只換時間、名稱與買斷價)──────────────
   // 不用輸碼、官網人人有;有效推薦碼再疊折。時間到全站自動恢復原價,不必回來拆。
   // ⚠️ 數字與時間必須和後端 functions/src/utils/constants.ts 的 SALE + resolveWebPrice 一字不差:
   //    pricing.html 把這裡算出的金額當 expected_twd 送去 createPayment,兩邊不同就 409 擋單。
@@ -73,15 +73,15 @@
   var LIST_PRICE = { monthly: 390, yearly: 1990, yearly_early_bird: 990, lifetime: 4990 };
   var REF_OFF = { yearly: 200, lifetime: 500 };            // = 後端 WEB_CODE_DISCOUNT_TWD(檔期外)
   var SALE = {
-    id: 'double11_2026',
-    start: Date.UTC(2026, 10, 8, 16, 0, 0),                // 2026-11-09 00:00 台灣
-    kolEarlyStart: Date.UTC(2026, 10, 8, 12, 0, 0),        // 2026-11-08 20:00 台灣(KOL/個人碼搶先)
-    end: Date.UTC(2026, 10, 11, 15, 59, 59),               // 2026-11-11 23:59:59 台灣
-    prices: { yearly: 1490, lifetime: 3990 },
+    id: 'xmas_2026',
+    start: Date.UTC(2026, 11, 23, 16, 0, 0),               // 2026-12-24 00:00 台灣
+    kolEarlyStart: Date.UTC(2026, 11, 23, 12, 0, 0),       // 2026-12-23 20:00 台灣(KOL/個人碼搶先)
+    end: Date.UTC(2026, 11, 27, 15, 59, 59),               // 2026-12-27 23:59:59 台灣
+    prices: { yearly: 1490, lifetime: 4190 },              // 買斷 3,990 → 4,190(Mia 2026-11-24:檔期買斷折太深,調高試水溫)
     refDiscount: { yearly: 150, lifetime: 400 },
     groupBonusDays: { group4_yearly: 30 },                 // 檔期內開的揪團年費:每人多送一個月(買斷團不送;後端 saleGroupBonusDays 同步)
     link: '/pricing.html',
-    zh: '雙11 限定', cn: '双11 限定', en: 'Double 11 Sale'
+    zh: '聖誕限定', cn: '圣诞限定', en: 'Christmas Sale'
   };
 
   /**
