@@ -3582,8 +3582,13 @@ function renderHub() {
         + '<button class="hub-card" onclick="switchMode(\'vocab\')"><i class="hc-wm" data-ic=book></i><span class="hc-ic"><i data-ic=book></i></span><span class="hc-t">' + L('單字', 'Vocabulary') + '</span><span class="hc-d">7,710' + L(' 詞 · N5–N1', ' words') + '</span></button>'
         + '<button class="hub-card" onclick="switchMode(\'grammar\')"><i class="hc-wm" data-ic=edit></i><span class="hc-ic"><i data-ic=edit></i></span><span class="hc-t">' + L('文法', 'Grammar') + '</span><span class="hc-d">382' + L(' 點 · N5–N1', ' points') + '</span></button>'
       + '</div>'
-      // 2026-11-24 面板瘦身(Mia):我的單字本(全站 25 人用)、讀書小屋(60 間只 3 間有第二人)、快速小考(跟刷題特區重疊)的面板入口拿掉;
-      // 功能都還在:單字頁「我的單字」鈕、右上更多選單、自訂面板都進得去。
+      // 2026-11-24 面板瘦身(Mia):讀書小屋(60 間只 3 間有第二人)、快速小考(跟刷題特區重疊)的面板入口拿掉;更多選單、自訂面板都還進得去。
+      // 我的單字本:當天先拿掉又放回——GA 143 人開、13 人加字,是「打開看不到自己收藏的字」不是沒人點;頁內已加「我收藏的字」。
+      + (function () { var n = 0, f = 0;   // 直接讀本機:面板第一次畫的時候 my-vocab.js 還沒載入
+          try { var mv = (JSON.parse(localStorage.getItem('my_vocab')) || []).filter(function (x) { return x && x.w && !x.del; }), own = {}; mv.forEach(function (x) { own[x.w] = 1; }); n = mv.length;
+            f = (JSON.parse(localStorage.getItem('word_notebook')) || []).filter(function (x) { return x && x.w && !own[x.w]; }).length; } catch (e) {}
+          return '<button class="hub-card hub-card-wide" onclick="MyVocab.open()"><i class="hc-wm" data-ic=bookmark></i><span class="hc-ic"><i data-ic=bookmark></i></span><span class="hc-t">' + L('我的單字本', 'My words') + '</span><span class="hc-d">'
+            + ((n + f) ? L('收藏和自己加的字 · 共 ' + (n + f) + ' 個', (n + f) + ' starred & added words') : L('收藏的字都在這 · 也能自己加', 'Your starred words · add your own too')) + '</span></button>'; })()
       + '<div class="hub-sec">' + L('練習', 'Practice') + '</div>'
       + '<div class="hub-grid2">'
         + '<a class="hub-card" href="speak.html"><i class="hc-wm" data-ic=mic></i><span class="hc-ic"><i data-ic=mic></i></span><span class="hc-t">' + L('AI 跟讀', 'AI Shadowing') + '</span><span class="hc-d">' + L('跟著唸 · 即時評分', 'Repeat & get scored') + '</span></a>'
