@@ -65,6 +65,19 @@ const I18n = (() => {
   writeCookieLang(lang);                // 一律鏡射到 cookie，之後被清也救得回
   try { if (window.ReactNativeWebView) window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'LANG', lang: lang })); } catch (_) {}   // 每次載頁同步給原生殼
   try { document.documentElement.lang = lang; } catch (_) {}
+  // GA:記介面語言(看哪個語言真的有人用)。user property 要在 GA 後台註冊自訂維度才看得到;
+  // 另外每個工作階段送一次事件 uilang_<code>,事件報表不用註冊就能直接看人數。
+  function gaLang(l, force) {
+    try {
+      if (typeof gtag !== 'function') return;
+      gtag('set', 'user_properties', { ui_lang: l });
+      var k = 'ga_uilang_sent';
+      if (!force && sessionStorage.getItem(k) === l) return;
+      sessionStorage.setItem(k, l);
+      gtag('event', 'uilang_' + String(l).toLowerCase().replace(/[^a-z]/g, '_'));
+    } catch (_) {}
+  }
+  gaLang(lang);
 
   // ko/vi/id/th:字典+UI 對照在 lang/<code>.js。用 document.write 同步載入,讓後面的 script 一執行就查得到
   // (改成 async 注入會有一瞬間先畫繁中再換字,而且 enOr/pick 在首繪時查不到會退成英文)。
@@ -669,6 +682,7 @@ const I18n = (() => {
     writeCookieLang(l);   // 同步寫 cookie，跨啟動保存（修 iOS 重開變英文）
     try { document.documentElement.lang = l; } catch (_) {}
     postLangToNative(l);
+    gaLang(l);
   }
 
   function getMonths() { return dictFor(lang).months || dict.en.months; }
