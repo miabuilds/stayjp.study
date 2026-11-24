@@ -9,7 +9,9 @@ const HQ_URL = (process.env.HQ_URL || '').replace(/\/$/, ''); const HQ_TOKEN = p
 if (!process.env.DRY && (!HQ_URL || !HQ_TOKEN)) { console.error('缺 HQ_URL / HQ_TOKEN'); process.exit(1); }
 const toMs = (v) => (v == null ? 0 : typeof v === 'number' ? (v < 1e12 ? v * 1000 : v) : typeof v.toMillis === 'function' ? v.toMillis() : (Date.parse(v) || 0));
 const dayTW = (ms) => new Date(ms + 8 * 3600e3).toISOString().slice(0, 10);
-const since = Date.now() - DAYS * 864e5;
+// 起點對齊台灣時間的 0 點:邊界那天要算整天。原本從「現在往回推 N 天」的同一個鐘點開始,邊界日只算到後半天,
+// 推上總部會把那天原本完整的數字蓋成半天(2026-11-24 發現:總部的 StayJP 本月淨額每天被吃掉一點)。
+const since = Math.floor((Date.now() + 8 * 3600e3) / 864e5) * 864e5 - 8 * 3600e3 - (DAYS - 1) * 864e5;
 const FEE = (pm) => /apple|ios|app_store|google|play|android/i.test(pm || '') ? 0.15 : /ecpay/i.test(pm || '') ? 0.028 : /paypal/i.test(pm || '') ? 0.045 : 0.03;
 const days = {}; const D = (k) => (days[k] ||= { day: k, gross_twd: 0, net_twd: 0, paid_n: 0, new_paid_n: 0, refund_n: 0, refund_twd: 0, trial_n: 0, new_users: 0, extra: { by_plan: {}, by_pm: {} } });
 for (const d of (await db.collection('transactions').get()).docs) {
@@ -92,7 +94,7 @@ const rows = Object.values(days).sort((a, b) => (a.day < b.day ? -1 : 1)).map((r
   visitors: gaOk ? (r.visitors || 0) : null, pageviews: gaOk ? (r.pageviews || 0) : null,
 }));
 console.log(`StayJP 近 ${DAYS} 天:${rows.length} 天有資料,夥伴碼 ${partners.length} 組,家族價名單 ${family.length} 人,未處理回饋 ${feedback.length} 則`);
-for (const r of rows.slice(-7)) console.log(`  ${r.day}  ${r.paid_n} 筆  毛 NT$${r.gross_twd}  淨≈NT$${Math.round(r.net_twd)}  退 ${r.refund_n}  試用 ${r.trial_n}  新帳號 ${r.new_users}`);
+for (const r of rows.slice(-(Number(process.env.SHOW) || 7))) console.log(`  ${r.day}  ${r.paid_n} 筆  毛 NT$${r.gross_twd}  淨≈NT$${Math.round(r.net_twd)}  退 ${r.refund_n}  試用 ${r.trial_n}  新帳號 ${r.new_users}`);
 if (process.env.DRY) process.exit(0);
 const res = await fetch(HQ_URL + '/api/ingest/daily', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + HQ_TOKEN }, body: JSON.stringify({ product: 'stayjp', rows, partners, family: authOk ? family : undefined, feedback }) });
 const out = await res.text(); console.log('HQ 回應', res.status, out.slice(0, 200));

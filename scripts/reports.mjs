@@ -27,10 +27,14 @@ if (cmd === 'list') {
   const [id, subject, bodyFile] = args; if (!id || !subject || !bodyFile) throw new Error('usage: reply <id> <subject> <bodyfile>');
   const r = (await db.doc(`reports/${id}`).get()).data(); if (!r) throw new Error('no such report');
   if (!r.email) { console.error('回報者沒留 email,只標 replied 不寄信'); await db.doc(`reports/${id}`).update({ status: 'replied', handled_at: admin.firestore.FieldValue.serverTimestamp(), reply_skipped: 'no_email' }); process.exit(0); }
+  if (r.replied_subject && !process.argv.includes('--followup')) { console.log(`沒寄:這筆回報已經回過信(主旨「${r.replied_subject}」)。不是錯誤,不要重試、不要改主旨再寄。`); process.exit(2); }
   const text = fs.readFileSync(bodyFile, 'utf8');
-  await db.collection('mail').add({ to: r.email, message: { subject, text }, kind: 'report_reply', report_id: id, created_at: admin.firestore.FieldValue.serverTimestamp() });
+  const { sendOnce, fmtTime } = await import('./lib/send-once.mjs');
+  const res = await sendOnce({ to: r.email, subject, text, key: `reports:${id}${process.argv.includes('--followup') ? ':2' : ''}`, kind: 'report_reply', extra: { report_id: id } });
+  if (!res.sent) { console.log(`沒寄:判定重複(${res.skipped}),上一封 ${fmtTime(res.prev && res.prev.at)} ${(res.prev && res.prev.subject) || ''}。不是錯誤,不要重試、不要改主旨再寄。`); process.exit(2); }
+  if (res.state !== 'SUCCESS' && res.state !== 'QUEUED') { console.log('寄送失敗:', res.state, '狀態沒動'); process.exit(1); }
   await db.doc(`reports/${id}`).update({ status: 'replied', handled_at: admin.firestore.FieldValue.serverTimestamp(), replied_subject: subject });
-  console.log('mail queued →', r.email);
+  console.log('已寄出 →', r.email, res.state);
 } else if (cmd === 'delete') {
   await db.doc(`reports/${args[0]}`).delete(); console.log('deleted', args[0]);
 } else { console.error('usage: list|set|reply|delete'); process.exit(1); }

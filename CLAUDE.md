@@ -24,6 +24,12 @@
 - iOS App 內（`html.ios-app`）不准出現「兌換碼」「輸入碼送天數」這類 UI（Apple 3.1.1 會退件），網頁和 Android 可以留。
 - 以程式碼和線上現況為準，`*_STATUS.md` 這類筆記可能過期。
 
+## 寄信給使用者（防重複寄）
+- 回信一律走 `node scripts/mail-reply.mjs`（或 `node scripts/reports.mjs reply`），**不准直接寫 `mail` 集合，也不要另外寫一次性的寄信腳本**。這兩支會擋：同一件事回過、同一個人 30 天內收過同主旨、該筆回報／回饋已標回過。
+- 寄之前先 `node scripts/mail-reply.mjs check <email>` 看對方最近收過什麼；查詢結果不要截斷。
+- 指令印「沒寄」（結束碼 2）= 判定重複，不要重試、不要改主旨再寄。要追加更正信先問 Mia，同意後才加 `--followup=2`。
+- 後端排程（functions/src 的活動信）每封都要有「寄過」記號，先查記號再寄；新增排程信要照做。
+
 ## 驗收
 - 改 UI 要用瀏覽器實際開頁截圖看，不能只讀 DOM 值（display:none 的元素也讀得到值）。
 - 說「修好了」之前要確認實際行為，不要空口說。
