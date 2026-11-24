@@ -172,7 +172,7 @@
     APPS = [{ key: 'stayjp', name: 'StayJP', link: jpHq.link || ('https://stayjp.study/?ref=' + encodeURIComponent(d.code)),
       rate: d.commission_pct != null ? d.commission_pct : jpHq.rate_pct, orders: jpOrders, month: jpMonth, total: jpTotal, jp: true }]
       .concat(hq ? hq.products.filter(p => p.key !== 'stayjp').map(p => ({ key: p.key, name: p.name, link: p.link, rate: p.rate_pct,
-        orders: p.orders || 0, month: p.commission_month || 0, total: p.commission || 0 }))
+        orders: p.orders || 0, month: p.commission_month || 0, total: p.commission || 0, clicks: p.clicks, c7: p.clicks_7d, c30: p.clicks_30d }))
         : Object.keys(SITES).map(k => ({ key: k, name: SITES[k][0], link: SITES[k][1] + '/?ref=' + encodeURIComponent(d.code), rate: d.commission_pct, orders: 0, month: 0, total: 0 })));
     const sum = k => APPS.reduce((a, p) => a + (Number(p[k]) || 0), 0);
     const shown = APPS.filter(p => MAIN.indexOf(p.key) >= 0 || p.orders > 0 || p.total !== 0)
@@ -192,6 +192,7 @@
         '</div>' +
         (p.jp ? '<div class="extra num">連結點擊 <b>' + (Number(d.clicks) || 0).toLocaleString() + '</b> 次（近 7 天 ' + (Number(d.clicks_7d) || 0) + '、近 30 天 ' + (Number(d.clicks_30d) || 0) + '）<br>' +
           '用你的碼註冊 <b>' + d.total + '</b> 人・目前付費中 <b>' + d.paid + '</b> 人・試用中 <b>' + d.trialing + '</b> 人</div>' : '') +
+        (!p.jp && p.clicks != null ? '<div class="extra num">連結點擊 <b>' + (Number(p.clicks) || 0).toLocaleString() + '</b> 次（近 7 天 ' + (Number(p.c7) || 0) + '、近 30 天 ' + (Number(p.c30) || 0) + '）</div>' : '') +
         '<div class="linkrow"><span class="url">' + esc(p.link) + '</span><button type="button" class="btn" data-copy="' + i + '">複製連結</button></div>' +
       '</div>';
     };
