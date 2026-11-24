@@ -6,31 +6,67 @@
 <meta name="robots" content="noindex">
 <title>推薦成效 — 日本再留計劃</title>
 <style>
-  :root { --bg:#FAF9F6;--bg2:#FFFFFF;--tx:#2C2C2C;--tx2:#7A7A7A;--tx3:#ACACAC;--ac:#D4654A;--bd:#E8E5E0; }
-  @media (prefers-color-scheme: dark) { :root { --bg:#1C1C1E;--bg2:#2C2C2E;--tx:#E5E5E5;--tx2:#8E8E93;--tx3:#636366;--ac:#E8734A;--bd:#3A3A3C; } }
+  :root { --bg:#FAF9F6;--bg2:#FFFFFF;--bg3:#F1EEE8;--tx:#2C2C2C;--tx2:#6F6F6F;--tx3:#9A9A9A;--ac:#C6553B;--bd:#E8E5E0;--ok:#15803D; }
+  @media (prefers-color-scheme: dark) { :root { --bg:#1C1C1E;--bg2:#2C2C2E;--bg3:#3A3A3C;--tx:#E5E5E5;--tx2:#A1A1A6;--tx3:#77777C;--ac:#E8734A;--bd:#3A3A3C;--ok:#4ADE80; } }
   *{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,"PingFang TC","Noto Sans TC",sans-serif}
-  body{background:var(--bg);color:var(--tx);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
-  .card{background:var(--bg2);border:1px solid var(--bd);border-radius:18px;max-width:420px;width:100%;padding:28px 24px;box-shadow:0 20px 50px -20px rgba(0,0,0,.25)}
-  .brand{font-size:13px;color:var(--ac);font-weight:700;letter-spacing:.5px;margin-bottom:4px}
-  h1{font-size:20px;margin-bottom:2px}
-  .kol{font-size:14px;color:var(--tx2);margin-bottom:20px}
-  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:18px}
-  .stats.top{grid-template-columns:repeat(2,1fr);margin-bottom:10px}
-  .stats.two{grid-template-columns:repeat(2,1fr)}
-  .stat .s{font-size:11px;color:var(--tx3);margin-top:4px;font-variant-numeric:tabular-nums}
-  .clicks .v{color:var(--ac)}
-  .click-help{display:flex;align-items:flex-start;gap:6px;font-size:12px;color:var(--tx2);line-height:1.6;margin:0 0 14px}
-  .click-help i{flex:none;margin-top:2px}
-  .stat{background:var(--bg);border:1px solid var(--bd);border-radius:12px;padding:14px 8px;text-align:center}
-  .stat .v{font-size:26px;font-weight:800;letter-spacing:-.5px}
-  .stat .l{font-size:12px;color:var(--tx2);margin-top:3px}
-  .paid .v{color:#16A34A}
-  .trial .v{color:#D946EF}
-  .note{font-size:12px;color:var(--tx3);line-height:1.7}
-  .err{color:#EF4444;font-size:14px;text-align:center;padding:20px 0}
+  body{background:var(--bg);color:var(--tx);min-height:100vh;padding:28px 16px 48px;line-height:1.5}
+  .page{max-width:600px;margin:0 auto}
+  .num{font-variant-numeric:tabular-nums}
+
+  /* 開頭 */
+  .brand{font-size:12px;color:var(--ac);font-weight:700;letter-spacing:.08em}
+  h1{font-size:24px;font-weight:800;letter-spacing:-.01em;margin-top:6px;line-height:1.25}
+  .kol{font-size:14px;color:var(--tx2);margin-top:4px}
+  .kol:empty{display:none}
+
+  /* 區塊 */
+  .sec{margin-top:28px}
+  .sec-h{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:10px}
+  .sec-h h2{font-size:15px;font-weight:700}
+  .sec-h span{font-size:12px;color:var(--tx3)}
+  .panel{background:var(--bg2);border:1px solid var(--bd);border-radius:16px;overflow:hidden}
+  .panel.pad{padding:16px}
+
+  /* 總覽 */
+  .tiles{display:grid;grid-template-columns:repeat(3,1fr)}
+  .tile{padding:16px 12px;text-align:center}
+  .tile + .tile{border-left:1px solid var(--bd)}
+  .tile .l{font-size:12px;color:var(--tx2)}
+  .tile .v{font-size:22px;font-weight:800;letter-spacing:-.02em;margin-top:6px;line-height:1.15}
+  .tile.main .v{color:var(--ok)}
+
+  /* 各 App：一個 App 一列，列與列用線分開 */
+  .app{padding:16px}
+  .app + .app{border-top:1px solid var(--bd)}
+  .app-top{display:flex;align-items:center;gap:8px}
+  .app-top b{font-size:16px;font-weight:700}
+  .chip{font-size:11.5px;color:var(--tx2);border:1px solid var(--bd);border-radius:6px;padding:2px 7px;white-space:nowrap}
+  .app-top .rate{margin-left:auto;font-size:12px;color:var(--tx3);white-space:nowrap}
+  .nums{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
+  .nums div{background:var(--bg);border:1px solid var(--bd);border-radius:10px;padding:10px 8px;text-align:center}
+  .nums .l{display:block;font-size:11.5px;color:var(--tx2)}
+  .nums .v{display:block;font-size:16px;font-weight:700;margin-top:4px}
+  .nums .v.zero{color:var(--tx3);font-weight:600}
+  .extra{margin-top:10px;font-size:12.5px;color:var(--tx2);line-height:1.7}
+  .extra b{color:var(--tx);font-weight:700}
+  .linkrow{display:flex;align-items:center;gap:8px;margin-top:12px}
+  .linkrow .url{flex:1;min-width:0;font-size:12.5px;color:var(--tx2);background:var(--bg);border:1px solid var(--bd);border-radius:9px;padding:9px 10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .btn{flex:none;font:inherit;font-size:13px;font-weight:700;padding:9px 14px;border:1px solid var(--bd);border-radius:9px;background:var(--bg2);color:var(--tx);cursor:pointer;white-space:nowrap}
+  .btn:hover{border-color:var(--tx3)}
+  .btn:focus-visible,.cta:focus-visible,summary:focus-visible,input:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
+  details.more{border-top:1px solid var(--bd)}
+  details.more > summary{list-style:none;cursor:pointer;padding:14px 16px;font-size:13.5px;font-weight:600;color:var(--tx2);display:flex;justify-content:space-between;align-items:center}
+  details.more > summary::-webkit-details-marker{display:none}
+  details.more > summary::after{content:"展開";font-size:12px;font-weight:500;color:var(--tx3)}
+  details.more[open] > summary::after{content:"收合"}
+  details.more[open] > summary{border-bottom:1px solid var(--bd)}
+
+  .note{font-size:12.5px;color:var(--tx2);line-height:1.75}
+  .note + .note{margin-top:6px}
+  .err{color:#DC2626;font-size:14px;text-align:center;padding:24px 0}
   .loading{color:var(--tx2);text-align:center;padding:30px 0}
-  .range-box{margin-top:18px;padding-top:16px;border-top:1px solid var(--bd)}
-  .range-title{font-size:14px;font-weight:700;margin-bottom:10px}
+
+  /* 期間查詢與明細 */
   .range-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
   .range-row input[type=date]{flex:1;min-width:120px;padding:9px 10px;border:1px solid var(--bd);border-radius:9px;background:var(--bg);color:var(--tx);font-size:14px}
   .range-row span{color:var(--tx2)}
@@ -38,141 +74,177 @@
   .range-row button:disabled{opacity:.5;cursor:not-allowed}
   .range-result{margin-top:12px;font-size:14px;color:var(--tx2);line-height:1.8;min-height:20px}
   .range-result b{color:var(--tx);font-size:17px}
-  .range-result .money{color:#16A34A}
+  .range-result .money{color:var(--ok)}
   .dlist{margin-top:12px;display:flex;flex-direction:column;gap:6px}
-  .drow{display:flex;align-items:center;gap:8px;font-size:12.5px;padding:8px 10px;background:var(--bg2);border-radius:8px}
+  .drow{display:flex;align-items:center;gap:8px;font-size:12.5px;padding:9px 10px;background:var(--bg);border:1px solid var(--bd);border-radius:9px}
   .drow .dp{font-weight:700;color:var(--tx)}
-  .drow .ds{color:var(--tx3);font-size:11px;background:var(--bg3);padding:1px 7px;border-radius:20px}
+  .drow .ds{color:var(--tx2);font-size:11px;background:var(--bg3);padding:1px 7px;border-radius:20px}
   .drow .dm{margin-left:auto;font-weight:700;font-variant-numeric:tabular-nums}
-  .drow .dm.money{color:#16A34A}
+  .drow .dm.money{color:var(--ok)}
   .drow .dx{font-size:11px;color:var(--tx2)}
   .drow .dd{color:var(--tx3);font-size:11px;min-width:34px;text-align:right}
   .drow.voided{opacity:.55}
   .drow.voided .dm{color:var(--tx3);text-decoration:line-through}
-  .drow.voided .dx{color:#EF4444}
+  .drow.voided .dx{color:#DC2626}
+  .pay{padding:12px 16px}
+  .pay + .pay{border-top:1px solid var(--bd)}
+  .pay-top{display:flex;align-items:baseline;gap:8px;font-size:13.5px}
+  .pay-top b{font-weight:700}
+  .pay-top .sub{color:var(--tx3);font-size:12px}
+  .pay-top .amt{margin-left:auto;font-weight:700;color:var(--ok)}
+  .cta{display:block;text-align:center;margin-top:28px;background:var(--ac);color:#fff;text-decoration:none;padding:15px;border-radius:12px;font-weight:700;font-size:15px}
+  @media (max-width:420px){ .tile .v{font-size:18px} .nums .v{font-size:15px} h1{font-size:22px} }
 </style>
 </head>
 <body>
-<div class="card">
-  <div class="brand">StayJP · 推薦成效</div>
+<div class="page">
+  <div class="brand">推薦成效</div>
   <h1 id="title">載入中…</h1>
   <div class="kol" id="kol"></div>
   <div id="body"><div class="loading">查詢中…</div></div>
 </div>
 <script>
   const FN = 'https://asia-east1-jpnote-1bdd6.cloudfunctions.net/kolStats';
+  const HQ = 'https://stayhq.getclockin.workers.dev/api/partner/stats';
   const q = new URLSearchParams(location.search);
   const code = (q.get('code') || '').toUpperCase();
   const t = q.get('t') || '';
   const title = document.getElementById('title');
   const kolEl = document.getElementById('kol');
   const body = document.getElementById('body');
+  const pad = n => (n < 10 ? '0' : '') + n;
+  const iso = dt => dt.getFullYear() + '-' + pad(dt.getMonth() + 1) + '-' + pad(dt.getDate());
+  const nt = n => 'NT$' + Math.round(Number(n) || 0).toLocaleString('en-US');
+  function esc(x){return String(x==null?"":x).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
+
+  // 2026-11-24 改版(Mia:各 App 要一清二楚):總覽 → 一個 App 一列(成交/本月/累計/連結) → 明細與領款。
+  // 主力五個直接列,其餘(還沒有成交的)收在「其他 App」;有成交就自動浮上來。
+  const TEACH = { stayjp:'日文', staykr:'韓文', staytw:'華語', pollytalk:'英文', stayth:'泰文', ajolito:'西班牙文', igelchen:'德文', coquelet:'法文', ruarua:'越南文' };
+  const MAIN = ['stayjp', 'staykr', 'staytw', 'pollytalk', 'stayth'];
+  let APPS = [];
+
   if (!code || !t) {
     title.textContent = '連結不完整';
     body.innerHTML = '<div class="err">這個查詢連結缺少參數,請使用主辦方提供的完整連結。</div>';
   } else {
-    fetch(FN + '?code=' + encodeURIComponent(code) + '&t=' + encodeURIComponent(t))
-      .then(r => r.json().then(d => ({ ok: r.ok, d })))
-      .then(({ ok, d }) => {
-        if (!ok || !d.ok) {
-          title.textContent = '查詢失敗';
-          body.innerHTML = '<div class="err">連結無效或已停用,請向主辦方確認。</div>';
-          return;
-        }
-        title.textContent = '推薦碼 ' + d.code;
-        kolEl.textContent = d.kol ? (d.kol + ' 的成效') : '';
-        const pad = n => (n < 10 ? '0' : '') + n;
-        const iso = dt => dt.getFullYear() + '-' + pad(dt.getMonth() + 1) + '-' + pad(dt.getDate());
-        const now = new Date();
-        const first = new Date(now.getFullYear(), now.getMonth(), 1);
-        body.innerHTML =
-          '<div class="stats top">' +
-            '<div class="stat clicks"><div class="v">' + (Number(d.clicks) || 0).toLocaleString() + '</div><div class="l"><i data-ic=target></i> 點擊次數</div>' +
-              '<div class="s">近 7 天 ' + (Number(d.clicks_7d) || 0) + '<br>近 30 天 ' + (Number(d.clicks_30d) || 0) + '</div></div>' +
-            '<div class="stat"><div class="v">' + d.total + '</div><div class="l"><i data-ic=user></i> 帶來人數</div></div>' +
-          '</div>' +
-          '<div class="click-help"><i data-ic=bulb></i><span>有人點你的連結就算一次（同一人 30 分鐘內只算一次）</span></div>' +
-          '<div class="stats two">' +
-            '<div class="stat paid"><div class="v">' + d.paid + '</div><div class="l">已付費</div></div>' +
-            '<div class="stat trial"><div class="v">' + d.trialing + '</div><div class="l">試用中</div></div>' +
-          '</div>' +
-          '<div class="note">「帶來人數」= 透過你的推薦碼註冊的人(含點你的連結後改到 App 註冊、系統自動配對到的人);「已付費」= 其中目前付費訂閱中(結算依據);「試用中」= 免費試用尚未轉付費。「點擊次數」從點擊統計上線後開始累計,比較早的點擊不會補算。數字即時更新。</div>' +
-          '<div class="range-box">' +
-            '<div class="range-title"><i data-ic=calendar></i> 期間查詢</div>' +
-            '<div class="range-row"><input type="date" id="rFrom" value="' + iso(first) + '"><span>~</span><input type="date" id="rTo" value="' + iso(now) + '"><button id="rBtn">查詢</button></div>' +
-            '<div id="rResult" class="range-result">選好日期,查這段期間的<b style="font-size:14px">成交筆數</b>與<b style="font-size:14px">分潤金額</b>。</div>' +
-          '</div>';
-        document.getElementById('rBtn').onclick = queryRange;
-        body.insertAdjacentHTML('beforeend', '<div id="otherApps"></div>');
-        loadOtherApps();
-        // 撥款紀錄:只顯示日期/金額/筆數(此頁無登入,不放帳號姓名)
-        var pos = d.payouts || [];
-        if (pos.length) {
-          body.insertAdjacentHTML('beforeend',
-            '<div class="range-box"><div class="range-title"><i data-ic=coin></i> 撥款紀錄</div><div class="dlist">' +
-            pos.map(function (p) {
-              var w = new Date(p.at);
-              var ds = w.getFullYear() + '/' + (w.getMonth() + 1) + '/' + w.getDate();
-              var sub = p.count + ' 筆分潤' + (p.clawback_twd ? ' · 已扣退款 NT$' + p.clawback_twd.toLocaleString() : '');
-              var pre = p.prepaid_twd ? '<div class="note" style="margin-top:4px">其中 ' + p.prepaid_count + ' 筆(NT$' + p.prepaid_twd.toLocaleString() + ')撥款時還在 30 天退款期內,已提前支付;若之後有用戶退款,該筆會在下次撥款時扣除,不需要另外退回。</div>' : '';
-              return '<div style="padding:10px;background:var(--bg2);border-radius:8px">' +
-                '<div style="display:flex;align-items:center;gap:8px;font-size:13px"><span class="dp" style="font-weight:700">' + ds + ' 已匯款</span><span class="ds" style="color:var(--tx3);font-size:11px">' + sub + '</span>' +
-                '<span style="margin-left:auto;font-weight:700;color:#16A34A;font-variant-numeric:tabular-nums">NT$' + p.net_twd.toLocaleString() + '</span></div>' + pre + '</div>';
-            }).join('') +
-            '</div><div class="note" style="margin-top:8px">已匯入你在領款申請填寫的帳戶,請查收。之後的領款只計算已過 30 天退款期的分潤。</div></div>');
-        }
-        body.insertAdjacentHTML('beforeend',
-          '<a href="kol-payout.html?code=' + encodeURIComponent(d.code) + '&t=' + encodeURIComponent(t) + '" ' +
-          'style="display:block;text-align:center;margin-top:18px;background:#C6553B;color:#fff;text-decoration:none;' +
-          'padding:15px;border-radius:12px;font-weight:700"><i data-ic=coin></i> 我要領款（線上簽署佣金協議）</a>' +
-          '<div class="note" style="margin-top:8px">領款需線上簽署佣金協議並填收款帳戶;送出後主辦方會核對金額轉帳。<b>單次領款建議 NT$20,000 以內</b>;單筆超過 NT$20,000 依法須預扣 10% 所得稅,建議分次跨月領。</div>');
-      })
-      .catch(() => {
-        title.textContent = '連線失敗';
-        body.innerHTML = '<div class="err">網路連線失敗,請稍後重新整理。</div>';
-      });
+    const now = new Date();
+    // StayJP:一次把全部期間的分潤明細拿回來(算累計與本月);其他 App 由總部統計(總部會回頭向 StayJP 驗這條連結)
+    const pJp = fetch(FN + '?code=' + encodeURIComponent(code) + '&t=' + encodeURIComponent(t) + '&from=2024-01-01&to=' + iso(now))
+      .then(r => r.json().then(d => ({ ok: r.ok, d })));
+    const pHq = fetch(HQ + '?c=' + encodeURIComponent(code) + '&t=' + encodeURIComponent(t))
+      .then(r => (r.ok ? r.json() : null)).catch(() => null);
+    Promise.all([pJp, pHq]).then(([jp, hq]) => {
+      if (!jp.ok || !jp.d.ok) {
+        title.textContent = '查詢失敗';
+        body.innerHTML = '<div class="err">連結無效或已停用,請向主辦方確認。</div>';
+        return;
+      }
+      render(jp.d, hq && hq.products ? hq : null, now);
+    }).catch(() => {
+      title.textContent = '連線失敗';
+      body.innerHTML = '<div class="err">網路連線失敗,請稍後重新整理。</div>';
+    });
   }
 
-  // 其他 App 的成效(2026-11-17):同一組推薦碼在 StayTW / StayKR / StayTH / BirdSpeak / Ajolito 也有效,
-// 成交與分潤由總部統計。用這頁原本的 code+t 去問總部(總部會回頭向 StayJP 驗這條連結),KOL 不用多拿一條連結。
-function loadOtherApps() {
-  var box = document.getElementById('otherApps'); if (!box) return;
-  fetch('https://stayhq.getclockin.workers.dev/api/partner/stats?c=' + encodeURIComponent(code) + '&t=' + encodeURIComponent(t))
-    .then(function (r) { return r.ok ? r.json() : null; })
-    .then(function (d) {
-      if (!d || !d.products) return;
-      var apps = d.products.filter(function (p) { return p.key !== 'stayjp'; });
-      if (!apps.length) return;
-      var nt = function (n) { return 'NT$' + (Number(n) || 0).toLocaleString(); };
-      var orders = apps.reduce(function (a, p) { return a + (p.orders || 0); }, 0);
-      var comm = apps.reduce(function (a, p) { return a + (p.commission || 0); }, 0);
-      var month = apps.reduce(function (a, p) { return a + (p.commission_month || 0); }, 0);
-      box.innerHTML = '<div class="range-box"><div class="range-title">其他 App 的成效</div>' +
-        '<div class="note" style="margin-bottom:12px">你的推薦碼 <b>' + esc(d.code) + '</b> 在下面這些 App 也有效。把各自的連結放進貼文，成交一樣會算給你。</div>' +
-        '<div class="stats two"><div class="stat paid"><div class="v">' + orders + '</div><div class="l">成交筆數</div></div>' +
-        '<div class="stat"><div class="v" style="font-size:22px">' + nt(comm) + '</div><div class="l">累計分潤</div><div class="s">本月 ' + nt(month) + '</div></div></div>' +
-        '<div class="dlist">' + apps.map(function (p, i) {
-          return '<div style="padding:12px;background:var(--bg);border:1px solid var(--bd);border-radius:10px">' +
-            '<div style="display:flex;align-items:baseline;gap:8px"><b style="font-size:14px">' + esc(p.name) + '</b>' +
-            '<span style="margin-left:auto;font-size:12.5px;color:var(--tx2);font-variant-numeric:tabular-nums">' + (p.orders || 0) + ' 筆 · ' + nt(p.commission) + '</span></div>' +
-            '<div style="display:flex;align-items:center;gap:8px;margin-top:8px"><span style="flex:1;min-width:0;font-size:12px;color:var(--tx2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + esc(p.link) + '</span>' +
-            '<button type="button" data-oa="' + i + '" style="flex:none;font:inherit;font-size:12px;font-weight:700;padding:6px 12px;border:1px solid var(--bd);border-radius:8px;background:var(--bg2);color:var(--tx);cursor:pointer">複製連結</button></div></div>';
-        }).join('') + '</div>' +
-        ((d.recent || []).filter(function (e) { return e.product !== 'StayJP'; }).length
-          ? '<div class="note" style="margin:14px 0 6px">最近成交</div><div class="dlist">' + d.recent.filter(function (e) { return e.product !== 'StayJP'; }).slice(0, 10).map(function (e) {
-              return '<div class="drow"><span>' + esc(e.ts) + '</span><span style="color:var(--tx2)">' + esc(e.product) + (e.type === 'refund' ? '（退款）' : '') + '</span><span style="margin-left:auto;font-weight:700;font-variant-numeric:tabular-nums">' + nt(e.commission) + '</span></div>';
-            }).join('') + '</div>' : '') +
-        '<div class="note" style="margin-top:10px">分潤以扣掉平台手續費後的金額計算；付款後 30 天內退款會作廢。這些 App 的分潤會跟 StayJP 的一起領：過了 30 天退款期，就會算進下面「我要領款」的可領金額，不用另外申請。</div></div>';
-      box.querySelectorAll('button[data-oa]').forEach(function (b) {
-        b.onclick = function () {
-          var link = apps[+b.getAttribute('data-oa')].link;
-          var done = function () { b.textContent = '已複製'; setTimeout(function () { b.textContent = '複製連結'; }, 1500); };
-          if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(link).then(done).catch(function () {});
-        };
-      });
-    }).catch(function () {});
-}
-function esc(x){return String(x==null?"":x).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+  function render(d, hq, now) {
+    title.textContent = '推薦碼 ' + d.code;
+    kolEl.textContent = d.kol ? (d.kol + ' 的成效') : '';
+    const first = new Date(now.getFullYear(), now.getMonth(), 1);
+    const ym = now.getFullYear() + '-' + pad(now.getMonth() + 1);
+
+    // StayJP 的數字以 StayJP 自己的明細為準(總部那份一天才同步一次)
+    const rg = d.range || { conversions: 0, commission_twd: 0, rows: [] };
+    const jpMonth = (rg.rows || []).reduce((a, r) => {
+      const w = new Date(r.at);
+      return a + (!r.voided && (w.getFullYear() + '-' + pad(w.getMonth() + 1)) === ym ? (Number(r.amount) || 0) : 0);
+    }, 0);
+    const hqMap = {}; (hq ? hq.products : []).forEach(p => { hqMap[p.key] = p; });
+    const jpHq = hqMap.stayjp || {};
+    APPS = [{ key: 'stayjp', name: 'StayJP', link: jpHq.link || ('https://stayjp.study/?ref=' + encodeURIComponent(d.code)),
+      rate: d.commission_pct != null ? d.commission_pct : jpHq.rate_pct, orders: rg.conversions || 0, month: jpMonth, total: rg.commission_twd || 0, jp: true }]
+      .concat((hq ? hq.products : []).filter(p => p.key !== 'stayjp').map(p => ({ key: p.key, name: p.name, link: p.link, rate: p.rate_pct,
+        orders: p.orders || 0, month: p.commission_month || 0, total: p.commission || 0 })));
+    const sum = k => APPS.reduce((a, p) => a + (Number(p[k]) || 0), 0);
+    const shown = APPS.filter(p => MAIN.indexOf(p.key) >= 0 || p.orders > 0 || p.total !== 0)
+      .sort((a, b) => (MAIN.indexOf(a.key) < 0 ? 99 : MAIN.indexOf(a.key)) - (MAIN.indexOf(b.key) < 0 ? 99 : MAIN.indexOf(b.key)));
+    const rest = APPS.filter(p => shown.indexOf(p) < 0);
+
+    const appHtml = p => {
+      const i = APPS.indexOf(p);
+      const v = (txt, zero) => '<span class="v num' + (zero ? ' zero' : '') + '">' + txt + '</span>';
+      return '<div class="app">' +
+        '<div class="app-top"><b>' + esc(p.name) + '</b>' + (TEACH[p.key] ? '<span class="chip">' + TEACH[p.key] + '</span>' : '') +
+          (p.rate != null ? '<span class="rate">分潤 ' + esc(p.rate) + '%</span>' : '') + '</div>' +
+        '<div class="nums">' +
+          '<div><span class="l">成交</span>' + v(p.orders + ' 筆', !p.orders) + '</div>' +
+          '<div><span class="l">本月分潤</span>' + v(nt(p.month), !p.month) + '</div>' +
+          '<div><span class="l">累計分潤</span>' + v(nt(p.total), !p.total) + '</div>' +
+        '</div>' +
+        (p.jp ? '<div class="extra num">連結點擊 <b>' + (Number(d.clicks) || 0).toLocaleString() + '</b> 次（近 7 天 ' + (Number(d.clicks_7d) || 0) + '、近 30 天 ' + (Number(d.clicks_30d) || 0) + '）<br>' +
+          '用你的碼註冊 <b>' + d.total + '</b> 人・目前付費中 <b>' + d.paid + '</b> 人・試用中 <b>' + d.trialing + '</b> 人</div>' : '') +
+        '<div class="linkrow"><span class="url">' + esc(p.link) + '</span><button type="button" class="btn" data-copy="' + i + '">複製連結</button></div>' +
+      '</div>';
+    };
+
+    const otherRecent = hq ? (hq.recent || []).filter(e => e.product !== 'StayJP').slice(0, 10) : [];
+    const pos = d.payouts || [];
+
+    body.innerHTML =
+      '<section class="sec"><div class="sec-h"><h2>總覽</h2><span>所有 App 加總</span></div>' +
+        '<div class="panel tiles">' +
+          '<div class="tile main"><div class="l">本月分潤</div><div class="v num">' + nt(sum('month')) + '</div></div>' +
+          '<div class="tile"><div class="l">累計分潤</div><div class="v num">' + nt(sum('total')) + '</div></div>' +
+          '<div class="tile"><div class="l">累計成交</div><div class="v num">' + sum('orders') + ' 筆</div></div>' +
+        '</div></section>' +
+
+      '<section class="sec"><div class="sec-h"><h2>各 App 成效與連結</h2><span>同一組碼 ' + esc(d.code) + '</span></div>' +
+        '<div class="panel">' + shown.map(appHtml).join('') +
+          (rest.length ? '<details class="more"><summary>其他 ' + rest.length + ' 個 App（' + rest.map(p => esc(TEACH[p.key] || p.name)).join('、') + '）</summary>' + rest.map(appHtml).join('') + '</details>' : '') +
+        '</div>' +
+        (hq ? '' : '<div class="note" style="margin-top:8px">其他 App 的數字暫時讀不到，請稍後重新整理。</div>') +
+        '<div class="note" style="margin-top:10px">每個 App 用自己的連結。讀者從連結進來就會自動帶上你的碼，年費和終身方案都是 9 折。</div></section>' +
+
+      '<section class="sec"><div class="sec-h"><h2>StayJP 期間查詢</h2><span>逐筆明細</span></div>' +
+        '<div class="panel pad">' +
+          '<div class="range-row"><input type="date" id="rFrom" aria-label="起始日" value="' + iso(first) + '"><span>~</span><input type="date" id="rTo" aria-label="結束日" value="' + iso(now) + '"><button id="rBtn">查詢</button></div>' +
+          '<div id="rResult" class="range-result">選好日期，查這段期間 StayJP 的成交筆數與分潤金額。</div>' +
+        '</div></section>' +
+
+      (otherRecent.length ? '<section class="sec"><div class="sec-h"><h2>其他 App 最近成交</h2><span>最近 ' + otherRecent.length + ' 筆</span></div><div class="dlist" style="margin-top:0">' +
+        otherRecent.map(e => '<div class="drow"><span class="dp">' + esc(e.product) + '</span>' + (e.type === 'refund' ? '<span class="dx">退款</span>' : e.type === 'void' ? '<span class="dx">作廢</span>' : '') +
+          '<span class="dm' + (e.type === 'paid' ? ' money' : '') + '">' + nt(e.commission) + '</span><span class="dd" style="min-width:74px">' + esc(e.ts) + '</span></div>').join('') + '</div></section>' : '') +
+
+      // 撥款紀錄:只顯示日期/金額/筆數(此頁無登入,不放帳號姓名)
+      (pos.length ? '<section class="sec"><div class="sec-h"><h2>撥款紀錄</h2><span>已匯入你填的收款帳戶</span></div><div class="panel">' +
+        pos.map(p => {
+          const w = new Date(p.at);
+          const ds = w.getFullYear() + '/' + (w.getMonth() + 1) + '/' + w.getDate();
+          const sub = p.count + ' 筆分潤' + (p.clawback_twd ? '・已扣退款 NT$' + p.clawback_twd.toLocaleString() : '');
+          const pre = p.prepaid_twd ? '<div class="note" style="margin-top:6px">其中 ' + p.prepaid_count + ' 筆（NT$' + p.prepaid_twd.toLocaleString() + '）撥款時還在 30 天退款期內，已提前支付；之後若有用戶退款，會在下次撥款時扣除，不需要另外退回。</div>' : '';
+          return '<div class="pay"><div class="pay-top"><b>' + ds + ' 已匯款</b><span class="sub">' + sub + '</span><span class="amt num">NT$' + p.net_twd.toLocaleString() + '</span></div>' + pre + '</div>';
+        }).join('') + '</div></section>' : '') +
+
+      '<a class="cta" href="kol-payout.html?code=' + encodeURIComponent(d.code) + '&t=' + encodeURIComponent(t) + '">我要領款（線上簽署佣金協議）</a>' +
+
+      '<section class="sec"><div class="sec-h"><h2>怎麼算</h2></div><div class="panel pad">' +
+        '<div class="note">・只算讀者第一次真的付款，免費試用和之後的續訂不算。退費的那筆不計入。</div>' +
+        '<div class="note">・分潤以扣掉平台手續費後的金額計算，App 內購與網頁的比例不同；金額為預估，實際以結算為準。</div>' +
+        '<div class="note">・所有 App 的分潤一起領：過了 30 天退款期，就會算進可領金額，不用分開申請。</div>' +
+        '<div class="note">・領款要線上簽署佣金協議並填收款帳戶。單次領款建議 NT$20,000 以內，超過依法須預扣 10% 所得稅，可以分次跨月領。</div>' +
+        '<div class="note">・連結點擊：同一人 30 分鐘內只算一次，從點擊統計上線後開始累計。StayJP 的數字即時更新，其他 App 每天更新一次。</div>' +
+      '</div></section>';
+
+    document.getElementById('rBtn').onclick = queryRange;
+    body.querySelectorAll('button[data-copy]').forEach(b => {
+      b.onclick = () => {
+        const link = APPS[+b.getAttribute('data-copy')].link;
+        const done = txt => { b.textContent = txt; setTimeout(() => { b.textContent = '複製連結'; }, 1600); };
+        if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(link).then(() => done('已複製')).catch(() => done('請長按連結複製'));
+        else done('請長按連結複製');
+      };
+    });
+  }
+
   function queryRange() {
     const btn = document.getElementById('rBtn');
     const res = document.getElementById('rResult');
