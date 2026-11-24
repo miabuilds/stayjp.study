@@ -13,7 +13,7 @@ import { db } from "./utils/firestore";
 
 if (admin.apps.length === 0) admin.initializeApp();
 
-const OWNER_EMAILS = new Set(["stayjpplan@gmail.com", "abc83327@gmail.com"]);
+export const OWNER_EMAILS = new Set(["stayjpplan@gmail.com", "abc83327@gmail.com"]);
 
 export const adminUserStats = functions.onRequest(
   {

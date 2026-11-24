@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>推播發送</title>
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<style>
+:root{--bg:#FAF8F3;--bg2:#FFF;--tx:#1C1C1E;--tx2:#6A6A6A;--tx3:#A9A9A9;--ac:#B8362A;--bd:#E5DECF;--line:#DDD5C0;--ok:#2F7A5D;--serif:"Hiragino Mincho ProN","Songti TC",serif}
+[data-theme="dark"]{--bg:#121113;--bg2:#1B1A1C;--tx:#EDE8DE;--tx2:#8F8A7E;--tx3:#5D5A53;--ac:#E4715F;--bd:#2C2A27;--line:#2C2A27;--ok:#4C9B7A}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,"Hiragino Sans","PingFang TC",sans-serif;background:var(--bg);color:var(--tx);line-height:1.7;font-size:15px}
+.wrap{max-width:760px;margin:0 auto;padding:36px 24px 90px}
+h1{font-family:var(--serif);font-size:24px;margin-bottom:6px}
+h2{font-size:16px;font-weight:700;margin:34px 0 12px}
+.sub{color:var(--tx2);font-size:13.5px;margin-bottom:8px}
+.back{display:inline-block;font-size:13px;color:var(--tx2);margin-bottom:14px;text-decoration:none}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px}
+.card{background:var(--bg2);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+.card b{font-family:var(--serif);font-size:26px;display:block;line-height:1.2}
+.card span{font-size:12px;color:var(--tx3)}
+.box{background:var(--bg2);border:1px solid var(--line);border-radius:14px;padding:16px 18px;margin-bottom:12px}
+.box-h{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
+.box-h b{font-size:14px}
+.box-h span{font-size:12px;color:var(--tx3)}
+label.f{display:block;font-size:12px;color:var(--tx2);margin:10px 0 4px}
+input.t,textarea.t,select.t{width:100%;border:1px solid var(--bd);background:var(--bg);color:var(--tx);border-radius:10px;padding:10px 12px;font:inherit;font-size:14.5px}
+textarea.t{min-height:64px;resize:vertical;line-height:1.55}
+.cnt{font-size:11.5px;color:var(--tx3);text-align:right;margin-top:3px}
+.cnt.over{color:var(--ac);font-weight:700}
+.row{display:flex;gap:12px;flex-wrap:wrap;margin-top:18px}
+.btn{background:var(--tx);color:var(--bg);border:none;border-radius:999px;padding:12px 26px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit}
+.btn.ghost{background:transparent;color:var(--tx);border:1px solid var(--bd)}
+.btn.danger{background:var(--ac);color:#fff}
+.btn:disabled{opacity:.45;cursor:default}
+.note{font-size:12.5px;color:var(--tx2);margin-top:10px;line-height:1.65}
+.msg{margin-top:14px;padding:12px 14px;border-radius:10px;font-size:13.5px;border:1px solid var(--line);background:var(--bg2);display:none}
+.msg.show{display:block}
+.msg.ok{border-color:var(--ok);color:var(--ok)}
+.msg.err{border-color:var(--ac);color:var(--ac)}
+.log{border:1px solid var(--line);border-radius:12px;background:var(--bg2);overflow:hidden}
+.log-i{padding:12px 16px;border-bottom:1px solid var(--line)}
+.log-i:last-child{border-bottom:0}
+.log-t{font-size:12px;color:var(--tx3);margin-bottom:3px}
+.log-b{font-size:14px;word-break:break-word}
+.muted{color:var(--tx3);font-size:13px}
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;padding:20px;z-index:50}
+.ov.show{display:flex}
+.dlg{background:var(--bg2);border-radius:16px;padding:22px 22px 18px;max-width:420px;width:100%}
+.dlg h3{font-size:17px;margin-bottom:10px}
+.dlg p{font-size:14px;color:var(--tx2);margin-bottom:8px}
+.dlg .pv{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:13.5px;margin:10px 0;max-height:220px;overflow:auto}
+.dlg .pv div{padding:6px 0;border-bottom:1px solid var(--line)}
+.dlg .pv div:last-child{border-bottom:0}
+.dlg .row{justify-content:flex-end;margin-top:14px}
+@media(max-width:640px){.wrap{padding:22px 14px 90px}h1{font-size:21px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="admin.html">← 回後台</a>
+  <h1 id="ttl">推播發送</h1>
+  <p class="sub">發一則通知給所有開了通知的 App 使用者。每支手機會收到它自己介面語言的那一則。</p>
+  <div id="gate" class="msg err"></div>
+
+  <div id="main" style="display:none">
+    <h2>目前收得到的裝置</h2>
+    <div class="cards" id="cards"></div>
+
+    <h2>內容</h2>
+    <div id="langs"></div>
+    <div class="box">
+      <label class="f" style="margin-top:0">沒有填的語言，改發哪一種</label>
+      <select class="t" id="fallback"></select>
+      <label class="f">點通知後打開的頁面（選填，只能填本站網址）</label>
+      <input class="t" id="link" placeholder="">
+    </div>
+
+    <div class="row">
+      <button class="btn ghost" id="btnTest" onclick="PUSH.test()">先發給我自己</button>
+      <button class="btn danger" id="btnSend" onclick="PUSH.ask()" disabled>發給所有人</button>
+    </div>
+    <p class="note" id="hint"></p>
+    <div id="out" class="msg"></div>
+
+    <h2>發送紀錄</h2>
+    <div class="log" id="log"></div>
+  </div>
+</div>
+
+<div class="ov" id="ov">
+  <div class="dlg">
+    <h3 id="dlgT"></h3>
+    <p id="dlgP"></p>
+    <div class="pv" id="dlgPv"></div>
+    <div class="row">
+      <button class="btn ghost" onclick="PUSH.close()">取消</button>
+      <button class="btn danger" id="dlgGo" onclick="PUSH.send()">確定發送</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script>
+const fbConfig = { apiKey:"AIzaSyDnmg2XOuvwgE8m8xCF5sS4o0nQYoUplPI", authDomain:"jpnote-1bdd6.firebaseapp.com", projectId:"jpnote-1bdd6", storageBucket:"jpnote-1bdd6.firebasestorage.app", messagingSenderId:"666368174384" };
+if (!firebase.apps.length) firebase.initializeApp(fbConfig);
+// ── 各站只改這一段 ──
+const CFG = {
+  brand: "StayJP",
+  themeKey: "theme",
+  site: "https://stayjp.study/",
+  fn: "https://asia-east1-jpnote-1bdd6.cloudfunctions.net/",
+  langs: [["zh-TW", "繁體中文"], ["zh-CN", "簡體中文（沒填會用繁體那則）"], ["en", "英文"], ["ko", "韓文"], ["vi", "越南文"], ["id", "印尼文"], ["th", "泰文"]],
+  fallback: "zh-TW",
+};
+const PATHS = { "/api/admin/push/stats": "adminPushStats", "/api/admin/push/send": "adminPushSend" };
+const TITLE_MAX = 40, BODY_MAX = 120;   // 通知在鎖定畫面大約顯示得完的長度
+
+(function(){const s=localStorage.getItem(CFG.themeKey);if(s==="dark"||(!s&&matchMedia("(prefers-color-scheme: dark)").matches))document.documentElement.dataset.theme="dark";})();
+function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+let FBUSER=null;
+function tok(){return FBUSER?"1":"";}
+async function call(path,body){
+  const t=await FBUSER.getIdToken();
+  const r=await fetch(CFG.fn+PATHS[path],{method:body?"POST":"GET",headers:Object.assign({Authorization:"Bearer "+t},body?{"Content-Type":"application/json"}:{}),body:body?JSON.stringify(body):undefined});
+  const d=await r.json().catch(()=>({}));
+  if(r.status===401) throw new Error("unauthorized");
+  return {status:r.status,d};
+}
+
+const PUSH=(()=>{
+  let total=0, adminDevices=0, tested="";   // tested = 已經發給自己看過的那份內容
+  function collect(){
+    const messages={};
+    CFG.langs.forEach(([k])=>{
+      const t=document.getElementById("t-"+k).value.trim(), b=document.getElementById("b-"+k).value.trim();
+      if(b) messages[k]={title:t,body:b};
+    });
+    return {messages, fallback:document.getElementById("fallback").value, url:document.getElementById("link").value.trim()};
+  }
+  function problems(p){
+    const ks=Object.keys(p.messages);
+    if(!ks.length) return "至少要填一種語言的內文";
+    if(!p.messages[p.fallback]) return "「沒有填的語言改發哪一種」選的那個語言還沒填內文";
+    for(const k of ks){ if(p.messages[k].title.length>TITLE_MAX||p.messages[k].body.length>BODY_MAX) return "有內容超過長度上限"; }
+    if(p.url && !p.url.startsWith(CFG.site)) return "連結只能填 "+CFG.site+" 開頭的網址";
+    return "";
+  }
+  function show(kind,text){const o=document.getElementById("out");o.className="msg show "+kind;o.textContent=text;}
+  function refresh(){
+    const p=collect(), same=JSON.stringify(p)===tested;
+    document.getElementById("btnSend").disabled=!same;
+    document.getElementById("hint").textContent = adminDevices
+      ? (same ? "已經發給你自己了，確認手機上看起來沒問題再按「發給所有人」。" : "要先按「先發給我自己」，在手機上看過實際樣子，才能發給所有人。內容改過要重新測一次。")
+      : "還沒有你自己的裝置：用管理員帳號登入 App 並開啟通知，重開 App 一次後再回來這頁。";
+    document.getElementById("btnTest").disabled=!adminDevices;
+  }
+  function count(el,max){const c=el.parentNode.querySelector(".cnt");c.textContent=el.value.length+" / "+max;c.classList.toggle("over",el.value.length>max);refresh();}
+  async function load(){
+    const gate=document.getElementById("gate");
+    if(!tok()){gate.className="msg err show";gate.innerHTML='還沒登入。<button class="btn" style="margin-left:10px;padding:8px 18px" onclick="PUSH.login()">用 Google 登入</button>';document.getElementById("main").style.display="none";return;}
+    let r; try{ r=await call("/api/admin/push/stats"); }catch(e){gate.className="msg err show";gate.textContent=e.message==="unauthorized"?"登入過期，請重新整理頁面。":"載入失敗："+e.message;return;}
+    if(r.status===403){gate.className="msg err show";gate.textContent="這個帳號不是管理員。";return;}
+    if(r.status!==200){gate.className="msg err show";gate.textContent="載入失敗（"+r.status+"）。後端可能還沒部署推播功能。";return;}
+    gate.className="msg"; document.getElementById("main").style.display="";
+    const by={}; total=0; (r.d.byLang||[]).forEach(x=>{by[x.lang||"?"]=(by[x.lang||"?"]||0)+x.n; total+=x.n;});
+    adminDevices=r.d.adminDevices||0;
+    const ios=(r.d.byLang||[]).filter(x=>x.platform==="ios").reduce((a,x)=>a+x.n,0);
+    document.getElementById("cards").innerHTML=
+      `<div class="card"><b>${total}</b><span>全部裝置</span></div><div class="card"><b>${ios}</b><span>iPhone</span></div><div class="card"><b>${total-ios}</b><span>Android</span></div>`+
+      Object.keys(by).sort((a,b)=>by[b]-by[a]).map(k=>`<div class="card"><b>${by[k]}</b><span>${esc(k)}</span></div>`).join("");
+    document.getElementById("log").innerHTML=(r.d.log||[]).map(x=>{
+      let first=""; try{const m=JSON.parse(x.payload)[0];const k=Object.keys(m)[0];first=(m[k].title?m[k].title+"｜":"")+m[k].body+(Object.keys(m).length>1?"（共 "+Object.keys(m).length+" 種語言）":"");}catch(e){first=x.payload;}
+      return `<div class="log-i"><div class="log-t">${esc(new Date(x.ts).toLocaleString("zh-TW",{hour12:false}))}　送達 ${x.sent}・失敗 ${x.failed}・已移除 App ${x.removed}</div><div class="log-b">${esc(first)}</div></div>`;
+    }).join("")||'<div class="log-i muted">還沒有發過</div>';
+    refresh();
+  }
+  async function test(){
+    const p=collect(), bad=problems(p); if(bad){show("err",bad);return;}
+    document.getElementById("btnTest").disabled=true;
+    try{
+      const r=await call("/api/admin/push/send",Object.assign({only_admin:true},p));
+      if(r.status===200&&r.d.sent>0){tested=JSON.stringify(p);show("ok","已發到你的 "+r.d.sent+" 支裝置，看一下手機。");}
+      else show("err","沒有發成功（送達 "+((r.d&&r.d.sent)||0)+"、失敗 "+((r.d&&r.d.failed)||0)+"）。"+((r.d&&r.d.error)||""));
+    }catch(e){show("err","發送失敗："+e.message);}
+    refresh();
+  }
+  function ask(){
+    const p=collect(), bad=problems(p); if(bad){show("err",bad);return;}
+    document.getElementById("dlgT").textContent="確定要發給所有人嗎？";
+    document.getElementById("dlgP").textContent="會發給 "+total+" 支裝置，發出去就收不回來。";
+    document.getElementById("dlgPv").innerHTML=Object.keys(p.messages).map(k=>`<div><b>${esc(k)}</b>　${esc(p.messages[k].title)}<br>${esc(p.messages[k].body)}</div>`).join("");
+    document.getElementById("ov").classList.add("show");
+  }
+  function close(){document.getElementById("ov").classList.remove("show");}
+  async function send(){
+    const p=collect(); const go=document.getElementById("dlgGo"); go.disabled=true;
+    let sent=0, failed=0, removed=0, after="", err="";
+    try{
+      for(let i=0;i<50;i++){
+        const r=await call("/api/admin/push/send",Object.assign({},p,after?{after}:{}));
+        if(r.status!==200){err=r.status===409?"這一則 10 分鐘內已經發過了，沒有重發。":"發送失敗（"+r.status+"）";break;}
+        sent+=r.d.sent; failed+=r.d.failed; removed+=r.d.removed;
+        if(!r.d.next) break; after=r.d.next;
+      }
+    }catch(e){err="發送中斷："+e.message;}
+    go.disabled=false; close(); tested="";
+    show(err&&!sent?"err":"ok",(err?err+" ":"")+"送達 "+sent+" 支、失敗 "+failed+" 支"+(removed?"（其中 "+removed+" 支已移除 App，名單已清掉）":"")+"。");
+    load();
+  }
+  function login(){const p=new firebase.auth.GoogleAuthProvider();p.setCustomParameters({prompt:"select_account"});firebase.auth().signInWithPopup(p).catch(e=>{if(!/popup-closed|cancelled-popup/.test(e.code||"")){const g=document.getElementById("gate");g.className="msg err show";g.textContent="登入失敗："+e.message;}});}
+  function init(){
+    document.getElementById("ttl").textContent=CFG.brand+" 推播發送";
+    document.getElementById("link").placeholder=CFG.site;
+    document.getElementById("langs").innerHTML=CFG.langs.map(([k,n])=>`<div class="box"><div class="box-h"><b>${esc(n)}</b><span>${esc(k)}</span></div>
+      <label class="f" style="margin-top:0">標題</label><div><input class="t" id="t-${k}" value="${esc(CFG.brand)}" oninput="PUSH.count(this,${TITLE_MAX})"><div class="cnt"></div></div>
+      <label class="f">內文</label><div><textarea class="t" id="b-${k}" oninput="PUSH.count(this,${BODY_MAX})"></textarea><div class="cnt"></div></div></div>`).join("");
+    document.getElementById("fallback").innerHTML=CFG.langs.map(([k,n])=>`<option value="${k}" ${k===CFG.fallback?"selected":""}>${esc(n)}</option>`).join("");
+    document.getElementById("fallback").onchange=refresh; document.getElementById("link").oninput=refresh;
+    CFG.langs.forEach(([k])=>{count(document.getElementById("t-"+k),TITLE_MAX);count(document.getElementById("b-"+k),BODY_MAX);});
+    firebase.auth().onAuthStateChanged(u=>{FBUSER=u||null;load();});
+  }
+  return {init,test,ask,close,send,count,login};
+})();
+window.PUSH=PUSH;
+PUSH.init();
+</script>
+</body>
+</html>
