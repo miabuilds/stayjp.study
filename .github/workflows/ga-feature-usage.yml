@@ -1,0 +1,24 @@
+name: GA feature usage (manual)
+
+# 手動跑:近 N 天各頁面/事件使用人數,判斷哪些功能沒人用。只印彙總數字。
+on:
+  workflow_dispatch:
+    inputs:
+      days: { description: '天數', default: '30' }
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '22' }
+      - name: Report
+        env:
+          OAUTH_CLIENT_ID: ${{ secrets.OAUTH_CLIENT_ID }}
+          OAUTH_CLIENT_SECRET: ${{ secrets.OAUTH_CLIENT_SECRET }}
+          OAUTH_REFRESH_TOKEN: ${{ secrets.OAUTH_REFRESH_TOKEN }}
+          GA4_PROPERTY_ID: ${{ secrets.GA4_PROPERTY_ID }}
+          DAYS: ${{ github.event.inputs.days }}
+        run: node scripts/ga-feature-usage.mjs "${DAYS:-30}"
