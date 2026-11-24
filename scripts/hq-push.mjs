@@ -25,21 +25,34 @@ for (const d of (await db.collection('transactions').get()).docs) {
 for (const d of (await db.collection('trial_used').get()).docs) { const ms = toMs(d.data().started_at); if (ms >= since) D(dayTW(ms)).trial_n++; }
 // 新帳號:users 文件沒有建立時間,改讀 Firebase Auth 的 creationTime(分頁 1000 筆,最多 30 頁);順便建 uid→信箱 給家族價名單用
 const emailOf = {};
+const created = [];   // 每個帳號的建立時間 → 算「到那天為止的註冊總數」
 let authOk = true;   // listUsers 沒權限時 → 新帳號/家族價不送(null),總部保留上次的值,不會被 0 蓋掉
 try {
   let token; for (let i = 0; i < 30; i++) {
     const page = await admin.auth().listUsers(1000, token);
-    for (const u of page.users) { const ms = Date.parse(u.metadata.creationTime || ''); if (ms >= since) D(dayTW(ms)).new_users++; if (u.email) emailOf[u.uid] = u.email; }
+    for (const u of page.users) { const ms = Date.parse(u.metadata.creationTime || ''); if (ms >= since) D(dayTW(ms)).new_users++; if (u.email) emailOf[u.uid] = u.email; created.push(ms || 0); }
     token = page.pageToken; if (!token) break;
   }
 } catch (e) { authOk = false; console.error('listUsers 失敗(新帳號/家族價這次不送,保留總部舊值):', e.message.slice(0, 160)); }
 // 家族價名單:真的付過錢的用戶(subscription 有效或買斷、非贈送、非沙盒)→ sha256(小寫信箱)。其他 App 登入時查總部給家族價
 const family = [];
 const now = Date.now();
-for (const d of (await db.collection('users').select('subscription').get()).docs) {
-  const sub = d.data().subscription; if (!sub || sub.is_gift || sub.is_sandbox) continue;
+// 用戶活躍(2026-11-24 Mia:總覽要看 DAU/MAU):同一次讀取多拿 study_log(不多花讀取數)。
+//   活躍 = 當天 study_log 有紀錄(真的有做題/背單字;只有連勝救星 freeze 的不算),所以只算登入用戶,跟 GA 的瀏覽人數不是同一群。
+const actByDay = {};   // 台灣日期 → Set(uid)
+const snap = { paid: 0, lifetime: 0, gift: 0 };
+for (const d of (await db.collection('users').select('subscription', 'study_log').get()).docs) {
+  const sl = d.data().study_log;
+  if (sl && typeof sl === 'object' && !Array.isArray(sl)) for (const k of Object.keys(sl)) {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(k)) continue;
+    const v = sl[k]; if (v && typeof v === 'object' && v.freeze && Object.keys(v).length === 1) continue;
+    (actByDay[k] ||= new Set()).add(d.id);
+  }
+  const sub = d.data().subscription; if (!sub || sub.is_sandbox) continue;
   const paid = ['active', 'cancelled'].includes(sub.status) && (sub.plan === 'lifetime' || toMs(sub.expiresAt) > now || sub.source === 'group');
   if (!paid) continue;
+  if (sub.is_gift) { snap.gift++; continue; }
+  snap.paid++; if (sub.plan === 'lifetime') snap.lifetime++;
   const em = (emailOf[d.id] || '').trim().toLowerCase(); if (!em) continue;
   family.push({ h: createHash('sha256').update(em).digest('hex'), since: sub.startedAt ? new Date(toMs(sub.startedAt)).toISOString().slice(0, 19).replace('T', ' ') : '' });
 }
@@ -88,6 +101,17 @@ try {
     feedback.push({ ext_id: 'fb:' + d.id, ts: ms ? new Date(ms).toISOString().slice(0, 19).replace('T', ' ') : '', type: (f.type || '') + (st !== 'new' ? '·' + st : ''), message: String(f.message || '').slice(0, 240), page: '意見表單' });
   }
 } catch (e) { console.error('feedback 讀取失敗:', e.message); }
+{
+  const todayK = dayTW(Date.now()); created.sort((x, y) => x - y);
+  const uniq = (endMs, n) => { const s = new Set(); for (let i = 0; i < n; i++) for (const u of actByDay[dayTW(endMs - i * 864e5)] || []) s.add(u); return s.size; };
+  for (let ms = since + 1; dayTW(ms) <= todayK; ms += 864e5) {
+    const k = dayTW(ms); const x = D(k);
+    const act = { dau: (actByDay[k] || new Set()).size, wau: uniq(ms, 7), mau: uniq(ms, 30) };
+    if (authOk) { const end = since + (Math.round((ms - since) / 864e5) + 1) * 864e5; let lo = 0, hi = created.length; while (lo < hi) { const m = (lo + hi) >> 1; created[m] < end ? (lo = m + 1) : (hi = m); } act.total = lo; }
+    x.extra.act = act;
+    if (k === todayK) x.extra.snap = snap;
+  }
+}
 const rows = Object.values(days).sort((a, b) => (a.day < b.day ? -1 : 1)).map((r) => ({
   ...r,
   new_users: authOk ? r.new_users : null,
@@ -95,7 +119,7 @@ const rows = Object.values(days).sort((a, b) => (a.day < b.day ? -1 : 1)).map((r
 }));
 console.log(`StayJP 近 ${DAYS} 天:${rows.length} 天有資料,夥伴碼 ${partners.length} 組,家族價名單 ${family.length} 人,未處理回饋 ${feedback.length} 則`);
 for (const r of rows.slice(-(Number(process.env.SHOW) || 7))) console.log(`  ${r.day}  ${r.paid_n} 筆  毛 NT$${r.gross_twd}  淨≈NT$${Math.round(r.net_twd)}  退 ${r.refund_n}  試用 ${r.trial_n}  新帳號 ${r.new_users}`);
-if (process.env.DRY) process.exit(0);
+if (process.env.DRY) { if (process.env.SHOW_ACT) for (const r of rows) console.log("  act", r.day, JSON.stringify(r.extra.act), JSON.stringify(r.extra.snap || "")); process.exit(0); }
 const res = await fetch(HQ_URL + '/api/ingest/daily', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + HQ_TOKEN }, body: JSON.stringify({ product: 'stayjp', rows, partners, family: authOk ? family : undefined, feedback }) });
 const out = await res.text(); console.log('HQ 回應', res.status, out.slice(0, 200));
 if (!res.ok) process.exit(1);
