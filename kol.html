@@ -120,7 +120,12 @@
   // 2026-11-24 改版(Mia:各 App 要一清二楚):總覽 → 一個 App 一列(成交/本月/累計/連結) → 明細與領款。
   // 主力五個直接列,其餘(還沒有成交的)收在「其他 App」;有成交就自動浮上來。
   const TEACH = { stayjp:'日文', staykr:'韓文', staytw:'華語', pollytalk:'英文', stayth:'泰文', ajolito:'西班牙文', igelchen:'德文', coquelet:'法文', ruarua:'越南文' };
-  const MAIN = ['stayjp', 'staykr', 'staytw', 'pollytalk', 'stayth'];
+  const MAIN = ['stayjp', 'staykr', 'staytw', 'pollytalk'];   // 2026-11-24 Mia:App 太多,先只列這四個;其他的有成交才會自動出現
+  const SITES = { staykr: ['StayKR', 'https://staykr.pages.dev'], staytw: ['StayTW', 'https://staytw.pages.dev'], pollytalk: ['BirdSpeak', 'https://birdspeak.app'] };
+  let HQD = null;
+  // StayJP 的分潤明細裡也含其他 App 併進來的(plan=App 名,origin:hq)。分開算,不然 StayJP 那列和各 App 那列會重複。
+  const OTHER_NAMES = ['StayKR', 'StayTW', 'BirdSpeak', 'PollyTalk', 'StayTH', 'Ajolito', 'Igelchen', 'Coquelet', 'StayVN', 'Ruarua', '熟記本'];
+  function isOther(r) { const n = String(r.plan || ''); return OTHER_NAMES.indexOf(n) >= 0 || !!(HQD && HQD.products.some(p => p.key !== 'stayjp' && p.name === n)); }
   let APPS = [];
 
   if (!code || !t) {
@@ -139,7 +144,8 @@
         body.innerHTML = '<div class="err">連結無效或已停用,請向主辦方確認。</div>';
         return;
       }
-      render(jp.d, hq && hq.products ? hq : null, now);
+      HQD = hq && hq.products ? hq : null;
+      render(jp.d, HQD, now);
     }).catch(() => {
       title.textContent = '連線失敗';
       body.innerHTML = '<div class="err">網路連線失敗,請稍後重新整理。</div>';
@@ -154,16 +160,20 @@
 
     // StayJP 的數字以 StayJP 自己的明細為準(總部那份一天才同步一次)
     const rg = d.range || { conversions: 0, commission_twd: 0, rows: [] };
-    const jpMonth = (rg.rows || []).reduce((a, r) => {
+    const jpRows = (rg.rows || []).filter(r => !r.voided && !isOther(r));
+    const jpMonth = jpRows.reduce((a, r) => {
       const w = new Date(r.at);
-      return a + (!r.voided && (w.getFullYear() + '-' + pad(w.getMonth() + 1)) === ym ? (Number(r.amount) || 0) : 0);
+      return a + ((w.getFullYear() + '-' + pad(w.getMonth() + 1)) === ym ? (Number(r.amount) || 0) : 0);
     }, 0);
+    const jpTotal = jpRows.reduce((a, r) => a + (Number(r.amount) || 0), 0);
+    const jpOrders = jpRows.filter(r => r.plan !== 'adjustment').length;
     const hqMap = {}; (hq ? hq.products : []).forEach(p => { hqMap[p.key] = p; });
     const jpHq = hqMap.stayjp || {};
     APPS = [{ key: 'stayjp', name: 'StayJP', link: jpHq.link || ('https://stayjp.study/?ref=' + encodeURIComponent(d.code)),
-      rate: d.commission_pct != null ? d.commission_pct : jpHq.rate_pct, orders: rg.conversions || 0, month: jpMonth, total: rg.commission_twd || 0, jp: true }]
-      .concat((hq ? hq.products : []).filter(p => p.key !== 'stayjp').map(p => ({ key: p.key, name: p.name, link: p.link, rate: p.rate_pct,
-        orders: p.orders || 0, month: p.commission_month || 0, total: p.commission || 0 })));
+      rate: d.commission_pct != null ? d.commission_pct : jpHq.rate_pct, orders: jpOrders, month: jpMonth, total: jpTotal, jp: true }]
+      .concat(hq ? hq.products.filter(p => p.key !== 'stayjp').map(p => ({ key: p.key, name: p.name, link: p.link, rate: p.rate_pct,
+        orders: p.orders || 0, month: p.commission_month || 0, total: p.commission || 0 }))
+        : Object.keys(SITES).map(k => ({ key: k, name: SITES[k][0], link: SITES[k][1] + '/?ref=' + encodeURIComponent(d.code), rate: d.commission_pct, orders: 0, month: 0, total: 0 })));
     const sum = k => APPS.reduce((a, p) => a + (Number(p[k]) || 0), 0);
     const shown = APPS.filter(p => MAIN.indexOf(p.key) >= 0 || p.orders > 0 || p.total !== 0)
       .sort((a, b) => (MAIN.indexOf(a.key) < 0 ? 99 : MAIN.indexOf(a.key)) - (MAIN.indexOf(b.key) < 0 ? 99 : MAIN.indexOf(b.key)));
@@ -186,7 +196,6 @@
       '</div>';
     };
 
-    const otherRecent = hq ? (hq.recent || []).filter(e => e.product !== 'StayJP').slice(0, 10) : [];
     const pos = d.payouts || [];
 
     body.innerHTML =
@@ -199,20 +208,15 @@
 
       '<section class="sec"><div class="sec-h"><h2>各 App 成效與連結</h2><span>同一組碼 ' + esc(d.code) + '</span></div>' +
         '<div class="panel">' + shown.map(appHtml).join('') +
-          (rest.length ? '<details class="more"><summary>其他 ' + rest.length + ' 個 App（' + rest.map(p => esc(TEACH[p.key] || p.name)).join('、') + '）</summary>' + rest.map(appHtml).join('') + '</details>' : '') +
         '</div>' +
-        (hq ? '' : '<div class="note" style="margin-top:8px">其他 App 的數字暫時讀不到，請稍後重新整理。</div>') +
+        (hq ? '' : '<div class="note" style="margin-top:8px">剛申請的推薦碼，StayJP 以外的 App 大約 2 小時內開通；開通後這裡會開始顯示數字。</div>') +
         '<div class="note" style="margin-top:10px">每個 App 用自己的連結。讀者從連結進來就會自動帶上你的碼，年費和終身方案都是 9 折。</div></section>' +
 
-      '<section class="sec"><div class="sec-h"><h2>StayJP 期間查詢</h2><span>逐筆明細</span></div>' +
+      '<section class="sec"><div class="sec-h"><h2>期間查詢</h2><span>所有 App・逐筆明細</span></div>' +
         '<div class="panel pad">' +
           '<div class="range-row"><input type="date" id="rFrom" aria-label="起始日" value="' + iso(first) + '"><span>~</span><input type="date" id="rTo" aria-label="結束日" value="' + iso(now) + '"><button id="rBtn">查詢</button></div>' +
-          '<div id="rResult" class="range-result">選好日期，查這段期間 StayJP 的成交筆數與分潤金額。</div>' +
+          '<div id="rResult" class="range-result">選好日期，查這段期間所有 App 的成交筆數與分潤金額。</div>' +
         '</div></section>' +
-
-      (otherRecent.length ? '<section class="sec"><div class="sec-h"><h2>其他 App 最近成交</h2><span>最近 ' + otherRecent.length + ' 筆</span></div><div class="dlist" style="margin-top:0">' +
-        otherRecent.map(e => '<div class="drow"><span class="dp">' + esc(e.product) + '</span>' + (e.type === 'refund' ? '<span class="dx">退款</span>' : e.type === 'void' ? '<span class="dx">作廢</span>' : '') +
-          '<span class="dm' + (e.type === 'paid' ? ' money' : '') + '">' + nt(e.commission) + '</span><span class="dd" style="min-width:74px">' + esc(e.ts) + '</span></div>').join('') + '</div></section>' : '') +
 
       // 撥款紀錄:只顯示日期/金額/筆數(此頁無登入,不放帳號姓名)
       (pos.length ? '<section class="sec"><div class="sec-h"><h2>撥款紀錄</h2><span>已匯入你填的收款帳戶</span></div><div class="panel">' +
@@ -236,6 +240,7 @@
       '</div></section>';
 
     document.getElementById('rBtn').onclick = queryRange;
+    queryRange();   // 一進來先查本月
     body.querySelectorAll('button[data-copy]').forEach(b => {
       b.onclick = () => {
         const link = APPS[+b.getAttribute('data-copy')].link;
@@ -262,16 +267,19 @@
         if (!rg) { res.innerHTML = '<span style="color:#EF4444">查詢失敗,請稍後再試。</span>'; return; }
         var PLAN={lifetime:'買斷',yearly_early_bird:'早鳥年費',yearly:'年費',monthly:'月費',group4_yearly:'揪團年費',group4_lifetime:'揪團買斷',adjustment:'額外項目'};
         var SRC={web:'網頁·綠界',paypal:'網頁·PayPal',app:'App內購'};
-        var list=(rg.rows||[]).map(function(r){
+        var rows=rg.rows||[], jpN=0, jpAmt=0, otN=0, otAmt=0;
+        rows.forEach(function(r){ if(r.voided) return; var o=isOther(r); if(r.plan!=='adjustment'){ if(o) otN++; else jpN++; } if(o) otAmt+=Number(r.amount)||0; else jpAmt+=Number(r.amount)||0; });
+        var list=rows.map(function(r){
           var when=new Date(r.at); var ds=(when.getMonth()+1)+'/'+when.getDate();
-          var planTxt = r.plan==='adjustment' ? ('額外:'+(r.note||'調整')) : (PLAN[r.plan]||r.plan||'—');
+          var planTxt = isOther(r) ? r.plan : 'StayJP・' + (r.plan==='adjustment' ? ('額外:'+(r.note||'調整')) : (PLAN[r.plan]||r.plan||'—'));
           var srcTxt = SRC[r.source]||r.source;
           var money = 'NT$'+(r.amount||0).toLocaleString();
           if(r.voided) return '<div class="drow voided"><span class="dp">'+esc(planTxt)+'</span><span class="ds">'+esc(srcTxt)+'</span><span class="dm">'+money+'</span><span class="dx"><i data-ic=x></i> 已退費</span><span class="dd">'+ds+'</span></div>';
           var stTxt = r.state==='paid'?'已付款':(r.state==='locked'?'可領':'鎖定中');
           return '<div class="drow"><span class="dp">'+esc(planTxt)+'</span><span class="ds">'+esc(srcTxt)+'</span><span class="dm money">'+money+'</span><span class="dx">'+stTxt+'</span><span class="dd">'+ds+'</span></div>';
         }).join('');
-        res.innerHTML = rg.from + ' ~ ' + rg.to + '<br>成交 <b>' + rg.conversions + '</b> 筆 · 分潤 <b class="money">NT$' + (rg.commission_twd || 0).toLocaleString() + '</b>' +
+        res.innerHTML = rg.from + ' ~ ' + rg.to + '<br>成交 <b>' + (jpN + otN) + '</b> 筆 · 分潤 <b class="money">NT$' + Math.round(jpAmt + otAmt).toLocaleString() + '</b>' +
+          '<br><span style="font-size:12px;color:var(--tx3)">StayJP ' + jpN + ' 筆 NT$' + Math.round(jpAmt).toLocaleString() + '・其他 App ' + otN + ' 筆 NT$' + Math.round(otAmt).toLocaleString() + '</span>' +
           (list ? '<div class="dlist">'+list+'</div>' : '') +
           '<br><span style="font-size:12px;color:var(--tx3)">(退費會標「已退費」不計入;金額為預估分潤,實際以結算為準。App 內購與網頁分成比例不同)</span>';
       })
