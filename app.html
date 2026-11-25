@@ -3285,8 +3285,13 @@ function _hubSimplePicks(zero) {
   const used = Object.keys(u).filter(k => _HUB_SIMPLE_OK.indexOf(k) >= 0 && u[k].n > 0)
     .sort((a, b) => (u[b].n - u[a].n) || (u[b].t - u[a].t));
   let lv = ''; try { lv = (window.Path && Path.level) ? Path.level() : (localStorage.getItem('base_level') || ''); } catch (e) {}
-  const def = zero ? ['kana', 'vocab', 'grammar', 'speak', 'ehon']
-    : (/^n[123]$/.test(lv) ? ['vocab', 'grammar', 'jlpt', 'speak', 'articles'] : ['vocab', 'grammar', 'jlpt', 'speak', 'ehon']);
+  // 刷題特區是主打,每個程度都放、排第一(2026-11-25 Mia)。五十音只給自己選了「全新開始/從零開始」的人,
+  // 沒選程度的不要假設是新手(zero 在沒選程度時也是 true,這裡另外看 base_level)。
+  // 注意:略過引導、或引導選「會五十音」的人 base_level 也是 'none',要看引導答案 ob_level / ob_skipped 才分得出來。
+  let bl = '', ol = '', sk = ''; try { bl = localStorage.getItem('base_level') || ''; ol = localStorage.getItem('ob_level') || ''; sk = localStorage.getItem('ob_skipped') || ''; } catch (e) {}
+  const trueZero = ol ? ol === 'zero' : (bl === 'none' && !sk);
+  const def = trueZero ? ['jlpt', 'kana', 'vocab', 'grammar', 'speak']
+    : (/^n[123]$/.test(lv) ? ['jlpt', 'vocab', 'grammar', 'speak', 'articles'] : ['jlpt', 'vocab', 'grammar', 'speak', 'ehon']);
   const out = [];
   used.concat(def).forEach(k => { if (out.length < 5 && out.indexOf(k) < 0) out.push(k); });
   return out;
@@ -5837,7 +5842,15 @@ function render() {
 
   let vc = 0;
   if (lf) h += searchScopeHTML(filtered.length);
-  cats.forEach(cat => {
+  // 每日批次:分類照「這批裡第一次出現的順序」排,編號才會由小到大(回饋 11/23:N5 第 51 授受動詞被排到 56 後面,看起來像跑錯批)。
+  // 全部顯示/搜尋/收藏維持原本的分類順序。
+  let catOrder = cats;
+  if (grammarDailyMode && !lf && !showFavOnly) {
+    const firstAt = {};
+    filtered.forEach((d, i) => { if (firstAt[d.cat] == null) firstAt[d.cat] = i; });
+    catOrder = cats.filter(c => firstAt[c.name] != null).sort((x, y) => firstAt[x.name] - firstAt[y.name]);
+  }
+  catOrder.forEach(cat => {
     const items = groups[cat.name];
     if (!items||!items.length) return;
     vc += items.length;
