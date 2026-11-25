@@ -5780,9 +5780,13 @@ function render() {
   // 文法詳解每級一檔、延後載入:這次要畫的級別還沒載到就先照常畫(卡片少了「詳解」鈕),載完再重畫一次補上
   (function () {
     var got = window.GRAMMAR_DETAIL_LV || {}, pend = window._gdPending || (window._gdPending = {});
+    // 簡中另有一份簡體詳解(每級一檔):中途從繁體切過來時基本檔已在、簡體檔還沒 → 用獨立的 key 再補載一次
+    var cn = false; try { cn = I18n.getLang() === 'zh-CN'; } catch (e) {}
     srcLvs.forEach(function (l) {
-      if (got[l] || pend[l] || !window.ensureGrammarDetail) return;
-      pend[l] = 1;
+      if (!window.ensureGrammarDetail) return;
+      if (cn && got[l] && !pend['cn:' + l]) { pend['cn:' + l] = 1; window.ensureGrammarDetail(l).then(function () { if (typeof doRender === 'function') doRender(); }); return; }
+      if (got[l] || pend[l]) return;
+      pend[l] = 1; if (cn) pend['cn:' + l] = 1;
       window.ensureGrammarDetail(l).then(function () { if (typeof doRender === 'function') doRender(); });
     });
   })();
@@ -6176,7 +6180,8 @@ function overlayReadingListening() {
 // 文法詳解依語言:外語時優先給 grammar-detail-<code>.js(GRAMMAR_DETAIL_L10N[code][id]),沒有就退回中文版(總比空白好)。
 function gdFor(id) {
   try {
-    if (I18n.isForeign()) { const L = window.GRAMMAR_DETAIL_L10N && window.GRAMMAR_DETAIL_L10N[I18n.getLang()]; if (L && L[id]) return L[id]; }
+    // 簡中也走這條:grammar-detail-zh-CN-<級>.js 是離線轉好的(只轉中文說明、日文原樣),不能在這裡整段 cvt(會把日文漢字轉成簡體)
+    if (I18n.isForeign() || I18n.getLang() === 'zh-CN') { const L = window.GRAMMAR_DETAIL_L10N && window.GRAMMAR_DETAIL_L10N[I18n.getLang()]; if (L && L[id]) return L[id]; }
   } catch (_) {}
   return window.GRAMMAR_DETAIL && window.GRAMMAR_DETAIL[id];
 }
@@ -6507,7 +6512,7 @@ function toggleDetail(btn) {
     var lvs = lv ? [String(lv).toLowerCase()] : ['n5', 'n4', 'n3', 'n2', 'n1'];
     var jobs = lvs.map(function (l) { return one('grammar-detail-' + l + '.js'); });
     // 外語:同時抓翻譯版(grammar-detail-<code>-<級>.js,每級一檔);沒有這檔就靜默退回中文(one() 失敗不 reject)
-    try { if (typeof I18n !== 'undefined' && I18n.isForeign()) lvs.forEach(function (l) { jobs.push(one('grammar-detail-' + I18n.getLang() + '-' + l + '.js')); }); } catch (e) {}
+    try { if (typeof I18n !== 'undefined' && (I18n.isForeign() || I18n.getLang() === 'zh-CN')) lvs.forEach(function (l) { jobs.push(one('grammar-detail-' + I18n.getLang() + '-' + l + '.js')); }); } catch (e) {}
     return Promise.all(jobs);
   };
   window.ensureVocabThemes = function () { return one('vocab-themes.js'); };
