@@ -48,7 +48,7 @@
   if (!C) return;
   booted = true;
   var END = C.end, CODE = C.code, LINK = C.link;
-  var DISMISS_KEY = SALE_BAR ? 'promo_xmas26_off' : NEWBIE_BAR ? 'promo_newbie_off' : 'promo_tsukimi_off';
+  var DISMISS_KEY = SALE_BAR ? 'promo_jlpt1207_off' : NEWBIE_BAR ? 'promo_newbie_off' : 'promo_tsukimi_off';
   var PRICED_BAR = SALE_BAR || NEWBIE_BAR;
   var NOW = function () { return (CP && CP.now) ? CP.now() : Date.now(); };
   var DISMISS_MS = 6 * 3600 * 1000;              // 網頁藥丸:關掉只安靜 6 小時,越接近截止越該看得到

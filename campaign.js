@@ -65,7 +65,7 @@
     } catch (e) { return false; }
   }
 
-  // ───── 檔期特價(2026-10 雙十首用;2026-11 雙11、2026-12 聖誕沿用同一套,只換時間、名稱與買斷價)──────────────
+  // ───── 檔期特價(2026-10 雙十首用;2026-11 雙11、2026-12 考後「發奮圖強優惠」沿用同一套,只換時間、名稱與買斷價)──────────────
   // 不用輸碼、官網人人有;有效推薦碼再疊折。時間到全站自動恢復原價,不必回來拆。
   // ⚠️ 數字與時間必須和後端 functions/src/utils/constants.ts 的 SALE + resolveWebPrice 一字不差:
   //    pricing.html 把這裡算出的金額當 expected_twd 送去 createPayment,兩邊不同就 409 擋單。
@@ -73,15 +73,15 @@
   var LIST_PRICE = { monthly: 390, yearly: 1990, yearly_early_bird: 990, lifetime: 4990 };
   var REF_OFF = { yearly: 200, lifetime: 500 };            // = 後端 WEB_CODE_DISCOUNT_TWD(檔期外)
   var SALE = {
-    id: 'xmas_2026',
-    start: Date.UTC(2026, 11, 23, 16, 0, 0),               // 2026-12-24 00:00 台灣
-    kolEarlyStart: Date.UTC(2026, 11, 23, 12, 0, 0),       // 2026-12-23 20:00 台灣(KOL/個人碼搶先)
-    end: Date.UTC(2026, 11, 27, 15, 59, 59),               // 2026-12-27 23:59:59 台灣
+    id: 'jlpt_2026_12',
+    start: Date.UTC(2026, 11, 6, 16, 0, 0),                // 2026-12-07 00:00 台灣(JLPT 12/6 考完隔天)
+    kolEarlyStart: Date.UTC(2026, 11, 6, 16, 0, 0),        // 這檔沒有搶先(= start,early 階段不會出現;Mia 2026-11-25:KOL 影片 12/7 18:00 才上)
+    end: Date.UTC(2026, 11, 13, 15, 59, 59),               // 2026-12-13 23:59:59 台灣(七天)
     prices: { yearly: 1490, lifetime: 4190 },              // 買斷 3,990 → 4,190(Mia 2026-11-24:檔期買斷折太深,調高試水溫)
     refDiscount: { yearly: 150, lifetime: 400 },
     groupBonusDays: { group4_yearly: 30 },                 // 檔期內開的揪團年費:每人多送一個月(買斷團不送;後端 saleGroupBonusDays 同步)
     link: '/pricing.html',
-    zh: '聖誕限定', cn: '圣诞限定', en: 'Christmas Sale'
+    zh: '發奮圖強優惠', cn: '发奋图强优惠', en: 'Post-JLPT Sale'
   };
 
   /**

@@ -234,11 +234,16 @@ const Calendar = (() => {
     // 換成「目標倒數+今天只要 10 個」的單一行動起點。做過任何一個動作後就恢復正常儀表板。
     if (Object.keys(getLog()).length === 0) {
       var _d1 = (function () {
-        var exam = new Date('2026-12-06T00:00:00+09:00');   // 12 月第一個週日 JLPT
+        // 下一場 JLPT(7 月、12 月第一個週日)。考試當天過完就換下一場,不要出現「還有 0 天」。
+        var _exams = ['2026-12-06', '2027-07-04', '2027-12-05', '2028-07-02', '2028-12-03'];
+        var _iso = _exams[_exams.length - 1];
+        for (var _i = 0; _i < _exams.length; _i++) { if (new Date(_exams[_i] + 'T18:00:00+09:00').getTime() >= Date.now()) { _iso = _exams[_i]; break; } }
+        var exam = new Date(_iso + 'T00:00:00+09:00');
+        var _md = Number(_iso.slice(5, 7)) + '/' + Number(_iso.slice(8, 10));
         var days = Math.max(0, Math.ceil((exam - Date.now()) / 86400000));
         var _e = (typeof enOr==='function') ? enOr : function(zh){ return zh; };
         return `<div class="cal-panel" style="text-align:center;padding:22px 16px">
-          <div style="font-size:13px;color:var(--ac,#d4654a);font-weight:800;letter-spacing:.05em">${_e('<i data-ic=clock></i> 距離 12/6 JLPT 還有 '+days+' 天','<i data-ic=clock></i> '+days+' days until the 12/6 JLPT')}</div>
+          <div style="font-size:13px;color:var(--ac,#d4654a);font-weight:800;letter-spacing:.05em">${_e('<i data-ic=clock></i> 距離 '+_md+' JLPT 還有 '+days+' 天','<i data-ic=clock></i> '+days+' days until the '+_md+' JLPT')}</div>
           <div style="font-size:19px;font-weight:800;margin:8px 0 4px">${_e('今天先背 10 個字就好','Just learn 10 words today')}</div>
           <div style="font-size:13px;color:var(--tx2,#888);margin-bottom:14px">${_e('明天它們會自動回來考你——這就是背得起來的原因。','They will come back to test you tomorrow — that is how they stick.')}</div>
           <button style="font:inherit;background:var(--ac,#d4654a);color:#fff;border:0;border-radius:12px;padding:12px 26px;font-weight:700;font-size:15px;cursor:pointer"
