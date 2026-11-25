@@ -1130,6 +1130,9 @@ body:has(#mn #sisterSet:not([hidden])) #sisterFt { display: none !important; }
 .vi .vw { font-size: 20px; font-weight: 700; line-height: 1.3; color: var(--tx); font-family: "Hiragino Mincho ProN", "Noto Serif JP", serif; padding-right: 150px; }
 .vi .vr { font-size:13px; color: var(--ac2); margin-top: 2px; }
 .vi .vm { font-size:15px; color: var(--tx2); margin-top: 4px; }
+.vi .vtr { display: inline-block; font-size: 11px; font-weight: 600; line-height: 1.5; padding: 0 7px; margin-right: 8px; border-radius: 10px; border: 1px solid currentColor; vertical-align: 1px; white-space: nowrap; }
+.vi .vtr-i { color: #16a34a; } .vi .vtr-t { color: #dc2626; } .vi .vtr-b { color: #b45309; }
+[data-theme="dark"] .vi .vtr-i { color: #4ade80; } [data-theme="dark"] .vi .vtr-t { color: #f87171; } [data-theme="dark"] .vi .vtr-b { color: #fbbf24; }
 /* 例句:接在中文意思下方,日文句 + 對應語言翻譯。整塊 data-nolang,語言由渲染時決定 */
 .vi .vex { margin-top: 8px; padding-top: 8px; border-top: 1px dashed var(--bd); }
 .vi .vex .exj { display: block; font-size:15px; line-height: 2.1; color: var(--tx); }
@@ -5603,10 +5606,12 @@ function renderVocab() {
   function vocabCardHTML(d, catName, isFav) {
     const dlv = lvOf.get(d) || currentLevel;
     const verbBtn = d.c === '動' ? `<button class="verb-btn" onclick="event.stopPropagation();openVerbModal('${esc1(d.w)}','${esc1(d.r||'')}')" title="變化表">変</button>` : '';
+    // 自動詞/他動詞標籤(回饋 2026-11-25)。資料 t 欄:自/他/両,2026-11-25 全部動詞對過字典。放在意思那行前面,不佔右上控制列、卡片高度不變。
+    const trTag = (d.c === '動' && d.t) ? `<span class="vtr vtr-${d.t === '自' ? 'i' : d.t === '他' ? 't' : 'b'}">${d.t === '自' ? enOr('自動詞', 'Intransitive') : d.t === '他' ? enOr('他動詞', 'Transitive') : enOr('自他動詞', 'Trans. / Intrans.')}</span>` : '';
     const ex = d.ex ? `<div class="vex" data-nolang data-j="${(''+d.ex.j).replace(/"/g,'&quot;')}" onclick="event.stopPropagation();speak(this.dataset.j)" title="${enOr('點例句聽發音','Tap to hear')}"><span class="exj">${window.furiganaHTML?window.furiganaHTML(d.ex.j):d.ex.j}<svg class="vex-spk" viewBox="0 0 24 24"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.54 8.46a5 5 0 010 7.07M19.07 4.93a10 10 0 010 14.14"/></svg></span><span class="exz">${I18n.getLang()==='en'?(d.ex.e||''):cvt(d.ex.z||'')}</span><button type="button" class="vex-sh" data-z="${(''+(d.ex.z||'')).replace(/"/g,'&quot;')}" onclick="event.stopPropagation();shadowEx(this.parentNode.dataset.j,this.dataset.z,'${esc1(d.w)}')">${enOr('跟讀','Shadow')}</button></div>` : '';
     return `<div class="vi" data-fid="${d.w}" data-w="${d.w}" data-r="${d.r||''}">`
       + `<div class="vx-ctrl"><span class="vspd${getTtsSpeed() !== 1 ? ' on' : ''}" onclick="event.stopPropagation();cycleTtsSpeed()" title="${enOr('語音速度(點擊切換)', 'Audio speed (tap to cycle)')}">${getTtsSpeed() === 1 ? '1' : getTtsSpeed()}×</span>${spkSvg}${verbBtn}<span class="vp">${catLabel(catName)}</span><svg class="star ${isFav?'on':''}" onclick="event.stopPropagation();toggleFav('${esc1(d.w)}','${dlv}')" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>`
-      + `<div class="vw">${lf ? `<span class="lv-tag">${dlv.toUpperCase()}</span>` : ''}${d.w}</div>${d.w!==d.r?`<div class="vr">${d.r}</div>`:''}<div class="vm">${cvt(d.m)}</div>`
+      + `<div class="vw">${lf ? `<span class="lv-tag">${dlv.toUpperCase()}</span>` : ''}${d.w}</div>${d.w!==d.r?`<div class="vr">${d.r}</div>`:''}<div class="vm">${trTag}${cvt(d.m)}</div>`
       + ex
       + `</div>`;
   }
