@@ -263,6 +263,12 @@
       // 清單
       '.mv-sec{font-size:12px;font-weight:800;color:var(--tx2);letter-spacing:.04em;margin:0 0 12px}',
       '.mv-item{background:var(--bg2);border:1px solid var(--bd);border-radius:14px;padding:14px;margin-bottom:12px}',
+      '.mv-sec-fav{margin-top:26px}',
+      '.mv-favs{background:var(--bg2);border:1px solid var(--bd);border-radius:14px;padding:2px 14px}',
+      '.mv-fav{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--bd)}.mv-fav:last-child{border-bottom:0}',
+      '.mv-fav-tx{flex:1;min-width:0}.mv-fav-top{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}',
+      '.mv-fav-w{font-size:16px;font-weight:800}.mv-fav-m{font-size:13.5px;color:var(--tx2);margin-top:4px;line-height:1.6}',
+      '.mv-fav-all{display:block;margin:14px auto 0}.mv-fav-hint{margin-top:14px}',
       '.mv-item-top{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}',
       '.mv-item-w{font-size:17px;font-weight:800}.mv-item-r{font-size:12.5px;color:var(--tx2)}',
       '.mv-item-m{font-size:14px;margin-top:8px;line-height:1.6}',
@@ -329,9 +335,9 @@
     var m = mask();
     if (!m) { m = document.createElement('div'); m.id = 'mvMask'; m.className = 'mv-mask'; document.body.appendChild(m); }
     document.body.classList.add('mv-open');
-    state.view = 'list'; state.preview = null; state.manual = false; state.results = null; state.quiz = null; state.bulkOpen = false; bulk.items = null;
+    state.view = 'list'; state.favAll = false; state.preview = null; state.manual = false; state.results = null; state.quiz = null; state.bulkOpen = false; bulk.items = null;
     render();
-    try { if (typeof track === 'function') track('myvocab_open', { n: count() }); } catch (e) {}
+    try { if (typeof track === 'function') track('myvocab_open', { n: count(), favs: favList().length }); } catch (e) {}
   }
   function close(keepStack) {
     var m = mask(); if (m) m.remove();
@@ -345,7 +351,7 @@
     var n = count();
     var sub = state.view === 'practice'
       ? L('小狸出情境，你用自己的字造句', 'The tutor sets the scene, you write the sentence')
-      : (n ? L('已收 ' + n + ' 個字 · 都會排進每日複習', n + ' saved · all in your daily review') : L('自己輸入想背的單字或片語', 'Add the words you actually want'));
+      : (n ? L('已收 ' + n + ' 個字 · 都會排進每日複習', n + ' saved · all in your daily review') : L('收藏的字和自己加的字都在這', 'Your starred and added words'));
     return '<div class="mv-hdr">'
       + (state.view === 'list'
         ? '<button type="button" class="mv-hdr-x" onclick="MyVocab.close()" aria-label="' + L('關閉', 'Close') + '"><i data-ic=x></i></button>'
@@ -401,11 +407,13 @@
       + '<div id="mvBulkOut">' + (bulk.items ? bulkListHtml() : '') + '</div>'
       + '</div>';
 
-    if (!items.length) {
+    var favs = favList();
+    if (!items.length && !favs.length) {
       h += '<div class="mv-empty"><img src="images/mascot/tanuki-p08.png" alt="">'
         + L('還沒有自己的字。<br>先加一個試試看，明天它就會出現在複習裡。', 'No words yet.<br>Add one and it shows up in tomorrow’s review.') + '</div>';
       return h;
     }
+    if (!items.length) return h + favsHtml(favs);
     h += '<div class="mv-sec">' + L('我的字（' + items.length + '）', 'My words (' + items.length + ')') + '</div>';
     items.forEach(function (it) {
       var pr = it.pr || {};
@@ -426,8 +434,35 @@
         + '</div>'
       + '</div>';
     });
-    return h;
+    return h + favsHtml(favs);
   }
+  // 2026-11-24:很多人點「我的單字本」是想看自己收藏(按星星)的字,結果只看到輸入框就走了(143 人開、13 人加字)。
+  // 把 word_notebook 的收藏字也列在這裡(唯讀;取消收藏照舊回單字頁按星星)。
+  function favList() {
+    var nb = []; try { nb = JSON.parse(localStorage.getItem('word_notebook')) || []; } catch (e) {}
+    if (!Array.isArray(nb)) return [];
+    return nb.filter(function (x) { return x && x.w && !has(x.w); })
+      .sort(function (a, b) { return String(b.added || '').localeCompare(String(a.added || '')); });
+  }
+  function favsHtml(favs) {
+    if (!favs || !favs.length) return '';
+    var CAP = 30, show = state.favAll ? favs : favs.slice(0, CAP);
+    var h = '<div class="mv-sec mv-sec-fav">' + L('我收藏的字（' + favs.length + '）', 'Starred words (' + favs.length + ')') + '</div>'
+      + '<div class="mv-favs">';
+    show.forEach(function (it) {
+      h += '<div class="mv-fav">'
+        + '<div class="mv-fav-tx"><div class="mv-fav-top"><span class="mv-fav-w">' + esc(it.w) + '</span>'
+        + (it.r && it.r !== it.w ? '<span class="mv-item-r">' + esc(it.r) + '</span>' : '')
+        + (it.lv ? '<span class="mv-tag">' + esc(String(it.lv).toUpperCase()) + '</span>' : '') + '</div>'
+        + (it.m ? '<div class="mv-fav-m">' + esc(it.m) + '</div>' : '') + '</div>'
+        + '<button type="button" class="mv-ibtn" onclick="MyVocab.say(\'' + attr(it.r || it.w) + '\', event)" aria-label="' + attr(L('發音', 'Play')) + '"><i data-ic=volume></i></button>'
+        + '</div>';
+    });
+    h += '</div>';
+    if (favs.length > CAP && !state.favAll) h += '<button type="button" class="mv-ibtn mv-fav-all" onclick="MyVocab.favAll()">' + L('顯示全部 ' + favs.length + ' 個', 'Show all ' + favs.length) + '</button>';
+    return h + '<div class="mv-hintline mv-fav-hint">' + L('在單字頁按星星收藏的字會出現在這裡。', 'Words you star on the vocabulary page show up here.') + '</div>';
+  }
+  function favAll() { state.favAll = true; paint(); }
 
   function manualHtml() {
     var p = state.preview || {};
@@ -801,7 +836,7 @@
   }
 
   root.MyVocab = {
-    open: open, close: close, back: back, list: list, count: count, has: has,
+    open: open, close: close, back: back, list: list, count: count, has: has, favAll: favAll, favCount: function () { return favList().length; },
     add: add, remove: remove, del: del,
     lookup: lookup, savePreview: savePreview, toggleManual: toggleManual, saveManual: saveManual,
     practice: practice, toggle: toggle, startQuiz: startQuiz, submit: submit, keep: keep,

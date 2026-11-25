@@ -74,3 +74,6 @@ export { invoiceAuditCron } from "./invoice-audit-cron";
 // Mia 的電子報(stayjp.study/letters):訂閱(雙重確認)/退訂/每小時照 feed.json 排寄
 export { newsletterSubscribe, newsletterConfirm, newsletterUnsub, newsletterCron, newsletterPrefs, newsletterAdmin } from "./newsletter";
 export { adminEcpayPeriodLog } from "./admin-ecpay-period-log";
+
+// 伺服器推播(2026-11):App 登記 Expo push token + owner 後台統計/發送(push.ts)
+export { pushRegister, adminPushStats, adminPushSend } from "./push";

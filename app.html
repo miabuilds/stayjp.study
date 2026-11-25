@@ -535,6 +535,17 @@ select.lang-btn {
 .hub-next, .hs-next { background: none; border: 0; padding: 0; text-align: left; cursor: pointer; font: inherit; font-weight: 700; color: var(--ac); text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1.5px; line-height: 1.45; }
 .hub-next { font-size: 12.5px; }
 .hs-next { display: block; margin-top: 6px; font-size: 13px; }
+/* 新手 5 天挑戰(starter5.js):招呼卡下面一條,只有第一週的新用戶看得到 */
+.s5 { margin: 12px 0 0; padding: 12px 14px; border: 1px solid var(--bd); border-radius: 16px; background: var(--bg2); }
+.hs > .s5 { margin: 12px 0 4px; }
+.hub-left > .s5 { margin: 12px 0; }
+.s5-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.s5-ttl { font-size: 13px; font-weight: 800; color: var(--tx); display: inline-flex; align-items: center; gap: 5px; }
+.s5-dots { display: inline-flex; gap: 6px; flex: none; }
+.s5-dot { width: 14px; height: 14px; border-radius: 50%; border: 2px solid var(--bd); background: transparent; box-sizing: border-box; }
+.s5-dot.on { background: var(--ac); border-color: var(--ac); }
+.s5-dot.next { border-color: var(--ac); border-style: dashed; }
+.s5-line { margin-top: 6px; font-size: 12.5px; color: var(--tx2); line-height: 1.5; }
 /* 例句跟讀鈕(單字清單 / 字卡 / 我的單字本) */
 .vex-sh { display: inline-block; margin-left: 8px; padding: 2px 9px; border: 1px solid var(--ac); border-radius: 999px; background: var(--bg2); color: var(--ac); font-size: 11.5px; font-weight: 700; cursor: pointer; vertical-align: 1px; }
 .srs-sh { min-height: 38px; padding: 4px 12px; font-size: 13px; }
@@ -1119,6 +1130,9 @@ body:has(#mn #sisterSet:not([hidden])) #sisterFt { display: none !important; }
 .vi .vw { font-size: 20px; font-weight: 700; line-height: 1.3; color: var(--tx); font-family: "Hiragino Mincho ProN", "Noto Serif JP", serif; padding-right: 150px; }
 .vi .vr { font-size:13px; color: var(--ac2); margin-top: 2px; }
 .vi .vm { font-size:15px; color: var(--tx2); margin-top: 4px; }
+.vi .vtr { display: inline-block; font-size: 11px; font-weight: 600; line-height: 1.5; padding: 0 7px; margin-right: 8px; border-radius: 10px; border: 1px solid currentColor; vertical-align: 1px; white-space: nowrap; }
+.vi .vtr-i { color: #16a34a; } .vi .vtr-t { color: #dc2626; } .vi .vtr-b { color: #b45309; }
+[data-theme="dark"] .vi .vtr-i { color: #4ade80; } [data-theme="dark"] .vi .vtr-t { color: #f87171; } [data-theme="dark"] .vi .vtr-b { color: #fbbf24; }
 /* 例句:接在中文意思下方,日文句 + 對應語言翻譯。整塊 data-nolang,語言由渲染時決定 */
 .vi .vex { margin-top: 8px; padding-top: 8px; border-top: 1px dashed var(--bd); }
 .vi .vex .exj { display: block; font-size:15px; line-height: 2.1; color: var(--tx); }
@@ -3209,15 +3223,27 @@ function hubYtStripHtml(L) {
 // 「0 基礎？日語從頭學」只給新手:沒填程度/填「從零開始」,或從頭學引導走到一半的人
 // 簡易版面板(2026-10-21):初學者回饋「功能太多、一進來很亂、不知道從哪開始」。
 // 首頁只留:今天從這裡開始(1 張大卡)+ 3 個入口 + 更多功能(展開=原本整個面板)+ 切換完整版。
-// Mia 定案:預設一律完整版,面板最下面自己來回切換;ui_simple='1' 才是簡易版(只存本機)
+// (舊)10/22 定案預設完整版 → 11/24 改:新用戶預設簡易、舊用戶照舊完整(見 _hubMode);面板最下面自己來回切換;ui_simple='1' 才是簡易版(只存本機)
 // 面板三種模式(2026-10-22 Mia):完整(預設)/ 簡易 / 自訂,面板最下面三顆按鈕切換,存本機 ui_hub。
-// 簡易版=「選項少」不是「內容簡單」:今天的闖關卡 + 複習 + 這個人最常點的 2 個功能(hub_use 計數,沒紀錄照程度給)。
+// 簡易版=「選項少」不是「內容簡單」:今天的闖關卡 + 複習 + 5 個熱門功能(白名單 _HUB_SIMPLE_OK,自己常點的排前面,見 _hubSimplePicks)。
 // 自訂版:闖關卡(可關)+ 自己勾選、排序的功能(hub_custom);第一次切過來直接開編輯器,先勾好常用的。
 function _hubMode() {
   try {
     const v = localStorage.getItem('ui_hub');
     if (v === 'simple' || v === 'full' || v === 'custom') return v;
-    return localStorage.getItem('ui_simple') === '1' ? 'simple' : 'full';   // 相容 10/21 版的開關
+    if (localStorage.getItem('ui_simple') === '1') return 'simple';   // 相容 10/21 版的開關
+    // 2026-11-24 Mia 翻案:沒選過的「新用戶」預設簡易版(數據:活躍者九成只用闖關/單字/測驗/文法/刷題);舊用戶照舊完整版。
+    // 判定只做一次存 hub_default:沒有連續紀錄、或今天才第一次來 = 新用戶。
+    let d = localStorage.getItem('hub_default');
+    if (d !== 'simple' && d !== 'full') {
+      let st = null; try { st = JSON.parse(localStorage.getItem('streak_v1') || 'null'); } catch (e) {}
+      const today = new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 10);
+      const isNew = !localStorage.getItem('hub_use') && (!st || ((st.longest || st.days || 0) <= 1 && (!st.last || st.last === today)));
+      d = isNew ? 'simple' : 'full';
+      localStorage.setItem('hub_default', d);
+      try { track('hub_default', { mode: d }); } catch (e) {}
+    }
+    return d;
   } catch (e) { return 'full'; }
 }
 function _hubSimpleOn() { return _hubMode() !== 'full'; }
@@ -3253,15 +3279,24 @@ document.addEventListener('click', function (e) {
     localStorage.setItem('hub_use', JSON.stringify(u));
   } catch (err) {}
 }, true);
-// 簡易版的 2 格:最常用(次數多→最近用的優先;複習固定在第一格不算);不足照程度補
+// 簡易版的 5 格(複習固定第一格,共 6 格=兩排):只從「真的很多人用」的功能裡挑(2026-11-25 Mia)。
+// 以前是照個人點擊數取前 2,結果點過幾次讀書小屋/打字這類冷門功能的人,簡易版就一直看到它 → 改成白名單。
+// 白名單內自己常點的排前面,不足照程度補。冷門功能還是能從「更多功能」或自訂版進去。
+const _HUB_SIMPLE_OK = ['vocab', 'grammar', 'jlpt', 'speak', 'articles', 'ehon', 'kana', 'yt', 'chat'];
 function _hubSimplePicks(zero) {
   const u = _hubUse();
-  const used = Object.keys(u).filter(k => k !== 'srs' && _hubFeat(k) && u[k].n > 0)
+  const used = Object.keys(u).filter(k => _HUB_SIMPLE_OK.indexOf(k) >= 0 && u[k].n > 0)
     .sort((a, b) => (u[b].n - u[a].n) || (u[b].t - u[a].t));
   let lv = ''; try { lv = (window.Path && Path.level) ? Path.level() : (localStorage.getItem('base_level') || ''); } catch (e) {}
-  const def = zero ? ['kana', 'ehon'] : (/^n[123]$/.test(lv) ? ['jlpt', 'articles'] : ['vocab', 'ehon']);
+  // 刷題特區是主打,每個程度都放、排第一(2026-11-25 Mia)。五十音只給自己選了「全新開始/從零開始」的人,
+  // 沒選程度的不要假設是新手(zero 在沒選程度時也是 true,這裡另外看 base_level)。
+  // 注意:略過引導、或引導選「會五十音」的人 base_level 也是 'none',要看引導答案 ob_level / ob_skipped 才分得出來。
+  let bl = '', ol = '', sk = ''; try { bl = localStorage.getItem('base_level') || ''; ol = localStorage.getItem('ob_level') || ''; sk = localStorage.getItem('ob_skipped') || ''; } catch (e) {}
+  const trueZero = ol ? ol === 'zero' : (bl === 'none' && !sk);
+  const def = trueZero ? ['jlpt', 'kana', 'vocab', 'grammar', 'speak']
+    : (/^n[123]$/.test(lv) ? ['jlpt', 'vocab', 'grammar', 'speak', 'articles'] : ['jlpt', 'vocab', 'grammar', 'speak', 'ehon']);
   const out = [];
-  used.concat(def).forEach(k => { if (out.length < 2 && out.indexOf(k) < 0) out.push(k); });
+  used.concat(def).forEach(k => { if (out.length < 5 && out.indexOf(k) < 0) out.push(k); });
   return out;
 }
 // 自訂版:'path' = 今天的闖關卡;其餘是 _HUB_FEATS 的 key
@@ -3319,6 +3354,7 @@ function _hubSimpleHtml(L, greet, streak, done, GOAL, zero) {
   return '<div class="hs">'
     + '<div class="hs-hello"><div><h2>' + greet + '</h2><div class="hs-sub">' + (streak > 0 ? '<i data-ic=fire></i> ' + L('連續 ' + streak + ' 天 · ', streak + '-day streak · ') : '') + L('今天 ' + done + ' / ' + GOAL, 'Today ' + done + ' / ' + GOAL) + '</div>' + _hubNextHtml('hs-next') + '</div>'
       + '<img class="hs-mascot" src="images/mascot/tanuki-p08.png" alt=""></div>'
+    + (window.Starter5 ? Starter5.hubHtml() : '')
     + body
     + '<button class="hs-more" id="hsMoreBtn" onclick="hubToggleMore()">' + L('更多功能 ▾', 'More ▾') + '</button>'
     + _hubModeBar(L)
@@ -3501,7 +3537,7 @@ function renderHub() {
   const _jrDone = (() => { try { return window.Journey ? Journey.stats().done : ''; } catch (e) { return ''; } })();
   const _showZero = _hubShowZero();
   const _simple = _hubSimpleOn();
-  const _sig = [_hubMode(), (_simple ? _hubSimplePicks(_showZero).join('+') + '|' + (localStorage.getItem('hub_custom') || '') : ''), _showZero, (localStorage.getItem('skit_seen') || ''), (typeof I18n !== 'undefined' && I18n.getLang ? I18n.getLang() : ''), streak, done, wod ? wod.w : '', lm || '', ll || '', _jrDone, (window.StudyPlan ? StudyPlan.sig() : ''), (window.Path ? Path.sig() : ''), _gr ? _gr.slot : '', (window.MyVocab ? MyVocab.count() : 0), (window.Omikuji ? (Omikuji.drawnToday() ? 1 : 0) : ''), DayKey.today(), GOAL].join('|');
+  const _sig = [_hubMode(), (_simple ? _hubSimplePicks(_showZero).join('+') + '|' + (localStorage.getItem('hub_custom') || '') : ''), _showZero, (localStorage.getItem('skit_seen') || ''), (typeof I18n !== 'undefined' && I18n.getLang ? I18n.getLang() : ''), streak, done, wod ? wod.w : '', lm || '', ll || '', _jrDone, (window.StudyPlan ? StudyPlan.sig() : ''), (window.Path ? Path.sig() : ''), (window.Starter5 ? Starter5.sig() : ''), _gr ? _gr.slot : '', (window.MyVocab ? MyVocab.count() : 0), (window.Omikuji ? (Omikuji.drawnToday() ? 1 : 0) : ''), DayKey.today(), GOAL].join('|');
   if (_sig === _hubSig && mn.querySelector('.hub')) return;
   _hubSig = _sig;
   const blossom = c => '<svg class="bl ' + c + '" viewBox="0 0 40 40"><g><ellipse cx="20" cy="11" rx="4.6" ry="7.4"/><ellipse cx="20" cy="11" rx="4.6" ry="7.4" transform="rotate(72 20 20)"/><ellipse cx="20" cy="11" rx="4.6" ry="7.4" transform="rotate(144 20 20)"/><ellipse cx="20" cy="11" rx="4.6" ry="7.4" transform="rotate(216 20 20)"/><ellipse cx="20" cy="11" rx="4.6" ry="7.4" transform="rotate(288 20 20)"/></g><circle cx="20" cy="20" r="2.6" fill="#fff"/></svg>';
@@ -3520,6 +3556,7 @@ function renderHub() {
         + '</div>'
         + _hubWeekHtml(L, GOAL, done)
       + '</div>'
+      + (window.Starter5 ? Starter5.hubHtml() : '')   // 新手 5 天挑戰(只有第一週的新用戶看得到,starter5.js)
       // 每日計畫卡(獨立一張,今日目標濃縮成卡底一條細線;2026-09-17 Mia:面板太擠)
       // 關卡節奏:今日關卡卡在最上面、計畫卡縮成複習卡;自由節奏:計畫卡在上、闖關卡在下
       + (_pathFirst && window.Path ? Path.hubCardHtml() : '')
@@ -3557,15 +3594,18 @@ function renderHub() {
         + '<button class="hub-card" onclick="switchMode(\'vocab\')"><i class="hc-wm" data-ic=book></i><span class="hc-ic"><i data-ic=book></i></span><span class="hc-t">' + L('單字', 'Vocabulary') + '</span><span class="hc-d">7,710' + L(' 詞 · N5–N1', ' words') + '</span></button>'
         + '<button class="hub-card" onclick="switchMode(\'grammar\')"><i class="hc-wm" data-ic=edit></i><span class="hc-ic"><i data-ic=edit></i></span><span class="hc-t">' + L('文法', 'Grammar') + '</span><span class="hc-d">382' + L(' 點 · N5–N1', ' points') + '</span></button>'
       + '</div>'
-      // 我的單字本(2026-09-20 社群回饋:想自己輸入片語再跟 AI 練)
-      + '<button class="hub-card hub-card-wide" onclick="MyVocab.open()"><i class="hc-wm" data-ic=bookmark></i><span class="hc-ic"><i data-ic=bookmark></i></span><span class="hc-t">' + L('我的單字本', 'My words') + '</span><span class="hc-d">' + (window.MyVocab && MyVocab.count() ? L('已收 ' + MyVocab.count() + ' 個字 · 跟小狸練', MyVocab.count() + ' saved · practice with the tutor') : L('自己輸入單字片語 · 小狸陪你練', 'Add your own words · drill them with the tutor')) + '</span></button>'
+      // 2026-11-24 面板瘦身(Mia):讀書小屋(60 間只 3 間有第二人)、快速小考(跟刷題特區重疊)的面板入口拿掉;更多選單、自訂面板都還進得去。
+      // 我的單字本:當天先拿掉又放回——GA 143 人開、13 人加字,是「打開看不到自己收藏的字」不是沒人點;頁內已加「我收藏的字」。
+      + (function () { var n = 0, f = 0;   // 直接讀本機:面板第一次畫的時候 my-vocab.js 還沒載入
+          try { var mv = (JSON.parse(localStorage.getItem('my_vocab')) || []).filter(function (x) { return x && x.w && !x.del; }), own = {}; mv.forEach(function (x) { own[x.w] = 1; }); n = mv.length;
+            f = (JSON.parse(localStorage.getItem('word_notebook')) || []).filter(function (x) { return x && x.w && !own[x.w]; }).length; } catch (e) {}
+          return '<button class="hub-card hub-card-wide" onclick="MyVocab.open()"><i class="hc-wm" data-ic=bookmark></i><span class="hc-ic"><i data-ic=bookmark></i></span><span class="hc-t">' + L('我的單字本', 'My words') + '</span><span class="hc-d">'
+            + ((n + f) ? L('收藏和自己加的字 · 共 ' + (n + f) + ' 個', (n + f) + ' starred & added words') : L('收藏的字都在這 · 也能自己加', 'Your starred words · add your own too')) + '</span></button>'; })()
       + '<div class="hub-sec">' + L('練習', 'Practice') + '</div>'
       + '<div class="hub-grid2">'
         + '<a class="hub-card" href="speak.html"><i class="hc-wm" data-ic=mic></i><span class="hc-ic"><i data-ic=mic></i></span><span class="hc-t">' + L('AI 跟讀', 'AI Shadowing') + '</span><span class="hc-d">' + L('跟著唸 · 即時評分', 'Repeat & get scored') + '</span></a>'
         + '<a class="hub-card" href="speak-chat.html"><i class="hc-wm" data-ic=speak></i><span class="hc-ic"><i data-ic=speak></i></span><span class="hc-t">' + L('AI 聊聊', 'AI Chat') + '</span><span class="hc-d">' + L('情境對話', 'Role-play chat') + '</span></a>'
       + '</div>'
-      // 讀書小屋(2026-10-20,免費;靜態卡片不打 API,面板速度不變)
-      + '<a class="hub-buddy" href="buddy.html"><span class="hbd-new">' + L('新功能', 'NEW') + '</span><span class="hbd-tx"><b>' + L('讀書小屋', 'Study Room') + '</b><small>' + L('找朋友一起讀,看誰還在睡', 'Study with friends — see who’s still asleep') + '</small></span><img class="hbd-desk" src="images/buddy/desk.webp" alt=""><img class="hbd-sleep" src="images/buddy/sleep.webp" alt=""></a>'
       + '<div class="hub-sec">' + L('看 · 聽', 'Watch & listen') + '</div>'
       + hubSkitStripHtml(L)
       + hubYtStripHtml(L)
@@ -3574,7 +3614,6 @@ function renderHub() {
       + '<div class="hub-quick">'
         + '<button onclick="SRS.start()"><span class="hq-ic"><i data-ic=refresh></i></span>' + L('複習', 'Review') + '</button>'
         + '<button onclick="Kana.open()"><span class="hq-ic"><i data-ic=grid></i></span>' + L('五十音', 'Kana') + '</button>'
-        + '<button onclick="MockExam.start()"><span class="hq-ic"><i data-ic=clipboard></i></span>' + L('快速小考', 'Quick test') + '</button>'
         + '<button onclick="FlashCard.start()"><span class="hq-ic"><i data-ic=bolt></i></span>' + L('快速背單字', 'Flashcards') + '</button>'
         + '<button onclick="VocabListen.open()"><span class="hq-ic"><i data-ic=headphones></i></span>' + L('用聽的背', 'Listen') + '</button>'
         + '<button onclick="Omikuji.open()" class="hq-omk' + ((window.Omikuji && Omikuji.drawnToday()) ? '' : ' hq-new') + '"><span class="hq-ic"><i data-ic=sparkle></i></span>' + L('今日運勢', 'Fortune') + '</button>'
@@ -4948,7 +4987,17 @@ const Streak = (() => {
     }
   }
 
-  return { markToday, render, showInfo, syncDown, maybePromptAt7, effectiveDays, check, savers, saverCap };
+  // 直接送 1 顆連勝救星(新手 5 天挑戰用,starter5.js);已存滿就不送,回 false
+  function grantSaver() {
+    const s = load(), cap = saverCap(), cur = s.savers || 0;
+    if (cur >= cap) return false;
+    s.savers = cur + 1; save(s);
+    try { track('streak_saver_earned', { days: s.days || 0, savers: s.savers, via: 'starter5' }); } catch (e) {}
+    try { render(); } catch (e) {}
+    try { if (typeof saveAllCloud === 'function') saveAllCloud(); } catch (e) {}
+    return true;
+  }
+  return { markToday, render, showInfo, syncDown, maybePromptAt7, effectiveDays, check, savers, saverCap, grantSaver };
 })();
 
 // ===== 新手引導:只對「完全沒有學習紀錄」的新使用者出現一次 =====
@@ -4987,10 +5036,23 @@ function onbFinish() { localStorage.setItem('onboarding_done_v1', '1'); _onbRemo
     }
     if (localStorage.getItem('ob_start_today')) {
       localStorage.removeItem('ob_start_today');
-      setTimeout(function(){
+      // 2026-11-24:引導頁那顆按鈕寫「開始今天的 N 個」,以前只是回首頁捲到卡片 → 四分之一的新註冊一題都沒做。
+      // 改成真的開始:走面板「今天先做這個」同一套(StudyPlan.nextStep → go),等內容載好最多試 8 次,不行才退回原本的提示。
+      var _obTries = 0;
+      var _obGo = function () {
+        _obTries++;
+        try {
+          if (document.getElementById('onbMask') || document.querySelector('.quiz-bg.show')) { if (_obTries < 8) setTimeout(_obGo, 700); return; }
+          // 選「全新開始(從五十音)」的人還不會讀假名,直接丟單字卡會嚇跑 → 開「日語從頭學」
+          if (localStorage.getItem('ob_level') === 'zero' && window.Journey && Journey.open) { try { track('ob_first_session', { kind: 'journey' }); } catch (e) {} Journey.open(); return; }
+          var ns = (window.StudyPlan && StudyPlan.nextStep) ? StudyPlan.nextStep() : null;
+          if (ns && (ns.kind === 'path' || ns.kind === 'new')) { try { track('ob_first_session', { kind: ns.kind }); } catch (e) {} StudyPlan.go(ns.kind, ns.k != null ? ns.k : null); return; }
+        } catch (e) {}
+        if (_obTries < 8) { setTimeout(_obGo, 700); return; }
         try{ var el=document.querySelector('.gcard,.vcard,.card-item'); if(el) el.scrollIntoView({block:'center',behavior:'smooth'}); }catch(e){}
         if (typeof showToast === 'function') showToast(enOr('想認識所有功能?更多 → <i data-ic=compass></i> 功能導覽','Want the full tour? More → <i data-ic=compass></i> Feature tour'));
-      }, 1100);
+      };
+      setTimeout(_obGo, 1100);
     }
   }catch(e){}
 })();
@@ -5544,10 +5606,12 @@ function renderVocab() {
   function vocabCardHTML(d, catName, isFav) {
     const dlv = lvOf.get(d) || currentLevel;
     const verbBtn = d.c === '動' ? `<button class="verb-btn" onclick="event.stopPropagation();openVerbModal('${esc1(d.w)}','${esc1(d.r||'')}')" title="變化表">変</button>` : '';
+    // 自動詞/他動詞標籤(回饋 2026-11-25)。資料 t 欄:自/他/両,2026-11-25 全部動詞對過字典。放在意思那行前面,不佔右上控制列、卡片高度不變。
+    const trTag = (d.c === '動' && d.t) ? `<span class="vtr vtr-${d.t === '自' ? 'i' : d.t === '他' ? 't' : 'b'}">${d.t === '自' ? enOr('自動詞', 'Intransitive') : d.t === '他' ? enOr('他動詞', 'Transitive') : enOr('自他動詞', 'Trans. / Intrans.')}</span>` : '';
     const ex = d.ex ? `<div class="vex" data-nolang data-j="${(''+d.ex.j).replace(/"/g,'&quot;')}" onclick="event.stopPropagation();speak(this.dataset.j)" title="${enOr('點例句聽發音','Tap to hear')}"><span class="exj">${window.furiganaHTML?window.furiganaHTML(d.ex.j):d.ex.j}<svg class="vex-spk" viewBox="0 0 24 24"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.54 8.46a5 5 0 010 7.07M19.07 4.93a10 10 0 010 14.14"/></svg></span><span class="exz">${I18n.getLang()==='en'?(d.ex.e||''):cvt(d.ex.z||'')}</span><button type="button" class="vex-sh" data-z="${(''+(d.ex.z||'')).replace(/"/g,'&quot;')}" onclick="event.stopPropagation();shadowEx(this.parentNode.dataset.j,this.dataset.z,'${esc1(d.w)}')">${enOr('跟讀','Shadow')}</button></div>` : '';
     return `<div class="vi" data-fid="${d.w}" data-w="${d.w}" data-r="${d.r||''}">`
       + `<div class="vx-ctrl"><span class="vspd${getTtsSpeed() !== 1 ? ' on' : ''}" onclick="event.stopPropagation();cycleTtsSpeed()" title="${enOr('語音速度(點擊切換)', 'Audio speed (tap to cycle)')}">${getTtsSpeed() === 1 ? '1' : getTtsSpeed()}×</span>${spkSvg}${verbBtn}<span class="vp">${catLabel(catName)}</span><svg class="star ${isFav?'on':''}" onclick="event.stopPropagation();toggleFav('${esc1(d.w)}','${dlv}')" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>`
-      + `<div class="vw">${lf ? `<span class="lv-tag">${dlv.toUpperCase()}</span>` : ''}${d.w}</div>${d.w!==d.r?`<div class="vr">${d.r}</div>`:''}<div class="vm">${cvt(d.m)}</div>`
+      + `<div class="vw">${lf ? `<span class="lv-tag">${dlv.toUpperCase()}</span>` : ''}${d.w}</div>${d.w!==d.r?`<div class="vr">${d.r}</div>`:''}<div class="vm">${trTag}${cvt(d.m)}</div>`
       + ex
       + `</div>`;
   }
@@ -5721,9 +5785,13 @@ function render() {
   // 文法詳解每級一檔、延後載入:這次要畫的級別還沒載到就先照常畫(卡片少了「詳解」鈕),載完再重畫一次補上
   (function () {
     var got = window.GRAMMAR_DETAIL_LV || {}, pend = window._gdPending || (window._gdPending = {});
+    // 簡中另有一份簡體詳解(每級一檔):中途從繁體切過來時基本檔已在、簡體檔還沒 → 用獨立的 key 再補載一次
+    var cn = false; try { cn = I18n.getLang() === 'zh-CN'; } catch (e) {}
     srcLvs.forEach(function (l) {
-      if (got[l] || pend[l] || !window.ensureGrammarDetail) return;
-      pend[l] = 1;
+      if (!window.ensureGrammarDetail) return;
+      if (cn && got[l] && !pend['cn:' + l]) { pend['cn:' + l] = 1; window.ensureGrammarDetail(l).then(function () { if (typeof doRender === 'function') doRender(); }); return; }
+      if (got[l] || pend[l]) return;
+      pend[l] = 1; if (cn) pend['cn:' + l] = 1;
       window.ensureGrammarDetail(l).then(function () { if (typeof doRender === 'function') doRender(); });
     });
   })();
@@ -5783,7 +5851,15 @@ function render() {
 
   let vc = 0;
   if (lf) h += searchScopeHTML(filtered.length);
-  cats.forEach(cat => {
+  // 每日批次:分類照「這批裡第一次出現的順序」排,編號才會由小到大(回饋 11/23:N5 第 51 授受動詞被排到 56 後面,看起來像跑錯批)。
+  // 全部顯示/搜尋/收藏維持原本的分類順序。
+  let catOrder = cats;
+  if (grammarDailyMode && !lf && !showFavOnly) {
+    const firstAt = {};
+    filtered.forEach((d, i) => { if (firstAt[d.cat] == null) firstAt[d.cat] = i; });
+    catOrder = cats.filter(c => firstAt[c.name] != null).sort((x, y) => firstAt[x.name] - firstAt[y.name]);
+  }
+  catOrder.forEach(cat => {
     const items = groups[cat.name];
     if (!items||!items.length) return;
     vc += items.length;
@@ -6109,7 +6185,8 @@ function overlayReadingListening() {
 // 文法詳解依語言:外語時優先給 grammar-detail-<code>.js(GRAMMAR_DETAIL_L10N[code][id]),沒有就退回中文版(總比空白好)。
 function gdFor(id) {
   try {
-    if (I18n.isForeign()) { const L = window.GRAMMAR_DETAIL_L10N && window.GRAMMAR_DETAIL_L10N[I18n.getLang()]; if (L && L[id]) return L[id]; }
+    // 簡中也走這條:grammar-detail-zh-CN-<級>.js 是離線轉好的(只轉中文說明、日文原樣),不能在這裡整段 cvt(會把日文漢字轉成簡體)
+    if (I18n.isForeign() || I18n.getLang() === 'zh-CN') { const L = window.GRAMMAR_DETAIL_L10N && window.GRAMMAR_DETAIL_L10N[I18n.getLang()]; if (L && L[id]) return L[id]; }
   } catch (_) {}
   return window.GRAMMAR_DETAIL && window.GRAMMAR_DETAIL[id];
 }
@@ -6406,6 +6483,7 @@ function toggleDetail(btn) {
 <script src="quiz.js"></script>
 <script src="srs.js"></script>
 <script src="study-plan.js"></script>
+<script src="starter5.js?v=1"></script>
 <script src="focus-time.js"></script>
 <script src="path.js"></script>
 <script src="placement.js"></script>
@@ -6439,7 +6517,7 @@ function toggleDetail(btn) {
     var lvs = lv ? [String(lv).toLowerCase()] : ['n5', 'n4', 'n3', 'n2', 'n1'];
     var jobs = lvs.map(function (l) { return one('grammar-detail-' + l + '.js'); });
     // 外語:同時抓翻譯版(grammar-detail-<code>-<級>.js,每級一檔);沒有這檔就靜默退回中文(one() 失敗不 reject)
-    try { if (typeof I18n !== 'undefined' && I18n.isForeign()) lvs.forEach(function (l) { jobs.push(one('grammar-detail-' + I18n.getLang() + '-' + l + '.js')); }); } catch (e) {}
+    try { if (typeof I18n !== 'undefined' && (I18n.isForeign() || I18n.getLang() === 'zh-CN')) lvs.forEach(function (l) { jobs.push(one('grammar-detail-' + I18n.getLang() + '-' + l + '.js')); }); } catch (e) {}
     return Promise.all(jobs);
   };
   window.ensureVocabThemes = function () { return one('vocab-themes.js'); };
