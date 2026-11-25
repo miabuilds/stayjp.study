@@ -75,6 +75,8 @@ try {
       body: JSON.stringify({ dateRanges: [{ startDate: `${n}daysAgo`, endDate: 'today' }], dimensions: [{ name: 'date' }], metrics: [{ name: 'activeUsers' }, { name: 'screenPageViews' }], limit: 400 }) })).json();
     for (const row of r.rows || []) {
       const d = row.dimensionValues[0].value; const k = `${d.slice(0, 4)}-${d.slice(4, 6)}-${d.slice(6, 8)}`;
+      // GA 的「N daysAgo」比銷售起點早一天:那天不在這次重算的範圍內,建了列就會用 0 把總部那天的收入蓋掉(2026-11-25:雙11 兩天被清成 0)
+      if (k < dayTW(since)) continue;
       const x = D(k); x.visitors = Number(row.metricValues[0].value) || 0; x.pageviews = Number(row.metricValues[1].value) || 0;
     }
     gaOk = true;
