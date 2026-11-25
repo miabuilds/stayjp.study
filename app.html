@@ -3222,7 +3222,7 @@ function hubYtStripHtml(L) {
 // 首頁只留:今天從這裡開始(1 張大卡)+ 3 個入口 + 更多功能(展開=原本整個面板)+ 切換完整版。
 // (舊)10/22 定案預設完整版 → 11/24 改:新用戶預設簡易、舊用戶照舊完整(見 _hubMode);面板最下面自己來回切換;ui_simple='1' 才是簡易版(只存本機)
 // 面板三種模式(2026-10-22 Mia):完整(預設)/ 簡易 / 自訂,面板最下面三顆按鈕切換,存本機 ui_hub。
-// 簡易版=「選項少」不是「內容簡單」:今天的闖關卡 + 複習 + 這個人最常點的 2 個功能(hub_use 計數,沒紀錄照程度給)。
+// 簡易版=「選項少」不是「內容簡單」:今天的闖關卡 + 複習 + 5 個熱門功能(白名單 _HUB_SIMPLE_OK,自己常點的排前面,見 _hubSimplePicks)。
 // 自訂版:闖關卡(可關)+ 自己勾選、排序的功能(hub_custom);第一次切過來直接開編輯器,先勾好常用的。
 function _hubMode() {
   try {
@@ -3276,15 +3276,19 @@ document.addEventListener('click', function (e) {
     localStorage.setItem('hub_use', JSON.stringify(u));
   } catch (err) {}
 }, true);
-// 簡易版的 2 格:最常用(次數多→最近用的優先;複習固定在第一格不算);不足照程度補
+// 簡易版的 5 格(複習固定第一格,共 6 格=兩排):只從「真的很多人用」的功能裡挑(2026-11-25 Mia)。
+// 以前是照個人點擊數取前 2,結果點過幾次讀書小屋/打字這類冷門功能的人,簡易版就一直看到它 → 改成白名單。
+// 白名單內自己常點的排前面,不足照程度補。冷門功能還是能從「更多功能」或自訂版進去。
+const _HUB_SIMPLE_OK = ['vocab', 'grammar', 'jlpt', 'speak', 'articles', 'ehon', 'kana', 'yt', 'chat'];
 function _hubSimplePicks(zero) {
   const u = _hubUse();
-  const used = Object.keys(u).filter(k => k !== 'srs' && _hubFeat(k) && u[k].n > 0)
+  const used = Object.keys(u).filter(k => _HUB_SIMPLE_OK.indexOf(k) >= 0 && u[k].n > 0)
     .sort((a, b) => (u[b].n - u[a].n) || (u[b].t - u[a].t));
   let lv = ''; try { lv = (window.Path && Path.level) ? Path.level() : (localStorage.getItem('base_level') || ''); } catch (e) {}
-  const def = zero ? ['kana', 'ehon'] : (/^n[123]$/.test(lv) ? ['jlpt', 'articles'] : ['vocab', 'ehon']);
+  const def = zero ? ['kana', 'vocab', 'grammar', 'speak', 'ehon']
+    : (/^n[123]$/.test(lv) ? ['vocab', 'grammar', 'jlpt', 'speak', 'articles'] : ['vocab', 'grammar', 'jlpt', 'speak', 'ehon']);
   const out = [];
-  used.concat(def).forEach(k => { if (out.length < 2 && out.indexOf(k) < 0) out.push(k); });
+  used.concat(def).forEach(k => { if (out.length < 5 && out.indexOf(k) < 0) out.push(k); });
   return out;
 }
 // 自訂版:'path' = 今天的闖關卡;其餘是 _HUB_FEATS 的 key
