@@ -253,7 +253,10 @@ a:hover{text-decoration:underline}
     <a href="https://play.google.com/store/apps/details?id=com.stayjp.app" target="_blank" rel="noopener" class="app-android" aria-label="Get it on Google Play" style="display:inline-flex;align-items:center;padding:0;border:0;background:none;text-decoration:none;margin:4px">
       <img src="google-play-badge.svg" alt="Get it on Google Play" style="height:46px;width:auto">
     </a>
+    <div style="margin-top:14px;padding-top:12px;border-top:1px solid #FFE3D1"><button type="button" id="twdToggle" style="background:none;border:0;padding:6px 8px;font:inherit;font-size:13px;color:#8A6F5C;text-decoration:underline;cursor:pointer"></button></div>
   </div>
+  <!-- 2026-11-25(Mia):外語介面的網頁版把台幣方案/綠界付款收起來,只留商店下載;按「人在台灣」才展開。繁中/簡中、App 內不受影響。 -->
+  <style>html.fx-store #refBox,html.fx-store #saleHero,html.fx-store #newbieHero,html.fx-store #plans,html.fx-store a[href="group.html"][data-web-only],html.fx-store #overseasPay{display:none!important}html.fx-store #storeNotice{margin-bottom:24px}</style>
 
   <!-- === 四付費方案 === -->
   <div class="plans" id="plans">
@@ -1201,8 +1204,18 @@ _auth.onAuthStateChanged(user => {
   if (!I18n.isForeign()) return;
   if (window.STAYJP_NATIVE && window.STAYJP_NATIVE.isNativeApp) return;
   var box = document.getElementById('storeNotice'); if (!box) return;
-  document.getElementById('storeNoticeTitle').textContent = I18n.pick('人在台灣以外?請到 App Store 或 Google Play 購買', 'Outside Taiwan? Buy through the App Store or Google Play');
-  document.getElementById('storeNoticeBody').textContent = I18n.pick('這一頁的付款只收新台幣(NT$)。在 StayJP App 內購買會以你當地的幣別計價,用同一個帳號登入,網頁和 App 都能用 Premium。', 'Payments on this page are charged in New Taiwan dollars (NT$). Buying inside the StayJP app is priced in your local currency, and the same account unlocks Premium on both the web and the app.');
+  document.getElementById('storeNoticeTitle').textContent = I18n.pick('在 App 內購買 Premium', 'Get Premium in the app');
+  document.getElementById('storeNoticeBody').textContent = I18n.pick('在 StayJP App 內購買會以你當地的幣別計價。用同一個帳號登入,網頁和 App 都能用 Premium。', 'Buying inside the StayJP app is priced in your local currency. Sign in with the same account and Premium works on both the web and the app.');
+  // 台幣方案預設收起來;?twd=1 或按鈕才展開(住台灣的外國人)
+  var ev = function (n) { try { if (typeof gtag === 'function') gtag('event', n, { lang: I18n.getLang() }); } catch (e) {} };
+  var tg = document.getElementById('twdToggle');
+  if (!/[?&]twd=1/.test(location.search)) {
+    document.documentElement.classList.add('fx-store');
+    tg.textContent = I18n.pick('人在台灣?改用新台幣付款', 'In Taiwan? Pay in NT$ instead');
+    tg.onclick = function () { document.documentElement.classList.remove('fx-store'); tg.parentNode.style.display = 'none'; ev('pricing_twd_show'); };
+    ev('pricing_store_only');
+  } else { tg.parentNode.style.display = 'none'; }
+  [].forEach.call(box.querySelectorAll('a.app-ios,a.app-android'), function (a) { a.addEventListener('click', function () { ev('pricing_store_click'); }); });
   box.hidden = false;
 }catch(e){} })();
 </script>
