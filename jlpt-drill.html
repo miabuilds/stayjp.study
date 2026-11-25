@@ -1016,7 +1016,7 @@ function applyStaticEn(){
   document.title='JLPT Drill Zone — Kanji · Vocabulary · Grammar, Every Question Explained | StayJP';
   const S=function(sel,txt){ const el=document.querySelector(sel); if(el) el.textContent=txt; };
   S('header .back .bk-t','Back');
-  S('header .logo','Japan Stay Plan');
+  S('header .logo','StayJP');
   S('#home h1','<i data-ic=target></i> JLPT Drill Zone');
   S('#home .lead','Questions modeled on real JLPT formats, each with a full explanation — not just whether you got it right, but why every wrong option is wrong. Missed questions go straight to your wrong-answer notebook.');
   S('#loadingTxt','Loading question bank…');
@@ -1038,7 +1038,7 @@ function applyStaticEn(){
   S('#retryBtn','Another round');
   S('#resBackBtn','Back to menu');
   const ft=document.querySelector('footer');
-  if(ft) ft.innerHTML='Japan Stay Plan (StayJP) · <a href="jlpt.html" style="color:var(--tx2)">JLPT Guide</a> · <a href="app.html" style="color:var(--tx2)">Study Tools</a>';
+  if(ft) ft.innerHTML='StayJP · <a href="jlpt.html" style="color:var(--tx2)">JLPT Guide</a> · <a href="app.html" style="color:var(--tx2)">Study Tools</a>';
 }
 applyStaticEn();
 renderHome();
