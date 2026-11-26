@@ -64,7 +64,8 @@ export { startTrial } from "./start-trial";
 export { trialEmailCron } from "./trial-email-cron";
 export { examCampaignCron } from "./exam-campaign-cron";
 export { kolCommissionReconcileCron } from "./kol-commission-reconcile-cron";
-export { sale1111Cron } from "./sale1111-cron";
+// 雙11 檔期已結束(11/13 起 no-op),不再匯出;雲端那支可 `firebase functions:delete sale1111Cron`
+export { salejlptCron } from "./salejlpt-cron";   // 考後發奮圖強優惠活動信(12/7、12/13)
 
 // 每日盯梢發票字軌(財政部配號由綠界業務兩個月申請一次,我們只能提早知道要催)
 export { invoiceWordCron } from "./invoice-word-cron";
