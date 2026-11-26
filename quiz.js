@@ -42,6 +42,12 @@ const Quiz = (() => {
     document.getElementById('quizBg').classList.add('show');
   }
 
+  // 站內提示視窗(不用原生 alert);AppUI 沒載到才退 toast
+  function _say(msg) {
+    if (window.AppUI && AppUI.alert) AppUI.alert(msg);
+    else if (typeof showToast === 'function') showToast(msg);
+  }
+
   function begin() {
     const lvEl = document.querySelector('#qLevel .on');
     const tyEl = document.querySelector('#qType .on');
@@ -52,18 +58,18 @@ const Quiz = (() => {
     if (rgEl) quizRange = rgEl.dataset.v;
     const count = ctEl ? parseInt(ctEl.dataset.v) : (questions.length || 20);
     const data = getVocabData(quizLevel);
-    if (!data || !data.length) { alert(t('quiz_no_data')); return; }
+    if (!data || !data.length) { _say(t('quiz_no_data')); return; }
 
     // 「今日學習」範圍 = daily-bar 顯示的當前批次（offset ~ offset+DAILY_NEW）
     let source = data;
     if (quizRange === 'today') {
       if (typeof getDailyProgress !== 'function' || typeof DAILY_NEW === 'undefined') {
-        alert('找不到今日學習資料，請改用「全部」'); return;
+        _say(_pk('找不到今日學習資料，請改用「全部」', 'Could not find today\'s words. Please use "All".')); return;
       }
       const prog = getDailyProgress(quizLevel);
       source = data.slice(prog.totalOffset, prog.totalOffset + DAILY_NEW);
       if (!source.length) {
-        alert('今日還沒學任何單字，請先到單字模式開始學習，或選「全部」範圍。');
+        _say(_pk('今日還沒學任何單字，請先到單字模式開始學習，或選「全部」範圍。', 'You have not studied any words today. Start in Vocabulary mode first, or use "All".'));
         return;
       }
     }
@@ -74,13 +80,25 @@ const Quiz = (() => {
       source = data.filter(d => !seen[quizLevel + ':' + d.w]);
       if (!source.length) {
         const msg = _pk('這一級的單字你都學過了，改用「全部」範圍複習吧。', 'You have already studied every word in this level. Use "All" to review.');
-        if (window.AppUI && AppUI.alert) AppUI.alert(msg); else if (typeof showToast === 'function') showToast(msg);
+        _say(msg);
         return;
       }
     }
-    score = 0; current = 0; results = [];
+    // 「選讀音」只能考有漢字的字;範圍裡剩下的全是純假名時會出 0 題 → 以前直接壞掉、按鈕看起來沒反應
+    // (用戶 2026-11-25:N5 還沒學過的 26 個字全是假名,選讀音按開始沒反應)
+    if (quizType === 'reading' && !source.some(d => d.w !== d.r)) {
+      _say(quizRange === 'new'
+        ? _pk('這一級還沒學過的 ' + source.length + ' 個字都是純假名，沒有讀音可以考。題型改選「看日選中」或「看中選日」就能把它們學完。',
+              'The ' + source.length + ' words you have not studied in this level are all kana-only, so there is no reading to test. Switch the type to JP→Meaning or Meaning→JP to finish them.')
+        : _pk('這個範圍的字都是純假名，沒有讀音可以考，請換一個題型或範圍。',
+              'The words in this range are all kana-only, so there is no reading to test. Please pick another type or range.'));
+      return;
+    }
     // generate 用 source 當題目來源，但錯誤選項仍從 data（全 pool）抽 — 維持挑戰性
-    questions = generate(source, data, Math.min(count, source.length));
+    const qs = generate(source, data, Math.min(count, source.length));
+    if (!qs.length) { _say(_pk('這個範圍目前出不了題，請換一個題型或範圍。', 'No questions available for this selection. Please pick another type or range.')); return; }
+    score = 0; current = 0; results = [];
+    questions = qs;
     renderQ();
   }
 

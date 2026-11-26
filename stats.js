@@ -617,6 +617,7 @@ const Stats = (() => {
     const fs = _lsGet('fontSize','normal');
     const isDark = (typeof document!=='undefined') && document.documentElement.getAttribute('data-theme')==='dark';
     const base = _lsGet('base_level','none'), goal = _lsGet('goal_level','');
+    const exam = _lsGet('exam_date','');
     const isApp = !!(window.STAYJP_NATIVE && window.STAYJP_NATIVE.isNativeApp);
     const rmOn = _lsGet('reminder_time_pref','');
     const fab = _lsGet('fab_mode','all');   // 右下角浮動按鈕:all / top(只留回頂端)/ none
@@ -667,6 +668,10 @@ const Stats = (() => {
         <div style="${seg}">${LVN.map(k=>`<button style="${chip(base===k)}" onclick="Stats._setLevel('base','${k}',this)">${LVL[k]}</button>`).join('')}</div>
         <div style="display:flex;align-items:center;gap:8px;margin:14px 0 10px"><span style="font-size:16px">🏁</span><span style="font-weight:600;color:var(--tx)">目標考級</span></div>
         <div style="${seg}">${GLN.map(k=>`<button style="${chip(goal===k)}" onclick="Stats._setLevel('goal','${k}',this)">${k.toUpperCase()}</button>`).join('')}</div>
+        <div style="display:flex;align-items:center;gap:8px;margin:16px 0 6px"><span style="font-size:16px"><i data-ic=calendar></i></span><span style="font-weight:600;color:var(--tx)">JLPT 考試日</span></div>
+        <div id="setExamInfo" style="font-size:13px;color:var(--tx2);margin-bottom:10px">${_examInfoHtml()}</div>
+        <div style="${seg}">${_examOpts().map(o=>`<button style="${chip(exam===o.iso)}" onclick="Stats._setExam('${o.iso}',this)">${o.label}</button>`).join('')}<button style="${chip(!exam)}" onclick="Stats._setExam('',this)">不設定</button></div>
+        <div style="display:flex;align-items:center;gap:10px;margin-top:12px;font-size:13px;color:var(--tx2)"><span>自訂日期</span><input type="date" id="setExamCustom" value="${exam}" onchange="Stats._setExam(this.value,null)" style="flex:1;min-width:0;padding:8px 10px;border-radius:10px;border:1px solid var(--bd);background:var(--bg);color:var(--tx);font:inherit"></div>
       </div>
       ${isApp ? `<div style="${box}">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px"><span style="font-size:16px"><i data-ic=clock></i></span><span style="font-weight:600;color:var(--tx)">每日提醒</span>${rmOn?`<span style="margin-left:auto;font-size:12px;color:var(--ac);font-weight:600">已開 ${rmOn}</span>`:''}</div>
@@ -703,6 +708,43 @@ const Stats = (() => {
   function _setFab(k,el){ try{ localStorage.setItem('fab_mode',k); }catch(e){} if(typeof applyFabMode==='function')applyFabMode(); _markChip(el); if(typeof showToast==='function')showToast('已更新'); }
   function _setTheme(mode,el){ const isDark=document.documentElement.getAttribute('data-theme')==='dark'; if((mode==='dark')!==isDark && typeof toggleTheme==='function') toggleTheme(); _markChip(el); if(typeof showToast==='function')showToast('主題已切換'); }
   function _setLevel(kind,v,el){ try{ localStorage.setItem(kind==='base'?'base_level':'goal_level', v); }catch(e){} if(typeof saveAllCloud==='function')saveAllCloud(); _markChip(el); if(typeof showToast==='function')showToast(kind==='base'?'程度已更新':'目標考級已更新'); }
+  // ── JLPT 考試日(2026-11-25):以前只有新手引導能填,之後沒地方改。這裡設定後 iOS 桌面小工具「JLPT 倒數」也讀這個值。
+  // JLPT 每年 7 月、12 月的第一個星期日;日期用本地年月日組字串(toISOString 在台灣會退一天)。
+  function _examOpts(){
+    const iso = d => d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+    const today = new Date(); today.setHours(0,0,0,0);
+    const out = []; let y = today.getFullYear();
+    while (out.length < 3) {
+      [7, 12].forEach(m => { if (out.length >= 3) return; let d = null; for (let day = 1; day <= 7; day++) { const t = new Date(y, m-1, day); if (t.getDay() === 0) { d = t; break; } } if (d && d >= today) out.push({ iso: iso(d), label: iso(d).replace(/-/g,'/') }); });
+      y++;
+    }
+    return out;
+  }
+  function _examDays(){
+    const v = _lsGet('exam_date',''); if (!/^\d{4}-\d{2}-\d{2}$/.test(v)) return null;
+    const p = v.split('-').map(Number); const d = new Date(p[0], p[1]-1, p[2]); const t = new Date(); t.setHours(0,0,0,0);
+    return Math.round((d - t) / 86400000);
+  }
+  function _examInfoHtml(){
+    const n = _examDays();
+    if (n === null) return '<span>還沒設定考試日</span>';
+    if (n < 0) return '<span>考試日已過,選下一場吧</span>';
+    if (n === 0) return '<span>就是今天,加油</span>';
+    return '<span>距離考試還有</span> <b style="color:var(--ac);font-size:17px">'+n+'</b> <span>天</span>';
+  }
+  function _setExam(v, el){
+    v = /^\d{4}-\d{2}-\d{2}$/.test(v||'') ? v : '';
+    try{ if (v) localStorage.setItem('exam_date', v); else localStorage.removeItem('exam_date'); }catch(e){}
+    if(typeof saveAllCloud==='function')saveAllCloud();
+    const info = document.getElementById('setExamInfo'); if (info) info.innerHTML = _examInfoHtml();
+    const inp = document.getElementById('setExamCustom');
+    if (el) { _markChip(el); if (inp) inp.value = v; }
+    else if (inp && inp.parentNode && inp.parentNode.previousElementSibling) {   // 自訂日期:把上面那排選項的選取樣式對回去
+      [...inp.parentNode.previousElementSibling.children].forEach(b => { const on = (b.getAttribute('onclick')||'').indexOf("'"+v+"'") >= 0 && !!v; b.style.border='1px solid '+(on?'var(--ac)':'var(--bd)'); b.style.background=on?'var(--ac)':'transparent'; b.style.color=on?'#fff':'var(--tx)'; });
+    }
+    try{ if(window.ReactNativeWebView) window.ReactNativeWebView.postMessage(JSON.stringify({type:'EXAM_DATE',payload:{exam:v,goal:_lsGet('goal_level','')}})); }catch(e){}   // App:馬上更新桌面小工具
+    if(typeof showToast==='function')showToast(v?'考試日已更新':'已取消考試日');
+  }
   function _setReminder(){ const t=document.getElementById('setRmTime'); if(!t)return; if(typeof enableDailyReminder==='function')enableDailyReminder(t.value); else { try{ localStorage.setItem('reminder_time_pref',t.value); }catch(e){} } if(typeof showToast==='function')showToast('提醒已設 '+t.value); }
   function _clearReminder(){ try{ localStorage.removeItem('reminder_time_pref'); }catch(e){}
     try{ if(window.STAYJP_NATIVE && window.STAYJP_NATIVE.isNativeApp && window.ReactNativeWebView) window.ReactNativeWebView.postMessage(JSON.stringify({type:'SET_REMINDER',payload:{time:'',cancel:true}})); }catch(e){}
@@ -934,6 +976,6 @@ const Stats = (() => {
     _renderFL();
   }
 
-  return { open, openProfile, close, switchTab, _setFont, _setFab, _setTheme, _setLevel, _setReminder, _clearReminder, _toggleQh, quizWeak, retryWrong, _answerWeak, addToNotebook, removeFromNotebook, quizNotebook, reviewNotebook, addWrongQuestion, getWrongQuestions, removeWrongQuestion, setWrongFilter, quizWrongQuestions, _wqAnswer, _wqNext, _wqRemoveAndNext, quizFavListening, _flReplay, _flAnswer, _flNext };
+  return { open, openProfile, close, switchTab, _setFont, _setFab, _setTheme, _setLevel, _setExam, _setReminder, _clearReminder, _toggleQh, quizWeak, retryWrong, _answerWeak, addToNotebook, removeFromNotebook, quizNotebook, reviewNotebook, addWrongQuestion, getWrongQuestions, removeWrongQuestion, setWrongFilter, quizWrongQuestions, _wqAnswer, _wqNext, _wqRemoveAndNext, quizFavListening, _flReplay, _flAnswer, _flNext };
 })();
 try { window.Stats = Stats; } catch (e) {}

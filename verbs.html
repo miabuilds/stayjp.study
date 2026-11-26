@@ -662,6 +662,7 @@ td.hl { color: var(--em-color); font-weight: 600; }
     </div>
     <div class="card-b"><div class="card-x">
       <div class="info"><strong>規則：</strong>一段＝去る＋ない ｜ 五段＝う段→あ段＋ない（う→わない 例外）｜ する→しない ｜ 来る→こない</div>
+      <button class="gsong-btn" data-gsong="nai" style="margin:12px 0"></button>
       <div class="tbl-wrap sticky-col"><table>
         <tr><th>辞書形</th><th>類</th><th>ない形</th><th>なかった</th></tr>
         <tr><td class="vb">書く</td><td>五</td><td>書かない</td><td>書かなかった</td></tr>
@@ -719,6 +720,7 @@ td.hl { color: var(--em-color); font-weight: 600; }
     <div class="card-b"><div class="card-x">
       <div class="info"><strong>規則：</strong>一段＝去る＋られる ｜ 五段＝う段→え段＋る ｜ する→できる ｜ 来る→来られる（こられる）<br>
       <strong>注意：</strong>可能形本身變成一段動詞（-える/-られる 結尾）。口語中一段的「られる」常省略為「れる」（ら抜き言葉）。</div>
+      <button class="gsong-btn" data-gsong="kanou" style="margin:12px 0"></button>
       <div class="tbl-wrap sticky-col"><table>
         <tr><th>辞書形</th><th>類</th><th>可能形</th><th>口語（ら抜き）</th></tr>
         <tr><td class="vb">書く</td><td>五</td><td>書ける</td><td>-</td></tr>
@@ -897,6 +899,7 @@ td.hl { color: var(--em-color); font-weight: 600; }
 <section class="sec" id="te-form">
   <h2><span class="icon">3</span> て形音變規則（最重要！）</h2>
   <p style="color:var(--tx2);font-size:13px;margin-bottom:16px">て形是日語最常用的變化形之一，用於連接句子、請求、進行式等。五段動詞的て形有<strong>音便（おんびん）</strong>規則，必須牢記。</p>
+  <button class="gsong-btn" data-gsong="tekei" style="margin:0 0 16px"></button>
 
   <div class="card open" id="card-te-rules">
     <div class="card-h" onclick="toggleCard('card-te-rules')">
@@ -1163,6 +1166,7 @@ const Drill = (() => {
 <section class="sec" id="pairs">
   <h2><span class="icon">5</span> 自動詞・他動詞對照表</h2>
   <p style="color:var(--tx2);font-size:13px;margin-bottom:16px">日語中很多動詞成對出現：自動詞（不及物）描述事物自然發生，他動詞（及物）描述人為動作。</p>
+  <button class="gsong-btn" data-gsong="jita" style="margin:0 0 16px"></button>
 
   <div class="tip" style="margin-bottom:16px">
     <strong>記憶技巧：</strong>很多時候，含「〜ある」的是自動詞，含「〜える」的是他動詞。例：集<strong>まる</strong>（自）/ 集<strong>める</strong>（他）。但也有例外，需要逐對記憶。
@@ -1455,6 +1459,7 @@ document.addEventListener('DOMContentLoaded', () => PTQuiz.render());
 <script src="day-key.js"></script>
 <script src="daily-log.js"></script>
 <script src="icons.js"></script>
+<script src="grammar-song.js?v=2"></script>
 <script src="i18n.js"></script>
 <!-- TTS manifest: text -> pre-rendered VOICEVOX mp3 hash. -->
 <script src="tts-config.js"></script>
