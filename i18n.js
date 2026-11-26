@@ -683,6 +683,7 @@ const I18n = (() => {
     try { document.documentElement.lang = l; } catch (_) {}
     postLangToNative(l);
     gaLang(l);
+    try { if (typeof window.__recordUiLang === 'function') window.__recordUiLang(); } catch (_) {}   // 登入中換語言 → 更新帳號上的 ui_lang
   }
 
   function getMonths() { return dictFor(lang).months || dict.en.months; }
