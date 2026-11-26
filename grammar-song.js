@@ -6,18 +6,28 @@
 // 檔尾一定要掛 window.GrammarSong(const 不會自己上 window)。
 (function () {
   var SONGS = {
-    tekei: { t: 'て形の歌',     en: 'The te-form song',          ids: ['n5-42'] },
-    nai:   { t: 'ない形の歌',   en: 'The nai-form song',         ids: ['n5-43'] },
-    kanou: { t: '可能形の歌',   en: 'The potential-form song',   ids: ['n4-52'] },
-    jita:  { t: '自他動詞の歌', en: 'Transitive / intransitive', ids: ['n5-62'] },
-    keigo: { t: '敬語の歌',     en: 'The keigo song',            ids: ['n4-62', 'n4-63', 'n4-65'] }
+    tekei: { t: 'て形の歌', ids: ['n5-42'] },
+    nai:   { t: 'ない形の歌', ids: ['n5-43'] },
+    kanou: { t: '可能形の歌', ids: ['n4-52'] },
+    jita:  { t: '自他動詞の歌', ids: ['n5-62'] },
+    keigo: { t: '敬語の歌', ids: ['n4-62', 'n4-63', 'n4-65'] }
   };
   var BY_ID = {};
   Object.keys(SONGS).forEach(function (k) { SONGS[k].ids.forEach(function (id) { BY_ID[id] = k; }); });
 
-  function foreign() { try { return typeof I18n !== 'undefined' && I18n.isForeign && I18n.isForeign(); } catch (e) { return false; } }
-  function zh(s) { try { return typeof cvt === 'function' ? cvt(s) : s; } catch (e) { return s; } }   // 簡中介面轉字(日文歌名不轉)
-  function label(k) { return foreign() ? 'Song: ' + SONGS[k].en : zh('聽歌記') + '｜' + SONGS[k].t; }
+  // 介面字串:七語都在這裡(2026-11-26 Mia:新內容也翻)。歌名是日文原名,各語言都不翻。
+  var UI = {
+    en: ['Learn by song', 'Close'], ko: ['노래로 외우기', '닫기'], vi: ['Học qua bài hát', 'Đóng'],
+    id: ['Belajar lewat lagu', 'Tutup'], th: ['จำด้วยเพลง', 'ปิด']
+  };
+  function ui(i) {
+    var zhs = ['聽歌記', '關閉'][i];
+    try {
+      if (typeof I18n !== 'undefined' && I18n.isForeign && I18n.isForeign()) return (UI[I18n.getLang()] || UI.en)[i];
+      return typeof cvt === 'function' ? cvt(zhs) : zhs;      // 簡中介面轉字
+    } catch (e) { return zhs; }
+  }
+  function label(k) { return ui(0) + '｜' + SONGS[k].t; }
 
   var CSS = '' +
     '.gsong-btn{display:inline-flex;align-items:center;gap:6px;margin:12px 0 4px;padding:8px 14px;border-radius:999px;cursor:pointer;' +
@@ -48,7 +58,7 @@
     var card = document.createElement('div'); card.className = 'gsong-card';
     var v = document.createElement('video');
     v.src = 'videos/song/' + k + '.mp4'; v.controls = true; v.playsInline = true; v.setAttribute('playsinline', ''); v.preload = 'auto';
-    var b = document.createElement('button'); b.type = 'button'; b.className = 'gsong-close'; b.textContent = foreign() ? 'Close' : zh('關閉');
+    var b = document.createElement('button'); b.type = 'button'; b.className = 'gsong-close'; b.textContent = ui(1);
     b.onclick = close;
     card.appendChild(v); card.appendChild(b); mask.appendChild(card);
     mask.addEventListener('click', function (e) { if (e.target === mask) close(); });
