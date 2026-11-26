@@ -50,7 +50,35 @@ async function ensureKey() {
   return KEY;
 }
 const sleep = ms => new Promise(r => setTimeout(r, ms));
+// L10N_BACKEND=cli:不走 API,改呼叫本機 `claude -p`(吃訂閱額度,不花 API 錢)。系統提示寫暫存檔、內容走 stdin,
+// 在空的暫存資料夾跑(不讀專案 CLAUDE.md)。速度比 API 慢,par 會被壓到 L10N_CLI_PAR(預設 2)。
+const BACKEND = process.env.L10N_BACKEND || 'api';
+async function callClaudeCLI(system, user) {
+  const { spawn } = await import('node:child_process');
+  const os = await import('node:os');
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'l10n-cli-'));
+  const sysFile = path.join(dir, 'system.txt');
+  fs.writeFileSync(sysFile, system + '\n\nReply with the JSON object only. Do not use any tools.');
+  const bin = process.env.CLAUDE_BIN || path.join(os.homedir(), '.local/bin/claude');
+  const env = { ...process.env }; delete env.ANTHROPIC_API_KEY;
+  try {
+    for (let attempt = 0; attempt < 4; attempt++) {
+      const text = await new Promise((resolve) => {
+        const c = spawn(bin, ['-p', '--model', process.env.L10N_CLI_MODEL || 'sonnet', '--system-prompt-file', sysFile, '--output-format', 'text'], { cwd: dir, env });
+        let out = '', err = '';
+        c.stdout.on('data', d => out += d); c.stderr.on('data', d => err += d);
+        c.on('close', code => resolve(code === 0 && out.trim() ? out : (process.stderr.write(`  [cli ${code}] ${String(err || out).slice(0, 160)}\n`), null)));
+        c.on('error', e => { process.stderr.write(`  [cli] ${e.message}\n`); resolve(null); });
+        c.stdin.end(user);
+      });
+      if (text) return text;
+      await sleep(15000 * (attempt + 1));
+    }
+    throw new Error('claude -p 連續失敗');
+  } finally { try { fs.rmSync(dir, { recursive: true, force: true }); } catch (_) {} }
+}
 async function callClaude(system, user, maxTokens = 16000) {
+  if (BACKEND === 'cli') return callClaudeCLI(system, user);
   await ensureKey();
   for (let attempt = 0; attempt < 6; attempt++) {
     try {
@@ -141,10 +169,12 @@ async function runBatches({ lang, part, units, batchSize, par, system, maxTokens
   const stale = k => done[k] && units[k].kind === 'vocab' && done[k].w && done[k].w !== units[k].w;
   const keys = Object.keys(units).filter(k => !done[k] || stale(k));
   const todo = limit ? keys.slice(0, limit) : keys;
+  if (process.env.L10N_DRY) { console.log(`[${lang}/${part}] 還沒翻 ${keys.length}：` + keys.slice(0, 12).join(' | ').slice(0, 600)); return done; }   // 只看缺多少,不翻
   console.log(`[${lang}/${part}] 單位 ${Object.keys(units).length},已翻 ${Object.keys(done).length},這次 ${todo.length}`);
   if (!todo.length) return done;
   const batches = [];
   for (let i = 0; i < todo.length; i += batchSize) batches.push(todo.slice(i, i + batchSize));
+  if (BACKEND === 'cli') par = Math.min(par, +(process.env.L10N_CLI_PAR || 2));
   let idx = 0, ok = 0, bad = 0;
   async function worker() {
     while (idx < batches.length) {

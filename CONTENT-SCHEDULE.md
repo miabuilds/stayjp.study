@@ -10,11 +10,23 @@
 | 社群 | 每篇文章一則鉤子文（官方帳號 brand，配封面、連結放留言） | stayjp-autopost `scheduled_posts.json` |
 | 更新紀錄 | 每週一一筆「本週新文章」、每月 1 號一筆「跟讀句」 | changelog.html `.tl-item[data-pub]`（時間到才顯示） |
 
-## 外語（韓/越/印/泰/英）不跟著翻新內容（2026-11-24 Mia 定）
+## 外語（韓/越/印/泰/英）跟著翻新內容（2026-11-26 Mia 改回來）
 
-每週文章、每月跟讀句只出中文，不產外語翻譯。原因：10/27 四語上線到 11/24，韓元/越南盾/印尼盾/泰銖的商店交易 0 筆，英文三個多月美金 5 筆。
-例外：**單字表有增刪或換位置時仍要重產外語單字包**（按位置疊層，不重產外語用戶會看到錯位的意思）。
-要不要恢復，看 GA 事件 `uilang_<語言>` 的人數（i18n.js `gaLang`，2026-11-24 加）。
+11/24 曾定「新內容不翻外語」，11/26 改回：新文章（含難度改寫版）、跟讀句、新功能的介面字都要有外語。
+每月批次產完中文後多跑一步（用本機訂閱，不花 API 額度）：
+
+```
+for l in ko vi id th; do
+  L10N_BACKEND=cli node scripts/gen-l10n.mjs articles $l
+  L10N_BACKEND=cli node scripts/gen-l10n.mjs ui $l
+  node scripts/gen-l10n.mjs build $l
+done
+```
+
+- 先看缺多少、不翻：前面加 `L10N_DRY=1`。
+- 英文：文章的 `title_en` / `trans_en` 等欄位在產文章時就要一起產；`ui en` 的待翻清單目前混了雜項，先不要整批跑。
+- 單字表有增刪或換位置時要重產外語單字包（按位置疊層，不重產外語用戶會看到錯位的意思）。
+- 各語言實際人數看 GA 事件 `uilang_<語言>`（i18n.js `gaLang`）。
 
 ## 每月批次（每月 25 日前後，Mac 會跳提醒）
 
@@ -25,7 +37,8 @@
 3. **更新紀錄**：在 changelog.html `<!-- SCHEDULED-ENTRIES -->` 下面加條目，`data-pub="YYYY-MM-DDT08:00:00+08:00"`；內容規模數字（文章數、跟讀句數）順手更新。
 4. **社群**：每篇文章一則寫進 stayjp-autopost `scheduled_posts.json`（account `brand`、`at`=epoch 秒、`images`=`https://stayjp.study/images/articles/<id>.jpg`、`reply`=`https://stayjp.study/app.html?open=article:<id>&utm_source=threads&utm_medium=social&utm_campaign=weekly_article`）。文案要用內容當鉤子（文化落差／反直覺），**不要寫成「本週更新公告」**（10/9 成效：公告類最冷）；短、像 Mia 隨手打、不寫她本人日文程度/簽證/住日本。時間建議週一 12:30 一篇、週一 20:30 一篇。
 5. **驗證**：localhost `?artpreview=1` 截圖看文章＋跟讀頁；validate-articles 全過；音檔、ruby、tokens/timings 覆蓋。
-6. **給 Mia 審**：列表（日期、等級、日文標題、中文、一句摘要、社群文案），她 OK 後 merge → push main → curl 確認線上檔案已更新。
+6. **外語**：照上面「外語跟著翻新內容」那段跑四語翻譯＋build。
+7. **給 Mia 審**：列表（日期、等級、日文標題、中文、一句摘要、社群文案），她 OK 後 merge → push main → curl 確認線上檔案已更新。
 
 ## 檢查點
 
