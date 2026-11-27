@@ -16,6 +16,14 @@
   function box() { return document.getElementById('quizBox'); }
   function bg() { return document.getElementById('quizBg'); }
   function show() { const b = bg(); if (b) b.classList.add('show'); }
+  // 2026-11-27 Mia:「彈窗很網頁、不絲滑」「動畫跟文字要一個畫面看完」→ 闖關流程改成整頁式:
+  //   手機滿版(吃 safe-area)、電腦固定大小的面板;內容是直向 flex,主按鈕固定在最下面,中間自己捲。
+  //   只在闖關進行中掛 pt-full,遮罩一關掉就拿掉(別的彈窗不受影響)。
+  function fullOn() {
+    const b = bg(); if (!b) return; ensureCss(); b.classList.add('pt-full');
+    // ⚠️ observer 裡一定要先判斷有沒有 pt-full:classList.remove 就算沒這個 class 也會重寫屬性 → 再觸發 observer → 無限迴圈卡死整頁
+    if (!b._ptObs) { b._ptObs = new MutationObserver(function () { if (!b.classList.contains('show') && b.classList.contains('pt-full')) b.classList.remove('pt-full'); }); b._ptObs.observe(b, { attributes: true, attributeFilter: ['class'] }); }
+  }
   function hide() { const b = bg(); if (b) b.classList.remove('show'); try { if (typeof doRender === 'function') { if (root.hubInvalidate) root.hubInvalidate(); doRender(); } } catch (e) {} }
   function hydrate() { try { if (root.Icons && Icons.hydrate) Icons.hydrate(); } catch (e) {} }
   function logAct(t) { try { if (root.StayDaily) StayDaily.log(t); else if (typeof Calendar !== 'undefined') Calendar.logActivity(t); } catch (e) {} }
@@ -98,6 +106,10 @@
     } catch (err) { return ''; }
   }
 
+  /** 這一關「用剛背的字造的例句」(path-eg.js);沒有就回 null,呼叫端照舊用文法表的例句 */
+  function ownEgs(lv, u) {
+    try { const a = root.PATH_EG && root.PATH_EG[lv + ':' + u.i]; return (a && a.length && !u.boss) ? a : null; } catch (e) { return null; }
+  }
   function units(lv) {
     const V = (typeof getVocabData === 'function' ? getVocabData(lv) : []) || [];
     const G = (typeof getGrammarData === 'function' ? (getGrammarData(lv).data || []) : []) || [];
@@ -510,6 +522,7 @@
     d.querySelector('.yes').onclick = function () { d.remove(); onYes(); };
   }
   function close() {
+    run = null; try { if (root.PathSkit) PathSkit.stop(); } catch (e) {}
     var m = document.getElementById('pathMask'); if (m) m.remove();
     document.body.classList.remove('pt-open');
     hide();
@@ -525,28 +538,43 @@
     //    要進關卡就先把地圖收起來。
     closeMap();
     run = { lv, k, u, correct: 0, total: 0, stepsDone: 0 };
+    fullOn();
     if (u.boss) { ensureJlptQ().then(() => quizStep(BOSS_N)); return; }
     if (!root.SRS || !u.words.length) { grammarStep(); return; }
     // 先把題庫排在背景抓,背完單字時題目已就位
     ensureJlptQ();
-    SRS.start(lv, { words: u.words, onDone: () => grammarStep() });
+    const words = () => { SRS.start(lv, { words: u.words, onDone: () => grammarStep() }); fullOn(); };   // SRS 會自己關開遮罩,滿版樣式要再掛一次
+    // 2026-11-27 試作:這關有課前小劇場(path-skit.js)就先演,台詞用的就是這關要背的字和文法;可跳過
+    const myRun = run;
+    const go = () => {
+      if (run !== myRun) return;   // 等資料的時候使用者已經關掉/開了別關
+      if (root.PathSkit && PathSkit.has(lv, u.i)) { ensureCss(); PathSkit.play(box(), lv, u.i, { no: k + 1, words: u.words, onDone: words, onQuit: close }); show(); return; }
+      words();
+    };
+    if (root.PathSkit && PathSkit.ensure) { let done = false; const once = () => { if (!done) { done = true; go(); } }; PathSkit.ensure(lv, u.i).then(once, once); setTimeout(once, 2500); } else go();
   }
   function grammarStep() {
-    if (!run) return; const g = run.u.grammar;
+    if (!run) return; fullOn(); const g = run.u.grammar;
     if (!g) { quizStep(QUIZ_N); return; }
     logAct('grammar');
-    const egs = (g.eg || []).slice(0, 2).map(e => {
+    // 2026-11-27 試作:這關有「用剛背的字造的例句」(path-eg.js)就用它,句子下面標出用到哪幾個剛背的字
+    const own = ownEgs(run.lv, run.u);
+    const wordOf = {}; (run.u.words || []).forEach(w => { wordOf[w.w] = w; });
+    const egs = (own || (g.eg || []).slice(0, 2)).map(e => {
       const j = strip(e.j);
       // 例句漢字標平假名(用戶 2026-10-09 回饋;同 grammar-drill 用 Rich 版,保留 <em>)
       const jh = root.furiganaHTMLRich ? (() => { try { return root.furiganaHTMLRich(e.j); } catch (x) { return e.j; } })() : e.j;
-      return '<div class="pt-eg"><div class="pt-eg-j">' + jh.replace(/<em>/g, '<b>').replace(/<\/em>/g, '</b>') + ' <button type="button" class="pt-spk" onclick="speak(\'' + esc(j).replace(/'/g, "\\'") + '\')" aria-label="play"><i data-ic=volume></i></button></div><div class="pt-eg-z">' + esc(e.z || '') + '</div></div>';
+      return '<div class="pt-eg"><div class="pt-eg-j">' + jh.replace(/<em>/g, '<b>').replace(/<\/em>/g, '</b>') + ' <button type="button" class="pt-spk" onclick="speak(\'' + esc(j).replace(/'/g, "\\'") + '\')" aria-label="play"><i data-ic=volume></i></button></div><div class="pt-eg-z">' + esc(own ? PathSkit.tr(e.z) : (e.z || '')) + '</div>'
+        + ((own && e.w && e.w.length) ? '<div class="pt-eg-w">' + e.w.map(x => { const w = wordOf[x]; return '<span class="pt-eg-chip">' + esc(x) + (w && w.r && w.r !== x ? ' <small>' + esc(w.r) + '</small>' : '') + '</span>'; }).join('') + '</div>' : '')
+        + '</div>';
     }).join('');
     box().innerHTML = '<div class="pt-step">'
       + stepHead(L('文法', 'Grammar'), 2)
-      + '<div class="pt-g-t">' + esc(strip(g.t)) + '</div>'
+      + '<div class="pt-scroll"><div class="pt-g-t">' + esc(strip(g.t)) + '</div>'
       + (g.p ? '<div class="pt-g-p">' + esc(strip(g.p)) + '</div>' : '')
       + (g.ex ? '<div class="pt-g-ex">' + esc(strip(g.ex)) + '</div>' : '')
-      + egs
+      + (own ? '<div class="pt-eg-hd"><i data-ic=star></i> ' + L('用你剛背的字造句', 'Sentences with the words you just learned') + '</div>' : '')
+      + egs + '</div>'
       + '<button type="button" class="pt-cta" onclick="Path._quiz()">' + L('懂了,做 ' + QUIZ_N + ' 題 →', 'Got it — ' + QUIZ_N + ' questions →') + '</button>'
       + '</div>';
     show(); hydrate();
@@ -557,7 +585,7 @@
   }
   let qs = [], qi = 0;
   function quizStep(n) {
-    if (!run) return;
+    if (!run) return; fullOn();
     qs = root.JLPT_Q ? questionsFor(run.lv, run.k, n) : []; qi = 0;
     if (!qs.length) { finish(); return; }
     renderQ();
@@ -689,7 +717,21 @@
       '.pt-row .pt-node{width:36px;height:36px;font-size:14px}.pt-row .pt-tx b{font-size:14px}.pt-row .pt-tx small{font-size:11.5px}.pt-row small .dim,.pt-stars .dim{opacity:.25}',
       '.pt-go{font-size:12px;font-weight:800;color:#fff;background:var(--ac);border-radius:999px;padding:4px 10px}',
       '.pt-step{padding-bottom:4px}.pt-g-t{font-size:20px;font-weight:900;margin:14px 0 6px;line-height:1.3}.pt-g-p{font-size:14px;color:var(--ac);font-weight:700;margin-bottom:8px}.pt-g-ex{font-size:13.5px;color:var(--tx2);line-height:1.6;margin-bottom:12px}',
-      '.pt-eg{background:var(--bg3);border-radius:12px;padding:10px 12px;margin-bottom:8px}.pt-eg-j{font-size:16px;line-height:1.7}.pt-eg-j b{color:var(--ac)}.pt-eg-z{font-size:13px;color:var(--tx2);margin-top:2px}',
+      '.pt-eg{background:var(--bg3);border-radius:12px;padding:10px 12px;margin-bottom:8px}.pt-eg-j{font-size:16px;line-height:1.7}.pt-eg-j b{color:var(--ac)}.pt-eg-z{font-size:13px;color:var(--tx2);margin-top:2px}'
+      + '.quiz-bg.pt-full{background:rgba(20,16,12,.55)}'
+      + '.quiz-bg.pt-full .quiz-box{width:100%;max-width:460px;height:min(760px,calc(100dvh - 40px));max-height:none;border-radius:26px;padding:20px 20px 18px;display:flex;flex-direction:column;overflow-y:auto;overscroll-behavior:contain;box-shadow:0 30px 80px rgba(0,0,0,.35);animation:ptPanelIn .42s cubic-bezier(.2,.9,.25,1) !important}'
+      + '.quiz-bg.pt-full .quiz-box>*{animation:ptStepIn .32s cubic-bezier(.2,.8,.2,1) both}'
+      + '.quiz-bg.pt-full .pt-step,.quiz-bg.pt-full .ps{display:flex;flex-direction:column;flex:1 1 auto;min-height:0}'
+      + '.quiz-bg.pt-full .pt-scroll{flex:1 1 auto;min-height:0;overflow-y:auto;margin:12px -4px 14px;padding:0 4px;border-top:1px solid var(--line);-webkit-overflow-scrolling:touch}'
+      + '.quiz-bg.pt-full .pt-step>.pt-cta{flex:0 0 auto;margin-top:0}'
+      + '@media (max-width:600px){.quiz-bg.pt-full{align-items:stretch;background:var(--bg2);backdrop-filter:none;-webkit-backdrop-filter:none}'
+      + '.quiz-bg.pt-full .quiz-box{max-width:none;height:100dvh;border-radius:0;border:0;box-shadow:none;padding:calc(14px + env(safe-area-inset-top,0px)) 18px calc(16px + env(safe-area-inset-bottom,0px));animation:ptSheetIn .38s cubic-bezier(.2,.9,.25,1) !important}}'
+      + 'body:has(.quiz-bg.pt-full.show) #quotaBadge{display:none !important}'
+      + '@keyframes ptPanelIn{from{opacity:0;transform:translateY(26px) scale(.97)}to{opacity:1;transform:none}}'
+      + '@keyframes ptSheetIn{from{opacity:.4;transform:translateY(100%)}to{opacity:1;transform:none}}'
+      + '@keyframes ptStepIn{from{opacity:0;transform:translateX(18px)}to{opacity:1;transform:none}}'
+      + '@media (prefers-reduced-motion:reduce){.quiz-bg.pt-full .quiz-box,.quiz-bg.pt-full .quiz-box>*{animation:none !important}}'
+      + '.pt-eg-hd{font-size:13px;font-weight:800;color:var(--ac);margin:14px 0 12px;display:flex;align-items:center;gap:6px}.pt-eg{margin-bottom:12px}.pt-eg-w{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;padding-top:10px;border-top:1px dashed var(--line)}.pt-eg-chip{font-size:12.5px;font-weight:700;background:var(--bg2);border:1px solid var(--line);border-radius:999px;padding:3px 10px}.pt-eg-chip small{font-weight:400;color:var(--tx2)}',
       '.pt-spk{font:inherit;background:none;border:0;color:var(--ac);cursor:pointer;vertical-align:middle;padding:0 4px}',
       '.pt-q{font-size:18px;line-height:1.7;margin:14px 0 12px;font-weight:600}.pt-opts{display:grid;gap:8px}',
       '.pt-opt{font:inherit;text-align:left;font-size:16px;line-height:1.5;background:var(--bg);border:1.5px solid var(--bd);border-radius:14px;padding:13px 14px;cursor:pointer;color:var(--tx);display:flex;gap:10px;align-items:baseline}.pt-opt .no{color:var(--tx3);font-size:13px}',
