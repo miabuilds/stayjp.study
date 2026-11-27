@@ -13,7 +13,7 @@
   const esc = s => String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   // 劇本資料按等級、每 25 關分一檔(path-skit-n5-0.js…,scripts/pathskit/build.py 產),進那一關才載入那一檔。
   // 有做的等級和版本號寫在 LEVELS;改了資料檔要把版本 +1。
-  const LEVELS = { n5: 2, n4: 1, n3: 1, n2: 1, n1: 1 };
+  const LEVELS = { n5: 2, n4: 1, n3: 2, n2: 1, n1: 1 };
   const CHUNK = 25;
   const SKITS = root.PATH_SKITS = root.PATH_SKITS || {};
   const loading = {};

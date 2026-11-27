@@ -15,14 +15,26 @@
   function today() { return DayKey.today(); }   // 本地日曆日(day-key.js),與 study_log 同一套日界
   function box() { return document.getElementById('quizBox'); }
   function bg() { return document.getElementById('quizBg'); }
-  function show() { const b = bg(); if (b) b.classList.add('show'); }
+  function show() { const b = bg(); if (b) b.classList.add('show'); fitBox(); setTimeout(fitBox, 500); }   // 第二次:等彈出動畫(縮放)結束再量一次才準
   // 2026-11-27 Mia:「彈窗很網頁、不絲滑」「動畫跟文字要一個畫面看完」→ 闖關流程改成整頁式:
   //   手機滿版(吃 safe-area)、電腦固定大小的面板;內容是直向 flex,主按鈕固定在最下面,中間自己捲。
   //   只在闖關進行中掛 pt-full,遮罩一關掉就拿掉(別的彈窗不受影響)。
   function fullOn() {
     const b = bg(); if (!b) return; ensureCss(); b.classList.add('pt-full');
     // ⚠️ observer 裡一定要先判斷有沒有 pt-full:classList.remove 就算沒這個 class 也會重寫屬性 → 再觸發 observer → 無限迴圈卡死整頁
-    if (!b._ptObs) { b._ptObs = new MutationObserver(function () { if (!b.classList.contains('show') && b.classList.contains('pt-full')) b.classList.remove('pt-full'); }); b._ptObs.observe(b, { attributes: true, attributeFilter: ['class'] }); }
+    if (!b._ptObs) { b._ptObs = new MutationObserver(function () { if (!b.classList.contains('show') && b.classList.contains('pt-full')) { b.classList.remove('pt-full'); const qb = b.querySelector('.quiz-box'); if (qb) qb.style.height = ''; } else if (b.classList.contains('show')) fitBox(); }); b._ptObs.observe(b, { attributes: true, attributeFilter: ['class'] }); }
+    fitBox();
+    if (!root._ptFitBound) { root._ptFitBound = 1; root.addEventListener('resize', fitBox); }
+  }
+  // 大字模式(html[data-fs] 對 .quiz-box 用 zoom 放大):有的瀏覽器會把面板高度也一起放大 → 超出螢幕、上下被切掉
+  // (2026-11-27 Mia 網頁版截圖)。各家 zoom 算法不同,所以直接量實際高度,超出就按比例縮回去。
+  function fitBox() {
+    const b = bg(); if (!b || !b.classList.contains('pt-full')) return;
+    const box = b.querySelector('.quiz-box'); if (!box) return;
+    box.style.height = '';
+    if ((parseFloat(getComputedStyle(box).zoom) || 1) === 1) return;
+    const r = box.getBoundingClientRect(), avail = root.innerWidth <= 600 ? root.innerHeight : root.innerHeight - 40;
+    if (r.height > avail + 1) box.style.height = Math.floor(parseFloat(getComputedStyle(box).height) * avail / r.height) + 'px';
   }
   function hide() { const b = bg(); if (b) b.classList.remove('show'); try { if (typeof doRender === 'function') { if (root.hubInvalidate) root.hubInvalidate(); doRender(); } } catch (e) {} }
   function hydrate() { try { if (root.Icons && Icons.hydrate) Icons.hydrate(); } catch (e) {} }
@@ -726,6 +738,15 @@
       + '.quiz-bg.pt-full .pt-step,.quiz-bg.pt-full .ps{display:flex;flex-direction:column;flex:1 1 auto;min-height:0}'
       + '.quiz-bg.pt-full .pt-scroll{flex:1 1 auto;min-height:0;overflow-y:auto;margin:12px -4px 14px;padding:0 4px;border-top:1px solid var(--line);-webkit-overflow-scrolling:touch}'
       + '.quiz-bg.pt-full .pt-step>.pt-cta{flex:0 0 auto;margin-top:0}'
+      // 闖關裡的翻卡(srs.js):卡片吃滿剩下的高度、字放大、翻面後按鈕落到最下面(大拇指按得到),統計縮成標題下一行小字(2026-11-27 Mia:空白好多)
+      + '.quiz-bg.pt-full .srs-card:has(>.srs-front){flex:1 1 auto;min-height:0;order:2;margin:14px 0 0;justify-content:center}'
+      + '.quiz-bg.pt-full .srs-card:has(>.srs-front)~.srs-stats-wrap{order:1;justify-content:flex-start;margin:6px 0 0;padding-bottom:12px;border-bottom:1px solid var(--line,var(--bd))}'
+      + '.quiz-bg.pt-full .srs-card:has(>.srs-front)~.srs-stats-wrap .srs-donut{display:none}'
+      + '.quiz-bg.pt-full .srs-card:has(>.srs-front)~.srs-stats-wrap .srs-legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12.5px}'
+      + '.quiz-bg.pt-full .srs-front,.quiz-bg.pt-full .srs-back{flex:1 1 auto;display:flex;flex-direction:column;justify-content:center}'
+      + '.quiz-bg.pt-full .srs-front .qmain,.quiz-bg.pt-full .srs-back .qmain{font-size:clamp(44px,13vw,64px);line-height:1.2}'
+      + '.quiz-bg.pt-full .srs-back>:first-child{margin-top:auto}'
+      + '.quiz-bg.pt-full .srs-back .srs-btns{margin-top:auto;padding-top:18px}'
       + '@media (max-width:600px){.quiz-bg.pt-full{align-items:stretch;background:var(--bg2);backdrop-filter:none;-webkit-backdrop-filter:none}'
       + '.quiz-bg.pt-full .quiz-box{max-width:none;height:100dvh;border-radius:0;border:0;box-shadow:none;padding:calc(14px + env(safe-area-inset-top,0px)) 18px calc(16px + env(safe-area-inset-bottom,0px));animation:ptSheetIn .38s cubic-bezier(.2,.9,.25,1) !important}}'
       + 'body:has(.quiz-bg.pt-full.show) #quotaBadge{display:none !important}'
