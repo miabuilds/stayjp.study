@@ -97,7 +97,7 @@ for src in srcs:
             need(l["who"] in SPEAKER, at + " who 要 t 或 k")
             for k in ("zh", "en", "ko"): need(l.get(k), at + " 缺 " + k)
             need(re.search(r"[가-힣]", l.get("ko", "")), at + " ko 不是韓文")
-            need(not re.search(r"[ぁ-ん]", l.get("zh", "") + l.get("en", "") + l.get("ko", "")), at + " 翻譯裡混了平假名")
+            need(not re.search(r"[ぁ-ん]", re.sub(r"「[^」]*」", "", l.get("zh", "") + l.get("en", "") + l.get("ko", ""))), at + " 翻譯裡混了平假名")   # 「」裡引用日文(例:教「だ」)可以
             need(l["j"].count("<em>") == l["j"].count("</em>") and not re.search(r"<(?!/?em>)", l["j"]), at + " 標籤只能用成對的 <em>")
             need(len(strip(l["j"])) <= 46, at + " 太長(>46 字),拆句或縮短")
             if not legacy: need(l.get("r") and not re.search(r"[一-龥]", l.get("r", "")), at + " 要有 r(整句平假名讀音,不能有漢字)")

@@ -13,7 +13,7 @@
   const esc = s => String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   // 劇本資料按等級、每 25 關分一檔(path-skit-n5-0.js…,scripts/pathskit/build.py 產),進那一關才載入那一檔。
   // 有做的等級和版本號寫在 LEVELS;改了資料檔要把版本 +1。
-  const LEVELS = { n5: 2, n4: 1, n3: 2, n2: 1, n1: 1 };
+  const LEVELS = { n5: 3, n4: 2, n3: 3, n2: 2, n1: 2 };
   const CHUNK = 25;
   const SKITS = root.PATH_SKITS = root.PATH_SKITS || {};
   const loading = {};
@@ -118,6 +118,7 @@
       const v = S.voice;
       if (p && p.then) p.then(() => { if (S === tk && S.i < 0) { v.pause(); v.currentTime = 0; } v.muted = false; }).catch(() => { v.muted = false; }); else v.muted = false;
     } catch (e) {}
+    try { document.querySelector('.ps').classList.add('playing'); } catch (e) {}   // 播放中下方按鈕區只剩一行提示 → 空間讓給字幕框
     document.getElementById('psAct').innerHTML = '<div class="ps-hint">' + L('點畫面可以暫停', 'Tap the scene to pause') + '</div>';
     document.getElementById('psSub').innerHTML = '';
     setPose(S.sk.start); emote(null);
@@ -137,6 +138,7 @@
     document.querySelectorAll('#psDots i').forEach((d, n) => d.classList.toggle('on', n <= S.i));
     document.getElementById('psSub').innerHTML = '<div class="ps-who ' + (ln.who === 't' ? 'wt' : 'wk') + '">' + (ln.who === 't' ? L('狸太郎', 'Tanuki') : L('コン', 'Kon')) + '</div>'
       + '<div class="ps-j">' + ruby(ln.j) + '</div><div class="ps-z">' + esc(tr(ln.z)) + '</div>';
+    fitSub();
     bgmVol('duck');
     warm(S.i + 1);   // 講這句時先抓下一句
     let done = false;
@@ -146,6 +148,18 @@
       const p = a.play(); if (p && p.catch) p.catch(() => later(2200, after));
       later(9000, after);   // 保險:音檔事件沒來也會往下走,不會卡住
     } catch (e) { later(2200, after); }
+  }
+
+  // 字幕框固定高(換句時畫面才不會跳);長台詞+振假名放不下時,逐步縮小字級,不讓講話者標籤或翻譯被切掉
+  function fitSub() {
+    const sub = document.getElementById('psSub'); if (!sub) return;
+    const j = sub.querySelector('.ps-j'), z = sub.querySelector('.ps-z'); if (!j) return;
+    sub.style.justifyContent = 'flex-start';   // 置中時上方溢出量不到,量的時候先靠上
+    for (let fs = 18; fs >= 15 && sub.scrollHeight > sub.clientHeight + 1; fs--) {
+      j.style.fontSize = fs + 'px'; j.style.lineHeight = fs >= 16 ? '1.9' : '1.75';
+      if (z && fs <= 15) z.style.fontSize = '12.5px';
+    }
+    sub.style.justifyContent = '';
   }
 
   function togglePause() {
@@ -165,6 +179,7 @@
   function finish() {
     if (!S) return;
     S.state = 'end';
+    try { document.querySelector('.ps').classList.remove('playing'); } catch (e) {}
     const sk = S.sk;
     setPose(sk.end); emote({ t: '♪', k: '♪' });
     ['t', 'k'].forEach(w => { S.el[w].classList.remove('talk'); S.el[w].classList.add('hop'); });
@@ -221,7 +236,7 @@
       '.ps-j{font-size:18px;line-height:1.9;font-weight:700}.ps-j b{color:var(--ac)}.ps-z{font-size:13.5px;color:var(--tx2);margin-top:4px}',
       '.ps-title{font-size:16px;font-weight:900;margin-bottom:6px}.ps-intro{font-size:13.5px;color:var(--tx2);line-height:1.6}',
       '.ps-used{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}.ps-credit{font-size:10.5px;color:var(--tx3);margin-top:12px}',
-      '.ps-act{flex:0 0 auto;display:flex;flex-direction:column;gap:12px;min-height:104px;justify-content:flex-end}.ps-act .pt-cta{display:flex;align-items:center;justify-content:center;gap:6px}',
+      '.ps.playing .ps-sub{height:190px}.ps.playing .ps-act{min-height:36px}.ps-act{flex:0 0 auto;display:flex;flex-direction:column;gap:12px;min-height:104px;justify-content:flex-end}.ps-act .pt-cta{display:flex;align-items:center;justify-content:center;gap:6px}',
       '.ps-skip{background:none;border:0;color:var(--tx2);font:inherit;font-size:13.5px;padding:8px;cursor:pointer;text-decoration:underline;text-underline-offset:3px}',
       '.ps-hint{text-align:center;font-size:12.5px;color:var(--tx3);padding:8px 0}',
       '@keyframes psBreath{0%,100%{transform:scale(1,1)}50%{transform:scale(1.015,.985)}}',
