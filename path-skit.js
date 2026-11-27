@@ -116,7 +116,7 @@
       S.voice.muted = true; S.voice.src = AU + S.sk.lines[0].au + '.mp3?v=1'; const p = S.voice.play();
       // 解鎖用的靜音試播:網路慢時它會比第一句晚結束 → 只有第一句還沒開始才收掉,不然會把正在講的台詞按暫停(之前卡住 9 秒的原因)
       const v = S.voice;
-      if (p && p.then) p.then(() => { if (S === tk && S.i < 0) { v.pause(); v.currentTime = 0; } v.muted = false; }).catch(() => { v.muted = false; }); else v.muted = false;
+      if (p && p.then) p.then(() => { if (S === tk && S.i < 0) { v.pause(); v.currentTime = 0; v.muted = false; } }).catch(() => { if (S === tk && S.i < 0) v.muted = false; }); else v.muted = false;   // 第一句已開始就不碰它(由 next 負責)
     } catch (e) {}
     try { document.querySelector('.ps').classList.add('playing'); } catch (e) {}   // 播放中下方按鈕區只剩一行提示 → 空間讓給字幕框
     document.getElementById('psAct').innerHTML = '<div class="ps-hint">' + L('點畫面可以暫停', 'Tap the scene to pause') + '</div>';
@@ -144,7 +144,12 @@
     let done = false;
     const after = () => { if (done) return; done = true; if (!S || S.state !== 'playing') return; ['t', 'k'].forEach(w => S.el[w].classList.remove('talk')); bgmVol('full'); later(650, next); };
     try {
-      const a = S.voice; a.onended = after; a.onerror = after; a.muted = false; a.src = AU + ln.au + '.mp3?v=1';
+      // 順序很重要:先停、同一個檔就倒回開頭(不重新載入),最後才取消靜音。
+      // 之前先取消靜音再換 src → 解鎖用的靜音試播被聽見幾個字,接著重新載入卡一秒、再從頭念(Mia 11/27 回報)
+      const a = S.voice; a.onended = after; a.onerror = after;
+      try { a.pause(); } catch (e) {}
+      if ((a.src || '').indexOf('/' + ln.au + '.mp3') < 0) a.src = AU + ln.au + '.mp3?v=1'; else { try { a.currentTime = 0; } catch (e) {} }
+      a.muted = false;
       const p = a.play(); if (p && p.catch) p.catch(() => later(2200, after));
       later(9000, after);   // 保險:音檔事件沒來也會往下走,不會卡住
     } catch (e) { later(2200, after); }
