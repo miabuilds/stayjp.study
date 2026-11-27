@@ -747,6 +747,13 @@
       + '.quiz-bg.pt-full .srs-front .qmain,.quiz-bg.pt-full .srs-back .qmain{font-size:clamp(44px,13vw,64px);line-height:1.2}'
       + '.quiz-bg.pt-full .srs-back>:first-child{margin-top:auto}'
       + '.quiz-bg.pt-full .srs-back .srs-btns{margin-top:auto;padding-top:18px}'
+      // 翻卡/打字/聽打切換:從標題列旁的小膠囊改成標題下獨立一排、三等分、iOS 分段樣式(按得到、不擠標題)
+      + '.quiz-bg.pt-full .qhd:has(.srs-seg){flex-wrap:wrap;row-gap:12px}'
+      + '.quiz-bg.pt-full .qhd .srs-seg{order:3;flex:1 0 100%;margin:0;border:0;border-radius:12px;padding:3px;background:var(--bg3);gap:3px}'
+      + '.quiz-bg.pt-full .qhd .srs-seg button{flex:1;justify-content:center;min-height:38px;border-radius:9px;background:transparent;color:var(--tx2);font-size:14px;font-weight:600;gap:6px}'
+      + '.quiz-bg.pt-full .qhd .srs-seg button.on{background:var(--bg2);color:var(--tx);box-shadow:0 1px 3px rgba(0,0,0,.12)}'
+      + '.quiz-bg.pt-full .qhd .srs-seg button i{width:15px;height:15px}'
+      + '.quiz-bg.pt-full .qhd .qclose{margin-left:auto !important}'
       + '@media (max-width:600px){.quiz-bg.pt-full{align-items:stretch;background:var(--bg2);backdrop-filter:none;-webkit-backdrop-filter:none}'
       + '.quiz-bg.pt-full .quiz-box{max-width:none;height:100dvh;border-radius:0;border:0;box-shadow:none;padding:calc(14px + env(safe-area-inset-top,0px)) 18px calc(16px + env(safe-area-inset-bottom,0px));animation:ptSheetIn .38s cubic-bezier(.2,.9,.25,1) !important}}'
       + 'body:has(.quiz-bg.pt-full.show) #quotaBadge{display:none !important}'
