@@ -90,13 +90,22 @@
     // 先把姿勢圖抓好,換姿勢才不會閃白
     const seen = {}; sk.lines.forEach(l => l.pose.forEach(p => { seen[p] = 1; })); sk.end.forEach(p => { seen[p] = 1; });
     Object.keys(seen).forEach(p => { const im = new Image(); im.src = IMG + p + '.png'; });
+    // 停在標題畫面時就先抓背景音樂和前兩句,按「看這一集」才不會等下載(2026-11-27 Mia:剛點開會卡一下)
+    try { S.bgm = new Audio(); S.bgm.preload = 'auto'; S.bgm.loop = true; S.bgm.src = AU + 'bgm.mp3?v=2'; S.bgm.load(); } catch (e) {}
+    S.warm = []; warm(0); warm(1);
     try { if (root.Icons && Icons.hydrate) Icons.hydrate(); } catch (e) {}
     try { if (typeof track === 'function') track('pathskit_open', { ep: sk.no }); } catch (e) {}
+  }
+
+  // 先把第 n 句音檔抓進快取(另開一個 Audio 只載不播)
+  function warm(n) {
+    try { const ln = S && S.sk.lines[n]; if (!ln) return; const a = new Audio(); a.preload = 'auto'; a.src = AU + ln.au + '.mp3?v=1'; a.load(); S.warm.push(a); if (S.warm.length > 3) S.warm.shift(); } catch (e) {}
   }
 
   function start() {
     if (!S || S.state === 'playing') return;
     S.state = 'playing'; S.i = -1; S.paused = false;
+    const tk = S;
     // 聲音要在這次點擊裡開:背景音樂直接播;台詞用同一個 <audio>,先靜音播一下把它解鎖(iOS)
     try {
       if (!S.bgm) { S.bgm = new Audio(AU + 'bgm.mp3?v=2'); S.bgm.loop = true; }
@@ -105,7 +114,9 @@
     try {
       if (!S.voice) S.voice = new Audio();
       S.voice.muted = true; S.voice.src = AU + S.sk.lines[0].au + '.mp3?v=1'; const p = S.voice.play();
-      if (p && p.then) p.then(() => { S.voice.pause(); S.voice.currentTime = 0; S.voice.muted = false; }).catch(() => { S.voice.muted = false; }); else S.voice.muted = false;
+      // 解鎖用的靜音試播:網路慢時它會比第一句晚結束 → 只有第一句還沒開始才收掉,不然會把正在講的台詞按暫停(之前卡住 9 秒的原因)
+      const v = S.voice;
+      if (p && p.then) p.then(() => { if (S === tk && S.i < 0) { v.pause(); v.currentTime = 0; } v.muted = false; }).catch(() => { v.muted = false; }); else v.muted = false;
     } catch (e) {}
     document.getElementById('psAct').innerHTML = '<div class="ps-hint">' + L('點畫面可以暫停', 'Tap the scene to pause') + '</div>';
     document.getElementById('psSub').innerHTML = '';
@@ -127,6 +138,7 @@
     document.getElementById('psSub').innerHTML = '<div class="ps-who ' + (ln.who === 't' ? 'wt' : 'wk') + '">' + (ln.who === 't' ? L('狸太郎', 'Tanuki') : L('コン', 'Kon')) + '</div>'
       + '<div class="ps-j">' + ruby(ln.j) + '</div><div class="ps-z">' + esc(tr(ln.z)) + '</div>';
     bgmVol('duck');
+    warm(S.i + 1);   // 講這句時先抓下一句
     let done = false;
     const after = () => { if (done) return; done = true; if (!S || S.state !== 'playing') return; ['t', 'k'].forEach(w => S.el[w].classList.remove('talk')); bgmVol('full'); later(650, next); };
     try {

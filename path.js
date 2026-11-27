@@ -367,6 +367,8 @@
     const lv = level(), us = units(lv);
     if (!us.length) return '';
     autoPlace(lv);
+    // 首頁一出現就趁空檔先載下一關的小劇場劇本,點進去不用等(2026-11-27)
+    try { const nu = us[currentIndex(lv)]; if (nu && !nu.boss && root.PathSkit && PathSkit.ensure) setTimeout(() => PathSkit.ensure(lv, nu.i), 1500); } catch (e) {}
     if (root.StudyPlan && StudyPlan.rhythm && StudyPlan.rhythm() === 'path' && currentIndex(lv) < us.length) return questCardHtml(lv, us);
     const cur = currentIndex(lv), doneN = Object.keys(lvProg(lv).done).length, total = us.length;
     const suggest = (root.StudyPlan && StudyPlan.modeInfo) ? StudyPlan.modeInfo().units : 2;
