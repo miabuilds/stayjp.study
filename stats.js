@@ -672,6 +672,7 @@ const Stats = (() => {
         <div id="setExamInfo" style="font-size:13px;color:var(--tx2);margin-bottom:10px">${_examInfoHtml()}</div>
         <div style="${seg}">${_examOpts().map(o=>`<button style="${chip(exam===o.iso)}" onclick="Stats._setExam('${o.iso}',this)">${o.label}</button>`).join('')}<button style="${chip(!exam)}" onclick="Stats._setExam('',this)">不設定</button></div>
         <div style="display:flex;align-items:center;gap:10px;margin-top:12px;font-size:13px;color:var(--tx2)"><span>自訂日期</span><input type="date" id="setExamCustom" value="${exam}" onchange="Stats._setExam(this.value,null)" style="flex:1;min-width:0;padding:8px 10px;border-radius:10px;border:1px solid var(--bd);background:var(--bg);color:var(--tx);font:inherit"></div>
+        ${_wtOK() ? `<button type="button" data-nolang onclick="Stats._wtHow()" style="display:flex;align-items:center;gap:8px;width:100%;margin-top:12px;padding:11px 13px;border-radius:10px;border:1px dashed var(--ac);background:transparent;color:var(--ac);font:inherit;font-size:13px;font-weight:700;text-align:left;cursor:pointer"><i data-ic=calendar></i><span style="flex:1">${_esc(_wt('examCta'))}</span><span>›</span></button>` : ''}
       </div>
       ${isApp ? `<div style="${box}">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px"><span style="font-size:16px"><i data-ic=clock></i></span><span style="font-weight:600;color:var(--tx)">每日提醒</span>${rmOn?`<span style="margin-left:auto;font-size:12px;color:var(--ac);font-weight:600">已開 ${rmOn}</span>`:''}</div>
@@ -680,6 +681,11 @@ const Stats = (() => {
           <button style="flex:1;padding:9px;border-radius:10px;border:none;background:var(--ac);color:#fff;font-weight:700;cursor:pointer" onclick="Stats._setReminder()">${rmOn?'更新提醒':'開啟提醒'}</button>
           ${rmOn?`<button style="padding:9px 12px;border-radius:10px;border:1px solid var(--bd);background:transparent;color:var(--tx2);cursor:pointer" onclick="Stats._clearReminder()">關閉</button>`:''}
         </div>
+      </div>` : ''}
+      ${_wtOK() ? `<div id="setWidgetSec" data-nolang style="${box}">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><span style="font-size:16px"><i data-ic=grid></i></span><span style="font-weight:600;color:var(--tx)">${_esc(_wt('title'))}</span></div>
+        <div style="font-size:12.5px;color:var(--tx2);line-height:1.6;margin-bottom:12px">${_esc(_wt('sub'))}</div>
+        <button type="button" onclick="Stats._wtHow()" style="width:100%;padding:10px;border-radius:10px;border:none;background:var(--ac);color:#fff;font:inherit;font-weight:700;cursor:pointer">${_esc(_wt('btn'))}</button>
       </div>` : ''}
       <a href="account.html" style="display:flex;align-items:center;gap:12px;padding:14px 16px;background:var(--bg2);border-radius:12px;color:var(--tx);text-decoration:none;margin-bottom:12px">
         <span style="font-size:20px"><i data-ic=user></i></span><div style="flex:1"><div style="font-weight:600">我的帳號</div><div style="font-size:12px;color:var(--tx2);margin-top:2px">訂閱・登入・推薦碼</div></div><span style="color:var(--tx3)">›</span>
@@ -744,6 +750,61 @@ const Stats = (() => {
     }
     try{ if(window.ReactNativeWebView) window.ReactNativeWebView.postMessage(JSON.stringify({type:'EXAM_DATE',payload:{exam:v,goal:_lsGet('goal_level','')}})); }catch(e){}   // App:馬上更新桌面小工具
     if(typeof showToast==='function')showToast(v?'考試日已更新':'已取消考試日');
+  }
+  // ── 桌面小工具教學(2026-11-27,照 StayTW/StayKR):只有新版 iOS App(STAYJP_NATIVE.widgets)才出現。
+  // 小工具只能從手機桌面加,App 裡加不了 → 把步驟講清楚。文字自帶七語、整塊 data-nolang(不給翻譯層再翻一次)。
+  // 首頁正在做新舊版對照(12/8 看數字),所以不在首頁放卡片,只放設定頁 + 考試日旁邊。
+  const _WT = {
+    'zh-TW': { title:'桌面小工具', sub:'把「每日一字」「連續學習」「JLPT 倒數」放到手機桌面，不用開 App 也看得到。', btn:'看怎麼加到桌面', examCta:'把考試倒數放到手機桌面', how:'怎麼加到桌面',
+      steps:['回到手機桌面，長按空白的地方，直到圖示開始晃動','點左上角的「編輯」→「加入小工具」（舊版 iOS 是左上角的「＋」）','往下找到「日本再留計劃」（或在搜尋欄輸入「日本再留」）並點進去','左右滑動選款式和大小，按「加入小工具」，再按右上角的「完成」'],
+      note:'有三款：每日一字（每天半夜自動換字）、連續學習（連續天數和今天的進度）、JLPT 倒數（照上面設的考試日，每天自動少一天）。找不到的話，先把 App 打開一次再回桌面找。', ok:'知道了' },
+    'zh-CN': { title:'桌面小组件', sub:'把“每日一词”“连续学习”“JLPT 倒数”放到手机桌面，不用打开 App 也看得到。', btn:'看怎么添加到桌面', examCta:'把考试倒数放到手机桌面', how:'怎么添加到桌面',
+      steps:['回到手机桌面，长按空白的地方，直到图标开始晃动','点左上角的“编辑”→“添加小组件”（旧版 iOS 是左上角的“＋”）','往下找到“日本再留計劃”（或在搜索栏输入“日本再留”）并点进去','左右滑动选择样式和大小，点“添加小组件”，再点右上角的“完成”'],
+      note:'共有三款：每日一词（每天半夜自动换词）、连续学习（连续天数和今天的进度）、JLPT 倒数（按上面设置的考试日，每天自动少一天）。找不到的话，先打开一次 App 再回桌面找。', ok:'知道了' },
+    en: { title:'Home Screen widgets', sub:'Put Word of the day, your Streak and a JLPT countdown on your Home Screen — no need to open the app.', btn:'See how to add', examCta:'Put the exam countdown on your Home Screen', how:'How to add a widget',
+      steps:['Go to the Home Screen and touch and hold an empty area until the icons jiggle','Tap Edit at the top left, then Add Widget (on older iOS, tap the + button)','Scroll down to 日本再留計劃 (StayJP), or type 日本再留 in the search field, and tap it','Swipe to pick a style and size, tap Add Widget, then tap Done'],
+      note:'There are three: Word of the day (changes at midnight), Streak (your streak and today\'s progress) and JLPT countdown (counts down to the exam date you set above). If the app doesn\'t show up, open it once and look again.', ok:'Got it' },
+    ko: { title:'홈 화면 위젯', sub:'"오늘의 단어", "연속 학습", "JLPT 디데이"를 홈 화면에 두면 앱을 열지 않아도 볼 수 있어요.', btn:'추가하는 방법 보기', examCta:'시험 디데이를 홈 화면에 두기', how:'홈 화면에 추가하는 방법',
+      steps:['홈 화면으로 돌아가 빈 곳을 아이콘이 흔들릴 때까지 길게 누르세요','왼쪽 위 "편집" → "위젯 추가"를 누르세요 (이전 iOS는 왼쪽 위 "+")','목록에서 "日本再留計劃"(StayJP)을 찾아 누르세요 (검색창에 日本再留 입력도 가능)','좌우로 넘겨 모양과 크기를 고르고 "위젯 추가", 그다음 오른쪽 위 "완료"를 누르세요'],
+      note:'세 가지가 있어요: 오늘의 단어(매일 자정에 바뀜), 연속 학습(연속 일수와 오늘 진도), JLPT 디데이(위에서 정한 시험일까지 매일 하루씩 줄어요). 안 보이면 앱을 한 번 연 뒤 다시 찾아보세요.', ok:'알겠어요' },
+    vi: { title:'Tiện ích màn hình chính', sub:'Đặt "Từ vựng hôm nay", "Chuỗi ngày học" và "Đếm ngược JLPT" lên màn hình chính, không cần mở app vẫn xem được.', btn:'Xem cách thêm', examCta:'Đặt đếm ngược kỳ thi lên màn hình chính', how:'Cách thêm tiện ích',
+      steps:['Về màn hình chính, chạm và giữ chỗ trống cho đến khi các biểu tượng rung','Chạm "Sửa" ở góc trên bên trái → "Thêm tiện ích" (iOS cũ: nút "+")','Kéo xuống tìm 日本再留計劃 (StayJP), hoặc gõ 日本再留 vào ô tìm kiếm, rồi chạm vào','Vuốt để chọn kiểu và kích thước, chạm "Thêm tiện ích", rồi chạm "Xong"'],
+      note:'Có ba loại: Từ vựng hôm nay (đổi lúc nửa đêm), Chuỗi ngày học (số ngày liên tiếp và tiến độ hôm nay), Đếm ngược JLPT (đếm đến ngày thi bạn đặt ở trên). Nếu không thấy, hãy mở app một lần rồi tìm lại.', ok:'Đã hiểu' },
+    id: { title:'Widget layar utama', sub:'Taruh "Kata hari ini", "Runtun belajar", dan "Hitung mundur JLPT" di layar utama, bisa dilihat tanpa membuka app.', btn:'Lihat cara menambah', examCta:'Taruh hitung mundur ujian di layar utama', how:'Cara menambah widget',
+      steps:['Kembali ke layar utama, sentuh dan tahan area kosong sampai ikon bergoyang','Ketuk "Edit" di kiri atas → "Tambah Widget" (iOS lama: tombol "+")','Gulir dan cari 日本再留計劃 (StayJP), atau ketik 日本再留 di kolom cari, lalu ketuk','Geser untuk memilih gaya dan ukuran, ketuk "Tambah Widget", lalu "Selesai"'],
+      note:'Ada tiga: Kata hari ini (berganti tengah malam), Runtun belajar (jumlah hari beruntun dan progres hari ini), Hitung mundur JLPT (menghitung ke tanggal ujian yang kamu atur di atas). Kalau tidak muncul, buka app sekali lalu cari lagi.', ok:'Mengerti' },
+    th: { title:'วิดเจ็ตหน้าโฮม', sub:'วาง "คำศัพท์วันนี้" "เรียนต่อเนื่อง" และ "นับถอยหลัง JLPT" ไว้บนหน้าโฮม ดูได้โดยไม่ต้องเปิดแอป', btn:'ดูวิธีเพิ่ม', examCta:'วางนับถอยหลังวันสอบไว้บนหน้าโฮม', how:'วิธีเพิ่มวิดเจ็ต',
+      steps:['กลับไปที่หน้าโฮม แตะค้างที่พื้นที่ว่างจนไอคอนเริ่มสั่น','แตะ "แก้ไข" มุมซ้ายบน → "เพิ่มวิดเจ็ต" (iOS รุ่นเก่า: ปุ่ม "+")','เลื่อนหา 日本再留計劃 (StayJP) หรือพิมพ์ 日本再留 ในช่องค้นหา แล้วแตะเข้าไป','ปัดเลือกแบบและขนาด แตะ "เพิ่มวิดเจ็ต" แล้วแตะ "เสร็จสิ้น"'],
+      note:'มีสามแบบ: คำศัพท์วันนี้ (เปลี่ยนตอนเที่ยงคืน) เรียนต่อเนื่อง (จำนวนวันต่อเนื่องและความคืบหน้าวันนี้) นับถอยหลัง JLPT (นับถึงวันสอบที่ตั้งไว้ด้านบน) ถ้าหาไม่เจอ ให้เปิดแอปหนึ่งครั้งแล้วลองหาใหม่', ok:'เข้าใจแล้ว' },
+  };
+  function _esc(x){ return String(x == null ? '' : x).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+  function _wt(k){ let l = 'zh-TW'; try { l = (typeof I18n !== 'undefined' && I18n.getLang) ? I18n.getLang() : (localStorage.getItem('ui_lang') || 'zh-TW'); } catch(e){} return (_WT[l] || _WT['zh-TW'])[k]; }
+  function _wtOK(){ const n = window.STAYJP_NATIVE; return !!(n && n.isNativeApp && n.platform === 'ios' && n.widgets); }
+  function _wtClose(){ const m = document.getElementById('sjWtHow'); if (m) m.remove(); document.removeEventListener('keydown', _wtKey); }
+  function _wtKey(e){ if (e.key === 'Escape') _wtClose(); }
+  function _wtHow(){
+    _wtClose();
+    const m = document.createElement('div'); m.id = 'sjWtHow'; m.setAttribute('data-nolang', '1');
+    m.style.cssText = 'position:fixed;inset:0;z-index:10050;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;padding:16px';
+    m.innerHTML = `<div role="dialog" aria-modal="true" style="background:var(--bg);color:var(--tx);border-radius:16px;padding:20px 18px 16px;width:100%;max-width:420px;max-height:calc(100vh - 32px);overflow:auto;box-shadow:0 12px 40px rgba(0,0,0,.25)">
+      <h3 style="margin:0 0 14px;font-size:17px">${_esc(_wt('how'))}</h3>
+      <ol style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:12px">${_wt('steps').map((x,i)=>`<li style="display:flex;gap:10px;align-items:flex-start;font-size:14px;line-height:1.6"><b style="flex:none;width:24px;height:24px;border-radius:50%;background:var(--ac);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12.5px;margin-top:1px">${i+1}</b><span>${_esc(x)}</span></li>`).join('')}</ol>
+      <div style="font-size:12.5px;margin:16px 0 0;padding:12px 13px;background:var(--bg2);border-radius:10px;line-height:1.65;color:var(--tx2)">${_esc(_wt('note'))}</div>
+      <button type="button" onclick="Stats._wtClose()" style="display:block;width:100%;margin-top:16px;padding:11px;border-radius:10px;border:none;background:var(--ac);color:#fff;font:inherit;font-weight:700;cursor:pointer">${_esc(_wt('ok'))}</button>
+    </div>`;
+    m.addEventListener('click', (e) => { if (e.target === m) _wtClose(); });
+    document.body.appendChild(m); document.addEventListener('keydown', _wtKey);
+  }
+  // 從「JLPT 倒數」小工具點進來(App 注入呼叫):開「我的 → 設定」,捲到 JLPT 考試日並閃一下
+  function openExam(){
+    try { openProfile(); switchTab('settings'); } catch(e) { return; }
+    setTimeout(() => {
+      const el = document.getElementById('setExamInfo'); if (!el) return;
+      const card = el.parentNode || el;
+      try { card.scrollIntoView({ behavior:'smooth', block:'center' }); } catch(e) { card.scrollIntoView(); }
+      const old = card.style.boxShadow; card.style.transition = 'box-shadow .3s'; card.style.boxShadow = '0 0 0 2px var(--ac)';
+      setTimeout(() => { card.style.boxShadow = old; }, 1800);
+    }, 120);
   }
   function _setReminder(){ const t=document.getElementById('setRmTime'); if(!t)return; if(typeof enableDailyReminder==='function')enableDailyReminder(t.value); else { try{ localStorage.setItem('reminder_time_pref',t.value); }catch(e){} } if(typeof showToast==='function')showToast('提醒已設 '+t.value); }
   function _clearReminder(){ try{ localStorage.removeItem('reminder_time_pref'); }catch(e){}
@@ -976,6 +1037,6 @@ const Stats = (() => {
     _renderFL();
   }
 
-  return { open, openProfile, close, switchTab, _setFont, _setFab, _setTheme, _setLevel, _setExam, _setReminder, _clearReminder, _toggleQh, quizWeak, retryWrong, _answerWeak, addToNotebook, removeFromNotebook, quizNotebook, reviewNotebook, addWrongQuestion, getWrongQuestions, removeWrongQuestion, setWrongFilter, quizWrongQuestions, _wqAnswer, _wqNext, _wqRemoveAndNext, quizFavListening, _flReplay, _flAnswer, _flNext };
+  return { open, openProfile, openExam, _wtHow, _wtClose, close, switchTab, _setFont, _setFab, _setTheme, _setLevel, _setExam, _setReminder, _clearReminder, _toggleQh, quizWeak, retryWrong, _answerWeak, addToNotebook, removeFromNotebook, quizNotebook, reviewNotebook, addWrongQuestion, getWrongQuestions, removeWrongQuestion, setWrongFilter, quizWrongQuestions, _wqAnswer, _wqNext, _wqRemoveAndNext, quizFavListening, _flReplay, _flAnswer, _flNext };
 })();
 try { window.Stats = Stats; } catch (e) {}
