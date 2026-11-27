@@ -59,7 +59,7 @@
   }
   function bgmVol(mode) {
     if (!S || !S.bgm) return;
-    const v = !bgmOn() ? 0 : mode === 'duck' ? 0.06 : mode === 'off' ? 0 : 0.16;
+    const v = !bgmOn() ? 0 : mode === 'duck' ? 0.4 : mode === 'off' ? 0 : 0.8;   // bgm.mp3 v2 檔案本身已壓到約 -37 LUFS(台詞約 -24);iOS 會無視 volume,所以靠檔案本身夠小
     S.bgm.volume = v;
   }
 
@@ -99,7 +99,7 @@
     S.state = 'playing'; S.i = -1; S.paused = false;
     // 聲音要在這次點擊裡開:背景音樂直接播;台詞用同一個 <audio>,先靜音播一下把它解鎖(iOS)
     try {
-      if (!S.bgm) { S.bgm = new Audio(AU + 'bgm.mp3?v=1'); S.bgm.loop = true; }
+      if (!S.bgm) { S.bgm = new Audio(AU + 'bgm.mp3?v=2'); S.bgm.loop = true; }
       S.bgm.currentTime = 0; bgmVol('full'); const p = S.bgm.play(); if (p && p.catch) p.catch(() => {});
     } catch (e) {}
     try {
@@ -156,7 +156,7 @@
     const sk = S.sk;
     setPose(sk.end); emote({ t: '♪', k: '♪' });
     ['t', 'k'].forEach(w => { S.el[w].classList.remove('talk'); S.el[w].classList.add('hop'); });
-    try { S.bgm.volume = bgmOn() ? 0.1 : 0; } catch (e) {}
+    try { S.bgm.volume = bgmOn() ? 0.6 : 0; } catch (e) {}
     const byW = {}; (S.opt.words || []).forEach(w => { byW[w.w] = w; });
     const chips = (sk.used || []).map(x => { const w = byW[x]; return '<span class="pt-eg-chip">' + esc(x) + (w && w.r && w.r !== x ? ' <small>' + esc(w.r) + '</small>' : '') + '</span>'; }).join('');
     document.getElementById('psSub').innerHTML = '<div class="ps-title">' + L('剛剛聽到的這些字,現在來背', 'Now learn the words you just heard') + '</div>'
