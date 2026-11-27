@@ -739,14 +739,14 @@
       + '.quiz-bg.pt-full .pt-scroll{flex:1 1 auto;min-height:0;overflow-y:auto;margin:12px -4px 14px;padding:0 4px;border-top:1px solid var(--line);-webkit-overflow-scrolling:touch}'
       + '.quiz-bg.pt-full .pt-step>.pt-cta{flex:0 0 auto;margin-top:0}'
       // 闖關裡的翻卡(srs.js):卡片吃滿剩下的高度、字放大、翻面後按鈕落到最下面(大拇指按得到),統計縮成標題下一行小字(2026-11-27 Mia:空白好多)
-      + '.quiz-bg.pt-full .srs-card:has(>.srs-front){flex:1 1 auto;min-height:0;order:2;margin:14px 0 0;justify-content:center}'
+      + '.quiz-bg.pt-full .srs-card:has(>.srs-front){flex:1 1 auto;min-height:0;order:2;margin:14px 0 0;justify-content:flex-start;overflow-y:auto;-webkit-overflow-scrolling:touch}'
       + '.quiz-bg.pt-full .srs-card:has(>.srs-front)~.srs-stats-wrap{order:1;justify-content:flex-start;margin:6px 0 0;padding-bottom:12px;border-bottom:1px solid var(--line,var(--bd))}'
       + '.quiz-bg.pt-full .srs-card:has(>.srs-front)~.srs-stats-wrap .srs-donut{display:none}'
       + '.quiz-bg.pt-full .srs-card:has(>.srs-front)~.srs-stats-wrap .srs-legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12.5px}'
-      + '.quiz-bg.pt-full .srs-front,.quiz-bg.pt-full .srs-back{flex:1 1 auto;display:flex;flex-direction:column;justify-content:center}'
+      + '.quiz-bg.pt-full .srs-front,.quiz-bg.pt-full .srs-back{flex:1 0 auto;align-self:stretch;display:flex;flex-direction:column;justify-content:center}'
       + '.quiz-bg.pt-full .srs-front .qmain,.quiz-bg.pt-full .srs-back .qmain{font-size:clamp(44px,13vw,64px);line-height:1.2}'
       + '.quiz-bg.pt-full .srs-back>:first-child{margin-top:auto}'
-      + '.quiz-bg.pt-full .srs-back .srs-btns{margin-top:auto;padding-top:18px}'
+      + '.quiz-bg.pt-full .srs-back .srs-btns{margin-top:auto;padding-top:18px;width:100%}.quiz-bg.pt-full .srs-card .srs-btn{flex:1;min-height:48px;padding:12px 8px;font-size:16px}'
       // 翻卡/打字/聽打切換:從標題列旁的小膠囊改成標題下獨立一排、三等分、iOS 分段樣式(按得到、不擠標題)
       + '.quiz-bg.pt-full .qhd:has(.srs-seg){flex-wrap:wrap;row-gap:12px}'
       + '.quiz-bg.pt-full .qhd .srs-seg{order:3;flex:1 0 100%;margin:0;border:0;border-radius:12px;padding:3px;background:var(--bg3);gap:3px}'
@@ -801,5 +801,5 @@
     document.head.appendChild(st);
   }
 
-  root.Path = { hubCardHtml, openMap, close, startUnit, setLevel, level, units, currentIndex, sig, resetLevel, dismissPlaced, startFrom, askStartFrom, menu, confirmReset, testLevel, premium, _quiz: () => quizStep(QUIZ_N), _ans, _next, _qFor: questionsFor };
+  root.Path = { fullOn, hubCardHtml, openMap, close, startUnit, setLevel, level, units, currentIndex, sig, resetLevel, dismissPlaced, startFrom, askStartFrom, menu, confirmReset, testLevel, premium, _quiz: () => quizStep(QUIZ_N), _ans, _next, _qFor: questionsFor };
 })(window);

@@ -171,6 +171,8 @@ const SRS = (() => {
     cur = 0;
     renderCard();
     document.getElementById('quizBg').classList.add('show');
+    // 2026-11-28 Mia:「間隔複習的單字卡還是舊樣式」→ 所有翻卡都用闖關那套整頁面板(path.js fullOn)
+    try { if (window.Path && Path.fullOn) Path.fullOn(); } catch (e) {}
   }
 
   // ── 打字模式(使用者回饋:單字複習想用打的)──

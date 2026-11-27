@@ -365,7 +365,7 @@ const Stats = (() => {
 
   function reviewNotebook() {
     const nb = getNotebook();
-    if (!nb.length) { alert(t('notebook_empty_alert')); return; }
+    if (!nb.length) { (window.AppUI ? AppUI.alert : alert)(t('notebook_empty_alert')); return; }
     document.getElementById('quizBg').classList.add('show');   // 我的頁 inline → 須開 overlay 才看得到逐一複習卡
     let cur = 0;
     function renderCard() {
@@ -373,14 +373,15 @@ const Stats = (() => {
       document.getElementById('quizBox').innerHTML = `
         <div class="qhd"><span>${t('nb_progress', { cur: cur+1, total: nb.length })}</span><button class="qclose" style="width:auto;margin:0;padding:2px 10px" onclick="Stats.close()"><i data-ic=x></i></button></div>
         <div class="srs-card" onclick="this.querySelector('#nbBack').style.display='';this.querySelector('#nbFront').style.display='none'">
-          <div id="nbFront"><div class="qmain">${item.w}</div>${item.w!==item.r?'<div class="qsub">'+item.r+'</div>':''}<div class="srs-hint">${t('flip_hint')}</div></div>
-          <div id="nbBack" style="display:none"><div class="qmain">${item.w}</div>${item.w!==item.r?'<div class="qsub">'+item.r+'</div>':''}<div class="srs-meaning">${typeof cvt==='function'?cvt(item.m):item.m}</div>
+          <div class="srs-front" id="nbFront"><div class="qmain">${item.w}</div>${item.w!==item.r?'<div class="qsub">'+item.r+'</div>':''}<div class="srs-hint">${t('flip_hint')}</div></div>
+          <div class="srs-back" id="nbBack" style="display:none"><div class="qmain">${item.w}</div>${item.w!==item.r?'<div class="qsub">'+item.r+'</div>':''}<div class="srs-meaning">${typeof cvt==='function'?cvt(item.m):item.m}</div>
             <div class="srs-btns">
               <button class="srs-btn srs-hard" onclick="event.stopPropagation();Stats._nbNext()">${t('nb_next')}</button>
               <button class="srs-btn srs-ok" onclick="event.stopPropagation();Stats.removeFromNotebook('${item.w.replace(/'/g,"\\'")}','${item.lv}');Stats._nbNext()">${t('nb_remove')}</button>
             </div>
           </div>
         </div>`;
+      try { if (window.Path && Path.fullOn) Path.fullOn(); } catch (e) {}   // 2026-11-28 翻卡統一用整頁面板
     }
     Stats._nbNext = function() { cur++; if (cur >= nb.length) { open(); } else { renderCard(); } };
     renderCard();

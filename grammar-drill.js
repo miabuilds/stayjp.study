@@ -139,11 +139,11 @@ const GrammarDrill = (() => {
     document.getElementById('quizBox').innerHTML = `
       <div class="qhd"><span>${t('grammar')} ${cur+1} / ${queue.length}</span><span>${isNew?t('gd_new'):t('gd_review')}</span><button class="qclose" style="width:auto;margin:0;padding:2px 10px" onclick="GrammarDrill.close()"><i data-ic=x></i></button></div>
       <div class="srs-card" onclick="GrammarDrill.flip()">
-        <div id="gdFront">
-          <div class="qmain" style="font-size:22px">${g.t}</div>
+        <div class="srs-front" id="gdFront">
+          <div class="qmain" style="font-size:26px">${g.t}</div>
           <div class="srs-hint">${t('gd_flip_hint')}</div>
         </div>
-        <div id="gdBack" style="display:none">
+        <div class="srs-back" id="gdBack" style="display:none">
           <div style="font-size:18px;font-weight:700;margin-bottom:8px">${g.t}</div>
           <div style="background:#FEF3C7;border-radius:7px;padding:8px 12px;font-size:14px;font-weight:600;color:#92400E;border-left:3px solid #D97706;margin:8px 0">${window.linkGrammarTerms?window.linkGrammarTerms(g.p):g.p}</div>
           <div style="font-size:14px;color:var(--tx);margin:8px 0;line-height:1.7">${(function(){var s=typeof cvt==='function'?cvt(g.ex):g.ex;return window.linkGrammarTerms?window.linkGrammarTerms(s):s;})()}</div>
@@ -159,6 +159,7 @@ const GrammarDrill = (() => {
           </div>
         </div>
       </div>`;
+    try { if (window.Path && Path.fullOn) Path.fullOn(); } catch (e) {}   // 2026-11-28 翻卡統一用整頁面板
   }
 
   function flip() {
