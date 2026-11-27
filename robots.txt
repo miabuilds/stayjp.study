@@ -3,3 +3,4 @@ Allow: /
 
 Sitemap: https://stayjp.study/sitemap.xml
 Sitemap: https://stayjp.study/sitemap-grammar.xml
+Sitemap: https://stayjp.study/sitemap-grammar-l10n.xml
