@@ -13,7 +13,7 @@
   const esc = s => String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   // 劇本資料按等級、每 25 關分一檔(path-skit-n5-0.js…,scripts/pathskit/build.py 產),進那一關才載入那一檔。
   // 有做的等級和版本號寫在 LEVELS;改了資料檔要把版本 +1。
-  const LEVELS = { n5: 3, n4: 2, n3: 3, n2: 3, n1: 2 };
+  const LEVELS = { n5: 4, n4: 3, n3: 4, n2: 4, n1: 3 };   // 2026-11-28 日文優先全面重寫
   const CHUNK = 25;
   const SKITS = root.PATH_SKITS = root.PATH_SKITS || {};
   const loading = {};
@@ -99,7 +99,7 @@
 
   // 先把第 n 句音檔抓進快取(另開一個 Audio 只載不播)
   function warm(n) {
-    try { const ln = S && S.sk.lines[n]; if (!ln) return; const a = new Audio(); a.preload = 'auto'; a.src = AU + ln.au + '.mp3?v=1'; a.load(); S.warm.push(a); if (S.warm.length > 3) S.warm.shift(); } catch (e) {}
+    try { const ln = S && S.sk.lines[n]; if (!ln) return; const a = new Audio(); a.preload = 'auto'; a.src = AU + ln.au + '.mp3?v=2'; a.load(); S.warm.push(a); if (S.warm.length > 3) S.warm.shift(); } catch (e) {}
   }
 
   function start() {
@@ -113,7 +113,7 @@
     } catch (e) {}
     try {
       if (!S.voice) S.voice = new Audio();
-      S.voice.muted = true; S.voice.src = AU + S.sk.lines[0].au + '.mp3?v=1'; const p = S.voice.play();
+      S.voice.muted = true; S.voice.src = AU + S.sk.lines[0].au + '.mp3?v=2'; const p = S.voice.play();
       // 解鎖用的靜音試播:網路慢時它會比第一句晚結束 → 只有第一句還沒開始才收掉,不然會把正在講的台詞按暫停(之前卡住 9 秒的原因)
       const v = S.voice;
       if (p && p.then) p.then(() => { if (S === tk && S.i < 0) { v.pause(); v.currentTime = 0; v.muted = false; } }).catch(() => { if (S === tk && S.i < 0) v.muted = false; }); else v.muted = false;   // 第一句已開始就不碰它(由 next 負責)
@@ -148,7 +148,7 @@
       // 之前先取消靜音再換 src → 解鎖用的靜音試播被聽見幾個字,接著重新載入卡一秒、再從頭念(Mia 11/27 回報)
       const a = S.voice; a.onended = after; a.onerror = after;
       try { a.pause(); } catch (e) {}
-      if ((a.src || '').indexOf('/' + ln.au + '.mp3') < 0) a.src = AU + ln.au + '.mp3?v=1'; else { try { a.currentTime = 0; } catch (e) {} }
+      if ((a.src || '').indexOf('/' + ln.au + '.mp3') < 0) a.src = AU + ln.au + '.mp3?v=2'; else { try { a.currentTime = 0; } catch (e) {} }
       a.muted = false;
       const p = a.play(); if (p && p.catch) p.catch(() => later(2200, after));
       later(9000, after);   // 保險:音檔事件沒來也會往下走,不會卡住

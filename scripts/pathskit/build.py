@@ -85,7 +85,7 @@ for src in srcs:
                 need(p not in BAD_POSE, tag + " 禁用姿勢 " + p)
         for k in ("zh", "en", "ko"):
             need(e["title"].get(k), tag + " title 缺 " + k); need(e["intro"].get(k), tag + " intro 缺 " + k)
-        need(len(e["used"]) >= min(2, len(words)), tag + " used 至少 2 個這關的字")
+        need(len(e["used"]) >= 1, tag + " used 至少 1 個這關的字(自然帶到就好,不硬塞)")
         for w in e["used"]:
             need(w in words, tag + " used 不是這關的字: " + w)
             need(any(has_word(w, strip(l["j"])) for l in e["lines"]), tag + " used 沒出現在台詞: " + w)
