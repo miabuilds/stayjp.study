@@ -165,6 +165,7 @@
 
 <div id="modalHost"></div>
 
+<script src="ui-modal.js"></script>
 <script src="icons.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
@@ -442,14 +443,14 @@ function showMember(i){
 function closeModal(){ document.getElementById('modalHost').innerHTML=''; }
 
 async function settle(code, locked){
-  if(!confirm('確認已把 '+code+' 的可領分潤 '+fmt(locked)+' 匯款了嗎?\n按確定=標記已付(建立結算紀錄、轉已付款、扣抵退款負債)。實際匯款請自行完成。'))return;
+  if(!await AppUI.confirm('確認已把 '+code+' 的可領分潤 '+fmt(locked)+' 匯款了嗎?\n按確定=標記已付(建立結算紀錄、轉已付款、扣抵退款負債)。實際匯款請自行完成。'))return;
   try{ const t=await auth.currentUser.getIdToken();
     const r=await fetch(FN_SETTLE,{method:'POST',headers:{Authorization:'Bearer '+t,'Content-Type':'application/json'},body:JSON.stringify({code})});
     const d=await r.json();
-    if(!r.ok||!d.ok){ alert('結算失敗:'+(d.error||r.status)); return; }
-    alert(d.nothing?'此碼目前沒有可結算分潤。':('已結算 '+code+':'+d.count+' 筆,淨額 '+fmt(d.net_twd||0)+(d.clawback_twd?'(扣退款負債 '+fmt(d.clawback_twd)+')':'')));
+    if(!r.ok||!d.ok){ AppUI.alert('結算失敗:'+(d.error||r.status)); return; }
+    AppUI.alert(d.nothing?'此碼目前沒有可結算分潤。':('已結算 '+code+':'+d.count+' 筆,淨額 '+fmt(d.net_twd||0)+(d.clawback_twd?'(扣退款負債 '+fmt(d.clawback_twd)+')':'')));
     loadData();
-  }catch(e){ alert('結算失敗:'+e.message); }
+  }catch(e){ AppUI.alert('結算失敗:'+e.message); }
 }
 </script>
 </body>

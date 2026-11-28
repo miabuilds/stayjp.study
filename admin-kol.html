@@ -92,6 +92,7 @@
   </div>
 </div>
 
+<script src="ui-modal.js"></script>
 <script src="icons.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
@@ -247,16 +248,16 @@ function applyRange() {
 }
 
 async function settleKol(code, locked) {
-  if (!confirm('確認你已把 ' + code + ' 的可領分潤 NT$' + Number(locked).toLocaleString() + ' 匯款給對方了嗎?\n\n按確定 = 標記已付款(建立結算紀錄、把這些分潤轉「已付款」、並自動扣抵任何退款負債)。實際匯款請先自行完成。')) return;
+  if (!await AppUI.confirm('確認你已把 ' + code + ' 的可領分潤 NT$' + Number(locked).toLocaleString() + ' 匯款給對方了嗎?\n\n按確定 = 標記已付款(建立結算紀錄、把這些分潤轉「已付款」、並自動扣抵任何退款負債)。實際匯款請先自行完成。')) return;
   try {
     const t = await auth.currentUser.getIdToken();
     const r = await fetch(FN_SETTLE, { method: 'POST', headers: { 'Authorization': 'Bearer ' + t, 'Content-Type': 'application/json' }, body: JSON.stringify({ code }) });
     const d = await r.json();
-    if (!r.ok || !d.ok) { alert('結算失敗:' + (d.error || r.status)); return; }
-    if (d.nothing) alert('此碼目前沒有可結算的分潤。');
-    else alert('已結算 ' + code + ':' + d.count + ' 筆,淨額 NT$' + Number(d.net_twd || 0).toLocaleString() + (d.clawback_twd ? '(已扣退款負債 NT$' + Number(d.clawback_twd).toLocaleString() + ')' : ''));
+    if (!r.ok || !d.ok) { AppUI.alert('結算失敗:' + (d.error || r.status)); return; }
+    if (d.nothing) AppUI.alert('此碼目前沒有可結算的分潤。');
+    else AppUI.alert('已結算 ' + code + ':' + d.count + ' 筆,淨額 NT$' + Number(d.net_twd || 0).toLocaleString() + (d.clawback_twd ? '(已扣退款負債 NT$' + Number(d.clawback_twd).toLocaleString() + ')' : ''));
     loadPayout();
-  } catch (e) { alert('結算失敗:' + e.message); }
+  } catch (e) { AppUI.alert('結算失敗:' + e.message); }
 }
 function createRefCode() {
   const code = (document.getElementById('refCodeNew').value||'').trim().toUpperCase().replace(/[^A-Z0-9_-]/g,'').slice(0,32);
@@ -275,17 +276,17 @@ function createRefCode() {
     }).catch(e=>{ msg.style.color='#EF4444'; msg.textContent='建立失敗:'+e.message; });
   });
 }
-function setRate(code, cur) {
-  const v = prompt('設定 '+code+' 的抽成%(0-100):', cur);
+async function setRate(code, cur) {
+  const v = await AppUI.prompt('設定 '+code+' 的抽成%(0-100):', cur);
   if (v===null) return;
   const pct = Math.max(0,Math.min(100,parseInt(v,10)));
   if (isNaN(pct)) return;
   db.collection('ref_codes').doc(code).set({ commission_pct:pct },{merge:true}).then(()=>{ loadRefCodes(); loadPayout(); });
 }
 function toggleRefCode(code, activate){ db.collection('ref_codes').doc(code).set({ active:!!activate },{merge:true}).then(()=>{loadRefCodes();loadPayout();}); }
-function deleteRefCode(code, paid){
+async function deleteRefCode(code, paid){
   const warn = paid>0?`\n\n此碼已有 ${paid} 位付費歸因者,刪除後 KOL 統計頁與即時歸因會失效(歷史交易/抽成仍可從帳本查)。`:'';
-  if (!confirm('刪除推薦碼 '+code+'?此動作不可復原。'+warn)) return;
+  if (!await AppUI.confirm('刪除推薦碼 '+code+'?此動作不可復原。'+warn)) return;
   db.collection('ref_codes').doc(code).delete().then(()=>{loadRefCodes();loadPayout();}).catch(e=>{ const m=document.getElementById('refCodeMsg'); m.style.color='#EF4444'; m.textContent='刪除失敗:'+e.message; });
 }
 function copyTxt(t){ (navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(()=>{ const m=document.getElementById('refCodeMsg'); m.style.color='#16A34A'; m.textContent='已複製:'+t; }).catch(()=>{ const m=document.getElementById('refCodeMsg'); m.style.color='var(--tx2)'; m.textContent=t; }); }

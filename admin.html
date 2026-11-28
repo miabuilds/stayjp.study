@@ -449,6 +449,7 @@ textarea.note:focus{outline:none;border-color:var(--ac)}
 </div>
 
 <!-- Firebase SDK -->
+<script src="ui-modal.js"></script>
 <script src="icons.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
@@ -597,11 +598,11 @@ async function renderRefunds() {
  } catch (e) { box.innerHTML = '<span style="color:#EF4444">讀取失敗:' + e.message + '</span>'; }
 }
 async function markRefundDone(id) {
- if (!confirm('確認已把「實退金額」匯回給對方、標記為已處理?\n(記得也去「訂閱管理」取消/降級他的訂閱)')) return;
+ if (!await AppUI.confirm('確認已把「實退金額」匯回給對方、標記為已處理?\n(記得也去「訂閱管理」取消/降級他的訂閱)')) return;
  try {
   await db.collection('refund_requests').doc(id).set({ status: 'done', done_at: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true });
   renderRefunds();
- } catch (e) { alert('標記失敗:' + e.message); }
+ } catch (e) { AppUI.alert('標記失敗:' + e.message); }
 }
 
 // KOL 領款申請清單(payout_requests):KOL 線上簽協議後列這;你轉帳後標記已處理。身分證/地址只在 email 的 PDF。
@@ -637,11 +638,11 @@ async function renderPayouts() {
  } catch (e) { box.innerHTML = '<span style="color:#EF4444">讀取失敗:' + e.message + '</span>'; }
 }
 async function markPayoutDone(id) {
- if (!confirm('確認已轉帳給這位 KOL、標記為已處理?\n(記得單次撥款壓 NT$20,000 內免扣繳;並依需要結算他的 commissions)')) return;
+ if (!await AppUI.confirm('確認已轉帳給這位 KOL、標記為已處理?\n(記得單次撥款壓 NT$20,000 內免扣繳;並依需要結算他的 commissions)')) return;
  try {
   await db.collection('payout_requests').doc(id).set({ status: 'done', handled_at: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true });
   renderPayouts();
- } catch (e) { alert('標記失敗:' + e.message); }
+ } catch (e) { AppUI.alert('標記失敗:' + e.message); }
 }
 
 // PayPal 待開通清單(用戶在 pricing 點 PayPal 鈕時記錄的 paypal_pending)
@@ -822,7 +823,7 @@ function sendEmail(tmpl, f) {
  db.collection('feedback').doc(f.id).update({
  email_sent_at: firebase.firestore.FieldValue.serverTimestamp(),
  email_subject: subject,
- }).catch(err => alert('標記寄信失敗:' + err.message));
+ }).catch(err => AppUI.alert('標記寄信失敗:' + err.message));
 }
 
 async function setStatus(newStatus) {
@@ -832,7 +833,7 @@ async function setStatus(newStatus) {
  try {
  await db.collection('feedback').doc(currentFeedback.id).update(updates);
  } catch (err) {
- alert('更新失敗:' + err.message);
+ AppUI.alert('更新失敗:' + err.message);
  }
 }
 
@@ -841,9 +842,9 @@ async function saveNote() {
  const note = document.getElementById('dNote').value;
  try {
  await db.collection('feedback').doc(currentFeedback.id).update({ resolution_note: note });
- alert('已儲存');
+ AppUI.alert('已儲存');
  } catch (err) {
- alert('儲存失敗:' + err.message);
+ AppUI.alert('儲存失敗:' + err.message);
  }
 }
 
@@ -925,19 +926,19 @@ async function setSub(action) {
    if (dv) body.expiresAt = dv;   // 買斷留空 → 後端自動設永久(~100 年)
    const amtv = document.getElementById('ssAmount').value;
    if (amtv !== '') body.amount = Number(amtv);   // 留空 → 後端用方案定價
-   if (!confirm(`補開 ${email} 的「${document.getElementById('ssPlan').selectedOptions[0].text}」訂閱,到期 ${isLife ? '永久(買斷)' : dv}${amtv !== '' ? `,實付 NT$${amtv}` : '(用方案定價)'}?`)) return;
+   if (!await AppUI.confirm(`補開 ${email} 的「${document.getElementById('ssPlan').selectedOptions[0].text}」訂閱,到期 ${isLife ? '永久(買斷)' : dv}${amtv !== '' ? `,實付 NT$${amtv}` : '(用方案定價)'}?`)) return;
  } else if (action === 'extend') {
    body.days = Number(document.getElementById('ssDays').value || 0);
    if (!body.days || body.days <= 0) { msg.textContent = '請輸入延長天數'; msg.style.color = '#EF4444'; return; }
-   if (!confirm(`把 ${email} 的到期日往後延 ${body.days} 天?`)) return;
+   if (!await AppUI.confirm(`把 ${email} 的到期日往後延 ${body.days} 天?`)) return;
  } else if (action === 'cancel') {
-   if (!confirm(`取消 ${email} 的訂閱(關閉續扣,仍可用到到期日)?`)) return;
+   if (!await AppUI.confirm(`取消 ${email} 的訂閱(關閉續扣,仍可用到到期日)?`)) return;
  } else if (action === 'revoke') {
-   if (!confirm(`立即停用 ${email} 的訂閱、馬上收回 Premium?\n(到期日設為現在 → 對方立刻降回免費版;用於退費後收回。不列黑名單)`)) return;
+   if (!await AppUI.confirm(`立即停用 ${email} 的訂閱、馬上收回 Premium?\n(到期日設為現在 → 對方立刻降回免費版;用於退費後收回。不列黑名單)`)) return;
  } else if (action === 'refund') {
    body.amount = Number(document.getElementById('ssRefundAmt').value || 0);
    if (!body.amount || body.amount <= 0) { msg.textContent = '請輸入退回金額(NT$)'; msg.style.color = '#EF4444'; return; }
-   if (!confirm(`幫 ${email} 補記一筆退費 NT$${body.amount}?\n(只記帳、報表淨營收下修;不碰權限、不列黑名單)\n錢要你自己先在銀行轉回去,這裡只是記帳。`)) return;
+   if (!await AppUI.confirm(`幫 ${email} 補記一筆退費 NT$${body.amount}?\n(只記帳、報表淨營收下修;不碰權限、不列黑名單)\n錢要你自己先在銀行轉回去,這裡只是記帳。`)) return;
  }
  msg.textContent = '處理中…'; msg.style.color = 'var(--tx2)'; result.textContent = '';
  try {
@@ -984,21 +985,21 @@ async function renderErrLog() {
 
 // 校正早鳥計數器 = 重算成「實際持有早鳥的訂閱數」,修正 pricing 顯示的剩餘名額。
 async function recomputeEarlyBird() {
-  if (!confirm('把早鳥計數器校正成「實際持有數」?(修正 pricing 顯示的剩餘名額)')) return;
+  if (!await AppUI.confirm('把早鳥計數器校正成「實際持有數」?(修正 pricing 顯示的剩餘名額)')) return;
   try {
     const t = await auth.currentUser.getIdToken();
     const r = await fetch(FN_RECOMPUTE_EB, { method: 'POST', headers: { Authorization: 'Bearer ' + t } });
     const d = await r.json();
-    if (!r.ok) { alert('失敗:' + (d.error || r.status)); return; }
-    alert(`早鳥計數器 ${d.before} → ${d.after}(剩 ${d.remaining} 名額)`);
+    if (!r.ok) { AppUI.alert('失敗:' + (d.error || r.status)); return; }
+    AppUI.alert(`早鳥計數器 ${d.before} → ${d.after}(剩 ${d.remaining} 名額)`);
     renderStats();
-  } catch (e) { alert('錯誤:' + e.message); }
+  } catch (e) { AppUI.alert('錯誤:' + e.message); }
 }
 
 // 清掉孤兒 pending(棄單)：只刪超過 1 小時的「處理中」,未扣款、不影響營收/權限。
 async function cleanupPending() {
   const msg = document.getElementById('cleanupMsg');
-  if (!confirm('清掉所有「處理中」超過 1 小時的棄單交易?\n(未扣款、不影響營收/權限;不可復原)')) return;
+  if (!await AppUI.confirm('清掉所有「處理中」超過 1 小時的棄單交易?\n(未扣款、不影響營收/權限;不可復原)')) return;
   msg.textContent = '清理中…'; msg.style.color = 'var(--tx2)';
   try {
     const t = await auth.currentUser.getIdToken();
@@ -1013,7 +1014,7 @@ async function cleanupPending() {
 // 清除「寫死的測試帳號」資料(交易+訂閱+pending)並校正早鳥。後端寫死 allowlist,不可能誤刪真客人。
 async function purgeTest() {
   const msg = document.getElementById('cleanupMsg');
-  if (!confirm('隱藏 2 個測試帳號(knv2dycg8z / yujoulinforwork)的交易+訂閱,並校正早鳥名額?\n(假刪除:資料保留可復原,只動這 2 個寫死帳號,不影響真客人)')) return;
+  if (!await AppUI.confirm('隱藏 2 個測試帳號(knv2dycg8z / yujoulinforwork)的交易+訂閱,並校正早鳥名額?\n(假刪除:資料保留可復原,只動這 2 個寫死帳號,不影響真客人)')) return;
   msg.textContent = '清理中…'; msg.style.color = 'var(--tx2)';
   try {
     const t = await auth.currentUser.getIdToken();
@@ -1029,7 +1030,7 @@ async function purgeTest() {
 // uid 從點選的列帶來(非自由輸入),用於清測試殘留 / 已刪帳號的孤兒交易(email 查不到 uid 的情況)。
 async function purgeUid(uid) {
   if (!uid) return;
-  if (!confirm('隱藏此帳號的「訂閱 + 全部交易」?(假刪除,資料保留可復原)\n\nuid: ' + uid + '\n\n訂閱會設為 voided(撤銷 premium)、交易標記隱藏 → 從帳本消失但不真刪。')) return;
+  if (!await AppUI.confirm('隱藏此帳號的「訂閱 + 全部交易」?(假刪除,資料保留可復原)\n\nuid: ' + uid + '\n\n訂閱會設為 voided(撤銷 premium)、交易標記隱藏 → 從帳本消失但不真刪。')) return;
   try {
     const t = await auth.currentUser.getIdToken();
     const r = await fetch(FN_PURGE_TEST, {
@@ -1038,10 +1039,10 @@ async function purgeUid(uid) {
       body: JSON.stringify({ uid }),
     });
     const d = await r.json();
-    if (!r.ok) { alert('清除失敗:' + (d.error || r.status)); return; }
-    alert('已隱藏(假刪)' + uid + '\n交易 ' + (d.deletedTxns || 0) + ' 筆,早鳥校正為 ' + d.earlyBird + '\n(資料保留,需要可復原)');
+    if (!r.ok) { AppUI.alert('清除失敗:' + (d.error || r.status)); return; }
+    AppUI.alert('已隱藏(假刪)' + uid + '\n交易 ' + (d.deletedTxns || 0) + ' 筆,早鳥校正為 ' + d.earlyBird + '\n(資料保留,需要可復原)');
     renderLedger(); renderStats();
-  } catch (e) { alert('清除失敗:' + e.message); }
+  } catch (e) { AppUI.alert('清除失敗:' + e.message); }
 }
 
 // 帳本匯出用:renderLedger 載入時收集,exportLedgerCSV 下載。
@@ -1083,7 +1084,7 @@ function txnChannel(x) {
   return pm || '其他';
 }
 function exportLedgerCSV() {
-  if (!_ledgerExport.length) { alert('先按「重新整理」載入帳本再匯出'); return; }
+  if (!_ledgerExport.length) { AppUI.alert('先按「重新整理」載入帳本再匯出'); return; }
   const head = ['時間', 'Email/UID', '類型', '方案', '金額(NT$)', '付款方式', '狀態', '推薦碼', '交易ID'];
   const q = v => '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"';
   const lines = [head.map(q).join(',')];
@@ -1428,9 +1429,9 @@ function createRefCode() {
 function toggleRefCode(code, activate) {
   db.collection('ref_codes').doc(code).set({ active: !!activate }, { merge: true }).then(loadRefCodes);
 }
-function deleteRefCode(code, paid) {
+async function deleteRefCode(code, paid) {
   const warn = paid > 0 ? `\n\n此碼已有 ${paid} 位付費歸因者,刪除後 KOL 統計頁與即時歸因會失效(歷史交易/抽成仍可從帳本查)。` : '';
-  if (!confirm('刪除推薦碼 ' + code + '?此動作不可復原。' + warn)) return;
+  if (!await AppUI.confirm('刪除推薦碼 ' + code + '?此動作不可復原。' + warn)) return;
   db.collection('ref_codes').doc(code).delete().then(loadRefCodes).catch(e => { const m = document.getElementById('refCodeMsg'); m.style.color = '#EF4444'; m.textContent = '刪除失敗:' + e.message; });
 }
 function copyTxt(t) { (navigator.clipboard ? navigator.clipboard.writeText(t) : Promise.reject()).then(() => { const m = document.getElementById('refCodeMsg'); m.style.color = '#16A34A'; m.textContent = '已複製:' + t; }).catch(() => { const m = document.getElementById('refCodeMsg'); m.style.color = 'var(--tx2)'; m.textContent = t; }); }
@@ -1500,8 +1501,8 @@ async function loadRedeemUses() {
       }).join('') + '</tbody></table>';
   } catch (e) { box.textContent = '讀取失敗:' + e.message + (/index/i.test(e.message) ? '(需要 Firestore 索引 → 點錯誤裡的連結建一下)' : ''); }
 }
-function deleteRedeemCode(code) {
-  if (!confirm('刪除兌換碼 ' + code + '?\n(已經兌換過的人不受影響;只是這個碼之後不能再用)')) return;
+async function deleteRedeemCode(code) {
+  if (!await AppUI.confirm('刪除兌換碼 ' + code + '?\n(已經兌換過的人不受影響;只是這個碼之後不能再用)')) return;
   db.collection('redeem_codes').doc(code).delete().then(loadRedeemCodes).catch(e => { const m = document.getElementById('rdCodeMsg'); m.style.color = '#EF4444'; m.textContent = '刪除失敗:' + e.message; });
 }
 
