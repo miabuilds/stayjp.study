@@ -105,7 +105,8 @@
 </div>
 <script>
   const FN = 'https://asia-east1-jpnote-1bdd6.cloudfunctions.net/kolStats';
-  const HQ = 'https://stayhq.getclockin.workers.dev/api/partner/stats';
+  // 總部 API 走 staytw.pages.dev/hq 代理(Service Binding),不寫死 *.workers.dev(子網域改名/中國連不到時會失效)
+  const HQ = 'https://staytw.pages.dev/hq/api/partner/stats';
   const q = new URLSearchParams(location.search);
   const code = (q.get('code') || '').toUpperCase();
   const t = q.get('t') || '';
