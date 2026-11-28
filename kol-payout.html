@@ -43,6 +43,7 @@
   #agreement .sigimg{height:64px;max-width:220px;object-fit:contain;border-bottom:1px solid #333;min-width:160px}
   .muted{color:var(--tx2);font-size:12px}
 </style>
+<script src="ui-modal.js"></script>
 </head>
 <body>
 <div class="wrap">
@@ -227,7 +228,7 @@
         show($('done'));
       }).catch(function(e){
         btn.disabled=false; btn.textContent='確認簽署並申請領款';
-        alert('送出失敗:'+(e.message||e)+'\n請稍後再試,或聯絡我們。');
+        AppUI.alert('送出失敗:'+(e.message||e)+'\n請稍後再試,或聯絡我們。');
       });
     });
   }

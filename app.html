@@ -4994,7 +4994,6 @@ const Streak = (() => {
         const msg = cvt(`你已經連續學習 ${s.days} 天了！\n\n這份紀錄目前只存在這台裝置——清快取或換裝置就會消失。\n\n登入後雲端備份，1 秒搞定。要登入嗎？`);
         const go = () => { try { handleAuth(); } catch (e) {} };
         if (window.AppUI) AppUI.confirm(msg, { title: cvt('連續 ' + s.days + ' 天'), tone: 'cheer', okText: cvt('登入') }).then(ok => { if (ok) go(); });
-        else if (confirm(msg)) go();
       };
       setTimeout(() => fire(0), 1500);
     }
@@ -6503,7 +6502,7 @@ function toggleDetail(btn) {
 <script src="placement.js"></script>
 <script src="vocab-listen.js"></script>
 <script src="staytw-card.js"></script>
-<script src="stats.js?v=2"></script>
+<script src="stats.js?v=3"></script>
 <script src="grammar-glossary.js"></script>
 <script src="grammar-drill.js?v=2"></script>
 <script src="mock-exam.js"></script>

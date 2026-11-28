@@ -94,7 +94,7 @@ const Listening = (() => {
     if (typeof showToast === 'function') showToast('這題音檔暫缺,已記錄,近期補上 ');
   }
   function speakBrowser(text, rate) {
-    if (!window.speechSynthesis) { alert(t('ls_no_tts')); return; }
+    if (!window.speechSynthesis) { AppUI.alert(t('ls_no_tts')); return; }
     speechSynthesis.cancel();
     const u = new SpeechSynthesisUtterance(text);
     u.lang = 'ja-JP';
@@ -160,7 +160,7 @@ const Listening = (() => {
 
   let lastCountVal = '5';
   let lastBatchIds = [];  // 上一輪用過的題目 id，下一輪優先排除
-  function begin() {
+  async function begin() {
     // 從起始面板讀設定；若從結果頁呼叫則面板不存在，沿用上次（防止按鈕無反應）
     const lvEl = document.querySelector('#lsLevel .on');
     const ctEl = document.querySelector('#lsCount .on');
@@ -172,7 +172,7 @@ const Listening = (() => {
     if (lgEl) { jpMode = lgEl.dataset.v === 'jp'; try { localStorage.setItem('ls_jp', jpMode ? '1' : '0'); } catch (e) {} }
 
     const pool = items.filter(i => i.level === selectedLevel);
-    if (!pool.length) { alert(t('ls_no_data')); return; }
+    if (!pool.length) { AppUI.alert(t('ls_no_data')); return; }
 
     // 排除已答過的題目 — 用完了才允許 fallback 到全 pool（重複舊題）
     const done = getDone();
@@ -180,7 +180,7 @@ const Listening = (() => {
     let exhausted = false;
     if (available.length === 0) {
       // 全部題目都答過了 — 提示使用者並用全 pool（或返回讓使用者重置）
-      if (!confirm('你已完成這個等級的所有題目！\n按「確定」重置進度從頭再來，按「取消」回到設定頁。')) return;
+      if (!(await AppUI.confirm('你已完成這個等級的所有題目！\n按「確定」重置進度從頭再來，按「取消」回到設定頁。'))) return;
       resetDone(selectedLevel);
       available = pool.slice();
       exhausted = true;
@@ -368,12 +368,12 @@ const Listening = (() => {
     document.getElementById('quizBg').classList.remove('show');
   }
 
-  function resetCurrent() {
+  async function resetCurrent() {
     const lvEl = document.querySelector('#lsLevel .on');
     const lv = lvEl ? lvEl.dataset.v : selectedLevel;
     const done = doneCountFor(lv);
-    if (!done) { alert(`${lv.toUpperCase()} 還沒答過任何題目，沒東西可以重置。`); return; }
-    if (!confirm(`確定要重置 ${lv.toUpperCase()} 的已答記錄嗎？\n（${done} 題會重新加入抽題池）`)) return;
+    if (!done) { AppUI.alert(`${lv.toUpperCase()} 還沒答過任何題目，沒東西可以重置。`); return; }
+    if (!(await AppUI.confirm(`確定要重置 ${lv.toUpperCase()} 的已答記錄嗎？\n（${done} 題會重新加入抽題池）`))) return;
     resetDone(lv);
     start();  // 重新渲染 start 畫面，更新計數
   }

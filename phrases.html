@@ -74,6 +74,7 @@
 <script src="accent.js"></script>
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-2WP4D34LE3"></script>
 <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','G-2WP4D34LE3',{'app_platform':(window.STAYJP_NATIVE&&window.STAYJP_NATIVE.isNativeApp)?'app':'web'});</script>
+<script src="ui-modal.js"></script>
 </head>
 <body data-lang="zh">
 <div class="wrap">
@@ -515,7 +516,7 @@ const PShadow = (() => {
       on=true; ui(true); nPost({type:'SPEECH_START',lang:'ja-JP'});
       return;
     }
-    if(!SR){ alert('這個瀏覽器不支援語音辨識'); return; }
+    if(!SR){ AppUI.alert('這個瀏覽器不支援語音辨識'); return; }
     rec=new SR(); rec.lang='ja-JP'; rec.interimResults=true; rec.continuous=true;
     rec.onresult=e=>{ let it=''; for(let k=e.resultIndex;k<e.results.length;k++){ const t=e.results[k][0].transcript; if(e.results[k].isFinal) acc+=t; else it+=t; } feed(acc+it,false); };
     rec.onerror=e=>{ if(e.error==='no-speech'||e.error==='aborted')return; stop(false); };

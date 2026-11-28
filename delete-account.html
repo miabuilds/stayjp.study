@@ -40,6 +40,7 @@ a{color:var(--ac2)}
 <!-- 全站語言:i18n.js 依 ui_lang 載字典/對照表,translate-layer.js 把繁中 UI 換成外語 -->
 <script src="i18n.js"></script>
 <script src="translate-layer.js"></script>
+<script src="ui-modal.js"></script>
 </head>
 <body>
 
@@ -125,7 +126,7 @@ $('btnLogout').onclick = function () { auth.signOut(); say(''); };
 $('btnDelete').onclick = async function () {
   var u = auth.currentUser;
   if (!u) { say('請先登入。', '#EF4444'); return; }
-  if (!confirm('確定要永久刪除帳號嗎?\n\n學習進度、收藏、訂閱狀態都會被清除,無法復原。\n若尚未取消訂閱,請先取消再刪除,否則會繼續扣款。')) return;
+  if (!(await AppUI.confirm('確定要永久刪除帳號嗎?\n\n學習進度、收藏、訂閱狀態都會被清除,無法復原。\n若尚未取消訂閱,請先取消再刪除,否則會繼續扣款。'))) return;
   var btn = this;
   btn.disabled = true;
   say('刪除中…');

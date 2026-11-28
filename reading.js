@@ -100,7 +100,7 @@ const Reading = (() => {
 
   // 追蹤本 session 內最近讀過的 passage id，避免連續抽到同一篇
   const recentIds = {}; // { n5: [...], n4: [...], ... }
-  function begin() {
+  async function begin() {
     const lvEl = document.querySelector('#rdLevel .on');
     const tmEl = document.querySelector('#rdTimer .on');
     const mdEl = document.querySelector('#rdMode .on');
@@ -108,7 +108,7 @@ const Reading = (() => {
     if (tmEl) timerEnabled = tmEl.dataset.v === '1';
     if (mdEl) readMode = mdEl.dataset.v;
     const pool = passages.filter(p => p.level === selectedLevel);
-    if (!pool.length) { alert(t('rd_no_data')); return; }
+    if (!pool.length) { AppUI.alert(t('rd_no_data')); return; }
     const done = doneList(selectedLevel);
 
     // 依模式選池
@@ -116,7 +116,7 @@ const Reading = (() => {
     if (readMode === 'new') {
       candidates = pool.filter(p => !done.includes(p.id));
       if (!candidates.length) {
-        if (confirm(`${selectedLevel.toUpperCase()} 全部 ${pool.length} 篇都讀過了。要切換到「複習」模式重讀嗎？`)) {
+        if (await AppUI.confirm(`${selectedLevel.toUpperCase()} 全部 ${pool.length} 篇都讀過了。要切換到「複習」模式重讀嗎？`)) {
           readMode = 'review';
           candidates = pool.filter(p => done.includes(p.id));
         } else { start(); return; }
@@ -124,7 +124,7 @@ const Reading = (() => {
     } else if (readMode === 'review') {
       candidates = pool.filter(p => done.includes(p.id));
       if (!candidates.length) {
-        alert(`${selectedLevel.toUpperCase()} 還沒讀過任何一篇，請先用「新題」模式。`);
+        AppUI.alert(`${selectedLevel.toUpperCase()} 還沒讀過任何一篇，請先用「新題」模式。`);
         start(); return;
       }
     } else {

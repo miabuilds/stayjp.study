@@ -253,6 +253,7 @@ select.lang-btn option { color: var(--tx); background: var(--bg); }
   .qr-card img { max-width: 320px; }
 }
 </style>
+<script src="ui-modal.js"></script>
 </head>
 <body>
 
@@ -555,8 +556,8 @@ function signIn() {
     const code = err && err.code;
     // 良性:連點取消 / 關彈窗 / App 內原生登入橋接(OPEN_LOGIN),不該跳錯誤
     if (code === 'auth/cancelled-popup-request' || code === 'auth/popup-closed-by-user') return;
-    if (code === 'auth/network-request-failed') { alert('網路不穩,登入連線失敗,請稍後再試一次。'); return; }
-    alert('登入失敗：' + (err.message || err));
+    if (code === 'auth/network-request-failed') { AppUI.alert('網路不穩,登入連線失敗,請稍後再試一次。'); return; }
+    AppUI.alert('登入失敗：' + (err.message || err));
   });
 }
 
@@ -619,7 +620,7 @@ async function shotPick(inp) {
 // ========== FORM → Firestore ==========
 async function submitForm(e) {
   e.preventDefault();
-  if (!currentUser) { alert('請先登入'); return; }
+  if (!currentUser) { AppUI.alert('請先登入'); return; }
   const btn = document.getElementById('submitBtn');
   btn.disabled = true;
   btn.textContent = '送出中…';
@@ -659,7 +660,7 @@ async function submitForm(e) {
   } catch (err) {
     btn.disabled = false;
     btn.textContent = '送出';
-    alert('送出失敗：' + (err.message || err));
+    AppUI.alert('送出失敗：' + (err.message || err));
   }
 }
 </script>

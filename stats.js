@@ -287,7 +287,7 @@ const Stats = (() => {
         if (vocab) wrong.push({ vocab, lv, wrongCount: val.reviews - val.correct });
       }
     });
-    if (!wrong.length) { alert(t('no_wrong')); return; }
+    if (!wrong.length) { AppUI.alert(t('no_wrong')); return; }
     wrong.sort((a, b) => b.wrongCount - a.wrongCount);
     const picked = wrong.slice(0, 20);
     const allVocab = [...getVocabData('n5'), ...getVocabData('n4'), ...getVocabData('n3'), ...getVocabData('n2'), ...getVocabData('n1')];
@@ -311,7 +311,7 @@ const Stats = (() => {
     if (nb.find(x => x.w === w && x.lv === lv)) return false; // already exists
     nb.push({ w, r, m, lv, added: new Date().toISOString() });
     saveNotebook(nb);
-    if (!silent) alert(t('added_to_notebook', { w }));   // silent=true → 由呼叫端自行用 toast 提示
+    if (!silent) AppUI.alert(t('added_to_notebook', { w }));   // silent=true → 由呼叫端自行用 toast 提示
     return true;
   }
 
@@ -350,7 +350,7 @@ const Stats = (() => {
 
   function quizNotebook() {
     const nb = getNotebook();
-    if (nb.length < 4) { alert(t('notebook_min')); return; }
+    if (nb.length < 4) { AppUI.alert(t('notebook_min')); return; }
     const allVocab = [...getVocabData('n5'), ...getVocabData('n4'), ...getVocabData('n3'), ...getVocabData('n2'), ...getVocabData('n1')];
     const picked = [...nb].sort(() => Math.random() - 0.5).slice(0, 20);
     const qs = picked.map(item => {
@@ -552,7 +552,7 @@ const Stats = (() => {
         }
       }
     });
-    if (!weak.length) { alert(t('weak_none')); return; }
+    if (!weak.length) { AppUI.alert(t('weak_none')); return; }
 
     close();
     const count = Math.min(weak.length, 20);
@@ -977,7 +977,7 @@ const Stats = (() => {
         pool.push({ j, z });
       });
     } catch(e) {}
-    if (pool.length < 4) { alert('收藏少於 4 個，沒法出聽力題。先去單字或跟讀加幾個再來。'); return; }
+    if (pool.length < 4) { AppUI.alert('收藏少於 4 個，沒法出聽力題。先去單字或跟讀加幾個再來。'); return; }
     const items = pool.slice().sort(() => Math.random() - 0.5).slice(0, 20);
     _fl = { items, pool, cur: 0, correct: 0 };
     document.getElementById('quizBg').classList.add('show');

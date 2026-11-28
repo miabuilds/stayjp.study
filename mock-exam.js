@@ -198,7 +198,7 @@ const MockExam = (() => {
     const grammar = getGrammar(examLevel);
 
     if (!vocab.length || vocab.length < 10) {
-      alert(t('me_no_data')); return;
+      AppUI.alert(t('me_no_data')); return;
     }
 
     // 確定開考 → 立刻計入該等級(開了就算用掉 1 套,避免「開了不做完→無限重開」繞過)

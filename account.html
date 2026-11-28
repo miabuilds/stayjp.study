@@ -78,6 +78,7 @@ a:hover{text-decoration:underline}
 .ft a{color:var(--ac2)}
 </style>
 <script src="accent.js"></script>
+<script src="ui-modal.js"></script>
 </head>
 <body>
 
@@ -378,8 +379,8 @@ setTimeout(function () { if (!_acctResolved && !currentUser) _acctShowGate(); },
 // 內建瀏覽器(LINE/FB/IG/Threads/微信…)登入 Firebase 會壞(popup 被擋 → redirect 在分割儲存環境失敗
 // → firebaseapp.com「missing initial state」錯誤)。偵測到就擋下、教用外部瀏覽器開。
 function _isInApp(){ return /FBAN|FBAV|FB_IAB|Instagram|Line\/|MicroMessenger|Twitter|TikTok|KAKAOTALK|NAVER|Barcelona|BytedanceWebview/i.test(navigator.userAgent || ''); }
-function _copyThisUrl(){ const u=location.href; (navigator.clipboard? navigator.clipboard.writeText(u):Promise.reject()).then(()=>alert('連結已複製!貼到 Safari／Chrome 開啟再登入。')).catch(()=>prompt('複製這個連結,貼到 Safari／Chrome 開啟:', u)); }
-function _inAppBlockLogin(){ alert('你正在 App 內建瀏覽器(LINE／IG／Threads／FB／微信 等)開啟,社群登入會被擋、無法完成。\n\n請點右上／右下的「⋯」或「⋮」→ 選「用預設瀏覽器開啟」(Safari／Chrome),再登入。'); _copyThisUrl(); }
+function _copyThisUrl(){ const u=location.href; (navigator.clipboard? navigator.clipboard.writeText(u):Promise.reject()).then(()=>AppUI.alert('連結已複製!貼到 Safari／Chrome 開啟再登入。')).catch(()=>AppUI.prompt('複製這個連結,貼到 Safari／Chrome 開啟:', u)); }
+function _inAppBlockLogin(){ AppUI.alert('你正在 App 內建瀏覽器(LINE／IG／Threads／FB／微信 等)開啟,社群登入會被擋、無法完成。\n\n請點右上／右下的「⋯」或「⋮」→ 選「用預設瀏覽器開啟」(Safari／Chrome),再登入。').then(_copyThisUrl); }
 try { if (_isInApp()) { var _w=document.getElementById('inAppWarn'); if(_w) _w.style.display='block'; } } catch(e){}
 
 document.getElementById('loginBtn').onclick = () => {
@@ -390,8 +391,8 @@ document.getElementById('loginBtn').onclick = () => {
    const code = err && err.code;
    // 良性:連點取消 / 關彈窗 / App 內原生登入橋接(會發 OPEN_LOGIN 彈原生登入框,不該跳錯誤)
    if (code === 'auth/cancelled-popup-request' || code === 'auth/popup-closed-by-user') return;
-   if (code === 'auth/network-request-failed') { alert('網路不穩,登入連線失敗,請稍後再試一次。'); return; }
-   alert('登入失敗:' + (err && err.message || err));
+   if (code === 'auth/network-request-failed') { AppUI.alert('網路不穩,登入連線失敗,請稍後再試一次。'); return; }
+   AppUI.alert('登入失敗:' + (err && err.message || err));
  });
 };
 
@@ -403,9 +404,9 @@ document.getElementById('loginApple').onclick = () => {
  auth.signInWithPopup(provider).catch(err => {
    const code = err && err.code;
    if (code === 'auth/cancelled-popup-request' || code === 'auth/popup-closed-by-user') return;
-   if (code === 'auth/operation-not-allowed') { alert('Apple 登入還在設定中,請先用 Google 登入。'); return; }
-   if (code === 'auth/network-request-failed') { alert('網路不穩,登入連線失敗,請稍後再試一次。'); return; }
-   alert('Apple 登入失敗:' + (err && err.message || err));
+   if (code === 'auth/operation-not-allowed') { AppUI.alert('Apple 登入還在設定中,請先用 Google 登入。'); return; }
+   if (code === 'auth/network-request-failed') { AppUI.alert('網路不穩,登入連線失敗,請稍後再試一次。'); return; }
+   AppUI.alert('Apple 登入失敗:' + (err && err.message || err));
  });
 };
 
@@ -846,14 +847,14 @@ function initDeleteAccount() {
 initDeleteAccount();
 
 async function deleteAccount() {
-  if (!currentUser) { alert('請先登入'); return; }
+  if (!currentUser) { AppUI.alert('請先登入'); return; }
   // 取消訂閱的路徑各平台不同,講錯會讓人找不到而繼續被扣款。
   var _p = (window.STAYJP_NATIVE && window.STAYJP_NATIVE.platform) || '';
   var _cancelHint =
     _p === 'android' ? 'Google Play →(右上頭像)付款與訂閱 → 訂閱項目 → StayJP → 取消'
     : _p === 'ios'   ? 'iOS 設定 → 你的名字 → 訂閱項目 → StayJP → 取消'
     : '你當初訂閱的管道(App Store / Google Play / 網頁金流)';
-  if (!confirm('確定要永久刪除帳號?\n\n• 你的學習進度、收藏、訂閱狀態將被清除,無法復原。\n• 若你有訂閱,刪除帳號「不會」自動停止扣款 — 請先到 ' + _cancelHint + ' 取消,再刪帳號。\n\n仍要刪除?')) return;
+  if (!(await AppUI.confirm('確定要永久刪除帳號?\n\n• 你的學習進度、收藏、訂閱狀態將被清除,無法復原。\n• 若你有訂閱,刪除帳號「不會」自動停止扣款 — 請先到 ' + _cancelHint + ' 取消,再刪帳號。\n\n仍要刪除?'))) return;
   try {
     const idToken = await currentUser.getIdToken();
     const res = await fetch(FN_DELETE_ACCOUNT, {
@@ -861,17 +862,17 @@ async function deleteAccount() {
       headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + idToken },
     });
     const d = await res.json().catch(() => ({}));
-    if (!res.ok) { alert('刪除失敗:' + (d.message || d.error || res.status) + '\n請稍後再試或聯絡客服。'); return; }
-    alert('帳號已刪除。感謝你使用過 StayJP ');
+    if (!res.ok) { AppUI.alert('刪除失敗:' + (d.message || d.error || res.status) + '\n請稍後再試或聯絡客服。'); return; }
+    await AppUI.alert('帳號已刪除。感謝你使用過 StayJP ');
     try { await auth.signOut(); } catch (e) {}
     location.reload();
   } catch (e) {
-    alert('刪除失敗:' + e.message);
+    AppUI.alert('刪除失敗:' + e.message);
   }
 }
 
 async function cancelRenew() {
- if (!confirm('確定關閉自動續訂?到期日前都還能正常使用,到期後不再扣款。')) return;
+ if (!(await AppUI.confirm('確定關閉自動續訂?到期日前都還能正常使用,到期後不再扣款。'))) return;
  const btn = document.getElementById('btnCancelRenew');
  if (btn) { btn.disabled = true; btn.textContent = '處理中…'; }
  try {
@@ -881,11 +882,11 @@ async function cancelRenew() {
  headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + idToken },
  });
  const data = await res.json();
- if (!res.ok) { alert(data.reason || data.error || '操作失敗'); return; }
- alert(data.message || '已關閉自動續訂。');
+ if (!res.ok) { AppUI.alert(data.reason || data.error || '操作失敗'); return; }
+ await AppUI.alert(data.message || '已關閉自動續訂。');
  location.reload();
  } catch (err) {
- alert('操作失敗:' + err.message);
+ AppUI.alert('操作失敗:' + err.message);
  } finally {
  if (btn) { btn.disabled = false; btn.textContent = '關閉自動續訂'; }
  }
@@ -897,10 +898,10 @@ async function requestRefundAtm() {
  const P = (zh, en) => (typeof I18n !== 'undefined' && I18n.isForeign()) ? I18n.pick(zh, en) : zh;
  const intro = P('你是 ATM／超商付款,無法自動退刷到信用卡——將由客服人工匯回。\n\n轉帳手續費 NT$15 由您負擔(從退款金額扣除)。我們會在 3 個工作天內以 email 與你聯繫、確認你的匯款帳戶。\n\n要繼續嗎?',
    'You paid by ATM / convenience store, so it can\'t be auto-refunded to a card — our team will transfer it back manually.\n\nA NT$15 bank-transfer fee is deducted from your refund (you cover it). We\'ll email you within 3 business days to confirm your bank account.\n\nContinue?');
- if (!confirm(intro)) return;
- const reason = prompt(P('請填寫退款原因(必填,我們會據此改善):', 'Please tell us why you\'re requesting a refund (required — we keep it to improve):'), '');
+ if (!(await AppUI.confirm(intro))) return;
+ const reason = await AppUI.prompt(P('請填寫退款原因(必填,我們會據此改善):', 'Please tell us why you\'re requesting a refund (required — we keep it to improve):'), '');
  if (reason == null) return;
- if (!reason.trim()) { alert(P('請填寫退款原因。', 'A reason is required.')); return; }
+ if (!reason.trim()) { AppUI.alert(P('請填寫退款原因。', 'A reason is required.')); return; }
  const btn = document.getElementById('btnRefund');
  if (btn) { btn.disabled = true; btn.textContent = P('處理中…', 'Submitting…'); }
  try {
@@ -911,10 +912,10 @@ async function requestRefundAtm() {
    body: JSON.stringify({ reason: reason.trim() }),
   });
   const data = await res.json();
-  if (!res.ok) { alert(data.reason || data.error || P('申請失敗', 'Request failed')); return; }
-  alert(data.message || P('已收到你的退款申請,客服會與你聯繫。', 'Refund request received; support will contact you.'));
+  if (!res.ok) { AppUI.alert(data.reason || data.error || P('申請失敗', 'Request failed')); return; }
+  AppUI.alert(data.message || P('已收到你的退款申請,客服會與你聯繫。', 'Refund request received; support will contact you.'));
  } catch (err) {
-  alert(P('退款申請失敗:', 'Refund request failed: ') + err.message);
+  AppUI.alert(P('退款申請失敗:', 'Refund request failed: ') + err.message);
  } finally {
   if (btn) { btn.disabled = false; btn.textContent = P('申請退費', 'Request a refund'); }
  }
@@ -943,7 +944,7 @@ async function requestRefund() {
  const _refundMsg = P('確定要申請退費?\n\n按下確認後:\n• 訂閱立刻降級為免費版\n', 'Request a refund?\n\nAfter you confirm:\n• Your subscription drops to the free plan immediately\n')
    + refundDesc + P('\n• 已訂閱期間使用記錄會保留', '\n• Your usage records during the subscription are kept') + ebWarn + grpWarn
    + P('\n（本站僅對明顯惡意濫用退費之帳號,保留拒絕未來新訂閱之權利）', '\n(We reserve the right to refuse future subscriptions only for accounts that clearly abuse refunds.)');
- if (!confirm(_refundMsg)) return;
+ if (!(await AppUI.confirm(_refundMsg))) return;
  const btn = document.getElementById('btnRefund');
  if (btn) { btn.disabled = true; btn.textContent = '處理中…'; }
  try {
@@ -953,11 +954,11 @@ async function requestRefund() {
  headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + idToken },
  });
  const data = await res.json();
- if (!res.ok) { alert(data.reason || data.error || '退費失敗'); return; }
- alert(data.message || '退費成功!');
+ if (!res.ok) { AppUI.alert(data.reason || data.error || '退費失敗'); return; }
+ await AppUI.alert(data.message || '退費成功!');
  location.reload();
  } catch (err) {
- alert('退費申請失敗:' + err.message);
+ AppUI.alert('退費申請失敗:' + err.message);
  } finally {
  if (btn) { btn.disabled = false; btn.textContent = '申請退費'; }
  }

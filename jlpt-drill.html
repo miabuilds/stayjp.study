@@ -131,6 +131,7 @@
 <script src="accent.js"></script>
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-2WP4D34LE3"></script>
 <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','G-2WP4D34LE3',{'app_platform':(window.STAYJP_NATIVE&&window.STAYJP_NATIVE.isNativeApp)?'app':'web'});</script>
+<script src="ui-modal.js"></script>
 </head>
 <body>
 <div class="wrap">
@@ -880,10 +881,10 @@ function examAnswer(i){
   node.ans = i;
   examNext();   // 依 flow 前進(最後一題→交卷)
 }
-function confirmQuitExam(){
+async function confirmQuitExam(){
   if(!EX) return;
   const un = EX.qs.filter(x=>x.ans===null).length;
-  if(un>0 && !confirm(enOr('還有 '+un+' 題未作答,未答以 0 分計。確定交卷?','You still have '+un+' unanswered questions — they count as 0. Submit now?'))) return;
+  if(un>0 && !(await AppUI.confirm(enOr('還有 '+un+' 題未作答,未答以 0 分計。確定交卷?','You still have '+un+' unanswered questions — they count as 0. Submit now?')))) return;
   finishExam(false);
 }
 function finishExam(timeout){

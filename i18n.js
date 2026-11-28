@@ -735,5 +735,7 @@ const I18n = (() => {
   return { t, getLang, setLang, getMonths, getWeekdays, setConverter, LANGS, isForeign, isPacked, uiMap, uiPatterns, pick, langName };
 })();
 
+if (typeof window !== "undefined") window.I18n = I18n;   // const 不會掛上 window,別頁用 window.I18n 判斷
+
 // Global shortcut
 const t = I18n.t;

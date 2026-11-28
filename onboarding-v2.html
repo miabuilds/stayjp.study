@@ -78,6 +78,7 @@
 <!-- 全站語言:i18n.js 依 ui_lang 載字典/對照表,translate-layer.js 把繁中 UI 換成外語 -->
 <script src="i18n.js"></script>
 <script src="translate-layer.js"></script>
+<script src="ui-modal.js"></script>
 </head>
 <body>
 <div class="stage">
@@ -211,7 +212,7 @@ const OB=(()=>{
   }
   function skip(){ save('skipped','1'); finish(false); }
   function finish(start){
-    if(DEMO){ alert('(預覽模式)正式流程會寫入設定並進入'+(start?'今日學習':'首頁')); return; }
+    if(DEMO){ AppUI.alert('(預覽模式)正式流程會寫入設定並進入'+(start?'今日學習':'首頁')); return; }
     try{
       localStorage.setItem('ob_v2_done','1');
       localStorage.setItem('onboarding_done_v1','1');   // 舊版引導不再出現

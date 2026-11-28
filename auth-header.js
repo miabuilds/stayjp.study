@@ -313,7 +313,7 @@
   function onLoginClick(e) {
     if (e) e.stopPropagation();
     if (isInApp()) {
-      alert('你正在 App 內建瀏覽器(Line／IG／Threads／FB／微信 等)開啟本站,登入會被擋。\n\n請改用 Safari 或 Chrome:\n點右上／右下的「⋯」或「⋮」→ 選「在預設瀏覽器開啟」,再登入即可。');
+      AppUI.alert('你正在 App 內建瀏覽器(Line／IG／Threads／FB／微信 等)開啟本站,登入會被擋。\n\n請改用 Safari 或 Chrome:\n點右上／右下的「⋯」或「⋮」→ 選「在預設瀏覽器開啟」,再登入即可。');
       return;
     }
     // 原生 App:signInWithPopup 已被 patch 成發 OPEN_LOGIN 原生選單(Google/Apple 原生選)→ 直接觸發,不顯示網頁選單
@@ -337,9 +337,9 @@
       .catch(function (e) {
         var code = e && e.code;
         if (code === 'auth/cancelled-popup-request' || code === 'auth/popup-closed-by-user') return;  // 良性
-        if (code === 'auth/network-request-failed') { alert('網路不穩,登入連線失敗,請稍後再試一次。'); return; }
-        if (code === 'auth/operation-not-allowed') { alert('Apple 登入還在設定中,請先用 Google 登入。'); return; }
-        alert('登入失敗: ' + (e && e.message || e));
+        if (code === 'auth/network-request-failed') { AppUI.alert('網路不穩,登入連線失敗,請稍後再試一次。'); return; }
+        if (code === 'auth/operation-not-allowed') { AppUI.alert('Apple 登入還在設定中,請先用 Google 登入。'); return; }
+        AppUI.alert('登入失敗: ' + (e && e.message || e));
       })
       .finally(function () { _ahxSigningIn = false; });
   }

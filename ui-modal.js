@@ -4,7 +4,7 @@
 //  - 字級用 em/rem 跟著頁面字級縮放;卡片 max-height 82vh + 捲動,字放大不破版
 //  - CSS 變數 fallback 鏈:各頁變數命名不一(--panel/--bg2、--ink/--tx…),取得到誰用誰
 //  - 狸貓配圖:info=讀書狸 / warn=趴牆狸(把「錯誤」講得不嚇人)
-//  - AppUI.alert 非阻塞(回 Promise,呼叫端 fire-and-forget 即可);confirm 回 Promise<boolean>
+//  - AppUI.alert 非阻塞(回 Promise,呼叫端 fire-and-forget 即可);confirm 回 Promise<boolean>;prompt 回 Promise<string|null>
 (function () {
   const CSS = `
   .aui-mask{position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;padding:22px;animation:auiFade .18s ease}
@@ -20,6 +20,8 @@
   .aui-msg{font-size:.95em;line-height:1.75;color:var(--ink2,var(--tx2,#666));white-space:pre-wrap;word-break:break-word;text-align:left}
   .aui-msg.center{text-align:center}
   .aui-btns{display:flex;gap:10px;margin-top:16px}
+  .aui-in{display:block;width:100%;box-sizing:border-box;margin-top:12px;font:inherit;font-size:.95em;padding:.65em .8em;border-radius:10px;
+    border:1px solid var(--line,var(--bd,#e5e0d8));background:var(--bg,transparent);color:var(--ink,var(--tx,#222))}
   .aui-btn{flex:1;font:inherit;font-size:.95em;font-weight:700;padding:.7em 1em;border-radius:12px;cursor:pointer;
     border:1px solid var(--line,var(--bd,#e5e0d8));background:none;color:var(--ink,var(--tx,#222))}
   .aui-btn.pri{background:var(--accent,var(--ac,#C6553B));border-color:var(--accent,var(--ac,#C6553B));color:#fff}
@@ -54,7 +56,7 @@
     opts = opts || {};
     return new Promise((resolve) => {
       if (!document.body) { // 極端 fallback:DOM 沒好就退原生
-        if (withCancel) resolve(window.confirm(msg)); else { window.alert(msg); resolve(true); }
+        if (opts.input !== undefined) resolve(window.prompt(msg, opts.input)); else if (withCancel) resolve(window.confirm(msg)); else { window.alert(msg); resolve(true); }
         return;
       }
       ensureStyle();
@@ -80,8 +82,14 @@
       body.className = 'aui-msg' + ((String(msg).length <= 22 && String(msg).indexOf('\n') === -1) ? ' center' : '');
       body.textContent = String(msg == null ? '' : msg);   // 一律純文字
       card.appendChild(body);
+      let inp = null;   // AppUI.prompt:多一個輸入框,確定回字串、取消回 null
+      if (opts.input !== undefined) {
+        inp = document.createElement('input'); inp.className = 'aui-in'; inp.type = 'text';
+        inp.value = String(opts.input == null ? '' : opts.input);
+        card.appendChild(inp);
+      }
       const btns = document.createElement('div'); btns.className = 'aui-btns';
-      const done = (v) => { try { document.removeEventListener('keydown', onKey); } catch (e) {} mask.remove(); resolve(v); };
+      const done = (v) => { try { document.removeEventListener('keydown', onKey); } catch (e) {} mask.remove(); resolve(inp ? (v ? inp.value : null) : v); };
       if (withCancel) {
         const c = document.createElement('button'); c.className = 'aui-btn';
         c.textContent = opts.cancelText || pk('取消', 'Cancel');
@@ -97,18 +105,19 @@
       mask.onclick = (e) => { if (e.target === mask && !withCancel) done(true); };   // confirm 不給點背景關(避免誤觸當取消/確定不明)
       function onKey(e) {
         if (e.key === 'Escape') done(withCancel ? false : true);
-        if (e.key === 'Enter' && !withCancel) done(true);
+        if (e.key === 'Enter' && (!withCancel || inp)) done(true);
       }
       document.addEventListener('keydown', onKey);
       document.body.appendChild(mask);
       try { if (window.cvtStaticUI && window.I18n && I18n.getLang() === 'zh-CN') cvtStaticUI(card); } catch (e) {}
-      try { ok.focus(); } catch (e) {}
+      try { if (inp) { inp.focus(); inp.select(); } else ok.focus(); } catch (e) {}
     });
   }
 
   window.AppUI = {
     alert: (msg, opts) => open(msg, opts, false),
     confirm: (msg, opts) => open(msg, opts, true),
+    prompt: (msg, def, opts) => open(msg, Object.assign({}, opts, { input: def == null ? '' : def }), true),
   };
   try { ensureStyle(); } catch (e) {}   // 立即注入:寬度縮放規則也涵蓋站上其他彈窗卡
 })();
