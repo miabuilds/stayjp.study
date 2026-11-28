@@ -747,6 +747,9 @@
       + '.quiz-bg.pt-full .srs-front .qmain,.quiz-bg.pt-full .srs-back .qmain{font-size:clamp(44px,13vw,64px);line-height:1.2}'
       + '.quiz-bg.pt-full .srs-back>:first-child{margin-top:auto}'
       + '.quiz-bg.pt-full .srs-back .srs-btns{margin-top:auto;padding-top:18px;width:100%}.quiz-bg.pt-full .srs-card .srs-btn{flex:1;min-height:48px;padding:12px 8px;font-size:16px}'
+      // 打字/聽打卡(沒有 .srs-front):不准被壓扁,長例句時讓整個 quiz-box 捲動,下一題/重打框才滑得到(2026-11-28 用戶回饋「按下一題無法滑動上去」)
+      + '.quiz-bg.pt-full .srs-card:not(:has(>.srs-front)){flex:0 0 auto;min-height:0}'
+      + '.quiz-bg.pt-full .srs-spk-row{flex-wrap:wrap;gap:8px}.quiz-bg.pt-full .srs-type-res .srs-spk{padding:0 16px;min-height:46px;font-size:15px}'
       // 翻卡/打字/聽打切換:從標題列旁的小膠囊改成標題下獨立一排、三等分、iOS 分段樣式(按得到、不擠標題)
       + '.quiz-bg.pt-full .qhd:has(.srs-seg){flex-wrap:wrap;row-gap:12px}'
       + '.quiz-bg.pt-full .qhd .srs-seg{order:3;flex:1 0 100%;margin:0;border:0;border-radius:12px;padding:3px;background:var(--bg3);gap:3px}'
